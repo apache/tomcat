@@ -150,4 +150,22 @@ public class Procattr {
      */
     public static native void errfnSet(long attr, long pool, Object o);
 
+    /**
+     * Set the username used for running process
+     * @param attr The procattr we care about.
+     * @param username The username used
+     * @param password User password if needed. Password is needed on WIN32
+     *                 or any other platform having
+     *                 APR_PROCATTR_USER_SET_REQUIRES_PASSWORD set.
+     */
+    public static native int userSet(long attr, String username, String password);
+
+    /**
+     * Set the group used for running process
+     * @param attr The procattr we care about.
+     * @param groupname The group name  used
+     */
+    public static native int groupSet(long attr, String groupname);
+
+
 }

@@ -16,6 +16,7 @@
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_thread_proc.h"
+#include "apr_version.h"
 
 #include "tcn.h"
 
@@ -375,3 +376,59 @@ TCN_IMPLEMENT_CALL(void, Procattr, errfnSet)(TCN_STDARGS, jlong attr,
 
 }
 
+TCN_IMPLEMENT_CALL(jint, Procattr, userSet)(TCN_STDARGS,
+                                            jlong attr,
+                                            jstring username,
+                                            jstring password)
+{
+
+#if ((APR_MAJOR_VERSION >= 1) && (APR_MINOR_VERSION >= 1))
+    apr_status_t rv;
+    apr_procattr_t *a = J2P(attr, apr_procattr_t *);
+    TCN_ALLOC_CSTRING(username);
+#if APR_PROCATTR_USER_SET_REQUIRES_PASSWORD
+    TCN_ALLOC_CSTRING(password);
+#else
+    const char *cpassword = NULL;
+#endif
+    UNREFERENCED(o);
+
+    rv = apr_procattr_user_set(a, J2S(username), J2S(password));
+    TCN_FREE_CSTRING(username);
+#if APR_PROCATTR_USER_SET_REQUIRES_PASSWORD
+    TCN_FREE_CSTRING(password);
+#endif
+    return (jint) rv;
+#else
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(attr);
+    UNREFERENCED(username);
+    UNREFERENCED(password);
+
+    return APR_ENOTIMPL;
+#endif
+}
+
+TCN_IMPLEMENT_CALL(jint, Procattr, groupSet)(TCN_STDARGS,
+                                             jlong attr,
+                                             jstring group)
+{
+
+#if ((APR_MAJOR_VERSION >= 1) && (APR_MINOR_VERSION >= 1))
+    apr_status_t rv;
+    apr_procattr_t *a = J2P(attr, apr_procattr_t *);
+    TCN_ALLOC_CSTRING(group);
+
+    UNREFERENCED(o);
+
+    rv = apr_procattr_group_set(a, J2S(group));
+    TCN_FREE_CSTRING(group);
+    return (jint) rv;
+#else
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(attr);
+    UNREFERENCED(group);
+
+    return APR_ENOTIMPL;
+#endif
+}
