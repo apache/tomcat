@@ -39,7 +39,7 @@
 
     <!-- Build classpath -->
     <path id="classpath">
-        <pathelement location="${build.dest}"/>
+        <pathelement location="${build.dest}/java"/>
     </path>
 
     <!-- Test classpath -->
@@ -142,6 +142,45 @@ limitations under the License.--&gt;">
         </javac>
         <copy todir="${build.dest}/java" filtering="yes">
             <fileset dir="${build.src}/java">
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Compiles the examples directory                                     -->
+    <!-- =================================================================== -->
+    <target name="examples" depends="compile">
+        <mkdir dir="${build.dest}"/>
+        <mkdir dir="${build.dest}/examples"/>
+        <mkdir dir="${build.src}"/>
+        <mkdir dir="${build.src}/examples"/>
+        <tstamp>
+            <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
+            <format property="TSTAMP" pattern="hh:mm:ss"/>
+        </tstamp>
+        <!-- Copy static resource files -->
+        <filter token="VERSION" value="${version}"/>
+        <filter token="VERSION_NUMBER" value="${version.number}"/>
+        <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
+        <copy todir="${build.src}/examples" filtering="yes">
+            <fileset dir="${src.dir}/examples">
+                <include name="**/*.java"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+
+        <javac srcdir="${build.src}/examples"
+            destdir="${build.dest}/examples"
+            debug="${debug}"
+            deprecation="${deprecation}"
+            optimize="${optimize}">
+            <classpath refid="examples.classpath"/>
+        </javac>
+        <copy todir="${build.dest}/examples" filtering="yes">
+            <fileset dir="${build.src}/examples">
                 <include name="**/*.xml"/>
                 <include name="**/*.properties"/>
             </fileset>
