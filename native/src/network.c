@@ -159,7 +159,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock,
     TCN_THROW_IF_ERR(apr_socket_accept(&n, s, p), s);
 
 cleanup:
-    return P2J(s);
+    return P2J(n);
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, connect)(TCN_STDARGS, jlong sock,
