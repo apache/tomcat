@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<!-- Build file for Tomcat Native -->
+<project name="Tomcat Native" default="compile" basedir=".">
+    <!-- Give user a chance to override without editing this file
+        (and without typing -D each time it compiles it
+    -->
+    <property file="${user.home}/.ant.properties" />
+    <property file="${user.home}/build.properties" />
+    <property file="build.properties" />
+    <property file=".ant.properties" />
+
+    <!-- Initialization properties -->
+    <property name="name" value="Tomcat Native"/>
+    <property name="title" value="Tomcat Native Library"/>
+    <property name="version" value="1.0.0"/>
+    <property name="version.number" value="100"/>
+    <property name="project" value="tomcat-native"/>
+    <property name="build.dir" value="./dist"/>
+    <property name="build.src" value="${build.dir}/src"/>
+    <property name="build.dest" value="${build.dir}/classes"/>
+    <property name="src.dir" value="."/>
+    <property name="final.name" value="${project}-${version}"/>
+    <property name="dist.root" value="./dist"/>
+    <property name="ant.home" value="."/>
+
+    <property name="debug" value="off"/>
+    <property name="optimize" value="on"/>
+    <property name="deprecation" value="on"/>
+
+    <property name="docs.src" value="./xdocs"/>
+    <property name="docs.dest" value="${dist.root}/doc"/>
+    <property name="docs.dest.print" value="${dist.root}/doc/printable"/>
+    <property name="test.runner" value="junit.textui.TestRunner"/>
+    <property name="test.dir" value="${build.dest}/test"/>
+    <property name="examples.dir" value="${build.dest}/examples"/>
+    <property name="junit.home" value="/usr/local/junit3.8"/>
+    <property name="junit.jar" value="${junit.home}/junit.jar"/>
+
+
+    <!-- Build classpath -->
+    <path id="classpath">
+        <pathelement location="${build.dest}"/>
+    </path>
+
+    <!-- Test classpath -->
+    <path id="test.classpath">
+        <pathelement location="${build.dest}/java"/>
+        <pathelement location="${build.dest}/test"/>
+        <pathelement location="${junit.jar}"/>
+    </path>
+
+    <!-- Examples classpath -->
+    <path id="examples.classpath">
+        <pathelement location="${build.dest}/java"/>
+        <pathelement location="${build.dest}/examples"/>
+    </path>
+
+    <!-- =================================================================== -->
+    <!-- prints the environment                                              -->
+    <!-- =================================================================== -->
+    <target name="env">
+        <echo message="java.home = ${java.home}"/>
+        <echo message="user.home = ${user.home}"/>
+        <!--
+        <echo message="java.class.path = ${java.class.path}"/>
+        -->
+        <echo message=""/>
+    </target>
+
+    <target name="prepare" depends="env">
+       <mkdir dir="${build.dir}"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Creates the API documentation                                       -->
+    <!-- =================================================================== -->
+    <target name="javadocs" description="Java documentation">
+        <mkdir dir="${docs.dest}"/>
+        <mkdir dir="${docs.dest}/api"/>
+        <javadoc sourcepath="${build.src}/java"
+            destdir="${docs.dest}/api"
+            author="true"
+            version="true"
+            overview="${src.dir}/java/overview.html"
+            packagenames="org.apache.tomcat.*"
+            windowtitle="${title} (Version ${version})"
+            doctitle="&lt;h1&gt;${title} (Version ${version})&lt;/h1&gt;"
+            bottom="Copyright 2002-2004 The Apache Software Foundation.&lt;!--
+
+Licensed under the Apache License, Version 2.0 (the 'License');
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an 'AS IS' BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.--&gt;">
+            <classpath refid="classpath"/>
+        </javadoc>
+     </target>
+
+    <!-- =================================================================== -->
+    <!-- Cleans up the build directory                                       -->
+    <!-- =================================================================== -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Compiles the source directory                                       -->
+    <!-- =================================================================== -->
+    <target name="compile" depends="prepare">
+        <mkdir dir="${build.dest}"/>
+        <mkdir dir="${build.dest}/java"/>
+        <mkdir dir="${build.src}"/>
+        <mkdir dir="${build.src}/java"/>
+        <tstamp>
+            <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
+            <format property="TSTAMP" pattern="hh:mm:ss"/>
+        </tstamp>
+        <!-- Copy static resource files -->
+        <filter token="VERSION" value="${version}"/>
+        <filter token="VERSION_NUMBER" value="${version.number}"/>
+        <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
+        <copy todir="${build.src}/java" filtering="yes">
+            <fileset dir="${src.dir}/java">
+                <include name="**/*.java"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+
+        <javac srcdir="${build.src}/java"
+            destdir="${build.dest}/java"
+            debug="${debug}"
+            deprecation="${deprecation}"
+            optimize="${optimize}">
+            <classpath refid="classpath"/>
+        </javac>
+        <copy todir="${build.dest}/java" filtering="yes">
+            <fileset dir="${build.src}/java">
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ================================================================== -->
+    <!-- Make Tomcat Native jar                                             -->
+    <!-- ================================================================== -->
+    <target name="jar" depends="compile"
+        description="Generates the Jar file">
+        <jar
+            destfile="${build.dir}/${final.name}.jar"
+            basedir="${build.dir}/classes/java"
+            excludes="**/*.java">
+            <manifest>
+                <section name="org/apache/tomcat/jni">
+                    <attribute name="Specification-Title" value="Tomcat Native"/>
+                    <attribute name="Specification-Version" value="${version}"/>
+                    <attribute name="Specification-Vendor" value="Apache Software Foundation"/>
+                    <attribute name="Implementation-Title" value="org.apache.tomcat.jni"/>
+                    <attribute name="Implementation-Vendor" value="Apache Software Foundation"/>
+                    <attribute name="Implementation-Vendor-Id" value="org.apache"/>
+                    <attribute name="Implementation-Version" value="${version} (build ${DSTAMP} ${TSTAMP})"/>
+                </section>
+            </manifest>
+        </jar>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Compiles the test directory                                         -->
+    <!-- =================================================================== -->
+    <target name="compile-tests" depends="compile">
+        <mkdir dir="${build.dest}/test"/>
+        <mkdir dir="${build.src}/test"/>
+        <copy todir="${build.src}/test" filtering="yes">
+            <fileset dir="${src.dir}/test">
+                <include name="**/*.java"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+        <javac srcdir="${build.src}/test"
+            destdir="${build.dest}/test"
+            debug="${debug}"
+            deprecation="${deprecation}"
+            optimize="${optimize}">
+
+            <classpath refid="test.classpath"/>
+        </javac>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Junit tests                                                         -->
+    <!-- =================================================================== -->
+    <target name="test.file" depends="compile-tests">
+        <echo message="Running Tomcat Native package tests ..."/>
+        <java dir="${test.dir}" classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
+            <arg value="org.apache.tomcat.jni.FileTestSuite"/>
+            <classpath refid="test.classpath"/>
+        </java>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- Compiles the examples directory                                     -->
+    <!-- =================================================================== -->
+    <target name="compile-examples" depends="compile">
+        <mkdir dir="${build.dest}/examples"/>
+        <mkdir dir="${build.src}/examples"/>
+        <copy todir="${build.src}/examples" filtering="yes">
+            <fileset dir="${src.dir}/examples">
+                <include name="**/*.java"/>
+                <include name="**/*.xml"/>
+                <include name="**/*.properties"/>
+            </fileset>
+        </copy>
+        <javac srcdir="${build.src}/examples"
+            destdir="${build.dest}/examples"
+            debug="${debug}"
+            deprecation="${deprecation}"
+            optimize="${optimize}">
+
+            <classpath refid="examples.classpath"/>
+        </javac>
+    </target>
+
+    <!-- =================================================================== -->
+    <!-- excutes the examples                                                -->
+    <!-- =================================================================== -->
+    <target name="example-basic" depends="compile-examples">
+        <echo message="Running Tomcat Native BasicSample example ..."/>
+        <java dir="${examples.dir}" classname="org.apache.tomcat.jni.BasicSample"
+             fork="yes" failonerror="${test.failonerror}">
+            <classpath refid="examples.classpath"/>
+        </java>
+    </target>
+</project>

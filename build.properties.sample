@@ -1,0 +1,6 @@
+# The directory containing your binary distribution of JUnit,
+# version 3.8 or later
+junit.home = /usr/local/java/junit3.8.1
+
+# The pathname of the "junit.jar" JAR file
+junit.jar = ${junit.home}/junit.jar
