@@ -27,3 +27,11 @@ TCN_IMPLEMENT_CALL(jboolean, OS, is)(TCN_STDARGS, jint type)
     else
         return JNI_FALSE;
 }
+
+TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
+                                   jlongArray inf)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(inf);
+    return APR_ENOTIMPL;
+}

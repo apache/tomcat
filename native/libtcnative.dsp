@@ -52,8 +52,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /opt:ref
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"Release/libtcnative-1.dll" /opt:ref
+# ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /opt:ref
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"Release/libtcnative-1.dll" /opt:ref
 
 !ELSEIF  "$(CFG)" == "libtcnative - Win32 Debug"
 
@@ -78,8 +78,8 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"Debug/libtcnative-1.dll"
+# ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"Debug/libtcnative-1.dll"
 
 !ENDIF 
 
