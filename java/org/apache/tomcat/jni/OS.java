@@ -24,6 +24,29 @@ package org.apache.tomcat.jni;
 
 public class OS {
 
+    /* OS Enums */
+    private static final int UNIX     = 1;
+    private static final int NETWARE  = 2;
+    private static final int WIN32    = 3;
+    private static final int WIN64    = 4;
+
+    /**
+     * Check for OS type.
+     * @param type OS type to test.
+     */
+    private static native boolean is(int type);
+
+    static {
+        IS_UNIX    = is(UNIX);
+        IS_NETWARE = is(NETWARE);
+        IS_WIN32   = is(WIN32);
+        IS_WIN64   = is(WIN64);
+    }
+
+    public static boolean IS_UNIX    = false;
+    public static boolean IS_NETWARE = false;
+    public static boolean IS_WIN32   = false;
+    public static boolean IS_WIN64   = false;
 
     /**
      * Get the name of the system default characer set.
@@ -53,4 +76,5 @@ public class OS {
      */
     public static native int random(byte [] buf, int len);
 
+    
 }

@@ -18,3 +18,12 @@
 #include "apr_network_io.h"
 
 #include "tcn.h"
+
+TCN_IMPLEMENT_CALL(jboolean, OS, is)(TCN_STDARGS, jint type)
+{
+    UNREFERENCED_STDARGS;
+    if (type == 2)
+        return JNI_TRUE;
+    else
+        return JNI_FALSE;
+}

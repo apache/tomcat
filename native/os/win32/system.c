@@ -16,5 +16,21 @@
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_network_io.h"
+#include "apr_arch_misc.h"  /* for apr_os_level */
 
 #include "tcn.h"
+
+
+TCN_IMPLEMENT_CALL(jboolean, OS, is)(TCN_STDARGS, jint type)
+{
+    UNREFERENCED_STDARGS;
+#ifdef _WIN64
+    if (type == 4)
+        return JNI_TRUE;
+    else
+#endif
+    if (type == 3)
+        return JNI_TRUE;
+    else
+        return JNI_FALSE;
+}
