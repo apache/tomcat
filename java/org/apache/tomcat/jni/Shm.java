@@ -17,6 +17,7 @@
 package org.apache.tomcat.jni;
 
 import java.nio.ByteBuffer;
+
 /** Shm
  *
  * @author Mladen Turk
@@ -106,7 +107,8 @@ public class Shm {
      * @param m The shared memory segment from which to retrieve
      *        the segment length.
      */
-    public static native ByteBuffer buffer(long m);
+    public static native long size(long m);
+
     /**
      * Retrieve new ByteBuffer base address of the shared memory segment.
      * NOTE: This address is only usable within the callers address
@@ -116,5 +118,6 @@ public class Shm {
      *        the base address.
      * @return address, aligned by APR_ALIGN_DEFAULT.
      */
+    public static native ByteBuffer buffer(long m);
 
 }
