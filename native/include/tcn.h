@@ -24,7 +24,9 @@
 #endif
 #define min(a, b)  ((a) < (b) ? (a) : (b))
 
+#ifndef APR_MAX_IOVEC_SIZE
 #define APR_MAX_IOVEC_SIZE 1024
+#endif
 
 #define TCN_FINFO_CLASS "org/apache/tomcat/jni/FileInfo"
 #define TCN_AINFO_CLASS "org/apache/tomcat/jni/Sockaddr"
