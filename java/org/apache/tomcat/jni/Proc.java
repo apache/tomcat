@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Proc
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Proc {
 
     /*

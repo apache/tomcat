@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Fileinfo
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class FileInfo {
 
     /** Allocates memory and closes lingering handles in the specified pool */

@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Stdlib
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Stdlib {
 
     /**

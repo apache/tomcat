@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Poll
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Poll {
 
     /**

@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Sockaddr
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Sockaddr {
 
    /** The pool to use... */

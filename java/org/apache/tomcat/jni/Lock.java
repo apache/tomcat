@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Lock
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Lock {
 
     /**

@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** File
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class File {
 
     /** Open the file for reading */

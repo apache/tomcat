@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Library
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public final class Library {
 
     /* Default library names */

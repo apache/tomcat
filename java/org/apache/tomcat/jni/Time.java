@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Time
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Time {
 
     /** number of microseconds per second */

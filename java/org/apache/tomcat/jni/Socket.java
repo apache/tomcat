@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Socket
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Socket {
 
     /* Standard socket defines */

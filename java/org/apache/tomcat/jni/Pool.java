@@ -16,6 +16,12 @@
 
 package org.apache.tomcat.jni;
 
+/** Pool
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+
 public class Pool {
 
     /**
