@@ -119,7 +119,7 @@ public class Pool {
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
      */
-    public static ByteBuffer alloc(long p, int size);
+    public static native ByteBuffer alloc(long p, int size);
 
     /**
      * Allocate a block of memory from a pool and set all of the memory to 0
@@ -127,6 +127,6 @@ public class Pool {
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
      */
-    public static ByteBuffer calloc(long p, int size);
+    public static native ByteBuffer calloc(long p, int size);
 
 }
