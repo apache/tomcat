@@ -3,6 +3,18 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
+Project: "apr"=..\apr\apr.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
 Project: "libapr"=..\apr\libapr.dsp - Package Owner=<4>
 
 Package=<5>
@@ -25,6 +37,21 @@ Package=<4>
 {{{
     Begin Project Dependency
     Project_Dep_Name libapr
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "tcnative"=.\tcnative.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name apr
     End Project Dependency
 }}}
 

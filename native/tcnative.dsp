@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MD /W3 /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
-# ADD CPP /nologo /MD /W3 /Zi /O2 /I "./include" /I "../apr/include" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /D "NDEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /Fd"Release\tcnative_src" /FD /c
+# ADD CPP /nologo /MD /W3 /Zi /O2 /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /D "NDEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "APR_DECLARE_STATIC" /Fd"Release\tcnative_src" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /opt:ref
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"Release/tcnative-1.dll" /opt:ref
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib rpcrt4.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"Release/tcnative-1.dll" /opt:ref
 
 !ELSEIF  "$(CFG)" == "tcnative - Win32 Debug"
 
@@ -69,7 +69,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FD /c
-# ADD CPP /nologo /MDd /W4 /GX /Zi /Od /I "./include" /I "../apr/include" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /D "_DEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /Fd"Debug\tcnative_src" /FD /c
+# ADD CPP /nologo /MDd /W4 /GX /Zi /Od /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /D "_DEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "APR_DECLARE_STATIC" /Fd"Debug\tcnative_src" /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"Debug/tcnative-1.dll"
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib ole32.lib rpcrt4.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"Debug/tcnative-1.dll"
 
 !ENDIF 
 
