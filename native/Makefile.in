@@ -1,0 +1,64 @@
+#
+# Top-level Makefile for TCNATIVE
+#
+CPP = @CPP@
+
+# gets substituted into some targets
+TCNATIVE_MAJOR_VERSION=@TCNATIVE_MAJOR_VERSION@
+TCNATIVE_DOTTED_VERSION=@TCNATIVE_DOTTED_VERSION@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+INCLUDES = @APR_INCLUDES@ @TCNATIVE_INCLUDES@ @TCNATIVE_PRIV_INCLUDES@
+APRUTIL_LDFLAGS = @TCNATIVE_LDFLAGS@
+APRUTIL_LIBS = @TCNATIVE_LIBS@
+
+TARGET_LIB = lib@TCNATIVE_LIBNAME@.la
+# INSTALL_SUBDIRS = @APR_ICONV_DIR@ @APR_XML_DIR@
+# EXTRA_SOURCE_DIRS = @APR_ICONV_DIR@ @APR_XML_DIR@
+EXTRA_OS_LINK=@EXTRA_OS_LINK@
+APRUTIL_PCFILE = tcnative-$(TCNATIVE_MAJOR_VERSION).pc
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+
+TARGETS = $(TARGET_LIB)
+
+# bring in rules.mk for standard functionality
+@INCLUDE_RULES@
+@INCLUDE_OUTPUTS@
+
+CLEAN_SUBDIRS = test
+
+CLEAN_TARGETS = .make.dirs
+DISTCLEAN_TARGETS = config.cache config.log config.status libtool \
+	build/rules.mk tcnative.pc
+EXTRACLEAN_TARGETS = configure aclocal.m4 build-outputs.mk \
+	build/apr_common.m4 build/find_apr.m4 build/install.sh \
+	build/config.guess build/config.sub tcnative.spec
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+libdir=@libdir@
+includedir=@includedir@
+top_srcdir=@abs_srcdir@
+top_blddir=@abs_builddir@
+
+
+install: $(TARGET_LIB)
+	$(APR_MKDIR) $(DESTDIR)$(includedir) $(DESTDIR)$(libdir)/pkgconfig \
+		     $(DESTDIR)$(libdir) $(DESTDIR)$(bindir)
+	$(INSTALL_DATA) $(top_srcdir)/include/*.h $(DESTDIR)$(includedir)
+	$(INSTALL_DATA) $(top_blddir)/include/*.h $(DESTDIR)$(includedir)
+	$(INSTALL_DATA) tcnative.pc $(DESTDIR)$(libdir)/pkgconfig/$(TCNATIVE_PCFILE)
+	list='$(INSTALL_SUBDIRS)'; for i in $$list; do \
+		( cd $$i ; $(MAKE) DESTDIR=$(DESTDIR) install ); \
+	done
+	$(LIBTOOL) --mode=install $(INSTALL) -m 755 $(TARGET_LIB) $(DESTDIR)$(libdir)
+
+$(TARGET_LIB): $(OBJECTS)
+	$(LINK) @lib_target@ @TCNATIVE_LIBS@
+
+check: $(TARGET_LIB)
+	(cd test && $(MAKE) check)

@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+TCNATIVE_MAJOR_VERSION=@TCNATIVE_MAJOR_VERSION@
+includedir=@includedir@
+
+Name: Tomcat native Java
+Description: Companion Native Java library
+Version: @TCNATIVE_DOTTED_VERSION@
+# assume that tcnative requires libapr of same major version
+Requires: apr-@TCNATIVE_MAJOR_VERSION@
+Libs: -L${libdir} -l@TCNATIVE_LIBNAME@ @TCNATIVE_EXPORT_LIBS@
+Cflags: -I${includedir}

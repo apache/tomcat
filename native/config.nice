@@ -1,0 +1,7 @@
+#! /bin/sh
+#
+# Created by configure
+
+"./configure" \
+"--with-apr=../apr-1.0.1" \
+"$@"

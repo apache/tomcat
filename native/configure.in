@@ -1,0 +1,184 @@
+dnl
+dnl Process this file with autoconf to produce a configure script
+dnl
+
+AC_PREREQ(2.13)
+AC_INIT(configure.in)
+
+AC_CONFIG_AUX_DIR(build)
+
+sinclude(build/apr_common.m4)
+sinclude(build/tcnative.m4)
+sinclude(build/find_apr.m4)
+
+dnl Generate ./config.nice for reproducing runs of configure
+dnl 
+APR_CONFIG_NICE(config.nice)
+
+dnl # Some initial steps for configuration.  We setup the default directory
+dnl # and which files are to be configured.
+
+dnl Absolute source/build directory
+abs_srcdir=`(cd $srcdir && pwd)`
+abs_builddir=`pwd`
+
+if test "$abs_builddir" != "$abs_srcdir"; then
+  USE_VPATH=1
+  TCN_CONFIG_LOCATION=build
+else
+  TCN_CONFIG_LOCATION=source
+fi
+
+AC_SUBST(TCN_CONFIG_LOCATION)
+
+AC_CANONICAL_SYSTEM
+
+AC_PROG_INSTALL
+
+dnl
+dnl compute the top directory of the build
+dnl note: this is needed for LIBTOOL and exporting the bundled Expat
+dnl
+top_builddir="$abs_builddir"
+AC_SUBST(top_builddir)
+AC_SUBST(abs_srcdir)
+AC_SUBST(abs_builddir)
+
+dnl Initialize mkdir -p functionality.
+APR_MKDIR_P_CHECK($abs_srcdir/build/mkdir.sh)
+
+dnl get our version information
+get_version="$abs_srcdir/build/get-version.sh"
+version_hdr="$abs_srcdir/include/tcn_version.h"
+TCNATIVE_MAJOR_VERSION="`$get_version major $version_hdr TCN`"
+TCNATIVE_DOTTED_VERSION="`$get_version all $version_hdr TCN`"
+
+AC_SUBST(TCNATIVE_DOTTED_VERSION)
+AC_SUBST(TCNATIVE_MAJOR_VERSION)
+
+echo "Tomcat Native Version: ${TCNATIVE_DOTTED_VERSION}"
+
+dnl Enable the layout handling code, then reparse the prefix-style
+dnl arguments due to autoconf being a PITA.
+APR_ENABLE_LAYOUT(tcnative)
+APR_PARSE_ARGUMENTS
+
+dnl
+dnl set up the compilation flags and stuff
+dnl
+
+TCNATIVE_INCLUDES=""
+TCNATIVE_PRIV_INCLUDES="-I$top_builddir/include"
+
+dnl
+dnl Find the APR includes directory and (possibly) the source (base) dir.
+dnl
+TCN_FIND_APR
+
+dnl
+dnl even though we use apr_rules.mk for building apr-util, we need
+dnl to grab CC and CPP ahead of time so that apr-util config tests
+dnl use the same compiler as APR; we need the same compiler options
+dnl and feature test macros as well
+dnl
+APR_SETIFNULL(CC, `$apr_config --cc`)
+APR_SETIFNULL(CPP, `$apr_config --cpp`)
+APR_ADDTO(CFLAGS, `$apr_config --cflags`)
+APR_ADDTO(CPPFLAGS, `$apr_config --cppflags`)
+
+AC_PROG_INSTALL
+
+dnl
+dnl  Find the APR-ICONV directory.
+dnl
+TCN_FIND_JDK
+TCN_FIND_JDK_OS
+AC_SUBST(JAVA_HOME)
+AC_SUBST(JAVA_PLATFORM)
+AC_SUBST(JAVA_OS)
+
+APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include])
+APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include/$JAVA_OS]) 
+
+so_ext=$APR_SO_EXT
+lib_target=$APR_LIB_TARGET
+AC_SUBST(so_ext)
+AC_SUBST(lib_target)
+
+TCNATIVE_LIBNAME="tcnative${libsuffix}"
+AC_SUBST(TCNATIVE_LIBNAME)
+
+EXTRA_OS_LINK=""
+host_alias=`uname -s`
+case "$host_alias" in
+    dnl ### BeOS requires that ALL symbols resolve at LINK time!
+    dnl ### 
+    dnl ### So, if we're building on BeOS then we need to add in the
+    dnl ### apr and expat libraries to the build or it'll die a truly horrible
+    dnl ### death. We now use the apr-config tool to determine the correct
+    dnl ### library to link against :)
+*AIX*|*Darwin*|*BeOS*)
+    dnl need such stuff as -liconv to be specified when building libaprutil.la
+    EXTRA_OS_LINK='$(TCNATIVE_LDFLAGS) $(TCNATIVE_LIBS)'
+    ;;
+*)
+    ;;
+esac
+
+AC_SUBST(EXTRA_OS_LINK)
+
+dnl
+dnl Prep all the flags and stuff for compilation and export to other builds
+dnl
+APR_ADDTO(TCNATIVE_LIBS, [$APR_LIBS])
+
+AC_SUBST(TCNATIVE_EXPORT_LIBS)
+AC_SUBST(TCNATIVE_PRIV_INCLUDES)
+AC_SUBST(TCNATIVE_INCLUDES)
+AC_SUBST(TCNATIVE_LDFLAGS)
+AC_SUBST(TCNATIVE_LIBS)
+AC_SUBST(LDFLAGS)
+
+dnl copy apr's rules.mk into our build directory.
+if test ! -d ./build; then
+   $mkdir_p build
+fi
+cp $APR_BUILD_DIR/apr_rules.mk $abs_builddir/build/rules.mk
+
+
+dnl
+dnl BSD/OS (BSDi) needs to use a different include syntax in the Makefiles
+dnl
+case "$host_alias" in
+*bsdi* | BSD/OS)
+    # Check whether they've installed GNU make
+    if make --version > /dev/null 2>&1; then
+        INCLUDE_RULES="include $abs_builddir/build/rules.mk"
+        INCLUDE_OUTPUTS="include $abs_srcdir/build-outputs.mk"
+    else
+        INCLUDE_RULES=".include \"$abs_builddir/build/rules.mk\""
+        INCLUDE_OUTPUTS=".include \"$abs_srcdir/build-outputs.mk\""
+    fi
+    ;;
+*)
+    INCLUDE_RULES="include $abs_builddir/build/rules.mk"
+    INCLUDE_OUTPUTS="include $abs_srcdir/build-outputs.mk"
+    ;;
+esac
+
+AC_SUBST(INCLUDE_RULES)
+AC_SUBST(INCLUDE_OUTPUTS)
+
+if test -d $srcdir/test; then
+    test_Makefile="test/Makefile"
+fi
+
+dnl
+dnl everthing is done. 
+MAKEFILES="Makefile"
+AC_OUTPUT([
+    tcnative.pc
+    $MAKEFILES
+	],[
+TCNATIVE_MAJOR_VERSION=$TCNATIVE_MAJOR_VERSION
+])
