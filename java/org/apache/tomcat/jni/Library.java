@@ -25,7 +25,7 @@ package org.apache.tomcat.jni;
 public final class Library {
 
     /* Default library names */
-    private static String [] NAMES = {"aprjava-1", "libaprjava-1"};
+    private static String [] NAMES = {"tcnative-1", "libtcnative-1"};
     /*
      * A handle to the unique Library singleton instance.
      */
