@@ -63,18 +63,36 @@ public class OS {
     public static native String localeEncoding(long pool);
 
     /**
-     * Sleep for the specified number of micro-seconds.
-     * <br /><b>Warning :</b> May sleep for longer than the specified time.
-     * @param t desired amount of time to sleep.
-     */
-    public static native void sleep(long t);
-
-    /**
      * Generate random bytes.
      * @param buf Buffer to fill with random bytes
      * @param len Length of buffer in bytes
      */
     public static native int random(byte [] buf, int len);
 
+    /**
+     * Gather system info.
+     * <PRE>
+     * On exit the inf array will be filled with:
+     * inf[0]  - Physical RAM
+     * inf[1]  - Available RAM
+     * inf[2]  - Total page file (swap + Physical RAM)
+     * inf[3]  - Free page file
+     * inf[4]  - Memory Load
+     *
+     * inf[5]  - Idle Time in microseconds
+     * inf[6]  - Kernel Time in microseconds
+     * inf[7]  - User Time in microseconds
+     *
+     * inf[8]  - Process creation time (apr_time_t)
+     * inf[9]  - Process Kernel Time in microseconds
+     * inf[10] - Process User Time in microseconds
+     *
+     * inf[11] - Current working set size.
+     * inf[12] - Peak working set size.
+     * inf[13] - Number of page faults.
+     * </PRE>
+     * @param inf array that will be filled with system informations.
+     */
+    public static native int info(long [] inf);
     
 }
