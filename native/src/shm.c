@@ -108,3 +108,17 @@ TCN_IMPLEMENT_CALL(jlong, Shm, size)(TCN_STDARGS, jlong shm)
     UNREFERENCED_STDARGS;
     return (jlong)apr_shm_size_get(s);
 }
+
+TCN_IMPLEMENT_CALL(jobject, Shm, buffer)(TCN_STDARGS, jlong shm)
+{
+    apr_shm_t *s = J2P(shm, apr_shm_t *);
+    jlong sz = (jlong)apr_shm_size_get(s);
+    void *a;
+
+    UNREFERENCED(o);
+
+    if ((a = apr_shm_baseaddr_get(s)) != NULL)
+        return (*e)->NewDirectByteBuffer(e, a, sz);
+    else
+        return NULL;
+}

@@ -123,3 +123,33 @@ TCN_IMPLEMENT_CALL(void, Pool, cleanupKill)(TCN_STDARGS, jlong pool,
     (*e)->DeleteGlobalRef(e, cb->obj);
     free(cb);
 }
+
+TCN_IMPLEMENT_CALL(jobject, Pool, alloc)(TCN_STDARGS, jlong pool,
+                                         jint size)
+{
+    apr_pool_t *p = J2P(pool, apr_pool_t *);
+    apr_size_t sz = (apr_size_t)size;
+    void *mem;
+
+    UNREFERENCED(o);
+    
+    if ((mem = apr_palloc(p, sz)) != NULL)
+        return (*e)->NewDirectByteBuffer(e, mem, (jlong)sz);
+    else
+        return NULL;
+}
+
+TCN_IMPLEMENT_CALL(jobject, Pool, calloc)(TCN_STDARGS, jlong pool,
+                                          jint size)
+{
+    apr_pool_t *p = J2P(pool, apr_pool_t *);
+    apr_size_t sz = (apr_size_t)size;
+    void *mem;
+
+    UNREFERENCED(o);
+    
+    if ((mem = apr_pcalloc(p, sz)) != NULL)
+        return (*e)->NewDirectByteBuffer(e, mem, (jlong)sz);
+    else
+        return NULL;
+}

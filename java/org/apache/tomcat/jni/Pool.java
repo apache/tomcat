@@ -16,6 +16,8 @@
 
 package org.apache.tomcat.jni;
 
+import java.nio.ByteBuffer;
+
 /** Pool
  *
  * @author Mladen Turk
@@ -98,7 +100,7 @@ public class Pool {
 
     /**
      * Register a process to be killed when a pool dies.
-     * @param a The pool to use to define the processes lifetime 
+     * @param a The pool to use to define the processes lifetime
      * @param proc The process to register
      * @param how How to kill the process, one of:
      * <PRE>
@@ -110,5 +112,21 @@ public class Pool {
      * </PRE>
      */
     public static native void noteSubprocess(long a, long proc, int how);
+
+    /**
+     * Allocate a block of memory from a pool
+     * @param p The pool to allocate from
+     * @param size The amount of memory to allocate
+     * @return The ByteBuffer with allocated memory
+     */
+    public static ByteBuffer alloc(long p, int size);
+
+    /**
+     * Allocate a block of memory from a pool and set all of the memory to 0
+     * @param p The pool to allocate from
+     * @param size The amount of memory to allocate
+     * @return The ByteBuffer with allocated memory
+     */
+    public static ByteBuffer calloc(long p, int size);
 
 }
