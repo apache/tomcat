@@ -15,9 +15,9 @@
 
 #include "apr.h"
 #include "apr_pools.h"
-#include "tcn.h"
-
 #include "apr_file_io.h"
+
+#include "tcn.h"
 
 TCN_IMPLEMENT_CALL(jint, Directory, make)(TCN_STDARGS, jstring path,
                                           jint perm, jlong pool)
