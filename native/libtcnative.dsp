@@ -172,15 +172,7 @@ SOURCE=.\include\tcn_version.h
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\src\netware.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\unix.c
-# End Source File
-# Begin Source File
-
-SOURCE=.\src\win32.c
+SOURCE=.\os\win32\system.c
 # End Source File
 # End Group
 # Begin Source File
@@ -189,17 +181,17 @@ SOURCE=.\libtcnative.rc
 # End Source File
 # Begin Source File
 
-SOURCE=..\apr\build\win32ver.awk
+SOURCE=.\build\win32ver.awk
 
 !IF  "$(CFG)" == "libtcnative - Win32 Release"
 
 # PROP Ignore_Default_Tool 1
 USERDEP__WIN32="./include/tcn_version.h"	
 # Begin Custom Build - Creating Version Resource
-InputPath=..\apr\build\win32ver.awk
+InputPath=.\build\win32ver.awk
 
 ".\libtcnative.rc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	awk -f ../apr/build/win32ver.awk libtcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\libtcnative.rc
+	awk -f ./build/win32ver.awk libtcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\libtcnative.rc
 
 # End Custom Build
 
@@ -208,10 +200,10 @@ InputPath=..\apr\build\win32ver.awk
 # PROP Ignore_Default_Tool 1
 USERDEP__WIN32="./include/tcn_version.h"	
 # Begin Custom Build - Creating Version Resource
-InputPath=..\apr\build\win32ver.awk
+InputPath=.\build\win32ver.awk
 
 ".\libtcnative.rc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	awk -f ../apr/build/win32ver.awk libtcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\libtcnative.rc
+	awk -f ./build/win32ver.awk libtcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\libtcnative.rc
 
 # End Custom Build
 

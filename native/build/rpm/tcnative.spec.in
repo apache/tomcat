@@ -1,7 +1,7 @@
 
 %define tcnative 1
 
-Summary: Apache Portable Runtime Java library
+Summary: Tomcat Native Java library
 Name: tcnative
 Version: TCN_VERSION
 Release: TCN_RELEASE
@@ -13,21 +13,19 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildPrereq: autoconf, libtool, doxygen, apr-devel >= 0:{version}-{release}
 
 %description
-The mission of the Apache Portable Runtime (APR) is to provide a
+The mission of the Tomcat Native Livrary (TCN) is to provide a
 free library of C data structures and routines.  This library
-contains additional utility interfaces for APR; including support
-for XML, LDAP, database interfaces, URI parsing and more.
+contains additional utility interfaces for Java.
 
 %package devel
 Group: Development/Libraries
-Summary: APR Java library development kit
+Summary: Tomcat Native development kit
 Requires: tcnative = %{version}-%{release}, apr-devel
 
 %description devel
-This package provides the support files which can be used to 
-build applications using the APR utility library.  The mission 
-of the Apache Portable Runtime (APR) is to provide a free 
-library of C data structures and routines.
+The mission of the Tomcat Native Livrary (TCN) is to provide a
+free library of C data structures and routines.  This library
+contains additional utility interfaces for Java.
 
 %prep
 %setup -q

@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "libapr"="..\apr\libapr.dsp" - Package Owner=<4>
+Project: "libapr"=..\apr\libapr.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -15,7 +15,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "libaprjava"=".\libtcnative.dsp" - Package Owner=<4>
+Project: "libtcnative"=.\libtcnative.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
