@@ -102,5 +102,22 @@ public class Poll {
                                   long [] descriptors)
         throws Error;
 
+    /**
+     * Return socket from poll descriptor
+     * @param polldesc The pollset decriptor to use
+     */
+    public static native long socket(long polldesc);
+
+    /**
+     * Return client data from poll descriptor
+     * @param polldesc The pollset decriptor to use
+     */
+    public static native long data(long polldesc);
+
+    /**
+     * Return rtnevents from poll descriptor
+     * @param polldesc The pollset decriptor to use
+     */
+    public static native int events(long polldesc);
 
 }

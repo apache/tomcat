@@ -103,3 +103,24 @@ cleanup:
 
     return (jint)num;
 }
+
+TCN_IMPLEMENT_CALL(jlong, Poll, socket)(TCN_STDARGS, jlong pollfd)
+{
+    apr_pollfd_t *fd = J2P(pollfd,  apr_pollfd_t *);
+    UNREFERENCED_STDARGS;;
+    return P2J(fd->desc.s);
+}
+
+TCN_IMPLEMENT_CALL(jlong, Poll, data)(TCN_STDARGS, jlong pollfd)
+{
+    apr_pollfd_t *fd = J2P(pollfd,  apr_pollfd_t *);
+    UNREFERENCED_STDARGS;;
+    return P2J(fd->client_data);
+}
+
+TCN_IMPLEMENT_CALL(jint, Poll, events)(TCN_STDARGS, jlong pollfd)
+{
+    apr_pollfd_t *fd = J2P(pollfd,  apr_pollfd_t *);
+    UNREFERENCED_STDARGS;;
+    return (jint)fd->rtnevents;
+}
