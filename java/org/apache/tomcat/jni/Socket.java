@@ -16,6 +16,9 @@
 
 package org.apache.tomcat.jni;
 
+/* Import needed classes */
+import java.nio.ByteBuffer;
+
 /** Socket
  *
  * @author Mladen Turk
@@ -178,11 +181,37 @@ public class Socket {
      * </PRE>
      * @param sock The socket to send the data over.
      * @param buf The buffer which contains the data to be sent.
+     * @param offset Offset in the byte buffer.
      * @param len The number of bytes to write; (-1) for full array.
      * @return The number of bytes send.
      * 
      */
-    public static native int send(long sock, byte[] buf, int len)
+    public static native int send(long sock, byte[] buf, int offset, int len)
+        throws Error;
+
+    /**
+     * Send data over a network.
+     * <PRE>
+     * This functions acts like a blocking write by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     *
+     * It is possible for both bytes to be sent and an error to be returned.
+     *
+     * APR_EINTR is never returned.
+     * </PRE>
+     * @param sock The socket to send the data over.
+     * @param buf The Byte buffer which contains the data to be sent.
+     * @param offset The offset within the buffer array of the first buffer from
+     *               which bytes are to be retrieved; must be non-negative
+     *               and no larger than buf.length
+     * @param len The maximum number of buffers to be accessed; must be non-negative
+     *            and no larger than buf.length - offset 
+     * @return The number of bytes send.
+     * 
+     */
+    public static native int sendb(long sock, ByteBuffer buf,
+                                   int offset, int len)
         throws Error;
 
     /**
@@ -209,10 +238,11 @@ public class Socket {
      * @param where The apr_sockaddr_t describing where to send the data
      * @param flags The flags to use
      * @param buf  The data to send
+     * @param offset Offset in the byte buffer.
      * @param len  The length of the data to send
      */
     public static native int sendto(long sock, long where, int flags,
-                                    byte[] buf, int len)
+                                    byte[] buf, int offset, int len)
         throws Error;
 
     /**
@@ -231,22 +261,49 @@ public class Socket {
      * </PRE>
      * @param sock The socket to read the data from.
      * @param buf The buffer to store the data in.
+     * @param offset Offset in the byte buffer.
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes received.
      */
-    public static native int recv(long sock, byte[] buf, int nbytes)
+    public static native int recv(long sock, byte[] buf, int offset, int nbytes)
         throws Error;
+
+    /**
+     * Read data from a network.
+     * 
+     * <PRE>
+     * This functions acts like a blocking read by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     * The number of bytes actually received is stored in argument 3.
+     *
+     * It is possible for both bytes to be received and an APR_EOF or
+     * other error to be returned.
+     *
+     * APR_EINTR is never returned.
+     * </PRE>
+     * @param sock The socket to read the data from.
+     * @param buf The buffer to store the data in.
+     * @param offset Offset in the byte buffer.
+     * @param nbytes The number of bytes to read (-1) for full array.
+     * @return the number of bytes received.
+     */
+    public static native int recvb(long sock, ByteBuffer buf,
+                                   int offset, int nbytes)
+        throws Error;
+
 
     /**
      * @param from The apr_sockaddr_t to fill in the recipient info
      * @param sock The socket to use
      * @param flags The flags to use
      * @param buf  The buffer to use
+     * @param offset Offset in the byte buffer.
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes received.
      */
     public static native int recvFrom(long from, long sock, int flags,
-                                      byte[] buf, int nbytes)
+                                      byte[] buf, int offset, int nbytes)
         throws Error;
 
 

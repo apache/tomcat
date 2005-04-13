@@ -46,7 +46,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, destroy)(TCN_STDARGS, jlong pollset)
 
 TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
                                     jlong socket, jlong data,
-                                    jint reqevents, jint rtnevents)
+                                    jint reqevents)
 {
     apr_pollset_t *p = J2P(pollset,  apr_pollset_t *);
     apr_pollfd_t fd;
@@ -56,7 +56,6 @@ TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
     fd.reqevents = (apr_int16_t)reqevents;
-    fd.rtnevents = (apr_int16_t)rtnevents;
     fd.desc.s = J2P(socket, apr_socket_t *);
     fd.client_data = J2P(data, void *);
 
