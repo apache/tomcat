@@ -79,10 +79,9 @@ public class Poll {
      * @param sock The sockets to add
      * @param data Client data to add
      * @param reqevents requested events
-     * @param rtnevents returned events
      */
     public static native int add(long pollset, long sock, long data,
-                                 int reqevents, int rtnevents);
+                                 int reqevents);
 
     /**
      * Remove a descriptor from a pollset
