@@ -89,6 +89,7 @@ public class Echo {
                 while (true) {
                     long clientSock = Socket.accept(serverSock, pool);
                     System.out.println("Accepted id: " +  i);
+                    Socket.timeoutSet(clientSock, 10000000);
                     Worker worker = new Worker(clientSock, i++,
                                                this.getClass().getName());
                     Echo.incThreads();
@@ -110,7 +111,7 @@ public class Echo {
             try {
 
                 pool = Pool.create(Echo.echoPool);
-                serverPollset = Poll.create(16, pool, 0);
+                serverPollset = Poll.create(16, pool, 0, 10000000);
             }
             catch( Exception ex ) {
                 ex.printStackTrace();
@@ -119,7 +120,7 @@ public class Echo {
 
         public void add(long socket, int workerId) {
             int rv = Poll.add(serverPollset, socket, workerId,
-                              Poll.APR_POLLIN, 0);
+                              Poll.APR_POLLIN);
             if (rv == Status.APR_SUCCESS) {
                 System.out.println("Added worker " + workerId + " to pollset");
                 nsocks++;
@@ -150,7 +151,8 @@ public class Echo {
                     for (int n = 0; n < rv; n++) {
                         long clientSock = Poll.socket(desc[n]);
                         int  workerId   = (int)Poll.data(desc[n]);
-                        remove(clientSock, workerId);
+                        System.out.println("Poll flags " + Poll.events(desc[n]));
+                        remove(clientSock, workerId);                        
                         Worker worker = new Worker(clientSock, workerId,
                                                    this.getClass().getName());
                         Echo.incThreads();
@@ -188,10 +190,10 @@ public class Echo {
         public void run() {
             boolean doClose = false;
             try {
-                Socket.send(clientSock, wellcomeMsg, wellcomeMsg.length);
+                Socket.send(clientSock, wellcomeMsg, 0, wellcomeMsg.length);
                 /* Do a blocking read byte at a time */
                 byte [] buf = new byte[1];
-                while (Socket.recv(clientSock, buf, 1) == 1) {
+                while (Socket.recv(clientSock, buf, 0, 1) == 1) {
                     if (buf[0] == '\n')
                         break;
                     else if (buf[0] == 'Q') {
@@ -202,7 +204,7 @@ public class Echo {
                 if (doClose) {
                     try {
                         byte [] msg = ("Bye from worker: " + workerId + "\r\n").getBytes();
-                        Socket.send(clientSock, msg, msg.length);
+                        Socket.send(clientSock, msg, 0, msg.length);
                     } catch(Exception e) { }
 
                     Socket.close(clientSock);
@@ -210,7 +212,7 @@ public class Echo {
                 else {
                     try {
                         byte [] msg = ("Recycling worker: " + workerId + "\r\n").getBytes();
-                        Socket.send(clientSock, msg, msg.length);
+                        Socket.send(clientSock, msg, 0, msg.length);
                     } catch(Exception e) { }
                     /* Put the socket to the keep-alive poll */
                     Echo.echoPoller.add(clientSock, workerId);
