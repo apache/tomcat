@@ -179,6 +179,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     jbyte *bytes;
     apr_int32_t nb;
+    apr_status_t ss;
 
     UNREFERENCED(o);
     apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
@@ -188,14 +189,16 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
          bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    TCN_THROW_IF_ERR(apr_socket_send(s, bytes + offset, &nbytes), nbytes);
+    ss = apr_socket_send(s, bytes + offset, &nbytes);
 
-cleanup:
     if (nb)
         (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
     else
         (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
@@ -204,20 +207,23 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_size_t nbytes;
     char *bytes;
+    apr_status_t ss;
 
     UNREFERENCED(o);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
     if (bytes == NULL || nbytes < 0) {
         tcn_ThrowAPRException(e, APR_EGENERAL);
-        goto cleanup;
+        return (jint)(-APR_EGENERAL);
     }
     if (len > 0)
         nbytes = min(nbytes - offset, (apr_size_t)len);
-    TCN_THROW_IF_ERR(apr_socket_send(s, bytes + offset, &nbytes), nbytes);
+    ss = apr_socket_send(s, bytes + offset, &nbytes);
 
-cleanup:
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
@@ -229,6 +235,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
     struct iovec vec[APR_MAX_IOVEC_SIZE];
     jobject ba[APR_MAX_IOVEC_SIZE];
     apr_size_t written = 0;
+    apr_status_t ss;
 
     UNREFERENCED(o);
 
@@ -242,13 +249,15 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
         vec[i].iov_base = (*e)->GetByteArrayElements(e, ba[i], NULL);
     }
 
-    TCN_THROW_IF_ERR(apr_socket_sendv(s, vec, nvec, &written), i);
+    ss = apr_socket_sendv(s, vec, nvec, &written);
 
-cleanup:
     for (i = 0; i < nvec; i++) {
         (*e)->ReleaseByteArrayElements(e, ba[i], vec[i].iov_base, JNI_ABORT);
     }
-    return (jint)written;
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
@@ -260,6 +269,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_int32_t nb;
+    apr_status_t ss;
 
     UNREFERENCED(o);
     apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
@@ -269,14 +279,16 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
          bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    TCN_THROW_IF_ERR(apr_socket_sendto(s, w, flag, bytes + offset, &nbytes), nbytes);
+    ss = apr_socket_sendto(s, w, flag, bytes + offset, &nbytes);
 
-cleanup:
     if (nb)
         (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, 0);
     else
         (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
@@ -285,24 +297,27 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    apr_status_t ss;
 
     UNREFERENCED(o);
     if (toread > 0)
         nbytes = min(nbytes - offset, (apr_size_t)toread);
 
-    TCN_THROW_IF_ERR(apr_socket_recv(s, bytes + offset, &nbytes), nbytes);
+    ss = apr_socket_recv(s, bytes + offset, &nbytes);
 
-cleanup:
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    nbytes ? 0 : JNI_ABORT);
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
                                         jobject buf, jint offset, jint len)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
-
+    apr_status_t ss;
     apr_size_t nbytes;
     char *bytes;
 
@@ -311,15 +326,17 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
     nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
     if (bytes == NULL || nbytes < 0) {
         tcn_ThrowAPRException(e, APR_EGENERAL);
-        goto cleanup;
+        return (jint)(-APR_EGENERAL);
     }
     if (len > 0)
         nbytes = min(nbytes - offset, (apr_size_t)len);
 
-    TCN_THROW_IF_ERR(apr_socket_recv(s, bytes + offset, &nbytes), nbytes);
+    ss = apr_socket_recv(s, bytes + offset, &nbytes);
 
-cleanup:
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
@@ -330,18 +347,20 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
     apr_sockaddr_t *f = J2P(from, apr_sockaddr_t *);
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    apr_status_t ss;
 
     UNREFERENCED(o);
     if (toread > 0)
         nbytes = min(nbytes - offset, (apr_size_t)toread);
 
-    TCN_THROW_IF_ERR(apr_socket_recvfrom(f, s,
-            (apr_int32_t)flags, bytes + offset, &nbytes), nbytes);
+    ss = apr_socket_recvfrom(f, s, (apr_int32_t)flags, bytes + offset, &nbytes);
 
-cleanup:
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    nbytes ? 0 : JNI_ABORT);
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, optSet)(TCN_STDARGS, jlong sock,

@@ -186,8 +186,7 @@ public class Socket {
      * @return The number of bytes send.
      * 
      */
-    public static native int send(long sock, byte[] buf, int offset, int len)
-        throws Error;
+    public static native int send(long sock, byte[] buf, int offset, int len);
 
     /**
      * Send data over a network.
@@ -211,8 +210,7 @@ public class Socket {
      * 
      */
     public static native int sendb(long sock, ByteBuffer buf,
-                                   int offset, int len)
-        throws Error;
+                                   int offset, int len);
 
     /**
      * Send multiple packets of data over a network.
@@ -230,8 +228,7 @@ public class Socket {
      * @param vec The array from which to get the data to send.
      * 
      */
-    public static native int sendv(long sock, byte[][] vec)
-        throws Error;
+    public static native int sendv(long sock, byte[][] vec);
 
     /**
      * @param sock The socket to send from
@@ -242,8 +239,7 @@ public class Socket {
      * @param len  The length of the data to send
      */
     public static native int sendto(long sock, long where, int flags,
-                                    byte[] buf, int offset, int len)
-        throws Error;
+                                    byte[] buf, int offset, int len);
 
     /**
      * Read data from a network.
@@ -265,8 +261,7 @@ public class Socket {
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes received.
      */
-    public static native int recv(long sock, byte[] buf, int offset, int nbytes)
-        throws Error;
+    public static native int recv(long sock, byte[] buf, int offset, int nbytes);
 
     /**
      * Read data from a network.
@@ -289,8 +284,7 @@ public class Socket {
      * @return the number of bytes received.
      */
     public static native int recvb(long sock, ByteBuffer buf,
-                                   int offset, int nbytes)
-        throws Error;
+                                   int offset, int nbytes);
 
 
     /**
@@ -303,9 +297,7 @@ public class Socket {
      * @return the number of bytes received.
      */
     public static native int recvFrom(long from, long sock, int flags,
-                                      byte[] buf, int offset, int nbytes)
-        throws Error;
-
+                                      byte[] buf, int offset, int nbytes);
 
     /**
      * Setup socket options for the specified socket
