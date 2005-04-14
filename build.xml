@@ -36,6 +36,8 @@
     <property name="junit.home" value="/usr/local/junit3.8"/>
     <property name="junit.jar" value="${junit.home}/junit.jar"/>
 
+	  <!-- The base directory for component sources -->
+	  <property name="source.home"             value="java"/>
 
     <!-- Build classpath -->
     <path id="classpath">
@@ -148,7 +150,22 @@ limitations under the License.--&gt;">
         </copy>
     </target>
 
-    <!-- =================================================================== -->
+	  <target name="compile-only" 
+	          description="Compile shareable components">
+
+	    <javac  srcdir="${source.home}"
+	           destdir="${build.home}/classes"
+	             debug="${compile.debug}"
+	       deprecation="${compile.deprecation}"
+	          optimize="${compile.optimize}">
+	      <classpath refid="classpath"/>
+	    </javac>
+	    <copy    todir="${build.home}/classes" filtering="on">
+	      <fileset dir="${source.home}" excludes="**/*.java"/>
+	    </copy>
+	  </target>
+
+	<!-- =================================================================== -->
     <!-- Compiles the examples directory                                     -->
     <!-- =================================================================== -->
     <target name="examples" depends="compile">
