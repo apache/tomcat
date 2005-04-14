@@ -244,5 +244,8 @@ public class Status {
     public static final boolean APR_STATUS_IS_ENOTIMPL(int s)   { return is(s, 73); }
     public static final boolean APR_STATUS_IS_EMISMATCH(int s)  { return is(s, 74); }
     public static final boolean APR_STATUS_IS_EBUSY(int s)      { return is(s, 75); }
-
+    
+    /* Socket errors */
+    public static final boolean APR_STATUS_IS_EAGAIN(int s)     { return is(s, 90); }
+    
 }
