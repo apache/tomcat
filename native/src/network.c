@@ -183,7 +183,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
     if (tosend > 0)
-        nbytes = min(nbytes, (apr_size_t)tosend);
+        nbytes = min(nbytes - offset, (apr_size_t)tosend);
     if (nb)
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
@@ -213,7 +213,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
         goto cleanup;
     }
     if (len > 0)
-        nbytes = min(nbytes, (apr_size_t)len);
+        nbytes = min(nbytes - offset, (apr_size_t)len);
     TCN_THROW_IF_ERR(apr_socket_send(s, bytes + offset, &nbytes), nbytes);
 
 cleanup:
@@ -264,7 +264,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
     if (tosend > 0)
-        nbytes = min(nbytes, (apr_size_t)tosend);
+        nbytes = min(nbytes - offset, (apr_size_t)tosend);
     if (nb)
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
@@ -288,7 +288,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     if (toread > 0)
-        nbytes = min(nbytes, (apr_size_t)toread);
+        nbytes = min(nbytes - offset, (apr_size_t)toread);
 
     TCN_THROW_IF_ERR(apr_socket_recv(s, bytes + offset, &nbytes), nbytes);
 
@@ -314,7 +314,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
         goto cleanup;
     }
     if (len > 0)
-        nbytes = min(nbytes, (apr_size_t)len);
+        nbytes = min(nbytes - offset, (apr_size_t)len);
 
     TCN_THROW_IF_ERR(apr_socket_recv(s, bytes + offset, &nbytes), nbytes);
 
@@ -333,7 +333,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
 
     UNREFERENCED(o);
     if (toread > 0)
-        nbytes = min(nbytes, (apr_size_t)toread);
+        nbytes = min(nbytes - offset, (apr_size_t)toread);
 
     TCN_THROW_IF_ERR(apr_socket_recvfrom(f, s,
             (apr_int32_t)flags, bytes + offset, &nbytes), nbytes);

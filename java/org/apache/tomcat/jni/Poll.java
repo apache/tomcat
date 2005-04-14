@@ -60,9 +60,10 @@ public class Poll {
      * @param size The maximum number of descriptors that this pollset can hold
      * @param p The pool from which to allocate the pollset
      * @param flags Optional flags to modify the operation of the pollset.
+     * @param ttl Maximum time to live for a particular socket.
      * @return  The pointer in which to return the newly created object
      */
-    public static native long create(int size, long p, int flags)
+    public static native long create(int size, long p, int flags, long ttl)
         throws Error;
     /**
      * Destroy a pollset object
@@ -98,8 +99,7 @@ public class Poll {
      * @return Number of signalled descriptors (output parameter)
      */
     public static native int poll(long pollset, long timeout,
-                                  long [] descriptors)
-        throws Error;
+                                  long [] descriptors);
 
     /**
      * Return socket from poll descriptor
