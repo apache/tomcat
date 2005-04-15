@@ -1,0 +1,5 @@
+  Building from the cvs tree:
+  chmod a+x build/get-version.sh
+  sh buildconf --with-apr=apr_source_location.
+  configure --with-apr=apr_install_location.
+  
