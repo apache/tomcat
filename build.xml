@@ -288,8 +288,8 @@ limitations under the License.--&gt;">
     <!-- excutes the examples                                                -->
     <!-- =================================================================== -->
     <target name="example-basic" depends="compile-examples">
-        <echo message="Running Tomcat Native BasicSample example ..."/>
-        <java dir="${examples.dir}" classname="org.apache.tomcat.jni.BasicSample"
+        <echo message="Running Tomcat Native Echo example ..."/>
+        <java dir="${examples.dir}" classname="org.apache.tomcat.jni.Echo"
              fork="yes" failonerror="${test.failonerror}">
             <classpath refid="examples.classpath"/>
         </java>
