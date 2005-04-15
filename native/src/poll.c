@@ -60,9 +60,9 @@ cleanup:
 
 TCN_IMPLEMENT_CALL(jint, Poll, destroy)(TCN_STDARGS, jlong pollset)
 {
-    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);;
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
 
-    UNREFERENCED_STDARGS;;
+    UNREFERENCED_STDARGS;
     return (jint)apr_pollset_destroy(p->pollset);
 }
 
@@ -99,7 +99,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
     apr_pollfd_t fd;
     apr_int32_t i;
 
-    UNREFERENCED_STDARGS;;
+    UNREFERENCED_STDARGS;
 
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
@@ -172,20 +172,35 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
 TCN_IMPLEMENT_CALL(jlong, Poll, socket)(TCN_STDARGS, jlong pollfd)
 {
     apr_pollfd_t *fd = J2P(pollfd,  apr_pollfd_t *);
-    UNREFERENCED_STDARGS;;
+    UNREFERENCED_STDARGS;
     return P2J(fd->desc.s);
 }
 
 TCN_IMPLEMENT_CALL(jlong, Poll, data)(TCN_STDARGS, jlong pollfd)
 {
     apr_pollfd_t *fd = J2P(pollfd,  apr_pollfd_t *);
-    UNREFERENCED_STDARGS;;
+    UNREFERENCED_STDARGS;
     return P2J(fd->client_data);
 }
 
 TCN_IMPLEMENT_CALL(jint, Poll, events)(TCN_STDARGS, jlong pollfd)
 {
     apr_pollfd_t *fd = J2P(pollfd,  apr_pollfd_t *);
-    UNREFERENCED_STDARGS;;
+    UNREFERENCED_STDARGS;
     return (jint)fd->rtnevents;
+}
+
+TCN_IMPLEMENT_CALL(void, Poll, setTtl)(TCN_STDARGS, jlong pollset,
+                                       jlong ttl)
+{
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    UNREFERENCED_STDARGS;
+    p->max_ttl = J2T(ttl);
+}
+
+TCN_IMPLEMENT_CALL(jlong, Poll, getTtl)(TCN_STDARGS, jlong pollset)
+{
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    UNREFERENCED_STDARGS;
+    return (jlong)p->max_ttl;
 }
