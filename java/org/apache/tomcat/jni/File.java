@@ -349,8 +349,7 @@ public class File {
      * @param nbytes The number of bytes to write; (-1) for full array.
      * @return The number of bytes written.
      */
-    public static native int write(long thefile, byte[] buf, int nbytes)
-        throws Error;
+    public static native int write(long thefile, byte[] buf, int offset, int nbytes);
 
     /**
      * Write data to the specified file, ensuring that all of the data is
@@ -372,9 +371,7 @@ public class File {
      * @param nbytes The number of bytes to write; (-1) for full array.
      * @return The number of bytes written.
      */
-    public static native int writeFull(long thefile, byte[] buf, int nbytes)
-        throws Error;
-
+    public static native int writeFull(long thefile, byte[] buf, int offset, int nbytes);
 
     /**
      * Write data from aray of byte arrays to the specified file.
@@ -388,8 +385,7 @@ public class File {
      * @param vec The array from which to get the data to write to the file.
      * @return The number of bytes written.
      */
-    public static native int writev(long thefile, byte[][] vec)
-        throws Error;
+    public static native int writev(long thefile, byte[][] vec);
 
     /**
      * Write data from aray of byte arrays to the specified file,
@@ -401,8 +397,7 @@ public class File {
      * @param vec The array from which to get the data to write to the file.
      * @return The number of bytes written.
      */
-    public static native int writevFull(long thefile, byte[][] vec)
-        throws Error;
+    public static native int writevFull(long thefile, byte[][] vec);
 
     /**
      * Read data from the specified file.
@@ -421,8 +416,7 @@ public class File {
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes read.
      */
-    public static native int read(long thefile, byte[] buf, int nbytes)
-        throws Error;
+    public static native int read(long thefile, byte[] buf,  int offset, int nbytes);
 
     /**
      * Read data from the specified file, ensuring that the buffer is filled
@@ -444,8 +438,7 @@ public class File {
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes read.
      */
-    public static native int readFull(long thefile, byte[] buf, int nbytes)
-        throws Error;
+    public static native int readFull(long thefile, byte[] buf,  int offset, int nbytes);
 
     /**
      * Read a string from the specified file.
@@ -453,7 +446,7 @@ public class File {
      * @param buf The buffer to store the string in.
      * @param thefile The file descriptor to read from
      */
-    public static native int gets(byte[] buf, long thefile);
+    public static native int gets(byte[] buf,  int offset, long thefile);
 
 
     /**

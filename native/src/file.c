@@ -249,6 +249,7 @@ TCN_IMPLEMENT_CALL(jint, File, getc)(TCN_STDARGS, jlong file)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     char ch;
+
     UNREFERENCED_STDARGS;
     TCN_THROW_IF_ERR(apr_file_getc(&ch, f), ch);
 
@@ -278,38 +279,44 @@ TCN_IMPLEMENT_CALL(jint, File, puts)(TCN_STDARGS, jbyteArray str, jlong file)
 }
 
 TCN_IMPLEMENT_CALL(jint, File, write)(TCN_STDARGS, jlong file,
-                                      jbyteArray buf, jint towrite)
+                                      jbyteArray buf, jint offset, jint towrite)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     jbyte *bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
+    apr_status_t ss;
 
     UNREFERENCED(o);
     if (towrite > 0)
-        nbytes = min(nbytes, (apr_size_t)towrite);
-    TCN_THROW_IF_ERR(apr_file_write(f, bytes, &nbytes), nbytes);
+        nbytes = min(nbytes - offset, (apr_size_t)towrite);
+    ss = apr_file_write(f, bytes + offset, &nbytes);
 
-cleanup:
     (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
-    return (jint)nbytes;
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, File, writeFull)(TCN_STDARGS, jlong file,
-                                          jbyteArray buf, jint towrite)
+                                          jbyteArray buf, jint offset, jint towrite)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     apr_size_t written = 0;
+    apr_status_t ss;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
     if (towrite > 0)
-        nbytes = min(nbytes, (apr_size_t)towrite);
-    TCN_THROW_IF_ERR(apr_file_write_full(f, bytes, nbytes, &written), nbytes);
+        nbytes = min(nbytes + offset, (apr_size_t)towrite);
+    ss = apr_file_write_full(f, bytes + offset, nbytes, &written);
 
-cleanup:
     (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
-    return (jint)written;
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, File, writev)(TCN_STDARGS, jlong file,
@@ -321,6 +328,7 @@ TCN_IMPLEMENT_CALL(jint, File, writev)(TCN_STDARGS, jlong file,
     struct iovec vec[APR_MAX_IOVEC_SIZE];
     jobject ba[APR_MAX_IOVEC_SIZE];
     apr_size_t written = 0;
+    apr_status_t ss;
 
     UNREFERENCED(o);
 
@@ -334,13 +342,15 @@ TCN_IMPLEMENT_CALL(jint, File, writev)(TCN_STDARGS, jlong file,
         vec[i].iov_base = (*e)->GetByteArrayElements(e, ba[i], NULL);
     }
 
-    TCN_THROW_IF_ERR(apr_file_writev(f, vec, nvec, &written), i);
+    ss = apr_file_writev(f, vec, nvec, &written);
 
-cleanup:
     for (i = 0; i < nvec; i++) {
         (*e)->ReleaseByteArrayElements(e, ba[i], vec[i].iov_base, JNI_ABORT);
     }
-    return (jint)written;
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, File, writevFull)(TCN_STDARGS, jlong file,
@@ -352,6 +362,7 @@ TCN_IMPLEMENT_CALL(jint, File, writevFull)(TCN_STDARGS, jlong file,
     struct iovec vec[APR_MAX_IOVEC_SIZE];
     jobject ba[APR_MAX_IOVEC_SIZE];
     apr_size_t written = 0;
+    apr_status_t ss;
 
     UNREFERENCED(o);
 
@@ -365,58 +376,69 @@ TCN_IMPLEMENT_CALL(jint, File, writevFull)(TCN_STDARGS, jlong file,
         vec[i].iov_base = (*e)->GetByteArrayElements(e, ba[i], NULL);
     }
 #if (APR_VERSION_MAJOR >= 1) && (APR_VERSION_MINOR >= 1)
-    TCN_THROW_IF_ERR(apr_file_writev_full(f, vec, nvec, &written), i);
+    ss = apr_file_writev_full(f, vec, nvec, &written);
 #else
-    TCN_THROW_IF_ERR(apr_file_writev(f, vec, nvec, &written), i);
+    ss = apr_file_writev(f, vec, nvec, &written);
 #endif
 
-cleanup:
     for (i = 0; i < nvec; i++) {
         (*e)->ReleaseByteArrayElements(e, ba[i], vec[i].iov_base,
                                        JNI_ABORT);
     }
-    return (jint)written;
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, File, read)(TCN_STDARGS, jlong file,
-                                     jbyteArray buf, jint toread)
+                                     jbyteArray buf, jint offset,
+                                     jint toread)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    apr_status_t ss;
 
     UNREFERENCED(o);
     if (toread > 0)
-        nbytes = min(nbytes, (apr_size_t)toread);
+        nbytes = min(nbytes - offset, (apr_size_t)toread);
 
-    TCN_THROW_IF_ERR(apr_file_read(f, bytes, &nbytes), nbytes);
+    ss = apr_file_read(f, bytes + offset, &nbytes);
 
-cleanup:
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                   nbytes ? 0 : JNI_ABORT);
-    return (jint)nbytes;
+                                   ss == APR_SUCCESS ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
 TCN_IMPLEMENT_CALL(jint, File, readFull)(TCN_STDARGS, jlong file,
-                                         jbyteArray buf, jint toread)
+                                         jbyteArray buf, jint offset,
+                                         jint toread)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
     apr_size_t nread;
+    apr_status_t ss;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
     if (toread > 0)
-        nbytes = min(nbytes, (apr_size_t)toread);
-    TCN_THROW_IF_ERR(apr_file_read_full(f, bytes, nbytes, &nread), nread);
+        nbytes = min(nbytes - offset, (apr_size_t)toread);
+    ss = apr_file_read_full(f, bytes + offset, nbytes, &nread);
 
-cleanup:
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                   nread ? 0 : JNI_ABORT);
-    return (jint)nread;
+                                   ss == APR_SUCCESS ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
 }
 
-TCN_IMPLEMENT_CALL(jint, File, gets)(TCN_STDARGS, jbyteArray buf, jlong file)
+TCN_IMPLEMENT_CALL(jint, File, gets)(TCN_STDARGS, jbyteArray buf, jint offset,
+                                     jlong file)
 {
     apr_status_t rv;
     apr_file_t *f = J2P(file, apr_file_t *);
@@ -424,7 +446,7 @@ TCN_IMPLEMENT_CALL(jint, File, gets)(TCN_STDARGS, jbyteArray buf, jlong file)
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
-    rv = apr_file_gets(bytes, nbytes, f);
+    rv = apr_file_gets(bytes + offset, nbytes, f);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    rv == APR_SUCCESS ? 0 : JNI_ABORT);
@@ -483,7 +505,7 @@ TCN_IMPLEMENT_CALL(jlong, File, dup)(TCN_STDARGS, jlong newf, jlong file,
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_pool_t *p = J2P(pool, apr_pool_t *);
-    apr_file_t *d = J2P(newf, apr_file_t *);;
+    apr_file_t *d = J2P(newf, apr_file_t *);
 
     UNREFERENCED(o);
     TCN_THROW_IF_ERR(apr_file_dup(&d, f, p), d);
@@ -497,7 +519,7 @@ TCN_IMPLEMENT_CALL(jlong, File, dup2)(TCN_STDARGS, jlong newf, jlong file,
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_pool_t *p = J2P(pool, apr_pool_t *);
-    apr_file_t *d = J2P(newf, apr_file_t *);;
+    apr_file_t *d = J2P(newf, apr_file_t *);
 
     UNREFERENCED(o);
     TCN_THROW_IF_ERR(apr_file_dup(&d, f, p), d);
