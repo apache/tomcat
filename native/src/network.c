@@ -313,6 +313,36 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
         return -(jint)ss;
 }
 
+TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
+                                        jbyteArray buf, jint offset,
+                                        jint toread, jlong timeout)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    apr_status_t ss;
+    apr_interval_time_t t;
+
+    UNREFERENCED(o);
+
+    if (toread > 0)
+        nbytes = min(nbytes - offset, (apr_size_t)toread);
+    if ((ss = apr_socket_timeout_get(s, &t)) != APR_SUCCESS)
+        goto cleanup;
+    if ((ss = apr_socket_timeout_set(s, J2T(timeout))) != APR_SUCCESS)
+        goto cleanup;
+    ss = apr_socket_recv(s, bytes + offset, &nbytes);
+    /* Resore the original timeout */
+    apr_socket_timeout_set(s, t);
+cleanup:
+    (*e)->ReleaseByteArrayElements(e, buf, bytes,
+                                   nbytes ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
+}
+
 TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
                                         jobject buf, jint offset, jint len)
 {
@@ -332,6 +362,40 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
         nbytes = min(nbytes - offset, (apr_size_t)len);
 
     ss = apr_socket_recv(s, bytes + offset, &nbytes);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
+}
+
+TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
+                                         jobject buf, jint offset,
+                                         jint len, jlong timeout)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    apr_status_t ss;
+    apr_size_t nbytes;
+    char *bytes;
+    apr_interval_time_t t;
+
+    UNREFERENCED(o);
+    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
+    if (bytes == NULL || nbytes < 0) {
+        tcn_ThrowAPRException(e, APR_EGENERAL);
+        return (jint)(-APR_EGENERAL);
+    }
+    if (len > 0)
+        nbytes = min(nbytes - offset, (apr_size_t)len);
+
+    if ((ss = apr_socket_timeout_get(s, &t)) != APR_SUCCESS)
+         return -(jint)ss;
+    if ((ss = apr_socket_timeout_set(s, J2T(timeout))) != APR_SUCCESS)
+         return -(jint)ss;
+    ss = apr_socket_recv(s, bytes + offset, &nbytes);
+    /* Resore the original timeout */
+    apr_socket_timeout_set(s, t);
 
     if (ss == APR_SUCCESS)
         return (jint)nbytes;

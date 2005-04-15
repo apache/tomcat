@@ -264,6 +264,30 @@ public class Socket {
     public static native int recv(long sock, byte[] buf, int offset, int nbytes);
 
     /**
+     * Read data from a network with timeout.
+     * 
+     * <PRE>
+     * This functions acts like a blocking read by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     * The number of bytes actually received is stored in argument 3.
+     *
+     * It is possible for both bytes to be received and an APR_EOF or
+     * other error to be returned.
+     *
+     * APR_EINTR is never returned.
+     * </PRE>
+     * @param sock The socket to read the data from.
+     * @param buf The buffer to store the data in.
+     * @param offset Offset in the byte buffer.
+     * @param nbytes The number of bytes to read (-1) for full array.
+     * @param timeout The socket timeout in microseconds.
+     * @return the number of bytes received.
+     */
+    public static native int recvt(long sock, byte[] buf, int offset,
+                                   int nbytes, long timeout);
+
+    /**
      * Read data from a network.
      * 
      * <PRE>
@@ -286,6 +310,29 @@ public class Socket {
     public static native int recvb(long sock, ByteBuffer buf,
                                    int offset, int nbytes);
 
+    /**
+     * Read data from a network with timeout.
+     * 
+     * <PRE>
+     * This functions acts like a blocking read by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     * The number of bytes actually received is stored in argument 3.
+     *
+     * It is possible for both bytes to be received and an APR_EOF or
+     * other error to be returned.
+     *
+     * APR_EINTR is never returned.
+     * </PRE>
+     * @param sock The socket to read the data from.
+     * @param buf The buffer to store the data in.
+     * @param offset Offset in the byte buffer.
+     * @param nbytes The number of bytes to read (-1) for full array.
+     * @param timeout The socket timeout in microseconds.
+     * @return the number of bytes received.
+     */
+    public static native int recvbt(long sock, ByteBuffer buf,
+                                    int offset, int nbytes, long timeout);
 
     /**
      * @param from The apr_sockaddr_t to fill in the recipient info
