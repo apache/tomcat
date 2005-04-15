@@ -244,9 +244,14 @@ public class Status {
     public static final boolean APR_STATUS_IS_ENOTIMPL(int s)   { return is(s, 73); }
     public static final boolean APR_STATUS_IS_EMISMATCH(int s)  { return is(s, 74); }
     public static final boolean APR_STATUS_IS_EBUSY(int s)      { return is(s, 75); }
-    
+
     /* Socket errors */
     public static final boolean APR_STATUS_IS_EAGAIN(int s)     { return is(s, 90); }
     public static final boolean APR_STATUS_IS_ETIMEDOUT(int s)  { return is(s, 91); }
+    public static final boolean APR_STATUS_IS_ECONNABORTED(int s) { return is(s, 92); }
+    public static final boolean APR_STATUS_IS_ECONNRESET(int s)   { return is(s, 93); }
+    public static final boolean APR_STATUS_IS_EINPROGRESS(int s)  { return is(s, 94); }
+    public static final boolean APR_STATUS_IS_EINTR(int s)      { return is(s, 95); }
+    public static final boolean APR_STATUS_IS_ENOTSOCK(int s)   { return is(s, 96); }
 
 }

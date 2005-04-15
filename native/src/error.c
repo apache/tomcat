@@ -181,6 +181,11 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         /* Socket errors */
         APR_IS(90, APR_STATUS_IS_EAGAIN);
         APR_IS(91, APR_STATUS_IS_ETIMEDOUT);
+        APR_IS(92, APR_STATUS_IS_ECONNABORTED);
+        APR_IS(93, APR_STATUS_IS_ECONNRESET);
+        APR_IS(94, APR_STATUS_IS_EINPROGRESS);
+        APR_IS(95, APR_STATUS_IS_EINTR);
+        APR_IS(96, APR_STATUS_IS_ENOTSOCK);
     }
     return JNI_FALSE;
 }
