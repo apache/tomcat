@@ -118,5 +118,19 @@ public class Poll {
      * @param polldesc The pollset decriptor to use
      */
     public static native int events(long polldesc);
+    
+    /**
+     * Set the socket time to live.
+     * @param pollset The pollset to use
+     * @param ttl Timeout in microseconds
+     */
+    public static native void setTtl(long pollset, long ttl);
+
+    /**
+     * Get the socket time to live.
+     * @param pollset The pollset to use
+     * @return Timeout in microseconds
+     */
+    public static native long getTtl(long pollset);
 
 }
