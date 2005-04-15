@@ -51,8 +51,8 @@ public class Echo {
             props.load(is);
             is.close();
             echoAddr = props.getProperty("echo.ip", "127.0.0.1");
-            echoPort = Integer.decode(props.getProperty("echo.port", "23"));
-            echoNmax = Integer.decode(props.getProperty("echo.max", "1"));
+            echoPort = Integer.decode(props.getProperty("echo.port", "23")).intValue();
+            echoNmax = Integer.decode(props.getProperty("echo.max", "1")).intValue();
         }
         catch (Throwable t) {
             ; // Nothing
@@ -159,15 +159,17 @@ public class Echo {
                         worker.start();
                     }
                 }
+                /* XXX: JFC quick hack
                 catch(Error err ) {
                     if (Status.APR_STATUS_IS_TIMEUP(err.getError())) {
-                        /* TODO: deal with timeout */
+                        /0 TODO: deal with timeout 0/
                     }
                     else {
                         err.printStackTrace();
                         break;
                     }
                 }
+                 */
                 catch( Exception ex ) {
                     ex.printStackTrace();
                     break;
