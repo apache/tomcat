@@ -180,7 +180,7 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(75, APR_STATUS_IS_EBUSY);
         /* Socket errors */
         APR_IS(90, APR_STATUS_IS_EAGAIN);
-
+        APR_IS(91, APR_STATUS_IS_ETIMEDOUT);
     }
     return JNI_FALSE;
 }

@@ -247,5 +247,6 @@ public class Status {
     
     /* Socket errors */
     public static final boolean APR_STATUS_IS_EAGAIN(int s)     { return is(s, 90); }
-    
+    public static final boolean APR_STATUS_IS_ETIMEDOUT(int s)  { return is(s, 91); }
+
 }
