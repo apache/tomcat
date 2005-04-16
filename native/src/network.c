@@ -135,9 +135,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, bind)(TCN_STDARGS, jlong sock,
     apr_sockaddr_t *a = J2P(sa, apr_sockaddr_t *);
 
     UNREFERENCED_STDARGS;
-    TCN_THROW_IF_ERR(apr_socket_bind(s, a), s);
-cleanup:
-    return (jint)0;
+    return (jint)apr_socket_bind(s, a);
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, listen)(TCN_STDARGS, jlong sock,
@@ -214,10 +212,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
-    if (bytes == NULL || nbytes < 0) {
-        tcn_ThrowAPRException(e, APR_EGENERAL);
-        return (jint)(-APR_EGENERAL);
-    }
+    if (bytes == NULL || nbytes < 0)
+        return (jint)(-APR_EINVAL);
     if (len > 0)
         nbytes = min(nbytes - offset, (apr_size_t)len);
     ss = apr_socket_send(s, bytes + offset, &nbytes);
@@ -241,10 +237,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
 
-    if (nvec >= APR_MAX_IOVEC_SIZE) {
-        /* TODO: Throw something here */
-        return 0;
-    }
+    if (nvec >= APR_MAX_IOVEC_SIZE)
+        return (jint)(-APR_ENOMEM);
     for (i = 0; i < nvec; i++) {
         ba[i] = (*e)->GetObjectArrayElement(e, bufs, i);
         vec[i].iov_len  = (*e)->GetArrayLength(e, ba[i]);
@@ -356,10 +350,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
-    if (bytes == NULL || nbytes < 0) {
-        tcn_ThrowAPRException(e, APR_EGENERAL);
-        return (jint)(-APR_EGENERAL);
-    }
+    if (bytes == NULL || nbytes < 0)
+        return (jint)(-APR_EINVAL);
     if (len > 0)
         nbytes = min(nbytes - offset, (apr_size_t)len);
 
@@ -384,10 +376,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
-    if (bytes == NULL || nbytes < 0) {
-        tcn_ThrowAPRException(e, APR_EGENERAL);
-        return (jint)(-APR_EGENERAL);
-    }
+    if (bytes == NULL || nbytes < 0)
+        return (jint)(-APR_EINVAL);
     if (len > 0)
         nbytes = min(nbytes - offset, (apr_size_t)len);
 
@@ -503,6 +493,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendfile)(TCN_STDARGS, jlong sock,
     apr_off_t off = (apr_off_t)offset;
     apr_size_t written = (apr_size_t)len;
     apr_hdtr_t hdrs;
+    apr_status_t ss;
 
     UNREFERENCED(o);
 
@@ -511,10 +502,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendfile)(TCN_STDARGS, jlong sock,
     if (trailers)
         nt = (*e)->GetArrayLength(e, trailers);
     /* Check for overflow */
-    if (nh >= APR_MAX_IOVEC_SIZE || nt >= APR_MAX_IOVEC_SIZE) {
-        /* TODO: Throw something here */
-        return 0;
-    }
+    if (nh >= APR_MAX_IOVEC_SIZE || nt >= APR_MAX_IOVEC_SIZE)
+        return (jint)(-APR_ENOMEM);
 
     for (i = 0; i < nh; i++) {
         hba[i] = (*e)->GetObjectArrayElement(e, headers, i);
@@ -531,10 +520,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendfile)(TCN_STDARGS, jlong sock,
     hdrs.trailers = &tvec[0];
     hdrs.numtrailers = nt;
 
-    TCN_THROW_IF_ERR(apr_socket_sendfile(s, f, &hdrs, &off,
-                     &written, (apr_int32_t)flags), i);
+    ss = apr_socket_sendfile(s, f, &hdrs, &off, &written, (apr_int32_t)flags);
 
-cleanup:
     for (i = 0; i < nh; i++) {
         (*e)->ReleaseByteArrayElements(e, hba[i], hvec[i].iov_base, JNI_ABORT);
     }
@@ -545,6 +532,9 @@ cleanup:
     /* Return Number of bytes actually sent,
      * including headers, file, and trailers
      */
-    return (jint)written;
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else
+        return -(jint)ss;
 }
 

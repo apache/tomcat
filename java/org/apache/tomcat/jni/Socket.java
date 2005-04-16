@@ -138,8 +138,7 @@ public class Socket {
      * This may be where we will find out if there is any other process
      *      using the selected port.
      */
-    public static native int bind(long sock, long sa)
-        throws Exception;
+    public static native int bind(long sock, long sa);
 
     /**
      * Listen to a bound socket for connections.
@@ -444,7 +443,6 @@ public class Socket {
      */
     public static native int sendfile(long sock, long file, byte [][] headers,
                                       byte[][] trailers, long offset,
-                                      int len, int flags)
-        throws Exception;
+                                      int len, int flags);
 
 }
