@@ -462,7 +462,7 @@ cleanup:
     return (jlong)timeout;
 }
 
-TCN_IMPLEMENT_CALL(jint, Socket, atmark)(TCN_STDARGS, jlong sock)
+TCN_IMPLEMENT_CALL(jboolean, Socket, atmark)(TCN_STDARGS, jlong sock)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_int32_t mark;

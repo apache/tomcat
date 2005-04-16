@@ -161,6 +161,14 @@ public class Socket {
         throws Exception;
 
     /**
+     * Query the specified socket if at the OOB/Urgent data mark
+     * @param sock The socket to query
+     * @return True if socket is at the OOB/urgent mark,
+     *         otherwise return false.
+     */
+    public static native boolean atmark(long sock);
+
+    /**
      * Issue a connection request to a socket either on the same machine
      * or a different one.
      * @param sock The socket we wish to use for our side of the connection
@@ -184,7 +192,7 @@ public class Socket {
      * @param offset Offset in the byte buffer.
      * @param len The number of bytes to write; (-1) for full array.
      * @return The number of bytes send.
-     * 
+     *
      */
     public static native int send(long sock, byte[] buf, int offset, int len);
 
@@ -205,9 +213,9 @@ public class Socket {
      *               which bytes are to be retrieved; must be non-negative
      *               and no larger than buf.length
      * @param len The maximum number of buffers to be accessed; must be non-negative
-     *            and no larger than buf.length - offset 
+     *            and no larger than buf.length - offset
      * @return The number of bytes send.
-     * 
+     *
      */
     public static native int sendb(long sock, ByteBuffer buf,
                                    int offset, int len);
@@ -226,7 +234,7 @@ public class Socket {
      * </PRE>
      * @param sock The socket to send the data over.
      * @param vec The array from which to get the data to send.
-     * 
+     *
      */
     public static native int sendv(long sock, byte[][] vec);
 
@@ -243,7 +251,7 @@ public class Socket {
 
     /**
      * Read data from a network.
-     * 
+     *
      * <PRE>
      * This functions acts like a blocking read by default.  To change
      * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
@@ -265,7 +273,7 @@ public class Socket {
 
     /**
      * Read data from a network with timeout.
-     * 
+     *
      * <PRE>
      * This functions acts like a blocking read by default.  To change
      * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
@@ -289,7 +297,7 @@ public class Socket {
 
     /**
      * Read data from a network.
-     * 
+     *
      * <PRE>
      * This functions acts like a blocking read by default.  To change
      * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
@@ -312,7 +320,7 @@ public class Socket {
 
     /**
      * Read data from a network with timeout.
-     * 
+     *
      * <PRE>
      * This functions acts like a blocking read by default.  To change
      * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
