@@ -64,7 +64,7 @@ public class Echo {
         private long serverSock = 0;
         private long inetAddress = 0;
         private long pool = 0;
-        public Acceptor() {
+        public Acceptor() throws Exception {
             try {
 
                 pool = Pool.create(Echo.echoPool);
@@ -80,6 +80,7 @@ public class Echo {
             }
             catch( Exception ex ) {
                 ex.printStackTrace();
+                throw(new Exception("Can't create Acceptor"));
             }
         }
 
@@ -232,10 +233,14 @@ public class Echo {
     {
         int i;
         echoPool = Pool.create(0);
-        echoAcceptor = new Acceptor();
-        echoAcceptor.start();
-        echoPoller = new Poller();
-        echoPoller.start();
+        try {
+            echoAcceptor = new Acceptor();
+            echoAcceptor.start();
+            echoPoller = new Poller();
+            echoPoller.start();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
