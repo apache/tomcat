@@ -90,6 +90,19 @@ public class Echo {
                 while (true) {
                     long clientSock = Socket.accept(serverSock, pool);
                     System.out.println("Accepted id: " +  i);
+                    try {
+                        long sa = Address.get(Socket.APR_REMOTE, clientSock);
+                        Sockaddr addr = new Sockaddr();
+                        if (Address.fill(addr, sa)) {
+                            System.out.println("Host: " + Address.getnameinfo(clientSock, 0));
+                            System.out.println("IP: " + Address.getip(sa) +
+                                               ":" + addr.port);
+                        }
+                    } catch (Exception e) {
+                        // Ignore
+                        e.printStackTrace();
+                    }
+
                     Socket.timeoutSet(clientSock, 10000000);
                     Worker worker = new Worker(clientSock, i++,
                                                this.getClass().getName());
@@ -153,7 +166,7 @@ public class Echo {
                         long clientSock = Poll.socket(desc[n]);
                         int  workerId   = (int)Poll.data(desc[n]);
                         System.out.println("Poll flags " + Poll.events(desc[n]));
-                        remove(clientSock, workerId);                        
+                        remove(clientSock, workerId);
                         Worker worker = new Worker(clientSock, workerId,
                                                    this.getClass().getName());
                         Echo.incThreads();
