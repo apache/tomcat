@@ -49,6 +49,9 @@ public final class Library {
                 break;
         }
         if (!loaded) {
+            err += "(";
+            err += System.getProperty("java.library.path");
+            err += ")";
             throw new UnsatisfiedLinkError(err);
         }
     }
