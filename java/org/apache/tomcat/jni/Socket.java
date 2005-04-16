@@ -138,7 +138,8 @@ public class Socket {
      * This may be where we will find out if there is any other process
      *      using the selected port.
      */
-    public static native int bind(long sock, long sa);
+    public static native int bind(long sock, long sa)
+        throws Exception;
 
     /**
      * Listen to a bound socket for connections.

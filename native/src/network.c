@@ -135,7 +135,9 @@ TCN_IMPLEMENT_CALL(jint, Socket, bind)(TCN_STDARGS, jlong sock,
     apr_sockaddr_t *a = J2P(sa, apr_sockaddr_t *);
 
     UNREFERENCED_STDARGS;
-    return (jint)apr_socket_bind(s, a);
+    TCN_THROW_IF_ERR(apr_socket_bind(s, a), s);
+cleanup:
+    return (jint)0;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, listen)(TCN_STDARGS, jlong sock,
