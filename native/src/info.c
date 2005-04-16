@@ -115,10 +115,6 @@ DECLARE_AINFO_FIELD(hostname);
 DECLARE_AINFO_FIELD(servname);
 DECLARE_AINFO_FIELD(port);
 DECLARE_AINFO_FIELD(family);
-DECLARE_AINFO_FIELD(salen);
-DECLARE_AINFO_FIELD(ipaddr_len);
-DECLARE_AINFO_FIELD(addr_str_len);
-DECLARE_AINFO_FIELD(ipaddr_ptr);
 DECLARE_AINFO_FIELD(next);
 
 static int finfo_class_initialized = 0;
@@ -173,10 +169,6 @@ apr_status_t tcn_load_ainfo_class(JNIEnv *e)
     GET_AINFO_S(servname);
     GET_AINFO_I(port);
     GET_AINFO_I(family);
-    GET_AINFO_I(salen);
-    GET_AINFO_I(ipaddr_len);
-    GET_AINFO_I(addr_str_len);
-    GET_AINFO_J(ipaddr_ptr);
     GET_AINFO_J(next);
 
     ainfo_class_initialized = 1;
@@ -215,10 +207,6 @@ static void fill_ainfo(JNIEnv *e, jobject obj, apr_sockaddr_t *info)
     SET_AINFO_S(servname, info->servname);
     SET_AINFO_I(port, info->port);
     SET_AINFO_I(family, info->family);
-    SET_AINFO_I(salen, info->salen);
-    SET_AINFO_I(ipaddr_len, info->ipaddr_len);
-    SET_AINFO_I(addr_str_len, info->addr_str_len);
-    SET_AINFO_J(ipaddr_ptr, P2J(info->ipaddr_ptr));
     SET_AINFO_J(next, P2J(info->next));
 
 }

@@ -69,6 +69,18 @@ TCN_IMPLEMENT_CALL(jstring, Address, getnameinfo)(TCN_STDARGS,
         return NULL;
 }
 
+TCN_IMPLEMENT_CALL(jstring, Address, getip)(TCN_STDARGS, jlong sa)
+{
+    apr_sockaddr_t *s = J2P(sa, apr_sockaddr_t *);
+    char *ipaddr;
+
+    UNREFERENCED(o);
+    if (apr_sockaddr_ip_get(&ipaddr, s) == APR_SUCCESS)
+        return AJP_TO_JSTRING(ipaddr);
+    else
+        return NULL;
+}
+
 TCN_IMPLEMENT_CALL(jlong, Address, get)(TCN_STDARGS, jint which,
                                          jlong sock)
 {

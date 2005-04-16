@@ -24,6 +24,7 @@ package org.apache.tomcat.jni;
 
 public class Address {
 
+    static public String APR_ANYADDR = "0.0.0.0";
     /**
      * Fill the Address class from apr_sockaddr_t
      * @param info Sockaddr class to fill
@@ -64,6 +65,15 @@ public class Address {
      * @return The hostname.
      */
     public static native String getnameinfo(long sa, int flags);
+
+    /**
+     * Return the IP address (in numeric address string format) in
+     * an APR socket address.  APR will allocate storage for the IP address 
+     * string from the pool of the apr_sockaddr_t.
+     * @param ss The socket address to reference.
+     * @return The IP address.
+     */
+    public static native String getip(long sa);
 
     /**
      * Given an apr_sockaddr_t and a service name, set the port for the service

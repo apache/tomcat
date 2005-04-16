@@ -34,16 +34,6 @@ public class Sockaddr {
     public int port;
     /** The family */
     public int family;
-    /** How big is the sockaddr we're using? */
-    public int salen;
-    /** How big is the ip address structure we're using? */
-    public int ipaddr_len;
-    /** How big should the address buffer be?  16 for v4 or 46 for v6
-     *  used in inet_ntop... */
-    public int addr_str_len;
-    /** This points to the IP address structure within the appropriate
-     *  sockaddr structure.  */
-    public long ipaddr_ptr;
     /** If multiple addresses were found by apr_sockaddr_info_get(), this
      *  points to a representation of the next address. */
     public long next;
