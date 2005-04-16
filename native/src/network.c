@@ -85,11 +85,11 @@ TCN_IMPLEMENT_CALL(jlong, Address, get)(TCN_STDARGS, jint which,
                                          jlong sock)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
-    apr_sockaddr_t *sa;
+    apr_sockaddr_t *sa = NULL;
 
     UNREFERENCED(o);
     TCN_THROW_IF_ERR(apr_socket_addr_get(&sa,
-                                    which, s), sa);
+                                    (apr_interface_e)which, s), sa);
 cleanup:
     return P2J(sa);
 }

@@ -291,3 +291,32 @@ TCN_IMPLEMENT_CALL(jboolean, Address, fill)(TCN_STDARGS,
     }
     return rv;
 }
+
+TCN_IMPLEMENT_CALL(jobject, Address, getInfo)(TCN_STDARGS, jlong info)
+{
+    apr_sockaddr_t *i = J2P(info, apr_sockaddr_t *);
+    jclass aprSockaddrClass;
+    jmethodID constructorID = 0;
+    jobject sockaddrObj = NULL;
+
+    UNREFERENCED(o);
+
+    aprSockaddrClass = (*e)->FindClass(e, TCN_AINFO_CLASS);
+    if (aprSockaddrClass == NULL)
+        return NULL;
+
+    /* Find the constructor ID */
+    constructorID = (*e)->GetMethodID(e, aprSockaddrClass,
+                                      "<init>", "()V");
+    if (constructorID == NULL)
+        goto cleanup;
+    /* Create the APR Error object */
+    sockaddrObj = (*e)->NewObject(e, aprSockaddrClass, constructorID);
+    if (sockaddrObj == NULL)
+        goto cleanup;
+    fill_ainfo(e, sockaddrObj, i);
+cleanup:
+    (*e)->DeleteLocalRef(e, aprSockaddrClass);
+
+    return sockaddrObj;
+}

@@ -26,11 +26,17 @@ public class Address {
 
     static public String APR_ANYADDR = "0.0.0.0";
     /**
-     * Fill the Address class from apr_sockaddr_t
+     * Fill the Sockaddr class from apr_sockaddr_t
      * @param info Sockaddr class to fill
      * @param sa Structure pointer
      */
     public static native boolean fill(Sockaddr info, long sa);
+
+    /**
+     * Create the Sockaddr object from apr_sockaddr_t
+     * @param sa Structure pointer
+     */
+    public static native Sockaddr getInfo(long sa);
 
     /**
      * Create apr_sockaddr_t from hostname, address family, and port.

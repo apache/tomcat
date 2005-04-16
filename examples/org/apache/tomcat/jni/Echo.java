@@ -75,6 +75,14 @@ public class Echo {
                                            pool);
                 serverSock = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM,
                                            Socket.APR_PROTO_TCP, pool);
+                long sa = Address.get(Socket.APR_LOCAL, serverSock);
+                Sockaddr addr = new Sockaddr();
+                if (Address.fill(addr, sa)) {
+                    System.out.println("Host: " + addr.hostname);
+                    System.out.println("Server: " + addr.servname);
+                    System.out.println("IP: " + Address.getip(sa) +
+                                       ":" + addr.port);
+                }                                           
                 Socket.bind(serverSock, inetAddress);
                 Socket.listen(serverSock, 5);
             }
@@ -90,11 +98,12 @@ public class Echo {
                 while (true) {
                     long clientSock = Socket.accept(serverSock, pool);
                     System.out.println("Accepted id: " +  i);
+                    
                     try {
                         long sa = Address.get(Socket.APR_REMOTE, clientSock);
                         Sockaddr addr = new Sockaddr();
                         if (Address.fill(addr, sa)) {
-                            System.out.println("Host: " + Address.getnameinfo(clientSock, 0));
+                            System.out.println("Host: " + Address.getnameinfo(sa, 0));
                             System.out.println("IP: " + Address.getip(sa) +
                                                ":" + addr.port);
                         }
@@ -102,7 +111,7 @@ public class Echo {
                         // Ignore
                         e.printStackTrace();
                     }
-
+                    
                     Socket.timeoutSet(clientSock, 10000000);
                     Worker worker = new Worker(clientSock, i++,
                                                this.getClass().getName());
