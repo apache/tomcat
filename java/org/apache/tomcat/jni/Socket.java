@@ -400,14 +400,6 @@ public class Socket {
     public static native int optGet(long sock, int opt);
 
     /**
-     * Query the specified socket if at the OOB/Urgent data mark
-     * @param sock The socket to query
-     * @return True if socket is at the OOB/urgent mark,
-     *         otherwise is set to false.
-     */
-    public static native boolean atmark(long sock);
-
-    /**
      * Setup socket timeout for the specified socket
      * @param sock The socket to set up.
      * @param t Value for the timeout in microseconds.
