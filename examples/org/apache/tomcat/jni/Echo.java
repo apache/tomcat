@@ -101,12 +101,21 @@ public class Echo {
                     
                     try {
                         long sa = Address.get(Socket.APR_REMOTE, clientSock);
-                        Sockaddr addr = new Sockaddr();
-                        if (Address.fill(addr, sa)) {
-                            System.out.println("Host: " + Address.getnameinfo(sa, 0));
-                            System.out.println("IP: " + Address.getip(sa) +
-                                               ":" + addr.port);
+                        Sockaddr raddr = new Sockaddr();
+                        if (Address.fill(raddr, sa)) {
+                            System.out.println("Remote Host: " + Address.getnameinfo(sa, 0));
+                            System.out.println("Remote IP: " + Address.getip(sa) +
+                                               ":" + raddr.port);
                         }
+                        sa = Address.get(Socket.APR_LOCAL, clientSock);
+                        Sockaddr laddr = new Sockaddr();
+                        if (Address.fill(laddr, sa)) {
+                            System.out.println("Local Host: " + laddr.hostname);
+                            System.out.println("Local Server: " + Address.getnameinfo(sa, 0));
+                            System.out.println("Local IP: " + Address.getip(sa) +
+                                               ":" + laddr.port);
+                        }                                        
+                        
                     } catch (Exception e) {
                         // Ignore
                         e.printStackTrace();
