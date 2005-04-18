@@ -212,12 +212,15 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
     if (rv != APR_SUCCESS)
         return (jint)(-rv);
     rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd);
+    apr_thread_mutex_lock(p->mutex);
     if (rv != APR_SUCCESS)
         num = 0;
 
     if (num > 0) {
         for (i = 0; i < num; i++) {
-            pset[i] = P2J(fd);
+            pset[i*4+0] = (jlong)(fd->rtnevents);
+            pset[i*4+1] = P2J(fd->desc.s);
+            pset[i*4+2] = P2J(fd->client_data);
             fd ++;
         }
     }
@@ -227,18 +230,19 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
         /* TODO: Add thread mutex protection
          * or make sure the Java part is synchronized.
          */
-        apr_thread_mutex_lock(p->mutex);
         for (n = 0; n < p->nelts; n++) {
             if ((now - p->query_ttl[n]) > p->max_ttl) {
                 p->query_set[n].rtnevents = APR_POLLHUP | APR_POLLIN;
-                if (i < p->nelts) {
-                    pset[i++] = P2J(&(p->query_set[n]));
+                if (num < p->nelts) {
+                    pset[num*4+0] = (jlong)(p->query_set[n].rtnevents);
+                    pset[num*4+1] = P2J(p->query_set[n].desc.s);
+                    pset[num*4+2] = P2J(p->query_set[n].client_data);
                     num++;
                 }
             }
         }
-        apr_thread_mutex_unlock(p->mutex);
     }
+    apr_thread_mutex_unlock(p->mutex);
     if (num)
         (*e)->ReleaseLongArrayElements(e, set, pset, 0);
     else
