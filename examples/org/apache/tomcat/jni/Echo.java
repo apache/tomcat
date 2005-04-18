@@ -180,13 +180,14 @@ public class Echo {
                         Thread.sleep(1);
                         continue;
                     }
-                    long [] desc = new long[16];
+                    /* Four times size then  created pollset */
+                    long [] desc = new long[64];
                     /* USe 1 second poll timeout */
                     int rv = Poll.poll(serverPollset, 1000000, desc);
                     for (int n = 0; n < rv; n++) {
-                        long clientSock = Poll.socket(desc[n]);
-                        int  workerId   = (int)Poll.data(desc[n]);
-                        System.out.println("Poll flags " + Poll.events(desc[n]));
+                        long clientSock = desc[n*4+1];
+                        int  workerId   = (int)desc[n*4+2];
+                        System.out.println("Poll flags " + desc[n*4]);
                         remove(clientSock, workerId);
                         Worker worker = new Worker(clientSock, workerId,
                                                    this.getClass().getName());

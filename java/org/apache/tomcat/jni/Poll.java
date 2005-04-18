@@ -96,29 +96,20 @@ public class Poll {
      * @param pollset The pollset to use
      * @param timeout Timeout in microseconds
      * @param descriptors Array of signalled descriptors (output parameter)
+     *        The desctiptor array must be four times the size of pollset.
+     *        and are populated as follows:
+     * <PRE>
+     * descriptors[n + 0] -> returned events
+     * descriptors[n + 1] -> socket
+     * descriptors[n + 2] -> client data
+     * descriptors[n + 2] -> reserved
+     * </PRE>
      * @return Number of signalled descriptors (output parameter)
+     *         or negative APR error code.
      */
     public static native int poll(long pollset, long timeout,
                                   long [] descriptors);
 
-    /**
-     * Return socket from poll descriptor
-     * @param polldesc The pollset decriptor to use
-     */
-    public static native long socket(long polldesc);
-
-    /**
-     * Return client data from poll descriptor
-     * @param polldesc The pollset decriptor to use
-     */
-    public static native long data(long polldesc);
-
-    /**
-     * Return rtnevents from poll descriptor
-     * @param polldesc The pollset decriptor to use
-     */
-    public static native int events(long polldesc);
-    
     /**
      * Set the socket time to live.
      * @param pollset The pollset to use
