@@ -198,7 +198,9 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
     for (n = 0; n < p->nadds; n++) {
         apr_pollfd_t pf = p->query_add[n];
         if (p->nelts == p->nalloc) {
-            rv = APR_ENOMEM;
+            /* In case the add queue is too large
+             * skip adding to pollset
+             */
             break;
         }
         if ((rv = apr_pollset_add(p->pollset, &pf)) != APR_SUCCESS)
