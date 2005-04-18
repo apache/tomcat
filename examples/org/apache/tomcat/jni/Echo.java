@@ -85,7 +85,7 @@ public class Echo {
                 }                                           
                 int rc = Socket.bind(serverSock, inetAddress);
                 if (rc != 0) {
-                  throw(new Exception("Can't create Acceptor:bind failed"));
+                  throw(new Exception("Can't create Acceptor: bind: " + Error.strerror(rc)));
                 }
                 Socket.listen(serverSock, 5);
             }
