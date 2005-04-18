@@ -19,6 +19,13 @@
 
 #include <jni.h>
 
+#if defined(_DEBUG) || defined(DEBUG)
+#include <assert.h>
+#define TCN_ASSERT(x)  assert((x))
+#else
+#define TCN_ASSERT(x) (void)0
+#endif
+
 #ifdef min
 #undef min
 #endif

@@ -48,6 +48,7 @@ TCN_IMPLEMENT_CALL(void, Pool, clear)(TCN_STDARGS, jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     UNREFERENCED_STDARGS;
+    TCN_ASSERT(pool != 0);
     apr_pool_clear(p);
 }
 
@@ -55,6 +56,7 @@ TCN_IMPLEMENT_CALL(void, Pool, destroy)(TCN_STDARGS, jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     UNREFERENCED_STDARGS;
+    TCN_ASSERT(pool != 0);
     apr_pool_destroy(p);
 }
 
@@ -62,6 +64,7 @@ TCN_IMPLEMENT_CALL(jlong, Pool, parentGet)(TCN_STDARGS, jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     UNREFERENCED_STDARGS;
+    TCN_ASSERT(pool != 0);
     return P2J(apr_pool_parent_get(p));
 }
 
@@ -132,7 +135,7 @@ TCN_IMPLEMENT_CALL(jobject, Pool, alloc)(TCN_STDARGS, jlong pool,
     void *mem;
 
     UNREFERENCED(o);
-    
+
     if ((mem = apr_palloc(p, sz)) != NULL)
         return (*e)->NewDirectByteBuffer(e, mem, (jlong)sz);
     else
@@ -147,7 +150,7 @@ TCN_IMPLEMENT_CALL(jobject, Pool, calloc)(TCN_STDARGS, jlong pool,
     void *mem;
 
     UNREFERENCED(o);
-    
+
     if ((mem = apr_pcalloc(p, sz)) != NULL)
         return (*e)->NewDirectByteBuffer(e, mem, (jlong)sz);
     else
