@@ -448,10 +448,6 @@ public class Socket {
     /**
      * Send a file from an open file descriptor to a socket, along with
      * optional headers and trailers, with a timeout.
-     * <br />
-     * This functions acts like a blocking write by default.  To change
-     *         this behavior, use apr_socket_timeout_set() or the
-     *         APR_SO_NONBLOCK socket option.
      * The number of bytes actually sent is stored in the len parameter.
      * The offset parameter is passed by reference for no reason; its
      * value will never be modified by the apr_socket_sendfile() function.
@@ -462,6 +458,8 @@ public class Socket {
      * @param offset Offset into the file where we should begin writing
      * @param len Number of bytes to send from the file
      * @param flags APR flags that are mapped to OS specific flags
+     * @param timeout Socket timeout to use with the call. The original
+     *                socket timeout will be preserved.
      * @return Number of bytes actually sent, including headers,
      *         file, and trailers
      *
