@@ -83,7 +83,10 @@ public class Echo {
                     System.out.println("IP: " + Address.getip(sa) +
                                        ":" + addr.port);
                 }                                           
-                Socket.bind(serverSock, inetAddress);
+                int rc = Socket.bind(serverSock, inetAddress);
+                if (rc != 0) {
+                  throw(new Exception("Can't create Acceptor:bind failed"));
+                }
                 Socket.listen(serverSock, 5);
             }
             catch( Exception ex ) {
