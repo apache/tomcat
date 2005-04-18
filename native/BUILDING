@@ -1,5 +1,20 @@
   Building from the cvs tree:
-  chmod a+x build/get-version.sh
   sh buildconf --with-apr=apr_source_location.
   configure --with-apr=apr_install_location.
-  
+  make
+
+  Testing the build:
+  The make should produce a .so file named libtcnative-1.so.
+  Build the jar containing the example by
+  cd ..
+  ant jar
+  Run the example:
+  ant example-basic
+ 
+  Using it in Tomcat:
+  1 - In <Connector> use of conf/server.xml:
+    protocol="org.apache.coyote.http11.Http11AprProtocol"
+  2 - In bin/setup.sh add the following:
+    CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
+    In my machine I am using:
+    /home/jfclere/jakarta-tomcat-connectors/jni/native/.libs for tclib_location 
