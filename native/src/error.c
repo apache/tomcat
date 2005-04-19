@@ -17,6 +17,9 @@
 #include "apr_pools.h"
 #include "tcn.h"
 
+/* Merge IS_ETIMEDOUT with APR_TIMEUP
+ */
+#define TCN_STATUS_IS_ETIMEDOUT(x) (APR_STATUS_IS_ETIMEDOUT((x)) || ((x) == APR_TIMEUP))
 /*
  * Convenience function to help throw an Exception.
  */
@@ -180,7 +183,7 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(75, APR_STATUS_IS_EBUSY);
         /* Socket errors */
         APR_IS(90, APR_STATUS_IS_EAGAIN);
-        APR_IS(91, APR_STATUS_IS_ETIMEDOUT);
+        APR_IS(91, TCN_STATUS_IS_ETIMEDOUT);
         APR_IS(92, APR_STATUS_IS_ECONNABORTED);
         APR_IS(93, APR_STATUS_IS_ECONNRESET);
         APR_IS(94, APR_STATUS_IS_EINPROGRESS);
