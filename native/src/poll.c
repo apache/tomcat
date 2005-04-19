@@ -94,7 +94,9 @@ TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
     fd.reqevents = (apr_int16_t)reqevents;
     fd.desc.s = J2P(socket, apr_socket_t *);
     fd.client_data = J2P(data, void *);
-    p->socket_set[p->nelts++] = fd;
+    p->socket_ttl[p->nelts] = apr_time_now();
+    p->socket_set[p->nelts] = fd;
+    p->nelts++;
     return (jint)apr_pollset_add(p->pollset, &fd);
 }
 
