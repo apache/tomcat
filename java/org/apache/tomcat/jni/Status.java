@@ -253,5 +253,6 @@ public class Status {
     public static final boolean APR_STATUS_IS_EINPROGRESS(int s)  { return is(s, 94); }
     public static final boolean APR_STATUS_IS_EINTR(int s)      { return is(s, 95); }
     public static final boolean APR_STATUS_IS_ENOTSOCK(int s)   { return is(s, 96); }
+    public static final boolean APR_STATUS_IS_EINVAL(int s)     { return is(s, 97); }
 
 }

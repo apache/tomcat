@@ -186,6 +186,7 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(94, APR_STATUS_IS_EINPROGRESS);
         APR_IS(95, APR_STATUS_IS_EINTR);
         APR_IS(96, APR_STATUS_IS_ENOTSOCK);
+        APR_IS(97, APR_STATUS_IS_EINVAL);
     }
     return JNI_FALSE;
 }

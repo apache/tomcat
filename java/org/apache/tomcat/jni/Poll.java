@@ -104,11 +104,31 @@ public class Poll {
      * descriptors[n + 2] -> client data
      * descriptors[n + 2] -> reserved
      * </PRE>
+     * @param remove Remove signaled descriptors from pollset
      * @return Number of signalled descriptors (output parameter)
      *         or negative APR error code.
      */
     public static native int poll(long pollset, long timeout,
-                                  long [] descriptors);
+                                  long [] descriptors, boolean remove);
+
+    /**
+     * Maintain on the descriptor(s) in a pollset
+     * @param pollset The pollset to use
+     * @param descriptors Array of signalled descriptors (output parameter)
+     *        The desctiptor array must be four times the size of pollset.
+     *        and are populated as follows:
+     * <PRE>
+     * descriptors[n + 0] -> returned events
+     * descriptors[n + 1] -> socket
+     * descriptors[n + 2] -> client data
+     * descriptors[n + 2] -> reserved
+     * </PRE>
+     * @param remove Remove signaled descriptors from pollset
+     * @return Number of signalled descriptors (output parameter)
+     *         or negative APR error code.
+     */
+    public static native int maintain(long pollset, long [] descriptors,
+                                      boolean remove);
 
     /**
      * Set the socket time to live.
