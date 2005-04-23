@@ -512,12 +512,12 @@ TCN_IMPLEMENT_CALL(jboolean, Socket, atmark)(TCN_STDARGS, jlong sock)
 }
 
 
-TCN_IMPLEMENT_CALL(jint, Socket, sendfile)(TCN_STDARGS, jlong sock,
-                                           jlong file,
-                                           jobjectArray headers,
-                                           jobjectArray trailers,
-                                           jlong offset, jint len,
-                                           jint flags)
+TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
+                                            jlong file,
+                                            jobjectArray headers,
+                                            jobjectArray trailers,
+                                            jlong offset, jlong len,
+                                            jint flags)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_file_t *f = J2P(file, apr_file_t *);
@@ -573,7 +573,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendfile)(TCN_STDARGS, jlong sock,
      * including headers, file, and trailers
      */
     if (ss == APR_SUCCESS)
-        return (jint)written;
+        return (jlong)written;
     else
-        return -(jint)ss;
+        return -(jlong)ss;
 }

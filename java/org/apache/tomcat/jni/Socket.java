@@ -441,8 +441,8 @@ public class Socket {
      *         file, and trailers
      *
      */
-    public static native int sendfile(long sock, long file, byte [][] headers,
-                                      byte[][] trailers, long offset,
-                                      int len, int flags);
+    public static native long sendfile(long sock, long file, byte [][] headers,
+                                       byte[][] trailers, long offset,
+                                       long len, int flags);
 
 }
