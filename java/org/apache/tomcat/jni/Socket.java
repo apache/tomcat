@@ -445,27 +445,4 @@ public class Socket {
                                       byte[][] trailers, long offset,
                                       int len, int flags);
 
-    /**
-     * Send a file from an open file descriptor to a socket, along with
-     * optional headers and trailers, with a timeout.
-     * The number of bytes actually sent is stored in the len parameter.
-     * The offset parameter is passed by reference for no reason; its
-     * value will never be modified by the apr_socket_sendfile() function.
-     * @param sock The socket to which we're writing
-     * @param file The open file from which to read
-     * @param headers Array containing the headers to send
-     * @param trailers Array containing the trailers to send
-     * @param offset Offset into the file where we should begin writing
-     * @param len Number of bytes to send from the file
-     * @param flags APR flags that are mapped to OS specific flags
-     * @param timeout Socket timeout to use with the call. The original
-     *                socket timeout will be preserved.
-     * @return Number of bytes actually sent, including headers,
-     *         file, and trailers
-     *
-     */
-    public static native int sendfilet(long sock, long file, byte [][] headers,
-                                       byte[][] trailers, long offset,
-                                       int len, int flags, long timeout);
-
 }
