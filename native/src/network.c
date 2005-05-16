@@ -195,7 +195,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
                                       jbyteArray buf, jint offset, jint tosend)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)tosend;
     jbyte *bytes;
     apr_int32_t nb;
     apr_status_t ss;
@@ -203,8 +203,6 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
-    if (tosend > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)tosend);
     if (nb)
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
@@ -225,7 +223,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
                                         jobject buf, jint offset, jint len)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
-    apr_size_t nbytes;
+    apr_size_t nbytes = (apr_size_t)len;
     char *bytes;
     apr_status_t ss;
 
@@ -233,11 +231,6 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
-    if (bytes == NULL || nbytes < 0)
-        return (jint)(-APR_EINVAL);
-    if (len > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)len);
     ss = apr_socket_send(s, bytes + offset, &nbytes);
 
     if (ss == APR_SUCCESS)
@@ -285,16 +278,16 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_sockaddr_t *w = J2P(where, apr_sockaddr_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)tosend;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_int32_t nb;
     apr_status_t ss;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+    TCN_ASSERT(bytes != NULL);
+
     apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
-    if (tosend > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)tosend);
     if (nb)
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
@@ -315,15 +308,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
                                        jbyteArray buf, jint offset, jint toread)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)toread;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
-    if (toread > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)toread);
-
+    TCN_ASSERT(bytes != NULL);
     ss = apr_socket_recv(s, bytes + offset, &nbytes);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
@@ -339,7 +330,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
                                         jint toread, jlong timeout)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)toread;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
     apr_interval_time_t t;
@@ -347,9 +338,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
+    TCN_ASSERT(bytes != NULL);
 
-    if (toread > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)toread);
     if ((ss = apr_socket_timeout_get(s, &t)) != APR_SUCCESS)
         goto cleanup;
     if ((ss = apr_socket_timeout_set(s, J2T(timeout))) != APR_SUCCESS)
@@ -371,19 +361,14 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_status_t ss;
-    apr_size_t nbytes;
+    apr_size_t nbytes = (apr_size_t)len;
     char *bytes;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
-    if (bytes == NULL || nbytes < 0)
-        return (jint)(-APR_EINVAL);
-    if (len > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)len);
-
+    TCN_ASSERT(bytes != NULL);
     ss = apr_socket_recv(s, bytes + offset, &nbytes);
 
     if (ss == APR_SUCCESS)
@@ -398,7 +383,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_status_t ss;
-    apr_size_t nbytes;
+    apr_size_t nbytes = (apr_size_t)len;
     char *bytes;
     apr_interval_time_t t;
 
@@ -406,11 +391,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    nbytes = (apr_size_t)(*e)->GetDirectBufferCapacity(e, buf);
-    if (bytes == NULL || nbytes < 0)
-        return (jint)(-APR_EINVAL);
-    if (len > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)len);
+    TCN_ASSERT(bytes != NULL);
 
     if ((ss = apr_socket_timeout_get(s, &t)) != APR_SUCCESS)
          return -(jint)ss;
@@ -432,16 +413,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_sockaddr_t *f = J2P(from, apr_sockaddr_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)toread;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
-    if (toread > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)toread);
-
     ss = apr_socket_recvfrom(f, s, (apr_int32_t)flags, bytes + offset, &nbytes);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
