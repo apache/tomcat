@@ -85,9 +85,9 @@ public class Address {
      * Given an apr_sockaddr_t and a service name, set the port for the service
      * @param sockaddr The apr_sockaddr_t that will have its port set
      * @param servname The name of the service you wish to use
+     * @return APR status code.
      */
-    public static native long getservbyname(long sockaddr, String servname)
-        throws Exception;
+    public static native int getservbyname(long sockaddr, String servname);
 
     /**
      * Return an apr_sockaddr_t from an apr_socket_t
