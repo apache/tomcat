@@ -161,6 +161,15 @@ public class Socket {
         throws Exception;
 
     /**
+     * Set an OS level accept filter.
+     * @param sock The socket to put the accept filter on.
+     * @param name The accept filter
+     * @param args Any extra args to the accept filter.  Passing NULL here removes
+     *             the accept filter.
+     */
+    public static native int acceptfilter(long sock, String name, String args);
+
+    /**
      * Query the specified socket if at the OOB/Urgent data mark
      * @param sock The socket to query
      * @return True if socket is at the OOB/urgent mark,

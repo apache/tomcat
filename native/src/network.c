@@ -57,7 +57,7 @@ cleanup:
 }
 
 TCN_IMPLEMENT_CALL(jstring, Address, getnameinfo)(TCN_STDARGS,
-                                                   jlong sa, jint flags)
+                                                  jlong sa, jint flags)
 {
     apr_sockaddr_t *s = J2P(sa, apr_sockaddr_t *);
     char *hostname;
@@ -82,7 +82,7 @@ TCN_IMPLEMENT_CALL(jstring, Address, getip)(TCN_STDARGS, jlong sa)
 }
 
 TCN_IMPLEMENT_CALL(jlong, Address, get)(TCN_STDARGS, jint which,
-                                         jlong sock)
+                                        jlong sock)
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_sockaddr_t *sa = NULL;
@@ -567,4 +567,30 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
         return (jlong)written;
     else
         return -(jlong)ss;
+}
+
+TCN_IMPLEMENT_CALL(jint, Socket, acceptfilter)(TCN_STDARGS,
+                                               jlong sock,
+                                               jstring name,
+                                               jstring args)
+{
+#if APR_HAS_SO_ACCEPTFILTER
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    TCN_ALLOC_CSTRING(name);
+    TCN_ALLOC_CSTRING(args);
+    apr_status_t rv;
+
+
+    UNREFERENCED(o);
+    rv = apr_socket_accept_filter(s, J2S(name), J2S(args) ? J2S(args) : "");
+    TCN_FREE_CSTRING(name);
+    TCN_FREE_CSTRING(args);
+    return (jint)rv;
+#else
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    UNREFERENCED(name);
+    UNREFERENCED(args);
+    return (jint)APR_ENOTIMPL;
+#endif
 }
