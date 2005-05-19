@@ -594,3 +594,52 @@ TCN_IMPLEMENT_CALL(jint, Socket, acceptfilter)(TCN_STDARGS,
     return (jint)APR_ENOTIMPL;
 #endif
 }
+
+TCN_IMPLEMENT_CALL(jint, Mulicast, join)(TCN_STDARGS,
+                                         jlong sock, jlong join,
+                                         jlong iface, jlong source)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    apr_sockaddr_t *ja = J2P(join, apr_sockaddr_t *);
+    apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
+    apr_sockaddr_t *sa = J2P(source, apr_sockaddr_t *);
+    UNREFERENCED_STDARGS;
+    return (jint)apr_mcast_join(s, ja, ia, sa);
+};
+
+TCN_IMPLEMENT_CALL(jint, Mulicast, leave)(TCN_STDARGS,
+                                          jlong sock, jlong addr,
+                                          jlong iface, jlong source)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    apr_sockaddr_t *aa = J2P(addr, apr_sockaddr_t *);
+    apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
+    apr_sockaddr_t *sa = J2P(source, apr_sockaddr_t *);
+    UNREFERENCED_STDARGS;
+    return (jint)apr_mcast_leave(s, aa, ia, sa);
+};
+
+TCN_IMPLEMENT_CALL(jint, Mulicast, hops)(TCN_STDARGS,
+                                         jlong sock, jint ttl)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    UNREFERENCED_STDARGS;
+    return (jint)apr_mcast_hops(s, (apr_byte_t)ttl);
+};
+
+TCN_IMPLEMENT_CALL(jint, Mulicast, loopback)(TCN_STDARGS,
+                                             jlong sock, jboolean opt)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    UNREFERENCED_STDARGS;
+    return (jint)apr_mcast_loopback(s, opt == JNI_TRUE ? 1 : 0);
+};
+
+TCN_IMPLEMENT_CALL(jint, Mulicast, ointerface)(TCN_STDARGS,
+                                               jlong sock, jlong iface)
+{
+    apr_socket_t *s = J2P(sock, apr_socket_t *);
+    apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
+    UNREFERENCED_STDARGS;
+    return (jint)apr_mcast_interface(s, ia);
+};
