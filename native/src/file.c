@@ -337,6 +337,25 @@ TCN_IMPLEMENT_CALL(jint, File, writeFull)(TCN_STDARGS, jlong file,
         return -(jint)ss;
 }
 
+TCN_IMPLEMENT_CALL(jint, File, writeFullb)(TCN_STDARGS, jlong file,
+                                           jobject buf, jint offset, jint towrite)
+{
+    apr_file_t *f = J2P(file, apr_file_t *);
+    apr_size_t nbytes = (apr_size_t)towrite;
+    apr_size_t written = 0;
+    apr_status_t ss = APR_EINVAL;
+    char *bytes = (char *)(*e)->GetDirectBufferAddress(e, buf);
+
+    UNREFERENCED(o);
+    if (bytes)
+        ss = apr_file_write_full(f, bytes + offset, nbytes, &written);
+
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else
+        return -(jint)ss;
+}
+
 TCN_IMPLEMENT_CALL(jint, File, writev)(TCN_STDARGS, jlong file,
                                        jobjectArray bufs)
 {
@@ -454,7 +473,7 @@ TCN_IMPLEMENT_CALL(jint, File, readFull)(TCN_STDARGS, jlong file,
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_size_t nbytes = (apr_size_t)toread;
-    apr_size_t nread;
+    apr_size_t nread  = 0;
     apr_status_t ss;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
@@ -464,7 +483,27 @@ TCN_IMPLEMENT_CALL(jint, File, readFull)(TCN_STDARGS, jlong file,
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    ss == APR_SUCCESS ? 0 : JNI_ABORT);
     if (ss == APR_SUCCESS)
-        return (jint)nbytes;
+        return (jint)nread;
+    else
+        return -(jint)ss;
+}
+
+TCN_IMPLEMENT_CALL(jint, File, readFullb)(TCN_STDARGS, jlong file,
+                                          jobject buf, jint offset,
+                                          jint toread)
+{
+    apr_file_t *f = J2P(file, apr_file_t *);
+    apr_size_t nbytes = (apr_size_t)toread;
+    apr_size_t nread  = 0;
+    char *bytes = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    apr_status_t ss = APR_EINVAL;
+
+    UNREFERENCED(o);
+    if (bytes)
+        ss = apr_file_read_full(f, bytes + offset, nbytes, &nread);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nread;
     else
         return -(jint)ss;
 }

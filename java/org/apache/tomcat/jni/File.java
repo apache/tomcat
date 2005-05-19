@@ -395,6 +395,29 @@ public class File {
     public static native int writeFull(long thefile, byte[] buf, int offset, int nbytes);
 
     /**
+     * Write data to the specified file, ensuring that all of the data is
+     * written before returning.
+     *
+     * Write will write up to the specified number of
+     * bytes, but never more.  If the OS cannot write that many bytes, the
+     * process/thread will block until they can be written. Exceptional
+     * error such as "out of space" or "pipe closed" will terminate with
+     * an error.
+     *
+     * It is possible for both bytes to be written and an error to
+     * be returned.  And if *bytes_written is less than nbytes, an
+     * accompanying error is _always_ returned.
+     *
+     * APR_EINTR is never returned.
+     * @param thefile The file descriptor to write to.
+     * @param buf The direct ByteBuffer which contains the data.
+     * @param offset Start offset in buf
+     * @param nbytes The number of bytes to write.
+     * @return The number of bytes written.
+     */
+    public static native int writeFullb(long thefile, ByteBuffer buf, int offset, int nbytes);
+
+    /**
      * Write data from aray of byte arrays to the specified file.
      *
      * It is possible for both bytes to be written and an error to
@@ -482,6 +505,29 @@ public class File {
      * @return the number of bytes read.
      */
     public static native int readFull(long thefile, byte[] buf,  int offset, int nbytes);
+
+    /**
+     * Read data from the specified file, ensuring that the buffer is filled
+     * before returning.
+     *
+     * Read will read up to the specified number of
+     * bytes, but never more.  If there isn't enough data to fill that
+     * number of bytes, then the process/thread will block until it is
+     * available or EOF is reached.  If a char was put back into the
+     * stream via ungetc, it will be the first character returned.
+     *
+     * It is possible for both bytes to be read and an error to be
+     * returned.  And if *bytes_read is less than nbytes, an accompanying
+     * error is _always_ returned.
+     *
+     * APR_EINTR is never returned.
+     * @param thefile The file descriptor to read from.
+     * @param buf The direct ByteBuffer to store the data to.
+     * @param offset Start offset in buf
+     * @param nbytes The number of bytes to read.
+     * @return the number of bytes read.
+     */
+    public static native int readFullb(long thefile, ByteBuffer buf,  int offset, int nbytes);
 
     /**
      * Read a string from the specified file.
