@@ -157,7 +157,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
 
     if (rv != APR_SUCCESS)
         return (jint)(-rv);
-    if ((rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd) != APR_SUCCESS)) {
+    if ((rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd)) != APR_SUCCESS) {
         num = (apr_int32_t)(-rv);
     }
     if (num > 0) {
@@ -207,7 +207,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
             memset(&fd, 0, sizeof(apr_pollfd_t));
             for (i = 0; i < num; i++) {
                 fd.desc_type = APR_POLL_SOCKET;
-                fd.desc.s = (apr_socket_t *)pset[i*4+1];
+                fd.desc.s = J2P(pset[i*4+1], apr_socket_t *);
                 do_remove(p, &fd);
             }
         }
