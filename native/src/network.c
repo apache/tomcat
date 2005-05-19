@@ -104,6 +104,19 @@ TCN_IMPLEMENT_CALL(jint, Address, equal)(TCN_STDARGS,
     return apr_sockaddr_equal(sa, sb) ? JNI_TRUE : JNI_FALSE;
 }
 
+TCN_IMPLEMENT_CALL(jint, Address, getservbyname)(TCN_STDARGS,
+                                                 jlong sa, jstring servname)
+{
+    apr_sockaddr_t *s = J2P(sa, apr_sockaddr_t *);
+    TCN_ALLOC_CSTRING(servname);
+    apr_status_t rv;
+
+    UNREFERENCED(o);
+    rv = apr_getservbyname(s, J2S(servname));
+    TCN_FREE_CSTRING(servname);
+    return (jint)rv;
+}
+
 TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
                                           jint type, jint protocol, jlong pool)
 {
