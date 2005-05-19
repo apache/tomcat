@@ -38,12 +38,12 @@ RSC=rc.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release"
-# PROP Intermediate_Dir "Release"
+# PROP Output_Dir "LibR"
+# PROP Intermediate_Dir "LibR"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MD /W3 /O2 /Oy- /Zi /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
-# ADD CPP /nologo /MD /W3 /O2 /Oy- /Zi /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /D "NDEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "APR_DECLARE_STATIC" /Fd"Release\tcnative_src" /FD /c
+# ADD BASE CPP /nologo /MD /W3 /Zi /O2 /Oy- /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
+# ADD CPP /nologo /MD /W3 /Zi /O2 /Oy- /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /I "../openssl/inc32" /D "NDEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "APR_DECLARE_STATIC" /D "NO_IDEA" /D "NO_RC5" /D "NO_MDC2" /D "OPENSSL_NO_IDEA" /D "OPENSSL_NO_RC5" /D "OPENSSL_NO_MDC2" /D "HAVE_OPENSSL" /D HAVE_SSL_SET_STATE=1 /Fd"LibR\tcnative_src" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /opt:ref
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib rpcrt4.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"Release/tcnative-1.dll" /opt:ref
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib rpcrt4.lib libeay32.lib ssleay32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"LibR/tcnative-1.dll" /libpath:"../openssl/out32dll" /libpath:"../openssl/out32" /opt:ref
 
 !ELSEIF  "$(CFG)" == "tcnative - Win32 Debug"
 
@@ -64,12 +64,12 @@ LINK32=link.exe
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug"
-# PROP Intermediate_Dir "Debug"
+# PROP Output_Dir "LibD"
+# PROP Intermediate_Dir "LibD"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MDd /W3 /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /FD /c
-# ADD CPP /nologo /MDd /W4 /GX /Zi /Od /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /D "_DEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "APR_DECLARE_STATIC" /Fd"Debug\tcnative_src" /FD /c
+# ADD CPP /nologo /MDd /W4 /GX /Zi /Od /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /I "../openssl/inc32" /D "_DEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "APR_DECLARE_STATIC" /D "NO_IDEA" /D "NO_RC5" /D "NO_MDC2" /D "OPENSSL_NO_IDEA" /D "OPENSSL_NO_RC5" /D "OPENSSL_NO_MDC2" /D "HAVE_OPENSSL" /D HAVE_SSL_SET_STATE=1 /Fd"LibD\tcnative_src" /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib rpcrt4.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"Debug/tcnative-1.dll"
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib rpcrt4.lib libeay32.lib ssleay32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"LibD/tcnative-1.dll" /libpath:"../openssl/out32dll" /libpath:"../openssl/out32"
 
 !ENDIF 
 
