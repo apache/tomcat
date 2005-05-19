@@ -15,7 +15,8 @@
  */
 
 package org.apache.tomcat.jni;
-
+/* Import needed classes */
+import java.nio.ByteBuffer;
 /** File
  *
  * @author Mladen Turk
@@ -346,10 +347,29 @@ public class File {
      * be returned.  APR_EINTR is never returned.
      * @param thefile The file descriptor to write to.
      * @param buf The buffer which contains the data.
+     * @param offset Start offset in buf
      * @param nbytes The number of bytes to write; (-1) for full array.
      * @return The number of bytes written.
      */
     public static native int write(long thefile, byte[] buf, int offset, int nbytes);
+
+    /**
+     * Write data to the specified file.
+     *
+     * Write will write up to the specified number of
+     * bytes, but never more.  If the OS cannot write that many bytes, it
+     * will write as many as it can.  The third argument is modified to
+     * reflect the * number of bytes written.
+     *
+     * It is possible for both bytes to be written and an error to
+     * be returned.  APR_EINTR is never returned.
+     * @param thefile The file descriptor to write to.
+     * @param buf The direct Byte buffer which contains the data.
+     * @param offset Start offset in buf
+     * @param nbytes The number of bytes to write
+     * @return The number of bytes written.
+     */
+    public static native int writeb(long thefile, ByteBuffer buf, int offset, int nbytes);
 
     /**
      * Write data to the specified file, ensuring that all of the data is
@@ -368,6 +388,7 @@ public class File {
      * APR_EINTR is never returned.
      * @param thefile The file descriptor to write to.
      * @param buf The buffer which contains the data.
+     * @param offset Start offset in buf
      * @param nbytes The number of bytes to write; (-1) for full array.
      * @return The number of bytes written.
      */
@@ -413,10 +434,31 @@ public class File {
      * or other error to be returned.  APR_EINTR is never returned.
      * @param thefile The file descriptor to read from.
      * @param buf The buffer to store the data to.
+     * @param offset Start offset in buf
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes read.
      */
     public static native int read(long thefile, byte[] buf,  int offset, int nbytes);
+
+    /**
+     * Read data from the specified file.
+     *
+     * apr_file_read will read up to the specified number of
+     * bytes, but never more.  If there isn't enough data to fill that
+     * number of bytes, all of the available data is read.  The third
+     * argument is modified to reflect the number of bytes read.  If a
+     * char was put back into the stream via ungetc, it will be the first
+     * character returned.
+     *
+     * It is not possible for both bytes to be read and an APR_EOF
+     * or other error to be returned.  APR_EINTR is never returned.
+     * @param thefile The file descriptor to read from.
+     * @param buf The direct Byte buffer to store the data to.
+     * @param offset Start offset in buf
+     * @param nbytes The number of bytes to read.
+     * @return the number of bytes read.
+     */
+    public static native int readb(long thefile, ByteBuffer buf,  int offset, int nbytes);
 
     /**
      * Read data from the specified file, ensuring that the buffer is filled
@@ -435,6 +477,7 @@ public class File {
      * APR_EINTR is never returned.
      * @param thefile The file descriptor to read from.
      * @param buf The buffer to store the data to.
+     * @param offset Start offset in buf
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes read.
      */
@@ -444,6 +487,7 @@ public class File {
      * Read a string from the specified file.
      * The buffer will be NUL-terminated if any characters are stored.
      * @param buf The buffer to store the string in.
+     * @param offset Start offset in buf
      * @param thefile The file descriptor to read from
      */
     public static native int gets(byte[] buf,  int offset, long thefile);

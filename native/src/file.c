@@ -282,16 +282,34 @@ TCN_IMPLEMENT_CALL(jint, File, write)(TCN_STDARGS, jlong file,
                                       jbyteArray buf, jint offset, jint towrite)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)towrite;
     jbyte *bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     apr_status_t ss;
 
     UNREFERENCED(o);
-    if (towrite > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)towrite);
+    if (towrite < 0)
+        towrite = (*e)->GetArrayLength(e, buf);
     ss = apr_file_write(f, bytes + offset, &nbytes);
 
     (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
+}
+
+TCN_IMPLEMENT_CALL(jint, File, writeb)(TCN_STDARGS, jlong file,
+                                       jobject buf, jint offset, jint towrite)
+{
+    apr_file_t *f = J2P(file, apr_file_t *);
+    apr_size_t nbytes = (apr_size_t)towrite;
+    char *bytes = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    apr_status_t ss = APR_EINVAL;
+
+    UNREFERENCED(o);
+    if (bytes)
+        ss = apr_file_write(f, bytes + offset, &nbytes);
+
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else
@@ -302,14 +320,14 @@ TCN_IMPLEMENT_CALL(jint, File, writeFull)(TCN_STDARGS, jlong file,
                                           jbyteArray buf, jint offset, jint towrite)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)towrite;
     apr_size_t written = 0;
     apr_status_t ss;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
-    if (towrite > 0)
-        nbytes = min(nbytes + offset, (apr_size_t)towrite);
+    if (towrite < 0)
+        towrite = (*e)->GetArrayLength(e, buf);
     ss = apr_file_write_full(f, bytes + offset, nbytes, &written);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
@@ -396,18 +414,34 @@ TCN_IMPLEMENT_CALL(jint, File, read)(TCN_STDARGS, jlong file,
                                      jint toread)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)toread;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
 
     UNREFERENCED(o);
-    if (toread > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)toread);
-
     ss = apr_file_read(f, bytes + offset, &nbytes);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    ss == APR_SUCCESS ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else
+        return -(jint)ss;
+}
+
+TCN_IMPLEMENT_CALL(jint, File, readb)(TCN_STDARGS, jlong file,
+                                      jobject buf, jint offset,
+                                      jint toread)
+{
+    apr_file_t *f = J2P(file, apr_file_t *);
+    apr_size_t nbytes = (apr_size_t)toread;
+    char *bytes = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    apr_status_t ss = APR_EINVAL;
+
+    UNREFERENCED(o);
+    if (bytes)
+        ss = apr_file_read(f, bytes + offset, &nbytes);
+
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else
@@ -419,14 +453,12 @@ TCN_IMPLEMENT_CALL(jint, File, readFull)(TCN_STDARGS, jlong file,
                                          jint toread)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
-    apr_size_t nbytes = (*e)->GetArrayLength(e, buf);
+    apr_size_t nbytes = (apr_size_t)toread;
     apr_size_t nread;
     apr_status_t ss;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
-    if (toread > 0)
-        nbytes = min(nbytes - offset, (apr_size_t)toread);
     ss = apr_file_read_full(f, bytes + offset, nbytes, &nread);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
@@ -446,7 +478,7 @@ TCN_IMPLEMENT_CALL(jint, File, gets)(TCN_STDARGS, jbyteArray buf, jint offset,
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
-    rv = apr_file_gets(bytes + offset, nbytes, f);
+    rv = apr_file_gets(bytes + offset, nbytes - offset, f);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    rv == APR_SUCCESS ? 0 : JNI_ABORT);
