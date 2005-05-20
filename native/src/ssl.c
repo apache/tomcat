@@ -134,10 +134,12 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
             if ((ee = ENGINE_by_id(J2S(engine))) == NULL
                 && (ee = ssl_try_load_engine(J2S(engine))) == NULL)
                 err = APR_ENOTIMPL;
-            if (strcmp(J2S(engine), "chil") == 0)
-                ENGINE_ctrl(ee, ENGINE_CTRL_CHIL_SET_FORKCHECK, 1, 0, 0);
-            if (!ENGINE_set_default(ee, ENGINE_METHOD_ALL))
-                err = APR_ENOTIMPL;
+            else {
+                if (strcmp(J2S(engine), "chil") == 0)
+                    ENGINE_ctrl(ee, ENGINE_CTRL_CHIL_SET_FORKCHECK, 1, 0, 0);
+                if (!ENGINE_set_default(ee, ENGINE_METHOD_ALL))
+                    err = APR_ENOTIMPL;
+            }
             /* Free our "structural" reference. */
             ENGINE_free(ee);
         }
