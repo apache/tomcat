@@ -24,10 +24,19 @@ package org.apache.tomcat.jni;
 
 public final class SSL {
 
-     /* Return OpenSSL version number */
-    private static native int version();
+    /* Return OpenSSL version number */
+    public static native int version();
 
-     /* Return OpenSSL version string */
-    private static native String versionString();
+    /* Return OpenSSL version string */
+    public static native String versionString();
+
+    /**
+     * Initialize OpenSSL support.
+     * This function needs to be called once for the
+     * lifetime of JVM. Library.init() has to be called before.
+     * @return APR status code
+     */
+    public static native int initialize();
+
 
 }

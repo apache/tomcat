@@ -22,6 +22,9 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
+static int ssl_initialized = 0;
+extern apr_pool_t *tcn_global_pool;
+
 TCN_IMPLEMENT_CALL(jint, SSL, version)(TCN_STDARGS)
 {
     UNREFERENCED_STDARGS;
@@ -34,9 +37,76 @@ TCN_IMPLEMENT_CALL(jstring, SSL, versionString)(TCN_STDARGS)
     return AJP_TO_JSTRING(OPENSSL_VERSION_TEXT);
 }
 
+/*
+ *  the various processing hooks
+ */
+static apr_status_t ssl_init_cleanup(void *data)
+{
+    UNREFERENCED(data);
+    /*
+     * Try to kill the internals of the SSL library.
+     */
+#if OPENSSL_VERSION_NUMBER >= 0x00907001
+    /* Corresponds to OPENSSL_load_builtin_modules():
+     * XXX: borrowed from apps.h, but why not CONF_modules_free()
+     * which also invokes CONF_modules_finish()?
+     */
+    CONF_modules_unload(1);
+#endif
+    /* Corresponds to SSL_library_init: */
+    EVP_cleanup();
+#if HAVE_ENGINE_LOAD_BUILTIN_ENGINES
+    ENGINE_cleanup();
+#endif
+#if OPENSSL_VERSION_NUMBER >= 0x00907001
+    CRYPTO_cleanup_all_ex_data();
+#endif
+    ERR_remove_state(0);
 
+    /* Don't call ERR_free_strings here; ERR_load_*_strings only
+     * actually load the error strings once per process due to static
+     * variable abuse in OpenSSL. */
 
+    /* 
+     * TODO: determine somewhere we can safely shove out diagnostics 
+     *       (when enabled) at this late stage in the game:
+     * CRYPTO_mem_leaks_fp(stderr);
+     */
+    return APR_SUCCESS;
+}
 
+TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS)
+{
+    
+    UNREFERENCED_STDARGS;
+    if (!tcn_global_pool)
+        return (jint)APR_EINVAL;
+    /* Check if already initialized */
+    if (ssl_initialized++)
+        return (jint)APR_SUCCESS;
+    /* We must register the library in full, to ensure our configuration 
+     * code can successfully test the SSL environment.
+     */
+    CRYPTO_malloc_init();
+    ERR_load_crypto_strings();
+    SSL_load_error_strings();
+    SSL_library_init();
+#if HAVE_ENGINE_LOAD_BUILTIN_ENGINES
+    ENGINE_load_builtin_engines();
+#endif
+#if OPENSSL_VERSION_NUMBER >= 0x00907001
+    OPENSSL_load_builtin_modules();
+#endif
+
+    /*
+     * Let us cleanup the ssl library when the module is unloaded
+     */
+    apr_pool_cleanup_register(tcn_global_pool, NULL,
+                              ssl_init_cleanup,
+                              apr_pool_cleanup_null);
+
+    return (jint)APR_SUCCESS;
+}
 
 #else
 /* OpenSSL is not supported

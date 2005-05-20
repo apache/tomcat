@@ -25,7 +25,7 @@
 #include "tcn_version.h"
 
 
-static apr_pool_t *tcn_global_pool = NULL;
+apr_pool_t *tcn_global_pool = NULL;
 static JavaVM     *tcn_global_vm = NULL;
 
 static jclass    jString_class;
