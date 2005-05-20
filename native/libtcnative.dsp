@@ -168,6 +168,10 @@ SOURCE=.\include\tcn.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\include\ssl_private.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\include\tcn_version.h
 # End Source File
 # End Group

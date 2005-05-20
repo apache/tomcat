@@ -13,34 +13,25 @@
  * limitations under the License.
  */
 
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_file_io.h"
+#ifndef SSL_PRIVATE_H
+#define SSL_PRIVATE_H
 
-#include "tcn.h"
-
-#ifdef HAVE_OPENSSL
-#include "ssl_private.h"
-
-TCN_IMPLEMENT_CALL(jint, SSL, version)(TCN_STDARGS)
-{
-    UNREFERENCED_STDARGS;
-    return OPENSSL_VERSION_NUMBER;
-}
-
-TCN_IMPLEMENT_CALL(jstring, SSL, versionString)(TCN_STDARGS)
-{
-    UNREFERENCED(o);
-    return AJP_TO_JSTRING(OPENSSL_VERSION_TEXT);
-}
-
-
-
-
-
-#else
-/* OpenSSL is not supported
- * If someday we make OpenSSL optional
- * APR_ENOTIMPL will go here
+/* OpenSSL headers */
+#include <openssl/ssl.h>
+#include <openssl/err.h>
+#include <openssl/x509.h>
+#include <openssl/pem.h>
+#include <openssl/crypto.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <openssl/x509v3.h>
+/* Avoid tripping over an engine build installed globally and detected
+ * when the user points at an explicit non-engine flavor of OpenSSL
  */
+#if defined(HAVE_OPENSSL_ENGINE_H) && defined(HAVE_ENGINE_INIT)
+#include <openssl/engine.h>
 #endif
+
+
+
+#endif /* SSL_PRIVATE_H */
