@@ -43,6 +43,9 @@ TCN_IMPLEMENT_CALL(jstring, SSL, versionString)(TCN_STDARGS)
 static apr_status_t ssl_init_cleanup(void *data)
 {
     UNREFERENCED(data);
+    if (!ssl_initialized)
+        return APR_SUCCESS;
+    ssl_initialized = 0;
     /*
      * Try to kill the internals of the SSL library.
      */
@@ -75,15 +78,20 @@ static apr_status_t ssl_init_cleanup(void *data)
     return APR_SUCCESS;
 }
 
-TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS)
+TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 {
+    TCN_ALLOC_CSTRING(engine);
     
-    UNREFERENCED_STDARGS;
-    if (!tcn_global_pool)
+    UNREFERENCED(o);
+    if (!tcn_global_pool) {
+        TCN_FREE_CSTRING(engine);
         return (jint)APR_EINVAL;
+    }
     /* Check if already initialized */
-    if (ssl_initialized++)
+    if (ssl_initialized++) {
+        TCN_FREE_CSTRING(engine);
         return (jint)APR_SUCCESS;
+    }
     /* We must register the library in full, to ensure our configuration 
      * code can successfully test the SSL environment.
      */
@@ -98,13 +106,37 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS)
     OPENSSL_load_builtin_modules();
 #endif
 
+#if defined(HAVE_OPENSSL_ENGINE_H) && defined(HAVE_ENGINE_INIT)
+    if (J2S(engine)) {
+        ENGINE *e;
+        apr_status_t err = APR_SUCCESS;
+        if (!(e = ENGINE_by_id(J2S(engine))) {
+            ssl_init_cleanup(NULL);
+            err = APR_ENOTIMPL;
+        }
+
+        if (strcmp(J2S(engine), "chil") == 0) {
+            ENGINE_ctrl(e, ENGINE_CTRL_CHIL_SET_FORKCHECK, 1, 0, 0);
+        }
+
+        if (!ENGINE_set_default(e, ENGINE_METHOD_ALL)) {
+            ssl_init_cleanup(NULL);
+            err = APR_ENOTIMPL;
+        }
+        ENGINE_free(e);
+        if (err != APR_SUCCESS) {
+            TCN_FREE_CSTRING(engine);
+            return (jint)err;
+        }
+    }
+#endif
     /*
-     * Let us cleanup the ssl library when the module is unloaded
+     * Let us cleanup the ssl library when the library is unloaded
      */
     apr_pool_cleanup_register(tcn_global_pool, NULL,
                               ssl_init_cleanup,
                               apr_pool_cleanup_null);
-
+    TCN_FREE_CSTRING(engine);
     return (jint)APR_SUCCESS;
 }
 
