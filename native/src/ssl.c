@@ -141,7 +141,8 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
                     err = APR_ENOTIMPL;
             }
             /* Free our "structural" reference. */
-            ENGINE_free(ee);
+            if (ee)
+                ENGINE_free(ee);
         }
         if (err != APR_SUCCESS) {
             TCN_FREE_CSTRING(engine);
