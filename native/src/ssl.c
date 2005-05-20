@@ -24,6 +24,7 @@
 
 static int ssl_initialized = 0;
 extern apr_pool_t *tcn_global_pool;
+ENGINE *tcn_ssl_engine = NULL;
 
 TCN_IMPLEMENT_CALL(jint, SSL, version)(TCN_STDARGS)
 {
@@ -70,18 +71,34 @@ static apr_status_t ssl_init_cleanup(void *data)
      * actually load the error strings once per process due to static
      * variable abuse in OpenSSL. */
 
-    /* 
-     * TODO: determine somewhere we can safely shove out diagnostics 
+    /*
+     * TODO: determine somewhere we can safely shove out diagnostics
      *       (when enabled) at this late stage in the game:
      * CRYPTO_mem_leaks_fp(stderr);
      */
     return APR_SUCCESS;
 }
 
+#ifndef OPENSSL_NO_ENGINE
+/* Try to load an engine in a shareable library */
+static ENGINE *ssl_try_load_engine(const char *engine)
+{
+    ENGINE *e = ENGINE_by_id("dynamic");
+    if (e) {
+        if (!ENGINE_ctrl_cmd_string(e, "SO_PATH", engine, 0)
+            || !ENGINE_ctrl_cmd_string(e, "LOAD", NULL, 0)) {
+            ENGINE_free(e);
+            e = NULL;
+        }
+    }
+    return e;
+}
+#endif
+
 TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 {
     TCN_ALLOC_CSTRING(engine);
-    
+
     UNREFERENCED(o);
     if (!tcn_global_pool) {
         TCN_FREE_CSTRING(engine);
@@ -92,7 +109,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         TCN_FREE_CSTRING(engine);
         return (jint)APR_SUCCESS;
     }
-    /* We must register the library in full, to ensure our configuration 
+    /* We must register the library in full, to ensure our configuration
      * code can successfully test the SSL environment.
      */
     CRYPTO_malloc_init();
@@ -106,28 +123,30 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     OPENSSL_load_builtin_modules();
 #endif
 
-#if defined(HAVE_OPENSSL_ENGINE_H) && defined(HAVE_ENGINE_INIT)
+#ifndef OPENSSL_NO_ENGINE
     if (J2S(engine)) {
-        ENGINE *e;
+        ENGINE *ee = NULL;
         apr_status_t err = APR_SUCCESS;
-        if (!(e = ENGINE_by_id(J2S(engine))) {
-            ssl_init_cleanup(NULL);
-            err = APR_ENOTIMPL;
+        if(strcmp(J2S(engine), "auto") == 0) {
+            ENGINE_register_all_complete();
         }
-
-        if (strcmp(J2S(engine), "chil") == 0) {
-            ENGINE_ctrl(e, ENGINE_CTRL_CHIL_SET_FORKCHECK, 1, 0, 0);
+        else {
+            if ((ee = ENGINE_by_id(J2S(engine))) == NULL
+                && (ee = ssl_try_load_engine(J2S(engine))) == NULL)
+                err = APR_ENOTIMPL;
+            if (strcmp(J2S(engine), "chil") == 0)
+                ENGINE_ctrl(ee, ENGINE_CTRL_CHIL_SET_FORKCHECK, 1, 0, 0);
+            if (!ENGINE_set_default(ee, ENGINE_METHOD_ALL))
+                err = APR_ENOTIMPL;
+            /* Free our "structural" reference. */
+            ENGINE_free(ee);
         }
-
-        if (!ENGINE_set_default(e, ENGINE_METHOD_ALL)) {
-            ssl_init_cleanup(NULL);
-            err = APR_ENOTIMPL;
-        }
-        ENGINE_free(e);
         if (err != APR_SUCCESS) {
             TCN_FREE_CSTRING(engine);
+            ssl_init_cleanup(NULL);
             return (jint)err;
         }
+        tcn_ssl_engine = ee;
     }
 #endif
     /*
