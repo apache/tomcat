@@ -28,7 +28,7 @@
 /* Avoid tripping over an engine build installed globally and detected
  * when the user points at an explicit non-engine flavor of OpenSSL
  */
-#if defined(HAVE_OPENSSL_ENGINE_H) && defined(HAVE_ENGINE_INIT)
+#ifndef OPENSSL_NO_ENGINE
 #include <openssl/engine.h>
 #endif
 
