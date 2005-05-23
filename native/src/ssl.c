@@ -16,6 +16,8 @@
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_file_io.h"
+#include "apr_portable.h"
+#include "apr_thread_mutex.h"
 
 #include "tcn.h"
 
@@ -44,6 +46,7 @@ TCN_IMPLEMENT_CALL(jstring, SSL, versionString)(TCN_STDARGS)
 static apr_status_t ssl_init_cleanup(void *data)
 {
     UNREFERENCED(data);
+
     if (!ssl_initialized)
         return APR_SUCCESS;
     ssl_initialized = 0;
@@ -94,6 +97,72 @@ static ENGINE *ssl_try_load_engine(const char *engine)
     return e;
 }
 #endif
+
+/*
+ * To ensure thread-safetyness in OpenSSL
+ */
+
+static apr_thread_mutex_t **ssl_lock_cs;
+static int                  ssl_lock_num_locks;
+
+static void ssl_thread_lock(int mode, int type,
+                            const char *file, int line)
+{
+    if (type < ssl_lock_num_locks) {
+        if (mode & CRYPTO_LOCK) {
+            apr_thread_mutex_lock(ssl_lock_cs[type]);
+        }
+        else {
+            apr_thread_mutex_unlock(ssl_lock_cs[type]);
+        }
+    }
+}
+
+static unsigned long ssl_thread_id(void)
+{
+    /* OpenSSL needs this to return an unsigned long.  On OS/390, the pthread
+     * id is a structure twice that big.  Use the TCB pointer instead as a
+     * unique unsigned long.
+     */
+#ifdef __MVS__
+    struct PSA {
+        char unmapped[540];
+        unsigned long PSATOLD;
+    } *psaptr = 0;
+
+    return psaptr->PSATOLD;
+#else
+    return (unsigned long) apr_os_thread_current();
+#endif
+}
+
+static apr_status_t ssl_thread_cleanup(void *data)
+{
+    CRYPTO_set_locking_callback(NULL);
+    CRYPTO_set_id_callback(NULL);
+    /* Let the registered mutex cleanups do their own thing
+     */
+    return APR_SUCCESS;
+}
+
+static void ssl_thread_setup(apr_pool_t *p)
+{
+    int i;
+
+    ssl_lock_num_locks = CRYPTO_num_locks();
+    ssl_lock_cs = apr_palloc(p, ssl_lock_num_locks * sizeof(*ssl_lock_cs));
+
+    for (i = 0; i < ssl_lock_num_locks; i++) {
+        apr_thread_mutex_create(&(ssl_lock_cs[i]),
+                                APR_THREAD_MUTEX_DEFAULT, p);
+    }
+
+    CRYPTO_set_id_callback(ssl_thread_id);
+    CRYPTO_set_locking_callback(ssl_thread_lock);
+
+    apr_pool_cleanup_register(p, NULL, ssl_thread_cleanup,
+                                       apr_pool_cleanup_null);
+}
 
 TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 {
@@ -158,6 +227,8 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     apr_pool_cleanup_register(tcn_global_pool, NULL,
                               ssl_init_cleanup,
                               apr_pool_cleanup_null);
+    /* Initialize thread support */
+    ssl_thread_setup(tcn_global_pool);
     TCN_FREE_CSTRING(engine);
     return (jint)APR_SUCCESS;
 }
