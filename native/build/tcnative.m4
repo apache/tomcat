@@ -280,10 +280,12 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
   saved_LDFLAGS=$LDFLAGS
   saved_LIBS=$LIBS
   if test "x$tcn_ssltk_base" != "x"; then
-    if test -d "$tcn_ssltk_base/lib"; then
-      ap_ssltk_lib="$tcn_ssltk_base/lib"
+    if test -d "$tcn_ssltk_base/lib64"; then
+      tcn_ssltk_lib="$tcn_ssltk_base/lib64"
+    elif test -d "$tcn_ssltk_base/lib"; then
+      tcn_ssltk_lib="$tcn_ssltk_base/lib"
     else
-      ap_ssltk_lib="$tcn_ssltk_base"
+      tcn_ssltk_lib="$tcn_ssltk_base"
     fi
     LDFLAGS="$LDFLAGS -L$tcn_ssltk_lib"
   fi
@@ -314,7 +316,7 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
   fi
   dnl (c) hook up linker paths
   if test "x$tcn_ssltk_lib" != "x"; then
-    APR_ADDTO(LDFLAGS, ["-L$tcn_ssltk_lib"])
+    APR_ADDTO(TCNATIVE_LDFLAGS, ["-L$tcn_ssltk_lib"])
   fi
 
   dnl Adjust configuration based on what we found above.
