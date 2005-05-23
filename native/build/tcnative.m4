@@ -214,7 +214,7 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
   tcn_ssltk_inc=""
   tcn_ssltk_lib=""
   tcn_ssltk_type=""
-  AC_ARG_WITH(ssl, APACHE_HELP_STRING(--with-ssl=DIR,OpenSSL SSL/TLS toolkit), [
+  AC_ARG_WITH(ssl, TCN_HELP_STRING(--with-ssl=DIR,OpenSSL SSL/TLS toolkit), [
     dnl If --with-ssl specifies a directory, we use that directory or fail
     if test "x$withval" != "xyes" -a "x$withval" != "x"; then
       dnl This ensures $withval is actually a directory and that it is absolute
@@ -268,7 +268,7 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
     fi
   fi
   if test "$tcn_ssltk_type" != "openssl"; then
-      AC_MSG_RESULT([no OpenSSL headers found])
+    AC_MSG_ERROR([... No OpenSSL headers found])
   fi
   dnl restore
   CPPFLAGS=$saved_CPPFLAGS
