@@ -30,9 +30,7 @@ else
 fi
 
 AC_SUBST(TCN_CONFIG_LOCATION)
-
 AC_CANONICAL_SYSTEM
-
 AC_PROG_INSTALL
 
 dnl
@@ -99,6 +97,11 @@ AC_SUBST(JAVA_OS)
 
 APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include])
 APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include/$JAVA_OS]) 
+
+dnl
+dnl Detect openssl toolkit installation
+dnl 
+TCN_CHECK_SSL_TOOLKIT
 
 so_ext=$APR_SO_EXT
 lib_target=$APR_LIB_TARGET
