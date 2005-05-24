@@ -26,11 +26,6 @@
 #define TCN_ASSERT(x) (void)0
 #endif
 
-#ifdef min
-#undef min
-#endif
-#define min(a, b)  ((a) < (b) ? (a) : (b))
-
 #ifndef APR_MAX_IOVEC_SIZE
 #define APR_MAX_IOVEC_SIZE 1024
 #endif
@@ -40,8 +35,8 @@
 #define TCN_ERROR_CLASS "org/apache/tomcat/jni/Error"
 
 #define UNREFERENCED(P) (P)
-#define P2J(P)          ((jlong)(long)(void *)P)
-#define J2P(P, T)       ((T)(void *)(long)P)
+#define P2J(P)          ((jlong)(P))
+#define J2P(P, T)       ((T)((jlong)(P)))
 /* On stack buffer size */
 #define TCN_BUFFER_SZ   8192
 #define TCN_STDARGS     JNIEnv *e, jobject o
