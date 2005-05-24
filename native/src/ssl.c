@@ -108,6 +108,8 @@ static int                  ssl_lock_num_locks;
 static void ssl_thread_lock(int mode, int type,
                             const char *file, int line)
 {
+    UNREFERENCED(file);
+    UNREFERENCED(line);
     if (type < ssl_lock_num_locks) {
         if (mode & CRYPTO_LOCK) {
             apr_thread_mutex_lock(ssl_lock_cs[type]);
@@ -132,12 +134,13 @@ static unsigned long ssl_thread_id(void)
 
     return psaptr->PSATOLD;
 #else
-    return (unsigned long) apr_os_thread_current();
+    return (unsigned long)((jlong)apr_os_thread_current());
 #endif
 }
 
 static apr_status_t ssl_thread_cleanup(void *data)
 {
+    UNREFERENCED(data);
     CRYPTO_set_locking_callback(NULL);
     CRYPTO_set_id_callback(NULL);
     /* Let the registered mutex cleanups do their own thing
