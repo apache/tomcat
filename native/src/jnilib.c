@@ -85,7 +85,7 @@ jstring tcn_new_string(JNIEnv *env, const char *str)
     }
 
     len = strlen(str);
-    bytes = (*env)->NewByteArray(env, len);
+    bytes = (*env)->NewByteArray(env, (jsize)len);
     if (bytes != NULL) {
         (*env)->SetByteArrayRegion(env, bytes, 0, (jint)len, (jbyte *)str);
         result = (*env)->NewObject(env, jString_class, jString_init, bytes);

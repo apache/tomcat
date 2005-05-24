@@ -184,8 +184,8 @@ static void fill_finfo(JNIEnv *e, jobject obj, apr_finfo_t *info)
     SET_FINFO_I(valid, info->valid);
     SET_FINFO_I(protection, info->protection);
     SET_FINFO_I(filetype, info->filetype);
-    SET_FINFO_I(user, info->user);
-    SET_FINFO_I(group, info->group);
+    SET_FINFO_I(user, ((jlong)info->user));
+    SET_FINFO_I(group, ((jlong)info->group));
     SET_FINFO_I(inode, info->inode);
     SET_FINFO_I(device, info->device);
     SET_FINFO_I(nlink, info->nlink);
