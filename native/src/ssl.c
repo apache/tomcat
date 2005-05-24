@@ -247,4 +247,5 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
  * If someday we make OpenSSL optional
  * APR_ENOTIMPL will go here
  */
+#error "No OpenSSL Toolkit defined."
 #endif
