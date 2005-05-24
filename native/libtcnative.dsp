@@ -148,6 +148,18 @@ SOURCE=.\src\ssl.c
 # End Source File
 # Begin Source File
 
+SOURCE=.\src\sslcontext.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\sslnetwork.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\sslutils.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\stdlib.c
 # End Source File
 # Begin Source File
