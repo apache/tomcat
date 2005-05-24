@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/*
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+ 
 #define _WIN32_WINNT 0x0500
 
 #include "apr.h"

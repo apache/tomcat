@@ -13,7 +13,12 @@
  * limitations under the License.
  */
 
-
+/*
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+ 
 #ifndef TCN_H
 #define TCN_H
 

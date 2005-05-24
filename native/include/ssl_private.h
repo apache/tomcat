@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/*
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+ 
 #ifndef SSL_PRIVATE_H
 #define SSL_PRIVATE_H
 

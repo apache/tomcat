@@ -13,6 +13,12 @@
  * limitations under the License.
  */
 
+/*
+ *
+ * @author Mladen Turk
+ * @version $Revision$, $Date$
+ */
+ 
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_user.h"
