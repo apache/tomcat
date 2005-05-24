@@ -93,7 +93,7 @@ cleanup:
 TCN_IMPLEMENT_CALL(jstring, User, username)(TCN_STDARGS, jlong userid, jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
-    apr_uid_t uid = (apr_uid_t)(long)userid;
+    apr_uid_t uid = (apr_uid_t)userid;
     char *uname = NULL;
 
     UNREFERENCED(o);
@@ -109,7 +109,7 @@ cleanup:
 TCN_IMPLEMENT_CALL(jstring, User, groupname)(TCN_STDARGS, jlong grpid, jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
-    apr_gid_t gid = (apr_uid_t)(long)grpid;
+    apr_gid_t gid = (apr_uid_t)grpid;
     char *gname = NULL;
 
     UNREFERENCED(o);
@@ -126,16 +126,16 @@ TCN_IMPLEMENT_CALL(jint, User,uidcompare)(TCN_STDARGS, jlong left, jlong right)
 {
 
     UNREFERENCED_STDARGS;
-    return (int)apr_uid_compare((apr_uid_t)(long)left,
-                                (apr_uid_t)(long)right);
+    return (int)apr_uid_compare((apr_uid_t)left,
+                                (apr_uid_t)right);
 }
 
 TCN_IMPLEMENT_CALL(jint, User,gidcompare)(TCN_STDARGS, jlong left, jlong right)
 {
 
     UNREFERENCED_STDARGS;
-    return (int)apr_gid_compare((apr_gid_t)(long)left,
-                                (apr_gid_t)(long)right);
+    return (int)apr_gid_compare((apr_gid_t)left,
+                                (apr_gid_t)right);
 }
 
 TCN_IMPLEMENT_CALL(jstring, User, homepath)(TCN_STDARGS, jstring uname, jlong pool)
