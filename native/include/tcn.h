@@ -18,7 +18,7 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #ifndef TCN_H
 #define TCN_H
 
@@ -138,5 +138,7 @@ struct tcn_callback {
 
 typedef struct tcn_callback tcn_callback_t;
 
-
+#ifdef TCN_DO_STATISTICS
+#define TCN_MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
 #endif /* TCN_H */

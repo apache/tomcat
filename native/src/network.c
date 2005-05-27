@@ -18,12 +18,19 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_network_io.h"
+#include "apr_portable.h"
 #include "tcn.h"
 
+#ifdef TCN_DO_STATISTICS
+static int sp_created  = 0;
+static int sp_closed   = 0;
+static int sp_cleared  = 0;
+static int sp_accepted = 0;
+#endif
 
 #if  !APR_HAVE_IPV6
 #define APR_INET6 APR_INET
@@ -39,6 +46,25 @@
     if (F == 0) T = SOCK_STREAM;     \
     else if (F == 1) T = SOCK_DGRAM; \
     else T = F
+
+#ifdef TCN_DO_STATISTICS
+
+static apr_status_t sp_socket_cleanup(void *data)
+{
+    sp_cleared++;
+    return APR_SUCCESS;
+}
+
+void sp_network_dump_statistics()
+{
+    fprintf(stderr, "Network Statistics ......\n");
+    fprintf(stderr, "Sockets created         : %d\n", sp_created);
+    fprintf(stderr, "Sockets accepted        : %d\n", sp_accepted);
+    fprintf(stderr, "Sockets closed          : %d\n", sp_closed);
+    fprintf(stderr, "Sockets cleared         : %d\n", sp_cleared);
+}
+
+#endif
 
 TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
                                          jstring hostname,
@@ -138,6 +164,13 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     TCN_THROW_IF_ERR(apr_socket_create(&s,
                      f, t, protocol, p), s);
 
+#ifdef TCN_DO_STATISTICS
+    sp_created++;
+    apr_pool_cleanup_register(p, (const void *)s,
+                              sp_socket_cleanup,
+                              apr_pool_cleanup_null);
+#endif
+
 cleanup:
     return P2J(s);
 
@@ -159,6 +192,12 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
+
+#ifdef TCN_DO_STATISTICS
+    sp_closed++;
+    apr_pool_cleanup_kill((apr_pool_t *)s, s, sp_socket_cleanup);
+#endif
+
     return (jint)apr_socket_close(s);
 }
 
@@ -193,7 +232,16 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
 
-    TCN_THROW_IF_ERR(apr_socket_accept(&n, s, p), s);
+    TCN_THROW_IF_ERR(apr_socket_accept(&n, s, p), n);
+
+#ifdef TCN_DO_STATISTICS
+    if (n) {
+        sp_accepted++;
+        apr_pool_cleanup_register(p, (const void *)n,
+                                  sp_socket_cleanup,
+                                  apr_pool_cleanup_null);
+    }
+#endif
 
 cleanup:
     return P2J(n);

@@ -18,7 +18,7 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_version.h"
@@ -30,6 +30,10 @@
 #include "tcn.h"
 #include "tcn_version.h"
 
+#ifdef TCN_DO_STATISTICS
+extern void sp_poll_dump_statistics();
+extern void sp_network_dump_statistics();
+#endif
 
 apr_pool_t *tcn_global_pool = NULL;
 static JavaVM     *tcn_global_vm = NULL;
@@ -44,7 +48,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
     JNIEnv *env;
 
     UNREFERENCED(reserved);
-    if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_2)) {
+    if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_4)) {
         return JNI_ERR;
     }
     tcn_global_vm = vm;
@@ -63,7 +67,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
         return JNI_ERR;
 
     apr_initialize();
-    return  JNI_VERSION_1_2;
+    return  JNI_VERSION_1_4;
 }
 
 
@@ -73,6 +77,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
     JNIEnv *env;
 
     UNREFERENCED(reserved);
+
     if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_2)) {
         return;
     }
@@ -161,8 +166,16 @@ TCN_IMPLEMENT_CALL(void, Library, terminate)(TCN_STDARGS)
 
     UNREFERENCED_STDARGS;
     if (tcn_global_pool) {
+#ifdef TCN_DO_STATISTICS
+        fprintf(stderr, "APR Statistical data ....\n");
+#endif
         apr_pool_destroy(tcn_global_pool);
         tcn_global_pool = NULL;
+#ifdef TCN_DO_STATISTICS
+        sp_poll_dump_statistics();
+        sp_network_dump_statistics();
+        fprintf(stderr, "APR Terminated\n");
+#endif
     }
 }
 
