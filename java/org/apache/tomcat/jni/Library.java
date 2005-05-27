@@ -68,7 +68,7 @@ public final class Library {
     /* destroy global TCN's APR pool
      * This has to be the last call to TCN library.
      */
-    private static native void terminate();
+    public static native void terminate();
     /* Internal function for loading APR Features */
     private static native boolean has(int what);
     /* Internal function for loading APR Features */
@@ -194,18 +194,6 @@ public final class Library {
             APR_O_NONBLOCK_INHERITED  = has(20);
         }
         return initialize();
-    }
-
-    /**
-     * Tear down any APR internal data structures which aren't torn down
-     * automatically.
-     * An APR program must call this function at termination once it
-     *         has stopped using APR services.
-     */
-    static public void terminate(boolean doCleanup)
-    {
-        terminate();
-        /* TODO: doCleanup code */
     }
 
 }
