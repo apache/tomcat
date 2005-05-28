@@ -39,9 +39,10 @@
 #define APR_MAX_IOVEC_SIZE 1024
 #endif
 
-#define TCN_FINFO_CLASS "org/apache/tomcat/jni/FileInfo"
-#define TCN_AINFO_CLASS "org/apache/tomcat/jni/Sockaddr"
-#define TCN_ERROR_CLASS "org/apache/tomcat/jni/Error"
+#define TCN_CLASS_PATH  "org/apache/tomcat/jni/"
+#define TCN_FINFO_CLASS TCN_CLASS_PATH "FileInfo"
+#define TCN_AINFO_CLASS TCN_CLASS_PATH "Sockaddr"
+#define TCN_ERROR_CLASS TCN_CLASS_PATH "Error"
 
 #define UNREFERENCED(P) (P)
 #define P2J(P)          ((jlong)(P))
