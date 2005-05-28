@@ -82,7 +82,7 @@ public class Echo {
                     System.out.println("Server: " + addr.servname);
                     System.out.println("IP: " + Address.getip(sa) +
                                        ":" + addr.port);
-                }                                           
+                }
                 int rc = Socket.bind(serverSock, inetAddress);
                 if (rc != 0) {
                   throw(new Exception("Can't create Acceptor: bind: " + Error.strerror(rc)));
@@ -101,7 +101,7 @@ public class Echo {
                 while (true) {
                     long clientSock = Socket.accept(serverSock, pool);
                     System.out.println("Accepted id: " +  i);
-                    
+
                     try {
                         long sa = Address.get(Socket.APR_REMOTE, clientSock);
                         Sockaddr raddr = new Sockaddr();
@@ -117,13 +117,13 @@ public class Echo {
                             System.out.println("Local Server: " + Address.getnameinfo(sa, 0));
                             System.out.println("Local IP: " + Address.getip(sa) +
                                                ":" + laddr.port);
-                        }                                        
-                        
+                        }
+
                     } catch (Exception e) {
                         // Ignore
                         e.printStackTrace();
                     }
-                    
+
                     Socket.timeoutSet(clientSock, 10000000);
                     Worker worker = new Worker(clientSock, i++,
                                                this.getClass().getName());
@@ -183,16 +183,25 @@ public class Echo {
                     /* Four times size then  created pollset */
                     long [] desc = new long[64];
                     /* USe 1 second poll timeout */
-                    int rv = Poll.poll(serverPollset, 1000000, desc);
-                    for (int n = 0; n < rv; n++) {
-                        long clientSock = desc[n*4+1];
-                        int  workerId   = (int)desc[n*4+2];
-                        System.out.println("Poll flags " + desc[n*4]);
-                        remove(clientSock, workerId);
-                        Worker worker = new Worker(clientSock, workerId,
-                                                   this.getClass().getName());
-                        Echo.incThreads();
-                        worker.start();
+                    int rv = Poll.poll(serverPollset, 1000000, desc, false);
+                    if (rv > 0) {
+                        for (int n = 0; n < rv; n++) {
+                            long clientSock = desc[n*4+1];
+                            int  workerId   = (int)desc[n*4+2];
+                            System.out.println("Poll flags " + desc[n*4]);
+                            remove(clientSock, workerId);
+                            Worker worker = new Worker(clientSock, workerId,
+                                                       this.getClass().getName());
+                            Echo.incThreads();
+                            worker.start();
+                        }
+                    }
+                    else {
+                        if (Status.APR_STATUS_IS_TIMEUP(-rv))
+                            System.out.println("Timeup");
+                        else {
+                            System.out.println("Error " + (-rv));
+                        }
                     }
                 }
                 /* XXX: JFC quick hack
@@ -294,6 +303,36 @@ public class Echo {
     public static void main(String [] args) {
         try {
             Library.initialize(null);
+            long [] inf = new long[16];
+            System.out.println("Info ...");
+            System.out.println("  Native        " + Library.versionString());
+            System.out.println("  APR           " + Library.aprVersionString());
+            OS.info(inf);
+            System.out.println("OS Info ...");
+            System.out.println("  Physical      " + inf[0]);
+            System.out.println("  Avail         " + inf[1]);
+            System.out.println("  Swap          " + inf[2]);
+            System.out.println("  Swap free     " + inf[3]);
+            System.out.println("  Shared        " + inf[4]);
+            System.out.println("  Buffers size  " + inf[5]);
+            System.out.println("  Load          " + inf[6]);
+
+            System.out.println("  Idle          " + inf[7]);
+            System.out.println("  Kernel        " + inf[8]);
+            System.out.println("  User          " + inf[9]);
+
+            System.out.println("  Proc creation " + inf[10]);
+            System.out.println("  Proc kernel   " + inf[11]);
+            System.out.println("  Proc user     " + inf[12]);
+            System.out.println("  Curr working  " + inf[13]);
+            System.out.println("  Peak working  " + inf[14]);
+            System.out.println("  Page faults   " + inf[15]);
+
+            SSL.initialize(null);
+            System.out.println("OpenSSL ...");
+            System.out.println("  version       " + SSL.versionString());
+            System.out.println("  number        " + SSL.version());
+
             System.out.println("Starting Native Echo server example on port " +
                                echoAddr + ":" + echoPort);
             Echo echo = new Echo();
