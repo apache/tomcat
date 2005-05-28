@@ -30,6 +30,13 @@ static int sp_created  = 0;
 static int sp_closed   = 0;
 static int sp_cleared  = 0;
 static int sp_accepted = 0;
+/* Fake private pool struct to deal with APR private's socket
+ * struct not exposing function to access the pool.
+ */
+typedef struct
+{
+    apr_pool_t *pool;
+} fake_apr_socket_t;
 #endif
 
 #if  !APR_HAVE_IPV6
@@ -195,7 +202,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
 
 #ifdef TCN_DO_STATISTICS
     sp_closed++;
-    apr_pool_cleanup_kill((apr_pool_t *)s, s, sp_socket_cleanup);
+    apr_pool_cleanup_kill(((fake_apr_socket_t *)s)->pool, s, sp_socket_cleanup);
 #endif
 
     return (jint)apr_socket_close(s);

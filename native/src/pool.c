@@ -133,6 +133,7 @@ TCN_IMPLEMENT_CALL(void, Pool, cleanupKill)(TCN_STDARGS, jlong pool,
     tcn_callback_t *cb = J2P(data, tcn_callback_t *);
 
     UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
     apr_pool_cleanup_kill(p, cb, generic_pool_cleanup);
     (*e)->DeleteGlobalRef(e, cb->obj);
     free(cb);
@@ -146,6 +147,7 @@ TCN_IMPLEMENT_CALL(jobject, Pool, alloc)(TCN_STDARGS, jlong pool,
     void *mem;
 
     UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
 
     if ((mem = apr_palloc(p, sz)) != NULL)
         return (*e)->NewDirectByteBuffer(e, mem, (jlong)sz);
@@ -161,9 +163,84 @@ TCN_IMPLEMENT_CALL(jobject, Pool, calloc)(TCN_STDARGS, jlong pool,
     void *mem;
 
     UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
 
     if ((mem = apr_pcalloc(p, sz)) != NULL)
         return (*e)->NewDirectByteBuffer(e, mem, (jlong)sz);
     else
         return NULL;
+}
+
+static apr_status_t generic_pool_data_cleanup(void *data)
+{
+    apr_status_t rv = APR_SUCCESS;
+    tcn_callback_t *cb = (tcn_callback_t *)data;
+
+    if (data) {
+        if (!TCN_IS_NULL(cb->env, cb->obj)) {
+            TCN_UNLOAD_CLASS(cb->env, cb->obj);
+        }
+        free(cb);
+    }
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jint, Pool, dataSet)(TCN_STDARGS, jlong pool,
+                                        jstring key, jobject data)
+{
+    apr_pool_t *p = J2P(pool, apr_pool_t *);
+    apr_status_t rv = APR_SUCCESS;
+    void *old = NULL;
+    TCN_ALLOC_CSTRING(key);
+
+    UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
+
+    if (apr_pool_userdata_get(&old, J2S(key), p) == APR_SUCCESS) {
+        if (old)
+            apr_pool_cleanup_run(p, old, generic_pool_data_cleanup);
+    }
+    if (data) {
+        tcn_callback_t *cb = (tcn_callback_t *)malloc(sizeof(tcn_callback_t));
+        cb->env = e;
+        cb->obj = (*e)->NewGlobalRef(e, data);
+        if ((rv = apr_pool_userdata_set(cb, J2S(key), generic_pool_data_cleanup,
+                                        p)) != APR_SUCCESS) {
+            (*e)->DeleteGlobalRef(e, cb->obj);
+            free(cb);
+        }
+    }
+    else {
+        /* Clear the exiting user data */
+        rv = apr_pool_userdata_set(NULL, J2S(key), NULL, p);
+    }
+    TCN_FREE_CSTRING(key);
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jobject, Pool, dataGet)(TCN_STDARGS, jlong pool,
+                                           jstring key)
+{
+    apr_pool_t *p = J2P(pool, apr_pool_t *);
+    void *old = NULL;
+    TCN_ALLOC_CSTRING(key);
+    jobject rv = NULL;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
+
+    if (apr_pool_userdata_get(&old, J2S(key), p) == APR_SUCCESS) {
+        if (old) {
+            tcn_callback_t *cb = (tcn_callback_t *)old;
+            rv = cb->obj;
+        }
+    }
+    TCN_FREE_CSTRING(key);
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(void, Pool, cleanupForExec)(TCN_STDARGS)
+{
+    UNREFERENCED_STDARGS;
+    apr_pool_cleanup_for_exec();;
 }

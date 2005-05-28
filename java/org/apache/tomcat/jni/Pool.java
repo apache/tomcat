@@ -129,4 +129,35 @@ public class Pool {
      */
     public static native ByteBuffer calloc(long p, int size);
 
+    /*
+     * User data management
+     */
+
+    /**
+     * Set the data associated with the current pool
+     * @param data The user data associated with the pool.
+     * @param key The key to use for association
+     * @param pool The current pool
+     * @warning The data to be attached to the pool should have a life span
+     *          at least as long as the pool it is being attached to.
+     *          Object attached to the pool will be globaly referenced
+     *          untill the pool is cleared or dataSet is called with the
+     *          null data.
+     * @return APR Status code.
+     */
+     public static native int dataSet(long pool, String key, Object data);
+
+    /**
+     * Return the data associated with the current pool.
+     * @param key The key for the data to retrieve
+     * @param pool The current pool.
+     */
+     public static native Object dataGet(long pool, String key);
+
+    /**
+     * Run all of the child_cleanups, so that any unnecessary files are
+     * closed because we are about to exec a new program
+     */
+    public static native void cleanupForExec();
+
 }
