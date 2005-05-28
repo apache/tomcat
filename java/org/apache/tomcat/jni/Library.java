@@ -95,6 +95,8 @@ public final class Library {
 
     /* TCN_VERSION_STRING */
     public static native String versionString();
+    /* APR_VERSION_STRING */
+    public static native String aprVersionString();
 
     /*  APR Feature Macros */
     public static boolean APR_HAVE_IPV6           = false;
@@ -192,8 +194,14 @@ public final class Library {
             APR_CHARSET_EBCDIC      = has(18);
             APR_TCP_NODELAY_INHERITED = has(19);
             APR_O_NONBLOCK_INHERITED  = has(20);
+            if (APR_MAJOR_VERSION < 1) {
+                throw new UnsatisfiedLinkError("Unsupported APR Version (" +
+                                               aprVersionString() + ")");
+            }
+            if (!APR_HAS_THREADS) {
+                throw new UnsatisfiedLinkError("Missing APR_HAS_THREADS");
+            }
         }
         return initialize();
     }
-
 }

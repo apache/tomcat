@@ -231,6 +231,12 @@ TCN_IMPLEMENT_CALL(jstring, Library, versionString)(TCN_STDARGS)
     return AJP_TO_JSTRING(TCN_VERSION_STRING);
 }
 
+TCN_IMPLEMENT_CALL(jstring, Library, aprVersionString)(TCN_STDARGS)
+{
+    UNREFERENCED(o);
+    return AJP_TO_JSTRING(apr_version_string());
+}
+
 TCN_IMPLEMENT_CALL(jboolean, Library, has)(TCN_STDARGS, jint what)
 {
     jboolean rv = JNI_FALSE;
