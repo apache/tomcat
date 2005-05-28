@@ -22,6 +22,10 @@
 #ifndef TCN_H
 #define TCN_H
 
+#ifndef APR_HAS_THREADS
+#error "Missing APR_HAS_THREADS support from APR."
+#endif
+
 #include <jni.h>
 
 #if defined(_DEBUG) || defined(DEBUG)
