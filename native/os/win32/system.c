@@ -18,7 +18,7 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #define _WIN32_WINNT 0x0500
 
 #include "apr.h"
@@ -135,13 +135,16 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
     FILETIME ft[4];
     PROCESS_MEMORY_COUNTERS pmc;
     jint rv;
+    int i;
     jsize ilen = (*e)->GetArrayLength(e, inf);
     jlong *pvals = (*e)->GetLongArrayElements(e, inf, NULL);
 
-    if (ilen < 14) {
-
+    if (ilen < 16) {
         return APR_EINVAL;
     }
+    for (i = 0; i < 16; i++)
+        pvals[i] = 0;
+
     ms.dwLength = sizeof(MEMORYSTATUSEX);
 
     UNREFERENCED(o);
@@ -150,7 +153,8 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         pvals[1] = (jlong)ms.ullAvailPhys;
         pvals[2] = (jlong)ms.ullTotalPageFile;
         pvals[3] = (jlong)ms.ullAvailPageFile;
-        pvals[4] = (jlong)ms.dwMemoryLoad;
+        /* Slots 4 and 5 are for shared memory */
+        pvals[6] = (jlong)ms.dwMemoryLoad;
     }
     else
         goto cleanup;
@@ -183,9 +187,9 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         else
             goto cleanup;
     }
-    pvals[5] = st[0];
-    pvals[6] = st[1];
-    pvals[7] = st[2];
+    pvals[7] = st[0];
+    pvals[8] = st[1];
+    pvals[9] = st[2];
 
     memset(st, 0, sizeof(st));
     if (GetProcessTimes(GetCurrentProcess(), &ft[0], &ft[1], &ft[2], &ft[3])) {
@@ -193,20 +197,20 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         st[1] = ((ft[2].dwHighDateTime << 32) | ft[2].dwLowDateTime) / 10;
         st[2] = ((ft[3].dwHighDateTime << 32) | ft[3].dwLowDateTime) / 10;
     }
-    pvals[8] = st[0];
-    pvals[9] = st[1];
-    pvals[10] = st[2];
+    pvals[10] = st[0];
+    pvals[11] = st[1];
+    pvals[12] = st[2];
 
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-        pvals[11] = pmc.WorkingSetSize;
-        pvals[12] = pmc.PeakWorkingSetSize;
-        pvals[13] = pmc.PageFaultCount;
+        pvals[14] = pmc.WorkingSetSize;
+        pvals[14] = pmc.PeakWorkingSetSize;
+        pvals[15] = pmc.PageFaultCount;
     }
 
     (*e)->ReleaseLongArrayElements(e, inf, pvals, 0);
     return APR_SUCCESS;
 cleanup:
     rv = apr_get_os_error();
-    (*e)->ReleaseLongArrayElements(e, inf, pvals, JNI_ABORT);
+    (*e)->ReleaseLongArrayElements(e, inf, pvals, 0);
     return rv;
 }

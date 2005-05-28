@@ -29,6 +29,9 @@ public class OS {
     private static final int NETWARE  = 2;
     private static final int WIN32    = 3;
     private static final int WIN64    = 4;
+    private static final int LINUX    = 5;
+    private static final int SOLARIS  = 6;
+    private static final int BSD      = 7;
 
     /**
      * Check for OS type.
@@ -41,12 +44,18 @@ public class OS {
         IS_NETWARE = is(NETWARE);
         IS_WIN32   = is(WIN32);
         IS_WIN64   = is(WIN64);
+        IS_LINUX   = is(LINUX);
+        IS_SOLARIS = is(SOLARIS);
+        IS_BSD     = is(BSD);
     }
 
     public static boolean IS_UNIX    = false;
     public static boolean IS_NETWARE = false;
     public static boolean IS_WIN32   = false;
     public static boolean IS_WIN64   = false;
+    public static boolean IS_LINUX   = false;
+    public static boolean IS_SOLARIS = false;
+    public static boolean IS_BSD     = false;
 
     /**
      * Get the name of the system default characer set.
@@ -73,26 +82,29 @@ public class OS {
      * Gather system info.
      * <PRE>
      * On exit the inf array will be filled with:
-     * inf[0]  - Physical RAM
-     * inf[1]  - Available RAM
-     * inf[2]  - Total page file (swap + Physical RAM)
-     * inf[3]  - Free page file
-     * inf[4]  - Memory Load
+     * inf[0]  - Total usable main memory size
+     * inf[1]  - Available memory size
+     * inf[2]  - Total page file/swap space size
+     * inf[3]  - Page file/swap space still available
+     * inf[4]  - Amount of shared memory
+     * inf[5]  - Memory used by buffers
+     * inf[6]  - Memory Load
      *
-     * inf[5]  - Idle Time in microseconds
-     * inf[6]  - Kernel Time in microseconds
-     * inf[7]  - User Time in microseconds
+     * inf[7]  - Idle Time in microseconds
+     * inf[9]  - Kernel Time in microseconds
+     * inf[9]  - User Time in microseconds
      *
-     * inf[8]  - Process creation time (apr_time_t)
-     * inf[9]  - Process Kernel Time in microseconds
-     * inf[10] - Process User Time in microseconds
+     * inf[10] - Process creation time (apr_time_t)
+     * inf[11] - Process Kernel Time in microseconds
+     * inf[12] - Process User Time in microseconds
      *
-     * inf[11] - Current working set size.
-     * inf[12] - Peak working set size.
-     * inf[13] - Number of page faults.
+     * inf[13] - Current working set size.
+     * inf[14] - Peak working set size.
+     * inf[15] - Number of page faults.
      * </PRE>
-     * @param inf array that will be filled with system informations.
+     * @param inf array that will be filled with system information.
+     *            Array length must be at least 16.
      */
     public static native int info(long [] inf);
-    
+
 }
