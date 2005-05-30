@@ -18,12 +18,14 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_file_io.h"
 #include "apr_portable.h"
 #include "apr_thread_mutex.h"
+#include "apr_strings.h"
+#include "apr_atomic.h"
 
 #include "tcn.h"
 
@@ -173,6 +175,123 @@ static void ssl_thread_setup(apr_pool_t *p)
                                        apr_pool_cleanup_null);
 }
 
+static int ssl_rand_choosenum(int l, int h)
+{
+    int i;
+    char buf[50];
+
+    apr_snprintf(buf, sizeof(buf), "%.0f",
+                 (((double)(rand()%RAND_MAX)/RAND_MAX)*(h-l)));
+    i = atoi(buf)+1;
+    if (i < l) i = l;
+    if (i > h) i = h;
+    return i;
+}
+
+static int ssl_rand_load_file(const char *file)
+{
+    char buffer[200];
+    int n;
+
+    if (file == NULL)
+        file = RAND_file_name(buffer, sizeof(buffer));
+    else if ((n = RAND_egd(file)) > 0) {
+        return n;
+    }
+    if (file && (n = RAND_load_file(file, -1)) > 0)
+        return n;
+    else
+        return -1;
+}
+
+/*
+ * writes a number of random bytes (currently 1024) to
+ * file which can be used to initialize the PRNG by calling
+ * RAND_load_file() in a later session
+ */
+static int ssl_rand_save_file(const char *file)
+{
+    char buffer[200];
+    int n;
+
+    if (file == NULL)
+        file = RAND_file_name(buffer, sizeof(buffer));
+    else if ((n = RAND_egd(file)) > 0) {
+        return 0;
+    }
+    if (file == NULL || !RAND_write_file(file))
+        return 0;
+    else
+        return 1;
+}
+
+static int ssl_rand_seed(const char *file)
+{
+    unsigned char stackdata[256];
+    static volatile apr_uint32_t counter = 0;
+
+    if (ssl_rand_load_file(file) < 0) {
+        int n;
+        struct {
+            apr_time_t    t;
+            pid_t         p;
+            unsigned long i;
+            apr_uint32_t  u;
+        } _ssl_seed;
+        _ssl_seed.t = apr_time_now();
+        _ssl_seed.p = getpid();
+        _ssl_seed.i = ssl_thread_id();
+        apr_atomic_inc32(&counter);
+        _ssl_seed.u = counter;
+        RAND_seed((unsigned char *)&_ssl_seed, sizeof(_ssl_seed));
+        /*
+         * seed in some current state of the run-time stack (128 bytes)
+         */
+        n = ssl_rand_choosenum(0, sizeof(stackdata)-128-1);
+        RAND_seed(stackdata + n, 128);
+    }
+    return RAND_status();
+}
+
+static int ssl_rand_make(const char *file, int len, int base64)
+{
+    int r;
+    int num = len;
+    BIO *out = NULL;
+
+    out = BIO_new(BIO_s_file());
+    if (out == NULL)
+        return 0;
+    if ((r = BIO_write_filename(out, (char *)file)) < 0) {
+        BIO_free_all(out);
+        return 0;
+    }
+    if (base64) {
+        BIO *b64 = BIO_new(BIO_f_base64());
+        if (b64 == NULL) {
+            BIO_free_all(out);
+            return 0;
+        }
+        out = BIO_push(b64, out);
+    }
+    while (num > 0) {
+        unsigned char buf[4096];
+        int len = num;
+        if (len > sizeof(buf))
+            len = sizeof(buf);
+        r = RAND_bytes(buf, len);
+        if (r <= 0) {
+            BIO_free_all(out);
+            return 0;
+        }
+        BIO_write(out, buf, len);
+        num -= len;
+    }
+    BIO_flush(out);
+    BIO_free_all(out);
+    return 1;
+}
+
 TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 {
     TCN_ALLOC_CSTRING(engine);
@@ -230,6 +349,8 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         tcn_ssl_engine = ee;
     }
 #endif
+    /* Initialize PRNG */
+    ssl_rand_seed(NULL);
     /*
      * Let us cleanup the ssl library when the library is unloaded
      */
@@ -240,6 +361,37 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     ssl_thread_setup(tcn_global_pool);
     TCN_FREE_CSTRING(engine);
     return (jint)APR_SUCCESS;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, randLoad)(TCN_STDARGS, jstring file)
+{
+    TCN_ALLOC_CSTRING(file);
+    int r;
+    UNREFERENCED(o);
+    r = ssl_rand_seed(J2S(file));
+    TCN_FREE_CSTRING(file);
+    return r ? JNI_TRUE : JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, randSave)(TCN_STDARGS, jstring file)
+{
+    TCN_ALLOC_CSTRING(file);
+    int r;
+    UNREFERENCED(o);
+    r = ssl_rand_save_file(J2S(file));
+    TCN_FREE_CSTRING(file);
+    return r ? JNI_TRUE : JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
+                                           jint length, jboolean base64)
+{
+    TCN_ALLOC_CSTRING(file);
+    int r;
+    UNREFERENCED(o);
+    r = ssl_rand_make(J2S(file), length, base64);
+    TCN_FREE_CSTRING(file);
+    return r ? JNI_TRUE : JNI_FALSE;
 }
 
 #else

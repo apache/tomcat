@@ -55,13 +55,14 @@
 #define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
 
-
+/* Private helper functions */
 void tcn_Throw(JNIEnv *env, const char *cname, const char *msg);
 void tcn_ThrowException(JNIEnv *env, const char *msg);
 void tcn_ThrowAPRException(JNIEnv *env, apr_status_t err);
 jstring tcn_new_string(JNIEnv *env, const char *str);
 char *tcn_get_string(JNIEnv *env, jstring jstr);
-char *tcn_dup_string(JNIEnv *env, jstring jstr);
+char *tcn_strdup(JNIEnv *env, jstring jstr);
+char *tcn_pstrdup(JNIEnv *env, jstring jstr, apr_pool_t *p);
 apr_status_t tcn_load_finfo_class(JNIEnv *env);
 apr_status_t tcn_load_ainfo_class(JNIEnv *env);
 

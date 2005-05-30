@@ -18,7 +18,7 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #ifndef SSL_PRIVATE_H
 #define SSL_PRIVATE_H
 
@@ -38,6 +38,104 @@
 #include <openssl/engine.h>
 #endif
 
+#ifndef RAND_MAX
+#include <limits.h>
+#define RAND_MAX INT_MAX
+#endif
 
+#define SSL_ALGO_UNKNOWN (0)
+#define SSL_ALGO_RSA     (1<<0)
+#define SSL_ALGO_DSA     (1<<1)
+#define SSL_ALGO_ALL     (SSL_ALGO_RSA|SSL_ALGO_DSA)
+
+#define SSL_AIDX_RSA     (0)
+#define SSL_AIDX_DSA     (1)
+#define SSL_AIDX_MAX     (2)
+
+/*
+ * Define IDs for the temporary RSA keys and DH params
+ */
+
+#define SSL_TMP_KEY_RSA_512  (0)
+#define SSL_TMP_KEY_RSA_1024 (1)
+#define SSL_TMP_KEY_DH_512   (2)
+#define SSL_TMP_KEY_DH_1024  (3)
+#define SSL_TMP_KEY_MAX      (4)
+
+/*
+ * Define the SSL options
+ */
+#define SSL_OPT_NONE           (0)
+#define SSL_OPT_RELSET         (1<<0)
+#define SSL_OPT_STDENVVARS     (1<<1)
+#define SSL_OPT_EXPORTCERTDATA (1<<3)
+#define SSL_OPT_FAKEBASICAUTH  (1<<4)
+#define SSL_OPT_STRICTREQUIRE  (1<<5)
+#define SSL_OPT_OPTRENEGOTIATE (1<<6)
+#define SSL_OPT_ALL            (SSL_OPT_STDENVVARS|SSL_OPT_EXPORTCERTDATA|SSL_OPT_FAKEBASICAUTH|SSL_OPT_STRICTREQUIRE|SSL_OPT_OPTRENEGOTIATE)
+
+/*
+ * Define the SSL Protocol options
+ */
+#define SSL_PROTOCOL_NONE  (0)
+#define SSL_PROTOCOL_SSLV2 (1<<0)
+#define SSL_PROTOCOL_SSLV3 (1<<1)
+#define SSL_PROTOCOL_TLSV1 (1<<2)
+#define SSL_PROTOCOL_ALL   (SSL_PROTOCOL_SSLV2|SSL_PROTOCOL_SSLV3|SSL_PROTOCOL_TLSV1)
+
+/* public cert/private key */
+typedef struct {
+    /*
+     * server only has 1-2 certs/keys
+     * 1 RSA and/or 1 DSA
+     */
+    const char  *cert_files[SSL_AIDX_MAX];
+    const char  *key_files[SSL_AIDX_MAX];
+    X509        *certs[SSL_AIDX_MAX];
+    EVP_PKEY    *keys[SSL_AIDX_MAX];
+
+    /* Certificates which specify the set of CA names which should be
+     * sent in the CertificateRequest message: */
+    const char  *ca_name_path;
+    const char  *ca_name_file;
+} ssl_pks_t;
+
+typedef struct {
+    /* client can have any number of cert/key pairs */
+    const char  *cert_file;
+    const char  *cert_path;
+    STACK_OF(X509_INFO) *certs;
+} ssl_pkc_t;
+
+struct tcn_ssl_ctxt {
+    apr_pool_t      *pool;
+    SSL_CTX         *ctx;
+    unsigned char   vhost_id[MD5_DIGEST_LENGTH];
+
+    int             protocol;
+    /* we are one or the other */
+    int             mode;
+    union {
+        ssl_pks_t   s;
+        ssl_pkc_t   c;
+    } pk;
+
+    const char      *cert_chain;
+    /* certificate revocation list */
+    const char      *crl_path;
+    const char      *crl_file;
+    X509_STORE      *crl;
+
+    /* known/trusted CAs */
+    const char      *ca_cert_path;
+    const char      *ca_cert_file;
+    const char      *cipher_suite;
+    /* for client or downstream server authentication */
+    int             verify_depth;
+    int             verify_mode;
+
+};
+
+typedef struct tcn_ssl_ctxt tcn_ssl_ctxt_t;
 
 #endif /* SSL_PRIVATE_H */

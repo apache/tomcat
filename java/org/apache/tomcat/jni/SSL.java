@@ -88,7 +88,6 @@ public final class SSL {
     public static final int SSL_VERIFY_CLIENT_ONCE          = 4;
     public static final int SSL_VERIFY_PEER_STRICT          = (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT);
 
-
     /* Return OpenSSL version number */
     public static native int version();
 
@@ -106,5 +105,30 @@ public final class SSL {
      */
     public static native int initialize(String engine);
 
+    /**
+     * Add content of the file to the PRNG
+     * @param filename Filename containing random data.
+     *        If null the default file will be tested.
+     *        The seed file is $RANDFILE if that environment variable is
+     *        set, $HOME/.rnd otherwise.
+     */
+    public static native boolean randLoad(String filename);
+
+    /**
+     * Writes a number of random bytes (currently 1024) to
+     * file @filename which can be used to initialize the PRNG by calling
+     * randLoad in a later session.
+     * @param filename Filename to save the data
+     */
+    public static native boolean randSave(String filename);
+
+    /**
+     * Creates random data to filename
+     * @param filename Filename to save the data
+     * @len   The length of random sequence in bytes
+     * @base64 Output the data in Base64 encoded format
+     */
+    public static native boolean randMake(String filename, int length,
+                                          boolean base64);
 
 }

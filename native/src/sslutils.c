@@ -30,6 +30,7 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional
