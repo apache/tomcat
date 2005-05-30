@@ -97,7 +97,7 @@ TCN_IMPLEMENT_CALL(jlong, File, mktemp)(TCN_STDARGS, jstring templ,
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     apr_file_t *f = NULL;
-    char *ctempl = tcn_dup_string(e, templ);
+    char *ctempl = tcn_strdup(e, templ);
 
     UNREFERENCED(o);
     if (!ctempl) {
