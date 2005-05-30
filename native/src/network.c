@@ -26,10 +26,12 @@
 #include "tcn.h"
 
 #ifdef TCN_DO_STATISTICS
-static int sp_created  = 0;
-static int sp_closed   = 0;
-static int sp_cleared  = 0;
-static int sp_accepted = 0;
+#include "apr_atomic.h"
+
+static volatile apr_uint32_t sp_created  = 0;
+static volatile apr_uint32_t sp_closed   = 0;
+static volatile apr_uint32_t sp_cleared  = 0;
+static volatile apr_uint32_t sp_accepted = 0;
 /* Fake private pool struct to deal with APR private's socket
  * struct not exposing function to access the pool.
  */
@@ -58,7 +60,7 @@ typedef struct
 
 static apr_status_t sp_socket_cleanup(void *data)
 {
-    sp_cleared++;
+    apr_atomic_inc32(&sp_cleared);
     return APR_SUCCESS;
 }
 
@@ -201,7 +203,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
     TCN_ASSERT(sock != 0);
 
 #ifdef TCN_DO_STATISTICS
-    sp_closed++;
+    apr_atomic_inc32(&sp_closed);
     apr_pool_cleanup_kill(((fake_apr_socket_t *)s)->pool, s, sp_socket_cleanup);
 #endif
 
@@ -243,7 +245,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock,
 
 #ifdef TCN_DO_STATISTICS
     if (n) {
-        sp_accepted++;
+        apr_atomic_inc32(&sp_accepted);
         apr_pool_cleanup_register(p, (const void *)n,
                                   sp_socket_cleanup,
                                   apr_pool_cleanup_null);
