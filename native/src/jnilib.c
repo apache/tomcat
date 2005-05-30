@@ -26,6 +26,8 @@
 #include "apr_network_io.h"
 #include "apr_file_io.h"
 #include "apr_mmap.h"
+#include "apr_atomic.h"
+#include "apr_strings.h"
 
 #include "tcn.h"
 #include "tcn_version.h"
@@ -67,6 +69,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
         return JNI_ERR;
 
     apr_initialize();
+
     return  JNI_VERSION_1_4;
 }
 
@@ -136,7 +139,7 @@ char *tcn_get_string(JNIEnv *env, jstring jstr)
     return result;
 }
 
-char *tcn_dup_string(JNIEnv *env, jstring jstr)
+char *tcn_strdup(JNIEnv *env, jstring jstr)
 {
     char *result = NULL;
     const char *cjstr;
@@ -144,6 +147,19 @@ char *tcn_dup_string(JNIEnv *env, jstring jstr)
     cjstr = (const char *)((*env)->GetStringUTFChars(env, jstr, 0));
     if (cjstr) {
         result = strdup(cjstr);
+        (*env)->ReleaseStringUTFChars(env, jstr, cjstr);
+    }
+    return result;
+}
+
+char *tcn_pstrdup(JNIEnv *env, jstring jstr, apr_pool_t *pool)
+{
+    char *result = NULL;
+    const char *cjstr;
+
+    cjstr = (const char *)((*env)->GetStringUTFChars(env, jstr, 0));
+    if (cjstr) {
+        result = apr_pstrdup(pool, cjstr);
         (*env)->ReleaseStringUTFChars(env, jstr, cjstr);
     }
     return result;
@@ -157,6 +173,7 @@ TCN_IMPLEMENT_CALL(jboolean, Library, initialize)(TCN_STDARGS)
         if (apr_pool_create(&tcn_global_pool, NULL) != APR_SUCCESS) {
             return JNI_FALSE;
         }
+        apr_atomic_init(tcn_global_pool);
     }
     return JNI_TRUE;
 }
