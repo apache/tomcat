@@ -37,7 +37,7 @@ public final class SSLContext {
      * SSL_PROTOCOL_ALL
      * </PRE>
      */
-    public static native long initS(jlong pool, jint protocol);
+    public static native long initS(long pool, int protocol);
 
     /**
      * Initialize new Client context
@@ -51,6 +51,6 @@ public final class SSLContext {
      * SSL_PROTOCOL_ALL
      * </PRE>
      */
-    public static native long initC(jlong pool, jint protocol);
+    public static native long initC(long pool, int protocol);
 
 }
