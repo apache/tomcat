@@ -30,10 +30,18 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
+static apr_status_t ssl_context_cleanup(void *data)
+{
+    tcn_ssl_ctxt_t *c = (tcn_ssl_ctxt_t *)data;
+    if (c && c->ctx) {
+        SSL_CTX_free(c->ctx);
+    }
+    return APR_SUCCESS;
+}
 
 /* Initialize server context */
-TCN_IMPLEMENT_CALL(jlong, SSL, initS)(TCN_STDARGS, jlong pool,
-                                      jint protocol)
+TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
+                                             jint protocol)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     tcn_ssl_ctxt_t *c = NULL;
@@ -87,6 +95,12 @@ TCN_IMPLEMENT_CALL(jlong, SSL, initS)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
+    /*
+     * Let us cleanup the ssl context when the pool is destroyed
+     */
+    apr_pool_cleanup_register(p, (const void *)ctx,
+                              ssl_context_cleanup,
+                              apr_pool_cleanup_null);
 
     return P2J(c);
 init_failed:
@@ -94,8 +108,8 @@ init_failed:
 }
 
 /* Initialize client context */
-TCN_IMPLEMENT_CALL(jlong, SSL, initC)(TCN_STDARGS, jlong pool,
-                                      jint protocol)
+TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
+                                             jint protocol)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     tcn_ssl_ctxt_t *c = NULL;
@@ -149,12 +163,25 @@ TCN_IMPLEMENT_CALL(jlong, SSL, initC)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
+    /*
+     * Let us cleanup the ssl context when the pool is destroyed
+     */
+    apr_pool_cleanup_register(p, (const void *)ctx,
+                              ssl_context_cleanup,
+                              apr_pool_cleanup_null);
 
     return P2J(c);
 init_failed:
     return 0;
 }
 
+TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    UNREFERENCED_STDARGS;
+    /* Run and destroy the cleanup callback */
+    return apr_pool_cleanup_run(c->pool, c, ssl_context_cleanup);
+}
 
 #else
 /* OpenSSL is not supported
