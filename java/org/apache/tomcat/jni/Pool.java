@@ -138,11 +138,11 @@ public class Pool {
      * @param data The user data associated with the pool.
      * @param key The key to use for association
      * @param pool The current pool
-     * @warning The data to be attached to the pool should have a life span
-     *          at least as long as the pool it is being attached to.
-     *          Object attached to the pool will be globaly referenced
-     *          untill the pool is cleared or dataSet is called with the
-     *          null data.
+     * <br /><b>Warning :</b>
+     * The data to be attached to the pool should have a life span
+     * at least as long as the pool it is being attached to.
+     * Object attached to the pool will be globaly referenced
+     * untill the pool is cleared or dataSet is called with the null data.
      * @return APR Status code.
      */
      public static native int dataSet(long pool, String key, Object data);

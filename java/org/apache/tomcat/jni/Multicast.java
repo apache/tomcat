@@ -53,8 +53,9 @@ public class Multicast {
      * Set the Multicast Time to Live (ttl) for a multicast transmission.
      * @param sock The socket to set the multicast ttl
      * @param ttl Time to live to Assign. 0-255, default=1
-     * @remark If the TTL is 0, packets will only be seen by sockets on
-     * the local machine, and only when multicast loopback is enabled.
+     * <br /><b>Remark :</b> If the TTL is 0, packets will only be seen
+     * by sockets on the local machine,
+     * and only when multicast loopback is enabled.
      */
     public static native int hops(long sock, int ttl);
 

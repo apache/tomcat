@@ -74,9 +74,9 @@ public class Address {
 
     /**
      * Return the IP address (in numeric address string format) in
-     * an APR socket address.  APR will allocate storage for the IP address 
+     * an APR socket address.  APR will allocate storage for the IP address
      * string from the pool of the apr_sockaddr_t.
-     * @param ss The socket address to reference.
+     * @param sa The socket address to reference.
      * @return The IP address.
      */
     public static native String getip(long sa);
