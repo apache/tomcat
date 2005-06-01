@@ -351,6 +351,9 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 #endif
     /* Initialize PRNG */
     ssl_rand_seed(NULL);
+    /* For SSL_get_app_data2() at request time */
+    SSL_init_app_data2_idx();
+
     /*
      * Let us cleanup the ssl library when the library is unloaded
      */
@@ -384,7 +387,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, randSave)(TCN_STDARGS, jstring file)
 }
 
 TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
-                                           jint length, jboolean base64)
+                                            jint length, jboolean base64)
 {
     TCN_ALLOC_CSTRING(file);
     int r;
@@ -392,6 +395,196 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
     r = ssl_rand_make(J2S(file), length, base64);
     TCN_FREE_CSTRING(file);
     return r ? JNI_TRUE : JNI_FALSE;
+}
+
+/* OpenSSL Java Stream BIO */
+
+typedef struct  {
+    apr_pool_t     *pool;
+    tcn_callback_t cb;
+} BIO_JAVA;
+
+static apr_status_t generic_bio_cleanup(void *data)
+{
+    BIO *b = (BIO *)data;
+
+    if (b) {
+        BIO_free(b);
+    }
+    return APR_SUCCESS;
+}
+
+static int jbs_new(BIO *bi)
+{
+    BIO_JAVA *j;
+
+    if ((j = OPENSSL_malloc(sizeof(BIO_JAVA))) == NULL)
+        return 0;
+    bi->shutdown = 1;
+    bi->init     = 0;
+    bi->num      = -1;
+    bi->ptr      = (char *)j;
+
+    return 1;
+}
+
+static int jbs_free(BIO *bi)
+{
+    if (bi == NULL)
+        return 0;
+    if (bi->ptr != NULL) {
+        BIO_JAVA *j = (BIO_JAVA *)bi->ptr;
+        if (bi->init) {
+            TCN_UNLOAD_CLASS(j->cb.env, j->cb.obj);
+        }
+        bi->init = 0;
+    }
+    OPENSSL_free(bi->ptr);
+    bi->ptr = NULL;
+    return 1;
+}
+
+static int jbs_write(BIO *b, const char *in, int inl)
+{
+    int ret = 0;
+    if (b->init && in != NULL) {
+        BIO_JAVA *j = (BIO_JAVA *)b->ptr;
+        JNIEnv   *e = j->cb.env;
+        if ((*e)->CallIntMethod(e, j->cb.obj,
+                                j->cb.mid[0],
+                                tcn_new_string(e, in, inl)))
+            ret = inl;
+    }
+    return ret;
+}
+
+static int jbs_read(BIO *b, char *out, int outl)
+{
+    int ret = 0;
+    if (b->init && out != NULL) {
+        BIO_JAVA *j = (BIO_JAVA *)b->ptr;
+        JNIEnv   *e = j->cb.env;
+        jobject  o;
+        if ((o = (*e)->CallObjectMethod(e, j->cb.obj,
+                            j->cb.mid[1], (jint)(outl - 1)))) {
+            TCN_ALLOC_CSTRING(o);
+            if (J2S(o)) {
+                int l = (int)strlen(J2S(o));
+                ret = TCN_MIN(outl, l);
+                memcpy(out, J2S(o), ret);
+            }
+            TCN_FREE_CSTRING(o);
+        }
+    }
+    return ret;
+}
+
+static int jbs_puts(BIO *b, const char *in)
+{
+    int ret = 0;
+    if (b->init && in != NULL) {
+        BIO_JAVA *j = (BIO_JAVA *)b->ptr;
+        JNIEnv   *e = j->cb.env;
+        ret = (*e)->CallIntMethod(e, j->cb.obj,
+                                  j->cb.mid[2],
+                                  tcn_new_string(e, in, -1));
+    }
+    return ret;
+}
+
+static int jbs_gets(BIO *b, char *out, int outl)
+{
+    int ret = 0;
+    if (b->init && out != NULL) {
+        BIO_JAVA *j = (BIO_JAVA *)b->ptr;
+        JNIEnv   *e = j->cb.env;
+        jobject  o;
+        if ((o = (*e)->CallObjectMethod(e, j->cb.obj,
+                            j->cb.mid[3], (jint)(outl - 1)))) {
+            TCN_ALLOC_CSTRING(o);
+            if (J2S(o)) {
+                int l = (int)strlen(J2S(o));
+                if (l < outl) {
+                    strcpy(out, J2S(o));
+                    ret = outl;
+                }
+            }
+            TCN_FREE_CSTRING(o);
+        }
+    }
+    return ret;
+}
+
+static long jbs_ctrl(BIO *b, int cmd, long num, void *ptr)
+{
+    return 0;
+}
+
+static BIO_METHOD jbs_methods = {
+    BIO_TYPE_FILE,
+    "JavaString Stream",
+    jbs_write,
+    jbs_read,
+    jbs_puts,
+    jbs_gets,
+    jbs_ctrl,
+    jbs_new,
+    jbs_free,
+    NULL
+};
+
+static BIO_METHOD *BIO_jbs()
+{
+    return(&jbs_methods);
+}
+
+TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
+                                       jobject callback)
+{
+    BIO *bio = NULL;
+    BIO_JAVA *j;
+    jclass cls;
+
+    UNREFERENCED(o);
+
+    if ((bio = BIO_new(BIO_jbs())) == NULL) {
+        tcn_ThrowException(e, "Create BIO failed");
+        goto init_failed;
+    }
+    j = (BIO_JAVA *)bio->ptr;
+    j->pool = J2P(pool, apr_pool_t *);
+    if (j->pool) {
+        apr_pool_cleanup_register(j->pool, (const void *)bio,
+                                  generic_bio_cleanup,
+                                  apr_pool_cleanup_null);
+    }
+
+    cls = (*e)->GetObjectClass(e, callback);
+    j->cb.env    = e;
+    j->cb.mid[0] = (*e)->GetMethodID(e, cls, "write", "(Ljava/lang/String;)I");
+    j->cb.mid[1] = (*e)->GetMethodID(e, cls, "read",  "(I)Ljava/lang/String;");
+    j->cb.mid[2] = (*e)->GetMethodID(e, cls, "puts",  "(Ljava/lang/String;)I");
+    j->cb.mid[3] = (*e)->GetMethodID(e, cls, "gets",  "(I)Ljava/lang/String;");
+    /* TODO: Check if method id's are valid */
+    j->cb.obj    = (*e)->NewGlobalRef(e, callback);
+
+    bio->init = 1;
+    return P2J(bio);
+init_failed:
+    return 0;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSL, closeBIO)(TCN_STDARGS, jlong bio)
+{
+    BIO *b = J2P(bio, BIO *);
+    BIO_JAVA *j;
+
+    UNREFERENCED_STDARGS;
+    j = (BIO_JAVA *)b->ptr;
+    if (j->pool) {
+        apr_pool_cleanup_run(j->pool, b, generic_bio_cleanup);
+    }
+    return APR_SUCCESS;
 }
 
 #else

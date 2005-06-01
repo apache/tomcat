@@ -138,4 +138,12 @@ struct tcn_ssl_ctxt {
 
 typedef struct tcn_ssl_ctxt tcn_ssl_ctxt_t;
 
+/*
+ *  Additional Functions
+ */
+void        SSL_init_app_data2_idx(void);
+void       *SSL_get_app_data2(SSL *);
+void        SSL_set_app_data2(SSL *, void *);
+
+
 #endif /* SSL_PRIVATE_H */

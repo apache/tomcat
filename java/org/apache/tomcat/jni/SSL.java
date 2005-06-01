@@ -131,4 +131,20 @@ public final class SSL {
     public static native boolean randMake(String filename, int length,
                                           boolean base64);
 
+    /**
+     * Initialize new BIO
+     * @param pool The pool to use.
+     * @param callback BIOCallback to use
+     * @return New BIO handle
+     */
+     public static native long newBIO(long pool, BIOCallback callback)
+            throws Exception;
+
+    /**
+     * Close BIO and derefrence callback object
+     * @param bio BIO to close and destroy.
+     * @return APR Status code
+     */
+     public static native int closeBIO(long bio);
+
 }

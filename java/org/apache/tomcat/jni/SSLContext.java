@@ -37,7 +37,8 @@ public final class SSLContext {
      * SSL_PROTOCOL_ALL
      * </PRE>
      */
-    public static native long initS(long pool, int protocol);
+    public static native long initS(long pool, int protocol)
+        throws Exception;
 
     /**
      * Initialize new Client context
@@ -51,6 +52,15 @@ public final class SSLContext {
      * SSL_PROTOCOL_ALL
      * </PRE>
      */
-    public static native long initC(long pool, int protocol);
+    public static native long initC(long pool, int protocol)
+        throws Exception;
+
+    /**
+     * Free the resources used by the Context
+     * @param ctx Server or Client context to free.
+     * @return APR Status code.
+     */
+    public static native int free(long ctx);
+
 
 }

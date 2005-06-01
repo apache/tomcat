@@ -59,7 +59,7 @@
 void tcn_Throw(JNIEnv *env, const char *cname, const char *msg);
 void tcn_ThrowException(JNIEnv *env, const char *msg);
 void tcn_ThrowAPRException(JNIEnv *env, apr_status_t err);
-jstring tcn_new_string(JNIEnv *env, const char *str);
+jstring tcn_new_string(JNIEnv *env, const char *str, int l);
 char *tcn_get_string(JNIEnv *env, jstring jstr);
 char *tcn_strdup(JNIEnv *env, jstring jstr);
 char *tcn_pstrdup(JNIEnv *env, jstring jstr, apr_pool_t *p);
@@ -72,8 +72,8 @@ apr_status_t tcn_load_ainfo_class(JNIEnv *env);
 #define J2T(T) (apr_time_t)((T))
 
 #if 1
-#define TCN_BEGIN_MACRO     {
-#define TCN_END_MACRO       } (void *)(0)
+#define TCN_BEGIN_MACRO     if (1) {
+#define TCN_END_MACRO       } else (void *)(0)
 #else
 #define TCN_BEGIN_MACRO     do {
 #define TCN_END_MACRO       } while (0)
@@ -134,17 +134,18 @@ apr_status_t tcn_load_ainfo_class(JNIEnv *env);
         }                                           \
     TCN_END_MACRO
 
+#define TCN_MAX_METHODS 8
 
 struct tcn_callback {
     JNIEnv      *env;
     jobject     obj;
-    jmethodID   mid;
+    jmethodID   mid[TCN_MAX_METHODS];
     void        *opaque;
 };
 
 typedef struct tcn_callback tcn_callback_t;
 
-#ifdef TCN_DO_STATISTICS
+#define TCN_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define TCN_MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
+
 #endif /* TCN_H */
