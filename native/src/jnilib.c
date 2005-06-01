@@ -88,17 +88,17 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
     apr_terminate();
 }
 
-jstring tcn_new_string(JNIEnv *env, const char *str)
+jstring tcn_new_string(JNIEnv *env, const char *str, int l)
 {
     jstring result;
     jbyteArray bytes = 0;
-    size_t len;
+    size_t len = l;
 
     if ((*env)->EnsureLocalCapacity(env, 2) < 0) {
         return NULL; /* out of memory error */
     }
-
-    len = strlen(str);
+    if (l < 0)
+        len = strlen(str);
     bytes = (*env)->NewByteArray(env, (jsize)len);
     if (bytes != NULL) {
         (*env)->SetByteArrayRegion(env, bytes, 0, (jint)len, (jbyte *)str);
