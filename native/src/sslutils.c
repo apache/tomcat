@@ -105,7 +105,7 @@ int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, int len)
 {
     int rv = 0;
     if (c && c->bio_is) {
-        if (c->bio_is->flags & BIO_FLAGS_MEM_RDONLY) {
+        if (c->bio_is->flags & SSL_BIO_FLAG_RDONLY) {
             /* Use error BIO in case of stdin */
             BIO_printf(c->bio_os, "Enter password: ");
         }

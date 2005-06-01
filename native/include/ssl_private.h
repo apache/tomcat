@@ -83,6 +83,9 @@
 #define SSL_PROTOCOL_TLSV1 (1<<2)
 #define SSL_PROTOCOL_ALL   (SSL_PROTOCOL_SSLV2|SSL_PROTOCOL_SSLV3|SSL_PROTOCOL_TLSV1)
 
+#define SSL_BIO_FLAG_RDONLY     (1<<0)
+#define SSL_BIO_FLAG_CALLBACK   (1<<1)
+
 /* public cert/private key */
 typedef struct {
     /*
@@ -147,5 +150,7 @@ void        SSL_init_app_data2_idx(void);
 void       *SSL_get_app_data2(SSL *);
 void        SSL_set_app_data2(SSL *, void *);
 int         SSL_password_prompt(tcn_ssl_ctxt_t *, char *, int);
+void        SSL_BIO_close(BIO *);
+void        SSL_BIO_doref(BIO *);
 
 #endif /* SSL_PRIVATE_H */

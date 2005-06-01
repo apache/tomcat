@@ -400,9 +400,11 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
 /* OpenSSL Java Stream BIO */
 
 typedef struct  {
+    int            refcount;
     apr_pool_t     *pool;
     tcn_callback_t cb;
 } BIO_JAVA;
+
 
 static apr_status_t generic_bio_cleanup(void *data)
 {
@@ -414,12 +416,43 @@ static apr_status_t generic_bio_cleanup(void *data)
     return APR_SUCCESS;
 }
 
+void SSL_BIO_close(BIO *bi)
+{
+    if (bi == NULL)
+        return;
+    if (bi->ptr != NULL && (bi->flags & SSL_BIO_FLAG_CALLBACK)) {
+        BIO_JAVA *j = (BIO_JAVA *)bi->ptr;
+        j->refcount--;
+        if (j->refcount == 0) {
+            if (j->pool)
+                apr_pool_cleanup_run(j->pool, bi, generic_bio_cleanup);
+            else
+                BIO_free(bi);
+        }
+    }
+    else
+        BIO_free(bi);
+}
+
+void SSL_BIO_doref(BIO *bi)
+{
+    if (bi == NULL)
+        return;
+    if (bi->ptr != NULL && (bi->flags & SSL_BIO_FLAG_CALLBACK)) {
+        BIO_JAVA *j = (BIO_JAVA *)bi->ptr;
+        j->refcount++;
+    }
+}
+
+
 static int jbs_new(BIO *bi)
 {
     BIO_JAVA *j;
 
     if ((j = OPENSSL_malloc(sizeof(BIO_JAVA))) == NULL)
         return 0;
+    j->pool      = NULL;
+    j->refcount  = 1;
     bi->shutdown = 1;
     bi->init     = 0;
     bi->num      = -1;
@@ -435,9 +468,9 @@ static int jbs_free(BIO *bi)
     if (bi->ptr != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)bi->ptr;
         if (bi->init) {
+            bi->init = 0;
             TCN_UNLOAD_CLASS(j->cb.env, j->cb.obj);
         }
-        bi->init = 0;
         OPENSSL_free(bi->ptr);
     }
     bi->ptr = NULL;
@@ -552,6 +585,10 @@ TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
         goto init_failed;
     }
     j = (BIO_JAVA *)bio->ptr;
+    if ((j = (BIO_JAVA *)bio->ptr) == NULL) {
+        tcn_ThrowException(e, "Create BIO failed");
+        goto init_failed;
+    }
     j->pool = J2P(pool, apr_pool_t *);
     if (j->pool) {
         apr_pool_cleanup_register(j->pool, (const void *)bio,
@@ -568,7 +605,8 @@ TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
     /* TODO: Check if method id's are valid */
     j->cb.obj    = (*e)->NewGlobalRef(e, callback);
 
-    bio->init = 1;
+    bio->init  = 1;
+    bio->flags = SSL_BIO_FLAG_CALLBACK;
     return P2J(bio);
 init_failed:
     return 0;
@@ -577,13 +615,8 @@ init_failed:
 TCN_IMPLEMENT_CALL(jint, SSL, closeBIO)(TCN_STDARGS, jlong bio)
 {
     BIO *b = J2P(bio, BIO *);
-    BIO_JAVA *j;
-
     UNREFERENCED_STDARGS;
-    j = (BIO_JAVA *)b->ptr;
-    if (j->pool) {
-        apr_pool_cleanup_run(j->pool, b, generic_bio_cleanup);
-    }
+    SSL_BIO_close(b);
     return APR_SUCCESS;
 }
 
