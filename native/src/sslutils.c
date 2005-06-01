@@ -100,16 +100,30 @@ static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
     return APR_SUCCESS;
 }
 
-/* Simple password prompting */
+/* Simple echo password prompting */
 int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, int len)
 {
     int rv = 0;
-    if (c && c->pprompt) {        
-        if (c->pprompt->flags & BIO_FLAGS_MEM_RDONLY) {
+    if (c && c->bio_is) {
+        if (c->bio_is->flags & BIO_FLAGS_MEM_RDONLY) {
             /* Use error BIO in case of stdin */
-            BIO_printf(c->bio_err, "Enter password: ");
+            BIO_printf(c->bio_os, "Enter password: ");
         }
-        rv = BIO_gets(c->pprompt, buf, len);
+        rv = BIO_gets(c->bio_is, buf, len);
+        if (rv > 0) {
+            /* Remove LF chars */
+            char *r = strchr(buf, '\n');
+            if (r) {
+                *r = '\0';
+                rv--;
+            }
+            /* Remove CR chars */
+            r = strchr(buf, '\r');
+            if (r) {
+                *r = '\0';
+                rv--;
+            }
+        }
     }
     return rv;
 }

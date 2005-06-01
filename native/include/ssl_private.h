@@ -110,8 +110,8 @@ typedef struct {
 struct tcn_ssl_ctxt {
     apr_pool_t      *pool;
     SSL_CTX         *ctx;
-    BIO             *bio_err;
-    BIO             *pprompt;
+    BIO             *bio_os;
+    BIO             *bio_is;
     unsigned char   vhost_id[MD5_DIGEST_LENGTH];
 
     int             protocol;

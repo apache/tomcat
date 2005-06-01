@@ -57,12 +57,12 @@ static apr_status_t ssl_context_cleanup(void *data)
             sk_X509_INFO_pop_free(c->pk.c.certs, X509_INFO_free);
             c->pk.c.certs = NULL;
         }
-        if (c->pprompt)
-            BIO_free(c->pprompt);
-        c->pprompt = NULL;
-        if (c->bio_err)
-            BIO_free(c->bio_err);
-        c->bio_err = NULL;
+        if (c->bio_is)
+            BIO_free(c->bio_is);
+        c->bio_is = NULL;
+        if (c->bio_os)
+            BIO_free(c->bio_os);
+        c->bio_os = NULL;
     }
     return APR_SUCCESS;
 }
@@ -105,13 +105,13 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
     c->mode = 1;
     c->ctx  = ctx;
     c->pool = p;
-    c->bio_err = BIO_new(BIO_s_file());
-    c->pprompt = BIO_new(BIO_s_file());
-    if (c->bio_err != NULL)
-        BIO_set_fp(c->bio_err, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
-    if (c->pprompt != NULL) {
-        BIO_set_fp(c->bio_err, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
-        c->pprompt->flags = BIO_FLAGS_MEM_RDONLY;
+    c->bio_os = BIO_new(BIO_s_file());
+    c->bio_is = BIO_new(BIO_s_file());
+    if (c->bio_os != NULL)
+        BIO_set_fp(c->bio_os, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
+    if (c->bio_is != NULL) {
+        BIO_set_fp(c->bio_is, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
+        c->bio_is->flags = BIO_FLAGS_MEM_RDONLY;
     }
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
     if (!(protocol & SSL_PROTOCOL_SSLV2))
@@ -182,13 +182,13 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
     c->mode = 0;
     c->ctx  = ctx;
     c->pool = p;
-    c->bio_err = BIO_new(BIO_s_file());
-    c->pprompt = BIO_new(BIO_s_file());
-    if (c->bio_err != NULL)
-        BIO_set_fp(c->bio_err, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
-    if (c->pprompt != NULL) {
-        BIO_set_fp(c->bio_err, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
-        c->pprompt->flags = BIO_FLAGS_MEM_RDONLY;
+    c->bio_os = BIO_new(BIO_s_file());
+    c->bio_is = BIO_new(BIO_s_file());
+    if (c->bio_os != NULL)
+        BIO_set_fp(c->bio_os, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
+    if (c->bio_is != NULL) {
+        BIO_set_fp(c->bio_is, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
+        c->bio_is->flags = BIO_FLAGS_MEM_RDONLY;
     }
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
     if (!(protocol & SSL_PROTOCOL_SSLV2))
@@ -249,26 +249,26 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setErrBIO)(TCN_STDARGS, jlong ctx,
                                                 jlong bio)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    BIO *bio_err      = J2P(bio, BIO *);
+    BIO *bio_os       = J2P(bio, BIO *);
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
-    if (c->bio_err && c->bio_err != bio_err)
-        BIO_free(c->bio_err);
-    c->bio_err = bio_err;
+    if (c->bio_os && c->bio_os != bio_os)
+        BIO_free(c->bio_os);
+    c->bio_os = bio_os;
 }
 
 TCN_IMPLEMENT_CALL(void, SSLContext, setPPromptBIO)(TCN_STDARGS, jlong ctx,
                                                     jlong bio)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    BIO *pprompt      = J2P(bio, BIO *);
+    BIO *bio_is       = J2P(bio, BIO *);
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
-    if (c->pprompt && c->pprompt != pprompt)
-        BIO_free(c->pprompt);
-    c->pprompt = pprompt;
+    if (c->bio_is && c->bio_is != bio_is)
+        BIO_free(c->bio_is);
+    c->bio_is = bio_is;
 }
 
 
