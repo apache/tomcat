@@ -39,7 +39,7 @@ static void generic_child_errfn(apr_pool_t *pool, apr_status_t err,
     cb = (tcn_callback_t *)data;
     if (cb) {
         if (!TCN_IS_NULL(cb->env, cb->obj)) {
-            (*(cb->env))->CallVoidMethod(cb->env, cb->obj, cb->mid,
+            (*(cb->env))->CallVoidMethod(cb->env, cb->obj, cb->mid[0],
                                 P2J(pool), (jint)err,
                                 (*(cb->env))->NewStringUTF(cb->env, description),
                                 NULL);
@@ -373,9 +373,9 @@ TCN_IMPLEMENT_CALL(void, Procattr, errfnSet)(TCN_STDARGS, jlong attr,
        return;
     }
     cls = (*e)->GetObjectClass(e, obj);
-    cb->env = e;
-    cb->obj = (*e)->NewGlobalRef(e, obj);
-    cb->mid = (*e)->GetMethodID(e, cls, "callback", "(JILjava/lang/String;)V");
+    cb->env    = e;
+    cb->obj    = (*e)->NewGlobalRef(e, obj);
+    cb->mid[0] = (*e)->GetMethodID(e, cls, "callback", "(JILjava/lang/String;)V");
 
     apr_pool_userdata_setn(cb, ERRFN_USERDATA_KEY, child_errfn_pool_cleanup, p);
     apr_procattr_child_errfn_set(a, generic_child_errfn);

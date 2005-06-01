@@ -32,7 +32,7 @@ static apr_status_t generic_pool_cleanup(void *data)
 
     if (data) {
         if (!TCN_IS_NULL(cb->env, cb->obj)) {
-            rv = (*(cb->env))->CallIntMethod(cb->env, cb->obj, cb->mid,
+            rv = (*(cb->env))->CallIntMethod(cb->env, cb->obj, cb->mid[0],
                                              NULL);
             TCN_UNLOAD_CLASS(cb->env, cb->obj);
         }
@@ -115,9 +115,9 @@ TCN_IMPLEMENT_CALL(jlong, Pool, cleanupRegister)(TCN_STDARGS, jlong pool,
        return 0;
     }
     cls = (*e)->GetObjectClass(e, obj);
-    cb->env = e;
-    cb->obj = (*e)->NewGlobalRef(e, obj);
-    cb->mid = (*e)->GetMethodID(e, cls, "callback", "()I");
+    cb->env    = e;
+    cb->obj    = (*e)->NewGlobalRef(e, obj);
+    cb->mid[0] = (*e)->GetMethodID(e, cls, "callback", "()I");
 
     apr_pool_cleanup_register(p, (const void *)cb,
                               generic_pool_cleanup,
