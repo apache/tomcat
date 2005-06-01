@@ -259,8 +259,8 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setBIO)(TCN_STDARGS, jlong ctx,
     SSL_BIO_doref(bio_handle);
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setOption)(TCN_STDARGS, jlong ctx,
-                                                jint opt)
+TCN_IMPLEMENT_CALL(void, SSLContext, setOptions)(TCN_STDARGS, jlong ctx,
+                                                 jint opt)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
 
