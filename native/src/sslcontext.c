@@ -107,13 +107,8 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
     c->ctx  = ctx;
     c->pool = p;
     c->bio_os = BIO_new(BIO_s_file());
-    c->bio_is = BIO_new(BIO_s_file());
     if (c->bio_os != NULL)
         BIO_set_fp(c->bio_os, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
-    if (c->bio_is != NULL) {
-        BIO_set_fp(c->bio_is, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
-        c->bio_is->flags = SSL_BIO_FLAG_RDONLY;
-    }
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
     if (!(protocol & SSL_PROTOCOL_SSLV2))
         SSL_CTX_set_options(c->ctx, SSL_OP_NO_SSLv2);
@@ -184,13 +179,8 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
     c->ctx  = ctx;
     c->pool = p;
     c->bio_os = BIO_new(BIO_s_file());
-    c->bio_is = BIO_new(BIO_s_file());
     if (c->bio_os != NULL)
         BIO_set_fp(c->bio_os, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
-    if (c->bio_is != NULL) {
-        BIO_set_fp(c->bio_is, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
-        c->bio_is->flags = SSL_BIO_FLAG_RDONLY;
-    }
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
     if (!(protocol & SSL_PROTOCOL_SSLV2))
         SSL_CTX_set_options(c->ctx, SSL_OP_NO_SSLv2);

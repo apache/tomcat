@@ -104,7 +104,8 @@ static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
 int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, int len)
 {
     int rv = 0;
-    if (c && c->bio_is) {
+    *buf = '\0';
+    if (c->bio_is) {
         if (c->bio_is->flags & SSL_BIO_FLAG_RDONLY) {
             /* Use error BIO in case of stdin */
             BIO_printf(c->bio_os, "Enter password: ");
@@ -124,6 +125,26 @@ int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, int len)
                 rv--;
             }
         }
+    }
+    else {
+#ifdef WIN32
+        #include <conio.h>
+        int ch;
+        BIO_printf(c->bio_os, "Enter password: ");
+        do {
+            ch = getch();
+            if (ch == '\r')
+                break;
+            fputc('*', stdout);
+            buf[rv++] = ch;
+            if (rv + 1 > len)
+                continue;
+        } while (ch != '\n');
+        buf[rv] = '\0';
+        fputc('\n', stdout);
+        fflush(stdout);
+#endif
+
     }
     return rv;
 }
