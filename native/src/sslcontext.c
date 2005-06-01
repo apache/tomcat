@@ -30,6 +30,53 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
+/*
+ * Handle the Temporary RSA Keys and DH Params
+ */
+
+#define SSL_TMP_KEY_FREE(ctx, type, idx) \
+    if (ctx->temp_keys[idx]) { \
+        type##_free((type *)ctx->temp_keys[idx]); \
+        ctx->temp_keys[idx] = NULL; \
+    }
+
+#define SSL_TMP_KEYS_FREE(ctx, type) \
+    SSL_TMP_KEY_FREE(ctx, type, SSL_TMP_KEY_##type##_512); \
+    SSL_TMP_KEY_FREE(ctx, type, SSL_TMP_KEY_##type##_1024)
+
+static void ssl_tmp_keys_free(tcn_ssl_ctxt_t *ctx)
+{
+
+    SSL_TMP_KEYS_FREE(ctx, RSA);
+    SSL_TMP_KEYS_FREE(ctx, DH);
+}
+
+static int ssl_tmp_key_init_rsa(tcn_ssl_ctxt_t *ctx,
+                                int bits, int idx)
+{
+    if (!(ctx->temp_keys[idx] =
+          RSA_generate_key(bits, RSA_F4, NULL, NULL))) {
+        BIO_printf(ctx->bio_os, "[ERROR] "
+                   "Init: Failed to generate temporary "
+                   "%d bit RSA private key", bits);
+        return 0;
+    }
+    return 1;
+}
+
+static int ssl_tmp_key_init_dh(tcn_ssl_ctxt_t *ctx,
+                               int bits, int idx)
+{
+    if (!(ctx->temp_keys[idx] =
+          SSL_dh_get_tmp_param(bits))) {
+        BIO_printf(ctx->bio_os, "[ERROR] "
+                   "Init: Failed to generate temporary "
+                   "%d bit DH parameters", bits);
+        return 0;
+    }
+    return 1;
+}
+
 static apr_status_t ssl_context_cleanup(void *data)
 {
     tcn_ssl_ctxt_t *c = (tcn_ssl_ctxt_t *)data;
@@ -128,6 +175,11 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
+    SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
+
+    SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
+    SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
+
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */
@@ -200,6 +252,8 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
+
+    SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */

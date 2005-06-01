@@ -85,6 +85,7 @@
 
 #define SSL_BIO_FLAG_RDONLY     (1<<0)
 #define SSL_BIO_FLAG_CALLBACK   (1<<1)
+#define SSL_DEFAULT_CACHE_SIZE  (256)
 
 /* public cert/private key */
 typedef struct {
@@ -138,10 +139,17 @@ struct tcn_ssl_ctxt {
     /* for client or downstream server authentication */
     int             verify_depth;
     int             verify_mode;
-
+    void            *temp_keys[SSL_TMP_KEY_MAX];
 };
 
 typedef struct tcn_ssl_ctxt tcn_ssl_ctxt_t;
+
+struct tcn_ssl_conn {
+    tcn_ssl_ctxt_t *ctx;
+    SSL            *ssl;
+};
+
+typedef struct tcn_ssl_conn tcn_ssl_conn_t;
 
 /*
  *  Additional Functions
@@ -152,5 +160,10 @@ void        SSL_set_app_data2(SSL *, void *);
 int         SSL_password_prompt(tcn_ssl_ctxt_t *, char *, int);
 void        SSL_BIO_close(BIO *);
 void        SSL_BIO_doref(BIO *);
+DH         *SSL_dh_get_tmp_param(int);
+DH         *SSL_dh_get_param_from_file(const char *);
+RSA        *SSL_callback_tmp_RSA(SSL *, int, int);
+DH         *SSL_callback_tmp_DH(SSL *, int, int);
+
 
 #endif /* SSL_PRIVATE_H */
