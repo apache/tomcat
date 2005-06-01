@@ -110,6 +110,8 @@ typedef struct {
 struct tcn_ssl_ctxt {
     apr_pool_t      *pool;
     SSL_CTX         *ctx;
+    BIO             *bio_err;
+    BIO             *pprompt;
     unsigned char   vhost_id[MD5_DIGEST_LENGTH];
 
     int             protocol;
@@ -144,6 +146,6 @@ typedef struct tcn_ssl_ctxt tcn_ssl_ctxt_t;
 void        SSL_init_app_data2_idx(void);
 void       *SSL_get_app_data2(SSL *);
 void        SSL_set_app_data2(SSL *, void *);
-
+int         SSL_password_prompt(tcn_ssl_ctxt_t *, char *, int);
 
 #endif /* SSL_PRIVATE_H */

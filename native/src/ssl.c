@@ -438,8 +438,8 @@ static int jbs_free(BIO *bi)
             TCN_UNLOAD_CLASS(j->cb.env, j->cb.obj);
         }
         bi->init = 0;
+        OPENSSL_free(bi->ptr);
     }
-    OPENSSL_free(bi->ptr);
     bi->ptr = NULL;
     return 1;
 }

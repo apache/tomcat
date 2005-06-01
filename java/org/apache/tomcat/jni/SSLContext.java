@@ -61,6 +61,39 @@ public final class SSLContext {
      * @return APR Status code.
      */
     public static native int free(long ctx);
+    
+    /**
+     * Set Virtual host id. Usually host:port combination.
+     * @param ctx Context to use.
+     * @param id  String that uniquely identifies this context.
+     */
+     public static native void setVhostId(long ctx, String id);
+ 
+    /**
+     * Asssociate BIOCallback for error reporting.
+     * <br />
+     * First word in the output string will contain error
+     * level in the form:
+     * <PRE>
+     * [ERROR]  -- Critical error messages
+     * [WARN]   -- Varning messages
+     * [INFO]   -- Informational messages
+     * [DEBUG]  -- Debugging messaged
+     * </PRE>
+     * Callback can use that word to determine application logging level
+     * by intercepting <b>write</b> call. 
+     * If the <b>bio</b> is set to 0 no error messages will be displayed.
+     * Default is to use the stderr output stream.
+     * @param ctx Server or Client context to use.
+     * @param bio BIO handle to use, created with SSL.newBIO
+     */
+     public static native void setErrBIO(long ctx, long bio);
 
+    /**
+     * Asssociate BIOCallback for Password prompting.
+     * @param ctx Server or Client context to use.
+     * @param bio BIO handle to use, created with SSL.newBIO
+     */
+     public static native void setPPromptBIO(long ctx, long bio);
 
 }

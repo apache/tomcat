@@ -53,9 +53,16 @@ static apr_status_t ssl_context_cleanup(void *data)
                 }
             }
         }
-        else {
+        else if (c->pk.c.certs) {
             sk_X509_INFO_pop_free(c->pk.c.certs, X509_INFO_free);
+            c->pk.c.certs = NULL;
         }
+        if (c->pprompt)
+            BIO_free(c->pprompt);
+        c->pprompt = NULL;
+        if (c->bio_err)
+            BIO_free(c->bio_err);
+        c->bio_err = NULL;
     }
     return APR_SUCCESS;
 }
@@ -98,7 +105,14 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
     c->mode = 1;
     c->ctx  = ctx;
     c->pool = p;
-
+    c->bio_err = BIO_new(BIO_s_file());
+    c->pprompt = BIO_new(BIO_s_file());
+    if (c->bio_err != NULL)
+        BIO_set_fp(c->bio_err, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
+    if (c->pprompt != NULL) {
+        BIO_set_fp(c->bio_err, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
+        c->pprompt->flags = BIO_FLAGS_MEM_RDONLY;
+    }
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
     if (!(protocol & SSL_PROTOCOL_SSLV2))
         SSL_CTX_set_options(c->ctx, SSL_OP_NO_SSLv2);
@@ -168,7 +182,14 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
     c->mode = 0;
     c->ctx  = ctx;
     c->pool = p;
-
+    c->bio_err = BIO_new(BIO_s_file());
+    c->pprompt = BIO_new(BIO_s_file());
+    if (c->bio_err != NULL)
+        BIO_set_fp(c->bio_err, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
+    if (c->pprompt != NULL) {
+        BIO_set_fp(c->bio_err, stdin, BIO_NOCLOSE | BIO_FP_TEXT);
+        c->pprompt->flags = BIO_FLAGS_MEM_RDONLY;
+    }
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
     if (!(protocol & SSL_PROTOCOL_SSLV2))
         SSL_CTX_set_options(c->ctx, SSL_OP_NO_SSLv2);
@@ -208,6 +229,48 @@ TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
     /* Run and destroy the cleanup callback */
     return apr_pool_cleanup_run(c->pool, c, ssl_context_cleanup);
 }
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setVhostId)(TCN_STDARGS, jlong ctx,
+                                                 jstring id)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    TCN_ALLOC_CSTRING(id);
+
+    TCN_ASSERT(ctx != 0);
+    UNREFERENCED(o);
+    if (J2S(id))
+        MD5((const unsigned char *)J2S(id), (unsigned long)strlen(J2S(id)),
+            &(c->vhost_id[0]));
+
+    TCN_FREE_CSTRING(id);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setErrBIO)(TCN_STDARGS, jlong ctx,
+                                                jlong bio)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    BIO *bio_err      = J2P(bio, BIO *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    if (c->bio_err && c->bio_err != bio_err)
+        BIO_free(c->bio_err);
+    c->bio_err = bio_err;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setPPromptBIO)(TCN_STDARGS, jlong ctx,
+                                                    jlong bio)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    BIO *pprompt      = J2P(bio, BIO *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    if (c->pprompt && c->pprompt != pprompt)
+        BIO_free(c->pprompt);
+    c->pprompt = pprompt;
+}
+
 
 #else
 /* OpenSSL is not supported

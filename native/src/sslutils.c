@@ -100,6 +100,20 @@ static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
     return APR_SUCCESS;
 }
 
+/* Simple password prompting */
+int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, int len)
+{
+    int rv = 0;
+    if (c && c->pprompt) {        
+        if (c->pprompt->flags & BIO_FLAGS_MEM_RDONLY) {
+            /* Use error BIO in case of stdin */
+            BIO_printf(c->bio_err, "Enter password: ");
+        }
+        rv = BIO_gets(c->pprompt, buf, len);
+    }
+    return rv;
+}
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional
