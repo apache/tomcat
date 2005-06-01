@@ -266,7 +266,7 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setOption)(TCN_STDARGS, jlong ctx,
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
-    SSL_CTX_set_options(c, opt);
+    SSL_CTX_set_options(c->ctx, opt);
 }
 
 #else
