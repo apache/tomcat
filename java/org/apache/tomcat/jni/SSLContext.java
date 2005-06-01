@@ -94,7 +94,28 @@ public final class SSLContext {
      * Set OpenSSL Option.
      * @param ctx Server or Client context to use.
      * @param options  See SSL.SSL_OP_* for option flags.
-     * @return true on success, false in case of error
      */
     public static native void setOptions(long ctx, int options);
+
+    /**
+     * Sets the "quiet shutdown" flag for <b>ctx</b> to be
+     * <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
+     * <b>mode</b> valid at the time and may be 0 or 1.
+     * <br />
+     * Normally when a SSL connection is finished, the parties must send out
+     * "close notify" alert messages using L<SSL_shutdown(3)|SSL_shutdown(3)>
+     * for a clean shutdown.
+     * <br />
+     * When setting the "quiet shutdown" flag to 1, <b>SSL.shutdown</b>
+     * will set the internal flags to SSL_SENT_SHUTDOWN|SSL_RECEIVED_SHUTDOWN.
+     * (<b>SSL_shutdown</b> then behaves like called with
+     * SSL_SENT_SHUTDOWN|SSL_RECEIVED_SHUTDOWN.)
+     * The session is thus considered to be shutdown, but no "close notify" alert
+     * is sent to the peer. This behaviour violates the TLS standard.
+     * The default is normal shutdown behaviour as described by the TLS standard.
+     * @param ctx Server or Client context to use.
+     * @param mode True to set the quiet shutdown.
+     */
+    public static native void setQuietShutdown(long ctx, boolean mode);
+
 }

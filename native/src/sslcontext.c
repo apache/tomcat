@@ -269,6 +269,16 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setOptions)(TCN_STDARGS, jlong ctx,
     SSL_CTX_set_options(c->ctx, opt);
 }
 
+TCN_IMPLEMENT_CALL(void, SSLContext, setQuietShutdown)(TCN_STDARGS, jlong ctx,
+                                                       jboolean mode)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    SSL_CTX_set_quiet_shutdown(c->ctx, mode ? 1 : 0);
+}
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional
