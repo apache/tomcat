@@ -236,34 +236,28 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVhostId)(TCN_STDARGS, jlong ctx,
     TCN_FREE_CSTRING(id);
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setErrBIO)(TCN_STDARGS, jlong ctx,
-                                                jlong bio)
+TCN_IMPLEMENT_CALL(void, SSLContext, setBIO)(TCN_STDARGS, jlong ctx,
+                                             jlong bio, jint dir)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    BIO *bio_os       = J2P(bio, BIO *);
+    BIO *bio_handle   = J2P(bio, BIO *);
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
-    if (c->bio_os && c->bio_os != bio_os)
-        SSL_BIO_close(c->bio_os);
-    SSL_BIO_doref(bio_os);
-    c->bio_os = bio_os;
+    if (dir == 0) {
+        if (c->bio_os && c->bio_os != bio_handle)
+            SSL_BIO_close(c->bio_os);
+        c->bio_os = bio_handle;
+    }
+    else if (dir == 1) {
+        if (c->bio_os && c->bio_is != bio_handle)
+            SSL_BIO_close(c->bio_is);
+        c->bio_os = bio_handle;
+    }
+    else
+        return;
+    SSL_BIO_doref(bio_handle);
 }
-
-TCN_IMPLEMENT_CALL(void, SSLContext, setPPromptBIO)(TCN_STDARGS, jlong ctx,
-                                                    jlong bio)
-{
-    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    BIO *bio_is       = J2P(bio, BIO *);
-
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(ctx != 0);
-    if (c->bio_is && c->bio_is != bio_is)
-        SSL_BIO_close(c->bio_is);
-    SSL_BIO_doref(bio_is);
-    c->bio_is = bio_is;
-}
-
 
 #else
 /* OpenSSL is not supported

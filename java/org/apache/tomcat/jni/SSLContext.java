@@ -70,7 +70,7 @@ public final class SSLContext {
      public static native void setVhostId(long ctx, String id);
  
     /**
-     * Asssociate BIOCallback for error reporting.
+     * Asssociate BIOCallback for input or output data capture.
      * <br />
      * First word in the output string will contain error
      * level in the form:
@@ -86,14 +86,8 @@ public final class SSLContext {
      * Default is to use the stderr output stream.
      * @param ctx Server or Client context to use.
      * @param bio BIO handle to use, created with SSL.newBIO
+     * @param dir BIO direction (1 for input 0 for output).
      */
-     public static native void setErrBIO(long ctx, long bio);
-
-    /**
-     * Asssociate BIOCallback for Password prompting.
-     * @param ctx Server or Client context to use.
-     * @param bio BIO handle to use, created with SSL.newBIO
-     */
-     public static native void setPPromptBIO(long ctx, long bio);
+     public static native void setBIO(long ctx, long bio, int dir);
 
 }
