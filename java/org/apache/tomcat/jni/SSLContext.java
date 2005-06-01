@@ -96,5 +96,5 @@ public final class SSLContext {
      * @param options  See SSL.SSL_OP_* for option flags.
      * @return true on success, false in case of error
      */
-    public static native void setOptions(long ctx, int options)
+    public static native void setOptions(long ctx, int options);
 }
