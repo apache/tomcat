@@ -33,8 +33,29 @@
 static apr_status_t ssl_context_cleanup(void *data)
 {
     tcn_ssl_ctxt_t *c = (tcn_ssl_ctxt_t *)data;
-    if (c && c->ctx) {
-        SSL_CTX_free(c->ctx);
+    if (c) {
+        if (c->crl)
+            X509_STORE_free(c->crl);
+        c->crl = NULL;
+        if (c->ctx)
+            SSL_CTX_free(c->ctx);
+        c->ctx = NULL;
+        if (c->mode) {
+            int i;
+            for (i = 0; i < SSL_AIDX_MAX; i++) {
+                if (c->pk.s.certs[i]) {
+                    X509_free(c->pk.s.certs[i]);
+                    c->pk.s.certs[i] = NULL;
+                }
+                if (c->pk.s.keys[i]) {
+                    EVP_PKEY_free(c->pk.s.keys[i]);
+                    c->pk.s.keys[i] = NULL;
+                }
+            }
+        }
+        else {
+            sk_X509_INFO_pop_free(c->pk.c.certs, X509_INFO_free);
+        }
     }
     return APR_SUCCESS;
 }
@@ -50,9 +71,11 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
 
     switch (protocol) {
         case SSL_PROTOCOL_SSLV2:
+        case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_TLSV1:
             ctx = SSL_CTX_new(SSLv2_server_method());
         break;
         case SSL_PROTOCOL_SSLV3:
+        case SSL_PROTOCOL_SSLV3 | SSL_PROTOCOL_TLSV1:
             ctx = SSL_CTX_new(SSLv3_server_method());
         break;
         case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_SSLV3:
@@ -98,7 +121,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */
-    apr_pool_cleanup_register(p, (const void *)ctx,
+    apr_pool_cleanup_register(p, (const void *)c,
                               ssl_context_cleanup,
                               apr_pool_cleanup_null);
 
@@ -118,9 +141,11 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
 
     switch (protocol) {
         case SSL_PROTOCOL_SSLV2:
+        case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_TLSV1:
             ctx = SSL_CTX_new(SSLv2_client_method());
         break;
         case SSL_PROTOCOL_SSLV3:
+        case SSL_PROTOCOL_SSLV3 | SSL_PROTOCOL_TLSV1:
             ctx = SSL_CTX_new(SSLv3_client_method());
         break;
         case SSL_PROTOCOL_SSLV2 | SSL_PROTOCOL_SSLV3:
@@ -166,7 +191,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */
-    apr_pool_cleanup_register(p, (const void *)ctx,
+    apr_pool_cleanup_register(p, (const void *)c,
                               ssl_context_cleanup,
                               apr_pool_cleanup_null);
 
@@ -179,6 +204,7 @@ TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
     /* Run and destroy the cleanup callback */
     return apr_pool_cleanup_run(c->pool, c, ssl_context_cleanup);
 }
