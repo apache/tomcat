@@ -61,14 +61,14 @@ public final class SSLContext {
      * @return APR Status code.
      */
     public static native int free(long ctx);
-    
+
     /**
      * Set Virtual host id. Usually host:port combination.
      * @param ctx Context to use.
      * @param id  String that uniquely identifies this context.
      */
-     public static native void setVhostId(long ctx, String id);
- 
+    public static native void setVhostId(long ctx, String id);
+
     /**
      * Asssociate BIOCallback for input or output data capture.
      * <br />
@@ -81,13 +81,20 @@ public final class SSLContext {
      * [DEBUG]  -- Debugging messaged
      * </PRE>
      * Callback can use that word to determine application logging level
-     * by intercepting <b>write</b> call. 
+     * by intercepting <b>write</b> call.
      * If the <b>bio</b> is set to 0 no error messages will be displayed.
      * Default is to use the stderr output stream.
      * @param ctx Server or Client context to use.
      * @param bio BIO handle to use, created with SSL.newBIO
      * @param dir BIO direction (1 for input 0 for output).
      */
-     public static native void setBIO(long ctx, long bio, int dir);
+    public static native void setBIO(long ctx, long bio, int dir);
 
+    /**
+     * Set OpenSSL Option.
+     * @param ctx Server or Client context to use.
+     * @param options  See SSL.SSL_OP_* for option flags.
+     * @return true on success, false in case of error
+     */
+    public static native void setOptions(long ctx, int options)
 }
