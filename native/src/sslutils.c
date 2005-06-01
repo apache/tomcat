@@ -31,6 +31,75 @@
 #include "ssl_private.h"
 
 
+/*  _________________________________________________________________
+**
+**  Additional High-Level Functions for OpenSSL
+**  _________________________________________________________________
+*/
+
+/* we initialize this index at startup time
+ * and never write to it at request time,
+ * so this static is thread safe.
+ * also note that OpenSSL increments at static variable when
+ * SSL_get_ex_new_index() is called, so we _must_ do this at startup.
+ */
+static int SSL_app_data2_idx = -1;
+
+void SSL_init_app_data2_idx(void)
+{
+    int i;
+
+    if (SSL_app_data2_idx > -1) {
+        return;
+    }
+
+    /* we _do_ need to call this twice */
+    for (i = 0; i <= 1; i++) {
+        SSL_app_data2_idx =
+            SSL_get_ex_new_index(0,
+                                 "Second Application Data for SSL",
+                                 NULL, NULL, NULL);
+    }
+}
+
+void *SSL_get_app_data2(SSL *ssl)
+{
+    return (void *)SSL_get_ex_data(ssl, SSL_app_data2_idx);
+}
+
+void SSL_set_app_data2(SSL *ssl, void *arg)
+{
+    SSL_set_ex_data(ssl, SSL_app_data2_idx, (char *)arg);
+    return;
+}
+
+/*
+ * Return APR_SUCCESS if the named file exists and is readable
+ */
+static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
+                                        apr_time_t *mtime)
+{
+    apr_status_t stat;
+    apr_finfo_t sbuf;
+    apr_file_t *fd;
+
+    if ((stat = apr_stat(&sbuf, fname, APR_FINFO_MIN, pool)) != APR_SUCCESS)
+        return stat;
+
+    if (sbuf.filetype != APR_REG)
+        return APR_EGENERAL;
+
+    if ((stat = apr_file_open(&fd, fname, APR_READ, 0, pool)) != APR_SUCCESS)
+        return stat;
+
+    if (mtime) {
+        *mtime = sbuf.mtime;
+    }
+
+    apr_file_close(fd);
+    return APR_SUCCESS;
+}
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional
