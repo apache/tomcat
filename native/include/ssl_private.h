@@ -88,6 +88,14 @@
 #define SSL_DEFAULT_CACHE_SIZE  (256)
 #define SSL_DEFAULT_VHOST_NAME  ("_default_:443")
 #define SSL_MAX_STR_LEN         2048
+
+#define SSL_CVERIFY_UNSET           (-1)
+#define SSL_CVERIFY_NONE            (0)
+#define SSL_CVERIFY_OPTIONAL        (1)
+#define SSL_CVERIFY_REQUIRE         (2)
+#define SSL_CVERIFY_OPTIONAL_NO_CA  (3)
+#define SSL_VERIFY_PEER_STRICT      (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT)
+
 /* public cert/private key */
 typedef struct {
     /*
@@ -167,5 +175,8 @@ DH         *SSL_dh_get_param_from_file(const char *);
 RSA        *SSL_callback_tmp_RSA(SSL *, int, int);
 DH         *SSL_callback_tmp_DH(SSL *, int, int);
 void        SSL_vhost_algo_id(const unsigned char *, unsigned char *, int);
+int         SSL_callback_SSL_verify(int, X509_STORE_CTX *);
+STACK_OF(X509_NAME)
+            *SSL_init_findCAList(tcn_ssl_ctxt_t *, const char *, const char *);
 
 #endif /* SSL_PRIVATE_H */

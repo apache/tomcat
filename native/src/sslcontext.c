@@ -183,8 +183,8 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
 
     SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
     SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
-    
-    /* Set default Certificate verification level 
+
+    /* Set default Certificate verification level
      * and depth for the Client Authentication
      */
     c->verify_depth = 1;
@@ -565,11 +565,73 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx
                                                           jint level)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    int verify = SSL_VERIFY_NONE;
+    STACK_OF(X509_NAME) *ca_list;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
     c->verify_mode = level;
-    /* TODO: Add verification code callback */
+
+    if (c->verify_mode == SSL_CVERIFY_UNSET)
+        c->verify_mode = SSL_CVERIFY_NONE;
+
+    /*
+     *  Configure callbacks for SSL context
+     */
+    if (c->verify_mode == SSL_CVERIFY_REQUIRE)
+        verify |= SSL_VERIFY_PEER_STRICT;
+    if ((c->verify_mode == SSL_CVERIFY_OPTIONAL) ||
+        (c->verify_mode == SSL_CVERIFY_OPTIONAL_NO_CA))
+        verify |= SSL_VERIFY_PEER;
+
+    SSL_CTX_set_verify(c->ctx, verify, SSL_callback_SSL_verify);
+   /*
+     * Configure Client Authentication details
+     */
+    if (c->ca_cert_file || c->ca_cert_path) {
+        if (!SSL_CTX_load_verify_locations(c->ctx,
+                         c->ca_cert_file,
+                         c->ca_cert_path)) {
+            BIO_printf(c->bio_os, "[ERROR] "
+                       "Unable to configure verify locations "
+                       "for client authentication");
+            return JNI_FALSE;
+        }
+
+        if (c->mode && (c->pk.s.ca_name_file || c->pk.s.ca_name_path)) {
+            ca_list = SSL_init_findCAList(c,
+                                          c->pk.s.ca_name_file,
+                                          c->pk.s.ca_name_path);
+        }
+        else {
+            ca_list = SSL_init_findCAList(c,
+                                          c->ca_cert_file,
+                                          c->ca_cert_path);
+        }
+        if (!ca_list) {
+            BIO_printf(c->bio_os, "[ERROR] "
+                       "Unable to determine list of acceptable "
+                       "CA certificates for client authentication");
+            return JNI_FALSE;
+        }
+        SSL_CTX_set_client_CA_list(c->ctx, (STACK *)ca_list);
+    }
+
+    /*
+     * Give a warning when no CAs were configured but client authentication
+     * should take place. This cannot work.
+     */
+    if (c->verify_mode == SSL_CVERIFY_REQUIRE) {
+        ca_list = (STACK_OF(X509_NAME) *)SSL_CTX_get_client_CA_list(c->ctx);
+
+        if (sk_X509_NAME_num(ca_list) == 0) {
+            BIO_printf(c->bio_os,
+                       "[WARN] Oops, you want to request client "
+                       "authentication, but no CAs are known for "
+                       "verification!?  [Hint: setCACertificate*]");
+        }
+    }
+
     return JNI_TRUE;
 }
 

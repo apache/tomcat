@@ -25,6 +25,7 @@
 #include "apr_portable.h"
 #include "apr_thread_mutex.h"
 #include "apr_hash.h"
+#include "apr_strings.h"
 
 #include "tcn.h"
 
@@ -429,6 +430,113 @@ int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, char *file,
     }
     BIO_free(bio);
     return n;
+}
+
+static int ssl_init_X509NameCmp(X509_NAME **a, X509_NAME **b)
+{
+    return (X509_NAME_cmp(*a, *b));
+}
+
+static void ssl_init_pushCAList(STACK_OF(X509_NAME) *ca_list,
+                                const char *file)
+{
+    int n;
+    STACK_OF(X509_NAME) *sk;
+
+    sk = (STACK_OF(X509_NAME) *)
+             SSL_load_client_CA_file((char *)file);
+
+    if (!sk) {
+        return;
+    }
+
+    for (n = 0; n < sk_X509_NAME_num(sk); n++) {
+        X509_NAME *name = sk_X509_NAME_value(sk, n);
+        /*
+         * note that SSL_load_client_CA_file() checks for duplicates,
+         * but since we call it multiple times when reading a directory
+         * we must also check for duplicates ourselves.
+         */
+
+        if (sk_X509_NAME_find(ca_list, name) < 0) {
+            /* this will be freed when ca_list is */
+            sk_X509_NAME_push(ca_list, name);
+        }
+        else {
+            /* need to free this ourselves, else it will leak */
+            X509_NAME_free(name);
+        }
+    }
+    sk_X509_NAME_free(sk);
+}
+
+STACK_OF(X509_NAME) *SSL_init_findCAList(tcn_ssl_ctxt_t *c,
+                                         const char *ca_file,
+                                         const char *ca_path)
+{
+    STACK_OF(X509_NAME) *ca_list;
+
+    /*
+     * Start with a empty stack/list where new
+     * entries get added in sorted order.
+     */
+    ca_list = sk_X509_NAME_new(ssl_init_X509NameCmp);
+
+    /*
+     * Process CA certificate bundle file
+     */
+    if (ca_file)
+        ssl_init_pushCAList(ca_list, ca_file);
+
+    /*
+     * Process CA certificate path files
+     */
+    if (ca_path) {
+        apr_dir_t *dir;
+        apr_finfo_t direntry;
+        apr_int32_t finfo_flags = APR_FINFO_TYPE|APR_FINFO_NAME;
+        apr_status_t rv;
+        apr_pool_t *ptemp;
+
+        if ((apr_pool_create(&ptemp, c->pool)) != APR_SUCCESS)
+            return NULL;
+        if ((rv = apr_dir_open(&dir, ca_path, c->pool)) != APR_SUCCESS) {
+            BIO_printf(c->bio_os, "[ERROR] "
+                       "Failed to open Certificate Path `%s'",
+                       ca_path);
+            apr_pool_destroy(ptemp);
+            return NULL;
+        }
+
+        while ((apr_dir_read(&direntry, finfo_flags, dir)) == APR_SUCCESS) {
+            const char *file;
+            if (direntry.filetype == APR_DIR)
+                continue; /* don't try to load directories */
+            file = apr_pstrcat(ptemp, ca_path, "/", direntry.name, NULL);
+            ssl_init_pushCAList(ca_list, file);
+        }
+
+        apr_dir_close(dir);
+        apr_pool_destroy(ptemp);
+    }
+
+    /*
+     * Cleanup
+     */
+    sk_X509_NAME_set_cmp_func(ca_list, NULL);
+    return ca_list;
+}
+
+
+/*
+ * This OpenSSL callback function is called when OpenSSL
+ * does client authentication and verifies the certificate chain.
+ */
+int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
+{
+
+    /* TODO: Dummy function for now */
+    return 1;
 }
 
 #else
