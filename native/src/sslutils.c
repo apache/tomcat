@@ -24,11 +24,15 @@
 #include "apr_file_io.h"
 #include "apr_portable.h"
 #include "apr_thread_mutex.h"
+#include "apr_hash.h"
 
 #include "tcn.h"
 
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
+
+extern apr_hash_t  *tcn_private_keys;
+extern apr_hash_t  *tcn_public_certs;
 
 
 /*  _________________________________________________________________
@@ -349,6 +353,82 @@ DH *SSL_callback_tmp_DH(SSL *ssl, int export, int keylen)
         break;
     }
     return (DH *)conn->ctx->temp_keys[idx];
+}
+
+void SSL_vhost_algo_id(const unsigned char *vhost_id, unsigned char *md, int algo)
+{
+    MD5_CTX c;
+    MD5_Init(&c);
+    MD5_Update(&c, vhost_id, MD5_DIGEST_LENGTH);
+    switch (algo) {
+        case SSL_ALGO_UNKNOWN:
+            MD5_Update(&c, "UNKNOWN", 7);
+        break;
+        case SSL_ALGO_RSA:
+            MD5_Update(&c, "RSA", 3);
+        break;
+        case SSL_ALGO_DSA:
+            MD5_Update(&c, "DSA", 3);
+        break;
+    }
+    MD5_Final(md, &c);
+}
+
+/*
+ * Read a file that optionally contains the server certificate in PEM
+ * format, possibly followed by a sequence of CA certificates that
+ * should be sent to the peer in the SSL Certificate message.
+ */
+int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, char *file,
+                                  int skipfirst)
+{
+    BIO *bio;
+    X509 *x509;
+    unsigned long err;
+    int n;
+    STACK *extra_certs;
+
+    if ((bio = BIO_new(BIO_s_file_internal())) == NULL)
+        return -1;
+    if (BIO_read_filename(bio, file) <= 0) {
+        BIO_free(bio);
+        return -1;
+    }
+    /* optionally skip a leading server certificate */
+    if (skipfirst) {
+        if ((x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)) == NULL) {
+            BIO_free(bio);
+            return -1;
+        }
+        X509_free(x509);
+    }
+    /* free a perhaps already configured extra chain */
+    extra_certs=SSL_CTX_get_extra_certs(ctx);
+    if (extra_certs != NULL) {
+        sk_X509_pop_free((STACK_OF(X509) *)extra_certs, X509_free);
+        SSL_CTX_set_extra_certs(ctx,NULL);
+    }
+    /* create new extra chain by loading the certs */
+    n = 0;
+    while ((x509 = PEM_read_bio_X509(bio, NULL, NULL, NULL)) != NULL) {
+        if (!SSL_CTX_add_extra_chain_cert(ctx, x509)) {
+            X509_free(x509);
+            BIO_free(bio);
+            return -1;
+        }
+        n++;
+    }
+    /* Make sure that only the error is just an EOF */
+    if ((err = ERR_peek_error()) > 0) {
+        if (!(   ERR_GET_LIB(err) == ERR_LIB_PEM
+              && ERR_GET_REASON(err) == PEM_R_NO_START_LINE)) {
+            BIO_free(bio);
+            return -1;
+        }
+        while (ERR_get_error() > 0) ;
+    }
+    BIO_free(bio);
+    return n;
 }
 
 #else

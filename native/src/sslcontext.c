@@ -175,7 +175,11 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
+    /* Default vhost id and cache size */
     SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
+    MD5((const unsigned char *)SSL_DEFAULT_VHOST_NAME,
+        (unsigned long)(sizeof(SSL_DEFAULT_VHOST_NAME) - 1),
+        &(c->vhost_id[0]));
 
     SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
     SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
@@ -252,8 +256,11 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initC)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
-
+    /* Default vhost id and cache size */
     SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
+    MD5((const unsigned char *)SSL_DEFAULT_VHOST_NAME,
+        (unsigned long)(sizeof(SSL_DEFAULT_VHOST_NAME) - 1),
+        &(c->vhost_id[0]));
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */
@@ -283,10 +290,11 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVhostId)(TCN_STDARGS, jlong ctx,
 
     TCN_ASSERT(ctx != 0);
     UNREFERENCED(o);
-    if (J2S(id))
-        MD5((const unsigned char *)J2S(id), (unsigned long)strlen(J2S(id)),
+    if (J2S(id)) {
+        MD5((const unsigned char *)J2S(id),
+            (unsigned long)strlen(J2S(id)),
             &(c->vhost_id[0]));
-
+    }
     TCN_FREE_CSTRING(id);
 }
 
@@ -331,6 +339,211 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setQuietShutdown)(TCN_STDARGS, jlong ctx,
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
     SSL_CTX_set_quiet_shutdown(c->ctx, mode ? 1 : 0);
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCipherSuite)(TCN_STDARGS, jlong ctx,
+                                                         jstring ciphers)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    TCN_ALLOC_CSTRING(ciphers);
+    jboolean rv = JNI_TRUE;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!J2S(ciphers))
+        return JNI_FALSE;
+
+    if (!SSL_CTX_set_cipher_list(c->ctx, J2S(ciphers))) {
+        BIO_printf(c->bio_os,
+                   "[ERROR] Unable to configure permitted SSL ciphers");
+        rv = JNI_FALSE;
+    }
+    TCN_FREE_CSTRING(ciphers);
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCARevocationFile)(TCN_STDARGS, jlong ctx,
+                                                              jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    TCN_ALLOC_CSTRING(file);
+    jboolean rv = JNI_FALSE;
+    X509_LOOKUP *lookup;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!J2S(file))
+        return JNI_FALSE;
+
+    if (!c->crl) {
+        if ((c->crl = X509_STORE_new()) == NULL)
+            goto cleanup;
+    }
+    lookup = X509_STORE_add_lookup(c->crl, X509_LOOKUP_file());
+    if (lookup == NULL) {
+        X509_STORE_free(c->crl);
+        c->crl = NULL;
+        goto cleanup;
+    }
+    X509_LOOKUP_load_file(lookup, J2S(file), X509_FILETYPE_PEM);
+    rv = JNI_TRUE;
+cleanup:
+    TCN_FREE_CSTRING(file);
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCARevocationPath)(TCN_STDARGS, jlong ctx,
+                                                              jstring path)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    TCN_ALLOC_CSTRING(path);
+    jboolean rv = JNI_FALSE;
+    X509_LOOKUP *lookup;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!J2S(path))
+        return JNI_FALSE;
+
+    if (!c->crl) {
+        if ((c->crl = X509_STORE_new()) == NULL)
+            goto cleanup;
+    }
+    lookup = X509_STORE_add_lookup(c->crl, X509_LOOKUP_hash_dir());
+    if (lookup == NULL) {
+        X509_STORE_free(c->crl);
+        c->crl = NULL;
+        goto cleanup;
+    }
+    X509_LOOKUP_add_dir(lookup, J2S(path), X509_FILETYPE_PEM);
+    rv = JNI_TRUE;
+cleanup:
+    TCN_FREE_CSTRING(path);
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateChainFile)(TCN_STDARGS, jlong ctx,
+                                                                  jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    jboolean rv = JNI_TRUE;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!file)
+        return JNI_FALSE;
+    if ((c->cert_chain = tcn_pstrdup(e, file, c->pool)) == NULL)
+        rv = JNI_FALSE;
+
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateFile)(TCN_STDARGS, jlong ctx,
+                                                             jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    int i;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!file)
+        return JNI_FALSE;
+    for (i = 0; i < SSL_AIDX_MAX; i++) {
+        if (!c->pk.s.cert_files[i]) {
+            c->pk.s.cert_files[i] = tcn_pstrdup(e, file, c->pool);
+            return JNI_TRUE;
+        }
+    }
+    BIO_printf(c->bio_os, "[ERROR] Only up to %d "
+               "different certificates per virtual host allowed",
+               SSL_AIDX_MAX);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateKeyFile)(TCN_STDARGS, jlong ctx,
+                                                                jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    int i;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!file)
+        return JNI_FALSE;
+    for (i = 0; i < SSL_AIDX_MAX; i++) {
+        if (!c->pk.s.key_files[i]) {
+            c->pk.s.key_files[i] = tcn_pstrdup(e, file, c->pool);
+            return JNI_TRUE;
+        }
+    }
+    BIO_printf(c->bio_os, "[ERROR] Only up to %d "
+               "different private keys per virtual host allowed",
+               SSL_AIDX_MAX);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificateFile)(TCN_STDARGS, jlong ctx,
+                                                               jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    jboolean rv = JNI_TRUE;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!file)
+        return JNI_FALSE;
+    if ((c->ca_cert_file = tcn_pstrdup(e, file, c->pool)) == NULL)
+        rv = JNI_FALSE;
+
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificatePath)(TCN_STDARGS, jlong ctx,
+                                                               jstring path)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    jboolean rv = JNI_TRUE;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!path)
+        return JNI_FALSE;
+    if ((c->ca_cert_path = tcn_pstrdup(e, path, c->pool)) == NULL)
+        rv = JNI_FALSE;
+
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCANDRCertificateFile)(TCN_STDARGS, jlong ctx,
+                                                                  jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    jboolean rv = JNI_TRUE;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!file)
+        return JNI_FALSE;
+    if ((c->pk.s.ca_name_file = tcn_pstrdup(e, file, c->pool)) == NULL)
+        rv = JNI_FALSE;
+
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCANDRCertificatePath)(TCN_STDARGS, jlong ctx,
+                                                                  jstring path)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    jboolean rv = JNI_TRUE;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(ctx != 0);
+    if (!path)
+        return JNI_FALSE;
+    if ((c->pk.s.ca_name_path = tcn_pstrdup(e, path, c->pool)) == NULL)
+        rv = JNI_FALSE;
+
+    return rv;
 }
 
 #else

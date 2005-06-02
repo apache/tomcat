@@ -118,4 +118,129 @@ public final class SSLContext {
      */
     public static native void setQuietShutdown(long ctx, boolean mode);
 
+    /**
+     * Cipher Suite available for negotiation in SSL handshake.
+     * <br />
+     * This complex directive uses a colon-separated cipher-spec string consisting
+     * of OpenSSL cipher specifications to configure the Cipher Suite the client
+     * is permitted to negotiate in the SSL handshake phase. Notice that this
+     * directive can be used both in per-server and per-directory context.
+     * In per-server context it applies to the standard SSL handshake when a
+     * connection is established. In per-directory context it forces a SSL
+     * renegotation with the reconfigured Cipher Suite after the HTTP request
+     * was read but before the HTTP response is sent.
+     * @param ctx Server or Client context to use.
+     * @param ciphers An SSL cipher specification.
+     */
+    public static native boolean setCipherSuite(long ctx, String ciphers);
+
+    /**
+     * Set Directory of PEM-encoded CA Certificates for Client Auth
+     * <br />
+     * This directive sets the directory where you keep the Certificates of
+     * Certification Authorities (CAs) whose clients you deal with. These are
+     * used to verify the client certificate on Client Authentication.
+     * <br />
+     * The files in this directory have to be PEM-encoded and are accessed through
+     * hash filenames. So usually you can't just place the Certificate files there:
+     * you also have to create symbolic links named hash-value.N. And you should
+     * always make sure this directory contains the appropriate symbolic links.
+     * Use the Makefile which comes with mod_ssl to accomplish this task.
+     * @param ctx Server or Client context to use.
+     * @param path Directory of PEM-encoded CA Certificates for Client Auth.
+     */
+    public static native boolean setCARevocationPath(long ctx, String path);
+
+    /**
+     * Set File of concatenated PEM-encoded CA CRLs for Client Auth
+     * <br />
+     * This directive sets the all-in-one file where you can assemble the
+     * Certificate Revocation Lists (CRL) of Certification Authorities (CA)
+     * whose clients you deal with. These are used for Client Authentication.
+     * Such a file is simply the concatenation of the various PEM-encoded CRL
+     * files, in order of preference. This can be used alternatively and/or
+     * additionally to <code>setCARevocationPath</code>.
+     * @param ctx Server or Client context to use.
+     * @param file File of concatenated PEM-encoded CA CRLs for Client Auth.
+     */
+    public static native boolean setCARevocationFile(long ctx, String file);
+
+    /**
+     * Set File of PEM-encoded Server CA Certificates
+     * <br />
+     * This directive sets the optional all-in-one file where you can assemble the
+     * certificates of Certification Authorities (CA) which form the certificate
+     * chain of the server certificate. This starts with the issuing CA certificate
+     * of of the server certificate and can range up to the root CA certificate.
+     * Such a file is simply the concatenation of the various PEM-encoded CA
+     * Certificate files, usually in certificate chain order.
+     * <br />
+     * But be careful: Providing the certificate chain works only if you are using
+     * a single (either RSA or DSA) based server certificate. If you are using a
+     * coupled RSA+DSA certificate pair, this will work only if actually both
+     * certificates use the same certificate chain. Else the browsers will be
+     * confused in this situation.
+     * @param ctx Server or Client context to use.
+     * @param file File of PEM-encoded Server CA Certificates.
+     */
+    public static native boolean setCertificateChainFile(long ctx, String file);
+
+    /**
+     * Set Server Certificate
+     * <br />
+     * Point setCertificateFile at a PEM encoded certificate.  If
+     * the certificate is encrypted, then you will be prompted for a
+     * pass phrase.  Note that a kill -HUP will prompt again. A test
+     * certificate can be generated with `make certificate' under
+     * built time. Keep in mind that if you've both a RSA and a DSA
+     * certificate you can configure both in parallel (to also allow
+     * the use of DSA ciphers, etc.)
+     * @param ctx Server or Client context to use.
+     * @param file Certificate file.
+     */
+    public static native boolean setCertificateFile(long ctx, String file);
+
+    /**
+     * Set Server Private Key
+     * <br />
+     * If the key is not combined with the certificate, use this
+     * directive to point at the key file.  Keep in mind that if
+     * you've both a RSA and a DSA private key you can configure
+     * both in parallel (to also allow the use of DSA ciphers, etc.)
+     * @param ctx Server or Client context to use.
+     * @param file Server Private Key file.
+     */
+    public static native boolean setCertificateKeyFile(long ctx, String file);
+
+    /**
+     * Set File of concatenated PEM-encoded CA Certificates for Client Auth
+     * <br />
+     * This directive sets the all-in-one file where you can assemble the
+     * Certificates of Certification Authorities (CA) whose clients you deal with.
+     * These are used for Client Authentication. Such a file is simply the
+     * concatenation of the various PEM-encoded Certificate files, in order of
+     * preference. This can be used alternatively and/or additionally to
+     * <code>setCACertificatePath</code>.
+     * @param ctx Server or Client context to use.
+     * @param file File of concatenated PEM-encoded CA Certificates for Client Auth.
+     */
+    public static native boolean setCACertificateFile(long ctx, String file);
+
+    /**
+     * Set Directory of PEM-encoded CA Certificates for Client Auth
+     * <br />
+     * This directive sets the directory where you keep the Certificates of
+     * Certification Authorities (CAs) whose clients you deal with. These are used
+     * to verify the client certificate on Client Authentication.
+     * <br />
+     * The files in this directory have to be PEM-encoded and are accessed through
+     * hash filenames. So usually you can't just place the Certificate files there:
+     * you also have to create symbolic links named hash-value.N. And you should always
+     * make sure this directory contains the appropriate symbolic links.
+     * Use the Makefile which comes with mod_ssl to accomplish this task.
+     * @param ctx Server or Client context to use.
+     * @param path Directory of PEM-encoded CA Certificates for Client Auth.
+     */
+    public static native boolean setCACertificatePath(long ctx, String path);
+
 }

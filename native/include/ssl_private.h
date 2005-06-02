@@ -86,7 +86,8 @@
 #define SSL_BIO_FLAG_RDONLY     (1<<0)
 #define SSL_BIO_FLAG_CALLBACK   (1<<1)
 #define SSL_DEFAULT_CACHE_SIZE  (256)
-
+#define SSL_DEFAULT_VHOST_NAME  ("_default_:443")
+#define SSL_MAX_STR_LEN         2048
 /* public cert/private key */
 typedef struct {
     /*
@@ -128,8 +129,6 @@ struct tcn_ssl_ctxt {
 
     const char      *cert_chain;
     /* certificate revocation list */
-    const char      *crl_path;
-    const char      *crl_file;
     X509_STORE      *crl;
 
     /* known/trusted CAs */
@@ -151,6 +150,9 @@ struct tcn_ssl_conn {
 
 typedef struct tcn_ssl_conn tcn_ssl_conn_t;
 
+#define SSL_CTX_get_extra_certs(ctx)       (ctx->extra_certs)
+#define SSL_CTX_set_extra_certs(ctx,value) {ctx->extra_certs = value;}
+
 /*
  *  Additional Functions
  */
@@ -164,6 +166,6 @@ DH         *SSL_dh_get_tmp_param(int);
 DH         *SSL_dh_get_param_from_file(const char *);
 RSA        *SSL_callback_tmp_RSA(SSL *, int, int);
 DH         *SSL_callback_tmp_DH(SSL *, int, int);
-
+void        SSL_vhost_algo_id(const unsigned char *, unsigned char *, int);
 
 #endif /* SSL_PRIVATE_H */

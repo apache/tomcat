@@ -26,6 +26,7 @@
 #include "apr_thread_mutex.h"
 #include "apr_strings.h"
 #include "apr_atomic.h"
+#include "apr_hash.h"
 
 #include "tcn.h"
 
@@ -35,6 +36,9 @@
 static int ssl_initialized = 0;
 extern apr_pool_t *tcn_global_pool;
 ENGINE *tcn_ssl_engine = NULL;
+
+apr_hash_t  *tcn_private_keys = NULL;
+apr_hash_t  *tcn_public_certs = NULL;
 
 TCN_IMPLEMENT_CALL(jint, SSL, version)(TCN_STDARGS)
 {
@@ -172,7 +176,7 @@ static void ssl_thread_setup(apr_pool_t *p)
     CRYPTO_set_locking_callback(ssl_thread_lock);
 
     apr_pool_cleanup_register(p, NULL, ssl_thread_cleanup,
-                                       apr_pool_cleanup_null);
+                              apr_pool_cleanup_null);
 }
 
 static int ssl_rand_choosenum(int l, int h)
@@ -353,7 +357,10 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     ssl_rand_seed(NULL);
     /* For SSL_get_app_data2() at request time */
     SSL_init_app_data2_idx();
-
+    
+    /* Create tables for global private keys and certs */
+    tcn_private_keys = apr_hash_make(tcn_global_pool);
+    tcn_public_certs = apr_hash_make(tcn_global_pool);
     /*
      * Let us cleanup the ssl library when the library is unloaded
      */
@@ -555,7 +562,7 @@ static long jbs_ctrl(BIO *b, int cmd, long num, void *ptr)
 
 static BIO_METHOD jbs_methods = {
     BIO_TYPE_FILE,
-    "JavaString Stream",
+    "Java Callback",
     jbs_write,
     jbs_read,
     jbs_puts,
