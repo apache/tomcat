@@ -183,7 +183,12 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, initS)(TCN_STDARGS, jlong pool,
 
     SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
     SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
-
+    
+    /* Set default Certificate verification level 
+     * and depth for the Client Authentication
+     */
+    c->verify_depth = 1;
+    c->verify_mode  = SSL_CVERIFY_UNSET;
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */
@@ -544,6 +549,28 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCADNRequestPath)(TCN_STDARGS, jlong 
         rv = JNI_FALSE;
 
     return rv;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setVerifyDepth)(TCN_STDARGS, jlong ctx,
+                                                     jint depth)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    c->verify_depth = depth;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx,
+                                                          jint level)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    c->verify_mode = level;
+    /* TODO: Add verification code callback */
+    return JNI_TRUE;
 }
 
 #else
