@@ -194,7 +194,7 @@ static int ssl_rand_choosenum(int l, int h)
 
 static int ssl_rand_load_file(const char *file)
 {
-    char buffer[200];
+    char buffer[APR_PATH_MAX];
     int n;
 
     if (file == NULL)
@@ -215,7 +215,7 @@ static int ssl_rand_load_file(const char *file)
  */
 static int ssl_rand_save_file(const char *file)
 {
-    char buffer[200];
+    char buffer[APR_PATH_MAX];
     int n;
 
     if (file == NULL)
@@ -353,7 +353,10 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         tcn_ssl_engine = ee;
     }
 #endif
-    /* Initialize PRNG */
+    /* Initialize PRNG
+     * This will in most cases call the builtin
+     * low entropy seed.
+     */
     ssl_rand_seed(NULL);
     /* For SSL_get_app_data2() at request time */
     SSL_init_app_data2_idx();

@@ -222,7 +222,8 @@ public final class SSLContext {
      * preference. This can be used alternatively and/or additionally to
      * <code>setCACertificatePath</code>.
      * @param ctx Server or Client context to use.
-     * @param file File of concatenated PEM-encoded CA Certificates for Client Auth.
+     * @param file File of concatenated PEM-encoded CA Certificates for
+     *             Client Auth.
      */
     public static native boolean setCACertificateFile(long ctx, String file);
 
@@ -235,12 +236,63 @@ public final class SSLContext {
      * <br />
      * The files in this directory have to be PEM-encoded and are accessed through
      * hash filenames. So usually you can't just place the Certificate files there:
-     * you also have to create symbolic links named hash-value.N. And you should always
-     * make sure this directory contains the appropriate symbolic links.
+     * you also have to create symbolic links named hash-value.N. And you should
+     * always make sure this directory contains the appropriate symbolic links.
      * Use the Makefile which comes with mod_ssl to accomplish this task.
      * @param ctx Server or Client context to use.
      * @param path Directory of PEM-encoded CA Certificates for Client Auth.
      */
     public static native boolean setCACertificatePath(long ctx, String path);
+
+    /**
+     * Set File of concatenated PEM-encoded CA Certificates for defining
+     * acceptable CA names
+     * <br />
+     * When a client certificate is requested by mod_ssl, a list of acceptable
+     * Certificate Authority names is sent to the client in the SSL handshake.
+     * These CA names can be used by the client to select an appropriate client
+     * certificate out of those it has available.
+     * <br />
+     * If neither of the directives <code>setCADNRequestPath</code> or
+     * <code>setCADNRequestFile</code> are given, then the set of acceptable
+     * CA names sent to the client is the names of all the CA certificates given
+     * by the <code>setCACertificateFile</code> and
+     * <code>setCACertificatePath</code> directives; in other words, the names
+     * of the CAs which will actually be used to verify the client certificate.
+     * <br />
+     * In some circumstances, it is useful to be able to send a set of acceptable
+     * CA names which differs from the actual CAs used to verify the client
+     * certificate - for example, if the client certificates are signed by
+     * intermediate CAs. In such cases, CADNRequestPath and/or CADNRequestFile
+     * can be used; the acceptable CA names are then taken from the complete
+     * set of certificates in the directory and/or file specified by
+     * this pair of directives.
+     * <br />
+     * setCADNRequestFile must specify an all-in-one file containing a
+     * concatenation of PEM-encoded CA certificates.
+     * @param ctx Server or Client context to use.
+     * @param file File of concatenated PEM-encoded CA Certificates for defining
+     *             acceptable CA names.
+     */
+    public static native boolean setCADNRequestFile(long ctx, String file);
+
+    /**
+     * Set Directory of PEM-encoded CA Certificates for defining acceptable
+     * CA names
+     * <br />
+     * This optional directive can be used to specify the set of acceptable
+     * CA names which will be sent to the client when a client certificate is
+     * requested. See the <code>setCADNRequestFile</code> directive for more details.
+     * <br />
+     * The files in this directory have to be PEM-encoded and are accessed through
+     * hash filenames. So usually you can't just place the Certificate files there:
+     * you also have to create symbolic links named hash-value.N. And you should
+     * always make sure this directory contains the appropriate symbolic links.
+     * Use the Makefile which comes with mod_ssl to accomplish this task.
+     * @param ctx Server or Client context to use.
+     * @param path Directory of PEM-encoded CA Certificates for defining
+     *             acceptable CA names.
+     */
+    public static native boolean setCADNRequestPath(long ctx, String path);
 
 }

@@ -160,6 +160,8 @@ public final class SSL {
      *        If null the default file will be tested.
      *        The seed file is $RANDFILE if that environment variable is
      *        set, $HOME/.rnd otherwise.
+     *        In case both files are unavailable builtin
+     *        random seed generator is used.
      */
     public static native boolean randLoad(String filename);
 

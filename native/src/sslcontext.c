@@ -514,8 +514,8 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificatePath)(TCN_STDARGS, jlon
     return rv;
 }
 
-TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCANDRCertificateFile)(TCN_STDARGS, jlong ctx,
-                                                                  jstring file)
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCADNRequestFile)(TCN_STDARGS, jlong ctx,
+                                                             jstring file)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     jboolean rv = JNI_TRUE;
@@ -530,8 +530,8 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCANDRCertificateFile)(TCN_STDARGS, j
     return rv;
 }
 
-TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCANDRCertificatePath)(TCN_STDARGS, jlong ctx,
-                                                                  jstring path)
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCADNRequestPath)(TCN_STDARGS, jlong ctx,
+                                                             jstring path)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     jboolean rv = JNI_TRUE;
