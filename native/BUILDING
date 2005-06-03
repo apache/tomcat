@@ -1,6 +1,6 @@
   Building from the cvs tree:
   sh buildconf --with-apr=apr_source_location.
-  configure --with-apr=apr_install_location.
+  configure --with-apr=apr_install_location --with-ssl=openssl_install_location
   make
 
   Testing the build:
@@ -14,7 +14,13 @@
   Using it in Tomcat:
   1 - In <Connector> use of conf/server.xml:
     protocol="org.apache.coyote.http11.Http11AprProtocol"
-  2 - In bin/setup.sh add the following:
+  2 - In bin/setenv.sh add the following:
     CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
     In my machine I am using:
-    /home/jfclere/jakarta-tomcat-connectors/jni/native/.libs for tclib_location 
+    /home/jfclere/jakarta-tomcat-connectors/jni/native/.libs for tclib_location
+
+NOTES:
+  - configure --without-ssl : Configure without ssl support.
+  - To use it in Tomcat you may have to add in bin/setenv.sh:
+    LD_LIBRARY_PATH=openssl_install_location/lib; export LD_LIBRARY_PATH
+    (use ldd ./.libs/libtcnative-1.so to check it).
