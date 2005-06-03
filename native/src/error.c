@@ -28,27 +28,20 @@
  */
 #define TCN_STATUS_IS_ETIMEDOUT(x) (APR_STATUS_IS_ETIMEDOUT((x)) || ((x) == APR_TIMEUP))
 /*
- * Convenience function to help throw an Exception.
- */
-static void do_throw(JNIEnv *env, const char *cname, const char *msg)
-{
-    jclass javaExceptionClass;
-
-    javaExceptionClass = (*env)->FindClass(env, cname);
-    if (javaExceptionClass == NULL) {
-        fprintf(stderr, "Cannot find %s class\n", cname);
-        return;
-    }
-    (*env)->ThrowNew(env, javaExceptionClass, msg);
-    (*env)->DeleteLocalRef(env, javaExceptionClass);
-}
-
-/*
  * Convenience function to help throw an java.lang.Exception.
  */
 void tcn_ThrowException(JNIEnv *env, const char *msg)
 {
-    do_throw(env, "java/lang/Exception", msg);
+    jclass javaExceptionClass;
+
+    javaExceptionClass = (*env)->FindClass(env, "java/lang/Exception");
+    if (javaExceptionClass == NULL) {
+        fprintf(stderr, "Cannot find java/lang/Exception class\n");
+        return;
+    }
+    (*env)->ThrowNew(env, javaExceptionClass, msg);
+    (*env)->DeleteLocalRef(env, javaExceptionClass);
+
 }
 
 void tcn_Throw(JNIEnv *env, const char *fmt, ...)
@@ -58,7 +51,7 @@ void tcn_Throw(JNIEnv *env, const char *fmt, ...)
 
     va_start(ap, fmt);
     apr_vsnprintf(msg, TCN_BUFFER_SZ, fmt, ap);
-    do_throw(env, "java/lang/Exception", msg);
+    tcn_ThrowException(env, msg);
     va_end(ap);
     free(msg);
 }
