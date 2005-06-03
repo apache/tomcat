@@ -18,9 +18,10 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #include "apr.h"
 #include "apr_pools.h"
+#include "apr_strings.h"
 #include "tcn.h"
 
 /* Merge IS_ETIMEDOUT with APR_TIMEUP
@@ -29,7 +30,7 @@
 /*
  * Convenience function to help throw an Exception.
  */
-void tcn_Throw(JNIEnv *env, const char *cname, const char *msg)
+static void do_throw(JNIEnv *env, const char *cname, const char *msg)
 {
     jclass javaExceptionClass;
 
@@ -47,7 +48,19 @@ void tcn_Throw(JNIEnv *env, const char *cname, const char *msg)
  */
 void tcn_ThrowException(JNIEnv *env, const char *msg)
 {
-    tcn_Throw(env, "java/lang/Exception", msg);
+    do_throw(env, "java/lang/Exception", msg);
+}
+
+void tcn_Throw(JNIEnv *env, const char *fmt, ...)
+{
+    char msg[TCN_BUFFER_SZ] = {'\0'};
+    va_list ap;
+
+    va_start(ap, fmt);
+    apr_vsnprintf(msg, TCN_BUFFER_SZ, fmt, ap);
+    do_throw(env, "java/lang/Exception", msg);
+    va_end(ap);
+    free(msg);
 }
 
 /*

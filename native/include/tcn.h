@@ -56,7 +56,7 @@
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
 
 /* Private helper functions */
-void tcn_Throw(JNIEnv *env, const char *cname, const char *msg);
+void tcn_Throw(JNIEnv *env, const char *fmt, ...);
 void tcn_ThrowException(JNIEnv *env, const char *msg);
 void tcn_ThrowAPRException(JNIEnv *env, apr_status_t err);
 jstring tcn_new_string(JNIEnv *env, const char *str, int l);
