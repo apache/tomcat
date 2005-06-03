@@ -32,6 +32,14 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
+#ifdef WIN32
+#include <conio.h>  /* getch() */
+#else
+#include <curses.h> /* getch() */
+#endif
+
+
+
 extern apr_hash_t  *tcn_private_keys;
 extern apr_hash_t  *tcn_public_certs;
 
@@ -105,51 +113,53 @@ static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
     return APR_SUCCESS;
 }
 
+static void password_prompt(const char *prompt, char *buf, size_t len)
+{
+    size_t i;
+    int ch;
+
+    fputs(prompt, stderr);    
+    for (i = 0; i < (len - 1); i++) {
+        ch = getch();
+        if (ch == '\n')
+            break;
+        else if (ch == '\b') {
+            i--;
+            if (i > 0)
+                i--;
+        }
+        else
+            buf[i] = ch;
+    }
+    buf[i] = '\0';
+}
+
+#define PROMPT_STRING "Enter password: "
 /* Simple echo password prompting */
-int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, int len)
+int SSL_password_prompt(tcn_ssl_ctxt_t *c, char *buf, size_t len)
 {
     int rv = 0;
     *buf = '\0';
     if (c->bio_is) {
         if (c->bio_is->flags & SSL_BIO_FLAG_RDONLY) {
             /* Use error BIO in case of stdin */
-            BIO_printf(c->bio_os, "Enter password: ");
+            BIO_printf(c->bio_os, PROMPT_STRING);
         }
         rv = BIO_gets(c->bio_is, buf, len);
-        if (rv > 0) {
-            /* Remove LF chars */
-            char *r = strchr(buf, '\n');
-            if (r) {
-                *r = '\0';
-                rv--;
-            }
-            /* Remove CR chars */
-            r = strchr(buf, '\r');
-            if (r) {
-                *r = '\0';
-                rv--;
-            }
-        }
     }
     else {
-#ifdef WIN32
-        #include <conio.h>
-        int ch;
-        BIO_printf(c->bio_os, "Enter password: ");
-        do {
-            ch = getch();
-            if (ch == '\r')
-                break;
-            fputc('*', stdout);
-            buf[rv++] = ch;
-            if (rv + 1 > len)
-                continue;
-        } while (ch != '\n');
-        buf[rv] = '\0';
-        fputc('\n', stdout);
-        fflush(stdout);
-#endif
-
+        password_prompt(PROMPT_STRING, buf, len);
+        fputc('\n', stderr);
+        fflush(stderr);
+        rv = strlen(buf);
+    }
+    if (rv > 0) {
+        /* Remove LF char if present */
+        char *r = strchr(buf, '\n');
+        if (r) {
+            *r = '\0';
+            rv--;
+        }
     }
     return rv;
 }
