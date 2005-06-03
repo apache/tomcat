@@ -167,7 +167,7 @@ typedef struct tcn_ssl_conn tcn_ssl_conn_t;
 void        SSL_init_app_data2_idx(void);
 void       *SSL_get_app_data2(SSL *);
 void        SSL_set_app_data2(SSL *, void *);
-int         SSL_password_prompt(tcn_ssl_ctxt_t *, char *, int);
+int         SSL_password_prompt(tcn_ssl_ctxt_t *, char *, size_t);
 void        SSL_BIO_close(BIO *);
 void        SSL_BIO_doref(BIO *);
 DH         *SSL_dh_get_tmp_param(int);
