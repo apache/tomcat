@@ -132,7 +132,8 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param ciphers An SSL cipher specification.
      */
-    public static native boolean setCipherSuite(long ctx, String ciphers);
+    public static native boolean setCipherSuite(long ctx, String ciphers)
+        throws Exception;
 
     /**
      * Set Directory of PEM-encoded CA Certificates for Client Auth
@@ -198,7 +199,8 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param file Certificate file.
      */
-    public static native boolean setCertificateFile(long ctx, String file);
+    public static native boolean setCertificateFile(long ctx, String file)
+        throws Exception;
 
     /**
      * Set Server Private Key
@@ -210,7 +212,8 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param file Server Private Key file.
      */
-    public static native boolean setCertificateKeyFile(long ctx, String file);
+    public static native boolean setCertificateKeyFile(long ctx, String file)
+        throws Exception;
 
     /**
      * Set File of concatenated PEM-encoded CA Certificates for Client Auth
@@ -342,6 +345,7 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param level Type of Client Certificate verification.
      */
-    public static native boolean setVerifyClient(long ctx, int level);
+    public static native boolean setVerifyClient(long ctx, int level)
+        throws Exception;
 
 }
