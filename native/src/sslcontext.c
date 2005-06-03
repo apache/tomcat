@@ -359,8 +359,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCipherSuite)(TCN_STDARGS, jlong ctx,
         return JNI_FALSE;
 
     if (!SSL_CTX_set_cipher_list(c->ctx, J2S(ciphers))) {
-        BIO_printf(c->bio_os,
-                   "[ERROR] Unable to configure permitted SSL ciphers");
+        tcn_Throw(e, "Unable to configure permitted SSL ciphers");
         rv = JNI_FALSE;
     }
     TCN_FREE_CSTRING(ciphers);
@@ -459,9 +458,9 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateFile)(TCN_STDARGS, jlong 
             return JNI_TRUE;
         }
     }
-    BIO_printf(c->bio_os, "[ERROR] Only up to %d "
-               "different certificates per virtual host allowed",
-               SSL_AIDX_MAX);
+    tcn_Throw(e, "Only up to %d "
+              "different certificates per virtual host allowed",
+              SSL_AIDX_MAX);
     return JNI_FALSE;
 }
 
@@ -481,9 +480,9 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateKeyFile)(TCN_STDARGS, jlo
             return JNI_TRUE;
         }
     }
-    BIO_printf(c->bio_os, "[ERROR] Only up to %d "
-               "different private keys per virtual host allowed",
-               SSL_AIDX_MAX);
+    tcn_Throw(e, "Only up to %d "
+              "different private keys per virtual host allowed",
+              SSL_AIDX_MAX);
     return JNI_FALSE;
 }
 
@@ -568,7 +567,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx
     int verify = SSL_VERIFY_NONE;
     STACK_OF(X509_NAME) *ca_list;
 
-    UNREFERENCED_STDARGS;
+    UNREFERENCED(o);
     TCN_ASSERT(ctx != 0);
     c->verify_mode = level;
 
@@ -592,9 +591,8 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx
         if (!SSL_CTX_load_verify_locations(c->ctx,
                          c->ca_cert_file,
                          c->ca_cert_path)) {
-            BIO_printf(c->bio_os, "[ERROR] "
-                       "Unable to configure verify locations "
-                       "for client authentication");
+            tcn_Throw(e, "Unable to configure verify locations "
+                      "for client authentication");
             return JNI_FALSE;
         }
 
@@ -609,9 +607,8 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx
                                           c->ca_cert_path);
         }
         if (!ca_list) {
-            BIO_printf(c->bio_os, "[ERROR] "
-                       "Unable to determine list of acceptable "
-                       "CA certificates for client authentication");
+            tcn_Throw(e, "Unable to determine list of acceptable "
+                      "CA certificates for client authentication");
             return JNI_FALSE;
         }
         SSL_CTX_set_client_CA_list(c->ctx, (STACK *)ca_list);
