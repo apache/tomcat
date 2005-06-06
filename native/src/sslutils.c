@@ -114,7 +114,9 @@ static void password_prompt(const char *prompt, char *buf, size_t len)
     fputs(prompt, stderr);
     for (i = 0; i < (len - 1); i++) {
         ch = getch();
-        if (ch == '\n')
+        if (ch == 0)
+            ch = getch();
+        if (ch == '\n' || ch == '\r')
             break;
         else if (ch == '\b') {
             i--;
