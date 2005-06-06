@@ -103,6 +103,11 @@ dnl Detect openssl toolkit installation
 dnl 
 TCN_CHECK_SSL_TOOLKIT
 
+dnl
+dnl check curses
+dnl
+TCN_FIND_CURSES
+
 so_ext=$APR_SO_EXT
 lib_target=$APR_LIB_TARGET
 AC_SUBST(so_ext)

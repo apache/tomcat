@@ -34,7 +34,9 @@
 #ifdef WIN32
 #include <conio.h>  /* getch() */
 #else
+#ifdef HAVE_CURSES
 #include <curses.h> /* getch() */
+#endif
 #endif
 
 /*  _________________________________________________________________
@@ -106,6 +108,7 @@ static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
     return APR_SUCCESS;
 }
 
+#if defined(WIN32) || defined(HAVE_CURSES)
 static void password_prompt(const char *prompt, char *buf, size_t len)
 {
     size_t i;
@@ -128,6 +131,30 @@ static void password_prompt(const char *prompt, char *buf, size_t len)
     }
     buf[i] = '\0';
 }
+#else
+static void password_prompt(const char *prompt, char *buf, size_t len)
+{
+    size_t i=0;
+    int ch;
+
+    fprintf(stderr, prompt);
+    for (i = 0; i < (len - 1); i++) {
+        ch = getchar();
+        if (ch == EOF)
+            break;
+        if (ch == '\n')
+            break;
+        else if (ch == '\b') {
+            i--;
+            if (i > 0)
+                i--;
+        }
+        else
+            buf[i] = ch;
+    }
+    buf[i] = '\0';
+}
+#endif
 
 #define PROMPT_STRING "Enter password: "
 /* Simple echo password prompting */
