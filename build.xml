@@ -37,8 +37,8 @@
     <property name="junit.jar" value="${junit.home}/junit.jar"/>
     <property name="tc.library.path" value="${basedir}/native/.libs"/>
 
-	  <!-- The base directory for component sources -->
-	  <property name="source.home"             value="java"/>
+      <!-- The base directory for component sources -->
+      <property name="source.home"             value="java"/>
 
     <!-- Build classpath -->
     <path id="classpath">
@@ -152,22 +152,22 @@ limitations under the License.--&gt;">
         </copy>
     </target>
 
-	  <target name="compile-only" 
-	          description="Compile shareable components">
+      <target name="compile-only"
+              description="Compile shareable components">
 
-	    <javac  srcdir="${source.home}"
-	           destdir="${build.home}/classes"
-	             debug="${compile.debug}"
-	       deprecation="${compile.deprecation}"
-	          optimize="${compile.optimize}">
-	      <classpath refid="classpath"/>
-	    </javac>
-	    <copy    todir="${build.home}/classes" filtering="on">
-	      <fileset dir="${source.home}" excludes="**/*.java"/>
-	    </copy>
-	  </target>
+        <javac  srcdir="${source.home}"
+               destdir="${build.home}/classes"
+                 debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+              optimize="${compile.optimize}">
+          <classpath refid="classpath"/>
+        </javac>
+        <copy    todir="${build.home}/classes" filtering="on">
+          <fileset dir="${source.home}" excludes="**/*.java"/>
+        </copy>
+      </target>
 
-	<!-- =================================================================== -->
+    <!-- =================================================================== -->
     <!-- Compiles the examples directory                                     -->
     <!-- =================================================================== -->
     <target name="examples" depends="compile">
@@ -289,10 +289,22 @@ limitations under the License.--&gt;">
     <!-- =================================================================== -->
     <!-- excutes the examples                                                -->
     <!-- =================================================================== -->
-    <target name="example-basic" depends="examples">
+    <target name="echo-example" depends="examples">
         <echo message="Running Tomcat Native Echo example ..."/>
         <java dir="${examples.dir}" classname="org.apache.tomcat.jni.Echo"
              fork="yes" failonerror="${test.failonerror}">
+            <classpath refid="examples.classpath"/>
+            <env key="PATH" path="${tc.library.path}:${java.library.path}"/>
+            <env key="Path" path="${tc.library.path}:${java.library.path}"/>
+            <jvmarg value="-Djava.library.path=${tc.library.path}"/>
+        </java>
+    </target>
+    <target name="server-example" depends="examples">
+        <echo message="Running Tomcat Native SSL Server example ..."/>
+        <java dir="${examples.dir}" classname="org.apache.tomcat.jni.SSLServer"
+             fork="yes" failonerror="${test.failonerror}">
+            <env key="PATH" path="${tc.library.path}:${java.library.path}"/>
+            <env key="Path" path="${tc.library.path}:${java.library.path}"/>
             <classpath refid="examples.classpath"/>
             <jvmarg value="-Djava.library.path=${tc.library.path}"/>
         </java>
