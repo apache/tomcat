@@ -136,6 +136,19 @@ public final class SSL {
     public static final int SSL_OP_NETSCAPE_CA_DN_BUG               = 0x20000000;
     public static final int SSL_OP_NETSCAPE_DEMO_CIPHER_CHANGE_BUG  = 0x40000000;
 
+    public static final int SSL_CRT_FORMAT_UNDEF    = 0;
+    public static final int SSL_CRT_FORMAT_ASN1     = 1;
+    public static final int SSL_CRT_FORMAT_TEXT     = 2;
+    public static final int SSL_CRT_FORMAT_PEM      = 3;
+    public static final int SSL_CRT_FORMAT_NETSCAPE = 4;
+    public static final int SSL_CRT_FORMAT_PKCS12   = 5;
+    public static final int SSL_CRT_FORMAT_SMIME    = 6;
+    public static final int SSL_CRT_FORMAT_ENGINE   = 7;
+
+    public static final int SSL_MODE_CLIENT         = 0;
+    public static final int SSL_MODE_SERVER         = 1;
+    public static final int SSL_MODE_COMBINED       = 2;
+
 
     /* Return OpenSSL version number */
     public static native int version();

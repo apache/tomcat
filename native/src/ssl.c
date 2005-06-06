@@ -26,7 +26,6 @@
 #include "apr_thread_mutex.h"
 #include "apr_strings.h"
 #include "apr_atomic.h"
-#include "apr_hash.h"
 
 #include "tcn.h"
 
@@ -35,10 +34,59 @@
 
 static int ssl_initialized = 0;
 extern apr_pool_t *tcn_global_pool;
-ENGINE *tcn_ssl_engine = NULL;
 
-apr_hash_t  *tcn_private_keys = NULL;
-apr_hash_t  *tcn_public_certs = NULL;
+ENGINE *tcn_ssl_engine = NULL;
+void *SSL_temp_keys[SSL_TMP_KEY_MAX];
+
+/*
+ * Handle the Temporary RSA Keys and DH Params
+ */
+
+#define SSL_TMP_KEY_FREE(type, idx)                     \
+    if (SSL_temp_keys[idx]) {                           \
+        type##_free((type *)SSL_temp_keys[idx]);        \
+        SSL_temp_keys[idx] = NULL;                      \
+    } else (void *)(0)
+
+#define SSL_TMP_KEYS_FREE(type) \
+    SSL_TMP_KEY_FREE(type, SSL_TMP_KEY_##type##_512);   \
+    SSL_TMP_KEY_FREE(type, SSL_TMP_KEY_##type##_1024);  \
+    SSL_TMP_KEY_FREE(type, SSL_TMP_KEY_##type##_2048);  \
+    SSL_TMP_KEY_FREE(type, SSL_TMP_KEY_##type##_4096)
+
+#define SSL_TMP_KEY_INIT_RSA(bits) \
+    ssl_tmp_key_init_rsa(bits, SSL_TMP_KEY_RSA_##bits)
+
+#define SSL_TMP_KEY_INIT_DH(bits)  \
+    ssl_tmp_key_init_dh(bits, SSL_TMP_KEY_DH_##bits)
+
+#define SSL_TMP_KEYS_INIT(R)            \
+    R |= SSL_TMP_KEY_INIT_RSA(512);     \
+    R |= SSL_TMP_KEY_INIT_RSA(1024);    \
+    R |= SSL_TMP_KEY_INIT_RSA(2048);    \
+    R |= SSL_TMP_KEY_INIT_DH(512);      \
+    R |= SSL_TMP_KEY_INIT_DH(1024);     \
+    R |= SSL_TMP_KEY_INIT_DH(2048);     \
+    R |= SSL_TMP_KEY_INIT_DH(4096)
+
+static int ssl_tmp_key_init_rsa(int bits, int idx)
+{
+    if (!(SSL_temp_keys[idx] =
+          RSA_generate_key(bits, RSA_F4, NULL, NULL)))
+        return 1;
+    else
+        return 0;
+}
+
+static int ssl_tmp_key_init_dh(int bits, int idx)
+{
+    if (!(SSL_temp_keys[idx] =
+          SSL_dh_get_tmp_param(bits)))
+        return 1;
+    else
+        return 0;
+}
+
 
 TCN_IMPLEMENT_CALL(jint, SSL, version)(TCN_STDARGS)
 {
@@ -62,6 +110,8 @@ static apr_status_t ssl_init_cleanup(void *data)
     if (!ssl_initialized)
         return APR_SUCCESS;
     ssl_initialized = 0;
+    SSL_TMP_KEYS_FREE(RSA);
+    SSL_TMP_KEYS_FREE(DH);
     /*
      * Try to kill the internals of the SSL library.
      */
@@ -298,6 +348,7 @@ static int ssl_rand_make(const char *file, int len, int base64)
 
 TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 {
+    int r;
     TCN_ALLOC_CSTRING(engine);
 
     UNREFERENCED(o);
@@ -360,10 +411,13 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     ssl_rand_seed(NULL);
     /* For SSL_get_app_data2() at request time */
     SSL_init_app_data2_idx();
-    
-    /* Create tables for global private keys and certs */
-    tcn_private_keys = apr_hash_make(tcn_global_pool);
-    tcn_public_certs = apr_hash_make(tcn_global_pool);
+
+    SSL_TMP_KEYS_INIT(r);
+    if (r) {
+        TCN_FREE_CSTRING(engine);
+        ssl_init_cleanup(NULL);
+        return APR_ENOTIMPL;
+    }
     /*
      * Let us cleanup the ssl library when the library is unloaded
      */

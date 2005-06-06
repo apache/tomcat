@@ -56,15 +56,15 @@
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
 
 /* Private helper functions */
-void tcn_Throw(JNIEnv *env, const char *fmt, ...);
-void tcn_ThrowException(JNIEnv *env, const char *msg);
-void tcn_ThrowAPRException(JNIEnv *env, apr_status_t err);
-jstring tcn_new_string(JNIEnv *env, const char *str, int l);
-char *tcn_get_string(JNIEnv *env, jstring jstr);
-char *tcn_strdup(JNIEnv *env, jstring jstr);
-char *tcn_pstrdup(JNIEnv *env, jstring jstr, apr_pool_t *p);
-apr_status_t tcn_load_finfo_class(JNIEnv *env);
-apr_status_t tcn_load_ainfo_class(JNIEnv *env);
+void            tcn_Throw(JNIEnv *, const char *, ...);
+void            tcn_ThrowException(JNIEnv *, const char *);
+void            tcn_ThrowAPRException(JNIEnv *, apr_status_t);
+jstring         tcn_new_string(JNIEnv *, const char *, int);
+char           *tcn_get_string(JNIEnv *, jstring);
+char           *tcn_strdup(JNIEnv *, jstring);
+char           *tcn_pstrdup(JNIEnv *, jstring, apr_pool_t *);
+apr_status_t    tcn_load_finfo_class(JNIEnv *);
+apr_status_t    tcn_load_ainfo_class(JNIEnv *);
 
 #define J2S(V)  c##V
 #define J2L(V)  p##V
@@ -136,14 +136,12 @@ apr_status_t tcn_load_ainfo_class(JNIEnv *env);
 
 #define TCN_MAX_METHODS 8
 
-struct tcn_callback {
+typedef struct {
     JNIEnv      *env;
     jobject     obj;
     jmethodID   mid[TCN_MAX_METHODS];
     void        *opaque;
-};
-
-typedef struct tcn_callback tcn_callback_t;
+} tcn_callback_t;
 
 #define TCN_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define TCN_MAX(a, b) ((a) > (b) ? (a) : (b))
