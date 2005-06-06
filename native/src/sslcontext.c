@@ -255,7 +255,9 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCipherSuite)(TCN_STDARGS, jlong ctx,
         return JNI_FALSE;
 
     if (!SSL_CTX_set_cipher_list(c->ctx, J2S(ciphers))) {
-        tcn_Throw(e, "Unable to configure permitted SSL ciphers");
+        char err[256];
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Unable to configure permitted SSL ciphers (%s)", err);
         rv = JNI_FALSE;
     }
     TCN_FREE_CSTRING(ciphers);
@@ -271,6 +273,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCARevocation)(TCN_STDARGS, jlong ctx
     TCN_ALLOC_CSTRING(path);
     jboolean rv = JNI_FALSE;
     X509_LOOKUP *lookup;
+    char err[256];
 
     UNREFERENCED(o);
     TCN_ASSERT(ctx != 0);
@@ -284,9 +287,10 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCARevocation)(TCN_STDARGS, jlong ctx
     if (J2S(file)) {
         lookup = X509_STORE_add_lookup(c->crl, X509_LOOKUP_file());
         if (lookup == NULL) {
+            ERR_error_string(ERR_get_error(), err);
             X509_STORE_free(c->crl);
             c->crl = NULL;
-            tcn_Throw(e, "Lookup failed for file %s", J2S(file));
+            tcn_Throw(e, "Lookup failed for file %s (%s)", J2S(file), err);
             goto cleanup;
         }
         X509_LOOKUP_load_file(lookup, J2S(file), X509_FILETYPE_PEM);
@@ -294,9 +298,10 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCARevocation)(TCN_STDARGS, jlong ctx
     if (J2S(path)) {
         lookup = X509_STORE_add_lookup(c->crl, X509_LOOKUP_hash_dir());
         if (lookup == NULL) {
+            ERR_error_string(ERR_get_error(), err);
             X509_STORE_free(c->crl);
             c->crl = NULL;
-            tcn_Throw(e, "Lookup failed for path %s", J2S(file));
+            tcn_Throw(e, "Lookup failed for path %s (%s)", J2S(file), err);
             goto cleanup;
         }
         X509_LOOKUP_add_dir(lookup, J2S(path), X509_FILETYPE_PEM);
@@ -344,8 +349,10 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificate)(TCN_STDARGS,
      */
     if (!SSL_CTX_load_verify_locations(c->ctx,
                                        J2S(file), J2S(path))) {
+        char err[256];
+        ERR_error_string(ERR_get_error(), err);
         tcn_Throw(e, "Unable to configure locations "
-                  "for client authentication");
+                  "for client authentication (%s)", err);
         rv = JNI_FALSE;
         goto cleanup;
     }
@@ -462,6 +469,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     TCN_ALLOC_CSTRING(key);
     TCN_ALLOC_CSTRING(password);
     const char *key_file, *cert_file;
+    char err[256];
 
     UNREFERENCED(o);
     TCN_ASSERT(ctx != 0);
@@ -480,29 +488,35 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     if (!key_file)
         key_file = cert_file;
     if ((c->keys[idx] = load_pem_key(c, key_file)) == NULL) {
-        tcn_Throw(e, "Unable to load Certificate Key %",
-                  key_file);
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Unable to load certificate key %s (%s)",
+                  key_file, err);
         rv = JNI_FALSE;
         goto cleanup;
     }
     if ((c->certs[idx] = load_pem_cert(cert_file)) == NULL) {
-        tcn_Throw(e, "Unable to load Certificate %",
-                  cert_file);
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Unable to load certificate %s (%s)",
+                  cert_file, err);
         rv = JNI_FALSE;
         goto cleanup;
     }
     if (SSL_CTX_use_certificate(c->ctx, c->certs[idx]) <= 0) {
-        tcn_Throw(e, "error setting certificate");
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Error setting certificate (%s)", err);
         rv = JNI_FALSE;
         goto cleanup;
     }
     if (SSL_CTX_use_PrivateKey(c->ctx, c->keys[idx]) <= 0) {
-        tcn_Throw(e, "error setting private key");
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Error setting private key (%s)", err);
         rv = JNI_FALSE;
         goto cleanup;
     }
     if (SSL_CTX_check_private_key(c->ctx) <= 0) {
-        tcn_Throw(e, "Private key does not match the certificate public key");
+        ERR_error_string(ERR_get_error(), err);
+        tcn_Throw(e, "Private key does not match the certificate public key (%s)",
+                  err);
         rv = JNI_FALSE;
         goto cleanup;
     }
