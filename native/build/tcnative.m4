@@ -327,31 +327,3 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
   AC_SUBST(SSL_LIBS)
   AC_SUBST(SSL_CFLAGS)
 ])
-
-dnl
-dnl TCN_FIND_CURSES: figure out how to use curses.
-dnl
-AC_DEFUN(
-  [TCN_FIND_CURSES],
-  [
-    AC_MSG_CHECKING([for curses (please wait)])
-    AC_ARG_WITH(curses,
-    [  --with-curses         path to the installed curses library],
-    [
-    if test "$withval" = "yes"; then
-      APR_ADDTO(TCNATIVE_LIBS, [-lcurses])
-      APR_ADDTO(CURSES_CFLAGS, [-DHAVE_CURSES])
-    elif test "$withval" != "no"; then
-      if test ! -d "${withval}"; then
-        AC_MSG_ERROR(Not a directory: ${withval})
-      fi
-      APR_ADDTO(TCNATIVE_LIBS, [-L${withval}/lib -lcurses])
-      APR_ADDTO(CURSES_CFLAGS, [-DHAVE_CURSES -I${withval}/include])
-    fi
-    ],
-    [
-    AC_MSG_RESULT("no curses")
-    ])
-
-  AC_SUBST(CURSES_CFLAGS)  
-  ])
