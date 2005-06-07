@@ -176,11 +176,11 @@ SOURCE=.\src\user.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\include\tcn.h
+SOURCE=.\include\ssl_private.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\ssl_private.h
+SOURCE=.\include\tcn.h
 # End Source File
 # Begin Source File
 
@@ -197,38 +197,7 @@ SOURCE=.\os\win32\system.c
 # End Group
 # Begin Source File
 
-SOURCE=.\tcnative.rc
-# End Source File
-# Begin Source File
-
-SOURCE=.\build\win32ver.awk
-
-!IF  "$(CFG)" == "tcnative - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__WIN32="./include/tcn_version.h"	
-# Begin Custom Build - Creating Version Resource
-InputPath=.\build\win32ver.awk
-
-".\tcnative.rc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	awk -f ./build/win32ver.awk tcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\tcnative.rc
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "tcnative - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__WIN32="./include/tcn_version.h"	
-# Begin Custom Build - Creating Version Resource
-InputPath=.\build\win32ver.awk
-
-".\tcnative.rc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	awk -f ./build/win32ver.awk tcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\tcnative.rc
-
-# End Custom Build
-
-!ENDIF 
-
+SOURCE=.\os\win32\libtcnative.rc
 # End Source File
 # End Target
 # End Project

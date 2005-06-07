@@ -42,8 +42,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir "Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MD /W3 /O2 /Oy- /Zi /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
-# ADD CPP /nologo /MD /W3 /O2 /Oy- /Zi /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /I "../openssl/inc32" /D "NDEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "NO_IDEA" /D "NO_RC5" /D "NO_MDC2" /D "OPENSSL_NO_IDEA" /D "OPENSSL_NO_RC5" /D "OPENSSL_NO_MDC2" /D "HAVE_OPENSSL" /D HAVE_SSL_SET_STATE=1 /Fd"Release\libtcnative_src" /FD /c
+# ADD BASE CPP /nologo /MD /W3 /Zi /O2 /Oy- /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /FD /c
+# ADD CPP /nologo /MD /W3 /Zi /O2 /Oy- /I "./include" /I "../apr/include" /I "../apr/include/arch/win32" /I "$(JAVA_HOME)/include" /I "$(JAVA_HOME)/include/win32" /I "../openssl/inc32" /D "NDEBUG" /D "TCN_DECLARE_EXPORT" /D "WIN32" /D "_WINDOWS" /D "WIN32_LEAN_AND_MEAN" /D "NO_IDEA" /D "NO_RC5" /D "NO_MDC2" /D "OPENSSL_NO_IDEA" /D "OPENSSL_NO_RC5" /D "OPENSSL_NO_MDC2" /D "HAVE_OPENSSL" /D HAVE_SSL_SET_STATE=1 /Fd"Release\libtcnative_src" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /o /win32 "NUL"
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
@@ -176,11 +176,11 @@ SOURCE=.\src\user.c
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=.\include\tcn.h
+SOURCE=.\include\ssl_private.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\include\ssl_private.h
+SOURCE=.\include\tcn.h
 # End Source File
 # Begin Source File
 
@@ -197,38 +197,7 @@ SOURCE=.\os\win32\system.c
 # End Group
 # Begin Source File
 
-SOURCE=.\libtcnative.rc
-# End Source File
-# Begin Source File
-
-SOURCE=.\build\win32ver.awk
-
-!IF  "$(CFG)" == "libtcnative - Win32 Release"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__WIN32="./include/tcn_version.h"	
-# Begin Custom Build - Creating Version Resource
-InputPath=.\build\win32ver.awk
-
-".\libtcnative.rc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	awk -f ./build/win32ver.awk libtcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\libtcnative.rc
-
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "libtcnative - Win32 Debug"
-
-# PROP Ignore_Default_Tool 1
-USERDEP__WIN32="./include/tcn_version.h"	
-# Begin Custom Build - Creating Version Resource
-InputPath=.\build\win32ver.awk
-
-".\libtcnative.rc" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	awk -f ./build/win32ver.awk libtcnative-1.dll "Tomcat Native Java Library"  ./include/tcn_version.h > .\libtcnative.rc
-
-# End Custom Build
-
-!ENDIF 
-
+SOURCE=.\os\win32\libtcnative.rc
 # End Source File
 # End Target
 # End Project
