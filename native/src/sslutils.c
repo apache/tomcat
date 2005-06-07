@@ -73,19 +73,14 @@ void SSL_set_app_data2(SSL *ssl, void *arg)
     return;
 }
 
-#define PROMPT_STRING "Enter password: "
 /* Simple echo password prompting */
 int SSL_password_prompt(tcn_pass_cb_t *data)
 {
     int rv = 0;
     data->password[0] = '\0';
-    if (data->ctx && data->ctx->bio_is) {
-        if (data->ctx->bio_is->flags & SSL_BIO_FLAG_RDONLY) {
-            /* Use error BIO in case of stdin */
-            BIO_puts(data->ctx->bio_os, data->prompt);
-        }
-        rv = BIO_gets(data->ctx->bio_is,
-                      data->password, SSL_MAX_PASSWORD_LEN);
+    if (data->bio) {
+        rv = BIO_gets(data->bio, data->password,
+                      SSL_MAX_PASSWORD_LEN);
     }
     else {
 #ifdef WIN32
@@ -121,15 +116,14 @@ int SSL_password_callback(char *buf, int bufsiz, int verify,
 {
     int rv = 0;
     tcn_pass_cb_t *cb_data = (tcn_pass_cb_t *)cb;
-    tcn_pass_cb_t c;
 
     if (buf == NULL)
         return 0;
     *buf = '\0';
-    if (cb_data == NULL) {
-        memset(&c, 0, sizeof(tcn_pass_cb_t));
-        cb_data = &c;
-    }
+    if (cb_data == NULL)
+        cb_data = &tcn_password_callback;
+    if (!cb_data->prompt)
+        cb_data->prompt = SSL_DEFAULT_PASS_PROMPT;
     if (cb_data->password[0]) {
         /* Return already obtained password */
         strncpy(buf, cb_data->password, bufsiz);

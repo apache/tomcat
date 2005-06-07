@@ -123,7 +123,6 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
     c->ctx      = ctx;
     c->pool     = p;
     c->bio_os   = BIO_new(BIO_s_file());
-    c->password.ctx = c;
     if (c->bio_os != NULL)
         BIO_set_fp(c->bio_os, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
@@ -162,7 +161,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
 
     /* Set default password callback */
     SSL_CTX_set_default_passwd_cb(c->ctx, (pem_password_cb *)SSL_password_callback);
-    SSL_CTX_set_default_passwd_cb_userdata(c->ctx, (void *)(&c->password));
+    SSL_CTX_set_default_passwd_cb_userdata(c->ctx, (void *)(&tcn_password_callback));
     /*
      * Let us cleanup the ssl context when the pool is destroyed
      */
@@ -214,9 +213,12 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setBIO)(TCN_STDARGS, jlong ctx,
         c->bio_os = bio_handle;
     }
     else if (dir == 1) {
-        if (c->bio_os && c->bio_is != bio_handle)
+        if (c->bio_is && c->bio_is != bio_handle)
             SSL_BIO_close(c->bio_is);
-        c->bio_os = bio_handle;
+        c->bio_is = bio_handle;
+        if (!c->cb_data)
+            c->cb_data = (tcn_pass_cb_t *)apr_pcalloc(c->pool, sizeof(tcn_pass_cb_t));
+        c->cb_data->bio = bio_handle;
     }
     else
         return;
@@ -426,6 +428,7 @@ static EVP_PKEY *load_pem_key(tcn_ssl_ctxt_t *c, const char *file)
 {
     BIO *bio = NULL;
     EVP_PKEY *key = NULL;
+    void *cb_data = c->cb_data;
 
     if ((bio = BIO_new(BIO_s_file())) == NULL) {
         return NULL;
@@ -434,9 +437,11 @@ static EVP_PKEY *load_pem_key(tcn_ssl_ctxt_t *c, const char *file)
         BIO_free(bio);
         return NULL;
     }
+    if (!cb_data)
+        cb_data = &tcn_password_callback;
     key = PEM_read_bio_PrivateKey(bio, NULL,
                 (pem_password_cb *)SSL_password_callback,
-                (void *)(&c->password));
+                cb_data);
     BIO_free(bio);
     return key;
 }
@@ -481,8 +486,10 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
         goto cleanup;
     }
     if (J2S(password)) {
-        strncpy(c->password.password, J2S(password), SSL_MAX_PASSWORD_LEN);
-        c->password.password[SSL_MAX_PASSWORD_LEN-1] = '\0';
+        if (!c->cb_data)
+            c->cb_data = &tcn_password_callback;
+        strncpy(c->cb_data->password, J2S(password), SSL_MAX_PASSWORD_LEN);
+        c->cb_data->password[SSL_MAX_PASSWORD_LEN-1] = '\0';
     }
     key_file  = J2S(key);
     cert_file = J2S(cert);

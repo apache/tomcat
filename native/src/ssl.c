@@ -37,6 +37,7 @@ extern apr_pool_t *tcn_global_pool;
 
 ENGINE *tcn_ssl_engine = NULL;
 void *SSL_temp_keys[SSL_TMP_KEY_MAX];
+tcn_pass_cb_t tcn_password_callback;
 
 /*
  * Handle the Temporary RSA Keys and DH Params
@@ -404,6 +405,8 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         tcn_ssl_engine = ee;
     }
 #endif
+
+    memset(&tcn_password_callback, 0, sizeof(tcn_pass_cb_t));
     /* Initialize PRNG
      * This will in most cases call the builtin
      * low entropy seed.

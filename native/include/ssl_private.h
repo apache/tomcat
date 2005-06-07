@@ -118,6 +118,10 @@
 #define SSL_CVERIFY_OPTIONAL_NO_CA  (3)
 #define SSL_VERIFY_PEER_STRICT      (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT)
 
+#define SSL_DEFAULT_PASS_PROMPT "Some of your private key files are encrypted for security reasons.\n"  \
+                                "In order to read them you have to provide the pass phrases.\n"         \
+                                "Enter password :"
+
 extern void *SSL_temp_keys[SSL_TMP_KEY_MAX];
 
 typedef struct {
@@ -132,8 +136,10 @@ typedef struct tcn_ssl_ctxt_t tcn_ssl_ctxt_t;
 typedef struct {
     char            password[SSL_MAX_PASSWORD_LEN];
     const char     *prompt;
-    tcn_ssl_ctxt_t *ctx;
+    BIO            *bio;
 } tcn_pass_cb_t;
+
+extern tcn_pass_cb_t tcn_password_callback;
 
 struct tcn_ssl_ctxt_t {
     apr_pool_t      *pool;
@@ -162,7 +168,7 @@ struct tcn_ssl_ctxt_t {
     int             verify_depth;
     int             verify_mode;
     void            *temp_keys[SSL_TMP_KEY_MAX];
-    tcn_pass_cb_t   password;
+    tcn_pass_cb_t   *cb_data;
 };
 
 typedef struct {
