@@ -687,6 +687,21 @@ TCN_IMPLEMENT_CALL(jint, SSL, closeBIO)(TCN_STDARGS, jlong bio)
     return APR_SUCCESS;
 }
 
+TCN_IMPLEMENT_CALL(void, SSLContext, setPasswordBIO)(TCN_STDARGS, jlong bio)
+{
+    BIO *bio_handle   = J2P(bio, BIO *);
+
+    UNREFERENCED_STDARGS;
+    if (tcn_password_callback.bio &&
+        tcn_password_callback.bio != bio_handle) {
+        SSL_BIO_close(tcn_password_callback.bio);
+        tcn_password_callback.bio = bio_handle;
+    }
+    else
+        return;
+    SSL_BIO_doref(bio_handle);
+}
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional

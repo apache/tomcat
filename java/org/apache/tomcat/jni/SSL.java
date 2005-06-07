@@ -211,4 +211,10 @@ public final class SSL {
      */
      public static native int closeBIO(long bio);
 
+    /**
+     * Set global Password callback BIO for obtaining passwords.
+     * @param bio BIO to use.
+     */
+     public static native void setPasswordBIO(long bio);
+
 }
