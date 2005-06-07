@@ -123,6 +123,7 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
     c->ctx      = ctx;
     c->pool     = p;
     c->bio_os   = BIO_new(BIO_s_file());
+    c->password.ctx = c;
     if (c->bio_os != NULL)
         BIO_set_fp(c->bio_os, stderr, BIO_NOCLOSE | BIO_FP_TEXT);
     SSL_CTX_set_options(c->ctx, SSL_OP_ALL);
