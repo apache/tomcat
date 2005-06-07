@@ -701,6 +701,17 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setPasswordBIO)(TCN_STDARGS, jlong bio)
     SSL_BIO_doref(bio_handle);
 }
 
+TCN_IMPLEMENT_CALL(void, SSLContext, setPassword)(TCN_STDARGS, jstring password)
+{
+    TCN_ALLOC_CSTRING(password);
+    UNREFERENCED(o);
+    if (J2S(password)) {
+        strncpy(tcn_password_callback.password, J2S(password), SSL_MAX_PASSWORD_LEN);
+        tcn_password_callback.password[SSL_MAX_PASSWORD_LEN-1] = '\0';
+    }
+    TCN_FREE_CSTRING(password);
+}
+
 TCN_IMPLEMENT_CALL(jboolean, SSL, generateRSATempKey)(TCN_STDARGS, jint idx)
 {
     int r = 1;

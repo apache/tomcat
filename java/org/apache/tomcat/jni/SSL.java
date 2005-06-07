@@ -222,6 +222,12 @@ public final class SSL {
      public static native void setPasswordBIO(long bio);
 
     /**
+     * Set global Password for decrypting certificates and keys.
+     * @param password Password to use.
+     */
+     public static native void setPassword(String password);
+
+    /**
      * Generate temporary RSA key.
      * <br />
      * Index can be one of:
