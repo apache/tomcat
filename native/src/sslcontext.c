@@ -529,6 +529,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
 cleanup:
     TCN_FREE_CSTRING(cert);
     TCN_FREE_CSTRING(key);
+    TCN_FREE_CSTRING(password);
     return rv;
 }
 
