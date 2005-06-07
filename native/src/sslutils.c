@@ -95,7 +95,7 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
         if (si.wShowWindow == 0)
             return 0;
 #endif
-        des_read_pw_string(data->password, SSL_MAX_PASSWORD_LEN,
+        EVP_read_pw_string(data->password, SSL_MAX_PASSWORD_LEN,
                            data->prompt, 0);
         rv = strlen(data->password);
     }
