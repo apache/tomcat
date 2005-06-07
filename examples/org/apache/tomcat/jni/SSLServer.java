@@ -22,6 +22,7 @@ public class SSLServer {
     public static String serverCert = null;
     public static String serverKey  = null;
     public static String serverCiphers  = null;
+    public static String serverPassword = null;
 
     private static Object threadLock = new Object();
 
@@ -38,7 +39,8 @@ public class SSLServer {
             serverNmax = Integer.decode(props.getProperty("server.max", "1")).intValue();
             serverCert = props.getProperty("server.cert", "server.pem");
             serverKey  = props.getProperty("server.key", null);
-            serverCiphers = props.getProperty("server.ciphers", "ALL");
+            serverCiphers  = props.getProperty("server.ciphers", "ALL");
+            serverPassword = props.getProperty("server.password", null);
         }
         catch (Throwable t) {
             ; // Nothing
@@ -55,7 +57,7 @@ public class SSLServer {
             /* List the ciphers that the client is permitted to negotiate. */
             SSLContext.setCipherSuite(serverCtx, serverCiphers);
             /* Load Server key and certificate */
-            SSLContext.setCertificate(serverCtx, serverCert, serverKey, null, SSL.SSL_AIDX_RSA);
+            SSLContext.setCertificate(serverCtx, serverCert, serverKey, serverPassword, SSL.SSL_AIDX_RSA);
             SSLContext.setVerifyDepth(serverCtx, 10);
             SSLContext.setVerifyClient(serverCtx, SSL.SSL_CVERIFY_REQUIRE);
             
