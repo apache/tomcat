@@ -53,7 +53,6 @@ void tcn_Throw(JNIEnv *env, const char *fmt, ...)
     apr_vsnprintf(msg, TCN_BUFFER_SZ, fmt, ap);
     tcn_ThrowException(env, msg);
     va_end(ap);
-    free(msg);
 }
 
 /*
