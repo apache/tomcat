@@ -242,10 +242,10 @@ public final class SSL {
      * <br />
      * Index can be one of:
      * <PRE>
-     * SSL_TMP_KEY_DSA_512
-     * SSL_TMP_KEY_DSA_1024
-     * SSL_TMP_KEY_DSA_2048
-     * SSL_TMP_KEY_DSA_4096
+     * SSL_TMP_KEY_DH_512
+     * SSL_TMP_KEY_DH_1024
+     * SSL_TMP_KEY_DH_2048
+     * SSL_TMP_KEY_DH_4096
      * </PRE>
      * @param idx temporary key index.
      * @param file File contatining DH params.
