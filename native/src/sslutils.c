@@ -31,6 +31,10 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
+#ifdef WIN32
+extern int WIN32_SSL_password_prompt(tcn_pass_cb_t *data);
+#endif
+
 /*  _________________________________________________________________
 **
 **  Additional High-Level Functions for OpenSSL
@@ -84,14 +88,11 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
     }
     else {
 #ifdef WIN32
-        STARTUPINFO si;
-        GetStartupInfo(&si);
-        /* Display a new Console window */
-        if (si.wShowWindow == 0)
-            return 0;
-#endif
+        rv = WIN32_SSL_password_prompt(data);
+#else
         EVP_read_pw_string(data->password, SSL_MAX_PASSWORD_LEN,
                            data->prompt, 0);
+#endif
         rv = strlen(data->password);
     }
     if (rv > 0) {

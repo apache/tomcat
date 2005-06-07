@@ -1,0 +1,49 @@
+#include <windows.h>
+
+1000 ICON "apache.ico"
+
+1001 DIALOGEX 0, 0, 252, 51
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_CAPTION
+CAPTION "Password prompt"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            1000,-1,8,6,21,20
+    LTEXT           "Some of your private key files are encrypted for security reasons.\nIn order to read them you have to provide the pass phrases.",
+                    -1,29,5,220,19
+    LTEXT           "Enter password:",-1,7,28,75,8
+    EDITTEXT        1002,67,27,174,12,ES_PASSWORD | ES_AUTOHSCROLL
+END
+
+1 VERSIONINFO
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "Licensed under the Apache License, Version 2.0 (the ""License""); you may not use this file except in compliance with the License.  You may obtain a copy of the License at\r\n\r\nhttp://www.apache.org/licenses/LICENSE-2.0\r\n\r\nUnless required by applicable law or agreed to in writing, software distributed under the License is distributed on an ""AS IS"" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License."
+            VALUE "CompanyName", "Apache Software Foundation"
+            VALUE "FileDescription", "Tomcat Native Java Library"
+            VALUE "FileVersion", "1.1.0-dev"
+            VALUE "InternalName", "libtcnative-1"
+            VALUE "LegalCopyright", "Copyright 2000-2005 The Apache Software Foundation"
+            VALUE "OriginalFilename", "libtcnative-1.dll"
+            VALUE "ProductName", "Apache Portable Runtime"
+            VALUE "ProductVersion", "1.1.0-dev"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

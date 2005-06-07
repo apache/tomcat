@@ -20,7 +20,8 @@
  */
 
 #define _WIN32_WINNT 0x0500
-
+#include <windows.h>
+#include <winsock.h>
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_network_io.h"
@@ -28,6 +29,7 @@
 #include "apr_arch_atime.h"  /* for FileTimeToAprTime */
 
 #include "tcn.h"
+#include "ssl_private.h"
 
 #pragma warning(push)
 #pragma warning(disable : 4201)
@@ -214,3 +216,57 @@ cleanup:
     (*e)->ReleaseLongArrayElements(e, inf, pvals, 0);
     return rv;
 }
+
+static DWORD WINAPI password_thread(void *data)
+{
+    tcn_pass_cb_t *cb = (tcn_pass_cb_t *)data;
+    MSG msg;
+    HWND hwnd = CreateDialog(dll_instance, MAKEINTRESOURCE(1001), NULL, NULL);
+    if (hwnd != NULL)
+        ShowWindow(hwnd, SW_SHOW);
+    else  {
+        ExitThread(1);
+        return 1;
+    }
+    while (1) {
+        if (PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_KEYUP) {
+                int nVirtKey = (int)msg.wParam;
+                if (nVirtKey == VK_ESCAPE) {
+                    DestroyWindow(hwnd);
+                    break;
+                }
+                else if (nVirtKey == VK_RETURN) {
+                    HWND he = GetDlgItem(hwnd, 1002);
+                    if (he) {
+                        int n = GetWindowText(he, cb->password, SSL_MAX_PASSWORD_LEN - 1);
+                        cb->password[n] = '\0';
+                    }
+                    DestroyWindow(hwnd);
+                    break;
+                }
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else
+            Sleep(100);
+    }
+    ExitThread(0);
+    return 0;
+}
+
+int WIN32_SSL_password_prompt(tcn_pass_cb_t *data)
+{
+    DWORD id;
+    HANDLE thread;
+    /* TODO: See how to display this from service mode */
+    thread = CreateThread(NULL, 0,
+                password_thread, data,
+                0, &id);
+    WaitForSingleObject(thread, INFINITE);
+    CloseHandle(thread);
+    return strlen(data->password);
+}
+
+
