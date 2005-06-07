@@ -61,12 +61,14 @@ tcn_pass_cb_t tcn_password_callback;
 #define SSL_TMP_KEY_INIT_DH(bits)  \
     ssl_tmp_key_init_dh(bits, SSL_TMP_KEY_DH_##bits)
 
-#define SSL_TMP_KEYS_INIT(R)            \
-    R |= SSL_TMP_KEY_INIT_RSA(512);     \
-    R |= SSL_TMP_KEY_INIT_RSA(1024);    \
-    R |= SSL_TMP_KEY_INIT_DH(512);      \
-    R |= SSL_TMP_KEY_INIT_DH(1024);     \
-    R |= SSL_TMP_KEY_INIT_DH(2048);     \
+#define SSL_TMP_KEYS_INIT(R)                    \
+    SSL_temp_keys[SSL_TMP_KEY_RSA_2048] = NULL; \
+    SSL_temp_keys[SSL_TMP_KEY_RSA_4096] = NULL; \
+    R |= SSL_TMP_KEY_INIT_RSA(512);             \
+    R |= SSL_TMP_KEY_INIT_RSA(1024);            \
+    R |= SSL_TMP_KEY_INIT_DH(512);              \
+    R |= SSL_TMP_KEY_INIT_DH(1024);             \
+    R |= SSL_TMP_KEY_INIT_DH(2048);             \
     R |= SSL_TMP_KEY_INIT_DH(4096)
 
 static int ssl_tmp_key_init_rsa(int bits, int idx)
