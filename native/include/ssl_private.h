@@ -118,16 +118,6 @@
 #define SSL_CVERIFY_OPTIONAL_NO_CA  (3)
 #define SSL_VERIFY_PEER_STRICT      (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT)
 
-#define SSL_PASSWORD_PROMPT         (0)
-#define SSL_PASSWORD_FILE           (1)
-#define SSL_PASSWORD_EXEC           (2)
-#define SSL_PASSWORD_ENGINE         (3)
-
-#define STR_PASSWORD_PROMPT         ("pass:")
-#define STR_PASSWORD_FILE           ("file:")
-#define STR_PASSWORD_EXEC           ("exec:")
-#define STR_PASSWORD_ENGINE         ("engine:")
-
 extern void *SSL_temp_keys[SSL_TMP_KEY_MAX];
 
 typedef struct {
@@ -141,9 +131,11 @@ typedef struct tcn_ssl_ctxt_t tcn_ssl_ctxt_t;
 
 typedef struct {
     char            password[SSL_MAX_PASSWORD_LEN];
+    const char     *pass;
     const char     *prompt;
-    int             mode;
     tcn_ssl_ctxt_t *ctx;
+    apr_file_t     *wrtty;
+    apr_file_t     *rdtty;
 } tcn_pass_cb_t;
 
 struct tcn_ssl_ctxt_t {
