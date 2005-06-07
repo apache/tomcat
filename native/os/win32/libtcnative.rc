@@ -1,5 +1,22 @@
 #include <windows.h>
 
+#define TCN_COPYRIGHT "Copyright 2000-2005 The Apache Software " \
+                      "Foundation or its licensors, as applicable."
+
+#define TCN_LICENSE "Licensed under the Apache License, Version 2.0 " \
+                    "(the ""License""); you may not use this file except " \
+                    "in compliance with the License.  You may obtain a " \
+                    "copy of the License at\r\n\r\n" \
+                    "http://www.apache.org/licenses/LICENSE-2.0\r\n\r\n" \
+                    "Unless required by applicable law or agreed to in " \
+                    "writing, software distributed under the License is " \
+                    "distributed on an ""AS IS"" BASIS, WITHOUT " \
+                    "WARRANTIES OR CONDITIONS OF ANY KIND, either " \
+                    "express or implied.  See the License for the " \
+                    "specific language governing permissions and " \
+                    "limitations under the License."
+
+#define TCN_VERISON "1.1.0-dev"
 1000 ICON "apache.ico"
 
 1001 DIALOGEX 0, 0, 252, 51
@@ -31,15 +48,15 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Licensed under the Apache License, Version 2.0 (the ""License""); you may not use this file except in compliance with the License.  You may obtain a copy of the License at\r\n\r\nhttp://www.apache.org/licenses/LICENSE-2.0\r\n\r\nUnless required by applicable law or agreed to in writing, software distributed under the License is distributed on an ""AS IS"" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License."
-            VALUE "CompanyName", "Apache Software Foundation"
-            VALUE "FileDescription", "Tomcat Native Java Library"
-            VALUE "FileVersion", "1.1.0-dev"
+            VALUE "Comments",  TCN_LICENSE "\0"
+            VALUE "CompanyName", "Apache Software Foundation\0"
+            VALUE "FileDescription", "Tomcat Native Java Library\0"
+            VALUE "FileVersion", TCN_VERISON "\0"
             VALUE "InternalName", "libtcnative-1"
-            VALUE "LegalCopyright", "Copyright 2000-2005 The Apache Software Foundation"
+            VALUE "LegalCopyright", TCN_COPYRIGHT "\0"
             VALUE "OriginalFilename", "libtcnative-1.dll"
-            VALUE "ProductName", "Apache Portable Runtime"
-            VALUE "ProductVersion", "1.1.0-dev"
+            VALUE "ProductName", "Tomcat Native Java Library\0"
+            VALUE "ProductVersion", TCN_VERISON "\0"
         END
     END
     BLOCK "VarFileInfo"
