@@ -484,6 +484,11 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     cert_file = J2S(cert);
     if (!key_file)
         key_file = cert_file;
+    if (!key_file) {
+        tcn_Throw(e, "No Certificate file specified");
+        rv = JNI_FALSE;
+        goto cleanup;
+    }
     if ((c->keys[idx] = load_pem_key(c, key_file)) == NULL) {
         ERR_error_string(ERR_get_error(), err);
         tcn_Throw(e, "Unable to load certificate key %s (%s)",
