@@ -167,7 +167,6 @@ struct tcn_ssl_ctxt_t {
     /* for client or downstream server authentication */
     int             verify_depth;
     int             verify_mode;
-    void            *temp_keys[SSL_TMP_KEY_MAX];
     tcn_pass_cb_t   *cb_data;
 };
 

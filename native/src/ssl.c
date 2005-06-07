@@ -64,7 +64,6 @@ tcn_pass_cb_t tcn_password_callback;
 #define SSL_TMP_KEYS_INIT(R)            \
     R |= SSL_TMP_KEY_INIT_RSA(512);     \
     R |= SSL_TMP_KEY_INIT_RSA(1024);    \
-    R |= SSL_TMP_KEY_INIT_RSA(2048);    \
     R |= SSL_TMP_KEY_INIT_DH(512);      \
     R |= SSL_TMP_KEY_INIT_DH(1024);     \
     R |= SSL_TMP_KEY_INIT_DH(2048);     \
@@ -700,6 +699,47 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setPasswordBIO)(TCN_STDARGS, jlong bio)
     else
         return;
     SSL_BIO_doref(bio_handle);
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, generateRSATempKey)(TCN_STDARGS, jint idx)
+{
+    int r = 1;
+    UNREFERENCED_STDARGS;
+    SSL_TMP_KEY_FREE(RSA, idx);
+    switch (idx) {
+        case SSL_TMP_KEY_RSA_512:
+            r = SSL_TMP_KEY_INIT_RSA(512);
+        break;
+        case SSL_TMP_KEY_RSA_1024:
+            r = SSL_TMP_KEY_INIT_RSA(1024);
+        break;
+        case SSL_TMP_KEY_RSA_2048:
+            r = SSL_TMP_KEY_INIT_RSA(2048);
+        break;
+        case SSL_TMP_KEY_RSA_4096:
+            r = SSL_TMP_KEY_INIT_RSA(4096);
+        break;
+    }
+    return r ? JNI_FALSE : JNI_TRUE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, loadDSATempKey)(TCN_STDARGS, jint idx,
+                                                  jstring file)
+{
+    jboolean r = JNI_FALSE;
+    TCN_ALLOC_CSTRING(file);
+    DH *dh;
+    UNREFERENCED(o);
+
+    if (!J2S(file))
+        return JNI_FALSE;
+    SSL_TMP_KEY_FREE(DSA, idx);
+    if ((dh = SSL_dh_get_param_from_file(J2S(file)))) {
+        SSL_temp_keys[idx] = dh;
+        r = JNI_TRUE;
+    }
+    TCN_FREE_CSTRING(file);
+    return r;
 }
 
 #else

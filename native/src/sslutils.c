@@ -346,12 +346,12 @@ RSA *SSL_callback_tmp_RSA(SSL *ssl, int export, int keylen)
         break;
         case 2048:
             idx = SSL_TMP_KEY_RSA_2048;
-            if (conn->ctx->temp_keys[idx] == NULL)
+            if (SSL_temp_keys[idx] == NULL)
                 idx = SSL_TMP_KEY_RSA_1024;
         break;
         case 4096:
             idx = SSL_TMP_KEY_RSA_4096;
-            if (conn->ctx->temp_keys[idx] == NULL)
+            if (SSL_temp_keys[idx] == NULL)
                 idx = SSL_TMP_KEY_RSA_2048;
         break;
         case 1024:
@@ -359,7 +359,7 @@ RSA *SSL_callback_tmp_RSA(SSL *ssl, int export, int keylen)
             idx = SSL_TMP_KEY_RSA_1024;
         break;
     }
-    return (RSA *)conn->ctx->temp_keys[idx];
+    return (RSA *)SSL_temp_keys[idx];
 }
 
 /*
@@ -384,7 +384,7 @@ DH *SSL_callback_tmp_DH(SSL *ssl, int export, int keylen)
             idx = SSL_TMP_KEY_DH_1024;
         break;
     }
-    return (DH *)conn->ctx->temp_keys[idx];
+    return (DH *)SSL_temp_keys[idx];
 }
 
 void SSL_vhost_algo_id(const unsigned char *vhost_id, unsigned char *md, int algo)

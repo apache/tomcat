@@ -45,9 +45,13 @@ public final class SSL {
 
     public static final int SSL_TMP_KEY_RSA_512  = 0;
     public static final int SSL_TMP_KEY_RSA_1024 = 1;
-    public static final int SSL_TMP_KEY_DH_512   = 2;
-    public static final int SSL_TMP_KEY_DH_1024  = 3;
-    public static final int SSL_TMP_KEY_MAX      = 4;
+    public static final int SSL_TMP_KEY_RSA_2048 = 2;
+    public static final int SSL_TMP_KEY_RSA_4096 = 3;
+    public static final int SSL_TMP_KEY_DH_512   = 4;
+    public static final int SSL_TMP_KEY_DH_1024  = 5;
+    public static final int SSL_TMP_KEY_DH_2048  = 6;
+    public static final int SSL_TMP_KEY_DH_4096  = 7;
+    public static final int SSL_TMP_KEY_MAX      = 8;
 
     /*
      * Define the SSL options
@@ -216,5 +220,36 @@ public final class SSL {
      * @param bio BIO to use.
      */
      public static native void setPasswordBIO(long bio);
+
+    /**
+     * Generate temporary RSA key.
+     * <br />
+     * Index can be one of:
+     * <PRE>
+     * SSL_TMP_KEY_RSA_512
+     * SSL_TMP_KEY_RSA_1024
+     * SSL_TMP_KEY_RSA_2048
+     * SSL_TMP_KEY_RSA_4096
+     * </PRE>
+     * By default 512 and 1024 keys are generated on startup.
+     * You can use a low priority thread to generate them on the fly.
+     * @param idx temporary key index.
+     */
+    public static native boolean generateRSATempKey(int idx);
+
+    /**
+     * Load temporary DSA key from file
+     * <br />
+     * Index can be one of:
+     * <PRE>
+     * SSL_TMP_KEY_DSA_512
+     * SSL_TMP_KEY_DSA_1024
+     * SSL_TMP_KEY_DSA_2048
+     * SSL_TMP_KEY_DSA_4096
+     * </PRE>
+     * @param idx temporary key index.
+     * @param file File contatining DH params.
+     */
+    public static native boolean loadDSATempKey(int idx, String file);
 
 }
