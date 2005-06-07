@@ -100,30 +100,6 @@ static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
     return APR_SUCCESS;
 }
 
-static void password_prompt(const char *prompt, char *buf, size_t len)
-{
-    size_t i=0;
-    int ch;
-
-    fprintf(stderr, prompt);
-    fflush(stderr);
-    for (i = 0; i < (len - 1); i++) {
-        ch = getchar();
-        if (ch == EOF)
-            break;
-        if (ch == '\n')
-            break;
-        else if (ch == '\b') {
-            i--;
-            if (i > 0)
-                i--;
-        }
-        else
-            buf[i] = ch;
-    }
-    buf[i] = '\0';
-}
-
 #define PROMPT_STRING "Enter password: "
 /* Simple echo password prompting */
 int SSL_password_prompt(tcn_pass_cb_t *data)
@@ -135,16 +111,29 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
     if (data->ctx && data->ctx->bio_is) {
         if (data->ctx->bio_is->flags & SSL_BIO_FLAG_RDONLY) {
             /* Use error BIO in case of stdin */
-            BIO_printf(data->ctx->bio_is, data->prompt);
+            BIO_puts(data->ctx->bio_os, data->prompt);
         }
         rv = BIO_gets(data->ctx->bio_is,
                       data->password, SSL_MAX_PASSWORD_LEN);
     }
     else {
-        password_prompt(data->prompt, data->password,
-                        SSL_MAX_PASSWORD_LEN);
-        fputc('\n', stderr);
-        fflush(stderr);
+#ifdef WIN32
+        STARTUPINFO si;
+        GetStartupInfo(&si);
+        /* Display a new Console window */
+        if (si.wShowWindow == 0) {
+            FreeConsole();
+            AllocConsole();
+            SetConsoleTitle("Enter password");
+        }
+#endif
+        des_read_pw_string(data->password, SSL_MAX_PASSWORD_LEN,
+                           data->prompt, 0);
+#ifdef WIN32
+        /* Destroy a new Console window */
+        if (si.wShowWindow == 0)
+            FreeConsole();
+#endif
         rv = strlen(data->password);
     }
     if (rv > 0) {
@@ -154,6 +143,12 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
             *r = '\0';
             rv--;
         }
+#ifdef WIN32
+        if ((r = strchr(data->password, '\r'))) {
+            *r = '\0';
+            rv--;
+        }
+#endif
     }
     return rv;
 }
@@ -170,6 +165,12 @@ int SSL_password_callback(char *buf, int bufsiz, int verify,
     if (cb_data == NULL) {
         memset(&c, 0, sizeof(tcn_pass_cb_t));
         cb_data = &c;
+    }
+    else {
+        /* TODO: Implement password prompt checking.
+         * and decide what mechanism to use for obtaining
+         * the password.
+         */
     }
     if (cb_data->password[0] ||
         (SSL_password_prompt(cb_data) > 0)) {
@@ -386,6 +387,8 @@ RSA *SSL_callback_tmp_RSA(SSL *ssl, int export, int keylen)
         break;
         case 2048:
             idx = SSL_TMP_KEY_RSA_2048;
+            if (conn->ctx->temp_keys[idx] == NULL)
+                idx = SSL_TMP_KEY_RSA_1024;
         break;
         case 4096:
             idx = SSL_TMP_KEY_RSA_4096;
