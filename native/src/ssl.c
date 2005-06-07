@@ -686,7 +686,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, closeBIO)(TCN_STDARGS, jlong bio)
     return APR_SUCCESS;
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setPasswordBIO)(TCN_STDARGS, jlong bio)
+TCN_IMPLEMENT_CALL(void, SSL, setPasswordBIO)(TCN_STDARGS, jlong bio)
 {
     BIO *bio_handle   = J2P(bio, BIO *);
 
@@ -701,7 +701,7 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setPasswordBIO)(TCN_STDARGS, jlong bio)
     SSL_BIO_doref(bio_handle);
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setPassword)(TCN_STDARGS, jstring password)
+TCN_IMPLEMENT_CALL(void, SSL, setPassword)(TCN_STDARGS, jstring password)
 {
     TCN_ALLOC_CSTRING(password);
     UNREFERENCED(o);
