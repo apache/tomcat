@@ -468,6 +468,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     jboolean rv = JNI_TRUE;
     TCN_ALLOC_CSTRING(cert);
     TCN_ALLOC_CSTRING(key);
+    TCN_ALLOC_CSTRING(password);
     const char *key_file, *cert_file;
     char err[256];
 
@@ -479,8 +480,10 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
         rv = JNI_FALSE;
         goto cleanup;
     }
-    if (password)
-        c->password.pass = tcn_pstrdup(e, password, c->pool);
+    if (J2S(password)) {
+        strncpy(c->password.password, J2S(password), SSL_MAX_PASSWORD_LEN);
+        c->password.password[SSL_MAX_PASSWORD_LEN-1] = '\0';
+    }
     key_file  = J2S(key);
     cert_file = J2S(cert);
     if (!key_file)

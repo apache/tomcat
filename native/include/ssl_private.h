@@ -131,11 +131,8 @@ typedef struct tcn_ssl_ctxt_t tcn_ssl_ctxt_t;
 
 typedef struct {
     char            password[SSL_MAX_PASSWORD_LEN];
-    const char     *pass;
     const char     *prompt;
     tcn_ssl_ctxt_t *ctx;
-    apr_file_t     *wrtty;
-    apr_file_t     *rdtty;
 } tcn_pass_cb_t;
 
 struct tcn_ssl_ctxt_t {

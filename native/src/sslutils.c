@@ -73,92 +73,6 @@ void SSL_set_app_data2(SSL *ssl, void *arg)
     return;
 }
 
-/*
- * Return APR_SUCCESS if the named file exists and is readable
- */
-static apr_status_t exists_and_readable(const char *fname, apr_pool_t *pool,
-                                        apr_time_t *mtime)
-{
-    apr_status_t stat;
-    apr_finfo_t sbuf;
-    apr_file_t *fd;
-
-    if ((stat = apr_stat(&sbuf, fname, APR_FINFO_MIN, pool)) != APR_SUCCESS)
-        return stat;
-
-    if (sbuf.filetype != APR_REG)
-        return APR_EGENERAL;
-
-    if ((stat = apr_file_open(&fd, fname, APR_READ, 0, pool)) != APR_SUCCESS)
-        return stat;
-
-    if (mtime) {
-        *mtime = sbuf.mtime;
-    }
-
-    apr_file_close(fd);
-    return APR_SUCCESS;
-}
-
-static apr_status_t ssl_pipe_child_create(tcn_pass_cb_t *data, apr_pool_t *p, const char *progname)
-{
-    /* Child process code for 'ErrorLog "|..."';
-     * may want a common framework for this, since I expect it will
-     * be common for other foo-loggers to want this sort of thing...
-     */
-    apr_status_t rc;
-    apr_procattr_t *procattr;
-    apr_proc_t *procnew;
-
-    if (((rc = apr_procattr_create(&procattr, p)) == APR_SUCCESS) &&
-        ((rc = apr_procattr_io_set(procattr,
-                                   APR_FULL_BLOCK,
-                                   APR_FULL_BLOCK,
-                                   APR_NO_PIPE)) == APR_SUCCESS)) {
-        char **args;
-        const char *pname;
-
-        apr_tokenize_to_argv(progname, &args, p);
-        pname = apr_pstrdup(p, args[0]);
-        procnew = (apr_proc_t *)apr_pcalloc(p, sizeof(*procnew));
-        rc = apr_proc_create(procnew, pname, (const char * const *)args,
-                             NULL, procattr, p);
-        if (rc == APR_SUCCESS) {
-            /* XXX: not sure if we aught to...
-             * apr_pool_note_subprocess(p, procnew, APR_KILL_AFTER_TIMEOUT);
-             */
-            data->wrtty = procnew->in;
-            data->rdtty = procnew->out;
-        }
-    }
-    return rc;
-}
-
-static int pipe_get_passwd_cb(tcn_pass_cb_t *data, char *buf, int length,
-                              const char *prompt)
-{
-    apr_status_t rc;
-    char *p;
-
-    apr_file_puts(prompt, data->wrtty);
-
-    buf[0]='\0';
-    rc = apr_file_gets(buf, length, data->rdtty);
-    apr_file_puts(APR_EOL_STR, data->wrtty);
-
-    if (rc != APR_SUCCESS || apr_file_eof(data->rdtty)) {
-        memset(buf, 0, length);
-        return 1;  /* failure */
-    }
-    if ((p = strchr(buf, '\n')) != NULL)
-        *p = '\0';
-#ifdef WIN32
-    if ((p = strchr(buf, '\r')) != NULL)
-        *p = '\0';
-#endif
-    return 0;
-}
-
 #define PROMPT_STRING "Enter password: "
 /* Simple echo password prompting */
 int SSL_password_prompt(tcn_pass_cb_t *data)
@@ -178,19 +92,11 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
         STARTUPINFO si;
         GetStartupInfo(&si);
         /* Display a new Console window */
-        if (si.wShowWindow == 0) {
-            FreeConsole();
-            AllocConsole();
-            SetConsoleTitle("Enter password");
-        }
+        if (si.wShowWindow == 0)
+            return 0;
 #endif
         des_read_pw_string(data->password, SSL_MAX_PASSWORD_LEN,
                            data->prompt, 0);
-#ifdef WIN32
-        /* Destroy a new Console window */
-        if (si.wShowWindow == 0)
-            FreeConsole();
-#endif
         rv = strlen(data->password);
     }
     if (rv > 0) {
@@ -228,25 +134,6 @@ int SSL_password_callback(char *buf, int bufsiz, int verify,
         /* Return already obtained password */
         strncpy(buf, cb_data->password, bufsiz);
         buf[bufsiz - 1] = '\0';
-        return strlen(buf);
-    }
-    if (!cb_data->prompt)
-        cb_data->prompt = PROMPT_STRING;
-    if (cb_data->pass) {
-        if (strncmp(cb_data->pass, "pass:", 5) == 0)
-            strncpy(buf, cb_data->pass + 5, bufsiz);
-        else if (strncmp(cb_data->pass, "exec:", 5) == 0) {
-            apr_pool_t *p;
-            apr_pool_create(&p, cb_data->ctx->pool);
-            if (ssl_pipe_child_create(cb_data, p,
-                        cb_data->pass + 5) == APR_SUCCESS) {
-                pipe_get_passwd_cb(cb_data, buf, bufsiz, cb_data->prompt);
-            }
-            apr_pool_destroy(p);
-        }
-        buf[bufsiz-1] = '\0';
-        strncpy(cb_data->password, buf, SSL_MAX_PASSWORD_LEN);
-        cb_data->password[SSL_MAX_PASSWORD_LEN - 1] = '\0';
         return strlen(buf);
     }
     else {
