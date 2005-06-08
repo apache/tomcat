@@ -93,7 +93,7 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
         EVP_read_pw_string(data->password, SSL_MAX_PASSWORD_LEN,
                            data->prompt, 0);
 #endif
-        rv = strlen(data->password);
+        rv = (int)strlen(data->password);
     }
     if (rv > 0) {
         /* Remove LF char if present */
@@ -129,14 +129,14 @@ int SSL_password_callback(char *buf, int bufsiz, int verify,
         /* Return already obtained password */
         strncpy(buf, cb_data->password, bufsiz);
         buf[bufsiz - 1] = '\0';
-        return strlen(buf);
+        return (int)strlen(buf);
     }
     else {
         if (SSL_password_prompt(cb_data) > 0)
             strncpy(buf, cb_data->password, bufsiz);
     }
     buf[bufsiz - 1] = '\0';
-    return strlen(buf);
+    return (int)strlen(buf);
 }
 
 static unsigned char dh0512_p[]={
