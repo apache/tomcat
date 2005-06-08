@@ -174,6 +174,14 @@ init_failed:
     return 0;
 }
 
+TCN_IMPLEMENT_CALL(jint, SSLContext, geterror)(TCN_STDARGS, jlong ctx, jint retcode)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    return SSL_get_error(c->ctx, retcode);
+}
+
 TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);

@@ -258,4 +258,19 @@ public final class SSL {
      */
     public static native boolean loadDSATempKey(int idx, String file);
 
+    /**
+     * Create a new SSL structure for a Client connection
+     * @param ctx Client context to accept.
+     * @param bior BIO for read.
+     * @param biow BIO for read.
+     * @return pointer to the created SSL structure.
+     */
+    public static native int make(long ctx, long bior, long biow);
+
+    /**
+     * Do the TLS/SSL handshake with a Client
+     * @param ssl Client communication channel to accept.
+     * @return Status code.
+     */
+    public static native int accept(long ssl);
 }

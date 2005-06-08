@@ -47,6 +47,27 @@ public class SSLServer {
         }
     }
 
+    private class CallBack implements BIOCallback {
+        long clientSock = 0;
+        public int write(byte [] buf) {
+            return(Socket.send(clientSock, buf, 0, buf.length)); 
+        }
+        public int read(byte [] buf) { 
+            return(Socket.recv(clientSock, buf, 0, buf.length));
+        }
+        public int puts(String data) {
+            System.out.println("CallBack.puts");
+            return -1;
+        }
+        public String gets(int len) {
+            System.out.println("CallBack.gets");
+            return "";
+        }
+        public void setsock(long sock) {
+            clientSock = sock;
+        }
+    }
+
     public SSLServer()
     {
         int i;
@@ -60,6 +81,36 @@ public class SSLServer {
             SSLContext.setCertificate(serverCtx, serverCert, serverKey, serverPassword, SSL.SSL_AIDX_RSA);
             SSLContext.setVerifyDepth(serverCtx, 10);
             SSLContext.setVerifyClient(serverCtx, SSL.SSL_CVERIFY_REQUIRE);
+
+            CallBack SSLCallBack = new CallBack();
+            long callback = SSL.newBIO(serverPool, SSLCallBack);
+            /*
+            SSLContext.setBIO(serverCtx, callback, 1);
+            SSLContext.setBIO(serverCtx, callback, 0);
+             */
+            long serverSSL = SSL.make(serverCtx, callback, callback);
+
+            long serverSock = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM,
+                                            Socket.APR_PROTO_TCP, serverPool);
+            long inetAddress = Address.info(SSLServer.serverAddr, Socket.APR_INET, SSLServer.serverPort, 0, serverPool);
+            int rc = Socket.bind(serverSock, inetAddress);
+            if (rc != 0) {
+                throw(new Exception("Can't bind: " + Error.strerror(rc)));
+            }
+            Socket.listen(serverSock, 5);
+            long clientSock = Socket.accept(serverSock, serverPool);
+            long sa = Address.get(Socket.APR_REMOTE, clientSock);
+            Sockaddr raddr = new Sockaddr();
+            if (Address.fill(raddr, sa)) {
+                System.out.println("Remote Host: " + Address.getnameinfo(sa, 0));
+                System.out.println("Remote IP: " + Address.getip(sa) +
+                                   ":" + raddr.port);
+            }
+            SSLCallBack.setsock(clientSock);
+            int retcode = SSL.accept(serverSSL);
+            if (retcode<=0) {
+                throw(new Exception("Can't SSL accept: " + SSLContext.geterror(serverCtx, retcode)));
+            }
             
         } catch (Exception e) {
             e.printStackTrace();
