@@ -45,12 +45,17 @@
 #define TCN_ERROR_CLASS TCN_CLASS_PATH "Error"
 
 #define UNREFERENCED(P) (P)
-#define P2J(P)          ((jlong)(P))
-#define J2P(P, T)       ((T)((jlong)(P)))
+#ifdef WIN32
+#define LLT(X) (X)
+#else
+#define LLT(X) ((long)(X))
+#endif
+#define P2J(P)          ((jlong)LLT(P))
+#define J2P(P, T)       ((T)LLT((jlong)P))
 /* On stack buffer size */
 #define TCN_BUFFER_SZ   8192
 #define TCN_STDARGS     JNIEnv *e, jobject o
-#define UNREFERENCED_STDARGS    { e; o; }
+#define UNREFERENCED_STDARGS    e; o
 
 #define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
