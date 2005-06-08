@@ -22,6 +22,22 @@
 #ifndef SSL_PRIVATE_H
 #define SSL_PRIVATE_H
 
+/* Exclude unused OpenSSL features
+ * even if the OpenSSL supports them
+ */
+#ifndef OPENSSL_NO_IDEA
+#define OPENSSL_NO_IDEA
+#endif
+#ifndef OPENSSL_NO_KRB5
+#define OPENSSL_NO_KRB5
+#endif
+#ifndef OPENSSL_NO_MDC2
+#define OPENSSL_NO_MDC2
+#endif
+#ifndef OPENSSL_NO_RC5
+#define OPENSSL_NO_RC5
+#endif
+
 /* OpenSSL headers */
 #include <openssl/ssl.h>
 #include <openssl/err.h>
