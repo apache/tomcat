@@ -237,21 +237,19 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
   if test "x$tcn_ssltk_type" = "x"; then
     AC_MSG_CHECKING(for OpenSSL version)
     dnl First check for manditory headers
-    AC_CHECK_HEADERS([openssl/opensslv.h openssl/ssl.h], [tcn_ssltk_type="openssl"], [])
+    AC_CHECK_HEADERS([openssl/opensslv.h], [tcn_ssltk_type="openssl"], [])
     if test "$tcn_ssltk_type" = "openssl"; then
       dnl so it's OpenSSL - test for a good version
       AC_TRY_COMPILE([#include <openssl/opensslv.h>],[
 #if !defined(OPENSSL_VERSION_NUMBER)
   #error "Missing openssl version"
 #endif
-#if  (OPENSSL_VERSION_NUMBER < 0x0090702f))
+#if  (OPENSSL_VERSION_NUMBER < 0x0090701f)
   #error "Unsuported openssl version " OPENSSL_VERSION_TEXT
 #endif],
       [AC_MSG_RESULT(OK)],
-      [dnl Replace this with OPENSSL_VERSION_TEXT from opensslv.h?
-       AC_MSG_RESULT([not encouraging])
-       echo "WARNING: OpenSSL version may contain security vulnerabilities!"
-       echo "         Ensure the latest security patches have been applied!"
+      [dnl Unsuported OpenSSL version
+         AC_MSG_ERROR([Unsupported OpenSSL version. Use 0.9.7a or higher version])
       ])
       dnl Look for additional, possibly missing headers
       AC_CHECK_HEADERS(openssl/engine.h)
