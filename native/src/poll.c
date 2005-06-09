@@ -119,7 +119,7 @@ TCN_IMPLEMENT_CALL(jlong, Poll, create)(TCN_STDARGS, jint size,
         TCN_THROW_IF_ERR(apr_pollset_create(&pollset,
                          (apr_uint32_t)size, p, f), pollset);
     }
-    tps = apr_palloc(p, sizeof(tcn_pollset_t));
+    tps = apr_pcalloc(p, sizeof(tcn_pollset_t));
     tps->pollset = pollset;
     tps->socket_set = apr_palloc(p, size * sizeof(apr_pollfd_t));
     tps->socket_ttl = apr_palloc(p, size * sizeof(apr_interval_time_t));
