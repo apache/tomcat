@@ -26,17 +26,17 @@ public interface BIOCallback {
 
     /**
      * Write data
-     * @param data String to write
-     * @return Number of characters written
+     * @param buf containg the bytes to write.
+     * @return Number of characters written.
      */
-    public int write(String data);
+    public int write(byte [] buf);
 
     /**
      * Read data
-     * @param len Maximum number of characters to read
-     * @return String with up to len bytes readed
+     * @param buf buffer to store the read bytes.
+     * @return number of bytes read.
      */
-    public String read(int len);
+    public int read(byte [] buf);
 
     /**
      * Puts string

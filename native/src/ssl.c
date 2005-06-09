@@ -551,10 +551,12 @@ static int jbs_write(BIO *b, const char *in, int inl)
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = j->cb.env;
-        if ((*e)->CallIntMethod(e, j->cb.obj,
-                                j->cb.mid[0],
-                                tcn_new_string(e, in, inl)))
-            ret = inl;
+        jbyteArray jb = (*e)->NewByteArray(e, inl);
+        (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
+        jint o = (*e)->CallIntMethod(e, j->cb.obj,
+                                j->cb.mid[0], jb);
+        (*e)->ReleaseByteArrayElements(e, jb, (jbyte *)in, 0);
+        ret = o;
     }
     return ret;
 }
@@ -565,16 +567,16 @@ static int jbs_read(BIO *b, char *out, int outl)
     if (b->init && out != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = j->cb.env;
-        jobject  o;
-        if ((o = (*e)->CallObjectMethod(e, j->cb.obj,
-                            j->cb.mid[1], (jint)(outl - 1)))) {
-            TCN_ALLOC_CSTRING(o);
-            if (J2S(o)) {
-                int l = (int)strlen(J2S(o));
-                ret = TCN_MIN(outl, l);
-                memcpy(out, J2S(o), ret);
-            }
-            TCN_FREE_CSTRING(o);
+        jbyteArray jb = (*e)->NewByteArray(e, outl);
+
+        jint  o = (*e)->CallObjectMethod(e, j->cb.obj,
+                            j->cb.mid[1], jb);
+        if (o>=0) {
+            int i;
+            jbyte *jout =  (*e)->GetByteArrayElements(e, jb, 0);
+            memcpy(out, jout, o);
+            (*e)->ReleaseByteArrayElements(e, jb, jout, 0);
+            ret = o;
         }
     }
     return ret;
@@ -666,8 +668,8 @@ TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
 
     cls = (*e)->GetObjectClass(e, callback);
     j->cb.env    = e;
-    j->cb.mid[0] = (*e)->GetMethodID(e, cls, "write", "(Ljava/lang/String;)I");
-    j->cb.mid[1] = (*e)->GetMethodID(e, cls, "read",  "(I)Ljava/lang/String;");
+    j->cb.mid[0] = (*e)->GetMethodID(e, cls, "write", "([B)I");
+    j->cb.mid[1] = (*e)->GetMethodID(e, cls, "read",  "([B)I");
     j->cb.mid[2] = (*e)->GetMethodID(e, cls, "puts",  "(Ljava/lang/String;)I");
     j->cb.mid[3] = (*e)->GetMethodID(e, cls, "gets",  "(I)Ljava/lang/String;");
     /* TODO: Check if method id's are valid */
