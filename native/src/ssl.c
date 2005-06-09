@@ -547,36 +547,37 @@ static int jbs_free(BIO *bi)
 
 static int jbs_write(BIO *b, const char *in, int inl)
 {
-    int ret = 0;
+    jint ret = 0;
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = j->cb.env;
         jbyteArray jb = (*e)->NewByteArray(e, inl);
-        (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
-        jint o = (*e)->CallIntMethod(e, j->cb.obj,
-                                j->cb.mid[0], jb);
-        (*e)->ReleaseByteArrayElements(e, jb, (jbyte *)in, 0);
-        ret = o;
+        if (!(*e)->ExceptionOccurred(e)) {
+            (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
+            ret = (*e)->CallIntMethod(e, j->cb.obj,
+                                      j->cb.mid[0], jb);
+            (*e)->DeleteLocalRef(e, jb);
+        }
     }
     return ret;
 }
 
 static int jbs_read(BIO *b, char *out, int outl)
 {
-    int ret = 0;
+    jint ret = 0;
     if (b->init && out != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = j->cb.env;
         jbyteArray jb = (*e)->NewByteArray(e, outl);
-
-        jint  o = (*e)->CallObjectMethod(e, j->cb.obj,
-                            j->cb.mid[1], jb);
-        if (o>=0) {
-            int i;
-            jbyte *jout =  (*e)->GetByteArrayElements(e, jb, 0);
-            memcpy(out, jout, o);
-            (*e)->ReleaseByteArrayElements(e, jb, jout, 0);
-            ret = o;
+        if (!(*e)->ExceptionOccurred(e)) {
+            ret = (*e)->CallIntMethod(e, j->cb.obj,
+                                      j->cb.mid[1], jb);
+            if (ret > 0) {
+                jbyte *jout = (*e)->GetPrimitiveArrayCritical(e, jb, NULL);
+                memcpy(out, jout, ret);
+                (*e)->ReleasePrimitiveArrayCritical(e, jb, jout, 0);
+            }
+            (*e)->DeleteLocalRef(e, jb);
         }
     }
     return ret;
