@@ -173,7 +173,10 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(54, APR_STATUS_IS_NOTDETACH);
         APR_IS(55, APR_STATUS_IS_CHILD_DONE);
         APR_IS(56, APR_STATUS_IS_CHILD_NOTDONE);
-        APR_IS(57, APR_STATUS_IS_TIMEUP);
+        case 57:
+            if (APR_STATUS_IS_TIMEUP(err) || err == TCN_TIMEUP)
+                return JNI_TRUE;
+        break;
         APR_IS(58, APR_STATUS_IS_INCOMPLETE);
         /* empty slot: +9 */
         /* empty slot: +10 */
@@ -193,7 +196,10 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(74, APR_STATUS_IS_EMISMATCH);
         APR_IS(75, APR_STATUS_IS_EBUSY);
         /* Socket errors */
-        APR_IS(90, APR_STATUS_IS_EAGAIN);
+        case 90:
+            if (APR_STATUS_IS_EAGAIN(err) || err == TCN_EAGAIN)
+                return JNI_TRUE;
+        break;
         APR_IS(91, TCN_STATUS_IS_ETIMEDOUT);
         APR_IS(92, APR_STATUS_IS_ECONNABORTED);
         APR_IS(93, APR_STATUS_IS_ECONNRESET);

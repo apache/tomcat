@@ -291,8 +291,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
         (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
@@ -311,8 +314,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
 
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
@@ -344,8 +350,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
     }
     if (ss == APR_SUCCESS)
         return (jint)written;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
@@ -376,8 +385,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
         (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
@@ -397,8 +409,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
                                    nbytes ? 0 : JNI_ABORT);
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
@@ -428,8 +443,11 @@ cleanup:
                                    nbytes ? 0 : JNI_ABORT);
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
@@ -449,8 +467,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
 
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
@@ -479,8 +500,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
 
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
@@ -502,8 +526,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
                                    nbytes ? 0 : JNI_ABORT);
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jint)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, optSet)(TCN_STDARGS, jlong sock,
@@ -628,8 +655,11 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
      */
     if (ss == APR_SUCCESS)
         return (jlong)written;
-    else
+    else {
+        if (APR_STATUS_IS_EAGAIN(ss))
+            ss = TCN_EAGAIN;
         return -(jlong)ss;
+    }
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, acceptfilter)(TCN_STDARGS,

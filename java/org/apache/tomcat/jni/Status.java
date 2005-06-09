@@ -175,6 +175,9 @@ public class Status {
     public static final int APR_EMISMATCH     = (APR_OS_START_STATUS + 24);
     public static final int APR_EBUSY         = (APR_OS_START_STATUS + 25);
 
+    public static final int TIMEUP            = (APR_OS_START_USERERR + 1);
+    public static final int EAGAIN            = (APR_OS_START_USERERR + 2);
+
     private static native boolean is(int err, int idx);
     /**
      * APR_STATUS_IS Status Value Tests

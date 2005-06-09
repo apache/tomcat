@@ -39,6 +39,9 @@
 #define APR_MAX_IOVEC_SIZE 1024
 #endif
 
+#define TCN_TIMEUP  APR_OS_START_USERERR + 1
+#define TCN_EAGAIN  APR_OS_START_USERERR + 2
+
 #define TCN_CLASS_PATH  "org/apache/tomcat/jni/"
 #define TCN_FINFO_CLASS TCN_CLASS_PATH "FileInfo"
 #define TCN_AINFO_CLASS TCN_CLASS_PATH "Sockaddr"
