@@ -47,19 +47,6 @@ public final class SSLContext {
         throws Exception;
 
     /**
-     * Do the TLS/SSL handshake with a Client
-     * @param ctx Client context to accept.
-     * @return Status code.
-     */
-    public static native int accept(long ctx);
-
-    /**
-     * Return the error code for openssl.
-     * @return Status code.
-     */
-    public static native int geterror(long ctx, int retcode);
-     
-    /**
      * Free the resources used by the Context
      * @param ctx Server or Client context to free.
      * @return APR Status code.

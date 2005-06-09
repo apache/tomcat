@@ -434,37 +434,6 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     return (jint)APR_SUCCESS;
 }
 
-TCN_IMPLEMENT_CALL(jint, SSL, accept)(TCN_STDARGS, jlong ctx)
-{
-    tcn_ssl_conn_t *c = J2P(ctx, tcn_ssl_conn_t *);
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(ctx != 0);
-    return SSL_accept(c->ssl);
-}
-
-TCN_IMPLEMENT_CALL(jint, SSL, make)(TCN_STDARGS, jlong ctx, jlong bior, jlong biow)
-{
-    tcn_ssl_ctxt_t *c    = J2P(ctx, tcn_ssl_ctxt_t *);
-    BIO *bio_handler     = J2P(bior, BIO *);
-    BIO *bio_handlew     = J2P(biow, BIO *);
-    SSL *ssl;
-    tcn_ssl_conn_t *cssl = NULL;
-
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(ctx != 0);
-
-    ssl=SSL_new(c->ctx);
-    SSL_set_bio(ssl, bio_handler, bio_handlew);
-    if ((cssl = apr_pcalloc(c->pool, sizeof(tcn_ssl_conn_t))) == NULL) {
-        goto make_failed;
-    }
-    cssl->ctx=c;
-    cssl->ssl=ssl;
-    return P2J(cssl);
-make_failed:
-    return 0;
-}
-
 TCN_IMPLEMENT_CALL(jboolean, SSL, randLoad)(TCN_STDARGS, jstring file)
 {
     TCN_ALLOC_CSTRING(file);
@@ -582,12 +551,10 @@ static int jbs_write(BIO *b, const char *in, int inl)
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = j->cb.env;
-        jbyteArray jb = (*e)->NewByteArray(e, inl);
-        (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
-        jint o = (*e)->CallIntMethod(e, j->cb.obj,
-                                j->cb.mid[0], jb);
-        (*e)->ReleaseByteArrayElements(e, jb, (jbyte *)in, 0);
-        ret = o;
+        if ((*e)->CallIntMethod(e, j->cb.obj,
+                                j->cb.mid[0],
+                                tcn_new_string(e, in, inl)))
+            ret = inl;
     }
     return ret;
 }
@@ -598,16 +565,16 @@ static int jbs_read(BIO *b, char *out, int outl)
     if (b->init && out != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = j->cb.env;
-        jbyteArray jb = (*e)->NewByteArray(e, outl);
-
-        jint  o = (*e)->CallObjectMethod(e, j->cb.obj,
-                            j->cb.mid[1], jb);
-        if (o>=0) {
-            int i;
-            jbyte *jout =  (*e)->GetByteArrayElements(e, jb, 0);
-            memcpy(out, jout, o);
-            (*e)->ReleaseByteArrayElements(e, jb, jout, 0);
-            ret = o;
+        jobject  o;
+        if ((o = (*e)->CallObjectMethod(e, j->cb.obj,
+                            j->cb.mid[1], (jint)(outl - 1)))) {
+            TCN_ALLOC_CSTRING(o);
+            if (J2S(o)) {
+                int l = (int)strlen(J2S(o));
+                ret = TCN_MIN(outl, l);
+                memcpy(out, J2S(o), ret);
+            }
+            TCN_FREE_CSTRING(o);
         }
     }
     return ret;
@@ -699,8 +666,8 @@ TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
 
     cls = (*e)->GetObjectClass(e, callback);
     j->cb.env    = e;
-    j->cb.mid[0] = (*e)->GetMethodID(e, cls, "write", "([B)I");
-    j->cb.mid[1] = (*e)->GetMethodID(e, cls, "read",  "([B)I");
+    j->cb.mid[0] = (*e)->GetMethodID(e, cls, "write", "(Ljava/lang/String;)I");
+    j->cb.mid[1] = (*e)->GetMethodID(e, cls, "read",  "(I)Ljava/lang/String;");
     j->cb.mid[2] = (*e)->GetMethodID(e, cls, "puts",  "(Ljava/lang/String;)I");
     j->cb.mid[3] = (*e)->GetMethodID(e, cls, "gets",  "(I)Ljava/lang/String;");
     /* TODO: Check if method id's are valid */
