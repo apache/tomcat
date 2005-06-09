@@ -556,6 +556,7 @@ static int jbs_write(BIO *b, const char *in, int inl)
             (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
             ret = (*e)->CallIntMethod(e, j->cb.obj,
                                       j->cb.mid[0], jb);
+            (*e)->ReleaseByteArrayElements(e, jb, (jbyte *)in, JNI_ABORT);
             (*e)->DeleteLocalRef(e, jb);
         }
     }
