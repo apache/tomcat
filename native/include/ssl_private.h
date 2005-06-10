@@ -169,7 +169,6 @@ struct tcn_ssl_ctxt_t {
     /* we are one or the other */
     int             mode;
 
-    const char      *cert_chain;
     /* certificate revocation list */
     X509_STORE      *crl;
     const char      *cert_files[SSL_AIDX_MAX];

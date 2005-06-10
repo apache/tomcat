@@ -166,8 +166,11 @@ public final class SSLContext {
      * confused in this situation.
      * @param ctx Server or Client context to use.
      * @param file File of PEM-encoded Server CA Certificates.
+     * @param skipfirst Skip first certificate if chain file is inside
+     *                  certificate file. 
      */
-    public static native boolean setCertificateChainFile(long ctx, String file);
+    public static native boolean setCertificateChainFile(long ctx, String file,
+                                                         boolean skipfirst);
 
     /**
      * Set Certificate

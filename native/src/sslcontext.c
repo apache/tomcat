@@ -317,18 +317,20 @@ cleanup:
 }
 
 TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateChainFile)(TCN_STDARGS, jlong ctx,
-                                                                  jstring file)
+                                                                  jstring file,
+                                                                  jboolean skipfirst)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    jboolean rv = JNI_TRUE;
-
+    jboolean rv = JNI_FALSE;
+    TCN_ALLOC_CSTRING(file);
+    
     UNREFERENCED(o);
     TCN_ASSERT(ctx != 0);
-    if (!file)
+    if (!J2S(file))
         return JNI_FALSE;
-    if ((c->cert_chain = tcn_pstrdup(e, file, c->pool)) == NULL)
-        rv = JNI_FALSE;
-
+    if (SSL_CTX_use_certificate_chain(c->ctx, J2S(file), skipfirst) > 0)
+        rv = JNI_TRUE;
+    TCN_FREE_CSTRING(file);
     return rv;
 }
 
