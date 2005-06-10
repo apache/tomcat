@@ -35,6 +35,7 @@
 #ifdef TCN_DO_STATISTICS
 extern void sp_poll_dump_statistics();
 extern void sp_network_dump_statistics();
+extern void ssl_network_dump_statistics();
 #endif
 
 apr_pool_t *tcn_global_pool = NULL;
@@ -191,6 +192,7 @@ TCN_IMPLEMENT_CALL(void, Library, terminate)(TCN_STDARGS)
 #ifdef TCN_DO_STATISTICS
         sp_poll_dump_statistics();
         sp_network_dump_statistics();
+        ssl_network_dump_statistics();
         fprintf(stderr, "APR Terminated\n");
 #endif
     }
