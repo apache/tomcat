@@ -39,8 +39,25 @@
 #define APR_MAX_IOVEC_SIZE 1024
 #endif
 
-#define TCN_TIMEUP  APR_OS_START_USERERR + 1
-#define TCN_EAGAIN  APR_OS_START_USERERR + 2
+#define TCN_TIMEUP      APR_OS_START_USERERR + 1
+#define TCN_EAGAIN      APR_OS_START_USERERR + 2
+#define TCN_EINTR       APR_OS_START_USERERR + 3
+#define TCN_EINPROGRESS APR_OS_START_USERERR + 4
+#define TCN_ETIMEDOUT   APR_OS_START_USERERR + 5
+
+#define TCN_ERROR_WRAP(E)                   \
+    if (APR_STATUS_IS_TIMEUP(E))            \
+        (E) = TCN_TIMEUP;                   \
+    else if (APR_STATUS_IS_EAGAIN(E))       \
+        (E) = TCN_EAGAIN;                   \
+    else if (APR_STATUS_IS_EINTR(E))        \
+        (E) = TCN_EINTR;                    \
+    else if (APR_STATUS_IS_EINPROGRESS(E))  \
+        (E) = TCN_EINPROGRESS;              \
+    else if (APR_STATUS_IS_ETIMEDOUT(E))    \
+        (E) = TCN_ETIMEDOUT;                \
+    else                                    \
+        (E) = (E)
 
 #define TCN_CLASS_PATH  "org/apache/tomcat/jni/"
 #define TCN_FINFO_CLASS TCN_CLASS_PATH "FileInfo"

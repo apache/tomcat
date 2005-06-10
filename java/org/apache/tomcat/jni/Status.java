@@ -177,6 +177,9 @@ public class Status {
 
     public static final int TIMEUP            = (APR_OS_START_USERERR + 1);
     public static final int EAGAIN            = (APR_OS_START_USERERR + 2);
+    public static final int EINTR             = (APR_OS_START_USERERR + 3);
+    public static final int EINPROGRESS       = (APR_OS_START_USERERR + 4);
+    public static final int ETIMEDOUT         = (APR_OS_START_USERERR + 5);
 
     private static native boolean is(int err, int idx);
     /**

@@ -250,10 +250,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
      p->sp_poll++;
 #endif
     if ((rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd)) != APR_SUCCESS) {
-        if (APR_STATUS_IS_TIMEUP(rv))
-            rv = TCN_TIMEUP;
-        else if (APR_STATUS_IS_EAGAIN(rv))
-            rv = TCN_EAGAIN;
+        TCN_ERROR_WRAP(rv);
 #ifdef TCN_DO_STATISTICS
         if (rv == TCN_TIMEUP)
             p->sp_poll_timeout++;

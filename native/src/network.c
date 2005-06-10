@@ -292,8 +292,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -315,8 +314,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -351,8 +349,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)written;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -386,8 +383,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -410,8 +406,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -444,8 +439,7 @@ cleanup:
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -468,8 +462,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -501,8 +494,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -527,8 +519,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
 }
@@ -656,8 +647,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
     if (ss == APR_SUCCESS)
         return (jlong)written;
     else {
-        if (APR_STATUS_IS_EAGAIN(ss))
-            ss = TCN_EAGAIN;
+        TCN_ERROR_WRAP(ss);
         return -(jlong)ss;
     }
 }
