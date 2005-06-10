@@ -34,7 +34,7 @@ public class SSLSocket {
      * @param pool The pool to use
      * @return The new socket that has been set up.
      */
-    public static native long accept(long ctx, long sock long pool)
+    public static native long accept(long ctx, long sock, long pool)
         throws Exception;
 
     /**
@@ -44,7 +44,7 @@ public class SSLSocket {
      * @param pool The pool to use
      * @return The new socket that has been set up.
      */
-    public static native long connect(long ctx, long sock long pool)
+    public static native long connect(long ctx, long sock, long pool)
         throws Exception;
 
 
