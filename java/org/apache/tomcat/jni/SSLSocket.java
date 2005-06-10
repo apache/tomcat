@@ -72,5 +72,10 @@ public class SSLSocket {
      */
     public static native int close(long thesocket);
 
-
+    /**
+     * Get the SSL error code.
+     * @param thesocket The SSL socket to use.
+     * @retcode the "local" error code returned by SSL.
+     * @return the error code.
+    public static native int geterror(long thesocket, int retcode);
 }
