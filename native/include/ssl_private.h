@@ -134,6 +134,11 @@
 #define SSL_CVERIFY_OPTIONAL_NO_CA  (3)
 #define SSL_VERIFY_PEER_STRICT      (SSL_VERIFY_PEER|SSL_VERIFY_FAIL_IF_NO_PEER_CERT)
 
+#define SSL_SHUTDOWN_TYPE_UNSET     (0)
+#define SSL_SHUTDOWN_TYPE_STANDARD  (1)
+#define SSL_SHUTDOWN_TYPE_UNCLEAN   (2)
+#define SSL_SHUTDOWN_TYPE_ACCURATE  (3)
+
 #define SSL_DEFAULT_PASS_PROMPT "Some of your private key files are encrypted for security reasons.\n"  \
                                 "In order to read them you have to provide the pass phrases.\n"         \
                                 "Enter password :"
@@ -177,6 +182,7 @@ struct tcn_ssl_ctxt_t {
     EVP_PKEY        *keys[SSL_AIDX_MAX];
 
     int             ca_certs;
+    int             shutdown_type;
 
     const char      *cipher_suite;
     /* for client or downstream server authentication */
@@ -188,6 +194,7 @@ struct tcn_ssl_ctxt_t {
 typedef struct {
     tcn_ssl_ctxt_t *ctx;
     SSL            *ssl;
+    int             shutdown_type;
 } tcn_ssl_conn_t;
 
 

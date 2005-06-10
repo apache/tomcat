@@ -156,8 +156,9 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
     /* Set default Certificate verification level
      * and depth for the Client Authentication
      */
-    c->verify_depth = 1;
-    c->verify_mode  = SSL_CVERIFY_UNSET;
+    c->verify_depth  = 1;
+    c->verify_mode   = SSL_CVERIFY_UNSET;
+    c->shutdown_type = SSL_SHUTDOWN_TYPE_UNSET;
 
     /* Set default password callback */
     SSL_CTX_set_default_passwd_cb(c->ctx, (pem_password_cb *)SSL_password_callback);
@@ -323,7 +324,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateChainFile)(TCN_STDARGS, j
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     jboolean rv = JNI_FALSE;
     TCN_ALLOC_CSTRING(file);
-    
+
     UNREFERENCED(o);
     TCN_ASSERT(ctx != 0);
     if (!J2S(file))
@@ -399,6 +400,16 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVerifyDepth)(TCN_STDARGS, jlong ctx,
     UNREFERENCED_STDARGS;
     TCN_ASSERT(ctx != 0);
     c->verify_depth = depth;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setShutdownType)(TCN_STDARGS, jlong ctx,
+                                                      jint type)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(ctx != 0);
+    c->shutdown_type = type;
 }
 
 TCN_IMPLEMENT_CALL(void, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx,

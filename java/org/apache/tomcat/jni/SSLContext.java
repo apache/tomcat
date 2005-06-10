@@ -41,7 +41,7 @@ public final class SSLContext {
      * SSL_MODE_CLIENT
      * SSL_MODE_SERVER
      * SSL_MODE_COMBINED
-     * </PRE>     
+     * </PRE>
      */
     public static native long make(long pool, int protocol, int mode)
         throws Exception;
@@ -134,7 +134,7 @@ public final class SSLContext {
      * Certificate Revocation Lists (CRL) of Certification Authorities (CA)
      * whose clients you deal with. These are used for Client Authentication.
      * Such a file is simply the concatenation of the various PEM-encoded CRL
-     * files, in order of preference.     
+     * files, in order of preference.
      * <br />
      * The files in this directory have to be PEM-encoded and are accessed through
      * hash filenames. So usually you can't just place the Certificate files there:
@@ -167,7 +167,7 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param file File of PEM-encoded Server CA Certificates.
      * @param skipfirst Skip first certificate if chain file is inside
-     *                  certificate file. 
+     *                  certificate file.
      */
     public static native boolean setCertificateChainFile(long ctx, String file,
                                                          boolean skipfirst);
@@ -247,6 +247,20 @@ public final class SSLContext {
      *              verification.
      */
     public static native void setVerifyDepth(long ctx, int depth);
+
+    /**
+     * Set SSL connection shutdown type
+     * <br />
+     * The following levels are available for level:
+     * <PRE>
+     * SSL_SHUTDOWN_TYPE_STANDARD
+     * SSL_SHUTDOWN_TYPE_UNCLEAN
+     * SSL_SHUTDOWN_TYPE_ACCURATE
+     * </PRE>
+     * @param ctx Server or Client context to use.
+     * @param type Shutdown type to use.
+     */
+    public static native void setShutdowType(long ctx, int type);
 
     /**
      * Set Type of Client Certificate verification

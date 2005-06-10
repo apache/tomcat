@@ -153,6 +153,10 @@ public final class SSL {
     public static final int SSL_MODE_SERVER         = 1;
     public static final int SSL_MODE_COMBINED       = 2;
 
+    public static final int SSL_SHUTDOWN_TYPE_UNSET    = 0;
+    public static final int SSL_SHUTDOWN_TYPE_STANDARD = 1;
+    public static final int SSL_SHUTDOWN_TYPE_UNCLEAN  = 2;
+    public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
 
     /* Return OpenSSL version number */
     public static native int version();
