@@ -120,44 +120,35 @@ static apr_status_t ssl_socket_cleanup(void *data)
     return APR_SUCCESS;
 }
 
-TCN_IMPLEMENT_CALL(jlong, SSLSocket, create)(TCN_STDARGS, jlong ctx,
-                                             jlong pool)
+static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *pool)
 {
-    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    apr_pool_t *p     = J2P(pool, apr_pool_t *);
     tcn_ssl_conn_t *con;
     SSL *ssl;
 
-    UNREFERENCED(o);
-    TCN_ASSERT(pool != 0);
-    TCN_ASSERT(ctx != 0);
-
-    if ((con = apr_pcalloc(p, sizeof(tcn_ssl_conn_t))) == NULL) {
-        tcn_ThrowAPRException(e, apr_get_os_error());
-        goto cleanup;
+    if ((con = apr_pcalloc(pool, sizeof(tcn_ssl_conn_t))) == NULL) {
+        tcn_ThrowAPRException(env, apr_get_os_error());
+        return NULL;
     }
-    if ((ssl = SSL_new(c->ctx)) == NULL) {
+    if ((ssl = SSL_new(ctx->ctx)) == NULL) {
         char err[256];
         ERR_error_string(ERR_get_error(), err);
-        tcn_Throw(e, "SSL_new failed (%s)", err);
+        tcn_Throw(env, "SSL_new failed (%s)", err);
         con = NULL;
-        goto cleanup;
+        return NULL;
     }
     SSL_clear(ssl);
-    con->pool = p;
-    con->ctx  = c;
+    con->pool = pool;
+    con->ctx  = ctx;
     con->ssl  = ssl;
-    con->shutdown_type = c->shutdown_type;
-    apr_pool_cleanup_register(p, (const void *)con,
+    con->shutdown_type = ctx->shutdown_type;
+    apr_pool_cleanup_register(pool, (const void *)con,
                               ssl_socket_cleanup,
                               apr_pool_cleanup_null);
 
 #ifdef TCN_DO_STATISTICS
     ssl_created++;
 #endif
-cleanup:
-    return P2J(con);
-
+    return con;
 }
 
 TCN_IMPLEMENT_CALL(jint, SSLSocket, shutdown)(TCN_STDARGS, jlong sock,
@@ -169,7 +160,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, shutdown)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     if (con->ssl) {
-        if (how < 0)
+        if (how < 1)
             how = con->shutdown_type;
         rv = ssl_smart_shutdown(con->ssl, how);
         /* TODO: Translate OpenSSL Error codes */
@@ -208,7 +199,60 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
     return (jint)rv;
 }
 
+TCN_IMPLEMENT_CALL(jlong, SSLSocket, accept)(TCN_STDARGS, jlong ctx,
+                                             jlong sock, jlong pool)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    apr_socket_t *s   = J2P(sock, apr_socket_t *);
+    apr_pool_t *p     = J2P(pool, apr_pool_t *);
+    tcn_ssl_conn_t *con;
+    apr_os_sock_t  oss;
 
+    UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
+    TCN_ASSERT(ctx != 0);
+    TCN_ASSERT(sock != 0);
+
+    if ((con = ssl_create(e, c, p)) == NULL)
+        return 0;
+    TCN_THROW_IF_ERR(apr_os_sock_get(&oss, s), c);
+    con->sock = s;
+
+    SSL_set_fd(con->ssl, (int)oss);
+    SSL_set_accept_state(con->ssl);
+
+    /* TODO: Do SSL_accept() */
+cleanup:
+    return P2J(con);
+}
+
+TCN_IMPLEMENT_CALL(jlong, SSLSocket, connect)(TCN_STDARGS, jlong ctx,
+                                              jlong sock, jlong pool)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    apr_socket_t *s   = J2P(sock, apr_socket_t *);
+    apr_pool_t *p     = J2P(pool, apr_pool_t *);
+    tcn_ssl_conn_t *con;
+    apr_os_sock_t  oss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
+    TCN_ASSERT(ctx != 0);
+    TCN_ASSERT(sock != 0);
+
+    if ((con = ssl_create(e, c, p)) == NULL)
+        return 0;
+    TCN_THROW_IF_ERR(apr_os_sock_get(&oss, s), c);
+    con->sock = s;
+
+    SSL_set_fd(con->ssl, (int)oss);
+    SSL_set_connect_state(con->ssl);
+
+    /* TODO: Do SSL_connect() */
+
+cleanup:
+    return P2J(con);
+}
 
 
 #else
