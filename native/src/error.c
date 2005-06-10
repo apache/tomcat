@@ -133,6 +133,7 @@ TCN_IMPLEMENT_CALL(jstring, Error, strerror)(TCN_STDARGS, jint err)
 TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
 {
 #define APR_IS(I, E) case I: if (E(err)) return JNI_TRUE; break
+#define APR_ISX(I, E, T) case I: if (E(err) || (err == T)) return JNI_TRUE; break
 
     UNREFERENCED_STDARGS;
     switch (idx) {
@@ -173,10 +174,7 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(54, APR_STATUS_IS_NOTDETACH);
         APR_IS(55, APR_STATUS_IS_CHILD_DONE);
         APR_IS(56, APR_STATUS_IS_CHILD_NOTDONE);
-        case 57:
-            if (APR_STATUS_IS_TIMEUP(err) || err == TCN_TIMEUP)
-                return JNI_TRUE;
-        break;
+        APR_ISX(57, APR_STATUS_IS_TIMEUP, TCN_TIMEUP);
         APR_IS(58, APR_STATUS_IS_INCOMPLETE);
         /* empty slot: +9 */
         /* empty slot: +10 */
@@ -196,15 +194,12 @@ TCN_IMPLEMENT_CALL(jboolean, Status, is)(TCN_STDARGS, jint err, jint idx)
         APR_IS(74, APR_STATUS_IS_EMISMATCH);
         APR_IS(75, APR_STATUS_IS_EBUSY);
         /* Socket errors */
-        case 90:
-            if (APR_STATUS_IS_EAGAIN(err) || err == TCN_EAGAIN)
-                return JNI_TRUE;
-        break;
-        APR_IS(91, TCN_STATUS_IS_ETIMEDOUT);
+        APR_ISX(90, APR_STATUS_IS_EAGAIN, TCN_EAGAIN);
+        APR_ISX(91, TCN_STATUS_IS_ETIMEDOUT, TCN_ETIMEDOUT);
         APR_IS(92, APR_STATUS_IS_ECONNABORTED);
         APR_IS(93, APR_STATUS_IS_ECONNRESET);
-        APR_IS(94, APR_STATUS_IS_EINPROGRESS);
-        APR_IS(95, APR_STATUS_IS_EINTR);
+        APR_ISX(94, APR_STATUS_IS_EINPROGRESS, TCN_EINPROGRESS);
+        APR_ISX(95, APR_STATUS_IS_EINTR, TCN_EINTR);
         APR_IS(96, APR_STATUS_IS_ENOTSOCK);
         APR_IS(97, APR_STATUS_IS_EINVAL);
     }
