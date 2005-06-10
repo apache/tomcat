@@ -225,30 +225,6 @@ public final class SSLContext {
         throws Exception;
 
     /**
-     * Set Maximum depth of CA Certificates in Client Certificate verification
-     * <br />
-     * This directive sets how deeply mod_ssl should verify before deciding that
-     * the clients don't have a valid certificate. Notice that this directive can
-     * be used both in per-server and per-directory context. In per-server context
-     * it applies to the client authentication process used in the standard SSL
-     * handshake when a connection is established. In per-directory context it forces
-     * a SSL renegotation with the reconfigured client verification depth after the
-     * HTTP request was read but before the HTTP response is sent.
-     * <br />
-     * The depth actually is the maximum number of intermediate certificate issuers,
-     * i.e. the number of CA certificates which are max allowed to be followed while
-     * verifying the client certificate. A depth of 0 means that self-signed client
-     * certificates are accepted only, the default depth of 1 means the client
-     * certificate can be self-signed or has to be signed by a CA which is directly
-     * known to the server (i.e. the CA's certificate is under
-     * <code>setCACertificatePath</code>), etc.
-     * @param ctx Server or Client context to use.
-     * @param depth Maximum depth of CA Certificates in Client Certificate
-     *              verification.
-     */
-    public static native void setVerifyDepth(long ctx, int depth);
-
-    /**
      * Set SSL connection shutdown type
      * <br />
      * The following levels are available for level:
@@ -263,7 +239,8 @@ public final class SSLContext {
     public static native void setShutdowType(long ctx, int type);
 
     /**
-     * Set Type of Client Certificate verification
+     * Set Type of Client Certificate verification and Maximum depth of CA Certificates
+     * in Client Certificate verification.
      * <br />
      * This directive sets the Certificate verification level for the Client
      * Authentication. Notice that this directive can be used both in per-server
@@ -281,10 +258,19 @@ public final class SSLContext {
      * SSL_CVERIFY_OPTIONAL_NO_CA - The client may present a valid Certificate
      *                              but it need not to be (successfully) verifiable
      * </PRE>
+     * <br />
+     * The depth actually is the maximum number of intermediate certificate issuers,
+     * i.e. the number of CA certificates which are max allowed to be followed while
+     * verifying the client certificate. A depth of 0 means that self-signed client
+     * certificates are accepted only, the default depth of 1 means the client
+     * certificate can be self-signed or has to be signed by a CA which is directly
+     * known to the server (i.e. the CA's certificate is under
      * <code>setCACertificatePath</code>), etc.
      * @param ctx Server or Client context to use.
      * @param level Type of Client Certificate verification.
+     * @param depth Maximum depth of CA Certificates in Client Certificate
+     *              verification.
      */
-    public static native void setVerifyClient(long ctx, int level);
+    public static native void setVerify(long ctx, int level, int depth);
 
 }

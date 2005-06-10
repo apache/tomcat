@@ -392,16 +392,6 @@ cleanup:
     return rv;
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setVerifyDepth)(TCN_STDARGS, jlong ctx,
-                                                     jint depth)
-{
-    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(ctx != 0);
-    c->verify_depth = depth;
-}
-
 TCN_IMPLEMENT_CALL(void, SSLContext, setShutdownType)(TCN_STDARGS, jlong ctx,
                                                       jint type)
 {
@@ -412,8 +402,8 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setShutdownType)(TCN_STDARGS, jlong ctx,
     c->shutdown_type = type;
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx,
-                                                      jint level)
+TCN_IMPLEMENT_CALL(void, SSLContext, setVerify)(TCN_STDARGS, jlong ctx,
+                                                jint level, jint depth)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     int verify = SSL_VERIFY_NONE;
@@ -424,7 +414,8 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVerifyClient)(TCN_STDARGS, jlong ctx,
 
     if (c->verify_mode == SSL_CVERIFY_UNSET)
         c->verify_mode = SSL_CVERIFY_NONE;
-
+    if (depth > 0)
+        c->verify_depth = depth;
     /*
      *  Configure callbacks for SSL context
      */
