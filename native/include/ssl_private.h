@@ -194,7 +194,9 @@ struct tcn_ssl_ctxt_t {
 typedef struct {
     tcn_ssl_ctxt_t *ctx;
     SSL            *ssl;
+    X509           *cert;
     int             shutdown_type;
+    apr_socket_t   *sock;
 } tcn_ssl_conn_t;
 
 
