@@ -144,9 +144,9 @@ TCN_IMPLEMENT_CALL(jlong, SSLSocket, create)(TCN_STDARGS, jlong ctx,
         goto cleanup;
     }
     SSL_clear(ssl);
-
-    con->ctx = c;
-    con->ssl = ssl;
+    con->pool = p;
+    con->ctx  = c;
+    con->ssl  = ssl;
     con->shutdown_type = c->shutdown_type;
     apr_pool_cleanup_register(p, (const void *)con,
                               ssl_socket_cleanup,
@@ -158,6 +158,54 @@ TCN_IMPLEMENT_CALL(jlong, SSLSocket, create)(TCN_STDARGS, jlong ctx,
 cleanup:
     return P2J(con);
 
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, shutdown)(TCN_STDARGS, jlong sock,
+                                              jint how)
+{
+    apr_status_t rv = APR_SUCCESS;
+    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(sock != 0);
+    if (con->ssl) {
+        if (how < 0)
+            how = con->shutdown_type;
+        rv = ssl_smart_shutdown(con->ssl, how);
+        /* TODO: Translate OpenSSL Error codes */
+        SSL_free(con->ssl);
+        con->ssl = NULL;
+    }
+    return (jint)rv;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
+{
+    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+    apr_status_t rv = APR_SUCCESS;
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(sock != 0);
+
+#ifdef TCN_DO_STATISTICS
+    apr_atomic_inc32(&ssl_closed);
+#endif
+    apr_pool_cleanup_kill(con->pool, con, ssl_socket_cleanup);
+    if (con->ssl) {
+        rv = ssl_smart_shutdown(con->ssl, con->shutdown_type);
+        SSL_free(con->ssl);
+        con->ssl = NULL;
+    }
+    if (con->cert) {
+        X509_free(con->cert);
+        con->cert = NULL;
+    }
+    if (con->sock) {
+        apr_status_t rc;
+        if ((rc = apr_socket_close(con->sock)) != APR_SUCCESS)
+            rv = rc;
+        con->sock = NULL;
+    }
+    return (jint)rv;
 }
 
 
