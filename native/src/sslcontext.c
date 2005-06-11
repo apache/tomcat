@@ -24,6 +24,7 @@
 #include "apr_file_io.h"
 #include "apr_portable.h"
 #include "apr_thread_mutex.h"
+#include "apr_poll.h"
 
 #include "tcn.h"
 

@@ -139,6 +139,17 @@
 #define SSL_SHUTDOWN_TYPE_UNCLEAN   (2)
 #define SSL_SHUTDOWN_TYPE_ACCURATE  (3)
 
+#define SSL_TO_APR_ERROR(X)         (APR_OS_START_USERERR + 1000 + X)
+
+#define SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) \
+   ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) \
+    || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN) \
+    || (errnum == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) \
+    || (errnum == X509_V_ERR_CERT_UNTRUSTED) \
+    || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE))
+
+
+
 #define SSL_DEFAULT_PASS_PROMPT "Some of your private key files are encrypted for security reasons.\n"  \
                                 "In order to read them you have to provide the pass phrases.\n"         \
                                 "Enter password :"
@@ -198,6 +209,7 @@ typedef struct {
     X509           *cert;
     int             shutdown_type;
     apr_socket_t   *sock;
+    apr_pollset_t  *pollset;
 } tcn_ssl_conn_t;
 
 

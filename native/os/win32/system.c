@@ -24,6 +24,7 @@
 #include <winsock.h>
 #include "apr.h"
 #include "apr_pools.h"
+#include "apr_poll.h"
 #include "apr_network_io.h"
 #include "apr_arch_misc.h" /* for apr_os_level */
 #include "apr_arch_atime.h"  /* for FileTimeToAprTime */
@@ -266,7 +267,7 @@ int WIN32_SSL_password_prompt(tcn_pass_cb_t *data)
                 0, &id);
     WaitForSingleObject(thread, INFINITE);
     CloseHandle(thread);
-    return strlen(data->password);
+    return (int)strlen(data->password);
 }
 
 

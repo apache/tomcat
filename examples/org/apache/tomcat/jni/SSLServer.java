@@ -17,12 +17,14 @@ public class SSLServer {
     public static String serverAddr = null;
     public static int serverPort    = 0;
     public static int serverNmax    = 0;
+    public static int serverNrun    = 0;
     public static long serverPool   = 0;
     public static long serverCtx    = 0;
     public static String serverCert = null;
     public static String serverKey  = null;
     public static String serverCiphers  = null;
     public static String serverPassword = null;
+    private static Acceptor serverAcceptor = null;
 
     private static Object threadLock = new Object();
 
@@ -58,15 +60,105 @@ public class SSLServer {
             SSLContext.setCipherSuite(serverCtx, serverCiphers);
             /* Load Server key and certificate */
             SSLContext.setCertificate(serverCtx, serverCert, serverKey, serverPassword, SSL.SSL_AIDX_RSA);
-            SSLContext.setVerifyDepth(serverCtx, 10);
-            SSLContext.setVerifyClient(serverCtx, SSL.SSL_CVERIFY_REQUIRE);
-            
+            SSLContext.setVerify(serverCtx, SSL.SSL_CVERIFY_REQUIRE, 10);
+            serverAcceptor = new Acceptor();
+            serverAcceptor.start();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
+    public static void incThreads() {
+        synchronized(threadLock) {
+            serverNrun++;
+        }
+    }
 
+    public static void decThreads() {
+        synchronized(threadLock) {
+            serverNrun--;
+        }
+    }
+
+    /* Acceptor thread. Listens for new connections */
+    private class Acceptor extends Thread {
+        private long serverSock = 0;
+        private long inetAddress = 0;
+        private long pool = 0;
+        public Acceptor() throws Exception {
+            try {
+
+                pool = Pool.create(SSLServer.serverPool);
+                System.out.println("Accepting: " +  SSLServer.serverAddr + ":" +
+                                   SSLServer.serverPort);
+                inetAddress = Address.info(SSLServer.serverAddr, Socket.APR_INET,
+                                           SSLServer.serverPort, 0,
+                                           pool);
+                serverSock = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM,
+                                           Socket.APR_PROTO_TCP, pool);
+                long sa = Address.get(Socket.APR_LOCAL, serverSock);
+                Sockaddr addr = new Sockaddr();
+                if (Address.fill(addr, sa)) {
+                    System.out.println("Host: " + addr.hostname);
+                    System.out.println("Server: " + addr.servname);
+                    System.out.println("IP: " + Address.getip(sa) +
+                                       ":" + addr.port);
+                }
+                int rc = Socket.bind(serverSock, inetAddress);
+                if (rc != 0) {
+                  throw(new Exception("Can't create Acceptor: bind: " + Error.strerror(rc)));
+                }
+                Socket.listen(serverSock, 5);
+            }
+            catch( Exception ex ) {
+                ex.printStackTrace();
+                throw(new Exception("Can't create Acceptor"));
+            }
+        }
+
+        public void run() {
+            int i = 0;
+            try {
+                while (true) {
+                    long clientSock = Socket.accept(serverSock, pool);
+                    System.out.println("Accepted id: " +  i);
+
+                    try {
+                        long sa = Address.get(Socket.APR_REMOTE, clientSock);
+                        Sockaddr raddr = new Sockaddr();
+                        if (Address.fill(raddr, sa)) {
+                            System.out.println("Remote Host: " + Address.getnameinfo(sa, 0));
+                            System.out.println("Remote IP: " + Address.getip(sa) +
+                                               ":" + raddr.port);
+                        }
+                        sa = Address.get(Socket.APR_LOCAL, clientSock);
+                        Sockaddr laddr = new Sockaddr();
+                        if (Address.fill(laddr, sa)) {
+                            System.out.println("Local Host: " + laddr.hostname);
+                            System.out.println("Local Server: " + Address.getnameinfo(sa, 0));
+                            System.out.println("Local IP: " + Address.getip(sa) +
+                                               ":" + laddr.port);
+                        }
+
+                    } catch (Exception e) {
+                        // Ignore
+                        e.printStackTrace();
+                    }
+
+                    Socket.timeoutSet(clientSock, 10000000);
+                    long sslSocket = SSLSocket.attach(SSLServer.serverCtx, clientSock, pool);
+                    i = SSLSocket.handshake(sslSocket);
+                    System.out.println("Handskake : " + i);
+
+                    SSLSocket.close(sslSocket);
+                }
+            }
+            catch( Exception ex ) {
+                ex.printStackTrace();
+            }
+        }
+    }
     public static void main(String [] args) {
         try {
             Library.initialize(null);

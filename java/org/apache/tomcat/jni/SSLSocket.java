@@ -28,25 +28,21 @@ import java.nio.ByteBuffer;
 public class SSLSocket {
 
     /**
-     * Accept a SSL connection.
-     * @param ctx SSLContext to use.
-     * @param sock APR Socket that already did physical accept.
-     * @param pool The pool to use
-     * @return The new socket that has been set up.
-     */
-    public static native long accept(long ctx, long sock, long pool)
-        throws Exception;
-
-    /**
-     * Connect on a SSL connection.
+     * Attach APR socket on a SSL connection.
      * @param ctx SSLContext to use.
      * @param sock APR Socket that already did physical connect.
      * @param pool The pool to use
+     * @param pool The pool to use
      * @return The new socket that has been set up.
      */
-    public static native long connect(long ctx, long sock, long pool)
+    public static native long attach(long ctx, long sock, long pool)
         throws Exception;
 
+    /**
+     * Do a SSL handshake.
+     * @param thesocket The socket to close
+     */
+    public static native int handshake(long thesocket);
 
     /**
      * Shutdown a socket.
@@ -72,10 +68,5 @@ public class SSLSocket {
      */
     public static native int close(long thesocket);
 
-    /**
-     * Get the SSL error code.
-     * @param thesocket The SSL socket to use.
-     * @retcode the "local" error code returned by SSL.
-     * @return the error code.
-    public static native int geterror(long thesocket, int retcode);
+
 }
