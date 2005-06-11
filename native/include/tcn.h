@@ -26,6 +26,7 @@
 #error "Missing APR_HAS_THREADS support from APR."
 #endif
 
+#define TCN_DO_STATISTICS 1
 #include <jni.h>
 
 #if defined(_DEBUG) || defined(DEBUG)
