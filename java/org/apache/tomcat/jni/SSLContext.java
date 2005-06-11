@@ -54,11 +54,11 @@ public final class SSLContext {
     public static native int free(long ctx);
 
     /**
-     * Set Virtual host id. Usually host:port combination.
+     * Set Session context id. Usually host:port combination.
      * @param ctx Context to use.
      * @param id  String that uniquely identifies this context.
      */
-    public static native void setVhostId(long ctx, String id);
+    public static native void setContextId(long ctx, String id);
 
     /**
      * Asssociate BIOCallback for input or output data capture.
