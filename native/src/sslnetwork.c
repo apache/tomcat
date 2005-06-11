@@ -24,6 +24,7 @@
 #include "apr_file_io.h"
 #include "apr_portable.h"
 #include "apr_thread_mutex.h"
+#include "apr_poll.h"
 
 #include "tcn.h"
 
@@ -141,14 +142,53 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
     con->ctx  = ctx;
     con->ssl  = ssl;
     con->shutdown_type = ctx->shutdown_type;
+    apr_pollset_create(&(con->pollset), 1, pool, 0);
+
     apr_pool_cleanup_register(pool, (const void *)con,
                               ssl_socket_cleanup,
                               apr_pool_cleanup_null);
+    SSL_set_app_data2(ssl, (void *)con);
 
 #ifdef TCN_DO_STATISTICS
     ssl_created++;
 #endif
     return con;
+}
+
+static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
+                                           apr_interval_time_t t,
+                                           int for_what)
+{
+    apr_interval_time_t timeout = t;
+    apr_pollfd_t pfd;
+    int type = for_what == SSL_ERROR_WANT_WRITE ? APR_POLLOUT : APR_POLLIN;
+    apr_status_t status;
+
+    if (timeout < 0)
+        apr_socket_timeout_get(con->sock, &timeout);
+    pfd.desc_type = APR_POLL_SOCKET;
+    pfd.desc.s = con->sock;
+    pfd.reqevents = type;
+
+    /* Remove the object if it was in the pollset, then add in the new
+     * object with the correct reqevents value. Ignore the status result
+     * on the remove, because it might not be in there (yet).
+     */
+    apr_pollset_remove(con->pollset, &pfd);
+
+    /* ### check status code */
+    apr_pollset_add(con->pollset, &pfd);
+
+    do {
+        int numdesc;
+        const apr_pollfd_t *pdesc;
+
+        status = apr_pollset_poll(con->pollset, timeout, &numdesc, &pdesc);
+        if (numdesc == 1 && (pdesc[0].rtnevents & type) != 0)
+            return APR_SUCCESS;
+    } while (APR_STATUS_IS_EINTR(status));
+
+    return status;
 }
 
 TCN_IMPLEMENT_CALL(jint, SSLSocket, shutdown)(TCN_STDARGS, jlong sock,
@@ -230,7 +270,7 @@ static int jbs_apr_write(BIO *b, const char *in, int inl)
     apr_socket_t *sock=b->ptr;
     printf("jbs_apr_write\n");
     fflush(stdout);
-    return(apr_socket_send(sock, in, &j)); 
+    return(apr_socket_send(sock, in, &j));
 }
 
 static int jbs_apr_read(BIO *b, char *out, int outl)
@@ -262,7 +302,7 @@ static long jbs_apr_ctrl(BIO *b, int cmd, long num, void *ptr)
     fflush(stdout);
     if (cmd==BIO_CTRL_FLUSH || cmd==BIO_CTRL_DUP)
       return 1;
-    else 
+    else
       return 0;
 }
 static BIO_METHOD jbs_apr_methods = {
@@ -333,13 +373,14 @@ TCN_IMPLEMENT_CALL(jlong, SSLSocket, accept)(TCN_STDARGS, jlong ctx,
         tcn_ThrowException(e, "Create SSL_accept failed");
         return 0;
     }
-    
+
 cleanup:
     return P2J(con);
 }
 
-#else
-TCN_IMPLEMENT_CALL(jlong, SSLSocket, accept)(TCN_STDARGS, jlong ctx,
+#endif /* JFC_TEST */
+
+TCN_IMPLEMENT_CALL(jlong, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
                                              jlong sock, jlong pool)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
@@ -359,40 +400,45 @@ TCN_IMPLEMENT_CALL(jlong, SSLSocket, accept)(TCN_STDARGS, jlong ctx,
     con->sock = s;
 
     SSL_set_fd(con->ssl, (int)oss);
-    SSL_set_accept_state(con->ssl);
+    if (c->mode)
+        SSL_set_accept_state(con->ssl);
+    else
+        SSL_set_connect_state(con->ssl);
 
-    /* TODO: Do SSL_accept() */
 cleanup:
     return P2J(con);
 }
-#endif /* JFC_TEST */
 
-TCN_IMPLEMENT_CALL(jlong, SSLSocket, connect)(TCN_STDARGS, jlong ctx,
-                                              jlong sock, jlong pool)
+TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 {
-    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    apr_socket_t *s   = J2P(sock, apr_socket_t *);
-    apr_pool_t *p     = J2P(pool, apr_pool_t *);
-    tcn_ssl_conn_t *con;
-    apr_os_sock_t  oss;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(pool != 0);
-    TCN_ASSERT(ctx != 0);
+    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+    int s, i;
+    apr_status_t rv;
+    UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
 
-    if ((con = ssl_create(e, c, p)) == NULL)
-        return 0;
-    TCN_THROW_IF_ERR(apr_os_sock_get(&oss, s), c);
-    con->sock = s;
-
-    SSL_set_fd(con->ssl, (int)oss);
-    SSL_set_connect_state(con->ssl);
-
-    /* TODO: Do SSL_connect() */
-
-cleanup:
-    return P2J(con);
+    for (;;) {
+        if ((s = SSL_do_handshake(con->ssl)) != 0) {
+            i = SSL_get_error(con->ssl, s);
+            switch (i) {
+                case SSL_ERROR_NONE:
+                    return APR_SUCCESS;
+                break;
+                case SSL_ERROR_WANT_READ:
+                case SSL_ERROR_WANT_WRITE:
+                    if ((rv = wait_for_io_or_timeout(con, -1, i)) != APR_SUCCESS) {
+                        return rv;
+                    }
+                break;
+                default:
+                    return SSL_TO_APR_ERROR(i);
+                break;
+            }
+        }
+        else
+            break;
+    }
+    return APR_SUCCESS;
 }
 
 
