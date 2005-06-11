@@ -760,6 +760,14 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, loadDSATempKey)(TCN_STDARGS, jint idx,
     return r;
 }
 
+TCN_IMPLEMENT_CALL(jstring, SSL, getLastError)(TCN_STDARGS)
+{
+    char buf[256];
+    UNREFERENCED(o);
+    ERR_error_string(ERR_get_error(), buf);
+    return tcn_new_string(e, buf, -1);
+}
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional

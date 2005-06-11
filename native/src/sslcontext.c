@@ -145,11 +145,11 @@ TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
      */
     SSL_CTX_set_options(c->ctx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION);
 #endif
-    /* Default vhost id and cache size */
+    /* Default session context id and cache size */
     SSL_CTX_sess_set_cache_size(c->ctx, SSL_DEFAULT_CACHE_SIZE);
     MD5((const unsigned char *)SSL_DEFAULT_VHOST_NAME,
         (unsigned long)(sizeof(SSL_DEFAULT_VHOST_NAME) - 1),
-        &(c->vhost_id[0]));
+        &(c->context_id[0]));
     if (mode) {
         SSL_CTX_set_tmp_rsa_callback(c->ctx, SSL_callback_tmp_RSA);
         SSL_CTX_set_tmp_dh_callback(c->ctx,  SSL_callback_tmp_DH);
@@ -185,8 +185,8 @@ TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
     return apr_pool_cleanup_run(c->pool, c, ssl_context_cleanup);
 }
 
-TCN_IMPLEMENT_CALL(void, SSLContext, setVhostId)(TCN_STDARGS, jlong ctx,
-                                                 jstring id)
+TCN_IMPLEMENT_CALL(void, SSLContext, setContextId)(TCN_STDARGS, jlong ctx,
+                                                   jstring id)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     TCN_ALLOC_CSTRING(id);
@@ -196,7 +196,7 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVhostId)(TCN_STDARGS, jlong ctx,
     if (J2S(id)) {
         MD5((const unsigned char *)J2S(id),
             (unsigned long)strlen(J2S(id)),
-            &(c->vhost_id[0]));
+            &(c->context_id[0]));
     }
     TCN_FREE_CSTRING(id);
 }
@@ -363,6 +363,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificate)(TCN_STDARGS,
         rv = JNI_FALSE;
         goto cleanup;
     }
+    c->store = SSL_CTX_get_cert_store(c->ctx);
     if (c->mode) {
         STACK_OF(X509_NAME) *ca_certs;
         c->ca_certs++;
@@ -425,6 +426,15 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setVerify)(TCN_STDARGS, jlong ctx,
     if ((c->verify_mode == SSL_CVERIFY_OPTIONAL) ||
         (c->verify_mode == SSL_CVERIFY_OPTIONAL_NO_CA))
         verify |= SSL_VERIFY_PEER;
+    if (!c->store) {
+        if (SSL_CTX_set_default_verify_paths(c->ctx)) {
+            c->store = SSL_CTX_get_cert_store(c->ctx);
+            X509_STORE_set_flags(c->store, 0);
+        }
+        else {
+            /* XXX: See if this is fatal */ 
+        }
+    }
 
     SSL_CTX_set_verify(c->ctx, verify, SSL_callback_SSL_verify);
 }
