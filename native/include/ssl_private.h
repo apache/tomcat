@@ -179,7 +179,7 @@ struct tcn_ssl_ctxt_t {
     BIO             *bio_os;
     BIO             *bio_is;
 
-    unsigned char   vhost_id[MD5_DIGEST_LENGTH];
+    unsigned char   context_id[MD5_DIGEST_LENGTH];
 
     int             protocol;
     /* we are one or the other */
@@ -187,6 +187,8 @@ struct tcn_ssl_ctxt_t {
 
     /* certificate revocation list */
     X509_STORE      *crl;
+    /* pointer to the context verify store */
+    X509_STORE      *store;
     const char      *cert_files[SSL_AIDX_MAX];
     const char      *key_files[SSL_AIDX_MAX];
     X509            *certs[SSL_AIDX_MAX];
