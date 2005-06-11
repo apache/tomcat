@@ -261,5 +261,9 @@ public final class SSL {
      * @param file File contatining DH params.
      */
     public static native boolean loadDSATempKey(int idx, String file);
-
+    
+    /**
+     * Return last SSL error string
+     */
+    public static native String getLastError();
 }
