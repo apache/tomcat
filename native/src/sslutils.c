@@ -464,7 +464,7 @@ int SSL_CTX_use_certificate_chain(SSL_CTX *ctx, const char *file,
     return n;
 }
 
-static int SSL_X509_STORE_lookup(X509_STORE *store, int yype,
+static int ssl_X509_STORE_lookup(X509_STORE *store, int yype,
                                  X509_NAME *name, X509_OBJECT *obj)
 {
     X509_STORE_CTX ctx;
@@ -476,7 +476,7 @@ static int SSL_X509_STORE_lookup(X509_STORE *store, int yype,
     return rc;
 }
 
-int SSL_callback_SSL_verify_CRL(int ok, X509_STORE_CTX *ctx, tcn_ssl_conn_t *con)
+static int ssl_verify_CRL(int ok, X509_STORE_CTX *ctx, tcn_ssl_conn_t *con)
 {
     X509_OBJECT obj;
     X509_NAME *subject, *issuer;
@@ -484,14 +484,6 @@ int SSL_callback_SSL_verify_CRL(int ok, X509_STORE_CTX *ctx, tcn_ssl_conn_t *con
     X509_CRL *crl;
     EVP_PKEY *pubkey;
     int i, n, rc;
-
-    /*
-     * Unless a revocation store for CRLs was created we
-     * cannot do any CRL-based verification, of course.
-     */
-    if (!con->ctx->crl) {
-        return ok;
-    }
 
     /*
      * Determine certificate ingredients in advance
@@ -536,7 +528,7 @@ int SSL_callback_SSL_verify_CRL(int ok, X509_STORE_CTX *ctx, tcn_ssl_conn_t *con
      * the current certificate in order to verify it's integrity.
      */
     memset((char *)&obj, 0, sizeof(obj));
-    rc = SSL_X509_STORE_lookup(con->ctx->crl,
+    rc = ssl_X509_STORE_lookup(con->ctx->crl,
                                X509_LU_CRL, subject, &obj);
     crl = obj.data.crl;
 
@@ -590,7 +582,7 @@ int SSL_callback_SSL_verify_CRL(int ok, X509_STORE_CTX *ctx, tcn_ssl_conn_t *con
      * the current certificate in order to check for revocation.
      */
     memset((char *)&obj, 0, sizeof(obj));
-    rc = SSL_X509_STORE_lookup(con->ctx->crl,
+    rc = ssl_X509_STORE_lookup(con->ctx->crl,
                                X509_LU_CRL, issuer, &obj);
 
     crl = obj.data.crl;
@@ -641,15 +633,17 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
         return 1;
 
     if (SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) &&
-        (verify == SSL_CVERIFY_OPTIONAL_NO_CA))
-        ok = TRUE;
-
+        (verify == SSL_CVERIFY_OPTIONAL_NO_CA)) {
+        ok = 1;
+        SSL_set_verify_result(ssl, X509_V_OK);
+    }
     /*
      * Additionally perform CRL-based revocation checks
      */
-    if (ok) {
-        if (!(ok = SSL_callback_SSL_verify_CRL(ok, ctx, con))) {
+    if (ok && con->ctx->crl) {
+        if (!(ok = ssl_verify_CRL(ok, ctx, con))) {
             errnum = X509_STORE_CTX_get_error(ctx);
+            /* TODO: Log something */
         }
     }
     /*
@@ -670,7 +664,10 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
          */
         ok = 0;
     }
-
+#if 1
+    else if (!ok)
+        ok = 1;
+#endif
     return ok;
 }
 
