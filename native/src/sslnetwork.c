@@ -147,7 +147,19 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
     apr_pool_cleanup_register(pool, (const void *)con,
                               ssl_socket_cleanup,
                               apr_pool_cleanup_null);
-    SSL_set_app_data2(ssl, (void *)con);
+    SSL_set_app_data(ssl, (void *)con);
+
+    if (ctx->mode) {
+        /*
+         *  Configure callbacks for SSL connection
+         */
+        SSL_set_tmp_rsa_callback(ssl, SSL_callback_tmp_RSA);
+        SSL_set_tmp_dh_callback(ssl,  SSL_callback_tmp_DH);
+        SSL_set_session_id_context(ssl, &(ctx->context_id[0]),
+                                   MD5_DIGEST_LENGTH);
+    }
+    SSL_set_verify_result(ssl, X509_V_OK);
+
 
 #ifdef TCN_DO_STATISTICS
     ssl_created++;
@@ -156,16 +168,14 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
 }
 
 static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
-                                           apr_interval_time_t t,
                                            int for_what)
 {
-    apr_interval_time_t timeout = t;
+    apr_interval_time_t timeout;
     apr_pollfd_t pfd;
     int type = for_what == SSL_ERROR_WANT_WRITE ? APR_POLLOUT : APR_POLLIN;
     apr_status_t status;
 
-    if (timeout < 0)
-        apr_socket_timeout_get(con->sock, &timeout);
+    apr_socket_timeout_get(con->sock, &timeout);
     pfd.desc_type = APR_POLL_SOCKET;
     pfd.desc.s = con->sock;
     pfd.reqevents = type;
@@ -418,25 +428,28 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
     TCN_ASSERT(sock != 0);
 
     for (;;) {
-        if ((s = SSL_do_handshake(con->ssl)) != 0) {
-            i = SSL_get_error(con->ssl, s);
-            switch (i) {
-                case SSL_ERROR_NONE:
-                    return APR_SUCCESS;
-                break;
-                case SSL_ERROR_WANT_READ:
-                case SSL_ERROR_WANT_WRITE:
-                    if ((rv = wait_for_io_or_timeout(con, -1, i)) != APR_SUCCESS) {
-                        return rv;
-                    }
-                break;
-                default:
-                    return SSL_TO_APR_ERROR(i);
-                break;
-            }
-        }
-        else
+        s = SSL_do_handshake(con->ssl);
+        i = SSL_get_error(con->ssl, s);
+        switch (i) {
+            case SSL_ERROR_NONE:
+                return APR_SUCCESS;
             break;
+            case SSL_ERROR_WANT_READ:
+            case SSL_ERROR_WANT_WRITE:
+                if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                    return rv;
+                }
+            break;
+            case SSL_ERROR_SYSCALL:
+                s = apr_get_netos_error();
+                if (!APR_STATUS_IS_EAGAIN(s) &&
+                    !APR_STATUS_IS_EINTR(s))
+                    return s;
+            break;
+            default:
+                return SSL_TO_APR_ERROR(i);
+            break;
+        }
     }
     return APR_SUCCESS;
 }
