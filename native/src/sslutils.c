@@ -116,7 +116,6 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
 int SSL_password_callback(char *buf, int bufsiz, int verify,
                           void *cb)
 {
-    int rv = 0;
     tcn_pass_cb_t *cb_data = (tcn_pass_cb_t *)cb;
 
     if (buf == NULL)

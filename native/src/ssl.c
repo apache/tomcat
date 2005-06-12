@@ -48,7 +48,7 @@ tcn_pass_cb_t tcn_password_callback;
     if (SSL_temp_keys[idx]) {                           \
         type##_free((type *)SSL_temp_keys[idx]);        \
         SSL_temp_keys[idx] = NULL;                      \
-    } else (void *)(0)
+    } else (void)(0)
 
 #define SSL_TMP_KEYS_FREE(type) \
     SSL_TMP_KEY_FREE(type, SSL_TMP_KEY_##type##_512);   \

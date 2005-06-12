@@ -26,7 +26,19 @@
 #error "Missing APR_HAS_THREADS support from APR."
 #endif
 
-#define TCN_DO_STATISTICS 1
+#if defined(DEBUG) || defined(_DEBUG)
+/* On -DDEBUG use the statistics */
+#ifndef TCN_DO_STATISTICS
+#define TCN_DO_STATISTICS
+#endif
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#include <process.h>
+#else
+#include <unistd.h>
+#endif 
 #include <jni.h>
 
 #if defined(_DEBUG) || defined(DEBUG)
@@ -65,7 +77,8 @@
 #define TCN_AINFO_CLASS TCN_CLASS_PATH "Sockaddr"
 #define TCN_ERROR_CLASS TCN_CLASS_PATH "Error"
 
-#define UNREFERENCED(P) (P)
+#define UNREFERENCED(P)      (P) = (P)
+#define UNREFERENCED_STDARGS e = e; o = o
 #ifdef WIN32
 #define LLT(X) (X)
 #else
@@ -76,7 +89,6 @@
 /* On stack buffer size */
 #define TCN_BUFFER_SZ   8192
 #define TCN_STDARGS     JNIEnv *e, jobject o
-#define UNREFERENCED_STDARGS    e; o
 
 #define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
@@ -97,13 +109,8 @@ apr_status_t    tcn_load_ainfo_class(JNIEnv *);
 
 #define J2T(T) (apr_time_t)((T))
 
-#if 1
 #define TCN_BEGIN_MACRO     if (1) {
-#define TCN_END_MACRO       } else (void *)(0)
-#else
-#define TCN_BEGIN_MACRO     do {
-#define TCN_END_MACRO       } while (0)
-#endif
+#define TCN_END_MACRO       } else (void)(0)
 
 #define TCN_ALLOC_CSTRING(V)     \
     const char *c##V = V ? (const char *)((*e)->GetStringUTFChars(e, V, 0)) : NULL

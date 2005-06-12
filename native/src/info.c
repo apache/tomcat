@@ -34,14 +34,14 @@
     if (_fid##N == NULL) {                          \
         (*e)->ExceptionClear(e);                    \
         goto cleanup;                               \
-    } (void *)(0)
+    } else (void)(0)
 
 #define GET_FINFO_J(N)      \
     _fid##N = (*e)->GetFieldID(e, finfo, #N, "J");  \
     if (_fid##N == NULL) {                          \
         (*e)->ExceptionClear(e);                    \
         goto cleanup;                               \
-    } (void *)(0)
+    } else (void)(0)
 
 #define GET_FINFO_S(N)      \
     _fid##N = (*e)->GetFieldID(e, finfo, #N,        \
@@ -49,7 +49,7 @@
     if (_fid##N == NULL) {                          \
         (*e)->ExceptionClear(e);                    \
         goto cleanup;                               \
-    } (void *)(0)
+    } else (void)(0)
 
 #define SET_FINFO_I(N, V)  \
     (*e)->SetIntField(e, obj, _fid##N, (jint)(V))
@@ -70,14 +70,14 @@
     if (_aid##N == NULL) {                          \
         (*e)->ExceptionClear(e);                    \
         goto cleanup;                               \
-    } (void *)(0)
+    } else (void)(0)
 
 #define GET_AINFO_J(N)      \
     _aid##N = (*e)->GetFieldID(e, ainfo, #N, "J");  \
     if (_aid##N == NULL) {                          \
         (*e)->ExceptionClear(e);                    \
         goto cleanup;                               \
-    } (void *)(0)
+    } else (void)(0)
 
 #define GET_AINFO_S(N)      \
     _aid##N = (*e)->GetFieldID(e, ainfo, #N,        \
@@ -85,7 +85,7 @@
     if (_aid##N == NULL) {                          \
         (*e)->ExceptionClear(e);                    \
         goto cleanup;                               \
-    } (void *)(0)
+    } else (void)(0)
 
 #define SET_AINFO_I(N, V)  \
     (*e)->SetIntField(e, obj, _aid##N, (jint)(V))
