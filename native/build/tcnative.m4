@@ -320,8 +320,7 @@ AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
   dnl (a) define preprocessor symbols
   if test "$tcn_ssltk_type" = "openssl"; then
     APR_SETVAR(SSL_LIBS, [-lssl -lcrypto])
-    APR_ADDTO(SSL_CFLAGS, [-DHAVE_OPENSSL])
+    APR_ADDTO(CFLAGS, [-DHAVE_OPENSSL])
   fi
   AC_SUBST(SSL_LIBS)
-  AC_SUBST(SSL_CFLAGS)
 ])

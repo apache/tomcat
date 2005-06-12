@@ -81,8 +81,6 @@ dnl and feature test macros as well
 dnl
 APR_SETIFNULL(CC, `$apr_config --cc`)
 APR_SETIFNULL(CPP, `$apr_config --cpp`)
-APR_ADDTO(CFLAGS, `$apr_config --cflags`)
-APR_ADDTO(CPPFLAGS, `$apr_config --cppflags`)
 
 AC_PROG_INSTALL
 
@@ -133,14 +131,17 @@ AC_SUBST(EXTRA_OS_LINK)
 dnl
 dnl Prep all the flags and stuff for compilation and export to other builds
 dnl
+APR_ADDTO(TCNATIVE_LIBS, [$LIBS])
 APR_ADDTO(TCNATIVE_LIBS, [$APR_LIBS])
+APR_ADDTO(TCNATIVE_LDFLAGS, [$LDFLAGS])
 
 AC_SUBST(TCNATIVE_EXPORT_LIBS)
 AC_SUBST(TCNATIVE_PRIV_INCLUDES)
 AC_SUBST(TCNATIVE_INCLUDES)
 AC_SUBST(TCNATIVE_LDFLAGS)
 AC_SUBST(TCNATIVE_LIBS)
-AC_SUBST(LDFLAGS)
+AC_SUBST(CFLAGS)
+AC_SUBST(CPPFLAGS)
 
 dnl copy apr's rules.mk into our build directory.
 if test ! -d ./build; then
