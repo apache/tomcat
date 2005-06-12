@@ -83,9 +83,20 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
 {
     int rv = 0;
     data->password[0] = '\0';
-    if (data->bio) {
-        rv = BIO_gets(data->bio, data->password,
-                      SSL_MAX_PASSWORD_LEN);
+    if (data->cb.env && data->cb.obj) {
+        JNIEnv *e = data->cb.env;
+        jobject  o;
+        jstring  prompt = AJP_TO_JSTRING(data->prompt);
+        if ((o = (*e)->CallObjectMethod(e, data->cb.obj,
+                            data->cb.mid[0], prompt))) {
+            TCN_ALLOC_CSTRING(o);
+            if (J2S(o)) {
+                strncpy(data->password, J2S(o), SSL_MAX_PASSWORD_LEN);
+                data->password[SSL_MAX_PASSWORD_LEN-1] = '\0';
+                rv = (int)strlen(data->password);
+            }
+            TCN_FREE_CSTRING(o);
+        }
     }
     else {
 #ifdef WIN32

@@ -218,9 +218,6 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setBIO)(TCN_STDARGS, jlong ctx,
         if (c->bio_is && c->bio_is != bio_handle)
             SSL_BIO_close(c->bio_is);
         c->bio_is = bio_handle;
-        if (!c->cb_data)
-            c->cb_data = (tcn_pass_cb_t *)apr_pcalloc(c->pool, sizeof(tcn_pass_cb_t));
-        c->cb_data->bio = bio_handle;
     }
     else
         return;

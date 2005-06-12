@@ -113,6 +113,12 @@ static apr_status_t ssl_init_cleanup(void *data)
     if (!ssl_initialized)
         return APR_SUCCESS;
     ssl_initialized = 0;
+
+    if (tcn_password_callback.cb.obj) {
+        TCN_UNLOAD_CLASS(tcn_password_callback.cb.env,
+                         tcn_password_callback.cb.obj);
+    }
+
     SSL_TMP_KEYS_FREE(RSA);
     SSL_TMP_KEYS_FREE(DH);
     /*
@@ -693,19 +699,23 @@ TCN_IMPLEMENT_CALL(jint, SSL, closeBIO)(TCN_STDARGS, jlong bio)
     return APR_SUCCESS;
 }
 
-TCN_IMPLEMENT_CALL(void, SSL, setPasswordBIO)(TCN_STDARGS, jlong bio)
+TCN_IMPLEMENT_CALL(void, SSL, setPasswordCallback)(TCN_STDARGS,
+                                                   jobject callback)
 {
-    BIO *bio_handle   = J2P(bio, BIO *);
+    jclass cls;
 
-    UNREFERENCED_STDARGS;
-    if (tcn_password_callback.bio &&
-        tcn_password_callback.bio != bio_handle) {
-        SSL_BIO_close(tcn_password_callback.bio);
-        tcn_password_callback.bio = bio_handle;
+    UNREFERENCED(o);
+    if (tcn_password_callback.cb.obj) {
+        TCN_UNLOAD_CLASS(tcn_password_callback.cb.env,
+                         tcn_password_callback.cb.obj);
     }
-    else
-        return;
-    SSL_BIO_doref(bio_handle);
+    cls = (*e)->GetObjectClass(e, callback);
+    tcn_password_callback.cb.env    = e;
+    tcn_password_callback.cb.mid[0] = (*e)->GetMethodID(e, cls, "callback",
+                           "(Ljava/lang/String;)Ljava/lang/String;");
+    /* TODO: Check if method id is valid */
+    tcn_password_callback.cb.obj    = (*e)->NewGlobalRef(e, callback);
+
 }
 
 TCN_IMPLEMENT_CALL(void, SSL, setPassword)(TCN_STDARGS, jstring password)
