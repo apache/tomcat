@@ -208,7 +208,7 @@ typedef struct {
     apr_pool_t     *pool;
     tcn_ssl_ctxt_t *ctx;
     SSL            *ssl;
-    X509           *cert;
+    X509           *peer;
     int             shutdown_type;
     apr_socket_t   *sock;
     apr_pollset_t  *pollset;

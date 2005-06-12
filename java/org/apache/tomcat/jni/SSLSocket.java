@@ -68,5 +68,46 @@ public class SSLSocket {
      */
     public static native int close(long thesocket);
 
+    /**
+     * Send data over a network.
+     * <PRE>
+     * This functions acts like a blocking write by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     *
+     * It is possible for both bytes to be sent and an error to be returned.
+     *
+     * APR_EINTR is never returned.
+     * </PRE>
+     * @param sock The socket to send the data over.
+     * @param buf The buffer which contains the data to be sent.
+     * @param offset Offset in the byte buffer.
+     * @param len The number of bytes to write; (-1) for full array.
+     * @return The number of bytes send.
+     *
+     */
+    public static native int send(long sock, byte[] buf, int offset, int len);
+
+    /**
+     * Read data from a network.
+     *
+     * <PRE>
+     * This functions acts like a blocking read by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     * The number of bytes actually received is stored in argument 3.
+     *
+     * It is possible for both bytes to be received and an APR_EOF or
+     * other error to be returned.
+     *
+     * APR_EINTR is never returned.
+     * </PRE>
+     * @param sock The socket to read the data from.
+     * @param buf The buffer to store the data in.
+     * @param offset Offset in the byte buffer.
+     * @param nbytes The number of bytes to read (-1) for full array.
+     * @return the number of bytes received.
+     */
+    public static native int recv(long sock, byte[] buf, int offset, int nbytes);
 
 }

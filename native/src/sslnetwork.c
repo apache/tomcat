@@ -105,9 +105,9 @@ static apr_status_t ssl_socket_cleanup(void *data)
             SSL_free(con->ssl);
             con->ssl = NULL;
         }
-        if (con->cert) {
-            X509_free(con->cert);
-            con->cert = NULL;
+        if (con->peer) {
+            X509_free(con->peer);
+            con->peer = NULL;
         }
         if (con->sock) {
             apr_socket_close(con->sock);
@@ -236,9 +236,9 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
         SSL_free(con->ssl);
         con->ssl = NULL;
     }
-    if (con->cert) {
-        X509_free(con->cert);
-        con->cert = NULL;
+    if (con->peer) {
+        X509_free(con->peer);
+        con->peer = NULL;
     }
     if (con->sock) {
         apr_status_t rc;
@@ -422,38 +422,207 @@ cleanup:
 TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 {
     tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
-    int s, i;
+    int s;
     apr_status_t rv;
+    X509 *peer;
+
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
 
-    for (;;) {
-        s = SSL_do_handshake(con->ssl);
-        i = SSL_get_error(con->ssl, s);
-        switch (i) {
-            case SSL_ERROR_NONE:
-                return APR_SUCCESS;
-            break;
-            case SSL_ERROR_WANT_READ:
-            case SSL_ERROR_WANT_WRITE:
-                if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
-                    return rv;
-                }
-            break;
-            case SSL_ERROR_SYSCALL:
-                s = apr_get_netos_error();
-                if (!APR_STATUS_IS_EAGAIN(s) &&
-                    !APR_STATUS_IS_EINTR(s))
-                    return s;
-            break;
-            default:
-                return SSL_TO_APR_ERROR(i);
-            break;
+    while (!SSL_is_init_finished(con->ssl)) {
+        if ((s = SSL_do_handshake(con->ssl)) <= 0) {
+            int i = SSL_get_error(con->ssl, s);
+            switch (i) {
+                case SSL_ERROR_NONE:
+                    return APR_SUCCESS;
+                break;
+                case SSL_ERROR_WANT_READ:
+                case SSL_ERROR_WANT_WRITE:
+                    if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                        return rv;
+                    }
+                break;
+                case SSL_ERROR_SYSCALL:
+                    s = apr_get_netos_error();
+                    if (!APR_STATUS_IS_EAGAIN(s) &&
+                        !APR_STATUS_IS_EINTR(s)) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        return s;
+                    }
+                break;
+                default:
+                    /*
+                    * Anything else is a fatal error
+                    */
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                    return SSL_TO_APR_ERROR(i);
+                break;
+            }
+        }
+        /*
+        * Check for failed client authentication
+        */
+        if (SSL_get_verify_result(con->ssl) != X509_V_OK) {
+            /* TODO: Log SSL client authentication failed */
+            con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+            /* TODO: Figure out the correct return value */
+            return APR_EGENERAL;
+        }
+
+        /*
+         * Remember the peer certificate
+         */
+        if ((peer = SSL_get_peer_certificate(con->ssl)) != NULL) {
+            if (con->peer)
+                X509_free(con->peer);
+            con->peer = peer;
         }
     }
+    fprintf(stderr, "Handshake done\n");
+    fflush(stderr);
     return APR_SUCCESS;
 }
 
+static apr_status_t ssl_socket_recv(tcn_ssl_conn_t *con, char *buf, apr_size_t *len)
+{
+    int s, rd = (int)(*len);
+    apr_status_t rv = APR_SUCCESS;
+
+    for (;;) {
+        if ((s = SSL_read(con->ssl, buf, rd)) <= 0) {
+            int i = SSL_get_error(con->ssl, s);
+            /* Special case if the "close notify" alert send by peer */
+            if (s == 0 && (con->ssl->shutdown & SSL_RECEIVED_SHUTDOWN)) {
+                *len = 0;
+                return APR_EOF;
+            }
+            switch (i) {
+                case SSL_ERROR_ZERO_RETURN:
+                    *len = 0;
+                    return APR_EOF;
+                break;
+                case SSL_ERROR_WANT_READ:
+                case SSL_ERROR_WANT_WRITE:
+                    if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                        return rv;
+                    }
+                break;
+                case SSL_ERROR_SYSCALL:
+                    s = apr_get_netos_error();
+                    if (!APR_STATUS_IS_EAGAIN(s) &&
+                        !APR_STATUS_IS_EINTR(s)) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        return s;
+                    }
+                break;
+                default:
+                    return apr_get_netos_error();
+                break;
+            }
+        }
+        else {
+            *len = s;
+            break;
+        }
+    }
+    return rv;
+}
+
+static apr_status_t ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
+                                    apr_size_t *len)
+{
+    int s, rd = (int)(*len);
+    apr_status_t rv = APR_SUCCESS;
+
+    for (;;) {
+        if ((s = SSL_write(con->ssl, buf, rd)) <= 0) {
+            int i = SSL_get_error(con->ssl, s);
+            switch (i) {
+                case SSL_ERROR_ZERO_RETURN:
+                    *len = 0;
+                    return APR_EOF;
+                break;
+                case SSL_ERROR_WANT_READ:
+                case SSL_ERROR_WANT_WRITE:
+                    if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                        return rv;
+                    }
+                break;
+                case SSL_ERROR_SYSCALL:
+                    s = apr_get_netos_error();
+                    if (!APR_STATUS_IS_EAGAIN(s) &&
+                        !APR_STATUS_IS_EINTR(s)) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        return s;
+                    }
+                break;
+                default:
+                    return apr_get_netos_error();
+                break;
+            }
+        }
+        else {
+            *len = s;
+            break;
+        }
+    }
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, send)(TCN_STDARGS, jlong sock,
+                                          jbyteArray buf, jint offset,
+                                          jint tosend)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    apr_size_t nbytes = (apr_size_t)tosend;
+    jbyte *bytes;
+    apr_int32_t nb;
+    apr_status_t ss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    apr_socket_opt_get(s->sock, APR_SO_NONBLOCK, &nb);
+    if (nb)
+         bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
+    else
+         bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    ss = ssl_socket_send(s, bytes + offset, &nbytes);
+
+    if (nb)
+        (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
+    else
+        (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, recv)(TCN_STDARGS, jlong sock,
+                                          jbyteArray buf, jint offset,
+                                          jint toread)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    apr_size_t nbytes = (apr_size_t)toread;
+    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    apr_status_t ss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(bytes != NULL);
+    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
+
+    (*e)->ReleaseByteArrayElements(e, buf, bytes,
+                                   nbytes ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
 
 #else
 /* OpenSSL is not supported

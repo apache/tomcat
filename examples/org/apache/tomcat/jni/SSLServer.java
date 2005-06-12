@@ -18,12 +18,14 @@ public class SSLServer {
     public static int serverPort    = 0;
     public static int serverNmax    = 0;
     public static int serverNrun    = 0;
-    public static long serverPool   = 0;
     public static long serverCtx    = 0;
+    public static long serverPool   = 0;
     public static String serverCert = null;
     public static String serverKey  = null;
     public static String serverCiphers  = null;
     public static String serverPassword = null;
+    public static String serverCAFile   = null;
+
     private static Acceptor serverAcceptor = null;
 
     private static Object threadLock = new Object();
@@ -41,6 +43,7 @@ public class SSLServer {
             serverNmax = Integer.decode(props.getProperty("server.max", "1")).intValue();
             serverCert = props.getProperty("server.cert", "server.pem");
             serverKey  = props.getProperty("server.key", null);
+            serverCAFile   = props.getProperty("server.cacertificate", null);
             serverCiphers  = props.getProperty("server.ciphers", "ALL");
             serverPassword = props.getProperty("server.password", null);
         }
@@ -60,7 +63,7 @@ public class SSLServer {
             SSLContext.setCipherSuite(serverCtx, serverCiphers);
             /* Load Server key and certificate */
             SSLContext.setCertificate(serverCtx, serverCert, serverKey, serverPassword, SSL.SSL_AIDX_RSA);
-            SSLContext.setVerify(serverCtx, SSL.SSL_CVERIFY_REQUIRE, 10);
+            SSLContext.setVerify(serverCtx, SSL.SSL_CVERIFY_NONE, 10);
             serverAcceptor = new Acceptor();
             serverAcceptor.start();
 
@@ -97,14 +100,6 @@ public class SSLServer {
                                            pool);
                 serverSock = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM,
                                            Socket.APR_PROTO_TCP, pool);
-                long sa = Address.get(Socket.APR_LOCAL, serverSock);
-                Sockaddr addr = new Sockaddr();
-                if (Address.fill(addr, sa)) {
-                    System.out.println("Host: " + addr.hostname);
-                    System.out.println("Server: " + addr.servname);
-                    System.out.println("IP: " + Address.getip(sa) +
-                                       ":" + addr.port);
-                }
                 int rc = Socket.bind(serverSock, inetAddress);
                 if (rc != 0) {
                   throw(new Exception("Can't create Acceptor: bind: " + Error.strerror(rc)));
@@ -149,9 +144,18 @@ public class SSLServer {
                     Socket.timeoutSet(clientSock, 10000000);
                     long sslSocket = SSLSocket.attach(SSLServer.serverCtx, clientSock, pool);
                     i = SSLSocket.handshake(sslSocket);
-                    System.out.println("Handskake : " + i);
+                    if (i == 0) {
 
-                    SSLSocket.close(sslSocket);
+                        Worker worker = new Worker(sslSocket, i++,
+                                                   this.getClass().getName());
+                        SSLServer.incThreads();
+                        worker.start();
+                        
+                    }
+                    else {
+                        System.out.println("Handshake error: " + SSL.getLastError());
+                        SSLSocket.close(sslSocket);
+                    }
                 }
             }
             catch( Exception ex ) {
@@ -159,6 +163,53 @@ public class SSLServer {
             }
         }
     }
+
+    private class Worker extends Thread {
+        private int workerId = 0;
+        private long clientSock = 0;
+        private byte [] wellcomeMsg = null;
+
+        public Worker(long clientSocket, int workerId, String from) {
+            this.clientSock = clientSocket;
+            this.workerId = workerId;
+            wellcomeMsg = ("SSLServer server id: " + this.workerId + " from " +
+                           from + "\r\n").getBytes();
+        }
+
+        public void run() {
+            boolean doClose = false;
+            try {
+                SSLSocket.send(clientSock, wellcomeMsg, 0, wellcomeMsg.length);
+                while (!doClose) {
+                    /* Do a blocking read byte at a time */
+                    byte [] buf = new byte[1];
+                    while (SSLSocket.recv(clientSock, buf, 0, 1) == 1) {
+                        if (buf[0] == '\n')
+                            break;
+                        else if (buf[0] == 'Q') {
+                            doClose = true;
+                            break;
+                        }
+                    }
+                    if (doClose) {
+                        try {
+                            byte [] msg = ("Bye from worker: " + workerId + "\r\n").getBytes();
+                            SSLSocket.send(clientSock, msg, 0, msg.length);
+                        } catch(Exception e) { }
+
+                        SSLSocket.close(clientSock);
+                    }
+                }
+            } catch (Exception e) {
+                SSLSocket.close(clientSock);
+                e.printStackTrace();
+            }
+            Echo.decThreads();
+            System.out.println("Worker: " +  workerId + " finished");
+        }
+    }
+
+
     public static void main(String [] args) {
         try {
             Library.initialize(null);

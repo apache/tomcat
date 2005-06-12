@@ -663,9 +663,9 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
         /* TODO: Some logging
          * Certificate Verification: Error
          */
-        if (con->cert) {
-            X509_free(con->cert);
-            con->cert = NULL;
+        if (con->peer) {
+            X509_free(con->peer);
+            con->peer = NULL;
         }
     }
     if (errdepth > depth) {
