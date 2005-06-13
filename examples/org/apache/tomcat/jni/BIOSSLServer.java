@@ -107,9 +107,10 @@ public class BIOSSLServer {
                                    ":" + raddr.port);
             }
             // SSLCallBack.setsock(clientSock);
-            int retcode = SSLSocket.accept(serverCtx, clientSock, serverPool);
+            long sslSocket = SSLSocket.attach(serverCtx, clientSock, serverPool);
+            int retcode = SSLSocket.handshake(sslSocket);
             if (retcode<=0) {
-                throw(new Exception("Can't SSL accept: " + SSLBIO.geterror(serverSSL, retcode)));
+                throw(new Exception("Can't SSL accept: " + SSL.getLastError()));
             }
             
         } catch (Exception e) {
