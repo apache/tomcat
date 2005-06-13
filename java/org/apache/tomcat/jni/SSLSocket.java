@@ -69,6 +69,16 @@ public class SSLSocket {
     public static native int close(long thesocket);
 
     /**
+     * Destroy the socket.
+     * <br />
+     * This function destroys the pool used for <code>attach</code> call.
+     * The main usage for this function is to allow the SSLSocket to be
+     * passed as client data to the Poll.
+     * @param thesocket The socket to destroy
+     */
+    public static native int destroy(long thesocket);
+
+    /**
      * Send data over a network.
      * <PRE>
      * This functions acts like a blocking write by default.  To change

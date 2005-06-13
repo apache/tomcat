@@ -172,12 +172,27 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
 {
     apr_interval_time_t timeout;
     apr_pollfd_t pfd;
-    int type = for_what == SSL_ERROR_WANT_WRITE ? APR_POLLOUT : APR_POLLIN;
+    int type;
     apr_status_t status;
+
+    /* Figure out the the poll direction */
+    switch (for_what) {
+        case SSL_ERROR_WANT_WRITE:
+        case SSL_ERROR_WANT_CONNECT:
+        case SSL_ERROR_WANT_ACCEPT:
+            type = APR_POLLOUT;
+        break;
+        case SSL_ERROR_WANT_READ:
+            type = APR_POLLIN;
+        break;
+        default:
+            return APR_EINVAL;
+        break;
+    }
 
     apr_socket_timeout_get(con->sock, &timeout);
     pfd.desc_type = APR_POLL_SOCKET;
-    pfd.desc.s = con->sock;
+    pfd.desc.s    = con->sock;    
     pfd.reqevents = type;
 
     /* Remove the object if it was in the pollset, then add in the new
@@ -247,6 +262,13 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
         con->sock = NULL;
     }
     return (jint)rv;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLSocket, destroy)(TCN_STDARGS, jlong sock)
+{
+    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+    UNREFERENCED_STDARGS;
+    apr_pool_destroy(con->pool);
 }
 
 #define JFC_TEST 0
