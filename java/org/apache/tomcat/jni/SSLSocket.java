@@ -110,26 +110,6 @@ public class SSLSocket {
      * APR_EINTR is never returned.
      * </PRE>
      * @param sock The socket to send the data over.
-     * @param buf The buffer which contains the data to be sent.
-     * @param offset Offset in the byte buffer.
-     * @param len The number of bytes to write; (-1) for full array.
-     * @return The number of bytes send.
-     *
-     */
-    public static native int send(long sock, byte[] buf, int offset, int len);
-
-    /**
-     * Send data over a network.
-     * <PRE>
-     * This functions acts like a blocking write by default.  To change
-     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
-     * socket option.
-     *
-     * It is possible for both bytes to be sent and an error to be returned.
-     *
-     * APR_EINTR is never returned.
-     * </PRE>
-     * @param sock The socket to send the data over.
      * @param buf The Byte buffer which contains the data to be sent.
      * @param offset The offset within the buffer array of the first buffer from
      *               which bytes are to be retrieved; must be non-negative
