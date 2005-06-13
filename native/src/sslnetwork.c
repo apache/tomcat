@@ -600,6 +600,66 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, send)(TCN_STDARGS, jlong sock,
     }
 }
 
+TCN_IMPLEMENT_CALL(jint, SSLSocket, sendv)(TCN_STDARGS, jlong sock,
+                                           jobjectArray bufs)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    jsize nvec = (*e)->GetArrayLength(e, bufs);
+    jsize i;
+    jobject ba;
+    apr_size_t written = 0;
+    apr_status_t ss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+
+    if (nvec >= APR_MAX_IOVEC_SIZE)
+        return (jint)(-APR_ENOMEM);
+    for (i = 0; i < nvec; i++) {
+        apr_size_t len;
+        jbyte     *buf;
+        ba = (*e)->GetObjectArrayElement(e, bufs, i);
+        len = (*e)->GetArrayLength(e, ba);
+        buf = (*e)->GetByteArrayElements(e, ba, NULL);
+        ss = ssl_socket_send(s, buf, &len);
+        (*e)->ReleaseByteArrayElements(e, ba, buf, JNI_ABORT);
+        if (ss == APR_SUCCESS)
+            written += len;
+        else
+            break;
+    }
+
+    if (ss == APR_SUCCESS)
+        return (jint)written;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, sendb)(TCN_STDARGS, jlong sock,
+                                            jobject buf, jint offset, jint len)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    apr_size_t nbytes = (apr_size_t)len;
+    char *bytes;
+    apr_status_t ss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(buf != NULL);
+    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    ss = ssl_socket_send(s, bytes + offset, &nbytes);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+
 TCN_IMPLEMENT_CALL(jint, SSLSocket, recv)(TCN_STDARGS, jlong sock,
                                           jbyteArray buf, jint offset,
                                           jint toread)
@@ -616,6 +676,94 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, recv)(TCN_STDARGS, jlong sock,
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    nbytes ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, recvt)(TCN_STDARGS, jlong sock,
+                                           jbyteArray buf, jint offset,
+                                           jint toread, jlong timeout)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    apr_size_t nbytes = (apr_size_t)toread;
+    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+    apr_status_t ss;
+    apr_interval_time_t t;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(buf != NULL);
+    TCN_ASSERT(bytes != NULL);
+
+    if ((ss = apr_socket_timeout_get(s->sock, &t)) != APR_SUCCESS)
+        goto cleanup;
+    if ((ss = apr_socket_timeout_set(s->sock, J2T(timeout))) != APR_SUCCESS)
+        goto cleanup;
+    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
+    /* Resore the original timeout */
+    apr_socket_timeout_set(s->sock, t);
+cleanup:
+    (*e)->ReleaseByteArrayElements(e, buf, bytes,
+                                   nbytes ? 0 : JNI_ABORT);
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, recvb)(TCN_STDARGS, jlong sock,
+                                           jobject buf, jint offset, jint len)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    apr_status_t ss;
+    apr_size_t nbytes = (apr_size_t)len;
+    char *bytes;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(buf != NULL);
+    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    TCN_ASSERT(bytes != NULL);
+    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, recvbt)(TCN_STDARGS, jlong sock,
+                                            jobject buf, jint offset,
+                                            jint len, jlong timeout)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    apr_status_t ss;
+    apr_size_t nbytes = (apr_size_t)len;
+    char *bytes;
+    apr_interval_time_t t;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(buf != NULL);
+    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    TCN_ASSERT(bytes != NULL);
+
+    if ((ss = apr_socket_timeout_get(s->sock, &t)) != APR_SUCCESS)
+         return -(jint)ss;
+    if ((ss = apr_socket_timeout_set(s->sock, J2T(timeout))) != APR_SUCCESS)
+         return -(jint)ss;
+    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
+    /* Resore the original timeout */
+    apr_socket_timeout_set(s->sock, t);
+
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
