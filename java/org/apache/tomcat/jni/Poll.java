@@ -159,7 +159,6 @@ public class Poll {
      * @return Number of descriptors (output parameter) in the Poll
      *         or negative APR error code.
      */
-    public static native int pollset(long pollset, long [] descriptors,
-                                     boolean remove);
+    public static native int pollset(long pollset, long [] descriptors);
 
 }
