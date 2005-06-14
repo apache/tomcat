@@ -297,13 +297,11 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
         for (i = 0; i < p->nelts; i++) {
             if ((now - p->socket_ttl[i]) > p->max_ttl) {
                 p->socket_set[i].rtnevents = APR_POLLHUP | APR_POLLIN;
-                if (num < p->nelts) {
-                    fd = p->socket_set[i];
-                    pset[num*4+0] = (jlong)(fd.rtnevents);
-                    pset[num*4+1] = P2J(fd.desc.s);
-                    pset[num*4+2] = P2J(fd.client_data);
-                    num++;
-                }
+                fd = p->socket_set[i];
+                pset[num*4+0] = (jlong)(fd.rtnevents);
+                pset[num*4+1] = P2J(fd.desc.s);
+                pset[num*4+2] = P2J(fd.client_data);
+                num++;
             }
         }
         if (remove && num) {
