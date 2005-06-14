@@ -233,4 +233,11 @@ public class SSLSocket {
     public static native int recvbt(long sock, ByteBuffer buf,
                                     int offset, int nbytes, long timeout);
 
+    /**
+     * Retrun SSL SESSION id.
+     *
+     * @param sock The socket to read the data from.
+     * @return Byte array containing session id.
+     */
+    public static byte[] getSessionId(long sock);
 }
