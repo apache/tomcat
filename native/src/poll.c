@@ -340,3 +340,28 @@ TCN_IMPLEMENT_CALL(jlong, Poll, getTtl)(TCN_STDARGS, jlong pollset)
     UNREFERENCED_STDARGS;
     return (jlong)p->max_ttl;
 }
+
+TCN_IMPLEMENT_CALL(jint, Poll, pollset)(TCN_STDARGS, jlong pollset,
+                                        jlongArray set)
+{
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    jlong *pset = (*e)->GetLongArrayElements(e, set, NULL);
+    apr_int32_t  i = 0;
+    apr_pollfd_t fd;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(pollset != 0);
+
+    for (i = 0; i < p->nelts; i++) {
+        p->socket_set[i].rtnevents = APR_POLLHUP | APR_POLLIN;
+        fd = p->socket_set[i];
+        pset[i*4+0] = (jlong)(fd.rtnevents);
+        pset[i*4+1] = P2J(fd.desc.s);
+        pset[i*4+2] = P2J(fd.client_data);
+    }
+    if (p->nelts)
+        (*e)->ReleaseLongArrayElements(e, set, pset, 0);
+    else
+        (*e)->ReleaseLongArrayElements(e, set, pset, JNI_ABORT);
+    return (jint)p->nelts;
+}
