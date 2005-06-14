@@ -239,5 +239,5 @@ public class SSLSocket {
      * @param sock The socket to read the data from.
      * @return Byte array containing session id.
      */
-    public static byte[] getSessionId(long sock);
+    public static native byte[] getSessionId(long sock);
 }
