@@ -183,14 +183,12 @@ public class SSLServer {
                 while (!doClose) {
                     /* Do a blocking read byte at a time */
                     byte [] buf = new byte[1];
-                    while (SSLSocket.recv(clientSock, buf, 0, 1) == 1) {
-                        if (buf[0] == '\n')
-                            break;
-                        else if (buf[0] == 'Q') {
-                            doClose = true;
-                            break;
-                        }
-                    }
+                    int ret;
+                    ret = SSLSocket.recv(clientSock, buf, 0, 1);
+                    if (ret != 1)
+                        throw(new Exception("SSLSocket.recv failed"));
+                    if (buf[0] == 'Q')
+                        doClose = true;
                     if (doClose) {
                         try {
                             byte [] msg = ("Bye from worker: " + workerId + "\r\n").getBytes();
