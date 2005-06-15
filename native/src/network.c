@@ -27,7 +27,6 @@
 
 #ifdef TCN_DO_STATISTICS
 #include "apr_atomic.h"
-
 static volatile apr_uint32_t sp_created  = 0;
 static volatile apr_uint32_t sp_closed   = 0;
 static volatile apr_uint32_t sp_cleared  = 0;
@@ -272,23 +271,30 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_size_t nbytes = (apr_size_t)tosend;
-    jbyte *bytes;
-    apr_int32_t nb;
     apr_status_t ss;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
-    apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
-    if (nb)
-         bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
-    else
-         bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    ss = apr_socket_send(s, bytes + offset, &nbytes);
+    if (tosend <= TCN_BUFFER_SZ) {
+        char sb[TCN_BUFFER_SZ];
+        (*e)->GetByteArrayRegion(e, buf, offset, tosend, (jbyte *)sb);
+        ss = apr_socket_send(s, sb, &nbytes);
+    }
+    else {
+        jbyte *bytes;
+        apr_int32_t nb;
+        apr_socket_opt_get(s, APR_SO_NONBLOCK, &nb);
+        if (nb)
+            bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
+        else
+            bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+        ss = apr_socket_send(s, bytes + offset, &nbytes);
 
-    if (nb)
-        (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
-    else
-        (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
+        if (nb)
+            (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
+        else
+            (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
+    }
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
@@ -393,16 +399,21 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_size_t nbytes = (apr_size_t)toread;
-    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
-    TCN_ASSERT(bytes != NULL);
-    ss = apr_socket_recv(s, bytes + offset, &nbytes);
-
-    (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                   nbytes ? 0 : JNI_ABORT);
+    if (toread <= TCN_BUFFER_SZ) {
+        char sb[TCN_BUFFER_SZ];
+        if ((ss = apr_socket_recv(s, sb, &nbytes)) == APR_SUCCESS)
+            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, sb);
+    }
+    else {
+        jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+        ss = apr_socket_recv(s, bytes + offset, &nbytes);
+        (*e)->ReleaseByteArrayElements(e, buf, bytes,
+                                       nbytes ? 0 : JNI_ABORT);
+    }
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
@@ -417,25 +428,31 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
 {
     apr_socket_t *s = J2P(sock, apr_socket_t *);
     apr_size_t nbytes = (apr_size_t)toread;
-    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
     apr_interval_time_t t;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
-    TCN_ASSERT(bytes != NULL);
 
     if ((ss = apr_socket_timeout_get(s, &t)) != APR_SUCCESS)
         goto cleanup;
     if ((ss = apr_socket_timeout_set(s, J2T(timeout))) != APR_SUCCESS)
         goto cleanup;
-    ss = apr_socket_recv(s, bytes + offset, &nbytes);
+    if (toread <= TCN_BUFFER_SZ) {
+        char sb[TCN_BUFFER_SZ];
+        ss = apr_socket_recv(s, sb, &nbytes);
+        (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, sb);
+    }
+    else {
+        jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
+        ss = apr_socket_recv(s, bytes + offset, &nbytes);
+        (*e)->ReleaseByteArrayElements(e, buf, bytes,
+                                       nbytes ? 0 : JNI_ABORT);
+    }
     /* Resore the original timeout */
     apr_socket_timeout_set(s, t);
 cleanup:
-    (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                   nbytes ? 0 : JNI_ABORT);
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
