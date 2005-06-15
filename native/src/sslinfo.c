@@ -31,27 +31,117 @@
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
 
-TCN_IMPLEMENT_CALL(jobject, SSLSocket, getSessionId)(TCN_STDARGS, jlong sock)
+static const char *hex_basis = "0123456789ABCDEF";
+
+static char *convert_to_hex(const void *buf, size_t len)
+{
+    const unsigned char *p = ( const unsigned char *)buf;
+    char *str, *s;
+    size_t i;
+
+    if ((len < 1) || ((str = malloc(len * 2 + 1)) == NULL))
+        return NULL;
+    for (i = 0, s = str; i < len; i++) {
+        unsigned char c = *p++;
+        *s++ = hex_basis[c >> 4];
+        *s++ = hex_basis[c & 0x0F];
+    }
+    *s = '\0';
+    return str;
+}
+
+TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
+                                                 jint what)
 {
     tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
-    SSL_SESSION *session;
+    jbyteArray array = NULL;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
-    if ((session = SSL_get_session(s->ssl)) != NULL) {
-        jbyteArray array;
-        jsize      len = (jsize)session->session_id_length;
-        array = (*e)->NewByteArray(e, len);
-        if (array) {
-            (*e)->SetByteArrayRegion(e, array, 0, len,
-                                     (jbyte *)(&session->session_id[0]));
+
+    switch (what) {
+        case SSL_INFO_SESSION_ID:
+        {
+            SSL_SESSION *session  = SSL_get_session(s->ssl);
+            if (session) {
+                jsize len = (jsize)session->session_id_length;
+                if ((array = (*e)->NewByteArray(e, len)) != NULL)
+                    (*e)->SetByteArrayRegion(e, array, 0, len,
+                                (jbyte *)(&session->session_id[0]));
+            }
         }
-        return array;
+        break;
+        default:
+            tcn_ThrowAPRException(e, APR_EINVAL);
+        break;
     }
-    else
-        return NULL;
+
+    return array;
 }
 
+TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
+                                                 jint what)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    jstring value = NULL;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+
+    switch (what) {
+        case SSL_INFO_SESSION_ID:
+        {
+            SSL_SESSION *session  = SSL_get_session(s->ssl);
+            if (session) {
+                char *hs = convert_to_hex(&session->session_id[0],
+                                          session->session_id_length);
+                if (hs) {
+                    value = tcn_new_string(e, hs, -1);
+                    free(hs);
+                }
+            }
+        }
+        break;
+        default:
+            tcn_ThrowAPRException(e, APR_EINVAL);
+        break;
+    }
+
+    return value;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
+                                              jint what)
+{
+    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    jint value = -1;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+
+    switch (what) {
+        case SSL_INFO_CIPHER_USEKEYSIZE:
+        case SSL_INFO_CIPHER_ALGKEYSIZE:
+        {
+            int usekeysize = 0;
+            int algkeysize = 0;
+            SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
+            if (cipher) {
+                usekeysize = SSL_CIPHER_get_bits(cipher, &algkeysize);
+                if (what == SSL_INFO_CIPHER_USEKEYSIZE)
+                    value = usekeysize;
+                else
+                    value = algkeysize;
+            }
+        }
+        break;
+        default:
+            tcn_ThrowAPRException(e, APR_EINVAL);
+        break;
+    }
+
+    return value;
+}
 
 #else
 /* OpenSSL is not supported

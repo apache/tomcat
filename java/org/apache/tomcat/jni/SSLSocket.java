@@ -234,10 +234,33 @@ public class SSLSocket {
                                     int offset, int nbytes, long timeout);
 
     /**
-     * Retrun SSL SESSION id.
+     * Retrun SSL Info parameter as byte array.
      *
      * @param sock The socket to read the data from.
-     * @return Byte array containing session id.
+     * @param id Parameter id.
+     * @return Byte array containing info id value.
      */
-    public static native byte[] getSessionId(long sock);
+    public static native byte[] getInfoB(long sock, int id)
+        throws Exception;
+
+    /**
+     * Retrun SSL Info parameter as String.
+     *
+     * @param sock The socket to read the data from.
+     * @param id Parameter id.
+     * @return String containing info id value.
+     */
+    public static native String getInfoS(long sock, int id)
+        throws Exception;
+
+    /**
+     * Retrun SSL Info parameter as integer.
+     *
+     * @param sock The socket to read the data from.
+     * @param id Parameter id.
+     * @return Integer containing info id value or -1 on error.
+     */
+    public static native int getInfoI(long sock, int id)
+        throws Exception;
+
 }

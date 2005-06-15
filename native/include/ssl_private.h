@@ -141,6 +141,11 @@
 
 #define SSL_TO_APR_ERROR(X)         (APR_OS_START_USERERR + 1000 + X)
 
+#define SSL_INFO_SESSION_ID         (1)
+#define SSL_INFO_CIPHER             (2)
+#define SSL_INFO_CIPHER_USEKEYSIZE  (3)
+#define SSL_INFO_CIPHER_ALGKEYSIZE  (4)
+
 #define SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) \
    ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) \
     || (errnum == X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN) \

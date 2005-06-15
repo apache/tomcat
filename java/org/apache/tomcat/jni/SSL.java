@@ -158,6 +158,11 @@ public final class SSL {
     public static final int SSL_SHUTDOWN_TYPE_UNCLEAN  = 2;
     public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
 
+    public static final int SSL_INFO_SESSION_ID             = 1;
+    public static final int SSL_INFO_CIPHER                 = 2;
+    public static final int SSL_INFO_CIPHER_USEKEYSIZE      = 3;
+    public static final int SSL_INFO_CIPHER_ALGKEYSIZE      = 4;
+
     /* Return OpenSSL version number */
     public static native int version();
 
@@ -261,7 +266,7 @@ public final class SSL {
      * @param file File contatining DH params.
      */
     public static native boolean loadDSATempKey(int idx, String file);
-    
+
     /**
      * Return last SSL error string
      */
