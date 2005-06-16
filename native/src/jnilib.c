@@ -89,12 +89,14 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
     apr_terminate();
 }
 
-jstring tcn_new_string(JNIEnv *env, const char *str, int l)
+jstring tcn_new_stringn(JNIEnv *env, const char *str, size_t l)
 {
     jstring result;
     jbyteArray bytes = 0;
     size_t len = l;
-
+    
+    if (!str)
+        return NULL;
     if ((*env)->EnsureLocalCapacity(env, 2) < 0) {
         return NULL; /* out of memory error */
     }
@@ -108,6 +110,24 @@ jstring tcn_new_string(JNIEnv *env, const char *str, int l)
         return result;
     } /* else fall through */
     return NULL;
+}
+
+jbyteArray tcn_new_arrayb(JNIEnv *env, const unsigned char *data, size_t len)
+{
+    jbyteArray bytes = (*env)->NewByteArray(env, (jsize)len);
+    if (bytes != NULL) {
+        (*env)->SetByteArrayRegion(env, bytes, 0, (jint)len, (jbyte *)data);
+    }
+    return bytes;
+}
+
+
+jstring tcn_new_string(JNIEnv *env, const char *str)
+{
+    if (!str)
+        return NULL;
+    else
+        return (*env)->NewStringUTF(env, str);
 }
 
 char *tcn_get_string(JNIEnv *env, jstring jstr)

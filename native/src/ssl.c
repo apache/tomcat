@@ -599,7 +599,7 @@ static int jbs_puts(BIO *b, const char *in)
         JNIEnv   *e = j->cb.env;
         ret = (*e)->CallIntMethod(e, j->cb.obj,
                                   j->cb.mid[2],
-                                  tcn_new_string(e, in, -1));
+                                  tcn_new_string(e, in));
     }
     return ret;
 }
@@ -775,7 +775,7 @@ TCN_IMPLEMENT_CALL(jstring, SSL, getLastError)(TCN_STDARGS)
     char buf[256];
     UNREFERENCED(o);
     ERR_error_string(ERR_get_error(), buf);
-    return tcn_new_string(e, buf, -1);
+    return tcn_new_string(e, buf);
 }
 
 #else

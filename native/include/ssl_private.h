@@ -145,6 +145,9 @@
 #define SSL_INFO_CIPHER             (2)
 #define SSL_INFO_CIPHER_USEKEYSIZE  (3)
 #define SSL_INFO_CIPHER_ALGKEYSIZE  (4)
+#define SSL_INFO_CIPHER_VERSION     (5)
+#define SSL_INFO_CIPHER_DESCRIPTION (6)
+#define SSL_INFO_PROTOCOL           (7)
 
 #define SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) \
    ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) \

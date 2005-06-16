@@ -64,10 +64,8 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
         {
             SSL_SESSION *session  = SSL_get_session(s->ssl);
             if (session) {
-                jsize len = (jsize)session->session_id_length;
-                if ((array = (*e)->NewByteArray(e, len)) != NULL)
-                    (*e)->SetByteArrayRegion(e, array, 0, len,
-                                (jbyte *)(&session->session_id[0]));
+                array = tcn_new_arrayb(e, &session->session_id[0],
+                                       session->session_id_length); 
             }
         }
         break;
@@ -96,11 +94,30 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
                 char *hs = convert_to_hex(&session->session_id[0],
                                           session->session_id_length);
                 if (hs) {
-                    value = tcn_new_string(e, hs, -1);
+                    value = tcn_new_string(e, hs);
                     free(hs);
                 }
             }
         }
+        break;
+        case SSL_INFO_PROTOCOL:
+            value = tcn_new_string(e, SSL_get_version(s->ssl));
+        break;
+        case SSL_INFO_CIPHER:
+            value = tcn_new_string(e, SSL_get_cipher_name(s->ssl));
+        break;
+        case SSL_INFO_CIPHER_VERSION:
+            value = tcn_new_string(e, SSL_get_cipher_version(s->ssl));
+        break;
+        case SSL_INFO_CIPHER_DESCRIPTION:
+            {
+                SSL_CIPHER *cipher = SSL_get_current_cipher(s->ssl);
+                if (cipher) {
+                    char buf[256];
+                    char *desc = SSL_CIPHER_description(cipher, buf, 256);
+                    value = tcn_new_string(e, desc);
+                }
+            }
         break;
         default:
             tcn_ThrowAPRException(e, APR_EINVAL);

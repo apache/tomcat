@@ -97,7 +97,9 @@
 void            tcn_Throw(JNIEnv *, const char *, ...);
 void            tcn_ThrowException(JNIEnv *, const char *);
 void            tcn_ThrowAPRException(JNIEnv *, apr_status_t);
-jstring         tcn_new_string(JNIEnv *, const char *, int);
+jstring         tcn_new_string(JNIEnv *, const char *);
+jstring         tcn_new_stringn(JNIEnv *, const char *, size_t);
+jbyteArray      tcn_new_arrayb(JNIEnv *, const unsigned char *, size_t);
 char           *tcn_get_string(JNIEnv *, jstring);
 char           *tcn_strdup(JNIEnv *, jstring);
 char           *tcn_pstrdup(JNIEnv *, jstring, apr_pool_t *);
