@@ -91,7 +91,7 @@ static int ssl_smart_shutdown(SSL *ssl, int shutdown_type)
     return rc;
 }
 
-static apr_status_t ssl_socket_cleanup(void *data)
+TCN_IMPLEMENT_METHOD(apr_status_t, cleanup)(void *data)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)data;
 
@@ -104,10 +104,6 @@ static apr_status_t ssl_socket_cleanup(void *data)
         if (con->peer) {
             X509_free(con->peer);
             con->peer = NULL;
-        }
-        if (con->sock) {
-            apr_socket_close(con->sock);
-            con->sock = NULL;
         }
     }
 
@@ -140,9 +136,6 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
     con->shutdown_type = ctx->shutdown_type;
     apr_pollset_create(&(con->pollset), 1, pool, 0);
 
-    apr_pool_cleanup_register(pool, (const void *)con,
-                              ssl_socket_cleanup,
-                              apr_pool_cleanup_null);
     SSL_set_app_data(ssl, (void *)con);
 
     if (ctx->mode) {
@@ -212,11 +205,10 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
     return status;
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, shutdown)(TCN_STDARGS, jlong sock,
-                                              jint how)
+TCN_IMPLEMENT_METHOD(jint, shutdown)(TCN_IMPARGS, jint how)
 {
     apr_status_t rv = APR_SUCCESS;
-    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
@@ -231,9 +223,9 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, shutdown)(TCN_STDARGS, jlong sock,
     return (jint)rv;
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
+TCN_IMPLEMENT_METHOD(jint, close)(TCN_IMPARGS)
 {
-    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     apr_status_t rv = APR_SUCCESS;
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
@@ -241,7 +233,6 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&ssl_closed);
 #endif
-    apr_pool_cleanup_kill(con->pool, con, ssl_socket_cleanup);
     if (con->ssl) {
         rv = ssl_smart_shutdown(con->ssl, con->shutdown_type);
         SSL_free(con->ssl);
@@ -251,20 +242,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, close)(TCN_STDARGS, jlong sock)
         X509_free(con->peer);
         con->peer = NULL;
     }
-    if (con->sock) {
-        apr_status_t rc;
-        if ((rc = apr_socket_close(con->sock)) != APR_SUCCESS)
-            rv = rc;
-        con->sock = NULL;
-    }
     return (jint)rv;
-}
-
-TCN_IMPLEMENT_CALL(void, SSLSocket, destroy)(TCN_STDARGS, jlong sock)
-{
-    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
-    UNREFERENCED_STDARGS;
-    apr_pool_destroy(con->pool);
 }
 
 #define JFC_TEST 0
@@ -408,45 +386,19 @@ cleanup:
 
 #endif /* JFC_TEST */
 
-TCN_IMPLEMENT_CALL(jlong, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
-                                             jlong sock, jlong pool)
-{
-    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    apr_socket_t *s   = J2P(sock, apr_socket_t *);
-    apr_pool_t *p     = J2P(pool, apr_pool_t *);
-    tcn_ssl_conn_t *con;
-    apr_os_sock_t  oss;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(pool != 0);
-    TCN_ASSERT(ctx != 0);
-    TCN_ASSERT(sock != 0);
-
-    if ((con = ssl_create(e, c, p)) == NULL)
-        return 0;
-    TCN_THROW_IF_ERR(apr_os_sock_get(&oss, s), c);
-    con->sock = s;
-
-    SSL_set_fd(con->ssl, (int)oss);
-    if (c->mode)
-        SSL_set_accept_state(con->ssl);
-    else
-        SSL_set_connect_state(con->ssl);
-
-cleanup:
-    return P2J(con);
-}
-
 TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 {
-    tcn_ssl_conn_t *con = J2P(sock, tcn_ssl_conn_t *);
+    tcn_socket_t *ss = J2P(sock, tcn_socket_t *);
+    tcn_ssl_conn_t *con;
     int s;
     apr_status_t rv;
     X509 *peer;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
-
+    if (ss->type != TCN_SOCKET_SSL)
+        return APR_EINVAL;
+    con = (tcn_ssl_conn_t *)ss->opaque;
     while (!SSL_is_init_finished(con->ssl)) {
         if ((s = SSL_do_handshake(con->ssl)) <= 0) {
             int i = SSL_get_error(con->ssl, s);
@@ -496,8 +448,6 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
             con->peer = peer;
         }
     }
-    fprintf(stderr, "Handshake done\n");
-    fflush(stderr);
     return APR_SUCCESS;
 }
 
@@ -587,11 +537,11 @@ static apr_status_t ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
     return rv;
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, send)(TCN_STDARGS, jlong sock,
-                                          jbyteArray buf, jint offset,
-                                          jint tosend)
+TCN_IMPLEMENT_METHOD(jint, send)(TCN_IMPARGS,
+                                 jbyteArray buf, jint offset,
+                                 jint tosend)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
     apr_size_t nbytes = (apr_size_t)tosend;
     jbyte *bytes;
     apr_int32_t nb;
@@ -618,10 +568,10 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, send)(TCN_STDARGS, jlong sock,
     }
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, sendv)(TCN_STDARGS, jlong sock,
-                                           jobjectArray bufs)
+TCN_IMPLEMENT_METHOD(jint, sendv)(TCN_IMPARGS,
+                                  jobjectArray bufs)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
     jsize nvec = (*e)->GetArrayLength(e, bufs);
     jsize i;
     jobject ba;
@@ -655,10 +605,10 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, sendv)(TCN_STDARGS, jlong sock,
     }
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, sendb)(TCN_STDARGS, jlong sock,
-                                            jobject buf, jint offset, jint len)
+TCN_IMPLEMENT_METHOD(jint, sendb)(TCN_IMPARGS,
+                                  jobject buf, jint offset, jint len)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
     apr_size_t nbytes = (apr_size_t)len;
     char *bytes;
     apr_status_t ss;
@@ -678,11 +628,11 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, sendb)(TCN_STDARGS, jlong sock,
 }
 
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, recv)(TCN_STDARGS, jlong sock,
-                                          jbyteArray buf, jint offset,
-                                          jint toread)
+TCN_IMPLEMENT_METHOD(jint, recv)(TCN_IMPARGS,
+                                 jbyteArray buf, jint offset,
+                                 jint toread)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
     apr_size_t nbytes = (apr_size_t)toread;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
@@ -702,11 +652,11 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, recv)(TCN_STDARGS, jlong sock,
     }
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, recvt)(TCN_STDARGS, jlong sock,
-                                           jbyteArray buf, jint offset,
-                                           jint toread, jlong timeout)
+TCN_IMPLEMENT_METHOD(jint, recvt)(TCN_IMPARGS,
+                                  jbyteArray buf, jint offset,
+                                  jint toread, jlong timeout)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
     apr_size_t nbytes = (apr_size_t)toread;
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
     apr_status_t ss;
@@ -735,8 +685,8 @@ cleanup:
     }
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, recvb)(TCN_STDARGS, jlong sock,
-                                           jobject buf, jint offset, jint len)
+TCN_IMPLEMENT_METHOD(jint, recvb)(TCN_IMPARGS,
+                                  jobject buf, jint offset, jint len)
 {
     tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
     apr_status_t ss;
@@ -758,9 +708,9 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, recvb)(TCN_STDARGS, jlong sock,
     }
 }
 
-TCN_IMPLEMENT_CALL(jint, SSLSocket, recvbt)(TCN_STDARGS, jlong sock,
-                                            jobject buf, jint offset,
-                                            jint len, jlong timeout)
+TCN_IMPLEMENT_METHOD(jint, recvbt)(TCN_IMPARGS,
+                                   jobject buf, jint offset,
+                                   jint len, jlong timeout)
 {
     tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
     apr_status_t ss;
@@ -788,6 +738,47 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, recvbt)(TCN_STDARGS, jlong sock,
         TCN_ERROR_WRAP(ss);
         return -(jint)ss;
     }
+}
+
+TCN_IMPLEMENT_CALL(jlong, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
+                                             jlong sock, jlong pool)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    tcn_socket_t *s   = J2P(sock, tcn_socket_t *);
+    apr_pool_t *p     = J2P(pool, apr_pool_t *);
+    tcn_ssl_conn_t *con;
+    apr_os_sock_t  oss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(pool != 0);
+    TCN_ASSERT(ctx != 0);
+    TCN_ASSERT(sock != 0);
+
+    if ((con = ssl_create(e, c, p)) == NULL)
+        return 0;
+    TCN_THROW_IF_ERR(apr_os_sock_get(&oss, s->sock), c);
+    con->sock = s->sock;
+
+    SSL_set_fd(con->ssl, (int)oss);
+    if (c->mode)
+        SSL_set_accept_state(con->ssl);
+    else
+        SSL_set_connect_state(con->ssl);
+    /* Change socket type */
+    s->type     = TCN_SOCKET_SSL;
+    s->cleanup  = TCN_GETNET_METHOD(cleanup);
+    s->shutdown = TCN_GETNET_METHOD(shutdown);
+    s->close    = TCN_GETNET_METHOD(close);
+    s->send     = TCN_GETNET_METHOD(send);
+    s->sendb    = TCN_GETNET_METHOD(sendb);
+    s->sendv    = TCN_GETNET_METHOD(sendv);
+    s->recv     = TCN_GETNET_METHOD(recv);
+    s->recvt    = TCN_GETNET_METHOD(recvt);
+    s->recvb    = TCN_GETNET_METHOD(recvb);
+    s->recvbt   = TCN_GETNET_METHOD(recvbt);
+
+cleanup:
+    return P2J(con);
 }
 
 #else

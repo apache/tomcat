@@ -189,7 +189,6 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     a->sock = s;
     a->pool = p;
     a->type = TCN_SOCKET_APR;
-    a->name = TCN_SOCKET_APR_N;
     apr_pool_cleanup_register(p, (const void *)a,
                               sp_socket_cleanup,
                               apr_pool_cleanup_null);
@@ -225,7 +224,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, shutdown)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     if (s->shutdown)
-        return (jint)(*s->shutdown)(TCN_IMPCALL(s), how);
+        return (*s->shutdown)(TCN_IMPCALL(s), how);
     else
         return (jint)apr_socket_shutdown(s->sock, (apr_shutdown_how_e)how);
 }
@@ -233,14 +232,20 @@ TCN_IMPLEMENT_CALL(jint, Socket, shutdown)(TCN_STDARGS, jlong sock,
 TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-
+    jint rv = APR_SUCCESS;
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
 
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&sp_closed);
 #endif
-    return (jint)apr_pool_cleanup_run(s->pool, s, sp_socket_cleanup);
+    if (s->close)
+        rv = (*s->close)(TCN_IMPCALL(s));
+    if (s->sock) {        
+        rv = (jint)apr_socket_close(s->sock);
+        s->sock = NULL;
+    }
+    return rv;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, bind)(TCN_STDARGS, jlong sock,
@@ -285,7 +290,6 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock,
         a->sock = n;
         a->pool = p;
         a->type = TCN_SOCKET_APR;
-        a->name = TCN_SOCKET_APR_N;
         apr_pool_cleanup_register(p, (const void *)a,
                                   sp_socket_cleanup,
                                   apr_pool_cleanup_null);
@@ -689,7 +693,9 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(file != 0);
-
+    
+    if (s->type != TCN_SOCKET_APR)
+        return (jint)(-APR_ENOTIMPL);
     if (headers)
         nh = (*e)->GetArrayLength(e, headers);
     if (trailers)

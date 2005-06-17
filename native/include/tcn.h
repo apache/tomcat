@@ -96,7 +96,7 @@
 /* On stack buffer size */
 #define TCN_BUFFER_SZ   8192
 #define TCN_STDARGS     JNIEnv *e, jobject o
-#define TCN_IMPARGS     JNIEnv *e, jobject o, void *opaque
+#define TCN_IMPARGS     JNIEnv *e, jobject o, void *sock
 #define TCN_IMPCALL(X)  e, o, X->opaque
 
 #define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
@@ -105,21 +105,17 @@
 #define TCN_IMPLEMENT_METHOD(RT, FN)    \
     static RT method_##FN
 
+#define TCN_GETNET_METHOD(FN)  method_##FN
+
 #define TCN_SOCKET_APR      1
 #define TCN_SOCKET_SSL      2
 #define TCN_SOCKET_UNIX     4
 #define TCN_SOCKET_NTPIPE   5
 
-#define TCN_SOCKET_APR_N    "APR socket"
-#define TCN_SOCKET_SSL_N    "SSL socket"
-#define TCN_SOCKET_UNIX_N   "UNIX local socket"
-#define TCN_SOCKET_NTPIPE_N "NT named pipe"
-
 typedef struct {
     apr_pool_t   *pool;
     apr_socket_t *sock;
     void         *opaque;
-    const char   *name;
     int          type;
     apr_status_t (*cleanup)(void *opaque);
     jint (*shutdown)(TCN_IMPARGS, jint how);
