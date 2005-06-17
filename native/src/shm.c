@@ -19,12 +19,8 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_shm.h"
-
 #include "tcn.h"
-
+#include "apr_shm.h"
 
 TCN_IMPLEMENT_CALL(jlong, Shm, create)(TCN_STDARGS, jlong reqsize,
                                        jstring filename,

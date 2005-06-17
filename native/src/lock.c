@@ -19,13 +19,9 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
+#include "tcn.h"
 #include "apr_proc_mutex.h"
 #include "apr_global_mutex.h"
-
-#include "tcn.h"
-
 
 TCN_IMPLEMENT_CALL(jlong, Lock, create)(TCN_STDARGS,
                                         jstring fname,

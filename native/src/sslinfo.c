@@ -19,14 +19,10 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
+#include "tcn.h"
 #include "apr_file_io.h"
-#include "apr_portable.h"
 #include "apr_thread_mutex.h"
 #include "apr_poll.h"
-
-#include "tcn.h"
 
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
@@ -50,6 +46,141 @@ static char *convert_to_hex(const void *buf, size_t len)
     return str;
 }
 
+#define DIGIT2NUM(x) (((x)[0] - '0') * 10 + (x)[1] - '0')
+
+static int get_days_remaining(ASN1_UTCTIME *tm)
+{
+    apr_time_t then, now = apr_time_now();
+    apr_time_exp_t exp = {0};
+    int diff;
+
+    /* Fail if the time isn't a valid ASN.1 UTCTIME; RFC3280 mandates
+     * that the seconds digits are present even though ASN.1
+     * doesn't. */
+    if (tm->length < 11 || !ASN1_UTCTIME_check(tm))
+        return 0;
+
+    exp.tm_year = DIGIT2NUM(tm->data);
+    exp.tm_mon  = DIGIT2NUM(tm->data + 2) - 1;
+    exp.tm_mday = DIGIT2NUM(tm->data + 4) + 1;
+    exp.tm_hour = DIGIT2NUM(tm->data + 6);
+    exp.tm_min  = DIGIT2NUM(tm->data + 8);
+    exp.tm_sec  = DIGIT2NUM(tm->data + 10);
+
+    if (exp.tm_year <= 50)
+        exp.tm_year += 100;
+    if (apr_time_exp_gmt_get(&then, &exp) != APR_SUCCESS)
+        return 0;
+
+    diff = (int)((apr_time_sec(then) - apr_time_sec(now)) / (60*60*24));
+    return diff > 0 ? diff : 0;
+}
+
+static char *get_cert_valid(ASN1_UTCTIME *tm)
+{
+    char *result;
+    BIO* bio;
+    int n;
+
+    if ((bio = BIO_new(BIO_s_mem())) == NULL)
+        return NULL;
+    ASN1_UTCTIME_print(bio, tm);
+    n = BIO_pending(bio);
+    result = malloc(n+1);
+    n = BIO_read(bio, result, n);
+    result[n] = '\0';
+    BIO_free(bio);
+    return result;
+}
+
+static char *get_cert_PEM(X509 *xs)
+{
+    char *result;
+    BIO *bio;
+    int n;
+
+    if ((bio = BIO_new(BIO_s_mem())) == NULL)
+        return NULL;
+    PEM_write_bio_X509(bio, xs);
+    n = BIO_pending(bio);
+    result = malloc(n+1);
+    n = BIO_read(bio, result, n);
+    result[n] = '\n';
+    BIO_free(bio);
+    return result;
+}
+
+static char *get_cert_serial(X509 *xs)
+{
+    char *result;
+    BIO *bio;
+    int n;
+
+    if ((bio = BIO_new(BIO_s_mem())) == NULL)
+        return NULL;
+    i2a_ASN1_INTEGER(bio, X509_get_serialNumber(xs));
+    n = BIO_pending(bio);
+    result = malloc(n+1);
+    n = BIO_read(bio, result, n);
+    result[n] = '\0';
+    BIO_free(bio);
+    return result;
+}
+
+static const struct {
+    int   fid;
+    int   nid;
+} info_cert_dn_rec[] = {
+    { SSL_INFO_DN_COUNTRYNAME,            NID_countryName            },
+    { SSL_INFO_DN_STATEORPROVINCENAME,    NID_stateOrProvinceName    },
+    { SSL_INFO_DN_LOCALITYNAME,           NID_localityName           },
+    { SSL_INFO_DN_ORGANIZATIONNAME,       NID_organizationName       },
+    { SSL_INFO_DN_ORGANIZATIONALUNITNAME, NID_organizationalUnitName },
+    { SSL_INFO_DN_COMMONNAME,             NID_commonName             },
+    { SSL_INFO_DN_TITLE,                  NID_title                  },
+    { SSL_INFO_DN_INITIALS,               NID_initials               },
+    { SSL_INFO_DN_GIVENNAME,              NID_givenName              },
+    { SSL_INFO_DN_SURNAME,                NID_surname                },
+    { SSL_INFO_DN_DESCRIPTION,            NID_description            },
+    { SSL_INFO_DN_UNIQUEIDENTIFIER,       NID_x500UniqueIdentifier   },
+    { SSL_INFO_DN_EMAILADDRESS,           NID_pkcs9_emailAddress     },
+    { 0,                                  0                          }
+};
+
+static char *lookup_ssl_cert_dn(X509_NAME *xsname, int dnidx)
+{
+    char *result;
+    X509_NAME_ENTRY *xsne;
+    int i, j, n, idx = 0;
+
+    result = NULL;
+
+    for (i = 0; info_cert_dn_rec[i].fid != 0; i++) {
+        if (info_cert_dn_rec[i].fid == dnidx) {
+            for (j = 0; j < sk_X509_NAME_ENTRY_num((STACK_OF(X509_NAME_ENTRY) *)
+                                                   (xsname->entries)); j++) {
+                xsne = sk_X509_NAME_ENTRY_value((STACK_OF(X509_NAME_ENTRY) *)
+                                                (xsname->entries), j);
+
+                n =OBJ_obj2nid((ASN1_OBJECT *)X509_NAME_ENTRY_get_object(xsne));
+                if (n == info_cert_dn_rec[i].nid && idx-- == 0) {
+                    result = malloc(xsne->value->length + 1);
+                    memcpy(result, xsne->value->data,
+                                   xsne->value->length);
+                    result[xsne->value->length] = '\0';
+
+#if APR_CHARSET_EBCDIC
+                    ap_xlate_proto_from_ascii(result, xsne->value->length);
+#endif /* APR_CHARSET_EBCDIC */
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    return result;
+}
+
 TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
                                                  jint what)
 {
@@ -65,7 +196,7 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
             SSL_SESSION *session  = SSL_get_session(s->ssl);
             if (session) {
                 array = tcn_new_arrayb(e, &session->session_id[0],
-                                       session->session_id_length); 
+                                       session->session_id_length);
             }
         }
         break;
@@ -82,6 +213,7 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
 {
     tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
     jstring value = NULL;
+    apr_status_t rv = APR_SUCCESS;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
@@ -120,9 +252,155 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
             }
         break;
         default:
-            tcn_ThrowAPRException(e, APR_EINVAL);
+            rv = APR_EINVAL;
         break;
     }
+    if (what & (SSL_INFO_CLIENT_S_DN | SSL_INFO_CLIENT_I_DN)) {
+        X509 *xs;
+        X509_NAME *xsname;
+        if ((xs = SSL_get_peer_certificate(s->ssl)) != NULL) {
+            char *result;
+            int idx = what & 0x0F;
+            if (what & SSL_INFO_CLIENT_S_DN)
+                xsname = X509_get_subject_name(xs);
+            else
+                xsname = X509_get_issuer_name(xs);
+            if (idx) {
+                result = lookup_ssl_cert_dn(xsname, idx);
+                if (result) {
+                    value = tcn_new_string(e, result);
+                    free(result);
+                }
+            }
+            else
+                value = tcn_new_string(e, X509_NAME_oneline(xsname, NULL, 0));
+            X509_free(xs);
+        }
+        rv = APR_SUCCESS;
+    }
+    else if (what & (SSL_INFO_SERVER_S_DN | SSL_INFO_SERVER_I_DN)) {
+        X509 *xs;
+        X509_NAME *xsname;
+        if ((xs = SSL_get_certificate(s->ssl)) != NULL) {
+            char *result;
+            int idx = what & 0x0F;
+            if (what & SSL_INFO_SERVER_S_DN)
+                xsname = X509_get_subject_name(xs);
+            else
+                xsname = X509_get_issuer_name(xs);
+            if (idx) {
+                result = lookup_ssl_cert_dn(xsname, what & 0x0F);
+                if (result) {
+                    value = tcn_new_string(e, result);
+                    free(result);
+                }
+            }
+            else
+                value = tcn_new_string(e, X509_NAME_oneline(xsname, NULL, 0));
+            /* XXX: No need to call the X509_free(xs); */
+        }
+        rv = APR_SUCCESS;
+    }
+    else if (what & SSL_INFO_CLIENT_MASK) {
+        X509 *xs;
+        char *result;
+        int nid;
+        if ((xs = SSL_get_peer_certificate(s->ssl)) != NULL) {
+            switch (what) {
+                case SSL_INFO_CLIENT_V_START:
+                    if ((result = get_cert_valid(X509_get_notBefore(xs)))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+                case SSL_INFO_CLIENT_V_END:
+                    if ((result = get_cert_valid(X509_get_notAfter(xs)))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+                case SSL_INFO_CLIENT_A_SIG:
+                    nid = OBJ_obj2nid((ASN1_OBJECT *)xs->cert_info->signature->algorithm);
+                    if (nid == NID_undef)
+                        value = tcn_new_string(e, "UNKNOWN");
+                    else
+                        value = tcn_new_string(e, OBJ_nid2ln(nid));
+                break;
+                case SSL_INFO_CLIENT_A_KEY:
+                    nid = OBJ_obj2nid((ASN1_OBJECT *)xs->cert_info->key->algor->algorithm);
+                    if (nid == NID_undef)
+                        value = tcn_new_string(e, "UNKNOWN");
+                    else
+                        value = tcn_new_string(e, OBJ_nid2ln(nid));
+                break;
+                case SSL_INFO_CLIENT_CERT:
+                    if ((result = get_cert_PEM(xs))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+                case SSL_INFO_CLIENT_M_SERIAL:
+                    if ((result = get_cert_serial(xs))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+            }
+            X509_free(xs);
+        }
+        rv = APR_SUCCESS;
+    }
+    else if (what & SSL_INFO_SERVER_MASK) {
+        X509 *xs;
+        char *result;
+        int nid;
+        if ((xs = SSL_get_certificate(s->ssl)) != NULL) {
+            switch (what) {
+                case SSL_INFO_SERVER_V_START:
+                    if ((result = get_cert_valid(X509_get_notBefore(xs)))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+                case SSL_INFO_SERVER_V_END:
+                    if ((result = get_cert_valid(X509_get_notAfter(xs)))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+                case SSL_INFO_SERVER_A_SIG:
+                    nid = OBJ_obj2nid((ASN1_OBJECT *)xs->cert_info->signature->algorithm);
+                    if (nid == NID_undef)
+                        value = tcn_new_string(e, "UNKNOWN");
+                    else
+                        value = tcn_new_string(e, OBJ_nid2ln(nid));
+                break;
+                case SSL_INFO_SERVER_A_KEY:
+                    nid = OBJ_obj2nid((ASN1_OBJECT *)xs->cert_info->key->algor->algorithm);
+                    if (nid == NID_undef)
+                        value = tcn_new_string(e, "UNKNOWN");
+                    else
+                        value = tcn_new_string(e, OBJ_nid2ln(nid));
+                break;
+                case SSL_INFO_SERVER_CERT:
+                    if ((result = get_cert_PEM(xs))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+                case SSL_INFO_SERVER_M_SERIAL:
+                    if ((result = get_cert_serial(xs))) {
+                        value = tcn_new_string(e, result);
+                        free(result);
+                    }
+                break;
+            }
+            /* XXX: No need to call the X509_free(xs); */
+        }
+        rv = APR_SUCCESS;
+    }
+    if (rv != APR_SUCCESS)
+        tcn_ThrowAPRException(e, rv);
 
     return value;
 }

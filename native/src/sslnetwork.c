@@ -19,14 +19,10 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_file_io.h"
-#include "apr_portable.h"
+#include "tcn.h"
 #include "apr_thread_mutex.h"
 #include "apr_poll.h"
 
-#include "tcn.h"
 
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
@@ -159,7 +155,7 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
                                    MD5_DIGEST_LENGTH);
     }
     SSL_set_verify_result(ssl, X509_V_OK);
-
+    SSL_rand_seed(ctx->rand_file);
 
 #ifdef TCN_DO_STATISTICS
     ssl_created++;

@@ -19,15 +19,9 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_file_io.h"
-#include "apr_portable.h"
-#include "apr_thread_mutex.h"
-#include "apr_strings.h"
-#include "apr_poll.h"
-
 #include "tcn.h"
+#include "apr_thread_mutex.h"
+#include "apr_poll.h"
 
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"

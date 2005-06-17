@@ -19,12 +19,8 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_file_io.h"
-#include "apr_network_io.h"
-
 #include "tcn.h"
+#include "apr_file_io.h"
 
 #define DECLARE_FINFO_FIELD(name) static jfieldID _fid##name = NULL
 #define FINFO_FIELD(name)         _fid##name

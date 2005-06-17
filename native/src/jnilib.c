@@ -19,17 +19,12 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
+#include "tcn.h"
 #include "apr_version.h"
-#include "apr_general.h"
-#include "apr_network_io.h"
 #include "apr_file_io.h"
 #include "apr_mmap.h"
 #include "apr_atomic.h"
-#include "apr_strings.h"
 
-#include "tcn.h"
 #include "tcn_version.h"
 
 #ifdef TCN_DO_STATISTICS

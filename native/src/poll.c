@@ -19,10 +19,8 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_poll.h"
 #include "tcn.h"
+#include "apr_poll.h"
 
 
 #ifdef TCN_DO_STATISTICS
@@ -152,10 +150,10 @@ TCN_IMPLEMENT_CALL(jint, Poll, destroy)(TCN_STDARGS, jlong pollset)
 }
 
 TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
-                                    jlong socket, jlong data,
-                                    jint reqevents)
+                                    jlong socket, jint reqevents)
 {
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    tcn_socket_t *s  = J2P(socket, tcn_socket_t *);
     apr_pollfd_t fd;
 
     UNREFERENCED_STDARGS;
@@ -170,8 +168,8 @@ TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
     fd.reqevents = (apr_int16_t)reqevents;
-    fd.desc.s = J2P(socket, apr_socket_t *);
-    fd.client_data = J2P(data, void *);
+    fd.desc.s    = s->sock;
+    fd.client_data = s;
     p->socket_ttl[p->nelts] = apr_time_now();
     p->socket_set[p->nelts] = fd;
     p->nelts++;
@@ -217,6 +215,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
                                        jlong socket)
 {
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
+    tcn_socket_t *s  = J2P(socket, tcn_socket_t *);
     apr_pollfd_t fd;
 
     UNREFERENCED_STDARGS;
@@ -224,7 +223,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
 
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
-    fd.desc.s = J2P(socket, apr_socket_t *);
+    fd.desc.s    = s->sock;
 #ifdef TCN_DO_STATISTICS
     p->sp_remove++;
 #endif
@@ -238,8 +237,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
                                      jboolean remove)
 {
     const apr_pollfd_t *fd = NULL;
-    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
-    jlong *pset = (*e)->GetLongArrayElements(e, set, NULL);
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);    
     apr_int32_t  i, num = 0;
     apr_status_t rv = APR_SUCCESS;
 
@@ -260,22 +258,20 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
         num = (apr_int32_t)(-rv);
     }
     if (num > 0) {
+        jlong *pset = (*e)->GetLongArrayElements(e, set, NULL);
 #ifdef TCN_DO_STATISTICS
          p->sp_polled += num;
          p->sp_max_polled = TCN_MAX(p->sp_max_polled, num);
 #endif
         for (i = 0; i < num; i++) {
-            pset[i*4+0] = (jlong)(fd->rtnevents);
-            pset[i*4+1] = P2J(fd->desc.s);
-            pset[i*4+2] = P2J(fd->client_data);
+            pset[i*2+0] = (jlong)(fd->rtnevents);
+            pset[i*2+1] = P2J(fd->client_data);
             if (remove)
                 do_remove(p, fd);
             fd ++;
         }
         (*e)->ReleaseLongArrayElements(e, set, pset, 0);
     }
-    else
-        (*e)->ReleaseLongArrayElements(e, set, pset, JNI_ABORT);
 
     return (jint)num;
 }
@@ -298,9 +294,8 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
             if ((now - p->socket_ttl[i]) > p->max_ttl) {
                 p->socket_set[i].rtnevents = APR_POLLHUP | APR_POLLIN;
                 fd = p->socket_set[i];
-                pset[num*4+0] = (jlong)(fd.rtnevents);
-                pset[num*4+1] = P2J(fd.desc.s);
-                pset[num*4+2] = P2J(fd.client_data);
+                pset[num*2+0] = (jlong)(fd.rtnevents);
+                pset[num*2+1] = P2J(fd.client_data);
                 num++;
             }
         }
@@ -312,7 +307,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
 #endif
             for (i = 0; i < num; i++) {
                 fd.desc_type = APR_POLL_SOCKET;
-                fd.desc.s = J2P(pset[i*4+1], apr_socket_t *);
+                fd.desc.s = (J2P(pset[i*2+1], tcn_socket_t *))->sock;
                 do_remove(p, &fd);
             }
         }
@@ -353,9 +348,8 @@ TCN_IMPLEMENT_CALL(jint, Poll, pollset)(TCN_STDARGS, jlong pollset,
     for (i = 0; i < p->nelts; i++) {
         p->socket_set[i].rtnevents = APR_POLLHUP | APR_POLLIN;
         fd = p->socket_set[i];
-        pset[i*4+0] = (jlong)(fd.rtnevents);
-        pset[i*4+1] = P2J(fd.desc.s);
-        pset[i*4+2] = P2J(fd.client_data);
+        pset[i*2+0] = (jlong)(fd.rtnevents);
+        pset[i*2+1] = P2J(fd.client_data);
     }
     if (p->nelts)
         (*e)->ReleaseLongArrayElements(e, set, pset, 0);

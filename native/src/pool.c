@@ -19,8 +19,6 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
 #include "tcn.h"
 
 extern apr_pool_t *tcn_global_pool;

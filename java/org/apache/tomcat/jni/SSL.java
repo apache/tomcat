@@ -158,10 +158,51 @@ public final class SSL {
     public static final int SSL_SHUTDOWN_TYPE_UNCLEAN  = 2;
     public static final int SSL_SHUTDOWN_TYPE_ACCURATE = 3;
 
-    public static final int SSL_INFO_SESSION_ID             = 1;
-    public static final int SSL_INFO_CIPHER                 = 2;
-    public static final int SSL_INFO_CIPHER_USEKEYSIZE      = 3;
-    public static final int SSL_INFO_CIPHER_ALGKEYSIZE      = 4;
+    public static final int SSL_INFO_SESSION_ID                = 0x0001;
+    public static final int SSL_INFO_CIPHER                    = 0x0002;
+    public static final int SSL_INFO_CIPHER_USEKEYSIZE         = 0x0003;
+    public static final int SSL_INFO_CIPHER_ALGKEYSIZE         = 0x0004;
+    public static final int SSL_INFO_CIPHER_VERSION            = 0x0005;
+    public static final int SSL_INFO_CIPHER_DESCRIPTION        = 0x0006;
+    public static final int SSL_INFO_PROTOCOL                  = 0x0007;
+
+    /* To obtain the CountryName of the Client Certificate Issuer
+     * use the SSL_INFO_CLIENT_I_DN + SSL_INFO_DN_COUNTRYNAME
+     */
+    public static final int SSL_INFO_CLIENT_S_DN               = 0x0010;
+    public static final int SSL_INFO_CLIENT_I_DN               = 0x0020;
+    public static final int SSL_INFO_SERVER_S_DN               = 0x0040;
+    public static final int SSL_INFO_SERVER_I_DN               = 0x0080;
+
+    public static final int SSL_INFO_DN_COUNTRYNAME            = 0x0001;
+    public static final int SSL_INFO_DN_STATEORPROVINCENAME    = 0x0002;
+    public static final int SSL_INFO_DN_LOCALITYNAME           = 0x0003;
+    public static final int SSL_INFO_DN_ORGANIZATIONNAME       = 0x0004;
+    public static final int SSL_INFO_DN_ORGANIZATIONALUNITNAME = 0x0005;
+    public static final int SSL_INFO_DN_COMMONNAME             = 0x0006;
+    public static final int SSL_INFO_DN_TITLE                  = 0x0007;
+    public static final int SSL_INFO_DN_INITIALS               = 0x0008;
+    public static final int SSL_INFO_DN_GIVENNAME              = 0x0009;
+    public static final int SSL_INFO_DN_SURNAME                = 0x000A;
+    public static final int SSL_INFO_DN_DESCRIPTION            = 0x000B;
+    public static final int SSL_INFO_DN_UNIQUEIDENTIFIER       = 0x000C;
+    public static final int SSL_INFO_DN_EMAILADDRESS           = 0x000D;
+
+    public static final int SSL_INFO_CLIENT_M_VERSION          = 0x0101;
+    public static final int SSL_INFO_CLIENT_M_SERIAL           = 0x0102;
+    public static final int SSL_INFO_CLIENT_V_START            = 0x0103;
+    public static final int SSL_INFO_CLIENT_V_END              = 0x0104;
+    public static final int SSL_INFO_CLIENT_A_SIG              = 0x0105;
+    public static final int SSL_INFO_CLIENT_A_KEY              = 0x0106;
+    public static final int SSL_INFO_CLIENT_CERT               = 0x0107;
+
+    public static final int SSL_INFO_SERVER_M_VERSION          = 0x0201;
+    public static final int SSL_INFO_SERVER_M_SERIAL           = 0x0202;
+    public static final int SSL_INFO_SERVER_V_START            = 0x0203;
+    public static final int SSL_INFO_SERVER_V_END              = 0x0204;
+    public static final int SSL_INFO_SERVER_A_SIG              = 0x0205;
+    public static final int SSL_INFO_SERVER_A_KEY              = 0x0206;
+    public static final int SSL_INFO_SERVER_CERT               = 0x0207;
 
     /* Return OpenSSL version number */
     public static native int version();

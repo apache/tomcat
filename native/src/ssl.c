@@ -19,16 +19,11 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
+#include "tcn.h"
 #include "apr_file_io.h"
-#include "apr_portable.h"
 #include "apr_thread_mutex.h"
-#include "apr_strings.h"
 #include "apr_atomic.h"
 #include "apr_poll.h"
-
-#include "tcn.h"
 
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
@@ -288,7 +283,7 @@ static int ssl_rand_save_file(const char *file)
         return 1;
 }
 
-static int ssl_rand_seed(const char *file)
+int SSL_rand_seed(const char *file)
 {
     unsigned char stackdata[256];
     static volatile apr_uint32_t counter = 0;
@@ -301,6 +296,10 @@ static int ssl_rand_seed(const char *file)
             unsigned long i;
             apr_uint32_t  u;
         } _ssl_seed;
+        if (counter == 0) {
+            apr_generate_random_bytes(stackdata, 256);
+            RAND_seed(stackdata, 128);
+        }
         _ssl_seed.t = apr_time_now();
         _ssl_seed.p = getpid();
         _ssl_seed.i = ssl_thread_id();
@@ -419,7 +418,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
      * This will in most cases call the builtin
      * low entropy seed.
      */
-    ssl_rand_seed(NULL);
+    SSL_rand_seed(NULL);
     /* For SSL_get_app_data2() at request time */
     SSL_init_app_data2_idx();
 
@@ -446,7 +445,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, randLoad)(TCN_STDARGS, jstring file)
     TCN_ALLOC_CSTRING(file);
     int r;
     UNREFERENCED(o);
-    r = ssl_rand_seed(J2S(file));
+    r = SSL_rand_seed(J2S(file));
     TCN_FREE_CSTRING(file);
     return r ? JNI_TRUE : JNI_FALSE;
 }

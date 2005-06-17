@@ -22,6 +22,13 @@
 #ifndef TCN_H
 #define TCN_H
 
+#include "apr.h"
+#include "apr_general.h"
+#include "apr_pools.h"
+#include "apr_portable.h"
+#include "apr_network_io.h"
+#include "apr_strings.h"
+
 #ifndef APR_HAS_THREADS
 #error "Missing APR_HAS_THREADS support from APR."
 #endif
@@ -89,9 +96,43 @@
 /* On stack buffer size */
 #define TCN_BUFFER_SZ   8192
 #define TCN_STDARGS     JNIEnv *e, jobject o
+#define TCN_IMPARGS     JNIEnv *e, jobject o, void *opaque
+#define TCN_IMPCALL(X)  e, o, X->opaque
 
 #define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
+
+#define TCN_IMPLEMENT_METHOD(RT, FN)    \
+    static RT method_##FN
+
+#define TCN_SOCKET_APR      1
+#define TCN_SOCKET_SSL      2
+#define TCN_SOCKET_UNIX     4
+#define TCN_SOCKET_NTPIPE   5
+
+#define TCN_SOCKET_APR_N    "APR socket"
+#define TCN_SOCKET_SSL_N    "SSL socket"
+#define TCN_SOCKET_UNIX_N   "UNIX local socket"
+#define TCN_SOCKET_NTPIPE_N "NT named pipe"
+
+typedef struct {
+    apr_pool_t   *pool;
+    apr_socket_t *sock;
+    void         *opaque;
+    const char   *name;
+    int          type;
+    apr_status_t (*cleanup)(void *opaque);
+    jint (*shutdown)(TCN_IMPARGS, jint how);
+    jint (*close)(TCN_IMPARGS);
+    jint (*send)(TCN_IMPARGS, jbyteArray buf, jint offset, jint tosend);
+    jint (*sendb)(TCN_IMPARGS, jobject buf, jint offset, jint len);
+    jint (*sendv)(TCN_IMPARGS, jobjectArray bufs);
+    jint (*recv)(TCN_IMPARGS, jbyteArray buf, jint offset, jint toread);
+    jint (*recvt)(TCN_IMPARGS, jbyteArray buf, jint offset, jint toread, jlong timeout);
+    jint (*recvb)(TCN_IMPARGS, jobject buf, jint offset, jint len);
+    jint (*recvbt)(TCN_IMPARGS, jobject buf, jint offset, jint len, jlong timeout);
+
+} tcn_socket_t;
 
 /* Private helper functions */
 void            tcn_Throw(JNIEnv *, const char *, ...);

@@ -19,9 +19,6 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_strings.h"
 #include "tcn.h"
 
 /* Merge IS_ETIMEDOUT with APR_TIMEUP

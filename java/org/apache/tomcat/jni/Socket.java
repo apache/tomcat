@@ -132,6 +132,12 @@ public class Socket {
     public static native int close(long thesocket);
 
     /**
+     * Destroy a pool associated with socket
+     * @param thesocket The destroy
+     */
+    public static native void destroy(long thesocket);
+
+    /**
      * Bind the socket to its associated port
      * @param sock The socket to bind
      * @param sa The socket address to bind to
@@ -453,5 +459,13 @@ public class Socket {
     public static native long sendfile(long sock, long file, byte [][] headers,
                                        byte[][] trailers, long offset,
                                        long len, int flags);
+
+
+    /**
+     * Create a child pool from associated socket pool.
+     * @param thesocket The socket to use
+     */
+    public static native long pool(long thesocket)
+        throws Exception;
 
 }

@@ -81,7 +81,7 @@ public class Poll {
      * @param data Client data to add
      * @param reqevents requested events
      */
-    public static native int add(long pollset, long sock, long data,
+    public static native int add(long pollset, long sock,
                                  int reqevents);
 
     /**

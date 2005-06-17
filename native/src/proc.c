@@ -19,13 +19,9 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
+#include "tcn.h"
 #include "apr_thread_proc.h"
 #include "apr_version.h"
-
-#include "tcn.h"
-
 
 #define ERRFN_USERDATA_KEY    "TCNATIVECHILDERRFN"
 

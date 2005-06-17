@@ -19,14 +19,11 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
+#include "tcn.h"
+
 #include "apr_file_io.h"
-#include "apr_portable.h"
 #include "apr_thread_mutex.h"
 #include "apr_poll.h"
-
-#include "tcn.h"
 
 #ifdef HAVE_OPENSSL
 #include "ssl_private.h"
@@ -475,6 +472,19 @@ static X509 *load_pem_cert(const char *file)
                  NULL);
     BIO_free(bio);
     return cert;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setRandom)(TCN_STDARGS, jlong ctx,
+                                                jstring file)
+{
+    tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
+    TCN_ALLOC_CSTRING(file);    
+
+    TCN_ASSERT(ctx != 0);
+    UNREFERENCED(o);
+    if (J2S(file))
+        c->rand_file = apr_pstrdup(c->pool, J2S(file));
+    TCN_FREE_CSTRING(file);
 }
 
 TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,

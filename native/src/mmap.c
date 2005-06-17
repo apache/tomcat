@@ -19,10 +19,8 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_mmap.h"
 #include "tcn.h"
+#include "apr_mmap.h"
 
 TCN_IMPLEMENT_CALL(jlong, Mmap, create)(TCN_STDARGS, jlong file,
                                         jlong offset, jlong size,

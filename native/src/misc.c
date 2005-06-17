@@ -19,12 +19,8 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_portable.h"
-#include "apr_general.h"
-#include "apr_time.h"
 #include "tcn.h"
+#include "apr_time.h"
 
 TCN_IMPLEMENT_CALL(void, Time, sleep)(TCN_STDARGS, jlong t)
 {

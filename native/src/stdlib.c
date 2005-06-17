@@ -19,10 +19,7 @@
  * @version $Revision$, $Date$
  */
  
-#include "apr.h"
-#include "apr_pools.h"
 #include "tcn.h"
-
 
 TCN_IMPLEMENT_CALL(jlong, Stdlib, malloc)(TCN_STDARGS, jint size)
 {
