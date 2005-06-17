@@ -153,23 +153,23 @@ public class Echo {
             }
         }
 
-        public void add(long socket, int workerId) {
-            int rv = Poll.add(serverPollset, socket, workerId,
+        public void add(long socket) {
+            int rv = Poll.add(serverPollset, socket,
                               Poll.APR_POLLIN);
             if (rv == Status.APR_SUCCESS) {
-                System.out.println("Added worker " + workerId + " to pollset");
+                System.out.println("Added worker to pollset");
                 nsocks++;
             }
         }
 
-        public void remove(long socket, int workerId) {
+        public void remove(long socket) {
             int rv = Poll.remove(serverPollset, socket);
             if (rv == Status.APR_SUCCESS) {
                nsocks--;
-               System.out.println("Removed worker " + workerId + " from pollset");
+               System.out.println("Removed worker from pollset");
             }
             else {
-               System.out.println("Failed removing worker " + workerId + " from pollset");
+               System.out.println("Failed removing worker from pollset");
             }
         }
 
@@ -180,17 +180,16 @@ public class Echo {
                         Thread.sleep(1);
                         continue;
                     }
-                    /* Four times size then  created pollset */
+                    /* Two times size then  created pollset */
                     long [] desc = new long[64];
                     /* USe 1 second poll timeout */
                     int rv = Poll.poll(serverPollset, 1000000, desc, false);
                     if (rv > 0) {
                         for (int n = 0; n < rv; n++) {
-                            long clientSock = desc[n*4+1];
-                            int  workerId   = (int)desc[n*4+2];
-                            System.out.println("Poll flags " + desc[n*4]);
-                            remove(clientSock, workerId);
-                            Worker worker = new Worker(clientSock, workerId,
+                            long clientSock = desc[n*2+1];
+                            System.out.println("Poll flags " + desc[n*2]);
+                            remove(clientSock);
+                            Worker worker = new Worker(clientSock, n,
                                                        this.getClass().getName());
                             Echo.incThreads();
                             worker.start();
@@ -262,7 +261,7 @@ public class Echo {
                         Socket.send(clientSock, msg, 0, msg.length);
                     } catch(Exception e) { }
                     /* Put the socket to the keep-alive poll */
-                    Echo.echoPoller.add(clientSock, workerId);
+                    Echo.echoPoller.add(clientSock);
                 }
             } catch (Exception e) {
                 Socket.close(clientSock);

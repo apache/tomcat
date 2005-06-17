@@ -154,7 +154,7 @@ public class SSLServer {
                     }
                     else {
                         System.out.println("Handshake error: " + SSL.getLastError());
-                        SSLSocket.close(sslSocket);
+                        Socket.destroy(sslSocket);
                     }
                 }
             }
@@ -179,27 +179,29 @@ public class SSLServer {
         public void run() {
             boolean doClose = false;
             try {
-                SSLSocket.send(clientSock, wellcomeMsg, 0, wellcomeMsg.length);
+                Socket.send(clientSock, wellcomeMsg, 0, wellcomeMsg.length);
                 while (!doClose) {
                     /* Do a blocking read byte at a time */
                     byte [] buf = new byte[1];
-                    int ret;
-                    ret = SSLSocket.recv(clientSock, buf, 0, 1);
-                    if (ret != 1)
-                        throw(new Exception("SSLSocket.recv failed"));
-                    if (buf[0] == 'Q')
-                        doClose = true;
+                    while (Socket.recv(clientSock, buf, 0, 1) == 1) {
+                        if (buf[0] == '\n')
+                            break;
+                        else if (buf[0] == 'Q') {
+                            doClose = true;
+                            break;
+                        }
+                    }
                     if (doClose) {
                         try {
                             byte [] msg = ("Bye from worker: " + workerId + "\r\n").getBytes();
-                            SSLSocket.send(clientSock, msg, 0, msg.length);
+                            Socket.send(clientSock, msg, 0, msg.length);
                         } catch(Exception e) { }
 
-                        SSLSocket.close(clientSock);
+                        Socket.close(clientSock);
                     }
                 }
             } catch (Exception e) {
-                SSLSocket.close(clientSock);
+                Socket.destroy(clientSock);
                 e.printStackTrace();
             }
             Echo.decThreads();
