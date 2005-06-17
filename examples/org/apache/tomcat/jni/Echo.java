@@ -242,7 +242,7 @@ public class Echo {
                 while (Socket.recv(clientSock, buf, 0, 1) == 1) {
                     if (buf[0] == '\n')
                         break;
-                    else if (buf[0] == 'Q') {
+                    else if (buf[0] == '!') {
                         doClose = true;
                         break;
                     }

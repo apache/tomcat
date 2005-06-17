@@ -142,11 +142,11 @@ public class SSLServer {
                     }
 
                     Socket.timeoutSet(clientSock, 10000000);
-                    long sslSocket = SSLSocket.attach(SSLServer.serverCtx, clientSock, pool);
-                    i = SSLSocket.handshake(sslSocket);
+                    SSLSocket.attach(SSLServer.serverCtx, clientSock, pool);
+                    i = SSLSocket.handshake(clientSock);
                     if (i == 0) {
 
-                        Worker worker = new Worker(sslSocket, i++,
+                        Worker worker = new Worker(clientSock, i++,
                                                    this.getClass().getName());
                         SSLServer.incThreads();
                         worker.start();
@@ -154,7 +154,7 @@ public class SSLServer {
                     }
                     else {
                         System.out.println("Handshake error: " + SSL.getLastError());
-                        Socket.destroy(sslSocket);
+                        Socket.destroy(clientSock);
                     }
                 }
             }
@@ -186,10 +186,11 @@ public class SSLServer {
                     while (Socket.recv(clientSock, buf, 0, 1) == 1) {
                         if (buf[0] == '\n')
                             break;
-                        else if (buf[0] == 'Q') {
+                        else if (buf[0] == '!') {
                             doClose = true;
                             break;
                         }
+                        Socket.send(clientSock, buf, 0, 1);
                     }
                     if (doClose) {
                         try {
