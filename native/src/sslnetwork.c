@@ -91,7 +91,7 @@ static int ssl_smart_shutdown(SSL *ssl, int shutdown_type)
     return rc;
 }
 
-TCN_IMPLEMENT_METHOD(apr_status_t, cleanup)(void *data)
+static apr_status_t ssl_cleanup(void *data)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)data;
 
@@ -181,7 +181,7 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
 
     apr_socket_timeout_get(con->sock, &timeout);
     pfd.desc_type = APR_POLL_SOCKET;
-    pfd.desc.s    = con->sock;    
+    pfd.desc.s    = con->sock;
     pfd.reqevents = type;
 
     /* Remove the object if it was in the pollset, then add in the new
@@ -205,13 +205,12 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
     return status;
 }
 
-TCN_IMPLEMENT_METHOD(jint, shutdown)(TCN_IMPARGS, jint how)
+static apr_status_t APR_THREAD_FUNC
+ssl_socket_shutdown(void *sock, apr_shutdown_how_e how)
 {
     apr_status_t rv = APR_SUCCESS;
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
 
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(sock != 0);
     if (con->ssl) {
         if (how < 1)
             how = con->shutdown_type;
@@ -220,15 +219,14 @@ TCN_IMPLEMENT_METHOD(jint, shutdown)(TCN_IMPARGS, jint how)
         SSL_free(con->ssl);
         con->ssl = NULL;
     }
-    return (jint)rv;
+    return rv;
 }
 
-TCN_IMPLEMENT_METHOD(jint, close)(TCN_IMPARGS)
+static apr_status_t APR_THREAD_FUNC
+ssl_socket_close(void *sock)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     apr_status_t rv = APR_SUCCESS;
-    UNREFERENCED_STDARGS;
-    TCN_ASSERT(sock != 0);
 
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&ssl_closed);
@@ -242,7 +240,7 @@ TCN_IMPLEMENT_METHOD(jint, close)(TCN_IMPARGS)
         X509_free(con->peer);
         con->peer = NULL;
     }
-    return (jint)rv;
+    return rv;
 }
 
 TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
@@ -310,7 +308,8 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
     return APR_SUCCESS;
 }
 
-static apr_status_t ssl_socket_recv(tcn_ssl_conn_t *con, char *buf, apr_size_t *len)
+static apr_status_t APR_THREAD_FUNC
+ssl_socket_recv(tcn_ssl_conn_t *con, char *buf, apr_size_t *len)
 {
     int s, rd = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
@@ -355,8 +354,9 @@ static apr_status_t ssl_socket_recv(tcn_ssl_conn_t *con, char *buf, apr_size_t *
     return rv;
 }
 
-static apr_status_t ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
-                                    apr_size_t *len)
+static apr_status_t APR_THREAD_FUNC
+ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
+                apr_size_t *len)
 {
     int s, rd = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
@@ -396,207 +396,27 @@ static apr_status_t ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
     return rv;
 }
 
-TCN_IMPLEMENT_METHOD(jint, send)(TCN_IMPARGS,
-                                 jbyteArray buf, jint offset,
-                                 jint tosend)
+static apr_status_t APR_THREAD_FUNC
+ssl_socket_sendv(tcn_ssl_conn_t *sock,
+                 const struct iovec *vec,
+                 apr_int32_t nvec, apr_size_t *len)
 {
-    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
-    apr_size_t nbytes = (apr_size_t)tosend;
-    jbyte *bytes;
-    apr_int32_t nb;
-    apr_status_t ss;
+    apr_status_t rv;
+    apr_size_t readed = 0;
+    apr_int32_t i;
 
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-    apr_socket_opt_get(s->sock, APR_SO_NONBLOCK, &nb);
-    if (nb)
-         bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
-    else
-         bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    ss = ssl_socket_send(s, bytes + offset, &nbytes);
-    if (nb)
-        (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
-    else
-        (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
-    if (ss == APR_SUCCESS)
-        return (jint)nbytes;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
-}
-
-TCN_IMPLEMENT_METHOD(jint, sendv)(TCN_IMPARGS,
-                                  jobjectArray bufs)
-{
-    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
-    jsize nvec = (*e)->GetArrayLength(e, bufs);
-    jsize i;
-    jobject ba;
-    apr_size_t written = 0;
-    apr_status_t ss;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-
-    if (nvec >= APR_MAX_IOVEC_SIZE)
-        return (jint)(-APR_ENOMEM);
     for (i = 0; i < nvec; i++) {
-        apr_size_t len;
-        jbyte     *buf;
-        ba = (*e)->GetObjectArrayElement(e, bufs, i);
-        len = (*e)->GetArrayLength(e, ba);
-        buf = (*e)->GetByteArrayElements(e, ba, NULL);
-        ss = ssl_socket_send(s, buf, &len);
-        (*e)->ReleaseByteArrayElements(e, ba, buf, JNI_ABORT);
-        if (ss == APR_SUCCESS)
-            written += len;
-        else
-            break;
+        apr_size_t rd = vec[i].iov_len;
+        if ((rv = ssl_socket_send(sock, vec[i].iov_base, &rd)) != APR_SUCCESS) {
+            *len = readed;
+            return rv;
+        }
+        readed += rd;
     }
-
-    if (ss == APR_SUCCESS)
-        return (jint)written;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
+    *len = readed;
+    return APR_SUCCESS;
 }
 
-TCN_IMPLEMENT_METHOD(jint, sendb)(TCN_IMPARGS,
-                                  jobject buf, jint offset, jint len)
-{
-    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
-    apr_size_t nbytes = (apr_size_t)len;
-    char *bytes;
-    apr_status_t ss;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-    TCN_ASSERT(buf != NULL);
-    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    ss = ssl_socket_send(s, bytes + offset, &nbytes);
-
-    if (ss == APR_SUCCESS)
-        return (jint)nbytes;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
-}
-
-
-TCN_IMPLEMENT_METHOD(jint, recv)(TCN_IMPARGS,
-                                 jbyteArray buf, jint offset,
-                                 jint toread)
-{
-    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
-    apr_size_t nbytes = (apr_size_t)toread;
-    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    apr_status_t ss;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-    TCN_ASSERT(bytes != NULL);
-    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
-
-    (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                   nbytes ? 0 : JNI_ABORT);
-    if (ss == APR_SUCCESS)
-        return (jint)nbytes;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
-}
-
-TCN_IMPLEMENT_METHOD(jint, recvt)(TCN_IMPARGS,
-                                  jbyteArray buf, jint offset,
-                                  jint toread, jlong timeout)
-{
-    tcn_ssl_conn_t *s = (tcn_ssl_conn_t *)sock;
-    apr_size_t nbytes = (apr_size_t)toread;
-    jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    apr_status_t ss;
-    apr_interval_time_t t;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-    TCN_ASSERT(buf != NULL);
-    TCN_ASSERT(bytes != NULL);
-
-    if ((ss = apr_socket_timeout_get(s->sock, &t)) != APR_SUCCESS)
-        goto cleanup;
-    if ((ss = apr_socket_timeout_set(s->sock, J2T(timeout))) != APR_SUCCESS)
-        goto cleanup;
-    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
-    /* Resore the original timeout */
-    apr_socket_timeout_set(s->sock, t);
-cleanup:
-    (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                   nbytes ? 0 : JNI_ABORT);
-    if (ss == APR_SUCCESS)
-        return (jint)nbytes;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
-}
-
-TCN_IMPLEMENT_METHOD(jint, recvb)(TCN_IMPARGS,
-                                  jobject buf, jint offset, jint len)
-{
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
-    apr_status_t ss;
-    apr_size_t nbytes = (apr_size_t)len;
-    char *bytes;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-    TCN_ASSERT(buf != NULL);
-    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    TCN_ASSERT(bytes != NULL);
-    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
-
-    if (ss == APR_SUCCESS)
-        return (jint)nbytes;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
-}
-
-TCN_IMPLEMENT_METHOD(jint, recvbt)(TCN_IMPARGS,
-                                   jobject buf, jint offset,
-                                   jint len, jlong timeout)
-{
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
-    apr_status_t ss;
-    apr_size_t nbytes = (apr_size_t)len;
-    char *bytes;
-    apr_interval_time_t t;
-
-    UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
-    TCN_ASSERT(buf != NULL);
-    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    TCN_ASSERT(bytes != NULL);
-
-    if ((ss = apr_socket_timeout_get(s->sock, &t)) != APR_SUCCESS)
-         return -(jint)ss;
-    if ((ss = apr_socket_timeout_set(s->sock, J2T(timeout))) != APR_SUCCESS)
-         return -(jint)ss;
-    ss = ssl_socket_recv(s, bytes + offset, &nbytes);
-    /* Resore the original timeout */
-    apr_socket_timeout_set(s->sock, t);
-
-    if (ss == APR_SUCCESS)
-        return (jint)nbytes;
-    else {
-        TCN_ERROR_WRAP(ss);
-        return -(jint)ss;
-    }
-}
 
 TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
                                             jlong sock, jlong pool)
@@ -625,18 +445,14 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     else
         SSL_set_connect_state(con->ssl);
     /* Change socket type */
-    s->type     = TCN_SOCKET_SSL;
-    s->cleanup  = TCN_GETNET_METHOD(cleanup);
-    s->shutdown = TCN_GETNET_METHOD(shutdown);
-    s->close    = TCN_GETNET_METHOD(close);
-    s->send     = TCN_GETNET_METHOD(send);
-    s->sendb    = TCN_GETNET_METHOD(sendb);
-    s->sendv    = TCN_GETNET_METHOD(sendv);
-    s->recv     = TCN_GETNET_METHOD(recv);
-    s->recvt    = TCN_GETNET_METHOD(recvt);
-    s->recvb    = TCN_GETNET_METHOD(recvb);
-    s->recvbt   = TCN_GETNET_METHOD(recvbt);
-    s->opaque   = con;
+    s->type         = TCN_SOCKET_SSL;
+    s->cleanup      = ssl_cleanup;
+    s->net_recv     = ssl_socket_recv;
+    s->net_send     = ssl_socket_send;
+    s->net_sendv    = ssl_socket_sendv;
+    s->net_shutdown = ssl_socket_shutdown;
+    s->net_close    = ssl_socket_close;
+    s->opaque    = con;
 
     return APR_SUCCESS;
 }

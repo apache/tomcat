@@ -45,7 +45,7 @@
 #include <process.h>
 #else
 #include <unistd.h>
-#endif 
+#endif
 #include <jni.h>
 
 #if defined(_DEBUG) || defined(DEBUG)
@@ -107,26 +107,22 @@
 
 #define TCN_GETNET_METHOD(FN)  method_##FN
 
-#define TCN_SOCKET_APR      1
-#define TCN_SOCKET_SSL      2
-#define TCN_SOCKET_UNIX     4
-#define TCN_SOCKET_NTPIPE   5
+#define TCN_SOCKET_APR      0
+#define TCN_SOCKET_SSL      1
+#define TCN_SOCKET_UNIX     2
+#define TCN_SOCKET_NTPIPE   3
 
 typedef struct {
     apr_pool_t   *pool;
     apr_socket_t *sock;
     void         *opaque;
     int          type;
-    apr_status_t (*cleanup)(void *opaque);
-    jint (*shutdown)(TCN_IMPARGS, jint how);
-    jint (*close)(TCN_IMPARGS);
-    jint (*send)(TCN_IMPARGS, jbyteArray buf, jint offset, jint tosend);
-    jint (*sendb)(TCN_IMPARGS, jobject buf, jint offset, jint len);
-    jint (*sendv)(TCN_IMPARGS, jobjectArray bufs);
-    jint (*recv)(TCN_IMPARGS, jbyteArray buf, jint offset, jint toread);
-    jint (*recvt)(TCN_IMPARGS, jbyteArray buf, jint offset, jint toread, jlong timeout);
-    jint (*recvb)(TCN_IMPARGS, jobject buf, jint offset, jint len);
-    jint (*recvbt)(TCN_IMPARGS, jobject buf, jint offset, jint len, jlong timeout);
+    apr_status_t (*cleanup)(void *);
+    apr_status_t (APR_THREAD_FUNC *net_send) (void *, const char *, apr_size_t *);
+    apr_status_t (APR_THREAD_FUNC *net_sendv)(void *sock, const struct iovec *, apr_int32_t, apr_size_t *);
+    apr_status_t (APR_THREAD_FUNC *net_recv) (void *sock, char *, apr_size_t *);
+    apr_status_t (APR_THREAD_FUNC *net_close) (void *);
+    apr_status_t (APR_THREAD_FUNC *net_shutdown) (void *, apr_shutdown_how_e);
 
 } tcn_socket_t;
 
