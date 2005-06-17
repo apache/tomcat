@@ -33,9 +33,9 @@ public class SSLSocket {
      * @param sock APR Socket that already did physical connect.
      * @param pool The pool to use
      * @param pool The pool to use
-     * @return The new socket that has been set up.
+     * @return APR_STATUS code.
      */
-    public static native long attach(long ctx, long sock, long pool)
+    public static native int attach(long ctx, long sock, long pool)
         throws Exception;
 
     /**
