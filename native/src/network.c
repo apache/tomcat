@@ -278,6 +278,29 @@ cleanup:
     return P2J(n);
 }
 
+TCN_IMPLEMENT_CALL(jlong, Socket, get)(TCN_STDARGS, jlong sock, jint what)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(sock != 0);
+
+    switch (what) {
+        case TCN_SOCKET_GET_POOL:
+            return P2J(s->pool);
+        break;
+        case TCN_SOCKET_GET_IMPL:
+            return P2J(s->opaque);
+        break;
+        case TCN_SOCKET_GET_APRS:
+            return P2J(s->sock);
+        break;
+        case TCN_SOCKET_GET_TYPE:
+            return P2J(s->type);
+        break;
+    }
+    return 0;
+}
+
 TCN_IMPLEMENT_CALL(jint, Socket, shutdown)(TCN_STDARGS, jlong sock,
                                            jint how)
 {

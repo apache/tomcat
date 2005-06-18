@@ -97,6 +97,12 @@ public class Socket {
     public static final int APR_LOCAL  = 0;
     public static final int APR_REMOTE = 1;
 
+    /* Socket.get types */
+    public static final int SOCKET_GET_POOL = 0;
+    public static final int SOCKET_GET_IMPL = 1;
+    public static final int SOCKET_GET_APRS = 2;
+    public static final int SOCKET_GET_TYPE = 3;
+
     /**
      * Create a socket.
      * @param family The address family of the socket (e.g., APR_INET).
@@ -467,5 +473,19 @@ public class Socket {
      */
     public static native long pool(long thesocket)
         throws Exception;
+
+    /**
+     * Private method for geting the socket struct members
+     * @param socket The soocket to use
+     * @param what Struct member to obtain
+     * <PRE>
+     * SOCKET_GET_POOL  - The socket pool
+     * SOCKET_GET_IMPL  - The socket implementation object
+     * SOCKET_GET_APRS  - APR socket
+     * SOCKET_GET_TYPE  - Socket type
+     * </PRE>
+     * @return The stucture member address
+     */
+    private static native long get(long socket, int what);
 
 }

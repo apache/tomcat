@@ -113,6 +113,11 @@
 #define TCN_SOCKET_UNIX     3
 #define TCN_SOCKET_NTPIPE   4
 
+#define TCN_SOCKET_GET_POOL 0
+#define TCN_SOCKET_GET_IMPL 1
+#define TCN_SOCKET_GET_APRS 2
+#define TCN_SOCKET_GET_TYPE 3
+
 typedef struct {
     apr_pool_t   *pool;
     apr_socket_t *sock;
