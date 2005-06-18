@@ -188,28 +188,28 @@ static apr_status_t sp_socket_cleanup(void *data)
 
 #if defined(DEBUG) || defined(_DEBUG)
 static APR_INLINE apr_status_t APR_THREAD_FUNC
-APR_socket_send(void *sock, const char *buf, apr_size_t *len)
+APR_socket_send(apr_socket_t *sock, const char *buf, apr_size_t *len)
 {
-    return apr_socket_send((apr_socket_t *)sock, buf, len);
+    return apr_socket_send(sock, buf, len);
 }
 
 static APR_INLINE apr_status_t APR_THREAD_FUNC
-APR_socket_recv(void *sock, char *buf, apr_size_t *len)
+APR_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
 {
-    return apr_socket_recv((apr_socket_t *)sock, buf, len);
+    return apr_socket_recv(sock, buf, len);
 }
 
 static APR_INLINE apr_status_t APR_THREAD_FUNC
-APR_socket_sendv(void *sock, const struct iovec *vec,
+APR_socket_sendv(apr_socket_t *sock, const struct iovec *vec,
                  apr_int32_t nvec, apr_size_t *len)
 {
-    return apr_socket_sendv((apr_socket_t *)sock, vec, nvec, len);
+    return apr_socket_sendv(sock, vec, nvec, len);
 }
 
 static APR_INLINE apr_status_t APR_THREAD_FUNC
-APR_socket_shutdown(void *sock, apr_shutdown_how_e how)
+APR_socket_shutdown(apr_socket_t *sock, apr_shutdown_how_e how)
 {
-    return apr_socket_shutdown((apr_socket_t *)sock, how);
+    return apr_socket_shutdown(sock, how);
 }
 
 #else

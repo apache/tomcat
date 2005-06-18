@@ -206,7 +206,7 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_shutdown(void *sock, apr_shutdown_how_e how)
+ssl_socket_shutdown(apr_socket_t *sock, apr_shutdown_how_e how)
 {
     apr_status_t rv = APR_SUCCESS;
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
@@ -223,7 +223,7 @@ ssl_socket_shutdown(void *sock, apr_shutdown_how_e how)
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_close(void *sock)
+ssl_socket_close(apr_socket_t *sock)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     apr_status_t rv = APR_SUCCESS;
@@ -309,7 +309,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_recv(void *sock, char *buf, apr_size_t *len)
+ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     int s, rd = (int)(*len);
@@ -356,7 +356,7 @@ ssl_socket_recv(void *sock, char *buf, apr_size_t *len)
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_send(void *sock, const char *buf,
+ssl_socket_send(apr_socket_t *sock, const char *buf,
                 apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
@@ -399,7 +399,7 @@ ssl_socket_send(void *sock, const char *buf,
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_sendv(void *sock,
+ssl_socket_sendv(apr_socket_t *sock,
                  const struct iovec *vec,
                  apr_int32_t nvec, apr_size_t *len)
 {
@@ -410,7 +410,8 @@ ssl_socket_sendv(void *sock,
 
     for (i = 0; i < nvec; i++) {
         apr_size_t rd = vec[i].iov_len;
-        if ((rv = ssl_socket_send(con, vec[i].iov_base, &rd)) != APR_SUCCESS) {
+        if ((rv = ssl_socket_send((apr_socket_t *)con,
+                                  vec[i].iov_base, &rd)) != APR_SUCCESS) {
             *len = readed;
             return rv;
         }
