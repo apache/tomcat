@@ -107,10 +107,11 @@
 
 #define TCN_GETNET_METHOD(FN)  method_##FN
 
-#define TCN_SOCKET_APR      0
-#define TCN_SOCKET_SSL      1
-#define TCN_SOCKET_UNIX     2
-#define TCN_SOCKET_NTPIPE   3
+#define TCN_SOCKET_UNKNOWN  0
+#define TCN_SOCKET_APR      1
+#define TCN_SOCKET_SSL      2
+#define TCN_SOCKET_UNIX     3
+#define TCN_SOCKET_NTPIPE   4
 
 typedef struct {
     apr_pool_t   *pool;
