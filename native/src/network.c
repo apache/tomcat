@@ -38,6 +38,7 @@ static volatile apr_off_t    sp_tot_recv = 0;
 static volatile apr_uint32_t sp_err_recv = 0;
 static volatile apr_uint32_t sp_tmo_recv = 0;
 static volatile apr_uint32_t sp_rst_recv = 0;
+static volatile apr_status_t sp_erl_recv = 0;
 
 /* Fake private pool struct to deal with APR private's socket
  * struct not exposing function to access the pool.
@@ -83,6 +84,7 @@ void sp_network_dump_statistics()
     fprintf(stderr, "Receive timeouts        : %d\n", sp_tmo_recv);
     fprintf(stderr, "Receive errors          : %d\n", sp_err_recv);
     fprintf(stderr, "Receive resets          : %d\n", sp_rst_recv);
+    fprintf(stderr, "Last receive error      : %d\n", sp_erl_recv);
 }
 
 #endif
@@ -603,10 +605,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
             APR_STATUS_IS_TIMEUP(ss))
             sp_tmo_recv++;
         else if (APR_STATUS_IS_ECONNABORTED(ss) ||
-                 APR_STATUS_IS_ECONNRESET(ss))
+                 APR_STATUS_IS_ECONNRESET(ss) ||
+                 APR_STATUS_IS_EOF(ss))
             sp_rst_recv++;
-        else
+        else {
             sp_err_recv++;
+            sp_erl_recv = ss;
+        }
     }
 #endif
     if (ss == APR_SUCCESS)
@@ -660,10 +665,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
             APR_STATUS_IS_TIMEUP(ss))
             sp_tmo_recv++;
         else if (APR_STATUS_IS_ECONNABORTED(ss) ||
-                 APR_STATUS_IS_ECONNRESET(ss))
+                 APR_STATUS_IS_ECONNRESET(ss) ||
+                 APR_STATUS_IS_EOF(ss))
             sp_rst_recv++;
-        else
+        else {
             sp_err_recv++;
+            sp_erl_recv = ss;
+        }
     }
 #endif
 cleanup:
@@ -702,10 +710,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
             APR_STATUS_IS_TIMEUP(ss))
             sp_tmo_recv++;
         else if (APR_STATUS_IS_ECONNABORTED(ss) ||
-                 APR_STATUS_IS_ECONNRESET(ss))
+                 APR_STATUS_IS_ECONNRESET(ss) ||
+                 APR_STATUS_IS_EOF(ss))
             sp_rst_recv++;
-        else
+        else {
             sp_err_recv++;
+            sp_erl_recv = ss;
+        }
     }
 #endif
     if (ss == APR_SUCCESS)
@@ -753,10 +764,13 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
             APR_STATUS_IS_TIMEUP(ss))
             sp_tmo_recv++;
         else if (APR_STATUS_IS_ECONNABORTED(ss) ||
-                 APR_STATUS_IS_ECONNRESET(ss))
+                 APR_STATUS_IS_ECONNRESET(ss) ||
+                 APR_STATUS_IS_EOF(ss))
             sp_rst_recv++;
-        else
+        else {
             sp_err_recv++;
+            sp_erl_recv = ss;
+        }
     }
 #endif
     if (ss == APR_SUCCESS)
