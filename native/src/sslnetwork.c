@@ -309,8 +309,9 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_recv(tcn_ssl_conn_t *con, char *buf, apr_size_t *len)
+ssl_socket_recv(void *sock, char *buf, apr_size_t *len)
 {
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     int s, rd = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
@@ -355,9 +356,10 @@ ssl_socket_recv(tcn_ssl_conn_t *con, char *buf, apr_size_t *len)
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
+ssl_socket_send(void *sock, const char *buf,
                 apr_size_t *len)
 {
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     int s, rd = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
@@ -397,17 +399,18 @@ ssl_socket_send(tcn_ssl_conn_t *con, const char *buf,
 }
 
 static apr_status_t APR_THREAD_FUNC
-ssl_socket_sendv(tcn_ssl_conn_t *sock,
+ssl_socket_sendv(void *sock,
                  const struct iovec *vec,
                  apr_int32_t nvec, apr_size_t *len)
 {
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     apr_status_t rv;
     apr_size_t readed = 0;
     apr_int32_t i;
 
     for (i = 0; i < nvec; i++) {
         apr_size_t rd = vec[i].iov_len;
-        if ((rv = ssl_socket_send(sock, vec[i].iov_base, &rd)) != APR_SUCCESS) {
+        if ((rv = ssl_socket_send(con, vec[i].iov_base, &rd)) != APR_SUCCESS) {
             *len = readed;
             return rv;
         }
@@ -419,23 +422,21 @@ ssl_socket_sendv(tcn_ssl_conn_t *sock,
 
 
 TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
-                                            jlong sock, jlong pool)
+                                            jlong sock)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
     tcn_socket_t *s   = J2P(sock, tcn_socket_t *);
-    apr_pool_t *p     = J2P(pool, apr_pool_t *);
     tcn_ssl_conn_t *con;
     apr_os_sock_t  oss;
     apr_status_t rv;
 
     UNREFERENCED(o);
-    TCN_ASSERT(pool != 0);
     TCN_ASSERT(ctx != 0);
     TCN_ASSERT(sock != 0);
 
     if ((rv = apr_os_sock_get(&oss, s->sock)) != APR_SUCCESS)
         return rv;
-    if ((con = ssl_create(e, c, p)) == NULL)
+    if ((con = ssl_create(e, c, s->pool)) == NULL)
         return APR_EGENERAL;
     con->sock = s->sock;
 
@@ -445,14 +446,14 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     else
         SSL_set_connect_state(con->ssl);
     /* Change socket type */
-    s->type         = TCN_SOCKET_SSL;
-    s->cleanup      = ssl_cleanup;
-    s->net_recv     = ssl_socket_recv;
-    s->net_send     = ssl_socket_send;
-    s->net_sendv    = ssl_socket_sendv;
-    s->net_shutdown = ssl_socket_shutdown;
-    s->net_close    = ssl_socket_close;
-    s->opaque    = con;
+    s->type     = TCN_SOCKET_SSL;
+    s->cleanup  = ssl_cleanup;
+    s->recv     = ssl_socket_recv;
+    s->send     = ssl_socket_send;
+    s->sendv    = ssl_socket_sendv;
+    s->shutdown = ssl_socket_shutdown;
+    s->close    = ssl_socket_close;
+    s->opaque   = con;
 
     return APR_SUCCESS;
 }

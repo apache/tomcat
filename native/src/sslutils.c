@@ -336,7 +336,6 @@ DH *SSL_dh_get_param_from_file(const char *file)
 
 RSA *SSL_callback_tmp_RSA(SSL *ssl, int export, int keylen)
 {
-    tcn_ssl_conn_t *conn = (tcn_ssl_conn_t *)SSL_get_app_data(ssl);
     int idx;
 
     /* doesn't matter if export flag is on,
@@ -372,7 +371,6 @@ RSA *SSL_callback_tmp_RSA(SSL *ssl, int export, int keylen)
  */
 DH *SSL_callback_tmp_DH(SSL *ssl, int export, int keylen)
 {
-    tcn_ssl_conn_t *conn = (tcn_ssl_conn_t *)SSL_get_app_data(ssl);
     int idx;
     switch (keylen) {
         case 512:
