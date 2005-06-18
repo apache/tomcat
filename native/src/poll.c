@@ -292,11 +292,8 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
     if (p->max_ttl > 0) {
         for (i = 0; i < p->nelts; i++) {
             if ((now - p->socket_ttl[i]) > p->max_ttl) {
-                p->socket_set[i].rtnevents = APR_POLLHUP | APR_POLLIN;
                 fd = p->socket_set[i];
-                pset[num*2+0] = (jlong)(fd.rtnevents);
-                pset[num*2+1] = P2J(fd.client_data);
-                num++;
+                pset[num++] = P2J(fd.client_data);
             }
         }
         if (remove && num) {
@@ -307,7 +304,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
 #endif
             for (i = 0; i < num; i++) {
                 fd.desc_type = APR_POLL_SOCKET;
-                fd.desc.s = (J2P(pset[i*2+1], tcn_socket_t *))->sock;
+                fd.desc.s = (J2P(pset[i], tcn_socket_t *))->sock;
                 do_remove(p, &fd);
             }
         }

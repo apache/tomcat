@@ -102,7 +102,7 @@ public class Socket {
      * @param family The address family of the socket (e.g., APR_INET).
      * @param type The type of the socket (e.g., SOCK_STREAM).
      * @param protocol The protocol of the socket (e.g., APR_PROTO_TCP).
-     * @param cont The pool to use
+     * @param cont The parent pool to use
      * @return The new socket that has been set up.
      */
     public static native long create(int family, int type,
@@ -163,7 +163,7 @@ public class Socket {
      *          made the connection request.  This is the socket which should
      *          be used for all future communication.
      */
-    public static native long accept(long sock, long pool)
+    public static native long accept(long sock)
         throws Exception;
 
     /**

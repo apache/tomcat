@@ -116,7 +116,7 @@ public class SSLServer {
             int i = 0;
             try {
                 while (true) {
-                    long clientSock = Socket.accept(serverSock, pool);
+                    long clientSock = Socket.accept(serverSock);
                     System.out.println("Accepted id: " +  i);
 
                     try {
@@ -142,7 +142,7 @@ public class SSLServer {
                     }
 
                     Socket.timeoutSet(clientSock, 10000000);
-                    SSLSocket.attach(SSLServer.serverCtx, clientSock, pool);
+                    SSLSocket.attach(SSLServer.serverCtx, clientSock);
                     i = SSLSocket.handshake(clientSock);
                     if (i == 0) {
 

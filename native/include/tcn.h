@@ -118,11 +118,11 @@ typedef struct {
     void         *opaque;
     int          type;
     apr_status_t (*cleanup)(void *);
-    apr_status_t (APR_THREAD_FUNC *net_send) (void *, const char *, apr_size_t *);
-    apr_status_t (APR_THREAD_FUNC *net_sendv)(void *sock, const struct iovec *, apr_int32_t, apr_size_t *);
-    apr_status_t (APR_THREAD_FUNC *net_recv) (void *sock, char *, apr_size_t *);
-    apr_status_t (APR_THREAD_FUNC *net_close) (void *);
-    apr_status_t (APR_THREAD_FUNC *net_shutdown) (void *, apr_shutdown_how_e);
+    apr_status_t (APR_THREAD_FUNC *send) (void *, const char *, apr_size_t *);
+    apr_status_t (APR_THREAD_FUNC *sendv)(void *, const struct iovec *, apr_int32_t, apr_size_t *);
+    apr_status_t (APR_THREAD_FUNC *recv) (void *, char *, apr_size_t *);
+    apr_status_t (APR_THREAD_FUNC *close) (void *);
+    apr_status_t (APR_THREAD_FUNC *shutdown) (void *, apr_shutdown_how_e);
 
 } tcn_socket_t;
 

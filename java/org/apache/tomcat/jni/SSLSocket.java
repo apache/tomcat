@@ -30,12 +30,10 @@ public class SSLSocket {
     /**
      * Attach APR socket on a SSL connection.
      * @param ctx SSLContext to use.
-     * @param sock APR Socket that already did physical connect.
-     * @param pool The pool to use
-     * @param pool The pool to use
+     * @param sock APR Socket that already did physical connect or accept.
      * @return APR_STATUS code.
      */
-    public static native int attach(long ctx, long sock, long pool)
+    public static native int attach(long ctx, long sock)
         throws Exception;
 
     /**

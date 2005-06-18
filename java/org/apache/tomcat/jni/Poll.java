@@ -113,11 +113,10 @@ public class Poll {
      * Maintain on the descriptor(s) in a pollset
      * @param pollset The pollset to use
      * @param descriptors Array of signalled descriptors (output parameter)
-     *        The desctiptor array must be two times the size of pollset.
+     *        The desctiptor array must be the size of pollset.
      *        and are populated as follows:
      * <PRE>
-     * descriptors[n + 0] -> returned events
-     * descriptors[n + 1] -> socket
+     * descriptors[n] -> socket
      * </PRE>
      * @param remove Remove signaled descriptors from pollset
      * @return Number of signalled descriptors (output parameter)
