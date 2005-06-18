@@ -27,6 +27,17 @@ static volatile apr_uint32_t sp_created  = 0;
 static volatile apr_uint32_t sp_closed   = 0;
 static volatile apr_uint32_t sp_cleared  = 0;
 static volatile apr_uint32_t sp_accepted = 0;
+static volatile apr_uint32_t sp_max_send = 0;
+static volatile apr_uint32_t sp_min_send = 10000000;
+static volatile apr_uint32_t sp_num_send = 0;
+static volatile apr_off_t    sp_tot_send = 0;
+static volatile apr_uint32_t sp_max_recv = 0;
+static volatile apr_uint32_t sp_min_recv = 10000000;
+static volatile apr_uint32_t sp_num_recv = 0;
+static volatile apr_off_t    sp_tot_recv = 0;
+static volatile apr_uint32_t sp_err_recv = 0;
+static volatile apr_uint32_t sp_tmo_recv = 0;
+
 /* Fake private pool struct to deal with APR private's socket
  * struct not exposing function to access the pool.
  */
@@ -60,6 +71,16 @@ void sp_network_dump_statistics()
     fprintf(stderr, "Sockets accepted        : %d\n", sp_accepted);
     fprintf(stderr, "Sockets closed          : %d\n", sp_closed);
     fprintf(stderr, "Sockets cleared         : %d\n", sp_cleared);
+    fprintf(stderr, "Total send calls        : %d\n", sp_num_send);
+    fprintf(stderr, "Minimum send lenght     : %d\n", sp_min_send);
+    fprintf(stderr, "Maximum send lenght     : %d\n", sp_max_send);
+    fprintf(stderr, "Average send lenght     : %.2f\n", (double)sp_tot_send/(double)sp_num_send);
+    fprintf(stderr, "Total recv calls        : %d\n", sp_num_recv);
+    fprintf(stderr, "Minimum recv lenght     : %d\n", sp_min_recv);
+    fprintf(stderr, "Maximum recv lenght     : %d\n", sp_max_recv);
+    fprintf(stderr, "Average recv lenght     : %.2f\n", (double)sp_tot_recv/(double)sp_num_recv);
+    fprintf(stderr, "Receive timeouts        : %d\n", sp_tmo_recv);
+    fprintf(stderr, "Receive errors          : %d\n", sp_err_recv);
 }
 
 #endif
@@ -399,6 +420,12 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+#ifdef TCN_DO_STATISTICS
+    sp_max_send = TCN_MAX(sp_max_send, nbytes);
+    sp_min_send = TCN_MIN(sp_min_send, nbytes);
+    sp_tot_send += nbytes;
+    sp_num_send++;
+#endif
 
     if (tosend <= TCN_BUFFER_SZ) {
         char sb[TCN_BUFFER_SZ];
@@ -438,6 +465,12 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
+#ifdef TCN_DO_STATISTICS
+    sp_max_send = TCN_MAX(sp_max_send, nbytes);
+    sp_min_send = TCN_MIN(sp_min_send, nbytes);
+    sp_tot_send += nbytes;
+    sp_num_send++;
+#endif
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     ss = (*s->send)(s->opaque, bytes + offset, &nbytes);
@@ -544,6 +577,21 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
         (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                        nbytes ? 0 : JNI_ABORT);
     }
+#ifdef TCN_DO_STATISTICS
+    if (ss == APR_SUCCESS) {
+        sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
+        sp_min_recv = TCN_MIN(sp_min_recv, nbytes);
+        sp_tot_recv += nbytes;
+        sp_num_recv++;
+    }
+    else {
+        if (APR_STATUS_IS_ETIMEDOUT(ss) ||
+            APR_STATUS_IS_TIMEUP(ss))
+            sp_tmo_recv++;
+        else
+            sp_err_recv++;
+    }
+#endif
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
@@ -582,6 +630,21 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     }
     /* Resore the original timeout */
     apr_socket_timeout_set(s->sock, t);
+#ifdef TCN_DO_STATISTICS
+    if (ss == APR_SUCCESS) {
+        sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
+        sp_min_recv = TCN_MIN(sp_min_recv, nbytes);
+        sp_tot_recv += nbytes;
+        sp_num_recv++;
+    }
+    else {
+        if (APR_STATUS_IS_ETIMEDOUT(ss) ||
+            APR_STATUS_IS_TIMEUP(ss))
+            sp_tmo_recv++;
+        else
+            sp_err_recv++;
+    }
+#endif
 cleanup:
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
@@ -606,7 +669,21 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     TCN_ASSERT(bytes != NULL);
     ss = (*s->recv)(s->opaque, bytes + offset, &nbytes);
-
+#ifdef TCN_DO_STATISTICS
+    if (ss == APR_SUCCESS) {
+        sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
+        sp_min_recv = TCN_MIN(sp_min_recv, nbytes);
+        sp_tot_recv += nbytes;
+        sp_num_recv++;
+    }
+    else {
+        if (APR_STATUS_IS_ETIMEDOUT(ss) ||
+            APR_STATUS_IS_TIMEUP(ss))
+            sp_tmo_recv++;
+        else
+            sp_err_recv++;
+    }
+#endif
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
@@ -639,7 +716,21 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     ss = (*s->recv)(s->opaque, bytes + offset, &nbytes);
     /* Resore the original timeout */
     apr_socket_timeout_set(s->sock, t);
-
+#ifdef TCN_DO_STATISTICS
+    if (ss == APR_SUCCESS) {
+        sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
+        sp_min_recv = TCN_MIN(sp_min_recv, nbytes);
+        sp_tot_recv += nbytes;
+        sp_num_recv++;
+    }
+    else {
+        if (APR_STATUS_IS_ETIMEDOUT(ss) ||
+            APR_STATUS_IS_TIMEUP(ss))
+            sp_tmo_recv++;
+        else
+            sp_err_recv++;
+    }
+#endif
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
     else {
