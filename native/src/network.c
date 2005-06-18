@@ -40,13 +40,6 @@ static volatile apr_uint32_t sp_tmo_recv = 0;
 static volatile apr_uint32_t sp_rst_recv = 0;
 static volatile apr_status_t sp_erl_recv = 0;
 
-/* Fake private pool struct to deal with APR private's socket
- * struct not exposing function to access the pool.
- */
-typedef struct
-{
-    apr_pool_t *pool;
-} fake_apr_socket_t;
 #endif
 
 #if  !APR_HAVE_IPV6
