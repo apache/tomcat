@@ -137,7 +137,7 @@ maintainer-mode,
 [
 case "${enableval}" in
     y | Y | YES | yes | TRUE | true )
-        CFLAGS="${CFLAGS} -DDEBUG -Wall"
+        CFLAGS="${CFLAGS} -DDEBUG"
         AC_MSG_RESULT([...Enabling Maintainer mode...])
         ;;
 esac
