@@ -192,7 +192,6 @@ public class SSLServer {
                         continue;
                     else if (buf[0] == '!') {
                         doClose = true;
-                        break;
                     }
                     Socket.send(clientSock, buf, 0, 1);
 
