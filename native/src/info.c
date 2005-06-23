@@ -121,17 +121,13 @@ DECLARE_AINFO_FIELD(next);
 
 static int finfo_class_initialized = 0;
 static int ainfo_class_initialized = 0;
+static jmethodID finfo_class_init = NULL;
+static jmethodID ainfo_class_init = NULL;
+static jclass finfo_class = NULL;
+static jclass ainfo_class = NULL;
 
-apr_status_t tcn_load_finfo_class(JNIEnv *e)
+apr_status_t tcn_load_finfo_class(JNIEnv *e, jclass finfo)
 {
-    jclass finfo;
-
-    finfo = (*e)->FindClass(e, TCN_FINFO_CLASS);
-    if (finfo == NULL) {
-        (*e)->ExceptionClear(e);
-        return APR_EGENERAL;
-    }
-
     GET_FINFO_J(pool);
     GET_FINFO_I(valid);
     GET_FINFO_I(protection);
@@ -149,33 +145,33 @@ apr_status_t tcn_load_finfo_class(JNIEnv *e)
     GET_FINFO_S(fname);
     GET_FINFO_S(name);
     GET_FINFO_J(filehand);
-
+    
+    finfo_class_init = (*e)->GetMethodID(e, finfo,
+                                      "<init>", "()V");
+    if (finfo_class_init == NULL)
+        goto cleanup;
     finfo_class_initialized = 1;
+    finfo_class = finfo;
 cleanup:
-    (*e)->DeleteLocalRef(e, finfo);
     return APR_SUCCESS;
 }
 
-apr_status_t tcn_load_ainfo_class(JNIEnv *e)
+apr_status_t tcn_load_ainfo_class(JNIEnv *e, jclass ainfo)
 {
-    jclass ainfo;
-
-    ainfo = (*e)->FindClass(e, TCN_AINFO_CLASS);
-    if (ainfo == NULL) {
-        (*e)->ExceptionClear(e);
-        return APR_EGENERAL;
-    }
-
     GET_AINFO_J(pool);
     GET_AINFO_S(hostname);
     GET_AINFO_S(servname);
     GET_AINFO_I(port);
     GET_AINFO_I(family);
     GET_AINFO_J(next);
+    ainfo_class_init = (*e)->GetMethodID(e, ainfo,
+                                      "<init>", "()V");
 
+    if (ainfo_class_init == NULL)
+        goto cleanup;
     ainfo_class_initialized = 1;
+    ainfo_class = ainfo;
 cleanup:
-    (*e)->DeleteLocalRef(e, ainfo);
     return APR_SUCCESS;
 }
 
@@ -233,6 +229,30 @@ TCN_IMPLEMENT_CALL(jint, File, stat)(TCN_STDARGS, jobject finfo,
     return (jint)rv;
 }
 
+TCN_IMPLEMENT_CALL(jobject, File, getStat)(TCN_STDARGS, jstring fname,
+                                           jint wanted, jlong pool)
+{
+    apr_pool_t *p = J2P(pool, apr_pool_t *);
+    TCN_ALLOC_CSTRING(fname);
+    apr_status_t rv;
+    apr_finfo_t info;
+    jobject finfo = NULL;
+
+    UNREFERENCED(o);
+
+    if ((rv =  apr_stat(&info, J2S(fname), wanted, p)) == APR_SUCCESS) {
+        finfo = (*e)->NewObject(e, finfo_class, finfo_class_init);
+        if (finfo == NULL)
+            goto cleanup;
+        fill_finfo(e, finfo, &info);
+    }
+    else
+        tcn_ThrowAPRException(e, rv);
+cleanup:
+    TCN_FREE_CSTRING(fname);
+    return finfo;
+}
+
 TCN_IMPLEMENT_CALL(jint, File, infoGet)(TCN_STDARGS, jobject finfo,
                                         jint wanted, jlong file)
 {
@@ -248,6 +268,27 @@ TCN_IMPLEMENT_CALL(jint, File, infoGet)(TCN_STDARGS, jobject finfo,
         (*e)->DeleteLocalRef(e, io);
     }
     return (jint)rv;
+}
+
+TCN_IMPLEMENT_CALL(jobject, File, getInfo)(TCN_STDARGS, jint wanted, jlong file)
+{
+    apr_file_t *f = J2P(file, apr_file_t *);
+    apr_status_t rv;
+    apr_finfo_t  info;
+
+    UNREFERENCED(o);
+
+    if ((rv =  apr_file_info_get(&info, wanted, f)) == APR_SUCCESS) {
+        jobject finfo;
+        finfo = (*e)->NewObject(e, finfo_class, finfo_class_init);
+        if (finfo == NULL)
+            return NULL;
+        fill_finfo(e, finfo, &info);
+        return finfo;
+    }
+    else
+        tcn_ThrowAPRException(e, rv);
+    return NULL;
 }
 
 TCN_IMPLEMENT_CALL(jint, Directory, read)(TCN_STDARGS, jobject finfo,
@@ -297,28 +338,14 @@ TCN_IMPLEMENT_CALL(jboolean, Address, fill)(TCN_STDARGS,
 TCN_IMPLEMENT_CALL(jobject, Address, getInfo)(TCN_STDARGS, jlong info)
 {
     apr_sockaddr_t *i = J2P(info, apr_sockaddr_t *);
-    jclass aprSockaddrClass;
-    jmethodID constructorID = 0;
     jobject sockaddrObj = NULL;
 
     UNREFERENCED(o);
 
-    aprSockaddrClass = (*e)->FindClass(e, TCN_AINFO_CLASS);
-    if (aprSockaddrClass == NULL)
-        return NULL;
-
-    /* Find the constructor ID */
-    constructorID = (*e)->GetMethodID(e, aprSockaddrClass,
-                                      "<init>", "()V");
-    if (constructorID == NULL)
-        goto cleanup;
     /* Create the APR Error object */
-    sockaddrObj = (*e)->NewObject(e, aprSockaddrClass, constructorID);
+    sockaddrObj = (*e)->NewObject(e, ainfo_class, ainfo_class_init);
     if (sockaddrObj == NULL)
-        goto cleanup;
+        return NULL;
     fill_ainfo(e, sockaddrObj, i);
-cleanup:
-    (*e)->DeleteLocalRef(e, aprSockaddrClass);
-
     return sockaddrObj;
 }

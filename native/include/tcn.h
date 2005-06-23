@@ -124,6 +124,8 @@ typedef struct {
     void         *opaque;
     int          type;
     apr_status_t (*cleanup)(void *);
+    apr_status_t (APR_THREAD_FUNC *tmset)(apr_socket_t *, apr_interval_time_t);
+    apr_status_t (APR_THREAD_FUNC *tmget)(apr_socket_t *, apr_interval_time_t *);
     apr_status_t (APR_THREAD_FUNC *send) (apr_socket_t *, const char *, apr_size_t *);
     apr_status_t (APR_THREAD_FUNC *sendv)(apr_socket_t *, const struct iovec *, apr_int32_t, apr_size_t *);
     apr_status_t (APR_THREAD_FUNC *recv) (apr_socket_t *, char *, apr_size_t *);
@@ -142,8 +144,8 @@ jbyteArray      tcn_new_arrayb(JNIEnv *, const unsigned char *, size_t);
 char           *tcn_get_string(JNIEnv *, jstring);
 char           *tcn_strdup(JNIEnv *, jstring);
 char           *tcn_pstrdup(JNIEnv *, jstring, apr_pool_t *);
-apr_status_t    tcn_load_finfo_class(JNIEnv *);
-apr_status_t    tcn_load_ainfo_class(JNIEnv *);
+apr_status_t    tcn_load_finfo_class(JNIEnv *, jclass);
+apr_status_t    tcn_load_ainfo_class(JNIEnv *, jclass);
 
 #define J2S(V)  c##V
 #define J2L(V)  p##V
