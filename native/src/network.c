@@ -444,6 +444,8 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
         a->send     = APR_socket_send;
         a->sendv    = APR_socket_sendv;
         a->shutdown = APR_socket_shutdown;
+        a->tmget    = APR_socket_timeout_get;
+        a->tmset    = APR_socket_timeout_set;
         a->close    = NULL;
         a->opaque   = n;
         apr_pool_cleanup_register(p, (const void *)a,
