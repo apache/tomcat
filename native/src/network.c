@@ -480,7 +480,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
-    TCN_ASSERT(s->sock != NULL);
+    TCN_ASSERT(s->opaque != NULL);
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
     sp_min_send = TCN_MIN(sp_min_send, nbytes);
@@ -525,6 +525,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
 #ifdef TCN_DO_STATISTICS
     sp_max_send = TCN_MAX(sp_max_send, nbytes);
@@ -557,6 +558,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendv)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
 
     nvec = (*e)->GetArrayLength(e, bufs);
     if (nvec >= APR_MAX_IOVEC_SIZE)
@@ -626,6 +628,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
 
     if (toread <= TCN_BUFFER_SZ) {
         char sb[TCN_BUFFER_SZ];
@@ -739,6 +742,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
@@ -786,7 +790,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(buf != NULL);
-    TCN_ASSERT(s->sock != NULL);
+    TCN_ASSERT(s->opaque != NULL);
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     TCN_ASSERT(bytes != NULL);

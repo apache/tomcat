@@ -419,19 +419,19 @@ ssl_socket_sendv(apr_socket_t *sock,
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
     apr_status_t rv;
-    apr_size_t readed = 0;
+    apr_size_t written = 0;
     apr_int32_t i;
 
     for (i = 0; i < nvec; i++) {
         apr_size_t rd = vec[i].iov_len;
         if ((rv = ssl_socket_send((apr_socket_t *)con,
                                   vec[i].iov_base, &rd)) != APR_SUCCESS) {
-            *len = readed;
+            *len = written;
             return rv;
         }
-        readed += rd;
+        written += rd;
     }
-    *len = readed;
+    *len = written;
     return APR_SUCCESS;
 }
 

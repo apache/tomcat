@@ -196,6 +196,10 @@ SOURCE=.\include\tcn_version.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\os\win32\ntpipe.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\os\win32\system.c
 # End Source File
 # End Group
