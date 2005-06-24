@@ -309,13 +309,13 @@ limitations under the License.--&gt;">
             <jvmarg value="-Djava.library.path=${tc.library.path}"/>
         </java>
     </target>
-    <target name="bioserver-example" depends="examples">
-        <echo message="Running another Tomcat Native SSL Server example ..."/>
-        <java dir="${examples.dir}" classname="org.apache.tomcat.jni.BIOSSLServer"
+    <target name="locals-example" depends="examples">
+        <echo message="Running Tomcat Native Local Server example ..."/>
+        <java dir="${examples.dir}" classname="org.apache.tomcat.jni.LocalServer"
              fork="yes" failonerror="${test.failonerror}">
+            <classpath refid="examples.classpath"/>
             <env key="PATH" path="${tc.library.path}:${java.library.path}"/>
             <env key="Path" path="${tc.library.path}:${java.library.path}"/>
-            <classpath refid="examples.classpath"/>
             <jvmarg value="-Djava.library.path=${tc.library.path}"/>
         </java>
     </target>
