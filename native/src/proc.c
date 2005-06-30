@@ -209,7 +209,7 @@ TCN_IMPLEMENT_CALL(jint, Proc, create)(TCN_STDARGS, jlong proc,
         as = (*e)->GetArrayLength(e, args);
     if (env)
         es = (*e)->GetArrayLength(e, args);
-    if (as > MAX_ARGS_SIZE || es > MAX_ENV_SIZE) {
+    if (as > (MAX_ARGS_SIZE - 1) || es > (MAX_ENV_SIZE - 2)) {
         TCN_FREE_CSTRING(progname);
         return APR_EINVAL;
     }
@@ -219,19 +219,34 @@ TCN_IMPLEMENT_CALL(jint, Proc, create)(TCN_STDARGS, jlong proc,
             s_args[i] = tcn_get_string(e, str);
             (*e)->DeleteLocalRef(e, str);
         }
+        s_args[i] = NULL;
         pargs = (const char * const *)&s_args[0];
     }
     if (es) {
         for (i = 0; i < es; i++) {
             jstring str = (*e)->GetObjectArrayElement(e, env, i);
-            s_env[i] = tcn_get_string(e, str);
+            s_env[i+1] = tcn_get_string(e, str);
             (*e)->DeleteLocalRef(e, str);
         }
+#ifdef WIN32
+        s_env[i++] = apr_psprintf(p, TCN_PARENT_IDE "=%d", getpid());
+#endif
+        s_env[i] = NULL;
         penv = (const char * const *)&s_env[0];
     }
-
+#ifdef WIN32
+    else {
+        char pps[32];
+        itoa(getpid(), pps, 10);
+        SetEnvironmentVariable(TCN_PARENT_IDE, pps);
+    }
+#endif
     rv = apr_proc_create(np, J2S(progname), pargs,
                          penv, a, p);
+#ifdef WIN32
+    if (!es)
+        SetEnvironmentVariable(TCN_PARENT_IDE, NULL);
+#endif
 
     /* Free local resources */
     TCN_FREE_CSTRING(progname);

@@ -74,4 +74,16 @@ public class Stdlib {
      */
     public static native void free(long mem);
 
+    /**
+     * Get current process pid.
+     * @return current pid or < 1 in case of error.
+     */
+    public static native int getpid();
+
+    /**
+     * Get current process parent pid.
+     * @return parent pid or < 1 in case of error.
+     */
+    public static native int getppid();
+
 }

@@ -83,6 +83,7 @@
 #define TCN_FINFO_CLASS TCN_CLASS_PATH "FileInfo"
 #define TCN_AINFO_CLASS TCN_CLASS_PATH "Sockaddr"
 #define TCN_ERROR_CLASS TCN_CLASS_PATH "Error"
+#define TCN_PARENT_IDE  "TCN_PARENT_ID"
 
 #define UNREFERENCED(P)      (P) = (P)
 #define UNREFERENCED_STDARGS e = e; o = o

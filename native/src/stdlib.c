@@ -21,6 +21,8 @@
  
 #include "tcn.h"
 
+extern int tcn_parent_pid;
+
 TCN_IMPLEMENT_CALL(jlong, Stdlib, malloc)(TCN_STDARGS, jint size)
 {
     UNREFERENCED_STDARGS;
@@ -101,5 +103,17 @@ TCN_IMPLEMENT_CALL(jboolean, Stdlib, memset)(TCN_STDARGS, jlong dst,
         return JNI_TRUE;
     else
         return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jint, Stdlib, getpid)(TCN_STDARGS)
+{
+    UNREFERENCED_STDARGS;
+    return (jint)getpid();
+}
+
+TCN_IMPLEMENT_CALL(jint, Stdlib, getppid)(TCN_STDARGS)
+{
+    UNREFERENCED_STDARGS;
+    return (jint)tcn_parent_pid;
 }
 

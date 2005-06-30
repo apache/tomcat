@@ -42,6 +42,8 @@ static jclass    jAinfo_class;
 static jmethodID jString_init;
 static jmethodID jString_getBytes;
 
+int tcn_parent_pid = 0;
+
 /* Called by the JVM when APR_JAVA is loaded */
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
@@ -67,7 +69,15 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
         return JNI_ERR;
     if(tcn_load_ainfo_class(env, jAinfo_class) != APR_SUCCESS)
         return JNI_ERR;
-
+#ifdef WIN32
+    {
+        char *ppid = getenv(TCN_PARENT_IDE);
+        if (ppid)
+            tcn_parent_pid = atoi(ppid);
+    }
+#else
+    tcn_parent_pid = getppid();
+#endif
     apr_initialize();
 
     return  JNI_VERSION_1_4;
