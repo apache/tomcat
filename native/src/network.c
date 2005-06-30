@@ -221,6 +221,18 @@ APR_socket_timeout_get(apr_socket_t *sock, apr_interval_time_t *t)
     return apr_socket_timeout_get(sock, t);
 }
 
+static APR_INLINE apr_status_t APR_THREAD_FUNC
+APR_socket_opt_set(apr_socket_t *sock, apr_int32_t opt, apr_int32_t on)
+{
+    return apr_socket_opt_set(sock, opt, on);
+}
+
+static APR_INLINE apr_status_t APR_THREAD_FUNC
+APR_socket_opt_get(apr_socket_t *sock, apr_int32_t opt, apr_int32_t *on)
+{
+    return apr_socket_opt_get(sock, opt, on);
+}
+
 #else
 #define APR_socket_send         apr_socket_send
 #define APR_socket_recv         apr_socket_recv
@@ -228,6 +240,8 @@ APR_socket_timeout_get(apr_socket_t *sock, apr_interval_time_t *t)
 #define APR_socket_shutdown     apr_socket_shutdown
 #define APR_socket_timeout_set  apr_socket_timeout_set
 #define APR_socket_timeout_get  apr_socket_timeout_get
+#define APR_socket_opt_set      apr_socket_opt_set
+#define APR_socket_opt_get      apr_socket_opt_get
 #endif
 
 TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
@@ -262,6 +276,8 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
         a->shutdown = APR_socket_shutdown;
         a->tmget    = APR_socket_timeout_get;
         a->tmset    = APR_socket_timeout_set;
+        a->get      = APR_socket_opt_get;
+        a->set      = APR_socket_opt_set;
         a->close    = NULL;
     }
     a->opaque   = s;
@@ -402,6 +418,8 @@ TCN_IMPLEMENT_CALL(jlong, Socket, acceptx)(TCN_STDARGS, jlong sock,
         a->shutdown = APR_socket_shutdown;
         a->tmget    = APR_socket_timeout_get;
         a->tmset    = APR_socket_timeout_set;
+        a->get      = APR_socket_opt_get;
+        a->set      = APR_socket_opt_set;
         a->close    = NULL;
         a->opaque   = n;
         apr_pool_cleanup_register(p, (const void *)a,
@@ -446,6 +464,8 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
         a->shutdown = APR_socket_shutdown;
         a->tmget    = APR_socket_timeout_get;
         a->tmset    = APR_socket_timeout_set;
+        a->get      = APR_socket_opt_get;
+        a->set      = APR_socket_opt_set;
         a->close    = NULL;
         a->opaque   = n;
         apr_pool_cleanup_register(p, (const void *)a,
@@ -867,7 +887,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, optSet)(TCN_STDARGS, jlong sock,
     if (!s->sock)
         return APR_EINVAL;
     else
-        return (jint)apr_socket_opt_set(s->sock, (apr_int32_t)opt, (apr_int32_t)on);
+        return (jint)(*s->set)(s->opaque, (apr_int32_t)opt, (apr_int32_t)on);
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, optGet)(TCN_STDARGS, jlong sock,
@@ -881,8 +901,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, optGet)(TCN_STDARGS, jlong sock,
     if (s->sock)
         tcn_ThrowAPRException(e, APR_EINVAL);
     else {
-        TCN_THROW_IF_ERR(apr_socket_opt_get(s->sock, (apr_int32_t)opt,
-                                            &on), on);
+        TCN_THROW_IF_ERR((*s->get)(s->opaque, (apr_int32_t)opt,
+                                   &on), on);
     }
 cleanup:
     return (jint)on;
@@ -907,7 +927,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, timeoutGet)(TCN_STDARGS, jlong sock)
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
-    TCN_THROW_IF_ERR((*s->tmget)(s->sock, &timeout), timeout);
+    TCN_THROW_IF_ERR((*s->tmget)(s->opaque, &timeout), timeout);
 cleanup:
     return (jlong)timeout;
 }

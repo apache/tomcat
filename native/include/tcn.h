@@ -127,6 +127,8 @@ typedef struct {
     apr_status_t (*cleanup)(void *);
     apr_status_t (APR_THREAD_FUNC *tmset)(apr_socket_t *, apr_interval_time_t);
     apr_status_t (APR_THREAD_FUNC *tmget)(apr_socket_t *, apr_interval_time_t *);
+    apr_status_t (APR_THREAD_FUNC *set)(apr_socket_t *, apr_int32_t, apr_int32_t);
+    apr_status_t (APR_THREAD_FUNC *get)(apr_socket_t *, apr_int32_t, apr_int32_t *);
     apr_status_t (APR_THREAD_FUNC *send) (apr_socket_t *, const char *, apr_size_t *);
     apr_status_t (APR_THREAD_FUNC *sendv)(apr_socket_t *, const struct iovec *, apr_int32_t, apr_size_t *);
     apr_status_t (APR_THREAD_FUNC *recv) (apr_socket_t *, char *, apr_size_t *);

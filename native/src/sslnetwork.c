@@ -219,6 +219,20 @@ ssl_socket_timeout_get(apr_socket_t *sock, apr_interval_time_t *t)
     return apr_socket_timeout_get(con->sock, t);
 }
 
+static APR_INLINE apr_status_t APR_THREAD_FUNC
+ssl_socket_opt_set(apr_socket_t *sock, apr_int32_t opt, apr_int32_t on)
+{
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
+    return apr_socket_opt_set(con->sock, opt, on);
+}
+
+static APR_INLINE apr_status_t APR_THREAD_FUNC
+ssl_socket_opt_get(apr_socket_t *sock, apr_int32_t opt, apr_int32_t *on)
+{
+    tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
+    return apr_socket_opt_get(con->sock, opt, on);
+}
+
 static apr_status_t APR_THREAD_FUNC
 ssl_socket_shutdown(apr_socket_t *sock, apr_shutdown_how_e how)
 {
@@ -469,6 +483,8 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     s->shutdown = ssl_socket_shutdown;
     s->tmget    = ssl_socket_timeout_get;
     s->tmset    = ssl_socket_timeout_set;
+    s->get      = ssl_socket_opt_get;
+    s->set      = ssl_socket_opt_set;
     s->close    = ssl_socket_close;
     s->opaque   = con;
 

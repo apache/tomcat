@@ -69,6 +69,8 @@ typedef struct {
     DWORD          timeout;
     int            mode;                 /* Client or server mode */
     int            nmax;
+    DWORD          sndbuf;
+    DWORD          rcvbuf;
     char           name[MAX_PATH+1];
     SECURITY_ATTRIBUTES sa;
 } tcn_ntp_conn_t;
@@ -103,6 +105,44 @@ ntp_socket_timeout_get(apr_socket_t *sock, apr_interval_time_t *t)
     else
         *t = con->timeout * 1000;
     return APR_SUCCESS;
+}
+
+static APR_INLINE apr_status_t APR_THREAD_FUNC
+ntp_socket_opt_set(apr_socket_t *sock, apr_int32_t opt, apr_int32_t on)
+{
+    tcn_ntp_conn_t *con = (tcn_ntp_conn_t *)sock;
+    apr_status_t rv = APR_SUCCESS;
+    switch (opt) {
+        case APR_SO_SNDBUF:
+            con->sndbuf = (DWORD)on;
+        break;
+        case APR_SO_RCVBUF:
+            con->rcvbuf = (DWORD)on;
+        break;
+        default:
+            rv = APR_EINVAL;
+        break; 
+    }
+    return rv;
+}
+
+static APR_INLINE apr_status_t APR_THREAD_FUNC
+ntp_socket_opt_get(apr_socket_t *sock, apr_int32_t opt, apr_int32_t *on)
+{
+    tcn_ntp_conn_t *con = (tcn_ntp_conn_t *)sock;
+    apr_status_t rv = APR_SUCCESS;
+    switch (opt) {
+        case APR_SO_SNDBUF:
+            *on = con->sndbuf;
+        break;
+        case APR_SO_RCVBUF:
+            *on = con->rcvbuf;
+        break;
+        default:
+            rv = APR_EINVAL;
+        break; 
+    }
+    return rv;
 }
 
 static apr_status_t ntp_cleanup(void *data)
@@ -264,6 +304,8 @@ TCN_IMPLEMENT_CALL(jlong, Local, create)(TCN_STDARGS, jstring name,
     con->mode = TCN_NTP_UNKNOWN;
     con->nmax = PIPE_UNLIMITED_INSTANCES;
     con->timeout = DEFTIMEOUT;
+    con->sndbuf  = DEFSIZE;
+    con->rcvbuf  = DEFSIZE;
     if (J2S(name)) {
         strncpy(con->name, J2S(name), MAX_PATH);
         con->name[MAX_PATH] = '\0';
@@ -288,6 +330,8 @@ TCN_IMPLEMENT_CALL(jlong, Local, create)(TCN_STDARGS, jstring name,
     s->shutdown = ntp_socket_shutdown;
     s->tmget    = ntp_socket_timeout_get;
     s->tmset    = ntp_socket_timeout_set;
+    s->get      = ntp_socket_opt_get;
+    s->set      = ntp_socket_opt_set;
     s->close    = ntp_socket_close;
     s->opaque   = con;
     apr_pool_cleanup_register(p, (const void *)s,
@@ -358,8 +402,8 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
                                       PIPE_ACCESS_DUPLEX | FILE_FLAG_OVERLAPPED,
                                       PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
                                       con->nmax,
-                                      DEFSIZE,
-                                      DEFSIZE,
+                                      con->sndbuf,
+                                      con->rcvbuf,
                                       con->timeout,
                                       &c->sa);
         if (con->h_pipe == INVALID_HANDLE_VALUE) {
@@ -399,6 +443,8 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
         a->shutdown = ntp_socket_shutdown;
         a->tmget    = ntp_socket_timeout_get;
         a->tmset    = ntp_socket_timeout_set;
+        a->get      = ntp_socket_opt_get;
+        a->set      = ntp_socket_opt_set;
         a->close    = ntp_socket_close;
         a->opaque   = con;
         apr_pool_cleanup_register(p, (const void *)a,
