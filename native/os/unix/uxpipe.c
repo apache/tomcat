@@ -306,7 +306,7 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
 #endif
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
         a->pool = p;
-        a->type     = TCN_SOCKET_NTPIPE;
+        a->type     = TCN_SOCKET_UNIX;
         a->cleanup  = uxp_cleanup;
         a->recv     = uxp_socket_recv;
         a->send     = uxp_socket_send;
@@ -347,7 +347,6 @@ TCN_IMPLEMENT_CALL(jint, Local, connect)(TCN_STDARGS, jlong sock,
     con = (tcn_uxp_conn_t *)s->opaque;
     if (con->mode != TCN_UXP_UNKNOWN)
         return APR_EINVAL;
-    con->mode = TCN_UXP_CLIENT;
     do {
         rc = connect(con->sd, (const struct sockaddr *)&(con->uxaddr),
                      sizeof(con->uxaddr));
@@ -355,6 +354,7 @@ TCN_IMPLEMENT_CALL(jint, Local, connect)(TCN_STDARGS, jlong sock,
 
     if (rc == -1 && errno != EISCONN)
         return errno;
+    con->mode = TCN_UXP_CLIENT;
 
     return APR_SUCCESS;
 }
