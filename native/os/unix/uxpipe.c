@@ -170,9 +170,9 @@ static apr_status_t uxp_socket_cleanup(void *data)
 {
     tcn_socket_t *s = (tcn_socket_t *)data;
 
-    if (s->cleanup) {
-        (*s->cleanup)(s->opaque);
-        s->cleanup = NULL;
+    if (s->net->cleanup) {
+        (*s->net->cleanup)(s->opaque);
+        s->net->cleanup = NULL;
     }
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&uxp_cleared);
@@ -246,7 +246,7 @@ TCN_IMPLEMENT_CALL(jint, Local, bind)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
     UNREFERENCED(sa);
     TCN_ASSERT(sock != 0);
-    if (s->type == TCN_SOCKET_UNIX) {
+    if (s->net->type == TCN_SOCKET_UNIX) {
         int rc;
         tcn_uxp_conn_t *c = (tcn_uxp_conn_t *)s->opaque;
         c->mode = TCN_UXP_SERVER;
@@ -267,7 +267,7 @@ TCN_IMPLEMENT_CALL(jint, Local, listen)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
 
     TCN_ASSERT(sock != 0);
-    if (s->type == TCN_SOCKET_UNIX) {
+    if (s->net->type == TCN_SOCKET_UNIX) {
         tcn_uxp_conn_t *c = (tcn_uxp_conn_t *)s->opaque;
         c->mode = TCN_UXP_SERVER;
         return apr_socket_listen(c->sock, (apr_int32_t)backlog);
@@ -287,7 +287,7 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
     TCN_ASSERT(sock != 0);
 
     TCN_THROW_IF_ERR(apr_pool_create(&p, s->pool), p);
-    if (s->type == TCN_SOCKET_UNIX) {
+    if (s->net->type == TCN_SOCKET_UNIX) {
         apr_socklen_t len;
         tcn_uxp_conn_t *c = (tcn_uxp_conn_t *)s->opaque;
         con = (tcn_uxp_conn_t *)apr_pcalloc(p, sizeof(tcn_uxp_conn_t));
@@ -330,15 +330,13 @@ TCN_IMPLEMENT_CALL(jint, Local, connect)(TCN_STDARGS, jlong sock,
                                          jlong sa)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    apr_pool_t   *p = NULL;
-    tcn_socket_t *a = NULL;
     tcn_uxp_conn_t *con = NULL;
     int rc;
 
     UNREFERENCED(o);
     UNREFERENCED(sa);
     TCN_ASSERT(sock != 0);
-    if (s->type != TCN_SOCKET_UNIX)
+    if (s->net->type != TCN_SOCKET_UNIX)
         return APR_ENOTSOCK;
     con = (tcn_uxp_conn_t *)s->opaque;
     if (con->mode != TCN_UXP_UNKNOWN)
