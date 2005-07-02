@@ -179,10 +179,8 @@ static apr_status_t sp_socket_cleanup(void *data)
 {
     tcn_socket_t *s = (tcn_socket_t *)data;
 
-    if (s->net->cleanup) {
+    if (s->net && s->net->cleanup)
         (*s->net->cleanup)(s->opaque);
-        s->net->cleanup = NULL;
-    }
     if (s->sock) {
         apr_socket_close(s->sock);
         s->sock = NULL;
@@ -367,8 +365,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&sp_closed);
 #endif
-    if (s->net->close)
+    if (s->net && s->net->close) {
         rv = (*s->net->close)(s->opaque);
+        s->net = NULL;
+    }
     if (s->sock) {
         rv = (jint)apr_socket_close(s->sock);
         s->sock = NULL;
