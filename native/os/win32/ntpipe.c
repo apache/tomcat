@@ -265,15 +265,29 @@ static apr_status_t ntp_socket_cleanup(void *data)
 {
     tcn_socket_t *s = (tcn_socket_t *)data;
 
-    if (s->cleanup) {
-        (*s->cleanup)(s->opaque);
-        s->cleanup = NULL;
+    if (s->net->cleanup) {
+        (*s->net->cleanup)(s->opaque);
+        s->net->cleanup = NULL;
     }
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&ntp_cleared);
 #endif
     return APR_SUCCESS;
 }
+
+static tcn_nlayer_t ntp_socket_layer = {
+    TCN_SOCKET_NTPIPE,
+    ntp_cleanup,
+    ntp_socket_close,
+    ntp_socket_shutdown,
+    ntp_socket_opt_get,
+    ntp_socket_opt_set,
+    ntp_socket_timeout_get,
+    ntp_socket_timeout_set,
+    ntp_socket_send,
+    ntp_socket_sendv,
+    ntp_socket_recv
+};
 
 static BOOL create_DACL(LPSECURITY_ATTRIBUTES psa)
 {
@@ -321,19 +335,9 @@ TCN_IMPLEMENT_CALL(jlong, Local, create)(TCN_STDARGS, jstring name,
     }
 
     s = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-    s->pool     = p;
-    s->type     = TCN_SOCKET_NTPIPE;
-    s->cleanup  = ntp_cleanup;
-    s->recv     = ntp_socket_recv;
-    s->send     = ntp_socket_send;
-    s->sendv    = ntp_socket_sendv;
-    s->shutdown = ntp_socket_shutdown;
-    s->tmget    = ntp_socket_timeout_get;
-    s->tmset    = ntp_socket_timeout_set;
-    s->get      = ntp_socket_opt_get;
-    s->set      = ntp_socket_opt_set;
-    s->close    = ntp_socket_close;
-    s->opaque   = con;
+    s->pool   = p;
+    s->net    = &ntp_socket_layer;
+    s->opaque = con;
     apr_pool_cleanup_register(p, (const void *)s,
                               ntp_socket_cleanup,
                               apr_pool_cleanup_null);
@@ -350,7 +354,7 @@ TCN_IMPLEMENT_CALL(jint, Local, bind)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
     UNREFERENCED(sa);
     TCN_ASSERT(sock != 0);
-    if (s->type == TCN_SOCKET_NTPIPE) {
+    if (s->net->type == TCN_SOCKET_NTPIPE) {
         tcn_ntp_conn_t *c = (tcn_ntp_conn_t *)s->opaque;
         c->mode = TCN_NTP_SERVER;
         return APR_SUCCESS;
@@ -366,7 +370,7 @@ TCN_IMPLEMENT_CALL(jint, Local, listen)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
 
     TCN_ASSERT(sock != 0);
-    if (s->type == TCN_SOCKET_NTPIPE) {
+    if (s->net->type == TCN_SOCKET_NTPIPE) {
         tcn_ntp_conn_t *c = (tcn_ntp_conn_t *)s->opaque;
         c->mode = TCN_NTP_SERVER;
         if (backlog > 0)
@@ -390,7 +394,7 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
     TCN_ASSERT(sock != 0);
 
     TCN_THROW_IF_ERR(apr_pool_create(&p, s->pool), p);
-    if (s->type == TCN_SOCKET_NTPIPE) {
+    if (s->net->type == TCN_SOCKET_NTPIPE) {
         tcn_ntp_conn_t *c = (tcn_ntp_conn_t *)s->opaque;
         con = (tcn_ntp_conn_t *)apr_pcalloc(p, sizeof(tcn_ntp_conn_t));
         con->pool = p;
@@ -434,19 +438,9 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
         apr_atomic_inc32(&ntp_accepted);
 #endif
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-        a->pool = p;
-        a->type     = TCN_SOCKET_NTPIPE;
-        a->cleanup  = ntp_cleanup;
-        a->recv     = ntp_socket_recv;
-        a->send     = ntp_socket_send;
-        a->sendv    = ntp_socket_sendv;
-        a->shutdown = ntp_socket_shutdown;
-        a->tmget    = ntp_socket_timeout_get;
-        a->tmset    = ntp_socket_timeout_set;
-        a->get      = ntp_socket_opt_get;
-        a->set      = ntp_socket_opt_set;
-        a->close    = ntp_socket_close;
-        a->opaque   = con;
+        a->pool   = p;
+        a->net    = &ntp_socket_layer;
+        a->opaque = con;
         apr_pool_cleanup_register(p, (const void *)a,
                                   ntp_socket_cleanup,
                                   apr_pool_cleanup_null);
@@ -469,7 +463,7 @@ TCN_IMPLEMENT_CALL(jint, Local, connect)(TCN_STDARGS, jlong sock,
     UNREFERENCED(o);
     UNREFERENCED(sa);
     TCN_ASSERT(sock != 0);
-    if (s->type != TCN_SOCKET_NTPIPE)
+    if (s->net->type != TCN_SOCKET_NTPIPE)
         return APR_ENOTSOCK;
     con = (tcn_ntp_conn_t *)s->opaque;
     if (con->mode == TCN_NTP_SERVER)

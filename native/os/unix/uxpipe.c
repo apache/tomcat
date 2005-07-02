@@ -180,6 +180,20 @@ static apr_status_t uxp_socket_cleanup(void *data)
     return APR_SUCCESS;
 }
 
+static tcn_nlayer_t uxp_socket_layer = {
+    TCN_SOCKET_UNIX,
+    uxp_cleanup,
+    uxp_socket_close,
+    uxp_socket_shutdown,
+    uxp_socket_opt_get,
+    uxp_socket_opt_set,
+    uxp_socket_timeout_get,
+    uxp_socket_timeout_set,
+    uxp_socket_send,
+    uxp_socket_sendv,
+    uxp_socket_recv
+};
+
 TCN_IMPLEMENT_CALL(jlong, Local, create)(TCN_STDARGS, jstring name,
                                          jlong pool)
 {
@@ -212,17 +226,9 @@ TCN_IMPLEMENT_CALL(jlong, Local, create)(TCN_STDARGS, jstring name,
     else
         strcpy(con->uxaddr.sun_path, DEFNAME);
     s = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-    s->pool     = p;
-    s->type     = TCN_SOCKET_UNIX;
-    s->cleanup  = uxp_cleanup;
-    s->recv     = uxp_socket_recv;
-    s->send     = uxp_socket_send;
-    s->sendv    = uxp_socket_sendv;
-    s->shutdown = uxp_socket_shutdown;
-    s->tmget    = uxp_socket_timeout_get;
-    s->tmset    = uxp_socket_timeout_set;
-    s->close    = uxp_socket_close;
-    s->opaque   = con;
+    s->pool   = p;
+    s->net    = &uxp_socket_layer;
+    s->opaque = con;
     apr_pool_cleanup_register(p, (const void *)s,
                               uxp_socket_cleanup,
                               apr_pool_cleanup_null);
@@ -305,19 +311,9 @@ TCN_IMPLEMENT_CALL(jlong, Local, accept)(TCN_STDARGS, jlong sock)
         apr_atomic_inc32(&uxp_accepted);
 #endif
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-        a->pool = p;
-        a->type     = TCN_SOCKET_UNIX;
-        a->cleanup  = uxp_cleanup;
-        a->recv     = uxp_socket_recv;
-        a->send     = uxp_socket_send;
-        a->sendv    = uxp_socket_sendv;
-        a->shutdown = uxp_socket_shutdown;
-        a->tmget    = uxp_socket_timeout_get;
-        a->tmset    = uxp_socket_timeout_set;
-        a->get      = uxp_socket_opt_get;
-        a->set      = uxp_socket_opt_set;
-        a->close    = uxp_socket_close;
-        a->opaque   = con;
+        a->pool   = p;
+	    a->net    = &uxp_socket_layer;
+        a->opaque = con;
         apr_pool_cleanup_register(p, (const void *)a,
                                   uxp_socket_cleanup,
                                   apr_pool_cleanup_null);

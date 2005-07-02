@@ -281,7 +281,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
-    if (ss->type != TCN_SOCKET_SSL)
+    if (ss->net->type != TCN_SOCKET_SSL)
         return APR_EINVAL;
     con = (tcn_ssl_conn_t *)ss->opaque;
     while (!SSL_is_init_finished(con->ssl)) {
@@ -449,6 +449,20 @@ ssl_socket_sendv(apr_socket_t *sock,
     return APR_SUCCESS;
 }
 
+static tcn_nlayer_t ssl_socket_layer = {
+    TCN_SOCKET_SSL,
+    ssl_cleanup,
+    ssl_socket_close,
+    ssl_socket_shutdown,
+    ssl_socket_opt_get,
+    ssl_socket_opt_set,
+    ssl_socket_timeout_get,
+    ssl_socket_timeout_set,
+    ssl_socket_send,
+    ssl_socket_sendv,
+    ssl_socket_recv
+};
+
 
 TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
                                             jlong sock)
@@ -475,18 +489,8 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     else
         SSL_set_connect_state(con->ssl);
     /* Change socket type */
-    s->type     = TCN_SOCKET_SSL;
-    s->cleanup  = ssl_cleanup;
-    s->recv     = ssl_socket_recv;
-    s->send     = ssl_socket_send;
-    s->sendv    = ssl_socket_sendv;
-    s->shutdown = ssl_socket_shutdown;
-    s->tmget    = ssl_socket_timeout_get;
-    s->tmset    = ssl_socket_timeout_set;
-    s->get      = ssl_socket_opt_get;
-    s->set      = ssl_socket_opt_set;
-    s->close    = ssl_socket_close;
-    s->opaque   = con;
+    s->net    = &ssl_socket_layer;
+    s->opaque = con;
 
     return APR_SUCCESS;
 }
