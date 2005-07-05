@@ -1,0 +1,199 @@
+#!/bin/sh
+#
+# Copyright 1999-2004 The Apache Software Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
+# This is the configuration file to treate the CA certificate of the
+# _DEMONSTRATION ONLY_ 'Coyote' Certificate Authority.
+# This CA is used to sign the localhost.crt and user.crt
+# because self-signed server certificates are not accepted by all browsers.
+# NEVER USE THIS CA YOURSELF FOR REAL LIFE! INSTEAD EITHER USE A PUBLICALLY
+# KNOWN CA OR CREATE YOUR OWN CA!
+
+if [ -z "$OPENSSL" ]; then OPENSSL=openssl; fi
+
+PASSPHRASE="pass:secret"
+GENRSA="$OPENSSL genrsa -des3"
+REQ="$OPENSSL req -new"
+CA="$OPENSSL ca"
+X509="$OPENSSL x509"
+
+$OPENSSL rand -out .rnd 8192
+$GENRSA -passout $PASSPHRASE -out ca.key -rand .rnd 1024
+
+cat >ca.cfg <<EOT
+[ ca ]
+default_ca                      = default_db
+[ default_db ]
+dir                             = .
+certs                           = .
+new_certs_dir                   = ca.certs
+database                        = ca.index
+serial                          = ca.serial
+RANDFILE                        = .rnd
+certificate                     = ca.crt
+private_key                     = ca.key
+default_days                    = 365
+default_crl_days                = 30
+default_md                      = md5
+preserve                        = no
+name_opt                        = ca_default
+cert_opt                        = ca_default
+unique_subject                  = no
+[ server_policy ]
+countryName                     = supplied
+stateOrProvinceName             = supplied
+localityName                    = supplied
+organizationName                = supplied
+organizationalUnitName          = supplied
+commonName                      = supplied
+emailAddress                    = supplied
+[ server_cert ]
+subjectKeyIdentifier            = hash
+authorityKeyIdentifier          = keyid:always
+extendedKeyUsage                = serverAuth,clientAuth,msSGC,nsSGC
+basicConstraints                = critical,CA:false
+[ user_policy ]
+commonName                      = supplied
+emailAddress                    = supplied
+[ user_cert ]
+subjectAltName                  = email:copy
+basicConstraints                = critical,CA:false
+authorityKeyIdentifier          = keyid:always
+extendedKeyUsage                = clientAuth,emailProtection
+
+[ req ]
+default_bits                    = 1024
+default_keyfile                 = ca.key
+distinguished_name              = default_ca
+x509_extensions                 = extensions
+string_mask                     = nombstr
+req_extensions                  = req_extensions
+input_password                  = secret
+output_password                 = secret
+[ default_ca ]
+countryName                     = Country Code
+countryName_value               = US
+countryName_min                 = 2
+countryName_max                 = 2
+stateOrProvinceName             = State Name
+stateOrProvinceName_value       = Delaware
+localityName                    = Locality Name
+localityName_value              = Wilmington
+organizationName                = Organization Name
+organizationName_value          = Apache Software Foundation
+organizationalUnitName          = Organizational Unit Name
+organizationalUnitName_value    = Apache Tomcat
+commonName                      = Common Name
+commonName_value                = Tomcat Demo Root CA
+commonName_max                  = 64
+emailAddress                    = Email Address
+emailAddress_value              = coyote@apache.org
+emailAddress_max                = 40
+[ extensions ]
+subjectKeyIdentifier            = hash
+authorityKeyIdentifier          = keyid:always
+basicConstraints                = critical,CA:true
+[ req_extensions ]
+nsCertType                      = objsign,email,server
+EOT
+
+$REQ -x509 -days 3650 -batch -config ca.cfg -key ca.key -out ca.crt
+
+$GENRSA -passout $PASSPHRASE -out localhost.key  -rand .rnd 1024
+
+cat >localhost.cfg <<EOT
+[ req ]
+default_bits                    = 1024
+distinguished_name              = localhost
+string_mask                     = nombstr
+req_extensions                  = extensions
+input_password                  = secret
+output_password                 = secret
+[ localhost ]
+countryName                     = Country Code
+countryName_value               = US
+countryName_min                 = 2
+countryName_max                 = 2
+stateOrProvinceName             = State Name
+stateOrProvinceName_value       = Delaware
+localityName                    = Locality Name
+localityName_value              = Wilmington
+organizationName                = Organization Name
+organizationName_value          = Apache Software Foundation
+organizationalUnitName          = Organizational Unit Name
+organizationalUnitName_value    = Apache Tomcat
+commonName                      = Common Name
+commonName_value                = Tomcat Localhost Secure Demo Server
+commonName_max                  = 64
+emailAddress                    = Email Address
+emailAddress_value              = root@localhost
+emailAddress_max                = 40
+[ extensions ]
+nsCertType                      = server
+basicConstraints                = critical,CA:false
+EOT
+
+$REQ -passin $PASSPHRASE -batch -config localhost.cfg -key localhost.key -out localhost.csr
+rm -f localhost.cfg
+
+#  make sure environment exists
+if [ ! -d ca.certs ]; then
+    mkdir ca.certs
+    echo '01' >ca.serial
+    cp /dev/null ca.index
+fi
+
+$CA -passin $PASSPHRASE -batch -config ca.cfg -extensions server_cert -policy server_policy  -out x.crt -infiles localhost.csr
+$X509 -in x.crt -out localhost.crt
+rm -f x.crt
+
+$GENRSA -passout $PASSPHRASE -out user.key -rand .rnd 1024
+
+cat >user.cfg <<EOT
+[ req ]
+default_bits            = 1024
+distinguished_name      = admin
+string_mask             = nombstr
+req_extensions          = extensions
+input_password          = secret
+output_password         = secret
+[ admin ]
+commonName              = User Name
+commonName_value        = Localhost Administrator
+commonName_max          = 64
+emailAddress            = Email Address
+emailAddress_value      = admin@localhost
+emailAddress_max        = 40
+[ extensions ]
+nsCertType              = client,email
+basicConstraints        = critical,CA:false
+EOT
+
+$REQ -passin $PASSPHRASE -batch -config user.cfg -key user.key -out user.csr
+rm -f user.cfg
+$CA -passin $PASSPHRASE -batch -config ca.cfg -extensions user_cert -policy user_policy  -out x.crt -infiles user.csr
+$X509 -in x.crt -out user.crt
+rm -f x.crt
+
+# $OPENSSL verify -CAfile ca.crt localhost.crt
+# $OPENSSL verify -CAfile ca.crt user.crt
+
+rm -f ca.cfg
+rm -f ca.serial.old
+rm -f ca.index.old
+rm -f ca.index.attr
+rm -f ca.index.attr.old
+rm -f .rnd
