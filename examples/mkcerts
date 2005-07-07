@@ -25,7 +25,10 @@
 if [ -z "$OPENSSL" ]; then OPENSSL=openssl; fi
 
 PASSPHRASE="pass:secret"
+# Encrypt all keys
 GENRSA="$OPENSSL genrsa -des3"
+# Uncomment for no key encryption
+# GENRSA="$OPENSSL genrsa"
 REQ="$OPENSSL req -new"
 CA="$OPENSSL ca"
 X509="$OPENSSL x509"
@@ -111,6 +114,16 @@ nsCertType                      = objsign,email,server
 EOT
 
 $REQ -x509 -days 3650 -batch -config ca.cfg -key ca.key -out ca.crt
+
+# Create cabundle.crt that can be used for CAfile
+cat >cabundle.crt <<EOT
+Tomcat Demo Root CA
+=========================================
+`$X509 -noout -fingerprint -in ca.crt`
+PEM Data:
+`$X509 -in ca.crt`
+`$X509 -noout -text -in ca.crt`
+EOT
 
 $GENRSA -passout $PASSPHRASE -out localhost.key  -rand .rnd 1024
 
