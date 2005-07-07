@@ -418,7 +418,8 @@ public class Socket {
      * </PRE>
      * @return Socket option returned on the call.
      */
-    public static native int optGet(long sock, int opt);
+    public static native int optGet(long sock, int opt)
+        throws Exception;
 
     /**
      * Setup socket timeout for the specified socket
