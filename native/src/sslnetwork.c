@@ -371,7 +371,7 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
                     }
                 break;
                 default:
-                    return apr_get_netos_error();
+                    return os;
                 break;
             }
         }
@@ -414,7 +414,7 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                     }
                 break;
                 default:
-                    return apr_get_netos_error();
+                    return os;
                 break;
             }
         }
