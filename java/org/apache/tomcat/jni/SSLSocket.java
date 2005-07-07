@@ -43,6 +43,22 @@ public class SSLSocket {
     public static native int handshake(long thesocket);
 
     /**
+     * Do a SSL renegotiation.
+     * SSL supports per-directory re-configuration of SSL parameters.
+     * This is implemented by performing an SSL renegotiation of the
+     * re-configured parameters after the request is read, but before the
+     * response is sent. In more detail: the renegotiation happens after the
+     * request line and MIME headers were read, but _before_ the attached
+     * request body is read. The reason simply is that in the HTTP protocol
+     * usually there is no acknowledgment step between the headers and the
+     * body (there is the 100-continue feature and the chunking facility
+     * only), so Apache has no API hook for this step.
+     *
+     * @param thesocket The socket to use
+     */
+    public static native int renegotiate(long thesocket);
+
+    /**
      * Retrun SSL Info parameter as byte array.
      *
      * @param sock The socket to read the data from.

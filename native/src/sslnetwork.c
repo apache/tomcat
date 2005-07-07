@@ -495,6 +495,18 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     return APR_SUCCESS;
 }
 
+TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
+                                                 jlong sock)
+{
+    tcn_socket_t *s   = J2P(sock, tcn_socket_t *);
+    tcn_ssl_conn_t *con;
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(sock != 0);
+    con = (tcn_ssl_conn_t *)s->opaque;
+    return SSL_renegotiate(con->ssl);
+}
+
 #else
 /* OpenSSL is not supported
  * If someday we make OpenSSL optional
