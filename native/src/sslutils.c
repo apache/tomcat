@@ -666,10 +666,6 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
          */
         ok = 0;
     }
-#if 1
-    else if (!ok)
-        ok = 1;
-#endif
     return ok;
 }
 
