@@ -340,11 +340,11 @@ static apr_status_t APR_THREAD_FUNC
 ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
-    int s, rd = (int)(*len);
+    int s, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
     for (;;) {
-        if ((s = SSL_read(con->ssl, buf, rd)) <= 0) {
+        if ((s = SSL_read(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
             int i = SSL_get_error(con->ssl, s);
             /* Special case if the "close notify" alert send by peer */
@@ -410,7 +410,7 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                     if (!APR_STATUS_IS_EAGAIN(os) &&
                         !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
-                        return s;
+                        return os;
                     }
                 break;
                 default:
