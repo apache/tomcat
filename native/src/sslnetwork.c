@@ -345,6 +345,7 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
 
     for (;;) {
         if ((s = SSL_read(con->ssl, buf, rd)) <= 0) {
+            apr_status_t os = apr_get_netos_error();
             int i = SSL_get_error(con->ssl, s);
             /* Special case if the "close notify" alert send by peer */
             if (s == 0 && (con->ssl->shutdown & SSL_RECEIVED_SHUTDOWN)) {
@@ -363,11 +364,10 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
-                    s = apr_get_netos_error();
-                    if (!APR_STATUS_IS_EAGAIN(s) &&
-                        !APR_STATUS_IS_EINTR(s)) {
+                    if (!APR_STATUS_IS_EAGAIN(os) &&
+                        !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
-                        return s;
+                        return os;
                     }
                 break;
                 default:
@@ -393,6 +393,7 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
 
     for (;;) {
         if ((s = SSL_write(con->ssl, buf, rd)) <= 0) {
+            apr_status_t os = apr_get_netos_error();
             int i = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_ZERO_RETURN:
@@ -406,9 +407,8 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
-                    s = apr_get_netos_error();
-                    if (!APR_STATUS_IS_EAGAIN(s) &&
-                        !APR_STATUS_IS_EINTR(s)) {
+                    if (!APR_STATUS_IS_EAGAIN(os) &&
+                        !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
                         return s;
                     }
