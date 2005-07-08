@@ -188,6 +188,7 @@
 #define SSL_INFO_SERVER_A_SIG               (0x0205)
 #define SSL_INFO_SERVER_A_KEY               (0x0206)
 #define SSL_INFO_SERVER_CERT                (0x0207)
+#define SSL_INFO_CLIENT_CERT_CHAIN          (0x0400)
 
 #define SSL_VERIFY_ERROR_IS_OPTIONAL(errnum) \
    ((errnum == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT) \

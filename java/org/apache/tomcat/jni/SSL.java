@@ -203,7 +203,10 @@ public final class SSL {
     public static final int SSL_INFO_SERVER_A_SIG              = 0x0205;
     public static final int SSL_INFO_SERVER_A_KEY              = 0x0206;
     public static final int SSL_INFO_SERVER_CERT               = 0x0207;
-
+    /* Return client certificate chain.
+     * Add certificate chain number to that flag (0 ... verify depth)
+     */
+    public static final int SSL_INFO_CLIENT_CERT_CHAIN         = 0x0400;
     /* Return OpenSSL version number */
     public static native int version();
 

@@ -105,7 +105,7 @@ static char *get_cert_PEM(X509 *xs)
     n = BIO_pending(bio);
     result = malloc(n+1);
     n = BIO_read(bio, result, n);
-    result[n] = '\n';
+    result[n] = '\0';
     BIO_free(bio);
     return result;
 }
@@ -398,6 +398,19 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
             /* XXX: No need to call the X509_free(xs); */
         }
         rv = APR_SUCCESS;
+    }
+    else if (what & SSL_INFO_CLIENT_CERT_CHAIN) {
+        X509 *xs;
+        char *result;
+        STACK_OF(X509) *sk =  SSL_get_peer_cert_chain(s->ssl);
+        int n = what & 0x0F;
+        if (n < sk_X509_num(sk)) {
+            xs = sk_X509_value(sk, n);
+            if ((result = get_cert_PEM(xs))) {
+                value = tcn_new_string(e, result);
+                free(result);
+            }
+        }
     }
     if (rv != APR_SUCCESS)
         tcn_ThrowAPRException(e, rv);
