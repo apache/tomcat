@@ -95,20 +95,39 @@ static char *get_cert_valid(ASN1_UTCTIME *tm)
 
 static char *get_cert_PEM(X509 *xs)
 {
-    char *result;
+    char *result = NULL;
     BIO *bio;
-    int n;
 
     if ((bio = BIO_new(BIO_s_mem())) == NULL)
         return NULL;
-    PEM_write_bio_X509(bio, xs);
-    n = BIO_pending(bio);
-    result = malloc(n+1);
-    n = BIO_read(bio, result, n);
-    result[n] = '\0';
+    if (PEM_write_bio_X509(bio, xs)) {
+        int n = BIO_pending(bio);
+        result = malloc(n+1);
+        n = BIO_read(bio, result, n);
+        result[n] = '\0';
+    }
     BIO_free(bio);
     return result;
 }
+
+static unsigned char *get_cert_ASN1(X509 *xs, int *len)
+{
+    char *result = NULL;
+    BIO *bio;
+
+    *len = 0;
+    if ((bio = BIO_new(BIO_s_mem())) == NULL)
+        return NULL;
+    if (i2d_X509_bio(bio, xs)) {
+        int n = BIO_pending(bio);
+        result = malloc(n);
+        n = BIO_read(bio, result, n);
+        *len = n;
+    }
+    BIO_free(bio);
+    return result;
+}
+
 
 static char *get_cert_serial(X509 *xs)
 {
@@ -186,6 +205,7 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
 {
     tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
     jbyteArray array = NULL;
+    apr_status_t rv = APR_SUCCESS;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
@@ -204,6 +224,56 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
             tcn_ThrowAPRException(e, APR_EINVAL);
         break;
     }
+    if (what & SSL_INFO_CLIENT_MASK) {
+        X509 *xs;
+        unsigned char *result;
+        int len;
+        if ((xs = SSL_get_peer_certificate(s->ssl)) != NULL) {
+            switch (what) {
+                case SSL_INFO_CLIENT_CERT:
+                    if ((result = get_cert_ASN1(xs, &len))) {
+                        array = tcn_new_arrayb(e, result, len);
+                        free(result);
+                    }
+                break;
+            }
+            X509_free(xs);
+        }
+        rv = APR_SUCCESS;
+    }
+    else if (what & SSL_INFO_SERVER_MASK) {
+        X509 *xs;
+        unsigned char *result;
+        int len;
+        if ((xs = SSL_get_certificate(s->ssl)) != NULL) {
+            switch (what) {
+                case SSL_INFO_SERVER_CERT:
+                    if ((result = get_cert_ASN1(xs, &len))) {
+                        array = tcn_new_arrayb(e, result, len);
+                        free(result);
+                    }
+                break;
+            }
+            /* XXX: No need to call the X509_free(xs); */
+        }
+        rv = APR_SUCCESS;
+    }
+    else if (what & SSL_INFO_CLIENT_CERT_CHAIN) {
+        X509 *xs;
+        unsigned char *result;
+        STACK_OF(X509) *sk =  SSL_get_peer_cert_chain(s->ssl);
+        int len, n = what & 0x0F;
+        if (n < sk_X509_num(sk)) {
+            xs = sk_X509_value(sk, n);
+            if ((result = get_cert_ASN1(xs, &len))) {
+                array = tcn_new_arrayb(e, result, len);
+                free(result);
+            }
+        }
+        rv = APR_SUCCESS;
+    }
+    if (rv != APR_SUCCESS)
+        tcn_ThrowAPRException(e, rv);
 
     return array;
 }
