@@ -203,13 +203,15 @@ static char *lookup_ssl_cert_dn(X509_NAME *xsname, int dnidx)
 TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
                                                  jint what)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_socket_t   *a = J2P(sock, tcn_socket_t *);
+    tcn_ssl_conn_t *s;
     jbyteArray array = NULL;
     apr_status_t rv = APR_SUCCESS;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
 
+    s = (tcn_ssl_conn_t *)(a->opaque);
     switch (what) {
         case SSL_INFO_SESSION_ID:
         {
@@ -281,13 +283,15 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
 TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
                                                  jint what)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_socket_t   *a = J2P(sock, tcn_socket_t *);
+    tcn_ssl_conn_t *s;
     jstring value = NULL;
     apr_status_t rv = APR_SUCCESS;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
 
+    s = (tcn_ssl_conn_t *)(a->opaque);
     switch (what) {
         case SSL_INFO_SESSION_ID:
         {
@@ -491,11 +495,14 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
 TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
                                               jint what)
 {
-    tcn_ssl_conn_t *s = J2P(sock, tcn_ssl_conn_t *);
+    tcn_socket_t   *a = J2P(sock, tcn_socket_t *);
+    tcn_ssl_conn_t *s;
     jint value = -1;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
+
+    s = (tcn_ssl_conn_t *)(a->opaque);
 
     switch (what) {
         case SSL_INFO_CIPHER_USEKEYSIZE:
