@@ -223,7 +223,7 @@ TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
         }
         break;
         default:
-            tcn_ThrowAPRException(e, APR_EINVAL);
+            rv = APR_EINVAL;
         break;
     }
     if (what & SSL_INFO_CLIENT_MASK) {
