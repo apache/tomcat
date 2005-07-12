@@ -521,6 +521,13 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
             }
         }
         break;
+        case SSL_INFO_CLIENT_CERT_CHAIN:
+        {
+            X509 *xs;
+            STACK_OF(X509) *sk =  SSL_get_peer_cert_chain(s->ssl);
+            value = sk_X509_num(sk);
+        }
+        break;
         default:
             tcn_ThrowAPRException(e, APR_EINVAL);
         break;
