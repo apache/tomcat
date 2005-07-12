@@ -16,9 +16,6 @@
 
 package org.apache.tomcat.jni;
 
-/* Import needed classes */
-import java.nio.ByteBuffer;
-
 /** SSL Socket
  *
  * @author Mladen Turk
