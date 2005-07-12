@@ -485,6 +485,7 @@ TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
                 free(result);
             }
         }
+        rv = APR_SUCCESS;
     }
     if (rv != APR_SUCCESS)
         tcn_ThrowAPRException(e, rv);
