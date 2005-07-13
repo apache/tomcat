@@ -204,6 +204,9 @@ rm -f x.crt
 # $OPENSSL verify -CAfile ca.crt localhost.crt
 # $OPENSSL verify -CAfile ca.crt user.crt
 
+# Create PKCS12 user certificate
+$OPENSSL pkcs12 -export -passout $PASSPHRASE -passin $PASSPHRASE -in user.crt -inkey user.key -certfile ca.crt -out user.p12
+
 rm -f ca.cfg
 rm -f ca.serial.old
 rm -f ca.index.old
