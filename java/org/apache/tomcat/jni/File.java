@@ -671,15 +671,14 @@ public class File {
         throws Error;
 
     /**
-     * Duplicate the specified file descriptor.
+     * Duplicate the specified file descriptor and close the original.
      * @param newFile The old file that is to be closed and reused.
      * newFile MUST point at a valid apr_file_t. It cannot be NULL.
      * @param oldFile The file to duplicate.
      * @param pool The pool to use for the new file.
-     * @return Duplicated file structure.
+     * @return Status code.
      */
-    public static native long dup2(long newFile, long oldFile, long pool)
-        throws Error;
+    public static native int dup2(long newFile, long oldFile, long pool)
 
     /**
      * Get the specified file's stats.  The file is specified by filename,

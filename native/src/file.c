@@ -589,16 +589,13 @@ cleanup:
     return P2J(d);
 }
 
-TCN_IMPLEMENT_CALL(jlong, File, dup2)(TCN_STDARGS, jlong newf, jlong file,
-                                      jlong pool)
+TCN_IMPLEMENT_CALL(jint, File, dup2)(TCN_STDARGS, jlong newf, jlong file,
+                                     jlong pool)
 {
     apr_file_t *f = J2P(file, apr_file_t *);
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     apr_file_t *d = J2P(newf, apr_file_t *);
 
-    UNREFERENCED(o);
-    TCN_THROW_IF_ERR(apr_file_dup2(&d, f, p), d);
-
-cleanup:
-    return P2J(d);
+    UNREFERENCED_STDARGS;
+    return (jint)apr_file_dup2(d, f, p);
 }
