@@ -498,6 +498,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
 {
     tcn_socket_t   *a = J2P(sock, tcn_socket_t *);
     tcn_ssl_conn_t *s;
+    apr_status_t rv = APR_SUCCESS;
     jint value = -1;
 
     UNREFERENCED(o);
@@ -528,10 +529,26 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
         }
         break;
         default:
-            tcn_ThrowAPRException(e, APR_EINVAL);
+            rv = APR_EINVAL;
         break;
     }
+    if (what & SSL_INFO_CLIENT_MASK) {
+        X509 *xs;
+        if ((xs = SSL_get_peer_certificate(s->ssl)) != NULL) {
+            switch (what) {
+                case SSL_INFO_CLIENT_V_REMAIN:
+                    value = get_days_remaining(X509_get_notAfter(xs));
+                    rv = APR_SUCCESS;
+                break;
+                default:
+                    rv = APR_EINVAL;
+                break;                    
+           }
+        }
+    }
 
+    if (rv != APR_SUCCESS)
+        tcn_ThrowAPRException(e, rv);
     return value;
 }
 

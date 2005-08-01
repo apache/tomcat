@@ -195,6 +195,7 @@ public final class SSL {
     public static final int SSL_INFO_CLIENT_A_SIG              = 0x0105;
     public static final int SSL_INFO_CLIENT_A_KEY              = 0x0106;
     public static final int SSL_INFO_CLIENT_CERT               = 0x0107;
+    public static final int SSL_INFO_CLIENT_V_REMAIN           = 0x0108;
 
     public static final int SSL_INFO_SERVER_M_VERSION          = 0x0201;
     public static final int SSL_INFO_SERVER_M_SERIAL           = 0x0202;

@@ -178,6 +178,7 @@
 #define SSL_INFO_CLIENT_A_SIG               (0x0105)
 #define SSL_INFO_CLIENT_A_KEY               (0x0106)
 #define SSL_INFO_CLIENT_CERT                (0x0107)
+#define SSL_INFO_CLIENT_V_REMAIN            (0x0108)
 
 #define SSL_INFO_SERVER_MASK                (0x0200)
 
