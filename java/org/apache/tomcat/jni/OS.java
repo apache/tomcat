@@ -91,7 +91,7 @@ public class OS {
      * inf[6]  - Memory Load
      *
      * inf[7]  - Idle Time in microseconds
-     * inf[9]  - Kernel Time in microseconds
+     * inf[8]  - Kernel Time in microseconds
      * inf[9]  - User Time in microseconds
      *
      * inf[10] - Process creation time (apr_time_t)

@@ -205,7 +205,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
     pvals[12] = st[2];
 
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-        pvals[14] = pmc.WorkingSetSize;
+        pvals[13] = pmc.WorkingSetSize;
         pvals[14] = pmc.PeakWorkingSetSize;
         pvals[15] = pmc.PageFaultCount;
     }
