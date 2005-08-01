@@ -38,30 +38,31 @@
 #if defined(sun)
 #define MAX_PROC_PATH_LEN 64
 #define MAX_CPUS 512
-// #define PSTATUS_T_SZ sizeof(pstatus_t)
 #define PSINFO_T_SZ sizeof(psinfo_t)
 #define PRUSAGE_T_SZ sizeof(prusage_t)
 
-static int proc_open(const char *type) {
+static int proc_open(const char *type)
+{
     char proc_path[MAX_PROC_PATH_LEN+1];
 
-    sprintf(proc_path,"/proc/self/%s",type);
+    sprintf(proc_path, "/proc/self/%s", type);
     return open(proc_path, O_RDONLY);
-} // end proc_open
+}
 
-static int proc_read(void *buf, const size_t size, int filedes) {
+static int proc_read(void *buf, const size_t size, int filedes)
+{
     ssize_t bytes;
 
-    if ( filedes >= 0 ) {
+    if (filedes >= 0) {
         bytes = pread(filedes, buf, size, 0);
-        if ( bytes != size ) {
+        if (bytes != size)
             return -1;
-        }
-    } else {
-        return -1;
+        else
+            return 0;
     }
-    return 0;
-} // end proc_read
+    else
+        return -1;
+}
 
 #endif
 
@@ -118,155 +119,164 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
     }
 #elif defined(sun)
     {
-/* static variables with basic procfs info */
+        /* static variables with basic procfs info */
         static long creation = 0;              /* unix timestamp of process creation */
         static int psinf_fd = 0;               /* file descriptor for the psinfo procfs file */
         static int prusg_fd = 0;               /* file descriptor for the usage procfs file */
-        static size_t rss=0;                   /* maximum of resident set size from previous calls */
-/* static variables with basic kstat info */
+        static size_t rss = 0;                 /* maximum of resident set size from previous calls */
+        /* static variables with basic kstat info */
         static kstat_ctl_t *kstat_ctl = NULL;  /* kstat control object, only initialized once */
         static kstat_t *kstat_cpu[MAX_CPUS];   /* array of kstat objects for per cpu statistics */
-        static int cpu_count=0;                /* number of cpu structures found in kstat */
-        static kid_t kid=0;                    /* kstat ID, for which the kstat_ctl holds the correct chain */
-/* non-static variables - general use */
-        int res=0;                             /* general result state */
-/* non-static variables - sysinfo/swapctl use */
+        static int cpu_count = 0;              /* number of cpu structures found in kstat */
+        static kid_t kid = 0;                  /* kstat ID, for which the kstat_ctl holds the correct chain */
+        /* non-static variables - general use */
+        int res = 0;                           /* general result state */
+        /* non-static variables - sysinfo/swapctl use */
         long ret_sysconf;                      /* value returned from sysconf call */
         long tck_dividend;                     /* factor used by transforming tick numbers to milliseconds */
         long tck_divisor;                      /* divisor used by transforming tick numbers to milliseconds */
-        long sys_pagesize=sysconf(_SC_PAGESIZE); /* size of a system memory page in bytes */
-        long sys_clk_tck=sysconf(_SC_CLK_TCK); /* number of system ticks per second */
+        long sys_pagesize = sysconf(_SC_PAGESIZE); /* size of a system memory page in bytes */
+        long sys_clk_tck = sysconf(_SC_CLK_TCK); /* number of system ticks per second */
         struct anoninfo info;                  /* structure for information about sizes in anonymous memory system */
-/* non-static variables - procfs use */
+        /* non-static variables - procfs use */
         psinfo_t psinf;                        /* psinfo structure from procfs */
         prusage_t prusg;                       /* usage structure from procfs */
-        size_t new_rss=0;                      /* resident set size read from procfs */
+        size_t new_rss = 0;                    /* resident set size read from procfs */
         time_t now;                            /* time needed for calculating process creation time */
-/* non-static variables - kstat use */
+        /* non-static variables - kstat use */
         kstat_t *kstat = NULL;                 /* kstat working pointer */
         cpu_sysinfo_t cpu;                     /* cpu sysinfo working pointer */
-        kid_t new_kid=0;                       /* kstat ID returned from chain update */
-        int new_kstat=0;                       /* flag indicating, if kstat structure has changed since last call */
+        kid_t new_kid = 0;                     /* kstat ID returned from chain update */
+        int new_kstat = 0;                     /* flag indicating, if kstat structure has changed since last call */
 
         rv = APR_SUCCESS;
 
-        if ( sys_pagesize <= 0 ) {
+        if (sys_pagesize <= 0) {
             rv = apr_get_os_error();
-        } else {
-            ret_sysconf=sysconf(_SC_PHYS_PAGES);
-            if ( ret_sysconf >= 0 ) {
-                pvals[0] = (jlong)(sys_pagesize*ret_sysconf);
-            } else {
+        }
+        else {
+            ret_sysconf = sysconf(_SC_PHYS_PAGES);
+            if (ret_sysconf >= 0) {
+                pvals[0] = (jlong)(sys_pagesize * ret_sysconf);
+            }
+            else {
                 rv = apr_get_os_error();
             }
-            ret_sysconf=sysconf(_SC_AVPHYS_PAGES);
-            if ( ret_sysconf >= 0 ) {
+            ret_sysconf = sysconf(_SC_AVPHYS_PAGES);
+            if (ret_sysconf >= 0) {
                 pvals[1] = (jlong)(sys_pagesize*ret_sysconf);
-            } else {
+            }
+            else {
                 rv = apr_get_os_error();
             }
             res=swapctl(SC_AINFO, &info);
-            if ( res >= 0 ) {
+            if (res >= 0) {
                 pvals[2] = (jlong)(sys_pagesize*info.ani_max);
                 pvals[3] = (jlong)(sys_pagesize*info.ani_free);
                 pvals[6] = (jlong)(100 - (info.ani_free * 100 / info.ani_max));
-            } else {
+            }
+            else {
                 rv = apr_get_os_error();
             }
         }
 
-        if ( psinf_fd == 0 ) {
+        if (psinf_fd == 0) {
             psinf_fd = proc_open("psinfo");
         }
         res = proc_read(&psinf, PSINFO_T_SZ, psinf_fd);
-        if ( res >= 0 ) {
+        if (res >= 0) {
             new_rss = psinf.pr_rssize*1024;
             pvals[13] = (jlong)(new_rss);
-            if ( new_rss > rss ) {
+            if (new_rss > rss) {
                 rss = new_rss;
             }
             pvals[14] = (jlong)(rss);
-        } else {
+        }
+        else {
             psinf_fd = 0;
             rv = apr_get_os_error();
         }
-        if ( prusg_fd == 0 ) {
+        if (prusg_fd == 0) {
             prusg_fd = proc_open("usage");
         }
         res = proc_read(&prusg, PRUSAGE_T_SZ, prusg_fd);
-        if ( res >= 0 ) {
-            if ( creation <= 0 ) {
+        if (res >= 0) {
+            if (creation <= 0) {
                 time(&now);
-                creation = (long)(now-(prusg.pr_tstamp.tv_sec-prusg.pr_create.tv_sec));
+                creation = (long)(now - (prusg.pr_tstamp.tv_sec -
+                                         prusg.pr_create.tv_sec));
             }
             pvals[10] = (jlong)(creation);
-            pvals[11] = (jlong)(prusg.pr_stime.tv_sec*1000+(prusg.pr_stime.tv_nsec/1000000));
-            pvals[12] = (jlong)(prusg.pr_utime.tv_sec*1000+(prusg.pr_utime.tv_nsec/1000000));
+            pvals[11] = (jlong)(prusg.pr_stime.tv_sec * 1000 +
+                                (prusg.pr_stime.tv_nsec / 1000000));
+            pvals[12] = (jlong)(prusg.pr_utime.tv_sec * 1000 +
+                                (prusg.pr_utime.tv_nsec / 1000000));
             pvals[15] = (jlong)(prusg.pr_majf);
-        } else {
+        }
+        else {
             prusg_fd = 0;
             rv = apr_get_os_error();
         }
 
-        if ( sys_clk_tck <= 0 ) {
+        if (sys_clk_tck <= 0) {
             rv = apr_get_os_error();
-        } else {
+        }
+        else {
             tck_dividend = 1000;
             tck_divisor = sys_clk_tck;
             for (i = 0; i < 3; i++) {
-                if ( tck_divisor % 2 == 0 ) {
-                       tck_divisor=tck_divisor/2;
-                       tck_dividend=tck_dividend/2;
+                if (tck_divisor % 2 == 0) {
+                    tck_divisor = tck_divisor / 2;
+                    tck_dividend = tck_dividend / 2;
                 }
-                if ( tck_divisor % 5 == 0 ) {
-                       tck_divisor=tck_divisor/5;
-                       tck_dividend=tck_dividend/5;
+                if (tck_divisor % 5 == 0) {
+                    tck_divisor = tck_divisor / 5;
+                    tck_dividend = tck_dividend / 5;
                 }
             }
-            if ( kstat_ctl == NULL ) {
+            if (kstat_ctl == NULL) {
                 kstat_ctl = kstat_open();
                 kid = kstat_ctl->kc_chain_id;
-                new_kstat=1;
+                new_kstat = 1;
             } else {
                 new_kid = kstat_chain_update(kstat_ctl);
-                if ( new_kid < 0 ) {
+                if (new_kid < 0) {
                     res=kstat_close(kstat_ctl);
                     kstat_ctl = kstat_open();
                     kid = kstat_ctl->kc_chain_id;
-                    new_kstat=1;
-                } else if ( new_kid > 0 && kid != new_kid ) {
+                    new_kstat = 1;
+                } else if (new_kid > 0 && kid != new_kid) {
                     kid = new_kid;
-                    new_kstat=1;
+                    new_kstat = 1;
                 }
             }
-            if ( new_kstat ) {
-                cpu_count=0;
+            if (new_kstat) {
+                cpu_count = 0;
                 for (kstat = kstat_ctl->kc_chain; kstat; kstat = kstat->ks_next) {
-                    if (strncmp(kstat->ks_name, "cpu_stat", 8) == 0 ) {
+                    if (strncmp(kstat->ks_name, "cpu_stat", 8) == 0) {
                         kstat_cpu[cpu_count++]=kstat;
                     }
                 }
             }
-            for (i=0;i<cpu_count;i++) {
+            for (i = 0; i < cpu_count; i++) {
                 new_kid = kstat_read(kstat_ctl, kstat_cpu[i], NULL);
-                if ( new_kid >= 0 ) {
+                if (new_kid >= 0) {
+                    long tck_r = tck_dividend / tck_divisor;
                     cpu = ((cpu_stat_t *)kstat_cpu[i]->ks_data)->cpu_sysinfo;
-                    pvals[7] += (jlong)(((long)cpu.cpu[CPU_IDLE])*tck_dividend/tck_divisor);
-                    pvals[7] += (jlong)(((long)cpu.cpu[CPU_WAIT])*tck_dividend/tck_divisor);
-                    pvals[8] += (jlong)(((long)cpu.cpu[CPU_KERNEL])*tck_dividend/tck_divisor);
-                    pvals[9] += (jlong)(((long)cpu.cpu[CPU_USER])*tck_dividend/tck_divisor);
+                    pvals[7] += (jlong)(((long)cpu.cpu[CPU_IDLE]) * tck_r);
+                    pvals[7] += (jlong)(((long)cpu.cpu[CPU_WAIT]) * tck_r);
+                    pvals[8] += (jlong)(((long)cpu.cpu[CPU_KERNEL]) * tck_r);
+                    pvals[9] += (jlong)(((long)cpu.cpu[CPU_USER]) * tck_r);
                 }
             }
         }
 
-/*
- * The next two are not implemented yet for Solaris
- * inf[4]  - Amount of shared memory
- * inf[5]  - Memory used by buffers
- *
- */
-        pvals[4] = (jlong)0;
-        pvals[5] = (jlong)0;
+        /*
+         * The next two are not implemented yet for Solaris
+         * inf[4]  - Amount of shared memory
+         * inf[5]  - Memory used by buffers
+         *
+         */
     }
 #else
     rv = APR_ENOTIMPL;
