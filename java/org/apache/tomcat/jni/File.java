@@ -678,7 +678,7 @@ public class File {
      * @param pool The pool to use for the new file.
      * @return Status code.
      */
-    public static native int dup2(long newFile, long oldFile, long pool)
+    public static native int dup2(long newFile, long oldFile, long pool);
 
     /**
      * Get the specified file's stats.  The file is specified by filename,
