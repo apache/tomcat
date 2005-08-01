@@ -597,7 +597,7 @@ TCN_IMPLEMENT_CALL(jlong, File, dup2)(TCN_STDARGS, jlong newf, jlong file,
     apr_file_t *d = J2P(newf, apr_file_t *);
 
     UNREFERENCED(o);
-    TCN_THROW_IF_ERR(apr_file_dup(&d, f, p), d);
+    TCN_THROW_IF_ERR(apr_file_dup2(&d, f, p), d);
 
 cleanup:
     return P2J(d);
