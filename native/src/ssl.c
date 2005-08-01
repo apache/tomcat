@@ -369,6 +369,10 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         TCN_FREE_CSTRING(engine);
         return (jint)APR_SUCCESS;
     }
+    if (SSLeay() < 0x0090700L) {
+        TCN_FREE_CSTRING(engine);
+        return (jint)APR_EINVAL;        
+    }
     /* We must register the library in full, to ensure our configuration
      * code can successfully test the SSL environment.
      */
