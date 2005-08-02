@@ -41,5 +41,5 @@ cd ../../../
 tar cvf ${JKJNIDIST}.tar ${JKJNIDIST}
 gzip ${JKJNIDIST}.tar
 # Convert lineends to DOS
-perl srclib/apr/lineends.pl --cr ${JKJNIDIST}
+perl srclib/apr/build/lineends.pl --cr ${JKJNIDIST}
 zip -9 -r  ${JKJNIDIST}.zip ${JKJNIDIST}
