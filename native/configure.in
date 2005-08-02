@@ -150,6 +150,15 @@ APR_ADDTO(TCNATIVE_LIBS, [$LIBS])
 APR_ADDTO(TCNATIVE_LIBS, [$APR_LIBS])
 APR_ADDTO(TCNATIVE_LDFLAGS, [$LDFLAGS])
 
+# Link libkstat for Solaris
+case $host in
+    *-solaris2*)
+        APR_ADDTO(TCNATIVE_LIBS, -lkstat)
+        ;;
+    *)
+        ;;
+esac
+
 AC_SUBST(TCNATIVE_EXPORT_LIBS)
 AC_SUBST(TCNATIVE_PRIV_INCLUDES)
 AC_SUBST(TCNATIVE_INCLUDES)
