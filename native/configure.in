@@ -85,16 +85,23 @@ APR_SETIFNULL(CPP, `$apr_config --cpp`)
 AC_PROG_INSTALL
 
 dnl
-dnl  Find the APR-ICONV directory.
+dnl  Find the JVM related information
 dnl
 TCN_FIND_JDK
-TCN_FIND_JDK_OS
+TCN_SABLEVM
+APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include])
+
+dnl sableVM does not have/need $JAVA_OS/jni_md.h
+if test "$SABLEVM" = "NONE"
+then
+  TCN_FIND_JDK_OS
+  APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include/$JAVA_OS])
+fi
+
 AC_SUBST(JAVA_HOME)
 AC_SUBST(JAVA_PLATFORM)
 AC_SUBST(JAVA_OS)
 
-APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include])
-APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/include/$JAVA_OS])
 
 dnl
 dnl Detect openssl toolkit installation

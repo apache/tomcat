@@ -195,6 +195,22 @@ AC_DEFUN(
       ])
   ])
 
+dnl check for sableVM
+dnl (copied from daemon/src/native/unix/support/apjava.m4)
+AC_DEFUN(
+  [TCN_SABLEVM],
+  [
+  if test x"$JAVA_HOME" != x
+  then
+    AC_PATH_PROG(SABLEVM,sablevm,NONE,$JAVA_HOME/bin)
+    if test "$SABLEVM" != "NONE"
+    then
+      AC_MSG_RESULT([Using sableVM: $SABLEVM])
+      CFLAGS="$CFLAGS -DHAVE_SABLEVM"
+    fi
+  fi
+  ])
+
 dnl TCN_HELP_STRING(LHS, RHS)
 dnl Autoconf 2.50 can not handle substr correctly.  It does have 
 dnl AC_HELP_STRING, so let's try to call it if we can.
