@@ -105,7 +105,7 @@ jstring tcn_new_stringn(JNIEnv *env, const char *str, size_t l)
     jstring result;
     jbyteArray bytes = 0;
     size_t len = l;
-    
+
     if (!str)
         return NULL;
     if ((*env)->EnsureLocalCapacity(env, 2) < 0) {
@@ -132,6 +132,10 @@ jbyteArray tcn_new_arrayb(JNIEnv *env, const unsigned char *data, size_t len)
     return bytes;
 }
 
+jobjectArray tcn_new_arrays(JNIEnv *env, size_t len)
+{
+    return (*env)->NewObjectArray(env, (jsize)len, jString_class, NULL);
+}
 
 jstring tcn_new_string(JNIEnv *env, const char *str)
 {
@@ -432,4 +436,25 @@ TCN_IMPLEMENT_CALL(jint, Library, size)(TCN_STDARGS, jint what)
 
     }
     return 0;
+}
+
+TCN_DECLARE(apr_pool_t *) tcn_get_global_pool()
+{
+    if (!tcn_global_pool) {
+        if (apr_pool_create(&tcn_global_pool, NULL) != APR_SUCCESS) {
+            return NULL;
+        }
+        apr_atomic_init(tcn_global_pool);
+    }
+    return tcn_global_pool;
+}
+
+TCN_DECLARE(jclass) tcn_get_string_class()
+{
+    return jString_class;
+}
+
+TCN_DECLARE(JavaVM *) tcn_get_java_vm()
+{
+    return tcn_global_vm;
 }

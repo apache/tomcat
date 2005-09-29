@@ -1,5 +1,8 @@
 #include <windows.h>
 
+LANGUAGE 0x9,0x1
+1 11 logmessages.bin
+
 #define TCN_COPYRIGHT "Copyright 2000-2005 The Apache Software " \
                       "Foundation or its licensors, as applicable."
 

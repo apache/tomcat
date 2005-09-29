@@ -46,7 +46,9 @@
 #else
 #include <unistd.h>
 #endif
-#include <jni.h>
+
+#include "tcn_api.h"
+
 
 #if defined(_DEBUG) || defined(DEBUG)
 #include <assert.h>
@@ -64,6 +66,13 @@
 #define TCN_EINTR       APR_OS_START_USERERR + 3
 #define TCN_EINPROGRESS APR_OS_START_USERERR + 4
 #define TCN_ETIMEDOUT   APR_OS_START_USERERR + 5
+
+#define TCN_LOG_EMERG  1
+#define TCN_LOG_ERROR  2
+#define TCN_LOG_NOTICE 3
+#define TCN_LOG_WARN   4
+#define TCN_LOG_INFO   5
+#define TCN_LOG_DEBUG  6
 
 #define TCN_ERROR_WRAP(E)                   \
     if (APR_STATUS_IS_TIMEUP(E))            \
@@ -100,13 +109,8 @@
 #define TCN_IMPARGS     JNIEnv *e, jobject o, void *sock
 #define TCN_IMPCALL(X)  e, o, X->opaque
 
-#ifdef HAVE_SABLEVM
-#define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
-    JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN##__J
-#else
 #define TCN_IMPLEMENT_CALL(RT, CL, FN)  \
     JNIEXPORT RT JNICALL Java_org_apache_tomcat_jni_##CL##_##FN
-#endif
 
 #define TCN_IMPLEMENT_METHOD(RT, FN)    \
     static RT method_##FN
@@ -152,6 +156,7 @@ void            tcn_ThrowAPRException(JNIEnv *, apr_status_t);
 jstring         tcn_new_string(JNIEnv *, const char *);
 jstring         tcn_new_stringn(JNIEnv *, const char *, size_t);
 jbyteArray      tcn_new_arrayb(JNIEnv *, const unsigned char *, size_t);
+jobjectArray    tcn_new_arrays(JNIEnv *env, size_t len);
 char           *tcn_get_string(JNIEnv *, jstring);
 char           *tcn_strdup(JNIEnv *, jstring);
 char           *tcn_pstrdup(JNIEnv *, jstring, apr_pool_t *);
@@ -232,5 +237,24 @@ typedef struct {
 
 #define TCN_MIN(a, b) ((a) < (b) ? (a) : (b))
 #define TCN_MAX(a, b) ((a) > (b) ? (a) : (b))
+
+#ifdef WIN32
+#define TCN_ALLOC_WSTRING(V)     \
+    jsize wl##V = (*e)->GetStringLength(e, V);   \
+    const jchar *ws##V = V ? (const jchar *)((*e)->GetStringChars(e, V, 0)) : NULL; \
+    jchar *w##V = NULL
+
+#define TCN_INIT_WSTRING(V)                                     \
+        w##V = (jchar *)malloc((wl##V + 1) * sizeof(jchar));    \
+        wcsncpy(w##V, ws##V, wl##V);                        \
+        w##V[wl##V] = 0
+
+#define TCN_FREE_WSTRING(V)      \
+    if (ws##V) (*e)->ReleaseStringChars(e, V, ws##V); \
+    if (ws##V) free (w##V)
+
+#define J2W(V)  w##V
+
+#endif
 
 #endif /* TCN_H */

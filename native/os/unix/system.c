@@ -35,6 +35,9 @@
 #include <sys/sysinfo.h>
 #endif
 
+#include <syslog.h>
+#include <stdarg.h>
+
 #if defined(sun)
 #define MAX_PROC_PATH_LEN 64
 #define MAX_CPUS 512
@@ -283,4 +286,63 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
 #endif
    (*e)->ReleaseLongArrayElements(e, inf, pvals, 0);
     return rv;
+}
+
+#define LOG_MSG_DOMAIN                   "Native"
+
+
+TCN_IMPLEMENT_CALL(jstring, OS, expand)(TCN_STDARGS, jstring val)
+{
+    jstring str;
+    TCN_ALLOC_CSTRING(val);
+
+    UNREFERENCED(o);
+    
+    /* TODO: Make ${ENVAR} expansion */
+    str = (*e)->NewStringUTF(e, J2S(val));
+
+    TCN_FREE_CSTRING(val);
+    return str;
+}
+
+TCN_IMPLEMENT_CALL(void, OS, sysloginit)(TCN_STDARGS, jstring domain)
+{
+    const char *d;
+    TCN_ALLOC_CSTRING(domain);
+
+    UNREFERENCED(o);
+    if ((d = J2S(domain)) == NULL)
+        d = LOG_MSG_DOMAIN;
+
+    openlog(d, LOG_CONS | LOG_PID, LOG_LOCAL0);
+    TCN_FREE_CSTRING(domain);
+}
+
+TCN_IMPLEMENT_CALL(void, OS, syslog)(TCN_STDARGS, jint level,
+                                     jstring msg)
+{
+    TCN_ALLOC_CSTRING(msg);
+    int id = LOG_DEBUG;
+    UNREFERENCED(o);
+
+    switch (level) {
+        case TCN_LOG_EMERG:
+            id = LOG_EMERG;
+        break;
+        case TCN_LOG_ERROR:
+            id = LOG_ERR;
+        break;
+        case TCN_LOG_NOTICE:
+            id = LOG_NOTICE;
+        break;
+        case TCN_LOG_WARN:
+            id = LOG_WARN;
+        break;
+        case TCN_LOG_INFO:
+            id = LOG_INFO;
+        break;
+    }
+    syslog (id, "%s", J2S(msg));
+
+    TCN_FREE_CSTRING(msg);
 }

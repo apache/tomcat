@@ -44,6 +44,7 @@ static HINSTANCE        dll_instance = NULL;
 static SYSTEM_INFO      dll_system_info;
 static HANDLE           h_kernel = NULL;
 static HANDLE           h_ntdll  = NULL;
+static char             dll_file_name[MAX_PATH];
 
 typedef BOOL (WINAPI *pfnGetSystemTimes)(LPFILETIME, LPFILETIME, LPFILETIME);
 typedef NTSTATUS (WINAPI *pfnNtQuerySystemInformation)(SYSTEM_INFORMATION_CLASS, PVOID, ULONG, PULONG);
@@ -83,6 +84,7 @@ DllMain(
                     h_ntdll = NULL;
                 }
             }
+            GetModuleFileName(instance, dll_file_name, sizeof(dll_file_name));
             break;
         /** The attached process creates a new thread.
          */
@@ -115,6 +117,146 @@ DllMain(
     UNREFERENCED_PARAMETER(reserved);
 }
 
+
+TCN_IMPLEMENT_CALL(jstring, OS, syserror)(TCN_STDARGS, jint err)
+{
+    jstring str;
+    void *buf;
+
+    UNREFERENCED(o);
+    if (!FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                       FORMAT_MESSAGE_FROM_SYSTEM |
+                       FORMAT_MESSAGE_IGNORE_INSERTS,
+                       NULL,
+                       err,
+                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                       (LPTSTR)&buf,
+                       0,
+                       NULL)) {
+        str = AJP_TO_JSTRING("Unknown Error");
+    }
+    else {
+        str = AJP_TO_JSTRING((const char *)buf);
+        LocalFree(buf);
+    }
+    return str;
+}
+
+TCN_IMPLEMENT_CALL(jstring, OS, expand)(TCN_STDARGS, jstring val)
+{
+    jstring str;
+    jchar buf[TCN_BUFFER_SZ] = L"";
+    DWORD len;
+    TCN_ALLOC_WSTRING(val);
+
+    UNREFERENCED(o);
+    TCN_INIT_WSTRING(val);
+
+    len = ExpandEnvironmentStringsW(J2W(val), buf, TCN_BUFFER_SZ - 1);
+    if (len > (TCN_BUFFER_SZ - 1)) {
+        jchar *dbuf = malloc((len + 1) * 2);
+        ExpandEnvironmentStringsW(J2W(val), dbuf, len);
+        str = (*e)->NewString(e, dbuf, wcslen(dbuf));
+        free(dbuf);
+    }
+    else
+        str = (*e)->NewString(e, buf, wcslen(buf));
+
+    TCN_FREE_WSTRING(val);
+    return str;
+}
+
+#define LOG_MSG_EMERG                    0xC0000001L
+#define LOG_MSG_ERROR                    0xC0000002L
+#define LOG_MSG_NOTICE                   0x80000003L
+#define LOG_MSG_WARN                     0x80000004L
+#define LOG_MSG_INFO                     0x40000005L
+#define LOG_MSG_DEBUG                    0x00000006L
+#define LOG_MSG_DOMAIN                   "Native"
+
+static char log_domain[MAX_PATH] = "Native";
+
+static void init_log_source(const char *domain)
+{
+    HKEY  key;
+    DWORD ts;
+    char event_key[MAX_PATH];
+
+    strcpy(event_key, "SYSTEM\\CurrentControlSet\\Services\\EventLog\\Application\\");
+    strcat(event_key, domain);
+    if (!RegCreateKey(HKEY_LOCAL_MACHINE, event_key, &key)) {
+        RegSetValueEx(key, "EventMessageFile", 0, REG_SZ, (LPBYTE)&dll_file_name[0],
+                      strlen(dll_file_name) + 1);
+        ts = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
+
+        RegSetValueEx(key, "TypesSupported", 0, REG_DWORD, (LPBYTE) &ts, sizeof(DWORD));
+        RegCloseKey(key);
+    }
+    strcpy(log_domain, domain);
+}
+
+TCN_IMPLEMENT_CALL(void, OS, sysloginit)(TCN_STDARGS, jstring domain)
+{
+    const char *d;
+    TCN_ALLOC_CSTRING(domain);
+
+    UNREFERENCED(o);
+
+    if ((d = J2S(domain)) == NULL)
+        d = LOG_MSG_DOMAIN;
+    init_log_source(d);
+
+    TCN_FREE_CSTRING(domain);
+}
+
+TCN_IMPLEMENT_CALL(void, OS, syslog)(TCN_STDARGS, jint level,
+                                     jstring msg)
+{
+    TCN_ALLOC_CSTRING(msg);
+    DWORD id = LOG_MSG_DEBUG;
+    WORD  il = EVENTLOG_SUCCESS;
+    HANDLE  source;
+    const char *messages[1];
+    UNREFERENCED(o);
+
+    switch (level) {
+        case TCN_LOG_EMERG:
+            id = LOG_MSG_EMERG;
+            il = EVENTLOG_ERROR_TYPE;
+        break;
+        case TCN_LOG_ERROR:
+            id = LOG_MSG_ERROR;
+            il = EVENTLOG_ERROR_TYPE;
+        break;
+        case TCN_LOG_NOTICE:
+            id = LOG_MSG_NOTICE;
+            il = EVENTLOG_WARNING_TYPE;
+        break;
+        case TCN_LOG_WARN:
+            id = LOG_MSG_WARN;
+            il = EVENTLOG_WARNING_TYPE;
+        break;
+        case TCN_LOG_INFO:
+            id = LOG_MSG_INFO;
+            il = EVENTLOG_INFORMATION_TYPE;
+        break;
+    }
+
+    messages[0] = J2S(msg);
+    source = RegisterEventSource(NULL, log_domain);
+
+    if (source != NULL) {
+        ReportEvent(source, il,
+                    0,
+                    id,
+                    NULL,
+                    1, 0,
+                    messages, NULL);
+        DeregisterEventSource(source);
+    }
+
+    TCN_FREE_CSTRING(msg);
+}
 
 TCN_IMPLEMENT_CALL(jboolean, OS, is)(TCN_STDARGS, jint type)
 {
@@ -221,8 +363,39 @@ cleanup:
 static DWORD WINAPI password_thread(void *data)
 {
     tcn_pass_cb_t *cb = (tcn_pass_cb_t *)data;
-    MSG msg;
-    HWND hwnd = CreateDialog(dll_instance, MAKEINTRESOURCE(1001), NULL, NULL);
+    MSG     msg;
+    HWINSTA hwss;
+    HWINSTA hwsu;
+    HDESK   hwds;
+    HDESK   hwdu;
+    HWND    hwnd;
+
+    /* Ensure connection to service window station and desktop, and
+     * save their handles.
+     */
+    GetDesktopWindow();
+    hwss = GetProcessWindowStation();
+    hwds = GetThreadDesktop(GetCurrentThreadId());
+
+    /* Impersonate the client and connect to the User's
+     * window station and desktop.
+     */
+    hwsu = OpenWindowStation("WinSta0", FALSE, MAXIMUM_ALLOWED);
+    if (hwsu == NULL) {
+        ExitThread(1);
+        return 1;
+    }
+    SetProcessWindowStation(hwsu);
+    hwdu = OpenDesktop("Default", 0, FALSE, MAXIMUM_ALLOWED);
+    if (hwdu == NULL) {
+        SetProcessWindowStation(hwss);
+        CloseWindowStation(hwsu);
+        ExitThread(1);
+        return 1;
+    }
+    SetThreadDesktop(hwdu);
+
+    hwnd = CreateDialog(dll_instance, MAKEINTRESOURCE(1001), NULL, NULL);
     if (hwnd != NULL)
         ShowWindow(hwnd, SW_SHOW);
     else  {
@@ -253,6 +426,13 @@ static DWORD WINAPI password_thread(void *data)
         else
             Sleep(100);
     }
+    /* Restore window station and desktop.
+     */
+    SetThreadDesktop(hwds);
+    SetProcessWindowStation(hwss);
+    CloseDesktop(hwdu);
+    CloseWindowStation(hwsu);
+
     ExitThread(0);
     return 0;
 }

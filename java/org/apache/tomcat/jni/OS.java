@@ -25,13 +25,20 @@ package org.apache.tomcat.jni;
 public class OS {
 
     /* OS Enums */
-    private static final int UNIX     = 1;
-    private static final int NETWARE  = 2;
-    private static final int WIN32    = 3;
-    private static final int WIN64    = 4;
-    private static final int LINUX    = 5;
-    private static final int SOLARIS  = 6;
-    private static final int BSD      = 7;
+    private static final int UNIX      = 1;
+    private static final int NETWARE   = 2;
+    private static final int WIN32     = 3;
+    private static final int WIN64     = 4;
+    private static final int LINUX     = 5;
+    private static final int SOLARIS   = 6;
+    private static final int BSD       = 7;
+
+    public static final int LOG_EMERG  = 1;
+    public static final int LOG_ERROR  = 2;
+    public static final int LOG_NOTICE = 3;
+    public static final int LOG_WARN   = 4;
+    public static final int LOG_INFO   = 5;
+    public static final int LOG_DEBUG  = 6;
 
     /**
      * Check for OS type.
@@ -106,5 +113,25 @@ public class OS {
      *            Array length must be at least 16.
      */
     public static native int info(long [] inf);
+
+    /**
+     * Expand environment variables.
+     * @param str String to expand
+     * @return Expanded string with replaced environment variables.
+     */
+    public static native String expand(String str);
+
+    /**
+     * Initialize system logging.
+     * @param domain String that will be prepended to every message
+     */
+    public static native void sysloginit(String domain);
+
+    /**
+     * Log message.
+     * @param level Log message severity. See LOG_XXX enums.
+     * @param message Message to log
+     */
+    public static native void syslog(int level, String message);
 
 }
