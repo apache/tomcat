@@ -594,7 +594,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
     apr_size_t nbytes = (apr_size_t)len;
     apr_status_t ss;
 
-    UNREFERENCED(o);
+    UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(s->jsbbuff != NULL);
@@ -854,7 +854,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbb)(TCN_STDARGS, jlong sock,
     apr_status_t ss;
     apr_size_t nbytes = (apr_size_t)len;
 
-    UNREFERENCED(o);
+    UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(s->jrbbuff != NULL);
@@ -952,7 +952,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
     apr_size_t nbytes = (apr_size_t)len;
     apr_interval_time_t t;
 
-    UNREFERENCED(o);
+    UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->jrbbuff != NULL);
     TCN_ASSERT(s->opaque != NULL);
@@ -1180,7 +1180,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfilen)(TCN_STDARGS, jlong sock,
     apr_hdtr_t hdrs;
     apr_status_t ss;
 
-    UNREFERENCED(o);
+    UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(file != 0);
 
