@@ -146,6 +146,8 @@ typedef struct {
     apr_pool_t   *pool;
     apr_socket_t *sock;
     void         *opaque;
+    char         *jsbbuff;
+    char         *jrbbuff;
     tcn_nlayer_t *net;
 } tcn_socket_t;
 

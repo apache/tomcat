@@ -531,6 +531,32 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
     }
 }
 
+TCN_IMPLEMENT_CALL(void, Socket, setsbb)(TCN_STDARGS, jlong sock,
+                                         jobject buf)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
+    if (buf)
+        s->jsbbuff = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    else
+        s->jsbbuff = NULL;
+}
+
+TCN_IMPLEMENT_CALL(void, Socket, setrbb)(TCN_STDARGS, jlong sock,
+                                         jobject buf)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
+    if (buf)
+        s->jrbbuff = (char *)(*e)->GetDirectBufferAddress(e, buf);
+    else
+        s->jrbbuff = NULL;
+}
+
 TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
                                         jobject buf, jint offset, jint len)
 {
@@ -552,6 +578,34 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     ss = (*s->net->send)(s->opaque, bytes + offset, &nbytes);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
+                                         jint offset, jint len)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_size_t nbytes = (apr_size_t)len;
+    apr_status_t ss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
+    TCN_ASSERT(s->jsbbuff != NULL);
+#ifdef TCN_DO_STATISTICS
+    sp_max_send = TCN_MAX(sp_max_send, nbytes);
+    sp_min_send = TCN_MIN(sp_min_send, nbytes);
+    sp_tot_send += nbytes;
+    sp_num_send++;
+#endif
+
+    ss = (*s->net->send)(s->opaque, s->jsbbuff + offset, &nbytes);
 
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
@@ -793,6 +847,48 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvb)(TCN_STDARGS, jlong sock,
     }
 }
 
+TCN_IMPLEMENT_CALL(jint, Socket, recvbb)(TCN_STDARGS, jlong sock,
+                                         jint offset, jint len)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_status_t ss;
+    apr_size_t nbytes = (apr_size_t)len;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->opaque != NULL);
+    TCN_ASSERT(s->jrbbuff != NULL);
+
+    ss = (*s->net->recv)(s->opaque, s->jrbbuff + offset, &nbytes);
+#ifdef TCN_DO_STATISTICS
+    if (ss == APR_SUCCESS) {
+        sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
+        sp_min_recv = TCN_MIN(sp_min_recv, nbytes);
+        sp_tot_recv += nbytes;
+        sp_num_recv++;
+    }
+    else {
+        if (APR_STATUS_IS_ETIMEDOUT(ss) ||
+            APR_STATUS_IS_TIMEUP(ss))
+            sp_tmo_recv++;
+        else if (APR_STATUS_IS_ECONNABORTED(ss) ||
+                 APR_STATUS_IS_ECONNRESET(ss) ||
+                 APR_STATUS_IS_EOF(ss))
+            sp_rst_recv++;
+        else {
+            sp_err_recv++;
+            sp_erl_recv = ss;
+        }
+    }
+#endif
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
 TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
                                          jobject buf, jint offset,
                                          jint len, jlong timeout)
@@ -816,6 +912,57 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
          return -(jint)ss;
     ss = (*s->net->recv)(s->opaque, bytes + offset, &nbytes);
+    /* Resore the original timeout */
+    (*s->net->timeout_set)(s->opaque, t);
+#ifdef TCN_DO_STATISTICS
+    if (ss == APR_SUCCESS) {
+        sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
+        sp_min_recv = TCN_MIN(sp_min_recv, nbytes);
+        sp_tot_recv += nbytes;
+        sp_num_recv++;
+    }
+    else {
+        if (APR_STATUS_IS_ETIMEDOUT(ss) ||
+            APR_STATUS_IS_TIMEUP(ss))
+            sp_tmo_recv++;
+        else if (APR_STATUS_IS_ECONNABORTED(ss) ||
+                 APR_STATUS_IS_ECONNRESET(ss) ||
+                 APR_STATUS_IS_EOF(ss))
+            sp_rst_recv++;
+        else {
+            sp_err_recv++;
+            sp_erl_recv = ss;
+        }
+    }
+#endif
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
+                                          jint offset,
+                                          jint len, jlong timeout)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_status_t ss;
+    apr_size_t nbytes = (apr_size_t)len;
+    apr_interval_time_t t;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(s->jrbbuff != NULL);
+    TCN_ASSERT(s->opaque != NULL);
+
+
+    if ((ss = (*s->net->timeout_get)(s->opaque, &t)) != APR_SUCCESS)
+         return -(jint)ss;
+    if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
+         return -(jint)ss;
+    ss = (*s->net->recv)(s->opaque, s->jrbbuff + offset, &nbytes);
     /* Resore the original timeout */
     (*s->net->timeout_set)(s->opaque, t);
 #ifdef TCN_DO_STATISTICS
@@ -1010,6 +1157,51 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
     for (i = 0; i < nt; i++) {
         (*e)->ReleaseByteArrayElements(e, tba[i], tvec[i].iov_base, JNI_ABORT);
     }
+    /* Return Number of bytes actually sent,
+     * including headers, file, and trailers
+     */
+    if (ss == APR_SUCCESS)
+        return (jlong)written;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jlong)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jlong, Socket, sendfilen)(TCN_STDARGS, jlong sock,
+                                             jlong file,
+                                             jlong offset, jlong len,
+                                             jint flags)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_file_t *f = J2P(file, apr_file_t *);
+    apr_off_t off = (apr_off_t)offset;
+    apr_size_t written = (apr_size_t)len;
+    apr_hdtr_t hdrs;
+    apr_status_t ss;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(file != 0);
+
+    if (s->net->type != TCN_SOCKET_APR)
+        return (jint)(-APR_ENOTIMPL);
+
+    hdrs.headers = NULL;
+    hdrs.numheaders = 0;
+    hdrs.trailers = NULL;
+    hdrs.numtrailers = 0;
+
+
+    ss = apr_socket_sendfile(s->sock, f, &hdrs, &off, &written, (apr_int32_t)flags);
+
+#ifdef TCN_DO_STATISTICS
+    sf_max_send = TCN_MAX(sf_max_send, written);
+    sf_min_send = TCN_MIN(sf_min_send, written);
+    sf_tot_send += written;
+    sf_num_send++;
+#endif
+
     /* Return Number of bytes actually sent,
      * including headers, file, and trailers
      */

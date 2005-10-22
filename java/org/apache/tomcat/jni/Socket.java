@@ -240,6 +240,11 @@ public class Socket {
      */
     public static native int sendb(long sock, ByteBuffer buf,
                                    int offset, int len);
+    /**
+     * Send data over a network using internally set ByteBuffer
+     */
+    public static native int sendbb(long sock,
+                                   int offset, int len);
 
     /**
      * Send multiple packets of data over a network.
@@ -338,7 +343,11 @@ public class Socket {
      */
     public static native int recvb(long sock, ByteBuffer buf,
                                    int offset, int nbytes);
-
+    /**
+     * Read data from a network using internally set ByteBuffer
+     */
+    public static native int recvbb(long sock,
+                                    int offset, int nbytes);
     /**
      * Read data from a network with timeout.
      *
@@ -362,6 +371,11 @@ public class Socket {
      */
     public static native int recvbt(long sock, ByteBuffer buf,
                                     int offset, int nbytes, long timeout);
+    /**
+     * Read data from a network with timeout using internally set ByteBuffer
+     */
+    public static native int recvbbt(long sock,
+                                     int offset, int nbytes, long timeout);
 
     /**
      * @param from The apr_sockaddr_t to fill in the recipient info
@@ -467,6 +481,11 @@ public class Socket {
                                        byte[][] trailers, long offset,
                                        long len, int flags);
 
+    /**
+     * Send a file without header and trailer arrays.
+     */
+    public static native long sendfilen(long sock, long file, long offset,
+                                        long len, int flags);
 
     /**
      * Create a child pool from associated socket pool.
@@ -489,4 +508,21 @@ public class Socket {
      */
     private static native long get(long socket, int what);
 
+    /**
+     * Set internal send ByteBuffer.
+     * This function will preset internal Java ByteBuffer for
+     * consecutive sendbb calls.
+     * @param thesocket The socket to use
+     * @param buf The ByteBuffer
+     */
+    public static native void setsbb(long sock, ByteBuffer buf);
+
+    /**
+     * Set internal receive ByteBuffer.
+     * This function will preset internal Java ByteBuffer for
+     * consecutive revcvbb/recvbbt calls.
+     * @param thesocket The socket to use
+     * @param buf The ByteBuffer
+     */
+    public static native void setrbb(long sock, ByteBuffer buf);
 }
