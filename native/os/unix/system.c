@@ -38,6 +38,10 @@
 #include <syslog.h>
 #include <stdarg.h>
 
+#ifndef LOG_WARN
+#define LOG_WARN LOG_WARNING
+#endif
+
 #if defined(sun)
 #define MAX_PROC_PATH_LEN 64
 #define MAX_CPUS 512
