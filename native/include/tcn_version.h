@@ -68,13 +68,13 @@ extern "C" {
 #define TCN_MINOR_VERSION       1
 
 /** patch level */
-#define TCN_PATCH_VERSION       0
+#define TCN_PATCH_VERSION       1
 
 /**
  *  This symbol is defined for internal, "development" copies of TCN. This
  *  symbol will be #undef'd for releases.
  */
-#define TCN_IS_DEV_VERSION
+#undef TCN_IS_DEV_VERSION
 
 
 /** The formatted string of APU's version */

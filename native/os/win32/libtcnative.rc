@@ -19,7 +19,7 @@ LANGUAGE 0x9,0x1
                     "specific language governing permissions and " \
                     "limitations under the License."
 
-#define TCN_VERISON "1.1.0-dev"
+#define TCN_VERISON "1.1.1"
 1000 ICON "apache.ico"
 
 1001 DIALOGEX 0, 0, 252, 51
