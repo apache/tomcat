@@ -112,12 +112,12 @@ cleanup:
 
 TCN_IMPLEMENT_CALL(jint, File, remove)(TCN_STDARGS, jstring path, jlong pool)
 {
-    apr_pool_t *p = J2P(pool, apr_pool_t *);
     TCN_ALLOC_CSTRING(path);
     apr_status_t rv;
 
     UNREFERENCED(o);
-    rv = apr_file_remove(J2S(path), p);
+    UNREFERENCED(pool);
+    rv = apr_file_remove(J2S(path), NULL);
     TCN_FREE_CSTRING(path);
     return (jint)rv;
 }
@@ -125,13 +125,13 @@ TCN_IMPLEMENT_CALL(jint, File, remove)(TCN_STDARGS, jstring path, jlong pool)
 TCN_IMPLEMENT_CALL(jint, File, rename)(TCN_STDARGS, jstring from,
                                        jstring to, jlong pool)
 {
-    apr_pool_t *p = J2P(pool, apr_pool_t *);
     TCN_ALLOC_CSTRING(from);
     TCN_ALLOC_CSTRING(to);
     apr_status_t rv;
 
     UNREFERENCED(o);
-    rv = apr_file_rename(J2S(from), J2S(to), p);
+    UNREFERENCED(pool);
+    rv = apr_file_rename(J2S(from), J2S(to), NULL);
     TCN_FREE_CSTRING(from);
     TCN_FREE_CSTRING(to);
     return (jint)rv;

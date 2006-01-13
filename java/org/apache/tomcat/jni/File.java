@@ -255,7 +255,7 @@ public class File {
     /**
      * Delete the specified file.
      * @param path The full path to the file (using / on all systems)
-     * @param pool The pool to use.
+     * @param pool Unused.
      * If the file is open, it won't be removed until all
      * instances are closed.
      */
@@ -268,7 +268,7 @@ public class File {
      * possible.
      * @param fromPath The full path to the original file (using / on all systems)
      * @param toPath The full path to the new file (using / on all systems)
-     * @param pool The pool to use.
+     * @param pool Unused.
      */
     public static native int rename(String fromPath, String toPath, long pool);
 
