@@ -280,7 +280,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     GET_S_FAMILY(f, family);
     GET_S_TYPE(t, type);
 
-    if (family > 0) { 
+    if (family >= 0) { 
         TCN_THROW_IF_ERR(apr_socket_create(&s,
                          f, t, protocol, p), a);
     }
@@ -290,7 +290,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
     a->sock = s;
     a->pool = p;
-    if (family > 0)
+    if (family >= 0)
         a->net = &apr_socket_layer;
     a->opaque   = s;
     apr_pool_cleanup_register(p, (const void *)a,
