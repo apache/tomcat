@@ -280,7 +280,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     GET_S_FAMILY(f, family);
     GET_S_TYPE(t, type);
 
-    if (family >= 0) { 
+    if (family >= 0) {
         TCN_THROW_IF_ERR(apr_socket_create(&s,
                          f, t, protocol, p), a);
     }
@@ -592,6 +592,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_size_t nbytes = (apr_size_t)len;
+    apr_size_t sent = 0;
     apr_status_t ss;
 
     UNREFERENCED_STDARGS;
@@ -605,10 +606,15 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
     sp_num_send++;
 #endif
 
-    ss = (*s->net->send)(s->opaque, s->jsbbuff + offset, &nbytes);
-
+    while (sent < nbytes) {
+	apr_size_t wr = nbytes - sent;
+	ss = (*s->net->send)(s->opaque, s->jsbbuff + offset + sent, &wr);
+	if (ss != APR_SUCCESS)
+	    break;
+	sent += wr;
+    }
     if (ss == APR_SUCCESS)
-        return (jint)nbytes;
+        return (jint)sent;
     else {
         TCN_ERROR_WRAP(ss);
         return -(jint)ss;
