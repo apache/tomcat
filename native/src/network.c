@@ -562,6 +562,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_size_t nbytes = (apr_size_t)len;
+    apr_size_t sent = 0;
     char *bytes;
     apr_status_t ss;
 
@@ -577,10 +578,17 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
 #endif
 
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
-    ss = (*s->net->send)(s->opaque, bytes + offset, &nbytes);
+
+    while (sent < nbytes) {
+        apr_size_t wr = nbytes - sent;
+        ss = (*s->net->send)(s->opaque, bytes + offset + sent, &wr);
+        if (ss != APR_SUCCESS)
+            break;
+        sent += wr;
+    }
 
     if (ss == APR_SUCCESS)
-        return (jint)nbytes;
+        return (jint)sent;
     else {
         TCN_ERROR_WRAP(ss);
         return -(jint)ss;
@@ -607,11 +615,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
 #endif
 
     while (sent < nbytes) {
-	apr_size_t wr = nbytes - sent;
-	ss = (*s->net->send)(s->opaque, s->jsbbuff + offset + sent, &wr);
-	if (ss != APR_SUCCESS)
-	    break;
-	sent += wr;
+        apr_size_t wr = nbytes - sent;
+        ss = (*s->net->send)(s->opaque, s->jsbbuff + offset + sent, &wr);
+        if (ss != APR_SUCCESS)
+            break;
+        sent += wr;
     }
     if (ss == APR_SUCCESS)
         return (jint)sent;
