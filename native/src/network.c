@@ -564,7 +564,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     apr_size_t nbytes = (apr_size_t)len;
     apr_size_t sent = 0;
     char *bytes;
-    apr_status_t ss;
+    apr_status_t ss = APR_SUCCESS;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
@@ -601,7 +601,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_size_t nbytes = (apr_size_t)len;
     apr_size_t sent = 0;
-    apr_status_t ss;
+    apr_status_t ss = APR_SUCCESS;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
