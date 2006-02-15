@@ -14,7 +14,7 @@
   Using it in Tomcat:
   1 - In <Connector> use of conf/server.xml:
     protocol="org.apache.coyote.http11.Http11AprProtocol"
-  2 - In bin/setenv.sh add the following:
+  2 - In bin/setenv.sh add the following: 
     CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
     In my machine I am using:
     /home/jfclere/jakarta-tomcat-connectors/jni/native/.libs for tclib_location
@@ -25,3 +25,7 @@ NOTES:
     LD_LIBRARY_PATH=openssl_install_location/lib; export LD_LIBRARY_PATH
     (use ldd ./.libs/libtcnative-1.so to check it).
   - quick testing: openssl s_client -connect localhost:8443
+  - For MAC OS X you must manually add a link
+    cd ${tcnative installdir}
+    ln -d libtcnative-1.dylib libtcnative-1.jnilib
+    
