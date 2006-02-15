@@ -718,7 +718,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
         char sb[TCN_BUFFER_SZ];
 
         if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
-            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)sb);
+            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)&sb[0]);
     }
     else {
         jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
@@ -776,7 +776,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     if (toread <= TCN_BUFFER_SZ) {
         char sb[TCN_BUFFER_SZ];
         ss = (*s->net->recv)(s->opaque, sb, &nbytes);
-        (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)sb);
+        (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)&sb[0]);
     }
     else {
         jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
