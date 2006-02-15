@@ -517,7 +517,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
             bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
         else
             bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-        ss = (*s->net->send)(s->opaque, bytes + offset, &nbytes);
+        ss = (*s->net->send)(s->opaque, (char *)(bytes + offset), &nbytes);
         if (nb)
             (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
         else
@@ -689,7 +689,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendto)(TCN_STDARGS, jlong sock,
          bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
     else
          bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-    ss = apr_socket_sendto(s->sock, w, flag, bytes + offset, &nbytes);
+    ss = apr_socket_sendto(s->sock, w, flag, (char *)(bytes + offset), &nbytes);
 
     if (nb)
         (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, 0);
@@ -718,11 +718,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
         char sb[TCN_BUFFER_SZ];
 
         if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
-            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, sb);
+            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)sb);
     }
     else {
         jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-        ss = (*s->net->recv)(s->opaque, bytes + offset, &nbytes);
+        ss = (*s->net->recv)(s->opaque, (char*)(bytes + offset), &nbytes);
         (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                        nbytes ? 0 : JNI_ABORT);
     }
@@ -776,11 +776,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     if (toread <= TCN_BUFFER_SZ) {
         char sb[TCN_BUFFER_SZ];
         ss = (*s->net->recv)(s->opaque, sb, &nbytes);
-        (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, sb);
+        (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)sb);
     }
     else {
         jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-        ss = (*s->net->recv)(s->opaque, bytes + offset, &nbytes);
+        ss = (*s->net->recv)(s->opaque, (char*)(bytes + offset), &nbytes);
         (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                        nbytes ? 0 : JNI_ABORT);
     }
@@ -1022,7 +1022,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvfrom)(TCN_STDARGS, jlong from,
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->sock != NULL);
     TCN_ASSERT(buf != NULL);
-    ss = apr_socket_recvfrom(f, s->sock, (apr_int32_t)flags, bytes + offset, &nbytes);
+    ss = apr_socket_recvfrom(f, s->sock, (apr_int32_t)flags, (char*)(bytes + offset), &nbytes);
 
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    nbytes ? 0 : JNI_ABORT);

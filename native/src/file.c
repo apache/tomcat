@@ -521,8 +521,7 @@ TCN_IMPLEMENT_CALL(jint, File, gets)(TCN_STDARGS, jbyteArray buf, jint offset,
     jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
 
     UNREFERENCED(o);
-    rv = apr_file_gets(bytes + offset, nbytes - offset, f);
-
+    rv = apr_file_gets((char*)(bytes + offset),nbytes - offset, f);
     (*e)->ReleaseByteArrayElements(e, buf, bytes,
                                    rv == APR_SUCCESS ? 0 : JNI_ABORT);
     return (jint)rv;
