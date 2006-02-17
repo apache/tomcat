@@ -22,13 +22,13 @@
 #include "tcn.h"
 
 static const char *tcn_errors[] = {
-                            "Unknown user error",
+                            "Unknow user error",
     /* TCN_TIMEUP      */   "Operation timed out",
     /* TCN_EAGAIN      */   "There is no data ready",
     /* TCN_EINTR       */   "Interrupted system call",
-    /* TCN_EINPROGRESS */   "Operation in prrogress",
+    /* TCN_EINPROGRESS */   "Operation in progress",
     /* TCN_ETIMEDOUT   */   "Connection timed out",
-    NULL,
+    NULL
 };
 
 /* Merge IS_ETIMEDOUT with APR_TIMEUP
@@ -133,7 +133,10 @@ TCN_IMPLEMENT_CALL(jstring, Error, strerror)(TCN_STDARGS, jint err)
     UNREFERENCED(o);
     if (err >= TCN_TIMEUP && err <= TCN_ETIMEDOUT) {
         err -= TCN_TIMEUP;
-        jerr = AJP_TO_JSTRING(tcn_errors[err]);
+        jerr = AJP_TO_JSTRING(tcn_errors[err + 1]);
+    }
+    else if (err > TCN_ETIMEDOUT) {
+        jerr = AJP_TO_JSTRING(tcn_errors[0]);
     }
     else {
         apr_strerror(err, serr, 512);
