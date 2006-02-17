@@ -135,9 +135,6 @@ TCN_IMPLEMENT_CALL(jstring, Error, strerror)(TCN_STDARGS, jint err)
         err -= TCN_TIMEUP;
         jerr = AJP_TO_JSTRING(tcn_errors[err + 1]);
     }
-    else if (err > TCN_ETIMEDOUT) {
-        jerr = AJP_TO_JSTRING(tcn_errors[0]);
-    }
     else {
         apr_strerror(err, serr, 512);
         jerr = AJP_TO_JSTRING(serr);
