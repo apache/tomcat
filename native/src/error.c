@@ -22,7 +22,7 @@
 #include "tcn.h"
 
 static const char *tcn_errors[] = {
-                            "Unknow user error",
+                            "Unknown user error",
     /* TCN_TIMEUP      */   "Operation timed out",
     /* TCN_EAGAIN      */   "There is no data ready",
     /* TCN_EINTR       */   "Interrupted system call",
