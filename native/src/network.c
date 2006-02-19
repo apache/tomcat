@@ -1103,6 +1103,7 @@ TCN_IMPLEMENT_CALL(jboolean, Socket, atmark)(TCN_STDARGS, jlong sock)
     return mark ? JNI_TRUE : JNI_FALSE;
 }
 
+#if APR_HAS_SENDFILE
 
 TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
                                             jlong file,
@@ -1226,6 +1227,44 @@ TCN_IMPLEMENT_CALL(jlong, Socket, sendfilen)(TCN_STDARGS, jlong sock,
         return -(jlong)ss;
     }
 }
+
+#else /* APR_HAS_SENDIFLE */
+
+TCN_IMPLEMENT_CALL(jlong, Socket, sendfile)(TCN_STDARGS, jlong sock,
+                                            jlong file,
+                                            jobjectArray headers,
+                                            jobjectArray trailers,
+                                            jlong offset, jlong len,
+                                            jint flags)
+{
+
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    UNREFERENCED(file);
+    UNREFERENCED(headers);
+    UNREFERENCED(trailers);
+    UNREFERENCED(offset);
+    UNREFERENCED(len);
+    UNREFERENCED(flags);
+    return -(jlong)APR_ENOTIMPL;
+}
+
+TCN_IMPLEMENT_CALL(jlong, Socket, sendfilen)(TCN_STDARGS, jlong sock,
+                                             jlong file,
+                                             jlong offset, jlong len,
+                                             jint flags)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    UNREFERENCED(file);
+    UNREFERENCED(offset);
+    UNREFERENCED(len);
+    UNREFERENCED(flags);
+    return -(jlong)APR_ENOTIMPL;
+}
+
+#endif  /* APR_HAS_SENDIFLE */
+
 
 TCN_IMPLEMENT_CALL(jint, Socket, acceptfilter)(TCN_STDARGS,
                                                jlong sock,
