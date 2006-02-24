@@ -385,6 +385,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, bind)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->sock != NULL);
+    apr_socket_opt_set(s->sock, APR_SO_REUSEADDR, 1);
     return (jint)apr_socket_bind(s->sock, a);
 }
 
