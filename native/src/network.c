@@ -379,14 +379,23 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
 TCN_IMPLEMENT_CALL(jint, Socket, bind)(TCN_STDARGS, jlong sock,
                                        jlong sa)
 {
+    jint rv = APR_SUCCESS;
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_sockaddr_t *a = J2P(sa, apr_sockaddr_t *);
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->sock != NULL);
+#if !defined(WIN32)
     apr_socket_opt_set(s->sock, APR_SO_REUSEADDR, 1);
-    return (jint)apr_socket_bind(s->sock, a);
+#endif
+    rv = (jint)apr_socket_bind(s->sock, a);
+#if defined(WIN32)
+    if (rv == APR_SUCCESS) {
+        apr_socket_opt_set(s->sock, APR_SO_REUSEADDR, 1);
+    }
+#endif
+    return rv;
 }
 
 TCN_IMPLEMENT_CALL(jint, Socket, listen)(TCN_STDARGS, jlong sock,
