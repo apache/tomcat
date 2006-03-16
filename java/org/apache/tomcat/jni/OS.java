@@ -46,23 +46,13 @@ public class OS {
      */
     private static native boolean is(int type);
 
-    static {
-        IS_UNIX    = is(UNIX);
-        IS_NETWARE = is(NETWARE);
-        IS_WIN32   = is(WIN32);
-        IS_WIN64   = is(WIN64);
-        IS_LINUX   = is(LINUX);
-        IS_SOLARIS = is(SOLARIS);
-        IS_BSD     = is(BSD);
-    }
-
-    public static boolean IS_UNIX    = false;
-    public static boolean IS_NETWARE = false;
-    public static boolean IS_WIN32   = false;
-    public static boolean IS_WIN64   = false;
-    public static boolean IS_LINUX   = false;
-    public static boolean IS_SOLARIS = false;
-    public static boolean IS_BSD     = false;
+    public static final boolean IS_UNIX    = is(UNIX);
+    public static final boolean IS_NETWARE = is(NETWARE);
+    public static final boolean IS_WIN32   = is(WIN32);
+    public static final boolean IS_WIN64   = is(WIN64);
+    public static final boolean IS_LINUX   = is(LINUX);
+    public static final boolean IS_SOLARIS = is(SOLARIS);
+    public static final boolean IS_BSD     = is(BSD);
 
     /**
      * Get the name of the system default characer set.
