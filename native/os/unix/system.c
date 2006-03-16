@@ -35,6 +35,14 @@
 #include <sys/sysinfo.h>
 #endif
 
+#if defined(DARWIN)
+#include <mach/mach_init.h>
+#include <mach/mach_host.h>
+#include <mach/host_info.h>
+#include <sys/sysctl.h>
+#include <sys/stat.h>
+#endif
+
 #include <syslog.h>
 #include <stdarg.h>
 
@@ -285,6 +293,24 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
          *
          */
     }
+    
+#elif defined(DARWIN)
+
+    uint64_t mem_total;
+    size_t len = sizeof(mem_total);
+
+    vm_statistics_data_t vm_info;
+    mach_msg_type_number_t info_count = HOST_VM_INFO_COUNT;
+
+    sysctlbyname("hw.memsize", &mem_total, &len, NULL, 0);
+    pvals[0] = (jlong)mem_total;
+
+    host_statistics(mach_host_self (), HOST_VM_INFO, (host_info_t)&vm_info, &info_count);
+    pvals[1] = (jlong)(((double)vm_info.free_count)*vm_page_size);
+    pvals[6] = (jlong)(100 - (pvals[1] * 100 / mem_total));
+    rv = APR_SUCCESS;
+
+/* DARWIN */
 #else
     rv = APR_ENOTIMPL;
 #endif
