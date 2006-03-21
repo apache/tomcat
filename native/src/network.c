@@ -386,15 +386,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, bind)(TCN_STDARGS, jlong sock,
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->sock != NULL);
-#if !defined(WIN32)
-    apr_socket_opt_set(s->sock, APR_SO_REUSEADDR, 1);
-#endif
     rv = (jint)apr_socket_bind(s->sock, a);
-#if defined(WIN32)
-    if (rv == APR_SUCCESS) {
-        apr_socket_opt_set(s->sock, APR_SO_REUSEADDR, 1);
-    }
-#endif
     return rv;
 }
 
