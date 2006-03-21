@@ -4,6 +4,7 @@ Tomcat Native Library.
 Building
 ========
 ant
+To build the native part see native/BUILDING
 
 Running the examples
 ====================
