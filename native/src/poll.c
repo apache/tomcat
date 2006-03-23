@@ -37,6 +37,7 @@ typedef struct tcn_pollset {
     apr_int32_t   nelts;
     apr_int32_t   nalloc;
     apr_pollset_t *pollset;
+    jlong         *set;
     apr_pollfd_t  *socket_set;
     apr_interval_time_t *socket_ttl;
     apr_interval_time_t max_ttl;
@@ -119,6 +120,7 @@ TCN_IMPLEMENT_CALL(jlong, Poll, create)(TCN_STDARGS, jint size,
     }
     tps = apr_pcalloc(p, sizeof(tcn_pollset_t));
     tps->pollset = pollset;
+    tps->set        = apr_palloc(p, size * sizeof(jlong) * 2);
     tps->socket_set = apr_palloc(p, size * sizeof(apr_pollfd_t));
     tps->socket_ttl = apr_palloc(p, size * sizeof(apr_interval_time_t));
     tps->nelts  = 0;
@@ -237,7 +239,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
                                      jboolean remove)
 {
     const apr_pollfd_t *fd = NULL;
-    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);    
+    tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
     apr_int32_t  i, num = 0;
     apr_status_t rv = APR_SUCCESS;
 
@@ -258,19 +260,18 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
         num = (apr_int32_t)(-rv);
     }
     if (num > 0) {
-        jlong *pset = (*e)->GetLongArrayElements(e, set, NULL);
 #ifdef TCN_DO_STATISTICS
          p->sp_polled += num;
          p->sp_max_polled = TCN_MAX(p->sp_max_polled, num);
 #endif
         for (i = 0; i < num; i++) {
-            pset[i*2+0] = (jlong)(fd->rtnevents);
-            pset[i*2+1] = P2J(fd->client_data);
+            p->set[i*2+0] = (jlong)(fd->rtnevents);
+            p->set[i*2+1] = P2J(fd->client_data);
             if (remove)
                 do_remove(p, fd);
             fd ++;
         }
-        (*e)->ReleaseLongArrayElements(e, set, pset, 0);
+        (*e)->SetLongArrayRegion(e, set, 0, num * 2, p->set);
     }
 
     return (jint)num;
@@ -280,7 +281,6 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
                                          jlongArray set, jboolean remove)
 {
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
-    jlong *pset = (*e)->GetLongArrayElements(e, set, NULL);
     apr_int32_t  i = 0, num = 0;
     apr_time_t now = apr_time_now();
     apr_pollfd_t fd;
@@ -293,7 +293,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
         for (i = 0; i < p->nelts; i++) {
             if ((now - p->socket_ttl[i]) > p->max_ttl) {
                 fd = p->socket_set[i];
-                pset[num++] = P2J(fd.client_data);
+                p->set[num++] = P2J(fd.client_data);
             }
         }
         if (remove && num) {
@@ -304,15 +304,13 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
 #endif
             for (i = 0; i < num; i++) {
                 fd.desc_type = APR_POLL_SOCKET;
-                fd.desc.s = (J2P(pset[i], tcn_socket_t *))->sock;
+                fd.desc.s = (J2P(p->set[i], tcn_socket_t *))->sock;
                 do_remove(p, &fd);
             }
         }
     }
     if (num)
-        (*e)->ReleaseLongArrayElements(e, set, pset, 0);
-    else
-        (*e)->ReleaseLongArrayElements(e, set, pset, JNI_ABORT);
+        (*e)->SetLongArrayRegion(e, set, 0, num, p->set);
     return (jint)num;
 }
 
@@ -335,7 +333,6 @@ TCN_IMPLEMENT_CALL(jint, Poll, pollset)(TCN_STDARGS, jlong pollset,
                                         jlongArray set)
 {
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
-    jlong *pset = (*e)->GetLongArrayElements(e, set, NULL);
     apr_int32_t  i = 0;
     apr_pollfd_t fd;
 
@@ -345,12 +342,10 @@ TCN_IMPLEMENT_CALL(jint, Poll, pollset)(TCN_STDARGS, jlong pollset,
     for (i = 0; i < p->nelts; i++) {
         p->socket_set[i].rtnevents = APR_POLLHUP | APR_POLLIN;
         fd = p->socket_set[i];
-        pset[i*2+0] = (jlong)(fd.rtnevents);
-        pset[i*2+1] = P2J(fd.client_data);
+        p->set[i*2+0] = (jlong)(fd.rtnevents);
+        p->set[i*2+1] = P2J(fd.client_data);
     }
     if (p->nelts)
-        (*e)->ReleaseLongArrayElements(e, set, pset, 0);
-    else
-        (*e)->ReleaseLongArrayElements(e, set, pset, JNI_ABORT);
+        (*e)->SetLongArrayRegion(e, set, 0, p->nelts * 2, p->set);
     return (jint)p->nelts;
 }
