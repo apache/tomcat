@@ -20,7 +20,9 @@
  */
 
 
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
+#endif
 #define STRICT
 #include <windows.h>
 #include <winsock.h>
@@ -121,7 +123,7 @@ ntp_socket_opt_set(apr_socket_t *sock, apr_int32_t opt, apr_int32_t on)
         break;
         default:
             rv = APR_EINVAL;
-        break; 
+        break;
     }
     return rv;
 }
@@ -140,7 +142,7 @@ ntp_socket_opt_get(apr_socket_t *sock, apr_int32_t opt, apr_int32_t *on)
         break;
         default:
             rv = APR_EINVAL;
-        break; 
+        break;
     }
     return rv;
 }
