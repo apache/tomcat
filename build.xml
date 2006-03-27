@@ -1,0 +1,29 @@
+<project name="Tomcat 6.0" default="deploy" basedir=".">
+
+
+  <!-- ===================== Initialize Property Values =================== -->
+
+  <!-- See "build.properties.sample" in the top level directory for all     -->
+  <!-- property values you must customize for successful building!!!        -->
+  <property file="${user.home}/build.properties"/>
+  <property file="build.properties"/>
+
+  <property file="build.properties.default"/>
+
+  <!-- Project Properties -->
+  <property name="name"                  value="Apache Tomcat" />
+  <property name="year"                  value="2005" />
+  <property name="version.major"         value="6" />
+  <property name="version.minor"         value="0" />
+  <property name="version.build"         value="0" />
+  <property name="version.patch"         value="0" />
+  <property name="version"               value="6.0.0-dev" />
+  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+
+  <property name="project"               value="apache-tomcat" />
+  <property name="final.name"            value="${project}-${version}" />
+  <property name="final-src.name"        value="${project}-${version}-src" />
+
+
+
+</project>

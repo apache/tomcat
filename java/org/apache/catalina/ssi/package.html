@@ -1,0 +1,16 @@
+<body>
+<p>This package contains code that is used by the SsiInvoker.</p>
+<p>This class consists of <code>SsiMediator.java</code> which works as a
+mediator between the different SsiCommands. To add a command you have to
+implement the <code>SsiCommand</code> interface and extend the
+<code>SsiMediator</code>. Commands currently implemented are</p>
+
+<ul>
+<li><b>SsiConfig</b> - Implementation of the NCSA command Config i.e. &lt;!--#config errmsg="error?"--&gt;</li>
+<li><b>SsiEcho</b> - Implementation of the NCSA command Echo i.e. &lt;!--#echo var="SERVER_NAME"--&gt;</li>
+<li><b>SsiExec</b> - Not implemented</li>
+<li><b>SsiFlastMod</b> - Implementation of the NCSA command flastmod i.e. &lt;!--#flastmod virtual="file"--&gt;</li>
+<li><b>SsiFsize</b> - Implementation of the NCSA command fsize i.e. &lt;!--#fsize file="file"--&gt;</li>
+<li><b>SsiInclude</b> - Implementation of the NCSA command Include i.e. &lt;!--#config virtual="includefile"--&gt;</li>
+</ul>
+</body>

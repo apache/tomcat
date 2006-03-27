@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<antlib>
+  <typedef
+        name="list"
+        classname="org.apache.catalina.ant.ListTask" />
+  <typedef
+        name="deploy"
+        classname="org.apache.catalina.ant.DeployTask" />
+  <typedef
+        name="start"
+        classname="org.apache.catalina.ant.StartTask" />
+  <typedef
+        name="reload"
+        classname="org.apache.catalina.ant.ReloadTask" />
+  <typedef
+        name="stop"
+        classname="org.apache.catalina.ant.StopTask" />        
+  <typedef
+        name="undeploy"
+        classname="org.apache.catalina.ant.UndeployTask" />
+  <typedef
+        name="roles"
+        classname="org.apache.catalina.ant.RolesTask" />
+  <typedef
+        name="resources"
+        classname="org.apache.catalina.ant.ResourcesTask" />
+  <typedef
+        name="sessions"
+        classname="org.apache.catalina.ant.SessionsTask" />
+  <typedef
+        name="jkupdate"
+        classname="org.apache.catalina.ant.JKStatusUpdateTask" />
+  <typedef
+        name="jmxManagerSet"
+        classname="org.apache.catalina.ant.JMXSetTask" />
+  <typedef
+        name="jmxManagerGet"
+        classname="org.apache.catalina.ant.JMXGetTask" />
+  <typedef
+        name="jmxManagerQuery"
+        classname="org.apache.catalina.ant.JMXQueryTask" />
+</antlib>

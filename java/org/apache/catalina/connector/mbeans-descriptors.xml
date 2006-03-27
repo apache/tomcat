@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean         name="CoyoteConnector"
+            className="org.apache.catalina.mbeans.ConnectorMBean"
+          description="Implementation of a Coyote connector"
+               domain="Catalina"
+                group="Connector"
+                 type="org.apache.catalina.connector.Connector">
+
+    <attribute   name="acceptCount"
+          description="The accept count for this Connector"
+                 type="int"/>
+
+    <attribute   name="address"
+          description="The IP address on which to bind"
+                 type="java.lang.String"/>
+
+    <attribute   name="algorithm"
+          description="The certificate encoding algorithm to be used"
+                 type="java.lang.String"/>
+
+    <attribute   name="allowTrace"
+          description="Allow disabling TRACE method"
+                 type="boolean"/>
+
+    <attribute   name="bufferSize"
+          description="The input buffer size we should create on input streams"
+                 type="int"/>
+
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="clientAuth"
+          description="Should we require client authentication?"
+                 type="java.lang.String"/>
+
+    <attribute   name="ciphers"
+          description="Comma-separated list of SSL cipher suites to be enabled"
+                 type="java.lang.String"/>
+
+    <attribute   name="compression"
+          description="Compression value"
+                 type="java.lang.String"/>
+
+    <attribute   name="connectionLinger"
+          description="Linger value on the incoming connection"
+                 type="int"/>
+
+    <attribute   name="connectionTimeout"
+          description="Timeout value on the incoming connection"
+                 type="int"/>
+
+    <attribute   name="connectionUploadTimeout"
+          description="Timeout value on the incoming connection during request processing"
+                 type="int"/>
+
+    <attribute    name="disableUploadTimeout"
+           description="Should Tomcat ignore setting a timeout for uploads?" 
+                  type="boolean"/>
+
+    <attribute   name="emptySessionPath"
+          description="The 'empty session path' flag for this Connector"
+                 type="boolean"/>
+
+    <attribute   name="enableLookups"
+          description="The 'enable DNS lookups' flag for this Connector"
+                 type="boolean"/>
+
+    <attribute   name="keystoreFile"
+          description="Pathname to the key store file to be used"
+                 type="java.lang.String"/>
+
+    <attribute   name="keystorePass"
+          description="Password for accessing the key store file"
+                 type="java.lang.String"/>
+
+    <attribute   name="keystoreType"
+          description="Type of keystore file to be used for the server certificate"
+                 type="java.lang.String"/>
+
+    <attribute   name="keyAlias"
+          description="Alias name of this connector's keypair and supporting certificate chain"
+                 type="java.lang.String"/>
+
+    <attribute   name="maxHttpHeaderSize"
+          description="Maximum size in bytes of the HTTP header"
+                 type="int"/>
+
+    <attribute   name="maxKeepAliveRequests"
+          description="Maximum number of Keep-Alive requests to honor per connection"
+                 type="int"/>
+
+    <attribute   name="maxPostSize"
+          description="Maximum size in bytes of a POST which will be handled by the servlet API provided features"
+                 type="int"/>
+
+    <attribute   name="maxSpareThreads"
+          description="The maximum number of unused request processing threads"
+                 type="int"/>
+
+    <attribute   name="maxThreads"
+          description="The maximum number of request processing threads to be created"
+                 type="int"/>
+
+    <attribute   name="minSpareThreads"
+          description="The number of request processing threads that will be created"
+                 type="int"/>
+
+    <attribute   name="port"
+          description="The port number on which we listen for ajp13 requests"
+                type="int"/>
+
+    <attribute   name="protocol"
+          description="Coyote protocol handler in use"
+                 type="java.lang.String"/>
+
+    <attribute   name="protocolHandlerClassName"
+          description="Coyote Protocol handler class name"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="proxyName"
+          description="Ther Server name to which we should pretend requests to this Connector"
+                 type="java.lang.String"/>
+
+    <attribute   name="proxyPort"
+          description="Ther Server port to which we should pretend requests to this Connector"
+                 type="int"/>
+
+    <attribute   name="redirectPort"
+          description="The redirect port for non-SSL to SSL redirects"
+                 type="int"/>
+
+    <attribute   name="scheme"
+          description="Protocol name for this Connector (http, https)"
+                 type="java.lang.String"/>
+
+    <attribute   name="secret"
+          description="Authentication secret (I guess ... not in Javadocs)"
+            readable = "false" 
+                 type="java.lang.String"/>
+
+    <attribute   name="secure"
+          description="Is this a secure (SSL) Connector?"
+                 type="boolean"/>
+
+    <attribute   name="sslProtocol"
+          description="SSL protocol variant to be used"
+                 type="java.lang.String"/>
+
+    <attribute   name="sslProtocols"
+          description="Comma-separated list of SSL protocol variants to be enabled"
+                 type="java.lang.String"/>
+
+    <attribute   name="strategy"
+          description="Thread pool strategy"
+                 type="java.lang.String"/>
+
+    <attribute   name="tcpNoDelay"
+          description="Should we use TCP no delay?"
+                 type="boolean"/>
+
+    <attribute    name="tomcatAuthentication"
+           description="Should Tomcat perform all authentications?"
+                  type="boolean"/>
+
+    <attribute    name="threadPriority"
+           description="The thread priority for processors"
+                  type="int"/>
+
+    <attribute   name="URIEncoding"
+          description="Character encoding used to decode the URI"
+                 type="java.lang.String"/>
+
+    <attribute   name="useBodyEncodingForURI"
+          description="Should the body encoding be used for URI query parameters"
+                 type="boolean"/>
+
+    <attribute    name="xpoweredBy"
+           description="Is generation of X-Powered-By response header enabled/disabled?"
+                  type="boolean"/>
+
+    <operation name="start" description="Start" impact="ACTION" returnType="void" />
+    <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
+    <operation name="pause" description="Start" impact="ACTION" returnType="void" />
+    <operation name="resume" description="Stop" impact="ACTION" returnType="void" />
+    <operation name="init" description="Init" impact="ACTION" returnType="void" />
+    <operation name="destroy" description="Destroy" impact="ACTION" returnType="void" />
+
+  </mbean>
+
+
+</mbeans-descriptors>
+
+

@@ -1,0 +1,17 @@
+<body>
+
+<p>This package contains <code>Servlets</code> that implement some of the
+standard functionality provided by the Catalina servlet container.  Because
+these servlets are in the <code>org.apache.catalina</code> package hierarchy,
+they are in the privileged position of being able to reference internal server
+data structures, which application level servlets are prevented from
+accessing (by the application class loader implementation).</p>
+
+<p>To the extent that these servlets depend upon internal Catalina data
+structures, they are obviously not portable to other servlet container
+environments.  However, they can be used as models for creating application
+level servlets that provide similar capabilities -- most obviously the
+<a href="DefaultServlet.html">DefaultServlet</a> implementation, which
+serves static resources when Catalina runs stand-alone.</p>
+
+</body>

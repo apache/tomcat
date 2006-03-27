@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean         name="WebappLoader"
+          description="Classloader implementation which is specialized for
+                       handling web applications"
+               domain="Catalina"
+                group="Loader"
+                 type="org.apache.catalina.loader.WebappLoader">
+                 
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="delegate"
+          description="The 'follow standard delegation model' flag that will be
+                       used to configure our ClassLoader"
+                 type="boolean"/>
+
+    <attribute   name="reloadable"
+          description="The reloadable flag for this Loader"
+                 type="boolean"/>
+
+    <attribute   name="repositories"
+          description="Extra repositories managed by this loader"
+                 type="[Ljava.lang.String;"/>
+
+    <attribute   name="repositoriesString"
+          description="Extra repositories managed by this loader"
+             writeable="false" 
+                 type="java.lang.String"/>
+
+    <attribute   name="loaderRepositories"
+          description="Repositories set in the real loader"
+                 type="[Ljava.lang.String;"
+            writeable="false" />
+
+    <attribute   name="loaderRepositoriesString"
+          description="Repositories set in the real loader"
+                 type="java.lang.String"
+             writeable="false" />
+
+    <operation   name="toString"
+          description="Info about the loader"
+               impact="INFO"
+           returnType="String">
+    </operation>
+  </mbean>
+
+
+  <mbean         name="WebappClassLoader"
+          description="Classloader implementation which is specialized for
+                       handling web applications"
+               domain="Catalina"
+                group="Loader"
+                 type="org.apache.catalina.loader.WebappClassLoader" />
+
+</mbeans-descriptors>

@@ -1,0 +1,22 @@
+<html><body>
+<H1>Buffers and Encodings</h1>
+
+This package contains buffers and utils to perform encoding/decoding of buffers. That includes byte to char
+conversions, URL encodings, etc. 
+
+<p>
+Encoding is a critical operation for performance. There are few tricks in this package - the C2B and 
+B2C converters are caching a ISReader/OSWriter and keep everything allocated to do the conversions 
+in any VM without any garbage.
+
+<p>
+This package must accomodate future extensions and additional converters ( most imporant: the nio.charset, 
+which should be detected and used if available ). Also, we do have one hand-written UTF8Decoder, and 
+other tuned encoders could be added.
+
+<p>
+My benchmarks ( I'm costin :-) show only small differences between C2B, B2C and hand-written codders/decoders,
+so UTF8Decoder may be disabled. 
+
+<p>
+</body></html>

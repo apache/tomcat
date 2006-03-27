@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean         name="JspMonitor"
+          description="JSP Monitoring"
+               domain="Catalina"
+                group="Monitoring"
+                 type="org.apache.jasper.servlet.JspServlet">
+
+    <attribute   name="jspCount"
+          description="The number of JSPs that have been loaded into a webapp"
+                 type="int"/>
+
+    <attribute   name="jspReloadCount"
+          description="The number of JSPs that have been reloaded"
+                 type="int"/>
+
+  </mbean>
+
+</mbeans-descriptors>

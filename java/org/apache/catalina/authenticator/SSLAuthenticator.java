@@ -1,0 +1,196 @@
+/*
+ * Copyright 1999,2004 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+package org.apache.catalina.authenticator;
+
+
+import java.io.IOException;
+import java.security.Principal;
+import java.security.cert.X509Certificate;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.coyote.ActionCode;
+import org.apache.catalina.Globals;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
+import org.apache.catalina.deploy.LoginConfig;
+
+
+
+/**
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication
+ * that utilizes SSL certificates to identify client users.
+ *
+ * @author Craig R. McClanahan
+ * @version $Revision: 303721 $ $Date: 2005-02-23 20:27:56 +0100 (mer., 23 févr. 2005) $
+ */
+
+public class SSLAuthenticator
+    extends AuthenticatorBase {
+
+
+    // ------------------------------------------------------------- Properties
+
+
+    /**
+     * Descriptive information about this implementation.
+     */
+    protected static final String info =
+        "org.apache.catalina.authenticator.SSLAuthenticator/1.0";
+
+
+    /**
+     * Return descriptive information about this Valve implementation.
+     */
+    public String getInfo() {
+
+        return (info);
+
+    }
+
+
+    // --------------------------------------------------------- Public Methods
+
+
+    /**
+     * Authenticate the user by checking for the existence of a certificate
+     * chain, and optionally asking a trust manager to validate that we trust
+     * this user.
+     *
+     * @param request Request we are processing
+     * @param response Response we are creating
+     * @param config    Login configuration describing how authentication
+     *              should be performed
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    public boolean authenticate(Request request,
+                                Response response,
+                                LoginConfig config)
+        throws IOException {
+
+        // Have we already authenticated someone?
+        Principal principal = request.getUserPrincipal();
+        //String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
+        if (principal != null) {
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("Already authenticated '" + principal.getName() + "'");
+            // Associate the session with any existing SSO session in order
+            // to get coordinated session invalidation at logout
+            String ssoId = (String) request.getNote(Constants.REQ_SSOID_NOTE);
+            if (ssoId != null)
+                associate(ssoId, request.getSessionInternal(true));
+            return (true);
+        }
+
+        // NOTE: We don't try to reauthenticate using any existing SSO session,
+        // because that will only work if the original authentication was
+        // BASIC or FORM, which are less secure than the CLIENT-CERT auth-type
+        // specified for this webapp
+        //
+        // Uncomment below to allow previous FORM or BASIC authentications
+        // to authenticate users for this webapp
+        // TODO make this a configurable attribute (in SingleSignOn??)
+        /*
+        // Is there an SSO session against which we can try to reauthenticate?
+        if (ssoId != null) {
+            if (log.isDebugEnabled())
+                log.debug("SSO Id " + ssoId + " set; attempting " +
+                          "reauthentication");
+            // Try to reauthenticate using data cached by SSO.  If this fails,
+            // either the original SSO logon was of DIGEST or SSL (which
+            // we can't reauthenticate ourselves because there is no
+            // cached username and password), or the realm denied
+            // the user's reauthentication for some reason.
+            // In either case we have to prompt the user for a logon
+            if (reauthenticateFromSSO(ssoId, request))
+                return true;
+        }
+        */
+
+        // Retrieve the certificate chain for this client
+        if (containerLog.isDebugEnabled())
+            containerLog.debug(" Looking up certificates");
+
+        X509Certificate certs[] = (X509Certificate[])
+            request.getAttribute(Globals.CERTIFICATES_ATTR);
+        if ((certs == null) || (certs.length < 1)) {
+            request.getCoyoteRequest().action
+                              (ActionCode.ACTION_REQ_SSL_CERTIFICATE, null);
+            certs = (X509Certificate[])
+                request.getAttribute(Globals.CERTIFICATES_ATTR);
+        }
+        if ((certs == null) || (certs.length < 1)) {
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("  No certificates included with this request");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                               sm.getString("authenticator.certificates"));
+            return (false);
+        }
+
+        // Authenticate the specified certificate chain
+        principal = context.getRealm().authenticate(certs);
+        if (principal == null) {
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("  Realm.authenticate() returned false");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                               sm.getString("authenticator.unauthorized"));
+            return (false);
+        }
+
+        // Cache the principal (if requested) and record this authentication
+        register(request, response, principal, Constants.CERT_METHOD,
+                 null, null);
+        return (true);
+
+    }
+
+
+    // ------------------------------------------------------ Lifecycle Methods
+
+
+    /**
+     * Initialize the database we will be using for client verification
+     * and certificate validation (if any).
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    public void start() throws LifecycleException {
+
+        super.start();
+
+    }
+
+
+    /**
+     * Finalize the database we used for client verification and
+     * certificate validation (if any).
+     *
+     * @exception LifecycleException if this component detects a fatal error
+     *  that prevents this component from being used
+     */
+    public void stop() throws LifecycleException {
+
+        super.stop();
+
+    }
+
+
+}

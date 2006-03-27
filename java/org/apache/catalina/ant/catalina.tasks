@@ -1,0 +1,22 @@
+# Pure catalina tasks
+deploy=org.apache.catalina.ant.DeployTask
+list=org.apache.catalina.ant.ListTask
+reload=org.apache.catalina.ant.ReloadTask
+sessions=org.apache.catalina.ant.SessionsTask
+resources=org.apache.catalina.ant.ResourcesTask
+roles=org.apache.catalina.ant.RolesTask
+start=org.apache.catalina.ant.StartTask
+stop=org.apache.catalina.ant.StopTask
+undeploy=org.apache.catalina.ant.UndeployTask
+validator=org.apache.catalina.ant.ValidatorTask
+
+#Jk Task
+jkstatus=org.apache.catalina.ant.JKStatusUpdateTask
+
+# Manager JMX
+jmxManagerSet=org.apache.catalina.ant.JMXSetTask
+jmxManagerGet=org.apache.catalina.ant.JMXGetTask
+jmxManagerQuery=org.apache.catalina.ant.JMXQueryTask
+
+# Jasper tasks
+jasper2=org.apache.jasper.JspC

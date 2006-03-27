@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<antlib>
+  <typedef
+        name="open"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorTask" />
+  <typedef
+        name="set"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorSetTask" />
+  <typedef
+        name="get"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorGetTask" />
+  <typedef
+        name="invoke"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorInvokeTask" />
+  <typedef
+        name="query"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorQueryTask" />
+  <typedef
+        name="create"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorCreateTask" />
+  <typedef
+        name="unregister"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorUnregisterTask" />
+  <typedef
+        name="equals"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition" />
+  <typedef
+        name="condition"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorCondition" />
+</antlib>

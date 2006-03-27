@@ -1,0 +1,55 @@
+/*
+ *  Copyright 2000-2005 The Apache Software Foundation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package org.apache.tomcat.jni;
+
+/** Open SSL BIO Callback Interface
+ *
+ * @author Mladen Turk
+ * @version $Revision: 300969 $, $Date: 2005-07-12 16:56:11 +0200 (mar., 12 juil. 2005) $
+ */
+
+public interface BIOCallback {
+
+    /**
+     * Write data
+     * @param buf containg the bytes to write.
+     * @return Number of characters written.
+     */
+    public int write(byte [] buf);
+
+    /**
+     * Read data
+     * @param buf buffer to store the read bytes.
+     * @return number of bytes read.
+     */
+    public int read(byte [] buf);
+
+    /**
+     * Puts string
+     * @param data String to write
+     * @return Number of characters written
+     */
+    public int puts(String data);
+
+    /**
+     * Read string up to the len or CLRLF
+     * @param len Maximum number of characters to read
+     * @return String with up to len bytes readed
+     */
+    public String gets(int len);
+
+}
