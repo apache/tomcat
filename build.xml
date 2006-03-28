@@ -24,6 +24,142 @@
   <property name="final.name"            value="${project}-${version}" />
   <property name="final-src.name"        value="${project}-${version}-src" />
 
+  <!-- Build Defaults -->
+  <property name="tomcat.build"      value="${basedir}/build"/>
+  <property name="tomcat.classes"    value="${basedir}/classes"/>
+  <property name="tomcat.dist"       value="${basedir}/dist"/>
+  <property name="test.failonerror"  value="true"/>
+  <property name="test.runner"       value="junit.textui.TestRunner"/>
 
+  <!-- JAR artifacts -->
+  <property name="servlet-api.jar" value="${tomcat.build}/common/lib/servlet-api.jar"/>
+  <property name="jsp-api.jar" value="${tomcat.build}/common/lib/jsp-api.jar"/>
+  <property name="el-api.jar" value="${tomcat.build}/common/lib/el-api.jar"/>
+  <property name="jasper-compiler.jar" value="${tomcat.build}/common/lib/jasper-compiler.jar"/>
+  <property name="jasper-runtime.jar" value="${tomcat.build}/common/lib/jasper-runtime.jar"/>
+  <property name="jasper-el.jar" value="${tomcat.build}/common/lib/jasper-el.jar"/>
+  
+  <!-- Classpath -->
+  <path id="tomcat.classpath">
+    <pathelement location="${ant.jar}"/>
+    <pathelement location="${jdt.jar}"/>
+    <pathelement location="${commons-logging.jar}"/>
+    <pathelement location="${commons-modeler.jar}"/>
+  </path>
+
+  <!-- Just build Tomcat -->
+  <target name="build-prepare">
+
+    <available classname="junit.framework.TestCase" property="junit.present" />
+
+    <mkdir dir="${tomcat.classes}"/>
+    
+    <mkdir dir="${tomcat.build}"/>
+    <mkdir dir="${tomcat.build}/bin"/>
+    <mkdir dir="${tomcat.build}/conf"/>
+    <mkdir dir="${tomcat.build}/lib"/>
+
+  </target>
+
+  <target name="build-only" depends="build-prepare">
+
+    <!-- Compile internal server components -->
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}"
+           excludes="**/CVS/**,**/.svn/**">
+      <classpath refid="tomcat.classpath" />
+      <exclude name="org/apache/tomcat/util/net/puretls/**" />
+    </javac>
+
+    <!-- Copy static resource files -->
+    <copy todir="${tomcat.classes}">
+      <fileset dir="java">
+        <include name="**/*.properties"/>
+        <include name="**/*.dtd"/>
+      </fileset>
+    </copy>
+
+    <!-- Servlet 2.5 Implementation JAR File -->
+    <jar  jarfile="${servlet-api.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="javax/servlet/*" />
+        <include name="javax/servlet/http/*" />
+        <include name="javax/servlet/resources/*" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+    <!-- JSP 2.1 Implementation JAR File -->
+    <jar  jarfile="${jsp-api.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="javax/servlet/jsp/**" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+    <!-- JSP 2.1 EL Implementation JAR File -->
+    <jar  jarfile="${el-api.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="javax/el/**" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+    <!-- Jasper Compiler JAR File -->
+    <jar  jarfile="${jasper-compiler.jar}">
+       <fileset dir="${tomcat.classes}">
+         <include name="org/apache/jasper/compiler/**" />
+         <include name="org/apache/jasper/xmlparser/**" />
+         <include name="org/apache/jasper/servlet/**" />
+         <include name="org/apache/jasper/tagplugins/**" />
+         <exclude name="org/apache/jasper/Constants.class" />
+         <exclude name="org/apache/jasper/JasperException.class" />
+         <include name="org/apache/jasper/*.class" />
+         <!-- Javadoc and i18n exclusions -->
+         <exclude name="**/package.html" />
+         <exclude name="**/LocalStrings_*" />
+       </fileset>
+     </jar>
+
+     <!-- Jasper Runtime JAR File -->
+     <jar  jarfile="${jasper-runtime.jar}">
+       <fileset dir="${tomcat.classes}">
+         <include name="org/apache/jasper/Constants.class" />
+         <include name="org/apache/jasper/JasperException.class" />
+         <include name="org/apache/jasper/compiler/Localizer.class" />
+         <include name="org/apache/jasper/el/**" />
+         <include name="org/apache/jasper/resources/**" />
+         <include name="org/apache/jasper/runtime/**" />
+         <include name="org/apache/jasper/security/**" />
+         <include name="org/apache/jasper/util/**" />
+         <!-- Javadoc and i18n exclusions -->
+         <exclude name="**/package.html" />
+         <exclude name="**/LocalStrings_*" />
+       </fileset>
+     </jar>
+
+     <!-- Jasper EL Implementation JAR File -->
+     <jar  jarfile="${jasper-el.jar}">
+       <fileset dir="${tomcat.classes}">
+         <include name="org/apache/el/**" />
+         <!-- Javadoc and i18n exclusions -->
+         <exclude name="**/package.html" />
+         <exclude name="**/LocalStrings_*" />
+       </fileset>
+     </jar>
+
+  </target>
+
+  <target name="deploy" depends="build-only">
+  </target>
 
 </project>
