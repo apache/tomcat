@@ -31,6 +31,19 @@
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
+  <!-- Can't be lower - jsp uses templates -->
+  <property name="compile.source" value="1.5"/>
+  
+  <!-- Defaults, if build.properties is missing. It is sometimes easier to 
+       just have one build file, and use properties to just override settings -->
+  <property name="TOMCAT_LIBS_BASE" location="../repository"/>
+  
+  <property name="ant.jar" location="${TOMCAT_LIBS_BASE}/apache-ant-1.6.5/lib/ant.jar"/>
+  <property name="jdt.jar" location="${TOMCAT_LIBS_BASE}/eclipse/plugins/org.eclipse.jdt.core_3.1.1.jar"/>
+  <property name="commons-logging.jar" location="${TOMCAT_LIBS_BASE}/commons-logging-1.0.4/commons-logging.jar"/>
+  <property name="commons-modeler.jar" location="${TOMCAT_LIBS_BASE}/commons-modeler-1.1/commons-modeler.jar"/>
+      
+  
   <!-- JAR artifacts -->
   <property name="servlet-api.jar" value="${tomcat.build}/common/lib/servlet-api.jar"/>
   <property name="jsp-api.jar" value="${tomcat.build}/common/lib/jsp-api.jar"/>
@@ -61,7 +74,7 @@
 
   </target>
 
-  <target name="build-only" depends="build-prepare">
+  <target name="compile">
 
     <!-- Compile internal server components -->
     <javac srcdir="java" destdir="${tomcat.classes}"
@@ -72,8 +85,9 @@
            excludes="**/CVS/**,**/.svn/**">
       <classpath refid="tomcat.classpath" />
       <exclude name="org/apache/tomcat/util/net/puretls/**" />
+      <exclude name="org/apache/naming/factory/MailSessionFactory.java"/>
+      <exclude name="org/apache/naming/factory/SendMailFactory.java"/>
     </javac>
-
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}">
       <fileset dir="java">
@@ -82,6 +96,11 @@
       </fileset>
     </copy>
 
+  </target>
+    
+  <target name="build-only" depends="build-prepare,compile,package" />
+  
+  <target name="package" >  
     <!-- Servlet 2.5 Implementation JAR File -->
     <jar  jarfile="${servlet-api.jar}">
       <fileset dir="${tomcat.classes}">
