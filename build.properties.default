@@ -1,0 +1,49 @@
+# -----------------------------------------------------------------------------
+# build.properties.sample
+#
+# This is an example "build.properties" file, used to customize building 
+# Jasper2 for your local environment.  It defines the location of all external
+# modules that Jasper2 depends on.  Copy this file to "build.properties"
+# in the top-level source directory, and customize it as needed.
+#
+# $Id: build.properties.sample 379500 2006-02-21 15:50:10Z remm $
+# -----------------------------------------------------------------------------
+
+# ----- Default Base Path for Dependent Packages -----
+# Please note this path must be absolute, not relative,
+# as it is referenced with different working directory
+# contexts by the various build scripts.
+base.path=/usr/share/java
+#base.path=C:/path/to/the/repository
+#base.path=/usr/local
+
+compile.source=1.5
+
+# ----- Servlet API v2.4 -----
+servlet-api.home=${base.path}/servlet-api-2.4
+servlet-api.lib=${servlet-api.home}/lib
+servlet-api.jar=${servlet-api.lib}/servlet-api.jar
+
+# ----- Commons Logging, version 1.0.1 or later -----
+commons-logging.home=${base.path}/commons-logging-1.0.4
+commons-logging.lib=${commons-logging.home}
+commons-logging-api.jar=${commons-logging.lib}/commons-logging-api.jar
+commons-logging.jar=${commons-logging.lib}/commons-logging.jar
+commons-logging.loc=${base-jakarta.loc}/commons/logging/binaries/commons-logging-1.0.4.tar.gz
+
+# ----- Commons Modeler, version 1.1 or later -----
+commons-modeler.home=${base.path}/commons-modeler-1.1
+commons-modeler.lib=${commons-modeler.home}
+commons-modeler.jar=${commons-modeler.lib}/commons-modeler.jar
+commons-modeler.loc=${base-jakarta.loc}/commons/modeler/binaries/modeler-1.1.tar.gz
+
+# ----- Eclipse JDT, version 3.1.2 or later -----
+jdt.home=${base.path}/eclipse/plugins
+jdt.lib=${jdt.home}
+jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.1.2.jar
+jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/R-3.1.2-200601181600/eclipse-JDT-3.1.2.zip
+
+# ----- Tomcat native library -----
+tomcat-native.home=${base.path}/tomcat-native-1.1.2
+tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
+tomcat-native.loc=${base-tomcat.loc}/tomcat-connectors/native/tomcat-native-1.1.2.tar.gz

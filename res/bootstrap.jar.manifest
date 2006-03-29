@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Main-Class: org.apache.catalina.startup.Bootstrap
+Class-Path: jmx.jar commons-daemon.jar commons-logging-api.jar tomcat-juli.jar
+Specification-Title: Catalina
+Specification-Version: 1.0
