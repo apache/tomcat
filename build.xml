@@ -38,9 +38,7 @@
   <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
-  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
-  <property name="catalina-optional.jar" value="${tomcat.build}/lib/catalina-optional.jar"/>
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="catalina-ant-jmx.jar" value="${tomcat.build}/lib/catalina-ant-jmx.jar"/>
   <property name="naming-factory.jar" value="${tomcat.build}/lib/naming-factory.jar"/>
@@ -142,30 +140,8 @@
       </fileset>
     </jar>
 
-    <!-- Catalina Bootstrap JAR File -->
-    <jar jarfile="${bootstrap.jar}" index="true"
-         manifest="res/bootstrap.jar.manifest">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/startup/Bootstrap.class" />
-        <include name="org/apache/catalina/startup/catalina.properties" />
-        <include name="org/apache/catalina/startup/CatalinaProperties.class" />
-        <include name="org/apache/catalina/startup/ClassLoaderFactory.class" />
-        <include name="org/apache/catalina/startup/Tool.class" />
-        <include name="org/apache/catalina/loader/StandardClassLoader*.class" />
-        <include name="org/apache/catalina/loader/Extension.class" />
-        <include name="org/apache/catalina/loader/Reloader.class" />
-        <include name="org/apache/catalina/security/SecurityClassLoad.class" />
-        <include name="org/apache/catalina/launcher/CatalinaLaunchFilter.class" />
-        <include name="org/apache/naming/JndiPermission.class" />
-        <include name="org/apache/tomcat/util/compat/*" />
-      	<!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
     <!-- Catalina Main JAR File -->
-    <jar jarfile="${catalina.jar}" index="true">
+    <jar jarfile="${catalina.jar}" index="true" manifest="res/bootstrap.jar.manifest">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/**" />
         <!-- Javadoc and i18n exclusions -->
@@ -176,76 +152,8 @@
         <exclude name="org/apache/catalina/cluster/**" />
         <exclude name="org/apache/catalina/launcher/**" />
         <exclude name="org/apache/catalina/servlets/**" />
-        <exclude name="org/apache/catalina/startup/Bootstrap.class" />
         <exclude name="org/apache/catalina/storeconfig/**" />
         <exclude name="org/apache/catalina/ssi/**" />
-        <exclude name="org/apache/naming/**" />
-        <!-- Catalina-optional classes -->
-        <exclude name="org/apache/catalina/realm/DataSourceRealm.class" />
-        <exclude name="org/apache/catalina/realm/JAAS*" />
-        <exclude name="org/apache/catalina/realm/JDBC*" />
-        <exclude name="org/apache/catalina/realm/JNDI*" />
-        <exclude name="org/apache/catalina/realm/Memory*" />
-        <exclude name="org/apache/catalina/session/StoreBase.class" />
-        <exclude name="org/apache/catalina/session/*Store.class" />
-        <exclude name="org/apache/catalina/session/PersistentManager*" />
-        <exclude name="org/apache/catalina/util/CGIProcessEnvironment.class" />
-        <exclude name="org/apache/catalina/util/CookieTools.class" />
-        <exclude name="org/apache/catalina/util/DateTool.class" />
-        <exclude name="org/apache/catalina/util/DOMWriter.class" />
-        <exclude name="org/apache/catalina/util/FastDateFormat.class" />
-        <exclude name="org/apache/catalina/util/IOTools.class" />
-        <exclude name="org/apache/catalina/util/MIME2Java.class" />
-        <exclude name="org/apache/catalina/util/Process*" />
-        <exclude name="org/apache/catalina/util/Queue.class" />
-        <exclude name="org/apache/catalina/util/Strftime.class" />
-        <exclude name="org/apache/catalina/util/XMLWriter.class" />
-        <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve.class" />
-        <exclude name="org/apache/catalina/valves/FastCommonAccessLogValve.class" />
-        <exclude name="org/apache/catalina/valves/FieldInfo.class" />
-        <exclude name="org/apache/catalina/valves/JDBCAccessLogValve.class" />
-        <exclude name="org/apache/catalina/valves/PersistentValve.class" />
-        <exclude name="org/apache/catalina/valves/Remote*" />
-        <exclude name="org/apache/catalina/valves/RequestDumperValve.class" />
-        <exclude name="org/apache/catalina/valves/RequestFilterValve.class" />
-        <exclude name="org/apache/catalina/valves/SemaphoreValve.class" />
-      </fileset>
-    </jar>
-
-    <!-- Catalina Optional JAR File -->
-    <jar jarfile="${catalina-optional.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/realm/DataSourceRealm.class" />
-        <include name="org/apache/catalina/realm/JAAS*" />
-        <include name="org/apache/catalina/realm/JDBC*" />
-        <include name="org/apache/catalina/realm/JNDI*" />
-        <include name="org/apache/catalina/realm/Memory*" />
-        <include name="org/apache/catalina/session/StoreBase.class" />
-        <include name="org/apache/catalina/session/*Store.class" />
-        <include name="org/apache/catalina/session/PersistentManager*" />
-        <include name="org/apache/catalina/util/CGIProcessEnvironment.class" />
-        <include name="org/apache/catalina/util/CookieTools.class" />
-        <include name="org/apache/catalina/util/DateTool.class" />
-        <include name="org/apache/catalina/util/DOMWriter.class" />
-        <include name="org/apache/catalina/util/FastDateFormat.class" />
-        <include name="org/apache/catalina/util/IOTools.class" />
-        <include name="org/apache/catalina/util/MIME2Java.class" />
-        <include name="org/apache/catalina/util/Process*" />
-        <include name="org/apache/catalina/util/Queue.class" />
-        <include name="org/apache/catalina/util/Strftime.class" />
-        <include name="org/apache/catalina/util/XMLWriter.class" />
-        <include name="org/apache/catalina/valves/ExtendedAccessLogValve.class" />
-        <include name="org/apache/catalina/valves/FastCommonAccessLogValve.class" />
-        <include name="org/apache/catalina/valves/FieldInfo.class" />
-        <include name="org/apache/catalina/valves/JDBCAccessLogValve.class" />
-        <include name="org/apache/catalina/valves/PersistentValve.class" />
-        <include name="org/apache/catalina/valves/Remote*" />
-        <include name="org/apache/catalina/valves/RequestDumperValve.class" />
-        <include name="org/apache/catalina/valves/RequestFilterValve.class" />
-        <include name="org/apache/catalina/valves/SemaphoreValve.class" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
       </fileset>
     </jar>
 
@@ -454,6 +362,17 @@
   </target>
 
   <target name="deploy" depends="build-only">
+
+    <copy file="${commons-logging-api.jar}" todir="${tomcat.build}/lib" />
+
+    <!-- Copy static resource files -->
+    <copy todir="${tomcat.build}/conf">
+      <fileset dir="conf">
+        <include name="*.xml"/>
+        <include name="*.properties"/>
+      </fileset>
+    </copy>
+
   </target>
 
   <target name="clean">
