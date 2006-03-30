@@ -91,6 +91,7 @@
         <include name="**/*.properties"/>
         <include name="**/*.dtd"/>
         <include name="**/*.xsd"/>
+        <include name="**/*.xml"/>
       </fileset>
     </copy>
 
