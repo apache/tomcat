@@ -5,5 +5,5 @@
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/commons-logging-1.0.4/commons-logging.jar"/>
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/apache-ant-1.6.5/lib/ant.jar"/>
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/eclipse/plugins/org.eclipse.jdt.core_3.1.2.jar"/>
-	<classpathentry kind="output" path="classes"/>
+	<classpathentry kind="output" path=".settings/output"/>
 </classpath>
