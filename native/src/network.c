@@ -85,8 +85,8 @@ void sp_network_dump_statistics()
     fprintf(stderr, "Last receive error      : %d\n", sp_erl_recv);
 
     fprintf(stderr, "Total sendfile calls    : %d\n", sf_num_send);
-    fprintf(stderr, "Minimum sendfile lenght : %d" APR_SIZE_T_FMT "\n", sf_min_send);
-    fprintf(stderr, "Maximum sendfile lenght : %d" APR_SIZE_T_FMT "\n", sf_max_send);
+    fprintf(stderr, "Minimum sendfile lenght : %" APR_SIZE_T_FMT "\n", sf_min_send);
+    fprintf(stderr, "Maximum sendfile lenght : %" APR_SIZE_T_FMT "\n", sf_max_send);
 
 }
 
