@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2004 The Apache Software Foundation.
+ * Copyright 2001-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -713,6 +713,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         } else if( "java.lang.Integer".equals( type ) ||
                 "int".equals( type )) {
             objValue=new Integer( value );
+        } else if( "java.lang.Long".equals( type ) ||
+                "long".equals( type )) {
+            objValue=new Long( value );
         } else if( "java.lang.Boolean".equals( type ) ||
                 "boolean".equals( type )) {
             objValue=new Boolean( value );
