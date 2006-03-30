@@ -18,11 +18,7 @@ base.path=/usr/share/java
 #base.path=/usr/local
 
 compile.source=1.5
-
-# ----- Servlet API v2.4 -----
-servlet-api.home=${base.path}/servlet-api-2.4
-servlet-api.lib=${servlet-api.home}/lib
-servlet-api.jar=${servlet-api.lib}/servlet-api.jar
+compile.target=1.5
 
 # ----- Commons Logging, version 1.0.1 or later -----
 commons-logging.home=${base.path}/commons-logging-1.0.4
@@ -30,12 +26,6 @@ commons-logging.lib=${commons-logging.home}
 commons-logging-api.jar=${commons-logging.lib}/commons-logging-api.jar
 commons-logging.jar=${commons-logging.lib}/commons-logging.jar
 commons-logging.loc=${base-jakarta.loc}/commons/logging/binaries/commons-logging-1.0.4.tar.gz
-
-# ----- Commons Modeler, version 1.1 or later -----
-commons-modeler.home=${base.path}/commons-modeler-1.1
-commons-modeler.lib=${commons-modeler.home}
-commons-modeler.jar=${commons-modeler.lib}/commons-modeler.jar
-commons-modeler.loc=${base-jakarta.loc}/commons/modeler/binaries/modeler-1.1.tar.gz
 
 # ----- Eclipse JDT, version 3.1.2 or later -----
 jdt.home=${base.path}/eclipse/plugins

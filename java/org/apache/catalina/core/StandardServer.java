@@ -45,8 +45,8 @@ import org.apache.catalina.util.StringManager;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.modeler.Registry;
 import org.apache.tomcat.util.buf.StringCache;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 

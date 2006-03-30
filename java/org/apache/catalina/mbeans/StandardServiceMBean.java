@@ -21,7 +21,7 @@ import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.RuntimeOperationsException;
 
-import org.apache.commons.modeler.BaseModelMBean;
+import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
 /**

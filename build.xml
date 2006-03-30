@@ -35,27 +35,17 @@
   <property name="compile.source" value="1.5"/>
   
   <!-- JAR artifacts -->
+  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
+
   <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
   <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="catalina-ant-jmx.jar" value="${tomcat.build}/lib/catalina-ant-jmx.jar"/>
-  <property name="naming-factory.jar" value="${tomcat.build}/lib/naming-factory.jar"/>
-  <property name="naming-resources.jar" value="${tomcat.build}/lib/naming-resources.jar"/>
-  <property name="servlets-cgi.jar" value="${tomcat.build}/lib/servlets-cgi.renametojar"/>
-  <property name="servlets-default.jar" value="${tomcat.build}/lib/servlets-default.jar"/>
-  <property name="servlets-invoker.jar" value="${tomcat.build}/lib/servlets-invoker.jar"/>
-  <property name="servlets-ssi.jar" value="${tomcat.build}/lib/servlets-ssi.renametojar"/>
-  <property name="servlets-webdav.jar" value="${tomcat.build}/lib/servlets-webdav.jar"/>
-  <property name="tomcat-util.jar" value="${tomcat.build}/lib/tomcat-util.jar"/>
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
-  <property name="tomcat-apr.jar" value="${tomcat.build}/lib/tomcat-apr.jar"/>
-  <property name="tomcat-ajp.jar" value="${tomcat.build}/lib/tomcat-ajp.jar"/>
-  <property name="tomcat-http.jar" value="${tomcat.build}/lib/tomcat-http.jar"/>
 
-  <property name="jasper-compiler.jar" value="${tomcat.build}/lib/jasper-compiler.jar"/>
-  <property name="jasper-runtime.jar" value="${tomcat.build}/lib/jasper-runtime.jar"/>
+  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
   
   <!-- Classpath -->
@@ -63,7 +53,6 @@
     <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${commons-logging.jar}"/>
-    <pathelement location="${commons-modeler.jar}"/>
   </path>
 
   <!-- Just build Tomcat -->
@@ -77,6 +66,7 @@
     <mkdir dir="${tomcat.build}/bin"/>
     <mkdir dir="${tomcat.build}/conf"/>
     <mkdir dir="${tomcat.build}/lib"/>
+    <mkdir dir="${tomcat.build}/webapps"/>
 
   </target>
 
@@ -95,10 +85,12 @@
       <exclude name="org/apache/naming/factory/SendMailFactory.java"/>
     </javac>
     <!-- Copy static resource files -->
-    <copy todir="${tomcat.classes}">
+    <filter token="VERSION" value="${version}"/>
+    <copy todir="${tomcat.classes}" filtering="true">
       <fileset dir="java">
         <include name="**/*.properties"/>
         <include name="**/*.dtd"/>
+        <include name="**/*.xsd"/>
       </fileset>
     </copy>
 
@@ -109,7 +101,7 @@
   <target name="package" >  
 
     <!-- Servlet 2.5 Implementation JAR File -->
-    <jar  jarfile="${servlet-api.jar}" index="true">
+    <jar  jarfile="${servlet-api.jar}">
       <fileset dir="${tomcat.classes}">
         <include name="javax/servlet/*" />
         <include name="javax/servlet/http/*" />
@@ -121,7 +113,7 @@
     </jar>
 
     <!-- JSP 2.1 Implementation JAR File -->
-    <jar  jarfile="${jsp-api.jar}" index="true">
+    <jar  jarfile="${jsp-api.jar}">
       <fileset dir="${tomcat.classes}">
         <include name="javax/servlet/jsp/**" />
         <!-- Javadoc and i18n exclusions -->
@@ -131,7 +123,7 @@
     </jar>
 
     <!-- JSP 2.1 EL Implementation JAR File -->
-    <jar  jarfile="${el-api.jar}" index="true">
+    <jar  jarfile="${el-api.jar}">
       <fileset dir="${tomcat.classes}">
         <include name="javax/el/**" />
         <!-- Javadoc and i18n exclusions -->
@@ -140,10 +132,32 @@
       </fileset>
     </jar>
 
+    <!-- Bootstrap JAR File -->
+    <jar jarfile="${bootstrap.jar}" 
+        manifest="res/bootstrap.jar.manifest">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/catalina/startup/Bootstrap.class" />
+        <include name="org/apache/catalina/startup/catalina.properties" />
+        <include name="org/apache/catalina/startup/CatalinaProperties.class" />
+        <include name="org/apache/catalina/startup/ClassLoaderFactory.class" />
+        <include name="org/apache/catalina/startup/Tool.class" />
+        <include name="org/apache/catalina/loader/StandardClassLoader*.class" />
+        <include name="org/apache/catalina/loader/Extension.class" />
+        <include name="org/apache/catalina/loader/Reloader.class" />
+        <include name="org/apache/catalina/security/SecurityClassLoad.class" />
+        <include name="org/apache/naming/JndiPermission.class" />
+        <include name="org/apache/tomcat/util/compat/*" />
+      	<!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
     <!-- Catalina Main JAR File -->
-    <jar jarfile="${catalina.jar}" index="true" manifest="res/bootstrap.jar.manifest">
+    <jar jarfile="${catalina.jar}">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/**" />
+        <include name="org/apache/naming/**" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -151,14 +165,12 @@
         <exclude name="org/apache/catalina/ant/**" />
         <exclude name="org/apache/catalina/cluster/**" />
         <exclude name="org/apache/catalina/launcher/**" />
-        <exclude name="org/apache/catalina/servlets/**" />
         <exclude name="org/apache/catalina/storeconfig/**" />
-        <exclude name="org/apache/catalina/ssi/**" />
       </fileset>
     </jar>
 
     <!-- Catalina Ant Tasks JAR File -->
-    <jar jarfile="${catalina-ant.jar}" index="true">
+    <jar jarfile="${catalina-ant.jar}">
       <fileset dir="${tomcat.classes}">
       	<include name="org/apache/catalina/ant/*" />
         <include name="org/apache/catalina/util/Base64.class" />
@@ -169,7 +181,7 @@
     </jar>
 
   	<!-- Catalina JMX Accessor Ant Tasks JAR File -->
-    <jar jarfile="${catalina-ant-jmx.jar}" index="true">
+    <jar jarfile="${catalina-ant-jmx.jar}">
       <fileset dir="${tomcat.classes}">
       	<include name="org/apache/catalina/ant/jmx/*" />
       	<!-- Javadoc and i18n exclusions -->
@@ -178,137 +190,12 @@
       </fileset>
     </jar>
 
-  	<!-- Naming - Factory JAR File -->
-    <jar jarfile="${naming-factory.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/naming/**" />
-        <exclude name="org/apache/naming/resources/**" />
-        <exclude name="org/apache/naming/JndiPermission.class" />
-      	<exclude name="org/apache/naming/NameParserImpl.class" />
-      	<exclude name="org/apache/naming/NamingContextBindingsEnumeration.class" />
-      	<exclude name="org/apache/naming/NamingContextEnumeration.class" />
-      	<exclude name="org/apache/naming/NamingEntry.class" />
-      	<exclude name="org/apache/naming/StringManager.class" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Naming - Resources JAR File -->
-    <jar jarfile="${naming-resources.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/naming/JndiPermission.class" />
-      	<include name="org/apache/naming/NameParserImpl.class" />
-      	<include name="org/apache/naming/NamingContextBindingsEnumeration.class" />
-      	<include name="org/apache/naming/NamingContextEnumeration.class" />
-      	<include name="org/apache/naming/NamingEntry.class" />
-      	<include name="org/apache/naming/StringManager.class" />
-        <include name="org/apache/naming/resources/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Servlets - CGI Servlet -->
-    <jar jarfile="${servlets-cgi.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/servlets/CGI*" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Servlets - Default File-Serving Servlet -->
-    <jar jarfile="${servlets-default.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/servlets/Default*" />
-        <include name="org/apache/catalina/servlets/Constants.class" />
-        <include name="org/apache/catalina/servlets/LocalStrings.properties" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Servlets - Invoker Servlet -->
-    <jar jarfile="${servlets-invoker.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/servlets/Invoker*" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Servlets - SSI Servlet -->
-    <jar jarfile="${servlets-ssi.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/ssi/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Servlets - Webdav Servlet -->
-    <jar jarfile="${servlets-webdav.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/servlets/Webdav*" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
     <!-- Protocol handlers - Coyote -->
-    <jar jarfile="${tomcat-coyote.jar}" index="true">
+    <jar jarfile="${tomcat-coyote.jar}">
       <fileset dir="${tomcat.classes}">
-        <include name="org/apache/coyote/*" />
-        <include name="org/apache/coyote/memory/*" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Protocol handlers - APR -->
-    <jar jarfile="${tomcat-apr.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/coyote/**" />
         <include name="org/apache/tomcat/jni/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Protocol handlers - HTTP -->
-    <jar jarfile="${tomcat-http.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/coyote/http11/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Protocol handlers - AJP -->
-    <jar jarfile="${tomcat-ajp.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/coyote/ajp/**" />
         <include name="org/apache/jk/**" />
-        <exclude name="org/apache/jk/ant/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-    <!-- Util JAR File -->
-    <jar jarfile="${tomcat-util.jar}" index="true">
-      <fileset dir="${tomcat.classes}">
         <include name="org/apache/tomcat/util/**" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
@@ -316,41 +203,18 @@
       </fileset>
     </jar>
 
-    <!-- Jasper Compiler JAR File -->
-    <jar  jarfile="${jasper-compiler.jar}" index="true">
-       <fileset dir="${tomcat.classes}">
-         <include name="org/apache/jasper/compiler/**" />
-         <include name="org/apache/jasper/xmlparser/**" />
-         <include name="org/apache/jasper/servlet/**" />
-         <include name="org/apache/jasper/tagplugins/**" />
-         <exclude name="org/apache/jasper/Constants.class" />
-         <exclude name="org/apache/jasper/JasperException.class" />
-         <include name="org/apache/jasper/*.class" />
-         <!-- Javadoc and i18n exclusions -->
-         <exclude name="**/package.html" />
-         <exclude name="**/LocalStrings_*" />
-       </fileset>
-     </jar>
-
-     <!-- Jasper Runtime JAR File -->
-     <jar  jarfile="${jasper-runtime.jar}" index="true">
-       <fileset dir="${tomcat.classes}">
-         <include name="org/apache/jasper/Constants.class" />
-         <include name="org/apache/jasper/JasperException.class" />
-         <include name="org/apache/jasper/compiler/Localizer.class" />
-         <include name="org/apache/jasper/el/**" />
-         <include name="org/apache/jasper/resources/**" />
-         <include name="org/apache/jasper/runtime/**" />
-         <include name="org/apache/jasper/security/**" />
-         <include name="org/apache/jasper/util/**" />
-         <!-- Javadoc and i18n exclusions -->
-         <exclude name="**/package.html" />
-         <exclude name="**/LocalStrings_*" />
-       </fileset>
-     </jar>
+    <!-- Jasper Implementation JAR File -->
+    <jar  jarfile="${jasper.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/jasper/**" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
 
      <!-- Jasper EL Implementation JAR File -->
-     <jar  jarfile="${jasper-el.jar}" index="true">
+     <jar  jarfile="${jasper-el.jar}">
        <fileset dir="${tomcat.classes}">
          <include name="org/apache/el/**" />
          <!-- Javadoc and i18n exclusions -->
@@ -363,13 +227,20 @@
 
   <target name="deploy" depends="build-only">
 
-    <copy file="${commons-logging-api.jar}" todir="${tomcat.build}/lib" />
+    <copy file="${commons-logging-api.jar}" todir="${tomcat.build}/bin" />
 
     <!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
       <fileset dir="conf">
         <include name="*.xml"/>
         <include name="*.properties"/>
+      </fileset>
+    </copy>
+
+    <!-- Temp: Copy webapps -->
+    <copy todir="${tomcat.build}/webapps">
+      <fileset dir="webapps">
+        <include name="ROOT/**"/>
       </fileset>
     </copy>
 

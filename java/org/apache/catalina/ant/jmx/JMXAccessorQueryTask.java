@@ -174,7 +174,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
             try {
                 MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
                 String code = minfo.getClassName();
-                if ("org.apache.commons.modeler.BaseModelMBean".equals(code)) {
+                if ("org.apache.tomcat.util.modeler.BaseModelMBean".equals(code)) {
                     code = (String) jmxServerConnection.getAttribute(oname,
                             "modelerType");
                 }

@@ -28,7 +28,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Valve;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 /**

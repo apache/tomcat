@@ -28,9 +28,9 @@ import javax.management.ObjectName;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.commons.modeler.Registry;
 
 import org.apache.tomcat.util.http.mapper.Mapper;
+import org.apache.tomcat.util.modeler.Registry;
 
 import org.apache.tomcat.util.res.StringManager;
 

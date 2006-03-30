@@ -23,9 +23,9 @@ import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.StandardHost;
-import org.apache.commons.modeler.BaseModelMBean;
-import org.apache.commons.modeler.ManagedBean;
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.BaseModelMBean;
+import org.apache.tomcat.util.modeler.ManagedBean;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 /**

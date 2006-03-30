@@ -31,10 +31,10 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.commons.modeler.Registry;
 import org.apache.jk.core.JkHandler;
 import org.apache.jk.core.WorkerEnv;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.modeler.Registry;
 
 /** Main class used to startup and configure jk. It manages the conf/jk2.properties file
  *  and is the target of JMX proxy.

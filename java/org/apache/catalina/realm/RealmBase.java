@@ -52,7 +52,7 @@ import org.apache.catalina.util.MD5Encoder;
 import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.Registry;
 
 /**
  * Simple implementation of <b>Realm</b> that reads an XML file to configure

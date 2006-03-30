@@ -22,7 +22,6 @@ import java.util.Iterator;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.apache.commons.modeler.Registry;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.Request;
@@ -41,6 +40,7 @@ import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLSupport;
 
 /** Plugs Jk into Coyote. Must be named "type=JkHandler,name=container"

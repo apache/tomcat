@@ -52,8 +52,8 @@ import org.apache.catalina.valves.RemoteAddrValve;
 import org.apache.catalina.valves.RemoteHostValve;
 import org.apache.catalina.valves.RequestDumperValve;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.commons.modeler.BaseModelMBean;
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.BaseModelMBean;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 /**

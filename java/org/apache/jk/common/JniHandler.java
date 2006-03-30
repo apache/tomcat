@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import javax.management.ObjectName;
 
-import org.apache.commons.modeler.Registry;
 import org.apache.jk.apr.AprImpl;
 import org.apache.jk.core.JkHandler;
 import org.apache.jk.core.Msg;
@@ -29,6 +28,7 @@ import org.apache.jk.core.JkChannel;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.modeler.Registry;
 
 
 /**

@@ -24,7 +24,7 @@ import javax.management.RuntimeOperationsException;
 import org.apache.catalina.Server;
 import org.apache.catalina.ServerFactory;
 import org.apache.catalina.core.StandardServer;
-import org.apache.commons.modeler.BaseModelMBean;
+import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 
 /**
