@@ -89,6 +89,16 @@ public class FilterMap implements Serializable {
         this.servletName = servletName;
     }
 
+    
+    /**
+     * The flag that indicates this mapping will match all.
+     */
+    private boolean allMatch = false;
+    
+    public boolean getAllMatch() {
+        return allMatch;
+    }
+    
 
     /**
      * The URL pattern this mapping matches.
@@ -100,7 +110,11 @@ public class FilterMap implements Serializable {
     }
 
     public void setURLPattern(String urlPattern) {
-        this.urlPattern = RequestUtil.URLDecode(urlPattern);
+        if ("*".equals(urlPattern)) {
+            this.allMatch = true;
+        } else {
+            this.urlPattern = RequestUtil.URLDecode(urlPattern);
+        }
     }
     
     /**

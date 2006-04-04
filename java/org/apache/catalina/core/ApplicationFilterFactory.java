@@ -196,13 +196,18 @@ public final class ApplicationFilterFactory {
     /**
      * Return <code>true</code> if the context-relative request path
      * matches the requirements of the specified filter mapping;
-     * otherwise, return <code>null</code>.
+     * otherwise, return <code>false</code>.
      *
      * @param filterMap Filter mapping being checked
      * @param requestPath Context-relative request path of this request
      */
     private boolean matchFiltersURL(FilterMap filterMap, String requestPath) {
 
+        // Check the specific "*" special URL pattern, which also matches
+        // named dispatches
+        if (filterMap.getAllMatch())
+            return (true);
+        
         if (requestPath == null)
             return (false);
 
