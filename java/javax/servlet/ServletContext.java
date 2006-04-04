@@ -82,7 +82,9 @@ public interface ServletContext {
 
     public ServletContext getContext(String uripath);
     
-    
+
+    public String getContextPath();
+
 
     /**
      * Returns the major version of the Java Servlet API that this
