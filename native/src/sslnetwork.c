@@ -289,19 +289,22 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
             int i = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_NONE:
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
                     return APR_SUCCESS;
                 break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
                     if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
+                case SSL_ERROR_SSL:
                     s = apr_get_netos_error();
                     if (!APR_STATUS_IS_EAGAIN(s) &&
                         !APR_STATUS_IS_EINTR(s)) {
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return s;
                     }
                 break;
@@ -309,7 +312,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
                     /*
                     * Anything else is a fatal error
                     */
-                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                     return SSL_TO_APR_ERROR(i);
                 break;
             }
@@ -319,7 +322,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
         */
         if (SSL_get_verify_result(con->ssl) != X509_V_OK) {
             /* TODO: Log SSL client authentication failed */
-            con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+            con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
             /* TODO: Figure out the correct return value */
             return APR_EGENERAL;
         }
@@ -355,28 +358,33 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
             switch (i) {
                 case SSL_ERROR_ZERO_RETURN:
                     *len = 0;
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
                     return APR_EOF;
                 break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
                     if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
+                case SSL_ERROR_SSL:
                     if (!APR_STATUS_IS_EAGAIN(os) &&
                         !APR_STATUS_IS_EINTR(os)) {
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return os;
                     }
                 break;
                 default:
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                     return os;
                 break;
             }
         }
         else {
             *len = s;
+            con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
             break;
         }
     }
@@ -388,16 +396,17 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                 apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
-    int s, rd = (int)(*len);
+    int s, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
     for (;;) {
-        if ((s = SSL_write(con->ssl, buf, rd)) <= 0) {
+        if ((s = SSL_write(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
             int i = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_ZERO_RETURN:
                     *len = 0;
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
                     return APR_EOF;
                 break;
                 case SSL_ERROR_WANT_READ:
@@ -407,13 +416,15 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                     }
                 break;
                 case SSL_ERROR_SYSCALL:
+                case SSL_ERROR_SSL:
                     if (!APR_STATUS_IS_EAGAIN(os) &&
                         !APR_STATUS_IS_EINTR(os)) {
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return os;
                     }
                 break;
                 default:
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                     return os;
                 break;
             }
