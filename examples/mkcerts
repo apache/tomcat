@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright 1999-2004 The Apache Software Foundation
+# Copyright 1999-2006 The Apache Software Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -100,10 +100,10 @@ organizationName_value          = Apache Software Foundation
 organizationalUnitName          = Organizational Unit Name
 organizationalUnitName_value    = Apache Tomcat
 commonName                      = Common Name
-commonName_value                = Tomcat Demo Root CA
+commonName_value                = Apache Tomcat demo root CA
 commonName_max                  = 64
 emailAddress                    = Email Address
-emailAddress_value              = coyote@apache.org
+emailAddress_value              = coyote@tomcat.apache.org
 emailAddress_max                = 40
 [ extensions ]
 subjectKeyIdentifier            = hash
@@ -149,10 +149,10 @@ organizationName_value          = Apache Software Foundation
 organizationalUnitName          = Organizational Unit Name
 organizationalUnitName_value    = Apache Tomcat
 commonName                      = Common Name
-commonName_value                = Tomcat Localhost Secure Demo Server
+commonName_value                = Apache Tomcat localhost secure demo server
 commonName_max                  = 64
 emailAddress                    = Email Address
-emailAddress_value              = root@localhost
+emailAddress_value              = tomcat@localhost.edu
 emailAddress_max                = 40
 [ extensions ]
 nsCertType                      = server
@@ -172,6 +172,8 @@ fi
 $CA -passin $PASSPHRASE -batch -config ca.cfg -extensions server_cert -policy server_policy  -out x.crt -infiles localhost.csr
 $X509 -in x.crt -out localhost.crt
 rm -f x.crt
+# Create PKCS12 localhost certificate
+$OPENSSL pkcs12 -export -passout $PASSPHRASE -passin $PASSPHRASE -in localhost.crt -inkey localhost.key -certfile ca.crt -out localhost.p12
 
 $GENRSA -passout $PASSPHRASE -out user.key -rand .rnd 1024
 
@@ -188,7 +190,7 @@ commonName              = User Name
 commonName_value        = Localhost Administrator
 commonName_max          = 64
 emailAddress            = Email Address
-emailAddress_value      = admin@localhost
+emailAddress_value      = admin@localhost.edu
 emailAddress_max        = 40
 [ extensions ]
 nsCertType              = client,email
@@ -208,8 +210,6 @@ rm -f x.crt
 $OPENSSL pkcs12 -export -passout $PASSPHRASE -passin $PASSPHRASE -in user.crt -inkey user.key -certfile ca.crt -out user.p12
 
 rm -f ca.cfg
-rm -f ca.serial.old
-rm -f ca.index.old
+rm -f *.old
 rm -f ca.index.attr
-rm -f ca.index.attr.old
 rm -f .rnd
