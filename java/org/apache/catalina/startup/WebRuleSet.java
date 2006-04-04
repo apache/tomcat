@@ -19,9 +19,14 @@ package org.apache.catalina.startup;
 
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.digester.CallMethodRule;
+import org.apache.tomcat.util.digester.CallParamRule;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSetBase;
@@ -115,6 +120,8 @@ public class WebRuleSet extends RuleSetBase {
         
         digester.addRule(prefix + "web-app",
                          new SetPublicIdRule("setPublicId"));
+        digester.addRule(prefix + "web-app",
+                         new IgnoreAnnotationsRule());
 
         digester.addCallMethod(prefix + "web-app/context-param",
                                "addParameter", 2);
@@ -222,15 +229,15 @@ public class WebRuleSet extends RuleSetBase {
         digester.addObjectCreate(prefix + "web-app/filter-mapping",
                                  "org.apache.catalina.deploy.FilterMap");
         digester.addSetNext(prefix + "web-app/filter-mapping",
-                            "addFilterMap",
-                            "org.apache.catalina.deploy.FilterMap");
+                                 "addFilterMap",
+                                 "org.apache.catalina.deploy.FilterMap");
 
         digester.addCallMethod(prefix + "web-app/filter-mapping/filter-name",
                                "setFilterName", 0);
         digester.addCallMethod(prefix + "web-app/filter-mapping/servlet-name",
-                               "setServletName", 0);
+                               "addServletName", 0);
         digester.addCallMethod(prefix + "web-app/filter-mapping/url-pattern",
-                               "setURLPattern", 0);
+                               "addURLPattern", 0);
 
         digester.addCallMethod(prefix + "web-app/filter-mapping/dispatcher",
                                "setDispatcher", 0);
@@ -392,10 +399,10 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "web-app/servlet/servlet-name",
                               "setName", 0);
 
-        digester.addCallMethod(prefix + "web-app/servlet-mapping",
-                               "addServletMapping", 2);
+        digester.addRule(prefix + "web-app/servlet-mapping",
+                               new CallMethodMultiRule("addServletMapping", 2, 0));
         digester.addCallParam(prefix + "web-app/servlet-mapping/servlet-name", 1);
-        digester.addCallParam(prefix + "web-app/servlet-mapping/url-pattern", 0);
+        digester.addRule(prefix + "web-app/servlet-mapping/url-pattern", new CallParamMultiRule(0));
 
         digester.addRule(prefix + "web-app/session-config",
                          sessionConfig);
@@ -611,6 +618,142 @@ final class WrapperCreateRule extends Rule {
         Wrapper wrapper = (Wrapper) digester.pop();
         if (digester.getLogger().isDebugEnabled())
             digester.getLogger().debug("pop " + wrapper.getClass().getName());
+    }
+
+}
+
+
+/**
+ * A Rule that can be used to call multiple times a method as many times as needed
+ * (used for addServletMapping).
+ */
+final class CallParamMultiRule extends CallParamRule {
+
+    public CallParamMultiRule(int paramIndex) {
+        super(paramIndex);
+    }
+
+    public void end(String namespace, String name) {
+        if (bodyTextStack != null && !bodyTextStack.empty()) {
+            // what we do now is push one parameter onto the top set of parameters
+            Object parameters[] = (Object[]) digester.peekParams();
+            ArrayList params = (ArrayList) parameters[paramIndex];
+            if (params == null) {
+                params = new ArrayList();
+                parameters[paramIndex] = params;
+            }
+            params.add(bodyTextStack.pop());
+        }
+    }
+
+}
+
+
+/**
+ * A Rule that can be used to call multiple times a method as many times as needed
+ * (used for addServletMapping).
+ */
+final class CallMethodMultiRule extends CallMethodRule {
+
+    protected int multiParamIndex = 0;
+    
+    public CallMethodMultiRule(String methodName, int paramCount, int multiParamIndex) {
+        super(methodName, paramCount);
+        this.multiParamIndex = multiParamIndex;
+    }
+
+    public void end() throws Exception {
+
+        // Retrieve or construct the parameter values array
+        Object parameters[] = null;
+        if (paramCount > 0) {
+            parameters = (Object[]) digester.popParams();
+        } else {
+            super.end();
+        }
+        
+        ArrayList multiParams = (ArrayList) parameters[multiParamIndex];
+        
+        // Construct the parameter values array we will need
+        // We only do the conversion if the param value is a String and
+        // the specified paramType is not String. 
+        Object paramValues[] = new Object[paramTypes.length];
+        for (int i = 0; i < paramTypes.length; i++) {
+            if (i != multiParamIndex) {
+                // convert nulls and convert stringy parameters 
+                // for non-stringy param types
+                if(parameters[i] == null || (parameters[i] instanceof String 
+                        && !String.class.isAssignableFrom(paramTypes[i]))) {
+                    paramValues[i] =
+                        IntrospectionUtils.convert((String) parameters[i], paramTypes[i]);
+                } else {
+                    paramValues[i] = parameters[i];
+                }
+            }
+        }
+
+        // Determine the target object for the method call
+        Object target;
+        if (targetOffset >= 0) {
+            target = digester.peek(targetOffset);
+        } else {
+            target = digester.peek(digester.getCount() + targetOffset);
+        }
+
+        if (target == null) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("[CallMethodRule]{");
+            sb.append("");
+            sb.append("} Call target is null (");
+            sb.append("targetOffset=");
+            sb.append(targetOffset);
+            sb.append(",stackdepth=");
+            sb.append(digester.getCount());
+            sb.append(")");
+            throw new org.xml.sax.SAXException(sb.toString());
+        }
+        
+        for (int j = 0; j < multiParams.size(); j++) {
+            Object param = multiParams.get(j);
+            if(param == null || (param instanceof String 
+                    && !String.class.isAssignableFrom(paramTypes[multiParamIndex]))) {
+                paramValues[multiParamIndex] =
+                    IntrospectionUtils.convert((String) param, paramTypes[multiParamIndex]);
+            } else {
+                paramValues[multiParamIndex] = param;
+            }
+            Object result = IntrospectionUtils.callMethodN(target, methodName,
+                    paramValues, paramTypes);   
+        }
+        
+    }
+
+}
+
+
+
+/**
+ * A Rule that check if the annotations have to be loaded.
+ * 
+ */
+
+final class IgnoreAnnotationsRule extends Rule {
+
+    public IgnoreAnnotationsRule() {
+    }
+
+    public void begin(String namespace, String name, Attributes attributes)
+        throws Exception {
+        Context context = (Context) digester.peek(digester.getCount() - 1);
+        String value = attributes.getValue("metadata-complete");
+        if ("true".equals(value)) {
+            context.setIgnoreAnnotations(true);
+        }
+        if (digester.getLogger().isDebugEnabled()) {
+            digester.getLogger().debug
+                (context.getClass().getName() + ".setIgnoreAnnotations( " +
+                    context.getIgnoreAnnotations() + ")");
+        }
     }
 
 }

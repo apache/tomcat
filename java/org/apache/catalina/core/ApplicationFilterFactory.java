@@ -212,7 +212,30 @@ public final class ApplicationFilterFactory {
             return (false);
 
         // Match on context relative request path
-        String testPath = filterMap.getURLPattern();
+        String[] testPaths = filterMap.getURLPatterns();
+        
+        for (int i = 0; i < testPaths.length; i++) {
+            if (matchFiltersURL(testPaths[i], requestPath)) {
+                return (true);
+            }
+        }
+        
+        // No match
+        return (false);
+        
+    }
+    
+
+    /**
+     * Return <code>true</code> if the context-relative request path
+     * matches the requirements of the specified filter mapping;
+     * otherwise, return <code>false</code>.
+     *
+     * @param testPath URL mapping being checked
+     * @param requestPath Context-relative request path of this request
+     */
+    private boolean matchFiltersURL(String testPath, String requestPath) {
+        
         if (testPath == null)
             return (false);
 
@@ -268,11 +291,13 @@ public final class ApplicationFilterFactory {
         if (servletName == null) {
             return (false);
         } else {
-            if (servletName.equals(filterMap.getServletName())) {
-                return (true);
-            } else {
-                return false;
+            String[] servletNames = filterMap.getServletNames();
+            for (int i = 0; i < servletNames.length; i++) {
+                if (servletName.equals(servletNames[i])) {
+                    return (true);
+                }
             }
+            return false;
         }
 
     }

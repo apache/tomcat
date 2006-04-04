@@ -301,7 +301,7 @@ public class StandardContext
     private boolean delegate = false;
 
 
-     /**
+    /**
      * The display name of this web application.
      */
     private String displayName = null;
@@ -357,6 +357,12 @@ public class StandardContext
      * they were defined in the deployment descriptor.
      */
     private FilterMap filterMaps[] = new FilterMap[0];
+
+
+    /**
+     * Ignore annotations.
+     */
+    private boolean ignoreAnnotations = false;
 
 
     /**
@@ -1301,6 +1307,28 @@ public class StandardContext
 
 
     /**
+     * Return the boolean on the annotations parsing.
+     */
+    public boolean getIgnoreAnnotations() {
+        return this.ignoreAnnotations;
+    }
+    
+    
+    /**
+     * Set the boolean on the annotations parsing for this web 
+     * application.
+     * 
+     * @param ignoreAnnotations The boolean on the annotations parsing
+     */
+    public void setIgnoreAnnotations(boolean ignoreAnnotations) {
+        boolean oldIgnoreAnnotations = this.ignoreAnnotations;
+        this.ignoreAnnotations = ignoreAnnotations;
+        support.firePropertyChange("ignoreAnnotations", Boolean.valueOf(oldIgnoreAnnotations),
+                Boolean.valueOf(this.ignoreAnnotations));
+    }
+    
+    
+    /**
      * Return the login configuration descriptor for this web application.
      */
     public LoginConfig getLoginConfig() {
@@ -2061,23 +2089,29 @@ public class StandardContext
 
         // Validate the proposed filter mapping
         String filterName = filterMap.getFilterName();
-        String servletName = filterMap.getServletName();
-        String urlPattern = filterMap.getURLPattern();
+        String[] servletNames = filterMap.getServletNames();
+        String[] urlPatterns = filterMap.getURLPatterns();
         if (findFilterDef(filterName) == null)
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.name", filterName));
-        if ((servletName == null) && (urlPattern == null))
+        if ((servletNames.length == 0) && (urlPatterns.length == 0))
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
-        if ((servletName != null) && (urlPattern != null))
+        // FIXME: Older spec revisions may still check this
+        /*
+        if ((servletNames.length != 0) && (urlPatterns.length != 0))
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
+        */
         // Because filter-pattern is new in 2.3, no need to adjust
         // for 2.2 backwards compatibility
-        if ((urlPattern != null) && !validateURLPattern(urlPattern))
-            throw new IllegalArgumentException
-                (sm.getString("standardContext.filterMap.pattern",
-                              urlPattern));
+        for (int i = 0; i < urlPatterns.length; i++) {
+            if (!validateURLPattern(urlPatterns[i])) {
+                throw new IllegalArgumentException
+                    (sm.getString("standardContext.filterMap.pattern",
+                            urlPatterns[i]));
+            }
+        }
 
         // Add this filter mapping to our registered set
         synchronized (filterMaps) {
@@ -4446,7 +4480,7 @@ public class StandardContext
         lifecycle.fireLifecycleEvent(DESTROY_EVENT, null);
 
         instanceListeners = new String[0];
-        applicationListeners = new String[0];
+
     }
     
     private void resetContext() throws Exception, MBeanRegistrationException {
@@ -4460,6 +4494,10 @@ public class StandardContext
         // Bugzilla 32867
         distributable = false;
 
+        applicationListeners = new String[0];
+        applicationEventListenersObjects = new Object[0];
+        applicationLifecycleListenersObjects = new Object[0];
+        
         if(log.isDebugEnabled())
             log.debug("resetContext " + oname + " " + mserver);
     }

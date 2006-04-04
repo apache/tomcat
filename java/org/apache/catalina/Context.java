@@ -259,6 +259,21 @@ public interface Context extends Container {
 
 
     /**
+     * Return the boolean on the annotations parsing.
+     */
+    public boolean getIgnoreAnnotations();
+    
+    
+    /**
+     * Set the boolean on the annotations parsing for this web 
+     * application.
+     * 
+     * @param ignoreAnnotations The boolean on the annotations parsing
+     */
+    public void setIgnoreAnnotations(boolean ignoreAnnotations);
+    
+    
+    /**
      * Return the login configuration descriptor for this web application.
      */
     public LoginConfig getLoginConfig();

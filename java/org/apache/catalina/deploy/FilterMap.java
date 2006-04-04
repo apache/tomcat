@@ -79,14 +79,17 @@ public class FilterMap implements Serializable {
     /**
      * The servlet name this mapping matches.
      */
-    private String servletName = null;
+    private String[] servletNames = new String[0];
 
-    public String getServletName() {
-        return (this.servletName);
+    public String[] getServletNames() {
+        return (this.servletNames);
     }
 
-    public void setServletName(String servletName) {
-        this.servletName = servletName;
+    public void addServletName(String servletName) {
+        String[] results = new String[servletNames.length + 1];
+        System.arraycopy(servletNames, 0, results, 0, servletNames.length);
+        results[servletNames.length] = servletName;
+        servletNames = results;
     }
 
     
@@ -103,17 +106,20 @@ public class FilterMap implements Serializable {
     /**
      * The URL pattern this mapping matches.
      */
-    private String urlPattern = null;
+    private String[] urlPatterns = new String[0];
 
-    public String getURLPattern() {
-        return (this.urlPattern);
+    public String[] getURLPatterns() {
+        return (this.urlPatterns);
     }
 
-    public void setURLPattern(String urlPattern) {
+    public void addURLPattern(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.allMatch = true;
         } else {
-            this.urlPattern = RequestUtil.URLDecode(urlPattern);
+            String[] results = new String[urlPatterns.length + 1];
+            System.arraycopy(urlPatterns, 0, results, 0, urlPatterns.length);
+            results[urlPatterns.length] = RequestUtil.URLDecode(urlPattern);
+            urlPatterns = results;
         }
     }
     
@@ -211,13 +217,13 @@ public class FilterMap implements Serializable {
         StringBuffer sb = new StringBuffer("FilterMap[");
         sb.append("filterName=");
         sb.append(this.filterName);
-        if (servletName != null) {
+        for (int i = 0; i < servletNames.length; i++) {
             sb.append(", servletName=");
-            sb.append(servletName);
+            sb.append(servletNames[i]);
         }
-        if (urlPattern != null) {
+        for (int i = 0; i < urlPatterns.length; i++) {
             sb.append(", urlPattern=");
-            sb.append(urlPattern);
+            sb.append(urlPatterns[i]);
         }
         sb.append("]");
         return (sb.toString());
