@@ -121,6 +121,16 @@ public class JspCServletContext implements ServletContext {
 
 
     /**
+     * Return the context path.
+     */
+    public String getContextPath() {
+
+        return (null);
+
+    }
+
+
+    /**
      * Return the specified context initialization parameter.
      *
      * @param name Name of the requested parameter
