@@ -1421,6 +1421,9 @@ public class Request
     public void setCharacterEncoding(String enc)
         throws UnsupportedEncodingException {
 
+        if (usingReader)
+            return;
+        
         // Ensure that the specified encoding is valid
         byte buffer[] = new byte[1];
         buffer[0] = (byte) 'a';
@@ -2231,7 +2234,7 @@ public class Request
             Cookie cookie = new Cookie(Globals.SESSION_COOKIE_NAME,
                                        session.getIdInternal());
             configureSessionCookie(cookie);
-            response.addCookie(cookie);
+            response.addCookieInternal(cookie);
         }
 
         if (session != null) {

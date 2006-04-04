@@ -908,11 +908,24 @@ public class Response
      */
     public void addCookie(final Cookie cookie) {
 
-        if (isCommitted())
-            return;
-
         // Ignore any call from an included servlet
         if (included)
+            return;
+
+        addCookieInternal(cookie);
+
+    }
+
+
+    /**
+     * Add the specified Cookie to those that will be included with
+     * this Response.
+     *
+     * @param cookie Cookie to be added
+     */
+    public void addCookieInternal(final Cookie cookie) {
+
+        if (isCommitted())
             return;
 
         cookies.add(cookie);
