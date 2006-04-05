@@ -406,12 +406,13 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
             switch (i) {
                 case SSL_ERROR_ZERO_RETURN:
                     *len = 0;
-                        con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
+                    con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
                     return APR_EOF;
                 break;
                 case SSL_ERROR_WANT_READ:
                 case SSL_ERROR_WANT_WRITE:
                     if ((rv = wait_for_io_or_timeout(con, i)) != APR_SUCCESS) {
+                        con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
                         return rv;
                     }
                 break;
