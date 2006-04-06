@@ -55,6 +55,7 @@ typedef struct tcn_pollset {
     int sp_poll_timeout;
     int sp_overflow;
     int sp_equals;
+    int sp_eintr;
 #endif
 } tcn_pollset_t;
 
@@ -75,6 +76,7 @@ static void sp_poll_statistics(tcn_pollset_t *p)
     fprintf(stderr, "Maintained              : %d\n", p->sp_maintained);
     fprintf(stderr, "Max. maintained         : %d\n", p->sp_max_maintained);
     fprintf(stderr, "Number of duplicates    : %d\n", p->sp_equals);
+    fprintf(stderr, "Number of interrupts    : %d\n", p->sp_eintr);
 
 }
 
@@ -249,15 +251,25 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
 #ifdef TCN_DO_STATISTICS
      p->sp_poll++;
 #endif
-    if ((rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd)) != APR_SUCCESS) {
-        TCN_ERROR_WRAP(rv);
+    for (;;) {
+        rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd);
+        if (rv != APR_SUCCESS) {
+            if (APR_STATUS_IS_EINTR(rv)) {
 #ifdef TCN_DO_STATISTICS
-        if (rv == TCN_TIMEUP)
-            p->sp_poll_timeout++;
-        else
-            p->sp_err_poll++;
+                p->sp_eintr++;
 #endif
-        num = (apr_int32_t)(-rv);
+                continue;
+            }
+            TCN_ERROR_WRAP(rv);
+#ifdef TCN_DO_STATISTICS
+            if (rv == TCN_TIMEUP)
+                p->sp_poll_timeout++;
+            else
+                p->sp_err_poll++;
+#endif
+            num = (apr_int32_t)(-rv);
+        }
+        break;
     }
     if (num > 0) {
 #ifdef TCN_DO_STATISTICS
