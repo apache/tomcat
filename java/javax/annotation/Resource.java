@@ -37,4 +37,5 @@ public @interface Resource {
     public AuthenticationType authenticationType() default AuthenticationType.CONTAINER;
     public boolean shareable() default true;
     public String description() default "";
+    public String mappedName();
 }
