@@ -75,7 +75,7 @@ public class ContextConfig
     // ----------------------------------------------------- Instance Variables
 
 
-    /*
+    /**
      * Custom mappings of login methods to authenticators
      */
     protected Map customAuthenticators;
@@ -284,6 +284,23 @@ public class ContextConfig
 
 
     // -------------------------------------------------------- protected Methods
+
+
+    /**
+     * Process the application classes annotations, if it exists.
+     */
+    protected void applicationAnnotationsConfig() {
+        
+        long t1=System.currentTimeMillis();
+        
+        WebAnnotationSet.loadApplicationAnnotations(context);
+        
+        long t2=System.currentTimeMillis();
+        if (context instanceof StandardContext) {
+            ((StandardContext) context).setStartupTime(t2-t1+
+                    ((StandardContext) context).getStartupTime());
+        }
+    }
 
 
     /**
@@ -1032,6 +1049,9 @@ public class ContextConfig
         // Process the default and application web.xml files
         defaultWebConfig();
         applicationWebConfig();
+        if (!context.getIgnoreAnnotations()) {
+            applicationAnnotationsConfig();
+        }
         if (ok) {
             validateSecurityRoles();
         }
