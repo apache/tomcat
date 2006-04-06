@@ -108,10 +108,16 @@ public class NamingResources implements Serializable {
 
 
     /**
+     * The web service references for this web application, keyed by name.
+     */
+    private HashMap services = new HashMap();
+
+
+    /**
      * The transaction for this webapp.
      */
     private ContextTransaction transaction = null;
-    
+
 
     /**
      * The property change support for this component.
@@ -325,6 +331,28 @@ public class NamingResources implements Serializable {
 
 
     /**
+     * Add a web service reference for this web application.
+     *
+     * @param service New web service reference
+     */
+    public void addService(ContextService service) {
+        
+        if (entries.containsKey(service.getName())) {
+            return;
+        } else {
+            entries.put(service.getName(), service.getType());
+        }
+        
+        synchronized (services) {
+            service.setNamingResources(this);
+            services.put(service.getName(), service);
+        }
+        support.firePropertyChange("service", null, service);
+        
+    }
+
+
+    /**
      * Return the EJB resource reference with the specified name, if any;
      * otherwise, return <code>null</code>.
      *
@@ -533,6 +561,35 @@ public class NamingResources implements Serializable {
 
 
     /**
+     * Return the web service reference for the specified
+     * name, if any; otherwise return <code>null</code>.
+     *
+     * @param name Name of the desired web service
+     */
+    public ContextService findService(String name) {
+
+        synchronized (services) {
+            return ((ContextService) services.get(name));
+        }
+
+    }
+
+
+    /**
+     * Return the defined web service references for this application.  If
+     * none have been defined, a zero-length array is returned.
+     */
+    public ContextService[] findServices() {
+        
+        synchronized (services) {
+            ContextService results[] = new ContextService[services.size()];
+            return ((ContextService[]) services.values().toArray(results));
+        }
+        
+    }
+
+
+    /**
      * Return true if the name specified already exists.
      */
     public boolean exists(String name) {
@@ -699,6 +756,27 @@ public class NamingResources implements Serializable {
             resourceLink.setNamingResources(null);
         }
 
+    }
+
+
+    /**
+     * Remove any web service reference with the specified name.
+     *
+     * @param name Name of the web service reference to remove
+     */
+    public void removeService(String name) {
+        
+        entries.remove(name);
+        
+        ContextService service = null;
+        synchronized (services) {
+            service = (ContextService) services.remove(name);
+        }
+        if (service != null) {
+            support.firePropertyChange("service", service, null);
+            service.setNamingResources(null);
+        }
+        
     }
 
 

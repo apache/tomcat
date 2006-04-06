@@ -369,6 +369,40 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "web-app/security-role/role-name",
                                "addSecurityRole", 0);
 
+        digester.addObjectCreate(prefix + "web-app/service-ref",
+                                 "org.apache.catalina.deploy.ContextService");
+        digester.addRule(prefix + "web-app/service-ref",
+                         new SetNextNamingRule("addService",
+                         "org.apache.catalina.deploy.ContextService"));
+        
+        digester.addCallMethod(prefix + "web-app/service-ref/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/display-name",
+                               "setDisplayname", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/icon",
+                               "setIcon", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-ref-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-interface",
+                               "setServiceinterface", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/wsdl-file",
+                               "setWsdlfile", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/jaxrpc-mapping-file",
+                               "setJaxrpcmappingfile", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-qname/namespaceURI",
+                               "setNamespaceURI", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-qname/localpart",
+                               "setLocalpart", 0);
+        digester.addCallMethod(prefix + 
+                               "web-app/service-ref/port-component/service-endpoint-interface",
+                               "setServiceendpoint", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/port-component/port-component-link",
+                               "setPortlink", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/handler",
+                               "setHandler", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-ref-type",
+                               "setType", 0);
+        
         digester.addRule(prefix + "web-app/servlet",
                          new WrapperCreateRule());
         digester.addSetNext(prefix + "web-app/servlet",
