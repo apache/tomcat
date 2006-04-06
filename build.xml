@@ -37,6 +37,7 @@
   <!-- JAR artifacts -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
 
+  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
   <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
   <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
   <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
@@ -100,6 +101,16 @@
   <target name="build-only" depends="build-prepare,compile,package" />
 
   <target name="package" >  
+
+    <!-- Common Annotations 1.0 JAR File -->
+    <jar  jarfile="${annotations-api.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="javax/annotation/**" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
 
     <!-- Servlet 2.5 Implementation JAR File -->
     <jar  jarfile="${servlet-api.jar}">
