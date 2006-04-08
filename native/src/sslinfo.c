@@ -112,7 +112,7 @@ static char *get_cert_PEM(X509 *xs)
 
 static unsigned char *get_cert_ASN1(X509 *xs, int *len)
 {
-    char *result = NULL;
+    unsigned char *result = NULL;
     BIO *bio;
 
     *len = 0;
