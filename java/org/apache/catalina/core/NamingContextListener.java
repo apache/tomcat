@@ -165,6 +165,14 @@ public class NamingContextListener
             log.debug( "setName " + name);
     }
 
+    
+    /**
+     * Return the env context.
+     */
+    public javax.naming.Context getEnvContext() {
+        return this.envCtx;
+    }
+    
 
     /**
      * Return the associated naming context.

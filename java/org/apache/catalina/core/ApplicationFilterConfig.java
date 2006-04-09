@@ -19,10 +19,12 @@ package org.apache.catalina.core;
 
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
 
+import javax.naming.NamingException;
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
@@ -31,6 +33,7 @@ import javax.servlet.ServletException;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.AnnotationProcessor;
 import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.log.SystemLogHandler;
 
@@ -66,11 +69,13 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
+     * @throws NamingException 
+     * @throws InvocationTargetException 
      */
     public ApplicationFilterConfig(Context context, FilterDef filterDef)
         throws ClassCastException, ClassNotFoundException,
                IllegalAccessException, InstantiationException,
-               ServletException {
+               ServletException, InvocationTargetException, NamingException {
 
         super();
         this.context = context;
@@ -186,9 +191,12 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
+     * @throws NamingException 
+     * @throws InvocationTargetException 
      */
     Filter getFilter() throws ClassCastException, ClassNotFoundException,
-        IllegalAccessException, InstantiationException, ServletException {
+        IllegalAccessException, InstantiationException, ServletException, 
+        InvocationTargetException, NamingException {
 
         // Return the existing filter instance, if any
         if (this.filter != null)
@@ -208,8 +216,16 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
         // Instantiate a new instance of this filter and return it
         Class clazz = classLoader.loadClass(filterClass);
         this.filter = (Filter) clazz.newInstance();
+        if (!context.getIgnoreAnnotations()) {
+            if (context instanceof StandardContext 
+                    && ((StandardContext) context).getNamingContextListener() != null) {
+                AnnotationProcessor.injectNamingResources
+                    (((StandardContext) context).getNamingContextListener().getEnvContext(), this.filter);
+            }
+            AnnotationProcessor.postConstruct(this.filter);
+        }
         if (context instanceof StandardContext &&
-            ((StandardContext)context).getSwallowOutput()) {
+            ((StandardContext) context).getSwallowOutput()) {
             try {
                 SystemLogHandler.startCapture();
                 filter.init(this);
@@ -244,8 +260,8 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
     void release() {
 
         if (this.filter != null){
-             if( System.getSecurityManager() != null) {
-                try{
+            if (System.getSecurityManager() != null) {
+                try {
                     SecurityUtil.doAsPrivilege("destroy", filter); 
                 } catch(java.lang.Exception ex){                    
                     context.getLogger().error("ApplicationFilterConfig.doAsPrivilege", ex);
@@ -253,6 +269,13 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                 SecurityUtil.remove(filter);
             } else { 
                 filter.destroy();
+            }
+            if (!context.getIgnoreAnnotations()) {
+                try {
+                    AnnotationProcessor.preDestroy(this.filter);
+                } catch (Exception e) {
+                    context.getLogger().error("ApplicationFilterConfig.preDestroy", e);
+                }
             }
         }
         this.filter = null;
@@ -274,18 +297,20 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
      * @exception InstantiationException if an exception occurs while
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
+     * @throws NamingException 
+     * @throws InvocationTargetException 
      */
     void setFilterDef(FilterDef filterDef)
         throws ClassCastException, ClassNotFoundException,
                IllegalAccessException, InstantiationException,
-               ServletException {
+               ServletException, InvocationTargetException, NamingException {
 
         this.filterDef = filterDef;
         if (filterDef == null) {
 
             // Release any previously allocated filter instance
             if (this.filter != null){
-                 if( System.getSecurityManager() != null) {
+                if( System.getSecurityManager() != null) {
                     try{
                         SecurityUtil.doAsPrivilege("destroy", filter);  
                     } catch(java.lang.Exception ex){    
@@ -294,6 +319,13 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                     SecurityUtil.remove(filter);
                 } else { 
                     filter.destroy();
+                }
+                if (!context.getIgnoreAnnotations()) {
+                    try {
+                        AnnotationProcessor.preDestroy(this.filter);
+                    } catch (Exception e) {
+                        context.getLogger().error("ApplicationFilterConfig.preDestroy", e);
+                    }
                 }
             }
             this.filter = null;

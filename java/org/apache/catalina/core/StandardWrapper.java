@@ -53,6 +53,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.AnnotationProcessor;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -1053,6 +1054,15 @@ public class StandardWrapper
             // Instantiate and initialize an instance of the servlet class itself
             try {
                 servlet = (Servlet) classClass.newInstance();
+                // Annotation processing
+                if (!((Context) getParent()).getIgnoreAnnotations()) {
+                    if (getParent() instanceof StandardContext 
+                            && ((StandardContext) getParent()).getNamingContextListener() != null) {
+                        AnnotationProcessor.injectNamingResources
+                            (((StandardContext) getParent()).getNamingContextListener().getEnvContext(), servlet);
+                    }
+                    AnnotationProcessor.postConstruct(servlet);
+                }
             } catch (ClassCastException e) {
                 unavailable(null);
                 // Restore the context ClassLoader
@@ -1330,9 +1340,15 @@ public class StandardWrapper
             } else {
                 instance.destroy();
             }
-
+            
             instanceSupport.fireInstanceEvent
               (InstanceEvent.AFTER_DESTROY_EVENT, instance);
+
+            // Annotation processing
+            if (!((Context) getParent()).getIgnoreAnnotations()) {
+                AnnotationProcessor.preDestroy(instance);
+            }
+
         } catch (Throwable t) {
             instanceSupport.fireInstanceEvent
               (InstanceEvent.AFTER_DESTROY_EVENT, instance, t);
@@ -1367,12 +1383,16 @@ public class StandardWrapper
             try {
                 Thread.currentThread().setContextClassLoader(classLoader);
                 while (!instancePool.isEmpty()) {
-                    if( System.getSecurityManager() != null) {
-                        SecurityUtil.doAsPrivilege("destroy",
-                                                   ((Servlet) instancePool.pop()));
+                    Servlet s = (Servlet) instancePool.pop();
+                    if (System.getSecurityManager() != null) {
+                        SecurityUtil.doAsPrivilege("destroy", s);
                         SecurityUtil.remove(instance);                           
                     } else {
-                        ((Servlet) instancePool.pop()).destroy();
+                        s.destroy();
+                    }
+                    // Annotation processing
+                    if (!((Context) getParent()).getIgnoreAnnotations()) {
+                        AnnotationProcessor.preDestroy(s);
                     }
                 }
             } catch (Throwable t) {

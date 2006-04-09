@@ -84,6 +84,7 @@ import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.TldConfig;
+import org.apache.catalina.util.AnnotationProcessor;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.RequestUtil;
@@ -3710,6 +3711,14 @@ public class StandardContext
             try {
                 Class clazz = loader.loadClass(listeners[i]);
                 results[i] = clazz.newInstance();
+                // Annotation processing
+                if (!getIgnoreAnnotations()) {
+                    if (getNamingContextListener() != null) {
+                        AnnotationProcessor.injectNamingResources
+                            (getNamingContextListener().getEnvContext(), results[i]);
+                    }
+                    AnnotationProcessor.postConstruct(results[i]);
+                }
             } catch (Throwable t) {
                 getLogger().error
                     (sm.getString("standardContext.applicationListener",
@@ -3787,31 +3796,60 @@ public class StandardContext
 
         boolean ok = true;
         Object listeners[] = getApplicationLifecycleListeners();
-        if (listeners == null)
-            return (ok);
-        ServletContextEvent event =
-          new ServletContextEvent(getServletContext());
-        for (int i = 0; i < listeners.length; i++) {
-            int j = (listeners.length - 1) - i;
-            if (listeners[j] == null)
-                continue;
-            if (!(listeners[j] instanceof ServletContextListener))
-                continue;
-            ServletContextListener listener =
-                (ServletContextListener) listeners[j];
-            try {
-                fireContainerEvent("beforeContextDestroyed", listener);
-                listener.contextDestroyed(event);
-                fireContainerEvent("afterContextDestroyed", listener);
-            } catch (Throwable t) {
-                fireContainerEvent("afterContextDestroyed", listener);
-                getLogger().error
-                    (sm.getString("standardContext.listenerStop",
-                                  listeners[j].getClass().getName()), t);
-                ok = false;
+        if (listeners != null) {
+            ServletContextEvent event =
+                new ServletContextEvent(getServletContext());
+            for (int i = 0; i < listeners.length; i++) {
+                int j = (listeners.length - 1) - i;
+                if (listeners[j] == null)
+                    continue;
+                if (listeners[j] instanceof ServletContextListener) {
+                    ServletContextListener listener =
+                        (ServletContextListener) listeners[j];
+                    try {
+                        fireContainerEvent("beforeContextDestroyed", listener);
+                        listener.contextDestroyed(event);
+                        fireContainerEvent("afterContextDestroyed", listener);
+                    } catch (Throwable t) {
+                        fireContainerEvent("afterContextDestroyed", listener);
+                        getLogger().error
+                            (sm.getString("standardContext.listenerStop",
+                                listeners[j].getClass().getName()), t);
+                        ok = false;
+                    }
+                }
+                // Annotation processing
+                if (!getIgnoreAnnotations()) {
+                    try {
+                        AnnotationProcessor.preDestroy(listeners[j]);
+                    } catch (Throwable t) {
+                        getLogger().error
+                            (sm.getString("standardContext.listenerStop",
+                                listeners[j].getClass().getName()), t);
+                        ok = false;
+                    }
+                }
             }
         }
 
+        // Annotation processing
+        listeners = getApplicationEventListeners();
+        if (!getIgnoreAnnotations() && listeners != null) {
+            for (int i = 0; i < listeners.length; i++) {
+                int j = (listeners.length - 1) - i;
+                if (listeners[j] == null)
+                    continue;
+                try {
+                    AnnotationProcessor.preDestroy(listeners[j]);
+                } catch (Throwable t) {
+                    getLogger().error
+                        (sm.getString("standardContext.listenerStop",
+                            listeners[j].getClass().getName()), t);
+                    ok = false;
+                }
+            }
+        }
+        
         setApplicationEventListeners(null);
         setApplicationLifecycleListeners(null);
 
@@ -4794,6 +4832,14 @@ public class StandardContext
     return namingContextName;
     }
 
+    
+    /**
+     * Naming context listener accessor.
+     */
+    public NamingContextListener getNamingContextListener() {
+        return namingContextListener;
+    }
+    
 
     /**
      * Return the request processing paused flag for this Context.
