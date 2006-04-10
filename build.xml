@@ -54,6 +54,8 @@
     <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${commons-logging.jar}"/>
+    <pathelement location="${mail.jar}" />
+    <pathelement location="${activation.jar}" />
   </path>
 
   <!-- Just build Tomcat -->
