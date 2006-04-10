@@ -60,7 +60,15 @@
   <target name="build-prepare">
 
     <available classname="junit.framework.TestCase" property="junit.present" />
-
+    <condition property="javamail.present">
+      <and>
+        <available classname="javax.activation.DataSource"
+         classpath="${activation.jar}" />
+        <available classname="javax.mail.Service"
+         classpath="${mail.jar}" />
+      </and>
+    </condition>
+    
     <mkdir dir="${tomcat.classes}"/>
     
     <mkdir dir="${tomcat.build}"/>
@@ -82,8 +90,10 @@
            excludes="**/CVS/**,**/.svn/**">
       <classpath refid="tomcat.classpath" />
       <exclude name="org/apache/tomcat/util/net/puretls/**" />
-      <exclude name="org/apache/naming/factory/MailSessionFactory.java"/>
-      <exclude name="org/apache/naming/factory/SendMailFactory.java"/>
+      <exclude name="org/apache/naming/factory/MailSessionFactory.java"
+              unless="javamail.present" />
+      <exclude name="org/apache/naming/factory/SendMailFactory.java"
+              unless="javamail.present" />
     </javac>
     <!-- Copy static resource files -->
     <filter token="VERSION" value="${version}"/>
