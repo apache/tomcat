@@ -117,15 +117,15 @@ public class AnnotationProcessor {
                 lookupFieldResource(context, instance, fields[i], annotation.name());
             }
             /*
-            if (f.isAnnotationPresent(EJB.class)) {
-                EJB annotation = (EJB) f.getAnnotation(EJB.class);
-                lookupOnFieldResource(f, annotation.name());
+            if (fields[i].isAnnotationPresent(EJB.class)) {
+                EJB annotation = (EJB) fields[i].getAnnotation(EJB.class);
+                lookupOnFieldResource(context, instance, fields[i], annotation.name());
             }
             
-            if (f.isAnnotationPresent(WebServiceRef.class)) {
-                WebServiceRef annotation = (WebServiceRef) 
-                f.getAnnotation(WebServiceRef.class);
-                lookupOnFieldResource(f, annotation.name());
+            if (fields[i].isAnnotationPresent(WebServiceRef.class)) {
+                WebServiceRef annotation = 
+                    (WebServiceRef) fields[i].getAnnotation(WebServiceRef.class);
+                lookupOnFieldResource(context, instance, fields[i], annotation.name());
             }
             */
         }
@@ -138,14 +138,14 @@ public class AnnotationProcessor {
                 lookupMethodResource(context, instance, methods[i], annotation.name());
             }
             /*
-            if (m.isAnnotationPresent(EJB.class)) {
-                EJB annotation = (EJB) m.getAnnotation(EJB.class);
-                lookupOnMethodResource(m, annotation.name());
+            if (methods[i].isAnnotationPresent(EJB.class)) {
+                EJB annotation = (EJB) methods[i].getAnnotation(EJB.class);
+                lookupOnMethodResource(context, instance, methods[i], annotation.name());
             }
-            if (m.isAnnotationPresent(WebServiceRef.class)) {
-                WebServiceRef annotation = (WebServiceRef) 
-                m.getAnnotation(WebServiceRef.class);
-                lookupOnMethodResource(m, annotation.name());
+            if (methods[i].isAnnotationPresent(WebServiceRef.class)) {
+                WebServiceRef annotation = 
+                    (WebServiceRef) methods[i].getAnnotation(WebServiceRef.class);
+                lookupOnMethodResource(context, instance, methods[i], annotation.name());
             }
             */
         }            

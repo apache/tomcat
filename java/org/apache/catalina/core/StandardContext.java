@@ -4842,6 +4842,14 @@ public class StandardContext
     
 
     /**
+     * Naming context listener setter.
+     */
+    public void setNamingContextListener(NamingContextListener namingContextListener) {
+        this.namingContextListener = namingContextListener;
+    }
+    
+
+    /**
      * Return the request processing paused flag for this Context.
      */
     public boolean getPaused() {

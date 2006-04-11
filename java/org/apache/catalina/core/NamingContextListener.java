@@ -147,9 +147,7 @@ public class NamingContextListener
      * Return the "name" property.
      */
     public String getName() {
-
         return (this.name);
-
     }
 
 
@@ -159,13 +157,18 @@ public class NamingContextListener
      * @param name The new name
      */
     public void setName(String name) {
-
         this.name = name;
-        if( log.isDebugEnabled() )
-            log.debug( "setName " + name);
     }
 
     
+    /**
+     * Return the comp context.
+     */
+    public javax.naming.Context getCompContext() {
+        return this.compCtx;
+    }
+    
+
     /**
      * Return the env context.
      */
@@ -178,9 +181,7 @@ public class NamingContextListener
      * Return the associated naming context.
      */
     public NamingContext getNamingContext() {
-
         return (this.namingContext);
-
     }
 
 
