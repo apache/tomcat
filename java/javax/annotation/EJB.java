@@ -15,15 +15,20 @@
  */
 
 
-package javax.annotation.security;
+package javax.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 
-public @interface DenyAll {
+public @interface EJB {
+   String name() default "";
+   Class businessInterface() default java.lang.Object.class;
+   String beanName() default "";
+   String mappedName() default "";
+   String description() default "";
 }

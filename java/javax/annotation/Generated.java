@@ -17,21 +17,15 @@
 
 package javax.annotation;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PACKAGE;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.SOURCE;
-
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ANNOTATION_TYPE, CONSTRUCTOR, FIELD, LOCAL_VARIABLE, METHOD, PACKAGE, PARAMETER, TYPE})
-@Retention(SOURCE)
+@Target({ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR, 
+    ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.METHOD, 
+    ElementType.PACKAGE, ElementType.PARAMETER, ElementType.TYPE})
+@Retention(RetentionPolicy.SOURCE)
 
 public @interface Generated {
     public String[] value();
