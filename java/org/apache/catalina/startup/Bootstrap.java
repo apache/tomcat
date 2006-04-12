@@ -115,50 +115,69 @@ public final class Bootstrap {
         if ((value == null) || (value.equals("")))
             return parent;
 
-        ArrayList unpackedList = new ArrayList();
-        ArrayList packedList = new ArrayList();
-        ArrayList urlList = new ArrayList();
-
+        ArrayList repositoryLocations = new ArrayList();
+        ArrayList repositoryTypes = new ArrayList();
+        int i;
+ 
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
         while (tokenizer.hasMoreElements()) {
             String repository = tokenizer.nextToken();
 
             // Local repository
-            boolean packed = false;
-            if (repository.startsWith(CATALINA_HOME_TOKEN)) {
-                repository = getCatalinaHome()
-                    + repository.substring(CATALINA_HOME_TOKEN.length());
-            } else if (repository.startsWith(CATALINA_BASE_TOKEN)) {
-                repository = getCatalinaBase()
-                    + repository.substring(CATALINA_BASE_TOKEN.length());
+            boolean replace = false;
+            String before = repository;
+            while ((i=repository.indexOf(CATALINA_HOME_TOKEN))>=0) {
+                replace=true;
+                if (i>0) {
+                repository = repository.substring(0,i) + getCatalinaHome() 
+                    + repository.substring(i+CATALINA_HOME_TOKEN.length());
+                } else {
+                    repository = getCatalinaHome() 
+                        + repository.substring(CATALINA_HOME_TOKEN.length());
+                }
             }
+            while ((i=repository.indexOf(CATALINA_BASE_TOKEN))>=0) {
+                replace=true;
+                if (i>0) {
+                repository = repository.substring(0,i) + getCatalinaBase() 
+                    + repository.substring(i+CATALINA_BASE_TOKEN.length());
+                } else {
+                    repository = getCatalinaBase() 
+                        + repository.substring(CATALINA_BASE_TOKEN.length());
+                }
+            }
+            if (replace && log.isDebugEnabled())
+                log.debug("Expanded " + before + " to " + replace);
 
             // Check for a JAR URL repository
             try {
-                urlList.add(new URL(repository));
+                URL url=new URL(repository);
+                repositoryLocations.add(repository);
+                repositoryTypes.add(ClassLoaderFactory.IS_URL);
                 continue;
             } catch (MalformedURLException e) {
                 // Ignore
             }
 
             if (repository.endsWith("*.jar")) {
-                packed = true;
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
-            }
-            if (packed) {
-                packedList.add(new File(repository));
+                repositoryLocations.add(repository);
+                repositoryTypes.add(ClassLoaderFactory.IS_GLOB);
+            } else if (repository.endsWith(".jar")) {
+                repositoryLocations.add(repository);
+                repositoryTypes.add(ClassLoaderFactory.IS_JAR);
             } else {
-                unpackedList.add(new File(repository));
+                repositoryLocations.add(repository);
+                repositoryTypes.add(ClassLoaderFactory.IS_DIR);
             }
         }
 
-        File[] unpacked = (File[]) unpackedList.toArray(new File[0]);
-        File[] packed = (File[]) packedList.toArray(new File[0]);
-        URL[] urls = (URL[]) urlList.toArray(new URL[0]);
-
+        String[] locations = (String[]) repositoryLocations.toArray(new String[0]);
+        Integer[] types = (Integer[]) repositoryTypes.toArray(new Integer[0]);
+ 
         ClassLoader classLoader = ClassLoaderFactory.createClassLoader
-            (unpacked, packed, urls, parent);
+            (locations, types, parent);
 
         // Retrieving MBean server
         MBeanServer mBeanServer = null;
@@ -414,7 +433,7 @@ public final class Bootstrap {
             } else if (command.equals("stop")) {
                 daemon.stopServer(args);
             } else {
-                log.warn("Bootsrap: command \"" + command + "\" does not exist.");
+                log.warn("Bootstrap: command \"" + command + "\" does not exist.");
             }
         } catch (Throwable t) {
             t.printStackTrace();
