@@ -33,7 +33,7 @@
 
   <!-- Can't be lower - jsp uses templates -->
   <property name="compile.source" value="1.5"/>
-  
+
   <!-- JAR artifacts -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
 
@@ -48,7 +48,12 @@
 
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
-  
+
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps" />
+  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps" />
+  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
+  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+
   <!-- Classpath -->
   <path id="tomcat.classpath">
     <pathelement location="${ant.jar}"/>
@@ -62,7 +67,7 @@
     <available classname="junit.framework.TestCase" property="junit.present" />
 
     <mkdir dir="${tomcat.classes}"/>
-    
+
     <mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.build}/bin"/>
     <mkdir dir="${tomcat.build}/conf"/>
@@ -98,7 +103,7 @@
 
   <target name="build-only" depends="build-prepare,compile,package" />
 
-  <target name="package" >  
+  <target name="package" >
 
     <!-- Common Annotations 1.0 JAR File -->
     <jar  jarfile="${annotations-api.jar}">
@@ -160,7 +165,7 @@
         <include name="org/apache/catalina/security/SecurityClassLoad.class" />
         <include name="org/apache/naming/JndiPermission.class" />
         <include name="org/apache/tomcat/util/compat/*" />
-      	<!-- Javadoc and i18n exclusions -->
+        <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
       </fileset>
@@ -185,10 +190,10 @@
     <!-- Catalina Ant Tasks JAR File -->
     <jar jarfile="${catalina-ant.jar}">
       <fileset dir="${tomcat.classes}">
-      	<include name="org/apache/catalina/ant/*" />
-      	<include name="org/apache/catalina/ant/jmx/*" />
+        <include name="org/apache/catalina/ant/*" />
+        <include name="org/apache/catalina/ant/jmx/*" />
         <include name="org/apache/catalina/util/Base64.class" />
-      	<!-- Javadoc and i18n exclusions -->
+        <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
       </fileset>
@@ -217,15 +222,32 @@
       </fileset>
     </jar>
 
-     <!-- Jasper EL Implementation JAR File -->
-     <jar  jarfile="${jasper-el.jar}">
-       <fileset dir="${tomcat.classes}">
-         <include name="org/apache/el/**" />
-         <!-- Javadoc and i18n exclusions -->
-         <exclude name="**/package.html" />
-         <exclude name="**/LocalStrings_*" />
-       </fileset>
-     </jar>
+    <!-- Jasper EL Implementation JAR File -->
+    <jar  jarfile="${jasper-el.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/el/**" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+    <!-- i18n JARs -->
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar">
+      <fileset dir="${tomcat.classes}">
+        <include name="**/LocalStrings_es.properties" />
+      </fileset>
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar">
+      <fileset dir="${tomcat.classes}">
+        <include name="**/LocalStrings_fr.properties" />
+      </fileset>
+    </jar>
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar">
+      <fileset dir="${tomcat.classes}">
+        <include name="**/LocalStrings_ja.properties" />
+      </fileset>
+    </jar>
 
   </target>
 
@@ -241,12 +263,15 @@
       </fileset>
     </copy>
 
-    <!-- Temp: Copy webapps -->
+    <!-- FIXME: Copy webapps -->
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="ROOT/**"/>
       </fileset>
     </copy>
+
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
+    <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
 
   </target>
 
@@ -254,5 +279,137 @@
     <delete dir="${tomcat.classes}" />
     <delete dir="${tomcat.build}" />
   </target>
-  
+
+  <!-- Download and dependency building -->
+  <target name="setproxy"  if="useproxy">
+    <taskdef name="setproxy"
+            classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
+    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
+    <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
+  </target>
+
+  <target name="testexist">
+    <echo message="Testing  for ${destfile}"/>
+    <available file="${destfile}" property="exist"/>
+  </target>
+
+  <target name="downloadgz" unless="exist" depends="setproxy,testexist">
+    <!-- Download and extract the package -->
+    <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
+    <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
+    <untar src="${base.path}/file.tar" dest="${base.path}"/>
+    <delete file="${base.path}/file.tar"/>
+    <delete file="${base.path}/file.tar.gz"/>
+  </target>
+
+  <target name="downloadzip" unless="exist" depends="setproxy,testexist">
+    <!-- Download and extract the package -->
+    <get src="${sourcefile}" dest="${base.path}/file.zip" />
+    <mkdir dir="${destdir}" />
+    <unzip src="${base.path}/file.zip" dest="${destdir}"/>
+    <delete file="${base.path}/file.zip"/>
+  </target>
+
+  <target name="download"
+          description="Builds and download dependent components">
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-logging.loc}"/>
+      <param name="destfile" value="${commons-logging.jar}"/>
+    </antcall>
+
+    <!-- Build Tomcat DBCP bundle -->
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-collections-src.loc}"/>
+      <param name="destfile" value="${tomcat-dbcp.jar}" />
+    </antcall>
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-pool-src.loc}"/>
+      <param name="destfile" value="${tomcat-dbcp.jar}" />
+    </antcall>
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-dbcp-src.loc}"/>
+      <param name="destfile" value="${tomcat-dbcp.jar}" />
+    </antcall>
+    <mkdir dir="${tomcat-dbcp.home}"/>
+    <antcall target="build-tomcat-dbcp">
+      <param name="basedir" value="${tomcat-dbcp.home}" />
+    </antcall>
+
+    <!-- Build Jasper JDT bundle -->
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${jdt.loc}"/>
+      <param name="destfile" value="${jdt.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+    <mkdir dir="${jasper-jdt.home}"/>
+    <antcall target="build-jasper-jdt">
+      <param name="basedir" value="${jasper-jdt.home}" />
+    </antcall>
+
+  </target>
+
+  <target name="build-tomcat-dbcp">
+    <copy todir="${tomcat-dbcp.home}">
+      <fileset dir="${commons-collections.home}" >
+        <include name="**/collections/CursorableLinkedList.java" />
+        <include name="**/collections/KeyValue.java" />
+        <include name="**/collections/LRUMap.java" />
+        <include name="**/collections/SequencedHashMap.java" />
+      </fileset>
+      <fileset dir="${commons-pool.home}">
+        <include name="**/*.java" />
+        <exclude name="**/Stack*.java" />
+        <exclude name="**/SoftReferenceObjectPool.java" />
+        <exclude name="**/test/**" />
+      </fileset>
+      <fileset dir="${commons-dbcp.home}">
+        <include name="**/*.java" />
+        <exclude name="**/test/**" />
+      </fileset>
+    </copy>
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons">
+      <replacefilter token="return UnmodifiableList.decorate(l);"
+            value="return l;" />
+      <replacefilter token="import org.apache.commons.collections.list.UnmodifiableList;"
+            value=" " />
+    </replace>
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons" >
+      <replacefilter token="org.apache.commons"
+            value="org.apache.tomcat.dbcp" />
+    </replace>
+    <mkdir dir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp" />
+    <move todir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp">
+      <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
+    </move>
+    <mkdir dir="${tomcat-dbcp.home}/classes"/>
+    <javac destdir="classes"
+           optimize="off"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           sourcepath="${tomcat-dbcp.home}/src/java"
+           srcdir="src/java" >
+      <include name="**" />
+    </javac>
+    <jar jarfile="${tomcat-dbcp.jar}"
+         index="true">
+      <fileset dir="${tomcat-dbcp.home}/classes">
+        <include name="**/*.class" />
+        <include name="**/*.properties" />
+      </fileset>
+    </jar>
+  </target>
+
+  <target name="build-jasper-jdt">
+    <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
+    <jar destfile="${jasper-jdt.jar}" index="true">
+      <fileset dir="${jasper-jdt.home}">
+        <include name="org/eclipse/jdt/core/compiler/**"/>
+        <include name="org/eclipse/jdt/internal/compiler/**"/>
+        <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
+      </fileset>
+    </jar>
+  </target>
+
 </project>
