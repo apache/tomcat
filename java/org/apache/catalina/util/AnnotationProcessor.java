@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,13 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import javax.annotation.EJB;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.naming.NamingException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
+import javax.xml.ws.WebServiceRef;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 
@@ -116,18 +120,25 @@ public class AnnotationProcessor {
                 Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
                 lookupFieldResource(context, instance, fields[i], annotation.name());
             }
-            /*
             if (fields[i].isAnnotationPresent(EJB.class)) {
                 EJB annotation = (EJB) fields[i].getAnnotation(EJB.class);
-                lookupOnFieldResource(context, instance, fields[i], annotation.name());
+                lookupFieldResource(context, instance, fields[i], annotation.name());
             }
-            
             if (fields[i].isAnnotationPresent(WebServiceRef.class)) {
                 WebServiceRef annotation = 
                     (WebServiceRef) fields[i].getAnnotation(WebServiceRef.class);
-                lookupOnFieldResource(context, instance, fields[i], annotation.name());
+                lookupFieldResource(context, instance, fields[i], annotation.name());
             }
-            */
+            if (fields[i].isAnnotationPresent(PersistenceContext.class)) {
+                PersistenceContext annotation = 
+                    (PersistenceContext) fields[i].getAnnotation(PersistenceContext.class);
+                lookupFieldResource(context, instance, fields[i], annotation.name());
+            }
+            if (fields[i].isAnnotationPresent(PersistenceUnit.class)) {
+                PersistenceUnit annotation = 
+                    (PersistenceUnit) fields[i].getAnnotation(PersistenceUnit.class);
+                lookupFieldResource(context, instance, fields[i], annotation.name());
+            }
         }
         
         // Initialize methods annotations
@@ -137,18 +148,26 @@ public class AnnotationProcessor {
                 Resource annotation = (Resource) methods[i].getAnnotation(Resource.class);
                 lookupMethodResource(context, instance, methods[i], annotation.name());
             }
-            /*
             if (methods[i].isAnnotationPresent(EJB.class)) {
                 EJB annotation = (EJB) methods[i].getAnnotation(EJB.class);
-                lookupOnMethodResource(context, instance, methods[i], annotation.name());
+                lookupMethodResource(context, instance, methods[i], annotation.name());
             }
             if (methods[i].isAnnotationPresent(WebServiceRef.class)) {
                 WebServiceRef annotation = 
                     (WebServiceRef) methods[i].getAnnotation(WebServiceRef.class);
-                lookupOnMethodResource(context, instance, methods[i], annotation.name());
+                lookupMethodResource(context, instance, methods[i], annotation.name());
             }
-            */
-        }            
+            if (methods[i].isAnnotationPresent(PersistenceContext.class)) {
+                PersistenceContext annotation = 
+                    (PersistenceContext) methods[i].getAnnotation(PersistenceContext.class);
+                lookupMethodResource(context, instance, methods[i], annotation.name());
+            }
+            if (methods[i].isAnnotationPresent(PersistenceUnit.class)) {
+                PersistenceUnit annotation = 
+                    (PersistenceUnit) methods[i].getAnnotation(PersistenceUnit.class);
+                lookupMethodResource(context, instance, methods[i], annotation.name());
+            }
+        }
 
     }
     

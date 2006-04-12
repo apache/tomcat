@@ -33,9 +33,6 @@ import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.MessageDestinationRef;
 
-//import javax.ejb.EJB;
-//import javax.xml.ws.WebServiceRef;
-
 /**
  * <p><strong>AnnotationSet</strong> for processing the annotations of the web application
  * classes (<code>/WEB-INF/classes</code> and <code>/WEB-INF/lib</code>).</p>
