@@ -54,23 +54,13 @@
     <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
     <pathelement location="${commons-logging.jar}"/>
-    <pathelement location="${mail.jar}" />
-    <pathelement location="${activation.jar}" />
   </path>
 
   <!-- Just build Tomcat -->
   <target name="build-prepare">
 
     <available classname="junit.framework.TestCase" property="junit.present" />
-    <condition property="javamail.present">
-      <and>
-        <available classname="javax.activation.DataSource"
-         classpath="${activation.jar}" />
-        <available classname="javax.mail.Service"
-         classpath="${mail.jar}" />
-      </and>
-    </condition>
-    
+
     <mkdir dir="${tomcat.classes}"/>
     
     <mkdir dir="${tomcat.build}"/>
@@ -92,10 +82,6 @@
            excludes="**/CVS/**,**/.svn/**">
       <classpath refid="tomcat.classpath" />
       <exclude name="org/apache/tomcat/util/net/puretls/**" />
-      <exclude name="org/apache/naming/factory/MailSessionFactory.java"
-              unless="javamail.present" />
-      <exclude name="org/apache/naming/factory/SendMailFactory.java"
-              unless="javamail.present" />
     </javac>
     <!-- Copy static resource files -->
     <filter token="VERSION" value="${version}"/>
@@ -117,7 +103,10 @@
     <!-- Common Annotations 1.0 JAR File -->
     <jar  jarfile="${annotations-api.jar}">
       <fileset dir="${tomcat.classes}">
-        <include name="javax/annotation/**" />
+        <include name="javax/annotation/*" />
+        <include name="javax/annotation/security/*" />
+        <include name="javax/persistence/*" />
+        <include name="javax/xml/ws/*" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -149,7 +138,7 @@
     <!-- JSP 2.1 EL Implementation JAR File -->
     <jar  jarfile="${el-api.jar}">
       <fileset dir="${tomcat.classes}">
-        <include name="javax/el/**" />
+        <include name="javax/el/*" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -197,17 +186,8 @@
     <jar jarfile="${catalina-ant.jar}">
       <fileset dir="${tomcat.classes}">
       	<include name="org/apache/catalina/ant/*" />
-        <include name="org/apache/catalina/util/Base64.class" />
-      	<!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
-
-  	<!-- Catalina JMX Accessor Ant Tasks JAR File -->
-    <jar jarfile="${catalina-ant-jmx.jar}">
-      <fileset dir="${tomcat.classes}">
       	<include name="org/apache/catalina/ant/jmx/*" />
+        <include name="org/apache/catalina/util/Base64.class" />
       	<!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
