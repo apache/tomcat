@@ -455,6 +455,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 // Ignore <example> element: Bugzilla 33538
             } else if ("tag-extension".equals(tname)) {
                 // Ignore <tag-extension> element: Bugzilla 33538
+            } else if ("icon".equals(tname) 
+                    || "display-name".equals(tname) 
+                    || "description".equals(tname)) {
+                // Ignore these elements: Bugzilla 38015
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage(

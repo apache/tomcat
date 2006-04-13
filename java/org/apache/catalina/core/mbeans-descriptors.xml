@@ -125,6 +125,10 @@
                description="The object used for mapping"
                type="java.lang.Object"/>
       
+    <attribute name="namingContextListener"
+               description="Associated naming context listener."
+               type="org.apache.catalina.core.NamingContextListener" />
+      
     <attribute name="objectName"
                description="Name of the object"
                type="java.lang.String"/>

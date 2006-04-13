@@ -184,13 +184,7 @@ public class FileDirContext extends BaseDirContext {
      * Release any resources allocated for this directory context.
      */
     public void release() {
-
-        caseSensitive = true;
-        allowLinking = false;
-        absoluteBase = null;
-        base = null;
         super.release();
-
     }
 
 

@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
@@ -534,9 +535,14 @@ public final class TldConfig  {
 
         InputSource inputSource = null;
         try {
-            inputSource =
-                new InputSource(
-                    context.getServletContext().getResourceAsStream(resourcePath));
+            InputStream stream =
+                context.getServletContext().getResourceAsStream(resourcePath);
+            if (stream == null) {
+                throw new IllegalArgumentException
+                (sm.getString("contextConfig.tldResourcePath",
+                        resourcePath));
+            }
+            inputSource = new InputSource(stream);
             if (inputSource == null) {
                 throw new IllegalArgumentException
                     (sm.getString("contextConfig.tldResourcePath",

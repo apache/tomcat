@@ -590,7 +590,6 @@ public class StandardSession
      * @param isValid The new value for the <code>isValid</code> flag
      */
     public void setValid(boolean isValid) {
-
         this.isValid = isValid;
     }
 
@@ -607,9 +606,6 @@ public class StandardSession
 
         this.lastAccessedTime = this.thisAccessedTime;
         this.thisAccessedTime = System.currentTimeMillis();
-
-        evaluateIfValid();
-
         accessCount++;
 
     }
@@ -1491,19 +1487,6 @@ public class StandardSession
         }
 
         return false;
-    }
-
-
-    protected void evaluateIfValid() {
-        /*
-     * If this session has expired or is in the process of expiring or
-     * will never expire, return
-     */
-        if (!this.isValid || expiring || maxInactiveInterval < 0)
-            return;
-
-        isValid();
-
     }
 
 
