@@ -395,7 +395,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                          policy,
                                          settings,
                                          requestor,
-                                         problemFactory);
+                                         problemFactory,
+                                         true);
         compiler.compile(compilationUnits);
 
         if (!ctxt.keepGenerated()) {
