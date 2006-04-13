@@ -320,6 +320,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if(opt.equals("1.5")) {
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
                              CompilerOptions.VERSION_1_5);
+                settings.put(CompilerOptions.OPTION_Compliance,
+                        CompilerOptions.VERSION_1_5);
             } else {
                 log.warn("Unknown target VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
@@ -328,6 +330,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         } else {
             // Default to 1.5
             settings.put(CompilerOptions.OPTION_TargetPlatform,
+                    CompilerOptions.VERSION_1_5);
+            settings.put(CompilerOptions.OPTION_Compliance,
                     CompilerOptions.VERSION_1_5);
         }
 
