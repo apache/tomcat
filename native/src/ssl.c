@@ -200,7 +200,7 @@ static unsigned long ssl_thread_id(void)
 
     return psaptr->PSATOLD;
 #else
-    return (unsigned long)((jlong)apr_os_thread_current());
+    return (unsigned long)(apr_os_thread_current());
 #endif
 }
 
@@ -371,7 +371,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     }
     if (SSLeay() < 0x0090700L) {
         TCN_FREE_CSTRING(engine);
-        return (jint)APR_EINVAL;        
+        return (jint)APR_EINVAL;
     }
     /* We must register the library in full, to ensure our configuration
      * code can successfully test the SSL environment.

@@ -18,7 +18,7 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_portable.h"
@@ -46,5 +46,5 @@ TCN_IMPLEMENT_CALL(jstring, OS, localeEncoding)(TCN_STDARGS, jlong pool)
 TCN_IMPLEMENT_CALL(jlong, OS, threadCurrent)(TCN_STDARGS)
 {
     UNREFERENCED_STDARGS;
-    return (jlong)apr_os_thread_current();
+    return (jlong)((unsigned long)apr_os_thread_current());
 }
