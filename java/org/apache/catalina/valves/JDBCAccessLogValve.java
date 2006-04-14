@@ -44,7 +44,7 @@ import org.apache.catalina.util.StringManager;
  * To use, copy into the server/classes directory of the Tomcat installation
  * and configure in server.xml as:
  * <pre>
- * 		&lt;Valve className="AccessLogDBValve"
+ * 		&lt;Valve className="org.apache.catalina.valves.JDBCAccessLogValve"
  *        	driverName="<i>your_jdbc_driver</i>"
  *        	connectionURL="<i>your_jdbc_url</i>"
  *        	pattern="combined" resolveHosts="false"
@@ -76,7 +76,7 @@ import org.apache.catalina.util.StringManager;
  * id INT UNSIGNED AUTO_INCREMENT NOT NULL,
  * ts TIMESTAMP NOT NULL,
  * remoteHost CHAR(15) NOT NULL,
- * user CHAR(15),
+ * userName CHAR(15),
  * timestamp TIMESTAMP NOT NULL,
  * virtualHost VARCHAR(64) NOT NULL,
  * method VARCHAR(8) NOT NULL,
@@ -124,7 +124,7 @@ public final class JDBCAccessLogValve
      * 		connectionURL = null;
      * 		tableName = "access";
      * 		remoteHostField = "remoteHost";
-     * 		userField = "user";
+     * 		userField = "userName";
      * 		timestampField = "timestamp";
      * 		virtualHostField = "virtualHost";
      * 		methodField = "method";
@@ -143,7 +143,7 @@ public final class JDBCAccessLogValve
         connectionURL = null;
         tableName = "access";
         remoteHostField = "remoteHost";
-        userField = "user";
+        userField = "userName";
         timestampField = "timestamp";
         virtualHostField = "virtualHost";
         methodField = "method";
@@ -208,7 +208,7 @@ public final class JDBCAccessLogValve
      * The descriptive information about this implementation.
      */
     protected static String info = 
-        "org.apache.catalina.valves.JDBCAccessLogValve/1.0";
+        "org.apache.catalina.valves.JDBCAccessLogValve/1.1";
 
 
     /**

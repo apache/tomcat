@@ -156,7 +156,7 @@ public class StandardSession
     /**
      * Set of attribute names which are not allowed to be persisted.
      */
-    private static final String[] excludedAttributes = {
+    protected static final String[] excludedAttributes = {
         Globals.SUBJECT_ATTR
     };
 
@@ -422,9 +422,9 @@ public class StandardSession
      */
     public long getLastAccessedTime() {
 
-        if ( !isValid() ) {
+        if (!isValidInternal()) {
             throw new IllegalStateException
-            (sm.getString("standardSession.getId.ise"));
+                (sm.getString("standardSession.getId.ise"));
         }
 
         return (this.lastAccessedTime);
@@ -564,7 +564,7 @@ public class StandardSession
             return true;
         }
 
-        if (!this.isValid ) {
+        if (!this.isValid) {
             return false;
         }
 
@@ -948,7 +948,7 @@ public class StandardSession
      */
     public long getCreationTime() {
 
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getCreationTime.ise"));
 
@@ -1003,7 +1003,7 @@ public class StandardSession
      */
     public Object getAttribute(String name) {
 
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttribute.ise"));
 
@@ -1021,7 +1021,7 @@ public class StandardSession
      */
     public Enumeration getAttributeNames() {
 
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttributeNames.ise"));
 
@@ -1061,7 +1061,7 @@ public class StandardSession
      */
     public String[] getValueNames() {
 
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getValueNames.ise"));
 
@@ -1078,7 +1078,7 @@ public class StandardSession
      */
     public void invalidate() {
 
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.invalidate.ise"));
 
@@ -1100,7 +1100,7 @@ public class StandardSession
      */
     public boolean isNew() {
 
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.isNew.ise"));
 
@@ -1175,7 +1175,7 @@ public class StandardSession
     public void removeAttribute(String name, boolean notify) {
 
         // Validate our current state
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.removeAttribute.ise"));
 
@@ -1239,7 +1239,7 @@ public class StandardSession
         }
 
         // Validate our current state
-        if (!isValid())
+        if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.setAttribute.ise"));
         if ((manager != null) && manager.getDistributable() &&
@@ -1342,6 +1342,15 @@ public class StandardSession
 
 
     /**
+     * Return the <code>isValid</code> flag for this session without any expiration
+     * check.
+     */
+    protected boolean isValidInternal() {
+        return (this.isValid || this.expiring);
+    }
+
+
+    /**
      * Read a serialized version of this session object from the specified
      * object input stream.
      * <p>
@@ -1353,7 +1362,7 @@ public class StandardSession
      * @exception ClassNotFoundException if an unknown class is specified
      * @exception IOException if an input/output error occurs
      */
-    private void readObject(ObjectInputStream stream)
+    protected void readObject(ObjectInputStream stream)
         throws ClassNotFoundException, IOException {
 
         // Deserialize the scalar instance variables (except Manager)
@@ -1418,7 +1427,7 @@ public class StandardSession
      *
      * @exception IOException if an input/output error occurs
      */
-    private void writeObject(ObjectOutputStream stream) throws IOException {
+    protected void writeObject(ObjectOutputStream stream) throws IOException {
 
         // Write the scalar instance variables (except Manager)
         stream.writeObject(new Long(creationTime));

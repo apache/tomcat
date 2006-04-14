@@ -2255,7 +2255,7 @@ class Generator {
                     out.printin("if (");
                     out.print(tagEvalVar);
                     out
-                            .println(" != javax.servlet.jsp.tagext.Tag.EVAL_BODY_INCLUDE)");
+                            .println(" != javax.servlet.jsp.tagext.Tag.EVAL_BODY_INCLUDE) {");
                     out.pushIndent();
                     out.printil("out = _jspx_page_context.popBody();");
                     if (n.implementsTryCatchFinally()) {
@@ -2266,6 +2266,7 @@ class Generator {
                         out.println("[0]--;");
                     }
                     out.popIndent();
+                    out.printil("}");
                 }
 
                 out.popIndent(); // EVAL_BODY

@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import org.apache.catalina.util.StringManager;
 * @author Craig R. McClanahan
 * @author Carson McDonald
 * @author Ignacio Ortega
-* @version $Revision: 373023 $
+* @version $Revision: 394121 $
 */
 
 public class DataSourceRealm
@@ -57,13 +57,13 @@ public class DataSourceRealm
     /**
      * The generated string for the roles PreparedStatement
      */
-    private StringBuffer preparedRoles = null;
+    private String preparedRoles = null;
 
 
     /**
      * The generated string for the credentials PreparedStatement
      */
-    private StringBuffer preparedCredentials = null;
+    private String preparedCredentials = null;
 
 
     /**
@@ -581,7 +581,7 @@ public class DataSourceRealm
         throws SQLException {
 
         PreparedStatement credentials =
-            dbConnection.prepareStatement(preparedCredentials.toString());
+            dbConnection.prepareStatement(preparedCredentials);
 
         credentials.setString(1, username);
         return (credentials);
@@ -601,7 +601,7 @@ public class DataSourceRealm
         throws SQLException {
 
         PreparedStatement roles = 
-            dbConnection.prepareStatement(preparedRoles.toString());
+            dbConnection.prepareStatement(preparedRoles);
 
         roles.setString(1, username);
         return (roles);
@@ -624,23 +624,24 @@ public class DataSourceRealm
         super.start();
 
         // Create the roles PreparedStatement string
-        preparedRoles = new StringBuffer("SELECT ");
-        preparedRoles.append(roleNameCol);
-        preparedRoles.append(" FROM ");
-        preparedRoles.append(userRoleTable);
-        preparedRoles.append(" WHERE ");
-        preparedRoles.append(userNameCol);
-        preparedRoles.append(" = ?");
+        StringBuffer temp = new StringBuffer("SELECT ");
+        temp.append(roleNameCol);
+        temp.append(" FROM ");
+        temp.append(userRoleTable);
+        temp.append(" WHERE ");
+        temp.append(userNameCol);
+        temp.append(" = ?");
+        preparedRoles = temp.toString();
 
         // Create the credentials PreparedStatement string
-        preparedCredentials = new StringBuffer("SELECT ");
-        preparedCredentials.append(userCredCol);
-        preparedCredentials.append(" FROM ");
-        preparedCredentials.append(userTable);
-        preparedCredentials.append(" WHERE ");
-        preparedCredentials.append(userNameCol);
-        preparedCredentials.append(" = ?");
-
+        temp = new StringBuffer("SELECT ");
+        temp.append(userCredCol);
+        temp.append(" FROM ");
+        temp.append(userTable);
+        temp.append(" WHERE ");
+        temp.append(userNameCol);
+        temp.append(" = ?");
+        preparedCredentials = temp.toString();
     }
 
 
