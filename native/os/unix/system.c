@@ -122,12 +122,12 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         if (sysinfo(&info))
             rv = apr_get_os_error();
         else {
-            pvals[0] = (jlong)info.totalram;
-            pvals[1] = (jlong)info.freeram;
-            pvals[2] = (jlong)info.totalswap;
-            pvals[3] = (jlong)info.freeswap;
-            pvals[4] = (jlong)info.sharedram;
-            pvals[5] = (jlong)info.bufferram;
+            pvals[0] = (jlong)(info.totalram  * info.mem_unit);
+            pvals[1] = (jlong)(info.freeram   * info.mem_unit);
+            pvals[2] = (jlong)(info.totalswap * info.mem_unit);
+            pvals[3] = (jlong)(info.freeswap  * info.mem_unit);
+            pvals[4] = (jlong)(info.sharedram * info.mem_unit);
+            pvals[5] = (jlong)(info.bufferram * info.mem_unit);
             pvals[6] = (jlong)(100 - (info.freeram * 100 / info.totalram));
             rv = APR_SUCCESS;
         }
@@ -293,7 +293,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
          *
          */
     }
-    
+
 #elif defined(DARWIN)
 
     uint64_t mem_total;
@@ -327,7 +327,7 @@ TCN_IMPLEMENT_CALL(jstring, OS, expand)(TCN_STDARGS, jstring val)
     TCN_ALLOC_CSTRING(val);
 
     UNREFERENCED(o);
-    
+
     /* TODO: Make ${ENVAR} expansion */
     str = (*e)->NewStringUTF(e, J2S(val));
 
