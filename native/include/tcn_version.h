@@ -18,7 +18,7 @@
  * @author Mladen Turk
  * @version $Revision$, $Date$
  */
- 
+
 #ifndef TCN_VERSION_H
 #define TCN_VERSION_H
 
@@ -68,7 +68,7 @@ extern "C" {
 #define TCN_MINOR_VERSION       1
 
 /** patch level */
-#define TCN_PATCH_VERSION       2
+#define TCN_PATCH_VERSION       3
 
 /**
  *  This symbol is defined for internal, "development" copies of TCN. This
