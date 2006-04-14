@@ -310,9 +310,9 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
 
     if (fnGetSystemTimes) {
         if ((*fnGetSystemTimes)(&ft[0], &ft[1], &ft[2])) {
-            st[0] = ((ft[0].dwHighDateTime << 32) | ft[0].dwLowDateTime) / 10;
-            st[1] = ((ft[1].dwHighDateTime << 32) | ft[1].dwLowDateTime) / 10;
-            st[2] = ((ft[2].dwHighDateTime << 32) | ft[2].dwLowDateTime) / 10;
+            st[0] = (((ULONGLONG)ft[0].dwHighDateTime << 32) | ft[0].dwLowDateTime) / 10;
+            st[1] = (((ULONGLONG)ft[1].dwHighDateTime << 32) | ft[1].dwLowDateTime) / 10;
+            st[2] = (((ULONGLONG)ft[2].dwHighDateTime << 32) | ft[2].dwLowDateTime) / 10;
         }
         else
             goto cleanup;
@@ -341,8 +341,8 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
     memset(st, 0, sizeof(st));
     if (GetProcessTimes(GetCurrentProcess(), &ft[0], &ft[1], &ft[2], &ft[3])) {
         FileTimeToAprTime((apr_time_t *)&st[0], &ft[0]);
-        st[1] = ((ft[2].dwHighDateTime << 32) | ft[2].dwLowDateTime) / 10;
-        st[2] = ((ft[3].dwHighDateTime << 32) | ft[3].dwLowDateTime) / 10;
+        st[1] = (((ULONGLONG)ft[2].dwHighDateTime << 32) | ft[2].dwLowDateTime) / 10;
+        st[2] = (((ULONGLONG)ft[3].dwHighDateTime << 32) | ft[3].dwLowDateTime) / 10;
     }
     pvals[10] = st[0];
     pvals[11] = st[1];
