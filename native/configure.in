@@ -50,9 +50,11 @@ get_version="$abs_srcdir/build/get-version.sh"
 version_hdr="$abs_srcdir/include/tcn_version.h"
 TCNATIVE_MAJOR_VERSION="`$get_version major $version_hdr TCN`"
 TCNATIVE_DOTTED_VERSION="`$get_version all $version_hdr TCN`"
+TCNATIVE_LIBTOOL_VERSION="`$get_version libtool $version_hdr TCN`"
 
 AC_SUBST(TCNATIVE_DOTTED_VERSION)
 AC_SUBST(TCNATIVE_MAJOR_VERSION)
+AC_SUBST(TCNATIVE_LIBTOOL_VERSION)
 
 echo "Tomcat Native Version: ${TCNATIVE_DOTTED_VERSION}"
 
@@ -146,7 +148,7 @@ maintainer-mode,
     CFLAGS="${CFLAGS} -DDEBUG -Wall"
   else
     CFLAGS="${CFLAGS} -DDEBUG"
-  fi  
+  fi
 AC_MSG_RESULT([...Enabling Maintainer mode...])
 ])
 
