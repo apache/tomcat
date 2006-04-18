@@ -389,7 +389,7 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            sourcepath="${tomcat-dbcp.home}/src/java"
-           srcdir="src/java" >
+           srcdir="${tomcat-dbcp.home}/src/java" >
       <include name="**" />
     </javac>
     <jar jarfile="${tomcat-dbcp.jar}"
