@@ -383,7 +383,7 @@
       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
     </move>
     <mkdir dir="${tomcat-dbcp.home}/classes"/>
-    <javac destdir="classes"
+    <javac destdir="${tomcat-dbcp.home}/classes"
            optimize="off"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
