@@ -35,8 +35,9 @@ import org.apache.tomcat.util.IntrospectionUtils;
 /**
  * Verify the annotation and Process it.
  *
- * @author    Fabien Carrion
- * @version   $Revision: 303236 $, $Date: 2006-03-09 16:46:52 -0600 (Thu, 09 Mar 2006) $
+ * @author Fabien Carrion
+ * @author Remy Maucherat
+ * @version $Revision: 303236 $, $Date: 2006-03-09 16:46:52 -0600 (Thu, 09 Mar 2006) $
  */
 public class AnnotationProcessor {
     
@@ -172,8 +173,11 @@ public class AnnotationProcessor {
     }
     
     
+    /**
+     * Inject resources in specified field.
+     */
     protected static void lookupFieldResource(javax.naming.Context context, 
-            Object instance, Field f, String name)
+            Object instance, Field field, String name)
         throws NamingException, IllegalAccessException {
     
         Object lookedupResource = null;
@@ -183,16 +187,19 @@ public class AnnotationProcessor {
                 (name.length() > 0)) {
             lookedupResource = context.lookup(name);
         } else {
-            lookedupResource = context.lookup(instance.getClass().getName() + "/" + f.getName());
+            lookedupResource = context.lookup(instance.getClass().getName() + "/" + field.getName());
         }
         
-        accessibility = f.isAccessible();
-        f.setAccessible(true);
-        f.set(instance, lookedupResource);
-        f.setAccessible(accessibility);
+        accessibility = field.isAccessible();
+        field.setAccessible(true);
+        field.set(instance, lookedupResource);
+        field.setAccessible(accessibility);
     }
 
 
+    /**
+     * Inject resources in specified method.
+     */
     protected static void lookupMethodResource(javax.naming.Context context, 
             Object instance, Method method, String name)
         throws NamingException, IllegalAccessException, InvocationTargetException {
