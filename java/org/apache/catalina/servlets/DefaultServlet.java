@@ -350,16 +350,7 @@ public class DefaultServlet
         throws IOException, ServletException {
 
         // Serve the requested resource, including the data content
-        try {
-            serveResource(request, response, true);
-        } catch( IOException ex ) {
-            // we probably have this check somewhere else too.
-            if( ex.getMessage() != null
-                && ex.getMessage().indexOf("Broken pipe") >= 0 ) {
-                // ignore it.
-            }
-            throw ex;
-        }
+        serveResource(request, response, true);
 
     }
 
