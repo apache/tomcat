@@ -194,6 +194,10 @@ public class BeanELResolver extends ELResolver {
 			}
 			return property;
 		}
+        
+        public Class<?> getType() {
+            return type;
+        }
 	}
 
 	private final static class BeanProperty {
@@ -253,7 +257,7 @@ public class BeanELResolver extends ELResolver {
 		String prop = property.toString();
 
 		BeanProperties props = this.cache.get(type.getName());
-		if (props == null) {
+		if (props == null || type != props.getType()) {
 			props = new BeanProperties(type);
 			this.cache.put(type.getName(), props);
 		}
