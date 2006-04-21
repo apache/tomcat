@@ -27,7 +27,6 @@ import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.NamingResources;
-import org.apache.tomcat.util.compat.JdkCompat;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
@@ -63,15 +62,6 @@ public class NamingResourcesMBean extends BaseModelMBean {
     }
 
 
-    // ----------------------------------------------------- Class Variables
-
-
-    /**
-     * JDK compatibility support
-     */
-    private static final JdkCompat jdkCompat = JdkCompat.getJdkCompat();
-
-
     // ----------------------------------------------------- Instance Variables
     
     /**
@@ -105,7 +95,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create object name for environment " + envs[i]);
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
         }
@@ -131,7 +121,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create object name for resource " + resources[i]);
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
         }
@@ -157,7 +147,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create object name for resource " + resourceLinks[i]);
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
         }

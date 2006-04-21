@@ -29,7 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.StringManager;
-import org.apache.tomcat.util.compat.JdkCompat;
 
 /**
  * Implementation of a Valve that performs filtering based on comparing the
@@ -70,12 +69,6 @@ public abstract class RequestFilterValve
 
 
     // ----------------------------------------------------- Class Variables
-
-
-    /**
-     * JDK compatibility support
-     */
-    private static final JdkCompat jdkCompat = JdkCompat.getJdkCompat();
 
 
     /**
@@ -234,7 +227,7 @@ public abstract class RequestFilterValve
             } catch (PatternSyntaxException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
                     (sm.getString("requestFilterValve.syntax", pattern));
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
             list = list.substring(comma + 1);

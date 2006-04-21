@@ -29,7 +29,6 @@ import javax.management.RuntimeOperationsException;
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
-import org.apache.tomcat.util.compat.JdkCompat;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
@@ -63,15 +62,6 @@ public class GroupMBean extends BaseModelMBean {
         super();
 
     }
-
-
-    // ----------------------------------------------------- Class Variables
-
-
-    /**
-     * JDK compatibility support
-     */
-    private static final JdkCompat jdkCompat = JdkCompat.getJdkCompat();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -117,7 +107,7 @@ public class GroupMBean extends BaseModelMBean {
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create object name for role " + role);
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
         }
@@ -144,7 +134,7 @@ public class GroupMBean extends BaseModelMBean {
             } catch (MalformedObjectNameException e) {
                 IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create object name for user " + user);
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
         }

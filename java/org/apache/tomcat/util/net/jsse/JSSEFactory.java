@@ -17,6 +17,9 @@
 package org.apache.tomcat.util.net.jsse;
 
 import java.net.Socket;
+
+import javax.net.ssl.SSLSocket;
+
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 
@@ -27,16 +30,20 @@ import org.apache.tomcat.util.net.ServerSocketFactory;
  * @author Bill Barker
  */
 
-interface JSSEFactory {
+public class JSSEFactory {
 
     /**
      * Returns the ServerSocketFactory to use.
      */
-    public ServerSocketFactory getSocketFactory();
+    public ServerSocketFactory getSocketFactory() {
+        return new JSSESocketFactory();
+    }
 
     /**
      * returns the SSLSupport attached to this socket.
      */
-    public SSLSupport getSSLSupport(Socket socket);
+    public SSLSupport getSSLSupport(Socket socket) {
+        return new JSSESupport((SSLSocket)socket);
+    }
 
 };

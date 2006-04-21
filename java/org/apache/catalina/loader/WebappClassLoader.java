@@ -62,7 +62,6 @@ import org.apache.naming.JndiPermission;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.compat.JdkCompat;
 
 /**
  * Specialized web application class loader.
@@ -141,11 +140,6 @@ public class WebappClassLoader
     protected static final String[] triggers = {
         "javax.servlet.Servlet"                     // Servlet API
     };
-
-    /** 
-     * Jdk Compatibility Support.
-     */
-    protected static JdkCompat jdkCompat = JdkCompat.getJdkCompat();
 
     /**
      * Set of package names which are not allowed to be loaded from a webapp
@@ -548,7 +542,7 @@ public class WebappClassLoader
         } catch (MalformedURLException e) {
             IllegalArgumentException iae = new IllegalArgumentException
                 ("Invalid repository: " + repository); 
-            jdkCompat.chainException(iae, e);
+            iae.initCause(e);
             throw iae;
         }
 
@@ -2300,7 +2294,14 @@ public class WebappClassLoader
     protected URL getURI(File file)
         throws MalformedURLException {
 
-        return jdkCompat.getURI(file);
+        File realFile = file;
+        try {
+            realFile = realFile.getCanonicalFile();
+        } catch (IOException e) {
+            // Ignore
+        }
+
+        return realFile.toURI().toURL();
 
     }
 

@@ -33,7 +33,6 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.compat.JdkCompat;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>
@@ -220,8 +219,7 @@ public class ErrorReportValve
 
         if (throwable != null) {
 
-            String stackTrace = JdkCompat.getJdkCompat()
-                .getPartialServletStackTrace(throwable);
+            String stackTrace = getPartialServletStackTrace(throwable);
             sb.append("<p><b>");
             sb.append(sm.getString("errorReportValve.exception"));
             sb.append("</b> <pre>");
@@ -229,8 +227,7 @@ public class ErrorReportValve
             sb.append("</pre></p>");
 
             while (rootCause != null) {
-                stackTrace = JdkCompat.getJdkCompat()
-                    .getPartialServletStackTrace(rootCause);
+                stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
                 sb.append(sm.getString("errorReportValve.rootCause"));
                 sb.append("</b> <pre>");
@@ -280,5 +277,30 @@ public class ErrorReportValve
         
     }
 
+
+    /**
+     * Print out a partial servlet stack trace (truncating at the last 
+     * occurrence of javax.servlet.).
+     */
+    protected String getPartialServletStackTrace(Throwable t) {
+        StringBuffer trace = new StringBuffer();
+        trace.append(t.toString()).append('\n');
+        StackTraceElement[] elements = t.getStackTrace();
+        int pos = elements.length;
+        for (int i = 0; i < elements.length; i++) {
+            if ((elements[i].getClassName().startsWith
+                 ("org.apache.catalina.core.ApplicationFilterChain"))
+                && (elements[i].getMethodName().equals("internalDoFilter"))) {
+                pos = i;
+            }
+        }
+        for (int i = 0; i < pos; i++) {
+            if (!(elements[i].getClassName().startsWith
+                  ("org.apache.catalina.core."))) {
+                trace.append('\t').append(elements[i].toString()).append('\n');
+            }
+        }
+        return trace.toString();
+    }
 
 }

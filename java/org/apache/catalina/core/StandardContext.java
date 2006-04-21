@@ -97,7 +97,6 @@ import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.FileDirContext;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.WARDirContext;
-import org.apache.tomcat.util.compat.JdkCompat;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -140,12 +139,6 @@ public class StandardContext
      */
     private static final String info =
         "org.apache.catalina.core.StandardContext/1.0";
-
-
-    /**
-     * JDK compatibility support
-     */
-    private static final JdkCompat jdkCompat = JdkCompat.getJdkCompat();
 
 
     /**

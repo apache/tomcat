@@ -18,8 +18,14 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.SocketException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
+import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.security.cert.X509Certificate;
@@ -41,14 +47,17 @@ import org.apache.tomcat.util.net.SSLSupport;
 */
 
 class JSSESupport implements SSLSupport {
+    
     private static org.apache.commons.logging.Log log =
-	org.apache.commons.logging.LogFactory.getLog(JSSESupport.class);
+        org.apache.commons.logging.LogFactory.getLog(JSSESupport.class);
 
     protected SSLSocket ssl;
 
+    Listener listener = new Listener();
 
     JSSESupport(SSLSocket sock){
         ssl=sock;
+        sock.addHandshakeCompletedListener(listener);
     }
 
     public String getCipherSuite() throws IOException {
@@ -64,41 +73,44 @@ class JSSESupport implements SSLSupport {
         return getPeerCertificateChain(false);
     }
 
-    protected java.security.cert.X509Certificate [] 
-	getX509Certificates(SSLSession session) throws IOException {
-        X509Certificate jsseCerts[] = null;
-    try{
-	    jsseCerts = session.getPeerCertificateChain();
-    } catch (Throwable ex){
-       // Get rid of the warning in the logs when no Client-Cert is
-       // available
+    protected java.security.cert.X509Certificate [] getX509Certificates(SSLSession session) 
+        throws IOException {
+        Certificate [] certs=null;
+        try {
+            certs = session.getPeerCertificates();
+        } catch( Throwable t ) {
+            log.debug("Error getting client certs",t);
+            return null;
+        }
+        if( certs==null ) return null;
+        
+        java.security.cert.X509Certificate [] x509Certs = 
+            new java.security.cert.X509Certificate[certs.length];
+        for(int i=0; i < certs.length; i++) {
+            if (certs[i] instanceof java.security.cert.X509Certificate ) {
+                // always currently true with the JSSE 1.1.x
+                x509Certs[i] = (java.security.cert.X509Certificate) certs[i];
+            } else {
+                try {
+                    byte [] buffer = certs[i].getEncoded();
+                    CertificateFactory cf =
+                        CertificateFactory.getInstance("X.509");
+                    ByteArrayInputStream stream =
+                        new ByteArrayInputStream(buffer);
+                    x509Certs[i] = (java.security.cert.X509Certificate) cf.generateCertificate(stream);
+                } catch(Exception ex) { 
+                    log.info("Error translating cert " + certs[i], ex);
+                    return null;
+                }
+            }
+            if(log.isTraceEnabled())
+                log.trace("Cert #" + i + " = " + x509Certs[i]);
+        }
+        if(x509Certs.length < 1)
+            return null;
+        return x509Certs;
     }
 
-	if(jsseCerts == null)
-	    jsseCerts = new X509Certificate[0];
-	java.security.cert.X509Certificate [] x509Certs =
-	    new java.security.cert.X509Certificate[jsseCerts.length];
-	for (int i = 0; i < x509Certs.length; i++) {
-	    try {
-		byte buffer[] = jsseCerts[i].getEncoded();
-		CertificateFactory cf =
-		    CertificateFactory.getInstance("X.509");
-		ByteArrayInputStream stream =
-		    new ByteArrayInputStream(buffer);
-		x509Certs[i] = (java.security.cert.X509Certificate)
-		    cf.generateCertificate(stream);
-		if(log.isTraceEnabled())
-		    log.trace("Cert #" + i + " = " + x509Certs[i]);
-	    } catch(Exception ex) {
-		log.info("Error translating " + jsseCerts[i], ex);
-		return null;
-	    }
-	}
-	
-	if ( x509Certs.length < 1 )
-	    return null;
-	return x509Certs;
-    }
     public Object[] getPeerCertificateChain(boolean force)
         throws IOException {
         // Look up the current SSLSession
@@ -124,9 +136,41 @@ class JSSESupport implements SSLSupport {
     }
 
     protected void handShake() throws IOException {
-        ssl.setNeedClientAuth(true);
+        if( ssl.getWantClientAuth() ) {
+            log.debug("No client cert sent for want");
+        } else {
+            ssl.setNeedClientAuth(true);
+        }
+
+        InputStream in = ssl.getInputStream();
+        int oldTimeout = ssl.getSoTimeout();
+        ssl.setSoTimeout(1000);
+        byte[] b = new byte[0];
+        listener.reset();
         ssl.startHandshake();
+        int maxTries = 60; // 60 * 1000 = example 1 minute time out
+        for (int i = 0; i < maxTries; i++) {
+        if(log.isTraceEnabled())
+            log.trace("Reading for try #" +i);
+            try {
+                int x = in.read(b);
+            } catch(SSLException sslex) {
+                log.info("SSL Error getting client Certs",sslex);
+                throw sslex;
+            } catch (IOException e) {
+                // ignore - presumably the timeout
+            }
+            if (listener.completed) {
+                break;
+            }
+        }
+        ssl.setSoTimeout(oldTimeout);
+        if (listener.completed == false) {
+            throw new SocketException("SSL Cert handshake timeout");
+        }
+
     }
+
     /**
      * Copied from <code>org.apache.catalina.valves.CertificateValve</code>
      */
@@ -173,6 +217,16 @@ class JSSESupport implements SSLSupport {
         return buf.toString();
     }
 
+
+    private static class Listener implements HandshakeCompletedListener {
+        volatile boolean completed = false;
+        public void handshakeCompleted(HandshakeCompletedEvent event) {
+            completed = true;
+        }
+        void reset() {
+            completed = false;
+        }
+    }
 
 }
 

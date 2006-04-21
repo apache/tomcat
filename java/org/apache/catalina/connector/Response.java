@@ -40,17 +40,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Context;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.StringManager;
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.net.URL;
-import org.apache.tomcat.util.compat.JdkCompat;
 
 /**
  * Wrapper object for the Coyote response.
@@ -77,12 +76,6 @@ public class Response
 
 
     // ----------------------------------------------------- Class Variables
-
-
-    /**
-     * JDK compatibility support
-     */
-    private static final JdkCompat jdkCompat = JdkCompat.getJdkCompat();
 
 
     /**
@@ -1477,7 +1470,7 @@ public class Response
                         } catch (PrivilegedActionException pae){
                             IllegalArgumentException iae =
                                 new IllegalArgumentException(location);
-                            jdkCompat.chainException(iae, pae.getException());
+                            iae.initCause(pae.getException());
                             throw iae;
                         }
                     } else {
@@ -1490,7 +1483,7 @@ public class Response
             } catch (IOException e) {
                 IllegalArgumentException iae =
                     new IllegalArgumentException(location);
-                jdkCompat.chainException(iae, e);
+                iae.initCause(e);
                 throw iae;
             }
 
