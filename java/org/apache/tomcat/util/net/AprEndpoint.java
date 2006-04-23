@@ -1,5 +1,5 @@
 /*
- *  Copyright 2005 The Apache Software Foundation
+ *  Copyright 2005-2006 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,21 +19,22 @@ package org.apache.tomcat.util.net;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Address;
 import org.apache.tomcat.jni.Error;
 import org.apache.tomcat.jni.File;
 import org.apache.tomcat.jni.Library;
+import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
-import org.apache.tomcat.jni.Socket;
-import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
+import org.apache.tomcat.jni.Socket;
+import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ThreadWithAttributes;
 
@@ -156,6 +157,14 @@ public class AprEndpoint {
 
 
     // ------------------------------------------------------------- Properties
+
+
+    /**
+     * External Executor based thread pool.
+     */
+    protected Executor executor = null;
+    public void setExecutor(Executor executor) { this.executor = executor; }
+    public Executor getExecutor() { return executor; }
 
 
     /**
@@ -685,7 +694,9 @@ public class AprEndpoint {
             paused = false;
 
             // Create worker collection
-            workers = new WorkerStack(maxThreads);
+            if (executor == null) {
+                workers = new WorkerStack(maxThreads);
+            }
 
             // Start acceptor thread
             for (int i = 0; i < acceptorThreadCount; i++) {
@@ -962,7 +973,26 @@ public class AprEndpoint {
             }
         }
     }
+
     
+    /**
+     * Process given socket.
+     */
+    protected boolean processSocket(long socket) {
+        try {
+            if (executor == null) {
+                getWorkerThread().assign(socket);
+            } else {
+                executor.execute(new SocketProcessor(socket));
+            }
+        } catch (Throwable t) {
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
+    }
     
 
     // --------------------------------------------------- Acceptor Inner Class
@@ -993,14 +1023,10 @@ public class AprEndpoint {
                 }
 
                 try {
-                    // Allocate a new worker thread
-                    Worker workerThread = getWorkerThread();
                     // Accept the next incoming connection from the server socket
                     long socket = Socket.accept(serverSock);
                     // Hand this socket off to an appropriate processor
-                    if (setSocketOptions(socket)) {
-                        workerThread.assign(socket);
-                    } else {
+                    if (!setSocketOptions(socket) || !processSocket(socket)) {
                         // Close socket and pool right away
                         Socket.destroy(socket);
                     }
@@ -1154,15 +1180,14 @@ public class AprEndpoint {
                     if (rv > 0) {
                         keepAliveCount -= rv;
                         for (int n = 0; n < rv; n++) {
-                            // Check for failed sockets
+                            // Check for failed sockets and hand this socket off to a worker
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
-                                    || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)) {
+                                    || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
+                                    || (!processSocket(desc[n*2+1]))) {
                                 // Close socket and clear pool
                                 Socket.destroy(desc[n*2+1]);
                                 continue;
                             }
-                            // Hand this socket off to a worker
-                            getWorkerThread().assign(desc[n*2+1]);
                         }
                     } else if (rv < 0) {
                         int errn = -rv;
@@ -1548,7 +1573,9 @@ public class AprEndpoint {
                                     Socket.timeoutSet(state.socket, soTimeout * 1000);
                                     // If all done hand this socket off to a worker for
                                     // processing of further requests
-                                    getWorkerThread().assign(state.socket);
+                                    if (!processSocket(state.socket)) {
+                                        Socket.destroy(state.socket);
+                                    }
                                 } else {
                                     // Close the socket since this is
                                     // the end of not keep-alive request.
@@ -1651,4 +1678,34 @@ public class AprEndpoint {
         }
     }
 
+
+    // ---------------------------------------------- SocketProcessor Inner Class
+
+
+    /**
+     * This class is the equivalent of the Worker, but will simply use in an
+     * external Executor thread pool.
+     */
+    protected class SocketProcessor implements Runnable {
+        
+        protected long socket = 0;
+        
+        public SocketProcessor(long socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+
+            // Process the request from this socket
+            if (!handler.process(socket)) {
+                // Close socket and pool
+                Socket.destroy(socket);
+                socket = 0;
+            }
+
+        }
+        
+    }
+    
+    
 }

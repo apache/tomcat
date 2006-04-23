@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2004 The Apache Software Foundation
+ *  Copyright 1999-2006 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +50,7 @@ public class JIoEndpoint {
     // -------------------------------------------------------------- Constants
 
 
-    protected static Log log=LogFactory.getLog(JIoEndpoint.class );
+    protected static Log log = LogFactory.getLog(JIoEndpoint.class);
 
     protected StringManager sm = 
         StringManager.getManager("org.apache.tomcat.util.net.res");
@@ -113,6 +114,14 @@ public class JIoEndpoint {
 
 
     // ------------------------------------------------------------- Properties
+
+
+    /**
+     * External Executor based thread pool.
+     */
+    protected Executor executor = null;
+    public void setExecutor(Executor executor) { this.executor = executor; }
+    public Executor getExecutor() { return executor; }
 
 
     /**
@@ -272,17 +281,12 @@ public class JIoEndpoint {
                     }
                 }
 
-                // Allocate a new worker thread
-                Worker workerThread = getWorkerThread();
-
                 // Accept the next incoming connection from the server socket
                 try {
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
                     serverSocketFactory.initSocket(socket);
                     // Hand this socket off to an appropriate processor
-                    if (setSocketOptions(socket)) {
-                        workerThread.assign(socket);
-                    } else {
+                    if (!setSocketOptions(socket) || !processSocket(socket)) {
                         // Close socket right away
                         try {
                             socket.close();
@@ -302,6 +306,40 @@ public class JIoEndpoint {
     }
 
 
+    // ------------------------------------------- SocketProcessor Inner Class
+
+
+    /**
+     * This class is the equivalent of the Worker, but will simply use in an
+     * external Executor thread pool.
+     */
+    protected class SocketProcessor implements Runnable {
+        
+        protected Socket socket = null;
+        
+        public SocketProcessor(Socket socket) {
+            this.socket = socket;
+        }
+
+        public void run() {
+
+            // Process the request from this socket
+            if (!handler.process(socket)) {
+                // Close socket
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                }
+            }
+
+            // Finish up this request
+            socket = null;
+
+        }
+        
+    }
+    
+    
     // ----------------------------------------------------- Worker Inner Class
 
 
@@ -442,6 +480,11 @@ public class JIoEndpoint {
             running = true;
             paused = false;
 
+            // Create worker collection
+            if (executor == null) {
+                workers = new WorkerStack(maxThreads);
+            }
+
             // Start acceptor thread
             acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor");
             acceptorThread.setPriority(threadPriority);
@@ -480,7 +523,7 @@ public class JIoEndpoint {
         }
         if (serverSocket != null) {
             try {
-                if (serverSocket!=null)
+                if (serverSocket != null)
                     serverSocket.close();
             } catch (Exception e) {
                 log.error(sm.getString("endpoint.err.close"), e);
@@ -635,6 +678,26 @@ public class JIoEndpoint {
         }
     }
 
+
+    /**
+     * Process given socket.
+     */
+    protected boolean processSocket(Socket socket) {
+        try {
+            if (executor == null) {
+                getWorkerThread().assign(socket);
+            } else {
+                executor.execute(new SocketProcessor(socket));
+            }
+        } catch (Throwable t) {
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
+    }
+    
 
     // ------------------------------------------------- WorkerStack Inner Class
 
