@@ -698,7 +698,7 @@ public class AprEndpoint {
                 workers = new WorkerStack(maxThreads);
             }
 
-            // Start acceptor thread
+            // Start acceptor threads
             for (int i = 0; i < acceptorThreadCount; i++) {
                 Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
                 acceptorThread.setPriority(threadPriority);
@@ -706,7 +706,7 @@ public class AprEndpoint {
                 acceptorThread.start();
             }
 
-            // Start poller thread
+            // Start poller threads
             pollers = new Poller[pollerThreadCount];
             for (int i = 0; i < pollerThreadCount; i++) {
                 pollers[i] = new Poller();
@@ -717,7 +717,7 @@ public class AprEndpoint {
                 pollerThread.start();
             }
 
-            // Start sendfile thread
+            // Start sendfile threads
             if (useSendfile) {
                 sendfiles = new Sendfile[sendfileThreadCount];
                 for (int i = 0; i < sendfileThreadCount; i++) {
@@ -1369,12 +1369,12 @@ public class AprEndpoint {
         protected long sendfilePollset = 0;
         protected long pool = 0;
         protected long[] desc;
-        protected HashMap sendfileData;
+        protected HashMap<Long, SendfileData> sendfileData;
         
         protected int sendfileCount;
         public int getSendfileCount() { return sendfileCount; }
 
-        protected ArrayList addS;
+        protected ArrayList<SendfileData> addS;
 
         /**
          * Create the sendfile poller. With some versions of APR, the maximum poller size will
@@ -1393,8 +1393,8 @@ public class AprEndpoint {
                 sendfilePollset = allocatePoller(size, pool, soTimeout);
             }
             desc = new long[size * 2];
-            sendfileData = new HashMap(size);
-            addS = new ArrayList();
+            sendfileData = new HashMap<Long, SendfileData>(size);
+            addS = new ArrayList<SendfileData>();
         }
 
         /**
@@ -1403,7 +1403,7 @@ public class AprEndpoint {
         protected void destroy() {
             // Close any socket remaining in the add queue
             for (int i = (addS.size() - 1); i >= 0; i--) {
-                SendfileData data = (SendfileData) addS.get(i);
+                SendfileData data = addS.get(i);
                 Socket.destroy(data.socket);
             }
             // Close all sockets still in the poller
@@ -1520,7 +1520,7 @@ public class AprEndpoint {
                     if (addS.size() > 0) {
                         synchronized (this) {
                             for (int i = (addS.size() - 1); i >= 0; i--) {
-                                SendfileData data = (SendfileData) addS.get(i);
+                                SendfileData data = addS.get(i);
                                 int rv = Poll.add(sendfilePollset, data.socket, Poll.APR_POLLOUT);
                                 if (rv == Status.APR_SUCCESS) {
                                     sendfileData.put(new Long(data.socket), data);
@@ -1540,7 +1540,7 @@ public class AprEndpoint {
                         for (int n = 0; n < rv; n++) {
                             // Get the sendfile state
                             SendfileData state =
-                                (SendfileData) sendfileData.get(new Long(desc[n*2+1]));
+                                sendfileData.get(new Long(desc[n*2+1]));
                             // Problem events
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)) {

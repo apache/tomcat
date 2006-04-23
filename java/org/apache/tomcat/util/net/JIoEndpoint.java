@@ -60,12 +60,6 @@ public class JIoEndpoint {
 
 
     /**
-     * The acceptor thread.
-     */
-    protected Thread acceptorThread = null;
-
-
-    /**
      * Available workers.
      */
     protected WorkerStack workers = null;
@@ -114,6 +108,14 @@ public class JIoEndpoint {
 
 
     // ------------------------------------------------------------- Properties
+
+
+    /**
+     * Acceptor thread count.
+     */
+    protected int acceptorThreadCount = 0;
+    public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
+    public int getAcceptorThreadCount() { return acceptorThreadCount; }
 
 
     /**
@@ -291,6 +293,7 @@ public class JIoEndpoint {
                         try {
                             socket.close();
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                 } catch (Throwable t) {
@@ -450,7 +453,16 @@ public class JIoEndpoint {
 
     // -------------------- Public methods --------------------
 
-    public void init() throws IOException, InstantiationException {
+    public void init()
+        throws Exception {
+
+        if (initialized)
+            return;
+        
+        // Initialize thread count defaults for acceptor
+        if (acceptorThreadCount == 0) {
+            acceptorThreadCount = 1;
+        }
         if (serverSocketFactory == null) {
             serverSocketFactory = ServerSocketFactory.getDefault();
         }
@@ -467,7 +479,9 @@ public class JIoEndpoint {
         }
         //if( serverTimeout >= 0 )
         //    serverSocket.setSoTimeout( serverTimeout );
+        
         initialized = true;
+        
     }
     
     public void start()
@@ -485,11 +499,13 @@ public class JIoEndpoint {
                 workers = new WorkerStack(maxThreads);
             }
 
-            // Start acceptor thread
-            acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor");
-            acceptorThread.setPriority(threadPriority);
-            acceptorThread.setDaemon(daemon);
-            acceptorThread.start();
+            // Start acceptor threads
+            for (int i = 0; i < acceptorThreadCount; i++) {
+                Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
+                acceptorThread.setPriority(threadPriority);
+                acceptorThread.setDaemon(daemon);
+                acceptorThread.start();
+            }
         }
     }
 
@@ -510,7 +526,6 @@ public class JIoEndpoint {
         if (running) {
             running = false;
             unlockAccept();
-            acceptorThread = null;
         }
     }
 
