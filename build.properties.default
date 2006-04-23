@@ -19,6 +19,7 @@ base.path=/usr/share/java
 
 compile.source=1.5
 compile.target=1.5
+compile.debug=true
 
 base-jakarta.loc=http://archive.apache.org/dist/jakarta
 
