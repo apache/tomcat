@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2004 The Apache Software Foundation
+ *  Copyright 1999-2006 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,14 +16,30 @@
 
 package org.apache.coyote.http11;
 
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.concurrent.Executor;
+
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.apache.coyote.ActionCode;
+import org.apache.coyote.ActionHook;
+import org.apache.coyote.Adapter;
+import org.apache.coyote.ProtocolHandler;
+import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.threads.ThreadPool;
-import org.apache.tomcat.util.threads.ThreadWithAttributes;
+import org.apache.tomcat.util.net.JIoEndpoint;
+import org.apache.tomcat.util.net.SSLImplementation;
+import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.ServerSocketFactory;
+import org.apache.tomcat.util.net.JIoEndpoint.Handler;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -33,38 +49,134 @@ import org.apache.tomcat.util.threads.ThreadWithAttributes;
  *
  * @author Remy Maucherat
  * @author Costin Manolache
+ * @deprecated
  */
-public class Http11Protocol extends Http11BaseProtocol implements MBeanRegistration
-{
+public class Http11Protocol 
+    implements ProtocolHandler, MBeanRegistration {
+
+
+    protected static org.apache.commons.logging.Log log
+        = org.apache.commons.logging.LogFactory.getLog(Http11Protocol.class);
+
+    /**
+     * The string manager for this package.
+     */
+    protected static StringManager sm =
+        StringManager.getManager(Constants.Package);
+
+
+    // ------------------------------------------------------------ Constructor
+
+
     public Http11Protocol() {
-    }
-    
-    protected Http11ConnectionHandler createConnectionHandler() {
-        return new JmxHttp11ConnectionHandler( this ) ;
+        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
+        setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
+        //setServerSoTimeout(Constants.DEFAULT_SERVER_SOCKET_TIMEOUT);
+        setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
-    ObjectName tpOname;
-    ObjectName rgOname;
+    
+    // ----------------------------------------------------------------- Fields
+
+
+    protected Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+    protected JIoEndpoint endpoint = new JIoEndpoint();
+
+
+    // *
+    protected ObjectName tpOname = null;
+    // *
+    protected ObjectName rgOname = null;
+
+
+    protected ServerSocketFactory socketFactory = null;
+    protected SSLImplementation sslImplementation = null;
+
+
+    // ----------------------------------------- ProtocolHandler Implementation
+    // *
+
+
+    protected HashMap<String, Object> attributes = new HashMap<String, Object>();
+
+    
+    /**
+     * Pass config info
+     */
+    public void setAttribute(String name, Object value) {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("http11protocol.setattribute", name, value));
+        }
+        attributes.put(name, value);
+    }
+
+    public Object getAttribute(String key) {
+        return attributes.get(key);
+    }
+
+    public Iterator getAttributeNames() {
+        return attributes.keySet().iterator();
+    }
+
+
+    /**
+     * The adapter, used to call the connector.
+     */
+    protected Adapter adapter;
+    public void setAdapter(Adapter adapter) { this.adapter = adapter; }
+    public Adapter getAdapter() { return adapter; }
+
+
+    public void init() throws Exception {
+        endpoint.setName(getName());
+        endpoint.setHandler(cHandler);
+
+        // Verify the validity of the configured socket factory
+        try {
+            if (secure) {
+                sslImplementation =
+                    SSLImplementation.getInstance(sslImplementationName);
+                socketFactory = sslImplementation.getServerSocketFactory();
+                endpoint.setServerSocketFactory(socketFactory);
+            } else if (socketFactoryName != null) {
+                socketFactory = (ServerSocketFactory) Class.forName(socketFactoryName).newInstance();
+                endpoint.setServerSocketFactory(socketFactory);
+            }
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.socketfactory.initerror"),
+                      ex);
+            throw ex;
+        }
+
+        if (socketFactory!=null) {
+            Iterator<String> attE = attributes.keySet().iterator();
+            while( attE.hasNext() ) {
+                String key = attE.next();
+                Object v=attributes.get(key);
+                socketFactory.setAttribute(key, v);
+            }
+        }
+        
+        try {
+            endpoint.init();
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
+            throw ex;
+        }
+        if (log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.init", getName()));
+
+    }
 
     public void start() throws Exception {
-        if( this.domain != null ) {
+        if (this.domain != null) {
             try {
-                // XXX We should be able to configure it separately
-                // XXX It should be possible to use a single TP
-                tpOname=new ObjectName
+                tpOname = new ObjectName
                     (domain + ":" + "type=ThreadPool,name=" + getName());
-                if ("ms".equals(getStrategy())) {
-                    Registry.getRegistry(null, null)
-                        .registerComponent(ep, tpOname, null );
-                } else {
-                    Registry.getRegistry(null, null)
-                        .registerComponent(tp, tpOname, null );
-                }
-                tp.setName(getName());
-                tp.setDaemon(false);
-                tp.addThreadPoolListener(new MXPoolListener(this, tp));
+                Registry.getRegistry(null, null)
+                    .registerComponent(endpoint, tpOname, null );
             } catch (Exception e) {
-                log.error("Can't register threadpool" );
+                log.error("Can't register endpoint");
             }
             rgOname=new ObjectName
                 (domain + ":type=GlobalRequestProcessor,name=" + getName());
@@ -72,92 +184,466 @@ public class Http11Protocol extends Http11BaseProtocol implements MBeanRegistrat
                 ( cHandler.global, rgOname, null );
         }
 
-        super.start();
+        try {
+            endpoint.start();
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.endpoint.starterror"), ex);
+            throw ex;
+        }
+        if (log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.start", getName()));
+    }
+
+    public void pause() throws Exception {
+        try {
+            endpoint.pause();
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.endpoint.pauseerror"), ex);
+            throw ex;
+        }
+        if (log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.pause", getName()));
+    }
+
+    public void resume() throws Exception {
+        try {
+            endpoint.resume();
+        } catch (Exception ex) {
+            log.error(sm.getString("http11protocol.endpoint.resumeerror"), ex);
+            throw ex;
+        }
+        if (log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.resume", getName()));
     }
 
     public void destroy() throws Exception {
-        super.destroy();
-        if( tpOname!=null )
+        if (log.isInfoEnabled())
+            log.info(sm.getString("http11protocol.stop", getName()));
+        endpoint.destroy();
+        if (tpOname!=null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if( rgOname != null )
+        if (rgOname != null)
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 
-    // --------------------  Connection handler --------------------
+    
+    // ------------------------------------------------------------- Properties
 
-    static class MXPoolListener implements ThreadPool.ThreadPoolListener {
-        MXPoolListener( Http11Protocol proto, ThreadPool control ) {
+    
+    // *
+    /**
+     * This field indicates if the protocol is secure from the perspective of
+     * the client (= https is used).
+     */
+    protected boolean secure;
+    public boolean getSecure() { return secure; }
+    public void setSecure(boolean b) { secure = b; }
+    
+    
+    /**
+     * Name of the socket factory.
+     */
+    protected String socketFactoryName = null;
+    public String getSocketFactory() { return socketFactoryName; }
+    public void setSocketFactory(String valueS) { socketFactoryName = valueS; }
+    
+    
+    /**
+     * Name of the SSL implementation.
+     */
+    protected String sslImplementationName=null;
+    public String getSSLImplementation() { return sslImplementationName; }
+    public void setSSLImplementation( String valueS) {
+        sslImplementationName = valueS;
+        setSecure(true);
+    }
+    
+    
+    // HTTP
+    /**
+     * Maximum number of requests which can be performed over a keepalive 
+     * connection. The default is the same as for Apache HTTP Server.
+     */
+    protected int maxKeepAliveRequests = 100;
+    public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }
+    public void setMaxKeepAliveRequests(int mkar) { maxKeepAliveRequests = mkar; }
 
+
+    // HTTP
+    /**
+     * This timeout represents the socket timeout which will be used while
+     * the adapter execution is in progress, unless disableUploadTimeout
+     * is set to true. The default is the same as for Apache HTTP Server
+     * (300 000 milliseconds).
+     */
+    protected int timeout = 300000;
+    public int getTimeout() { return timeout; }
+    public void setTimeout(int timeout) { this.timeout = timeout; }
+
+
+    // *
+    /**
+     * Maximum size of the post which will be saved when processing certain
+     * requests, such as a POST.
+     */
+    protected int maxSavePostSize = 4 * 1024;
+    public int getMaxSavePostSize() { return maxSavePostSize; }
+    public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
+
+
+    // HTTP
+    /**
+     * Maximum size of the HTTP message header.
+     */
+    protected int maxHttpHeaderSize = 8 * 1024;
+    public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }
+    public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
+
+
+    // HTTP
+    /**
+     * If true, the regular socket timeout will be used for the full duration
+     * of the connection.
+     */
+    protected boolean disableUploadTimeout = true;
+    public boolean getDisableUploadTimeout() { return disableUploadTimeout; }
+    public void setDisableUploadTimeout(boolean isDisabled) { disableUploadTimeout = isDisabled; }
+
+
+    // HTTP
+    /**
+     * Integrated compression support.
+     */
+    protected String compression = "off";
+    public String getCompression() { return compression; }
+    public void setCompression(String valueS) { compression = valueS; }
+    
+    
+    // HTTP
+    protected String noCompressionUserAgents = null;
+    public String getNoCompressionUserAgents() { return noCompressionUserAgents; }
+    public void setNoCompressionUserAgents(String valueS) { noCompressionUserAgents = valueS; }
+
+    
+    // HTTP
+    protected String compressableMimeTypes = "text/html,text/xml,text/plain";
+    public String getCompressableMimeType() { return compressableMimeTypes; }
+    public void setCompressableMimeType(String valueS) { compressableMimeTypes = valueS; }
+    
+    
+    // HTTP
+    protected int compressionMinSize = 2048;
+    public int getCompressionMinSize() { return compressionMinSize; }
+    public void setCompressionMinSize(int valueI) { compressionMinSize = valueI; }
+
+
+    // HTTP
+    /**
+     * User agents regular expressions which should be restricted to HTTP/1.0 support.
+     */
+    protected String restrictedUserAgents = null;
+    public String getRestrictedUserAgents() { return restrictedUserAgents; }
+    public void setRestrictedUserAgents(String valueS) { restrictedUserAgents = valueS; }
+    
+    
+    // HTTP
+    /**
+     * Server header.
+     */
+    protected String server;
+    public void setServer( String server ) { this.server = server; }
+    public String getServer() { return server; }
+
+
+    // --------------------------------------------------------- Public methods
+
+    // *
+    public Executor getExecutor() {
+        return endpoint.getExecutor();
+    }
+    
+    // *
+    public void setExecutor(Executor executor) {
+        endpoint.setExecutor(executor);
+    }
+    
+    // *
+    public int getMaxThreads() {
+        return endpoint.getMaxThreads();
+    }
+
+    // *
+    public void setMaxThreads( int maxThreads ) {
+        endpoint.setMaxThreads(maxThreads);
+    }
+
+    // *
+    public void setThreadPriority(int threadPriority) {
+        endpoint.setThreadPriority(threadPriority);
+    }
+
+    // *
+    public int getThreadPriority() {
+        return endpoint.getThreadPriority();
+    }
+
+    // *
+    public int getBacklog() {
+        return endpoint.getBacklog();
+    }
+
+    // *
+    public void setBacklog( int i ) {
+        endpoint.setBacklog(i);
+    }
+
+    // *
+    public int getPort() {
+        return endpoint.getPort();
+    }
+
+    // *
+    public void setPort( int port ) {
+        endpoint.setPort(port);
+    }
+
+    // *
+    public InetAddress getAddress() {
+        return endpoint.getAddress();
+    }
+
+    // *
+    public void setAddress(InetAddress ia) {
+        endpoint.setAddress( ia );
+    }
+
+    // *
+    public String getName() {
+        String encodedAddr = "";
+        if (getAddress() != null) {
+            encodedAddr = "" + getAddress();
+            if (encodedAddr.startsWith("/"))
+                encodedAddr = encodedAddr.substring(1);
+            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
         }
+        return ("http-" + encodedAddr + endpoint.getPort());
+    }
 
-        public void threadStart(ThreadPool tp, Thread t) {
-        }
+    // *
+    public boolean getTcpNoDelay() {
+        return endpoint.getTcpNoDelay();
+    }
 
-        public void threadEnd(ThreadPool tp, Thread t) {
-            // Register our associated processor
-            // TP uses only TWA
-            ThreadWithAttributes ta=(ThreadWithAttributes)t;
-            Object tpData[]=ta.getThreadData(tp);
-            if( tpData==null ) return;
-            // Weird artifact - it should be cleaned up, but that may break something
-            // and it won't gain us too much
-            if( tpData[1] instanceof Object[] ) {
-                tpData=(Object [])tpData[1];
-            }
-            ObjectName oname=(ObjectName)tpData[Http11BaseProtocol.THREAD_DATA_OBJECT_NAME];
-            if( oname==null ) return;
-            Registry.getRegistry(null, null).unregisterComponent(oname);
-            Http11Processor processor =
-                (Http11Processor) tpData[Http11Protocol.THREAD_DATA_PROCESSOR];
-            RequestInfo rp=processor.getRequest().getRequestProcessor();
-            rp.setGlobalProcessor(null);
+    // *
+    public void setTcpNoDelay( boolean b ) {
+        endpoint.setTcpNoDelay( b );
+    }
+
+    // *
+    public int getSoLinger() {
+        return endpoint.getSoLinger();
+    }
+
+    // *
+    public void setSoLinger( int i ) {
+        endpoint.setSoLinger( i );
+    }
+
+    // *
+    public int getSoTimeout() {
+        return endpoint.getSoTimeout();
+    }
+
+    // *
+    public void setSoTimeout( int i ) {
+        endpoint.setSoTimeout(i);
+    }
+
+    // HTTP
+    /**
+     * Return the Keep-Alive policy for the connection.
+     */
+    public boolean getKeepAlive() {
+        return ((maxKeepAliveRequests != 0) && (maxKeepAliveRequests != 1));
+    }
+
+    // HTTP
+    /**
+     * Set the keep-alive policy for this connection.
+     */
+    public void setKeepAlive(boolean keepAlive) {
+        if (!keepAlive) {
+            setMaxKeepAliveRequests(1);
         }
     }
 
-    static class JmxHttp11ConnectionHandler extends Http11ConnectionHandler  {
-        Http11Protocol proto;
-        static int count=0;
+    /*
+     * Note: All the following are JSSE/java.io specific attributes.
+     */
+    
+    public String getKeystore() {
+        return (String) getAttribute("keystore");
+    }
 
-        JmxHttp11ConnectionHandler( Http11Protocol proto ) {
-            super(proto);
-            this.proto = proto ;
+    public void setKeystore( String k ) {
+        setAttribute("keystore", k);
+    }
+
+    public String getKeypass() {
+        return (String) getAttribute("keypass");
+    }
+
+    public void setKeypass( String k ) {
+        attributes.put("keypass", k);
+        //setAttribute("keypass", k);
+    }
+
+    public String getKeytype() {
+        return (String) getAttribute("keystoreType");
+    }
+
+    public void setKeytype( String k ) {
+        setAttribute("keystoreType", k);
+    }
+
+    public String getClientauth() {
+        return (String) getAttribute("clientauth");
+    }
+
+    public void setClientauth( String k ) {
+        setAttribute("clientauth", k);
+    }
+
+    public String getProtocols() {
+        return (String) getAttribute("protocols");
+    }
+
+    public void setProtocols(String k) {
+        setAttribute("protocols", k);
+    }
+
+    public String getAlgorithm() {
+        return (String) getAttribute("algorithm");
+    }
+
+    public void setAlgorithm( String k ) {
+        setAttribute("algorithm", k);
+    }
+
+    public String getCiphers() {
+        return (String) getAttribute("ciphers");
+    }
+
+    public void setCiphers(String ciphers) {
+        setAttribute("ciphers", ciphers);
+    }
+
+    public String getKeyAlias() {
+        return (String) getAttribute("keyAlias");
+    }
+
+    public void setKeyAlias(String keyAlias) {
+        setAttribute("keyAlias", keyAlias);
+    }
+
+    // -----------------------------------  Http11ConnectionHandler Inner Class
+
+    protected static class Http11ConnectionHandler implements Handler {
+        protected Http11Protocol protocol;
+        protected static int count = 0;
+        protected RequestGroupInfo global = new RequestGroupInfo();
+        protected ThreadLocal<Http11Processor> localProcessor = new ThreadLocal<Http11Processor>();
+
+        Http11ConnectionHandler(Http11Protocol proto) {
+            this.protocol = proto;
         }
 
-        public void setAttribute( String name, Object value ) {
-        }
+        public boolean process(Socket socket) {
+            Http11Processor processor = null;
+            try {
+                processor = localProcessor.get();
+                if (processor == null) {
+                    processor =
+                        new Http11Processor(protocol.maxHttpHeaderSize, protocol.endpoint);
+                    processor.setAdapter(protocol.adapter);
+                    processor.setMaxKeepAliveRequests(protocol.maxKeepAliveRequests);
+                    processor.setTimeout(protocol.timeout);
+                    processor.setDisableUploadTimeout(protocol.disableUploadTimeout);
+                    processor.setCompression(protocol.compression);
+                    processor.setCompressionMinSize(protocol.compressionMinSize);
+                    processor.setNoCompressionUserAgents(protocol.noCompressionUserAgents);
+                    processor.setCompressableMimeTypes(protocol.compressableMimeTypes);
+                    processor.setRestrictedUserAgents(protocol.restrictedUserAgents);
+                    processor.setMaxSavePostSize(protocol.maxSavePostSize);
+                    processor.setServer(protocol.server);
+                    localProcessor.set(processor);
+                    if (protocol.getDomain() != null) {
+                        synchronized (this) {
+                            try {
+                                RequestInfo rp = processor.getRequest().getRequestProcessor();
+                                rp.setGlobalProcessor(global);
+                                ObjectName rpName = new ObjectName
+                                (protocol.getDomain() + ":type=RequestProcessor,worker="
+                                        + protocol.getName() + ",name=HttpRequest" + count++);
+                                Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                            } catch (Exception e) {
+                                log.warn("Error registering request");
+                            }
+                        }
+                    }
+                }
 
-        public void setServer( Object o ) {
-        }
+                if (processor instanceof ActionHook) {
+                    ((ActionHook) processor).action(ActionCode.ACTION_START, null);
+                }
 
-        public Object[] init() {
+                if (protocol.secure && (protocol.sslImplementation != null)) {
+                    processor.setSSLSupport
+                        (protocol.sslImplementation.getSSLSupport(socket));
+                } else {
+                    processor.setSSLSupport(null);
+                }
+                
+                processor.setSocket(socket);
+                processor.process(socket.getInputStream(), socket.getOutputStream());
+                return false;
 
-            Object thData[]=super.init();
+            } catch(java.net.SocketException e) {
+                // SocketExceptions are normal
+                Http11Protocol.log.debug
+                    (sm.getString
+                     ("http11protocol.proto.socketexception.debug"), e);
+            } catch (java.io.IOException e) {
+                // IOExceptions are normal
+                Http11Protocol.log.debug
+                    (sm.getString
+                     ("http11protocol.proto.ioexception.debug"), e);
+            }
+            // Future developers: if you discover any other
+            // rare-but-nonfatal exceptions, catch them here, and log as
+            // above.
+            catch (Throwable e) {
+                // any other exception or error is odd. Here we log it
+                // with "ERROR" level, so it will show up even on
+                // less-than-verbose logs.
+                Http11Protocol.log.error
+                    (sm.getString("http11protocol.proto.error"), e);
+            } finally {
+                //       if(proto.adapter != null) proto.adapter.recycle();
+                //                processor.recycle();
 
-            // was set up by supper
-            Http11Processor  processor = (Http11Processor)
-                    thData[ Http11BaseProtocol.THREAD_DATA_PROCESSOR];
-
-            if( proto.getDomain() != null ) {
-                try {
-                    RequestInfo rp=processor.getRequest().getRequestProcessor();
-                    rp.setGlobalProcessor(global);
-                    ObjectName rpName=new ObjectName
-                        (proto.getDomain() + ":type=RequestProcessor,worker="
-                         + proto.getName() +",name=HttpRequest" + count++ );
-                    Registry.getRegistry(null, null).registerComponent( rp, rpName, null);
-                    thData[Http11BaseProtocol.THREAD_DATA_OBJECT_NAME]=rpName;
-                } catch( Exception ex ) {
-                    log.warn("Error registering request");
+                if (processor instanceof ActionHook) {
+                    ((ActionHook) processor).action(ActionCode.ACTION_STOP, null);
                 }
             }
-
-            return  thData;
+            return false;
         }
     }
 
-    // -------------------- Various implementation classes --------------------
 
+    // -------------------- JMX related methods --------------------
 
+    // *
     protected String domain;
     protected ObjectName oname;
     protected MBeanServer mserver;
@@ -186,5 +672,4 @@ public class Http11Protocol extends Http11BaseProtocol implements MBeanRegistrat
 
     public void postDeregister() {
     }
-
 }

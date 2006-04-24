@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2004 The Apache Software Foundation
+ *  Copyright 1999-2006 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
@@ -35,6 +35,7 @@ import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedInputFilter;
 import org.apache.coyote.http11.filters.ChunkedOutputFilter;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
@@ -43,17 +44,15 @@ import org.apache.coyote.http11.filters.IdentityOutputFilter;
 import org.apache.coyote.http11.filters.SavedRequestInputFilter;
 import org.apache.coyote.http11.filters.VoidInputFilter;
 import org.apache.coyote.http11.filters.VoidOutputFilter;
-import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.PoolTcpEndpoint;
+import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ThreadPool;
 import org.apache.tomcat.util.threads.ThreadWithAttributes;
 
 
@@ -78,19 +77,13 @@ public class Http11Processor implements Processor, ActionHook {
         StringManager.getManager(Constants.Package);
 
 
-    // ----------------------------------------------------------- Constructors
+    // ------------------------------------------------------------ Constructor
 
 
-    /**
-     * Default constructor.
-     */
-    public Http11Processor() {
-        this(Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
-    }
+    public Http11Processor(int headerBufferSize, JIoEndpoint endpoint) {
 
-
-    public Http11Processor(int headerBufferSize) {
-
+        this.endpoint = endpoint;
+        
         request = new Request();
         inputBuffer = new InternalInputBuffer(request, headerBufferSize);
         request.setInputBuffer(inputBuffer);
@@ -301,15 +294,9 @@ public class Http11Processor implements Processor, ActionHook {
 
 
     /**
-     * Associated thread pool.
-     */
-    protected ThreadPool threadPool;
-
-
-    /**
      * Associated endpoint.
      */
-    protected PoolTcpEndpoint endpoint;
+    protected JIoEndpoint endpoint;
 
 
     /**
@@ -364,16 +351,6 @@ public class Http11Processor implements Processor, ActionHook {
      */
     public void setCompressionMinSize(int compressionMinSize) {
         this.compressionMinSize = compressionMinSize;
-    }
-
-
-    public void setThreadPool(ThreadPool threadPool) {
-        this.threadPool = threadPool;
-    }
-
-    
-    public void setEndpoint(PoolTcpEndpoint endpoint) {
-        this.endpoint = endpoint;
     }
 
 
@@ -765,7 +742,7 @@ public class Http11Processor implements Processor, ActionHook {
         ThreadWithAttributes thrA=
                 (ThreadWithAttributes)Thread.currentThread();
         RequestInfo rp = request.getRequestProcessor();
-        thrA.setCurrentStage(threadPool, "parsing http request");
+        thrA.setCurrentStage(endpoint, "parsing http request");
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Set the remote address
@@ -788,14 +765,8 @@ public class Http11Processor implements Processor, ActionHook {
         int soTimeout = socket.getSoTimeout();
         int oldSoTimeout = soTimeout;
 
-        int threadRatio = 0;
-        if (threadPool.getCurrentThreadsBusy() > 0) {
-            threadRatio = (threadPool.getCurrentThreadsBusy() * 100)
-                / threadPool.getMaxThreads();
-        } else {
-            threadRatio = (endpoint.getCurrentThreadsBusy() * 100)
+        int threadRatio = (endpoint.getCurrentThreadsBusy() * 100)
                 / endpoint.getMaxThreads();
-        }
         if ((threadRatio > 33) && (threadRatio <= 66)) {
             soTimeout = soTimeout / 2;
         } else if ((threadRatio > 66) && (threadRatio <= 90)) {
@@ -826,7 +797,7 @@ public class Http11Processor implements Processor, ActionHook {
                 }
                 inputBuffer.parseRequestLine();
                 request.setStartTime(System.currentTimeMillis());
-                thrA.setParam( threadPool, request.requestURI() );
+                thrA.setParam( endpoint, request.requestURI() );
                 keptAlive = true;
                 if (!disableUploadTimeout) {
                     socket.setSoTimeout(timeout);
@@ -845,7 +816,7 @@ public class Http11Processor implements Processor, ActionHook {
             }
 
             // Setting up filters, and parse some request headers
-            thrA.setCurrentStage(threadPool, "prepareRequest");
+            thrA.setCurrentStage(endpoint, "prepareRequest");
             rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
             try {
                 prepareRequest();
@@ -864,7 +835,7 @@ public class Http11Processor implements Processor, ActionHook {
             // Process the request in the adapter
             if (!error) {
                 try {
-                    thrA.setCurrentStage(threadPool, "service");
+                    thrA.setCurrentStage(endpoint, "service");
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     adapter.service(request, response);
                     // Handle when the response was committed before a serious
@@ -889,7 +860,7 @@ public class Http11Processor implements Processor, ActionHook {
 
             // Finish the handling of the request
             try {
-                thrA.setCurrentStage(threadPool, "endRequestIB");
+                thrA.setCurrentStage(endpoint, "endRequestIB");
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
                 inputBuffer.endRequest();
             } catch (IOException e) {
@@ -901,7 +872,7 @@ public class Http11Processor implements Processor, ActionHook {
                 error = true;
             }
             try {
-                thrA.setCurrentStage(threadPool, "endRequestOB");
+                thrA.setCurrentStage(endpoint, "endRequestOB");
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
                 outputBuffer.endRequest();
             } catch (IOException e) {
@@ -918,7 +889,7 @@ public class Http11Processor implements Processor, ActionHook {
             }
             request.updateCounters();
 
-            thrA.setCurrentStage(threadPool, "ended");
+            thrA.setCurrentStage(endpoint, "ended");
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             // Don't reset the param - we'll see it as ended. Next request
