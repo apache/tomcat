@@ -82,7 +82,6 @@ public class JSSESocketFactory
 
     // defaults
     static String defaultProtocol = "TLS";
-    static String defaultAlgorithm = "SunX509";
     static boolean defaultClientAuth = false;
     static String defaultKeystoreType = "JKS";
     private static final String defaultKeystoreFile
@@ -361,7 +360,7 @@ public class JSSESocketFactory
             // Certificate encoding algorithm (e.g., SunX509)
             String algorithm = (String) attributes.get("algorithm");
             if (algorithm == null) {
-                algorithm = defaultAlgorithm;
+                algorithm = KeyManagerFactory.getDefaultAlgorithm();;
             }
 
             String keystoreType = (String) attributes.get("keystoreType");
@@ -371,7 +370,7 @@ public class JSSESocketFactory
 
         String trustAlgorithm = (String)attributes.get("truststoreAlgorithm");
         if( trustAlgorithm == null ) {
-        trustAlgorithm = algorithm;
+            trustAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
         }
             // Create and init SSLContext
             SSLContext context = SSLContext.getInstance(protocol); 
@@ -433,10 +432,6 @@ public class JSSESocketFactory
      */
     protected TrustManager[] getTrustManagers(String keystoreType, String algorithm)
         throws Exception {
-        if (attributes.get("truststoreAlgorithm") == null) {
-            // in 1.5, the Trust default isn't the same as the Key default.
-            algorithm = TrustManagerFactory.getDefaultAlgorithm();
-        }
         String crlf = (String) attributes.get("crlFile");
         
         TrustManager[] tms = null;
