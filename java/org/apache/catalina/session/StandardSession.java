@@ -424,7 +424,7 @@ public class StandardSession
 
         if (!isValidInternal()) {
             throw new IllegalStateException
-                (sm.getString("standardSession.getId.ise"));
+                (sm.getString("standardSession.getLastAccessedTime.ise"));
         }
 
         return (this.lastAccessedTime);
