@@ -1,22 +1,7 @@
-<!--
-  Copyright 2004 The Apache Software Foundation
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
 <!-- DTD for XML Schemas: Part 1: Structures
      Public Identifier: "-//W3C//DTD XMLSCHEMA 200102//EN"
      Official Location: http://www.w3.org/2001/XMLSchema.dtd -->
-<!-- $Id: XMLSchema.dtd 267129 2004-03-18 16:40:35Z jfarcand $ -->
+<!-- $Rev: 46020 $ $Date: 2004-09-14 06:22:15 -0600 (Tue, 14 Sep 2004) $ -->
 <!-- Note this DTD is NOT normative, or even definitive. -->           <!--d-->
 <!-- prose copy in the structures REC is the definitive version -->    <!--d-->
 <!-- (which shouldn't differ from this one except for this -->         <!--d-->
