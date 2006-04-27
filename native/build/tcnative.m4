@@ -177,17 +177,18 @@ AC_DEFUN(
       ],
       [   
         AC_MSG_CHECKING(os_type directory)
-        if test -f ${JAVA_HOME}/include/jni_md.h; then
+        JAVA_OS=NONE
+        if test -f ${JAVA_HOME}/${JAVA_INC}/jni_md.h; then
           JAVA_OS=""
         else
-          for f in ${JAVA_HOME}/include/*/jni_md.h; do
+          for f in ${JAVA_HOME}/${JAVA_INC}/*/jni_md.h; do
             if test -f $f; then
               JAVA_OS=`dirname ${f}`
               JAVA_OS=`basename ${JAVA_OS}`
               echo " ${JAVA_OS}"
             fi
           done
-          if test -z "${JAVA_OS}"; then
+          if test "${JAVA_OS}" = "NONE"; then
             AC_MSG_RESULT(Cannot find jni_md.h in ${JAVA_HOME}/${OS})
             AC_MSG_ERROR(You should retry --with-os-type=SUBDIR)
           fi
