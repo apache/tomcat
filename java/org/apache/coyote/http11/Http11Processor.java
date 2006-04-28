@@ -17,9 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InterruptedIOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.security.AccessController;
@@ -31,7 +29,6 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
-import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
@@ -61,7 +58,7 @@ import org.apache.tomcat.util.threads.ThreadWithAttributes;
  *
  * @author Remy Maucherat
  */
-public class Http11Processor implements Processor, ActionHook {
+public class Http11Processor implements ActionHook {
 
 
     /**
@@ -650,14 +647,6 @@ public class Http11Processor implements Processor, ActionHook {
 
 
     /**
-     * Set the socket associated with this HTTP connection.
-     */
-    public void setSocket(Socket socket)
-        throws IOException {
-        this.socket = socket;
-    }
-
-    /**
      * Set the flag to control upload time-outs.
      */
     public void setDisableUploadTimeout(boolean isDisabled) {
@@ -737,7 +726,7 @@ public class Http11Processor implements Processor, ActionHook {
      * responses
      * @throws IOException error during an I/O operation
      */
-    public void process(InputStream input, OutputStream output)
+    public void process(Socket socket)
         throws IOException {
         ThreadWithAttributes thrA=
                 (ThreadWithAttributes)Thread.currentThread();
@@ -754,8 +743,9 @@ public class Http11Processor implements Processor, ActionHook {
         localPort = -1;
 
         // Setting up the I/O
-        inputBuffer.setInputStream(input);
-        outputBuffer.setOutputStream(output);
+        this.socket = socket;
+        inputBuffer.setInputStream(socket.getInputStream());
+        outputBuffer.setOutputStream(socket.getOutputStream());
 
         // Error flag
         error = false;

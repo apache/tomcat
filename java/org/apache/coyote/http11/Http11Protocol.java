@@ -36,7 +36,6 @@ import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
-import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
@@ -604,8 +603,7 @@ public class Http11Protocol
                     processor.setSSLSupport(null);
                 }
                 
-                processor.setSocket(socket);
-                processor.process(socket.getInputStream(), socket.getOutputStream());
+                processor.process(socket);
                 return false;
 
             } catch(java.net.SocketException e) {

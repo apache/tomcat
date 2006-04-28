@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.Executor;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -212,6 +213,16 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
 
     // -------------------- Pool setup --------------------
 
+    // *
+    public Executor getExecutor() {
+        return ep.getExecutor();
+    }
+    
+    // *
+    public void setExecutor(Executor executor) {
+        ep.setExecutor(executor);
+    }
+    
     public int getMaxThreads() {
         return ep.getMaxThreads();
     }
