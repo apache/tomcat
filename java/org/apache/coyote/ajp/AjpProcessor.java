@@ -41,7 +41,6 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ThreadWithAttributes;
 
 
 /**
@@ -326,10 +325,7 @@ public class AjpProcessor implements ActionHook {
      */
     public boolean process(Socket socket)
         throws IOException {
-        ThreadWithAttributes thrA=
-                (ThreadWithAttributes)Thread.currentThread();
         RequestInfo rp = request.getRequestProcessor();
-        thrA.setCurrentStage(endpoint, "parsing http request");
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Setting up the socket
@@ -382,11 +378,9 @@ public class AjpProcessor implements ActionHook {
             }
 
             // Setting up filters, and parse some request headers
-            thrA.setCurrentStage(endpoint, "prepareRequest");
             rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
             try {
                 prepareRequest();
-                thrA.setParam(endpoint, request.requestURI());
             } catch (Throwable t) {
                 log.debug(sm.getString("ajpprocessor.request.prepare"), t);
                 // 400 - Internal Server Error
@@ -397,7 +391,6 @@ public class AjpProcessor implements ActionHook {
             // Process the request in the adapter
             if (!error) {
                 try {
-                    thrA.setCurrentStage(endpoint, "service");
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     adapter.service(request, response);
                 } catch (InterruptedIOException e) {
@@ -426,7 +419,6 @@ public class AjpProcessor implements ActionHook {
             }
             request.updateCounters();
 
-            thrA.setCurrentStage(endpoint, "ended");
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             recycle();
 

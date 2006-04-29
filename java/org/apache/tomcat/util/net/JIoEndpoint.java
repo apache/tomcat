@@ -26,7 +26,6 @@ import java.util.concurrent.Executor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ThreadWithAttributes;
 
 /**
  * Handle incoming TCP connections.
@@ -463,7 +462,7 @@ public class JIoEndpoint {
          * Start the background processing thread.
          */
         public void start() {
-            thread = new ThreadWithAttributes(JIoEndpoint.this, this);
+            thread = new Thread(this);
             thread.setName(getName() + "-" + (++curThreads));
             thread.setDaemon(true);
             thread.start();

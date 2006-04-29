@@ -53,7 +53,6 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ThreadWithAttributes;
 
 
 /**
@@ -738,10 +737,7 @@ public class Http11AprProcessor implements ActionHook {
      */
     public boolean process(long socket)
         throws IOException {
-        ThreadWithAttributes thrA=
-                (ThreadWithAttributes)Thread.currentThread();
         RequestInfo rp = request.getRequestProcessor();
-        thrA.setCurrentStage(endpoint, "parsing http request");
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
         // Set the remote address
@@ -790,7 +786,6 @@ public class Http11AprProcessor implements ActionHook {
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
-                thrA.setParam(endpoint, request.requestURI());
                 keptAlive = true;
                 if (!disableUploadTimeout) {
                     Socket.timeoutSet(socket, timeout * 1000);
@@ -809,7 +804,6 @@ public class Http11AprProcessor implements ActionHook {
             }
 
             // Setting up filters, and parse some request headers
-            thrA.setCurrentStage(endpoint, "prepareRequest");
             rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
             try {
                 prepareRequest();
@@ -828,7 +822,6 @@ public class Http11AprProcessor implements ActionHook {
             // Process the request in the adapter
             if (!error) {
                 try {
-                    thrA.setCurrentStage(endpoint, "service");
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
                     adapter.service(request, response);
                     // Handle when the response was committed before a serious
@@ -853,7 +846,6 @@ public class Http11AprProcessor implements ActionHook {
 
             // Finish the handling of the request
             try {
-                thrA.setCurrentStage(endpoint, "endRequestIB");
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
                 inputBuffer.endRequest();
             } catch (IOException e) {
@@ -865,7 +857,6 @@ public class Http11AprProcessor implements ActionHook {
                 error = true;
             }
             try {
-                thrA.setCurrentStage(endpoint, "endRequestOB");
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
                 outputBuffer.endRequest();
             } catch (IOException e) {
@@ -882,7 +873,6 @@ public class Http11AprProcessor implements ActionHook {
             }
             request.updateCounters();
 
-            thrA.setCurrentStage(endpoint, "ended");
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
             // Don't reset the param - we'll see it as ended. Next request

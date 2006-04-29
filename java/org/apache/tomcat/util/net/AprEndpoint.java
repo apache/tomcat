@@ -36,7 +36,6 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ThreadWithAttributes;
 
 /**
  * APR tailored thread pool, providing the following services:
@@ -1325,7 +1324,7 @@ public class AprEndpoint {
          * Start the background processing thread.
          */
         public void start() {
-            thread = new ThreadWithAttributes(AprEndpoint.this, this);
+            thread = new Thread(this);
             thread.setName(getName() + "-" + (++curThreads));
             thread.setDaemon(true);
             thread.start();
