@@ -18,11 +18,14 @@
 package org.apache.catalina.core;
 
 import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Stack;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -73,10 +76,10 @@ public class StandardWrapper
     extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
-    private static org.apache.commons.logging.Log log=
+    protected static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( StandardWrapper.class );
 
-    private static final String[] DEFAULT_SERVLET_METHODS = new String[] {
+    protected static final String[] DEFAULT_SERVLET_METHODS = new String[] {
                                                     "GET", "HEAD", "POST" };
 
     // ----------------------------------------------------------- Constructors
@@ -92,6 +95,22 @@ public class StandardWrapper
         pipeline.setBasic(swValve);
         broadcaster = new NotificationBroadcasterSupport();
 
+        if (restrictedServlets == null) {
+            restrictedServlets = new Properties();
+            try {
+                InputStream is = 
+                    this.getClass().getClassLoader().getResourceAsStream
+                        ("org/apache/catalina/core/RestrictedServlets.properties");
+                if (is != null) {
+                    restrictedServlets.load(is);
+                } else {
+                    log.error(sm.getString("standardWrapper.restrictedServletsResources"));
+                }
+            } catch (IOException e) {
+                log.error(sm.getString("standardWrapper.restrictedServletsResources"), e);
+            }
+        }
+        
     }
 
 
@@ -104,70 +123,70 @@ public class StandardWrapper
      * If this value equals Long.MAX_VALUE, the unavailability of this
      * servlet is considered permanent.
      */
-    private long available = 0L;
+    protected long available = 0L;
     
     /**
      * The broadcaster that sends j2ee notifications. 
      */
-    private NotificationBroadcasterSupport broadcaster = null;
+    protected NotificationBroadcasterSupport broadcaster = null;
     
     /**
      * The count of allocations that are currently active (even if they
      * are for the same instance, as will be true on a non-STM servlet).
      */
-    private int countAllocated = 0;
+    protected int countAllocated = 0;
 
 
     /**
      * The facade associated with this wrapper.
      */
-    private StandardWrapperFacade facade =
+    protected StandardWrapperFacade facade =
         new StandardWrapperFacade(this);
 
 
     /**
      * The descriptive information string for this implementation.
      */
-    private static final String info =
+    protected static final String info =
         "org.apache.catalina.core.StandardWrapper/1.0";
 
 
     /**
      * The (single) initialized instance of this servlet.
      */
-    private Servlet instance = null;
+    protected Servlet instance = null;
 
 
     /**
      * The support object for our instance listeners.
      */
-    private InstanceSupport instanceSupport = new InstanceSupport(this);
+    protected InstanceSupport instanceSupport = new InstanceSupport(this);
 
 
     /**
      * The context-relative URI of the JSP file for this servlet.
      */
-    private String jspFile = null;
+    protected String jspFile = null;
 
 
     /**
      * The load-on-startup order value (negative value means load on
      * first call) for this servlet.
      */
-    private int loadOnStartup = -1;
+    protected int loadOnStartup = -1;
 
 
     /**
      * Mappings associated with the wrapper.
      */
-    private ArrayList mappings = new ArrayList();
+    protected ArrayList mappings = new ArrayList();
 
 
     /**
      * The initialization parameters for this servlet, keyed by
      * parameter name.
      */
-    private HashMap parameters = new HashMap();
+    protected HashMap parameters = new HashMap();
 
 
     /**
@@ -175,97 +194,104 @@ public class StandardWrapper
      * used in the servlet.  The corresponding value is the role name of
      * the web application itself.
      */
-    private HashMap references = new HashMap();
+    protected HashMap references = new HashMap();
 
 
     /**
      * The run-as identity for this servlet.
      */
-    private String runAs = null;
+    protected String runAs = null;
 
     /**
      * The notification sequence number.
      */
-    private long sequenceNumber = 0;
+    protected long sequenceNumber = 0;
 
     /**
      * The fully qualified servlet class name for this servlet.
      */
-    private String servletClass = null;
+    protected String servletClass = null;
 
 
     /**
      * Does this servlet implement the SingleThreadModel interface?
      */
-    private boolean singleThreadModel = false;
+    protected boolean singleThreadModel = false;
 
 
     /**
      * Are we unloading our servlet instance at the moment?
      */
-    private boolean unloading = false;
+    protected boolean unloading = false;
 
 
     /**
      * Maximum number of STM instances.
      */
-    private int maxInstances = 20;
+    protected int maxInstances = 20;
 
 
     /**
      * Number of instances currently loaded for a STM servlet.
      */
-    private int nInstances = 0;
+    protected int nInstances = 0;
 
 
     /**
      * Stack containing the STM instances.
      */
-    private Stack instancePool = null;
+    protected Stack instancePool = null;
 
     
     /**
      * Wait time for servlet unload in ms.
      */
-    private long unloadDelay = 2000;
+    protected long unloadDelay = 2000;
     
 
     /**
      * True if this StandardWrapper is for the JspServlet
      */
-    private boolean isJspServlet;
+    protected boolean isJspServlet;
 
 
     /**
      * The ObjectName of the JSP monitoring mbean
      */
-    private ObjectName jspMonitorON;
+    protected ObjectName jspMonitorON;
 
 
     /**
      * Should we swallow System.out
      */
-    private boolean swallowOutput = false;
+    protected boolean swallowOutput = false;
 
     // To support jmx attributes
-    private StandardWrapperValve swValve;
-    private long loadTime=0;
-    private int classLoadTime=0;
+    protected StandardWrapperValve swValve;
+    protected long loadTime=0;
+    protected int classLoadTime=0;
     
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.init</code> is invoked.
      */
-    private static Class[] classType = new Class[]{ServletConfig.class};
+    protected static Class[] classType = new Class[]{ServletConfig.class};
     
     
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.service</code>  is invoked.
      */                                                 
-    private static Class[] classTypeUsedInService = new Class[]{
+    protected static Class[] classTypeUsedInService = new Class[]{
                                                          ServletRequest.class,
                                                          ServletResponse.class};
+    
+    /**
+     * Restricted servlets (which can only be loaded by a privileged webapp).
+     */
+    protected static Properties restrictedServlets = null;
+    
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -1535,7 +1561,7 @@ public class StandardWrapper
     // -------------------------------------------------------- Package Methods
 
 
-    // -------------------------------------------------------- Private Methods
+    // -------------------------------------------------------- protected Methods
 
 
     /**
@@ -1558,7 +1584,7 @@ public class StandardWrapper
      *
      * @param classname Name of the class to be checked
      */
-    private boolean isContainerProvidedServlet(String classname) {
+    protected boolean isContainerProvidedServlet(String classname) {
 
         if (classname.startsWith("org.apache.catalina.")) {
             return (true);
@@ -1577,24 +1603,31 @@ public class StandardWrapper
     /**
      * Return <code>true</code> if loading this servlet is allowed.
      */
-    private boolean isServletAllowed(Object servlet) {
+    protected boolean isServletAllowed(Object servlet) {
 
+        // Privileged webapps may load all servlets without restriction
+        if (((Context) getParent()).getPrivileged()) {
+            return true;
+        }
+        
         if (servlet instanceof ContainerServlet) {
-            if (((Context) getParent()).getPrivileged()
-                || (servlet.getClass().getName().equals
-                    ("org.apache.catalina.servlets.InvokerServlet"))) {
-                return (true);
-            } else {
-                return (false);
-            }
+            return (false);
         }
 
+        Class clazz = servlet.getClass();
+        while (clazz != null && !clazz.getName().equals("javax.servlet.http.HttpServlet")) {
+            if ("restricted".equals(restrictedServlets.getProperty(clazz.getName()))) {
+                return (false);
+            }
+            clazz = clazz.getSuperclass();
+        }
+        
         return (true);
 
     }
 
 
-    private Method[] getAllDeclaredMethods(Class c) {
+    protected Method[] getAllDeclaredMethods(Class c) {
 
         if (c.equals(javax.servlet.http.HttpServlet.class)) {
             return null;
@@ -1776,7 +1809,7 @@ public class StandardWrapper
     	
     }
     
-    private MBeanNotificationInfo[] notificationInfo;
+    protected MBeanNotificationInfo[] notificationInfo;
     
     /* Get JMX Broadcaster Info
      * @TODO use StringManager for international support!
