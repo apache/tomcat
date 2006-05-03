@@ -2369,13 +2369,13 @@ class Generator {
             out.print(tagHandlerClassName);
             out.println("();");
 
-            generateSetters(n, tagHandlerVar, handlerInfo, true);
-
             // Resource injection
             out.printin("org.apache.jasper.runtime.AnnotationProcessor.postConstruct(");
             out.print(tagHandlerVar);
             out.println(");");
             
+            generateSetters(n, tagHandlerVar, handlerInfo, true);
+
             // Set the body
             if (findJspBody(n) == null) {
                 /*
