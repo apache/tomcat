@@ -50,7 +50,7 @@ public final class Constants {
     public static final String TldSchemaPublicId_20 =
         "web-jsptaglibrary_2_0.xsd";;
     public static final String TldSchemaResourcePath_20 =
-        "/javax/servlet/resources/web-jsptaglibrary_2_0.xsd";
+        "/javax/servlet/jsp/resources/web-jsptaglibrary_2_0.xsd";
 
     public static final String WebDtdPublicId_22 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
@@ -80,7 +80,7 @@ public final class Constants {
     public static final String JspSchemaPublicId_20 =
         "jsp_2_0.xsd";;
     public static final String JspSchemaResourcePath_20 =
-        "/javax/servlet/resources/jsp_2_0.xsd";
+        "/javax/servlet/jsp/resources/jsp_2_0.xsd";
     
     public static final String J2eeWebServiceSchemaPublicId_11 =
             "j2ee_web_services_1_1.xsd";
