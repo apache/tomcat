@@ -24,6 +24,8 @@ import java.lang.reflect.Modifier;
 import javax.annotation.EJB;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
@@ -38,15 +40,71 @@ import javax.xml.ws.WebServiceRef;
  * @version $Revision: 303236 $, $Date: 2006-03-09 16:46:52 -0600 (Thu, 09 Mar 2006) $
  */
 public class AnnotationProcessor {
-    
 
+    
     /**
-     * Call postConstruct method on the specified instance.
+     * Call postConstruct method on the specified instance. Note: In Jasper, this
+     * calls naming resources injection as well.
      */
     public static void postConstruct(Object instance)
-        throws IllegalAccessException, InvocationTargetException {
+        throws IllegalAccessException, InvocationTargetException, NamingException {
         
+        // Initialize fields annotations
+        Field[] fields = instance.getClass().getFields();
+        for (int i = 0; i < fields.length; i++) {
+            if (fields[i].isAnnotationPresent(Resource.class)) {
+                Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
+                lookupFieldResource(instance, fields[i], annotation.name());
+            }
+            if (fields[i].isAnnotationPresent(EJB.class)) {
+                EJB annotation = (EJB) fields[i].getAnnotation(EJB.class);
+                lookupFieldResource(instance, fields[i], annotation.name());
+            }
+            if (fields[i].isAnnotationPresent(WebServiceRef.class)) {
+                WebServiceRef annotation = 
+                    (WebServiceRef) fields[i].getAnnotation(WebServiceRef.class);
+                lookupFieldResource(instance, fields[i], annotation.name());
+            }
+            if (fields[i].isAnnotationPresent(PersistenceContext.class)) {
+                PersistenceContext annotation = 
+                    (PersistenceContext) fields[i].getAnnotation(PersistenceContext.class);
+                lookupFieldResource(instance, fields[i], annotation.name());
+            }
+            if (fields[i].isAnnotationPresent(PersistenceUnit.class)) {
+                PersistenceUnit annotation = 
+                    (PersistenceUnit) fields[i].getAnnotation(PersistenceUnit.class);
+                lookupFieldResource(instance, fields[i], annotation.name());
+            }
+        }
+        
+        // Initialize methods annotations
         Method[] methods = instance.getClass().getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            if (methods[i].isAnnotationPresent(Resource.class)) {
+                Resource annotation = (Resource) methods[i].getAnnotation(Resource.class);
+                lookupMethodResource(instance, methods[i], annotation.name());
+            }
+            if (methods[i].isAnnotationPresent(EJB.class)) {
+                EJB annotation = (EJB) methods[i].getAnnotation(EJB.class);
+                lookupMethodResource(instance, methods[i], annotation.name());
+            }
+            if (methods[i].isAnnotationPresent(WebServiceRef.class)) {
+                WebServiceRef annotation = 
+                    (WebServiceRef) methods[i].getAnnotation(WebServiceRef.class);
+                lookupMethodResource(instance, methods[i], annotation.name());
+            }
+            if (methods[i].isAnnotationPresent(PersistenceContext.class)) {
+                PersistenceContext annotation = 
+                    (PersistenceContext) methods[i].getAnnotation(PersistenceContext.class);
+                lookupMethodResource(instance, methods[i], annotation.name());
+            }
+            if (methods[i].isAnnotationPresent(PersistenceUnit.class)) {
+                PersistenceUnit annotation = 
+                    (PersistenceUnit) methods[i].getAnnotation(PersistenceUnit.class);
+                lookupMethodResource(instance, methods[i], annotation.name());
+            }
+        }
+
         Method postConstruct = null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isAnnotationPresent(PostConstruct.class)) {
@@ -107,80 +165,15 @@ public class AnnotationProcessor {
     
     
     /**
-     * Inject resources in specified instance.
-     */
-    public static void injectNamingResources(javax.naming.Context context, Object instance)
-        throws IllegalAccessException, InvocationTargetException, NamingException {
-        
-        // Initialize fields annotations
-        Field[] fields = instance.getClass().getFields();
-        for (int i = 0; i < fields.length; i++) {
-            if (fields[i].isAnnotationPresent(Resource.class)) {
-                Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
-                lookupFieldResource(context, instance, fields[i], annotation.name());
-            }
-            if (fields[i].isAnnotationPresent(EJB.class)) {
-                EJB annotation = (EJB) fields[i].getAnnotation(EJB.class);
-                lookupFieldResource(context, instance, fields[i], annotation.name());
-            }
-            if (fields[i].isAnnotationPresent(WebServiceRef.class)) {
-                WebServiceRef annotation = 
-                    (WebServiceRef) fields[i].getAnnotation(WebServiceRef.class);
-                lookupFieldResource(context, instance, fields[i], annotation.name());
-            }
-            if (fields[i].isAnnotationPresent(PersistenceContext.class)) {
-                PersistenceContext annotation = 
-                    (PersistenceContext) fields[i].getAnnotation(PersistenceContext.class);
-                lookupFieldResource(context, instance, fields[i], annotation.name());
-            }
-            if (fields[i].isAnnotationPresent(PersistenceUnit.class)) {
-                PersistenceUnit annotation = 
-                    (PersistenceUnit) fields[i].getAnnotation(PersistenceUnit.class);
-                lookupFieldResource(context, instance, fields[i], annotation.name());
-            }
-        }
-        
-        // Initialize methods annotations
-        Method[] methods = instance.getClass().getMethods();
-        for (int i = 0; i < methods.length; i++) {
-            if (methods[i].isAnnotationPresent(Resource.class)) {
-                Resource annotation = (Resource) methods[i].getAnnotation(Resource.class);
-                lookupMethodResource(context, instance, methods[i], annotation.name());
-            }
-            if (methods[i].isAnnotationPresent(EJB.class)) {
-                EJB annotation = (EJB) methods[i].getAnnotation(EJB.class);
-                lookupMethodResource(context, instance, methods[i], annotation.name());
-            }
-            if (methods[i].isAnnotationPresent(WebServiceRef.class)) {
-                WebServiceRef annotation = 
-                    (WebServiceRef) methods[i].getAnnotation(WebServiceRef.class);
-                lookupMethodResource(context, instance, methods[i], annotation.name());
-            }
-            if (methods[i].isAnnotationPresent(PersistenceContext.class)) {
-                PersistenceContext annotation = 
-                    (PersistenceContext) methods[i].getAnnotation(PersistenceContext.class);
-                lookupMethodResource(context, instance, methods[i], annotation.name());
-            }
-            if (methods[i].isAnnotationPresent(PersistenceUnit.class)) {
-                PersistenceUnit annotation = 
-                    (PersistenceUnit) methods[i].getAnnotation(PersistenceUnit.class);
-                lookupMethodResource(context, instance, methods[i], annotation.name());
-            }
-        }
-
-    }
-    
-    
-    /**
      * Inject resources in specified field.
      */
-    protected static void lookupFieldResource(javax.naming.Context context, 
-            Object instance, Field field, String name)
+    protected static void lookupFieldResource(Object instance, Field field, String name)
         throws NamingException, IllegalAccessException {
     
         Object lookedupResource = null;
         boolean accessibility = false;
         
+        Context context = (Context) (new InitialContext()).lookup("java:comp/env");
         if ((name != null) &&
                 (name.length() > 0)) {
             lookedupResource = context.lookup(name);
@@ -198,8 +191,7 @@ public class AnnotationProcessor {
     /**
      * Inject resources in specified method.
      */
-    protected static void lookupMethodResource(javax.naming.Context context, 
-            Object instance, Method method, String name)
+    protected static void lookupMethodResource(Object instance, Method method, String name)
         throws NamingException, IllegalAccessException, InvocationTargetException {
         
         if (!method.getName().startsWith("set") 
@@ -211,6 +203,7 @@ public class AnnotationProcessor {
         Object lookedupResource = null;
         boolean accessibility = false;
         
+        Context context = (Context) (new InitialContext()).lookup("java:comp/env");
         if ((name != null) &&
                 (name.length() > 0)) {
             lookedupResource = context.lookup(name);

@@ -19,6 +19,9 @@ package org.apache.jasper.runtime;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.ServletConfig;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.jasper.Constants;
 
 /**
@@ -33,6 +36,8 @@ public class TagHandlerPool {
     public static String OPTION_TAGPOOL="tagpoolClassName";
     public static String OPTION_MAXSIZE="tagpoolMaxSize";
 
+    private Log log = LogFactory.getLog(TagHandlerPool.class);
+    
     // index of next available tag handler
     private int current;
 
@@ -113,7 +118,9 @@ public class TagHandlerPool {
         // Out of sync block - there is no need for other threads to
         // wait for us to construct a tag for this thread.
         try {
-            return (Tag) handlerClass.newInstance();
+            Tag instance = (Tag) handlerClass.newInstance();
+            AnnotationProcessor.postConstruct(instance);
+            return instance;
         } catch (Exception e) {
             throw new JspException(e.getMessage(), e);
         }
@@ -135,6 +142,12 @@ public class TagHandlerPool {
         }
         // There is no need for other threads to wait for us to release
         handler.release();
+        try {
+            AnnotationProcessor.preDestroy(handler);
+        } catch (Exception e) {
+            log.warn("Error processing preDestroy on tag instance of " 
+                    + handler.getClass().getName(), e);
+        }
     }
 
     /**
@@ -142,9 +155,15 @@ public class TagHandlerPool {
      * handler pool.
      */
     public synchronized void release() {
-	for (int i=current; i>=0; i--) {
-	    handlers[i].release();
-	}
+        for (int i = current; i >= 0; i--) {
+            handlers[i].release();
+            try {
+                AnnotationProcessor.preDestroy(handlers[i]);
+            } catch (Exception e) {
+                log.warn("Error processing preDestroy on tag instance of " 
+                        + handlers[i].getClass().getName(), e);
+            }
+        }
     }
 
     protected static String getOption( ServletConfig config, String name, String defaultV) {

@@ -504,7 +504,8 @@ class Generator {
         }
         out.printin("private javax.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
-        out.println(";\n");
+        out.println(";");
+        out.println();
     }
 
     /**
@@ -2370,6 +2371,11 @@ class Generator {
 
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
+            // Resource injection
+            out.printin("org.apache.jasper.runtime.AnnotationProcessor.postConstruct(");
+            out.print(tagHandlerVar);
+            out.println(");");
+            
             // Set the body
             if (findJspBody(n) == null) {
                 /*
@@ -2410,6 +2416,11 @@ class Generator {
             // Declare and synchronize AT_END scripting variables
             declareScriptingVars(n, VariableInfo.AT_END);
             syncScriptingVars(n, VariableInfo.AT_END);
+
+            // Resource injection
+            out.printin("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(");
+            out.print(tagHandlerVar);
+            out.println(");");
 
             n.setEndJavaLine(out.getJavaLine());
         }
