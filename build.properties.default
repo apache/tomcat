@@ -30,11 +30,11 @@ commons-logging-api.jar=${commons-logging.lib}/commons-logging-api.jar
 commons-logging.jar=${commons-logging.lib}/commons-logging.jar
 commons-logging.loc=${base-jakarta.loc}/commons/logging/binaries/commons-logging-1.0.4.tar.gz
 
-# ----- Eclipse JDT, version 3.1.2 or later -----
+# ----- Eclipse JDT, version 3.2 or later -----
 jdt.home=${base.path}/eclipse/plugins
 jdt.lib=${jdt.home}
-jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.1.2.jar
-jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/R-3.1.2-200601181600/eclipse-JDT-3.1.2.zip
+jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.2.0.v_661.jar
+jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/S-3.2RC2-200604281315/eclipse-JDT-3.2RC2.zip
 
 # ----- Tomcat native library -----
 tomcat-native.home=${base.path}/tomcat-native-1.1.3
