@@ -93,7 +93,7 @@ class Generator {
 
     private PageInfo pageInfo;
 
-    private Vector tagHandlerPoolNames;
+    private Vector<String> tagHandlerPoolNames;
 
     private GenBuffer charArrayBuffer;
 
@@ -385,7 +385,7 @@ class Generator {
         out.pushIndent();
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin((String) tagHandlerPoolNames.elementAt(i));
+                out.printin(tagHandlerPoolNames.elementAt(i));
                 out
                         .print(" = org.apache.jasper.runtime.TagHandlerPool.getTagHandlerPool(");
                 if (ctxt.isTagFile()) {
@@ -422,8 +422,20 @@ class Generator {
         
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
-                out.printin((String) tagHandlerPoolNames.elementAt(i));
-                out.println(".release();");
+                out.printin("Tag handler = ");
+                out.printin(tagHandlerPoolNames.elementAt(i));
+                out.println(";");
+                out.println("handler.release();");
+                out.println("try {");
+                out.pushIndent();
+                out.println("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(handler);");
+                out.popIndent();
+                out.println("} catch (Exception e) {");
+                out.pushIndent();
+                out.println("log(\"Error processing preDestroy on tag instance of \" ");
+                out.println(" + handler.getClass().getName());");
+                out.popIndent();
+                out.println("}");
             }
         }
         
@@ -2143,6 +2155,9 @@ class Generator {
                 out.print("new ");
                 out.print(tagHandlerClassName);
                 out.println("();");
+                out.printin("org.apache.jasper.runtime.AnnotationProcessor.postConstruct(");
+                out.print(tagHandlerVar);
+                out.println(");");
             }
 
             // includes setting the context
@@ -2288,6 +2303,19 @@ class Generator {
                 } else {
                     out.printin(tagHandlerVar);
                     out.println(".release();");
+                    out.println("try {");
+                    out.pushIndent();
+                    out.printin("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(");
+                    out.print(tagHandlerVar);
+                    out.println(");");
+                    out.popIndent();
+                    out.println("} catch (Exception e) {");
+                    out.pushIndent();
+                    out.println("log(\"Error processing preDestroy on tag instance of \" +");
+                    out.printin(tagHandlerVar);
+                    out.println(".getClass().getName());");
+                    out.popIndent();
+                    out.println("}");
                 }
             }
             if (isTagFile || isFragment) {
@@ -2330,6 +2358,17 @@ class Generator {
             } else {
                 out.printin(tagHandlerVar);
                 out.println(".release();");
+                out.println("try {");
+                out.pushIndent();
+                out.printin("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(");
+                out.print(tagHandlerVar);
+                out.println(");");
+                out.println("} catch (Exception e) {");
+                out.println("log(\"Error processing preDestroy on tag instance of \" +");
+                out.printin(tagHandlerVar);
+                out.println(".getClass().getName());");
+                out.popIndent();
+                out.println("}");
             }
 
             if (n.implementsTryCatchFinally()) {
