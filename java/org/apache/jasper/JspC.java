@@ -159,6 +159,7 @@ public class JspC implements Options {
     private boolean smapSuppressed = true;
     private boolean smapDumped = false;
     private boolean caching = true;
+    private boolean ignoreAnnotations = false;
     private Map cache = new HashMap();
 
     private String compiler = null;
@@ -588,6 +589,20 @@ public class JspC implements Options {
      */
     public void setCompilerSourceVM(String vm) {
         compilerSourceVM = vm;
+    }
+
+    /**
+     * Should annotations on tags be ignored?
+     */
+    public boolean getIgnoreAnnotations() {
+        return ignoreAnnotations;
+    }
+
+    /**
+     * Should annotations on tags be ignored?
+     */
+    public void setIgnoreAnnotations(boolean ignoreAnnotations) {
+        this.ignoreAnnotations = ignoreAnnotations;
     }
 
     public TldLocationsCache getTldLocationsCache() {

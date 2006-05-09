@@ -40,6 +40,7 @@ public class TagHandlerPool {
     
     // index of next available tag handler
     private int current;
+    private boolean ignoreAnnotations = false;
 
     public static TagHandlerPool getTagHandlerPool( ServletConfig config) {
         TagHandlerPool result=null;
@@ -75,6 +76,10 @@ public class TagHandlerPool {
         }
         this.handlers = new Tag[maxSize];
         this.current = -1;
+        String annotations = getOption(config, "org.apache.jasper.IGNORE_ANNOTATIONS", null);
+        if ("true".equals(annotations)) {
+            ignoreAnnotations = true;
+        }
     }
 
     /**
@@ -119,7 +124,9 @@ public class TagHandlerPool {
         // wait for us to construct a tag for this thread.
         try {
             Tag instance = (Tag) handlerClass.newInstance();
-            AnnotationProcessor.postConstruct(instance);
+            if (!ignoreAnnotations) {
+                AnnotationProcessor.postConstruct(instance);
+            }
             return instance;
         } catch (Exception e) {
             throw new JspException(e.getMessage(), e);
@@ -142,11 +149,13 @@ public class TagHandlerPool {
         }
         // There is no need for other threads to wait for us to release
         handler.release();
-        try {
-            AnnotationProcessor.preDestroy(handler);
-        } catch (Exception e) {
-            log.warn("Error processing preDestroy on tag instance of " 
-                    + handler.getClass().getName(), e);
+        if (!ignoreAnnotations) {
+            try {
+                AnnotationProcessor.preDestroy(handler);
+            } catch (Exception e) {
+                log.warn("Error processing preDestroy on tag instance of " 
+                        + handler.getClass().getName(), e);
+            }
         }
     }
 
@@ -157,11 +166,13 @@ public class TagHandlerPool {
     public synchronized void release() {
         for (int i = current; i >= 0; i--) {
             handlers[i].release();
-            try {
-                AnnotationProcessor.preDestroy(handlers[i]);
-            } catch (Exception e) {
-                log.warn("Error processing preDestroy on tag instance of " 
-                        + handlers[i].getClass().getName(), e);
+            if (!ignoreAnnotations) {
+                try {
+                    AnnotationProcessor.preDestroy(handlers[i]);
+                } catch (Exception e) {
+                    log.warn("Error processing preDestroy on tag instance of " 
+                            + handlers[i].getClass().getName(), e);
+                }
             }
         }
     }
