@@ -4235,6 +4235,14 @@ public class StandardContext
         // Binding thread
         oldCCL = bindThread();
 
+        // Set annotation processing parameter for Jasper (unfortunately, since
+        // this can be configured in many places and not just in /WEB-INF/web.xml,
+        // there are not many solutions)
+        if (ignoreAnnotations) {
+            Wrapper jspServlet = (Wrapper) findChild(Constants.JSP_SERVLET_NAME);
+            jspServlet.addInitParameter("org.apache.jasper.IGNORE_ANNOTATIONS", "true");
+        }
+        
         try {
             
             // Create context attributes that will be required
