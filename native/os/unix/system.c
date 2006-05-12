@@ -276,7 +276,6 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
             for (i = 0; i < cpu_count; i++) {
                 new_kid = kstat_read(kstat_ctl, kstat_cpu[i], NULL);
                 if (new_kid >= 0) {
-                    long tck_r = tck_dividend / tck_divisor;
                     cpu = ((cpu_stat_t *)kstat_cpu[i]->ks_data)->cpu_sysinfo;
                     if ( tck_divisor == 1 ) {
                         pvals[7] += (jlong)(((jlong)cpu.cpu[CPU_IDLE]) * tck_dividend);
