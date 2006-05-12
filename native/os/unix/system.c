@@ -172,23 +172,23 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         else {
             ret_sysconf = sysconf(_SC_PHYS_PAGES);
             if (ret_sysconf >= 0) {
-                pvals[0] = (jlong)(sys_pagesize * ret_sysconf);
+                pvals[0] = (jlong)((jlong)sys_pagesize * ret_sysconf);
             }
             else {
                 rv = apr_get_os_error();
             }
             ret_sysconf = sysconf(_SC_AVPHYS_PAGES);
             if (ret_sysconf >= 0) {
-                pvals[1] = (jlong)(sys_pagesize*ret_sysconf);
+                pvals[1] = (jlong)((jlong)sys_pagesize * ret_sysconf);
             }
             else {
                 rv = apr_get_os_error();
             }
             res=swapctl(SC_AINFO, &info);
             if (res >= 0) {
-                pvals[2] = (jlong)(sys_pagesize*info.ani_max);
-                pvals[3] = (jlong)(sys_pagesize*info.ani_free);
-                pvals[6] = (jlong)(100 - (info.ani_free * 100 / info.ani_max));
+                pvals[2] = (jlong)((jlong)sys_pagesize * info.ani_max);
+                pvals[3] = (jlong)((jlong)sys_pagesize * info.ani_free);
+                pvals[6] = (jlong)(100 - (jlong)info.ani_free * 100 / info.ani_max);
             }
             else {
                 rv = apr_get_os_error();
@@ -222,9 +222,9 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
                                          prusg.pr_create.tv_sec));
             }
             pvals[10] = (jlong)(creation);
-            pvals[11] = (jlong)(prusg.pr_stime.tv_sec * 1000 +
+            pvals[11] = (jlong)((jlong)prusg.pr_stime.tv_sec * 1000 +
                                 (prusg.pr_stime.tv_nsec / 1000000));
-            pvals[12] = (jlong)(prusg.pr_utime.tv_sec * 1000 +
+            pvals[12] = (jlong)((jlong)prusg.pr_utime.tv_sec * 1000 +
                                 (prusg.pr_utime.tv_nsec / 1000000));
             pvals[15] = (jlong)(prusg.pr_majf);
         }
@@ -278,10 +278,17 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
                 if (new_kid >= 0) {
                     long tck_r = tck_dividend / tck_divisor;
                     cpu = ((cpu_stat_t *)kstat_cpu[i]->ks_data)->cpu_sysinfo;
-                    pvals[7] += (jlong)(((long)cpu.cpu[CPU_IDLE]) * tck_r);
-                    pvals[7] += (jlong)(((long)cpu.cpu[CPU_WAIT]) * tck_r);
-                    pvals[8] += (jlong)(((long)cpu.cpu[CPU_KERNEL]) * tck_r);
-                    pvals[9] += (jlong)(((long)cpu.cpu[CPU_USER]) * tck_r);
+                    if ( tck_divisor == 1 ) {
+                        pvals[7] += (jlong)(((jlong)cpu.cpu[CPU_IDLE]) * tck_dividend);
+                        pvals[7] += (jlong)(((jlong)cpu.cpu[CPU_WAIT]) * tck_dividend);
+                        pvals[8] += (jlong)(((jlong)cpu.cpu[CPU_KERNEL]) * tck_dividend);
+                        pvals[9] += (jlong)(((jlong)cpu.cpu[CPU_USER]) * tck_dividend);
+                    } else {
+                        pvals[7] += (jlong)(((jlong)cpu.cpu[CPU_IDLE]) * tck_dividend / tck_divisor);
+                        pvals[7] += (jlong)(((jlong)cpu.cpu[CPU_WAIT]) * tck_dividend / tck_divisor);
+                        pvals[8] += (jlong)(((jlong)cpu.cpu[CPU_KERNEL]) * tck_dividend / tck_divisor);
+                        pvals[9] += (jlong)(((jlong)cpu.cpu[CPU_USER]) * tck_dividend / tck_divisor);
+                    }
                 }
             }
         }
