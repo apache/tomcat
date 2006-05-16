@@ -561,8 +561,10 @@ public class AprEndpoint {
             addressStr = address.getHostAddress();
         }
         int family = Socket.APR_INET;
-        if (Library.APR_HAVE_IPV6)
-            family= Socket.APR_UNSPEC;
+        if (Library.APR_HAVE_IPV6 && addressStr != null) {
+            if (addressStr.indexOf(':') >= 0)
+                family= Socket.APR_UNSPEC;
+        }
         long inetAddress = Address.info(addressStr, family,
                 port, 0, rootPool);
         // Create the APR server socket
