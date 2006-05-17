@@ -329,8 +329,7 @@ public class InternalAprInputBuffer implements InputBuffer {
      * consumed. This method only resets all the pointers so that we are ready
      * to parse the next HTTP request.
      */
-    public void nextRequest()
-        throws IOException {
+    public void nextRequest() {
 
         // Recycle Request object
         request.recycle();

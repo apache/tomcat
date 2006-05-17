@@ -1294,6 +1294,12 @@ public class Request
         if (readOnlyAttributes.containsKey(name)) {
             return;
         }
+
+        // Pass special attributes to the native layer
+        if (name.startsWith("org.apache.tomcat.")) {
+            coyoteRequest.getAttributes().remove(name);
+        }
+
         found = attributes.containsKey(name);
         if (found) {
             value = attributes.get(name);
@@ -1301,7 +1307,7 @@ public class Request
         } else {
             return;
         }
-
+        
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0))

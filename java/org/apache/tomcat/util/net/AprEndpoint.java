@@ -300,6 +300,14 @@ public class AprEndpoint {
 
 
     /**
+     * Allow comet request handling.
+     */
+    protected boolean useComet = true;
+    public void setUseComet(boolean useComet) { this.useComet = useComet; }
+    public boolean getUseComet() { return useComet; }
+
+
+    /**
      * Acceptor thread count.
      */
     protected int acceptorThreadCount = 0;
@@ -331,6 +339,17 @@ public class AprEndpoint {
     public Poller getPoller() {
         pollerRoundRobin = (pollerRoundRobin + 1) % pollers.length;
         return pollers[pollerRoundRobin];
+    }
+
+
+    /**
+     * The socket poller used for Comet support.
+     */
+    protected Poller[] cometPollers = null;
+    protected int cometPollerRoundRobin = 0;
+    public Poller getCometPoller() {
+        cometPollerRoundRobin = (cometPollerRoundRobin + 1) % cometPollers.length;
+        return cometPollers[cometPollerRoundRobin];
     }
 
 
@@ -561,11 +580,8 @@ public class AprEndpoint {
             addressStr = address.getHostAddress();
         }
         int family = Socket.APR_INET;
-        if (Library.APR_HAVE_IPV6) {
-            if (addressStr == null)
-                family = Socket.APR_UNSPEC;
-            else if (addressStr.indexOf(':') >= 0)
-                family = Socket.APR_UNSPEC;
+        if (Library.APR_HAVE_IPV6 && (addressStr == null || addressStr.indexOf(':') >= 0)) {
+            family = Socket.APR_UNSPEC;
         }
         long inetAddress = Address.info(addressStr, family,
                 port, 0, rootPool);
@@ -712,9 +728,20 @@ public class AprEndpoint {
             // Start poller threads
             pollers = new Poller[pollerThreadCount];
             for (int i = 0; i < pollerThreadCount; i++) {
-                pollers[i] = new Poller();
+                pollers[i] = new Poller(false);
                 pollers[i].init();
                 Thread pollerThread = new Thread(pollers[i], getName() + "-Poller-" + i);
+                pollerThread.setPriority(threadPriority);
+                pollerThread.setDaemon(true);
+                pollerThread.start();
+            }
+
+            // Start comet poller threads
+            cometPollers = new Poller[pollerThreadCount];
+            for (int i = 0; i < pollerThreadCount; i++) {
+                cometPollers[i] = new Poller(true);
+                cometPollers[i].init();
+                Thread pollerThread = new Thread(cometPollers[i], getName() + "-CometPoller-" + i);
                 pollerThread.setPriority(threadPriority);
                 pollerThread.setDaemon(true);
                 pollerThread.start();
@@ -998,6 +1025,26 @@ public class AprEndpoint {
     }
     
 
+    /**
+     * Process given socket for an event.
+     */
+    protected boolean processSocket(long socket, boolean error) {
+        try {
+            if (executor == null) {
+                getWorkerThread().assign(socket, error);
+            } else {
+                executor.execute(new SocketEventProcessor(socket, error));
+            }
+        } catch (Throwable t) {
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
+    }
+    
+
     // --------------------------------------------------- Acceptor Inner Class
 
 
@@ -1060,10 +1107,18 @@ public class AprEndpoint {
 
         protected long[] addS;
         protected int addCount = 0;
+        protected long[] removeS;
+        protected int removeCount = 0;
         
+        protected boolean comet = true;
+
         protected int keepAliveCount = 0;
         public int getKeepAliveCount() { return keepAliveCount; }
 
+        public Poller(boolean comet) {
+            this.comet = comet;
+        }
+        
         /**
          * Create the poller. With some versions of APR, the maximum poller size will
          * be 62 (reocmpiling APR is necessary to remove this limitation).
@@ -1071,19 +1126,29 @@ public class AprEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = pollerSize / pollerThreadCount;
-            serverPollset = allocatePoller(size, pool, soTimeout);
+            int timeout = soTimeout;
+            if (comet) {
+                // FIXME: Find an appropriate timeout value, for now, "longer than usual"
+                // semms appropriate
+                timeout = soTimeout * 20;
+            }
+            serverPollset = allocatePoller(size, pool, timeout);
             if (serverPollset == 0 && size > 1024) {
                 size = 1024;
-                serverPollset = allocatePoller(size, pool, soTimeout);
+                serverPollset = allocatePoller(size, pool, timeout);
             }
             if (serverPollset == 0) {
                 size = 62;
-                serverPollset = allocatePoller(size, pool, soTimeout);
+                serverPollset = allocatePoller(size, pool, timeout);
             }
             desc = new long[size * 2];
             keepAliveCount = 0;
             addS = new long[size];
             addCount = 0;
+            if (comet) {
+                removeS = new long[size];
+            }
+            removeCount = 0;
         }
 
         /**
@@ -1092,18 +1157,32 @@ public class AprEndpoint {
         protected void destroy() {
             // Close all sockets in the add queue
             for (int i = 0; i < addCount; i++) {
+                if (comet) {
+                    processSocket(addS[i], true);
+                }
                 Socket.destroy(addS[i]);
+            }
+            // Close all sockets in the remove queue
+            for (int i = 0; i < removeCount; i++) {
+                if (comet) {
+                    processSocket(removeS[i], true);
+                }
+                Socket.destroy(removeS[i]);
             }
             // Close all sockets still in the poller
             int rv = Poll.pollset(serverPollset, desc);
             if (rv > 0) {
                 for (int n = 0; n < rv; n++) {
+                    if (comet) {
+                        processSocket(desc[n*2+1], true);
+                    }
                     Socket.destroy(desc[n*2+1]);
                 }
             }
             Pool.destroy(pool);
             keepAliveCount = 0;
             addCount = 0;
+            removeCount = 0;
         }
 
         /**
@@ -1120,11 +1199,38 @@ public class AprEndpoint {
                 // at most for pollTime before being polled
                 if (addCount >= addS.length) {
                     // Can't do anything: close the socket right away
+                    if (comet) {
+                        processSocket(socket, true);
+                    }
                     Socket.destroy(socket);
                     return;
                 }
                 addS[addCount] = socket;
                 addCount++;
+                this.notify();
+            }
+        }
+
+        /**
+         * Remove specified socket and associated pool from the poller. The socket will
+         * be added to a temporary array, and polled first after a maximum amount
+         * of time equal to pollTime (in most cases, latency will be much lower,
+         * however). Note that this is automatic, except if the poller is used for
+         * comet.
+         *
+         * @param socket to remove from the poller
+         */
+        public void remove(long socket) {
+            synchronized (this) {
+                // Add socket to the list. Newly added sockets will wait
+                // at most for pollTime before being polled
+                if (removeCount >= removeS.length) {
+                    // Normally, it cannot happen ...
+                    Socket.destroy(socket);
+                    return;
+                }
+                removeS[removeCount] = socket;
+                removeCount++;
                 this.notify();
             }
         }
@@ -1171,23 +1277,41 @@ public class AprEndpoint {
                                     keepAliveCount++;
                                 } else {
                                     // Can't do anything: close the socket right away
+                                    if (comet) {
+                                        processSocket(addS[i], true);
+                                    }
                                     Socket.destroy(addS[i]);
                                 }
                             }
                             addCount = 0;
                         }
                     }
+                    // Remove sockets which are waiting to the poller
+                    if (removeCount > 0) {
+                        synchronized (this) {
+                            for (int i = 0; i < removeCount; i++) {
+                                int rv = Poll.remove(serverPollset, removeS[i]);
+                            }
+                            removeCount = 0;
+                        }
+                    }
+
                     maintainTime += pollTime;
                     // Pool for the specified interval
-                    int rv = Poll.poll(serverPollset, pollTime, desc, true);
+                    int rv = Poll.poll(serverPollset, pollTime, desc, !comet);
                     if (rv > 0) {
                         keepAliveCount -= rv;
                         for (int n = 0; n < rv; n++) {
                             // Check for failed sockets and hand this socket off to a worker
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
+                                    || (comet && (!processSocket(desc[n*2+1], false))) 
                                     || (!processSocket(desc[n*2+1]))) {
                                 // Close socket and clear pool
+                                if (comet) {
+                                    processSocket(desc[n*2+1], true);
+                                    Poll.remove(serverPollset, desc[n*2+1]);
+                                }
                                 Socket.destroy(desc[n*2+1]);
                                 continue;
                             }
@@ -1215,6 +1339,11 @@ public class AprEndpoint {
                             keepAliveCount -= rv;
                             for (int n = 0; n < rv; n++) {
                                 // Close socket and clear pool
+                                if (comet) {
+                                    // FIXME: should really close in case of timeout ?
+                                    // FIXME: maybe comet should use an extended timeout
+                                    processSocket(desc[n], true);
+                                }
                                 Socket.destroy(desc[n]);
                             }
                         }
@@ -1242,6 +1371,8 @@ public class AprEndpoint {
         protected Thread thread = null;
         protected boolean available = false;
         protected long socket = 0;
+        protected boolean event = false;
+        protected boolean error = false;
 
 
         /**
@@ -1265,6 +1396,28 @@ public class AprEndpoint {
 
             // Store the newly available Socket and notify our thread
             this.socket = socket;
+            event = false;
+            error = false;
+            available = true;
+            notifyAll();
+
+        }
+
+
+        protected synchronized void assign(long socket, boolean error) {
+
+            // Wait for the Processor to get the previous Socket
+            while (available) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                }
+            }
+
+            // Store the newly available Socket and notify our thread
+            this.socket = socket;
+            event = true;
+            this.error = error;
             available = true;
             notifyAll();
 
@@ -1310,7 +1463,11 @@ public class AprEndpoint {
                     continue;
 
                 // Process the request from this socket
-                if (!handler.process(socket)) {
+                if ((event) && (handler.event(socket, error) == Handler.SocketState.CLOSED)) {
+                    // Close socket and pool
+                    Socket.destroy(socket);
+                    socket = 0;
+                } else if (handler.process(socket) == Handler.SocketState.CLOSED) {
                     // Close socket and pool
                     Socket.destroy(socket);
                     socket = 0;
@@ -1622,7 +1779,11 @@ public class AprEndpoint {
      * thread local fields.
      */
     public interface Handler {
-        public boolean process(long socket);
+        public enum SocketState {
+            OPEN, CLOSED, LONG
+        }
+        public SocketState process(long socket);
+        public SocketState event(long socket, boolean error);
     }
 
 
@@ -1700,7 +1861,38 @@ public class AprEndpoint {
         public void run() {
 
             // Process the request from this socket
-            if (!handler.process(socket)) {
+            if (handler.process(socket) == Handler.SocketState.CLOSED) {
+                // Close socket and pool
+                Socket.destroy(socket);
+                socket = 0;
+            }
+
+        }
+        
+    }
+    
+    
+    // --------------------------------------- SocketEventProcessor Inner Class
+
+
+    /**
+     * This class is the equivalent of the Worker, but will simply use in an
+     * external Executor thread pool.
+     */
+    protected class SocketEventProcessor implements Runnable {
+        
+        protected long socket = 0;
+        protected boolean error = false; 
+        
+        public SocketEventProcessor(long socket, boolean error) {
+            this.socket = socket;
+            this.error = error;
+        }
+
+        public void run() {
+
+            // Process the request from this socket
+            if (handler.event(socket, error) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 Socket.destroy(socket);
                 socket = 0;

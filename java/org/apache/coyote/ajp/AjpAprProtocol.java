@@ -35,6 +35,7 @@ import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
+import org.apache.tomcat.util.net.AprEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -429,7 +430,12 @@ public class AjpAprProtocol
             this.proto = proto;
         }
 
-        public boolean process(long socket) {
+        // FIXME: Support for this could be added in AJP as well
+        public SocketState event(long socket, boolean error) {
+            return SocketState.CLOSED;
+        }
+        
+        public SocketState process(long socket) {
             AjpAprProcessor processor = null;
             try {
                 processor = (AjpAprProcessor) localProcessor.get();
@@ -460,7 +466,11 @@ public class AjpAprProtocol
                     ((ActionHook) processor).action(ActionCode.ACTION_START, null);
                 }
 
-                return processor.process(socket);
+                if (processor.process(socket)) {
+                    return SocketState.OPEN;
+                } else {
+                    return SocketState.CLOSED;
+                }
 
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
@@ -487,7 +497,7 @@ public class AjpAprProtocol
                     ((ActionHook) processor).action(ActionCode.ACTION_STOP, null);
                 }
             }
-            return false;
+            return SocketState.CLOSED;
         }
     }
 

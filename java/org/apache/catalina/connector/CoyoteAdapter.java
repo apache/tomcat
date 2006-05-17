@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 
+import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
@@ -135,10 +136,35 @@ public class CoyoteAdapter
 
         }
 
+        // Comet processing
+        if (request.getWrapper() != null 
+                && request.getWrapper() instanceof CometProcessor) {
+            try {
+                if (request.getAttribute("org.apache.tomcat.comet.error") != null) {
+                    ((CometProcessor) request.getWrapper()).error(request.getRequest(), response.getResponse());
+                } else {
+                    ((CometProcessor) request.getWrapper()).read(request.getRequest(), response.getResponse());
+                }
+            } catch (IOException e) {
+                ;
+            } catch (Throwable t) {
+                log.error(sm.getString("coyoteAdapter.service"), t);
+            } finally {
+                // Recycle the wrapper request and response
+                if (request.getAttribute("org.apache.tomcat.comet") == null) {
+                    request.recycle();
+                    response.recycle();
+                }
+            }
+            return;
+        }
+        
         if (connector.getXpoweredBy()) {
             response.addHeader("X-Powered-By", "Servlet/2.5");
         }
 
+        boolean comet = false;
+        
         try {
 
             // Parse and set Catalina and configuration specific 
@@ -148,8 +174,16 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }
 
-            response.finishResponse();
-            req.action( ActionCode.ACTION_POST_REQUEST , null);
+            if (request.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE 
+                    && request.getWrapper() instanceof CometProcessor) {
+                request.setAttribute("org.apache.tomcat.comet", Boolean.TRUE);
+                comet = true;
+            }
+
+            if (!comet) {
+                response.finishResponse();
+                req.action( ActionCode.ACTION_POST_REQUEST , null);
+            }
 
         } catch (IOException e) {
             ;
@@ -157,8 +191,10 @@ public class CoyoteAdapter
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
             // Recycle the wrapper request and response
-            request.recycle();
-            response.recycle();
+            if (!comet) {
+                request.recycle();
+                response.recycle();
+            }
         }
 
     }

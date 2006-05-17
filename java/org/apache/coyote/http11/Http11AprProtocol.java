@@ -20,6 +20,7 @@ import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 import javax.management.MBeanRegistration;
@@ -598,19 +599,72 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
     // --------------------  Connection handler --------------------
 
     static class Http11ConnectionHandler implements Handler {
-        Http11AprProtocol proto;
-        static int count=0;
-        RequestGroupInfo global=new RequestGroupInfo();
-        ThreadLocal localProcessor = new ThreadLocal();
+        
+        protected Http11AprProtocol proto;
+        protected static int count = 0;
+        protected RequestGroupInfo global = new RequestGroupInfo();
+        
+        protected ThreadLocal<Http11AprProcessor> localProcessor = 
+            new ThreadLocal<Http11AprProcessor>();
+        protected ConcurrentHashMap<Long, Http11AprProcessor> connections =
+            new ConcurrentHashMap<Long, Http11AprProcessor>();
+        protected java.util.Stack<Http11AprProcessor> recycledProcessors = 
+            new java.util.Stack<Http11AprProcessor>();
 
-        Http11ConnectionHandler( Http11AprProtocol proto ) {
-            this.proto=proto;
+        Http11ConnectionHandler(Http11AprProtocol proto) {
+            this.proto = proto;
         }
 
-        public boolean process(long socket) {
+        public SocketState event(long socket, boolean error) {
+            Http11AprProcessor result = connections.get(socket);
+            SocketState state = SocketState.CLOSED; 
+            if (result != null) {
+                boolean recycle = error;
+                // Call the appropriate event
+                try {
+                    state = result.event(error);
+                } catch (java.net.SocketException e) {
+                    // SocketExceptions are normal
+                    Http11AprProtocol.log.debug
+                        (sm.getString
+                            ("http11protocol.proto.socketexception.debug"), e);
+                } catch (java.io.IOException e) {
+                    // IOExceptions are normal
+                    Http11AprProtocol.log.debug
+                        (sm.getString
+                            ("http11protocol.proto.ioexception.debug"), e);
+                }
+                // Future developers: if you discover any other
+                // rare-but-nonfatal exceptions, catch them here, and log as
+                // above.
+                catch (Throwable e) {
+                    // any other exception or error is odd. Here we log it
+                    // with "ERROR" level, so it will show up even on
+                    // less-than-verbose logs.
+                    Http11AprProtocol.log.error
+                        (sm.getString("http11protocol.proto.error"), e);
+                } finally {
+                    if (state != SocketState.LONG) {
+                        connections.remove(socket);
+                        recycledProcessors.push(result);
+                    }
+                }
+            }
+            return state;
+        }
+        
+        public SocketState process(long socket) {
             Http11AprProcessor processor = null;
             try {
                 processor = (Http11AprProcessor) localProcessor.get();
+                if (processor == null) {
+                    synchronized (recycledProcessors) {
+                        if (!recycledProcessors.isEmpty()) {
+                            processor = recycledProcessors.pop();
+                            localProcessor.set(processor);
+                        }
+                    }
+                }
                 if (processor == null) {
                     processor =
                         new Http11AprProcessor(proto.maxHttpHeaderSize, proto.ep);
@@ -647,7 +701,15 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
                     ((ActionHook) processor).action(ActionCode.ACTION_START, null);
                 }
 
-                return processor.process(socket);
+                SocketState state = processor.process(socket);
+                if (state == SocketState.LONG) {
+                    // Associate the connection with the processor. The next request 
+                    // processed by this thread will use either a new or a recycled
+                    // processor.
+                    connections.put(socket, processor);
+                    localProcessor.set(null);
+                }
+                return state;
 
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
@@ -669,15 +731,8 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
                 // less-than-verbose logs.
                 Http11AprProtocol.log.error
                     (sm.getString("http11protocol.proto.error"), e);
-            } finally {
-                //       if(proto.adapter != null) proto.adapter.recycle();
-                //                processor.recycle();
-
-                if (processor instanceof ActionHook) {
-                    ((ActionHook) processor).action(ActionCode.ACTION_STOP, null);
-                }
             }
-            return false;
+            return SocketState.CLOSED;
         }
     }
 

@@ -52,6 +52,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AprEndpoint;
+import org.apache.tomcat.util.net.AprEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -147,12 +148,6 @@ public class Http11AprProcessor implements ActionHook {
 
 
     /**
-     * State flag.
-     */
-    protected boolean started = false;
-
-
-    /**
      * Error flag.
      */
     protected boolean error = false;
@@ -180,6 +175,12 @@ public class Http11AprProcessor implements ActionHook {
      * Sendfile data.
      */
     protected AprEndpoint.SendfileData sendfileData = null;
+
+
+    /**
+     * Comet used.
+     */
+    protected boolean comet = false;
 
 
     /**
@@ -735,7 +736,53 @@ public class Http11AprProcessor implements ActionHook {
      *
      * @throws IOException error during an I/O operation
      */
-    public boolean process(long socket)
+    public SocketState event(boolean error)
+        throws IOException {
+        
+        RequestInfo rp = request.getRequestProcessor();
+        
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            if (error) {
+                request.setAttribute("org.apache.tomcat.comet.error", Boolean.TRUE);
+            }
+            // FIXME: It is also possible to add a new "event" method in the adapter
+            // or something similar
+            adapter.service(request, response);
+            if (request.getAttribute("org.apache.tomcat.comet") == null) {
+                comet = false;
+                endpoint.getCometPoller().remove(socket);
+            }
+        } catch (InterruptedIOException e) {
+            error = true;
+        } catch (Throwable t) {
+            log.error(sm.getString("http11processor.request.process"), t);
+            // 500 - Internal Server Error
+            response.setStatus(500);
+            error = true;
+        }
+        
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (error) {
+            recycle();
+            return SocketState.CLOSED;
+        } else if (!comet) {
+            recycle();
+            endpoint.getPoller().add(socket);
+            return SocketState.OPEN;
+        } else {
+            return SocketState.LONG;
+        }
+    }
+    
+    /**
+     * Process pipelined HTTP requests using the specified input and output
+     * streams.
+     *
+     * @throws IOException error during an I/O operation
+     */
+    public SocketState process(long socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -768,7 +815,7 @@ public class Http11AprProcessor implements ActionHook {
         boolean keptAlive = false;
         boolean openSocket = false;
 
-        while (started && !error && keepAlive) {
+        while (!error && keepAlive) {
 
             // Parsing the request header
             try {
@@ -833,7 +880,10 @@ public class Http11AprProcessor implements ActionHook {
                         error = response.getErrorException() != null ||
                                 statusDropsConnection(response.getStatus());
                     }
-
+                    // Comet support
+                    if (request.getAttribute("org.apache.tomcat.comet") != null) {
+                        comet = true;
+                    }
                 } catch (InterruptedIOException e) {
                     error = true;
                 } catch (Throwable t) {
@@ -845,25 +895,8 @@ public class Http11AprProcessor implements ActionHook {
             }
 
             // Finish the handling of the request
-            try {
-                rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
-                inputBuffer.endRequest();
-            } catch (IOException e) {
-                error = true;
-            } catch (Throwable t) {
-                log.error(sm.getString("http11processor.request.finish"), t);
-                // 500 - Internal Server Error
-                response.setStatus(500);
-                error = true;
-            }
-            try {
-                rp.setStage(org.apache.coyote.Constants.STAGE_ENDOUTPUT);
-                outputBuffer.endRequest();
-            } catch (IOException e) {
-                error = true;
-            } catch (Throwable t) {
-                log.error(sm.getString("http11processor.response.finish"), t);
-                error = true;
+            if (!comet) {
+                endRequest();
             }
 
             // If there was an error, make sure the request is counted as
@@ -873,17 +906,8 @@ public class Http11AprProcessor implements ActionHook {
             }
             request.updateCounters();
 
-            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-
-            // Don't reset the param - we'll see it as ended. Next request
-            // will reset it
-            // thrA.setParam(null);
-            // Next request
-            inputBuffer.nextRequest();
-            outputBuffer.nextRequest();
-
             // Do sendfile as needed: add socket to sendfile and end
-            if (sendfileData != null) {
+            if (sendfileData != null && !error) {
                 sendfileData.socket = socket;
                 sendfileData.keepAlive = keepAlive;
                 if (!endpoint.getSendfile().add(sendfileData)) {
@@ -892,19 +916,63 @@ public class Http11AprProcessor implements ActionHook {
                 }
             }
             
+            rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
+
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        // Recycle
-        inputBuffer.recycle();
-        outputBuffer.recycle();
-        this.socket = 0;
-
-        return openSocket;
+        if (comet) {
+            if (error) {
+                recycle();
+                return SocketState.CLOSED;
+            } else {
+                endpoint.getCometPoller().add(socket);
+                return SocketState.LONG;
+            }
+        } else {
+            recycle();
+            return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
+        }
         
     }
 
+    
+    public void endRequest() {
+        
+        // Finish the handling of the request
+        try {
+            inputBuffer.endRequest();
+        } catch (IOException e) {
+            error = true;
+        } catch (Throwable t) {
+            log.error(sm.getString("http11processor.request.finish"), t);
+            // 500 - Internal Server Error
+            response.setStatus(500);
+            error = true;
+        }
+        try {
+            outputBuffer.endRequest();
+        } catch (IOException e) {
+            error = true;
+        } catch (Throwable t) {
+            log.error(sm.getString("http11processor.response.finish"), t);
+            error = true;
+        }
+
+        // Next request
+        inputBuffer.nextRequest();
+        outputBuffer.nextRequest();
+        
+    }
+    
+    
+    public void recycle() {
+        inputBuffer.recycle();
+        outputBuffer.recycle();
+        this.socket = 0;
+    }
+    
 
     // ----------------------------------------------------- ActionHook Methods
 
@@ -966,6 +1034,7 @@ public class Http11AprProcessor implements ActionHook {
             // End the processing of the current request, and stop any further
             // transactions with the client
 
+            comet = false;
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {
@@ -984,14 +1053,6 @@ public class Http11AprProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_CUSTOM) {
 
             // Do nothing
-
-        } else if (actionCode == ActionCode.ACTION_START) {
-
-            started = true;
-
-        } else if (actionCode == ActionCode.ACTION_STOP) {
-
-            started = false;
 
         } else if (actionCode == ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE) {
 
@@ -1368,6 +1429,8 @@ public class Http11AprProcessor implements ActionHook {
         if (endpoint.getUseSendfile()) {
             request.setAttribute("org.apache.tomcat.sendfile.support", Boolean.TRUE);
         }
+        // Advertise comet support through a request attribute
+        request.setAttribute("org.apache.tomcat.comet.support", Boolean.TRUE);
         
     }
 
