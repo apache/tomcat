@@ -459,7 +459,7 @@ final class ApplicationDispatcher
                      origServletPath);
                 outerRequest.setAttribute
                     (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                     new Integer(ApplicationFilterFactory.FORWARD));
+                     Integer.valueOf(ApplicationFilterFactory.FORWARD));
                 invoke(outerRequest, response);
             } else {
                 invoke(outerRequest, response);
@@ -517,7 +517,7 @@ final class ApplicationDispatcher
             if ( log.isDebugEnabled() )
                 log.debug(" Non-HTTP Include");
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                                             new Integer(ApplicationFilterFactory.INCLUDE));
+                    Integer.valueOf(ApplicationFilterFactory.INCLUDE));
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, origServletPath);
             invoke(request, outerResponse);
         }
@@ -534,7 +534,7 @@ final class ApplicationDispatcher
             if (servletPath != null)
                 wrequest.setServletPath(servletPath);
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                                             new Integer(ApplicationFilterFactory.INCLUDE));
+                    Integer.valueOf(ApplicationFilterFactory.INCLUDE));
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, origServletPath);
             invoke(outerRequest, outerResponse);
 
@@ -569,7 +569,7 @@ final class ApplicationDispatcher
             }
             
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                                             new Integer(ApplicationFilterFactory.INCLUDE));
+                    Integer.valueOf(ApplicationFilterFactory.INCLUDE));
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, origServletPath);
             invoke(outerRequest, outerResponse);
 
