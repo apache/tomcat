@@ -45,5 +45,7 @@ public interface Adapter {
     public void service(Request req, Response res)
 	throws Exception;
 
+    public boolean event(Request req, Response res, boolean error)
+    throws Exception;
 
 }

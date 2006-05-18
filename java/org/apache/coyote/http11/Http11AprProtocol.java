@@ -617,6 +617,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
 
         public SocketState event(long socket, boolean error) {
             Http11AprProcessor result = connections.get(socket);
+            
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
                 boolean recycle = error;
@@ -708,10 +709,11 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
                     // processor.
                     connections.put(socket, processor);
                     localProcessor.set(null);
+                    proto.ep.getCometPoller().add(socket);
                 }
                 return state;
 
-            } catch(java.net.SocketException e) {
+            } catch (java.net.SocketException e) {
                 // SocketExceptions are normal
                 Http11AprProtocol.log.debug
                     (sm.getString

@@ -103,6 +103,56 @@ public class CoyoteAdapter
 
     // -------------------------------------------------------- Adapter Methods
 
+    
+    /**
+     * Event method.
+     * 
+     * @return false to indicate an error, expected or not
+     */
+    public boolean event(org.apache.coyote.Request req, 
+            org.apache.coyote.Response res, boolean error) {
+
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
+
+        if (request.getWrapper() != null) {
+            CometProcessor servlet = null;
+            try {
+                servlet = (CometProcessor) request.getWrapper().allocate();
+            } catch (Throwable t) {
+                log.error(sm.getString("coyoteAdapter.service"), t);
+                request.removeAttribute("org.apache.tomcat.comet");
+                return false;
+            }
+            try {
+                if (error) {
+                    servlet.error(request.getRequest(), response.getResponse());
+                } else {
+                    servlet.read(request.getRequest(), response.getResponse());
+                }
+                return (!error);
+            } catch (Throwable t) {
+                if (!(t instanceof IOException)) {
+                    log.error(sm.getString("coyoteAdapter.service"), t);
+                }
+                request.removeAttribute("org.apache.tomcat.comet");
+                try {
+                    servlet.error(request.getRequest(), response.getResponse());
+                } catch (Throwable th) {
+                    log.error(sm.getString("coyoteAdapter.service"), th);
+                }
+                return false;
+            } finally {
+                // Recycle the wrapper request and response
+                if (request.getAttribute("org.apache.tomcat.comet") == null) {
+                    request.recycle();
+                    response.recycle();
+                }
+            }
+        }
+        return true;
+    }
+    
 
     /**
      * Service method.
@@ -136,29 +186,6 @@ public class CoyoteAdapter
 
         }
 
-        // Comet processing
-        if (request.getWrapper() != null 
-                && request.getWrapper() instanceof CometProcessor) {
-            try {
-                if (request.getAttribute("org.apache.tomcat.comet.error") != null) {
-                    ((CometProcessor) request.getWrapper()).error(request.getRequest(), response.getResponse());
-                } else {
-                    ((CometProcessor) request.getWrapper()).read(request.getRequest(), response.getResponse());
-                }
-            } catch (IOException e) {
-                ;
-            } catch (Throwable t) {
-                log.error(sm.getString("coyoteAdapter.service"), t);
-            } finally {
-                // Recycle the wrapper request and response
-                if (request.getAttribute("org.apache.tomcat.comet") == null) {
-                    request.recycle();
-                    response.recycle();
-                }
-            }
-            return;
-        }
-        
         if (connector.getXpoweredBy()) {
             response.addHeader("X-Powered-By", "Servlet/2.5");
         }
@@ -174,9 +201,8 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }
 
-            if (request.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE 
-                    && request.getWrapper() instanceof CometProcessor) {
-                request.setAttribute("org.apache.tomcat.comet", Boolean.TRUE);
+            if (request.getAttribute("org.apache.tomcat.comet") == Boolean.TRUE
+                    && request.getWrapper().allocate() instanceof CometProcessor) {
                 comet = true;
             }
 

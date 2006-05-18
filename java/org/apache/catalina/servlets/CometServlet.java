@@ -21,8 +21,6 @@ package org.apache.catalina.servlets;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,7 +36,7 @@ public abstract class CometServlet
 
     public void begin(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
-        
+        request.setAttribute("org.apache.tomcat.comet", Boolean.TRUE);
     }
     
     public void end(HttpServletRequest request, HttpServletResponse response)

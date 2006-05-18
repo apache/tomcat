@@ -743,15 +743,9 @@ public class Http11AprProcessor implements ActionHook {
         
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            if (error) {
-                request.setAttribute("org.apache.tomcat.comet.error", Boolean.TRUE);
-            }
-            // FIXME: It is also possible to add a new "event" method in the adapter
-            // or something similar
-            adapter.service(request, response);
+            error = !adapter.event(request, response, error);
             if (request.getAttribute("org.apache.tomcat.comet") == null) {
                 comet = false;
-                endpoint.getCometPoller().remove(socket);
             }
         } catch (InterruptedIOException e) {
             error = true;
@@ -772,6 +766,7 @@ public class Http11AprProcessor implements ActionHook {
             endpoint.getPoller().add(socket);
             return SocketState.OPEN;
         } else {
+            endpoint.getCometPoller().add(socket);
             return SocketState.LONG;
         }
     }
@@ -815,7 +810,7 @@ public class Http11AprProcessor implements ActionHook {
         boolean keptAlive = false;
         boolean openSocket = false;
 
-        while (!error && keepAlive) {
+        while (!error && keepAlive && !comet) {
 
             // Parsing the request header
             try {
@@ -927,7 +922,6 @@ public class Http11AprProcessor implements ActionHook {
                 recycle();
                 return SocketState.CLOSED;
             } else {
-                endpoint.getCometPoller().add(socket);
                 return SocketState.LONG;
             }
         } else {
