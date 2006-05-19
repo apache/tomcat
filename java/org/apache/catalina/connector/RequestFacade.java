@@ -46,6 +46,7 @@ import org.apache.catalina.security.SecurityUtil;
  * @version $Revision: 303900 $ $Date: 2005-04-30 00:22:29 +0200 (sam., 30 avr. 2005) $
  */
 
+@SuppressWarnings("deprecation")
 public class RequestFacade implements HttpServletRequest {
         
         
@@ -569,7 +570,6 @@ public class RequestFacade implements HttpServletRequest {
             return request.getRequestDispatcher(path);
         }
     }
-
 
     public String getRealPath(String path) {
 
