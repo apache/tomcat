@@ -128,7 +128,15 @@ public class CoyoteAdapter
                 if (error) {
                     servlet.error(request.getRequest(), response.getResponse());
                 } else {
-                    servlet.read(request.getRequest(), response.getResponse());
+                    if (!servlet.read(request.getRequest(), response.getResponse())) {
+                        error = true;
+                        request.removeAttribute("org.apache.tomcat.comet");
+                        try {
+                            servlet.error(request.getRequest(), response.getResponse());
+                        } catch (Throwable th) {
+                            log.error(sm.getString("coyoteAdapter.service"), th);
+                        }
+                    }
                 }
                 return (!error);
             } catch (Throwable t) {

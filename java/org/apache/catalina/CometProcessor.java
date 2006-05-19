@@ -30,8 +30,10 @@ public interface CometProcessor {
      * of the processing of the connection. It can be used to initialize any relevant 
      * fields using the request and response objects.
      * 
-     * @param request
-     * @param response
+     * @param request The HTTP servlet request instance, which can be accessed
+     *        asynchronously at any time until the end or error methods are called
+     * @param response The HTTP servlet response instance, which can be accessed
+     *        asynchronously at any time until the end or error methods are called
      * @throws IOException
      * @throws ServletException
      */
@@ -40,7 +42,9 @@ public interface CometProcessor {
 
     /**
      * End may be called to end the processing of the request. Fields that have
-     * been initialized in the begin method should be reset.
+     * been initialized in the begin method should be reset. After this method has
+     * been called, the request and response objects, as well as all their dependent
+     * objects will be recycled and used to process other requests.
      * 
      * @param request
      * @param response
@@ -53,7 +57,9 @@ public interface CometProcessor {
     /**
      * Error will be called by the container in the case where an IO exception
      * or a similar unrecoverable error occurs on the connection. Fields that have
-     * been initialized in the begin method should be reset.
+     * been initialized in the begin method should be reset. After this method has
+     * been called, the request and response objects, as well as all their dependent
+     * objects will be recycled and used to process other requests.
      * 
      * @param request
      * @param response
@@ -68,14 +74,19 @@ public interface CometProcessor {
      * without blocking. The available and ready methods of the InputStream or
      * Reader may be used to determine if there is a risk of blocking: the servlet
      * should read while data is reported available, and can make one additional read
-     * without blocking.
+     * without blocking. When encountering a read error or an EOF, the servlet MUST
+     * report it by either returning null or throwing an exception such as an 
+     * IOException. 
      * 
      * @param request
      * @param response
-     * @throws IOException
+     * @throws IOException An IOException may be thrown to indicate an IO error, 
+     *         or that the EOF has been reached on the connection
      * @throws ServletException
+     * @return false if the read attempt returned an EOF; alternately, it is also
+     *         valid to throw an IOException
      */
-    public void read(HttpServletRequest request, HttpServletResponse response)
+    public boolean read(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException;
 
 }

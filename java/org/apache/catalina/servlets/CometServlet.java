@@ -19,6 +19,7 @@ package org.apache.catalina.servlets;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -49,8 +50,20 @@ public abstract class CometServlet
         end(request, response);
     }
     
-    public abstract void read(HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException;
+    public boolean read(HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException {
+        InputStream is = request.getInputStream();
+        byte[] buf = new byte[512];
+        do {
+            int n = is.read(buf);
+            if (n > 0) {
+                // Do something with the data
+            } else if (n < 0) {
+                return false;
+            }
+        } while (is.available() > 0);
+        return true;
+    }
 
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
