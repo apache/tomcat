@@ -19,6 +19,7 @@ package org.apache.catalina.mbeans;
 
 import java.util.Hashtable;
 
+import javax.management.DynamicMBean;
 import javax.management.MBeanException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -139,7 +140,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Connector connector)
+    static DynamicMBean createMBean(Connector connector)
         throws Exception {
 
         String mname = createManagedName(connector);
@@ -151,7 +152,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(connector);
+        DynamicMBean mbean = managed.createMBean(connector);
         ObjectName oname = createObjectName(domain, connector);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -170,7 +171,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Context context)
+    static DynamicMBean createMBean(Context context)
         throws Exception {
 
         String mname = createManagedName(context);
@@ -182,7 +183,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(context);
+        DynamicMBean mbean = managed.createMBean(context);
         ObjectName oname = createObjectName(domain, context);
         if( mserver.isRegistered(oname)) {
             log.debug("Already registered " + oname);
@@ -202,7 +203,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(ContextEnvironment environment)
+    static DynamicMBean createMBean(ContextEnvironment environment)
         throws Exception {
 
         String mname = createManagedName(environment);
@@ -214,7 +215,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(environment);
+        DynamicMBean mbean = managed.createMBean(environment);
         ObjectName oname = createObjectName(domain, environment);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -233,7 +234,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(ContextResource resource)
+    static DynamicMBean createMBean(ContextResource resource)
         throws Exception {
 
         String mname = createManagedName(resource);
@@ -245,7 +246,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(resource);
+        DynamicMBean mbean = managed.createMBean(resource);
         ObjectName oname = createObjectName(domain, resource);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -264,7 +265,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(ContextResourceLink resourceLink)
+    static DynamicMBean createMBean(ContextResourceLink resourceLink)
         throws Exception {
 
         String mname = createManagedName(resourceLink);
@@ -276,7 +277,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(resourceLink);
+        DynamicMBean mbean = managed.createMBean(resourceLink);
         ObjectName oname = createObjectName(domain, resourceLink);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -294,7 +295,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Engine engine)
+    static DynamicMBean createMBean(Engine engine)
         throws Exception {
 
         String mname = createManagedName(engine);
@@ -306,7 +307,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(engine);
+        DynamicMBean mbean = managed.createMBean(engine);
         ObjectName oname = createObjectName(domain, engine);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -325,7 +326,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Group group)
+    static DynamicMBean createMBean(Group group)
         throws Exception {
 
         String mname = createManagedName(group);
@@ -337,7 +338,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(group);
+        DynamicMBean mbean = managed.createMBean(group);
         ObjectName oname = createObjectName(domain, group);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -356,7 +357,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Host host)
+    static DynamicMBean createMBean(Host host)
         throws Exception {
 
         String mname = createManagedName(host);
@@ -368,7 +369,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(host);
+        DynamicMBean mbean = managed.createMBean(host);
         ObjectName oname = createObjectName(domain, host);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -387,7 +388,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Loader loader)
+    static DynamicMBean createMBean(Loader loader)
         throws Exception {
 
         String mname = createManagedName(loader);
@@ -399,7 +400,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(loader);
+        DynamicMBean mbean = managed.createMBean(loader);
         ObjectName oname = createObjectName(domain, loader);
         if( mserver.isRegistered( oname ))  {
             // side effect: stop it
@@ -418,7 +419,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Manager manager)
+    static DynamicMBean createMBean(Manager manager)
         throws Exception {
 
         String mname = createManagedName(manager);
@@ -430,7 +431,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(manager);
+        DynamicMBean mbean = managed.createMBean(manager);
         ObjectName oname = createObjectName(domain, manager);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -449,7 +450,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(MBeanFactory factory)
+    static DynamicMBean createMBean(MBeanFactory factory)
         throws Exception {
 
         String mname = createManagedName(factory);
@@ -461,7 +462,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(factory);
+        DynamicMBean mbean = managed.createMBean(factory);
         ObjectName oname = createObjectName(domain, factory);
         if( mserver.isRegistered(oname )) {
             mserver.unregisterMBean(oname);
@@ -480,7 +481,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(NamingResources resource)
+    static DynamicMBean createMBean(NamingResources resource)
         throws Exception {
 
         String mname = createManagedName(resource);
@@ -492,7 +493,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(resource);
+        DynamicMBean mbean = managed.createMBean(resource);
         ObjectName oname = createObjectName(domain, resource);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -511,7 +512,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Realm realm)
+    static DynamicMBean createMBean(Realm realm)
         throws Exception {
 
         String mname = createManagedName(realm);
@@ -523,7 +524,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(realm);
+        DynamicMBean mbean = managed.createMBean(realm);
         ObjectName oname = createObjectName(domain, realm);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -542,7 +543,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Role role)
+    static DynamicMBean createMBean(Role role)
         throws Exception {
 
         String mname = createManagedName(role);
@@ -554,7 +555,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(role);
+        DynamicMBean mbean = managed.createMBean(role);
         ObjectName oname = createObjectName(domain, role);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -573,7 +574,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Server server)
+    static DynamicMBean createMBean(Server server)
         throws Exception {
 
         String mname = createManagedName(server);
@@ -585,7 +586,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(server);
+        DynamicMBean mbean = managed.createMBean(server);
         ObjectName oname = createObjectName(domain, server);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -604,7 +605,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Service service)
+    static DynamicMBean createMBean(Service service)
         throws Exception {
 
         String mname = createManagedName(service);
@@ -616,7 +617,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(service);
+        DynamicMBean mbean = managed.createMBean(service);
         ObjectName oname = createObjectName(domain, service);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -635,7 +636,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(User user)
+    static DynamicMBean createMBean(User user)
         throws Exception {
 
         String mname = createManagedName(user);
@@ -647,7 +648,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(user);
+        DynamicMBean mbean = managed.createMBean(user);
         ObjectName oname = createObjectName(domain, user);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -666,7 +667,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(UserDatabase userDatabase)
+    static DynamicMBean createMBean(UserDatabase userDatabase)
         throws Exception {
 
         String mname = createManagedName(userDatabase);
@@ -678,7 +679,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(userDatabase);
+        DynamicMBean mbean = managed.createMBean(userDatabase);
         ObjectName oname = createObjectName(domain, userDatabase);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -697,7 +698,7 @@ public class MBeanUtils {
      *
      * @exception Exception if an MBean cannot be created or registered
      */
-    static ModelMBean createMBean(Valve valve)
+    static DynamicMBean createMBean(Valve valve)
         throws Exception {
 
         String mname = createManagedName(valve);
@@ -709,7 +710,7 @@ public class MBeanUtils {
         String domain = managed.getDomain();
         if (domain == null)
             domain = mserver.getDefaultDomain();
-        ModelMBean mbean = managed.createMBean(valve);
+        DynamicMBean mbean = managed.createMBean(valve);
         ObjectName oname = createObjectName(domain, valve);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
@@ -1377,7 +1378,7 @@ public class MBeanUtils {
     /**
      * Create and configure (if necessary) and return the
      * <code>MBeanServer</code> with which we will be
-     * registering our <code>ModelMBean</code> implementations.
+     * registering our <code>DynamicMBean</code> implementations.
      */
     public synchronized static MBeanServer createServer() {
 
