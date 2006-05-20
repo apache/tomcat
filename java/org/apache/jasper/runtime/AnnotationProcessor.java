@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 
 import javax.annotation.EJB;
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -140,7 +141,7 @@ public class AnnotationProcessor {
         Method[] methods = instance.getClass().getMethods();
         Method preDestroy = null;
         for (int i = 0; i < methods.length; i++) {
-            if (methods[i].isAnnotationPresent(PostConstruct.class)) {
+            if (methods[i].isAnnotationPresent(PreDestroy.class)) {
                 if ((preDestroy != null) 
                         || (methods[i].getParameterTypes().length != 0)
                         || (Modifier.isStatic(methods[i].getModifiers())) 
