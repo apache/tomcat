@@ -51,7 +51,7 @@ public class AnnotationProcessor {
         throws IllegalAccessException, InvocationTargetException, NamingException {
         
         // Initialize fields annotations
-        Field[] fields = instance.getClass().getFields();
+        Field[] fields = instance.getClass().getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             if (fields[i].isAnnotationPresent(Resource.class)) {
                 Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
@@ -79,7 +79,7 @@ public class AnnotationProcessor {
         }
         
         // Initialize methods annotations
-        Method[] methods = instance.getClass().getMethods();
+        Method[] methods = instance.getClass().getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isAnnotationPresent(Resource.class)) {
                 Resource annotation = (Resource) methods[i].getAnnotation(Resource.class);
@@ -138,7 +138,7 @@ public class AnnotationProcessor {
     public static void preDestroy(Object instance)
         throws IllegalAccessException, InvocationTargetException {
         
-        Method[] methods = instance.getClass().getMethods();
+        Method[] methods = instance.getClass().getDeclaredMethods();
         Method preDestroy = null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isAnnotationPresent(PreDestroy.class)) {
