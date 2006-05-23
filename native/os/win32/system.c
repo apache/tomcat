@@ -36,7 +36,7 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4201)
-#if (_WIN32_WINNT < 0x0502)
+#if (_WIN32_WINNT < 0x0501)
 #include <winternl.h>
 #endif
 #include <psapi.h>
@@ -79,7 +79,7 @@ DllMain(
             if (fnGetSystemTimes == NULL) {
                 FreeLibrary(h_kernel);
                 h_kernel = NULL;
-#if (_WIN32_WINNT < 0x0502)
+#if (_WIN32_WINNT < 0x0501)
                 if ((h_ntdll = LoadLibrary("ntdll.dll")) != NULL)
                     fnNtQuerySystemInformation =
                         (pfnNtQuerySystemInformation)GetProcAddress(h_ntdll,
@@ -322,7 +322,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         else
             goto cleanup;
     }
-#if (_WIN32_WINNT < 0x0502)
+#if (_WIN32_WINNT < 0x0501)
     else if (fnNtQuerySystemInformation) {
         BYTE buf[2048]; /* This should ne enough for 32 processors */
         NTSTATUS rs = (*fnNtQuerySystemInformation)(SystemProcessorPerformanceInformation,
