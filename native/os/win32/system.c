@@ -36,7 +36,9 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4201)
+#if (_WIN32_WINNT < 0x0502)
 #include <winternl.h>
+#endif
 #include <psapi.h>
 #pragma warning(pop)
 
@@ -49,10 +51,11 @@ static HANDLE           h_ntdll  = NULL;
 static char             dll_file_name[MAX_PATH];
 
 typedef BOOL (WINAPI *pfnGetSystemTimes)(LPFILETIME, LPFILETIME, LPFILETIME);
-typedef NTSTATUS (WINAPI *pfnNtQuerySystemInformation)(SYSTEM_INFORMATION_CLASS, PVOID, ULONG, PULONG);
-
 static pfnGetSystemTimes fnGetSystemTimes = NULL;
+#if (_WIN32_WINNT < 0x0502)
+typedef NTSTATUS (WINAPI *pfnNtQuerySystemInformation)(SYSTEM_INFORMATION_CLASS, PVOID, ULONG, PULONG);
 static pfnNtQuerySystemInformation fnNtQuerySystemInformation = NULL;
+#endif
 
 BOOL
 WINAPI
@@ -76,6 +79,7 @@ DllMain(
             if (fnGetSystemTimes == NULL) {
                 FreeLibrary(h_kernel);
                 h_kernel = NULL;
+#if (_WIN32_WINNT < 0x0502)
                 if ((h_ntdll = LoadLibrary("ntdll.dll")) != NULL)
                     fnNtQuerySystemInformation =
                         (pfnNtQuerySystemInformation)GetProcAddress(h_ntdll,
@@ -85,6 +89,7 @@ DllMain(
                     FreeLibrary(h_ntdll);
                     h_ntdll = NULL;
                 }
+#endif
             }
             GetModuleFileName(instance, dll_file_name, sizeof(dll_file_name));
             break;
@@ -317,6 +322,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         else
             goto cleanup;
     }
+#if (_WIN32_WINNT < 0x0502)
     else if (fnNtQuerySystemInformation) {
         BYTE buf[2048]; /* This should ne enough for 32 processors */
         NTSTATUS rs = (*fnNtQuerySystemInformation)(SystemProcessorPerformanceInformation,
@@ -334,6 +340,7 @@ TCN_IMPLEMENT_CALL(jint, OS, info)(TCN_STDARGS,
         else
             goto cleanup;
     }
+#endif
     pvals[7] = st[0];
     pvals[8] = st[1];
     pvals[9] = st[2];
