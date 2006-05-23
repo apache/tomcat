@@ -52,7 +52,7 @@ static char             dll_file_name[MAX_PATH];
 
 typedef BOOL (WINAPI *pfnGetSystemTimes)(LPFILETIME, LPFILETIME, LPFILETIME);
 static pfnGetSystemTimes fnGetSystemTimes = NULL;
-#if (_WIN32_WINNT < 0x0502)
+#if (_WIN32_WINNT < 0x0501)
 typedef NTSTATUS (WINAPI *pfnNtQuerySystemInformation)(SYSTEM_INFORMATION_CLASS, PVOID, ULONG, PULONG);
 static pfnNtQuerySystemInformation fnNtQuerySystemInformation = NULL;
 #endif
