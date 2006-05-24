@@ -98,7 +98,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision: 378251 $ $Date: 2006-02-16 15:19:13 +0100 (jeu., 16 févr. 2006) $
+ * @version $Revision$ $Date: 2006-05-19 19:52:46 -0700 (Fri, 19 May 2006) $
  */
 public class WebappClassLoader
     extends URLClassLoader
@@ -140,6 +140,7 @@ public class WebappClassLoader
     protected static final String[] triggers = {
         "javax.servlet.Servlet"                     // Servlet API
     };
+
 
     /**
      * Set of package names which are not allowed to be loaded from a webapp
@@ -511,6 +512,13 @@ public class WebappClassLoader
         this.loaderDir = new File(workDir, "loader");
     }
 
+     /**
+      * Utility method for use in subclasses.
+      * Must be called before Lifecycle methods to have any effect.
+      */
+     protected void setParentClassLoader(ClassLoader pcl) {
+         parent = pcl;
+     }
 
     // ------------------------------------------------------- Reloader Methods
 
@@ -1064,7 +1072,7 @@ public class WebappClassLoader
                             && (!(name.endsWith(".class")))) {
                         // Copy binary content to the work directory if not present
                         File resourceFile = new File(loaderDir, name);
-                        url = resourceFile.toURL();
+                        url = getURI(resourceFile);
                     }
                 } catch (Exception e) {
                     // Ignore
@@ -1401,9 +1409,9 @@ public class WebappClassLoader
             URL[] urls = new URL[length];
             for (i = 0; i < length; i++) {
                 if (i < filesLength) {
-                    urls[i] = getURL(files[i]);
+                    urls[i] = getURL(files[i], true);
                 } else if (i < filesLength + jarFilesLength) {
-                    urls[i] = getURL(jarRealFiles[i - filesLength]);
+                    urls[i] = getURL(jarRealFiles[i - filesLength], true);
                 } else {
                     urls[i] = external[i - filesLength - jarFilesLength];
                 }
@@ -1831,7 +1839,7 @@ public class WebappClassLoader
         ResourceEntry entry = new ResourceEntry();
         try {
             entry.source = getURI(new File(file, path));
-            entry.codeBase = getURL(new File(file, path));
+            entry.codeBase = getURL(new File(file, path), false);
         } catch (MalformedURLException e) {
             return null;
         }   
@@ -1957,7 +1965,7 @@ public class WebappClassLoader
 
                     entry = new ResourceEntry();
                     try {
-                        entry.codeBase = getURL(jarRealFiles[i]);
+                        entry.codeBase = getURL(jarRealFiles[i], false);
                         String jarFakeUrl = getURI(jarRealFiles[i]).toString();
                         jarFakeUrl = "jar:" + jarFakeUrl + "!/" + path;
                         entry.source = new URL(jarFakeUrl);
@@ -2274,7 +2282,7 @@ public class WebappClassLoader
     /**
      * Get URL.
      */
-    protected URL getURL(File file)
+    protected URL getURL(File file, boolean encoded)
         throws MalformedURLException {
 
         File realFile = file;
@@ -2283,7 +2291,11 @@ public class WebappClassLoader
         } catch (IOException e) {
             // Ignore
         }
-        return realFile.toURL();
+        if(encoded) {
+            return getURI(realFile);
+        } else {
+            return realFile.toURL();
+        }
 
     }
 
@@ -2294,13 +2306,13 @@ public class WebappClassLoader
     protected URL getURI(File file)
         throws MalformedURLException {
 
+
         File realFile = file;
         try {
             realFile = realFile.getCanonicalFile();
         } catch (IOException e) {
             // Ignore
         }
-
         return realFile.toURI().toURL();
 
     }
