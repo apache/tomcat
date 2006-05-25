@@ -106,14 +106,14 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * The set of ManagedBean instances for the beans this registry
      * knows about, keyed by name.
      */
-    private HashMap descriptors = new HashMap();
+    private HashMap<String, ManagedBean> descriptors = new HashMap<String, ManagedBean>();
 
     /** List of managed byeans, keyed by class name
      */
-    private HashMap descriptorsByClass = new HashMap();
+    private HashMap<String, ManagedBean> descriptorsByClass = new HashMap<String, ManagedBean>();
 
     // map to avoid duplicated searching or loading descriptors 
-    private HashMap searchedPaths=new HashMap();
+    private Hashtable<String, URL> searchedPaths=new Hashtable<String, URL>();
     
     private Object key;
     private Object guard;
@@ -218,9 +218,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.1
      */ 
     public void stop() {
-        descriptorsByClass = new HashMap();
-        descriptors = new HashMap();
-        searchedPaths=new HashMap();
+        descriptorsByClass = new HashMap<String, ManagedBean>();
+        descriptors = new HashMap<String, ManagedBean>();
+        searchedPaths=new Hashtable<String, URL>();
     }
     
     /** 
@@ -411,9 +411,11 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public void addManagedBean(ManagedBean bean) {
         // XXX Use group + name
-        descriptors.put(bean.getName(), bean);
-        if( bean.getType() != null ) {
-            descriptorsByClass.put( bean.getType(), bean );
+        synchronized(descriptors) {
+            descriptors.put(bean.getName(), bean);
+            if( bean.getType() != null ) {
+                descriptorsByClass.put( bean.getType(), bean );
+            }
         }
     }
 
@@ -428,10 +430,12 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public ManagedBean findManagedBean(String name) {
         // XXX Group ?? Use Group + Type
-        ManagedBean mb=((ManagedBean) descriptors.get(name));
-        if( mb==null )
-            mb=(ManagedBean)descriptorsByClass.get(name);
-        return mb;
+        synchronized(descriptors) {
+            ManagedBean mb= descriptors.get(name);
+            if( mb==null )
+                mb=descriptorsByClass.get(name);
+            return mb;
+        }
     }
     
     /**
@@ -441,7 +445,9 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @since 1.0
      */
     public String[] findManagedBeans() {
-        return ((String[]) descriptors.keySet().toArray(new String[0]));
+        synchronized(descriptors) {
+            return ((String[]) descriptors.keySet().toArray(new String[0]));
+        }
     }
 
 
@@ -456,13 +462,15 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public String[] findManagedBeans(String group) {
 
         ArrayList results = new ArrayList();
-        Iterator items = descriptors.values().iterator();
-        while (items.hasNext()) {
-            ManagedBean item = (ManagedBean) items.next();
-            if ((group == null) && (item.getGroup() == null)) {
-                results.add(item.getName());
-            } else if (group.equals(item.getGroup())) {
-                results.add(item.getName());
+        synchronized(descriptors) {
+            Iterator<ManagedBean> items = descriptors.values().iterator();
+            while (items.hasNext()) {
+                ManagedBean item =  items.next();
+                if ((group == null) && (item.getGroup() == null)) {
+                    results.add(item.getName());
+                } else if (group.equals(item.getGroup())) {
+                    results.add(item.getName());
+                }
             }
         }
         String values[] = new String[results.size()];
@@ -479,8 +487,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public void removeManagedBean(ManagedBean bean) {
        // TODO: change this to use group/name
-        descriptors.remove(bean.getName());
-        descriptorsByClass.remove( bean.getType());
+        synchronized(descriptors) {
+            descriptors.remove(bean.getName());
+            descriptorsByClass.remove( bean.getType());
+        }
     }
 
     // -------------------- Deprecated 1.0 methods  --------------------
@@ -840,7 +850,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      *
      * @param packageName
      */
-    public void loadDescriptors( String packageName, ClassLoader classLoader  ) {
+    public synchronized void loadDescriptors( String packageName, ClassLoader classLoader  ) {
         String res=packageName.replace( '.', '/');
 
         if( log.isTraceEnabled() ) {
