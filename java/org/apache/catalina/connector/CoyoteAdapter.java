@@ -116,12 +116,22 @@ public class CoyoteAdapter
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request.getWrapper() != null) {
+            
+            // Bind the context CL to the current thread
+            if (request.getContext().getLoader() != null ) {
+                Thread.currentThread().setContextClassLoader
+                        (request.getContext().getLoader().getClassLoader());
+            }
+            
             CometProcessor servlet = null;
             try {
                 servlet = (CometProcessor) request.getWrapper().allocate();
             } catch (Throwable t) {
                 log.error(sm.getString("coyoteAdapter.service"), t);
                 request.removeAttribute("org.apache.tomcat.comet");
+                // Restore the context classloader
+                Thread.currentThread().setContextClassLoader
+                    (CoyoteAdapter.class.getClassLoader());
                 return false;
             }
             try {
@@ -156,6 +166,9 @@ public class CoyoteAdapter
                     request.recycle();
                     response.recycle();
                 }
+                // Restore the context classloader
+                Thread.currentThread().setContextClassLoader
+                    (CoyoteAdapter.class.getClassLoader());
             }
         }
         return true;

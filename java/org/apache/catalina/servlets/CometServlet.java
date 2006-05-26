@@ -71,12 +71,20 @@ public abstract class CometServlet
         if (request.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
             begin(request, response);
         } else {
-            // FIXME: Implement without comet support
+            // No Comet support: regular servlet handling
             begin(request, response);
-            
-            // Loop reading data
-            
-            end(request, response);
+            boolean error = true;
+            try {
+                // Loop reading data
+                while (read(request, response));
+                error = false;
+            } finally {
+                if (error) {
+                    error(request, response);
+                } else {
+                    end(request, response);
+                }
+            }
         }
         
     }
