@@ -99,6 +99,10 @@ public class WebAnnotationSet {
             if (children[i] instanceof StandardWrapper) {
                 
                 wrapper = (StandardWrapper) children[i];
+                if (wrapper.getServletClass() == null) {
+                    continue;
+                }
+                
                 try {
                     classClass = classLoader.loadClass(wrapper.getServletClass());
                 } catch (ClassNotFoundException e) {

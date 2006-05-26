@@ -30,8 +30,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.xml.ws.WebServiceRef;
 
-import org.apache.tomcat.util.IntrospectionUtils;
-
 
 /**
  * Verify the annotation and Process it.
@@ -49,7 +47,7 @@ public class AnnotationProcessor {
     public static void postConstruct(Object instance)
         throws IllegalAccessException, InvocationTargetException {
         
-        Method[] methods = IntrospectionUtils.findMethods(instance.getClass());
+        Method[] methods = instance.getClass().getDeclaredMethods();
         Method postConstruct = null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isAnnotationPresent(PostConstruct.class)) {
@@ -82,7 +80,7 @@ public class AnnotationProcessor {
     public static void preDestroy(Object instance)
         throws IllegalAccessException, InvocationTargetException {
         
-        Method[] methods = IntrospectionUtils.findMethods(instance.getClass());
+        Method[] methods = instance.getClass().getDeclaredMethods();
         Method preDestroy = null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isAnnotationPresent(PreDestroy.class)) {
@@ -116,7 +114,7 @@ public class AnnotationProcessor {
         throws IllegalAccessException, InvocationTargetException, NamingException {
         
         // Initialize fields annotations
-        Field[] fields = instance.getClass().getFields();
+        Field[] fields = instance.getClass().getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             if (fields[i].isAnnotationPresent(Resource.class)) {
                 Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
@@ -144,7 +142,7 @@ public class AnnotationProcessor {
         }
         
         // Initialize methods annotations
-        Method[] methods = IntrospectionUtils.findMethods(instance.getClass());
+        Method[] methods = instance.getClass().getDeclaredMethods();
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].isAnnotationPresent(Resource.class)) {
                 Resource annotation = (Resource) methods[i].getAnnotation(Resource.class);
