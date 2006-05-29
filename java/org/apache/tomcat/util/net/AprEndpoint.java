@@ -826,7 +826,7 @@ public class AprEndpoint {
         // Close all APR memory pools and resources
         Pool.destroy(rootPool);
         rootPool = 0;
-        initialized = false ;
+        initialized = false;
     }
 
 
@@ -1132,7 +1132,7 @@ public class AprEndpoint {
             if (comet) {
                 // FIXME: Find an appropriate timeout value, for now, "longer than usual"
                 // semms appropriate
-                timeout = soTimeout * 20;
+                timeout = soTimeout * 50;
             }
             serverPollset = allocatePoller(size, pool, timeout);
             if (serverPollset == 0 && size > 1024) {
@@ -1153,6 +1153,16 @@ public class AprEndpoint {
          * Destroy the poller.
          */
         protected void destroy() {
+            // Wait for polltime before doing anything, so that the poller threads
+            // exit, otherwise parallel descturction of sockets which are still
+            // in the poller can cause problems
+            try {
+                synchronized (this) {
+                    this.wait(pollTime / 1000);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            }
             // Close all sockets in the add queue
             for (int i = 0; i < addCount; i++) {
                 if (comet) {
@@ -1216,7 +1226,6 @@ public class AprEndpoint {
                 // Loop if endpoint is paused
                 while (paused) {
                     try {
-                        // TODO: We can easly do the maintenance here
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         // Ignore
@@ -1293,7 +1302,7 @@ public class AprEndpoint {
                             continue;
                         }
                     }
-                    if (soTimeout > 0 && maintainTime > 1000000L) {
+                    if (soTimeout > 0 && maintainTime > 1000000L && running) {
                         rv = Poll.maintain(serverPollset, desc, true);
                         maintainTime = 0;
                         if (rv > 0) {
@@ -1301,8 +1310,6 @@ public class AprEndpoint {
                             for (int n = 0; n < rv; n++) {
                                 // Close socket and clear pool
                                 if (comet) {
-                                    // FIXME: should really close in case of timeout ?
-                                    // FIXME: maybe comet should use an extended timeout
                                     processSocket(desc[n], true);
                                 } else {
                                     Socket.destroy(desc[n]);
@@ -1316,8 +1323,12 @@ public class AprEndpoint {
 
             }
 
-        }
+            synchronized (this) {
+                this.notifyAll();
+            }
 
+        }
+        
     }
 
 
@@ -1523,6 +1534,16 @@ public class AprEndpoint {
          * Destroy the poller.
          */
         protected void destroy() {
+            // Wait for polltime before doing anything, so that the poller threads
+            // exit, otherwise parallel descturction of sockets which are still
+            // in the poller can cause problems
+            try {
+                synchronized (this) {
+                    this.wait(pollTime / 1000);
+                }
+            } catch (InterruptedException e) {
+                // Ignore
+            }
             // Close any socket remaining in the add queue
             for (int i = (addS.size() - 1); i >= 0; i--) {
                 SendfileData data = addS.get(i);
@@ -1725,6 +1746,10 @@ public class AprEndpoint {
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.poll.error"), t);
                 }
+            }
+
+            synchronized (this) {
+                this.notifyAll();
             }
 
         }
