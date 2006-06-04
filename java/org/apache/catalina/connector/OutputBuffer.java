@@ -24,12 +24,10 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
-import org.apache.tomcat.util.buf.CharChunk;
 
 
 /**
@@ -41,7 +39,7 @@ import org.apache.tomcat.util.buf.CharChunk;
  * @author Remy Maucherat
  */
 public class OutputBuffer extends Writer
-    implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
+    implements ByteChunk.ByteOutputChannel {
 
 
     // -------------------------------------------------------------- Constants
@@ -50,14 +48,6 @@ public class OutputBuffer extends Writer
     public static final String DEFAULT_ENCODING = 
         org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
     public static final int DEFAULT_BUFFER_SIZE = 8*1024;
-
-
-    // The buffer can be used for byte[] and char[] writing
-    // ( this is needed to support ServletOutputStream and for
-    // efficient implementations of templating systems )
-    public final int INITIAL_STATE = 0;
-    public final int CHAR_STATE = 1;
-    public final int BYTE_STATE = 2;
 
 
     // ----------------------------------------------------- Instance Variables
@@ -70,15 +60,9 @@ public class OutputBuffer extends Writer
 
 
     /**
-     * The chunk buffer.
-     */
-    private CharChunk cb;
-
-
-    /**
      * State of the output buffer.
      */
-    private int state = 0;
+    private boolean initial = true;
 
 
     /**
@@ -170,9 +154,6 @@ public class OutputBuffer extends Writer
         bb = new ByteChunk(size);
         bb.setLimit(size);
         bb.setByteOutputChannel(this);
-        cb = new CharChunk(size);
-        cb.setCharOutputChannel(this);
-        cb.setLimit(size);
 
     }
 
@@ -228,11 +209,10 @@ public class OutputBuffer extends Writer
      */
     public void recycle() {
         
-        state = INITIAL_STATE;
+        initial = true;
         bytesWritten = 0;
         charsWritten = 0;
         
-        cb.recycle();
         bb.recycle(); 
         closed = false;
         suspended = false;
@@ -263,11 +243,6 @@ public class OutputBuffer extends Writer
 
         if ((!coyoteResponse.isCommitted()) 
             && (coyoteResponse.getContentLengthLong() == -1)) {
-            // Flushing the char buffer
-            if (state == CHAR_STATE) {
-                cb.flushBuffer();
-                state = BYTE_STATE;
-            }
             // If this didn't cause a commit of the response, the final content
             // length can be calculated
             if (!coyoteResponse.isCommitted()) {
@@ -306,15 +281,12 @@ public class OutputBuffer extends Writer
             return;
 
         doFlush = true;
-        if (state == CHAR_STATE) {
-            cb.flushBuffer();
-            bb.flushBuffer();
-            state = BYTE_STATE;
-        } else if (state == BYTE_STATE) {
-            bb.flushBuffer();
-        } else if (state == INITIAL_STATE) {
-            // If the buffers are empty, commit the response header
+        if (initial) {
             coyoteResponse.sendHeaders();
+            initial = false;
+        }
+        if (bb.getLength() > 0) {
+            bb.flushBuffer();
         }
         doFlush = false;
 
@@ -375,9 +347,6 @@ public class OutputBuffer extends Writer
         if (suspended)
             return;
 
-        if (state == CHAR_STATE)
-            cb.flushBuffer();
-        state = BYTE_STATE;
         writeBytes(b, off, len);
 
     }
@@ -407,11 +376,7 @@ public class OutputBuffer extends Writer
         if (suspended)
             return;
 
-        if (state == CHAR_STATE)
-            cb.flushBuffer();
-        state = BYTE_STATE;
-
-        bb.append( (byte)b );
+        bb.append((byte) b);
         bytesWritten++;
 
     }
@@ -426,11 +391,10 @@ public class OutputBuffer extends Writer
         if (suspended)
             return;
 
-        state = CHAR_STATE;
-
-        cb.append((char) c);
+        conv.convert((char) c);
+        conv.flushBuffer();
         charsWritten++;
-
+        
     }
 
 
@@ -451,25 +415,9 @@ public class OutputBuffer extends Writer
         if (suspended)
             return;
 
-        state = CHAR_STATE;
-
-        cb.append(c, off, len);
+        conv.convert(c, off, len);
+        conv.flushBuffer();
         charsWritten += len;
-
-    }
-
-
-    public void write(StringBuffer sb)
-        throws IOException {
-
-        if (suspended)
-            return;
-
-        state = CHAR_STATE;
-
-        int len = sb.length();
-        charsWritten += len;
-        cb.append(sb);
 
     }
 
@@ -483,12 +431,11 @@ public class OutputBuffer extends Writer
         if (suspended)
             return;
 
-        state=CHAR_STATE;
-
         charsWritten += len;
-        if (s==null)
-            s="null";
-        cb.append( s, off, len );
+        if (s == null)
+            s = "null";
+        conv.convert(s, off, len);
+        conv.flushBuffer();
 
     }
 
@@ -499,42 +446,16 @@ public class OutputBuffer extends Writer
         if (suspended)
             return;
 
-        state = CHAR_STATE;
-        if (s==null)
-            s="null";
-        write(s, 0, s.length());
+        if (s == null)
+            s = "null";
+        conv.convert(s);
+        conv.flushBuffer();
 
     } 
 
 
-    public void flushChars()
-        throws IOException {
-
-        cb.flushBuffer();
-        state = BYTE_STATE;
-
-    }
-
-
-    public boolean flushCharsNeeded() {
-        return state == CHAR_STATE;
-    }
-
-
     public void setEncoding(String s) {
         enc = s;
-    }
-
-
-    public void realWriteChars(char c[], int off, int len) 
-        throws IOException {
-
-        if (!gotEnc)
-            setConverter();
-
-        conv.convert(c, off, len);
-        conv.flushBuffer();	// ???
-
     }
 
 
@@ -625,26 +546,25 @@ public class OutputBuffer extends Writer
 
     public void setBufferSize(int size) {
         if (size > bb.getLimit()) {// ??????
-	    bb.setLimit(size);
-	}
+            bb.setLimit(size);
+        }
     }
 
 
     public void reset() {
 
-        //count=0;
         bb.recycle();
         bytesWritten = 0;
-        cb.recycle();
         charsWritten = 0;
         gotEnc = false;
         enc = null;
-        state = INITIAL_STATE;
+        initial = true;
+        
     }
 
 
     public int getBufferSize() {
-	return bb.getLimit();
+        return bb.getLimit();
     }
 
 
