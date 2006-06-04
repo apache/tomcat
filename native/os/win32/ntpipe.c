@@ -24,8 +24,9 @@
 #define _WIN32_WINNT 0x0500
 #endif
 #define STRICT
-#include <windows.h>
-#include <winsock.h>
+#include <winsock2.h>
+#include <mswsock.h>
+#include <ws2tcpip.h>
 #include <sddl.h>
 
 #include "tcn.h"

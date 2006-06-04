@@ -22,8 +22,9 @@
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0500
 #endif
-#include <windows.h>
-#include <winsock.h>
+#include <winsock2.h>
+#include <mswsock.h>
+#include <ws2tcpip.h>
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_poll.h"
