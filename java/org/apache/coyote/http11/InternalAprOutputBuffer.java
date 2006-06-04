@@ -62,10 +62,12 @@ public class InternalAprOutputBuffer
         this.response = response;
         headers = response.getMimeHeaders();
 
-        headerBuffer = new byte[headerBufferSize];
-        buf = headerBuffer;
-
-        bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
+        buf = new byte[headerBufferSize];
+        if (headerBufferSize < (8 * 1024)) {
+            bbuf = ByteBuffer.allocateDirect(6 * 1500);
+        } else {
+            bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
+        }
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
 
@@ -120,7 +122,7 @@ public class InternalAprOutputBuffer
 
 
     /**
-     * Pointer to the current read buffer.
+     * Pointer to the current write buffer.
      */
     protected byte[] buf;
 
@@ -129,12 +131,6 @@ public class InternalAprOutputBuffer
      * Position in the buffer.
      */
     protected int pos;
-
-
-    /**
-     * HTTP header buffer.
-     */
-    protected byte[] headerBuffer;
 
 
     /**
@@ -316,7 +312,6 @@ public class InternalAprOutputBuffer
         bbuf.clear();
 
         socket = 0;
-        buf = headerBuffer;
         pos = 0;
         lastActiveFilter = -1;
         committed = false;
@@ -335,9 +330,6 @@ public class InternalAprOutputBuffer
 
         // Recycle Request object
         response.recycle();
-
-        // Determine the header buffer used for next request
-        buf = headerBuffer;
 
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
