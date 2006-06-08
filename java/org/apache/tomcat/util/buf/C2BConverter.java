@@ -82,6 +82,12 @@ public final class C2BConverter {
 
     /** Generate the bytes using the specified encoding
      */
+    public  final void convert(String s, int off, int len ) throws IOException {
+	conv.write( s, off, len );
+    }
+
+    /** Generate the bytes using the specified encoding
+     */
     public  final void convert(String s ) throws IOException {
 	conv.write( s );
     }
