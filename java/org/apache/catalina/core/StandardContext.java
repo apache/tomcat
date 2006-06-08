@@ -69,6 +69,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
@@ -4128,6 +4129,22 @@ public class StandardContext
         if (log.isDebugEnabled())
             log.debug("Processing standard container startup");
 
+        // Acquire clustered manager
+        Manager contextManager = null;
+        if (manager == null) {
+        	if ((getCluster() != null) && distributable) {
+        		try {
+        			contextManager = getCluster().createManager(getName());
+        		} catch (Exception ex) {
+        			log.error("standardContext.clusterFail", ex);
+        			ok = false;
+        		}
+        	} else {
+        		contextManager = new StandardManager();
+        	}
+        }
+        
+        
         // Binding thread
         ClassLoader oldCCL = bindThread();
 
@@ -4184,17 +4201,8 @@ public class StandardContext
                 lifecycle.fireLifecycleEvent(START_EVENT, null);
 
                 // Configure default manager if none was specified
-                if (manager == null) {
-                    if ((getCluster() != null) && distributable) {
-                        try {
-                            setManager(getCluster().createManager(getName()));
-                        } catch (Exception ex) {
-                            log.error("standardContext.clusterFail", ex);
-                            ok = false;
-                        }
-                    } else {
-                        setManager(new StandardManager());
-                    }
+                if (contextManager != null) {
+                	setManager(contextManager);
                 }
                 
                 // Start manager
