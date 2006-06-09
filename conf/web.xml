@@ -392,8 +392,10 @@
   <!-- directives in HTML pages consistent with similar support in web      -->
   <!-- servers like Apache.  Traditionally, this filter is mapped to the    -->
   <!-- URL pattern "*.shtml", though it can be mapped to "*" as it will     -->
-  <!-- selectively enable/disable SSI processing based on mime types.  The  -->
-  <!-- contentType init param allows you to apply SSI processing to JSP     -->
+  <!-- selectively enable/disable SSI processing based on mime types. For   -->
+  <!-- this to work you will need to uncomment the .shtml mime type         -->
+  <!-- definition towards the bottom of this file.                          -->
+  <!-- The contentType init param allows you to apply SSI processing to JSP -->
   <!-- pages, javascript, or any other content you wish.  This filter       -->
   <!-- supports the following initialization parameters (default values are -->
   <!-- in square brackets):                                                 -->
@@ -875,10 +877,12 @@
         <extension>shar</extension>
         <mime-type>application/x-shar</mime-type>
     </mime-mapping>
+<!--
     <mime-mapping>
         <extension>shtml</extension>
         <mime-type>text/x-server-parsed-html</mime-type>
     </mime-mapping>
+-->
     <mime-mapping>
         <extension>smf</extension>
         <mime-type>audio/x-midi</mime-type>
