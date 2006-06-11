@@ -1344,10 +1344,6 @@ public class StandardWrapper
             }
         }
 
-        ClassLoader oldCtxClassLoader =
-            Thread.currentThread().getContextClassLoader();
-        ClassLoader classLoader = instance.getClass().getClassLoader();
-
         PrintStream out = System.out;
         if (swallowOutput) {
             SystemLogHandler.startCapture();
@@ -1358,7 +1354,6 @@ public class StandardWrapper
             instanceSupport.fireInstanceEvent
               (InstanceEvent.BEFORE_DESTROY_EVENT, instance);
 
-            Thread.currentThread().setContextClassLoader(classLoader);
             if( System.getSecurityManager() != null) {
                 SecurityUtil.doAsPrivilege("destroy",
                                            instance);
@@ -1387,8 +1382,6 @@ public class StandardWrapper
                 (sm.getString("standardWrapper.destroyException", getName()),
                  t);
         } finally {
-            // restore the context ClassLoader
-            Thread.currentThread().setContextClassLoader(oldCtxClassLoader);
             // Write captured output
             if (swallowOutput) {
                 String log = SystemLogHandler.stopCapture();
@@ -1407,7 +1400,6 @@ public class StandardWrapper
 
         if (singleThreadModel && (instancePool != null)) {
             try {
-                Thread.currentThread().setContextClassLoader(classLoader);
                 while (!instancePool.isEmpty()) {
                     Servlet s = (Servlet) instancePool.pop();
                     if (System.getSecurityManager() != null) {
@@ -1429,10 +1421,6 @@ public class StandardWrapper
                 throw new ServletException
                     (sm.getString("standardWrapper.destroyException",
                                   getName()), t);
-            } finally {
-                // restore the context ClassLoader
-                Thread.currentThread().setContextClassLoader
-                    (oldCtxClassLoader);
             }
             instancePool = null;
             nInstances = 0;
