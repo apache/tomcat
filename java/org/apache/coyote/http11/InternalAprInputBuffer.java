@@ -350,17 +350,6 @@ public class InternalAprInputBuffer implements InputBuffer {
         }
 
     }
-    
-    public int readSocketData() {
-        bbuf.clear();
-        int nRead = Socket.recvbbt(socket, 0, buf.length - lastValid, readTimeout);
-        if (nRead > 0) {
-            bbuf.limit(nRead);
-            bbuf.get(buf, pos, nRead);
-            lastValid = pos + nRead;
-        }
-        return nRead>=0?nRead:-1;
-    }
 
 
     /**

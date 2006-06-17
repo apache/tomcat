@@ -743,19 +743,9 @@ public class Http11AprProcessor implements ActionHook {
         
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            int data = inputBuffer.readSocketData();
-            if ( data > 0 ) {
-                int contentLength = request.getContentLength();
-                if (contentLength>=0) request.setContentLength(contentLength + data);
-                for (int i=0; i<inputBuffer.activeFilters.length; i++) {
-                    //this resets the remaining flag and the content length on the filter
-                    //if we don't do this, then request.getInputStream.read will return 0
-                    if (inputBuffer.activeFilters[i]!=null) inputBuffer.activeFilters[i].setRequest(request);
-                }
-                error = !adapter.event(request, response, error);
-                if (request.getAttribute("org.apache.tomcat.comet") == null) {
-                    comet = false;
-                }
+            error = !adapter.event(request, response, error);
+            if (request.getAttribute("org.apache.tomcat.comet") == null) {
+                comet = false;
             }
         } catch (InterruptedIOException e) {
             error = true;
