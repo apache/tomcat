@@ -16,26 +16,24 @@
 
 package org.apache.tomcat.util.modeler.modules;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.util.modeler.AttributeInfo;
-import org.apache.tomcat.util.modeler.ConstructorInfo;
-import org.apache.tomcat.util.modeler.ManagedBean;
-import org.apache.tomcat.util.modeler.OperationInfo;
-import org.apache.tomcat.util.modeler.ParameterInfo;
-import org.apache.tomcat.util.modeler.Registry;
-
-import javax.management.ObjectName;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+
+import javax.management.ObjectName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.tomcat.util.modeler.AttributeInfo;
+import org.apache.tomcat.util.modeler.ManagedBean;
+import org.apache.tomcat.util.modeler.OperationInfo;
+import org.apache.tomcat.util.modeler.ParameterInfo;
+import org.apache.tomcat.util.modeler.Registry;
 
 public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 {
@@ -363,7 +361,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 }
             }
 
-            Constructor[] constructors = realClass.getConstructors();
+            /*Constructor[] constructors = realClass.getConstructors();
             for(int i=0;i<constructors.length;i++) {
                 ConstructorInfo info = new ConstructorInfo();
                 String className = realClass.getName();
@@ -383,6 +381,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 }
                 mbean.addConstructor(info);
             }
+            */
             
             if( log.isDebugEnabled())
                 log.debug("Setting name: " + type );

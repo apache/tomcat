@@ -19,10 +19,8 @@ package org.apache.tomcat.util.modeler;
 
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 
-import javax.management.Descriptor;
-import javax.management.modelmbean.ModelMBeanAttributeInfo;
+import javax.management.MBeanAttributeInfo;
 
 
 /**
@@ -30,57 +28,21 @@ import javax.management.modelmbean.ModelMBeanAttributeInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 155428 $ $Date: 2005-02-26 14:12:25 +0100 (sam., 26 févr. 2005) $
  */
-
 public class AttributeInfo extends FeatureInfo implements Serializable {
     static final long serialVersionUID = -2511626862303972143L;
 
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The <code>ModelMBeanAttributeInfo</code> object that corresponds
-     * to this <code>AttributeInfo</code> instance.
-     */
-    protected transient ModelMBeanAttributeInfo info = null;
     protected String displayName = null;
+
+    // Information about the method to use
     protected String getMethod = null;
     protected String setMethod = null;
-
-    protected transient Method getMethodObj = null;
-    protected transient Method setMethodObj = null;
-
     protected boolean readable = true;
     protected boolean writeable = true;
-
     protected boolean is = false;
-    protected String type = null;
-
-    protected String persist;
-    protected String defaultStringValue;
+    
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Override the <code>description</code> property setter.
-     *
-     * @param description The new description
-     */
-    public void setDescription(String description) {
-        super.setDescription(description);
-        this.info = null;
-    }
-
-    /**
-     * Override the <code>name</code> property setter.
-     *
-     * @param name The new name
-     */
-    public void setName(String name) {
-        super.setName(name);
-        this.info = null;
-    }
 
     /**
      * The display name of this attribute.
@@ -97,28 +59,13 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
      * The name of the property getter method, if non-standard.
      */
     public String getGetMethod() {
+        if(getMethod == null) 
+            getMethod = getMethodName(getName(), true, isIs());
         return (this.getMethod);
     }
 
     public void setGetMethod(String getMethod) {
         this.getMethod = getMethod;
-        this.info = null;
-    }
-
-    public Method getGetMethodObj() {
-        return getMethodObj;
-    }
-
-    public void setGetMethodObj(Method getMethodObj) {
-        this.getMethodObj = getMethodObj;
-    }
-
-    public Method getSetMethodObj() {
-        return setMethodObj;
-    }
-
-    public void setSetMethodObj(Method setMethodObj) {
-        this.setMethodObj = setMethodObj;
     }
 
     /**
@@ -130,7 +77,6 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
 
     public void setIs(boolean is) {
         this.is = is;
-        this.info = null;
     }
 
 
@@ -143,7 +89,6 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
 
     public void setReadable(boolean readable) {
         this.readable = readable;
-        this.info = null;
     }
 
 
@@ -151,27 +96,14 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
      * The name of the property setter method, if non-standard.
      */
     public String getSetMethod() {
+        if( setMethod == null )
+            setMethod = getMethodName(getName(), false, false);
         return (this.setMethod);
     }
 
     public void setSetMethod(String setMethod) {
         this.setMethod = setMethod;
-        this.info = null;
     }
-
-
-    /**
-     * The fully qualified Java class name of this attribute.
-     */
-    public String getType() {
-        return (this.type);
-    }
-
-    public void setType(String type) {
-        this.type = type;
-        this.info = null;
-    }
-
 
     /**
      * Is this attribute writeable by management applications?
@@ -182,34 +114,7 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
 
     public void setWriteable(boolean writeable) {
         this.writeable = writeable;
-        this.info = null;
     }
-
-    /** Persistence policy.
-     * All persistent attributes should have this attribute set.
-     * Valid values:
-     *   ???
-     */
-    public String getPersist() {
-        return persist;
-    }
-
-    public void setPersist(String persist) {
-        this.persist = persist;
-    }
-
-    /** Default value. If set, it can provide info to the user and
-     * it can be used by persistence mechanism to generate a more compact
-     * representation ( a value may not be saved if it's default )
-     */
-    public String getDefault() {
-        return defaultStringValue;
-    }
-
-    public void setDefault(String defaultStringValue) {
-        this.defaultStringValue = defaultStringValue;
-    }
-
 
     // --------------------------------------------------------- Public Methods
 
@@ -218,73 +123,14 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
      * Create and return a <code>ModelMBeanAttributeInfo</code> object that
      * corresponds to the attribute described by this instance.
      */
-    public ModelMBeanAttributeInfo createAttributeInfo() {
+    MBeanAttributeInfo createAttributeInfo() {
         // Return our cached information (if any)
-        if (info != null)
-            return (info);
-        if((getMethodObj != null) || (setMethodObj != null) ) {
-            try {
-                info=new ModelMBeanAttributeInfo(getName(), getDescription(),
-                                        getMethodObj,  setMethodObj);
-                return info;
-            } catch( Exception ex) {
-                ex.printStackTrace();
-            }
+        if (info == null) {
+            info = new MBeanAttributeInfo(getName(), getType(), getDescription(),
+                            isReadable(), isWriteable(), false);
         }
-
-        // Create and return a new information object
-        info = new ModelMBeanAttributeInfo
-            (getName(), getType(), getDescription(),
-             isReadable(), isWriteable(), false);
-        Descriptor descriptor = info.getDescriptor();
-        if (getDisplayName() != null)
-            descriptor.setField("displayName", getDisplayName());
-        if (isReadable()) {
-            if (getGetMethod() != null)
-                descriptor.setField("getMethod", getGetMethod());
-            else
-                descriptor.setField("getMethod",
-                                    getMethodName(getName(), true, isIs()));
-        }
-        if (isWriteable()) {
-            if (getSetMethod() != null)
-                descriptor.setField("setMethod", getSetMethod());
-            else
-                descriptor.setField("setMethod",
-                                    getMethodName(getName(), false, false));
-        }
-        addFields(descriptor);
-        info.setDescriptor(descriptor);
-        return (info);
-
+        return (MBeanAttributeInfo)info;
     }
-
-
-    /**
-     * Return a string representation of this attribute descriptor.
-     */
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer("AttributeInfo[");
-        sb.append("name=");
-        sb.append(name);
-        sb.append(", description=");
-        sb.append(description);
-        if (!readable) {
-            sb.append(", readable=");
-            sb.append(readable);
-        }
-        sb.append(", type=");
-        sb.append(type);
-        if (!writeable) {
-            sb.append(", writeable=");
-            sb.append(writeable);
-        }
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
 
     // -------------------------------------------------------- Private Methods
 
