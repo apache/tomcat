@@ -62,13 +62,6 @@ public final class Bootstrap {
     // ------------------------------------------------------- Static Variables
 
 
-    private static final String JMX_ERROR_MESSAGE =
-        "This release of Apache Tomcat was packaged to run on J2SE 5.0 \n"
-        + "or later. It can be run on earlier JVMs by downloading and \n"
-        + "installing a compatibility package from the Apache Tomcat \n"
-        + "binary download page.";
-
-
     /**
      * Daemon object used by main.
      */
@@ -389,19 +382,6 @@ public final class Bootstrap {
      * @param args Command line arguments to be processed
      */
     public static void main(String args[]) {
-
-        try {
-            // Attempt to load JMX class
-            new ObjectName("test:foo=bar");
-        } catch (Throwable t) {
-            System.out.println(JMX_ERROR_MESSAGE);
-            try {
-                // Give users some time to read the message before exiting
-                Thread.sleep(5000);
-            } catch (Exception ex) {
-            }
-            return;
-        }
 
         if (daemon == null) {
             daemon = new Bootstrap();
