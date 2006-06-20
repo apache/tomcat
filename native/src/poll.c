@@ -1,4 +1,4 @@
-/* Copyright 2000-2005 The Apache Software Foundation
+/* Copyright 2000-2006 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -228,6 +228,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
     memset(&fd, 0, sizeof(apr_pollfd_t));
     fd.desc_type = APR_POLL_SOCKET;
     fd.desc.s    = s->sock;
+    fd.reqevents = APR_POLLIN | APR_POLLOUT;
 #ifdef TCN_DO_STATISTICS
     p->sp_remove++;
 #endif
@@ -244,15 +245,31 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
     apr_int32_t  i, num = 0;
     apr_status_t rv = APR_SUCCESS;
-
+    apr_interval_time_t ptime = J2T(timeout);
     UNREFERENCED(o);
     TCN_ASSERT(pollset != 0);
 
 #ifdef TCN_DO_STATISTICS
      p->sp_poll++;
 #endif
+
+    if (timeout > 0) {
+        apr_time_t now = apr_time_now();
+
+        /* Find the minimum timeout */
+        for (i = 0; i < p->nelts; i++) {
+            apr_interval_time_t t = now - p->socket_ttl[i];
+            if (t >= p->max_ttl) {
+                ptime = 0;
+                break;
+            }
+            else {
+                ptime = TCN_MIN(p->max_ttl - t, ptime);
+            }
+        }
+    }
     for (;;) {
-        rv = apr_pollset_poll(p->pollset, J2T(timeout), &num, &fd);
+        rv = apr_pollset_poll(p->pollset, ptime, &num, &fd);
         if (rv != APR_SUCCESS) {
             if (APR_STATUS_IS_EINTR(rv)) {
 #ifdef TCN_DO_STATISTICS
@@ -303,7 +320,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
     /* Check for timeout sockets */
     if (p->max_ttl > 0) {
         for (i = 0; i < p->nelts; i++) {
-            if ((now - p->socket_ttl[i]) > p->max_ttl) {
+            if ((now - p->socket_ttl[i]) >= p->max_ttl) {
                 fd = p->socket_set[i];
                 p->set[num++] = P2J(fd.client_data);
             }
@@ -316,6 +333,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
 #endif
             for (i = 0; i < num; i++) {
                 fd.desc_type = APR_POLL_SOCKET;
+                fd.reqevents = APR_POLLIN | APR_POLLOUT;
                 fd.desc.s = (J2P(p->set[i], tcn_socket_t *))->sock;
                 do_remove(p, &fd);
             }
