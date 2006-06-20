@@ -20,9 +20,8 @@ package org.apache.tomcat.util.modeler;
 
 import java.io.Serializable;
 
-import javax.management.Descriptor;
+import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
-import javax.management.modelmbean.ModelMBeanOperationInfo;
 
 
 /**
@@ -30,9 +29,7 @@ import javax.management.modelmbean.ModelMBeanOperationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 155428 $ $Date: 2005-02-26 14:12:25 +0100 (sam., 26 févr. 2005) $
  */
-
 public class OperationInfo extends FeatureInfo implements Serializable {
     static final long serialVersionUID = 4418342922072614875L;
     // ----------------------------------------------------------- Constructors
@@ -46,76 +43,15 @@ public class OperationInfo extends FeatureInfo implements Serializable {
         super();
 
     }
-
-
-    /**
-     * Special constructor for setting up getter and setter operations.
-     *
-     * @param name Name of this operation
-     * @param getter Is this a getter (as opposed to a setter)?
-     * @param type Data type of the return value (if this is a getter)
-     *  or the parameter (if this is a setter)
-     * 
-     */
-    public OperationInfo(String name, boolean getter, String type) {
-
-        super();
-        setName(name);
-        if (getter) {
-            setDescription("Attribute getter method");
-            setImpact("INFO");
-            setReturnType(type);
-            setRole("getter");
-        } else {
-            setDescription("Attribute setter method");
-            setImpact("ACTION");
-            setReturnType("void");
-            setRole("setter");
-            addParameter(new ParameterInfo("value", type,
-                                           "New attribute value"));
-        }
-
-    }
-
-
+   
     // ----------------------------------------------------- Instance Variables
 
-
-    /**
-     * The <code>ModelMBeanOperationInfo</code> object that corresponds
-     * to this <code>OperationInfo</code> instance.
-     */
-    transient ModelMBeanOperationInfo info = null;
     protected String impact = "UNKNOWN";
     protected String role = "operation";
-    protected String returnType = "void";    // FIXME - Validate
     protected ParameterInfo parameters[] = new ParameterInfo[0];
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Override the <code>description</code> property setter.
-     *
-     * @param description The new description
-     */
-    public void setDescription(String description) {
-        super.setDescription(description);
-        this.info = null;
-    }
-
-
-    /**
-     * Override the <code>name</code> property setter.
-     *
-     * @param name The new name
-     */
-    public void setName(String name) {
-        super.setName(name);
-        this.info = null;
-    }
-
 
     /**
      * The "impact" of this operation, which should be a (case-insensitive)
@@ -151,11 +87,14 @@ public class OperationInfo extends FeatureInfo implements Serializable {
      * operation.
      */
     public String getReturnType() {
-        return (this.returnType);
+        if(type == null) {
+            type = "void";
+        }
+        return type;
     }
 
     public void setReturnType(String returnType) {
-        this.returnType = returnType;
+        this.type = returnType;
     }
 
     /**
@@ -190,57 +129,32 @@ public class OperationInfo extends FeatureInfo implements Serializable {
      * Create and return a <code>ModelMBeanOperationInfo</code> object that
      * corresponds to the attribute described by this instance.
      */
-    public ModelMBeanOperationInfo createOperationInfo() {
+    MBeanOperationInfo createOperationInfo() {
 
         // Return our cached information (if any)
-        if (info != null)
-            return (info);
+        if (info == null) {
+            // Create and return a new information object
+            int impact = MBeanOperationInfo.UNKNOWN;
+            if ("ACTION".equals(getImpact()))
+                impact = MBeanOperationInfo.ACTION;
+            else if ("ACTION_INFO".equals(getImpact()))
+                impact = MBeanOperationInfo.ACTION_INFO;
+            else if ("INFO".equals(getImpact()))
+                impact = MBeanOperationInfo.INFO;
+    
+            info = new MBeanOperationInfo(getName(), getDescription(), 
+                                          getMBeanParameterInfo(),
+                                          getReturnType(), impact);
+        }
+        return (MBeanOperationInfo)info;
+    }
 
-        // Create and return a new information object
+    protected MBeanParameterInfo[] getMBeanParameterInfo() {
         ParameterInfo params[] = getSignature();
         MBeanParameterInfo parameters[] =
             new MBeanParameterInfo[params.length];
         for (int i = 0; i < params.length; i++)
             parameters[i] = params[i].createParameterInfo();
-        int impact = ModelMBeanOperationInfo.UNKNOWN;
-        if ("ACTION".equals(getImpact()))
-            impact = ModelMBeanOperationInfo.ACTION;
-        else if ("ACTION_INFO".equals(getImpact()))
-            impact = ModelMBeanOperationInfo.ACTION_INFO;
-        else if ("INFO".equals(getImpact()))
-            impact = ModelMBeanOperationInfo.INFO;
-
-        info = new ModelMBeanOperationInfo
-            (getName(), getDescription(), parameters,
-             getReturnType(), impact);
-        Descriptor descriptor = info.getDescriptor();
-        descriptor.removeField("class");
-        descriptor.setField("role", getRole());
-        addFields(descriptor);
-        info.setDescriptor(descriptor);
-        return (info);
-
+        return parameters;
     }
-
-
-    /**
-     * Return a string representation of this operation descriptor.
-     */
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer("OperationInfo[");
-        sb.append("name=");
-        sb.append(name);
-        sb.append(", description=");
-        sb.append(description);
-        sb.append(", returnType=");
-        sb.append(returnType);
-        sb.append(", parameters=");
-        sb.append(parameters.length);
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
-
 }

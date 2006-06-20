@@ -20,8 +20,7 @@ package org.apache.tomcat.util.modeler;
 
 import java.io.Serializable;
 
-import javax.management.Descriptor;
-import javax.management.modelmbean.ModelMBeanNotificationInfo;
+import javax.management.MBeanNotificationInfo;
 
 
 /**
@@ -42,7 +41,7 @@ public class NotificationInfo extends FeatureInfo implements Serializable {
      * The <code>ModelMBeanNotificationInfo</code> object that corresponds
      * to this <code>NotificationInfo</code> instance.
      */
-    transient ModelMBeanNotificationInfo info = null;
+    transient MBeanNotificationInfo info = null;
     protected String notifTypes[] = new String[0];
 
     // ------------------------------------------------------------- Properties
@@ -103,18 +102,18 @@ public class NotificationInfo extends FeatureInfo implements Serializable {
      * Create and return a <code>ModelMBeanNotificationInfo</code> object that
      * corresponds to the attribute described by this instance.
      */
-    public ModelMBeanNotificationInfo createNotificationInfo() {
+    public MBeanNotificationInfo createNotificationInfo() {
 
         // Return our cached information (if any)
         if (info != null)
             return (info);
 
         // Create and return a new information object
-        info = new ModelMBeanNotificationInfo
+        info = new MBeanNotificationInfo
             (getNotifTypes(), getName(), getDescription());
-        Descriptor descriptor = info.getDescriptor();
-        addFields(descriptor);
-        info.setDescriptor(descriptor);
+        //Descriptor descriptor = info.getDescriptor();
+        //addFields(descriptor);
+        //info.setDescriptor(descriptor);
         return (info);
 
     }

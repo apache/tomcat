@@ -70,7 +70,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
                 "addAttribute",
             "org.apache.tomcat.util.modeler.AttributeInfo");
         
-        digester.addObjectCreate
+        /*digester.addObjectCreate
             ("mbeans-descriptors/mbean/attribute/descriptor/field",
             "org.apache.tomcat.util.modeler.FieldInfo");
         digester.addSetProperties
@@ -119,7 +119,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
             ("mbeans-descriptors/mbean/descriptor/field",
                 "addField",
             "org.apache.tomcat.util.modeler.FieldInfo");
-        
+        */
         digester.addObjectCreate
             ("mbeans-descriptors/mbean/notification",
             "org.apache.tomcat.util.modeler.NotificationInfo");

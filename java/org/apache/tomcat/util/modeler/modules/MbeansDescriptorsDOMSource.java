@@ -25,8 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.DomUtil;
 import org.apache.tomcat.util.modeler.AttributeInfo;
-import org.apache.tomcat.util.modeler.ConstructorInfo;
-import org.apache.tomcat.util.modeler.FieldInfo;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.NotificationInfo;
 import org.apache.tomcat.util.modeler.OperationInfo;
@@ -116,7 +114,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                 Node firstN;
 
                 // Process descriptor subnode
-                Node mbeanDescriptorN =
+                /*Node mbeanDescriptorN =
                     DomUtil.getChild(mbeanN, "descriptor");
                 if (mbeanDescriptorN != null) {
                     Node firstFieldN =
@@ -127,7 +125,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                         DomUtil.setAttributes(fi, fieldN);
                         managed.addField(fi);
                     }
-                }
+                }*/
 
                 // process attribute nodes
                 firstN=DomUtil.getChild( mbeanN, "attribute");
@@ -140,7 +138,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                     DomUtil.setAttributes(ai, descN);
 
                     // Process descriptor subnode
-                    Node descriptorN =
+                    /*Node descriptorN =
                         DomUtil.getChild(descN, "descriptor");
                     if (descriptorN != null) {
                         Node firstFieldN =
@@ -152,6 +150,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                             ai.addField(fi);
                         }
                     }
+                    */
 
                     // Add this info to our managed bean info
                     managed.addAttribute( ai );
@@ -162,6 +161,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                 }
 
                 // process constructor nodes
+                /*
                 firstN=DomUtil.getChild( mbeanN, "constructor");
                 for (Node descN = firstN; descN != null;
                      descN = DomUtil.getNext( descN )) {
@@ -200,7 +200,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                         log.trace("Create constructor " + ci);
                     }
 
-                }
+                }*/
 
                 // process notification nodes
                 firstN=DomUtil.getChild( mbeanN, "notification");
@@ -213,7 +213,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                     DomUtil.setAttributes(ni, descN);
 
                     // Process descriptor subnode
-                    Node firstDescriptorN =
+                    /*Node firstDescriptorN =
                         DomUtil.getChild(descN, "descriptor");
                     if (firstDescriptorN != null) {
                         Node firstFieldN =
@@ -224,7 +224,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                             DomUtil.setAttributes(fi, fieldN);
                             ni.addField(fi);
                         }
-                    }
+                    }*/
 
                     // Process notification-type subnodes
                     Node firstParamN=DomUtil.getChild( descN, "notification-type");
@@ -254,7 +254,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                     DomUtil.setAttributes(oi, descN);
 
                     // Process descriptor subnode
-                    Node firstDescriptorN =
+                    /*Node firstDescriptorN =
                         DomUtil.getChild(descN, "descriptor");
                     if (firstDescriptorN != null) {
                         Node firstFieldN =
@@ -265,7 +265,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
                             DomUtil.setAttributes(fi, fieldN);
                             oi.addField(fi);
                         }
-                    }
+                    }*/
 
                     // Process parameter subnodes
                     Node firstParamN=DomUtil.getChild( descN, "parameter");

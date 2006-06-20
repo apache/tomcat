@@ -40,79 +40,8 @@ public class ParameterInfo extends FeatureInfo implements Serializable {
      * Standard zero-arguments constructor.
      */
     public ParameterInfo() {
-
         super();
-
     }
-
-
-    /**
-     * Special constructor for setting up parameters programatically.
-     *
-     * @param name Name of this parameter
-     * @param type Java class of this parameter
-     * @param description Description of this parameter
-     */
-    public ParameterInfo(String name, String type, String description) {
-
-        super();
-        setName(name);
-        setType(type);
-        setDescription(description);
-
-    }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The <code>MBeanParameterInfo</code> object that corresponds
-     * to this <code>ParameterInfo</code> instance.
-     */
-    transient MBeanParameterInfo info = null;
-    protected String type = null;
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Override the <code>description</code> property setter.
-     *
-     * @param description The new description
-     */
-    public void setDescription(String description) {
-        super.setDescription(description);
-        this.info = null;
-    }
-
-
-    /**
-     * Override the <code>name</code> property setter.
-     *
-     * @param name The new name
-     */
-    public void setName(String name) {
-        super.setName(name);
-        this.info = null;
-    }
-
-
-    /**
-     * The fully qualified Java class name of this parameter.
-     */
-    public String getType() {
-        return (this.type);
-    }
-
-    public void setType(String type) {
-        this.type = type;
-        this.info = null;
-    }
-
-
-    // --------------------------------------------------------- Public Methods
-
 
     /**
      * Create and return a <code>MBeanParameterInfo</code> object that
@@ -121,31 +50,10 @@ public class ParameterInfo extends FeatureInfo implements Serializable {
     public MBeanParameterInfo createParameterInfo() {
 
         // Return our cached information (if any)
-        if (info != null)
-            return (info);
-
-        // Create and return a new information object
-        info = new MBeanParameterInfo
-            (getName(), getType(), getDescription());
-        return (info);
-
-    }
-
-
-    /**
-     * Return a string representation of this parameter descriptor.
-     */
-    public String toString() {
-
-        StringBuffer sb = new StringBuffer("ParameterInfo[");
-        sb.append("name=");
-        sb.append(name);
-        sb.append(", description=");
-        sb.append(description);
-        sb.append(", type=");
-        sb.append(type);
-        sb.append("]");
-        return (sb.toString());
-
+        if (info == null) {
+            info = new MBeanParameterInfo
+                (getName(), getType(), getDescription());
+        }
+        return (MBeanParameterInfo)info;
     }
 }

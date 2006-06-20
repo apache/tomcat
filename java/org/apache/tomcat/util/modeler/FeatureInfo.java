@@ -19,11 +19,8 @@ package org.apache.tomcat.util.modeler;
 
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
-import javax.management.Descriptor;
+import javax.management.MBeanFeatureInfo;
 
 
 /**
@@ -38,12 +35,16 @@ import javax.management.Descriptor;
 
 public class FeatureInfo implements Serializable {
     static final long serialVersionUID = -911529176124712296L;
+    
     protected String description = null;
-    protected List fields = new ArrayList();
     protected String name = null;
+    protected MBeanFeatureInfo info = null;
+    
+    // all have type except Constructor
+    protected String type = null;
 
+    
     // ------------------------------------------------------------- Properties
-
 
     /**
      * The human-readable description of this feature.
@@ -54,14 +55,6 @@ public class FeatureInfo implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-
-    /**
-     * The field information for this feature.
-     */
-    public List getFields() {
-        return (fields);
     }
 
 
@@ -77,38 +70,15 @@ public class FeatureInfo implements Serializable {
         this.name = name;
     }
 
-
-    // --------------------------------------------------------- Public Methods
-
-
     /**
-     * <p>Add a new field to the fields associated with the
-     * Descriptor that will be created from this metadata.</p>
-     *
-     * @param field The field to be added
+     * The fully qualified Java class name of this element.
      */
-    public void addField(FieldInfo field) {
-        fields.add(field);
+    public String getType() {
+        return (this.type);
     }
 
-
-    // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * <p>Add the name/value fields that have been stored into the
-     * specified <code>Descriptor</code> instance.</p>
-     *
-     * @param descriptor The <code>Descriptor</code> to add fields to
-     */
-    protected void addFields(Descriptor descriptor) {
-
-        Iterator items = getFields().iterator();
-        while (items.hasNext()) {
-            FieldInfo item = (FieldInfo) items.next();
-            descriptor.setField(item.getName(), item.getValue());
-        }
-
+    public void setType(String type) {
+        this.type = type;
     }
 
 
