@@ -4056,6 +4056,7 @@ public class StandardContext
 
         // Look for a realm - that may have been configured earlier. 
         // If the realm is added after context - it'll set itself.
+        // TODO: what is the use case for this ? 
         if( realm == null && mserver != null ) {
             ObjectName realmName=null;
             try {
@@ -4546,7 +4547,7 @@ public class StandardContext
         applicationLifecycleListenersObjects = new Object[0];
         
         if(log.isDebugEnabled())
-            log.debug("resetContext " + oname + " " + mserver);
+            log.debug("resetContext " + oname);
     }
 
     /**
@@ -5183,20 +5184,18 @@ public class StandardContext
                 host.setAutoDeploy(false);
                 Registry.getRegistry(null, null)
                     .registerComponent(host, parentName, null);
-                mserver.invoke(parentName, "init", new Object[] {}, new String[] {} );
+                // We could do it the hard way...
+                //mserver.invoke(parentName, "init", new Object[] {}, new String[] {} );
+                // or same thing easier:
+                host.init();
             }
             
             // Add the main configuration listener
             LifecycleListener config = null;
             try {
-                Object configClassname = null;
-                try {
-                    configClassname = mserver.getAttribute(parentName, "configClass");
-                } catch (AttributeNotFoundException e) {
-                    // Ignore, it's normal a host may not have this optional attribute
-                }
-                if (configClassname != null) {
-                    Class clazz = Class.forName(String.valueOf(configClassname));
+                String configClassName = ((Host)getParent()).getConfigClass();
+                if (configClassName != null) {
+                    Class clazz = Class.forName(configClassName);
                     config = (LifecycleListener) clazz.newInstance();
                 } else {
                     config = new ContextConfig();
@@ -5211,8 +5210,7 @@ public class StandardContext
                 log.debug("AddChild " + parentName + " " + this);
             }
             try {
-                mserver.invoke(parentName, "addChild", new Object[] { this },
-                               new String[] {"org.apache.catalina.Container"});
+                ((Host)getParent()).addChild(this);
             } catch (Exception e) {
                 destroy();
                 throw e;
