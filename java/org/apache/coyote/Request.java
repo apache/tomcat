@@ -440,6 +440,25 @@ public final class Request {
     // -------------------- Per-Request "notes" --------------------
 
 
+    /** 
+     * Used to store private data. Thread data could be used instead - but 
+     * if you have the req, getting/setting a note is just a array access, may
+     * be faster than ThreadLocal for very frequent operations.
+     * 
+     *  Example use: 
+     *   Jk:
+     *     HandlerRequest.HOSTBUFFER = 10 CharChunk, buffer for Host decoding
+     *     WorkerEnv: SSL_CERT_NOTE=16 - MessageBytes containing the cert
+     *                
+     *   Catalina CoyoteAdapter:
+     *      ADAPTER_NOTES = 1 - stores the HttpServletRequest object ( req/res)             
+     *      
+     *   To avoid conflicts, note in the range 0 - 8 are reserved for the 
+     *   servlet container ( catalina connector, etc ), and values in 9 - 16 
+     *   for connector use. 
+     *   
+     *   17-31 range is not allocated or used.
+     */
     public final void setNote(int pos, Object value) {
         notes[pos] = value;
     }
