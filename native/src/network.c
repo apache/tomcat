@@ -1,4 +1,4 @@
-/* Copyright 2000-2005 The Apache Software Foundation
+/* Copyright 2000-2006 The Apache Software Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 /*
  *
  * @author Mladen Turk
- * @version $Revision$, $Date$
+ * @version
  */
 
 #include "tcn.h"
@@ -507,23 +507,17 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
 #endif
 
     if (tosend <= TCN_BUFFER_SZ) {
-        char sb[TCN_BUFFER_SZ];
-        (*e)->GetByteArrayRegion(e, buf, offset, tosend, (jbyte *)sb);
+        jbyte sb[TCN_BUFFER_SZ];
+        (*e)->GetByteArrayRegion(e, buf, offset, tosend, &sb[0]);
         ss = (*s->net->send)(s->opaque, sb, &nbytes);
     }
     else {
-        jbyte *bytes;
-        apr_int32_t nb;
-        apr_socket_opt_get(s->sock, APR_SO_NONBLOCK, &nb);
-        if (nb)
-            bytes = (*e)->GetPrimitiveArrayCritical(e, buf, NULL);
-        else
-            bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-        ss = (*s->net->send)(s->opaque, (char *)(bytes + offset), &nbytes);
-        if (nb)
-            (*e)->ReleasePrimitiveArrayCritical(e, buf, bytes, JNI_ABORT);
-        else
-            (*e)->ReleaseByteArrayElements(e, buf, bytes, JNI_ABORT);
+        jbyte *sb = (jbyte *)malloc(nbytes);
+        if (sb == NULL)
+            return -APR_ENOMEM;
+        (*e)->GetByteArrayRegion(e, buf, offset, tosend, sb);
+        ss = (*s->net->send)(s->opaque, sb, &nbytes);
+        free(sb);
     }
     if (ss == APR_SUCCESS)
         return (jint)nbytes;
@@ -724,9 +718,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, recv)(TCN_STDARGS, jlong sock,
     }
     else {
         jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-        ss = (*s->net->recv)(s->opaque, (char*)(bytes + offset), &nbytes);
-        (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                       nbytes ? 0 : JNI_ABORT);
+        if ((ss = (*s->net->recv)(s->opaque, (char*)(bytes + offset),
+                                  &nbytes)) == APR_SUCCESS)
+            (*e)->ReleaseByteArrayElements(e, buf, bytes,
+                                           nbytes ? 0 : JNI_ABORT);
     }
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
@@ -764,30 +759,27 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_size_t nbytes = (apr_size_t)toread;
     apr_status_t ss;
-    apr_interval_time_t t;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
 
-    if ((ss = (*s->net->timeout_get)(s->opaque, &t)) != APR_SUCCESS)
-        goto cleanup;
     if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
         goto cleanup;
     if (toread <= TCN_BUFFER_SZ) {
-        char sb[TCN_BUFFER_SZ];
-        ss = (*s->net->recv)(s->opaque, sb, &nbytes);
-        (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, (jbyte*)&sb[0]);
+        jbyte sb[TCN_BUFFER_SZ];
+        if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
+            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, &sb[0]);
     }
     else {
-        jbyte *bytes = (*e)->GetByteArrayElements(e, buf, NULL);
-        ss = (*s->net->recv)(s->opaque, (char*)(bytes + offset), &nbytes);
-        (*e)->ReleaseByteArrayElements(e, buf, bytes,
-                                       nbytes ? 0 : JNI_ABORT);
+        jbyte *sb = (jbyte *)malloc(nbytes);
+        if (sb == NULL)
+            return -APR_ENOMEM;
+        if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
+            (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, &sb[0]);
+        free(sb);
     }
-    /* Resore the original timeout */
-    (*s->net->timeout_set)(s->opaque, t);
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
         sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
@@ -913,7 +905,6 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     apr_status_t ss;
     apr_size_t nbytes = (apr_size_t)len;
     char *bytes;
-    apr_interval_time_t t;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
@@ -923,13 +914,9 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     TCN_ASSERT(bytes != NULL);
 
-    if ((ss = (*s->net->timeout_get)(s->opaque, &t)) != APR_SUCCESS)
-         return -(jint)ss;
     if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
          return -(jint)ss;
     ss = (*s->net->recv)(s->opaque, bytes + offset, &nbytes);
-    /* Resore the original timeout */
-    (*s->net->timeout_set)(s->opaque, t);
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
         sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
@@ -974,13 +961,9 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(s->opaque != NULL);
 
 
-    if ((ss = (*s->net->timeout_get)(s->opaque, &t)) != APR_SUCCESS)
-         return -(jint)ss;
     if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
          return -(jint)ss;
     ss = (*s->net->recv)(s->opaque, s->jrbbuff + offset, &nbytes);
-    /* Resore the original timeout */
-    (*s->net->timeout_set)(s->opaque, t);
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
         sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
