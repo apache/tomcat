@@ -20,7 +20,7 @@ package org.apache.catalina.startup;
 
 import javax.annotation.Resource;
 import javax.annotation.Resources;
-import javax.annotation.security.DeclaresRoles;
+import javax.annotation.security.DeclareRoles;
 import javax.annotation.security.RunAs;
 
 import org.apache.catalina.Container;
@@ -240,9 +240,9 @@ public class WebAnnotationSet {
          * Ref JSR 250, equivalent to the security-role element in
          * the deployment descriptor
          */
-        if (classClass.isAnnotationPresent(DeclaresRoles.class)) {
-            DeclaresRoles annotation = (DeclaresRoles) 
-                classClass.getAnnotation(DeclaresRoles.class);
+        if (classClass.isAnnotationPresent(DeclareRoles.class)) {
+            DeclareRoles annotation = (DeclareRoles) 
+                classClass.getAnnotation(DeclareRoles.class);
             for (int i = 0; annotation.value() != null && i < annotation.value().length; i++) {
                 context.addSecurityRole(annotation.value()[i]);
             }
