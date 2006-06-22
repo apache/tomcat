@@ -551,7 +551,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                 return false;
             }
             timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>this.readTimeout);
-            if ( !timedOut && nRead == 0 ) try {Thread.sleep(25);}catch ( Exception x ) {}
+            //if ( !timedOut && nRead == 0 ) try {Thread.sleep(5);}catch ( Exception x ) {}
         }while ( nRead == 0 && (!timedOut) );
         //else throw new IOException(sm.getString("iib.failedread"));
         return false; //timeout
