@@ -1191,32 +1191,15 @@ public class NioEndpoint {
                     log.error("",x);
                     continue;
                 }
-                //timeout
-                Set keys = selector.keys();
-                long now = System.currentTimeMillis();
-                for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-                    SelectionKey key = (SelectionKey) iter.next();
-                    try {
-                        if (key.interestOps() == SelectionKey.OP_READ) {
-                            //only timeout sockets that we are waiting for a read from
-                            KeyAttachment ka = (KeyAttachment) key.attachment();
-                            long delta = now - ka.getLastAccess();
-                            if (delta > (long) soTimeout) {
-                                cancelledKey(key);
-                            }
-                        }
-                    }catch ( CancelledKeyException ckx ) {
-                        cancelledKey(key);
-                    }
-                }
+                
             
 
-                if (keyCount == 0) continue;
+                //if (keyCount == 0) continue;
 
-                Iterator iterator = selector.selectedKeys().iterator();
+                Iterator iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
                 // Walk through the collection of ready keys and dispatch
                 // any active event.
-                while (iterator.hasNext()) {
+                while (iterator != null && iterator.hasNext()) {
                     SelectionKey sk = (SelectionKey) iterator.next();
                     iterator.remove();
                     KeyAttachment attachment = (KeyAttachment)sk.attachment();
@@ -1255,7 +1238,25 @@ public class NioEndpoint {
                     }
                 }//while
 
-                
+                //timeout
+                Set keys = selector.keys();
+                long now = System.currentTimeMillis();
+                for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
+                    SelectionKey key = (SelectionKey) iter.next();
+                    try {
+                        if (key.interestOps() == SelectionKey.OP_READ) {
+                            //only timeout sockets that we are waiting for a read from
+                            KeyAttachment ka = (KeyAttachment) key.attachment();
+                            long delta = now - ka.getLastAccess();
+                            if (delta > (long) soTimeout) {
+                                cancelledKey(key);
+                            }
+                        }
+                    }catch ( CancelledKeyException ckx ) {
+                        cancelledKey(key);
+                    }
+                }
+
             }
             synchronized (this) {
                 this.notifyAll();
