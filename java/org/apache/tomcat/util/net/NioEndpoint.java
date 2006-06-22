@@ -39,7 +39,6 @@ import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -950,7 +949,19 @@ public class NioEndpoint {
      * Process given socket.
      */
     protected boolean processSocket(SocketChannel socket) {
-        return processSocket(socket,false);
+        try {
+            if (executor == null) {
+                getWorkerThread().assign(socket);
+            }  else {
+                executor.execute(new SocketProcessor(socket));
+            }
+        } catch (Throwable t) {
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
     }
 
 
@@ -1083,8 +1094,6 @@ public class NioEndpoint {
          * @param socket to add to the poller
          */
         public void add(final SocketChannel socket) {
-            KeyAttachment att = (KeyAttachment)socket.keyFor(getPoller().getSelector()).attachment();
-            if ( att!=null )att.setCurrentAccess(false);
             final SelectionKey key = socket.keyFor(selector);
             Runnable r = new Runnable() {
                 public void run() {
@@ -1315,8 +1324,6 @@ public class NioEndpoint {
 
             // Store the newly available Socket and notify our thread
             this.socket = socket;
-            KeyAttachment att = (KeyAttachment)socket.keyFor(getPoller().getSelector()).attachment();
-            if ( att!= null ) att.setCurrentAccess(true);
             event = true;
             this.error = error;
             available = true;
