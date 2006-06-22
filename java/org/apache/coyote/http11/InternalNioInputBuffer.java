@@ -32,6 +32,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.SelectionKey;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
+import java.nio.channels.CancelledKeyException;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -564,13 +565,21 @@ public class InternalNioInputBuffer implements InputBuffer {
             if ( !timedOut && nRead == 0 ) 
                 try {
                     final SelectionKey key = socket.keyFor(poller.getSelector());
-                    KeyAttachment att = (KeyAttachment)key.attachment();
+                    final KeyAttachment att = (KeyAttachment)key.attachment();
                     att.setWakeUp(true);
                     
                     poller.addEvent(
                         new Runnable() {
                             public void run() {
-                                if ( key != null ) key.interestOps(SelectionKey.OP_READ);
+                                try {
+                                    if (key != null) key.interestOps(SelectionKey.OP_READ);
+                                } catch (CancelledKeyException ckx) {
+                                    try {
+                                        socket.socket().close();
+                                        socket.close();
+                                        att.setWakeUp(false);
+                                    } catch (Exception ignore) {}
+                                }
                             }
                     });
                     synchronized (att.getMutex()) { att.getMutex().wait(25);}
