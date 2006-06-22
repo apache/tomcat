@@ -28,6 +28,10 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
+import java.nio.channels.Selector;
+import java.nio.channels.SelectionKey;
+import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import org.apache.tomcat.util.net.NioEndpoint.Poller;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -183,7 +187,7 @@ public class InternalNioInputBuffer implements InputBuffer {
      * header.
      */
     protected long readTimeout;
-
+    private Poller poller;
 
     // ------------------------------------------------------------- Properties
 
@@ -203,6 +207,9 @@ public class InternalNioInputBuffer implements InputBuffer {
         return socket;
     }
 
+    public Poller getPoller() {
+        return poller;
+    }
 
     /**
      * Add an input filter to the filter library.
@@ -272,6 +279,9 @@ public class InternalNioInputBuffer implements InputBuffer {
         this.swallowInput = swallowInput;
     }
 
+    public void setPoller(Poller poller) {
+        this.poller = poller;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -551,7 +561,20 @@ public class InternalNioInputBuffer implements InputBuffer {
                 return false;
             }
             timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>this.readTimeout);
-            //if ( !timedOut && nRead == 0 ) try {Thread.sleep(5);}catch ( Exception x ) {}
+            if ( !timedOut && nRead == 0 ) 
+                try {
+                    final SelectionKey key = socket.keyFor(poller.getSelector());
+                    KeyAttachment att = (KeyAttachment)key.attachment();
+                    att.setWakeUp(true);
+                    
+                    poller.addEvent(
+                        new Runnable() {
+                            public void run() {
+                                if ( key != null ) key.interestOps(SelectionKey.OP_READ);
+                            }
+                    });
+                    synchronized (att.getMutex()) { att.getMutex().wait(25);}
+                }catch ( Exception x ) {}
         }while ( nRead == 0 && (!timedOut) );
         //else throw new IOException(sm.getString("iib.failedread"));
         return false; //timeout

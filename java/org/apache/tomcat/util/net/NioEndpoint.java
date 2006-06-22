@@ -1084,6 +1084,13 @@ public class NioEndpoint {
             }
             close = true;
         }
+        
+        public void addEvent(Runnable event) {
+            synchronized (events) {
+                events.add(event);
+            }
+            selector.wakeup();
+        }
 
         /**
          * Add specified socket and associated pool to the poller. The socket will
@@ -1095,15 +1102,14 @@ public class NioEndpoint {
          */
         public void add(final SocketChannel socket) {
             final SelectionKey key = socket.keyFor(selector);
+            KeyAttachment att = (KeyAttachment)key.attachment();
+            if ( att != null ) att.setWakeUp(false);
             Runnable r = new Runnable() {
                 public void run() {
                     if ( key != null ) key.interestOps(SelectionKey.OP_READ);
                 }
             };
-            synchronized (events) {
-                events.add(r);
-            }
-            selector.wakeup();
+            addEvent(r);
         }
 
         public void events() {
@@ -1217,7 +1223,10 @@ public class NioEndpoint {
                         SocketChannel channel = (SocketChannel)sk.channel();
                         boolean read = sk.isReadable();
                         if (read) {
-                            if ( comet ) {
+                            if ( attachment.getWakeUp() ) {
+                                attachment.setWakeUp(false);
+                                synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
+                            } else if ( comet ) {
                                 if (!processSocket(channel,false)) processSocket(channel,true);
                             } else {
                                 boolean close = (!processSocket(channel));
@@ -1258,7 +1267,11 @@ public class NioEndpoint {
         public boolean getComet() { return comet; }
         public boolean getCurrentAccess() { return currentAccess; }
         public void setCurrentAccess(boolean access) { currentAccess = access; }
-
+        public boolean getWakeUp() { return wakeUp; }
+        public void setWakeUp(boolean wakeUp) { this.wakeUp = wakeUp; }
+        public Object getMutex() {return mutex;}
+        protected Object mutex = new Object();
+        protected boolean wakeUp = false;
         protected long lastAccess = System.currentTimeMillis();
         protected boolean currentAccess = false;
         protected boolean comet = false;
