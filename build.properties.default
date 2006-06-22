@@ -22,6 +22,7 @@ compile.target=1.5
 compile.debug=true
 
 base-jakarta.loc=http://archive.apache.org/dist/jakarta
+base-tomcat.loc=http://archive.apache.org/dist/tomcat
 
 # ----- Commons Logging, version 1.0.1 or later -----
 commons-logging.home=${base.path}/commons-logging-1.0.4
