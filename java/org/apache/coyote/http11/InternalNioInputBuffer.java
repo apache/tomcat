@@ -567,10 +567,14 @@ public class InternalNioInputBuffer implements InputBuffer {
                 try {
                     final SelectionKey key = socket.keyFor(poller.getSelector());
                     final KeyAttachment att = (KeyAttachment)key.attachment();
-                    att.setWakeUp(true);
-                    
-                    poller.addEvent(
-                        new Runnable() {
+                    //to do, add in a check, we might have just timed out on the wait,
+                    //so there is no need to register us again.
+                    boolean addToQueue = false;
+                    try { addToQueue = ((key.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ignore ){}
+                    if ( addToQueue ) {
+                        att.setWakeUp(true);
+                        poller.addEvent(
+                            new Runnable() {
                             public void run() {
                                 try {
                                     if (key != null) key.interestOps(SelectionKey.OP_READ);
@@ -582,12 +586,16 @@ public class InternalNioInputBuffer implements InputBuffer {
                                     } catch (Exception ignore) {}
                                 }
                             }
-                    });
-                    synchronized (att.getMutex()) { att.getMutex().wait(25);}
+                        });
+                    }//end if
+                    synchronized (att.getMutex()) {
+                        if ( att.getWakeUp() ) att.getMutex().wait(25);
+                    }
                 }catch ( Exception x ) {}
         }while ( nRead == 0 && (!timedOut) );
         //else throw new IOException(sm.getString("iib.failedread"));
-        return false; //timeout
+        //return false; //timeout
+        throw new IOException("read timed out.");
     }
 
 
