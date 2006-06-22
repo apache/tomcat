@@ -559,7 +559,8 @@ public class InternalNioInputBuffer implements InputBuffer {
                 lastValid = pos + nRead;
                 return true;
             } else if (nRead == -1) {
-                return false;
+                //return false;
+                throw new IOException("end of stream reached.");
             }
             timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>this.readTimeout);
             if ( !timedOut && nRead == 0 ) 
