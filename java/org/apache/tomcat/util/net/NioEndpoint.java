@@ -1106,7 +1106,14 @@ public class NioEndpoint {
             if ( att != null ) att.setWakeUp(false);
             Runnable r = new Runnable() {
                 public void run() {
-                    if ( key != null ) key.interestOps(SelectionKey.OP_READ);
+                    try {
+                        if (key != null) key.interestOps(SelectionKey.OP_READ);
+                    }catch ( CancelledKeyException ckx ) {
+                        try {
+                            socket.socket().close();
+                            socket.close();
+                        } catch ( Exception ignore ) {}
+                    }
                 }
             };
             addEvent(r);
