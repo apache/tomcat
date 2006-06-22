@@ -110,6 +110,7 @@
       <fileset dir="${tomcat.classes}">
         <include name="javax/annotation/*" />
         <include name="javax/annotation/security/*" />
+        <include name="javax/ejb/*" />
         <include name="javax/persistence/*" />
         <include name="javax/xml/ws/*" />
         <!-- Javadoc and i18n exclusions -->
@@ -163,6 +164,7 @@
         <include name="org/apache/catalina/loader/Extension.class" />
         <include name="org/apache/catalina/loader/Reloader.class" />
         <include name="org/apache/catalina/security/SecurityClassLoad.class" />
+        <include name="org/apache/juli/**" />
         <include name="org/apache/naming/JndiPermission.class" />
         <include name="org/apache/tomcat/util/compat/*" />
         <!-- Javadoc and i18n exclusions -->
@@ -255,7 +257,10 @@
 
     <copy file="${commons-logging-api.jar}" todir="${tomcat.build}/bin" />
 
-    <!-- Copy static resource files -->
+    <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
+            file="${tomcat-native.tar.gz}" />
+
+  	<!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
       <fileset dir="conf">
         <include name="*.xml"/>
@@ -267,6 +272,10 @@
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="ROOT/**"/>
+        <include name="docs/**"/>
+        <include name="examples/**"/>
+        <include name="manager/**"/>
+        <include name="host-manager/**"/>
       </fileset>
     </copy>
 
@@ -310,12 +319,24 @@
     <delete file="${base.path}/file.zip"/>
   </target>
 
+  <target name="downloadfile" unless="exist" depends="setproxy,testexist">
+    <!-- Download extract the file -->
+    <mkdir dir="${destdir}" />
+    <get src="${sourcefile}" dest="${destfile}" />
+  </target>
+
   <target name="download"
           description="Builds and download dependent components">
 
     <antcall target="downloadgz">
       <param name="sourcefile" value="${commons-logging.loc}"/>
       <param name="destfile" value="${commons-logging.jar}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${tomcat-native.loc}"/>
+      <param name="destfile" value="${tomcat-native.tar.gz}"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
     <!-- Build Tomcat DBCP bundle -->
