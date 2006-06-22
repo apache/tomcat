@@ -623,9 +623,7 @@ public class Connector
         }
 
         if (apr) {
-            if ("HTTP/1.1/NIO".equals(protocol)) {
-                setProtocolHandlerClassName("org.apache.coyote.http11.Http11NioProtocol");
-            } else if ("HTTP/1.1".equals(protocol)) {
+            if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.http11.Http11AprProtocol");
             } else if ("AJP/1.3".equals(protocol)) {
@@ -638,9 +636,7 @@ public class Connector
                     ("org.apache.coyote.http11.Http11AprProtocol");
             }
         } else {
-            if ("HTTP/1.1/NIO".equals(protocol)) {
-                setProtocolHandlerClassName("org.apache.coyote.http11.Http11NioProtocol");
-            }else if ("HTTP/1.1".equals(protocol)) {
+            if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.http11.Http11Protocol");
             } else if ("AJP/1.3".equals(protocol)) {
