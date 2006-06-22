@@ -90,8 +90,8 @@ public class Http11NioProcessor implements ActionHook {
             readTimeout = timeout;
             //readTimeout = -1;
         }
-        inputBuffer = new InternalNioInputBuffer(request, headerBufferSize,
-                readTimeout);
+        inputBuffer = new InternalNioInputBuffer(request, headerBufferSize,readTimeout);
+        inputBuffer.setPoller(endpoint.getPoller());
         request.setInputBuffer(inputBuffer);
 
         response = new Response();
