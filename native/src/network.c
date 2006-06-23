@@ -953,7 +953,6 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_status_t ss;
     apr_size_t nbytes = (apr_size_t)len;
-    apr_interval_time_t t;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
@@ -1276,6 +1275,40 @@ TCN_IMPLEMENT_CALL(jint, Socket, acceptfilter)(TCN_STDARGS,
     UNREFERENCED(args);
     return (jint)APR_ENOTIMPL;
 #endif
+}
+
+
+TCN_IMPLEMENT_CALL(jint, Socket, dataSet)(TCN_STDARGS, jlong sock,
+                                          jstring key, jobject data)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_status_t rv = APR_SUCCESS;
+    void *old = NULL;
+    TCN_ALLOC_CSTRING(key);
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+
+    rv = apr_socket_data_set(s->sock, data, J2S(key), NULL);
+    TCN_FREE_CSTRING(key);
+    return rv;
+}
+
+TCN_IMPLEMENT_CALL(jobject, Socket, dataGet)(TCN_STDARGS, jlong socket,
+                                             jstring key)
+{
+    tcn_socket_t *s = J2P(socket, tcn_socket_t *);
+    TCN_ALLOC_CSTRING(key);
+    jobject rv = NULL;
+
+    UNREFERENCED(o);
+    TCN_ASSERT(sock != 0);
+
+    if (apr_socket_data_get(&rv, J2S(key), s->sock) != APR_SUCCESS) {
+        rv = NULL;
+    }
+    TCN_FREE_CSTRING(key);
+    return rv;
 }
 
 TCN_IMPLEMENT_CALL(jint, Mulicast, join)(TCN_STDARGS,

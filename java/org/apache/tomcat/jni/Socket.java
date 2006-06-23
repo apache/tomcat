@@ -525,4 +525,22 @@ public class Socket {
      * @param buf The ByteBuffer
      */
     public static native void setrbb(long sock, ByteBuffer buf);
+
+    /**
+     * Set the data associated with the current socket.
+     * @param sock The currently open socket.
+     * @param data The user data to associate with the socket.
+     * @param key The key to associate with the data.
+     * @param cleanup The cleanup to call when the socket is destroyed.
+     */
+      public static native int dataSet(long sock, String key, Object data);
+
+    /**
+     * Return the data associated with the current socket
+     * @param data The user data associated with the socket.
+     * @param key The key to associate with the user data.
+     * @param sock The currently open socket.
+     * @return Data or null in case of error.
+     */
+     public static native Object dataGet(long sock, String key);
 }
