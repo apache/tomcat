@@ -1277,13 +1277,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, acceptfilter)(TCN_STDARGS,
 #endif
 }
 
-
 TCN_IMPLEMENT_CALL(jint, Socket, dataSet)(TCN_STDARGS, jlong sock,
                                           jstring key, jobject data)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_status_t rv = APR_SUCCESS;
-    void *old = NULL;
     TCN_ALLOC_CSTRING(key);
 
     UNREFERENCED(o);
