@@ -34,8 +34,9 @@ commons-logging.loc=${base-jakarta.loc}/commons/logging/binaries/commons-logging
 # ----- Eclipse JDT, version 3.2 or later -----
 jdt.home=${base.path}/eclipse/plugins
 jdt.lib=${jdt.home}
-jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.2.0.v_661.jar
-jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/S-3.2RC2-200604281315/eclipse-JDT-3.2RC2.zip
+jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.2.0.v_670.jar
+jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/S-3.2RC7-200606021317/eclipse-JDT-3.2RC7.zip
+#jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/S-3.2RC2-200604281315/eclipse-JDT-3.2RC2.zip
 
 # ----- Tomcat native library -----
 tomcat-native.home=${base.path}/tomcat-native-1.1.3
