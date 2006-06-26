@@ -1187,7 +1187,7 @@ public class NioEndpoint {
                 int keyCount = 0;
                 try {
                     keyCount = selector.select(selectorTimeout);
-                } catch (IOException x) {
+                } catch (Throwable x) {
                     log.error("",x);
                     continue;
                 }
