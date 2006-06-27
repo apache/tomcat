@@ -357,7 +357,9 @@ public class Request
      */
     protected String localName = null;
 
+
     // --------------------------------------------------------- Public Methods
+
 
     /**
      * Release all object references, and initialize instance variables, in
@@ -424,6 +426,14 @@ public class Request
 
     }
 
+
+    /**
+     * Clear cached encoders (to save memory for Comet requests).
+     */
+    public void clearEncoders() {
+        inputBuffer.clearEncoders();
+    }
+    
 
     // -------------------------------------------------------- Request Methods
 
