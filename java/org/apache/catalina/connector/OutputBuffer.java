@@ -228,6 +228,14 @@ public class OutputBuffer extends Writer
 
 
     /**
+     * Clear cached encoders (to save memory for Comet requests).
+     */
+    public void clearEncoders() {
+        encoders.clear();
+    }
+    
+    
+    /**
      * Close the output buffer. This tries to calculate the response size if 
      * the response has not been committed yet.
      * 

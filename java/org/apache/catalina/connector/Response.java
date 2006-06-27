@@ -286,6 +286,14 @@ public class Response
     }
 
 
+    /**
+     * Clear cached encoders (to save memory for Comet requests).
+     */
+    public void clearEncoders() {
+        outputBuffer.clearEncoders();
+    }
+    
+
     // ------------------------------------------------------- Response Methods
 
 

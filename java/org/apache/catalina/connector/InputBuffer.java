@@ -237,6 +237,14 @@ public class InputBuffer extends Reader
 
 
     /**
+     * Clear cached encoders (to save memory for Comet requests).
+     */
+    public void clearEncoders() {
+        encoders.clear();
+    }
+    
+    
+    /**
      * Close the input buffer.
      * 
      * @throws IOException An underlying IOException occurred
@@ -493,6 +501,5 @@ public class InputBuffer extends Reader
         }
 
     }
-
 
 }

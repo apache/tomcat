@@ -241,6 +241,11 @@ public class CoyoteAdapter
             if (!comet) {
                 request.recycle();
                 response.recycle();
+            } else {
+                // Clear converters so that the minimum amount of memory 
+                // is used by this processor
+                request.clearEncoders();
+                response.clearEncoders();
             }
         }
 
