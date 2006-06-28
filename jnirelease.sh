@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+# APRDIR have to be the location of the APR sources
+APRDIR=$HOME/apr
+#
 # Replace JKJNIEXT with branche/or tag
 #  and JKJNIVER by the version like -1.1.0
 JKJNIEXT="trunk"
@@ -32,11 +35,11 @@ svn cat $SVNBASE/${JKJNIEXT}/jni/README.txt > ${JKJNIDIST}/README.txt
 # Prebuild
 cd ${JKJNIDIST}/jni/native
 # Adjust the location of APR sources
-./buildconf --with-apr=$HOME/apr
+./buildconf --with-apr=$APRDIR
 cd ../../../
 # Create distribution
 tar cvf ${JKJNIDIST}.tar ${JKJNIDIST}
 gzip ${JKJNIDIST}.tar
 # Convert lineends to DOS
-perl srclib/apr/build/lineends.pl --cr ${JKJNIDIST}
+perl $APRDIR/build/lineends.pl --cr ${JKJNIDIST}
 zip -9 -r  ${JKJNIDIST}.zip ${JKJNIDIST}
