@@ -14,28 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Replace JKJNITAG with real tag, like TOMCAT_NATIVE_1_1_0
-JKJNITAG=HEAD
-# Replace JKJNIEXT with tagged version number, like 1.1.0
-JKJNIEXT="current"
-JKJNIVER="-${JKJNIEXT}"
-JKJNICVST=jakarta-tomcat-connectors
-export CVSROOT=:pserver:anoncvs@cvs.apache.org:/home/cvspublic
-JKJNIDIST=tomcat-native${JKJNIVER}
+# Replace JKJNIEXT with branche/or tag
+#  and JKJNIVER by the version like -1.1.0
+JKJNIEXT="trunk"
+JKJNIVER="-dev"
+SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
+JKJNIDIST=tomcat-connectors${JKJNIVER}
 rm -rf ${JKJNIDIST}
-rm -f ${JKJNIDIST}.*
-cvs export -N -r $JKJNITAG jakarta-tomcat-connectors/KEYS
-cvs export -N -r $JKJNITAG jakarta-tomcat-connectors/LICENSE
-cvs export -N -r $JKJNITAG jakarta-tomcat-connectors/NOTICE
-cvs export -N -r $JKJNITAG jakarta-tomcat-connectors/jni/NOTICE.txt
-cvs export -N -r $JKJNITAG jakarta-tomcat-connectors/jni/README.txt
-cvs export -N -r $JKJNITAG jakarta-tomcat-connectors/jni/native
-mv ${JKJNICVST} ${JKJNIDIST}
+mkdir -p ${JKJNIDIST}/jni
+svn export $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
+svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKJNIDIST}/KEYS
+svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKJNIDIST}/LICENSE
+svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKJNIDIST}/NOTICE
+svn cat $SVNBASE/${JKJNIEXT}/jni/NOTICE.txt > ${JKJNIDIST}/NOTICE.txt
+svn cat $SVNBASE/${JKJNIEXT}/jni/README.txt > ${JKJNIDIST}/README.txt
 
 # Prebuild
 cd ${JKJNIDIST}/jni/native
 # Adjust the location of APR sources
-./buildconf --with-apr=../../../srclib/apr
+./buildconf --with-apr=$HOME/apr
 cd ../../../
 # Create distribution
 tar cvf ${JKJNIDIST}.tar ${JKJNIDIST}
