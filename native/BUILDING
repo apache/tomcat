@@ -17,7 +17,7 @@
   2 - In bin/setenv.sh add the following: 
     CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
     In my machine I am using:
-    /home/jfclere/jakarta-tomcat-connectors/jni/native/.libs for tclib_location
+    /home/jfclere/tomcat-connectors/jni/native/.libs for tclib_location
 
 NOTES:
   - configure --without-ssl : Configure without ssl support.
@@ -28,4 +28,3 @@ NOTES:
   - For MAC OS X you must manually add a link
     cd ${tcnative installdir}
     ln -d libtcnative-1.dylib libtcnative-1.jnilib
-    
