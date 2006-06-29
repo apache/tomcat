@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -79,6 +80,10 @@ import org.apache.catalina.security.SecurityUtil;
 
 public class StandardSession
     implements HttpSession, Session, Serializable {
+
+
+    protected static final boolean ACTIVITY_CHECK = 
+        Boolean.valueOf(System.getProperty("org.apache.catalina.session.StandardSession.ACTIVITY_CHECK", "false")).booleanValue();
 
 
     // ----------------------------------------------------------- Constructors
@@ -272,9 +277,9 @@ public class StandardSession
     /**
      * The access count for this session.
      */
-    protected transient int accessCount = 0;
+    protected transient AtomicInteger accessCount = null;
 
-
+    
     // ----------------------------------------------------- Session Properties
 
 
@@ -568,7 +573,7 @@ public class StandardSession
             return false;
         }
 
-        if (accessCount > 0) {
+        if (ACTIVITY_CHECK && accessCount.get() > 0) {
             return true;
         }
 
@@ -606,7 +611,10 @@ public class StandardSession
 
         this.lastAccessedTime = this.thisAccessedTime;
         this.thisAccessedTime = System.currentTimeMillis();
-        accessCount++;
+        
+        if (ACTIVITY_CHECK) {
+            accessCount.incrementAndGet();
+        }
 
     }
 
@@ -617,7 +625,10 @@ public class StandardSession
     public void endAccess() {
 
         isNew = false;
-        accessCount--;
+
+        if (ACTIVITY_CHECK) {
+            accessCount.decrementAndGet();
+        }
 
     }
 
@@ -697,7 +708,7 @@ public class StandardSession
                     }
                 }
             }
-            accessCount = 0;
+            accessCount = null;
             setValid(false);
 
             /*
@@ -775,6 +786,11 @@ public class StandardSession
      */
     public void activate() {
 
+        // Initialize access count
+        if (ACTIVITY_CHECK) {
+            accessCount = new AtomicInteger();
+        }
+        
         // Notify interested session event listeners
         fireSessionEvent(Session.SESSION_ACTIVATED_EVENT, null);
 
@@ -837,7 +853,7 @@ public class StandardSession
         id = null;
         lastAccessedTime = 0L;
         maxInactiveInterval = -1;
-        accessCount = 0;
+        accessCount = null;
         notes.clear();
         setPrincipal(null);
         isNew = false;
