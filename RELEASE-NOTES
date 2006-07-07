@@ -1,0 +1,174 @@
+
+
+                     Apache Tomcat Version @VERSION@
+                            Release Notes
+
+
+$Id: RELEASE-NOTES 351503 2005-12-01 22:12:48Z keith $
+
+
+=============================
+KNOWN ISSUES IN THIS RELEASE:
+=============================
+
+* Dependency Changes
+* JNI Based Applications
+* Bundled APIs
+* Web application reloading and static fields in shared libraries
+* Tomcat on Linux
+* Enabling SSI and CGI Support
+* Security manager URLs
+* Symlinking static resources
+* Enabling invoker servlet
+* Viewing the Tomcat Change Log
+* When all else fails
+
+
+===================
+Dependency Changes:
+===================
+Tomcat 5.5 is designed to run on J2SE 5.0 and later, and requires
+configuration to run on J2SE 1.4.  Make sure to read the "RUNNING.txt" 
+file in the fulldocs downloadable file(s) if you are using J2SE 1.4.
+
+In addition, Tomcat 5.5 uses the Eclipse JDT Java compiler for compiling
+JSP pages.  This means you no longer need to have the complete
+Java Development Kit (JDK) to run Tomcat, but a Java Runtime Environment
+(JRE) is sufficient.  The Eclipse JDT Java compiler is bundled with the 
+binary Tomcat distributions.  Tomcat can also be configured to use the
+compiler from the JDK to compile JSPs, or any other Java compiler supported 
+by Apache Ant.
+
+
+=======================
+JNI Based Applications:
+=======================
+Applications that require native libraries must ensure that the libraries have
+been loaded prior to use.  Typically, this is done with a call like:
+
+  static {
+    System.loadLibrary("path-to-library-file");
+  }
+
+in some class.  However, the application must also ensure that the library is
+not loaded more than once.  If the above code were placed in a class inside
+the web application (i.e. under /WEB-INF/classes or /WEB-INF/lib), and the
+application were reloaded, the loadLibrary() call would be attempted a second
+time.
+
+To avoid this problem, place classes that load native libraries outside of the
+web application, and ensure that the loadLibrary() call is executed only once
+during the lifetime of a particular JVM.
+
+
+=============
+Bundled APIs:
+=============
+A standard installation of Tomcat 5.5 makes all of the following APIs available
+for use by web applications (by placing them in "common/lib" or "shared/lib"):
+* commons-el.jar (Commons Expression Language 1.0)
+* commons-logging-api.jar (Commons Logging API 1.0.x)
+* jasper-compiler.jar (Jasper 2 Compiler)
+* jasper-compiler-jdt.jar (Eclipse JDT Java compiler)
+* jasper-runtime.jar (Jasper 2 Runtime)
+* jsp-api.jar (JSP 2.0 API)
+* naming-common.jar (JNDI Context implementation)
+* naming-factory.jar (JNDI object factories for J2EE ENC support)
+* naming-factory-dbcp.jar (DataSource implementation based on commons-dbcp)
+* naming-resources.jar (JNDI DirContext implementations)
+* servlet-api.jar (Servlet 2.4 API)
+
+Installing the compatibility package will add the following to the list, which are
+needed when running on J2SE 1.4:
+* jmx.jar (Java Management Extensions API 1.2 or later)
+* xercesImpl.jar (Xerces XML Parser, version 2.6.2 or later)
+
+You can make additional APIs available to all of your web applications by
+putting unpacked classes into a "classes" directory (not created by default),
+or by placing them in JAR files in the "lib" directory.
+
+To override the XML parser implementation or interfaces, use the endorsed
+mechanism of the JVM. The default configuration defines JARs located in 
+"common/endorsed" as endorsed.
+
+
+================================================================
+Web application reloading and static fields in shared libraries:
+================================================================
+Some shared libraries (many are part of the JDK) keep references to objects
+instantiated by the web application. To avoid class loading related problems
+(ClassCastExceptions, messages indicating that the classloader
+is stopped, etc.), the shared libraries state should be reinitialized.
+
+Something which might help is to avoid putting classes which would be
+referenced by a shared static field in the web application classloader,
+and putting them in the shared classloader instead (JARs should be put in the
+"lib" folder, and classes should be put in the "classes" folder).
+
+
+================
+Tomcat on Linux:
+================
+GLIBC 2.2 / Linux 2.4 users should define an environment variable:
+export LD_ASSUME_KERNEL=2.2.5
+
+Redhat Linux 9.0 users should use the following setting to avoid
+stability problems:
+export LD_ASSUME_KERNEL=2.4.1
+
+
+=============================
+Enabling SSI and CGI Support:
+=============================
+Because of the security risks associated with CGI and SSI available
+to web applications, these features are disabled by default.  
+
+To enable and configure CGI support, please see the cgi-howto.html page.
+
+To enable and configue SSI support, please see the ssi-howto.html page.
+
+
+======================
+Security manager URLs:
+======================
+In order to grant security permissions to JARs located inside the
+web application repository, use URLs of of the following format
+in your policy file:
+
+file:${catalina.home}/webapps/examples/WEB-INF/lib/driver.jar
+
+
+============================
+Symlinking static resources:
+============================
+By default, Unix symlinks will not work when used in a web application to link
+resources located outside the web application root directory.
+
+This behavior is optional, and the "allowLinking" flag may be used to disable
+the check.
+
+
+=========================
+Enabling invoker servlet:
+=========================
+Starting with Tomcat 4.1.12, the invoker servlet is no longer available by
+default in all webapps. Enabling it for all webapps is possible by editing
+$CATALINA_HOME/conf/web.xml to uncomment the "/servlet/*" servlet-mapping
+definition.
+
+Using the invoker servlet in a production environment is not recommended and
+is unsupported.  More details are available on the Tomcat FAQ at
+http://tomcat.apache.org/faq/misc.html#invoker.
+
+
+==============================
+Viewing the Tomcat Change Log:
+==============================
+See changelog.html in this directory.
+
+
+====================
+When all else fails:
+====================
+See the FAQ
+http://tomcat.apache.org/faq/

@@ -1,0 +1,766 @@
+<project name="Tomcat 6.0" default="release" basedir=".">
+
+
+	  <!-- ===================== Initialize Property Values =================== -->
+
+	  <!-- See "build.properties.sample" in the top level directory for all     -->
+	  <!-- property values you must customize for successful building!!!        -->
+	  <property file="${user.home}/build.properties"/>
+	  <property file="build.properties"/>
+
+	  <property file="build.properties.default"/>
+
+	  <!-- Project Properties -->
+	  <property name="name"                  value="Apache Tomcat" />
+	  <property name="year"                  value="2005" />
+	  <property name="version.major"         value="6" />
+	  <property name="version.minor"         value="0" />
+	  <property name="version.build"         value="0" />
+	  <property name="version.patch"         value="0" />
+	  <property name="version"               value="6.0.0-dev" />
+	  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+
+	  <property name="project"               value="apache-tomcat" />
+	  <property name="final.name"            value="${project}-${version}" />
+	  <property name="final-src.name"        value="${project}-${version}-src" />
+
+	  <!-- Build Defaults -->
+	  <property name="tomcat.build"      value="${basedir}/build"/>
+	  <property name="tomcat.classes"    value="${basedir}/classes"/>
+	  <property name="tomcat.dist"       value="${basedir}/dist"/>
+	  <property name="tomcat.deployer"   value="${basedir}/deployer"/>
+	  <property name="tomcat.release"    value="${basedir}/release"/>
+	  <property name="test.failonerror"  value="true"/>
+	  <property name="test.runner"       value="junit.textui.TestRunner"/>
+
+	  <!-- Can't be lower - jsp uses templates -->
+	  <property name="compile.source" value="1.5"/>
+
+	  <!-- JAR artifacts -->
+	  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
+
+	  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
+	  <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
+	  <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
+	  <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
+	  <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
+	  <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
+	  <property name="catalina-ant-jmx.jar" value="${tomcat.build}/lib/catalina-ant-jmx.jar"/>
+	  <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+
+	  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
+	  <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
+
+	  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
+	  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
+	  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
+	  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+
+
+  <target name="build-webapps-precompile" description="Precompile webapps" >
+
+    <!-- JSPC -->
+    <property name="admin.base" location="${tomcat.build}/server/webapps/admin" />
+    <property name="ROOT.base" location="${tomcat.build}/webapps/ROOT" />
+    <property name="jsp-examples.base" location="${tomcat.build}/webapps/jsp-examples" />
+
+    <mkdir dir="${admin.base}/WEB-INF/src/admin" />
+    <mkdir dir="${ROOT.base}/WEB-INF/src" />
+    <mkdir dir="${ROOT.base}/WEB-INF/classes" />
+    <mkdir dir="${jsp-examples.base}/WEB-INF/src" />
+
+    <path id="jspc.classpath">
+      <pathelement location="${java.home}/../lib/tools.jar"/>
+      <pathelement location="${commons-logging-api.jar}"/>
+      <fileset dir="${tomcat.build}/lib">
+        <include name="*.jar"/>
+      </fileset>
+      <pathelement location="${tomcat.build}/classes"/>
+    </path>
+
+    <taskdef classname="org.apache.jasper.JspC" name="jasper2" >
+      <classpath refid="jspc.classpath"/>
+    </taskdef>
+
+    <jasper2
+             compile="false"
+             validateXml="false"
+             uriroot="${ROOT.base}"
+             webXmlFragment="${ROOT.base}/WEB-INF/generated_web.xml"
+             addWebXmlMappings="true"
+             outputDir="${ROOT.base}/WEB-INF/src" />
+
+    <jasper2
+             compile="false"
+             validateXml="false"
+             uriroot="${jsp-examples.base}"
+         webXmlFragment="${jsp-examples.base}/WEB-INF/generated_web.xml"
+             addWebXmlMappings="true"
+             outputDir="${jsp-examples.base}/WEB-INF/src" />
+
+    <jasper2
+             package="admin"
+             compile="false"
+             validateXml="false"
+             uriroot="${admin.base}"
+             webXmlFragment="${admin.base}/WEB-INF/generated_web.xml"
+             addWebXmlMappings="true"
+             outputDir="${admin.base}/WEB-INF/src/admin" />
+
+    <javac destdir="${ROOT.base}/WEB-INF/classes"
+           optimize="off"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           failonerror="false"
+           srcdir="${ROOT.base}/WEB-INF/src"
+       excludes="**/*.smap">
+      <classpath>
+        <pathelement location="${java.home}/../lib/tools.jar"/>
+        <fileset dir="${tomcat.build}/server/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.build}/common/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${tomcat.build}/classes"/>
+      </classpath>
+      <include name="**" />
+    </javac>
+
+    <mkdir dir="${jsp-examples.base}/WEB-INF/src/tags"/>
+    <copy todir="${jsp-examples.base}/WEB-INF/classes">
+      <fileset dir="${jsp-examples.base}/WEB-INF/src">
+        <include name="**/*.class" />
+      </fileset>
+    </copy>
+
+    <javac destdir="${jsp-examples.base}/WEB-INF/classes"
+           optimize="off"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           failonerror="false"
+           srcdir="${jsp-examples.base}/WEB-INF/src"
+       excludes="**/*.smap">
+      <classpath>
+        <pathelement location="${java.home}/../lib/tools.jar"/>
+        <fileset dir="${tomcat.build}/server/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${jsp-examples.base}/WEB-INF/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.build}/common/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${tomcat.build}/classes"/>
+        <pathelement location="${jsp-examples.base}/WEB-INF/classes"/>
+      </classpath>
+      <include name="**" />
+      <exclude name="tags/**" />
+    </javac>
+
+    <javac destdir="${admin.base}/WEB-INF/classes"
+           optimize="off"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           failonerror="false"
+           srcdir="${admin.base}/WEB-INF/src"
+       excludes="**/*.smap">
+      <classpath>
+        <pathelement location="${java.home}/../lib/tools.jar"/>
+        <fileset dir="${tomcat.build}/server/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${admin.base}/WEB-INF/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <fileset dir="${tomcat.build}/common/lib">
+          <include name="*.jar"/>
+        </fileset>
+        <pathelement location="${tomcat.build}/classes"/>
+      </classpath>
+      <include name="admin/**" />
+    </javac>
+  </target>
+
+  <target name="fix-webapps">
+    <!-- Extra build steps for webapps -->
+
+    <filter token="VERSION" value="${version}"/>
+
+    <!-- Add release notes to the root webapp -->
+    <copy file="${basedir}/RELEASE-NOTES"
+        tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt"
+        filtering="true" />
+
+    <!-- Add documents to the tomcat-docs webapp -->
+    <copy file="${basedir}/resources/build.xml"
+        todir="${tomcat.build}/webapps/tomcat-docs" />
+    <copy file="./RELEASE-NOTES"
+        tofile="${tomcat.build}/webapps/tomcat-docs/RELEASE-NOTES.txt"
+        filtering="true" />
+
+    <!-- Build JARs for webapps classes -->
+    <mkdir dir="${tomcat.build}/server/webapps/admin/WEB-INF/lib" />
+    <jar jarfile="${tomcat.build}/server/webapps/admin/WEB-INF/lib/catalina-admin.jar"
+         index="true">
+       <fileset dir="${tomcat.build}/server/webapps/admin/WEB-INF/classes">
+          <include name="**/*.class" />
+          <include name="**/*.properties" />
+       </fileset>
+    </jar>
+    <mkdir dir="${tomcat.build}/server/webapps/manager/WEB-INF/lib" />
+    <jar jarfile="${tomcat.build}/server/webapps/manager/WEB-INF/lib/catalina-manager.jar"
+         index="true">
+       <fileset dir="${tomcat.build}/server/webapps/manager/WEB-INF/classes">
+          <include name="**/*.class" />
+          <include name="**/*.properties" />
+       </fileset>
+    </jar>
+    <mkdir dir="${tomcat.build}/server/webapps/host-manager/WEB-INF/lib" />
+    <jar jarfile="${tomcat.build}/server/webapps/host-manager/WEB-INF/lib/catalina-host-manager.jar"
+         index="true">
+       <fileset dir="${tomcat.build}/server/webapps/host-manager/WEB-INF/classes">
+          <include name="**/*.class" />
+          <include name="**/*.properties" />
+       </fileset>
+    </jar>
+    <mkdir dir="${tomcat.build}/webapps/balancer/WEB-INF/lib" />
+    <jar jarfile="${tomcat.build}/webapps/balancer/WEB-INF/lib/catalina-balancer.jar"
+         index="true">
+       <fileset dir="${tomcat.build}/webapps/balancer/WEB-INF/classes">
+          <include name="**/*.class" />
+          <include name="**/*.properties" />
+       </fileset>
+    </jar>
+    <mkdir dir="${tomcat.build}/webapps/ROOT/WEB-INF/lib" />
+    <jar jarfile="${tomcat.build}/webapps/ROOT/WEB-INF/lib/catalina-root.jar"
+         index="true">
+       <fileset dir="${tomcat.build}/webapps/ROOT/WEB-INF/classes">
+          <include name="**/*.class" />
+          <include name="**/*.properties" />
+       </fileset>
+    </jar>
+
+    <!-- Add XML declarations for admin, manager and balancer -->
+    <copy file="${tomcat.build}/server/webapps/manager/manager.xml"
+         todir="${tomcat.build}/conf/Catalina/localhost" />
+    <copy file="${tomcat.build}/server/webapps/host-manager/host-manager.xml"
+         todir="${tomcat.build}/conf/Catalina/localhost" />
+    <copy file="${tomcat.build}/server/webapps/admin/admin.xml"
+         todir="${tomcat.build}/conf/Catalina/localhost" />
+
+  </target>
+
+  <!-- ====================== Deployer target =================== -->
+
+  <target name="deployer" description="Create the Tomcat deployer binary" >
+
+    <!-- Servlet and JSP -->
+    <copy todir="${tomcat.deployer}/lib">
+      <fileset dir="${tomcat.build}/lib">
+        <include name="el-api.jar"/>
+        <include name="jasper-el.jar"/>
+        <include name="jsp-api.jar"/>
+        <include name="jasper.jar"/>
+        <include name="servlet-api.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- Digester and dependencies -->
+    <copy todir="${tomcat.deployer}/lib"
+           file="${tomcat.build}/lib/catalina-ant.jar"/>
+    <copy todir="${tomcat.deployer}/lib" file="${commons-logging-api.jar}"/>
+    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar">
+       <fileset dir="${tomcat.build}/classes">
+          <include name="org/apache/catalina/startup/DigesterFactory.class" />
+          <include name="org/apache/catalina/util/SchemaResolver.class" />
+          <include name="org/apache/catalina/util/StringManager.class" />
+          <include name="org/apache/tomcat/util/*" />
+          <include name="org/apache/tomcat/util/digester/*" />
+          <exclude name="**/package.html" />
+          <exclude name="**/LocalStrings_*" />
+       </fileset>
+    </jar>
+
+    <!-- Main build script -->
+    <copy todir="${tomcat.deployer}">
+      <fileset dir="${basedir}/res/deployer" />
+    </copy>
+
+    <!-- Copy deployer documentation -->
+    <copy todir="${tomcat.deployer}">
+      <fileset dir="${tomcat.build}/webapps/docs">
+        <include name="images/jakarta-logo.gif" />
+        <include name="images/tomcat.gif" />
+      </fileset>
+    </copy>
+    <copy tofile="${tomcat.deployer}/docs/manual.html"
+      file="${tomcat.build}/webapps/docs/printer/deployer-howto.html" />
+
+  </target>
+
+  <!-- ====================== COMBO: Clean All Directories ================ -->
+  <target name="clean"
+   description="Clean all components">
+
+    <delete dir="${tomcat.deployer}"/>
+    <delete dir="${tomcat.dist}" failonerror="false"/>
+
+  </target>
+
+
+  <!-- ====================== DIST: Create Directories ==================== -->
+  <target name="dist-prepare">
+    <mkdir dir="${tomcat.dist}"/>
+    <mkdir dir="${tomcat.dist}/bin"/>
+    <mkdir dir="${tomcat.dist}/conf"/>
+    <mkdir dir="${tomcat.dist}/lib"/>
+    <mkdir dir="${tomcat.dist}/logs"/>
+    <mkdir dir="${tomcat.dist}/temp"/>
+    <mkdir dir="${tomcat.dist}/webapps"/>
+    <mkdir dir="${tomcat.dist}/work"/>
+  </target>
+
+
+  <!-- ====================== DIST: Copy Static Files ===================== -->
+  <target name="dist-static" depends="dist-prepare">
+
+    <!-- Copy the top-level documentation files -->
+    <copy todir="${tomcat.dist}">
+      <fileset dir=".">
+        <include name="INSTALLING.txt"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE*"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
+    </copy>
+
+    <!-- Copy the contents of each "build" directory -->
+    <copy todir="${tomcat.dist}/bin">
+      <fileset dir="${tomcat.build}/bin">
+      </fileset>
+    </copy>
+    <copy todir="${tomcat.dist}/lib">
+      <fileset dir="${tomcat.build}/lib" />
+    </copy>
+    <copy todir="${tomcat.dist}/conf">
+      <fileset dir="${tomcat.build}/conf">
+      </fileset>
+    </copy>
+
+  	<copy todir="${tomcat.dist}/webapps">
+      <fileset dir="${tomcat.build}/webapps">
+        <exclude name="**/balancer/WEB-INF/classes/**" />
+        <exclude name="**/ROOT/WEB-INF/classes/**" />
+        <exclude name="**/WEB-INF/src/**" />
+      </fileset>
+    </copy>
+
+    <!-- Bugzilla 37035: http://issues.apache.org/bugzilla/show_bug.cgi?id=37035 -->
+    <touch file="${tomcat.dist}/temp/bugzilla37035-safeToDelete.tmp" />
+
+    <!-- Correct permissions and line endings on "bin" scripts -->
+    <fixcrlf srcdir="${tomcat.dist}/bin"   includes="*.sh"  eol="lf"/>
+    <fixcrlf srcdir="${tomcat.dist}/bin"   includes="*.bat" eol="crlf"/>
+    <chmod      dir="${tomcat.dist}/bin"   includes="*.sh"  perm="+x"/>
+
+  </target>
+
+  <target name="dist-javadoc" description="Create the Tomcat javadoc" >
+    <javadoc packagenames="org.apache.*"
+      sourcepath="${tomcat.dist}/src/java"
+      destdir="${tomcat.dist}/webapps/docs/api"
+      author="true" version="true"
+      windowtitle="Tomcat API Documentation"
+      doctitle="Tomcat API"
+      bottom="Copyright &#169; 2000-2006 Apache Software Foundation.  All Rights Reserved."
+      additionalparam="-breakiterator">
+    </javadoc>
+  </target>
+
+  <target name="dist-deployer" description="Create the Tomcat deployer binary" >
+
+    <!-- Servlet and JSP -->
+    <copy todir="${tomcat.deployer}/lib">
+      <fileset dir="${tomcat.build}/lib">
+        <include name="el-api.jar"/>
+        <include name="jsp-api.jar"/>
+        <include name="jasper.jar"/>
+        <include name="jasper-el.jar"/>
+        <include name="servlet-api.jar"/>
+      </fileset>
+    </copy>
+
+    <!-- Digester and dependencies -->
+    <copy todir="${tomcat.deployer}/lib"
+           file="${tomcat.build}/lib/catalina-ant.jar"/>
+    <copy todir="${tomcat.deployer}/lib" file="${commons-logging.jar}"/>
+    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar">
+       <fileset dir="${tomcat.classes}">
+          <include name="org/apache/catalina/startup/DigesterFactory.class" />
+          <include name="org/apache/catalina/util/SchemaResolver.class" />
+          <include name="org/apache/catalina/util/StringManager.class" />
+          <include name="org/apache/tomcat/util/*" />
+          <include name="org/apache/tomcat/util/digester/*" />
+          <exclude name="**/package.html" />
+          <exclude name="**/LocalStrings_*" />
+       </fileset>
+    </jar>
+
+    <!-- Main build script -->
+    <copy todir="${tomcat.deployer}">
+      <fileset dir="${basedir}/res/deployer" />
+    </copy>
+
+    <!-- Copy deployer documentation -->
+    <copy todir="${tomcat.deployer}">
+      <fileset dir="${tomcat.build}/webapps/docs">
+        <include name="images/jakarta-logo.gif" />
+        <include name="images/tomcat.gif" />
+      </fileset>
+    </copy>
+    <copy tofile="${tomcat.deployer}/docs/manual.html"
+      file="${tomcat.build}/webapps/docs/printer/deployer-howto.html" 
+      failonerror="false"/>
+
+  </target>
+
+  <!-- ====================== DIST: Create Sources ======================== -->
+  <target name="dist-source">
+
+    <mkdir dir="${tomcat.dist}/src"/>
+
+    <!-- Tomcat source -->
+    <copy todir="${tomcat.dist}/src">
+      <fileset dir="${basedir}">
+        <exclude name=".*/**"/>
+        <exclude name="build/**"/>
+        <exclude name="classes/**"/>
+        <exclude name="dist/**"/>
+        <exclude name="release/**"/>
+        <exclude name="deployer/**"/>
+        <exclude name="build.properties"/>
+      </fileset>
+    </copy>
+
+  </target>
+
+
+  <!-- ================= DIST: Create Windows Installer =================== -->
+  <target name="installer"
+   description="Create Windows installer" if="execute.installer">
+    <echo message="Builds a Windows installer based on Nullsoft Installer"/>
+    <copy todir="${tomcat.dist}">
+      <fileset dir="resources" />
+    </copy>
+    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
+    <copy file="${jtc.home}/procrun/bin/tomcat5.exe"
+        tofile="${tomcat.dist}/bin/tomcat5.exe" />
+    <copy file="${jtc.home}/procrun/bin/tomcat5w.exe"
+        tofile="${tomcat.dist}/bin/tomcat5w.exe" />
+
+    <filter token="VERSION" value="${version}"/>
+    <filter token="VERSION_NUMBER" value="${version.number}"/>
+
+    <copy file="tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" filtering="true"/>
+    <exec dir="${tomcat.dist}" executable="${nsis.exe}">
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="tomcat.nsi" />
+    </exec>
+
+    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}.exe"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" 
+                      message="${md5sum.binary-prefix}${final.name}.exe${line.separator}" append="true" />
+  </target>
+
+
+  <!-- ==================== RELEASE: Create Release ======================= -->
+  <target name="release" depends="clean,dist-static,dist-source,dist-javadoc,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,package-admin-zip,package-admin-tgz,package-src-zip,package-src-tgz,package-docs-tgz"
+   description="Create a Tomcat 5 packaged distribution">
+
+    <filter token="VERSION" value="${version}"/>
+    <copy file="KEYS"
+         todir="${tomcat.release}/v${version}"/>
+    <copy file="RELEASE-NOTES"
+         todir="${tomcat.release}/v${version}"
+     filtering="true"/>
+    <copy file="res/welcome.main.html"
+        tofile="${tomcat.release}/v${version}/README.html"
+     filtering="true"/>
+    <copy file="res/welcome.bin.html"
+        tofile="${tomcat.release}/v${version}/bin/README.html"
+     filtering="true"/>
+
+    <!-- This is why releasing must be done on a Windows box: 
+         otherwise this check fails and the .exe distro is not generated -->
+    <condition property="execute.installer">
+      <and>
+        <os family="windows" />
+        <available file="${nsis.exe}" />
+        <available file="${nsis.installoptions.dll}" />
+        <available file="${nsis.nsexec.dll}" />
+        <available file="${nsis.nsisdl.dll}" />
+      </and>
+    </condition>
+
+  </target>
+
+  <!-- Packages the core zip distro -->
+  <target name="package-zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**"/>
+        <include name="conf/**"/>
+        <include name="logs/**"/>
+        <include name="lib/**"/>
+        <include name="webapps/**"/>
+        <include name="work/**"/>
+        <include name="temp/**"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+        <include name="RUNNING.txt"/>
+        <include name="BENCHMARKS.txt"/>
+        <exclude name="webapps/admin/**"/>
+        <exclude name="conf/Catalina/localhost/admin.xml"/>
+      </zipfileset>
+    </zip>
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}.zip${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the deployer distribution in zip format -->
+  <target name="package-deployer-zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip">
+      <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="LICENSE" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="NOTICE" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="README.txt" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="RELEASE-NOTES" />
+    </zip>
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-deployer.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-deployer.zip${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the admin webapp distro in zip format -->
+  <target name="package-admin-zip">
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-admin.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="server/webapps/admin/**"/>
+        <include name="conf/Catalina/localhost/admin.xml"/>
+        <exclude name="*.jsp" />
+      </zipfileset>
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="LICENSE" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="NOTICE" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="README.txt" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="RELEASE-NOTES" />
+    </zip>
+   
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-admin.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-admin.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-admin.zip${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the core tar.gz distro -->
+  <target name="package-tgz">
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf"/>
+    <fixcrlf srcdir="${tomcat.dist}/conf" eol="lf"/>
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
+      <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
+        <include name="bin/catalina.sh" />
+        <include name="bin/digest.sh" />
+        <include name="bin/jasper.sh" />
+        <include name="bin/jspc.sh" />
+        <include name="bin/setclasspath.sh" />
+        <include name="bin/startup.sh" />
+        <include name="bin/shutdown.sh" />
+        <include name="bin/tool-wrapper.sh" />
+        <include name="bin/tool-wrapper-using-launcher.sh" />
+        <include name="bin/shutdown-using-launcher.sh" />
+        <include name="bin/startup-using-launcher.sh" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
+        <include name="conf/**" />
+        <exclude name="conf/Catalina/localhost/admin.xml" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/**" />
+        <include name="common/**" />
+        <include name="logs/**" />
+        <include name="server/**" />
+        <include name="shared/**" />
+        <include name="temp/**" />
+        <include name="webapps/**" />
+        <include name="work/**" />
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RELEASE-NOTES" />
+        <include name="RUNNING.txt" />
+        <include name="BENCHMARKS.txt" />
+        <exclude name="bin/catalina.sh" />
+        <exclude name="bin/digest.sh" />
+        <exclude name="bin/jasper.sh" />
+        <exclude name="bin/jspc.sh" />
+        <exclude name="bin/setclasspath.sh" />
+        <exclude name="bin/startup.sh" />
+        <exclude name="bin/shutdown.sh" />
+        <exclude name="bin/tool-wrapper.sh" />
+        <exclude name="bin/tool-wrapper-using-launcher.sh" />
+        <exclude name="bin/shutdown-using-launcher.sh" />
+        <exclude name="bin/startup-using-launcher.sh" />
+        <exclude name="conf/**" />
+        <exclude name="src/**" />
+        <exclude name="server/webapps/admin/**" />
+      </tarfileset>
+    </tar>
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}.tar.gz"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.tar.gz.md5"
+                      message="${md5sum.binary-prefix}${final.name}.tar.gz${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the deployer Tomcat distro in tar.gz format -->
+  <target name="package-deployer-tgz">
+    <fixcrlf srcdir="${tomcat.dist}"
+     includes="*.txt,LICENSE,NOTICE" eol="lf"/>
+    <fixcrlf srcdir="${tomcat.deployer}" includes="*.xml" eol="lf"/>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz">
+      <tarfileset dir="${tomcat.dist}" prefix="${final.name}-deployer">
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RELEASE-NOTES" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer">
+        <include name="**" />
+      </tarfileset>
+    </tar>
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz.md5"
+                      message="${md5sum.binary-prefix}${final.name}-deployer.tar.gz${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the admin webapp distro in tar.gz format -->
+  <target name="package-admin-tgz">
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf"/>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}-admin.tar.gz">
+      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RELEASE-NOTES" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="server/webapps/admin/**" />
+        <exclude name="*.jsp" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
+        <include name="conf/Catalina/localhost/admin.xml" />
+      </tarfileset>
+    </tar>
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-admin.tar.gz"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-admin.tar.gz.md5"
+                      message="${md5sum.binary-prefix}${final.name}-admin.tar.gz${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the documentation distro in tar.gz format -->
+  <target name="package-docs-tgz">
+
+    <!-- Package gocs -->
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf"/>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz">
+      <tarfileset dir="${tomcat.dist}" prefix="tomcat-6.0-doc">
+        <include name="LICENSE" />
+        <include name="NOTICE" />
+        <include name="README.txt" />
+        <include name="RUNNING.txt" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}/webapps/docs" prefix="tomcat-6.0-doc">
+        <include name="**" />
+      </tarfileset>
+    </tar>
+
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz.md5"
+                      message="${md5sum.binary-prefix}${final.name}-fulldocs.tar.gz${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the source code distribution in zip format -->
+  <target name="package-src-zip">
+    <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip">
+      <zipfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
+    </zip>
+
+    <checksum file="${tomcat.release}/v${version}/src/${final-src.name}.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/src/${final-src.name}.zip.md5"
+                      message="${md5sum.binary-prefix}${final-src.name}.zip${line.separator}" append="true" />
+  </target>
+
+  <!-- Packages the source code distribution in tar.gz format -->
+  <target name="package-src-tgz">
+    <fixcrlf srcdir="${tomcat.dist}"
+     excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war" eol="lf"/>
+
+    <tar longfile="gnu" compression="gzip"
+         tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
+      <tarfileset dir="${tomcat.dist}/src" mode="755" prefix="${final-src.name}">
+        <include name="${jtc.project}/jk/native/buildconf.sh" />
+        <include name="${jtc.project}/jk/native/apache-1.3/build-hpux-cc.sh" />
+        <include name="${jtc.project}/jk/native/apache-1.3/build-solaris.sh" />
+        <include name="${jtc.project}/jk/native/apache-1.3/build-unix.sh" />
+        <include name="${jtc.project}/jk/native/apache-2.0/build-unix.sh" />
+        <include name="${jtc.project}/jk/native/apache-2.0/install-unix.sh" />
+        <include name="${jtc.project}/jk/native/domino/mkini.sh" />
+      </tarfileset>
+      <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}">
+        <exclude name="${jtc.project}/jk/native/buildconf.sh" />
+        <exclude name="${jtc.project}/jk/native/apache-1.3/build-hpux-cc.sh" />
+        <exclude name="${jtc.project}/jk/native/apache-1.3/build-solaris.sh" />
+        <exclude name="${jtc.project}/jk/native/apache-1.3/build-unix.sh" />
+        <exclude name="${jtc.project}/jk/native/apache-2.0/build-unix.sh" />
+        <exclude name="${jtc.project}/jk/native/apache-2.0/install-unix.sh" />
+        <exclude name="${jtc.project}/jk/native/domino/mkini.sh" />
+      </tarfileset>
+    </tar>
+
+    <checksum file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz.md5"
+                      message="${md5sum.binary-prefix}${final-src.name}.tar.gz${line.separator}" append="true" />
+  </target>
+
+</project>
