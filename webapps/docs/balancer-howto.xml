@@ -1,0 +1,148 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="balancer-howto.html">
+
+    &project; 
+
+    <properties>
+        <author email="yoavs@apache.org">Yoav Shapira</author>
+        <author>Remy Maucherat</author>
+        <author>Andy Oliver</author>
+        <title>Load Balancer HOW-TO</title>
+    </properties>
+
+<body>
+
+<section name="Table of Contents">
+<p>
+<a href="#Using the JK 1.2.x native connector">
+Using the JK native connector</a><br />
+<a href="#Using Apache HTTP Server 2.x with mod_proxy">
+Using Apache HTTP Server 2.x and mod_proxy</a><br />
+<a href="#Using the balancer webapp">Using the balancer webapp</a><br />
+</p>
+</section>
+
+<section name="Using the JK 1.2.x native connector">
+
+Please refer to the JK 1.2.x documentation.
+
+</section>
+
+<section name="Using Apache HTTP Server 2.x with mod_proxy">
+
+Please refer to the mod_proxy documentation for Apache HTTP Server 2.2. This supports either
+HTTP or AJP load balancing. This new version of mod_proxy is also useable with
+Apache HTTP Server 2.0, but mod_proxy will have to be compiled separately using the code
+from Apache HTTP Server 2.2.
+
+</section>
+
+<section name="Using the balancer webapp">
+
+<subsection name="Overview">
+
+<p>
+Tomcat 5.0.15 and later ships with a webapp named balancer.  This is
+a simple implemention of a rules-based load balancer.  It was not designed
+as a replacement for other load-balancing mechanisms used for high traffic
+environments.  Rather, it is a simple, pure Java, easily extensible, and fast
+way to direct traffic among multiple servers.
+</p>
+<p>
+Although balancer ships with Tomcat, it is not Tomcat-specific and runs
+on other containers without any modification.  The balancer webapp 
+requires a Servlet Specification 2.3 or later container if you wish 
+to use a filter to redirect traffic.  If you wish to redirect traffic
+using a servlet, you may use any servlet container.
+</p>
+</subsection>
+
+<subsection name="Sample Configuration">
+<p>
+The default balancer installation uses a single filter, BalancerFilter,
+mapped to all requests (url-pattern /*).  The filter reads its rules
+from the location specified in the balancer deployment descriptor
+(web.xml file).  The default rules are:
+<ul>
+  <li>Redirect requests with News in the URL to www.cnn.com</li>
+  <li>Redirect requests with a parameter named paramName whose
+value is paramValue to www.yahoo.com.</li>
+  <li>Redirect all other requests to jakarta.apache.org.</li>
+</ul>
+
+Therefore, when you install tomcat, start it, and point your
+browser to http://localhost:8080/balancer, you will be redirected
+to http://jakarta.apache.org.  If you point your browser to
+http://localhost:8080/balancer/News you will be redirected to
+http://www.cnn.com.  The request for 
+http://localhost:8080/balancer/BlahBlah?paramName=paramValue will
+be redirected to http://www.yahoo.com.
+</p>
+</subsection>
+
+<subsection name="Balancer Rules">
+<p>
+A <i>Rule</i> in the balancer system is a combination of
+a request matching criterion and a redirection URL for
+matching requests.  Rules implement the
+org.apache.webapp.balancer.Rule interface.
+</p>
+
+<p>
+The balancer distribution contains a number of useful
+rules.  The framework is also designed for easy extensibility
+so that you can write your own rules quickly.  Rules
+should be JavaBeans (public no-args constructor, public
+setter method setXXX for property xxx), as they are
+instantiated by Jakarta Commons Digester.  Feel free
+to inquire on the tomcat-user mailing list regarding
+the availability of rules or the inclusion of your rules
+in the distribution.
+</p>
+
+<p>
+Rules are assembled into RuleChains.  Each BalancerFilter
+(or Servlet/JSP) refers to one RuleChain when making its
+redirection decisions.  Note that you are not restricted
+to having one filter mapped to /* as done in the sample
+configuration.  You can configure as many filters as
+desired, using the full filter mapping possibilities defined
+in the Servlet Specification.  Each filter will have
+its own RuleChain.
+</p>
+</subsection>
+
+<subsection name="How it Works">
+<p>
+<ol>
+  <li>You write a rules configuration file containing various
+rules and redirection locations.</li>
+  <li>You define the balancer filter in your web.xml, mapping
+it as desired (/* is a common use-case) and configuring it
+with your rules configuration file.</li>
+  <li>The server is started, initializing the filter.</li>
+  <li>A request comes into the server.  The filter consults
+its rule chain to determine where to redirect the request.  Rules
+are consulted in the order in which they are defined in the rules
+configuration file.  The first matching rule will stop the
+evaluation and cause the request to be redirected.</li>
+</ol>
+</p>
+
+</subsection>
+
+<subsection name="Comments">
+<p>
+Please direct questions, comments, suggestions, etc. to the
+tomcat-user mailing list.  Thank you.
+</p>
+</subsection>
+
+</section>
+
+</body>
+
+</document>

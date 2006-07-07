@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="class-loader-howto.html">
+
+    &project;
+
+    <properties>
+        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
+        <author email="yoavs@apache.org">Yoav Shapira</author>
+        <title>Class Loader HOW-TO</title>
+    </properties>
+
+<body>
+
+
+<section name="Quick Start">
+
+<p>The following rules cover about 95% of the decisions that application
+developers and deployers must make about where to place class and resource
+files to make them available to web applications:</p>
+<ul>
+<li>For classes and resources specific to a particular web application,
+    place unpacked classes and resources under <code>/WEB-INF/classes</code>
+    of your web application archive, or place JAR files containing those
+    classes and resources under <code>/WEB-INF/lib</code> of your web
+    application archive.</li>
+<li>For classes and resources that must be shared across all web applications,
+    place unpacked classes and resources under
+    <code>$CATALINA_BASE/shared/classes</code>, or place JAR files
+    containing those classes and resources under
+    <code>$CATALINA_BASE/shared/lib</code>.</li>
+</ul>
+
+</section>
+
+
+<section name="Overview">
+
+<p>Like many server applications, Tomcat 5 installs a variety of class loaders
+(that is, classes that implement <code>java.lang.ClassLoader</code>) to allow
+different portions of the container, and the web applications running on the
+container, to have access to different repositories of available classes and
+resources.  This mechanism is used to provide the functionality defined in the
+Servlet Specification, version 2.4 -- in particular, Sections 9.4 and 9.6.</p>
+
+<p>In a J2SE 2 (that is, J2SE 1.2 or later) environment, class loaders are
+arranged in a parent-child tree.  Normally, when a class loader is asked to
+load a particular class or resource, it delegates the request to a parent
+class loader first, and then looks in its own repositories only if the parent
+class loader(s) cannot find the requested class or resource.  The model for
+web application class loaders differs slightly from this, as discussed below,
+but the main principles are the same.</p>
+
+<p>When Tomcat 5 is started, it creates a set of class loaders that are
+organized into the following parent-child relationships, where the parent
+class loader is above the child class loader:</p>
+
+<source>
+      Bootstrap
+          |
+       System
+          |
+       Common
+      /      \
+ Catalina   Shared
+             /   \
+        Webapp1  Webapp2 ... 
+</source>
+
+<p>The characteristics of each of these class loaders, including the source
+of classes and resources that they make visible, are discussed in detail in
+the following section.</p>
+
+</section>
+
+<section name="Class Loader Definitions">
+
+<p>As indicated in the diagram above, Tomcat 5 creates the following class
+loaders as it is initialized:</p>
+<ul>
+<li><strong>Bootstrap</strong> - This class loader contains the basic runtime
+    classes provided by the Java Virtual Machine, plus any classes from JAR
+    files present in the System Extensions directory
+    (<code>$JAVA_HOME/jre/lib/ext</code>).  <em>NOTE</em> - Some JVMs may
+    implement this as more than one class loader, or it may not be visible
+    (as a class loader) at all.</li>
+<li><strong>System</strong> - This class loader is normally initialized from
+    the contents of the <code>CLASSPATH</code> environment variable.  All such
+    classes are visible to both Tomcat internal classes, and to web
+    applications.  However, the standard Tomcat 5 startup scripts
+    (<code>$CATALINA_HOME/bin/catalina.sh</code> or
+    <code>%CATALINA_HOME%\bin\catalina.bat</code>) totally ignore the contents
+    of the <code>CLASSPATH</code> environment variable itself, and instead
+    build the System class loader from the following repositories:
+    <ul>
+    <li><em>$CATALINA_HOME/bin/bootstrap.jar</em> - Contains the main() method
+        that is used to initialize the Tomcat 5 server, and the class loader
+        implementation classes it depends on.</li>
+    <li><em>$JAVA_HOME/lib/tools.jar</em> - Contains the "javac" compiler used
+        to convert JSP pages into servlet classes.</li>
+    <li><em>$CATALINA_HOME/bin/commons-logging-api.jar</em> - Jakarta commons 
+        logging API.</li>
+    <li><em>$CATALINA_HOME/bin/commons-daemon.jar</em> - Jakarta commons 
+        daemon API.</li>
+    <li><em>jmx.jar</em> - The JMX 1.2 implementation.</li>
+    </ul></li>
+<li><strong>Common</strong> - This class loader contains additional classes
+    that are made visible to both Tomcat internal classes and to all web
+    applications.  Normally, application classes should <strong>NOT</strong>
+    be placed here.  All unpacked classes and resources in
+    <code>$CATALINA_HOME/common/classes</code>, as well as classes and
+    resources in JAR files under the
+    <code>$CATALINA_HOME/commons/endorsed</code>,
+    <code>$CATALINA_HOME/commons/i18n</code> and
+    <code>$CATALINA_HOME/common/lib</code> directories,
+    are made visible through this
+    class loader.  By default, that includes the following:
+    <ul>
+    <li><em>commons-el.jar</em> - Jakarta commons el, implementing the 
+        expression language used by Jasper.</li>
+    <li><em>jasper-compiler.jar</em> - The JSP 2.0 compiler.</li>
+    <li><em>jasper-compiler-jdt.jar</em> - The Eclipse JDT Java compiler.</li>
+    <li><em>jasper-runtime.jar</em> - The JSP 2.0 runtime.</li>
+    <li><em>jsp-api.jar</em> - The JSP 2.0 API.</li>
+    <li><em>naming-common.jar</em> - The JNDI implementation used by Tomcat 5
+        to represent in-memory naming contexts.</li>
+    <li><em>naming-factory.jar</em> - The JNDI implementation used by Tomcat 5
+        to resolve references to enterprise resources (EJB, connection 
+        pools).</li>
+    <li><em>naming-factory-dbcp.jar</em> - Jakarta commons DBCP, providing a
+        JDBC connection pool to web applications. The classes have been moved
+        out of their default org.apache.commons package.</li>
+    <li><em>naming-java.jar</em> - Handler for the java: namespace.</li>
+    <li><em>naming-resources.jar</em> - The specialized JNDI naming context
+        implementation used to represent the static resources of a web
+        application. This is not related to the support of the J2EE ENC, and
+        cannot be removed.</li>
+    <li><em>servlet-api.jar</em> - The Servlet 2.4 API.</li>
+    <li><em>tomcat-i18n-**.jar</em> - Optional JARs containing resource bundles
+        for other languages. As default bundles are also included in each 
+        individual JAR, they can be safely removed if no internationalization
+        of messages is needed.</li>
+    </ul></li>
+<li><strong>Catalina</strong> - This class loader is initialized to include
+    all classes and resources required to implement Tomcat 5 itself.  These
+    classes and resources are <strong>TOTALLY</strong> invisible to web
+    applications.  All unpacked classes and resources in
+    <code>$CATALINA_HOME/server/classes</code>, as well as classes and
+    resources in JAR files under
+    <code>$CATALINA_HOME/server/lib</code>, are made visible through
+    this class loader.  By default, that includes the following:
+    <ul>
+    <li><em>catalina.jar</em> - Implementation of the Catalina servlet
+        container portion of Tomcat 5.</li>
+    <li><em>catalina-ant.jar</em> - Some Ant tasks which can be used to
+        manage Tomcat using the manager web application.</li>
+    <li><em>catalina-optional.jar</em> - Some optional components of
+        Catalina.</li>
+    <li><em>commons-modeler.jar</em> - A model MBeans implementation used
+        by Tomcat to expose its internal objects through JMX.</li>
+    <li><em>servlets-xxxxx.jar</em> - The classes associated with each
+        internal servlet that provides part of Tomcat's functionality.
+        These are separated so that they can be completely removed if the
+        corresponding service is not required, or they can be subject to
+        specialized security manager permissions.</li>
+    <li><em>tomcat-coyote.jar</em> - Coyote API.</li>
+    <li><em>tomcat-http.jar</em> - Standalone Java HTTP/1.1 
+        connector.</li>
+    <li><em>tomcat-ajp.jar</em> - Classes for the Java portion of the
+        <code>AJP</code> web server connector, which allows Tomcat to
+        run behind web servers such as Apache and iPlanet iAS and iWS.</li>
+    <li><em>tomcat-util.jar</em> - Utility classes required by some
+        Tomcat connectors.</li>
+    </ul></li>
+<li><strong>Shared</strong> - This class loader is the place to put classes
+    and resources that you wish to share across <strong>ALL</strong>
+    web applications (unless Tomcat internal classes also need access,
+    in which case you should put them in the <strong>Common</strong>
+    class loader instead).  All unpacked classes and resources in
+    <code>$CATALINA_BASE/shared/classes</code>, as well as classes and
+    resources in JAR files under <code>$CATALINA_BASE/shared/lib</code>, are
+    made visible through this class loader. If multiple Tomcat instances are
+    run from the same binary using the $CATALINA_BASE environment variable,
+    then this classloader repositories are relative to $CATALINA_BASE rather
+    than $CATALINA_HOME.</li>
+<li><strong>WebappX</strong> - A class loader is created for each web
+    application that is deployed in a single Tomcat 5 instance.  All unpacked
+    classes and resources in the <code>/WEB-INF/classes</code> directory of
+    your web application archive, plus classes and resources in JAR files
+    under the <code>/WEB-INF/lib</code> directory of your web application
+    archive, are made visible to the containing web application, but to
+    no others.</li>
+</ul>
+
+<p>As mentioned above, the web application class loader diverges from the
+default Java 2 delegation model (in accordance with the recommendations in the
+Servlet Specification, version 2.3, section 9.7.2 Web Application Classloader).  
+When a request to load a
+class from the web application's <em>WebappX</em> class loader is processed,
+this class loader will look in the local repositories <strong>first</strong>,
+instead of delegating before looking.  There are exceptions. Classes which are
+part of the JRE base classes cannot be overriden. For some classes (such as
+the XML parser components in J2SE 1.4+), the J2SE 1.4 endorsed feature can be 
+used  
+(see the common classloader definition above).
+Last, any JAR containing servlet API classes will be ignored by the 
+classloader.
+All other class loaders in Tomcat 5 follow the usual delegation pattern.</p>
+
+<p>Therefore, from the perspective of a web application, class or resource
+loading looks in the following repositories, in this order:</p>
+<ul>
+<li>Bootstrap classes of your JVM</li>
+<li>System class loader classses (described above)</li>
+<li><em>/WEB-INF/classes</em> of your web application</li>
+<li><em>/WEB-INF/lib/*.jar</em> of your web application</li>
+<li><em>$CATALINA_HOME/common/classes</em></li>
+<li><em>$CATALINA_HOME/common/endorsed/*.jar</em></li>
+<li><em>$CATALINA_HOME/common/i18n/*.jar</em></li>
+<li><em>$CATALINA_HOME/common/lib/*.jar</em></li>
+<li><em>$CATALINA_BASE/shared/classes</em></li>
+<li><em>$CATALINA_BASE/shared/lib/*.jar</em></li>
+</ul>
+
+</section>
+
+
+<section name="XML Parsers and J2SE 1.4">
+
+<p>Among many other changes, the J2SE 1.4 release packages the JAXP APIs, and
+a version of Xerces, inside the JRE.  This has impacts on applications that
+wish to use their own XML parser.</p>
+
+<p>In previous versions of Tomcat 5, you could simply replace the XML parser
+in the <code>$CATALINA_HOME/common/lib</code> directory to change the parser
+used by all web applications.  However, this technique will not be effective
+when you are running on J2SE 1.4, because the usual class loader delegation
+process will always choose the implementation inside the JDK in preference
+to this one.</p>
+
+<p>JDK 1.4 supports a mechanism called the "Endorsed Standards Override
+Mechanism" to allow replacement of APIs created outside of the JCP (i.e.
+DOM and SAX from W3C).  It can also be used to update the XML parser
+implementation.  For more information, see:
+<a href="http://java.sun.com/j2se/1.4/docs/guide/standards/index.html">
+http://java.sun.com/j2se/1.4/docs/guide/standards/index.html</a>.</p>
+
+<p>Tomcat utilizes this mechanism by including the system property setting
+<code>-Djava.endorsed.dirs=$CATALINA_HOME/common/endorsed</code> in the
+command line that starts the container.  Therefore, you can replace the
+parser that is installed in this directory, and it will get used even on a
+JDK 1.4 system.</p>
+
+</section>
+
+
+<section name="Running under a security manager">
+
+<p>When running under a security manager the locations from which classes
+are permitted to be loaded will also depend on the contents of your policy
+file. See <a href="security-manager-howto.html">Security Manager HOW-TO</a>
+for further information.</p>
+
+</section>
+
+
+</body>
+
+</document>

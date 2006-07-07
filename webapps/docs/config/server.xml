@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="server.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
+    <title>The Server Component</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  <p>A <strong>Server</strong> element represents the entire Catalina
+  servlet container.  Therefore, it must be the single outermost element
+  in the <code>conf/server.xml</code> configuration file.  Its attributes
+  represent the characteristics of the servlet container as a whole.</p>
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+  <p>All implementations of <strong>Server</strong>
+  support the following attributes:</p>
+
+  <attributes>
+
+    <attribute name="className" required="false">
+      <p>Java class name of the implementation to use.  This class must
+      implement the <code>org.apache.catalina.Server</code> interface.
+      If no class name is specified, the standard implementation will
+      be used.</p>
+    </attribute>
+
+    <attribute name="port" required="true">
+      <p>The TCP/IP port number on which this server waits for a shutdown
+      command.  This connection must be initiated from the same server
+      computer that is running this instance of Tomcat.</p>
+    </attribute>
+
+    <attribute name="shutdown" required="true">
+      <p>The command string that must be received via a TCP/IP connection
+      to the specified port number, in order to shut down Tomcat.</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
+  <subsection name="Standard Implementation">
+
+  <p>The standard implementation of <strong>Server</strong> is
+  <strong>org.apache.catalina.core.StandardServer</strong>.
+  It supports the following additional attributes (in addition to the
+  common attributes listed above):</p>
+
+  <attributes>
+  </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="Nested Components">
+
+  <p>The following components may be nested inside a <strong>Server</strong>
+  element:</p>
+  <ul>
+  <li><a href="service.html"><strong>Service</strong></a> - 
+      One or more service element.</li>
+  <li><a href="globalresources.html"><strong>GlobalNamingResources</strong></a> - 
+      Configure the JNDI global resources for the server.</li>
+  </ul>
+
+</section>
+
+
+<section name="Special Features">
+
+  <p>There are no special features associated with a <strong>Server</strong>.
+  </p>
+
+</section>
+
+
+</body>
+
+</document>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="startup.html">
+
+  &project;
+
+  <properties>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <title>Startup</title>
+  </properties>
+
+<body>
+
+
+<section name="Server Startup">
+
+<p>
+This page describes how the Tomcat server starts up.  There are several
+different ways to start tomcat, including:
+<ul>
+  <li>From the command line.</li>
+  <li>From a Java program as an embedded server.</li>
+  <li>Automatically as a Windows service.</li>
+</ul>
+</p>
+
+<subsection name="description">
+<p>
+A text description of the startup procedure is available
+<a href="startup/serverStartup.txt">here.</a>
+</p>
+</subsection>
+
+<subsection name="diagram">
+<p>
+A UML sequence diagram of the startup procedure is available
+<a href="startup/serverStartup.pdf">here.</a>
+</p>
+</subsection>
+
+<subsection name="comments">
+<p>
+The startup process can be customized in many ways, both
+by modifying Tomcat code and by implementing your own
+LifecycleListeners which are then registered in the server.xml
+configuration file.
+</p>
+
+</subsection>
+
+</section>
+
+
+</body>
+</document>

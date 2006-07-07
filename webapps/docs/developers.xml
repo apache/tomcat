@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="developers.html">
+
+  &project;
+
+  <properties>
+    <author email="remm@apache.org">Remy Maucherat</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <title>Tomcat Developers</title>
+  </properties>
+
+<body>
+
+  <section name="Active Developers">
+
+    <p>
+      The list indicates the developers' main areas of interest. Feel free to
+      add to the list :) The developers email addresses are 
+      <code>[login]@apache.org</code>. Please <strong>do not</strong> contact 
+      developers directly for any support issues (please post to the 
+      tomcat-users mailing list instead, or one of the other support 
+      resources; some organizations and individual consultants also offer 
+      for pay Tomcat support, as listed on the 
+      <a href="http://jakarta.apache.org/site/vendors.html">vendors page</a>
+      on the Jakarta website).
+    </p>
+
+    <ul>
+      <li>Amy Roh (amyroh): Catalina, Admin webapp</li>
+      <li>Bill Barker (billbarker): Connectors</li>
+      <li>Costin Manolache (costin): Catalina, Connectors</li>
+      <li>Filip Hanik (fhanik): Clustering</li>
+      <li>Glenn Nielsen (glenn): Catalina, Connectors</li>
+      <li>Henri Gomez (hgomez): Connectors</li>
+      <li>Jan Luehe (luehe): Jasper</li>
+      <li>Jean-Francois Arcand (jfarcand): Catalina</li>
+      <li>Jean-Frederic Clere (jfclere): Connectors</li>
+      <li>Kin-Man Chung (kinman): Jasper</li>
+      <li>Mladen Turk (mturk): Connectors</li>
+      <li>Peter Rossbach (pero): Catalina, Clustering, JMX</li>
+      <li>Remy Maucherat (remm): Catalina, Connectors, Docs</li>
+      <li>Tim Funk (funkman): Catalina, Docs</li>
+      <li>Yoav Shapira (yoavs): Docs, JMX, Catalina, balancer, Release Manager</li>
+    </ul>
+
+  </section>
+
+  <section name="Retired Developers">
+
+
+
+  </section>
+
+</body>
+</document>

@@ -1,0 +1,2812 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="changelog.html">
+
+  &project;
+
+  <properties>
+    <author email="remm@apache.org">Remy Maucherat</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <title>Changelog</title>
+  </properties>
+
+<body>
+
+<section name="Tomcat 5.5.17 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Update to Xerces 2.8.0 (remm)
+      </update>
+      <update>
+        Update to tcnative 1.1.3 (remm)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix SingleSignOn Valve and add Session.getLastAccessTimeInternal() without session invalidation test. (pero)
+      </fix>
+      <fix>
+        <bug>38814</bug>: CGIServlet correctly handles Shift_JIS output. (markt) 
+      </fix>
+      <fix>
+        Add missing REQUEST_URI environment variable to CGI environment. (markt)
+      </fix>
+      <fix>
+        <bug>27617</bug>: Sync existing mime types with httpd. (keith)
+      </fix>
+      <fix>
+        <bug>38761</bug>: Handle relative symlinks to shell scripts as suggested by Adam Murray (keith)
+      </fix>
+      <fix>
+        <bug>38795</bug>: Associate more closely bind with a finally unbind in StandardContext start and
+        stop, based on a patch by Darryl Miles (remm)
+      </fix>
+      <fix>
+        Improve undeployment robustness (remm)
+      </fix>
+      <update>
+        Expand the semaphore valve (remm)
+      </update>
+      <fix>
+        <bug>39021</bug>: Add back support for authentication only, submitted by Scott Stark (remm)
+      </fix>
+      <fix>
+        Revert fix for <bug>38113</bug>, which does not seem a legitimate problem, and causes
+        regressions (remm)
+      </fix>
+      <fix>
+        Correctly reset listeners when reloading a webapp (remm)
+      </fix>
+      <fix>
+        <bug>38194</bug>: Don't fail silently if -force is used without CATALINA_PID, submitted by Matthew Buckett. (yoavs)
+      </fix>
+      <fix>
+        <bug>38154</bug>: Avoid NPE in FileDirContext after webapp undeploy, reported by Jamie Maher. (yoavs)
+      </fix>
+      <fix>
+        <bug>38217</bug>: Added cautionary note about keystore password to SSL HowTo, as suggested by Ralf Hauser. (yoavs)
+      </fix>
+      <fix>
+        <bug>38262</bug>: Cleared ambiguity in host documentation, as suggested by Jeffrey Bennett. (yoavs)
+      </fix>
+      <fix>
+        <bug>38476</bug>: Modified check for null TLD stream, as suggested by Fabrizio Giustina. (yoavs)
+      </fix>
+      <fix>
+        <bug>38052</bug>: Use <i>userName</i> as userField default. User is at many databases a 
+        reserved keyword, as suggested by rik. (pero)
+      </fix>
+      <fix>
+        Fix handling of non matching if-range header (remm)
+      </fix>
+      <fix>
+        <bug>37848</bug>: Only output catalina.sh diagnostic messages if we have a TTY, submitted by
+          David Shaw. (yoavs)
+      </fix>
+      <fix>
+        <bug>38596</bug>: Minor performance optimization in DataSourceRealm, suggested by Sandy
+          McArthur. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Make the default cipher suites available for SSL the same as the set of cipher
+        suites enabled by default rather than the set of all cipher suites. This prevents
+        ciphers suites that do not provide confidentiality protection and/or server
+        authentication being used by default. (markt)
+      </fix>
+      <fix>
+        Move AprEndpoint.getWorkerThread inside the try/catch for the main accept loop, to guard
+        about an OOM (which would most likely doom the server anyway) (remm)
+      </fix>
+      <fix>
+        As exhibited in the ASF's JIRA installation, it seems EINTR is a status code that should
+        be ignored as a result to a poll call (remm)
+      </fix>
+      <update>
+        New APR connectors defaults (remm)
+      </update>
+      <update>
+        Add multiple threads for APR pollers, to work around Windows limitations (performance degrades
+        very rapidly if poller sizes over 1024 are allowed when compiling APR) (remm)
+      </update>
+      <update>
+        New modes for firstReadTimeout (-1 being the new default) (remm)
+      </update>
+      <update>
+        Replace java.util.Stack usage with a simple array in the APR endpoint (remm)
+      </update>
+      <fix>
+        tcnative jnilib.c now report correct compile flags for runtime 
+        Library.java checks like sendfile support default true/false (pero)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>38015</bug>: Remove misleading warnings logged in TagLibraryInfoImpl, as suggested by Andrew Houghton. (yoavs)
+      </fix>
+      <fix>
+        <bug>38376</bug>: Make sure body content stack is always properly aligned, as submitted by Tony Deigh. (yoavs)
+      </fix>
+      <fix>
+        Compatibility with JDT 3.2 (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>39292</bug>: Update catalina.policy at demo balancer app. Fix provided by Kerry Sainsbury (pero)
+      </fix>
+      <fix>
+        <bug>36847</bug>: Fixed the manager app copy function to not overwrite fileA with fileB when fileA==fileB.
+        Fix provided by Haroon Rafique (fhanik)
+      </fix>
+      <fix>
+        <bug>38508</bug>: Several enhancements to Host Manager application, including configurable
+          manager app support and dialog box enhancements.  Thanks to George Sexton for the patch. (yoavs)
+      </fix>
+      <fix>
+        <bug>37781</bug>: Make sure context config file is writeable, suggested by George Sexton. (yoavs,pero)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+       <update>
+        Add at PooledSocketSender the jmx attributes inPoolSize and inUsePoolSize. (pero)
+       </update>
+       <fix>
+         DeltaManager set session creationTime at backup node. (pero)
+       </fix>
+       <update>
+        Add JvmRouteBinderValve documentation at cluster-howto.xml. (pero)
+       </update>
+       <add>
+        JvmRouteBinderValve now supports now sessionid's from request and cookies.
+        Thanks to Brian Stansberry for reporting it. (pero)
+       </add>
+       <fix>
+      	<bug>38779</bug> Fix wrong jmx message arg at SimpleTcpCluster
+          at o.a.c.cluster.tcp.mbeans-descriptors.xml, submitted by Pawel Tucholski (pero)
+      </fix>
+      <fix>
+        Fix that not after every "Keep Alive Socket close" a log warning is generated at TcpReplicationThread (pero)
+      </fix>
+      <fix>
+        <bug>39178</bug>: Now ROOT.war deployment with FarmWarDeployer is possible (pero)
+      </fix>
+      <fix>
+        ReplicationValve not set primarySession flag when all backup nodes gone (pero)
+      </fix>
+      <update>
+        Add DeltaSession.getLastAccessTimeInternal() without session invalidation test. (pero)
+      </update>
+    </changelog>
+  </subsection>
+ </section>
+
+<section name="Tomcat 5.5.16 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Updated / enhanced docs to remove old FIXME references. (yoavs)
+      </update>
+      <update>
+        Required tcnative library version upgraded to 1.1.2 (remm)
+      </update>
+      <update>
+        Update to Eclipse JDT 3.1.2 (remm)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>23950</bug>: Context.listBindings() should return objects not
+        references. (markt)
+      </fix>
+      <fix>
+        <bug>38124</bug>: Add support for Windows 20xx when reading environment
+        variables in CGIServlet. (markt)
+      </fix>
+      <fix>
+        <bug>29214</bug>: response.containsHeader() now returns the correct
+        value for Content-Type and Content-Length headers. (markt)
+      </fix>
+      <fix>
+        Allow using a custom ContextConfig when using JMX embedding of Tomcat, as
+        is doen by the regular deployer. (remm)
+      </fix>
+      <add>
+        Add JMX serverInfo attribute to Server MBean, that we can identify
+        the tomcat release remotely. (pero)
+      </add>
+      <fix>
+        Fix the JMX MBeanFactory.createStandardHost signature at mbean-descriptors.xml (pero)
+      </fix>
+      <fix>
+        Fix some cases (for example with realm usage) where the container logger for a context
+        would be retrieved using the wrong classloader (remm)
+      </fix>
+      <fix>
+        HttpSession.getId will no longer throw an ISE when the session is invalid (remm)
+      </fix>
+      <fix>
+         ore detailed errors for naming issues (remm)
+      </fix>
+      <docs>
+        Add documentation for the Transaction element (remm)
+      </docs>
+      <update>
+        Add getContextPath to the internal servlet context implementation (remm)
+      </update>
+      <fix>
+        Only null instances loaded by the webapp CL, submitted by Matt Jensen (remm)
+      </fix>
+      <update>
+        Deploy folders which don't have a WEB-INF, and return an error when a context
+        file does not contain a Context element (remm)
+      </update>
+      <fix>
+        <bug>38653</bug>: Fix property name (remm)
+      </fix>
+      <fix>
+        Slightly modify the timing of the manager start, so that it is not started by a
+        listener (remm)
+      </fix>
+      <fix>
+        Refresh loggers used by the digester (remm)
+      </fix>
+      <fix>
+        Use sendError instead of setStatus to send the 401 code. (billbarker)
+      </fix>
+      <fix>
+        Don't append the port for an SSL redirect if it is the default port. (billbarker)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Log errors when setting socket options with debug priority rather than error. (remm)
+      </fix>
+      <fix>
+        <bug>38100</bug>: Make certain that a valid Host name is set, or none at all. (billbarker)
+      </fix>
+      <fix>
+        <bug>38485</bug>: Fix minor regression setting connection timeout (as well as linger and
+        no delay) where the default value was always used when using the regular 
+        HTTP connector (remm)
+      </fix>
+      <update>
+        Pass along more of the SSL related fields to OpenSSL (remm)
+      </update>
+      <update>
+        CharChunk now implements CharSequence (remm)
+      </update>
+      <fix>
+        Fix coding error which could cause a rare crash when a poller error occurred and sockets
+        where pending being added to the keepalive poller (remm)
+      </fix>
+      <fix>
+        Fix potential sync issues when restarting a poller (remm)
+      </fix>
+      <fix>
+        Update APR error reports, including the error codes (remm)
+      </fix>
+      <fix>
+        <bug>38726</bug>: Remove duplicate request group field causing blank statistics for the
+        HTTP connector (remm) 
+      </fix>
+      <fix>
+        Fix invalid length used by some AJP packets for the AJP APR connector, which could cause 
+        corruption, submitted by Rudiger Plum (jim)
+      </fix>
+      <fix>
+        <bug>38346</bug>: Fix problems with request.getReader().readLine(). 
+        Patch by Rainer Jung (billbarker)
+      </fix>
+      <update>
+        Local address reuse for APR Endpoints (via APR_SO_REUSEADDR) now enabled (jim)
+     </update>
+      <fix>
+        Don't write out the shutdown secret file if shutdown is disabled (the default) (billbarker)
+      </fix>
+      <fix>
+        Fix NPE when no sink is supplied. (billbarker)
+      </fix>
+      <update>
+        APR Endpoints now IPv6 aware (jim)
+     </update>
+      <update>
+        Downgrade "Response already committed" logging entry to DEBUG. (billbarker)
+     </update>
+     <fix>
+       <bug>38113</bug>: Return the empty String for an empty query-string instead of null. (billbarker)
+     </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>38389</bug>: Set correct JDT Compiler option to java 1.5 compliance. 
+        Patch from Olivier Thomann and Paul Hamer (pero)
+      </fix>
+      <update>
+        Add some useful hints to jasper-howto. (pero).
+      </update>
+      <fix>
+        <bug>38776</bug>: Fix source file attribute, submitted by Olivier Thomann (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Update DeltaManager session access stats  (pero)
+      </fix>
+      <fix>
+        DeltaSession getId will no longer throw an ISE when the session is invalid (pero)
+      </fix>
+      <update>
+          Resurrected the &quot;suspect&quot; property so that the logs don't fill
+          up with errors when member disappears or a connection is lost. Only useful for pooled mode (fhanik)
+      </update>
+      <add>
+       <bug>35710</bug>: Add session replication for cross context session changes.
+       The portlet api need this support, see refactored ReplicationValve. (pero)
+      </add>
+      <update>
+        ReplicationValve reset DeltaSession when cluster node has no backup node. (pero)
+      </update>
+      <update>
+        DataSender close connection and throw exception also even if waitForAck is false.  (pero)
+      </update>
+      <fix>
+        Active cluster junit test again. (pero)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        Fix some XSS issues in the JSP examples. (markt)
+      </fix>
+      <fix>
+        Fix logos in the manager webapp (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.15 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        <bug>32081</bug>: Remove the JDK requirement from the Win32 scripts. (keith)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+       <bug>37852</bug>: Fix regression where the magic role '*' was denying all access. Patch by xrcat (billbarker)
+      </fix>
+      <fix>
+       <bug>37934</bug>: Don't ask for authentication if deny-from-all is in effect. (billbarker)
+      </fix>
+      <fix>
+        <bug>15570</bug>: auth-constraint of * was interpretted as all
+        authenticated users rather than as all roles defined in web.xml. (markt)
+      </fix>
+      <fix>
+       Remove leftover static logger which was used to log application level messages in
+       ApplicationContextFacade (remm)
+      </fix>
+      <fix>
+        <bug>38012</bug>: Where a CGI script sets a response code, use it. (markt)
+      </fix>
+      <fix>
+        <bug>37854</bug>: Extension-List checking was too strict. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+       Report binding errors in the APR endpoint as strings rather than platform specific
+       status codes (remm)
+      </fix>
+      <fix>
+       <bug>37934</bug>: Don't ask for authentication if deny-from-all is in effect. (billbarker)
+      </fix>
+      <fix><bug>38047</bug>: Handle the case where the Servlet attempts to read
+              the Request body from the AJP/1.3 Connector, in the case that no
+              body was sent. (billbarker)
+      </fix>
+      <fix><bug>38030</bug>: Unconditionally return EOS for an attempt to read 
+              the body of any request that doesn't send CL or TE. 
+              (remm, billbarker).
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>35351</bug>: Fix problem using an inner class for a &lt;jsp:useBean /&gt;. (kinman).
+      </fix>
+      <fix>
+        <bug>37929</bug>: Don't stop on the generic attribute methods just because the session is invalid. Patch by Pierre Delisle. (billbarker)
+      </fix>
+      <update>
+        Add system properties org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER and
+        org.apache.jasper.runtime.JspFactoryImpl.USE_POOL to allow configuring Jasper
+        memory usage (remm)
+      </update>
+      <fix>
+        <bug>37933</bug>: Restrict &lt;jsp:getAttribute /&gt; to only look in PAGE_SCOPE. (billbarker)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+       <bug>37808</bug>: Fix ArrayIndexOutOfBoundsException inside XByteBuffer. Reported by Dietmar Mueller (pero)
+      </fix>
+      <update>
+        <bug>37896</bug>DataSender starts new Socket after IOException. (pero)
+      </update>
+      <update>
+        Reduce memory usage at membership service. (pero)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.14 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Update optional native APR connector version to 1.1.1. (mturk)
+      </update>
+      <update>
+        Update build.properties.default to get native connector from new location. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>13040</bug>: Fix getContext() when used to obtain a context that is a sub-context
+        of the current context. Ported from TC4. (markt) 
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>37746</bug>: Remove extra space from StringTokenizer pattern in JspC, as suggested by
+        Eric Hedstrom. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+       <bug>36863</bug>: Strip quotes when parsing Cookie values, even for v0 Cookies. (billbarker)
+      </fix>
+      <fix>
+       <bug>37803</bug>: Don't claim that we have a string value in MessageBytes until we actually do. 
+           Patch by Doug Rand (billbarker)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.13 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        <bug>36711</bug>: Unused line of code. (yoavs)
+      </fix>
+      <update>
+        Removed unused SAXPath, Jaxen dependencies. (yoavs)
+      </update>
+      <update>
+        Update log4j dependency to version 1.2.12, Struts to 1.2.7. (yoavs)
+      </update>
+      <update>
+        Removed JDBC 2.0 StdExt dependency (only class from there is javax.sql.XADataSource, which is
+        present in JDK 1.4 and later. (yoavs)
+      </update>
+      <fix>
+        <bug>37039</bug>: typo on JK Quick configuration how-to. (yoavs)
+      </fix>
+      <add>
+        <bug>37035</bug>: Add a placeholder file in the temp directory for WinZip tar.gz handling. (yoavs)
+      </add>
+      <update>
+        Update JAF dependency to 1.0.2, JTA to 1.0.1b and JavaMail to 1.3.3_01. (markt)
+      </update>
+      <add>
+        Added Eclipse .project, .classpath, and associated files to make building Tomcat from
+        Eclipse significantly easier. (markt)
+      </add>
+      <add> 
+        <bug>37284</bug>: Guess JSE 5.0 location on Mac OS X, patch by Stepan Koltsov. (yoavs)
+      </add>
+      <fix>
+        <bug></bug>: Wrong class name in antlib.xml for JkStatusUpdateTask. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>36802</bug>: Fix problem of double-init when JMX-deploying a 
+        Context into a started Host. (billbarker)
+      </fix>
+      <fix>
+        <bug>36840</bug>: Provide information as to which web.xml is being processed on startup to
+        help debug parsing errors. (yoavs)
+      </fix>
+      <add>
+        <bug>34724</bug>: Ability to set domain for Single-Sign-On cookie.  Patch by Oliver
+        Rossmueller. (yoavs)
+      </add>
+      <fix>
+        <bug>37044</bug>: RealmBase.hasResourcePermission needs to access the GenericPrincipal as
+        set by the realm unless hasRole is overriden, which was no longer being done properly for
+        the JAAS realm (remm)
+      </fix>
+      <fix>
+        <bug>37264</bug>: JNDI resources were no longer available when stopping listeners,
+        submitted by Bogdan Calmac (remm)
+      </fix>
+      <fix>
+        <bug>37150</bug>: Turn off directory listing by default and add a warning
+        regarding enabling listing of directories with many entries. (markt)
+      </fix>
+      <update>
+        Add configurability for the amount of time that the container will wait for requests
+        to complete when unloading servlets, using the unloadDelay property. (remm)
+      </update>
+      <update>
+        Add code to set to null fields in loaded classes when stopping a web application, as a
+        possible workaround for suspicious garbage collection behavior. (remm)
+      </update>
+      <update>
+        Update messages and stack traces for classloading errors which may occur when removing
+        a web application, and for stopped web applications. (remm)
+      </update>
+      <fix>
+        <bug>37319</bug>: Fix catalina.bat reference to CATALINA_BASE for logging.properties.  Thanks
+        to Pierre-Yves Benzaken. (yoavs)
+      </fix>
+      <fix>
+        <bug>36852</bug>: Custom classloaders don't honor Contet privileged attribute.  Thanks to
+        Matt Brinkley for the analysis and patch. (yoavs)
+      </fix>
+      <fix>Fix for a couple of (mostly silly) edge-cases in testing auth.
+           Thanks to Nam T. Nguyen for the report. (billbarker) 
+      </fix>
+      <fix>
+        <bug>37060</bug>: Actually copy the Request headers when replaying after Form auth. (billbarker)
+      </fix>
+      <fix>
+        <bug>37591</bug>: Typo in Engine configuration reference. (yoavs)
+      </fix>
+      <fix>
+        <bug>37668</bug>: Added note about JSP recompilation to Context configuration documentation. (yoavs)
+      </fix>
+      <fix>
+        <bug>37132</bug>: Have DigestAuthenticator Handle user names with commas.  Thanks to 
+          Robert Wille for the patch. (yoavs)
+      </fix>
+      <fix>
+        <bug>37212</bug>: Better error reporting in Connector.java.  Thanks to Ralf Hauser for
+        the patch. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Gracefully handle the case where some Socket options are disabled at 
+        the OS level for the AJP/1.3 Connector. (billbarker)
+      </fix>
+      <fix>
+        <bug>36366</bug>: Use rewritten deployer-howto page by Allistair Crossley. (remm)
+      </fix>
+      <add>
+        <bug>36630</bug>: Added extra log output for class instantiation failure. (yoavs)
+      </add>
+      <fix>
+        <bug>37121</bug>: Sendfile always needs to be given the length of data to write,
+        which fixes ranged requests. (remm)
+      </fix>
+      <fix>
+        Optimized direct byte buffers association with the socket for APR connectors. (mturk)
+      </fix>
+      <fix>
+        Fix hidden NPEs when using the APR connectors and there's no host header. (pero, remm)
+      </fix>
+      <fix>
+        Http11Protocol now register RequestProcessor at JMX and show current usage inside manager app. (pero)
+      </fix>
+      <add>
+        JkStatus Ant tasks for mod_jk 1.2.15. (pero)
+      </add>
+      <update>Connection Timeout is normal, so reduce logging to DEBUG (billbarker) 
+      </update>
+      <fix>
+        Fix crash which could occur with the HTTP APR connector when accessing request JMX objects
+        outside of the processing of the said request (remm)
+      </fix>
+      <fix>
+        <bug>37627</bug>: Fix buffering issue in the HTTP APR connector when a large buffer size was
+        used for servlets (remm)
+      </fix>
+      <fix>
+        <bug>37673</bug>: Fix implementation of getLocalPort and getLocalAddr in the HTTP APR connector
+        (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>35252</bug>: Jasper PageDataImpl outputs malformed XML.  Patch by Rahul Akolkar. (yoavs)
+      </fix>
+      <add>
+        <bug>37062</bug>: Helpful JSP exception message containing file, line numbers.  Patch by
+        Tim Fennell at http://www.tfenne.com/jasper/. (yoavs)
+      </add>
+      <fix>
+        <bug>37407</bug>: File descriptor leak in JspReader.  Thanks to Fred for the patch.  I also
+        did some minor cleanup in the class. (yoavs)
+      </fix>
+      <add>
+        <bug>37612</bug>: Add file location to JSP Validator error message.  Thanks to Renaud Bruyeron
+        for the patch. (yoavs)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix that session replace messages are logged after node recovery get all session from master node. (pero)
+      </fix>
+      <fix>
+        <bug>37896</bug> Fix that sendMessage signature at all DataSender subclasses must be changed.
+        Now pooled and async modes working as expected. (pero)
+      </fix>
+      <fix>
+        Fix that socket at o.a.c.cluster.tcp.FastAsyncSocketSender can be disconnect/connect. (pero)
+      </fix>    
+      <fix>
+        Fix cluster module build.xml script for new svn repository structure (pero)
+      </fix>    
+      <fix>
+        Fix closed socket exceptions at normal server shutdown, reported by Olve Hansen (pero)
+      </fix>    
+      <fix>
+        Fix closed socket exceptions inside async message transfer modes (pero)
+      </fix>    
+      <fix>
+        <bug>34984</bug>: HttpSessionBindingEvent.getValue() get correct value (pero)
+      </fix>    
+      <fix>
+        <bug>35916</bug>: send sessionCreated to SessionListener after cluster node recovery (pero)
+      </fix>
+      <fix>
+        <bug>36541</bug>: Used also Hashtable at DeltaSession (pero)
+      </fix>
+      <fix>
+        Better support cluster at engine level. (pero)
+      </fix>
+      <fix>
+        <bug>36866</bug>: Correct attribute name in conf/server.xml documentation for Cluster element. (yoavs)
+      </fix>
+      <fix>
+        <bug>37261</bug>: Allow xerces to know where the web.xml file is so that relative entities can be resolved.
+      </fix>
+      <fix>
+        <bug>37529</bug>: Fixed race condition in ReplicationLister#stopListening.  Thanks to 
+        Chris Walker for the patch. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>Remove obsolete TagPlugin file from JSP examples (billbarker)</fix>
+      <fix>
+        <bug>36019</bug>: Made clear the Host-Manager HowTo is coming soon, not ready yet. (yoavs)
+      </fix>
+      <fix>
+        <bug>36336</bug>: Check WAR extension in both upper and lower case, as suggested by
+        A. Grasoff. (yoavs)
+      </fix>
+      <fix>
+        <bug>35982</bug>: Can't delete mail sessions in admin webapp. (yoavs)
+      </fix>
+      <fix>
+        <bug>36673</bug>: Similar to the one above, for data sources. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.12 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Remove uneeded files in conf. (remm)
+      </fix>
+      <update>
+        Change distribution file names from jakarta-* to apache-*. (remm)
+      </update>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add JMX Remote create and unregister ant tasks (pero)
+      </add>
+      <fix>
+        <bug>36343</bug>: Only normalize out backslash on Windows platforms. (billbarker)
+      </fix>
+      <fix>
+        Allow configuring standard stream redirection. (remm)
+      </fix>
+      <add>
+        <bug>36088</bug>: Add RUNNING.txt and RELEASE-NOTES.txt to fulldocs distro. (yoavs)
+      </add>
+      <fix>
+        <bug>36534</bug>: fix equals for URLs returned by ServletContext.getResource() (luehe)
+      </fix>
+      <fix>
+        <bug>36558</bug>: Clear IntrospectionUtils cache when stopping a webapp, as it 
+        could leak to keeping a reference to the classloader (remm)
+      </fix>
+      <fix>
+        <bug>36113</bug>: Session persistence for objects with primitive types could fail in
+        some rare cases (remm)
+      </fix>
+      <fix>
+        <bug>36541</bug>: Full synchronization for session objects attributes collections (remm)
+      </fix>
+      <fix>
+        <bug>35609</bug>: service.bat echo command when wrong arguments given [patch by Robert
+        Longson] (yoavs)
+      </fix>
+      <fix>
+        <bug>34749</bug>: jsessionid dropped on trailing slash (/) redirect (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  
+   <subsection name="Coyote">
+     <changelog>
+       <update>
+         Add support for secret for AJP APR (remm)
+       </update>
+     </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Fix NPE with an error message when no Java compiler is available (remm)
+      </fix>
+      <fix>
+        Restrict System err stream capture to the Ant compiler, as the Eclipse compiler
+        does not need it (remm)
+      </fix>
+      <update>
+        JSP compilation speed improvement using tag library information caching, 
+        submitted by Xingbo Gao (remm)
+      </update>
+      <add>
+        Initial contribution of JSTL tag plugins supporting the core tag library of
+        JSTL, submitted by Jing Li (remm)
+      </add>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>36541</bug>: Sync all session attribute access (read and write) at DeltaSession (pero)
+      </fix>
+      <fix>
+        <bug>36518</bug>: Classname typos for senders, submitted by Christoph Bachhuber-Haller (remm)
+      </fix>
+      <add>
+        <bug>35613</bug>: Added FAQ question and answer about tcpListenAddress="auto" and /etc/hosts (yoavs)
+      </add>
+      <update>
+        Moved FAQ section for Clustering from Clustering HowTo page to its own FAQ page. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Webapps">
+    <changelog>
+      <docs>
+        <bug>36319</bug>: Fix broken link to DBCP docs, submitted by Xavier Poinsard (remm)
+      </docs>
+      <docs>
+        Brand new deployer specs, submitted by Allistair Crossley (remm)
+      </docs>
+    </changelog>
+  </subsection>
+ </section>
+
+<section name="Tomcat 5.5.11 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Update to Xerces 2.7.1 (remm)
+      </update>
+      <add>
+        Add ready to build bin/tomcat-native.tar.gz for the APR JNI wrapper library (remm)
+      </add>
+      <fix>
+        <bug>35930</bug>: Bad logging config used by the Tomcat Windows service (remm)
+      </fix>
+      <add>
+        <bug>33261</bug>: Windows installer now checks the user type and warns non-admins as needed. (yoavs)
+      </add>
+      <update>
+        The Windows installer will now optionally download a (32bit) Windows .dll for Tomcat native
+        from HEAnet (remm)
+      </update>
+      <fix>
+        Declaration of jspc Ant task to fix the deployer package (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add concurrency control valve (o.a.c.valves.SemaphoreValve). As the Tomcat distribution 
+        is not built for Java 5, the valve will have to be compiled from the sources 
+        using Java 5 (remm)
+      </add>
+      <fix>
+        <bug>35880</bug>: Ignore JSSE15SocketFactory when generating JavaDoc, as it breaks
+          the JDK 1.4 JavaDoc tool. (yoavs)
+      </fix>
+      <fix>
+        <bug>35865</bug>: setclasspath.sh cannot be excutive under cygwin. (funkman)
+      </fix>
+      <fix>
+        <bug>33267</bug>: Set working path in service installer, as suggested by Dominik
+          Drzewiecki. (yoavs)
+      </fix>
+      <update>
+        <bug>34794</bug>: Update connector documentation to include clientAuth attribute. (yoavs)
+      </update>
+      <fix>
+        <bug>35894</bug>, <bug>36228</bug>: Fix CNFE when starting in a sandbox. (billbarker, remm)
+      </fix>
+      <fix>
+        Add version check for Tomcat native so that incompatible API changes are detected early (remm)
+      </fix>
+      <fix>
+        <bug>36020</bug>: Allow MemoryUserDatabase to work better on write protected mediums,
+        submitted by Rainer Jung (remm)
+      </fix>
+      <fix>
+        <bug>35978</bug>: Bad handling of single range requests greater than 2GB in the DefaultServlet
+        (remm)
+      </fix>
+      <fix>
+        <bug>35984</bug>: Client abort exceptions will now use getCause (remm)
+      </fix>
+      <fix>
+        Fix handling of non-file based includes with SSI, submitted by David Becker (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  
+   <subsection name="Coyote">
+     <changelog>
+      <fix>
+        Fix default ports for http and https which are set in the request when the parsed
+        hostname does not specify the port, and which were inverted (https was set as 80 
+        and http as 443). (remm)
+      </fix>
+      <fix>
+        Add missing tomcatAuthentication attribute to the AJP APR implementation. (remm)
+      </fix>
+      <fix>
+        Check filename sendfile attribute only if sendfile is enabled. (remm)
+      </fix>
+      <fix>
+        Fix output buffering for APR AJP implementation. (remm)
+      </fix>
+      <fix>
+        <bug>35941</bug>: Fix getRemoteAddr for APR AJP implementation. (remm)
+      </fix>
+      <fix>
+        <bug>35942</bug>: Fix NPE retriving cipher suite attribute when no certificate 
+        was submitted (for example with no SSL). (remm)
+      </fix>
+      <fix>
+        Internationalization and code cleanups for APR AJP implementation. (remm)
+      </fix>
+      <fix>
+        Security exception in APR AJP implementation when running with the security
+        manager enabled. (remm)
+      </fix>
+      <fix>
+        <bug>36173</bug>: Add missing sync in FastHttpDateFormat.formatDate, submitted 
+        by Alexei Krainiouk (remm)
+      </fix>
+      <fix>
+        Disable HTTP compression when sendfile is used for a resource (remm)
+      </fix>
+      <fix>
+        AJP secret attribute report only at trace level. (pero)
+      </fix>
+     </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>36127</bug>: Validation compatibility with Xerces 2.7.1, submitted 
+        by Florent Benoit (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Cluster">
+    <changelog>        
+      <fix>
+        Fix NPE when cluster stops (pero)
+      </fix>
+      <fix>
+        <bug>36218</bug>: MemoryRealm now support also GenericPrincipal, but 
+        JAASRealm with cluster replication still has a problem, detected by Dirk Dekok (pero)
+      </fix>   
+     </changelog>
+  </subsection>
+  
+  <subsection name="Webapps">
+    <changelog>
+    </changelog>
+  </subsection>
+ </section>
+
+<section name="Tomcat 5.5.10 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <add>
+         Add JMX remote ant task to control tomcat MBeanserver via ant scripts.
+         Ant lib is included at "server/lib/catalina-ant-jmx.jar" and documentation
+         is added to <a href="monitoring.html">Monitoring and Managing Tomcat How-To</a> (pero)
+      </add>
+      <fix>
+        <bug>34361</bug>: Integrate better antlib and import support for 
+        catalina manager tasks [Modified patch from Daniel Santos]  (pero)
+      </fix>
+      <fix>
+        StoreConfig save now the Connector.sslProtocol attribute. (pero)
+      </fix>
+      <update>
+        Change log dir at service.bat to "$CATALINA_BASE/logs" for better multi instance support. (pero)
+      </update>
+      <update>
+        <bug>34237</bug>: Added note and links to context and host configuration
+          references in JNDI DataSources HowTo to aid the clueless. (yoavs)
+      </update>
+      <update>
+        <bug>34248</bug>: Update JavaMail download instructions to include JAF. (yoavs)
+      </update>
+      <update>
+        Update to JDT from Eclipse 3.1, with support for Java 5 (remm)
+      </update>
+      <update>
+        Refactoring, redesign and extend the cluster module
+          - Cluster can be configured as subelement from Engine and Host.
+          - Optimized performance and reduce memory usage
+          - Better JMX support
+          - add a lot of JMX stats attribute for better monitoring 
+          - add a single element default cluster configuration
+          - more config options
+             LifecycleListener
+             ClusterListener
+             more than one cluster valves
+          - better subclass support
+          - change a lot of existing cluster API's (pero)
+       </update>
+       <add>
+         Add Apache Portable Runtime JNI wrapper and helper API (mturk)
+       </add>
+       <update>
+         Update JULI to provide support for taking over java.util.logging bootstrap configuration,
+         and move the default properties file to ${catalina.base}/conf/logging.properties (remm)
+       </update>
+       <fix>
+         <bug>34746</bug>: Updated catalina.properties instructions per Bill Edwards' suggestion. (yoavs)
+       </fix>
+       <fix>
+         <bug>35090</bug>: Minor documentation typo fix. (yoavs)
+       </fix>
+       <fix>
+         <bug>34931</bug>: Rewrote ROOT/index.jsp to be XHTML strict compliant, per Richard
+           Beton's patch. (yoavs)
+       </fix>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>20380</bug>: Access log timestamps now take account of Daylight Saving
+        Time (DST). (markt)
+      </fix>
+      <add>
+        <bug>34220</bug>: Provide better error message when server.xml can't be located.
+          [Modified patch from Ralf Hauser] (yoavs)
+      </add>
+      <add>
+          Add MessageListener and LifecylceListener cluster saving to storeconfig module
+          (&lt;Cluster ... &gt;&lt;ClusterListener className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" &gt;) (pero)
+      </add>  
+      <fix>
+        <bug>33743</bug>: Add additional synchronization in webapp classloader to avoid
+        possible race condition when defining a class (remm)
+      </fix>
+      <fix>
+        <bug>33711</bug>: Add events on passivate and activate to cleanup SSO, and recycle
+        session objects when removing them from a manager (so that anyone keeping references
+        to it would leak a minimal amount of memory) (remm)
+      </fix>
+      <update>
+        Re-add patch causing Session.getId to throw an ISE, and make all internal components
+        use a safe getIdInternal method (remm)
+      </update>
+      <update>
+        Store principal to be exposed for Request.getUserPrincipal inside the GenericPrincipal,
+        to remove hacks from the JAAS realm (remm)
+      </update>
+      <fix>
+        <bug>10385</bug>: SSI Servlet now includes better support for files that use character
+        encodings other than the platform default.(markt)
+      </fix>
+      <fix>
+        Remove CopyParentClassLoader rule, which doesn't seem to be doing anything useful
+        anymore. (remm)
+      </fix>
+      <add>
+        Provide an ServletFilter implementation of Server Side Includes (SSI). This was
+        submitted by David Becker under <bug>33106</bug>. (markt)
+      </add>
+      <add>
+        Add sendfile support to default servlet, with a sendfileSize configuration attribute.
+        (remm)
+      </add>
+      <update>
+        If APR as well as Tomcat's JNI wrapper for APR are present, use APRized protocol handlers
+        instead of the regular ones (remm)
+      </update>
+      <fix>
+        <bug>22617</bug>: When used with an EJB container and a realm that supports the concept
+        of an unauthenticated user (J2EE.3.4.3) BASIC authentication was always authenticating
+        users as the unauthenticated user without giving them a chance to supply a username and
+        password. (markt)
+      </fix>
+      <fix>
+        Prevent facade objects cloning (remm)
+      </fix>
+      <update>
+        Add missing CGI variables to SSI servlet. Patch submitted by Fritz Schneider. (markt)
+      </update>
+      <fix>
+        <bug>34578</bug>: Updated JNDIRealm comment. (yoavs)
+      </fix>
+      <fix>
+        <bug>34273</bug>: Better Bootstrap warning message. [Path from Ralf Hauser] (yoavs)
+      </fix>
+      <update>
+        <bug>34675</bug>: Updated Proxy-HowTo page with Servlet API calls. (yoavs)
+      </update>
+      <fix>
+        <bug>34546</bug>: Fix problem where the "first" Valve couldn't be removed from a Pipeline. (billbarker)
+      </fix>
+      <fix>
+        Fix NPE when POST size exceeds limit defined by maxPostSize. (markt)
+      </fix>
+      <fix>
+        Fix FORM authentication so POSTed parameters are not assumed to be encoded with platform
+        default encoding. A side effect of this fix is that the bodies of POST requests that
+        require FORM authentication are now buffered and made available after a sucessful login. (markt)
+      </fix>
+      <fix>
+        <bug>34840</bug>: Better handling of external WARs redeployment, and ignore docBase specified
+        in context file if within the Host appBase (remm)
+      </fix>
+      <fix>
+        Fix handling of symbolic links when the DefaultServlet is generating directory
+        listings. (markt)
+      </fix>
+      <fix>
+        <bug>35769</bug>: Correct implementation of javax.naming.Context.composeName( Name, Name)
+        in multiple places. Patch provided by Laurent Simon. (markt)
+      </fix>
+      <add>
+        <bug>34805</bug>: Add warning for suspicious security patterns, as suggested by Ralf Hauser. (yoavs)
+      </add>
+      <fix>
+        <bug>35819</bug>: Use getWorkPath for deleting work directory on context destroy, as suggested
+          by Rob Steele. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  
+   <subsection name="Coyote">
+     <changelog>
+      <update>
+        Add support for using "Smart Cards" as trust/keyStore. (billbarker)
+      </update>
+      <update>
+        Add some Mbean attributes and operations to ChannelSocket (pero)
+      </update>    
+      <add>
+        Apache Portable Runtime based HTTP/1.1 protocol handler, with SSL support (remm)
+      </add>
+      <add>
+        Add support for simple file-based CRLs under JDK 1.5 (billbarker)
+      </add>
+      <add>
+        Add experimental NIO-Socket channel for the AJP/1.3 Connector (billbarker)
+      </add>
+      <add>
+        <bug>34648</bug>: Add configuration option to enable IP-based Virtual Hosts. (billbarker)
+      </add>
+      <update>
+        Refactor the AJP/1.3 Connector to be able to handle more advanced Actions. (billbarker)
+      </update>
+      <fix>
+        Fix connector initialisation so sslProtocol is not required for SSL. (markt)
+      </fix>
+      <add>
+        Add bufferSize option to the AJP/1.3 Java connector to control output buffering. (billbarker)
+      </add>
+      <add>
+        Apache Portable Runtime based AJP/1.3 protocol handler (remm)
+      </add>
+      <fix>
+        Delay reading the inital request body packet by default for the AJP/1.3 Java connector. (billbarker)
+      </fix>
+     </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>18477</bug>: Allow symbolic links when precompiling JSPs (markt)
+      </fix>
+      <add>
+        <bug>34727</bug>: Allow specifying the Option class used by the Jasper engine,
+        submitted by Scott Stark (remm)
+      </add>
+      <add>
+        Support for Java 5.0 in JSPs (remm)
+      </add>
+      <update>
+        Java 5 will be the source and target for JSPs when running on Java 5 (remm)
+      </update>
+      <update>
+        <bug>34652</bug>: Add the ability to get SMAPs when precompiling, submitted by
+        Daryl Robbins (remm)
+      </update>
+      <fix>
+        <bug>34465</bug>: Jspc failure if there is no web.xml (remm)
+      </fix>
+      <fix>
+        <bug>35696</bug>: Make certain that release is called for custom tags 
+         when tag-pooling is disabled. (billbarker)
+      </fix>
+      <fix>
+        <bug>35386</bug>: Make useBean resources use consistent spelling, from Kurt Huwig. (yoavs)
+      </fix>
+      <update>
+        <bug>33522</bug>: Update jasper-howto to reflect use of javac switch. (yoavs)
+      </update>
+      <add>
+        <bug>35114</bug>: Add failOnError flag to JspC, by ziweth. (yoavs)
+      </add>
+      <fix>
+        <bug>35410</bug>: Fixed NPE in JspWriterImpl. (yoavs)
+      </fix>
+      <add>
+        <bug>35571</bug>: JspC resolved uriRoot relative to Ant project basedir, if any, as suggested
+          by Jason Pettiss. (yoavs)
+      </add>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Cluster">
+    <changelog>        
+      <add>
+        Add that cluster can configure as Engine and Host element. (pero)
+      </add>      
+      <add>
+        Add single cluster default configuration element - discussed at JAX 2005 conference Cluster Workshop. (pero)
+      </add>      
+      <fix>
+        Fix resend GET_ALL_SESSIONS when wait ACK failed at receiver side (pero)
+      </fix>  
+      <fix>
+        ClusterValve now remove from container element when cluster stops and added with next start again. (pero)
+      </fix>     
+      <add>
+        Set timestamp only at first time inside SessionMessageImpl (pero)
+      </add>    
+      <add>
+       Set timestamp from findsessions method call, when handling GET_ALL_SESSION
+       to all SEND_SESSION_DATA and TRANSFER complete messages. (pero>
+      </add>
+      <add> 
+       Drop all received message inside GET_ALL_SESSION message queue before state 
+       transfer message timestamp. (pero)
+      </add>      
+      <add>
+        Cluster ping now transfer cluster domain information and DeltaManager only
+        send and receive message from same domain members (pero)
+      </add>      
+      <add>
+        JMX Support for McastService (Membership) (pero)
+      </add>      
+      <add>
+        Redesign SimpleTcpCluster message receiving to ClusterReceiverBase (pero)
+      </add>      
+      <add>
+        Cluster transfer all attributes to the generate session manager at addManager. 
+        Remove some unused attributes at SimpleTcpCluster and ReplicationTransmitter (pero)
+      </add>    
+      <update>
+        Refactor DeltaManager:
+          - createSession call now ManagerBase super class method
+          - extract some long methods
+          - send GET_ALL_SESSION with session blocks
+          - don't sync sessions map when send all sessions (pero)  
+      </update>          
+      <update>
+        Add developer actions at to-do.txt (Proposal of changes) (pero)  
+      </update>          
+      <update>
+        Small refactorings at FastAsyncSocketSender (pero)  
+      </update>          
+      <update>
+        Redesign cluster message sending to lesser cpu and memory usage. 
+        Set at ReplicationTransmitter#compress=false as default. Change API from
+        ClusterSender, ReplicaitonTransmitter, DataSender, SimpleTcpCluster (pero)  
+      </update>          
+      <add>
+        DeltaManager has now JMX expireAllLocalSessions and processExipre operation 
+        for better cluster node shutdown handling (usefull for testing only) (pero)   
+      </add>  
+      <add>
+        DataSender doWaitAckStats for better understanding wait ack problems (pero)   
+      </add>  
+      <update>
+        Refactor DeltaManager and add counter for cluster message send/receive message (pero)  
+      </update>          
+      <fix>
+        <bug>34389</bug>:Porting Clustering fix pack to 5.5.10 code base.
+        Remove synchonized from DataSender.pushMessage(). Very offen the 
+        complete cluster blocking after replicated a bulk of new session messages under heavy load.
+        All cluster node standing for a lot of time and made nothing. 
+        Fix it for pooled, asynchronous and fastasyncqueue replication mode. Very bad thing, sorry! (pero)  
+      </fix>
+      <add>
+        Add notifySessionListenersOnReplication attribute to SimpleTcpCluster to stop notify 
+        event to SessionListener at backup nodes from create and destroy replicated session (pero)
+      </add>
+      <add>
+        Add compress attribute to ClusterSender and ClusterReceiver interface. Now compress config
+        transfer from sender to receiver at SimpleTcpCluster. (pero) 
+      </add>    
+      <add>
+        Add ClusterValve interface and implement it as ReplicationValve and JvmRouteBinderValve. Now both
+        Valves can be directly configured at server.xml Host/Cluster/Valve subelements.
+        Also this configuration are correctly handled with the StoreConfig module. (pero)  
+      </add>    
+      <update>
+        Deactivate DataSender keepAliveMaxRequestCount change default to -1. 
+        Cluster replication sockets are fast and very stable! (pero)  
+      </update>          
+      <update>
+        Setup JvmRouteBinderValve as host valve instead context valve. Refactor the API a little bit. (pero)
+      </update>
+      <fix>
+        Don't increment open socket counter before socket is really open. Add socket open failures counter (pero) 
+      </fix>  
+      <add>
+        Add MessageListener support to cluster server.xml element (ClusterListener) to 
+        register your own cluster message receiver (pero)
+      </add>  
+      <add>
+        Add LifecycleListener support to cluster server.xml element (Listener)
+        and notify those listener from start/stop cluster,
+        add/remove session manager, sending fault and start/stop member  (pero)
+      </add>  
+      <add>
+        Add active backgroundProcess keepAlive timeout and request count socket close check
+        at ReplicationTransmitter.  Check frequency can be change with attribute 
+        processSenderFrequency (default 2). (pero)
+      </add>
+      <add>
+        Remove useless Jdk13ReplicationListener,Jdk13ObjectReader. 
+        Add SocketReplicationListener and SocketObjectReader to have nativ socket ClusterReceiver. 
+        Also extract ClusterReceiverBase superclass for SocketReplicationListener and ReplicationListener (pero) 
+      </add>
+      <update>
+        Add and update some API and the <a href="cluster-howto.html">cluster howto documentation</a> (pero)
+      </update>
+      <update>
+        Refactor ReplicationValve for better understanding and small optimization (pero)
+      </update>
+      <add>
+        Starting a unit test suite for cluster module - very much todo (pero)
+      </add>
+      <fix>
+        Fix ant build.xml to direct compile at cluster module directory (pero)
+      </fix>
+      <fix>
+        Fix some I18N messages, but a lot of work is waiting for fix (pero)
+      </fix>
+      <add>
+        Add ReplicationValve Mbeans stats attribute getter and resetStatistics operation (pero)
+      </add>
+     </changelog>
+  </subsection>
+  
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>35758</bug>: Admin webapp mishandling digest attribute of JDBCDataSourceRealm. (yoavs)
+      </fix>
+      <add>
+        <bug>34250</bug>: Admin webapp Commit Changes button now asks for confirmation. (yoavs)
+      </add>
+      <add>
+        <bug>34818</bug>: Alternating row for apps in HTML manager, as suggested by Jeff
+          Domeyer. (yoavs)
+      </add>
+      <add>
+        <bug>35379</bug>: Added commons-logging to build path of manager and host-manager apps,
+          to make them build with Jikes, as suggested by Aaron Isotton. (yoavs)
+      </add>
+    </changelog>
+  </subsection>
+ </section>
+
+<section name="Tomcat 5.5.9 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <add>
+        Add JULI, a java.util.logging implementation, used to provide sane defaults and
+        configurability equivalent to Tomcat 4.0 for Tomcat 5.5 logging (remm)
+      </add>
+      <docs>
+        Add JULI documentation to the logging page (remm)
+      </docs>
+      <add>
+        Add host manager webapp (remm)
+      </add>
+      <add>
+        Add ant JkStatusUpdateTask for remote status worker handling ( >=mod_jk 1.2.9) (pero)
+      </add>
+      <add>
+        <bug>33739</bug>: Add reference to RUNNING.txt in setup.html. (yoavs)
+      </add>
+      <fix>
+        <bug>33719</bug>: Update reference to Ant download page. (yoavs)
+      </fix>
+      <fix>
+        <bug>33883</bug>: Bad options in SSL-HowTo. (yoavs)
+      </fix>
+      <update>
+        Update to MX4J 3.0.1 (pero)
+      </update>
+      <update>
+        <bug>34139</bug>: Updated Realm-HowTo to specify JMX, Commons-Logging jars for RealmBase. (yoavs)
+      </update>
+      <add>
+        <bug>33325</bug>: Added top-level clean target to Netbuild build.xml file. (yoavs)
+      </add>
+      <update>
+        <bug>33755</bug>: Clarified Postgresql JNDI datasource example. [patch submitted by
+          Tom Witmer] (yoavs)
+      </update>
+    </changelog>
+   </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Remove some instances of expanded folder removal (remm)
+      </fix>
+      <fix>
+        Don't call mkdirs if we're not going to save the configuration in StandardContext (remm)
+      </fix>
+      <fix>
+        Fix context classloader binding during loader initialization (it was set to null before) (remm)
+      </fix>
+      <fix>
+        The webapp logger should only be retrieved when the context classloader is set to the 
+        webapp's classloader (remm)
+      </fix>
+      <fix>
+        <bug>34170</bug>: Add back retry logic in JDBC realm in case of a connection failure (remm)
+      </fix>
+      <fix>
+        <bug>22041</bug>: Support dynamic proxies as session objects. (markt)
+      </fix>
+      <fix>
+        Fix logger names for wrappers (remm)
+      </fix>
+      <fix>
+        <bug>34006</bug>: If antiResourceLocking was used, HostConfig considered the path as external,
+        and web application resources were not correctly removed or tacked; also simplify the code a lot
+        (remm)
+      </fix>
+      <fix>
+        <bug>34016</bug>: Save and restore docBase when using antiResourceLocking, for compatibility with
+        the admin webapp (remm)
+      </fix>
+      <add>
+        <bug>33636</bug>: Set lastModified attribute when expanding WAR files. (yoavs)
+      </add>
+      <add>
+        <bug>32938</bug>: Allow Salted SHA (SSHA) passwords in JNDIRealm. (yoavs)
+      </add>
+      <add>
+        <bug>31288</bug>: Allow SMTP authentication for JNDI MailSessionFactory. (yoavs)
+      </add>
+      <update>
+        Harmonize processing of the context.xml defaults with the way web.xml is processed
+        (remm)
+      </update>
+      <fix>
+        Ignore ';' if it is in the query string (remm)
+      </fix>
+      <fix>
+        private to protected for the webapp classloader (remm)
+      </fix>
+      <fix>
+        Improve logging of filters and listeners startup errors (remm)
+      </fix>
+      <fix>
+        <bug>33774</bug>: Retry once in JNDI realm authenticate failure regardless of the 
+        exception message (remm)
+      </fix>
+      <fix>
+        <bug>33961</bug>: Don't encode '~' in context paths (remm)
+      </fix>
+      <fix>
+        <bug>32866</bug>: Propagate distributable property from context to manager (yoavs)
+      </fix>
+      <fix>
+        <bug>32867</bug>: Reset distributable attribute in context for clean reload handling (yoavs)
+      </fix>
+      <update>
+          Fix some RealmBase/JNDIRealm log.isXXXEnabled (pero)
+      </update>
+      <fix>
+          <bug>34161</bug>: Harmonize StandardContext.stop with ContainerBase.stop (remm)
+      </fix>
+    </changelog>
+   </subsection>
+   
+   <subsection name="Coyote">
+     <changelog>
+      <fix>
+        <bug>33971</bug>: Set remoteHost to null when Apache doesn't send one. (billbarker)
+      </fix>
+      <fix>
+        Fix calculation of threadRatio for the ms thread pool, and fix setting the updated
+        timeout value (remm)
+      </fix>
+      <update>
+        Update the ms thread pool so that we allocate a worker before accepting a new socket,
+        and wait a little if the pool is exhausted; this should make low maxThreads values work a 
+        lot better (remm)
+      </update>
+      <update>
+        <bug>33857</bug>: Update information on automatic mod_jk configuration in Apache-HowTo (yoavs)
+      </update>
+      <fix>
+        Fix sync block placement in Mapper.addContext (remm)
+      </fix>
+      <fix>
+        <bug>32741</bug>: Fix spelling of "committed" [patch from Ben Souther] (yoavs)
+      </fix>
+      <fix>
+        <bug>34133</bug>: Make setHeader clear multi-valued headers (billbarker)
+      </fix>
+     </changelog>
+   </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>34034</bug>: Jasper does not respect external entities (billbarker)
+      </fix>
+      <fix>
+        <bug>33810</bug>: Incorrect recycling of BodyContent if close is called (remm)
+      </fix>
+      <update>
+        Per instance loggers in Jasper (remm)
+      </update>
+    </changelog>
+  </subsection>
+   
+   <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix JvmRouteBinderValve primary failover attribute to
+        org.apache.catalina.cluster.session.JvmRouteOrignalSessionID (pero)
+      </fix>
+      <fix>
+        Change attribute name waitForAck to sendAck at ReplicationListener (pero)
+      </fix>
+      <add>
+        Integrate new fastasyncqueue cluster sender mode.
+        Support queue size limitation,
+        get all queued objects and send it to the backup node,
+        no queue thread lock contention under high replication load,
+        submitted by Rainer Jung (pero)
+      </add>
+      <add>
+        Add compress attribute to Sender and Receiver to transfer data uncompressed. 
+        At high cluster load this option consume lesser cpu and memory.
+        Implement the compress handling to ReplicationTransmitter, ReplicationListener, 
+        XByteBuffer and Jdk13ReplicationListener (pero)
+      </add>
+      <add>
+        Add doProcessingStats to synchronous, asynchronous and fastqueueasync sender modes
+        to get min, avg, max processing times as IDataSender JMX MBeans (pero)
+      </add>
+      <fix>
+        TcpThreadPool use constant ACK byte array instead create 
+        new 3 byte buffer for every message ack (pero)
+      </fix>
+      <update>
+        Refactor ReplicationTransmitter and ReplicationListener (pero)
+      </update>
+      <update>
+        add getCatalinaCluster() to ClusterReceiver and SimpleTcpCluster (pero)
+      </update>    
+      <update>
+        Update the Api documentation (pero)
+      </update>
+    </changelog>
+   </subsection>
+   <subsection name="Webapps">
+     <changelog>
+       <update>
+         Use the standard struts taglib URIs in admin JSPs. (billbarker)
+       </update>
+      <add>
+        Add more host parameters to create new host with host-manager (pero)
+      </add>
+      <fix>
+        <bug>34033</bug>: Fix quoting related bugs (remm)
+      </fix>
+      <fix>
+        <bug>33713</bug>: Add Struts init code in frameset.jsp as well (remm)
+      </fix>
+     </changelog>
+   </subsection>
+</section>
+
+<section name="Tomcat 5.5.8 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        <bug>33204</bug>: Fixed SSL HowTo page. (yoavs)
+      </fix>
+      <fix>
+        <bug>33351</bug>: Fix silent uninstallation. (remm)
+      </fix>
+      <fix>
+        <bug>33489</bug>: Missing space in uninstaller message. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Unregister host mbean and all context mbeans at remove a host, s. StandardHost.destroy() and MBeanFactory.createStandardHost/removeHost(,) detected by Thorsten Kamann (pero)
+      </fix>
+      <fix>
+        make it possible to restart connector, now serversocket recreated after stop,start (pero)
+      </fix>
+      <fix>
+        change mbean names from Mapper and ProtocolHandler to connector naming style (pero)
+      </fix>
+      <update>
+        Add some log.isXXXEnabled (pero)
+      </update>
+      <fix>
+        Deregister MapperListener after remove connector (pero)
+      </fix>
+      <fix>
+        Remove host only at own domain with same name at all services, detected by Thorsten Kamann (pero)
+      </fix>
+      <fix>
+        <bug>33187</bug>: Remove any logging of the password in the JAAS realm,
+        submitted by Andrew Jaquith (remm)
+      </fix>
+      <fix>
+        <bug>33033</bug>: Don't do anything to the response in the ErrorReportValve
+        if data has already been written (remm)
+      </fix>
+      <update>
+        Add charset support for the URLs used by the tasks, to remove deprecation (remm)
+      </update>
+      <fix>
+        <bug>26135</bug>: Workaround for memory leak when reloading Struts
+        based web applications by clearing the bean instrospector cache of the JVM on
+        classloader stop, submitted by Tobias Lofstrand. (remm)
+      </fix>
+      <fix>
+         Ensure that if CLASSPATH is declared on startup - it is not used. (funkman)
+      </fix>
+      <fix>
+         Add back use of deployOnStartup in HostConfig (remm)
+      </fix>
+      <docs>
+         Ant tasks docs patches, submitted by Gabriele Garuglieri. (remm)
+      </docs>
+      <update>
+         Use NIO for the raw copying operation, as it is faster (a little under 30%), 
+         and decreases a little the impact of antiResourceLocking. (remm)
+      </update>
+      <fix>
+         <bug>33357</bug>: Fix connection leaks with the DataSourceRealm, as well 
+         as improve efficiency, submitted by Dominik Drzewiecki. (remm)
+      </fix>
+      <update>
+         Improve a little logging of servlet exceptions, which should all log the root cause. (remm)
+      </update>
+      <update>
+         Add new Manager.createSession(sessionId) method, allowing the client to "specify" the session id which should be used using a cookie
+         when using emptySessionPath="true". This fixes session tracking in this case. (remm)
+      </update>
+      <fix>
+         <bug>33368</bug>: Fix memory leak in swallowOutput feature which occurred when the thread pool size is
+         reduced, submitted by Rainer Jung. (remm)
+      </fix>
+	  <fix>
+          StoreConfig: can't save cluster Membership element (pero)
+       </fix>
+	  <add>
+          StoreConfig: suppress default jkHome attribute at connector  (pero)
+      </add>
+	  <add>
+          StoreConfig: Save new dymanic properties from ReplicationTransmitter  (pero)
+      </add>
+      <fix>
+         <bug>33463</bug>: Remove attributes after context destroy. (remm)
+      </fix>
+      <fix>
+         <bug>33572</bug>: context.xml should be a redeploy resource, and add prioritization for
+         redeploy resources. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+         PoolTcpEndpoint recreate ServerSocket after start,stop,start connector (pero)
+      </fix>
+      <update>
+        Add some log.isXXXEnabled (pero)
+      </update>
+	  <add>
+	    JkMX: make log4j mbean configurable with attribute log4jEnabled (pero)
+	  </add>
+	  <fix>
+	    When Tomcat runs on Windows and IE is uploading data to the server, the first read 
+	    must be at least 8KB, otherwise upload speed is extremely low, submitted by Noel 
+	    Rocher (remm)
+	  </fix>
+    </changelog>
+  </subsection>
+ 
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>33223</bug>: pageContext.forward and jsp:include result
+        in StringIndexOutOfBoundsException (luehe)
+      </fix>
+      <fix>
+        <bug>33373</bug>: Fix handling of context classloader in jspc (remm)
+      </fix>
+      <fix>
+        <bug>33538</bug>: Ignore example and tag-extension elements in TagLibraryInfoImpl. (yoavs)
+      </fix>
+      <fix>
+        <bug>33539</bug>: Better error message when an unknown element is encountered in the tag file. (yoavs)
+      </fix>
+      <fix>
+        <bug>33219</bug>: Minor JspServletWrapper code cleanup. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+  
+  <subsection name="Cluster">
+    <changelog>
+       <fix>
+          Add instance based ReplicationValve statistics to Mbean descriptor (pero)
+       </fix>
+       <fix>
+          Better I18N support to cluster session and tcp classes (pero)
+       </fix>
+       <add>
+          Support optional primaryIndicator at ReplicationValve to mark that 
+          request processing to existing session is at primary cluster node. 
+          Easy failover detection, when mark is not at 
+          configurable primaryIndicator attribute, submitted by Rainer Jung (pero)
+       </add>
+       <update>
+          Refactor all implementation from interface IDataSenders (pero)
+       </update>
+      <add>
+          Add some usefull attributes and operations to the all sender MBeans. (pero)
+       </add>
+      <add>
+          Add keepAlive and waitForAck handling to AsyncSocketSender and factor out a DataSender base class.(pero)
+       </add>
+       <add>
+          ReplicationTransmitter: Enable and Disable autoreconnect sender and waitForAck. (pero)
+       </add>
+       <add>
+          ReplicationTransmitter: transfer all properties to socket sender from server.xml configuration. (pero)
+       </add>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        Fix create and remove Host for Admin app. (pero)
+      </fix>
+    </changelog>
+   </subsection>
+</section>
+
+<section name="Tomcat 5.5.7 (remm)">
+  <subsection name="General">
+    <changelog>
+      <add>
+        Add installer for mod_jk on IIS. (mturk)
+      </add>
+      <add>
+        New store config module for better server.xml saving support.<br/>
+        Add &lt;Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener" /&gt; to your server.xml (pero)
+      </add>
+      <update>
+        <bug>32081</bug>: Remove the JDK requirement from the Unix scripts, submitted
+        by Ben Souther (remm)
+      </update>
+      <fix>
+        <bug>32953</bug>: SERVLETAPI: XSS Issues, submitted by Mark Thomas (jfarcand)
+      </fix>
+      <update>
+        Update to commons-digester 1.6, JDT 3.0.1, MX4J 2.1.0, Struts 1.2.6 (remm)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+         First integration at StoreConfig to StandardServer (pero)
+      </update>
+      <fix>
+        <bug>32714 </bug>: Don't make the AccessLogValve final (funkman)
+      </fix>
+      <fix>
+        <bug>32694</bug>: Fix bad code to make docBase path aboslute in antiLocking
+        method. (remm)
+      </fix>
+      <fix>
+        <bug>32713</bug>: Fix resource-env-ref handling. (remm)
+      </fix>
+      <fix>
+        <bug>31201</bug>: Improve i18n support in DefaultServlet. This was causing
+        problems with JSP include actions and static files. (markt)
+      </fix>
+      <fix>
+        Add some log.isXXXEnabled to o.a.c.core.StandardHost StandardEngine, StandardService (pero)
+      </fix>
+      <add>
+        Feature addition to add Redirector and failOnError support for all Catalina Ant tasks,
+        submitted by Gabriele Garuglieri (remm)
+      </add>
+      <fix>
+        <bug>31198</bug>: Fix FORM and DIGEST authentication for non-ASCII
+        usernames and passwords. (markt)
+      </fix>
+      <fix>
+        Reimplement charset mapper (remm)
+      </fix>
+      <fix>
+        Add logging of exception which could occur when retrieving the password in JDBCRealm (remm)
+      </fix>
+      <fix>
+        <bug>25889</bug>: Don't execute queries twice, submitted by Tom Anderson (remm)
+      </fix>
+      <fix>
+        <bug>32832</bug>: request.getSession(false) fails to return null (luehe)
+      </fix>
+      <fix>
+        <bug>28222</bug>: request.getRequestURL() in forwarded jsp/servlet returns
+        original url rather than new url as per SRV8.4 (markt)
+      </fix>
+      <fix>
+        <bug>33157</bug>: Fix handling of the buffer length for basic authentication parsing (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>32708</bug>: Better handling of bad encoding with the string cache. (remm)
+      </fix>
+      <fix>
+        <bug>32781</bug>: Fix bad initialization of the "scheme" field of the request
+        object, which would cause getScheme to return "http" for the first request. (remm)
+      </fix>
+      <fix>
+        Content length should be ignored if there is chunking (remm)
+      </fix>
+      <fix>
+        Remove most deprecation problems for the AJP connector (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>32746</bug>: Avoid JAR locking when loading classes and improve loading
+        performance by taking advantage of caching, submitted by Dominik Drzewiecki. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+    <changelog>
+       <fix>
+          correct JvmRouteSessionIDBinderListener MBean name to &lt;domain&gt;:type=Listener,name=JvmRouteSessionIDBinderListener,host=&lt;host&gt; (pero)
+       </fix>
+       <add>
+          JMX support to SimpleTcpCluster, ReplicationTransmitter and all senders (pero)
+       </add>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        Fix the webDAV servlet so it can be used via any arbitrary mapping
+        (eg /webdav/*) to edit the contents of a web application. (markt)
+      </fix>
+      <fix>
+        <bug>32729</bug>: Stop is optional and may fail, so it needs to be in a separate try/catch (remm)
+      </fix>
+      <update>
+        Remove the remove method of the manager servlet, and use the undeploy method instead (remm)
+      </update>
+      <fix>
+        <bug>32777</bug>: Fail if application isn't configured properly, submitted by Gabriele Garuglieri
+        (remm)
+      </fix>
+      <fix>
+        <bug>32771</bug>: Cannot undeploy/deploy misconfigured app after tomcat startup,
+        submitted by Gabriele Garuglieri (remm)
+      </fix>
+      <fix>
+        <bug>28867</bug>: Correct manager documentation to document correct way to
+        reference the ROOT context. Submitted by Stephane Bailliez. (markt)
+      </fix>
+      <fix>
+        <bug>33085</bug>: Add support for setting privileged attribute of context
+        to admin webapp. (markt)
+      </fix>
+      <fix>
+        <bug>33117</bug>: Fix Open bugs link broken on default homepage.
+        Patch supplied by Sander Temme. (markt)
+      </fix>
+      <fix>
+        Improve javadoc generation for Catalina. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.6 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        <bug>32532</bug>: updated logging documentation. (yoavs)
+      </update>
+      <update>
+        <bug>32382</bug>: Index page and packaed WAR for sample webapp. (yoavs)
+      </update>
+      <fix>
+        <bug>32603</bug>: Updated host.xml to reflect appBase resolution. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add child to the map of the parent before starting it. (remm)
+      </fix>
+      <fix>
+        Decouple usage of the scheme and secure attributes from enabling SSL. (remm)
+      </fix>
+      <fix>
+        <bug>32502</bug>: memory leak in DigestAuthenticator. (yoavs)
+      </fix>
+      <fix>
+        <bug>28709</bug>: javax.servlet.http.HttpServletRequest.isRequestedSessionIdValid() returns true for an invalidated session. (luehe)
+      </fix>
+      <fix>
+        <bug>32137</bug>: Possible thread-safety issue in RealmBase. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>32585</bug>: Better handling for content length greater than Integer.MAX_VALUE in response. (markt)
+      </fix>
+      <update>
+        Allow ApacheConfig and friends to live under an Engine. (billbarker)
+      </update>
+      <update>
+        Syncronize access to the Jk Request registration count. (billbarker)
+      </update>
+      <update>
+        Speed the MsgContext on its way to GC. (billbarker)
+      </update>
+      <fix>
+        Keep correct thread counts in Thread pool when thread ends in an exception (billbarker)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Updated Jasper-HowTo section on using Jikes, changed conf/web.xml JSPServlet to refer people to Jasper-HowTo so that we don't have these instructions in two places. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>32505</bug>: Fix handling of an empty context parameter (which occurred every time the HTML
+        manager was used to deploy a local war without specifying also a context file). (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.5 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        <bug>32235</bug>: Sync conf/web.xml MIME types with Apache httpd. (yoavs)
+      </update>
+      <fix>
+        <bug>31132</bug>: Better -x/-r support for OS/400 in startup scripts. (yoavs)
+      </fix>
+      <update>
+        <bug>22679</bug>: Added misc note on accessing session ID to SSL-HowTo. (yoavs)
+      </update>
+ <!-- ByteBufferAccessLogValve.java is not inside!!
+      <update>
+        Add an asynchrounous access log valve based on NIO (jfarcand)
+      </update>
+ -->
+       <update>
+        <bug>32249</bug>: Updated logging documentation. (yoavs)
+      </update>
+      <update>
+        <bug>32282</bug>: Modify Windows Uninstaller to only remove webapps/ROOT and webapps if user asks to remove everything. (yoavs)
+      </update>
+      <fix>
+        <bug>32371</bug>: outdated introduction.xml page. (yoavs)
+      </fix>
+      <fix>
+        <bug>32373</bug>: outdated installation.xml page. (yoavs)
+      </fix>
+      <update>
+        <bug>32454</bug>: amended JNDI documentation for JavaMail/JavaActivationFramework usage. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>32130</bug>: Add safety check to FileStore#keys method. (yoavs)
+      </fix>
+      <update>
+        <bug>32276</bug>: Add developer info to Realm How-To. (yoavs)
+      </update>
+      <fix>
+        <bug>32082</bug>: Added protected getPrincipals method to MemoryRealm for easier extension. (yoavs)
+      </fix>
+      <fix>
+        <bug>32023</bug>: CGIServlet fails to handle post message with multipart/form data. (yoavs)
+      </fix>
+      <fix>
+        <bug>32269</bug>: JNDIRealm fails with InvalidNameException to authenticate users if LDAP distinguished name (DN) contains slash or double quote character(s). (yoavs)
+      </fix>
+     <fix>
+        Move processExpiresFrequency check to ManagerBase and reflect change to all subclasses (StandardManager, PersientManagerBase, DeltaManager). (pero)
+      </fix>
+      <update>
+        Add DIGEST authentication support to the JDBC and DataSource realms. Supports both digested and cleartext passwords. (markt)
+      </update>
+      <fix>
+        <bug>32429</bug>: CGIServlet calculates number of lines received on stderr incorrectly. (markt)
+      </fix>
+      <fix>
+        <bug>32431</bug>: Fix typo in code that passes data to CGI script. (markt)
+      </fix>
+      <fix>
+        <bug>32430</bug>: Class cast exception in toString() method within CGI servlet. (markt)
+      </fix>
+      <fix>
+         Add some log.isXXXEnabled checks at StandardContext and HostConfig (pero)
+      </fix>
+      <fix>
+         Remove the last DefaultContext artifacts (pero)
+      </fix>
+      <fix>
+         <bug>32031</bug>: using createConnector with "http" protocol (remm)
+      </fix>
+      <fix>
+         Add configFile attribute in JMX descriptors (remm)
+      </fix>
+      <fix>
+         Fix autodeployer handling of a war which includes a /META-INF/context.xml, so that it is
+         correctly registered and can be reloaded correctly (remm)
+      </fix>
+      <fix>
+         <bug>32137</bug>: Use of MessageDigest should be synced in DIGEST (remm)
+      </fix>
+      <fix>
+         Add info log when the autodeployer reloads a context (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Small HTTP/1.1 optimizations: replace usage of Strings with constant byte arrays, and
+        simplify the code converting Strings to bytes (remm)
+      </update>
+      <update>
+        Greatly reduce the amount of recycle method calls on the buffers (remm)
+      </update>
+      <fix>Add null OName check for Request unregistration in Jk, to remove
+           exception under JDK 1.5. (billbarker)
+      </fix>
+      <fix><bug>32292</bug>: Don't send keep-alive header when the protocol
+           can't be parsed. (billbarker)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Updated JspC usage messages to include recently added configurable parameters. (yoavs)
+      </update>
+      <fix>
+        <bug>32330</bug>: JspC changes context classloader. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+    <changelog>
+       <add>
+          JvmRouteBinderValve/JvmRouteSessionIDBinderListener to bind cluster session after primary node failure at first calling backup node.
+          This was an option to have session stickyness after cluster node crashed. Work only with JESSIONID cookies. (pero)
+       </add>
+       <add>
+          Better log support to DeltaManager to see detail information at debug level. (pero)
+       </add>
+       <fix>
+          Fix FarmWarDeployer based on new HostConfig deployer. (pero)
+       </fix>
+       <fix>
+          FarmWarDeployer controlled WarWatcher with engine backgroundProcess call.
+          Added processDeployFrequency attribute to Deployer server.xml element. (pero)
+       </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <update>
+        <bug>32019</bug>: Remove maxlength=64 restriction on env entry values in admin webapp. (yoavs)
+      </update>
+      <fix>
+        Fix various problems in realm docs, submitted by Phil Mocek. (remm)
+      </fix>
+      <update>
+        Add log4j docs submitted by Allistair Crossley. (remm)
+      </update>
+      <fix><bug>32381</bug>: Fix problem where EL expression is used as a
+        place holder in the admin webapp.
+        Submitted by Allistair Crossley. (billbarker)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.4 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        <bug>31671</bug>: Update web.xml files to 2.4 schema where applicable. (yoavs)
+      </update>
+      <update>
+        <bug>31912</bug>: Add PNG and CSS file types to replication filter default. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add processExpiresFrequency to PersistentManagerBase and made some small JDBCStore optimizations (pero)
+      </fix>
+      <fix>
+        Register JSP monitoring mbean for each servlet that declares a jsp-file in web.xml. (luehe)
+      </fix>
+      <fix>
+        <bug>31578</bug>: Update Manager configuration documentation. (yoavs)
+      </fix>
+      <fix>
+        <bug>31273</bug>: Add support for derefaliases in JNDIRealm. (markt)
+      </fix>
+      <fix>
+        <bug>31623</bug>: Better OS400 support in setclasspath.sh. (yoavs)
+      </fix>
+      <add>
+        Extend background processing to most container components. (remm)
+      </add>
+      <fix>
+        Remove all MX4J related code. (remm)
+      </fix>
+      <fix>
+        Update JAR list in TldConfig. (remm)
+      </fix>
+      <add>
+        Register datasources with JMX. With DBCP, this is enough to provide JMX management and monitoring.
+        It might work well with many other data sources which might not register themselves in JMX
+        but do expose their stuff in a java bean fashion. (remm)
+      </add>
+      <update>
+        Add the ability to force session cookies to be set to the root path "/". This should not be used
+        on large servers, otherwise tons of cookies may be sent. (remm)
+      </update>
+      <fix>
+        Workaround for client socket exceptions occurring while running a CGI, which could cause
+        the external process to hang. (remm)
+      </fix>
+      <update>
+        Optimize session cookie IDs conversion to String, since this is an unavoidable and uncacheable
+        operation. (remm)
+      </update>
+      <fix>
+        Add explicit error message if temp dir does not exist, and remove useless calls to initDirs. (remm)
+      </fix>
+      <add>
+        Add an optimized access log valve, supporting hardcoded support for the common and combined patterns,
+        and doing a majority of its write-to-logfile operations asynchronously. (remm)
+      </add>
+      <update>
+        Register an MBean to monitor and manage the StringCache, and allow invoking the reset operation. (remm)
+      </update>
+      <fix>
+        <bug>31677</bug>: Log warning if work dir for context can't be determined. (yoavs)
+      </fix>
+      <fix>
+        <bug>31903</bug>: Fix condition which seems to not have been properly updated after adding
+        entry.binaryContent = null a little below, submitted by Joe Zhou. (remm)
+      </fix>
+      <fix>
+        Prevent silent NPEs during StandardContext.start dealing with JMX registration of realm, submitted
+        by Keith Wannamaker. (remm)
+      </fix>
+      <fix>
+        <bug>31592</bug>: Support other encodings for digests. (yoavs)
+      </fix>
+      <update>
+        <bug>31739</bug>: Minor realm-howto and AJP connector doc updates. (yoavs)
+      </update>
+      <fix>
+        <bug>31753</bug>: Minor inconsistency between JDBC and DataSourceRealm#authenticate. (yoavs)
+      </fix>
+      <update>
+        <bug>31683</bug>: Minor clarifications to realm documentation. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Improve i18n in TCP endpoint, and add a better error message when an exception occurs
+        in setSocketOptions. (remm)
+      </fix>
+      <fix>
+        <bug>31663</bug>: Use interval field as the delay for monitor thread. (remm)
+      </fix>
+      <fix>
+        Remove bad shutdown logic for ms pool strategy. (remm)
+      </fix>
+      <fix>
+        Sync with Cookie, by adding ' ' as a special char. If a special char is present,
+        the string will be quoted. If the client doesn't support it, the String will no be quoted anyway
+        and no IAE will be thrown. (remm)
+      </fix>
+      <add>
+        Add an optional String cache for ByteChunk.toString and CharChunk.toString. The cache is
+        unsynchronized during most of its operation, and is static after a training period. An operation
+        is provided to allow resetting the cache. (remm)
+      </add>
+      <update>
+        String caching is enabled by default for ByteChunk. (remm)
+      </update>
+      <fix>
+        <bug>31090</bug>: Use a URL encoded path when setting session cookies. (remm)
+      </fix>
+       <add>
+          Add getAttributeName() to ProtocolHandler to get all attributes at runtime (pero)
+       </add>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Exposed compilerSourceVM and compilerTargetVM options to JspC. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+    <changelog>
+       <fix>
+          DeltaManager and SimpleTcpReplicationManager generate double jvmRoute (pero)
+       </fix>
+       <add>
+          Add some missing Getters and log.isXXXEnableds (pero)
+       </add>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>31707</bug>: Broken JavaScript confirmation in HTML manager. (yoavs)
+      </fix>
+      <fix>
+        Remove hard-coded admin context path from admin's banner.jsp. (yoavs)
+      </fix>
+      <update>
+        Major connector docs update. (remm)
+      </update>
+      <fix>
+        <bug>31732</bug>: Fix Japanese localization of Manager's list output. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+</section>
+
+<section name="Tomcat 5.5.3 (yoavs)">
+
+  <subsection name="General">
+    <changelog>
+      <fix>
+        <bug>30568</bug>: Incomplete setup.html documentation for launching jsvc. (yoavs)
+      </fix>
+      <update>
+        Repackage naming features. (remm)
+      </update>
+      <fix>
+        Fix deployer packaging. (remm)
+      </fix>
+      <fix>
+        Fix embed packaging. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix memory leak when Security Manager is turned on. (jfarcand)
+      </fix>
+      <fix>
+        When checking status codes for error handling, only check if
+        Response.isError() is true. This way, users may use setStatus() to set their own
+        error status without having the error page invoked. (in which case, the user should've
+        use sendError()) (funkman)
+      </fix>
+      <update>
+        Remove Digester code for Xerces workaround. (jfarcand)
+      </update>
+      <fix>
+        Give proper permission to the balancer app when running under the security manager. (jfarcand)
+      </fix>
+      <fix>
+        <bug>30869</bug>: Make sure JAAS realm name is legal. (yoavs)
+      </fix>
+      <update>
+          md5Helper, md5Encoder, and normalize are used by WebdavServlet,
+          not DefaultServelt so move them into WebdavServlet.
+      </update>
+      <fix>
+        <bug>31277</bug>: Clarified automatic application deployment section of Host configuration page. (yoavs)
+      </fix>
+     <fix>
+       <bug>28631</bug>: JAASRealm enhancements to support custom user and role classes  use Commons-Logging. (yoavs)
+     </fix>
+     <fix>
+       <bug>31364</bug>: Missing resource in org.apache.catalina.core.LocalString.properties. (yoavs)
+     </fix>
+     <fix>
+       <bug>31362</bug>: Missing -Xdebug in catalina.bat when launching with JPDA and Security. (yoavs)
+     </fix>
+     <fix>
+       <bug>31356</bug>: Duplicates not counted in session generation. (yoavs)
+     </fix>
+     <fix>
+       <bug>30949</bug>: Make sure ApplicationDispatcher unwraps request/response even if include error occurs. (yoavs)
+     </fix>
+      <fix>
+        Fixed StandardContext.getStartTime() to return actual start time/date instead of time (startupTime) it took to start context. (luehe)
+      </fix>
+      <update>
+        getRequest/getResponse should return the most relevant interface, to avoid casts. (remm)
+      </update>
+      <update>
+        Add check for directory before considering something is a compressed WAR. (remm)
+      </update>
+      <docs>
+        Update the connector documentation. (remm)
+      </docs>
+      <fix>
+        When parsing a context file, ignore the "path" attribute:
+        the only place where it is acceptable is in server.xml. (remm)
+      </fix>
+      <fix>
+        Digester handling fixes: always call reset in a finally block after using a digester. (remm)
+      </fix>
+      <update>
+        Remove many fields from Connector, and tie the creation of the Connector to the
+        creation of the protocol handler. (remm)
+      </update>
+      <update>
+        Remove package triggers from the classloader, which seem useless when using Java 5. (remm)
+      </update>
+      <fix>
+        Realms will now use set attribute to set themselves in their container when using JMX. (remm)
+      </fix>
+      <fix>
+        Fix JMX related operations with the Connector. (remm)
+      </fix>
+      <fix>
+        Fix save-to-XML for naming resources. (remm)
+      </fix>
+      <fix>
+        Remove authenticator "debug" attributes from the descriptors. (remm)
+      </fix>
+      <update>
+        Refactor org.apache.catalina.deploy.ContextXXX to use new super class ResourceBase. (pero)
+      </update>
+      <fix>
+        Enable Connector.findLifecycleListener that we can listen start/stop Connector events and save the listener to xml. (pero)
+      </fix>
+      <update>
+        Remove Watchdog references, as it is no longer used. (yoavs)
+      </update>
+      <fix>
+        <bug>31511</bug>: Don't call setenv.bat if not found, in *using-launcher scripts. (yoavs)
+      </fix>
+      <fix>
+        <bug>31549</bug>: Add name to WebappClassLoader's stopped message. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Allow customized server header for Standalone. (funkman)
+      </update>
+      <fix>
+        Digester.reset now removes the error handler, the root and calls clear, to prevent
+        any memory leak. (remm)
+      </fix>
+      <update>
+        Remove useless stuff in digester. (remm)
+      </update>
+      <update>
+        In HTTP, add a utility method to convert strings to byte arrays, and output the server header
+        directly as bytes. (remm)
+      </update>
+      <add>
+        Add a master slave thread pool based on the code from Tomcat 4.0. It is less exotic than the
+        default one, and might fare better on some picky systems, such as Redhat 9. The two threadpools
+        will likely be removed once we use the Java 5 API, although more investigation is needed. (remm)
+      </add>
+      <fix>
+        Fix issue with getProperty in IntrospectionUtils. (remm)
+      </fix>
+      <update>
+        Remove attribute translation for SSL in the HTTP protocol handler: it will now be done in the
+        Catalina Connector class. (remm)
+      </update>
+      <fix>
+        Fix handling of the "timeout" attribute of the HTTP protocol handler. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>31171</bug>: Wrap to avoid ClassCastException in PageContextImpl. (yoavs)
+      </fix>
+      <fix>
+        <bug>31257</bug>: Added specification of endorsed dirs if forking.  Note that this is fairly useless for now in 5.5 since it uses JDT and not javac by default. (yoavs)
+      </fix>
+      <docs>
+        Document new Jasper defaults, and update the production configuration. (remm)
+      </docs>
+      <fix>
+        Copied XML encoding detection logic into JASPER, so we're no longer dependent on Xerces. (luehe)
+      </fix>
+      <fix>
+        Fix cosmetic issue where extra CRLF would be inserted during each precompilation in web.xml. (remm)
+      </fix>
+      <update>
+        Allow configuring the interval following a compilation during which a JSP will not be checked
+        for modifications. (remm)
+      </update>
+      <fix>
+        <bug>31465</bug>: Ensure that the compiler reads the .java file using the same encoding as that with which it was written. (markt)
+      </fix>
+      <fix>
+        <bug>31510</bug>: Null out response in JspWriterImpl#recycle to aid in JBoss memory leak. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+    <changelog>
+      <update>
+        Added flag to the cluster (notifyListenersOnReplication) to enable/disable the
+        notifications of attribute/context listeners upon replication of a session delta
+        Works only with the DeltaManager (fhanik)
+      </update>
+      <update>
+        Added flag to the cluster (Cluster/Sender/ackTimeout) to set the timeout in milliseconds
+        for a synchronous request to go through, defaults to 15000ms (fhanik)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>29485</bug>: I broke the HTML manager when adding JavaScript confirmation, fixed now ;) (yoavs)
+      </fix>
+      <fix>
+        <bug>31058</bug>: Ensure StatusTransformer escapes query string for XML. (yoavs)
+      </fix>
+      <update>
+        Added contexts' start time (available from 'startTime' MBean attribute of StandardContext) to status page (luehe)
+      </update>
+      <fix>
+        <bug>31264</bug>: the deploy task should now behave correctly. (remm)
+      </fix>
+      <update>
+        Refactor the manager servlet to make calls to the deployer more robust. (remm)
+      </update>
+      <fix>
+        Use the more robust String.valueOf in the form edit action of the connector. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+
+
+<section name="Tomcat 5.5.2 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        The installer will now use the system's JRE. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix URL generation for classloaders on Windows, causing common/classes and shared/classes
+        to be unusable (remm)
+      </fix>
+      <fix>
+        <bug>31110</bug>: Fix resource packaging bug for servlets (remm)
+      </fix>
+      <fix>
+        Fix 5.5 regression where going through the authenticator would create a session each time. (remm)
+      </fix>
+      <fix>
+        Fix classname of the connector in Embedded, and remove the socket factory. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Redo server header handling again. (remm)
+      </fix>
+      <update>
+        Cleanup a little access to the headers using a local variable and
+        use setValue for Server and Date headers. (remm)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Remove maxTagNesting and curTagNesting since they are unused. (funkman)
+      </fix>
+      <fix>
+        Fix tag files handling with JDT, which were ususable, and refactor the lifecycle handling of
+        the page loader. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+    <changelog>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.1 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Tomcat 5.5 can be built on JDK 5.0. (yoavs)
+      </update>
+      <fix>
+        Windows installer polish. (mladen, remm)
+      </fix>
+      <update>
+        Remove dependency on Jakarta regexp. (remm)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Allow overriding the location of the default context file, similar to the default
+        web.xml. (remm)
+      </fix>
+      <update>
+        Backport if-else logic for SSI servlet from 4.1 (funkman)
+      </update>
+      <fix>
+        Remove DefaultContext elements from the digester rules. (remm)
+      </fix>
+      <fix>
+        Fix ResourceLink handling. (remm)
+      </fix>
+      <fix>
+        Modify the auto deployer to get along with contexts which are statically defined in server.xml. (remm)
+      </fix>
+      <fix>
+        Externalize constant strings defining the location of deployment related resources. (remm)
+      </fix>
+      <fix>
+        <bug>31052</bug>: BeanFactory swallows root cause of exception. (yoavs)
+      </fix>
+      <fix>
+        Allow using deploy Ant task with just config attribute, submitted by Michael Schuerig. (remm)
+      </fix>
+      <add>
+        Added longest time an expired session had been alive to set of monitorable session manager attributes. (luehe)
+      </add>
+      <add>
+        Added average time an expired session had been alive to set of monitorable session manager attributes. (luehe)
+      </add>
+      <fix>
+        Clear a reference in the digester where a context would be referenced for more time than it
+        needed, until the next context deployment operation. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>31018</bug>: Race condition in SystemLogHandler. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Use the "compiler" parameter to allow specifying that Ant should be used. (remm)
+      </fix>
+      <fix>
+        Ignore JDT compiler warnings. (remm)
+      </fix>
+      <add>
+        Added compilerTargetVM option support, "1.4" default. (yoavs)
+      </add>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix adding the clustering valve, so that session replication actually occurs. (fhanik)
+      </fix>
+    </changelog>
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+      <update>
+        Major documentation update with current Tomcat 5.5 changes. (remm)
+      </update>
+      <update>
+        Added JavaScript confirmation dialog to "dangerous" Manager servler links. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+
+<section name="Tomcat 5.5.0 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Many updated and fixed JavaDocs. (yoavs)
+      </update>
+      <update>
+        Designed and tested Tomcat on J2SE 5.0 (aka JDK 1.5). (everyone)
+      </update>
+      <update>
+        Bundled Eclipse JDT (new dependency) to allow Tomcat to run on a JRE only, i.e. no JDK required. (remm)
+      </update>
+      <update>
+        Repackage commons-dbcp and its dependencies as a sigle smaller WAR, with renamed packages. (remm)
+      </update>
+      <update>
+        Removed dependencies on commons-digester, commons-beanutils, and commons-collections.
+        The relevant digester functionality is now merged in tomcat-util. (remm)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Removed usage of org.apache.catalina.Logger, increased usage of commons-logging everywhere. (remm)
+      </update>
+      <update>
+        Refactored classloader code to better handle JAR and general resource locking. (remm)
+      </update>
+      <update>
+        Written JMX-related code to play nicely with J2SE 5.0 built-in JMX abilities. (remm, costin)
+      </update>
+      <update>
+        Extensively profiled and optimized the server startup performance as well as the request mapping and processing pipeline. (remm)
+      </update>
+      <update>
+        The container will now always process a /META-INF/context.xml resource, unless the webapp has a specified external context file. (remm)
+      </update>
+      <update>
+        New default configuration mechanism for web applications, replacing DefaultContext. This uses a
+        shared context file located in conf/context.xml. (remm)
+      </update>
+      <update>
+        Revamped deployer, alloying full hotdeploy (note: on Windows, this requires the anti file locking
+        features). (remm)
+      </update>
+      <update>
+        Remove verbosity from the JNDI resources configuration, by allowing arbitrary attributes on the Resource element. (remm)
+      </update>
+      <update>
+        Simpler Valve interface, to allow smaller stack traces and reducing the amount of method calls. (remm)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Coyote">
+  </subsection>
+
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Eclipse JDT is now the default Java compiler in Jasper. Source dependencies are now loaded from
+        the container classloader, and compilation times are much faster. (remm)
+      </update>
+      <update>
+        Jasper development mode should now have acceptable performance for heavily accessed pages.
+        Precompiling JSPs is still significantly more efficient, however. (remm)
+      </update>
+    </changelog>
+  </subsection>
+
+  <subsection name="Cluster">
+  </subsection>
+
+  <subsection name="Webapps">
+    <changelog>
+    </changelog>
+  </subsection>
+</section>
+
+</body>
+</document>

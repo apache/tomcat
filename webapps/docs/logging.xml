@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="logging.html">
+
+    &project;
+
+  <properties>
+    <title>Logging in Tomcat</title>
+    <author>Allistair Crossley</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+  </properties>
+
+<body>
+
+  <section name="Introduction">
+  <p>
+    Tomcat 5.5 uses 
+    <a href="http://jakarta.apache.org/commons/logging">Commons Logging</a>
+    throughout its internal code allowing the 
+    developer to choose a logging configuration that suits their needs, e.g
+    java.util.logging or 
+    <a href="http://logging.apache.org/log4j">Log4J</a>. 
+    Commons Logging provides Tomcat the ability to log
+    hierarchially across various log levels without needing to rely on a particular
+    logging implementation.
+  </p>
+  <p>
+    An important consequence for Tomcat 5.5 is that the &lt;Logger&gt; element found in 
+    previous versions to create a <code>localhost_log</code> is no longer a valid nested element 
+    of &lt;Context&gt;. Instead, the default Tomcat configuration will use java.util.logging. 
+    If the developer wishes to collect detailed internal Tomcat logging (i.e what is happening 
+    within the Tomcat engine), then they should configure a logging system such as java.util.logging 
+    or log4j as detailed next.
+  </p>
+
+  </section>
+
+  <section name="log4j">
+    <p>
+      Tomcat 5.5 has done away with <code>localhost_log</code> which you may be familiar with
+      as the runtime exception/stack trace log. These types of error are usually thrown
+      by uncaught exceptions, but are still valuable to the developer. They can now be
+      found in the <code>stdout</code> log.
+    </p>
+
+    <p>
+      If you need to setup cross-context detailed logging from within Tomcat's code, 
+      then you can use a simple log4j configuration. Note that this logging van be very 
+      verbose depending on the log level you chose to use.  Note also that a log4j logging 
+      configuration is not going to produce stack trace type logging: those stack traces
+      are output to <code>stdout</code> as discussed above.
+    </p>
+
+    <p>
+      Follow the following steps to setup a file named tomcat.log that has internal 
+      Tomcat logging output to it:
+    </p>
+
+    <p>
+      <ol>
+        <li>Create a file called log4j.properties with the following content 
+            and save it into common/classes.
+          <source>
+            log4j.rootLogger=debug, R <br />
+            log4j.appender.R=org.apache.log4j.RollingFileAppender <br />
+            log4j.appender.R.File=${catalina.home}/logs/tomcat.log <br />
+            log4j.appender.R.MaxFileSize=10MB <br />
+            log4j.appender.R.MaxBackupIndex=10 <br />
+            log4j.appender.R.layout=org.apache.log4j.PatternLayout <br />
+            log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n <br />
+            log4j.logger.org.apache.catalina=DEBUG, R
+          </source>
+	</li>
+
+	<li><a href="http://logging.apache.org/log4j">Download Log4J</a> 
+            (v1.2 or later) and place the log4j jar in $CATALINA_HOME/common/lib.</li>
+
+        <li><a href="http://jakarta.apache.org/site/downloads/downloads_commons-logging.cgi">
+            Download Commons Logging</a> and place the commons-logging.jar 
+            (not commons-logging-api.jar) in $CATALINA_HOME/common/lib with 
+            the log4j jar.</li>
+
+	<li>Start Tomcat</li>
+      </ol>
+    </p>
+
+    <p>
+      This log4j configuration sets up a file called tomcat.log in your 
+      Tomcat logs folder with a maximum file size of 10MB and
+      up to 10 backups.  DEBUG level is specified which will result in the 
+      most verbose output from Tomcat.
+    </p>
+	
+    <p>
+      You can (and should) be more picky about which packages to include 
+      in the logging. Tomcat 5.5 uses defines loggers by Engine and Host names.
+      For example, for a default Catalina localhost log, add this to the
+      end of the log4j.properties above. Note that there are known issues with 
+      using this naming convention (with square brackets) in log4j XML based
+      configuration files, so we recommend you use a properties file as described
+      until a future version of log4j allows this convention.
+      
+      <ul>
+        <li>log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG, R</li>
+	<li>log4j.logger.org.apache.catalina.core=DEBUG, R</li>
+	<li>log4j.logger.org.apache.catalina.session=DEBUG, R</li>
+      </ul>
+
+      Be warned a level of DEBUG will produce megabytes of logging and slow startup
+      of Tomcat. This level should be used sparingly when debugging of internal Tomcat
+      operations is required.
+    </p>
+	
+    <p>
+      Your web applications should certainly use their own log4j configuration. 
+      This is valid <i>with</i> the above configuration.  You would place a similar log4j.properties 
+      file in your web application's WEB-INF/classes folder, and log4j1.2.8.jar into
+      WEB-INF/lib. Then specify your package level logging. This is a basic setup of log4j 
+      which does *not* require Commons-Logging, 
+      and you should consult the 
+      <a href="http://logging.apache.org/log4j/docs/documentation.html">log4j documentation</a> 
+      for more options.  This page is intended only as a bootstrapping guide.
+    </p>
+	
+  </section>
+
+  <section name="java.util.logging">
+
+  <p>
+    In order to configure JDK logging you should have JDK 1.4+. Tomcat 5.5 is intended for
+    JDK 5.0, but can be run on JDK 1.4 using a compatibility package.
+  </p>
+  <p>
+    The default implemenatation of java.util.logging provided in the JDK is too limited to be 
+    useful. A limitation of JDK Logging appears to be the inability to have per-web application logging, 
+    as the configuration is per-VM. As a result, Tomcat will, in the default configuration,
+    replace the default LogManager implementation with a container friendly implementation
+    called JULI, which addresses these shortcomings. It supports the same configuration mechanisms 
+    as the standard JDK java.util.logging, using either a programmatic approach, or properties
+    files. The main difference is that per-classloader properties files can be set (which enables easy
+    redeployment friendly webapp configuration), and the properties files support slightly extended
+    constructs which allows more freedom for defining handlers and assigning them to loggers.
+  </p>
+  <p>
+    JULI is enabled by default in Tomcat 5.5, and supports per classloader configuration, in addition to 
+    the regular global java.util.logging configuration. This means that logging can be configured at 
+    the following layers:
+    <ul>
+      <li>In the JDK's logging.properties file. Check
+      your JAVA_HOME environment setting to see which JDK Tomcat is using (or maybe JRE 5.0 as Tomcat
+      can now run on a JRE from version 5.5). The file will be in <code>$JAVA_HOME/jre/lib</code>.
+      Alternately, it can also use a global configuration file located elsewhere by using the 
+      system property <code>java.util.logging.config.file</code>, or programmatic configuration using
+      <code>java.util.logging.config.class</code>.</li>
+      <li>In each classloader using a logging.properties file. This means that it is possible to have a
+      configuration for the Tomcat core, as well as separate configurations for each webapps which will 
+      have the same lifecycle as the webapps.</li>
+    </ul>
+  </p>
+  <p>
+    The default logging.properties specifies a ConsoleHandler for routing logging to stdout and
+    also a FileHandler. A handler's log level threshold can be set using SEVERE, CONFIG, INFO, 
+    WARN, FINE, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You
+    can also target specific packages to collect logging from and specify a level. Here is how
+    you would set debugging from Tomcat. You would need to ensure the ConsoleHandler's level is also
+    set to collect this threshold, so FINEST or ALL should be set. Please refer to Sun's java.util.logging
+    documentation for the complete details.
+  </p>
+  <p>
+    <source>org.apache.catalina.level=FINEST</source>
+  </p>
+  <p>
+    The configuration used by JULI is extremely similar, but uses a few extensions to allow better 
+    flexibility in assigning loggers. The main differences are:
+    <ul>
+      <li>A prefix may be added to handler names, so that multiple handlers of a single class may be 
+      instantiated. A prefix is a String which starts with a digit, and ends with '.'. For example, 
+      <code>22foobar.</code> is a valid prefix.</li>
+      <li>As in Java 5.0, loggers can define a list of handlers using the <code>loggerName.handlers</code>
+      property.</li>
+      <li>By default, loggers will not delegate to their parent if they have associated handlers. This
+      may be changed per logger using the <code>loggerName.useParentHandlers</code> property, which accepts 
+      a boolean value.</li>
+      <li>The root logger can define its set of handlers using a <code>.handlers</code> property.</li>
+      <li>System property replacement for property values which start with ${sytstemPropertyName}.</li>
+    </ul>
+  </p>
+  <p>
+    Example logging.properties file to be placed in common/classes:
+    <source>
+handlers = 1catalina.org.apache.juli.FileHandler, 2localhost.org.apache.juli.FileHandler, \
+           3manager.org.apache.juli.FileHandler, 4admin.org.apache.juli.FileHandler, \
+           java.util.logging.ConsoleHandler
+
+.handlers = 1catalina.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+
+############################################################
+# Handler specific properties.
+# Describes specific configuration info for Handlers.
+############################################################
+
+1catalina.org.apache.juli.FileHandler.level = FINE
+1catalina.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
+1catalina.org.apache.juli.FileHandler.prefix = catalina.
+
+2localhost.org.apache.juli.FileHandler.level = FINE
+2localhost.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
+2localhost.org.apache.juli.FileHandler.prefix = localhost.
+
+3manager.org.apache.juli.FileHandler.level = FINE
+3manager.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
+3manager.org.apache.juli.FileHandler.prefix = manager.
+
+4admin.org.apache.juli.FileHandler.level = FINE
+4admin.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
+4admin.org.apache.juli.FileHandler.prefix = admin.
+
+java.util.logging.ConsoleHandler.level = FINE
+java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
+
+
+############################################################
+# Facility specific properties.
+# Provides extra control for each logger.
+############################################################
+
+org.apache.catalina.core.ContainerBase.[Catalina].[localhost].level = INFO
+org.apache.catalina.core.ContainerBase.[Catalina].[localhost].handlers = \
+   2localhost.org.apache.juli.FileHandler
+
+org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].level = INFO
+org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handlers = \
+   3manager.org.apache.juli.FileHandler
+
+org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/admin].level = INFO
+org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/admin].handlers = \
+   4admin.org.apache.juli.FileHandler
+
+# For example, set the com.xyz.foo logger to only log SEVERE
+# messages:
+#org.apache.catalina.startup.ContextConfig.level = FINE
+#org.apache.catalina.startup.HostConfig.level = FINE
+#org.apache.catalina.session.ManagerBase.level = FINE
+    </source>
+    </p>
+    
+    <p>
+      Example logging.properties for the servlet-examples web application to be placed
+      in WEB-INF/classes inside the web application:
+      <source>
+handlers = org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+
+############################################################
+# Handler specific properties.
+# Describes specific configuration info for Handlers.
+############################################################
+
+org.apache.juli.FileHandler.level = FINE
+org.apache.juli.FileHandler.directory = ${catalina.base}/logs
+org.apache.juli.FileHandler.prefix = servlet-examples.
+
+java.util.logging.ConsoleHandler.level = FINE
+java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
+      </source>
+    </p>
+
+  </section>
+
+</body>
+</document>

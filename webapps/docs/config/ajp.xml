@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="ajp.html">
+
+  &project;
+
+  <properties>
+    <author email="remm@apache.org">Remy Maucherat</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <author email="arjaquith@mindspring.com">Andrew R. Jaquith</author>
+    <title>The AJP Connector</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  <p>The <strong>AJP Connector</strong> element represents a
+  <strong>Connector</strong> component that communicates with a web
+  connector via the <code>AJP</code> protocol.  This is used for cases
+  where you wish to invisibly integrate Tomcat 5 into an existing (or new)
+  Apache installation, and you want Apache to handle the static content
+  contained in the web application, and/or utilize Apache's SSL
+  processing.</p>
+
+  <p>This connector supports load balancing when used in conjunction with
+  the <code>jvmRoute</code> attribute of the 
+  <a href="engine.html">Engine</a>.</p>
+
+<p>The native connectors supported with this Tomcat release are:
+<ul>
+<li>JK 1.2.x with any of the supported servers</li>
+<li>mod_proxy on Apache httpd 2.x (included by default in Apache HTTP Server 2.2), 
+with AJP enabled</li>
+</ul>
+</p>
+
+<p><b>Other native connectors supporting AJP may work, but are no longer supported.</b></p>
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+  <p>All implementations of <strong>Connector</strong>
+  support the following attributes:</p>
+
+  <attributes>
+
+    <attribute name="allowTrace" required="false">
+      <p>A boolean value which can be used to enable or disable the TRACE
+      HTTP method. If not specified, this attribute is set to false.</p>
+    </attribute>
+
+    <attribute name="emptySessionPath" required="false">
+      <p>If set to <code>true</code>, all paths for session cookies will be set
+      to <code>/</code>. This can be useful for portlet specification implementations,
+      but will greatly affect performance if many applications are accessed on a given
+      server by the client.
+      If not specified, this attribute is set to <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="enableLookups" required="false">
+      <p>Set to <code>true</code> if you want calls to
+      <code>request.getRemoteHost()</code> to perform DNS lookups in
+      order to return the actual host name of the remote client.  Set
+      to <code>false</code> to skip the DNS lookup and return the IP
+      address in String form instead (thereby improving performance).
+      By default, DNS lookups are enabled.</p>
+    </attribute>
+
+    <attribute name="maxPostSize" required="false">
+      <p>The maximum size in bytes of the POST which will be handled by
+      the container FORM URL parameter parsing. The feature can be disabled by
+      setting this attribute to a value less than or equal to 0.
+      If not specified, this attribute is set to 2097152 (2 megabytes).</p>
+    </attribute>
+
+    <attribute name="maxSavePostSize" required="false">
+      <p>The maximum size in bytes of the POST which will be saved/buffered by
+      the container during FORM or CLIENT-CERT authentication. For both types
+      of authentication, the POST will be saved/buffered before the user is
+      authenticated. For CLIENT-CERT authentication, the POST is buffered for
+      the duration of the SSL handshake and the buffer emptied when the request
+      is processed. For FORM authentication the POST is saved whilst the user
+      is re-directed to the login form and is retained until the user
+      successfully authenticates or the session associated with the
+      authentication request expires. The limit can be disabled by setting this
+      attribute to -1. Setting the attribute to zero will disable the saving of
+      POST data during authentication. If not specified, this attribute is set
+      to 4096 (4 kilobytes).</p>
+    </attribute>
+
+    <attribute name="protocol" required="false">
+      <p>This attribute value must be <code>AJP/1.3</code> to use the AJP
+      handler.</p>
+    </attribute>
+
+    <attribute name="proxyName" required="false">
+      <p>If this <strong>Connector</strong> is being used in a proxy
+      configuration, configure this attribute to specify the server name
+      to be returned for calls to <code>request.getServerName()</code>.
+      See <a href="#Proxy Support">Proxy Support</a> for more
+      information.</p>
+    </attribute>
+
+    <attribute name="proxyPort" required="false">
+      <p>If this <strong>Connector</strong> is being used in a proxy
+      configuration, configure this attribute to specify the server port
+      to be returned for calls to <code>request.getServerPort()</code>.
+      See <a href="#Proxy Support">Proxy Support</a> for more
+      information.</p>
+    </attribute>
+
+    <attribute name="redirectPort" required="false">
+      <p>If this <strong>Connector</strong> is supporting non-SSL
+      requests, and a request is received for which a matching
+      <code>&lt;security-constraint&gt;</code> requires SSL transport,
+      Catalina will automatically redirect the request to the port
+      number specified here.</p>
+    </attribute>
+
+    <attribute name="request.registerRequests" required="false">
+      <p>This attribute controls request registration for JMX monitoring
+      of the Connector.  It is enabled by default, but may be turned
+      it off to save a bit of memory.</p>
+    </attribute>
+
+    <attribute name="scheme" required="false">
+      <p>Set this attribute to the name of the protocol you wish to have
+      returned by calls to <code>request.getScheme()</code>.  For
+      example, you would set this attribute to "<code>https</code>"
+      for an SSL Connector.  The default value is "<code>http</code>".
+      See <a href="#SSL Support">SSL Support</a> for more information.</p>
+    </attribute>
+
+    <attribute name="secure" required="false">
+      <p>Set this attribute to <code>true</code> if you wish to have
+      calls to <code>request.isSecure()</code> to return <code>true</code>
+      for requests received by this Connector (you would want this on an
+      SSL Connector).  The default value is <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="URIEncoding" required="false">
+      <p>This specifies the character encoding used to decode the URI bytes,
+      after %xx decoding the URL. If not specified, ISO-8859-1 will be used.
+      </p>
+    </attribute>
+
+    <attribute name="useBodyEncodingForURI" required="false">
+      <p>This specifies if the encoding specified in contentType should be used
+      for URI query parameters, instead of using the URIEncoding. This
+      setting is present for compatibility with Tomcat 4.1.x, where the
+      encoding specified in the contentType, or explicitely set using
+      Request.setCharacterEncoding method was also used for the parameters from
+      the URL. The default value is <code>false</code>.
+      </p>
+    </attribute>
+
+    <attribute name="useIPVHosts" required="false">
+      <p>Set this attribute to <code>true</code> to cause Tomcat to use
+      the ServerName passed by the native web server to determine the Host
+      to send the request to.  The default value is <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="xpoweredBy" required="false">
+      <p>Set this attribute to <code>true</code> to cause Tomcat to advertise
+      support for the Srevlet specification using the header recommended in the
+      specification.  The default value is <code>false</code>.</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
+  <subsection name="Standard Implementation">
+
+  <p>To use AJP, you
+  must specify the protocol attribute (see above).</p>
+
+  <p><strong>This implementation supports the AJP 1.3 protocol.</strong></p>
+
+  <p>It supports the following additional attributes (in addition to the
+  common attributes listed above):</p>
+
+  <attributes>
+
+    <attribute name="address" required="false">
+      <p>For servers with more than one IP address, this attribute
+      specifies which address will be used for listening on the specified
+      port.  By default, this port will be used on all IP addresses
+      associated with the server. A value of <code>127.0.0.1</code>
+      indicates that the Connector will only listen on the loopback
+      interface.</p>
+    </attribute>
+
+    <attribute name="backlog" required="false">
+      <p>The maximum queue length for incoming connection requests when
+      all possible request processing threads are in use.  Any requests
+      received when the queue is full will be refused.  The default
+      value is 10.</p>
+    </attribute>
+
+    <attribute name="bufferSize" required="false">
+      <p>The size of the output buffer to use.  If less than or equal to zero,
+         then output buffering is disabled.  The default value is -1
+         (i.e. buffering disabled)</p>
+    </attribute>
+
+    <attribute name="connectionTimeout" required="false">
+      <p>The number of milliseconds this <strong>Connector</strong> will wait,
+      after accepting a connection, for the request URI line to be
+      presented.  The default value is infinite (i.e. no timeout).</p>
+    </attribute>
+
+    <attribute name="minProcessors" required="false">
+      <strong>deprecated</strong>
+      <p>The minimum number of processors to start at initialization time.
+      If not specified, this atttribute is set to 5.</p>
+    </attribute>
+
+    <attribute name="maxProcessors" required="false">
+      <strong>deprecated</strong>
+      <p>The maximum number of processors allowed. This should be
+      set to a value that is greater than or equal to the maximum number
+      of concurrent connections the remote web server can open to Tomcat 
+      simultaneously. For example, if the web server is Apache 1.x or 2.x
+      Tomcat's <code>maxProcessors</code> should be set to the 
+      value of Apache's <code>maxClients</code> directive.</p>
+      <p>A <code>maxProcessors</code> value of zero (0) signifies that 
+      the number of processors is unlimited. If not specified, this
+      atttribute defaults to 20.</p>
+     </attribute>
+
+    <attribute name="maxSpareThreads" required="false">
+      <p>The maximum number of unused request processing threads that
+      will be allowed to exist until the thread pool starts stopping the
+      unnecessary threads.  The default value is 50.</p>
+    </attribute>
+
+    <attribute name="maxThreads" required="false">
+      <p>The maximum number of request processing threads to be created
+      by this <strong>Connector</strong>, which therefore determines the
+      maximum number of simultaneous requests that can be handled.  If
+      not specified, this attribute is set to 200.</p>
+    </attribute>
+
+    <attribute name="minSpareThreads" required="false">
+      <p>The number of request processing threads that will be created
+      when this <strong>Connector</strong> is first started.  The connector
+      will also make sure it has the specified number of idle processing
+      threads available. This attribute should be set to a value smaller
+      than that set for <code>maxThreads</code>.  The default value is 4.</p>
+    </attribute>
+
+    <attribute name="port" required="true">
+      <p>The TCP port number on which this <strong>Connector</strong>
+      will create a server socket and await incoming connections.  Your
+      operating system will allow only one server application to listen
+      to a particular port number on a particular IP address.</p>
+    </attribute>
+
+    <attribute name="tcpNoDelay" required="false">
+      <p>If set to <code>true</code>, the TCP_NO_DELAY option will be
+      set on the server socket, which improves performance under most
+      circumstances.  This is set to <code>true</code> by default.</p>
+    </attribute>
+
+    <attribute name="tomcatAuthentication" required="false">
+      <p>If set to <code>true</code>, the authetication will be done in Tomcat. 
+      Otherwise, the authenticated principal will be propagated from the native
+      webaserver and used for authorization in Tomcat.  
+      The default value is <code>true</code>.</p>
+    </attribute>
+
+  </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="Nested Components">
+
+  <p>None at this time.</p>
+
+</section>
+
+
+</body>
+
+</document>

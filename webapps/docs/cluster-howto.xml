@@ -1,0 +1,1129 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="cluster-howto.html">
+
+    &project;
+
+    <properties>
+        <author email="fhanik@apache.org">Filip Hanik</author>
+        <author email="pero@apache.org">Peter Rossbach</author>
+        <title>Clustering/Session Replication HOW-TO</title>
+    </properties>
+
+<body>
+
+
+<section name="Quick Start">
+
+<p>To run session replication in your Tomcat 5.5 container, the following steps
+should be completed:</p>
+<ul>
+<li>All your session attributes must implement <code>java.io.Serializable</code></li>
+<li>Uncomment the <code>Cluster</code> element in server.xml</li>
+<li>Uncomment the <code>Valve(ReplicationValve)</code> element in server.xml</li>
+<li>If your Tomcat instances are running on the same machine, make sure the <code>tcpListenPort</code>
+    attribute is unique for each instance.</li>
+<li>Make sure your <code>web.xml</code> has the <code>&lt;distributable/&gt;</code> element 
+    or set at your <code>&lt;Context distributable="true" /&gt;</code></li>
+<li>Make sure that jvmRoute attribute is set at your Engine <code>&lt;Engine name="Catalina" jvmRoute="node01" &gt;</code></li>
+<li>Make sure that all nodes have the same time and sync with NTP service!</li>
+<li>Make sure that your loadbalancer is configured for sticky session mode.</li>
+</ul>
+<p>Load balancing can be achieved through many techniques, as seen in the
+<a href="balancer-howto.html">Load Balancing</a> chapter.</p>
+<p>Note: Remember that your session state is tracked by a cookie, so your URL must look the same from the out
+   side otherwise, a new session will be created.</p>
+<p>Note: Clustering support currently requires the JDK version 1.4 or later.</p>
+</section>
+
+
+<section name="Overview">
+
+<p>To enable session replication in Tomcat, three different paths can be followed to achieve the exact same thing:</p>
+<ol>
+  <li>Using session persistence, and saving the session to a shared file system (PersistenceManager + FileStore)</li>
+  <li>Using session persistence, and saving the session to a shared database (PersistenceManager + JDBCStore)</li>
+  <li>Using in-memory-replication, using the SimpleTcpCluster that ships with Tomcat 5 (server/lib/catalina-cluster.jar)</li>
+</ol>
+
+<p>In this release of session replication, Tomcat performs an all-to-all replication of session state.
+
+   This is an algorithm that is only efficient when the clusters are small. For large clusters, the next
+   release will support a primary-secondary session replication where the session will only be stored at one
+   or maybe two backup servers. 
+   Currently you can use the domain worker attribute (mod_jk &gt; 1.2.8) to build cluster partitions
+   with the potential of very scaleable cluster solution.
+   In order to keep the network traffic down in an all-to-all environment, you can split your cluster
+   into smaller groups. This can be easily achieved by using different multicast addresses for the different groups.
+   A very simple setup would look like this:
+   </p>
+
+<source>
+        DNS Round Robin
+               |
+         Load Balancer
+          /           \
+      Cluster1      Cluster2
+      /     \        /     \
+  Tomcat1 Tomcat2  Tomcat3 Tomcat4
+</source>
+
+<p>What is important to mention here, is that session replication is only the beginning of clustering.
+   Another popular concept used to implement clusters is farming, ie, you deploy your apps only to one
+   server, and the cluster will distribute the deployments across the entire cluster.
+   This is all capabilities that can go into with the FarmWarDeployer (s. cluster example at <code>server.xml</code>)</p>
+<p>In the next section will go deeper into how session replication works and how to configure it.</p>
+
+</section>
+
+<section name="How it Works">
+<p>To make it easy to understand how clustering works, We are gonna take you through a series of scenarios.
+   In the scenario we only plan to use two tomcat instances <code>TomcatA</code> and <code>TomcatB</code>.
+   We will cover the following sequence of events:</p>
+
+<ol>
+<li><code>TomcatA</code> starts up</li>
+<li><code>TomcatB</code> starts up (Wait that TomcatA start is complete)</li>
+<li><code>TomcatA</code> receives a request, a session <code>S1</code> is created.</li>
+<li><code>TomcatA</code> crashes</li>
+<li><code>TomcatB</code> receives a request for session <code>S1</code></li>
+<li><code>TomcatA</code> starts up</li>
+<li><code>TomcatA</code> receives a request, invalidate is called on the session (<code>S1</code>)</li>
+<li><code>TomcatB</code> receives a request, for a new session (<code>S2</code>)</li>
+<li><code>TomcatA</code> The session <code>S2</code> expires due to inactivity.</li>
+</ol>
+
+<p>Ok, now that we have a good sequence, we will take you through exactly what happens in the session repliction code</p>
+
+<ol>
+<li><b><code>TomcatA</code> starts up</b>
+    <p>
+        Tomcat starts up using the standard start up sequence. When the Host object is created, a cluster object is associated with it.
+        When the contexts are parsed, if the distributable element is in place in web.xml
+        Tomcat asks the Cluster class (in this case <code>SimpleTcpCluster</code>) to create a manager
+        for the replicated context. So with clustering enabled, distributable set in web.xml
+        Tomcat will create a <code>DeltaManager</code> for that context instead of a <code>StandardManager</code>.
+        The cluster class will start up a membership service (multicast) and a replication service (tcp unicast).
+        More on the architecture further down in this document.
+    </p><p></p>
+</li>
+<li><b><code>TomcatB</code> starts up</b>
+    <p>
+        When TomcatB starts up, it follows the same sequence as TomcatA did with one exception.
+        The cluster is started and will establish a membership (TomcatA,TomcatB).
+        TomcatB will now request the session state from a server that already exists in the cluster,
+        in this case TomcatA. TomcatA responds to the request, and before TomcatB starts listening
+        for HTTP requests, the state has been transferred from TomcatA to TomcatB.
+        In case TomcatA doesn't respond, TomcatB will time out after 60 seconds, and issue a log
+        entry. The session state gets transferred for each web application that has distributable in
+        its web.xml. Note: To use session replication efficiently, all your tomcat instances should be
+        configured the same.
+    </p><p></p>
+</li>
+<li><B><code>TomcatA</code> receives a request, a session <code>S1</code> is created.</B>
+    <p>
+        The request coming in to TomcatA is treated exactly the same way as without session replication.
+        The action happens when the request is completed, the <code>ReplicationValve</code> will intercept
+        the request before the response is returned to the user.
+        At this point it finds that the session has been modified, and it uses TCP to replicata the
+        session to TomcatB. Once the serialized data has been handed off to the operating systems TCP logic,
+        the request returns to the user, back through the valve pipeline.
+        For each request the entire session is replicated, this allows code that modifies attributes
+        in the session without calling setAttribute or removeAttribute to be replicated.
+        a useDirtyFlag configuration parameter can be used to optimize the number of times
+        a session is replicated.
+    </p><p></p>
+
+</li>
+<li><b><code>TomcatA</code> crashes</b>
+    <p>
+        When TomcatA crashes, TomcatB receives a notification that TomcatA has dropped out
+        of the cluster. TomcatB removes TomcatA from its membership list, and TomcatA will no longer
+        be notified of any changes that occurs in TomcatB.
+        The load balancer will redirect the requests from TomcatA to TomcatB and all the sessions
+        are current.
+    </p><p></p>
+</li>
+<li><b><code>TomcatB</code> receives a request for session <code>S1</code></b>
+    <p>Nothing exciting, TomcatB will process the request as any other request.
+    </p><p></p>
+</li>
+<li><b><code>TomcatA</code> starts up</b>
+    <p>Upon start up, before TomcatA starts taking new request and making itself
+    available to it will follow the start up sequence described above 1) 2).
+    It will join the cluster, contact TomcatB for the current state of all the sessions.
+    And once it receives the session state, it finishes loading and opens its HTTP/mod_jk ports.
+    So no requests will make it to TomcatA until it has received the session state from TomcatB.
+    </p><p></p>
+</li>
+<li><b><code>TomcatA</code> receives a request, invalidate is called on the session (<code>S1</code>)</b>
+    <p>The invalidate is call is intercepted, and the session is queued with invalidated sessions.
+        When the request is complete, instead of sending out the session that has changed, it sends out
+        an "expire" message to TomcatB and TomcatB will invalidate the session as well.
+    </p><p></p>
+
+</li>
+<li><b><code>TomcatB</code> receives a request, for a new session (<code>S2</code>)</b>
+    <p>Same scenario as in step 3)
+    </p><p></p>
+
+
+</li>
+<li><code>TomcatA</code> The session <code>S2</code> expires due to inactivity.
+    <p>The invalidate is call is intercepted the same was as when a session is invalidated by the user,
+       and the session is queued with invalidated sessions.
+       At this point, the invalidet session will not be replicated across until
+       another request comes through the system and checks the invalid queue.
+    </p><p></p>
+</li>
+</ol>
+
+<p>Phuuuhh! :)</p>
+
+<p><b>Membership</b>
+    Clustering membership is established using very simple multicast pings.
+    Each Tomcat instance will periodically send out a multicast ping,
+    in the ping message the instance will broad cast its IP and TCP listen port
+    for replication.
+    If an instance has not received such a ping within a given timeframe, the
+    member is considered dead. Very simple, and very effective!
+    Of course, you need to enable multicasting on your system.
+</p>
+
+<p><b>TCP Replication</b>
+    Once a multicast ping has been received, the member is added to the cluster
+    Upon the next replication request, the sending instance will use the host and
+    port info and establish a TCP socket. Using this socket it sends over the serialized data.
+    The reason I choose TCP sockets is because it has built in flow control and guaranteed delivery.
+    So I know, when I send some data, it will make it there :)
+</p>
+
+<p><b>Distributed locking and pages using frames</b>
+    Tomcat does not keep session instances in sync across the cluster.
+    The implementation of such logic would be to much overhead and cause all
+    kinds of problems. If your client accesses the same session
+    simultanously using multiple requests, then the last request
+    will override the other sessions in the cluster.
+</p>
+
+</section>
+
+<section name="Cluster Architecture">
+
+<p><b>Component Levels:</b>
+<source>
+         Server
+           |
+         Service
+           |
+         Engine
+           |  \ 
+           |  --- Cluster --*
+           |
+         Host
+           |
+         ------
+        /      \
+     Cluster    Context(1-N)                 
+        |             \
+        |             -- Manager
+        |                   \
+        |                   -- DeltaManager
+        |
+     -----------------------------
+     |          |         |       \
+   Receiver    Sender   Membership  \
+     \                               -- Valve
+     -- SocketReplicationListener    |      \
+     -- ReplicationListener          |       -- ReplicationValve
+                                     |       -- JvmRouteBinderValve 
+                                     |
+                                     -- LifecycleListener 
+                                     |
+                                     -- ClusterListener 
+                                     |      \
+                                     |       -- ClusterSessionListener
+                                     |       -- JvmRouteSessionIDBinderListener
+                                     |
+                                     -- Deployer 
+                                            \
+                                             -- FarmWarDeployer
+      
+      
+</source>
+<source>
+   Sender
+    \
+    -- ReplicationTransmitter 
+             |
+             ---------
+                      \
+                   IDataSender
+                          \
+                          |
+                          --- (sync)
+                          |  \
+                          |   -- PooledSocketSender   (pooled)
+                          |   -- SockerSender         (synchronous)
+                          |                                
+                          --- (async)
+                             \
+                              -- AsyncSocketSender     (asynchronous)
+                              -- FastAsyncSocketSender (fastasyncqueue)         
+</source>
+</p>
+
+</section>
+
+
+<section name="Cluster Configuration">
+<p>The cluster configuration is described in the sample server.xml file.
+What is worth to mention is that the attributes starting with mcastXXX
+are for the membership multicast ping, and the attributes starting with tcpXXX
+are for the actual TCP replication.
+</p>
+<p>
+    The membership is established by all the tomcat instances are sending broadcast messages
+    on the same multicast IP and port.
+    The TCP listen port, is the port where the session replication is received from other members.
+</p>
+<p>
+    The replication valve is used to find out when the request has been completed and initiate the
+    replication.
+</p>
+<p>
+    One of the most important performance considerations is the synchronous (pooled or not pooled) versus asynchronous replication
+    mode. In a synchronous replication mode the request doesn't return until the replicated session has been
+    sent over the wire and reinstantiated on all the other cluster nodes.
+    There are two settings for synchronous replication. Pooled or not pooled.
+    Not pooled (ie replicationMode=&quot;fastasnycqueue&quot; or &quot;synchronous&quot;) means that all the replication request are sent over a single
+    socket.
+    Using synchronous mode can potentially becomes a bottleneck when a lot of messages generated,
+    You can overcome this bottleneck by setting replicationMode=&quot;pooled&quot; but then you worker threads blocks with replication .
+    What is recommended here is to increase the number of threads that handle
+    incoming replication request. This is the tcpThreadCount property in the cluster
+    section of server.xml. The pooled setting means that we are using multiple sockets, hence increases the performance.
+    Asynchronous replication, should be used if you have sticky sessions until fail over, then
+    your replicated data is not time crucial, but the request time is, at this time leave the tcpThreadCount to
+    be number-of-nodes-1.
+    During async replication, the request is returned before the data has been replicated. async replication yields shorter
+    request times, and synchronous replication guarantees the session to be replicated before the request returns.
+</p>
+<p>
+    The parameter &quot;replicationMode&quot; has four different settings: &quot;pooled&quot;, &quot;synchronous&quot;, &quot;asynchronous&quot; and &quot;fastasyncqueue&quot;
+</p>
+
+<section name="Simple Cluster Configuration">
+<p>
+Simple one line configuration<br/>
+<source>
+   &lt;Server                 port="8011" 
+                       shutdown="SHUTDOWN" &gt;
+    &lt;GlobalNamingResources&gt;
+    &lt;Resource              name="UserDatabase" auth="Container"
+                           type="org.apache.catalina.UserDatabase"
+                    description="User database that can be updated and saved"
+                        factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+                        pathname="conf/tomcat-users.xml" /&gt;
+  &lt;/GlobalNamingResources&gt;
+    &lt;Service              name="Catalina"&gt;
+        &lt;Connector        port="9012" 
+                      protocol="AJP/1.3"
+        &lt;Connector         port="9013"
+                     maxThreads="100"
+                minSpareThreads="4"
+                maxSpareThreads="4"
+        /&gt;
+        &lt;Engine            name="Catalina" 
+                   defaultHost="localhost" 
+                        jvmRoute="node1"&gt;
+        &lt;Realm        className="org.apache.catalina.realm.UserDatabaseRealm"
+                   resourceName="UserDatabase" /&gt;
+            &lt;Host          name="localhost"
+                        appBase="webapps"&gt;
+             &lt;Cluster className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"/&gt;
+            &lt;/Host&gt;
+        &lt;/Engine&gt;
+    &lt;/Service&gt;
+&lt;/Server&gt;
+</source>
+<br/>
+The default mode configuration setup a <em>fastasyncqueue</em> mode cluster configuration with following
+parameters:
+<ul>
+    <li>Open Membership receiver at <em>228.0.0.4</em> and send to multicast udp port <em>8012</em></li>
+    <li>Send membership every 1 sec and drop member after 30sec.</li>
+    <li>Open message receiver at default ip interface at first free port between <em>8015</em> and <em>8019</em>.</li>
+    <li>Receiver message with <em>SocketReplicationListener</em> </li>
+    <li>Configure a <em>ReplicationTransmitter</em> with <em>fastasyncqueue</em> sender mode.</li>
+    <li>Add <em>ClusterSessionListener</em> and <em>ReplicationValve</em>.</li>
+</ul> 
+</p>
+<p>
+<b>NOTE</b>: Use this configuration when you need very quick a test cluster with
+at your developer machine. You can change the default attributes from cluster sub elements.
+Use following cluster attribute prefixes <em>sender.</em>,
+<b>receiver.</b>, <b>service.</b>, <b>manager.</b>, <b>valve.</b> and <b>listener.</b>.
+<br/><b>Example</b> configure cluster at windows laptop with network connection and
+change receiver port range<br/>
+<source>
+&lt;Cluster                 className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"
+          service.mcastBindAddress="127.0.0.1" 
+            receiver.tcpListenPort="9070" 
+         receiver.tcpListenMaxPort="9075" /&gt;
+</source>    
+<br/>       
+<b>WARNING</b>: When you add you sub elements, there overwrite the defaults complete.
+<br/><b>Example</b> configure cluster with cluster failover jsessionid support. In this
+case you need also the defaultmode Cluster listener <em>ClusterSessionListener</em> and <em>ReplicationValve</em>.<br/>
+<source>
+&lt;Cluster                 className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"
+          service.mcastBindAddress="127.0.0.1" 
+            receiver.tcpListenPort="9070" 
+         receiver.tcpListenMaxPort="9075" &gt;
+       &lt;ClusterListener  className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
+       &lt;ClusterListener  className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
+       &lt;Valve            className="org.apache.catalina.cluster.tcp.ReplicationValve"
+                            filter=".*\.gif;.*\.js;.*\.css;.*\.png;.*\.jpeg;.*\.jpg;.*\.htm;.*\.html;.*\.txt;"
+                  primaryIndicator="true" /&gt;
+	   &lt;Valve            className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
+	                      enabled="true"  /&gt;
+&lt;Cluster/&gt;
+</source> 
+</p>
+</section>
+
+<section name="Simple Engine Cluster Configuration for all hosts">
+<p>
+Simple one line engine configuration<br/>
+<source>
+   &lt;Server                 port="8011" 
+                       shutdown="SHUTDOWN" &gt;
+    &lt;GlobalNamingResources&gt;
+    &lt;Resource              name="UserDatabase" auth="Container"
+                           type="org.apache.catalina.UserDatabase"
+                    description="User database that can be updated and saved"
+                        factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+                        pathname="conf/tomcat-users.xml" /&gt;
+  &lt;/GlobalNamingResources&gt;
+    &lt;Service              name="Catalina"&gt;
+        &lt;Connector        port="9012" 
+                      protocol="AJP/1.3"
+        &lt;Connector         port="9013"
+                     maxThreads="100"
+                minSpareThreads="4"
+                maxSpareThreads="4"
+        /&gt;
+        &lt;Engine            name="Catalina" 
+                   defaultHost="localhost" 
+                        jvmRoute="node01"&gt;
+        &lt;Realm        className="org.apache.catalina.realm.UserDatabaseRealm"
+                   resourceName="UserDatabase" /&gt;
+        &lt;Cluster      className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"/&gt;
+            &lt;Host          name="localhost"
+                        appBase="webapps"/&gt;
+        &lt;/Engine&gt;
+    &lt;/Service&gt;
+&lt;/Server&gt;
+</source>
+<br/>
+See default mode configuration description as simple host cluster example before.
+</p>
+</section>
+
+<section name="Complex Cluster Configuration">
+<p>
+<br/><b>Example</b> Configure cluster with complete sub elements. Activate this node
+as master farm delopyer. Message receiver is NIO based <em>ReplicationListener</em> with six parallel
+worker threads.
+<br/>
+<source>
+       &lt;Server                 port="8011" 
+                       shutdown="SHUTDOWN" &gt;
+    &lt;GlobalNamingResources&gt;
+    &lt;Resource              name="UserDatabase" auth="Container"
+                           type="org.apache.catalina.UserDatabase"
+                    description="User database that can be updated and saved"
+                        factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+                        pathname="conf/tomcat-users.xml" /&gt;
+  &lt;/GlobalNamingResources&gt;
+    &lt;Service              name="Catalina"&gt;
+        &lt;Connector        port="9012" 
+                      protocol="AJP/1.3"
+        &lt;Connector         port="9013"
+                     maxThreads="100"
+                minSpareThreads="4"
+                maxSpareThreads="4"
+        /&gt;
+        &lt;Engine            name="Catalina" 
+                   defaultHost="localhost" 
+                        jvmRoute="node01"&gt;
+        &lt;Realm        className="org.apache.catalina.realm.UserDatabaseRealm"
+                   resourceName="UserDatabase" /&gt;
+            &lt;Host          name="localhost"
+                        appBase="webapps"&gt;
+                &lt;Cluster                  className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"
+                                       doClusterLog="true"
+                                     clusterLogName="clusterlog"
+                                  manager.className="org.apache.catalina.cluster.session.DeltaManager"
+                   manager.expireSessionsOnShutdown="false"
+               manager.notifyListenersOnReplication="false"
+        manager.notifySessionListenersOnReplication="false"
+                            manager.sendAllSessions="false"
+                        manager.sendAllSessionsSize="500"
+                    manager.sendAllSessionsWaitTime="20"&gt;
+                  &lt;Membership 
+                                          className="org.apache.catalina.cluster.mcast.McastService"
+                                          mcastAddr="228.0.0.4"
+                                   mcastBindAddress="127.0.0.1" 
+                                 mcastClusterDomain="d10" 
+                                          mcastPort="45564"
+                                     mcastFrequency="1000"
+                                      mcastDropTime="30000"/&gt;
+                  &lt;Receiver 
+                                           className="org.apache.catalina.cluster.tcp.ReplicationListener"
+                                    tcpListenAddress="auto"
+                                       tcpListenPort="9015"
+                                  tcpSelectorTimeout="100"
+                                      tcpThreadCount="6"
+                  &lt;Sender
+                                           className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
+                                     replicationMode="fastasyncqueue"
+                        doTransmitterProcessingStats="true"
+                                   doProcessingStats="true"
+                                      doWaitAckStats="true"
+                                       queueTimeWait="true"
+                                        queueDoStats="true"
+                                      queueCheckLock="true"
+                                          ackTimeout="15000"
+                                          waitForAck="true"
+                                    keepAliveTimeout="80000"
+                            keepAliveMaxRequestCount="-1"/&gt;
+                  &lt;Valve                   className="org.apache.catalina.cluster.tcp.ReplicationValve"
+                                              filter=".*\.gif;.*\.js;.*\.css;.*\.png;.*\.jpeg;.*\.jpg;.*\.htm;.*\.html;.*\.txt;"
+                                    primaryIndicator="true" /&gt;
+                  &lt;Valve                    className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
+                                             enabled="true" /&gt;	
+                  &lt;ClusterListener         className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
+                  &lt;ClusterListener         className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
+                  &lt;Deployer                className="org.apache.catalina.cluster.deploy.FarmWarDeployer"
+                                            tempDir="${catalina.base}/war-temp"
+                                          deployDir="${catalina.base}/war-deploy/"
+                                           watchDir="${catalina.base}/war-listen/"
+                                       watchEnabled="true"/&gt;
+                  &lt;/Cluster&gt;
+            &lt;/Host&gt;
+        &lt;/Engine&gt;
+    &lt;/Service&gt;
+&lt;/Server&gt;
+</source>
+</p>
+</section>
+
+<section name="Cluster Configuration for ReplicationTransmitter">
+<p>
+List of Attributes<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Attribute</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">Default value</th>
+  </tr>
+
+  <tr>
+    <td>replicationMode</td>
+    <td>replication mode (<em>synchronous</em>, <em>pooled</em>, <em>asynchronous</em> or <em>fastasyncqueue</em>)
+    </td>
+    <td><code>pooled</code></td>
+  </tr>
+
+  <tr>
+    <td>processSenderFrequency</td>
+    <td>Control the sender keepalive status and drop sender socket connection after timeout is reached.
+    Check every processSenderFrequency value engine background ticks.
+    </td>
+    <td><code>2</code></td>
+  </tr>
+
+  <tr>
+    <td>compress</td>
+    <td>compress bytes before sending (consume memory, but reduce network traffic - GZIP)</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>ackTimeout</td>
+    <td>acknowledge timeout and only usefull it waitForAck is true</td>
+    <td><code>15000</code></td>
+  </tr>
+  
+  <tr>
+    <td>waitForAck</td>
+    <td>Wait for ack after data send</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>autoConnect</td>
+    <td>is sender disabled, fork a new socket</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>doTransmitterProcessingStats</td>
+    <td>create processing time stats</td>
+    <td><code>false</code></td>
+  </tr>
+</table>
+</p>
+<p>
+Example to get statistic information, wait for ack at every message send and transfer at compressed mode<br/>
+<source>
+    &lt;Sender
+      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
+      replicationMode="fastasyncqueue"
+      compress="true"
+      doTransmitterProcessingStats="true"
+      ackTimeout="15000"
+      waitForAck="true"
+      autoConnect="false"/&gt;
+</source>
+</p>  
+</section>
+     
+<section name="Cluster Configuration for ReplicationTransmitter (fastayncqueue - mode)">
+<p>
+List of Attributes<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Attribute</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">Default value</th>
+  </tr>
+  
+  <tr>
+    <td>keepAliveTimeout</td>
+    <td>active socket keep alive timeout</td>
+    <td><code>60000</code></td>
+  </tr>  
+
+  <tr>
+    <td>keepAliveMaxRequestCount</td>
+    <td>max request over this socket</td>
+    <td><code>-1</code></td>
+  </tr>  
+
+  <tr>
+    <td>doProcessingStats</td>
+    <td>create Processing time stats</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>doWaitAckStats</td>
+    <td>create waitAck time stats</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>resend</td>
+    <td>resend message after failure, can overwrite at message</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>queueDoStats</td>
+    <td>activated queue stats</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>queueCheckLock</td>
+    <td>check to lost locks</td>
+    <td><code>false</code></td>
+  </tr>
+  <tr>
+    <td>queueAddWaitTimeout</td>
+    <td>queue add wait time (tomcat connector thread waits)</td>
+    <td><code>10000</code></td>
+  </tr>
+  <tr>
+    <td>queueRemoveWaitTimeout</td>
+    <td>queue remove wait time (queue thread waits)</td>
+    <td><code>30000</code></td>
+  </tr>
+  
+  <tr>
+    <td>maxQueueLength</td>
+    <td>max queue length (default without limit)</td>
+    <td><code>-1</code></td>
+  </tr>
+  
+  <tr>
+    <td>threadPriority</td>
+    <td>change queue thread priority (1-10 ; 5 is normal)</td>
+    <td><code>5</code></td>
+  </tr>
+</table>
+  
+</p>
+<p>
+Example to get a lot of statistic information and no wait for ACK<br/>
+<source>
+    &lt;Sender
+      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
+      replicationMode="fastasyncqueue"
+      doTransmitterProcessingStats="true"
+      doProcessingStats="true"
+      queueTimeWait="true"
+      queueDoStats="true"
+      queueCheckLock="true"
+      waitForAck="false"
+      autoConnect="false"
+      keepAliveTimeout="320000"
+      keepAliveMaxRequestCount="-1"/&gt;
+</source>
+</p>  
+</section>
+
+<section name="Cluster Configuration for ReplicationTransmitter ( asynchronous - mode)">
+<p>
+List of Attributes<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Attribute</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">Default value</th>
+  </tr>
+  
+  <tr>
+    <td>keepAliveTimeout</td>
+    <td>active socket keep alive timeout</td>
+    <td><code>60000</code></td>
+  </tr>  
+
+  <tr>
+    <td>keepAliveMaxRequestCount</td>
+    <td>max request over this socket</td>
+    <td><code>-1</code></td>
+  </tr>  
+
+  <tr>
+    <td>doProcessingStats</td>
+    <td>create Processing time stats</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>doWaitAckStats</td>
+    <td>create waitAck time stats</td>
+    <td><code>false</code></td>
+  </tr>
+  
+  <tr>
+    <td>resend</td>
+    <td>resend message after failure, can overwrite at message</td>
+    <td><code>false</code></td>
+  </tr>
+
+</table>
+</p>
+<p>
+Example to get a processing statistic information, resend after failure and wait for ACK<br/>
+<source>
+    &lt;Sender
+      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
+      replicationMode="asynchronous"
+      doProcessingStats="true"
+      doWaitAckStats="true"
+      waitForAck="true"
+      ackTimeout="30000"
+      resend="true"
+      keepAliveTimeout="320000"
+      keepAliveMaxRequestCount="-1"/&gt;
+</source>
+</p>  
+</section>
+    
+<section name="Cluster Configuration for ReplicationTransmitter ( synchronous - mode)">
+<p>
+List of Attributes<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Attribute</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">Default value</th>
+  </tr>
+  
+  <tr>
+    <td>keepAliveTimeout</td>
+    <td>active socket keep alive timeout</td>
+    <td><code>60000</code></td>
+  </tr>  
+
+  <tr>
+    <td>keepAliveMaxRequestCount</td>
+    <td>max request over this socket</td>
+    <td><code>-1</code></td>
+  </tr>  
+
+  <tr>
+    <td>doProcessingStats</td>
+    <td>create Processing time stats</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>doWaitAckStats</td>
+    <td>create waitAck time stats</td>
+    <td><code>true</code></td>
+  </tr>
+
+  <tr>
+    <td>resend</td>
+    <td>resend message after failure, can overwrite at message</td>
+    <td><code>false</code></td>
+  </tr>
+
+</table>
+  
+</p>
+<p>
+Example to get a no processing statistic information, no wait for ACK, after 10000 request renew socket and autoconnect before first request is send.<br/>
+<source>
+    &lt;Sender
+      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
+      replicationMode="synchronous"
+      autoConnect="true"
+      keepAliveTimeout="-1"
+      keepAliveMaxRequestCount="100000"/&gt;
+</source>
+</p>  
+</section>
+
+<section name="Cluster Configuration for ReplicationTransmitter ( pooled - mode)">
+<p>
+List of Attributes<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Attribute</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">Default value</th>
+  </tr>
+  
+  <tr>
+    <td>keepAliveTimeout</td>
+    <td>active socket keep alive timeout</td>
+    <td><code>60000</code></td>
+  </tr>  
+
+  <tr>
+    <td>keepAliveMaxRequestCount</td>
+    <td>max request over this socket</td>
+    <td><code>-1</code></td>
+  </tr>  
+
+  <tr>
+    <td>maxPoolSocketLimit</td>
+    <td>max pooled sockets (Sender Sockets)</td>
+    <td><code>25</code></td>
+  </tr>
+  
+  <tr>
+    <td>resend</td>
+    <td>resend message after failure, can overwrite at message</td>
+    <td><code>false</code></td>
+  </tr>
+  
+</table>
+  
+</p>
+<p>
+Example to get a no processing statistic information, wait for ACK, after 10000 request renew socket, only 10 SockerSender available and autoconnect before first request is send.<br/>
+<source>
+    &lt;Sender
+      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
+      replicationMode="pooled"
+      autoConnect="true"
+      maxPoolSocketLimit="10"
+      keepAliveTimeout="-1"
+      keepAliveMaxRequestCount="10000"
+      waitForAck="true" /&gt;
+</source>
+</p>  
+</section>
+
+<section name="Cluster Configuration for ReplicationTransmitter ( DeltaManager Attribute)">
+<p>
+List of Attributes<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Attribute</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">Default value</th>
+  </tr>
+  
+  <tr>
+    <td>expireSessionsOnShutdown</td>
+    <td>When server stopped, expire all sessions also at backup nodes (only for testing)</td>
+    <td><code>false</code></td>
+  </tr>
+
+  <tr>
+    <td>maxActiveSessions</td>
+    <td>Number of active sessions. (Default is no limit)</td>
+    <td><code>-1</code></td>
+  </tr>  
+
+  <tr>
+    <td>notifyListenersOnReplication</td>
+    <td>Notify application session listener to session creation 
+    and expiring events at backup nodes</td>
+    <td><code>true</code></td>
+  </tr>
+
+  <tr>
+    <td>notifySessionListenersOnReplication</td>
+    <td>Notify application session listener to attribute changes at backup nodes</td>
+    <td><code>true</code></td>
+  </tr>
+
+  <tr>
+    <td>stateTransferTimeout</td>
+    <td>Timeout that session state transfer is complete. Is attribute <code>stateTransferTimeout == -1</code> 
+        then application wait that other node send the complete session state</td>
+    <td><code>60</code></td>
+  </tr>
+  
+  <tr>
+    <td>sendAllSessions</td>
+    <td>Flag to send sessions as splited blocks</td>
+    <td><code>true</code></td>
+  </tr>
+
+  <tr>
+    <td>sendAllSessionsSize</td>
+    <td>Number of serialize sessions inside a send block session message. Only useful when <code>sendAllSessions==false</code></td>
+    <td><code>1000</code></td>
+  </tr>
+
+  <tr>
+    <td>sendAllSessionsWaitTime</td>
+    <td>wait time between two session send blocks.</td>
+    <td><code>2000</code></td>
+  </tr>
+
+  <tr>
+    <td>sendClusterDomainOnly</td>
+    <td>Send all session messages only to member inside same cluster domain 
+        (value od Membership attribute mcastClusterDomain). Also don't handle
+        session messages from other domains.</td>
+    <td><code>true</code></td>
+  </tr>  
+
+  <tr>
+    <td>stateTimestampDrop</td>
+    <td>DeltaManager queued Sessions messages when send GET_ALL_SESSION to other node.
+    with stateTimestampDrop all messages before state transfer message creation date (find session) are dropped.
+    Only other GET_ALL_SESSION events are handle with date before state transfer message.</td>
+    <td><code>true</code></td>
+  </tr>  
+  
+</table>
+  
+</p>
+<p>
+Example send all sessions at separate blocks. Serialize and send 100 session inside one block.
+Wait maximale two minutes before the complete backup sessions are loaded inside tomcat boot process.
+Between send blocks wait 5 secs to transfers the session block to other node. This save memory
+when you use the async modes with queues.<br/>
+<source>
+    &lt;Cluster className="org.apache.catalina.tcp.SimpleTcpCluster"
+      managerClassName="org.apache.catalina.cluster.session.DeltaManager"
+      manager.stateTransferTimeout="120"
+      manager.sendAllSessions="false"
+      manager.sendAllSessionsSize="100"
+      manager.sendAllSessionsWaitTime="5000"
+      "/&gt;
+</source>
+</p>
+<p>
+<b>Note:</b><br/>
+As <em>Cluster.defaultMode=true</em> you can configure the manager attributes with prefix <em>manager.</em>. 
+<br/>
+<b>Note:</b><br/>
+With <em>Cluster.setProperty(&lt;String&gt;,&lt;String&gt;)</em> you can modify 
+attributes for all register managers. The method exists as MBeans operation.
+</p>
+</section>
+
+<section name="Bind session after crash to failover node">
+<p>
+As you configure more then two nodes at same cluster for backup, most loadbalancer
+send don't all your requests after failover to the same node.
+</p>
+<p> 
+The JvmRouteBinderValve handle tomcat jvmRoute takeover using mod_jk module after node
+failure. After a node crashed the next request going to other cluster node. The JvmRouteBinderValve 
+now detect the takeover and rewrite the jsessionid
+information to the backup cluster node. After the next response all client
+request goes direct to the backup node. The change sessionid send also to all
+other cluster nodes. Well, now the session stickyness work directly to the
+backup node, but traffic don't go back too restarted cluster nodes!<br/>
+As jsessionid was created by cookie, the change JSESSIONID cookie resend with next response.
+</p>
+<p>
+You must add JvmRouteBinderValve and the corresponding cluster message listener JvmRouteSessionIDBinderListener.
+As you add the new listener you must also add the default ClusterSessionListener that receiver the normal cluster messages.
+
+<source>
+&lt;Cluster className="org.apache.catalina.tcp.SimpleTcpCluster" &gt;
+...
+     &lt;Valve className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
+               enabled="true" sessionIdAttribute="takeoverSessionid"/&gt;	
+     &lt;ClusterListener className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
+     &lt;ClusterListener className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
+...
+&lt;Cluster&gt;
+</source>
+</p>
+<p>
+<b>Hint:</b><br/>
+With attribute <i>sessionIdAttribute</i> you can change the request attribute name that included the old session id.
+Default attribuite name is <i>org.apache.catalina.cluster.session.JvmRouteOrignalSessionID</i>.
+</p>
+<p>
+<b>Trick:</b><br/>
+You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes!
+Set enable true on all JvmRouteBinderValve backups, disable worker at mod_jk 
+and then drop node and restart it! Then enable mod_jk Worker and disable JvmRouteBinderValves again. 
+This use case means that only requested session are migrated.
+</p>
+
+</section>
+
+</section>
+
+
+<section name="Monitoring your Cluster with JMX">
+<p>Monitoring is a very important question when you use a cluster. Some of the cluster objects are JMX MBeans </p>
+<p>Add the following parameter to your startup script with Java 5:
+<source>
+set CATALINA_OPTS=\
+-Dcom.sun.management.jmxremote \
+-Dcom.sun.management.jmxremote.port=%my.jmx.port% \
+-Dcom.sun.management.jmxremote.ssl=false \
+-Dcom.sun.management.jmxremote.authenticate=false
+</source>
+</p>
+<p>Activate JMX with JDK 1.4:
+<ol>
+<li>Install the compat package</li>
+<li>Install the mx4j-tools.jar at common/lib (use the same mx4j version as your tomcat release)</li>
+<li>Configure a MX4J JMX HTTP Adaptor at your AJP Connector<p></p>
+<source>
+&lt;Connector port="${AJP.PORT}" 
+   handler.list="mx"
+   mx.enabled="true" 
+   mx.httpHost="${JMX.HOST}" 
+   mx.httpPort="${JMX.PORT}" 
+   protocol="AJP/1.3" /&gt;
+</source>
+</li>
+<li>Start your tomcat and look with your browser to http://${JMX.HOST}:${JMX.PORT}</li>
+<li>With the connector parameter <code>mx.authMode="basic" mx.authUser="tomcat" mx.authPassword="strange"</code> you can control the access!</li>
+</ol>
+</p>
+<p>
+List of Cluster Mbeans<br/>
+<table border="1" cellpadding="5">
+
+  <tr>
+    <th align="center" bgcolor="aqua">Name</th>
+    <th align="center" bgcolor="aqua">Description</th>
+    <th align="center" bgcolor="aqua">MBean ObjectName - Engine</th>
+    <th align="center" bgcolor="aqua">MBean ObjectName - Host</th>
+  </tr>
+
+  <tr>
+    <td>Cluster</td>
+    <td>The complete cluster element</td>
+    <td><code>type=Cluster</code></td>
+    <td><code>type=Cluster,host=${HOST}</code></td>
+  </tr>
+ 
+  <tr>
+    <td>ClusterSender</td>
+    <td>Configuration and stats of the sender infrastructure</td>
+    <td><code>type=ClusterSender</code></td>
+    <td><code>type=ClusterSender,host=${HOST}</code></td>
+  </tr>
+ 
+  <tr>
+    <td>ClusterReceiver</td>
+    <td>Configuration and stats of the recevier infrastructure</td>
+    <td><code>type=ClusterReceiver</code></td>
+    <td><code>type=ClusterReceiver,host=${HOST}</code></td>
+  </tr>
+
+  <tr>
+    <td>ClusterMembership</td>
+    <td>Configuration and stats of the membership infrastructure</td>
+    <td><code>type=ClusterMembership</code></td>
+    <td><code>type=ClusterMembership,host=${HOST}</code></td>
+  </tr>
+
+  <tr>
+    <td>IDataSender</td>
+    <td>For every cluster member it exist a sender mbeans. 
+    It exists speziall MBeans to all replication modes</td>
+    <td><code>type=IDataSender,
+        senderAddress=${MEMBER.SENDER.IP},
+        senderPort=${MEMBER.SENDER.PORT}</code></td>
+    <td><code>type=IDataSender,host=${HOST},
+        senderAddress=${MEMBER.SENDER.IP},
+        senderPort=${MEMBER.SENDER.PORT}</code></td>
+  </tr>
+ 
+  <tr>
+    <td>DeltaManager</td>
+    <td>This manager control the sessions and handle session replication </td>
+    <td><code>type=Manager,path=${APP.CONTEXT.PATH}, host=${HOST}</code></td>
+    <td><code>type=Manager,path=${APP.CONTEXT.PATH}, host=${HOST}</code></td>
+  </tr>
+
+  <tr>
+    <td>ReplicationValve</td>
+    <td>This valve control the replication to the backup nodes</td>
+    <td><code>type=Valve,name=ReplicationValve</code></td>
+    <td><code>type=Valve,name=ReplicationValve,host=${HOST}</code></td>
+  </tr>
+
+  <tr>
+    <td>JvmRouteBinderValve</td>
+    <td>This is a cluster fallback valve to change the Session ID to the current tomcat jvmroute.</td>
+    <td><code>type=Valve,name=JvmRouteBinderValve,
+              path=${APP.CONTEXT.PATH}</code></td>
+    <td><code>type=Valve,name=JvmRouteBinderValve,host=${HOST},
+              path=${APP.CONTEXT.PATH}</code></td>
+  </tr>
+
+</table>
+</p>
+</section>
+
+<section name="FAQ">
+<p>Please see <a href="http://tomcat.apache.org/faq/cluster.html">the clustering section of the FAQ</a>.</p>
+</section>
+
+</body>
+
+</document>
