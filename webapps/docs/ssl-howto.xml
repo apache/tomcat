@@ -1,0 +1,539 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="ssl-howto.html">
+
+    &project;
+
+    <properties>
+        <author email="ccain@apache.org">Christopher Cain</author>
+        <author email="yoavs@apache.org">Yoav Shapira</author>
+        <title>SSL Configuration HOW-TO</title>
+    </properties>
+
+<body>
+
+
+<section name="Quick Start">
+
+   <p><b>IMPORTANT NOTE: This Howto refers to usage of JSSE. When using APR, Tomcat will
+   use OpenSSL, which uses a different configuration.</b></p>
+
+    <blockquote><em>
+    <p>The description below uses the variable name $CATALINA_HOME
+    to refer to the directory into which you have installed Tomcat 5,
+    and is the base directory against which most relative paths are
+    resolved.  However, if you have configured Tomcat 5 for multiple
+    instances by setting a CATALINA_BASE directory, you should use
+    $CATALINA_BASE instead of $CATALINA_HOME for each of these
+    references.</p>
+    </em></blockquote>
+
+<p>To install and configure SSL support on Tomcat 5, you need to follow
+these simple steps.  For more information, read the rest of this HOW-TO.</p>
+<ol>
+<li>If you are running a 1.3 JVM, download JSSE 1.0.3 (or later) from
+   <a href="http://java.sun.com/products/jsse/">http://java.sun.com/products/jsse/</a>
+   and either make it an <em>installed extension</em> on the system, or else
+   set an environment variable <code>JSSE_HOME</code> that points at the
+   directory into which you installed JSSE.  </li><br/><br/>
+<li>Create a certificate keystore by executing the following command:
+<p>Windows:</p>
+<source>
+%JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA
+</source>
+<p>Unix:</p>
+<source>
+$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA
+</source>
+<p></p>
+    and specify a password value of "changeit".</li><br/><br/>
+<li>Uncomment the "SSL HTTP/1.1 Connector" entry in
+    <code>$CATALINA_HOME/conf/server.xml</code> and tweak as necessary.</li>
+    <br/><br/>
+</ol>
+
+
+</section>
+
+
+<section name="Introduction to SSL">
+
+<p>SSL, or Secure Socket Layer, is a technology which allows web browsers and
+web servers to communicate over a secured connection.  This means that the data
+being sent is encrypted by one side, transmitted, then decrypted by the other
+side before processing.  This is a two-way process, meaning that both the
+server AND the browser encrypt all traffic before sending out data.</p>
+
+<p>Another important aspect of the SSL protocol is Authentication.  This means
+that during your initial attempt to communicate with a web server over a secure
+connection, that server will present your web browser with a set of
+credentials, in the form of a "Certificate", as proof the site is who and what
+it claims to be.  In certain cases, the server may also request a Certificate
+from your web browser, asking for proof that <em>you</em> are who you claim
+to be.  This is known as "Client Authentication," although in practice this is
+used more for business-to-business (B2B) transactions than with individual
+users.  Most SSL-enabled web servers do not request Client Authentication.</p>
+
+</section>
+
+<section name="SSL and Tomcat">
+
+<p>It is important to note that configuring Tomcat to take advantage of
+secure sockets is usually only necessary when running it as a stand-alone
+web server.  When running Tomcat primarily as a Servlet/JSP container behind
+another web server, such as Apache or Microsoft IIS, it is usually necessary
+to configure the primary web server to handle the SSL connections from users.
+Typically, this server will negotiate all SSL-related functionality, then
+pass on any requests destined for the Tomcat container only after decrypting
+those requests.  Likewise, Tomcat will return cleartext responses, that will
+be encrypted before being returned to the user's browser.  In this environment,
+Tomcat knows that communications between the primary web server and the
+client are taking place over a secure connection (because your application
+needs to be able to ask about this), but it does not participate in the
+encryption or decryption itself.</p>
+
+</section>
+
+<section name="Certificates">
+
+<p>In order to implement SSL, a web server must have an associated Certificate
+for each external interface (IP address) that accepts secure connections.
+The theory behind this design is that a server should provide some kind of
+reasonable assurance that its owner is who you think it is, particularly
+before receiving any sensitive information.  While a broader explanation of
+Certificates is beyond the scope of this document, think of a Certificate
+as a "digital driver's license" for an Internet address.  It states what
+company the site is associated with, along with some basic contact
+information about the site owner or administrator.</p>
+
+<p>This "driver's license" is cryptographically signed by its owner, and is
+therefore extremely difficult for anyone else to forge.  For sites involved
+in e-commerce, or any other business transaction in which authentication of
+identity is important, a Certificate is typically purchased from a well-known
+<em>Certificate Authority</em> (CA) such as VeriSign or Thawte.  Such
+certificates can be electronically verified -- in effect, the Certificate
+Authority will vouch for the authenticity of the certificates that it grants,
+so you can believe that that Certificate is valid if you trust the Certificate
+Authority that granted it.</p>
+
+<p>In many cases, however, authentication is not really a concern.  An
+administrator may simply want to ensure that the data being transmitted and
+received by the server is private and cannot be snooped by anyone who may be
+eavesdropping on the connection.  Fortunately, Java provides a relatively
+simple command-line tool, called <code>keytool</code>, which can easily create
+a "self-signed" Certificate.  Self-signed Certificates are simply user
+generated Certificates which have not been officially registered with any
+well-known CA, and are therefore not really guaranteed to be authentic at all.
+Again, this may or may not even be important, depending on your needs.</p>
+
+</section>
+
+<section name="General Tips on Running SSL">
+
+<p>The first time a user attempts to access a secured page on your site,
+he or she is typically presented with a dialog containing the details of
+the certificate (such as the company and contact name), and asked if he or she
+wishes to accept the Certificate as valid and continue with the transaction.
+Some browsers will provide an option for permanently accepting a given
+Certificate as valid, in which case the user will not be bothered with a
+prompt each time they visit your site.  Other browsers do not provide this
+option.  Once approved by the user, a Certificate will be considered valid
+for at least the entire browser session.</p>
+
+<p>Also, while the SSL protocol was designed to be as efficient as securely
+possible, encryption/decryption is a computationally expensive process from
+a performance standpoint.  It is not strictly necessary to run an entire
+web application over SSL, and indeed a developer can pick and choose which
+pages require a secure connection and which do not.  For a reasonably busy
+site, it is customary to only run certain pages under SSL, namely those
+pages where sensitive information could possibly be exchanged.  This would
+include things like login pages, personal information pages, and shopping
+cart checkouts, where credit card information could possibly be transmitted.
+Any page within an application can be requested over a secure socket by
+simply prefixing the address with <code>https:</code> instead of
+<code>http:</code>.  Any pages which absolutely <strong>require</strong>
+a secure connection should check the protocol type associated with the
+page request and take the appropriate action if <code>https</code> is not
+specified.</p>
+
+<p>Finally, using name-based virtual hosts on a secured connection can be
+problematic.  This is a design limitation of the SSL protocol itself.  The SSL
+handshake, where the client browser accepts the server certificate, must occur
+before the HTTP request is accessed.  As a result, the request information
+containing the virtual host name cannot be determined prior to authentication,
+and it is therefore not possible to assign multiple certificates to a single
+IP address.  If all virtual hosts on a single IP address need to authenticate
+against the same certificate, the addition of multiple virtual hosts should not
+interfere with normal SSL operations on the server.  Be aware, however, that
+most client browsers will compare the server's domain name against the domain
+name listed in the certificate, if any (applicable primarily to official,
+CA-signed certificates).  If the domain names do not match, these browsers will
+display a warning to the client user.  In general, only address-based virtual
+hosts are commonly used with SSL in a production environment.</p>
+
+</section>
+
+<section name="Configuration">
+
+<subsection name="Download and Install JSSE (if needed)">
+<p>Note that JSSE is bundled with Sun's JDK 1.4 and later, so if you're using
+JDK 1.4 and later, you can skip this step.</p>
+
+
+<p>Download the <em>Java Secure Socket Extensions</em> (JSSE) package,
+version 1.0.3 or later, from
+<a href="http://java.sun.com/products/jsse/">http://java.sun.com/products/jsse/</a>.
+If you built Tomcat from source, you have probably already downloaded this
+package.</p>
+
+<p>After expanding the package, there are two ways to make it available to
+Tomcat (choose one or the other):</p>
+<ul>
+<li>Make JSSE an <em>installed extension</em> by copying all three JAR files
+    (<code>jcert.jar</code>, <code>jnet.jar</code>, and <code>jsse.jar</code>)
+    into your <code>$JAVA_HOME/jre/lib/ext</code> directory.</li>
+<li>Create a new environment variable <code>JSSE_HOME</code> that contains
+    the absolute path to the directory into which you unpacked the
+    JSSE binary distribution.</li>
+</ul>
+
+</subsection>
+
+<subsection name="Prepare the Certificate Keystore">
+
+<p>Tomcat currently operates only on <code>JKS</code> or <code>PKCS12</code>
+format keystores.  The <code>JKS</code> format
+is Java's standard "Java KeyStore" format, and is the format created by the
+<code>keytool</code> command-line utility.  This tool is included in the JDK.
+The <code>PKCS12</code> format is an internet standard, and can be manipulated
+via (among other things) OpenSSL and Microsoft's Key-Manager.  However, 
+currently there are some limitations on the support for <code>PKCS12</code>.
+</p>
+
+<p>To import an existing certificate into a JKS keystore, please read the
+documentation (in your JDK documentation package) about <code>keytool</code>.
+</p>
+<p>To import an existing certificate signed by your own CA into a PKCS12 
+keystore using OpenSSL you would execute a command like:
+<source>openssl pkcs12 -export -in mycert.crt -inkey mykey.key \
+                        -out mycert.p12 -name tomcat -CAfile myCA.crt \
+                        -caname root -chain
+</source>
+For more advanced cases, consult the <a href="http://www.openssl.org/">OpenSSL
+documententation</a>.
+</p>
+<p>To create a new keystore from scratch, containing a single self-signed
+Certificate, execute the following from a terminal command line:</p>
+<p>Windows:</p>
+<source>
+%JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA
+</source>
+<p>Unix:</p>
+<source>
+$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA
+</source>
+
+<p>(The RSA algorithm should be preferred as a secure algorithm, and this
+also ensures general compatibility with other servers and components.)</p>
+
+<p>This command will create a new file, in the home directory of the user
+under which you run it, named "<code>.keystore</code>".  To specify a
+different location or filename, add the <code>-keystore</code> parameter,
+followed by the complete pathname to your keystore file,
+to the <code>keytool</code> command shown above.  You will also need to
+reflect this new location in the <code>server.xml</code> configuration file,
+as described later.  For example:</p>
+<p>Windows:</p>
+<source>
+%JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA \
+  -keystore \path\to\my\keystore
+</source>
+<p>Unix:</p>
+<source>
+$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA \
+  -keystore /path/to/my/keystore
+</source>
+
+<p>After executing this command, you will first be prompted for the keystore
+password.  The default password used by Tomcat is "<code>changeit</code>"
+(all lower case), although you can specify a custom password if you like.
+You will also need to specify the custom password in the
+<code>server.xml</code> configuration file, as described later.</p>
+
+<p>Next, you will be prompted for general information about this Certificate,
+such as company, contact name, and so on.  This information will be displayed
+to users who attempt to access a secure page in your application, so make
+sure that the information provided here matches what they will expect.</p>
+
+<p>Finally, you will be prompted for the <em>key password</em>, which is the
+password specifically for this Certificate (as opposed to any other
+Certificates stored in the same keystore file).  You <strong>MUST</strong>
+use the same password here as was used for the keystore password itself.
+(Currently, the <code>keytool</code> prompt will tell you that pressing the
+ENTER key does this for you automatically.)</p>
+
+<p>If everything was successful, you now have a keystore file with a
+Certificate that can be used by your server.</p>
+
+<p><strong>Note:</strong> your private key password and keystore password
+should be the same.  If they differ, you will get an error along the lines
+of <code>java.io.IOException: Cannot recover key</code>, as documented in 
+<a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=38217">Bugzilla issue 38217</a>, 
+which contains further references for this issue.</p>
+
+</subsection>
+
+<subsection name="Edit the Tomcat Configuration File">
+
+<p>The final step is to configure your secure socket in the
+<code>$CATALINA_HOME/conf/server.xml</code> file, where
+<code>$CATALINA_HOME</code> represents the directory into which you
+installed Tomcat 5.  An example <code>&lt;Connector&gt;</code> element
+for an SSL connector is included in the default <code>server.xml</code>
+file installed with Tomcat.  It will look something like this:</p>
+<source>
+&lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!--
+&lt;Connector 
+           port="8443" minProcessors="5" maxProcessors="75"
+           enableLookups="true" disableUploadTimeout="true"
+           acceptCount="100" debug="0" scheme="https" secure="true";
+           clientAuth="false" sslProtocol="TLS"/&gt;
+--&gt;
+</source>
+
+<p>You will note that the Connector element itself is commented out by default,
+so you will need to remove the comment tags around it.  Then, you can
+customize the specified attributes as necessary.  For detailed information
+about the various options, consult the
+<a href="config/index.html">Server Configuration Reference</a>.  The
+following discussion covers only those attributes of most interest when
+setting up SSL communication.</p>
+
+<p>The <code>port</code> attribute (default value is 8443) is the TCP/IP
+port number on which Tomcat will listen for secure connections.  You can
+change this to any port number you wish (such as to the default port for
+<code>https</code> communications, which is 443).  However, special setup
+(outside the scope of this document) is necessary to run Tomcat on port
+numbers lower than 1024 on many operating systems.</p>
+
+  <blockquote><em>
+  <p>If you change the port number here, you should also change the
+  value specified for the <code>redirectPort</code> attribute on the
+  non-SSL connector.  This allows Tomcat to automatically redirect
+  users who attempt to access a page with a security constraint specifying
+  that SSL is required, as required by the Servlet 2.4 Specification.</p>
+  </em></blockquote>
+
+<p>There are addional option used to configure the SSL protocol.
+  You may need to add or change the following attribute
+values, depending on how you configured your keystore earlier:</p>
+
+<table border="1">
+  <tr>
+    <th>Attribute</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><code>clientAuth</code></td>
+    <td>Set this value to <code>true</code> if you want Tomcat to require
+        all SSL clients to present a client Certificate in order to use
+        this socket.  Set this value to <code>want</code> if you want Tomcat
+        to request a client Certificate, but not fail if one isn't presented.
+    </td>
+  </tr>
+  <tr>
+    <td><code>keystoreFile</code></td>
+    <td>Add this attribute if the keystore file you created is not in
+        the default place that Tomcat expects (a file named
+        <code>.keystore</code> in the user home directory under
+        which Tomcat is running).  You can specify an absolute pathname,
+        or a relative pathname that is resolved against the
+        <code>$CATALINA_BASE</code> environment variable.</td>
+  </tr>
+  <tr>
+    <td><code>keystorePass</code></td>
+    <td>Add this element if you used a different keystore (and Certificate)
+        password than the one Tomcat expects (<code>changeit</code>).</td>
+  </tr>
+  <tr>
+    <td><code>keystoreType</code></td>
+    <td>Add this element if using a PKCS12 keystore.  The valid values are
+        <code>JKS</code> and <code>PKCS12</code>.</td>
+  </tr>
+  <tr>
+    <td><code>sslProtocol</code></td>
+    <td>The encryption/decryption protocol to be used on this socket.
+        It is not recommended to change this value if you are using Sun's
+        JVM.  It is reported that IBM's 1.4.1 implementation
+        of the TLS protocol is not compatible with some popular browsers.
+        In this case, use the value <code>SSL</code>.</td>
+  </tr>
+  <tr>
+    <td><code>ciphers</code></td>
+    <td>The comma separated list of encryption ciphers that this socket is 
+        allowed to use.  By default, any available cipher is allowed.</td>
+  </tr>
+  <tr>
+    <td><code>algorithm</code></td>
+    <td>The <code>X509</code> algorithm to use.  This defaults to the Sun 
+        implementation (<code>SunX509</code>).  For IBM JVMs you should use
+        the value <code>IbmX509</code>.  For other vendors, consult the JVM
+        documentation for the correct value.
+    </td>
+  </tr>
+  <tr>
+   <td><code>truststoreFile</code></td>
+   <td>The TrustStore file to use to validate client certificates.</td>
+  </tr>
+  <tr>
+   <td><code>truststorePass</code></td>
+   <td>The password to access the TrustStore.  This defaults to the value
+       of <code>keystorePass</code>.</td>
+  </tr>
+  <tr>
+   <td><code>truststoreType</code></td>
+    <td>Add this element if your are using a different format for the 
+        TrustStore then you are using for the KeyStore.  The valid values are
+        <code>JKS</code> and <code>PKCS12</code>.</td>
+  </tr>
+</table>
+
+<p>After completing these configuration changes, you must restart Tomcat as
+you normally do, and you should be in business.  You should be able to access
+any web application supported by Tomcat via SSL.  For example, try:</p>
+<source>
+https://localhost:8443
+</source>
+
+<p>and you should see the usual Tomcat splash page (unless you have modified
+the ROOT web application).  If this does not work, the following section
+contains some troubleshooting tips.</p>
+
+</subsection>
+
+</section>
+
+<section name="Installing a Certificate from a Certificate Authority">
+<p>To obstain and install a Certificate from a Certificate Authority (like verisign.com, thawte.com 
+or trustcenter.de) you should have read the previous section and then follow these instructions:</p>
+
+<subsection name="Create a local Certificate Signing Request (CSR)">
+<p>In order to obtain a Certificate from the Certificate Authority of your choice 
+you have to create a so called Certificate Signing Request (CSR). That CSR will be used 
+by the Certificate Authority to create a Certificate that will identify your website 
+as "secure". To create a CSR follow these steps:</p>
+<ul>
+<li>Create a local Certificate (as described in the previous section):
+	<source>keytool -genkey -alias tomcat -keyalg RSA \
+	-keystore &lt;your_keystore_filename&gt;</source>
+	Note: In some cases you will have to enter the domain of your website (i.e. <code>www.myside.org</code>)
+	in the field "first- and lastname" in order to create a working Certificate. 
+</li>
+<li>The CSR is then created with:
+	<source>keytool -certreq -keyalg RSA -alias tomcat -file certreq.csr \
+	-keystore &lt;your_keystore_filename&gt;</source>
+</li>
+</ul>
+<p>Now you have a file called <code>certreq.csr</code> that you can submit to the Certificate Authority (look at the
+documentation of the Certificate Authority website on how to do this). In return you get a Certificate.</p>
+</subsection>
+
+<subsection name="Importing the Certificate">
+<p>Now that you have your Certificate you can import it into you local keystore. 
+First of all you have to import a so called Chain Certificate or Root Certificate into your keystore. 
+After that you can procede with importing your Certificate.</p>
+
+<ul>
+<li>Download a Chain Certificate from the Certificate Authority you obtained the Certificate from.<br/>
+	For Verisign.com commercial certificates go to:
+            http://www.verisign.com/support/install/intermediate.html<br/>
+        For Verisign.com trial certificates go to:
+            http://www.verisign.com/support/verisign-intermediate-ca/Trial_Secure_Server_Root/index.html
+	For Trustcenter.de go to:
+            http://www.trustcenter.de/certservices/cacerts/en/en.htm#server<br/>
+	For Thawte.com go to:
+            http://www.thawte.com/certs/trustmap.html<br/>
+</li>
+<li>Import the Chain Certificate into you keystore
+    <source>keytool -import -alias root -keystore &lt;your_keystore_filename&gt; \
+	-trustcacerts -file &lt;filename_of_the_chain_certificate&gt;</source>
+</li>
+<li>And finally import your new Certificate
+	<source>keytool -import -alias tomcat -keystore &lt;your_keystore_filename&gt; \
+	-trustcacerts -file &lt;your_certificate_filename&gt;</source>
+</li>
+</ul>
+</subsection>
+</section>
+
+<section name="Troubleshooting">
+
+<p>Here is a list of common problems that you may encounter when setting up
+SSL communications, and what to do about them.</p>
+
+<ul>
+
+<li>I get "java.security.NoSuchAlgorithmException" errors in my
+    log files.
+    <blockquote>
+    <p>The JVM cannot find the JSSE JAR files.  Follow all of the directions to
+    <a href="#Download and Install JSSE">download and install JSSE</a>.</p>
+    </blockquote></li>
+
+<li>When Tomcat starts up, I get an exception like
+    "java.io.FileNotFoundException: {some-directory}/{some-file} not found".
+    <blockquote>
+    <p>A likely explanation is that Tomcat cannot find the keystore file
+    where it is looking.  By default, Tomcat expects the keystore file to
+    be named <code>.keystore</code> in the user home directory under which
+    Tomcat is running (which may or may not be the same as yours :-).  If
+    the keystore file is anywhere else, you will need to add a
+    <code>keystoreFile</code> attribute to the <code>&lt;Factory&gt;</code>
+    element in the <a href="#Edit the Tomcat Configuration File">Tomcat
+    configuration file</a>.</p>
+    </blockquote></li>
+
+<li>When Tomcat starts up, I get an exception like
+    "java.io.FileNotFoundException:  Keystore was tampered with, or
+    password was incorrect".
+    <blockquote>
+    <p>Assuming that someone has not <em>actually</em> tampered with
+    your keystore file, the most likely cause is that Tomcat is using
+    a different password than the one you used when you created the
+    keystore file.  To fix this, you can either go back and
+    <a href="#Prepare the Certificate Keystore">recreate the keystore
+    file</a>, or you can add or update the <code>keystorePass</code>
+    attribute on the <code>&lt;Connector&gt;</code> element in the
+    <a href="#Edit the Tomcat Configuration File">Tomcat configuration
+    file</a>.  <strong>REMINDER</strong> - Passwords are case sensitive!</p>
+    </blockquote></li>
+
+</ul>
+
+<p>If you are still having problems, a good source of information is the
+<strong>TOMCAT-USER</strong> mailing list.  You can find pointers to archives
+of previous messages on this list, as well as subscription and unsubscription
+information, at
+<a href="http://jakarta.apache.org/site/mail.html">http://jakarta.apache.org/site/mail.html"</a>.</p>
+
+</section>
+
+<section name="Miscellaneous Tips and Bits">
+
+<p>To access the SSL session ID from the request, use:<br />
+
+  <code>
+    String sslID = (String)request.getAttribute("javax.servlet.request.ssl_session");
+  </code>
+<br />
+For additional discussion on this area, please see
+<a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=22679">Bugzilla</a>.
+</p>
+</section>
+
+</body>
+
+</document>

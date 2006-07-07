@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="index.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
+    <author email="remm@apache.org">Remy Maucherat</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <title>Documentation Index</title>
+  </properties>
+
+<body>
+
+<section name="Introduction">
+
+<p>This is the top-level entry point of the documentation bundle for the
+<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 5.5 
+implements the
+Servlet 2.4 and JavaServer Pages 2.0 specifications from the
+<a href="http://www.jcp.org">Java Community Process</a>, and includes many
+additional features that make it a useful platform for developing and deploying
+web applications and web services.</p>
+
+<p>Select one of the links from the navigation menu (to the left) to drill
+down to the more detailed documentation that is available.  Each available
+manual is described in more detail below.</p>
+
+</section>
+
+
+<section name="Apache Tomcat User Guide">
+
+<p>The following documents will assist you in downloading, installing
+Apache Tomcat 5, and using many of the Apache Tomcat features.</p>
+
+<ol>
+<li><a href="introduction.html"><strong>Introduction</strong></a> - A
+    brief, high level, overview of Apache Tomcat.</li>
+<li><a href="setup.html"><strong>Setup</strong></a> - How to install and run
+    Apache Tomcat on a variety of platforms.</li>
+<li><a href="appdev/index.html"><strong>First web application</strong></a>
+    - An introduction to the concepts of a <em>web application</em> as defined
+    in the <a href="http://java.sun.com/products/servlet/download.html">Servlet
+    2.3 Specification</a>.  Covers basic organization of your web application
+    source tree, the structure of a web application archive, and an
+    introduction to the web application deployment descriptor
+    (<code>/WEB-INF/web.xml</code>).</li>
+<li><a href="deployer-howto.html"><strong>Deployer</strong></a> -
+    Operating the Apache Tomcat Deployer to deploy, precompile, and validate web
+    applications.</li>
+<li><a href="manager-howto.html"><strong>Manager</strong></a> -
+    Operating the <code>Manager</code> web app to deploy, undeploy, and
+    redeploy applications while Apache Tomcat is running.</li>
+<li><a href="realm-howto.html"><strong>Realms and Access Control</strong></a>
+    - Description of how to configure <em>Realms</em> (databases of users,
+    passwords, and their associated roles) for use in web applications that
+    utilize <em>Container Managed Security</em>.</li>
+<li><a href="security-manager-howto.html"><strong>Security Manager</strong></a>
+    - Configuring and using a Java Security Manager to
+    support fine-grained control over the behavior of your web applications.
+    </li>
+<li><a href="jndi-resources-howto.html"><strong>JNDI Resources</strong></a>
+    - Configuring standard and custom resources in the JNDI naming context
+    that is provided to each web application.</li>
+<li><a href="jndi-datasource-examples-howto.html">
+    <strong>JDBC DataSource</strong></a>
+    - Configuring a JNDI DataSoure with a DB connection pool.
+    Examples for many popular databases.</li>
+<li><a href="class-loader-howto.html"><strong>Classloading</strong></a>
+    - Information about class loading in Apache Tomcat 5, including where to place
+    your application classes so that they are visible.</li>
+<li><a href="jasper-howto.html"><strong>JSPs</strong></a>
+    - Information about Jasper configuration, as well as the JSP compiler
+    usage.</li>
+<li><a href="ssl-howto.html"><strong>SSL</strong></a> -
+    Installing and
+    configuring SSL support so that your Apache Tomcat will serve requests using
+    the <code>https</code> protocol.</li>
+<li><a href="ssi-howto.html"><strong>SSI</strong></a> -
+    Using Server Side Includes in Apache Tomcat.</li>
+<li><a href="cgi-howto.html"><strong>CGI</strong></a> -
+    Using CGIs with Apache Tomcat.</li>
+<li><a href="proxy-howto.html"><strong>Proxy Support</strong></a> -
+    Configuring Apache Tomcat 5 to run behind a proxy server (or a web server
+    functioning as a proxy server).</li>
+<li><a href="mbeans-descriptor-howto.html"><strong>MBean Descriptor</strong></a> -
+    Configuring MBean descriptors files for custom components.</li>
+<li><a href="default-servlet.html"><strong>Default Servlet</strong></a> -
+    Configuring the default servlet and customizing directory listings.</li>
+<li><a href="cluster-howto.html"><strong>Apache Tomcat Clustering</strong></a> -
+    Enable session replication in a Apache Tomcat environment.</li>
+<li><a href="balancer-howto.html"><strong>Balancer</strong></a> -
+    Configuring, using, and extending the load balancer application.</li>
+<li><a href="connectors.html"><strong>Connectors</strong></a> -
+    Connectors available in Apache Tomcat, and native web server integration.</li>
+<li><a href="monitoring.html"><strong>Monitoring and Management</strong></a> -
+    Enabling JMX Remote support, and using tools to monitor and manage Apache Tomcat.</li>
+<li><a href="logging.html"><strong>Logging</strong></a> -
+    Confuguring logging in Apache Tomcat.</li>
+
+</ol>
+
+</section>
+
+
+<section name="Reference">
+
+<p>The following documents are aimed at <em>System Administrators</em> who
+are responsible for installing, configuring, and operating a Apache Tomcat 5 server.
+</p>
+<ul>
+<li><a href="RELEASE-NOTES.txt"><strong>Release notes</strong></a>
+    - Known issues in this Apache Tomcat release.
+    </li>
+<li><a href="config/index.html"><strong>Apache Tomcat Server Configuration Reference</strong></a>
+    - Reference manual that documents all available elements and attributes
+      that may be placed into a Apache Tomcat 5 <code>conf/server.xml</code> file.
+    </li>
+<li><a href="http://jakarta.apache.org/tomcat/connectors-doc/index.html"><strong>JK Documentation</strong></a>
+    - Complete documentation and HOWTOs on the JK native webserver connector,
+      used to interface Apache Tomcat with servers like Apache HTTPd, IIS
+      and others.</li>
+<li><a href="servletapi/index.html"><strong>Servlet API Javadocs</strong></a> -
+    The Servlet 2.4 API Javadocs.</li>
+<li><a href="jspapi/index.html"><strong>JSP API Javadocs</strong></a> -
+    The JSP 2.0 API Javadocs.</li>
+</ul>
+
+</section>
+
+
+<section name="Apache Tomcat Developers">
+
+<p>The following documents are for Java developers who wish to contribute to
+the development of the <em>Apache Tomcat</em> project.</p>
+<ul>
+<li><a href="building.html"><strong>Building from Source</strong></a> - 
+    Details the steps necessary to download Apache Tomcat 5 source code (and the 
+    other packages that it depends on), and build a binary distribution from 
+    those sources.
+    </li>
+<li><a href="changelog.html"><strong>Changelog</strong></a> - Details the
+    changes made to Apache Tomcat.
+    </li>
+<li><a href="status.html"><strong>Status</strong></a> - Apache Tomcat development 
+    status.
+    </li>
+<li><a href="developers.html"><strong>Developers</strong></a> - List of active
+    Apache Tomcat contributors.
+    </li>
+<li><a href="catalina/funcspecs/index.html"><strong>Functional Specifications</strong></a>
+    - Requirements specifications for features of the <em>Catalina</em> servlet
+    container portion of Apache Tomcat 5.</li>
+<li><a href="catalina/docs/api/index.html"><strong>Catalina Javadocs</strong></a>
+    - Javadoc API documentation for the <em>Catalina</em> servlet
+    container and its dependencies.</li>
+<li><a href="jasper/docs/api/index.html"><strong>Jasper Javadocs</strong></a>
+    - Javadoc API documentation for the <em>Jasper</em> JSP container
+    portion of Apache Tomcat 5.</li>
+<li><a href="architecture/index.html"><strong>Apache Tomcat Architecture</strong></a>
+    - Documentation of the Apache Tomcat Server Architecture.</li>
+    
+</ul>
+
+</section>
+
+
+</body>
+</document>

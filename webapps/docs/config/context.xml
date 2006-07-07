@@ -1,0 +1,778 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="context.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
+    <title>The Context Container</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  <p>The <strong>Context</strong> element represents a <em>web
+  application</em>, which is run within a particular virtual host.
+  Each web application is based on a <em>Web Application Archive</em>
+  (WAR) file, or a corresponding directory containing the corresponding
+  unpacked contents, as described in the Servlet Specification (version
+  2.2 or later).  For more information about web application archives,
+  you can download the
+  <a href="http://java.sun.com/products/servlet/download.html">Servlet
+  Specification</a>, and review the Tomcat
+  <a href="../appdev/index.html">Application Developer's Guide</a>.</p>
+
+  <p>The web application used to process each HTTP request is selected
+  by Catalina based on matching the longest possible prefix of the
+  Request URI against the <em>context path</em> of each defined Context.
+  Once selected, that Context will select an appropriate servlet to
+  process the incoming request, according to the servlet mappings defined
+  in the <em>web application deployment descriptor</em> file (which MUST
+  be located at <code>/WEB-INF/web.xml</code> within the web app's
+  directory hierarchy).</p>
+
+  <p>You may define as many <strong>Context</strong> elements as you
+  wish.  Each such Context MUST have a unique
+  context path, which is defined by the <code>path</code> attribute.
+  In addition, you MUST define a Context with a context path equal to
+  a zero-length string.  This Context becomes the <em>default</em>
+  web application for this virtual host, and is used to process all
+  requests that do not match any other Context's context path.</p>
+
+  <p>In addition to nesting <strong>Context</strong> elements inside a
+  <a href="host.html">Host</a> element, you can also store them:</p>
+  <ul>
+  <li>in the individual <code>$CATALINA_HOME/conf/context.xml</code> file: 
+  the Context element information will be loaded by all webapps</li>
+  <li>in the individual 
+  <code>$CATALINA_HOME/conf/[enginename]/[hostname]/context.xml.default</code>
+  file: the Context element information will be loaded by all webapps of that
+  host</li>
+  <li>in individual files (with a ".xml" extension) in the 
+  <code>$CATALINA_HOME/conf/[enginename]/[hostname]/</code> directory</li>
+  <li>if the previous file was not found for this application, in individual file
+  at <code>/META-INF/context.xml</code> inside the application files</li>
+  </ul>
+  <p>See
+  <a href="host.html#Automatic Application Deployment">Automatic
+  Application Deployment</a> for more information. This method allows dynamic
+  reconfiguration of the web application, since the main 
+  <code>conf/server.xml</code> file cannot be reloaded without restarting
+  Tomcat. <b>Please note that for tomcat 5, unlike tomcat 4.x, it is NOT
+  recommended to place &lt;Context&gt; elements directly in the server.xml file.</b>
+  Instead, put them in the META-INF/context.xml directory of your WAR file or
+  the conf directory as described above.
+  </p>
+
+  <p>In addition to explicitly specified Context elements, there are
+  several techniques by which Context elements can be created automatically
+  for you.  See <a href="host.html#Automatic Application Deployment">
+  Automatic Application Deployment</a> and
+  <a href="host.html#User Web Applications">User Web Applications</a>
+  for more information.</p>
+
+    <blockquote><em>
+    <p>The description below uses the variable name $CATALINA_HOME
+    to refer to the directory into which you have installed Tomcat 5,
+    and is the base directory against which most relative paths are
+    resolved.  However, if you have configured Tomcat 5 for multiple
+    instances by setting a CATALINA_BASE directory, you should use
+    $CATALINA_BASE instead of $CATALINA_HOME for each of these
+    references.</p>
+    </em></blockquote>
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+    <p>All implementations of <strong>Context</strong>
+    support the following attributes:</p>
+
+    <attributes>
+
+      <attribute name="backgroundProcessorDelay" required="false">
+        <p>This value represents the delay in seconds between the 
+        invocation of the backgroundProcess method on this context and 
+        its child containers, including all wrappers. 
+        Child containers will not be invoked if their delay value is not 
+        negative (which would mean they are using their own processing 
+        thread). Setting this to a positive value will cause 
+        a thread to be spawn. After waiting the specified amount of time, 
+        the thread will invoke the backgroundProcess method on this host 
+        and all its child containers. A context will use background 
+        processing to perform session expiration and class monitoring for
+        reloading. If not specified, the default value for this attribute is 
+        -1, which means the context will rely on the background processing 
+        thread of its parent host.</p>
+      </attribute>
+
+      <attribute name="className" required="false">
+        <p>Java class name of the implementation to use.  This class must
+        implement the <code>org.apache.catalina.Context</code> interface.
+        If not specified, the standard value (defined below) will be used.</p>
+      </attribute>
+
+      <attribute name="cookies" required="false">
+        <p>Set to <code>true</code> if you want cookies to be used for
+        session identifier communication if supported by the client (this
+        is the default).  Set to <code>false</code> if you want to disable
+        the use of cookies for session identifier communication, and rely
+        only on URL rewriting by the application.</p>
+      </attribute>
+
+      <attribute name="crossContext" required="false">
+        <p>Set to <code>true</code> if you want calls within this application
+        to <code>ServletContext.getContext()</code> to successfully return a
+        request dispatcher for other web applications running on this virtual
+        host.  Set to <code>false</code> (the default) in security
+        conscious environments, to make <code>getContext()</code> always
+        return <code>null</code>.</p>
+      </attribute>
+
+      <attribute name="docBase" required="true">
+        <p>The <em>Document Base</em> (also known as the <em>Context
+        Root</em>) directory for this web application, or the pathname
+        to the web application archive file (if this web application is
+        being executed directly from the WAR file).    You may specify
+        an absolute pathname for this directory or WAR file, or a pathname
+        that is relative to the <code>appBase</code> directory of the
+        owning <a href="host.html">Host</a>.</p>
+      </attribute>
+
+      <attribute name="override" required="false">
+        <p>Set to <code>true</code> to have explicit settings in this
+        Context element override any corresponding settings in the
+        <a href="defaultcontext.html">DefaultContext</a> element associated
+        with our owning <a href="host.html">Host</a>.  By default, settings
+        in the DefaultContext element will be used.</p>
+      </attribute>
+
+      <attribute name="privileged" required="false">
+        <p>Set to <code>true</code> to allow this context to use container
+        servlets, like the manager servlet.</p>
+      </attribute>
+
+      <attribute name="path" required="false">
+        <p>The <em>context path</em> of this web application, which is
+        matched against the beginning of each request URI to select the
+        appropriate web application for processing.  All of the context paths
+        within a particular <a href="host.html">Host</a> must be unique.
+        If you specify a context path of an empty string (""), you are
+        defining the <em>default</em> web application for this Host, which
+        will process all requests not assigned to other Contexts. The value of
+        this field must not be set except when statically defining a Context in
+        server.xml, as it will be infered from the filenames used for either the 
+        .xml context file or the docBase.</p>
+      </attribute>
+
+      <attribute name="reloadable" required="false">
+        <p>Set to <code>true</code> if you want Catalina to monitor classes in
+        <code>/WEB-INF/classes/</code> and <code>/WEB-INF/lib</code> for
+        changes, and automatically reload the web application if a change
+        is detected.  This feature is very useful during application
+        development, but it requires significant runtime overhead and is
+        not recommended for use on deployed production applications.  That's
+        why the default setting for this attribute is <i>false</i>.  You
+        can use the <a href="../manager-howto.html">Manager</a> web
+        application, however, to trigger reloads of deployed applications
+        on demand.</p>
+      </attribute>
+
+      <attribute name="wrapperClass" required="false">
+        <p>Java class name of the <code>org.apache.catalina.Wrapper</code>
+        implementation class that will be used for servlets managed by this
+        Context.  If not specified, a standard default value will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+  <subsection name="Standard Implementation">
+
+    <p>The standard implementation of <strong>Context</strong> is
+    <strong>org.apache.catalina.core.StandardContext</strong>.
+    It supports the following additional attributes (in addition to the
+    common attributes listed above):</p>
+
+    <attributes>
+
+      <attribute name="allowLinking" required="false">
+        <p>If the value of this flag is <code>true</code>, symlinks will be
+        allowed inside the web application, pointing to resources outside the
+        web application base path. If not specified, the default value
+        of the flag is <code>false</code>.</p>
+        <p><b>NOTE: This flag MUST NOT be set to true on the Windows platform
+        (or any other OS which does not have a case sensitive filesystem),
+        as it will disable case sensitivity checks, allowing JSP source code
+        disclosure, among other security problems.</b></p>
+      </attribute>
+
+      <attribute name="antiJARLocking" required="false">
+        <p>If true, the Tomcat classloader will take extra measures to avoid
+        JAR file locking when resources are accessed inside JARs through URLs.
+        This will impact startup time of applications, but could prove to be useful
+        on platforms or configurations where file locking can occur.
+        If not specified, the default value is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="antiResourceLocking" required="false">
+        <p>If true, Tomcat will prevent any file locking.
+        This will significantly impact startup time of applications, 
+        but allows full webapp hot deploy and undeploy on platforms 
+        or configurations where file locking can occur.
+        If not specified, the default value is <code>false</code>.</p>
+   
+        <p>Please note that setting this to <code>true</code> has some side effects,
+        including the disabling of JSP reloading in a running server: see
+        <a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=37668">Bugzilla 37668</a>.
+        </p>
+      </attribute>
+
+      <attribute name="cacheMaxSize" required="false">
+        <p>Maximum size of the static resource cache in kilobytes. 
+        If not specified, the default value is <code>10240</code>
+        (10 megabytes).</p>
+      </attribute>
+
+      <attribute name="cacheTTL" required="false">
+        <p>Amount of time in milliseconds between cache entries revalidation.
+        If not specified, the default value is <code>5000</code> 
+        (5 seconds).</p>
+      </attribute>
+
+      <attribute name="cachingAllowed" required="false">
+        <p>If the value of this flag is <code>true</code>, the cache for static
+        resources will be used. If not specified, the default value
+        of the flag is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="caseSensitive" required="false">
+        <p>If the value of this flag is <code>true</code>, all case sensitivity
+        checks will be disabled. If not 
+        specified, the default value of the flag is <code>true</code>.</p>
+        <p><b>NOTE: This flag MUST NOT be set to false on the Windows platform
+        (or any other OS which does not have a case sensitive filesystem),
+        as it will disable case sensitivity checks, allowing JSP source code
+        disclosure, among other security problems.</b></p>
+      </attribute>
+
+      <attribute name="processTlds" required="false">
+        <p>Whether the context should process TLDs on startup.  The default
+        is true.  The false setting is intended for special cases
+        that know in advance TLDs are not part of the webapp.</p>
+      </attribute>
+
+      <attribute name="swallowOutput" required="false">
+        <p>If the value of this flag is <code>true</code>, the bytes output to
+        System.out and System.err by the web application will be redirected to
+        the web application logger. If not specified, the default value
+        of the flag is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="tldNamespaceAware" required="false">
+        <p>If the value of this flag is <code>true</code>, the TLD files
+        XML validation will be namespace-aware.  If you turn this flag on,
+        you should probably also turn <code>tldValidation</code> on.  The
+        default value for this flag is <code>false</code>, and setting it
+        to true will incur a performance penalty.
+        </p>
+      </attribute>
+
+      <attribute name="tldValidation" required="false">
+        <p>If the value of this flag is <code>true</code>, the TLD files
+        will be XML validated on context startup.  The default value for
+        this flag is <code>false</code>, and setting it to true will incur
+        a performance penalty.</p>
+      </attribute>
+
+      <attribute name="unloadDelay" required="false">
+        <p>Amount of ms that the container will wait for servlets to unload.
+        If not specified, the default value of the flag is <code>2000</code> 
+        ms.</p>
+      </attribute>
+
+      <attribute name="unpackWAR" required="false">
+        <p>If true, Tomcat will unpack all compressed web applications before
+        running them.
+        If not specified, the default value is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="useNaming" required="false">
+        <p>Set to <code>true</code> (the default) to have Catalina enable a
+        JNDI <code>InitialContext</code> for this web application that is
+        compatible with Java2 Enterprise Edition (J2EE) platform
+        conventions.</p>
+      </attribute>
+
+      <attribute name="workDir" required="false">
+        <p>Pathname to a scratch directory to be provided by this Context
+        for temporary read-write use by servlets within the associated web
+        application.  This directory will be made visible to servlets in the
+        web application by a servlet context attribute (of type
+        <code>java.io.File</code>) named
+        <code>javax.servlet.context.tempdir</code> as described in the
+        Servlet Specification.  If not specified, a suitable directory
+        underneath <code>$CATALINA_HOME/work</code> will be provided.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+</section>
+
+
+<section name="Nested Components">
+
+  <p>You can nest at most one instance of the following utility components
+  by nesting a corresponding element inside your <strong>Context</strong>
+  element:</p>
+  <ul>
+  <li><a href="loader.html"><strong>Loader</strong></a> -
+      Configure the web application class loader that will be used to load
+      servlet and bean classes for this web application.  Normally, the
+      default configuration of the class loader will be sufficient.</li>
+  <li><a href="manager.html"><strong>Manager</strong></a> -
+      Configure the session manager that will be used to create, destroy,
+      and persist HTTP sessions for this web application.  Normally, the
+      default configuration of the session manager will be sufficient.</li>
+  <li><a href="realm.html"><strong>Realm</strong></a> -
+      Configure a realm that will allow its
+      database of users, and their associated roles, to be utilized solely
+      for this particular web application.  If not specified, this web
+      application will utilize the Realm associated with the owning
+      <a href="host.html">Host</a> or <a href="engine.html">Engine</a>.</li>
+  <li><a href="resources.html"><strong>Resources</strong></a> -
+      Configure the resource manager that will be used to access the static
+      resources associated with this web application.  Normally, the
+      default configuration of the resource manager will be sufficient.</li>
+  <li><strong>WatchedResource</strong> - The auto deployer will monitor the 
+      specified static resource of the web application for updates, and will
+      reload the web application if is is updated. The content of this element
+      must be a string.</li>
+  </ul>
+
+</section>
+
+
+<section name="Special Features">
+
+
+  <subsection name="Logging">
+
+    <p>A context is associated with the 
+       <code>org.apache.catalina.core.ContainerBase.[enginename].[hostname].[path]</code>
+       log category.  Note that the brackets are actually part of the name, don't omit them.</p>
+
+  </subsection>
+
+
+  <subsection name="Access Logs">
+
+    <p>When you run a web server, one of the output files normally generated
+    is an <em>access log</em>, which generates one line of information for
+    each request processed by the server, in a standard format.  Catalina
+    includes an optional <a href="valve.html">Valve</a> implementation that
+    can create access logs in the same standard format created by web servers,
+    or in any number of custom formats.</p>
+
+    <p>You can ask Catalina to create an access log for all requests
+    processed by an <a href="engine.html">Engine</a>,
+    <a href="host.html">Host</a>, or <a href="context.html">Context</a>
+    by nesting a <a href="valve.html">Valve</a> element like this:</p>
+
+<source>
+&lt;Context path="/examples" ...&gt;
+  ...
+  &lt;Valve className="org.apache.catalina.valves.AccessLogValve"
+         prefix="localhost_access_log." suffix=".txt"
+         pattern="common"/&gt;
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>See <a href="valve.html#Access Log Valve">Access Log Valve</a>
+    for more information on the configuration attributes that are
+    supported.</p>
+
+  </subsection>
+
+
+  <subsection name="Automatic Context Configuration">
+
+    <p>If you use the standard <strong>Context</strong> implementation,
+    the following configuration steps occur automtically when Catalina
+    is started, or whenever this web application is reloaded.  No special
+    configuration is required to enable this feature.</p>
+    
+    <ul>
+    <li>If you have not declared your own <a href="loader.html">Loader</a>
+       element, a standard web application class loader will be configured.
+       </li>
+    <li>If you have not declared your own <a href="manager.html">Manager</a>
+        element, a standard session manager will be configured.</li>
+    <li>If you have not declared your own <a href="resources.html">Resources</a>
+        element, a standard resources manager will be configured.</li>
+    <li>The web application properties listed in <code>conf/web.xml</code>
+        will be processed as defaults for this web application.  This is used
+        to establish default mappings (such as mapping the <code>*.jsp</code>
+        extension to the corresponding JSP servlet), and other standard
+        features that apply to all web applications.</li>
+    <li>The web application properties listed in the
+        <code>/WEB-INF/web.xml</code> resource for this web application
+        will be processed (if this resource exists).</li>
+    <li>If your web application has specified security constraints that might
+        require user authentication, an appropriate Authenticator that
+        implements the login method you have selected will be configured.</li>
+    </ul>
+
+  </subsection>
+
+
+  <subsection name="Context Parameters">
+
+    <p>You can configure named values that will be made visible to the
+    web application as servlet context initialization parameters by nesting
+    <code>&lt;Parameter&gt;</code> elements inside this element.  For
+    example, you can create an initialization parameter like this:</p>
+<source>
+&lt;Context ...&gt;
+  ...
+  &lt;Parameter name="companyName" value="My Company, Incorporated"
+         override="false"/&gt;
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>This is equivalent to the inclusion of the following element in the
+    web application deployment descriptor (<code>/WEB-INF/web.xml</code>):
+    </p>
+<source>
+&lt;context-param&gt;
+  &lt;param-name&gt;companyName&lt;/param-name&gt;
+  &lt;param-value&gt;My Company, Incorporated&lt;/param-value&gt;
+&lt;/context-param&gt;
+</source>
+    <p>but does <em>not</em> require modification of the deployment descriptor
+    to customize this value.</p>
+
+    <p>The valid attributes for a <code>&lt;Parameter&gt;</code> element
+    are as follows:</p>
+
+    <attributes>
+
+      <attribute name="description" required="false">
+        <p>Optional, human-readable description of this context
+        initialization parameter.</p>
+      </attribute>
+
+      <attribute name="name" required="true">
+        <p>The name of the context initialization parameter to be created.</p>
+      </attribute>
+
+      <attribute name="override" required="false">
+        <p>Set this to <code>false</code> if you do <strong>not</strong> want
+        a <code>&lt;context-param&gt;</code> for the same parameter name,
+        found in the web application deployment descriptor, to override the
+        value specified here.  By default, overrides are allowed.</p>
+      </attribute>
+
+      <attribute name="value" required="true">
+        <p>The parameter value that will be presented to the application
+        when requested by calling
+        <code>ServletContext.getInitParameter()</code>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+  <subsection name="Environment Entries">
+
+    <p>You can configure named values that will be made visible to the
+    web application as environment entry resources, by nesting
+    <code>&lt;Environment&gt;</code> entries inside this element.  For
+    example, you can create an environment entry like this:</p>
+<source>
+&lt;Context ...&gt;
+  ...
+  &lt;Environment name="maxExemptions" value="10"
+         type="java.lang.Integer" override="false"/&gt;
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>This is equivalent to the inclusion of the following element in the
+    web application deployment descriptor (<code>/WEB-INF/web.xml</code>):
+    </p>
+<source>
+&lt;env-entry&gt;
+  &lt;env-entry-name&gt;maxExemptions&lt;/param-name&gt;
+  &lt;env-entry-value&gt;10&lt;/env-entry-value&gt;
+  &lt;env-entry-type&gt;java.lang.Integer&lt;/env-entry-type&gt;
+&lt;/env-entry&gt;
+</source>
+    <p>but does <em>not</em> require modification of the deployment descriptor
+    to customize this value.</p>
+
+    <p>The valid attributes for an <code>&lt;Environment&gt;</code> element
+    are as follows:</p>
+
+    <attributes>
+
+      <attribute name="description" required="false">
+        <p>Optional, human-readable description of this environment entry.</p>
+      </attribute>
+
+      <attribute name="name" required="true">
+        <p>The name of the environment entry to be created, relative to the
+        <code>java:comp/env</code> context.</p>
+      </attribute>
+
+      <attribute name="override" required="false">
+        <p>Set this to <code>false</code> if you do <strong>not</strong> want
+        an <code>&lt;env-entry&gt;</code> for the same environment entry name,
+        found in the web application deployment descriptor, to override the
+        value specified here.  By default, overrides are allowed.</p>
+      </attribute>
+
+      <attribute name="type" required="true">
+        <p>The fully qualified Java class name expected by the web application
+        for this environment entry.  Must be one of the legal values for
+        <code>&lt;env-entry-type&gt;</code> in the web application deployment
+        descriptor:  <code>java.lang.Boolean</code>,
+        <code>java.lang.Byte</code>, <code>java.lang.Character</code>,
+        <code>java.lang.Double</code>, <code>java.lang.Float</code>,
+        <code>java.lang.Integer</code>, <code>java.lang.Long</code>,
+        <code>java.lang.Short</code>, or <code>java.lang.String</code>.</p>
+      </attribute>
+
+      <attribute name="value" required="true">
+        <p>The parameter value that will be presented to the application
+        when requested from the JNDI context.  This value must be convertable
+        to the Java type defined by the <code>type</code> attribute.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+  <subsection name="Lifecycle Listeners">
+
+    <p>If you have implemented a Java object that needs to know when this
+    <strong>Context</strong> is started or stopped, you can declare it by
+    nesting a <strong>Listener</strong> element inside this element.  The
+    class name you specify must implement the
+    <code>org.apache.catalina.LifecycleListener</code> interface, and
+    it will be notified about the occurrence of the coresponding
+    lifecycle events.  Configuration of such a listener looks like this:</p>
+
+<source>
+&lt;Context path="/examples" ...&gt;
+  ...
+  &lt;Listener className="com.mycompany.mypackage.MyListener" ... &gt;
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>Note that a Listener can have any number of additional properties
+    that may be configured from this element.  Attribute names are matched
+    to corresponding JavaBean property names using the standard property
+    method naming patterns.</p>
+
+  </subsection>
+
+
+  <subsection name="Request Filters">
+
+    <p>You can ask Catalina to check the IP address, or host name, on every
+    incoming request directed to the surrounding
+    <a href="engine.html">Engine</a>, <a href="host.html">Host</a>, or
+    <a href="context.html">Context</a> element.  The remote address or name
+    will be checked against a configured list of "accept" and/or "deny"
+    filters, which are defined using the Regular Expression syntax supported
+    by the <a href="http://jakarta.apache.org/regexp/">Jakarta Regexp</a>
+    regular expression library.  Requests that come from locations that are
+    not accepted will be rejected with an HTTP "Forbidden" error.
+    Example filter declarations:</p>
+
+<source>
+&lt;Context path="/examples" ...&gt;
+  ...
+  &lt;Valve className="org.apache.catalina.valves.RemoteHostValve"
+         allow="*.mycompany.com,www.yourcompany.com"/&gt;
+  &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
+         deny="192.168.1.*"/&gt;
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>See <a href="valve.html#Remote Address Filter">Remote Address Filter</a>
+    and <a href="valve.html#Remote Host Filter">Remote Host Filter</a> for
+    more information about the configuration options that are supported.</p>
+
+  </subsection>
+
+
+  <subsection name="Resource Definitions">
+
+    <p>You can declare the characteristics of the resource
+    to be returned for JNDI lookups of <code>&lt;resource-ref&gt;</code> and
+    <code>&lt;resource-env-ref&gt;</code> elements in the web application
+    deployment descriptor.  You <strong>MUST</strong> also define
+    the needed resource parameters as attributes of the <code>Resource</code> 
+    element, to configure the object factory to be used (if not known to Tomcat 
+    already), and the properties used to configure that object factory.</p>
+
+    <p>For example, you can create a resource definition like this:</p>
+<source>
+&lt;Context ...&gt;
+  ...
+  &lt;Resource name="jdbc/EmployeeDB" auth="Container"
+            type="javax.sql.DataSource"
+     description="Employees Database for HR Applications"/&gt;
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>This is equivalent to the inclusion of the following element in the
+    web application deployment descriptor (<code>/WEB-INF/web.xml</code>):</p>
+<source>
+&lt;resource-ref&gt;
+  &lt;description&gt;Employees Database for HR Applications&lt;/description&gt;
+  &lt;res-ref-name&gt;jdbc/EmployeeDB&lt;/res-ref-name&gt;
+  &lt;res-ref-type&gt;javax.sql.DataSource&lt;/res-ref-type&gt;
+  &lt;res-auth&gt;Container&lt;/res-auth&gt;
+&lt;/resource-ref&gt;
+</source>
+
+    <p>but does <em>not</em> require modification of the deployment
+    descriptor to customize this value.</p>
+
+    <p>The valid attributes for a <code>&lt;Resource&gt;</code> element
+    are as follows:</p>
+
+    <attributes>
+
+      <attribute name="auth" required="false">
+        <p>Specify whether the web Application code signs on to the
+        corresponding resource manager programatically, or whether the
+        Container will sign on to the resource manager on behalf of the
+        application.  The value of this attribute must be
+        <code>Application</code> or <code>Container</code>.  This
+        attribute is <strong>required</strong> if the web application
+        will use a <code>&lt;resource-ref&gt;</code> element in the web
+        application deployment descriptor, but is optional if the
+        application uses a <code>&lt;resource-env-ref&gt;</code> instead.</p>
+      </attribute>
+
+      <attribute name="description" required="false">
+        <p>Optional, human-readable description of this resource.</p>
+      </attribute>
+
+      <attribute name="name" required="true">
+        <p>The name of the resource to be created, relative to the
+        <code>java:comp/env</code> context.</p>
+      </attribute>
+
+      <attribute name="scope" required="false">
+        <p>Specify whether connections obtained through this resource
+        manager can be shared.  The value of this attribute must be
+        <code>Shareable</code> or <code>Unshareable</code>.  By default,
+        connections are assumed to be shareable.</p>
+      </attribute>
+
+      <attribute name="type" required="true">
+        <p>The fully qualified Java class name expected by the web
+        application when it performs a lookup for this resource.</p>
+      </attribute>
+
+    </attributes>
+
+
+  </subsection>
+
+
+  <subsection name="Resource Links">
+
+     <p>This element is used to create a link to a global JNDI resource. Doing
+     a JNDI lookup on the link name will then return the linked global 
+     resource.</p>
+
+    <p>For example, you can create a resource link like this:</p>
+<source>
+&lt;Context ...&gt;
+  ...
+  &lt;ResourceLink name="linkToGlobalResource"
+            global="simpleValue"
+            type="java.lang.Integer"
+  ...
+&lt;/Context&gt;
+</source>
+
+    <p>The valid attributes for a <code>&lt;ResourceLink&gt;</code> element
+    are as follows:</p>
+
+    <attributes>
+
+      <attribute name="global" required="true">
+        <p>The name of the linked global resource in the 
+        global JNDI context.</p>
+      </attribute>
+
+      <attribute name="name" required="true">
+        <p>The name of the resource link to be created, relative to the
+        <code>java:comp/env</code> context.</p>
+      </attribute>
+
+      <attribute name="type" required="true">
+        <p>The fully qualified Java class name expected by the web
+        application when it performs a lookup for this resource link.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Transaction">
+
+    <p>You can declare the characteristics of the UserTransaction
+    to be returned for JNDI lookup for <code>java:comp/UserTransaction</code>. 
+    You <strong>MUST</strong> define an object factory class to instantiate
+    this object as well as the needed resource parameters as attributes of the 
+    <code>Transaction</code> 
+    element, and the properties used to configure that object factory.</p>
+
+    <p>The valid attributes for the <code>&lt;Transaction&gt;</code> element
+    are as follows:</p>
+
+    <attributes>
+
+      <attribute name="factory" required="true">
+        <p>The class name for the JNDI object factory.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
+</body>
+
+
+</document>

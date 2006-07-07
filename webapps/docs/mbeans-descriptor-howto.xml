@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="mbeans-descriptor-howto.html">
+
+    &project;
+
+    <properties>
+        <author email="amyroh@apache.org">Amy Roh</author>
+        <title>MBean Descriptor How To</title>
+    </properties>
+
+<body>
+
+<section name="Introduction">
+
+<p>Tomcat 5 uses JMX MBeans as the technology for implementing 
+manageability of Tomcat.</p>
+
+<p>The descriptions of JMX MBeans for Catalina are in the mbeans-descriptor.xml 
+file in each package.</p>
+
+<p>You will need to add MBean descriptions for your custom components 
+in order to avoid a "ManagedBean is not found" exception.</p>
+
+</section>
+
+<section name="Adding MBean descriptions">
+
+<p>You may also add MBean descriptions for custom components in 
+a mbeans-descriptor.xml file, located in the same package as the class files
+it describes.</p>
+
+<source>
+  &lt;mbean         name="LDAPRealm"
+            className="org.apache.catalina.mbeans.ClassNameMBean"
+          description="Custom LDAPRealm"
+               domain="Catalina"
+                group="Realm"
+                 type="com.myfirm.mypackage.LDAPRealm"&gt;
+
+    &lt;attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/&gt;
+
+    &lt;attribute   name="debug"
+          description="The debugging detail level for this component"
+                 type="int"/&gt;
+    .
+    .
+    .
+
+  &lt;/mbean&gt;
+</source>
+
+
+</section>
+
+</body>
+
+</document>

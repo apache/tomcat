@@ -1,0 +1,240 @@
+<project name="tomcat-docs" default="build-main" basedir=".">
+
+
+  <!-- ===================== Initialize Property Values =================== -->
+
+  <!-- See "build.properties.sample" in the top level directory for all     -->
+  <!-- property values you must customize for successful building!!!        -->
+  <property file="build.properties"/>
+  <property file="../build.properties"/>
+  <property file="../../build.properties"/>
+  <property file="${user.home}/build.properties"/>
+
+  <property name="build.compiler"  value="modern"/>
+  <property name="webapps.build"   value="../build"/>
+  <property name="webapps.dist"    value="../dist"/>
+  <property name="webapp.name"     value="tomcat-docs"/>
+
+
+  <!-- =================== BUILD: Create Directories ====================== -->
+  <target name="build-prepare">
+    <mkdir dir="${webapps.build}"/>
+    <mkdir dir="${webapps.build}/${webapp.name}"/>
+  </target>
+
+
+  <!-- ================ BUILD: Copy Static Files ========================== -->
+  <target name="build-static" depends="build-prepare">
+
+    <!-- Top Level Static Files -->
+    <copy    todir="${webapps.build}/${webapp.name}">
+      <fileset dir="../..">
+        <include name="BUILDING.txt"/>
+        <include name="README.txt"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
+    </copy>
+    <copy    todir="${webapps.build}/${webapp.name}">
+      <fileset dir="." includes="**/*.html"/>
+    </copy>
+
+    <!-- WEB-INF Static Files -->
+    <copy    todir="${webapps.build}/${webapp.name}/WEB-INF">
+      <fileset dir="WEB-INF"/>
+    </copy>
+
+    <!-- Application Developer's Guide Examples -->
+    <copy    todir="${webapps.build}/${webapp.name}/appdev">
+      <fileset dir="appdev" includes="*.txt"/>
+    </copy>
+
+    <!-- This copy includes a binary file (sample.war) so it should not have a filter token -->
+    <!-- See Bugzilla 36318: http://issues.apache.org/bugzilla/show_bug.cgi?id=36318 -->
+    <copy    todir="${webapps.build}/${webapp.name}/appdev/sample">
+      <fileset dir="appdev/sample"/>
+    </copy>
+
+    <copy   tofile="${webapps.build}/${webapp.name}/appdev/sample/build.xml"
+              file="appdev/build.xml.txt"/>
+
+    <!-- Catalina Functional Specifications -->
+    <mkdir     dir="${webapps.build}/${webapp.name}/catalina/funcspecs"/>
+
+    <!-- Architecture -->
+    <copy    todir="${webapps.build}/${webapp.name}/architecture">
+      <fileset dir="architecture" excludes="*.xml"/>
+    </copy>
+
+    <!-- Images Subdirectory -->
+    <mkdir     dir="${webapps.build}/${webapp.name}/images"/>
+    <copy    todir="${webapps.build}/${webapp.name}/images">
+      <fileset dir="images"/>
+    </copy>
+
+    <mkdir     dir="${webapps.build}/${webapp.name}/printer"/>
+    <!-- Top Level Static Files -->
+    <copy    todir="${webapps.build}/${webapp.name}/printer">
+      <fileset dir="../..">
+        <include name="BUILDING.txt"/>
+        <include name="README.txt"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
+    </copy>
+    <style basedir="."
+           destdir="${webapps.build}/${webapp.name}/printer"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="build.xml project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="./.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+    <!-- WEB-INF Subdirectory -->
+    <mkdir     dir="${webapps.build}/${webapp.name}/WEB-INF"/>
+    <copy    todir="${webapps.build}/${webapp.name}/WEB-INF">
+      <fileset dir="WEB-INF"/>
+    </copy>
+
+  </target>
+
+
+  <!-- ================= BUILD: XML-HTML Generation ======================= -->
+  <target name="build-main" depends="build-static">
+
+    <!-- Top Level Directory -->
+    <style basedir="."
+           destdir="${webapps.build}/${webapp.name}"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="build.xml project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="."/>
+    </style>
+
+    <!-- Application Developer's Guide -->
+    <style basedir="appdev"
+           destdir="${webapps.build}/${webapp.name}/appdev"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <mkdir     dir="${webapps.build}/${webapp.name}/appdev/printer"/>
+    <!-- Application Developer's Guide Examples -->
+    <copy    todir="${webapps.build}/${webapp.name}/appdev/printer">
+      <fileset dir="appdev" includes="*.txt"/>
+    </copy>
+    <style basedir="appdev"
+           destdir="${webapps.build}/${webapp.name}/appdev/printer"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+    <!-- Catalina Functional Specifications -->
+    <mkdir     dir="${webapps.build}/${webapp.name}/catalina"/>
+    <mkdir     dir="${webapps.build}/${webapp.name}/catalina/funcspecs"/>
+    <style basedir="funcspecs"
+           destdir="${webapps.build}/${webapp.name}/catalina/funcspecs"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+    </style>
+    <mkdir     dir="${webapps.build}/${webapp.name}/catalina/funcspecs/printer"/>
+    <style basedir="funcspecs"
+           destdir="${webapps.build}/${webapp.name}/catalina/funcspecs/printer"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+    <!-- Server Configuration Reference -->
+    <style basedir="config"
+           destdir="${webapps.build}/${webapp.name}/config"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <mkdir     dir="${webapps.build}/${webapp.name}/config/printer"/>
+    <style basedir="config"
+           destdir="${webapps.build}/${webapp.name}/config/printer"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+    <!-- Server Architecture -->
+    <style basedir="architecture"
+           destdir="${webapps.build}/${webapp.name}/architecture"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <mkdir     dir="${webapps.build}/${webapp.name}/architecture/printer"/>
+    <style basedir="architecture"
+           destdir="${webapps.build}/${webapp.name}/architecture/printer"
+         extension=".html"
+             style="tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+  </target>
+
+
+  <!-- ==================== BUILD: Rebuild Everything ===================== -->
+  <target name="all" depends="build-clean,build-main"
+   description="Clean and build documentation webapp"/>
+
+
+  <!-- ======================= BUILD: Clean Directory ===================== -->
+  <target name="build-clean">
+    <delete dir="${webapps.build}/${webapp.name}"/>
+  </target>
+
+
+  <!-- ======================= DIST: Create Directories =================== -->
+  <target name="dist-prepare">
+    <mkdir dir="${webapps.dist}"/>
+  </target>
+
+
+  <!-- ======================= DIST: Create Distribution Files ============ -->
+  <target name="dist" depends="build-main,dist-prepare"
+   description="Create documentation webapp binary distribution">
+      <jar   jarfile="${webapps.dist}/${webapp.name}.war"
+             basedir="${webapps.build}/${webapp.name}" includes="**"/>
+  </target>
+
+
+  <!-- ======================= DIST: Clean Directory ====================== -->
+  <target name="dist-clean">
+    <delete dir="${webapps.dist}/${webapp.name}"/>
+  </target>
+
+
+  <!-- ====================== Convenient Synonyms ========================= -->
+  <target name="clean" depends="build-clean,dist-clean"
+   description="Clean build and dist directories"/>
+
+
+</project>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Apache Tomcat Documentation - Top Level Directory"
+        href="http://jakarta.apache.org/tomcat/">
+
+    <title>The Apache Tomcat 6.0 Servlet/JSP Container</title>
+
+    <logo href="/images/tomcat.gif">
+      The Apache Tomcat Servlet/JSP Container
+    </logo>
+
+
+    <body>
+
+    <menu name="Links">
+        <item name="Docs Home"             href="index.html"/>
+        <item name="FAQ"                   href="../faq" />
+    </menu>
+
+    <menu name="User Guide">
+        <item name="1) Introduction"        href="introduction.html"/>
+        <item name="2) Setup"               href="setup.html"/>
+        <item name="3) First webapp"        href="appdev/index.html"/>
+        <item name="4) Deployer"            href="deployer-howto.html"/>
+        <item name="5) Manager"             href="manager-howto.html"/>
+        <item name="6) Realms and AAA"      href="realm-howto.html"/>
+        <item name="7) Security Manager"
+              href="security-manager-howto.html"/>
+        <item name="8) JNDI Resources"      href="jndi-resources-howto.html"/>
+        <item name="9) JDBC DataSources"
+              href="jndi-datasource-examples-howto.html"/>
+        <item name="10) Classloading"       href="class-loader-howto.html"/>
+        <item name="11) JSPs"               href="jasper-howto.html"/>
+        <item name="12) SSL"                href="ssl-howto.html"/>
+        <item name="13) SSI"                href="ssi-howto.html"/>
+        <item name="14) CGI"                href="cgi-howto.html"/>
+        <item name="15) Proxy Support"      href="proxy-howto.html"/>
+        <item name="16) MBean Descriptor"
+              href="mbeans-descriptor-howto.html"/>
+        <item name="17) Default Servlet"    href="default-servlet.html"/>
+        <item name="18) Clustering"         href="cluster-howto.html"/>
+        <item name="19) Load Balancer"      href="balancer-howto.html"/>
+        <item name="20) Connectors"         href="connectors.html"/>
+        <item name="21) Monitoring and Management"         
+              href="monitoring.html"/>
+        <item name="22) Logging"            href="logging.html"/>
+        <item name="23) APR"                href="apr.html"/>
+        <item name="24) Asynchronous APIs"  href="async.html"/>
+    </menu>
+
+    <menu name="Reference">
+        <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
+        <item name="Apache Tomcat Configuration"  href="config/index.html"/>
+        <item name="JK 1.2 Documentation"      
+              href="http://jakarta.apache.org/tomcat/connectors-doc/"/>
+        <item name="Servlet API Javadocs"  href="servletapi/index.html"/>
+        <item name="JSP API Javadocs"      href="jspapi/index.html"/>
+    </menu>
+
+    <menu name="Apache Tomcat Development">
+        <item name="Building"              href="building.html"/>
+        <item name="Changelog"             href="changelog.html"/>
+        <item name="Status"                href="status.html"/>
+        <item name="Developers"            href="developers.html"/>
+        <item name="Functional Specs."     href="catalina/funcspecs/index.html"/>
+        <item name="Apache Tomcat Javadocs"       href="catalina/docs/api/index.html"/>
+        <item name="Apache Jasper Javadocs"       href="jasper/docs/api/index.html"/>
+        <item name="Architecture"          href="architecture/index.html" />
+    </menu>
+
+    </body>
+
+</project>

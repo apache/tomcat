@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="status.html">
+
+  &project;
+
+  <properties>
+    <author email="remm@apache.org">Remy Maucherat</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <title>Project Status</title>
+  </properties>
+
+<body>
+  <section name="Preface">
+    <p>
+      This document attempts to convey the current status of Tomcat development
+      in "big picture" terms.  This is not the place to check if an individual
+      bug report has been addressed or when an individual feature will be available.
+    </p>
+    <p>
+      This page is updated roughly once per every couple of Tomcat minor releases,
+      so for day-to-day status you should check the tomcat-user and tomcat-dev mailing
+      lists.  You can always inquire there as to the availability or status of a
+      specific feature or component.
+    </p>
+  </section>
+
+  <section name="Current Status Summary">
+    <p>
+      <b>Tomcat 5.0.27</b> was released on June 17th, 2004.  At that time, the TOMCAT_5_0
+      branch was tagged in CVS, and work on Tomcat 5.5 began.  We have now had several
+      Tomcat 5.5 releases, including a couple of stable ones.  Accordingly, Tomcat 5.5
+      is now the focus on work.  Tomcat 5.0 is in maintenance mode and its releases
+      will become less and less frequent.
+    </p>
+    <p>
+      <b>Tomcat 5.5</b> has several major goals.  They are discussed in the tomcat-dev
+      mailing list's "5.next" thread: 
+      <a href="http://marc.theaimsgroup.com/?l=tomcat-dev&amp;w=2&amp;r=1&amp;s=5.next&amp;q=b">MARC</a>.
+      The status of some of these items is detailed below.  Once 5.5 releases are
+      available, please refer to the Changelog accompanying each release for detailed
+      changes, enhancements, and fixes.
+    </p>
+    <p>
+      <b>Tomcat 4.1.x</b> is no longer actively developed.  It is maintained to address
+      only showstopper, security, and Servlet Specification compliance issues.  Maintenance
+      for Tomcat 4.1.x will likely cease once a stable release or two of Tomcat 5.5 are out.
+      Users of Tomcat 4.1.x are strongly encouraged to upgrade to the latest stable Tomcat
+      5.0 release.
+    </p>
+    <p>
+      <b>Tomcat 4.0.x</b> is relatively old, and not actively maintained or supported.
+      It is strongly recommended that users of these releases upgrade to the latest
+      stable Tomcat 5.0 release or at least the latest stable Tomcat 4.1 release.
+    </p>
+    <p>
+      <b>Tomcat 3.3.x</b> is in roughly the same maintenance mode as Tomcat 4.1.x.
+    </p>
+    <p>
+      <b>Tomcat 3.2</b> and earlier are in roughly the same support state as Tomcat 4.0.x.
+      Users should upgrade to Tomcat 3.3.x or the latest stable Tomcat 5.0.x.
+    </p>
+  </section>
+
+  <section name="How to read the report">
+    
+    <p>
+      The columns in this report contain the following information:
+    <ul>
+      <li><b>Priority</b> - A sense of how important it is to address this 
+        issue in the short term.</li>
+      <li><b>Action Item</b> - Concise description of the action item
+        to be completed.  Where relevant, Java package names of the
+        primary classes involved are listed in [square brackets]</li>
+      <li><b>Volunteers</b> - Login of those developers who
+        have volunteered to assist in the design, implementation, testing, and
+        documentation of this action item's changes to Tomcat.</li>
+    </ul>
+      Developers can nominate
+      themselves to work on particular action items by asking a Committer to 
+      add their name address to those items.  The developers 
+      working on each item should discuss and agree upon the approach to be 
+      used for implementing the item's changes to the project source code 
+      and documentation, prior to completing those changes.  Such discussions 
+      should take place on the tomcat-dev mailing list so that everyone can 
+      stay apprised of what is going on, or chime in if they want to 
+      contribute ideas and suggestions.
+    </p>
+    
+  </section>
+
+  <section name="TODO List">
+
+    <status>
+      <item priority="High" owner="costin">
+        Refactor ClassLoaders for Tomcat 5.5 to allow container plugins.
+      </item>
+      <item priority="Medium" owner="fhanik">
+        Enhance Cluster functionality for Tomcat 5.5.
+      </item>
+      <item priority="Medium" owner="everyone">
+        Continue fixing bugs and updating docs.
+      </item>
+    </status>
+
+  </section>
+
+  <section name="Open bugs">
+    
+    <p>
+      The list of the bugs which are in an unresolved state for Tomcat 5 can be
+      seen 
+      <a href="http://issues.apache.org/bugzilla/buglist.cgi?bug_status=UNCONFIRMED&amp;bug_status=NEW&amp;bug_status=ASSIGNED&amp;bug_status=REOPENED&amp;bug_status=RESOLVED&amp;resolution=LATER&amp;resolution=REMIND&amp;resolution=---&amp;bugidtype=include&amp;product=Tomcat+5&amp;cmdtype=doit&amp;order=Importance">here</a>.
+      Aspiring volunteers and others are strongly encouraged to attempt 
+      to comment and help resolve these issues.
+    </p>
+    
+  </section>
+
+</body>
+</document>

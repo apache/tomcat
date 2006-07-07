@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="installation.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
+    <author email="yoavs@apache.org">Yoav Shapira</author>
+    <title>Installation</title>
+  </properties>
+
+<body>
+
+
+<section name="Installation">
+
+<p>In order to use Tomcat 5 for developing web applications, you must first
+install it (and the software it depends on).  The required steps are outlined
+in the following subsections.</p>
+
+<subsection name="JDK">
+
+<p>Tomcat 5.5 was designed to run on J2SE 5.0, but it can run on JDK 1.4
+as well, using the compatability package as detailed in the Tomcat 
+installation instructions.
+</p>
+
+<p>Compatible JDKs for many platforms (or links to where they can be found)
+are available at
+<a href="http://java.sun.com/j2se/">http://java.sun.com/j2se/</a>.</p>
+
+</subsection>
+
+<subsection name="Tomcat">
+
+<p>Binary downloads of the <strong>Tomcat</strong> server are available from
+<a href="http://jakarta.apache.org/binindex.cgi">http://jakarta.apache.org/binindex.cgi</a>.
+This manual assumes you are using the most recent release
+of Tomcat 5.  Detailed instructions for downloading and installing
+Tomcat 5 are available <a href="../setup.html">here</a>.</p>
+
+<p>In the remainder of this manual, example shell scripts assume that you have
+set an environment variable <code>CATALINA_HOME</code> that contains the
+pathname to the directory in which Tomcat 5 has been installed.</p>
+
+</subsection>
+
+
+<subsection name="Ant">
+
+<p>Binary downloads of the <strong>Ant</strong> build tool are available from
+<a href="http://ant.apache.org/bindownload.cgi">http://ant.apache.org/bindownload.cgi</a>.
+This manual assumes you are using Ant 1.4 or later.  The instructions should
+also be compatible with later versions, but this has not been tested.</p>
+
+<p>Download and install Ant from the distribution directory mentioned above.
+Then, add the <code>bin</code> directory of the Ant distribution to your
+<code>PATH</code> environment variable, following the standard practices for
+your operating system platform.  Once you have done this, you will be able to
+execute the <code>ant</code> shell command directly.</p>
+
+</subsection>
+
+
+<subsection name="CVS">
+
+<p>Besides the required tools described above, you are strongly encouraged
+to download and install a <em>source code control</em> system, such as the
+<strong>Concurrent Version System</strong> (CVS), to maintain historical
+versions of the source files that make up your web application.  Besides
+the server, you will also need appropriate client
+tools to check out source code files, and check in modified versions.</p>
+
+<p>Detailed instructions for installing and using source code control
+applications is beyond the scope of this manual.  However, CVS server and
+client tools for many platforms (along with documentation) can be downloaded
+from <a href="http://www.cvshome.org">http://www.cvshome.org</a>.</p>
+
+</subsection>
+
+
+</section>
+
+
+</body>
+</document>

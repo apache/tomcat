@@ -1,0 +1,345 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="jasper-howto.html">
+
+    &project;
+
+    <properties>
+        <author email="glenn@apache.org">Glenn L. Nielsen</author>
+        <author email="pero@apache.org">Peter Rossbach</author>
+        <title>Jasper 2 JSP Engine How To</title>
+    </properties>
+
+<body>
+
+<section name="Table of Contents">
+<p>
+<a href="#Introduction">Introduction</a><br />
+<a href="#Configuration">Configuration</a><br />
+<a href="#Production Configuration">Production Configuration</a><br />
+<a href="#Web Application Compilation">Web Application Compilation</a><br />
+<a href="#Using Jikes">Using Jikes</a><br />
+</p>
+</section>
+
+<section name="Introduction">
+
+<p>Tomcat 5.5 uses the Jasper 2 JSP Engine to implement
+the <a href="http://java.sun.com/products/jsp/">JavaServer Pages 2.0</a>
+specification.</p>
+
+<p>Jasper 2 has been redesigned to significantly improve performance over
+the orignal Jasper.  In addition to general code improvements the following
+changes were made:
+<ul>
+<li><strong>JSP Custom Tag Pooling</strong> - The java objects instantiated
+for JSP Custom Tags can now be pooled and reused.  This significantly boosts
+the performance of JSP pages which use custom tags.</li>
+<li><strong>Background JSP compilation</strong> - If you make a change to
+a JSP page which had already been compiled Jasper 2 can recompile that
+page in the background.  The previously compiled JSP page will still be
+available to serve requests.  Once the new page has been compiled
+successfully it will replace the old page.  This helps improve availablity
+of your JSP pages on a production server.</li>
+<li><strong>Recompile JSP when included page changes</strong> - Jasper 2
+can now detect when a page included at compile time from a JSP has changed
+and then recompile the parent JSP.</li>
+<li><strong>JDT used to compile JSP pages</strong> - The
+Eclipse JDT Java compiler is now used to perform JSP java source code
+compilation. This compiler loads source dependencies from the container
+classloader. Ant and javac can still be used.</li>
+</ul>
+</p>
+
+<p>Jasper is implemented using the servlet class
+<code>org.apache.jasper.servlet.JspServlet</code>.</p>
+
+</section>
+
+<section name="Configuration">
+
+<p>By default Jasper is configured for use when doing web application
+development.  See the section <a href="#Production Configuration">
+Production Configuration</a> for information on configuring Jasper
+for use on a production Tomcat server.</p>
+
+<p>The servlet which implements Jasper is configured using init parameters
+in your global <code>$CATALINA_BASE/conf/web.xml</code>.
+
+<ul>
+<li><strong>checkInterval</strong> - If development is false and reloading is
+true, background compiles are enabled. checkInterval is the time in seconds
+between checks to see if a JSP page needs to be recompiled. Default
+<code>300</code> seconds.</li>
+
+<li><strong>compiler</strong> - Which compiler Ant should use to compile JSP
+pages.  See the Ant documentation for more information. If the value is not set,
+then the default Eclipse JDT Java compiler will be used instead of using Ant. 
+No default value.</li>
+
+<li><strong>classdebuginfo</strong> - Should the class file be compiled with
+debugging information?  <code>true</code> or <code>false</code>, default
+<code>true</code>.
+</li>
+
+<li><strong>classpath</strong> - What class path should I use while compiling
+generated servlets?  By default the classpath is created dynamically based on
+the current web application.</li>
+
+<li><strong>compilerSourceVM</strong> - What JDK version are the source files compatible with? (Default JDK 1.4)</li>
+
+<li><strong>compilerTargetVM</strong> - What JDK version are the generated files compatible with? (Default JDK 1.4)</li>
+
+<li><strong>development</strong> - Is Jasper used in development mode (will
+check for JSP modification on every access)? <code>true</code> or
+<code>false</code>, default <code>true</code>.</li>
+
+<li><strong>enablePooling</strong> - Determines whether tag handler pooling is
+enabled. <code>true</code> or <code>false</code>, default <code>true</code>.
+</li>
+
+<li><strong>engineOptionsClass</strong> - Allows specifying the Options class
+used to configure Jasper. If not present, the default EmbeddedServletOptions
+will be used.
+</li>
+
+<li><strong>ieClassId</strong> - The class-id value to be sent to Internet
+Explorer when using &lt;jsp:plugin&gt; tags.   Default
+<code>clsid:8AD9C840-044E-11D1-B3E9-00805F499D93</code>.</li>
+
+<li><strong>fork</strong> - Have Ant fork JSP page compiles so they are
+performed in a seperate JVM from Tomcat? <code>true</code> or
+<code>false</code>, default <code>true</code>.</li>
+
+<li><strong>javaEncoding</strong> - Java file encoding to use for generating
+java source files. Default <code>UTF8</code>.</li>
+
+<li><strong>genStringAsCharArray</strong> - Should text strings be generated as char
+arrays, to improve performance in some cases? Default <code>false</code>.</li>
+
+<li><strong>keepgenerated</strong> - Should we keep the generated Java source
+code for each page instead of deleting it? <code>true</code> or
+<code>false</code>, default <code>true</code>.</li>
+
+<li><strong>mappedfile</strong> - Should we generate static content with one 
+print statement per input line, to ease debugging?
+<code>true</code> or <code>false</code>, default <code>true</code>.</li>
+
+<li><strong>modificationTestInterval</strong> - Checks for modification for a given
+JSP file (and all its dependent files) will be performed only once every specified amount
+of seconds. Setting this to 0 will cause the JSP to be checked on every access.
+Default is <code>4</code> seconds.</li>
+
+<li><strong>reloading</strong> - Should Jasper check for modified JSPs?
+<code>true</code> or <code>false</code>, default <code>false</code>.</li>
+
+<li><strong>scratchdir</strong> - What scratch directory should we use when
+compiling JSP pages? Default is the work directory for the current web
+application.</li>
+
+<li><strong>trimSpaces</strong> - Should white spaces in template text between
+actions or directives be trimmed ?, default <code>false</code>.</li>
+</ul>
+</p>
+
+<p>The Java compiler from Eclipse JDT in included as the default compiler. It is an
+advanced Java compiler which will load all dependencies from the Tomcat class loader, 
+which will help tremendously when compiling on large installations with tens of JARs.
+On fast servers, this will allow sub-second recompilation cycles for even large JSP 
+pages. This new compiler will be updated to support the Java 5 syntax as soon as
+possible.</p>
+
+<p>Apache Ant, which was used in previous Tomcat releases, can be used instead instead of 
+the new compiler by simply removing the <code>common/lib/jasper-compiler-jdt.jar</code> file, 
+and placing the <code>ant.jar</code> file from the latest Ant distribution in the 
+<code>common/lib</code> folder.  If you do this, you also need to use the "javac"
+argument to catalina.sh.</p>
+
+</section>
+
+<section name="Production Configuration">
+
+<p>The main JSP optimization which can be done is precompilation of JSPs. However,
+this might not be possible (for example, when using the jsp-property-group feature)
+or practical, in which case the configuration of the Jasper servlet becomes critical.</p>
+
+<p>When using Jasper 2 in a production Tomcat server you should consider
+making the following changes from the default configuration.
+<ul>
+<li><strong>development</strong> - To disable on access checks for JSP
+pages compilation set this to <code>false</code>.</li>
+<li><strong>genStringAsCharArray</strong> - To generate slightly more efficient 
+char arrays, set this to <code>true</code>.</li>
+<li><strong>modificationTestInterval</strong> - If development has to be set to
+<code>true</code> for any reason (such as dynamic generation of JSPs), setting
+this to a high value will improve performance a lot.</li>
+<li><strong>trimSpaces</strong> - To remove useless bytes from the response,
+set this to <code>true</code>.</li>
+</ul>
+</p>
+
+</section>
+
+<section name="Web Application Compilation">
+
+<p>Using Ant is the preferred way to compile web applications using JSPC. 
+Use the script given below (a similar script is included in the "deployer" 
+download) to precompile a webapp:
+</p>
+
+<p>
+<source>
+&lt;project name="Webapp Precompilation" default="all" basedir="."&gt; 
+
+  &lt;target name="jspc"&gt; 
+
+    &lt;taskdef classname="org.apache.jasper.JspC" name="jasper2" &gt; 
+      &lt;classpath id="jspc.classpath"&gt; 
+        &lt;pathelement location="${java.home}/../lib/tools.jar"/&gt; 
+        &lt;fileset dir="${tomcat.home}/bin"&gt; 
+          &lt;include name="*.jar"/&gt; 
+        &lt;/fileset&gt; 
+        &lt;fileset dir="${tomcat.home}/server/lib"&gt; 
+          &lt;include name="*.jar"/&gt; 
+        &lt;/fileset&gt; 
+        &lt;fileset dir="${tomcat.home}/common/lib"&gt; 
+          &lt;include name="*.jar"/&gt; 
+        &lt;/fileset&gt; 
+      &lt;/classpath&gt; 
+    &lt;/taskdef&gt; 
+
+    &lt;jasper2 
+             validateXml="false" 
+             uriroot="${webapp.path}" 
+             webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml" 
+             outputDir="${webapp.path}/WEB-INF/src" /&gt; 
+
+  &lt;/target&gt; 
+
+  &lt;target name="compile"&gt;
+
+    &lt;mkdir dir="${webapp.path}/WEB-INF/classes"/&gt;
+    &lt;mkdir dir="${webapp.path}/WEB-INF/lib"/&gt;
+
+    &lt;javac destdir="${webapp.path}/WEB-INF/classes"
+           optimize="off"
+           debug="on" failonerror="false"
+           srcdir="${webapp.path}/WEB-INF/src" 
+	   excludes="**/*.smap"&gt;
+      &lt;classpath&gt;
+        &lt;pathelement location="${webapp.path}/WEB-INF/classes"/&gt;
+        &lt;fileset dir="${webapp.path}/WEB-INF/lib"&gt;
+          &lt;include name="*.jar"/&gt;
+        &lt;/fileset&gt;
+        &lt;pathelement location="${tomcat.home}/common/classes"/&gt;
+        &lt;fileset dir="${tomcat.home}/common/lib"&gt;
+          &lt;include name="*.jar"/&gt;
+        &lt;/fileset&gt;
+        &lt;pathelement location="${tomcat.home}/shared/classes"/&gt;
+        &lt;fileset dir="${tomcat.home}/shared/lib"&gt;
+          &lt;include name="*.jar"/&gt;
+        &lt;/fileset&gt;
+        &lt;fileset dir="${tomcat.home}/bin"&gt; 
+          &lt;include name="*.jar"/&gt; 
+        &lt;/fileset&gt; 
+      &lt;/classpath&gt;
+      &lt;include name="**" /&gt;
+      &lt;exclude name="tags/**" /&gt;
+    &lt;/javac&gt;
+
+  &lt;/target&gt;
+
+  &lt;target name="all" depends="jspc,compile"&gt;
+  &lt;/target&gt;
+
+  &lt;target name="cleanup"&gt;
+  	&lt;delete&gt;
+        &lt;fileset dir="${webapp.path}/WEB-INF/src"/&gt;
+        &lt;fileset dir="${webapp.path}/WEB-INF/classes/org/apache/jsp"/&gt;
+  	&lt;/delete&gt;
+  &lt;/target&gt;
+
+&lt;/project&gt;
+</source>
+</p>
+
+<p>
+The following command line can be used to run the script
+(replacing the tokens with the Tomcat base path and the path to the webapp 
+which should be precompiled):<br/>
+<source>
+$ANT_HOME/bin/ant -Dtomcat.home=&lt;$TOMCAT_HOME&gt; -Dwebapp.path=&lt;$WEBAPP_PATH&gt;
+</source>
+</p>
+
+<p>
+Then, the declarations and mappings for the servlets which were generated 
+during the precompilation must be added to the web application deployment
+descriptor. Insert the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
+at the right place inside the <code>${webapp.path}/WEB-INF/web.xml</code> file.
+Restart the web application (using the manager) and test it to verify it is 
+running fine with precompiled servlets. An appropriate token placed in the
+web application deployment descriptor may also be used to automatically
+insert the generated servlet declarations and mappings using Ant filtering 
+capabilities. This is actually how all the webapps distributed with Tomcat 
+are automatically compiled as part of the build process.
+</p>
+
+<p>
+At the jasper2 task you can use the option <code>addWebXmlMappings</code> for 
+automatic merge the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
+with the current web application deployment descriptor at <code>${webapp.path}/WEB-INF/web.xml</code>.
+When you want to use Java 5 feature inside your jsp's, add the following javac compiler task
+attributes: <code>source=&quot;1.5&quot; target=&quot;1.5&quot;</code>. For live application
+you can also compile with <code>optimize=&quot;on&quot;</code> and without debug info
+<code>debug=&quot;off&quot;</code>.
+</p>
+
+<p>
+When you don't want to stop the jsp generation at first jsp syntax error, use   
+<code>failOnError=&quot;false&quot;</code>and with <code>showSuccess=&quot;true&quot;</code>
+all successfull <i>jsp to java</i> generation are printed out. Sometimes it is
+very helpfull, when you cleanup the generate java source files at <code>${webapp.path}/WEB-INF/src</code>
+and the compile jsp servlet classes at <code>${webapp.path}/WEB-INF/classes/org/apache/jsp</code>.
+</p>
+
+<p><strong>Hints:</strong>
+<ul>
+<li> When you switch to another tomcat release, then regenerate and recompile
+your jsp's with this version again!</li>
+<li>Use java system property at server runtime to disable tag pooling <code>org.apache.jasper.runtime.JspFactoryImpl.USE_POOL=false</code>.
+and limit the buffering with <code>org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER=true</code>. Note that changing
+from the defaults may affect performance, but depending on the application.</li>
+</ul>
+</p>
+</section>
+
+<section name="Using Jikes">
+
+<p>If you wish to use
+<a href="http://oss.software.ibm.com/developerworks/opensource/jikes/">
+Jikes</a> to compile JSP pages:
+<ul>
+<li>From your <a href="ant.apache.org">Ant</a> installation, copy ant.jar
+and (if it's available: Ant 1.5 and later) ant-launcher.jar to 
+<code>$CATALINA_BASE/common/lib</code>.</li>
+<li>Download and install jikes. jikes must support the -encoding option.
+Execute <code>jikes -help</code> to verify that it was built with support
+for <code>-encoding</code>.</li>
+<li>Set the init parameter <code>compiler</code> to <code>jikes</code>.</li>
+<li>Define the property <code>-Dbuild.compiler.emacs=true</code> when starting
+Tomcat by adding it to your <code>CATALINA_OPTS</code> environment variable.
+This changes how jikes outputs error messages so that it is compatible with
+Jasper.</li>
+<li>If you get an error reporting that jikes can't use UTF8 encoding, try
+setting the init parameter <code>javaEncoding</code> to
+<code>ISO-8859-1</code>.</li>
+</ul>
+</p>
+
+</section>
+</body>
+
+</document>

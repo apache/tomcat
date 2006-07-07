@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="setup.html">
+
+  &project;
+
+  <properties>
+    <author email="remm@apache.org">Remy Maucherat</author>
+    <title>Tomcat Setup</title>
+  </properties>
+
+<body>
+
+  <section name="Introduction">
+    <p>
+      This document introduces several ways to set up Tomcat for running
+      on different platforms.  Please note that some advanced setup issues
+      are not covered here: the full distribution (ZIP file or tarball) 
+      includes a file called
+      RUNNING.txt which discusses these issues.  We encourage you to refer
+      to it if the information below does not answer some of your questions.
+    </p>
+  </section>
+
+  <section name="Windows">
+
+    <p>
+      Installing Tomcat on Windows can be done easily using the Windows 
+      installer. Its interface and functionality is similar to other wizard
+      based installers, with only a few items of interest.
+    </p>
+
+    <p>
+      <ul>
+        <li><strong>Installation as a service</strong>: Tomcat will be 
+            installed as a Windows
+            NT/2k/XP service no matter what setting is selected. Using the
+            checkbox on the component page sets the service as "auto"
+            startup, so that Tomcat is automatically started when Windows
+            starts. For optimal security, the service should be run as a
+            separate user, with reduced permissions (see the Windows Services
+            administration tool and its documentation).</li>
+        <li><strong>Java location</strong>: The installer will use the registry
+            or the JAVA_HOME environment variable to determine the base path
+            of a J2SE 5 JRE.
+            </li>
+        <li><strong>Tray icon</strong>: When Tomcat is run as a service, there
+            will not be any tray icon present when Tomcat is running. Note that
+            when choosing to run Tomcat at the end of installation, the tray
+            icon will be used even if Tomcat was installed as a service.</li>
+        <li>Refer to the
+            <a href="windows-service-howto.html">Windows Service HOW-TO</a>
+            for information on how to manage Tomcat as Windows NT service.
+            </li>            
+      </ul>
+    </p>
+
+    <p>The installer will create shortcuts allowing starting and configuring 
+       Tomcat. It is important to note that the Tomcat administration web 
+       application can only be used when Tomcat is running.</p>
+
+    <p>If using a J2SE 1.4 JRE, the compatibility package must be downloaded and
+       expanded inside the folder where Tomcat was installed.</p>
+
+  </section>
+
+  <section name="Unix daemon">
+
+    <p>Tomcat can be run as a daemon using the jsvc tool from the 
+       commons-daemon project. Source tarballs for jsvc are included with the
+       Tomcat binaries, and need to be compiled. Building jsvc requires
+       a C ANSI compiler (such as GCC), GNU Autoconf, and a JDK.</p>
+
+    <p>Before running the script, the <code>JAVA_HOME</code> environment
+       variable should be set to the base path of the JDK. Alternately, when
+       calling the <code>./configure</code> script, the path of the JDK may
+       be specified using the <code>--with-java</code> parameter, such as
+       <code>./configure --with-java=/usr/java</code>.</p>
+
+    <p>Using the following commands should result in a compiled jsvc binary,
+       located in the <code>$CATALINA_HOME/bin</code> folder. This assumes
+       that GNU TAR is used, and that <code>CATALINA_HOME</code> is an 
+       environment variable pointing to the base path of the Tomcat 
+       installation.</p>
+  
+    <p>Please note that you should use the GNU make (gmake) instead of
+       the native BSD make on FreeBSD systems.</p>
+
+
+<source>
+    cd $CATALINA_HOME/bin
+    tar xvfz jsvc.tar.gz
+    cd jsvc-src
+    autoconf
+    ./configure
+    make
+    cp jsvc ..
+    cd ..
+</source>
+
+    <p>Tomcat can then be run as a daemon using the following commands.</p>
+
+<source>
+    cd $CATALINA_HOME
+    ./bin/jsvc -Djava.endorsed.dirs=./common/endorsed -cp ./bin/bootstrap.jar \
+        -outfile ./logs/catalina.out -errfile ./logs/catalina.err \
+        org.apache.catalina.startup.Bootstrap
+</source>
+
+    <p>jsvc has other useful parameters, such as <code>-user</code> which 
+       causes it to switch to another user after the daemon initialization is
+       complete. This allows, for example, running Tomcat as a non privileged
+       user while still being able to use privileged ports. 
+       <code>jsvc --help</code> will return the full jsvc usage 
+       information. In particular, the <code>-debug</code> option is useful
+       to debug issues running jsvc.</p>
+
+    <p>The file <code>$CATALINA_HOME/bin/jsvc/native/tomcat.sh</code> can be 
+       used as a template for starting Tomcat automatically at boot time from 
+       <code>/etc/init.d</code>.  The file is currently setup for running 
+       Tomcat 4.1.x, so it is necessary to edit it and change the classname 
+       from <code>BootstrapService</code> to <code>Bootstrap</code>.</p>
+
+    <p>Note that the Commons-Daemon JAR file must be on your runtime classpath 
+       to run Tomcat in this manner.  The Commons-Daemon JAR file is in the Class-Path 
+       entry of the bootstrap.jar manifest, but if you get a ClassNotFoundException 
+       or a NoClassDefFoundError for a Commons-Daemon class, add the Commons-Daemon 
+       JAR to the -cp argument when launching jsvc.</p> 
+
+  </section>
+
+</body>
+</document>

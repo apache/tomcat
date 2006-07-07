@@ -1,0 +1,331 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="apr.html">
+
+    &project;
+
+  <properties>
+    <title>Apache Portable Runtime and Tomcat</title>
+    <author>Remy Maucherat</author>
+  </properties>
+
+<body>
+
+  <section name="Introduction">
+
+  <p>
+      Tomcat can use the <a href="http://apr.apache.org/">Apache Portable Runtime</a> to 
+      provide superior scalability, performance, and better integration with native server 
+      technologies. The Apache Portable Runtime is a highly portable library that is at 
+      the heart of Apache HTTP Server 2.x. APR has many uses, including access to advanced IO
+      functionality (such as sendfile, epoll and OpenSSL), OS level functionality (random number
+      generation, system status, etc), and native process handling (shared memory, NT
+      pipes and Unix sockets).
+  </p>
+  
+  <p>
+      These features allows making Tomcat a general purpose webserver, will enable much better 
+      integration with other native web technologies, and overall make Java much more viable as
+      a full fledged webserver platform rather than simply a backend focused technology.
+  </p>
+
+  </section>
+
+  <section name="Installation">
+
+    <p>
+      APR support requires three main native components to be installed:
+      <ul>
+        <li>APR library</li>
+        <li>JNI wrappers for APR used by Tomcat (libtcnative)</li>
+        <li>OpenSSL libraries</li>
+      </ul>
+    </p>
+
+    <subsection name="Windows">
+    
+    <p>
+      Windows binaries are provided for tcnative-1, which is a statically compiled .dll which includes
+      OpenSSL and APR. It can be downloaded from <a href="http://tomcat.heanet.ie/native/">here</a>
+      as 32bit or AMD x86-64 binaries.
+      In security conscious production environments, it is recommended to use separate shared dlls
+      for OpenSSL, APR, and libtcnative-1, and update them as needed according to security bulletins.
+      Windows OpenSSL binaries are linked from the <a href="http://www.openssl.org">Official OpenSSL 
+      website</a> (see related/binaries).
+    </p>
+    
+    </subsection>
+    
+    <subsection name="Linux">
+    
+    <p>
+      Most Linux distributions will ship packages for APR and OpenSSL. The JNI wrapper (libtcnative) will 
+      then have to be compiled. It depends on APR, OpenSSL, and the Java headers.
+    </p>
+    
+    <p>
+      Requirements:
+      <ul>
+        <li>APR 1.2+ development headers (libapr1-dev package)</li>
+        <li>OpenSSL 0.9.7+ development headers (libssl-dev package)</li>
+        <li>JNI headers from Java compatible JDK 1.4+</li>
+        <li>GNU development environment (gcc, make)</li>
+      </ul>
+    </p>
+    
+    <p>
+      The wrapper library sources are located in the Tomcat binary bundle, in the 
+      <code>bin/tomcat-native.tar.gz</code> archive.
+      Once the build environment is installed and the source archive is extracted, the wrapper library 
+      can be compiled using (from the folder containing the configure script):
+      <source>./configure &amp;&amp; make &amp;&amp; make install</source>
+    </p>
+    
+    </subsection>
+	
+  </section>
+
+  <section name="APR Components">
+
+  <p>
+    Once the libraries are properly installed and available to Java (if loading fails, the library path
+    will be displayed), the Tomcat connectors will automatically use APR. Configuration of the connectors
+    is similar to the regular connectors, but have a few extra attributes which are used to configure
+    APR components. Note that the defaults should be well tuned for most use cases, and additional
+    tweaking shouldn't be required.
+  </p>
+
+  <p>
+    When APR is enabled, the following features are also enabled in Tomcat:
+    <ul>
+      <li>Secure session ID generation by default on all platforms (platforms other than Linux required
+          random number generation using a configured entropy)</li>
+      <li>OS level statistics on memory usage and CPU usage by the Tomcat process are displayed by
+          the status servlet</li>
+    </ul>
+  </p>
+
+  </section>
+
+  <section name="APR Connectors Configuration">
+
+    <subsection name="HTTP">
+    
+    <p>
+      When APR is enabled, the HTTP connector will use sendfile for hadling large static files (all such
+      files will be sent ansychronously using high performance kernel level calls), and will use 
+      a socket poller for keepalive, increasing scalability of the server.
+    </p>
+
+    <p>
+      The following attributes are supported in the HTTP APR connector in addition to the ones supported
+      in the regular HTTP connector:
+    </p>
+
+    <attributes>
+ 
+    <attribute name="firstReadTimeout" required="false">
+      <p>The first read of a request will be made using the specified timeout. If no data is available
+      after the specified time, the socket will be placed in the poller. The value of this attribute is
+      in ms. Setting this value to 0 or -1 will
+      increase scalability by always using a poller to handle keepalive, but will have a minor impact 
+      on latency (see the related pollTime attribute). The difference is that with 0, the first read of
+      a request will be made using a short timeout, while with -1, the first read will be made using the
+      regular socket timeout that is configured on the connector. Setting this to -2 will cause
+      the connector to not use the poller for keepalive in most situations, emulating the behavior of
+      the java.io HTTP connector.
+      The default value is -1. Note: on Windows, the actual value of firstReadTimeout will
+      be 500 + the specified value, if the specified value is strictly positive.</p>
+    </attribute>
+
+    <attribute name="pollTime" required="false">
+      <p>Duration of a poll call. Lowering this value will slightly decrease latency of connections 
+      being kept alive in some cases, but will use more CPU as more poll calls are being made. The
+      default value is 2000 (5ms).</p>
+    </attribute>
+
+    <attribute name="pollerSize" required="false">
+      <p>Amount of sockets that the poller responsible for polling kept alive connections can hold at a
+      given time. Extra connections will be closed right away. The default value is 8192, corresponding to
+      8192 keepalive connections.</p>
+    </attribute>
+
+    <attribute name="useSendfile" required="false">
+      <p>Use kernel level sendfile for certain static files. The default value is true.</p>
+    </attribute>
+
+    <attribute name="sendfileSize" required="false">
+      <p>Amount of sockets that the poller responsible for sending static files asynchronously can hold 
+      at a given time. Extra connections will be closed right away without any data being sent 
+      (resulting in a zero length file on the client side). Note that in most cases, sendfile is a call
+      that will return right away (being taken care of "synchonously" by the kernel), and the sendfile
+      poller will not be used, so the amount of static files which can be sent concurrently is much larger
+      than the specified amount. The default value is 1024.</p>
+    </attribute>
+
+    </attributes>
+    
+    </subsection>
+	
+    <subsection name="HTTPS">
+    
+    <p>
+      When APR is enabled, the HTTPS connector will use a socket poller for keepalive, increasing 
+      scalability of the server. It also uses OpenSSL, which may be more optimized than JSSE depending
+      on the processor being used, and can be complemented with many commercial accelerator components.
+      Unlike the HTTP connector, the HTTPS connector cannot use sendfile to optimize static file
+      processing.
+    </p>
+
+    <p>
+      The HTTPS APR connector has the same basic attributes than the HTTP APR connector, but adds 
+      OpenSSL specific ones. For the full details on using OpenSSL, please refer to OpenSSL documentations
+      and the many books available for it (see the <a href="http://www.openssl.org">Official OpenSSL 
+      website</a>). The SSL specific attributes for the connector are:
+    </p>
+    
+    <attributes>
+
+    <attribute name="SSLEngine" required="false">
+    <p>
+      Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no specific ENGINE.
+      The default value is off.
+    </p>
+    </attribute>
+    <attribute name="SSLProtocol" required="false">
+    <p>
+      Protocol which may be used for communicating with clients. The default is "all", with
+      other acceptable values being "SSLv2", "SSLv3", "TLSv1", and "SSLv2+SSLv3".
+    </p>
+    </attribute>
+    <attribute name="SSLCipherSuite" required="false">
+    <p>
+      Ciphers which may be used for communicating with clients. The default is "ALL", with
+      other acceptable values being a list of ciphers, with ":" used as the delimiter
+      (see OpenSSL documentation for the list of ciphers supported).
+    </p>
+    </attribute>
+    <attribute name="SSLCertificateFile" required="true">
+    <p>
+      Name of the file that contains the server certificate. The format is PEM-encoded.
+    </p>
+    </attribute>
+    <attribute name="SSLCertificateKeyFile" required="false">
+    <p>
+      Name of the file that contains the server private key. The format is PEM-encoded.
+      The default value is the value of "SSLCertificateFile" and in this case both certificate
+      and private key have to be in this file (NOT RECOMMENDED).
+    </p>
+    </attribute>
+    <attribute name="SSLPassword" required="false">
+    <p>
+      Pass phrase for the encrypted private key. If "SSLPassword" is not provided, the callback fonction
+      should prompt for the pass phrase.
+    </p>
+    </attribute>
+    <attribute name="SSLVerifyClient" required="false">
+    <p>
+      Ask client for certificate. The default is "none", meaning the client will not have the opportunity
+      to submit a certificate. Other acceptable values include "optional", "require" and "optionalNoCA".
+    </p>
+    </attribute>
+    <attribute name="SSLVerifyDepth" required="false">
+    <p>
+      Maximum verification depth for client certificates. The default is "10".
+    </p>
+    </attribute>
+    <attribute name="SSLCACertificateFile" required="false">
+    <p>
+      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatefile">the mod_ssl documentation</a>.
+    </p>
+    </attribute>
+    <attribute name="SSLCACertificatePath" required="false">
+    <p>
+      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcacertificatepath">the mod_ssl documentation</a>.
+    </p>
+    </attribute>
+    <attribute name="SSLCertificateChainFile" required="false">
+    <p>
+      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcertificatechainfile">the mod_ssl documentation</a>.
+    </p>
+    </attribute>
+    <attribute name="SSLCARevocationFile" required="false">
+    <p>
+      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcarevocationfile">the mod_ssl documentation</a>.
+    </p>
+    </attribute>
+    <attribute name="SSLCARevocationPath" required="false">
+    <p>
+      See <a href="http://httpd.apache.org/docs/2.2/mod/mod_ssl.html#sslcarevocationpath">the mod_ssl documentation</a>.
+    </p>
+    </attribute>
+
+    </attributes>
+    
+    <p>
+    An example SSL Connector declaration can be:
+    <source>
+    &lt;Connector port="443" maxHttpHeaderSize="8192"
+               maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+               enableLookups="false" disableUploadTimeout="true"
+               acceptCount="100" scheme="https" secure="true"
+               SSLEngine="on" 
+               SSLCertificateFile="${catalina.base}/conf/localhost.crt"
+               SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" /&gt;</source>
+    </p>
+    
+    </subsection>
+	
+    <subsection name="AJP">
+    
+    <p>
+      When APR is enabled, the AJP connector will use a socket poller for keepalive, increasing 
+      scalability of the server. As AJP is designed around a pool of persistent (or almost
+      persistent) connections, this will reduce significantly the amount of processing threads 
+      needed by Tomcat. Unlike the HTTP connector, the AJP connector cannot use sendfile to optimize
+      static file processing.
+    </p>
+
+    <p>
+      The following attributes are supported in the AJP APR connector in addition to the ones supported
+      in the regular AJP connector:
+    </p>
+
+    <attributes>
+ 
+    <attribute name="firstReadTimeout" required="false">
+      <p>The first read of a request will be made using the specified timeout. If no data is available
+      after the specified time, the socket will be placed in the poller. The value of this attribute is
+      in ms. Setting this value to 0 or -1 will
+      increase scalability by always using a poller to handle keepalive, but will have a minor impact 
+      on latency (see the related pollTime attribute). The difference is that with 0, the first read of
+      a request will be made using a short timeout, while with -1, the first read will be made using the
+      regular socket timeout that is configured on the connector. Setting this to -2 will cause
+      the connector to not use the poller for keepalive in most situations, emulating the behavior of
+      the java.io HTTP connector.
+      The default value is -1. Note: on Windows, the actual value of firstReadTimeout will
+      be 500 + the specified value, if the specified value is strictly positive.</p>
+    </attribute>
+
+    <attribute name="pollTime" required="false">
+      <p>Duration of a poll call. Lowering this value will slightly decrease latency of connections 
+      being kept alive in some cases, but will use more CPU as more poll calls are being made. The
+      default value is 2000 (5ms).</p>
+    </attribute>
+
+    <attribute name="pollerSize" required="false">
+      <p>Amount of sockets that the poller responsible for polling kept alive connections can hold at a
+      given time. Extra connections will be closed right away. The default value is 8192, corresponding to
+      8192 keepalive connections.</p>
+    </attribute>
+
+    </attributes>
+    
+    </subsection>
+	
+  </section>
+
+</body>
+</document>

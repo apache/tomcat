@@ -1,0 +1,12 @@
+<!--
+
+    Context configuration file for the Tomcat Balancer Web App
+    This is only needed to keep the distribution small and avoid duplicating
+    commons libraries
+
+    $Id: context.xml 303123 2004-08-26 17:03:35Z remm $
+
+-->
+
+
+<Context antiResourceLocking="false" />

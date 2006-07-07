@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="fs-invoker.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig McClanahan</author>
+    <title>Invoker Servlet</title>
+    <revision>$Id: fs-invoker.xml 301460 2003-01-15 03:40:45Z glenn $</revision>
+  </properties>
+
+<body>
+
+
+<section name="Overview">
+
+
+  <subsection name="Introduction">
+
+    <p>The purpose of the <strong>Invoker Servlet</strong> is to allow a
+    web application to dynamically register new <em>servlet definitions</em>
+    that correspond with a <code>&lt;servlet&gt;</code> element in the
+    <code>/WEB-INF/web.xml</code> deployment descriptor, and execute
+    requests utilizing the new servlet definitions.  From the perspective
+    of the newly registered servlets, all servlet lifecycle requirements
+    of the Servlet Specification (such as calling <code>init()</code> and
+    <code>destroy()</code> at the correct times) will be respected.</p>
+
+  </subsection>
+
+
+  <subsection name="External Specifications">
+
+    <p>I do not know of any formal specification of the behavior of an
+    invoker servlet that is publicly available.  Anyone know of one?</p>
+
+  </subsection>
+
+
+  <subsection name="Implementation Requirements">
+
+    <p>The implementation of this functionality shall conform to the
+    following requirements:</p>
+    <ul>
+    <li>Implemented as a servlet.</li>
+    <li>Exist in the <code>org.apache.catalina.servlets</code> package
+        so that it can be loaded by the Catalina class loader.</li>
+    <li>Implement the <code>org.apache.catalina.ContainerServlet</code>
+        interface, so that it gains knowledge of the <code>Wrapper</code>
+        that is responsible for itself and, therefore, access to other
+        internal Catalina components.</li>
+    <li>Support a configurable debugging detail level.</li>
+    <li>Log debugging and operational messages (suitably internationalized)
+        via the <code>getServletContext().log()</code> method.</li>
+    </ul>
+
+  </subsection>
+
+
+</section>
+
+
+<section name="Dependencies">
+
+
+  <subsection name="Environmental Dependencies">
+
+    <p>The following environmental dependencies must be met in order for
+    the Invoker servlet to operate correctly:</p>
+    <ul>
+    <li>The invoker servlet must be registered in the application deployment
+        descriptor (or the default deployment descriptor in file
+        <code>$CATALINA_HOME/conf/web.xml</code>) using a "path mapped"
+        servlet mapping.  The historical default mapping is to URL pattern
+        "<code>/servlet/*</code>", although the invoker servlet must operate
+        correctly with an arbitrary mapping.</li>
+    </ul>
+
+  </subsection>
+
+
+  <subsection name="Container Dependencies">
+
+    <p>Correct operation of the invoker servlet depends on the following
+    specific features of the surrounding container:</p>
+    <ul>
+    <li>Correct support for the <code>ContainerServlet</code> interface,
+        including calling <code>setWrapper()</code> <strong>before</strong>
+        the <code>init()</code> method of the invoker servlet is called.</li>
+    <li>The web application class loader must be stored as the context
+        class loader of the request processing thread.</li>
+    </ul>
+
+  </subsection>
+
+
+</section>
+
+
+<section name="Functionality">
+
+
+  <subsection name="Initialization Functionality">
+
+    <p>The following processing must be performed when the <code>init()</code>
+    method of the invoker servlet is called:</p>
+    <ul>
+    <li>Ensure that the container has called <code>setWrapper()</code>.  If
+        not, throw a permanent <code>UnavailableException</code>.</li>
+    <li>Look up and cache the <code>Context</code> that corresponds to our
+        <code>Wrapper</code>.  This is the component with which new servlet
+        definitions and mappings will be registered.</li>
+    </ul>
+
+  </subsection>
+
+
+  <subsection name="Per-Request Functionality">
+
+    <p>On each request, the following processing shall be performed:</p>
+    <ol>
+    <li>Calculate the <code>{ServletPath}</code> for this request, either from
+        request attribute <code>javax.servlet.include.servlet_path</code> or
+        by calling <code>request.getServletPath()</code>.</li>
+    <li>Calculate the <code>{PathInfo}</code> for this request, either from
+        request attribute <code>javax.servlet.include.path_info</code> or
+        by calling <code>request.getPathInfo()</code>.  If the calculated
+        <code>{PathInfo}</code> is null, return HTTP status 400
+        (bad request).</li>
+    <li>Parse the calculated <code>{PathInfo}</code> value as follows:
+        <ol>
+        <li>Ignore the leading slash character.</li>
+        <li>Accumulate characters up to the next '/' (if any) as the
+            <code>{ServletSelector}</code>.</li>
+        <li>If a '/' was encountered, accumulate all characters from that
+            slash (inclusive) to the end of the string as
+            <code>{PathRemainder}</code>.  If no slash was encountered,
+            set <code>{PathRemainder}</code> to a zero-length string.</li>
+        </ol></li>
+    <li>Determine whether <code>{ServletSelector}</code> is the name of an
+        existing servlet definition, and process it as follows:
+        <ol>
+        <li>Ask our associated <code>Context</code> to find and return a
+            child <code>Wrapper</code> named <code>{ServletSelector}</code>.
+            </li>
+        <li>If there is no such child, skip to the next major step.</li>
+        <li>Register a new servlet mapping for this <code>Wrapper</code>,
+            using a URL pattern calculated as follows:
+            <code>{ServletPath}</code> + "/" + <code>{ServletSelector}</code>
+            + "/*"</li>
+        <li>Create a request dispatcher using a path calculated as follows:
+            <code>{ServletPath}</code> + "/" + <code>{ServletSelector}</code>
+            + <code>{PathRemainder}</code></li>
+        <li>Forward this request to the created request dispatcher, and
+            exit from this request.</li>
+        </ol></li>
+    <li>Assume that <code>{ServletSelector}</code> is the fully qualified
+        name of a Java class that implements <code>javax.servlet.Servlet</code>
+        and process it as follows:
+        <ol>
+        <li>Synthesize a new <code>{ServletName}</code> for the servlet
+            definition that will be created.</li>
+        <li>If there is already a child <code>Wrapper</code> associated with
+            this name, return HTTP status 500 (internal server error), because
+            a mapping should have already been created for this servlet.</li>
+        <li>Attempt to load a class named <code>{ServletSelector}</code> from
+            the web application class loader (i.e. the context class loader
+            for our current thread).  If this fails, return HTTP status 404
+            (not found).</li>
+        <li>Instantiate an instance of this class.  If an error occurs,
+            return HTTP status 404 (not found).</li>
+        <li>If this class does not implement the
+            <code>javax.servlet.Servlet</code> interface, return HTTP status
+            404 (not found).</li>
+        <li>Create and register a new <code>Wrapper</code> child with our
+            <code>Context</code>, under name <code>{ServletName}</code>.</li>
+        <li>Register a new servlet mapping for this <code>Wrapper</code>,
+            using a URL pattern calculated as follows:
+            <code>{ServletPath}</code> + "/" + <code>{ServletSelector}</code>
+            + "/*"</li>
+        <li>Create a request dispatcher using a path calculated as follows:
+            <code>{ServletPath}</code> + "/" + <code>{ServletSelector}</code>
+            + <code>{PathRemainder}</code></li>
+        <li>Forward this request to the created request dispatcher, and
+            exit from this request.</li>
+        </ol></li>
+    </ol>
+
+  </subsection>
+
+
+  <subsection name="Finalization Functionality">
+
+    <p>No specific processing is required when the <code>destroy()</code>
+    method is called:</p>
+
+  </subsection>
+
+
+</section>
+
+
+<section name="Testable Assertions">
+
+  <p>In addition the the assertions implied by the functionality requirements
+  listed above, the following additional assertions shall be tested to
+  validate the behavior of the invoker servlet:</p>
+  <ul>
+  <li>It is possible to access an existing servlet definition by name
+      through the invoker.  The existing servlet definition can include
+      either a <code>&lt;servlet-class&gt;</code> or
+      <code>&lt;jsp-file&gt;</code> subelement.</li>
+  <li>When an existing servlet definition is accessed by name, the request
+      will be ultimately processed by the same servlet instance that would
+      have processed it had a mapping to that servlet definition been used
+      on the request directly.</li>
+  <li>It is possible to access an anonymous servlet by class name
+      through the invoker.</li>
+  <li>When an anonymous servlet is accessed, the servlet instance is processed
+      according to the lifecycle requirements of the Servlet Specification.
+      </li>
+  <li>When an anonymous servlet is accessed, the servlet instance receives
+      a <code>ServletConfig</code> instance with no servlet initialization
+      parameters.</li>
+  <li>It is possible to utilize the invoker servlet via a direct request.</li>
+  <li>It is possible to utilize the invoker servlet via a call to
+      <code>RequestDispatcher.forward()</code>, or the corresponding
+      <code>&lt;jsp:forward&gt;</code> tag in a JSP page.</li>
+  <li>It is possible to utilize the invoker servlet via a call to
+      <code>RequestDispatcher.include()</code>, or the corresponding
+      <code>&lt;jsp:include&gt;</code> tag in a JSP page.</li>
+  <li>It is possible to use any HTTP method (including GET and POST) that
+      is supported by the Servlet class that is ultimately executed.</li>
+  <li>The invoker servlet should never be asked to process a second or
+      subsequent request for the same <code>{ServletSelector}</code> (because
+      it will have registered an appropriate servlet mapping.</li>
+  </ul>
+
+</section>
+
+
+</body>
+
+</document>

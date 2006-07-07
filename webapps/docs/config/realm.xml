@@ -1,0 +1,497 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="realm.html">
+
+  &project;
+
+  <properties>
+    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
+    <title>The Realm Component</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  <p>A <strong>Realm</strong> element represents a "database" of usernames,
+  passwords, and <em>roles</em> (similar to Unix <em>groups</em>) assigned
+  to those users.  Different implementations of Realm allow Catalina to be
+  integrated into environments where such authentication information is already
+  being created and maintained, and then utilize that information to implement
+  <em>Container Managed Security</em> as described in the Servlet
+  Specification.</p>
+
+  <p>You may nest a Realm inside any Catalina container
+  <a href="engine.html">Engine</a>, <a href="host.html">Host</a>, or
+  <a href="context.html">Context</a>).  In addition, Realms associated with
+  an Engine or a Host are automatically inherited by lower-level
+  containers, unless explicitly overridden.</p>
+
+  <p>For more in-depth information about container managed security in web
+  applications, as well as more information on configuring and using the 
+  standard realm component implementations, please see the 
+  <a href="../realm-howto.html">Container-Managed Security Guide</a>.
+  </p>
+
+    <blockquote><em>
+    <p>The description below uses the variable name $CATALINA_HOME
+    to refer to the directory into which you have installed Tomcat 5,
+    and is the base directory against which most relative paths are
+    resolved.  However, if you have configured Tomcat 5 for multiple
+    instances by setting a CATALINA_BASE directory, you should use
+    $CATALINA_BASE instead of $CATALINA_HOME for each of these
+    references.</p>
+    </em></blockquote>
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+    <p>All implementations of <strong>Realm</strong>
+    support the following attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This class must
+        implement the <code>org.apache.catalina.Realm</code> interface.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+
+  <subsection name="Standard Implementation">
+
+    <p>Unlike most Catalina components, there are several standard
+    <strong>Realm</strong> implementations available.  As a result,
+    the <code>className</code> attribute MUST be used to select the
+    implementation you wish to use.</p>
+
+    <h3>JDBC Database Realm (org.apache.catalina.realm.JDBCRealm)</h3>
+
+    <p>The <strong>JDBC Database Realm</strong> connects Catalina to
+    a relational database, accessed through an appropriate JDBC driver,
+    to perform lookups of usernames, passwords, and their associated
+    roles.  Because the lookup is done each time that it is required,
+    changes to the database will be immediately reflected in the
+    information used to authenticate new logins.</p>
+
+    <p>A rich set of additional attributes lets you configure the required
+    connection to the underlying database, as well as the table and
+    column names used to retrieve the required information:</p>
+
+    <attributes>
+
+      <attribute name="connectionName" required="true">
+        <p>The database username to use when establishing the JDBC
+        connection.</p>
+      </attribute>
+
+      <attribute name="connectionPassword" required="true">
+        <p>The database password to use when establishing the JDBC
+        connection.</p>
+      </attribute>
+
+      <attribute name="connectionURL" required="true">
+        <p>The connection URL to be passed to the JDBC driver when
+        establishing a database connection.</p>
+      </attribute>
+
+      <attribute name="digest" required="false">
+        <p>The name of the <code>MessageDigest</code> algorithm used
+        to encode user passwords stored in the database.  If not specified,
+        user passwords are assumed to be stored in clear-text.</p>
+      </attribute>
+   
+      <attribute name="digestEncoding" required="false">
+        <p>The charset for encoding digests.  If not specified, the platform
+        default will be used.</p>
+      </attribute>
+
+      <attribute name="driverName" required="true">
+        <p>Fully qualified Java class name of the JDBC driver to be
+        used to connect to the authentication database.</p>
+      </attribute>
+
+      <attribute name="roleNameCol" required="true">
+        <p>Name of the column, in the "user roles" table, which contains
+        a role name assigned to the corresponding user.</p>
+      </attribute>
+
+      <attribute name="userCredCol" required="true">
+        <p>Name of the column, in the "users" table, which contains
+        the user's credentials (i.e. password(.  If a value for the
+        <code>digest</code> attribute is specified, this component
+        will assume that the passwords have been encoded with the
+        specified algorithm.  Otherwise, they will be assumed to be
+        in clear text.</p>
+      </attribute>
+
+      <attribute name="userNameCol" required="true">
+        <p>Name of the column, in the "users" and "user roles" table,
+        that contains the user's username.</p>
+      </attribute>
+
+      <attribute name="userRoleTable" required="true">
+        <p>Name of the "user roles" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="userTable" required="true">
+        <p>Name of the "users" table, which must contain columns named
+        by the <code>userNameCol</code> and <code>userCredCol</code>
+        attributes.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
+    information on setting up container managed security using the
+    JDBC Database Realm component.</p>
+
+
+    <h3>
+      DataSource Database Realm (org.apache.catalina.realm.DataSourceRealm)
+    </h3>
+
+    <p>The <strong>DataSource Database Realm</strong> connects Catalina to
+    a relational database, accessed through a JNDI named JDBC DataSource
+    to perform lookups of usernames, passwords, and their associated
+    roles.  Because the lookup is done each time that it is required,
+    changes to the database will be immediately reflected in the
+    information used to authenticate new logins.</p>
+
+    <p>The JDBC Realm uses a single db connection. This requires that
+    realm based authentication be synchronized, i.e. only one authentication
+    can be done at a time. This could be a bottleneck for applications
+    with high volumes of realm based authentications.</p>
+
+    <p>The DataSource Database Realm supports simultaneous realm based
+    authentications and allows the underlying JDBC DataSource to
+    handle optimizations like database connection pooling.</p>
+
+    <p>A rich set of additional attributes lets you configure the name
+    of the JNDI JDBC DataSource, as well as the table and
+    column names used to retrieve the required information:</p>
+
+    <attributes>
+
+      <attribute name="dataSourceName" required="true">
+        <p>The name of the JNDI JDBC DataSource for this Realm.</p>
+      </attribute>
+
+      <attribute name="digest" required="false">
+        <p>The name of the <code>MessageDigest</code> algorithm used
+        to encode user passwords stored in the database.  If not specified,
+        user passwords are assumed to be stored in clear-text.</p>
+      </attribute>
+
+      <attribute name="roleNameCol" required="true">
+        <p>Name of the column, in the "user roles" table, which contains
+        a role name assigned to the corresponding user.</p>
+      </attribute>
+
+      <attribute name="userCredCol" required="true">
+        <p>Name of the column, in the "users" table, which contains
+        the user's credentials (i.e. password(.  If a value for the
+        <code>digest</code> attribute is specified, this component
+        will assume that the passwords have been encoded with the
+        specified algorithm.  Otherwise, they will be assumed to be
+        in clear text.</p>
+      </attribute>
+
+      <attribute name="userNameCol" required="true">
+        <p>Name of the column, in the "users" and "user roles" table,
+        that contains the user's username.</p>
+      </attribute>
+
+      <attribute name="userRoleTable" required="true">
+        <p>Name of the "user roles" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="userTable" required="true">
+        <p>Name of the "users" table, which must contain columns named
+        by the <code>userNameCol</code> and <code>userCredCol</code>
+        attributes.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>See the <a href="../realm-howto.html#DataSourceRealm">
+    DataSource Realm HOW-TO</a> for more information on setting up container
+    managed security using the DataSource Database Realm component.</p>
+
+
+    <h3>JNDI Directory Realm (org.apache.catalina.realm.JNDIRealm)</h3>
+
+
+    <p>The <strong>JNDI Directory Realm</strong> connects Catalina to
+    an LDAP Directory, accessed through an appropriate JNDI driver,
+    that stores usernames, passwords, and their associated
+    roles. Changes to the directory are immediately reflected in the
+    information used to authenticate new logins.</p>
+
+
+    <p>The directory realm supports a variety of approaches to using
+    LDAP for authentication:</p>
+
+    <ul>
+    <li>The realm can either use a pattern to determine the
+    distinguished name (DN) of the user's directory entry, or search
+    the directory to locate that entry.
+    </li>
+
+    <li>The realm can authenticate the user either by binding to the
+    directory with the DN of the user's entry and the password
+    presented by the user, or by retrieving the password from the
+    user's entry and performing a comparison locally.
+    </li>
+
+    <li>Roles may be represented in the directory as explicit entries
+    found by a directory search (e.g. group entries of which the user
+    is a member), as the values of an attribute in the user's entry,
+    or both.
+    </li>
+    </ul>
+
+    <p> A rich set of additional attributes lets you configure the
+    required behaviour as well as the connection to the underlying
+    directory and the element and attribute names used to retrieve
+    information from the directory:</p>
+
+    <attributes>
+       <attribute name="alternateURL" required="false">
+         <p>If a socket connection can not be made to the provider at
+         the <code>connectionURL</code> an attempt will be made to use the
+         <code>alternateURL</code>.</p>
+       </attribute>
+
+       <attribute name="authentication" required="false">
+         <p>A string specifying the type of authentication to use.
+         "none", "simple", "strong" or a provider specific definition
+         can be used. If no value is given the providers default is used.</p>
+       </attribute>
+
+      <attribute name="connectionName" required="false">
+        <p>The directory username to use when establishing a
+        connection to the directory for LDAP search operations. If not
+        specified an anonymous connection is made, which is often
+        sufficient unless you specify the <code>userPassword</code>
+        property.</p>
+      </attribute>
+
+      <attribute name="connectionPassword" required="false">
+        <p>The directory password to use when establishing a
+        connection to the directory for LDAP search operations. If not
+        specified an anonymous connection is made, which is often
+        sufficient unless you specify the <code>userPassword</code>
+        property.</p>
+      </attribute>
+
+      <attribute name="connectionURL" required="true">
+        <p>The connection URL to be passed to the JNDI driver when
+        establishing a connection to the directory.</p>
+      </attribute>
+
+      <attribute name="contextFactory" required="false">
+        <p>Fully qualified Java class name of the factory class used
+        to acquire our JNDI <code>InitialContext</code>.  By default,
+        assumes that the standard JNDI LDAP provider will be utilized.</p>
+      </attribute>
+      
+      <attribute name="derefAliases" required="false">
+        <p>A string specifying how aliases are to be dereferenced during
+        search operations. The allowed values are "always", "never",
+        "finding" and "searching". If not specified, "always" is used.</p>
+      </attribute>
+
+      <attribute name="protocol" required="false">
+         <p>A string specifying the security protocol to use. If not given
+         the providers default is used.</p>
+      </attribute>
+
+      <attribute name="roleBase" required="false">
+        <p>The base directory entry for performing role searches. If
+        not specified the top-level element in the directory context
+        will be used.</p>
+      </attribute>
+
+      <attribute name="roleName" required="false">
+        <p>The name of the attribute that contains role names in the
+        directory entries found by a role search. In addition you can
+        use the <code>userRoleName</code> property to specify the name
+        of an attribute, in the user's entry, containing additional
+        role names.  If <code>roleName</code> is not specified a role
+        search does not take place, and roles are taken only from the
+        user's entry.</p>
+      </attribute>
+
+      <attribute name="roleSearch" required="false">
+        <p>The LDAP filter expression used for performing role
+        searches.  Use <code>{0}</code> to substitute the
+        distinguished name (DN) of the user, and/or <code>{1}</code> to
+        substitute the username. If not specified a role search does
+        not take place and roles are taken only from the attribute in
+        the user's entry specified by the <code>userRoleName</code>
+        property.</p>
+      </attribute>
+
+      <attribute name="roleSubtree" required="false">
+        <p>Set to <code>true</code> if you want to search the entire
+        subtree of the element specified by the <code>roleBase</code>
+        property for role entries associated with the user. The
+        default value of <code>false</code> causes only the top level
+        to be searched.</p>
+      </attribute>
+
+      <attribute name="userBase" required="false">
+        <p>The base element for user searches performed using the
+        <code>userSearch</code> expression.  Not used if you are using
+        the <code>userPattern</code> expression.</p>
+      </attribute>
+
+      <attribute name="userPassword" required="false">
+        <p>Name of the attribute in the user's entry containing the
+        user's password.  If you specify this value, JNDIRealm will
+        bind to the directory using the values specified by
+        <code>connectionName</code> and
+        <code>connectionPassword</code> properties, and retrieve the
+        corresponding attribute for comparison to the value specified
+        by the user being authenticated.  If you do
+        <strong>not</strong> specify this value, JNDIRealm will
+        attempt a simple bind to the directory using the DN of the
+        user's entry and the password presented by the user, with a
+        successful bind being interpreted as an authenticated
+        user.</p>
+      </attribute>
+
+      <attribute name="userPattern" required="false">
+        <p>Pattern for the distinguished name (DN) of the user's
+        directory entry, with <code>{0}</code> marking where the
+        actual username should be inserted. You can use this property
+        instead of <code>userSearch</code>, <code>userSubtree</code>
+        and <code>userBase</code> when the distinguished name contains
+        the username and is otherwise the same for all users.</p>
+      </attribute>
+
+      <attribute name="userRoleName" required="false">
+        <p>The name of an attribute in the user's directory entry
+        containing zero or more values for the names of roles assigned
+        to this user.  In addition you can use the
+        <code>roleName</code> property to specify the name of an
+        attribute to be retrieved from individual role entries found
+        by searching the directory. If <code>userRoleName</code> is
+        not specified all the roles for a user derive from the role
+        search.</p>
+      </attribute>
+
+      <attribute name="userSearch" required="false">
+        <p>The LDAP filter expression to use when searching for a
+        user's directory entry, with <code>{0}</code> marking where
+        the actual username should be inserted.  Use this property
+        (along with the <code>userBase</code> and
+        <code>userSubtree</code> properties) instead of
+        <code>userPattern</code> to search the directory for the
+        user's entry.</p>
+      </attribute>
+
+      <attribute name="userSubtree" required="false">
+        <p>Set to <code>true</code> if you want to search the entire
+        subtree of the element specified by the <code>userBase</code>
+        property for the user's entry. The default value of
+        <code>false</code> causes only the top level to be searched.
+        Not used if you are using the <code>userPattern</code>
+        expression.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
+    information on setting up container managed security using the
+    JNDI Directory Realm component.</p>
+
+
+    <h3>Memory Based Realm (org.apache.catalina.realm.MemoryRealm)</h3>
+
+    <p>The <strong>Memory Based Realm</strong> is a simple Realm implementation
+    that reads user information from an XML format, and represents it as a
+    collection of Java objects in memory.  This implementation is intended
+    solely to get up and running with container managed security - it is NOT
+    intended for production use.  As such, there are no mechanisms for
+    updating the in-memory collection of users when the content of the
+    underlying data file is changed.</p>
+
+    <p>The Memory Based Realm implementation supports the following
+    additional attributes:</p>
+
+    <attributes>
+
+      <attribute name="pathname" required="false">
+        <p>Absolute or relative (to $CATALINA_HOME) pathname to the XML file
+        containing our user information.  See below for details on the
+        XML element format required.  If no pathname is specified, the
+        default value is <code>conf/tomcat-users.xml</code>.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>The XML document referenced by the <code>pathname</code> attribute must
+    conform to the following requirements:</p>
+    <ul>
+    <li>The root (outer) element must be <code>&lt;tomcat-users&gt;</code>.
+        </li>
+    <li>Each authorized user must be represented by a single XML element
+        <code>&lt;user&gt;</code>, nested inside the root element.</li>
+    <li>Each <code>&lt;user&gt;</code> element must have the following
+        attributes:
+        <ul>
+        <li><strong>name</strong> - Username of this user (must be unique
+            within this file).</li>
+        <li><strong>password</strong> - Password of this user (in
+            clear text).</li>
+        <li><strong>roles</strong> - Comma-delimited list of the role names
+            assigned to this user.</li>
+        </ul></li>
+    </ul>
+
+    <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
+    information on setting up container managed security using the
+    Memory Based Realm component.</p>
+
+
+  </subsection>
+
+
+</section>
+
+
+<section name="Nested Components">
+
+  <p>No components may be nested inside a <strong>Realm</strong> element.</p>
+
+</section>
+
+
+<section name="Special Features">
+
+  <p>See <a href="host.html">Single Sign On</a> for information about
+  configuring Single Sign On support for a virtual host.</p>
+
+</section>
+
+
+</body>
+
+
+</document>

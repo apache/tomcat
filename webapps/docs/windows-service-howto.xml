@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="windows-service-howto.html">
+
+    &project;
+
+    <properties>
+      <author email="mturk@apache.org">Mladen Turk</author>
+      <title>Windows service HOW-TO</title>
+    </properties>
+
+<body>
+ 
+<section name="NOTICE">
+<p>
+    <b>This section of the documentation applies to procrun 1.0, and is now obsolete.</b>
+</p>
+</section>
+<section name="Tomcat5 service application">
+<p>
+    <b>Tomcat5</b> is a service application for running Tomcat5 as NT service.
+</p>
+</section>
+<section name="Tomcat5w monitor application">
+<p>
+    <b>Tomcat5w</b> is a GUI application for monitoring and configuring Tomcat
+    services.
+</p>    
+    <p>The available command line options are:</p>
+<p> 
+    <table>
+    <tr><th>//ES//</th>
+        <td>Edit service configuration</td>
+        <td>This is the default operation. It is called if the no option is
+            provided but the executable is renamed to <b>servicenameW.exe</b></td>
+    </tr>
+    <tr><th>//MS//</th>
+        <td>Monitor service</td>
+        <td>Put the icon in the system try</td>
+    </tr>
+    </table>
+</p>
+</section>
+<section name="Command line arguments">
+<p>
+    Each command line directive is in the form of <b>//XX//ServiceName</b>
+</p>
+    <p>The available command line options are:</p>
+<p> 
+    <table>
+    <tr><th>//TS//</th>
+        <td>Run the service as console application</td>
+        <td>This is the default operation. It is called if the no option is
+            provided. The ServiceName is the name of the executable without
+            exe sufix, meaning Tomcat5</td>
+    </tr>
+    <tr><th>//RS//</th>
+        <td>Run the service</td>
+        <td>Called only from ServiceManager</td>
+    </tr>
+    <tr><th>//SS//</th>
+        <td>Stop the service</td>
+        <td></td>
+    </tr>
+    <tr><th>//US//</th>
+        <td>Update service parameters</td>
+        <td></td>
+    </tr>
+    <tr><th>//IS//</th>
+        <td>Install service</td>
+        <td></td>
+    </tr>
+    <tr><th>//DS//</th>
+        <td>Delete service</td>
+        <td>Stops the service if running</td>
+    </tr>        
+    </table>
+</p> 
+</section>
+<section name="Command line parameters">
+<p>
+    Each command parameter is prefixed with <b>--</b>.
+    If the command line is prefixed with <b>++</b> then it's value will
+    be appended to the existing option.
+    If the environment variable with the same name as command line parameter but
+    prefixed with <code>PR_</code> exists it will take precedence.
+    For example:
+<source>set PR_CLASSPATH=xx.jar</source>
+</p>    
+<p>is equivalent to providing
+<source>--Classpath=xx.jar</source>
+</p>
+<p> as command line parameter.</p>
+<p> 
+    <table>
+    <tr>
+    <th>ParameterName</th>
+	<th>Default</th>
+	<th>Description</th>
+	</tr> 
+    <tr>
+    <td>--Description</td>
+    <td></td>
+    <td>Service name description (maximum 1024 characters)</td>
+    </tr>
+    <tr>
+    <td>--DisplayName</td>
+    <td>ServiceName</td>
+    <td>Service display name</td>
+    </tr>
+    <tr>
+    <td>--Install</td>
+    <td>procrun.exe //RS//ServiceName</td>
+    <td>Install image</td>
+    </tr>
+    <tr>
+    <td>--Startup</td>
+    <td>manual</td>
+    <td>Service startup mode can be either <b>auto</b> or <b>manual</b></td>
+    </tr>
+    <tr>
+    <td>--DependsOn</td>
+    <td></td>
+    <td>List of services that this service depend on. Dependent services
+        are separated using either <b>#</b> or <b>;</b> characters</td>
+    </tr>
+    <tr>
+    <td>--Environment</td>
+    <td></td>
+    <td>List of environment variables that will be provided to the service
+        in the form <b>key=value</b>. They are separated using either
+        <b>#</b> or <b>;</b> characters</td>
+    </tr>
+    <tr>
+    <td>--User</td>
+    <td></td>
+    <td>User account used for running executable. It is used only for
+    	StartMode <b>java</b> or <b>exe</b> and enables running applications
+    	as service under account without LogonAsService privilege.</td>
+    </tr>
+    <tr>
+    <td>--Password</td>
+    <td></td>
+    <td>Password for user account set by --User parameter</td>
+    </tr>
+    <tr>
+    <td>--JavaHome</td>
+    <td>JAVA_HOME</td>
+    <td>Set a different JAVA_HOME then defined by JAVA_HOME environment
+        variable</td>
+    </tr>
+    <tr>
+    <td>--Jvm</td>
+    <td>auto</td>
+    <td>Use either <b>auto</b> or specify the full path to the <b>jvm.dll</b>.
+        You can use the environment variable expansion here.</td>
+    </tr>
+    <tr>
+    <td>--JvmOptions</td>
+    <td>-Xrs</td>
+    <td>List of options in the form of <b>-D</b> or <b>-X</b> that will be
+        passed to the JVM. The options are separated using either
+        <b>#</b> or <b>;</b> characters.</td>
+    </tr>
+    <tr>
+    <td>--Classpath</td>
+    <td></td>
+    <td>Set the Java classpath</td>
+    </tr>
+    <tr>
+    <td>--JvmMs</td>
+    <td></td>
+    <td>Initial memory pool size in MB</td>
+    </tr>
+    <tr>
+    <td>--JvmMx</td>
+    <td></td>
+    <td>Maximum memory pool size in MB</td>
+    </tr>
+    <tr>
+    <td>--JvmSs</td>
+    <td></td>
+    <td>Thread stack size in KB</td>
+    </tr>
+    <tr>
+    <tr>
+    <td>--StartImage</td>
+    <td></td>
+    <td>Executable that will be run.</td>
+    </tr>
+    <tr>
+    <td>--StartPath</td>
+    <td></td>
+    <td>Working path for the start image executable.</td>
+    </tr>
+    <tr>
+    <td>--StartClass</td>
+    <td></td>
+    <td>Class that will be used for startup.</td>
+    </tr>
+    <tr>
+    <td>--StartParams</td>
+    <td></td>
+    <td>List of parameters that will be passed to either StartImage or
+        StartClass. Parameters are separated using either <b>#</b> or
+        <b>;</b> character.</td>
+    </tr>
+    <tr>
+    <td>--StartMethod</td>
+    <td>Main</td>
+    <td>Method name if differs then main</td>
+    </tr>
+    <tr>
+    <td>--StartMode</td>
+    <td>executable</td>
+    <td>Can one of <b>jvm</b> <b>java</b> or <b>exe</b></td>
+    </tr>
+    <td>--StopImage</td>
+    <td></td>
+    <td>Executable that will be run on Stop service signal.</td>
+    </tr>
+    <tr>
+    <td>--StopPath</td>
+    <td></td>
+    <td>Working path for the stop image executable.</td>
+    </tr>
+    <tr>
+    <td>--StopClass</td>
+    <td></td>
+    <td>Class that will be used on Stop service signal.</td>
+    </tr>
+    <tr>
+    <td>--StopParams</td>
+    <td></td>
+    <td>List of parameters that will be passed to either StopImage or
+        StopClass. Parameters are separated using either <b>#</b> or
+        <b>;</b> character.</td>
+    </tr>
+    <tr>
+    <td>--StopMethod</td>
+    <td>Main</td>
+    <td>Method name if differs then main</td>
+    </tr>
+    <tr>
+    <td>--StopMode</td>
+    <td>executable</td>
+    <td>Can one of <b>jvm</b> <b>java</b> or <b>exe</b></td>
+    </tr>
+    <tr>
+    <td>--StopTimeout</td>
+    <td>No Timeout</td>
+    <td>Defines the timeout in seconds that procrun waits for service to
+        exit gracefully.</td>
+    </tr>
+    <tr>
+    <td>--LogPath</td>
+    <td>working path</td>
+    <td>Defines the path for logging</td>
+    </tr>
+    <tr>
+    <td>--LogPrefix</td>
+    <td>jakarta_service</td>
+    <td>Defines the service log filename</td>
+    </tr>
+    <tr>
+    <td>--LogLevel</td>
+    <td>INFO</td>
+    <td>Defines the logging level and can be either <b>error</b>,
+        <b>info</b>, <b>warn</b> or <b>debug</b></td>
+    </tr>
+    <tr>
+    <td>--StdOutput</td>
+    <td></td>
+    <td>Redirected stdout filename</td>
+    </tr>
+    <tr>
+    <td>--StdError</td>
+    <td></td>
+    <td>Redirected stderr filename</td>
+    </tr>    
+    </table>
+</p> 
+</section>
+<section name="Installing services">
+<p>
+The safest way to manually install the service is to use the provided <b>service.bat</b> script.
+</p>
+<p>
+<source>
+Install the service named 'Tomcat5'
+C:\> service.bat install
+</source>
+</p>
+<p>
+If using tomcat5.exe, you need to use the <b>//IS//</b> parameter.
+</p>
+<p>
+<source>
+Install the service named 'Tomcat5'
+C:\> tomcat5 //IS//Tomcat5 --DisplayName="Apache Tomcat 5" \
+C:\> --Install="C:\Program Files\Tomcat\bin\tomcat5.exe" --Jvm=auto \
+C:\> --StartMode=jvm --StopMode=jvm \
+C:\> --StartClass=org.apache.catalina.startup.Bootstrap --StartParams=start \
+C:\> --StopClass=org.apache.catalina.startup.Bootstrap --StopParams=stop
+</source>
+</p>
+</section>
+<section name="Updating services">
+<p>
+To update the service parameters, you need to use the <b>//US//</b> parameter.
+</p>
+<p>
+<source>
+Update the service named 'Tomcat5
+C:\> tomcat5 //US//Tomcat5 --Description="Apache Tomcat Server - http://jakarta.apache.org/tomcat " \
+C:\> --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar
+</source>
+</p>
+</section>
+<section name="Removing services">
+<p>
+To remove the service, you need to use the <b>//DS//</b> parameter.<br/>
+If the service is running it will be stopped and then deleted.
+</p>
+<p>
+<source>
+Remove the service named 'Tomcat5'
+C:\> tomcat5 //DS//Tomcat5
+</source>
+</p>
+</section>
+<section name="Debugging services">
+<p>
+To run the service in console mode, you need to use the <b>//TS//</b> parameter.
+The service shutdown can be initiated by pressing <b>CTRL+C</b> or
+<b>CTRL+BREAK</b>.
+If you rename the tomcat5.exe to testservice.exe then you can just execute the
+testservice.exe and this command mode will be executed by default.
+</p>
+<p>
+<source>
+Run the service named 'Tomcat5' in console mode
+C:\> tomcat5 //TS//Tomcat5 [additional arguments]
+Or simply execute:
+C:\> tomcat5
+</source>
+</p>
+</section>
+</body>
+</document> 
