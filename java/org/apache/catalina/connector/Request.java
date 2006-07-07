@@ -404,8 +404,12 @@ public class Request
         requestedSessionId = null;
         requestedSessionURL = false;
 
-        parameterMap.setLocked(false);
-        parameterMap.clear();
+        if (Constants.SECURITY) {
+            parameterMap = new ParameterMap();
+        } else {
+            parameterMap.setLocked(false);
+            parameterMap.clear();
+        }
 
         mappingData.recycle();
 
