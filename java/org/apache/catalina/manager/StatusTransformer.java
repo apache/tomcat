@@ -246,10 +246,6 @@ public class StatusTransformer {
             writer.print("<p>");
             writer.print(" Max threads: ");
             writer.print(mBeanServer.getAttribute(tpName, "maxThreads"));
-            writer.print(" Min spare threads: ");
-            writer.print(mBeanServer.getAttribute(tpName, "minSpareThreads"));
-            writer.print(" Max spare threads: ");
-            writer.print(mBeanServer.getAttribute(tpName, "maxSpareThreads"));
             writer.print(" Current thread count: ");
             writer.print(mBeanServer.getAttribute(tpName, "currentThreadCount"));
             writer.print(" Current thread busy: ");
@@ -318,8 +314,6 @@ public class StatusTransformer {
 
             writer.write("<threadInfo ");
             writer.write(" maxThreads=\"" + mBeanServer.getAttribute(tpName, "maxThreads") + "\"");
-            writer.write(" minSpareThreads=\"" + mBeanServer.getAttribute(tpName, "minSpareThreads") + "\"");
-            writer.write(" maxSpareThreads=\"" + mBeanServer.getAttribute(tpName, "maxSpareThreads") + "\"");
             writer.write(" currentThreadCount=\"" + mBeanServer.getAttribute(tpName, "currentThreadCount") + "\"");
             writer.write(" currentThreadsBusy=\"" + mBeanServer.getAttribute(tpName, "currentThreadsBusy") + "\"");
             writer.write(" />");
