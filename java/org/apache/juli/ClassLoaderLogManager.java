@@ -51,14 +51,15 @@ public class ClassLoaderLogManager extends LogManager {
      * weak hashmap is used to ensure no classloader reference is leaked from 
      * application redeployment.
      */
-    protected final Map classLoaderLoggers = new WeakHashMap();
+    protected final Map<ClassLoader, ClassLoaderLogInfo> classLoaderLoggers = 
+        new WeakHashMap<ClassLoader, ClassLoaderLogInfo>();
 
     
     /**
      * This prefix is used to allow using prefixes for the properties names
      * of handlers and their subcomponents.
      */
-    protected ThreadLocal prefix = new ThreadLocal();
+    protected ThreadLocal<String> prefix = new ThreadLocal<String>();
 
     
     // --------------------------------------------------------- Public Methods
@@ -179,7 +180,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Get an enumeration of the logger names currently defined in the 
      * classloader local configuration.
      */
-    public synchronized Enumeration getLoggerNames() {
+    public synchronized Enumeration<String> getLoggerNames() {
         ClassLoader classLoader = Thread.currentThread()
                 .getContextClassLoader();
         return Collections.enumeration(getClassLoaderInfo(classLoader).loggers.keySet());
@@ -334,12 +335,12 @@ public class ClassLoaderLogManager extends LogManager {
         }
         ClassLoaderLogInfo info = 
             new ClassLoaderLogInfo(new LogNode(null, localRootLogger));
-        info.loggers.put("", localRootLogger);
         classLoaderLoggers.put(classLoader, info);
         
         if (is != null) {
             readConfiguration(is, classLoader);
         }
+        addLogger(localRootLogger);
         
     }
     
@@ -472,7 +473,8 @@ public class ClassLoaderLogManager extends LogManager {
     protected static final class LogNode {
         Logger logger;
 
-        protected final Map children = new HashMap();
+        protected final Map<String, LogNode> children = 
+            new HashMap<String, LogNode>();
 
         protected final LogNode parent;
 
@@ -487,6 +489,9 @@ public class ClassLoaderLogManager extends LogManager {
 
         LogNode findNode(String name) {
             LogNode currentNode = this;
+            if (logger.getName().equals(name)) {
+                return this;
+            }
             while (name != null) {
                 final int dotIndex = name.indexOf('.');
                 final String nextName;
@@ -538,8 +543,8 @@ public class ClassLoaderLogManager extends LogManager {
 
     protected static final class ClassLoaderLogInfo {
         final LogNode rootNode;
-        final Map loggers = new HashMap();
-        final Map handlers = new HashMap();
+        final Map<String, Logger> loggers = new HashMap<String, Logger>();
+        final Map<String, Handler> handlers = new HashMap<String, Handler>();
         final Properties props = new Properties();
 
         ClassLoaderLogInfo(final LogNode rootNode) {
