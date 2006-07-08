@@ -259,4 +259,19 @@ typedef struct {
 
 #endif
 
+#if  !APR_HAVE_IPV6
+#define APR_INET6 APR_INET
+#endif
+
+#define GET_S_FAMILY(T, F)           \
+    if (F == 0) T = APR_UNSPEC;      \
+    else if (F == 1) T = APR_INET;   \
+    else if (F == 2) T = APR_INET6;  \
+    else T = F
+
+#define GET_S_TYPE(T, F)             \
+    if (F == 0) T = SOCK_STREAM;     \
+    else if (F == 1) T = SOCK_DGRAM; \
+    else T = F
+
 #endif /* TCN_H */
