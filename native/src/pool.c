@@ -240,5 +240,5 @@ TCN_IMPLEMENT_CALL(jobject, Pool, dataGet)(TCN_STDARGS, jlong pool,
 TCN_IMPLEMENT_CALL(void, Pool, cleanupForExec)(TCN_STDARGS)
 {
     UNREFERENCED_STDARGS;
-    apr_pool_cleanup_for_exec();;
+    apr_pool_cleanup_for_exec();
 }
