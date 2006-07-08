@@ -19,13 +19,7 @@
  * @version $Revision$, $Date$
  */
 
-#include "apr.h"
-#include "apr_pools.h"
-#include "apr_portable.h"
 #include "tcn.h"
-
-
-
 
 TCN_IMPLEMENT_CALL(jstring, OS, defaultEncoding)(TCN_STDARGS, jlong pool)
 {
@@ -43,8 +37,3 @@ TCN_IMPLEMENT_CALL(jstring, OS, localeEncoding)(TCN_STDARGS, jlong pool)
     return AJP_TO_JSTRING(apr_os_locale_encoding(p));
 }
 
-TCN_IMPLEMENT_CALL(jlong, OS, threadCurrent)(TCN_STDARGS)
-{
-    UNREFERENCED_STDARGS;
-    return (jlong)((unsigned long)apr_os_thread_current());
-}

@@ -22,7 +22,9 @@
 #include "tcn.h"
 
 #ifdef TCN_DO_STATISTICS
+
 #include "apr_atomic.h"
+
 static volatile apr_uint32_t sp_created  = 0;
 static volatile apr_uint32_t sp_closed   = 0;
 static volatile apr_uint32_t sp_cleared  = 0;
@@ -44,25 +46,6 @@ static volatile apr_size_t   sf_max_send = 0;
 static volatile apr_size_t   sf_min_send = 10000000;
 static volatile apr_uint32_t sf_num_send = 0;
 static volatile apr_off_t    sf_tot_send = 0;
-
-#endif
-
-#if  !APR_HAVE_IPV6
-#define APR_INET6 APR_INET
-#endif
-
-#define GET_S_FAMILY(T, F)           \
-    if (F == 0) T = APR_UNSPEC;      \
-    else if (F == 1) T = APR_INET;   \
-    else if (F == 2) T = APR_INET6;  \
-    else T = F
-
-#define GET_S_TYPE(T, F)             \
-    if (F == 0) T = SOCK_STREAM;     \
-    else if (F == 1) T = SOCK_DGRAM; \
-    else T = F
-
-#ifdef TCN_DO_STATISTICS
 
 void sp_network_dump_statistics()
 {
@@ -90,90 +73,7 @@ void sp_network_dump_statistics()
 
 }
 
-#endif
-
-TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
-                                         jstring hostname,
-                                         jint family, jint port,
-                                         jint flags, jlong pool)
-{
-    apr_pool_t *p = J2P(pool, apr_pool_t *);
-    TCN_ALLOC_CSTRING(hostname);
-    apr_sockaddr_t *sa = NULL;
-    apr_int32_t f;
-
-
-    UNREFERENCED(o);
-    GET_S_FAMILY(f, family);
-    TCN_THROW_IF_ERR(apr_sockaddr_info_get(&sa,
-            J2S(hostname), f, (apr_port_t)port,
-            (apr_int32_t)flags, p), sa);
-
-cleanup:
-    TCN_FREE_CSTRING(hostname);
-    return P2J(sa);
-}
-
-TCN_IMPLEMENT_CALL(jstring, Address, getnameinfo)(TCN_STDARGS,
-                                                  jlong sa, jint flags)
-{
-    apr_sockaddr_t *s = J2P(sa, apr_sockaddr_t *);
-    char *hostname;
-
-    UNREFERENCED(o);
-    if (apr_getnameinfo(&hostname, s, (apr_int32_t)flags) == APR_SUCCESS)
-        return AJP_TO_JSTRING(hostname);
-    else
-        return NULL;
-}
-
-TCN_IMPLEMENT_CALL(jstring, Address, getip)(TCN_STDARGS, jlong sa)
-{
-    apr_sockaddr_t *s = J2P(sa, apr_sockaddr_t *);
-    char *ipaddr;
-
-    UNREFERENCED(o);
-    if (apr_sockaddr_ip_get(&ipaddr, s) == APR_SUCCESS)
-        return AJP_TO_JSTRING(ipaddr);
-    else
-        return NULL;
-}
-
-TCN_IMPLEMENT_CALL(jlong, Address, get)(TCN_STDARGS, jint which,
-                                        jlong sock)
-{
-    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    apr_sockaddr_t *sa = NULL;
-
-    UNREFERENCED(o);
-    TCN_THROW_IF_ERR(apr_socket_addr_get(&sa,
-                        (apr_interface_e)which, s->sock), sa);
-cleanup:
-    return P2J(sa);
-}
-
-TCN_IMPLEMENT_CALL(jint, Address, equal)(TCN_STDARGS,
-                                         jlong a, jlong b)
-{
-    apr_sockaddr_t *sa = J2P(a, apr_sockaddr_t *);
-    apr_sockaddr_t *sb = J2P(b, apr_sockaddr_t *);
-
-    UNREFERENCED_STDARGS;
-    return apr_sockaddr_equal(sa, sb) ? JNI_TRUE : JNI_FALSE;
-}
-
-TCN_IMPLEMENT_CALL(jint, Address, getservbyname)(TCN_STDARGS,
-                                                 jlong sa, jstring servname)
-{
-    apr_sockaddr_t *s = J2P(sa, apr_sockaddr_t *);
-    TCN_ALLOC_CSTRING(servname);
-    apr_status_t rv;
-
-    UNREFERENCED(o);
-    rv = apr_getservbyname(s, J2S(servname));
-    TCN_FREE_CSTRING(servname);
-    return (jint)rv;
-}
+#endif /* TCN_DO_STATISTICS */
 
 static apr_status_t sp_socket_cleanup(void *data)
 {
@@ -1308,52 +1208,3 @@ TCN_IMPLEMENT_CALL(jobject, Socket, dataGet)(TCN_STDARGS, jlong socket,
     TCN_FREE_CSTRING(key);
     return rv;
 }
-
-TCN_IMPLEMENT_CALL(jint, Mulicast, join)(TCN_STDARGS,
-                                         jlong sock, jlong join,
-                                         jlong iface, jlong source)
-{
-    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    apr_sockaddr_t *ja = J2P(join, apr_sockaddr_t *);
-    apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
-    apr_sockaddr_t *sa = J2P(source, apr_sockaddr_t *);
-    UNREFERENCED_STDARGS;
-    return (jint)apr_mcast_join(s->sock, ja, ia, sa);
-};
-
-TCN_IMPLEMENT_CALL(jint, Mulicast, leave)(TCN_STDARGS,
-                                          jlong sock, jlong addr,
-                                          jlong iface, jlong source)
-{
-    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    apr_sockaddr_t *aa = J2P(addr, apr_sockaddr_t *);
-    apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
-    apr_sockaddr_t *sa = J2P(source, apr_sockaddr_t *);
-    UNREFERENCED_STDARGS;
-    return (jint)apr_mcast_leave(s->sock, aa, ia, sa);
-};
-
-TCN_IMPLEMENT_CALL(jint, Mulicast, hops)(TCN_STDARGS,
-                                         jlong sock, jint ttl)
-{
-    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    UNREFERENCED_STDARGS;
-    return (jint)apr_mcast_hops(s->sock, (apr_byte_t)ttl);
-};
-
-TCN_IMPLEMENT_CALL(jint, Mulicast, loopback)(TCN_STDARGS,
-                                             jlong sock, jboolean opt)
-{
-    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    UNREFERENCED_STDARGS;
-    return (jint)apr_mcast_loopback(s->sock, opt == JNI_TRUE ? 1 : 0);
-};
-
-TCN_IMPLEMENT_CALL(jint, Mulicast, ointerface)(TCN_STDARGS,
-                                               jlong sock, jlong iface)
-{
-    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
-    apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
-    UNREFERENCED_STDARGS;
-    return (jint)apr_mcast_interface(s->sock, ia);
-};

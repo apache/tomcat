@@ -92,6 +92,10 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=.\src\address.c
+# End Source File
+# Begin Source File
+
 SOURCE=.\src\dir.c
 # End Source File
 # Begin Source File
@@ -121,6 +125,10 @@ SOURCE=.\src\misc.c
 # Begin Source File
 
 SOURCE=.\src\mmap.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\multicast.c
 # End Source File
 # Begin Source File
 
@@ -165,6 +173,10 @@ SOURCE=.\src\sslutils.c
 # Begin Source File
 
 SOURCE=.\src\stdlib.c
+# End Source File
+# Begin Source File
+
+SOURCE=.\src\thread.c
 # End Source File
 # Begin Source File
 
