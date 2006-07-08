@@ -68,7 +68,7 @@ extern "C" {
 #define TCN_MINOR_VERSION       1
 
 /** patch level */
-#define TCN_PATCH_VERSION       3
+#define TCN_PATCH_VERSION       4
 
 /**
  *  This symbol is defined for internal, "development" copies of TCN. This
