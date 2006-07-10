@@ -394,25 +394,18 @@ public class InternalNioOutputBuffer
         if (!committed) {
             //Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0
             ByteBuffer buf = ByteBuffer.wrap(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
-            writeToSocket(buf);
+            writeToSocket(buf,false);
         }
 
     }
 
-    private void writeToSocket(ByteBuffer bytebuffer) throws IOException {
+    private synchronized void writeToSocket(ByteBuffer bytebuffer, boolean flip) throws IOException {
         int limit = bytebuffer.position();
-        bytebuffer.rewind();
-        bytebuffer.limit(limit);
-        int remaining = limit;
-        while ( remaining > 0 ) {
+        if ( flip ) bytebuffer.flip();
+        while ( bytebuffer.hasRemaining() ) {
             int written = socket.write(bytebuffer);
-            remaining -= written;
         }
         bbuf.clear();
-        bbuf.rewind();
-        bbuf.limit(bbufLimit);
-
-        //System.out.println("Written:"+limit);
         this.total = 0;
     } 
 
@@ -735,7 +728,7 @@ public class InternalNioOutputBuffer
 
         //write to the socket, if there is anything to write
         if (bbuf.position() > 0) {
-            writeToSocket(bbuf);
+            writeToSocket(bbuf,true);
         }
     }
 

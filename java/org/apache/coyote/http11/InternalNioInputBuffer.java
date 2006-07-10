@@ -542,7 +542,7 @@ public class InternalNioInputBuffer implements InputBuffer {
      * Perform blocking read with a timeout if desired
      * @param timeout boolean - set to true if the system will time out
      * @return boolean - true if data was read, false is EOF is reached
-     * @throws IOException
+     * @throws IOException 
      */
     private boolean readSocket(boolean timeout) throws IOException {
         int nRead = 0;
