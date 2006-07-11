@@ -486,7 +486,7 @@
 
 
   <!-- ==================== RELEASE: Create Release ======================= -->
-  <target name="release" depends="clean,dist-static,dist-source,dist-javadoc,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,package-admin-zip,package-admin-tgz,package-src-zip,package-src-tgz,package-docs-tgz"
+  <target name="release" depends="clean,dist-static,dist-source,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,package-admin-zip,package-admin-tgz,package-src-zip,package-src-tgz,dist-javadoc,package-docs-tgz"
    description="Create a Tomcat 5 packaged distribution">
 
     <filter token="VERSION" value="${version}"/>
@@ -564,7 +564,7 @@
   <target name="package-admin-zip">
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-admin.zip">
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="server/webapps/admin/**"/>
+        <include name="webapps/admin/**"/>
         <include name="conf/Catalina/localhost/admin.xml"/>
         <exclude name="*.jsp" />
       </zipfileset>
@@ -605,10 +605,8 @@
       </tarfileset>
       <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**" />
-        <include name="common/**" />
+        <include name="lib/**" />
         <include name="logs/**" />
-        <include name="server/**" />
-        <include name="shared/**" />
         <include name="temp/**" />
         <include name="webapps/**" />
         <include name="work/**" />
@@ -631,7 +629,7 @@
         <exclude name="bin/startup-using-launcher.sh" />
         <exclude name="conf/**" />
         <exclude name="src/**" />
-        <exclude name="server/webapps/admin/**" />
+        <exclude name="webapps/admin/**" />
       </tarfileset>
     </tar>
 
