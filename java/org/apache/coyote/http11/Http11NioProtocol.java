@@ -290,23 +290,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         return ep.getPollerSize();
     }
 
-    public void setSendfileSize(int i) {
-        ep.setSendfileSize(i); 
-        setAttribute("sendfileSize", "" + i);
-    }
-
-    public int getSendfileSize() {
-        return ep.getSendfileSize();
-    }
-
-    public boolean getUseSendfile() {
-        return ep.getUseSendfile();
-    }
-
-    public void setUseSendfile(boolean useSendfile) {
-        ep.setUseSendfile(useSendfile);
-    }
-
     public InetAddress getAddress() {
         return ep.getAddress();
     }

@@ -48,7 +48,6 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.NioEndpoint.SendfileData;
 import org.apache.tomcat.util.res.StringManager;
 import java.nio.channels.SelectionKey;
 
@@ -169,11 +168,6 @@ public class Http11NioProcessor implements ActionHook {
      */
     protected boolean http09 = false;
 
-
-    /**
-     * Sendfile data.
-     */
-    protected NioEndpoint.SendfileData sendfileData = null;
 
 
     /**
@@ -914,16 +908,6 @@ public class Http11NioProcessor implements ActionHook {
             }
             request.updateCounters();
 
-            // Do sendfile as needed: add socket to sendfile and end
-            if (sendfileData != null && !error) {
-                sendfileData.socket = socket;
-                sendfileData.keepAlive = keepAlive;
-                if (!endpoint.getSendfile().add(sendfileData)) {
-                    openSocket = true;
-                    break;
-                }
-            }
-
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
         }
@@ -1250,7 +1234,6 @@ public class Http11NioProcessor implements ActionHook {
         http09 = false;
         contentDelimitation = false;
         expectation = false;
-        sendfileData = null;
         if (ssl) {
             request.scheme().setString("https");
         }
@@ -1412,10 +1395,6 @@ public class Http11NioProcessor implements ActionHook {
             contentDelimitation = true;
         }
 
-        // Advertise sendfile support through a request attribute
-        if (endpoint.getUseSendfile()) {
-            request.setAttribute("org.apache.tomcat.sendfile.support", Boolean.FALSE);
-        }
         // Advertise comet support through a request attribute
         request.setAttribute("org.apache.tomcat.comet.support", Boolean.TRUE);
 
@@ -1590,26 +1569,10 @@ public class Http11NioProcessor implements ActionHook {
             contentDelimitation = true;
         }
 
-        // Sendfile support
-        if (endpoint.getUseSendfile()) {
-            String fileName = (String) request.getAttribute("org.apache.tomcat.sendfile.filename");
-            if (fileName != null) {
-                // No entity body sent here
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.VOID_FILTER]);
-                contentDelimitation = true;
-                sendfileData = new NioEndpoint.SendfileData();
-                sendfileData.fileName = fileName;
-                sendfileData.start = 
-                    ((Long) request.getAttribute("org.apache.tomcat.sendfile.start")).longValue();
-                sendfileData.end = 
-                    ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue();
-            }
-        }
 
         // Check for compression
         boolean useCompression = false;
-        if (entityBody && (compressionLevel > 0) && (sendfileData == null)) {
+        if (entityBody && (compressionLevel > 0)) {
             useCompression = isCompressable();
             // Change content-length to -1 to force chunking
             if (useCompression) {
