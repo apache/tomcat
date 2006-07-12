@@ -334,6 +334,8 @@
     <mkdir dir="${tomcat.dist}/temp"/>
     <mkdir dir="${tomcat.dist}/webapps"/>
     <mkdir dir="${tomcat.dist}/work"/>
+  	<mkdir dir="${tomcat.release}/v${version}/bin" />
+  	<mkdir dir="${tomcat.release}/v${version}/src" />
   </target>
 
 
@@ -451,11 +453,7 @@
     <copy todir="${tomcat.dist}/src">
       <fileset dir="${basedir}">
         <exclude name=".*/**"/>
-        <exclude name="build/**"/>
-        <exclude name="classes/**"/>
-        <exclude name="dist/**"/>
-        <exclude name="release/**"/>
-        <exclude name="deployer/**"/>
+        <exclude name="output/**"/>
         <exclude name="build.properties"/>
       </fileset>
     </copy>
@@ -512,7 +510,6 @@
     <copy file="res/welcome.bin.html"
         tofile="${tomcat.release}/v${version}/bin/README.html"
      filtering="true"/>
-    <mkdir dir="${tomcat.release}/v${version}/src" />
 
   </target>
 
@@ -730,31 +727,12 @@
 
   <!-- Packages the source code distribution in tar.gz format -->
   <target name="package-src-tgz">
-    <fixcrlf srcdir="${tomcat.dist}"
+  	<fixcrlf srcdir="${tomcat.dist}/src"
      excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war" eol="lf"/>
-
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
-      <tarfileset dir="${tomcat.dist}/src" mode="755" prefix="${final-src.name}">
-        <include name="${jtc.project}/jk/native/buildconf.sh" />
-        <include name="${jtc.project}/jk/native/apache-1.3/build-hpux-cc.sh" />
-        <include name="${jtc.project}/jk/native/apache-1.3/build-solaris.sh" />
-        <include name="${jtc.project}/jk/native/apache-1.3/build-unix.sh" />
-        <include name="${jtc.project}/jk/native/apache-2.0/build-unix.sh" />
-        <include name="${jtc.project}/jk/native/apache-2.0/install-unix.sh" />
-        <include name="${jtc.project}/jk/native/domino/mkini.sh" />
-      </tarfileset>
-      <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}">
-        <exclude name="${jtc.project}/jk/native/buildconf.sh" />
-        <exclude name="${jtc.project}/jk/native/apache-1.3/build-hpux-cc.sh" />
-        <exclude name="${jtc.project}/jk/native/apache-1.3/build-solaris.sh" />
-        <exclude name="${jtc.project}/jk/native/apache-1.3/build-unix.sh" />
-        <exclude name="${jtc.project}/jk/native/apache-2.0/build-unix.sh" />
-        <exclude name="${jtc.project}/jk/native/apache-2.0/install-unix.sh" />
-        <exclude name="${jtc.project}/jk/native/domino/mkini.sh" />
-      </tarfileset>
+      <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
     </tar>
-
     <checksum file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz"
               forceOverwrite="yes" fileext=".md5" />
     <echo     file="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz.md5"
