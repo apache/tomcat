@@ -12,7 +12,7 @@
 
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2005" />
+  <property name="year"                  value="2006" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
@@ -25,9 +25,9 @@
   <property name="final-src.name"        value="${project}-${version}-src" />
 
   <!-- Build Defaults -->
-  <property name="tomcat.build"      value="${basedir}/build"/>
-  <property name="tomcat.classes"    value="${basedir}/classes"/>
-  <property name="tomcat.dist"       value="${basedir}/dist"/>
+  <property name="tomcat.build"      value="${basedir}/output/build"/>
+  <property name="tomcat.classes"    value="${basedir}/output/classes"/>
+  <property name="tomcat.dist"       value="${basedir}/output/dist"/>
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
@@ -263,8 +263,8 @@
   	<!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
       <fileset dir="conf">
-        <include name="*.xml"/>
-        <include name="*.properties"/>
+        <include name="**/*.xml"/>
+        <include name="**/*.properties"/>
       </fileset>
     </copy>
 

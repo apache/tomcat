@@ -1,61 +1,60 @@
 <project name="Tomcat 6.0" default="release" basedir=".">
 
 
-	  <!-- ===================== Initialize Property Values =================== -->
+  <!-- ===================== Initialize Property Values =================== -->
 
-	  <!-- See "build.properties.sample" in the top level directory for all     -->
-	  <!-- property values you must customize for successful building!!!        -->
-	  <property file="${user.home}/build.properties"/>
-	  <property file="build.properties"/>
+  <!-- See "build.properties.sample" in the top level directory for all     -->
+  <!-- property values you must customize for successful building!!!        -->
+  <property file="${user.home}/build.properties"/>
+  <property file="build.properties"/>
 
-	  <property file="build.properties.default"/>
+  <property file="build.properties.default"/>
 
-	  <!-- Project Properties -->
-	  <property name="name"                  value="Apache Tomcat" />
-	  <property name="year"                  value="2005" />
-	  <property name="version.major"         value="6" />
-	  <property name="version.minor"         value="0" />
-	  <property name="version.build"         value="0" />
-	  <property name="version.patch"         value="0" />
-	  <property name="version"               value="6.0.0-dev" />
-	  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <!-- Project Properties -->
+  <property name="name"                  value="Apache Tomcat" />
+  <property name="year"                  value="2006" />
+  <property name="version.major"         value="6" />
+  <property name="version.minor"         value="0" />
+  <property name="version.build"         value="0" />
+  <property name="version.patch"         value="0" />
+  <property name="version"               value="6.0.0-dev" />
+  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
 
-	  <property name="project"               value="apache-tomcat" />
-	  <property name="final.name"            value="${project}-${version}" />
-	  <property name="final-src.name"        value="${project}-${version}-src" />
+  <property name="project"               value="apache-tomcat" />
+  <property name="final.name"            value="${project}-${version}" />
+  <property name="final-src.name"        value="${project}-${version}-src" />
 
-	  <!-- Build Defaults -->
-	  <property name="tomcat.build"      value="${basedir}/build"/>
-	  <property name="tomcat.classes"    value="${basedir}/classes"/>
-	  <property name="tomcat.dist"       value="${basedir}/dist"/>
-	  <property name="tomcat.deployer"   value="${basedir}/deployer"/>
-	  <property name="tomcat.release"    value="${basedir}/release"/>
-	  <property name="test.failonerror"  value="true"/>
-	  <property name="test.runner"       value="junit.textui.TestRunner"/>
+  <!-- Build Defaults -->
+  <property name="tomcat.build"      value="${basedir}/output/build"/>
+  <property name="tomcat.classes"    value="${basedir}/output/classes"/>
+  <property name="tomcat.dist"       value="${basedir}/output/dist"/>
+  <property name="tomcat.deployer"   value="${basedir}/output/deployer"/>
+  <property name="tomcat.release"    value="${basedir}/output/release"/>
+  <property name="test.failonerror"  value="true"/>
+  <property name="test.runner"       value="junit.textui.TestRunner"/>
 
-	  <!-- Can't be lower - jsp uses templates -->
-	  <property name="compile.source" value="1.5"/>
+  <!-- Can't be lower - jsp uses templates -->
+  <property name="compile.source" value="1.5"/>
 
-	  <!-- JAR artifacts -->
-	  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
+  <!-- JAR artifacts -->
+  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
 
-	  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
-	  <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
-	  <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
-	  <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
-	  <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
-	  <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
-	  <property name="catalina-ant-jmx.jar" value="${tomcat.build}/lib/catalina-ant-jmx.jar"/>
-	  <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
+  <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
+  <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
+  <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
+  <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
+  <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
+  <property name="catalina-ant-jmx.jar" value="${tomcat.build}/lib/catalina-ant-jmx.jar"/>
+  <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
 
-	  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
-	  <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
+  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
+  <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
 
-	  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
-	  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
-	  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
-	  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
-
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
+  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
+  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
+  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
 
   <target name="build-webapps-precompile" description="Precompile webapps" >
 
@@ -310,6 +309,18 @@
     <delete dir="${tomcat.deployer}"/>
     <delete dir="${tomcat.dist}" failonerror="false"/>
 
+    <!-- This is why releasing must be done on a Windows box: 
+         otherwise this check fails and the .exe distro is not generated -->
+    <condition property="execute.installer">
+      <and>
+        <os family="windows" />
+        <available file="${nsis.exe}" />
+        <available file="${nsis.installoptions.dll}" />
+        <available file="${nsis.nsexec.dll}" />
+        <available file="${nsis.nsisdl.dll}" />
+      </and>
+    </condition>
+
   </target>
 
 
@@ -457,20 +468,20 @@
    description="Create Windows installer" if="execute.installer">
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
-      <fileset dir="resources" />
+      <fileset dir="res" />
     </copy>
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-    <copy file="${jtc.home}/procrun/bin/tomcat5.exe"
-        tofile="${tomcat.dist}/bin/tomcat5.exe" />
-    <copy file="${jtc.home}/procrun/bin/tomcat5w.exe"
-        tofile="${tomcat.dist}/bin/tomcat5w.exe" />
+    <copy file="res/procrun/tomcat6.exe"
+        tofile="${tomcat.dist}/bin/tomcat6.exe" />
+    <copy file="res/procrun/tomcat6w.exe"
+        tofile="${tomcat.dist}/bin/tomcat6w.exe" />
 
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_NUMBER" value="${version.number}"/>
 
-    <copy file="tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" filtering="true"/>
+    <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" filtering="true" overwrite="true"/>
     <exec dir="${tomcat.dist}" executable="${nsis.exe}">
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="tomcat.nsi" />
@@ -501,18 +512,7 @@
     <copy file="res/welcome.bin.html"
         tofile="${tomcat.release}/v${version}/bin/README.html"
      filtering="true"/>
-
-    <!-- This is why releasing must be done on a Windows box: 
-         otherwise this check fails and the .exe distro is not generated -->
-    <condition property="execute.installer">
-      <and>
-        <os family="windows" />
-        <available file="${nsis.exe}" />
-        <available file="${nsis.installoptions.dll}" />
-        <available file="${nsis.nsexec.dll}" />
-        <available file="${nsis.nsisdl.dll}" />
-      </and>
-    </condition>
+    <mkdir dir="${tomcat.release}/v${version}/src" />
 
   </target>
 

@@ -58,3 +58,10 @@ commons-collections.jar=${commons-collections.lib}/commons-collections-3.1.jar
 commons-collections.loc=${base-jakarta.loc}/commons/collections/binaries/commons-collections-3.1.tar.gz
 commons-collections-src.loc=${base-jakarta.loc}/commons/collections/source/commons-collections-3.1-src.tar.gz
 
+# ----- NSIS, version 2.0 or later -----
+nsis.home=${base.path}/nsis-2.0
+nsis.exe=${nsis.home}/makensis.exe
+nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
+nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
+nsis.nsisdl.dll=${nsis.home}/Plugins/nsisdl.dll
+nsis.loc=${base-sf.loc}/nsis/nsis20.exe

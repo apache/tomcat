@@ -1,0 +1,77 @@
+<!-- Example Server Configuration File -->
+<!-- Note that component elements are nested corresponding to their
+     parent-child relationships with each other -->
+
+<!-- A "Server" is a singleton element that represents the entire JVM,
+     which may contain one or more "Service" instances.  The Server
+     listens for a shutdown command on the indicated port.
+
+     Note:  A "Server" is not itself a "Container", so you may not
+     define subcomponents such as "Valves" or "Loggers" at this level.
+ -->
+
+<Server port="8005" shutdown="SHUTDOWN">
+
+  <!-- Comment these entries out to disable JMX MBeans support used for the 
+       administration web application -->
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" />
+  <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>
+
+  <!-- Global JNDI resources -->
+  <GlobalNamingResources>
+
+    <!-- Test entry for demonstration purposes -->
+    <Environment name="simpleValue" type="java.lang.Integer" value="30"/>
+
+    <!-- Editable user database that can also be used by
+         UserDatabaseRealm to authenticate users -->
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+       description="User database that can be updated and saved"
+           factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+          pathname="conf/tomcat-users.xml" />
+
+  </GlobalNamingResources>
+
+  <!-- A "Service" is a collection of one or more "Connectors" that share
+       a single "Container" (and therefore the web applications visible
+       within that Container).  Normally, that Container is an "Engine",
+       but this is not required.
+
+       Note:  A "Service" is not itself a "Container", so you may not
+       define subcomponents such as "Valves" or "Loggers" at this level.
+   -->
+
+  <!-- Define the Tomcat Stand-Alone Service -->
+  <Service name="Catalina">
+
+    <!-- A "Connector" represents an endpoint by which requests are received
+         and responses are returned.  Each Connector passes requests on to the
+         associated "Container" (normally an Engine) for processing.
+
+         By default, a non-SSL HTTP/1.1 Connector is established on port 8080.
+         You can also enable an SSL HTTP/1.1 Connector on port 8443 by
+         following the instructions below and uncommenting the second Connector
+         entry.  SSL support requires the following steps (see the SSL Config
+         HOWTO in the Tomcat 5 documentation bundle for more detailed
+         instructions):
+         * If your JDK version 1.3 or prior, download and install JSSE 1.0.2 or
+           later, and put the JAR files into "$JAVA_HOME/jre/lib/ext".
+         * Execute:
+             %JAVA_HOME%\bin\keytool -genkey -alias tomcat -keyalg RSA (Windows)
+             $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA  (Unix)
+           with a password value of "changeit" for both the certificate and
+           the keystore itself.
+
+         By default, DNS lookups are enabled when a web application calls
+         request.getRemoteHost().  This can have an adverse impact on
+         performance, so you can disable it by setting the
+         "enableLookups" attribute to "false".  When DNS lookups are disabled,
+         request.getRemoteHost() will return the String version of the
+         IP address of the remote client.
+    -->
+
+    <!-- Define a non-SSL HTTP/1.1 Connector on port 8080 -->
+    <Connector
