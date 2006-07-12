@@ -323,7 +323,6 @@ public class NioEndpoint {
     public Poller getPoller() {
         pollerRoundRobin = (pollerRoundRobin + 1) % pollers.length;
         Poller poller = pollers[pollerRoundRobin];
-        poller.comet = false;
         return poller;
     }
 
@@ -333,7 +332,6 @@ public class NioEndpoint {
      */
     public Poller getCometPoller() {
         Poller poller = getPoller();
-        poller.comet = true;
         return poller;
     }
 
@@ -620,7 +618,7 @@ public class NioEndpoint {
             // Start poller threads
             pollers = new Poller[pollerThreadCount];
             for (int i = 0; i < pollerThreadCount; i++) {
-                pollers[i] = new Poller(false);
+                pollers[i] = new Poller();
                 pollers[i].init();
                 Thread pollerThread = new Thread(pollers[i], getName() + "-Poller-" + i);
                 pollerThread.setPriority(threadPriority);
@@ -969,15 +967,13 @@ public class NioEndpoint {
         protected Selector selector;
         protected LinkedList<Runnable> events = new LinkedList<Runnable>();
         protected boolean close = false;
-        protected boolean comet = true;
 
         protected int keepAliveCount = 0;
         public int getKeepAliveCount() { return keepAliveCount; }
 
 
 
-        public Poller(boolean comet) throws IOException {
-            this.comet = comet;
+        public Poller() throws IOException {
             this.selector = Selector.open();
         }
         
@@ -1139,7 +1135,7 @@ public class NioEndpoint {
                             if ( attachment.getWakeUp() ) {
                                 attachment.setWakeUp(false);
                                 synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
-                            } else if ( comet ) {
+                            } else if ( attachment.getComet() ) {
                                 if (!processSocket(channel,false)) processSocket(channel,true);
                             } else {
                                 boolean close = (!processSocket(channel));
