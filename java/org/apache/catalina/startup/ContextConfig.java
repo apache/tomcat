@@ -875,7 +875,8 @@ public class ContextConfig
             docBase = file.getCanonicalPath();
         }
         file = new File(docBase);
-
+        String origDocBase = docBase;
+        
         if (docBase.toLowerCase().endsWith(".war") && !file.isDirectory() && unpackWARs) {
             URL war = new URL("jar:" + (new File(docBase)).toURL() + "!/");
             String contextPath = context.getPath();
@@ -885,6 +886,9 @@ public class ContextConfig
             docBase = ExpandWar.expand(host, war, contextPath);
             file = new File(docBase);
             docBase = file.getCanonicalPath();
+            if (context instanceof StandardContext) {
+                ((StandardContext) context).setOriginalDocBase(origDocBase);
+            }
         } else {
             File docDir = new File(docBase);
             if (!docDir.exists()) {
@@ -898,6 +902,9 @@ public class ContextConfig
                     } else {
                         docBase = warFile.getCanonicalPath();
                     }
+                }
+                if (context instanceof StandardContext) {
+                    ((StandardContext) context).setOriginalDocBase(origDocBase);
                 }
             }
         }
