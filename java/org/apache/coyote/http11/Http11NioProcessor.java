@@ -743,7 +743,11 @@ public class Http11NioProcessor implements ActionHook {
             SelectionKey key = socket.keyFor(endpoint.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
-                if ( attach!=null ) attach.setComet(comet);
+                if ( attach!=null ) {
+                    attach.setComet(comet);
+                    Integer comettimeout = (Integer)request.getAttribute("org.apache.tomcat.comet.timeout");
+                    if ( comettimeout != null ) attach.setTimeout(comettimeout.longValue());
+                }
             }
             
         } catch (InterruptedIOException e) {
@@ -884,7 +888,11 @@ public class Http11NioProcessor implements ActionHook {
                     SelectionKey key = socket.keyFor(endpoint.getPoller().getSelector());
                     if (key != null) {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
-                        if (attach != null) attach.setComet(comet);
+                        if (attach != null)  {
+                            attach.setComet(comet);
+                            Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                            if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
+                        }
                     }
                 } catch (InterruptedIOException e) {
                     error = true;
@@ -1397,6 +1405,8 @@ public class Http11NioProcessor implements ActionHook {
 
         // Advertise comet support through a request attribute
         request.setAttribute("org.apache.tomcat.comet.support", Boolean.TRUE);
+        // Advertise comet timeout support
+        request.setAttribute("org.apache.tomcat.comet.timeout.support", Boolean.TRUE);
 
     }
 

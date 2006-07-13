@@ -1158,16 +1158,17 @@ public class NioEndpoint {
                 }//while
 
                 //timeout
-                Set keys = selector.keys();
+                Set<SelectionKey> keys = selector.keys();
                 long now = System.currentTimeMillis();
-                for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-                    SelectionKey key = (SelectionKey) iter.next();
+                for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext(); ) {
+                    SelectionKey key = iter.next();
                     try {
                         if (key.interestOps() == SelectionKey.OP_READ) {
                             //only timeout sockets that we are waiting for a read from
                             KeyAttachment ka = (KeyAttachment) key.attachment();
                             long delta = now - ka.getLastAccess();
-                            if (delta > (long) soTimeout) {
+                            boolean isTimedout = (ka.getTimeout()==-1)?(delta > (long) soTimeout):(delta>ka.getTimeout());
+                            if (isTimedout) {
                                 cancelledKey(key);
                             }
                         }
@@ -1197,11 +1198,14 @@ public class NioEndpoint {
         public boolean getWakeUp() { return wakeUp; }
         public void setWakeUp(boolean wakeUp) { this.wakeUp = wakeUp; }
         public Object getMutex() {return mutex;}
+        public void setTimeout(long timeout) {this.timeout = timeout;}
+        public long getTimeout() {return this.timeout;}
         protected Object mutex = new Object();
         protected boolean wakeUp = false;
         protected long lastAccess = System.currentTimeMillis();
         protected boolean currentAccess = false;
         protected boolean comet = false;
+        protected long timeout = -1;
 
     }
 

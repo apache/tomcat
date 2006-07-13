@@ -117,7 +117,7 @@ public interface CometProcessor {
      * This method should not be called asynchronously, as that will have no effect.
      * @param request The HTTP servlet request instance
      * @param response The HTTP servlet response instance
-     * @param timeout The timeout in milliseconds for this connection
+     * @param timeout The timeout in milliseconds for this connection, must be a positive value, larger than 0
      * @throws IOException An IOException may be thrown to indicate an IO error, 
      *         or that the EOF has been reached on the connection
      * @throws ServletException An exception has occurred, as specified by the root
