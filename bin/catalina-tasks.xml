@@ -1,0 +1,41 @@
+<!--
+  XML file for importing Catalina ant tasks.
+  <import file="${catalina.home}/bin/catalina-tasks.xml"/>
+-->
+
+<project name="catalina-tasks">
+  <description>Catalina Ant Manager, JMX and JSPC Tasks</description>
+  <!-- set catalina.home if it's not already set -->
+  <dirname property="catalina.home.bin.dir" file="${ant.file.catalina-tasks}"/>
+  <property name="catalina.home" value="${catalina.home.bin.dir}/.."/>
+  <taskdef resource="org/apache/catalina/ant/catalina.tasks">
+    <classpath>
+      <fileset file="${catalina.home}/bin/commons-logging-api.jar"/>
+      <fileset file="${catalina.home}/lib/jasper.jar"/>
+      <fileset file="${catalina.home}/lib/jasper-el.jar"/>
+      <fileset file="${catalina.home}/lib/el-api.jar"/>
+      <fileset file="${catalina.home}/lib/jsp-api.jar"/>
+      <fileset file="${catalina.home}/lib/servlet-api.jar"/>
+      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
+    </classpath>
+  </taskdef>
+  <taskdef resource="org/apache/catalina/ant/jmx/jmxaccessor.tasks">
+    <classpath>
+      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
+    </classpath>
+  </taskdef>
+  <typedef
+        name="jmxEquals"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition">
+    <classpath>
+      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
+    </classpath>
+  </typedef>
+  <typedef
+        name="jmxCondition"
+        classname="org.apache.catalina.ant.jmx.JMXAccessorCondition">
+    <classpath>
+      <fileset file="${catalina.home}/lib/catalina-ant.jar"/>
+    </classpath>
+  </typedef>
+</project>
