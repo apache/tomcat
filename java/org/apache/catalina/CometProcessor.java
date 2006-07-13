@@ -88,7 +88,7 @@ public interface CometProcessor {
      * Reader may be used to determine if there is a risk of blocking: the servlet
      * should read while data is reported available, and can make one additional read
      * without blocking. When encountering a read error or an EOF, the servlet MUST
-     * report it by either returning null or throwing an exception such as an 
+     * report it by either returning false or throwing an exception such as an 
      * IOException. This will cause the error method to be invoked, and the connection
      * will be closed. It is not allowed to attempt reading data from the request object
      * outside of the execution of this method.
@@ -104,5 +104,28 @@ public interface CometProcessor {
      */
     public boolean read(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException;
+    
+    /**
+     * Sets the timeout for this Comet connection. Please NOTE, that the implementation 
+     * of a per connection timeout is OPTIONAL and MAY NOT be implemented.<br/>
+     * This method sets the timeout in milliseconds of idle time on the connection.
+     * The timeout is reset every time data is received from the connection or data is flushed
+     * using <code>response.flushBuffer()</code>. If a timeout occurs, the 
+     * <code>error(HttpServletRequest, HttpServletResponse)</code> method is invoked. The 
+     * web application SHOULD NOT attempt to reuse the request and response objects after a timeout
+     * as the <code>error(HttpServletRequest, HttpServletResponse)</code> method indicates.<br/>
+     * This method should not be called asynchronously, as that will have no effect.
+     * @param request The HTTP servlet request instance
+     * @param response The HTTP servlet response instance
+     * @param timeout The timeout in milliseconds for this connection
+     * @throws IOException An IOException may be thrown to indicate an IO error, 
+     *         or that the EOF has been reached on the connection
+     * @throws ServletException An exception has occurred, as specified by the root
+     *         cause
+     * @throws UnsupportedOperationException if per connection timeout is not supported, either at all or at this phase
+     *         of the invocation.
+     */
+    public void setTimeout(HttpServletRequest request, HttpServletResponse response, int timeout)
+        throws IOException, ServletException, UnsupportedOperationException;
 
 }

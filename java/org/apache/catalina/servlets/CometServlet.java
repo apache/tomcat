@@ -86,7 +86,16 @@ public abstract class CometServlet
                 }
             }
         }
-        
     }
+    
+    public void setTimeout(HttpServletRequest request, HttpServletResponse response, int timeout)
+        throws IOException, ServletException, UnsupportedOperationException {
+        if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
+            request.setAttribute("org.apache.tomcat.comet.timeout",new Integer(timeout));
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
 
 }
