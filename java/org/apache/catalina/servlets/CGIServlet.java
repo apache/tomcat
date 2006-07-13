@@ -19,14 +19,14 @@ package org.apache.catalina.servlets;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -234,7 +234,7 @@ import org.apache.catalina.util.IOTools;
  *
  * @author Martin T Dengler [root@martindengler.com]
  * @author Amy Roh
- * @version $Revision: 383693 $, $Date: 2006-03-06 23:16:24 +0100 (lun., 06 mars 2006) $
+ * @version $Revision: 421476 $, $Date: 2006-07-12 22:08:28 -0400 (Wed, 12 Jul 2006) $
  * @since Tomcat 4.0
  *
  */
@@ -707,7 +707,7 @@ public final class CGIServlet extends HttpServlet {
      * <p>
      * </p>
      *
-     * @version  $Revision: 383693 $, $Date: 2006-03-06 23:16:24 +0100 (lun., 06 mars 2006) $
+     * @version  $Revision: 421476 $, $Date: 2006-07-12 22:08:28 -0400 (Wed, 12 Jul 2006) $
      * @since    Tomcat 4.0
      *
      */
@@ -741,8 +741,8 @@ public final class CGIServlet extends HttpServlet {
         /** cgi command's desired working directory */
         private File workingDirectory = null;
 
-        /** cgi command's query parameters */
-        private ArrayList queryParameters = new ArrayList();
+        /** cgi command's command line parameters */
+        private ArrayList cmdLineParameters = new ArrayList();
 
         /** whether or not this object is valid or not */
         private boolean valid = false;
@@ -762,20 +762,6 @@ public final class CGIServlet extends HttpServlet {
                                  ServletContext context) throws IOException {
             setupFromContext(context);
             setupFromRequest(req);
-
-            Enumeration paramNames = req.getParameterNames();
-            while (paramNames != null && paramNames.hasMoreElements()) {
-                String param = paramNames.nextElement().toString();
-                if (param != null) {
-                    String values[] = req.getParameterValues(param);
-                    for (int i=0; i < values.length; i++) {
-                        String value = URLEncoder.encode(values[i],
-                                                         parameterEncoding);
-                        NameValuePair nvp = new NameValuePair(param, value);
-                        queryParameters.add(nvp);
-                    }
-                }
-            }
 
             this.valid = setCGIEnvironment(req);
 
@@ -807,8 +793,11 @@ public final class CGIServlet extends HttpServlet {
          *
          * @param  req   HttpServletRequest for information provided by
          *               the Servlet API
+         * @throws UnsupportedEncodingException 
          */
-        protected void setupFromRequest(HttpServletRequest req) {
+        protected void setupFromRequest(HttpServletRequest req)
+                throws UnsupportedEncodingException {
+            
             this.contextPath = req.getContextPath();
             this.servletPath = req.getServletPath();
             this.pathInfo = req.getPathInfo();
@@ -817,8 +806,32 @@ public final class CGIServlet extends HttpServlet {
             if (this.pathInfo == null) {
                 this.pathInfo = this.servletPath;
             }
+            
+            // If request is HEAD or GET and Query String does not contain
+            // an unencoded "=" this is an indexed query. Parsed Query String
+            // forms command line parameters for cgi command.
+            if (!"GET".equals(req.getMethod()) &&
+                    !"HEAD".equals(req.getMethod()))
+                return;
+            
+            String qs = req.getQueryString();
+            
+            if (qs == null || qs.indexOf("=")>0)
+                return;
+            
+            int delimIndex = 0;
+            int lastDelimIndex = 0;
+            delimIndex = qs.indexOf("+");
+            
+            while (delimIndex >0) {
+                cmdLineParameters.add(URLDecoder.decode(qs.substring(
+                        lastDelimIndex,delimIndex),parameterEncoding));
+                lastDelimIndex = delimIndex + 1;
+                delimIndex = qs.indexOf("+",lastDelimIndex);
+            }
+            cmdLineParameters.add(URLDecoder.decode(qs.substring(
+                    lastDelimIndex),parameterEncoding));
         }
-
 
 
         /**
@@ -1270,15 +1283,14 @@ public final class CGIServlet extends HttpServlet {
             }
             sb.append("</td></tr>");
 
-            sb.append("<tr><td colspan=2>Query Params</td></tr>");
-            for (int i=0; i < queryParameters.size(); i++) {
-                NameValuePair nvp = (NameValuePair) queryParameters.get(i);
-                sb.append("<tr><td>");
-                sb.append(nvp.getName());
-                sb.append("</td><td>");
-                sb.append(nvp.getValue());
-                sb.append("</td></tr>");
+            sb.append("<tr><td>Command Line Params</td><td>");
+            for (int i=0; i < cmdLineParameters.size(); i++) {
+                String param = (String) cmdLineParameters.get(i);
+                sb.append("<p>");
+                sb.append(param);
+                sb.append("</p>");
             }
+            sb.append("</td></tr>");
 
             sb.append("</TABLE><p>end.");
 
@@ -1330,7 +1342,7 @@ public final class CGIServlet extends HttpServlet {
          *
          */
         protected ArrayList getParameters() {
-            return queryParameters;
+            return cmdLineParameters;
         }
 
 
@@ -1422,7 +1434,7 @@ public final class CGIServlet extends HttpServlet {
      * and <code>setResponse</code> methods, respectively.
      * </p>
      *
-     * @version   $Revision: 383693 $, $Date: 2006-03-06 23:16:24 +0100 (lun., 06 mars 2006) $
+     * @version   $Revision: 421476 $, $Date: 2006-07-12 22:08:28 -0400 (Wed, 12 Jul 2006) $
      */
 
     protected class CGIRunner {
@@ -1436,7 +1448,7 @@ public final class CGIServlet extends HttpServlet {
         /** working directory used when invoking the cgi script */
         private File wd = null;
 
-        /** query parameters to be passed to the invoked script */
+        /** command line parameters to be passed to the invoked script */
         private ArrayList params = null;
 
         /** stdin to be passed to cgi script */
@@ -1462,8 +1474,8 @@ public final class CGIServlet extends HttpServlet {
          * @param  command  string full path to command to be executed
          * @param  env      Hashtable with the desired script environment
          * @param  wd       File with the script's desired working directory
-         * @param  params   ArrayList with the script's query parameters as
-         *                  NameValuePairs
+         * @param  params   ArrayList with the script's query command line
+         *                  paramters as strings
          */
         protected CGIRunner(String command, Hashtable env, File wd,
                             ArrayList params) {
@@ -1657,21 +1669,14 @@ public final class CGIServlet extends HttpServlet {
 
             for (int i=0; i < params.size(); i++) {
                 cmdAndArgs.append(" ");
-                NameValuePair nvp = (NameValuePair) params.get(i); 
-                String k = nvp.getName();
-                String v = nvp.getValue();
-                if ((k.indexOf("=") < 0) && (v.indexOf("=") < 0)) {
-                    StringBuffer arg = new StringBuffer(k);
-                    arg.append("=");
-                    arg.append(v);
-                    if (arg.toString().indexOf(" ") < 0) {
-                        cmdAndArgs.append(arg);
-                    } else {
-                        // Spaces used as delimiter, so need to use quotes
-                        cmdAndArgs.append("\"");
-                        cmdAndArgs.append(arg);
-                        cmdAndArgs.append("\"");
-                    }
+                String param = (String) params.get(i);
+                if (param.indexOf(" ") < 0) {
+                    cmdAndArgs.append(param);
+                } else {
+                    // Spaces used as delimiter, so need to use quotes
+                    cmdAndArgs.append("\"");
+                    cmdAndArgs.append(param);
+                    cmdAndArgs.append("\"");
                 }
             }
 
@@ -1680,48 +1685,14 @@ public final class CGIServlet extends HttpServlet {
             command.append(cmdAndArgs.toString());
             cmdAndArgs = command;
 
-            String sContentLength = (String) env.get("CONTENT_LENGTH");
-            ByteArrayOutputStream contentStream = null;
-            if(!"".equals(sContentLength)) {
-                byte[] content = new byte[Integer.parseInt(sContentLength)];
-
-                // Bugzilla 32023
-                int lenRead = 0;
-                do {
-                    int partRead = stdin.read(content,lenRead,content.length-lenRead);
-                    lenRead += partRead;
-                } while (lenRead > 0 && lenRead < content.length);
-
-                contentStream = new ByteArrayOutputStream(
-                        Integer.parseInt(sContentLength));
-                if ("POST".equals(env.get("REQUEST_METHOD"))) {
-                    String paramStr = getPostInput(params);
-                    if (paramStr != null) {
-                        byte[] paramBytes = paramStr.getBytes();
-                        contentStream.write(paramBytes);
-
-                        int contentLength = paramBytes.length;
-                        if (lenRead > 0) {
-                            String lineSep = System.getProperty("line.separator");
-                            contentStream.write(lineSep.getBytes());
-                            contentLength = lineSep.length() + lenRead;
-                        }
-                        env.put("CONTENT_LENGTH", Integer.toString(contentLength));
-                    }
-                }
-
-                if (lenRead > 0) {
-                    contentStream.write(content, 0, lenRead);
-                }
-                contentStream.close();
-            }
-
             rt = Runtime.getRuntime();
             proc = rt.exec(cmdAndArgs.toString(), hashToStringArray(env), wd);
 
-            if(contentStream != null) {
+            String sContentLength = (String) env.get("CONTENT_LENGTH");
+
+            if(!"".equals(sContentLength)) {
                 commandsStdIn = new BufferedOutputStream(proc.getOutputStream());
-                commandsStdIn.write(contentStream.toByteArray());
+                IOTools.flow(stdin, commandsStdIn);
                 commandsStdIn.flush();
                 commandsStdIn.close();
             }
@@ -1893,62 +1864,7 @@ public final class CGIServlet extends HttpServlet {
                 log("runCGI: " + lineCount + " lines received on stderr") ;
             } ;
         }
-
-
-        /**
-         * Gets a string for input to a POST cgi script
-         *
-         * @param  params   ArrayList of query parameters to be passed to
-         *                  the CGI script
-         * @return          for use as input to the CGI script
-         */
-
-        protected String getPostInput(ArrayList params) {
-            StringBuffer qs = new StringBuffer("");
-            for (int i=0; i < params.size(); i++) {
-                NameValuePair nvp = (NameValuePair) this.params.get(i); 
-                String k = nvp.getName();
-                String v = nvp.getValue();
-                if ((k.indexOf("=") < 0) && (v.indexOf("=") < 0)) {
-                    qs.append(k);
-                    qs.append("=");
-                    qs.append(v);
-                    qs.append("&");
-                }
-            }
-            if (qs.length() > 0) {
-                // Remove last "&"
-                qs.setLength(qs.length() - 1);
-                return qs.toString();
-            } else {
-                return null;
-            }
-        }
     } //class CGIRunner
-
-    /**
-     * This is a simple class for storing name-value pairs.
-     * 
-     * TODO: It might be worth moving this to the utils package there is a
-     * wider requirement for this functionality.
-     */
-    protected class NameValuePair {
-        private String name;
-        private String value;
-        
-        NameValuePair(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-        
-        protected String getName() {
-            return name;
-        }
-        
-        protected String getValue() {
-            return value;
-        }
-    }
 
     /**
      * This is an input stream specifically for reading HTTP headers. It reads
