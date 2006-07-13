@@ -260,6 +260,13 @@
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
             file="${tomcat-native.tar.gz}" />
 
+  	<!-- Copy scripts -->
+    <copy todir="${tomcat.build}/bin">
+      <fileset dir="bin">
+         <exclude name="**/*.launch"/>
+      </fileset>
+    </copy>
+
   	<!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
       <fileset dir="conf">
