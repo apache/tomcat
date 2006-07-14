@@ -967,6 +967,7 @@ public class NioEndpoint {
         protected Selector selector;
         protected LinkedList<Runnable> events = new LinkedList<Runnable>();
         protected boolean close = false;
+        protected long nextExpiration = 0;//optimize expiration handling
 
         protected int keepAliveCount = 0;
         public int getKeepAliveCount() { return keepAliveCount; }
@@ -1029,6 +1030,10 @@ public class NioEndpoint {
                         if (key != null) key.interestOps(SelectionKey.OP_READ);
                     }catch ( CancelledKeyException ckx ) {
                         try {
+                            if ( key != null && key.attachment() != null ) {
+                                KeyAttachment ka = (KeyAttachment)key.attachment();
+                                ka.setError(true); //set to collect this socket immediately
+                            }
                             socket.socket().close();
                             socket.close();
                         } catch ( Exception ignore ) {}
@@ -1075,7 +1080,7 @@ public class NioEndpoint {
             try {
                 KeyAttachment ka = (KeyAttachment) key.attachment();
                 key.cancel();
-                if (ka.getComet()) processSocket( (SocketChannel) key.channel(), true);
+                if (ka != null && ka.getComet()) processSocket( (SocketChannel) key.channel(), true);
                 key.channel().close();
             } catch (IOException e) {
                 if ( log.isDebugEnabled() ) log.debug("",e);
@@ -1156,34 +1161,45 @@ public class NioEndpoint {
                         log.error("",t);
                     }
                 }//while
-
-                //timeout
-                Set<SelectionKey> keys = selector.keys();
-                long now = System.currentTimeMillis();
-                for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext(); ) {
-                    SelectionKey key = iter.next();
-                    try {
-                        if (key.interestOps() == SelectionKey.OP_READ) {
-                            //only timeout sockets that we are waiting for a read from
-                            KeyAttachment ka = (KeyAttachment) key.attachment();
-                            long delta = now - ka.getLastAccess();
-                            boolean isTimedout = (ka.getTimeout()==-1)?(delta > (long) soTimeout):(delta>ka.getTimeout());
-                            if (isTimedout) {
-                                cancelledKey(key);
-                            }
-                        }
-                    }catch ( CancelledKeyException ckx ) {
-                        cancelledKey(key);
-                    }
-                }
-
+                //process timeouts
+                timeout();
             }
             synchronized (this) {
                 this.notifyAll();
             }
 
         }
-
+        protected void timeout() {
+            long now = System.currentTimeMillis();
+            if ( now < nextExpiration ) return;
+            nextExpiration = now + (long)soTimeout;
+            //timeout
+            Set<SelectionKey> keys = selector.keys();
+            for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext(); ) {
+                SelectionKey key = iter.next();
+                try {
+                    KeyAttachment ka = (KeyAttachment) key.attachment();
+                    if ( ka == null ) {
+                        cancelledKey(key); //we don't support any keys without attachments
+                    } else if ( ka.getError() ) {
+                        cancelledKey(key);
+                    }else if ((key.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                        //only timeout sockets that we are waiting for a read from
+                        long delta = now - ka.getLastAccess();
+                        long timeout = (ka.getTimeout()==-1)?((long) soTimeout):(ka.getTimeout());
+                        boolean isTimedout = delta > timeout;
+                        if (isTimedout) {
+                            cancelledKey(key);
+                        } else {
+                            long nextTime = now+(timeout-delta);
+                            nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
+                        }
+                    }//end if
+                }catch ( CancelledKeyException ckx ) {
+                    cancelledKey(key);
+                }
+            }//for
+        }
     }
     
     public static class KeyAttachment {
@@ -1200,12 +1216,15 @@ public class NioEndpoint {
         public Object getMutex() {return mutex;}
         public void setTimeout(long timeout) {this.timeout = timeout;}
         public long getTimeout() {return this.timeout;}
+        public boolean getError() { return error; }
+        public void setError(boolean error) { this.error = error; }
         protected Object mutex = new Object();
         protected boolean wakeUp = false;
         protected long lastAccess = System.currentTimeMillis();
         protected boolean currentAccess = false;
         protected boolean comet = false;
         protected long timeout = -1;
+        protected boolean error = false;
 
     }
 

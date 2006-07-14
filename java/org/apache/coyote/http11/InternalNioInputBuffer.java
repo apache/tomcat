@@ -572,21 +572,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                     boolean addToQueue = false;
                     try { addToQueue = ((key.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ignore ){}
                     if ( addToQueue ) {
-                        att.setWakeUp(true);
-                        poller.addEvent(
-                            new Runnable() {
-                            public void run() {
-                                try {
-                                    if (key != null) key.interestOps(SelectionKey.OP_READ);
-                                } catch (CancelledKeyException ckx) {
-                                    try {
-                                        socket.socket().close();
-                                        socket.close();
-                                        att.setWakeUp(false);
-                                    } catch (Exception ignore) {}
-                                }
-                            }
-                        });
+                        addToReadQueue(key, att);
                     }//end if
                     synchronized (att.getMutex()) {
                         if ( att.getWakeUp() ) att.getMutex().wait(25);
@@ -596,6 +582,28 @@ public class InternalNioInputBuffer implements InputBuffer {
         //else throw new IOException(sm.getString("iib.failedread"));
         //return false; //timeout
         throw new IOException("read timed out.");
+    }
+
+    private void addToReadQueue(final SelectionKey key, final KeyAttachment att) {
+        att.setWakeUp(true);
+        poller.addEvent(
+            new Runnable() {
+            public void run() {
+                try {
+                    if (key != null) key.interestOps(SelectionKey.OP_READ);
+                } catch (CancelledKeyException ckx) {
+                    try {
+                        if ( key != null && key.attachment() != null ) {
+                            KeyAttachment ka = (KeyAttachment)key.attachment();
+                            ka.setError(true); //set to collect this socket immediately
+                        }
+                        socket.socket().close();
+                        socket.close();
+                        att.setWakeUp(false);
+                    } catch (Exception ignore) {}
+                }
+            }
+        });
     }
 
 
