@@ -39,6 +39,7 @@ import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.res.StringManager;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -965,7 +966,7 @@ public class NioEndpoint {
     public class Poller implements Runnable {
 
         protected Selector selector;
-        protected LinkedList<Runnable> events = new LinkedList<Runnable>();
+        protected ConcurrentLinkedQueue<Runnable> events = new ConcurrentLinkedQueue<Runnable>();
         protected boolean close = false;
         protected long nextExpiration = 0;//optimize expiration handling
 
@@ -1006,9 +1007,7 @@ public class NioEndpoint {
         }
         
         public void addEvent(Runnable event) {
-            synchronized (events) {
-                events.add(event);
-            }
+            events.add(event);
             selector.wakeup();
         }
 
@@ -1044,16 +1043,13 @@ public class NioEndpoint {
         }
 
         public void events() {
-            synchronized (events) {
-                Runnable r = null;
-                while ( (events.size() > 0) && (r = events.removeFirst()) != null ) {
-                    try {
-                        r.run();
-                    } catch ( Exception x ) {
-                        log.error("",x);
-                    }
+            Runnable r = null;
+            while ( (events.size() > 0) && (r = events.poll()) != null ) {
+                try {
+                    r.run();
+                } catch ( Exception x ) {
+                    log.error("",x);
                 }
-                events.clear();
             }
         }
         
@@ -1070,9 +1066,7 @@ public class NioEndpoint {
                 }
     
             };
-            synchronized (events) {
-                events.add(r);
-            }
+            events.add(r);
             selector.wakeup();
         }
         
