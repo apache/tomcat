@@ -1048,7 +1048,8 @@ public class Http11NioProcessor implements ActionHook {
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                 if ( attach!=null && attach.getComet()) {
-                    //we need to recycle
+                    //if this is a comet connection
+                    //then execute the connection closure at the next selector loop
                     request.getAttributes().remove("org.apache.tomcat.comet.timeout");
                     attach.setError(true);
                 }
