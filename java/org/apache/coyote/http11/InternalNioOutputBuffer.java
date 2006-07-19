@@ -571,16 +571,11 @@ public class InternalNioOutputBuffer
 
     int total = 0;
     private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
-        try {
-            if (bbuf.capacity() <= (offset + length)) {
-                flushBuffer();
-            }
-            bbuf.put(buf, offset, length);
-            total += length;
-        }catch ( Exception x ) {
-            x.printStackTrace();
+        if (bbuf.capacity() <= (offset + length)) {
+            flushBuffer();
         }
-        //System.out.println("Total:"+total);
+        bbuf.put(buf, offset, length);
+        total += length;
     }
 
 

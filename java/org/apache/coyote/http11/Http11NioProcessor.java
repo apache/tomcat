@@ -174,7 +174,14 @@ public class Http11NioProcessor implements ActionHook {
      * Comet used.
      */
     protected boolean comet = false;
-
+    
+    /**
+     * Closed flag, a Comet async thread can 
+     * signal for this Nio processor to be closed and recycled instead
+     * of waiting for a timeout.
+     * Closed by HttpServletResponse.getWriter().close()
+     */
+    protected boolean cometClose = false;
 
     /**
      * Content delimitator for the request (if false, the connection will
@@ -970,6 +977,8 @@ public class Http11NioProcessor implements ActionHook {
         inputBuffer.recycle();
         outputBuffer.recycle();
         this.socket = null;
+        this.cometClose = false;
+        this.comet = false;
     }
 
 
@@ -1034,6 +1043,17 @@ public class Http11NioProcessor implements ActionHook {
             // transactions with the client
 
             comet = false;
+            cometClose = true;
+            SelectionKey key = socket.keyFor(endpoint.getPoller().getSelector());
+            if ( key != null ) {
+                NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
+                if ( attach!=null && attach.getComet()) {
+                    //we need to recycle
+                    request.getAttributes().remove("org.apache.tomcat.comet.timeout");
+                    attach.setError(true);
+                }
+            }
+
             try {
                 outputBuffer.endRequest();
             } catch (IOException e) {

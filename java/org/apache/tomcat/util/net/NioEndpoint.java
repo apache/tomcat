@@ -312,7 +312,7 @@ public class NioEndpoint {
     public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
     public int getPollerThreadCount() { return pollerThreadCount; }
 
-    protected long selectorTimeout = 5000;
+    protected long selectorTimeout = 1000;
     public void setSelectorTimeout(long timeout){ this.selectorTimeout = timeout;}
     public long getSelectorTimeout(){ return this.selectorTimeout; }
     /**
@@ -1043,9 +1043,11 @@ public class NioEndpoint {
             addEvent(r);
         }
 
-        public void events() {
+        public boolean events() {
+            boolean result = false;
             synchronized (events) {
                 Runnable r = null;
+                result = (events.size() > 0);
                 while ( (events.size() > 0) && (r = events.removeFirst()) != null ) {
                     try {
                         r.run();
@@ -1055,6 +1057,7 @@ public class NioEndpoint {
                 }
                 events.clear();
             }
+            return result;
         }
         
         public void register(final SocketChannel socket)
@@ -1103,8 +1106,9 @@ public class NioEndpoint {
                         // Ignore
                     }
                 }
+                boolean hasEvents = false;
 
-                events();
+                hasEvents = (hasEvents | events());
                 // Time to terminate?
                 if (close) return;
 
@@ -1115,8 +1119,9 @@ public class NioEndpoint {
                     log.error("",x);
                     continue;
                 }
-                
-            
+
+                //either we timed out or we woke up, process events first
+                if ( keyCount == 0 ) hasEvents = (hasEvents | events());
 
                 //if (keyCount == 0) continue;
 
@@ -1162,16 +1167,18 @@ public class NioEndpoint {
                     }
                 }//while
                 //process timeouts
-                timeout();
-            }
+                timeout(keyCount,hasEvents);
+            }//while
             synchronized (this) {
                 this.notifyAll();
             }
 
         }
-        protected void timeout() {
+        protected void timeout(int keyCount, boolean hasEvents) {
             long now = System.currentTimeMillis();
-            if ( now < nextExpiration ) return;
+            //don't process timeouts too frequently, but if the selector simply timed out
+            //then we can check timeouts to avoid gaps
+            if ( (now < nextExpiration) && (keyCount>0 || hasEvents) ) return;
             nextExpiration = now + (long)soTimeout;
             //timeout
             Set<SelectionKey> keys = selector.keys();
