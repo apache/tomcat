@@ -293,11 +293,21 @@ public class CoyoteAdapter
             req.serverName().setString(proxyName);
         }
 
+        // Parse session Id
+        parseSessionId(req, request);
+
         // URI decoding
         MessageBytes decodedURI = req.decodedURI();
         decodedURI.duplicate(req.requestURI());
 
         if (decodedURI.getType() == MessageBytes.T_BYTES) {
+            // Remove any path parameters
+            ByteChunk uriBB = decodedURI.getByteChunk();
+            int semicolon = uriBB.indexOf(';', 0);
+            if (semicolon > 0) {
+                decodedURI.setBytes
+                    (uriBB.getBuffer(), uriBB.getStart(), semicolon);
+            }
             // %xx decoding of the URL
             try {
                 req.getURLDecoder().convert(decodedURI, false);
@@ -319,6 +329,13 @@ public class CoyoteAdapter
             // protocol handler, we have to assume the URL has been properly
             // decoded already
             decodedURI.toChars();
+            // Remove any path parameters
+            CharChunk uriCC = decodedURI.getCharChunk();
+            int semicolon = uriCC.indexOf(';');
+            if (semicolon > 0) {
+                decodedURI.setChars
+                    (uriCC.getBuffer(), uriCC.getStart(), semicolon);
+            }
         }
 
         // Set the remote principal
@@ -331,19 +348,6 @@ public class CoyoteAdapter
         String authtype = req.getAuthType().toString();
         if (authtype != null) {
             request.setAuthType(authtype);
-        }
-
-        // Parse session Id
-        parseSessionId(req, request);
-
-        // Remove any remaining parameters (other than session id, which has
-        // already been removed in parseSessionId()) from the URI, so they
-        // won't be considered by the mapping algorithm.
-        CharChunk uriCC = decodedURI.getCharChunk();
-        int semicolon = uriCC.indexOf(';');
-        if (semicolon > 0) {
-            decodedURI.setChars
-                (uriCC.getBuffer(), uriCC.getStart(), semicolon);
         }
 
         // Request mapping.
@@ -420,49 +424,35 @@ public class CoyoteAdapter
      */
     protected void parseSessionId(org.apache.coyote.Request req, Request request) {
 
-        CharChunk uriCC = req.decodedURI().getCharChunk();
-        int semicolon = uriCC.indexOf(match, 0, match.length(), 0);
+        ByteChunk uriBC = req.requestURI().getByteChunk();
+        int semicolon = uriBC.indexOf(match, 0, match.length(), 0);
 
         if (semicolon > 0) {
 
             // Parse session ID, and extract it from the decoded request URI
-            int start = uriCC.getStart();
-            int end = uriCC.getEnd();
+            int start = uriBC.getStart();
+            int end = uriBC.getEnd();
 
-            int sessionIdStart = start + semicolon + match.length();
-            int semicolon2 = uriCC.indexOf(';', sessionIdStart);
+            int sessionIdStart = semicolon + match.length();
+            int semicolon2 = uriBC.indexOf(';', sessionIdStart);
             if (semicolon2 >= 0) {
                 request.setRequestedSessionId
-                    (new String(uriCC.getBuffer(), sessionIdStart, 
-                                semicolon2 - semicolon - match.length()));
+                    (new String(uriBC.getBuffer(), start + sessionIdStart, 
+                            semicolon2 - sessionIdStart));
+                // Extract session ID from request URI
+                byte[] buf = uriBC.getBuffer();
+                for (int i = 0; i < end - start - semicolon2; i++) {
+                    buf[start + semicolon + i] 
+                        = buf[start + i + semicolon2];
+                }
+                uriBC.setBytes(buf, start, end - start - semicolon2 + semicolon);
             } else {
                 request.setRequestedSessionId
-                    (new String(uriCC.getBuffer(), sessionIdStart, 
-                                end - sessionIdStart));
+                    (new String(uriBC.getBuffer(), start + sessionIdStart, 
+                            (end - start) - sessionIdStart));
+                uriBC.setEnd(start + semicolon);
             }
             request.setRequestedSessionURL(true);
-
-            // Extract session ID from request URI
-            ByteChunk uriBC = req.requestURI().getByteChunk();
-            start = uriBC.getStart();
-            end = uriBC.getEnd();
-            semicolon = uriBC.indexOf(match, 0, match.length(), 0);
-
-            if (semicolon > 0) {
-                sessionIdStart = start + semicolon;
-                semicolon2 = uriCC.indexOf
-                    (';', start + semicolon + match.length());
-                uriBC.setEnd(start + semicolon);
-                byte[] buf = uriBC.getBuffer();
-                if (semicolon2 >= 0) {
-                    for (int i = 0; i < end - start - semicolon2; i++) {
-                        buf[start + semicolon + i] 
-                            = buf[start + i + semicolon2];
-                    }
-                    uriBC.setBytes(buf, start, semicolon 
-                                   + (end - start - semicolon2));
-                }
-            }
 
         } else {
             request.setRequestedSessionId(null);
