@@ -1333,7 +1333,6 @@ public class NioEndpoint {
 
             // Process requests until we receive a shutdown signal
             while (running) {
-
                 // Wait for the next socket to be assigned
                 SocketChannel socket = await();
                 if (socket == null)
@@ -1357,12 +1356,11 @@ public class NioEndpoint {
                         log.error("",x);
                     }
                 }
-
+                //dereference socket to let GC do its job
+                socket = null;
                 // Finish up this request
                 recycleWorkerThread(this);
-
             }
-
         }
 
 
