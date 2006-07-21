@@ -24,8 +24,6 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
@@ -33,11 +31,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.jni.Error;
-import org.apache.tomcat.jni.Library;
-import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.SSL;
-import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -545,9 +539,9 @@ public class NioEndpoint {
             // Initialize SSL
             // FIXME: one per VM call ?
             if ("on".equalsIgnoreCase(SSLEngine)) {
-                SSL.initialize(null);
+                //SSL.initialize(null);
             } else {
-                SSL.initialize(SSLEngine);
+                //SSL.initialize(SSLEngine);
             }
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_ALL;
@@ -844,24 +838,6 @@ public class NioEndpoint {
             workers.push(workerThread);
             curThreadsBusy--;
             workers.notify();
-        }
-    }
-
-
-    /**
-     * Allocate a new poller of the specified size.
-     */
-    protected long allocatePoller(int size, long pool, int timeout) {
-        try {
-            return Poll.create(size, pool, 0, timeout * 1000);
-        } catch (Error e) {
-            if (Status.APR_STATUS_IS_EINVAL(e.getError())) {
-                log.info(sm.getString("endpoint.poll.limitedpollsize", "" + size));
-                return 0;
-            } else {
-                log.error(sm.getString("endpoint.poll.initfail"), e);
-                return -1;
-            }
         }
     }
 
