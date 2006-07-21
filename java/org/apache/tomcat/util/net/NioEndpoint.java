@@ -1133,29 +1133,31 @@ public class NioEndpoint {
                     iterator.remove();
                     KeyAttachment attachment = (KeyAttachment)sk.attachment();
                     try {
-                        if(attachment == null) attachment = new KeyAttachment();
-                        attachment.access();
-                        sk.attach(attachment);
-
-                        int readyOps = sk.readyOps();
-                        sk.interestOps(sk.interestOps() & ~readyOps);
-                        SocketChannel channel = (SocketChannel)sk.channel();
-                        boolean read = sk.isReadable();
-                        if (read) {
-                            if ( attachment.getWakeUp() ) {
-                                attachment.setWakeUp(false);
-                                synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
-                            } else if ( attachment.getComet() ) {
-                                if (!processSocket(channel,false)) processSocket(channel,true);
-                            } else {
-                                boolean close = (!processSocket(channel));
-                                if ( close ) {
-                                    channel.socket().close();
-                                    channel.close();
+                        if ( sk.isValid() ) {
+                            if(attachment == null) attachment = new KeyAttachment();
+                            attachment.access();
+                            sk.attach(attachment);
+                            int readyOps = sk.readyOps();
+                            sk.interestOps(sk.interestOps() & ~readyOps);
+                            SocketChannel channel = (SocketChannel)sk.channel();
+                            boolean read = sk.isReadable();
+                            if (read) {
+                                if ( attachment.getWakeUp() ) {
+                                    attachment.setWakeUp(false);
+                                    synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
+                                } else if ( attachment.getComet() ) {
+                                    if (!processSocket(channel,false)) processSocket(channel,true);
+                                } else {
+                                    boolean close = (!processSocket(channel));
+                                    if ( close ) {
+                                        channel.socket().close();
+                                        channel.close();
+                                    }
                                 }
                             }
-                        }
-                        if (sk.isValid() && sk.isWritable()) {
+                        } else {
+                            //invalid key
+                            cancelledKey(sk);
                         }
                     } catch ( CancelledKeyException ckx ) {
                         if (attachment!=null && attachment.getComet()) processSocket( (SocketChannel) sk.channel(), true);
