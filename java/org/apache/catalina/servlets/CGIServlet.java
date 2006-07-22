@@ -1685,103 +1685,118 @@ public final class CGIServlet extends HttpServlet {
             command.append(cmdAndArgs.toString());
             cmdAndArgs = command;
 
-            rt = Runtime.getRuntime();
-            proc = rt.exec(cmdAndArgs.toString(), hashToStringArray(env), wd);
-
-            String sContentLength = (String) env.get("CONTENT_LENGTH");
-
-            if(!"".equals(sContentLength)) {
-                commandsStdIn = new BufferedOutputStream(proc.getOutputStream());
-                IOTools.flow(stdin, commandsStdIn);
-                commandsStdIn.flush();
-                commandsStdIn.close();
-            }
-
-            /* we want to wait for the process to exit,  Process.waitFor()
-             * is useless in our situation; see
-             * http://developer.java.sun.com/developer/
-             *                               bugParade/bugs/4223650.html
-             */
-
-            boolean isRunning = true;
-            commandsStdErr = new BufferedReader
-                (new InputStreamReader(proc.getErrorStream()));
-            final BufferedReader stdErrRdr = commandsStdErr ;
-
-            new Thread() {
-                public void run () {
-                    sendToLog(stdErrRdr) ;
-                } ;
-            }.start() ;
-
-            InputStream cgiHeaderStream =
-                new HTTPHeaderInputStream(proc.getInputStream());
-            BufferedReader cgiHeaderReader =
-                new BufferedReader(new InputStreamReader(cgiHeaderStream));
-            
-            while (isRunning) {
-                try {
-                    //set headers
-                    String line = null;
-                    while (((line = cgiHeaderReader.readLine()) != null)
-                           && !("".equals(line))) {
-                        if (debug >= 2) {
-                            log("runCGI: addHeader(\"" + line + "\")");
-                        }
-                        if (line.startsWith("HTTP")) {
-                            response.setStatus(getSCFromHttpStatusLine(line));
-                        } else if (line.indexOf(":") >= 0) {
-                            String header =
-                                line.substring(0, line.indexOf(":")).trim();
-                            String value =
-                                line.substring(line.indexOf(":") + 1).trim(); 
-                            if (header.equalsIgnoreCase("status")) {
-                                response.setStatus(getSCFromCGIStatusHeader(value));
-                            } else {
-                                response.addHeader(header , value);
-                            }
-                        } else {
-                            log("runCGI: bad header line \"" + line + "\"");
-                        }
-                    }
-
-                    //write output
-                    byte[] bBuf = new byte[2048];
-
-                    OutputStream out = response.getOutputStream();
-                    cgiOutput = proc.getInputStream();
-
-                    try {
-                        while ((bufRead = cgiOutput.read(bBuf)) != -1) {
-                            if (debug >= 4) {
-                                log("runCGI: output " + bufRead +
-                                    " bytes of data");
-                            }
-                            out.write(bBuf, 0, bufRead);
-                        }
-                    } finally {
-                        // Attempt to consume any leftover byte if something bad happens,
-                        // such as a socket disconnect on the servlet side; otherwise, the
-                        // external process could hang
-                        if (bufRead != -1) {
-                            while ((bufRead = cgiOutput.read(bBuf)) != -1) {}
-                        }
-                    }
+            try {
+                rt = Runtime.getRuntime();
+                proc = rt.exec(cmdAndArgs.toString(), hashToStringArray(env), wd);
     
-                    proc.exitValue(); // Throws exception if alive
+                String sContentLength = (String) env.get("CONTENT_LENGTH");
 
-                    isRunning = false;
-
-                } catch (IllegalThreadStateException e) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException ignored) {
-                    }
+                if(!"".equals(sContentLength)) {
+                    commandsStdIn = new BufferedOutputStream(proc.getOutputStream());
+                    IOTools.flow(stdin, commandsStdIn);
+                    commandsStdIn.flush();
+                    commandsStdIn.close();
                 }
-            } //replacement for Process.waitFor()
 
-            // Close the output stream used
-            cgiOutput.close();
+                /* we want to wait for the process to exit,  Process.waitFor()
+                 * is useless in our situation; see
+                 * http://developer.java.sun.com/developer/
+                 *                               bugParade/bugs/4223650.html
+                 */
+
+                boolean isRunning = true;
+                commandsStdErr = new BufferedReader
+                    (new InputStreamReader(proc.getErrorStream()));
+                final BufferedReader stdErrRdr = commandsStdErr ;
+
+                new Thread() {
+                    public void run () {
+                        sendToLog(stdErrRdr) ;
+                    } ;
+                }.start() ;
+
+                InputStream cgiHeaderStream =
+                    new HTTPHeaderInputStream(proc.getInputStream());
+                BufferedReader cgiHeaderReader =
+                    new BufferedReader(new InputStreamReader(cgiHeaderStream));
+            
+                while (isRunning) {
+                    try {
+                        //set headers
+                        String line = null;
+                        while (((line = cgiHeaderReader.readLine()) != null)
+                               && !("".equals(line))) {
+                            if (debug >= 2) {
+                                log("runCGI: addHeader(\"" + line + "\")");
+                            }
+                            if (line.startsWith("HTTP")) {
+                                response.setStatus(getSCFromHttpStatusLine(line));
+                            } else if (line.indexOf(":") >= 0) {
+                                String header =
+                                    line.substring(0, line.indexOf(":")).trim();
+                                String value =
+                                    line.substring(line.indexOf(":") + 1).trim(); 
+                                if (header.equalsIgnoreCase("status")) {
+                                    response.setStatus(getSCFromCGIStatusHeader(value));
+                                } else {
+                                    response.addHeader(header , value);
+                                }
+                            } else {
+                                log("runCGI: bad header line \"" + line + "\"");
+                            }
+                        }
+    
+                        //write output
+                        byte[] bBuf = new byte[2048];
+    
+                        OutputStream out = response.getOutputStream();
+                        cgiOutput = proc.getInputStream();
+    
+                        try {
+                            while ((bufRead = cgiOutput.read(bBuf)) != -1) {
+                                if (debug >= 4) {
+                                    log("runCGI: output " + bufRead +
+                                        " bytes of data");
+                                }
+                                out.write(bBuf, 0, bufRead);
+                            }
+                        } finally {
+                            // Attempt to consume any leftover byte if something bad happens,
+                            // such as a socket disconnect on the servlet side; otherwise, the
+                            // external process could hang
+                            if (bufRead != -1) {
+                                while ((bufRead = cgiOutput.read(bBuf)) != -1) {}
+                            }
+                        }
+        
+                        proc.exitValue(); // Throws exception if alive
+    
+                        isRunning = false;
+    
+                    } catch (IllegalThreadStateException e) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException ignored) {
+                        }
+                    }
+                } //replacement for Process.waitFor()
+    
+                // Close the output stream used
+                cgiOutput.close();
+            }
+            catch (IOException e){
+                log ("Caught exception " + e);
+                throw new IOException (e.toString());
+            }
+            finally{
+                if (debug > 4) {
+                    log ("Running finally block");
+                }
+                if (proc != null){
+                    proc.destroy();
+                    proc = null;
+                }
+            }
         }
 
         /**
