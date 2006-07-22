@@ -232,12 +232,14 @@ public class SSIProcessor {
         boolean inside = false;
         String[] vals = new String[count];
         StringBuffer sb = new StringBuffer();
+        char endQuote = 0;
         for (int bIdx = start; bIdx < cmd.length(); bIdx++) {
             if (!inside) {
-                while (bIdx < cmd.length() && cmd.charAt(bIdx) != '"')
+                while (bIdx < cmd.length() && !isQuote(cmd.charAt(bIdx)))
                     bIdx++;
                 if (bIdx >= cmd.length()) break;
                 inside = !inside;
+                endQuote = cmd.charAt(bIdx);
             } else {
                 boolean escaped = false;
                 for (; bIdx < cmd.length(); bIdx++) {
@@ -248,7 +250,7 @@ public class SSIProcessor {
                         continue;
                     }
                     // If we reach the other " then stop
-                    if (c == '"' && !escaped) break;
+                    if (c == endQuote && !escaped) break;
                     // Since parsing of attributes and var
                     // substitution is done in separate places,
                     // we need to leave escape in the string
@@ -309,5 +311,9 @@ public class SSIProcessor {
 
     protected boolean isSpace(char c) {
         return c == ' ' || c == '\n' || c == '\t' || c == '\r';
+    }
+    
+    protected boolean isQuote(char c) {
+        return c == '\'' || c == '\"' || c == '`';
     }
 }
