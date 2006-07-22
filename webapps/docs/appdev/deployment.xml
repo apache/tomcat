@@ -116,7 +116,7 @@ used within a Tomcat 5 installation for shared code:</p>
     good place to put JDBC drivers that are required for both your application
     and internal Tomcat use (such as for a JDBCRealm).
     <br/><br/></li>
-<li><strong>$CATALINA_HOME/shared/lib</strong> - JAR files placed here are
+<li><strong>$CATALINA_BASE/shared/lib</strong> - JAR files placed here are
     visible to all web applications, but not to internal Tomcat code.  This
     is the right place for shared libraries that are specific to your
     application.<br/><br/></li>
