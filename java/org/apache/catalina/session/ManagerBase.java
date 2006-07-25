@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,9 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -171,7 +173,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      * The set of currently active Sessions for this Manager, keyed by
      * session identifier.
      */
-    protected HashMap sessions = new HashMap();
+    protected Map sessions = new ConcurrentHashMap();
 
     // Number of sessions created by this manager
     protected int sessionCounter=0;
@@ -731,11 +733,10 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      */
     public void add(Session session) {
 
-        synchronized (sessions) {
-            sessions.put(session.getIdInternal(), session);
-            if( sessions.size() > maxActive ) {
-                maxActive=sessions.size();
-            }
+        sessions.put(session.getIdInternal(), session);
+        int size = sessions.size();
+        if( size > maxActive ) {
+            maxActive = size;
         }
     }
 
@@ -854,10 +855,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
 
         if (id == null)
             return (null);
-        synchronized (sessions) {
-            Session session = (Session) sessions.get(id);
-            return (session);
-        }
+        return (Session) sessions.get(id);
 
     }
 
@@ -885,9 +883,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      */
     public void remove(Session session) {
 
-        synchronized (sessions) {
-            sessions.remove(session.getIdInternal());
-        }
+        sessions.remove(session.getIdInternal());
 
     }
 
@@ -1134,8 +1130,8 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      */
     public String listSessionIds() {
         StringBuffer sb=new StringBuffer();
-        Iterator keys=sessions.keySet().iterator();
-        while( keys.hasNext() ) {
+        Iterator keys = sessions.keySet().iterator();
+        while (keys.hasNext()) {
             sb.append(keys.next()).append(" ");
         }
         return sb.toString();
@@ -1150,7 +1146,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      * @return The attribute value, if found, null otherwise
      */
     public String getSessionAttribute( String sessionId, String key ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s = (Session) sessions.get(sessionId);
         if( s==null ) {
             if(log.isInfoEnabled())
                 log.info("Session not found " + sessionId);

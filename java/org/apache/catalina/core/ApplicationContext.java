@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.Binding;
 import javax.naming.NamingException;
@@ -87,13 +88,13 @@ public class ApplicationContext
     /**
      * The context attributes for this context.
      */
-    private HashMap attributes = new HashMap();
+    private Map attributes = new ConcurrentHashMap();
 
 
     /**
      * List of read only attributes for this context.
      */
-    private HashMap readOnlyAttributes = new HashMap();
+    private Map readOnlyAttributes = new ConcurrentHashMap();
 
 
     /**
@@ -118,7 +119,7 @@ public class ApplicationContext
     /**
      * The merged context initialization parameters for this Context.
      */
-    private HashMap parameters = null;
+    private Map parameters = null;
 
 
     /**
@@ -172,9 +173,7 @@ public class ApplicationContext
      */
     public Object getAttribute(String name) {
 
-        synchronized (attributes) {
-            return (attributes.get(name));
-        }
+        return (attributes.get(name));
 
     }
 
@@ -185,9 +184,7 @@ public class ApplicationContext
      */
     public Enumeration getAttributeNames() {
 
-        synchronized (attributes) {
-            return new Enumerator(attributes.keySet(), true);
-        }
+        return new Enumerator(attributes.keySet(), true);
 
     }
 
@@ -258,9 +255,8 @@ public class ApplicationContext
     public String getInitParameter(final String name) {
 
         mergeParameters();
-        synchronized (parameters) {
-            return ((String) parameters.get(name));
-        }
+        return ((String) parameters.get(name));
+
     }
 
 
@@ -271,9 +267,7 @@ public class ApplicationContext
     public Enumeration getInitParameterNames() {
 
         mergeParameters();
-        synchronized (parameters) {
-           return (new Enumerator(parameters.keySet()));
-        }
+        return (new Enumerator(parameters.keySet()));
 
     }
 
@@ -688,17 +682,15 @@ public class ApplicationContext
         boolean found = false;
 
         // Remove the specified attribute
-        synchronized (attributes) {
-            // Check for read only attribute
-           if (readOnlyAttributes.containsKey(name))
-                return;
-            found = attributes.containsKey(name);
-            if (found) {
-                value = attributes.get(name);
-                attributes.remove(name);
-            } else {
-                return;
-            }
+        // Check for read only attribute
+        if (readOnlyAttributes.containsKey(name))
+            return;
+        found = attributes.containsKey(name);
+        if (found) {
+            value = attributes.get(name);
+            attributes.remove(name);
+        } else {
+            return;
         }
 
         // Notify interested application event listeners
@@ -754,15 +746,13 @@ public class ApplicationContext
         boolean replaced = false;
 
         // Add or replace the specified attribute
-        synchronized (attributes) {
-            // Check for read only attribute
-            if (readOnlyAttributes.containsKey(name))
-                return;
-            oldValue = attributes.get(name);
-            if (oldValue != null)
-                replaced = true;
-            attributes.put(name, value);
-        }
+        // Check for read only attribute
+        if (readOnlyAttributes.containsKey(name))
+            return;
+        oldValue = attributes.get(name);
+        if (oldValue != null)
+            replaced = true;
+        attributes.put(name, value);
 
         // Notify interested application event listeners
         Object listeners[] = context.getApplicationEventListeners();
@@ -822,11 +812,9 @@ public class ApplicationContext
 
         // Create list of attributes to be removed
         ArrayList list = new ArrayList();
-        synchronized (attributes) {
-            Iterator iter = attributes.keySet().iterator();
-            while (iter.hasNext()) {
-                list.add(iter.next());
-            }
+        Iterator iter = attributes.keySet().iterator();
+        while (iter.hasNext()) {
+            list.add(iter.next());
         }
 
         // Remove application originated attributes
@@ -855,10 +843,8 @@ public class ApplicationContext
      */
     void setAttributeReadOnly(String name) {
 
-        synchronized (attributes) {
-            if (attributes.containsKey(name))
-                readOnlyAttributes.put(name, name);
-        }
+        if (attributes.containsKey(name))
+            readOnlyAttributes.put(name, name);
 
     }
 
@@ -915,7 +901,7 @@ public class ApplicationContext
 
         if (parameters != null)
             return;
-        HashMap results = new HashMap();
+        Map results = new ConcurrentHashMap();
         String names[] = context.findParameters();
         for (int i = 0; i < names.length; i++)
             results.put(names[i], context.findParameter(names[i]));
