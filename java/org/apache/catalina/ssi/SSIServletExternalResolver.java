@@ -533,7 +533,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             // a problem
             // if a truly empty file
             //were included, but not sure how else to tell.
-            if (retVal.equals("")) {
+            if (retVal.equals("") && !req.getMethod().equalsIgnoreCase(
+                    org.apache.coyote.http11.Constants.HEAD)) {
                 throw new IOException("Couldn't find file: " + path);
             }
             return retVal;
