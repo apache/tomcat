@@ -415,7 +415,7 @@ class Parser implements TagConstants {
                     }
                     if (impl == null) {
                         String[] location = ctxt.getTldLocation(uri);
-                        impl = new TagLibraryInfoImpl(ctxt, parserController,
+                        impl = new TagLibraryInfoImpl(ctxt, parserController, pageInfo,
                                 prefix, uri, location, err);
                         if (ctxt.getOptions().isCaching()) {
                             ctxt.getOptions().getCache().put(uri, impl);
@@ -431,7 +431,7 @@ class Parser implements TagConstants {
                     if (pageInfo.getTaglib(urnTagdir) == null) {
                         pageInfo.addTaglib(urnTagdir,
                                 new ImplicitTagLibraryInfo(ctxt,
-                                        parserController, prefix, tagdir, err));
+                                        parserController, pageInfo, prefix, tagdir, err));
                     }
                     pageInfo.addPrefixMapping(prefix, urnTagdir);
                 }

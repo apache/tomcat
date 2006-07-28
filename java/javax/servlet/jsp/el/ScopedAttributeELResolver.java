@@ -40,7 +40,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return null;
 	}
 
-	public Class<?> getType(ELContext context, Object base, Object property)
+	public Class getType(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -91,10 +91,10 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return false;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 
 		PageContext ctxt = (PageContext) context.getContext(JspContext.class);
-		List list = new ArrayList();
+		List<FeatureDescriptor> list = new ArrayList<FeatureDescriptor>();
 		Enumeration e;
 		Object value;
 		String name;
@@ -173,7 +173,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 		}
 	}
 
-	public Class<?> getCommonPropertyType(ELContext context, Object base) {
+	public Class<String> getCommonPropertyType(ELContext context, Object base) {
 		if (base == null) {
 			return String.class;
 		}

@@ -1232,6 +1232,7 @@ class JspDocumentParser
                 new ImplicitTagLibraryInfo(
                     ctxt,
                     parserController,
+                    pageInfo,
                     prefix,
                     tagdir,
                     err);
@@ -1261,6 +1262,7 @@ class JspDocumentParser
                         new TagLibraryInfoImpl(
                             ctxt,
                             parserController,
+                            pageInfo,
                             prefix,
                             uri,
                             location,

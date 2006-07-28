@@ -44,6 +44,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private Hashtable tagFileMap;
 
     private ParserController pc;
+    private PageInfo pi;
     private Vector vec;
 
     /**
@@ -51,11 +52,13 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
      */
     public ImplicitTagLibraryInfo(JspCompilationContext ctxt,
 				  ParserController pc,
+                  PageInfo pi,
 				  String prefix,
 				  String tagdir,
 				  ErrorDispatcher err) throws JasperException {
         super(prefix, null);
 	this.pc = pc;
+    this.pi = pi;
 	this.tagFileMap = new Hashtable();
 	this.vec = new Vector();
 
@@ -138,4 +141,10 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
 
 	return tagFile;
     }
+    
+    public TagLibraryInfo[] getTagLibraryInfos() {
+        Collection coll = pi.getTaglibs();
+        return (TagLibraryInfo[]) coll.toArray(new TagLibraryInfo[0]);
+    }
+    
 }

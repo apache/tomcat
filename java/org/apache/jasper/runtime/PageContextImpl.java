@@ -491,7 +491,7 @@ public class PageContextImpl extends PageContext {
 		return context.getAttribute(name);
 	}
 
-	public Enumeration getAttributeNamesInScope(final int scope) {
+	public Enumeration<String> getAttributeNamesInScope(final int scope) {
 		if (SecurityUtil.isPackageProtectionEnabled()) {
 			return (Enumeration) AccessController
 					.doPrivileged(new PrivilegedAction() {

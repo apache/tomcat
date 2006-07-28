@@ -107,10 +107,10 @@ public class MapELResolver extends ELResolver {
 		return this.readOnly;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (base instanceof Map) {
 			Iterator itr = ((Map) base).keySet().iterator();
-			List feats = new ArrayList();
+			List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>();
 			Object key;
 			FeatureDescriptor desc;
 			while (itr.hasNext()) {

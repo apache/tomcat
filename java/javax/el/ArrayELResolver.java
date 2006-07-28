@@ -103,7 +103,7 @@ public class ArrayELResolver extends ELResolver {
 		return this.readOnly;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (base != null && base.getClass().isArray()) {
 			FeatureDescriptor[] descs = new FeatureDescriptor[Array.getLength(base)];
 			for (int i = 0; i < descs.length; i++) {

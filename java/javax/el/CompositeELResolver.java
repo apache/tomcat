@@ -16,6 +16,7 @@
 
 package javax.el;
 
+import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 public class CompositeELResolver extends ELResolver {
@@ -84,7 +85,7 @@ public class CompositeELResolver extends ELResolver {
 		return false;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		return new FeatureIterator(context, base, this.resolvers, this.size);
 	}
 
@@ -115,7 +116,7 @@ public class CompositeELResolver extends ELResolver {
 		return null;
 	}
 
-	private final static class FeatureIterator implements Iterator {
+	private final static class FeatureIterator implements Iterator<FeatureDescriptor> {
 
 		private final ELContext context;
 
@@ -152,7 +153,7 @@ public class CompositeELResolver extends ELResolver {
 			return this.itr != null;
 		}
 
-		public Object next() {
+		public FeatureDescriptor next() {
 			Object result = null;
 			if (this.itr != null) {
 				if (this.itr.hasNext()) {
@@ -163,7 +164,7 @@ public class CompositeELResolver extends ELResolver {
 					}
 				}
 			}
-			return result;
+			return (FeatureDescriptor) result;
 		}
 
 		public void remove() {
