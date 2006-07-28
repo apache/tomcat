@@ -127,7 +127,7 @@ public class ListELResolver extends ELResolver {
 		return this.readOnly;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (base instanceof List) {
 			FeatureDescriptor[] descs = new FeatureDescriptor[((List) base).size()];
 			for (int i = 0; i < descs.length; i++) {

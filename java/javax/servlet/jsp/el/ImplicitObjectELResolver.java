@@ -102,7 +102,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return null;
     }
 
-    public Class<?> getType(ELContext context, Object base, Object property)
+    public Class getType(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
             throw new NullPointerException();
@@ -150,7 +150,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return false;
     }
 
-    public Iterator getFeatureDescriptors(ELContext context, Object base) {
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>(
                 SCOPE_NAMES.length);
         FeatureDescriptor feat;
@@ -168,7 +168,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return feats.iterator();
     }
 
-    public Class<?> getCommonPropertyType(ELContext context, Object base) {
+    public Class<String> getCommonPropertyType(ELContext context, Object base) {
         if (base == null) {
             return String.class;
         }

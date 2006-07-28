@@ -62,7 +62,7 @@ public abstract class ELResolver {
 
     public abstract boolean isReadOnly(ELContext context, Object base, Object property) throws NullPointerException, PropertyNotFoundException, ELException;
     
-    public abstract Iterator getFeatureDescriptors(ELContext context, Object base);
+    public abstract Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base);
     
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 }

@@ -55,14 +55,14 @@ public class TagData implements Cloneable {
      */
     public TagData(Object[] atts[]) {
 	if (atts == null) {
-	    attributes = new Hashtable();
+	    attributes = new Hashtable<String, Object>();
 	} else {
-	    attributes = new Hashtable(atts.length);
+	    attributes = new Hashtable<String, Object>(atts.length);
 	}
 
 	if (atts != null) {
 	    for (int i = 0; i < atts.length; i++) {
-		attributes.put(atts[i][0], atts[i][1]);
+		attributes.put((String) atts[i][0], atts[i][1]);
 	    }
 	}
     }
@@ -75,7 +75,7 @@ public class TagData implements Cloneable {
      *
      * @param attrs A hashtable to get the values from.
      */
-    public TagData(Hashtable attrs) {
+    public TagData(Hashtable<String, Object> attrs) {
         this.attributes = attrs;
     }
 
@@ -143,11 +143,11 @@ public class TagData implements Cloneable {
      *
      *@return An enumeration of the attributes in a TagData
      */
-    public java.util.Enumeration getAttributes() {
+    public java.util.Enumeration<String> getAttributes() {
         return attributes.keys();
     };
 
     // private data
 
-    private Hashtable attributes;	// the tagname/value map
+    private Hashtable<String, Object> attributes;	// the tagname/value map
 }

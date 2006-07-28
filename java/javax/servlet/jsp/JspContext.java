@@ -205,7 +205,7 @@ public abstract class JspContext {
      *     invalidated.
      */
 
-    abstract public Enumeration getAttributeNamesInScope(int scope);
+    abstract public Enumeration<String> getAttributeNamesInScope(int scope);
 
     /**
      * The current value of the out object (a JspWriter).

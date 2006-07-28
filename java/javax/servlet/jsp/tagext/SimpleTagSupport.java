@@ -175,7 +175,7 @@ public class SimpleTagSupport
      * or is an instance of the class specified
      */
     public static final JspTag findAncestorWithClass(
-	JspTag from, Class klass) 
+	JspTag from, Class<?> klass) 
     {
 	boolean isInterface = false;
 

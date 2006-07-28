@@ -94,7 +94,7 @@ abstract public class TagLibraryValidator {
      *
      * @param map A Map describing the init parameters
      */
-    public void setInitParameters(Map map) {
+    public void setInitParameters(Map<String, Object> map) {
 	initParameters = map;
     }
 
@@ -105,7 +105,7 @@ abstract public class TagLibraryValidator {
      *
      * @return The init parameters as an immutable map.
      */
-    public Map getInitParameters() {
+    public Map<String, Object> getInitParameters() {
 	return initParameters;
     }
 
@@ -138,6 +138,6 @@ abstract public class TagLibraryValidator {
     }
 
     // Private data
-    private Map initParameters;
+    private Map<String, Object> initParameters;
 
 }

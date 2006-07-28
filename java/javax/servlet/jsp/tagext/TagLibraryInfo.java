@@ -225,6 +225,22 @@ abstract public class TagLibraryInfo {
     }
 
 
+    /**
+     * Returns an array of TagLibraryInfo objects representing the entire set 
+     * of tag libraries (including this TagLibraryInfo) imported by taglib 
+     * directives in the translation unit that references this TagLibraryInfo. 
+     * If a tag library is imported more than once and bound to different prefices, 
+     * only the TagLibraryInfo bound to the first prefix must be included 
+     * in the returned array.
+     * 
+     * @return Array of TagLibraryInfo objects representing the entire set 
+     * of tag libraries (including this TagLibraryInfo) imported by taglib 
+     * directives in the translation unit that references this TagLibraryInfo.
+     * @since 2.1
+     */
+    public abstract javax.servlet.jsp.tagext.TagLibraryInfo[] getTagLibraryInfos();
+    
+    
     // Protected fields
 
     /**

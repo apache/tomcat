@@ -228,7 +228,7 @@ public class TagSupport implements IterationTag, Serializable {
 
     public void setValue(String k, Object o) {
 	if (values == null) {
-	    values = new Hashtable();
+	    values = new Hashtable<String, Object>();
 	}
 	values.put(k, o);
     }
@@ -267,7 +267,7 @@ public class TagSupport implements IterationTag, Serializable {
      *     or null or an empty Enumeration if no values have been set.
      */
 
-    public Enumeration getValues() {
+    public Enumeration<String> getValues() {
 	if (values == null) {
 	    return null;
 	}
@@ -277,7 +277,7 @@ public class TagSupport implements IterationTag, Serializable {
     // private fields
 
     private   Tag         parent;
-    private   Hashtable   values;
+    private   Hashtable<String, Object>   values;
     /**
      * The value of the id attribute of this tag; or null.
      */

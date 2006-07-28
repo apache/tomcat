@@ -17,6 +17,7 @@
 package javax.el;
 
 import java.beans.BeanInfo;
+import java.beans.FeatureDescriptor;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
@@ -129,7 +130,7 @@ public class BeanELResolver extends ELResolver {
 				|| this.property(context, base, property).isReadOnly();
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (context == null) {
 			throw new NullPointerException();
 		}
@@ -145,7 +146,7 @@ public class BeanELResolver extends ELResolver {
 				pds[i].setValue(RESOLVABLE_AT_DESIGN_TIME, Boolean.TRUE);
 				pds[i].setValue(TYPE, pds[i].getPropertyType());
 			}
-			return Arrays.asList(pds).iterator();
+			return Arrays.asList((FeatureDescriptor[]) pds).iterator();
 		} catch (IntrospectionException e) {
 			//
 		}
@@ -165,7 +166,7 @@ public class BeanELResolver extends ELResolver {
 		return null;
 	}
 
-	private final static class BeanProperties {
+	protected final static class BeanProperties {
 		private final Map<String, BeanProperty> properties;
 
 		private final Class<?> type;
@@ -200,7 +201,7 @@ public class BeanELResolver extends ELResolver {
         }
 	}
 
-	private final static class BeanProperty {
+    protected final static class BeanProperty {
 		private final Class type;
 
 		private final Class owner;

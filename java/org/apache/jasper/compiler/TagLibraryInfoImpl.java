@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.JarURLConnection;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -67,6 +68,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     private Hashtable jarEntries;
 
     private JspCompilationContext ctxt;
+    
+    private PageInfo pi;
 
     private ErrorDispatcher err;
 
@@ -128,13 +131,14 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     /**
      * Constructor.
      */
-    public TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc,
+    public TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc, PageInfo pi,
             String prefix, String uriIn, String[] location, ErrorDispatcher err)
             throws JasperException {
         super(prefix, uriIn);
 
         this.ctxt = ctxt;
         this.parserController = pc;
+        this.pi = pi;
         this.err = err;
         InputStream in = null;
         JarFile jarFile = null;
@@ -197,6 +201,11 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
     }
 
+    public TagLibraryInfo[] getTagLibraryInfos() {
+        Collection coll = pi.getTaglibs();
+        return (TagLibraryInfo[]) coll.toArray(new TagLibraryInfo[0]);
+    }
+    
     /*
      * @param ctxt The JSP compilation context @param uri The TLD's uri @param
      * in The TLD's input stream @param jarFileUrl The JAR file containing the
