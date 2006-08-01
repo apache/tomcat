@@ -4445,6 +4445,13 @@ public class StandardContext
             // Stop our filters
             filterStop();
 
+            // Stop our child containers, if any
+            Container[] children = findChildren();
+            for (int i = 0; i < children.length; i++) {
+                if (children[i] instanceof Lifecycle)
+                    ((Lifecycle) children[i]).stop();
+            }
+
             // Stop our application listeners
             listenerStop();
 
@@ -4468,13 +4475,6 @@ public class StandardContext
             // Stop the Valves in our pipeline (including the basic), if any
             if (pipeline instanceof Lifecycle) {
                 ((Lifecycle) pipeline).stop();
-            }
-
-            // Stop our child containers, if any
-            Container[] children = findChildren();
-            for (int i = 0; i < children.length; i++) {
-                if (children[i] instanceof Lifecycle)
-                    ((Lifecycle) children[i]).stop();
             }
 
             // Clear all application-originated servlet context attributes
