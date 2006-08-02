@@ -33,7 +33,6 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import javax.management.AttributeNotFoundException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanRegistrationException;
@@ -58,6 +57,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
+import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -85,8 +85,8 @@ import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.TldConfig;
-import org.apache.catalina.util.AnnotationProcessor;
 import org.apache.catalina.util.CharsetMapper;
+import org.apache.catalina.util.DefaultAnnotationProcessor;
 import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -172,6 +172,12 @@ public class StandardContext
 
 
     /**
+     * Annotation processor.
+     */
+    private AnnotationProcessor annotationProcessor = null;
+
+
+   /**
      * Associated host name.
      */
     private String hostName;
@@ -671,6 +677,16 @@ public class StandardContext
     // ----------------------------------------------------- Context Properties
 
 
+    public AnnotationProcessor getAnnotationProcessor() {
+       return annotationProcessor;
+    }
+
+
+    public void setAnnotationProcessor(AnnotationProcessor annotationProcessor) {
+       this.annotationProcessor = annotationProcessor;
+    }
+
+    
     public String getEncodedPath() {
         return encodedPath;
     }
@@ -3735,11 +3751,8 @@ public class StandardContext
                 results[i] = clazz.newInstance();
                 // Annotation processing
                 if (!getIgnoreAnnotations()) {
-                    if (getNamingContextListener() != null) {
-                        AnnotationProcessor.injectNamingResources
-                            (getNamingContextListener().getEnvContext(), results[i]);
-                    }
-                    AnnotationProcessor.postConstruct(results[i]);
+                    getAnnotationProcessor().processAnnotations(results[i]);
+                    getAnnotationProcessor().postConstruct(results[i]);
                 }
             } catch (Throwable t) {
                 getLogger().error
@@ -3843,7 +3856,7 @@ public class StandardContext
                 // Annotation processing
                 if (!getIgnoreAnnotations()) {
                     try {
-                        AnnotationProcessor.preDestroy(listeners[j]);
+                        getAnnotationProcessor().preDestroy(listeners[j]);
                     } catch (Throwable t) {
                         getLogger().error
                             (sm.getString("standardContext.listenerStop",
@@ -3862,7 +3875,7 @@ public class StandardContext
                 if (listeners[j] == null)
                     continue;
                 try {
-                    AnnotationProcessor.preDestroy(listeners[j]);
+                    getAnnotationProcessor().preDestroy(listeners[j]);
                 } catch (Throwable t) {
                     getLogger().error
                         (sm.getString("standardContext.listenerStop",
@@ -4153,6 +4166,18 @@ public class StandardContext
                 addLifecycleListener(namingContextListener);
             }
         }
+        
+        // Initialize annotation processor
+        if (ok && !getIgnoreAnnotations() && annotationProcessor == null) {
+            if (isUseNaming() && namingContextListener != null) {
+                annotationProcessor = 
+                    new DefaultAnnotationProcessor(namingContextListener.getEnvContext());
+            } else {
+                annotationProcessor = new DefaultAnnotationProcessor(null);
+            }
+        }
+        getServletContext().setAttribute
+            (Globals.ANNOTATION_PROCESSOR_ATTR, annotationProcessor);
 
         // Standard container startup
         if (log.isDebugEnabled())

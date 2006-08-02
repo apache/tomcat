@@ -25,6 +25,10 @@
                is="true"
                type="boolean"/>
       
+     <attribute name="annotationProcessor"
+                description="Object that processes things like injection annotations"
+                type="org.apache.AnnotationProcessor" />
+
     <attribute name="antiJARLocking"
                description="Take care to not lock jar files"
                type="boolean" />
@@ -133,10 +137,6 @@
                description="Name of the object"
                type="java.lang.String"/>
       
-    <attribute name="originalDocBase"
-               description="The original document root for this web application"
-               type="java.lang.String"/>
-
     <attribute name="override"
                description="The DefaultContext override flag for this web application"
                type="boolean"/>

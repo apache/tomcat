@@ -56,7 +56,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.AnnotationProcessor;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -1082,12 +1081,10 @@ public class StandardWrapper
                 servlet = (Servlet) classClass.newInstance();
                 // Annotation processing
                 if (!((Context) getParent()).getIgnoreAnnotations()) {
-                    if (getParent() instanceof StandardContext 
-                            && ((StandardContext) getParent()).getNamingContextListener() != null) {
-                        AnnotationProcessor.injectNamingResources
-                            (((StandardContext) getParent()).getNamingContextListener().getEnvContext(), servlet);
+                    if (getParent() instanceof StandardContext) {
+                       ((StandardContext)getParent()).getAnnotationProcessor().processAnnotations(servlet);
+                       ((StandardContext)getParent()).getAnnotationProcessor().postConstruct(servlet);
                     }
-                    AnnotationProcessor.postConstruct(servlet);
                 }
             } catch (ClassCastException e) {
                 unavailable(null);
@@ -1367,7 +1364,7 @@ public class StandardWrapper
 
             // Annotation processing
             if (!((Context) getParent()).getIgnoreAnnotations()) {
-                AnnotationProcessor.preDestroy(instance);
+               ((StandardContext)getParent()).getAnnotationProcessor().preDestroy(instance);
             }
 
         } catch (Throwable t) {
@@ -1410,7 +1407,7 @@ public class StandardWrapper
                     }
                     // Annotation processing
                     if (!((Context) getParent()).getIgnoreAnnotations()) {
-                        AnnotationProcessor.preDestroy(s);
+                       ((StandardContext)getParent()).getAnnotationProcessor().preDestroy(s);
                     }
                 }
             } catch (Throwable t) {
