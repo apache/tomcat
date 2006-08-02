@@ -289,10 +289,11 @@ public class ResourceCache {
     public CacheEntry lookup(String name) {
 
         CacheEntry cacheEntry = null;
+        CacheEntry[] currentCache = cache;
         accessCount++;
-        int pos = find(cache, name);
-        if ((pos != -1) && (name.equals(cache[pos].name))) {
-            cacheEntry = cache[pos];
+        int pos = find(currentCache, name);
+        if ((pos != -1) && (name.equals(currentCache[pos].name))) {
+            cacheEntry = currentCache[pos];
         }
         if (cacheEntry == null) {
             try {
