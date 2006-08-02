@@ -30,6 +30,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
 import javax.xml.ws.WebServiceRef;
 
+import org.apache.AnnotationProcessor;
+
 
 /**
  * Verify the annotation and Process it.
@@ -38,13 +40,19 @@ import javax.xml.ws.WebServiceRef;
  * @author Remy Maucherat
  * @version $Revision: 303236 $, $Date: 2006-03-09 16:46:52 -0600 (Thu, 09 Mar 2006) $
  */
-public class AnnotationProcessor {
+public class DefaultAnnotationProcessor implements AnnotationProcessor {
     
+    protected javax.naming.Context context = null;
+    
+    public DefaultAnnotationProcessor(javax.naming.Context context) {
+        this.context = context;
+    }
+
 
     /**
      * Call postConstruct method on the specified instance.
      */
-    public static void postConstruct(Object instance)
+    public void postConstruct(Object instance)
         throws IllegalAccessException, InvocationTargetException {
         
         Method[] methods = instance.getClass().getDeclaredMethods();
@@ -77,7 +85,7 @@ public class AnnotationProcessor {
     /**
      * Call preDestroy method on the specified instance.
      */
-    public static void preDestroy(Object instance)
+    public void preDestroy(Object instance)
         throws IllegalAccessException, InvocationTargetException {
         
         Method[] methods = instance.getClass().getDeclaredMethods();
@@ -110,8 +118,13 @@ public class AnnotationProcessor {
     /**
      * Inject resources in specified instance.
      */
-    public static void injectNamingResources(javax.naming.Context context, Object instance)
+    public void processAnnotations(Object instance)
         throws IllegalAccessException, InvocationTargetException, NamingException {
+        
+        if (context == null) {
+            // No resource injection
+            return;
+        }
         
         // Initialize fields annotations
         Field[] fields = instance.getClass().getDeclaredFields();

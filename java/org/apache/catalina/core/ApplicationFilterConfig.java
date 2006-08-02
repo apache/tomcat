@@ -30,10 +30,10 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.apache.AnnotationProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.AnnotationProcessor;
 import org.apache.catalina.util.Enumerator;
 import org.apache.tomcat.util.log.SystemLogHandler;
 
@@ -217,12 +217,11 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
         Class clazz = classLoader.loadClass(filterClass);
         this.filter = (Filter) clazz.newInstance();
         if (!context.getIgnoreAnnotations()) {
-            if (context instanceof StandardContext 
-                    && ((StandardContext) context).getNamingContextListener() != null) {
-                AnnotationProcessor.injectNamingResources
-                    (((StandardContext) context).getNamingContextListener().getEnvContext(), this.filter);
+            if (context instanceof StandardContext) {
+               AnnotationProcessor processor = ((StandardContext)context).getAnnotationProcessor();
+               processor.processAnnotations(this.filter);
+               processor.postConstruct(this.filter);
             }
-            AnnotationProcessor.postConstruct(this.filter);
         }
         if (context instanceof StandardContext &&
             ((StandardContext) context).getSwallowOutput()) {
@@ -239,6 +238,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
             filter.init(this);
         }
         return (this.filter);
+
 
     }
 
@@ -259,7 +259,8 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
      */
     void release() {
 
-        if (this.filter != null){
+        if (this.filter != null)
+        {
             if (System.getSecurityManager() != null) {
                 try {
                     SecurityUtil.doAsPrivilege("destroy", filter); 
@@ -272,7 +273,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
             }
             if (!context.getIgnoreAnnotations()) {
                 try {
-                    AnnotationProcessor.preDestroy(this.filter);
+                    ((StandardContext)context).getAnnotationProcessor().preDestroy(this.filter);
                 } catch (Exception e) {
                     context.getLogger().error("ApplicationFilterConfig.preDestroy", e);
                 }
@@ -322,7 +323,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                 }
                 if (!context.getIgnoreAnnotations()) {
                     try {
-                        AnnotationProcessor.preDestroy(this.filter);
+                        ((StandardContext)context).getAnnotationProcessor().preDestroy(this.filter);
                     } catch (Exception e) {
                         context.getLogger().error("ApplicationFilterConfig.preDestroy", e);
                     }
