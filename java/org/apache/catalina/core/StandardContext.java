@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import javax.management.AttributeNotFoundException;
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
 import javax.management.MBeanRegistrationException;
@@ -4168,16 +4169,18 @@ public class StandardContext
         }
         
         // Initialize annotation processor
-        if (ok && !getIgnoreAnnotations() && annotationProcessor == null) {
-            if (isUseNaming() && namingContextListener != null) {
-                annotationProcessor = 
-                    new DefaultAnnotationProcessor(namingContextListener.getEnvContext());
-            } else {
-                annotationProcessor = new DefaultAnnotationProcessor(null);
+        if (ok && !getIgnoreAnnotations()) {
+            if (annotationProcessor == null) {
+                if (isUseNaming() && namingContextListener != null) {
+                    annotationProcessor = 
+                        new DefaultAnnotationProcessor(namingContextListener.getEnvContext());
+                } else {
+                    annotationProcessor = new DefaultAnnotationProcessor(null);
+                }
             }
+            getServletContext().setAttribute
+                (Globals.ANNOTATION_PROCESSOR_ATTR, annotationProcessor);
         }
-        getServletContext().setAttribute
-            (Globals.ANNOTATION_PROCESSOR_ATTR, annotationProcessor);
 
         // Standard container startup
         if (log.isDebugEnabled())
@@ -5246,7 +5249,12 @@ public class StandardContext
             // Add the main configuration listener
             LifecycleListener config = null;
             try {
-                String configClassName = ((Host)getParent()).getConfigClass();
+                String configClassName = null;
+                try {
+                    configClassName = String.valueOf(mserver.getAttribute(parentName, "configClass"));
+                } catch (AttributeNotFoundException e) {
+                    // Ignore, it's normal a host may not have this optional attribute
+                }
                 if (configClassName != null) {
                     Class clazz = Class.forName(configClassName);
                     config = (LifecycleListener) clazz.newInstance();
@@ -5263,7 +5271,8 @@ public class StandardContext
                 log.debug("AddChild " + parentName + " " + this);
             }
             try {
-                ((Host)getParent()).addChild(this);
+                mserver.invoke(parentName, "addChild", new Object[] { this },
+                        new String[] {"org.apache.catalina.Container"});
             } catch (Exception e) {
                 destroy();
                 throw e;
