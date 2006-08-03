@@ -293,15 +293,15 @@ SectionEnd
 ;
 ;SectionEnd
 
-Section "Webapps" SecWebapps
-
-  SectionIn 3
-
-  SetOutPath $INSTDIR\webapps
-  File /nonfatal /r webapps\balancer
-  File /nonfatal /r webapps\webdav
-
-SectionEnd
+;Section "Webapps" SecWebapps
+;
+;  SectionIn 3
+;
+;  SetOutPath $INSTDIR\webapps
+;  File /nonfatal /r webapps\balancer
+;  File /nonfatal /r webapps\webdav
+;
+;SectionEnd
 
 ;Section "Compatibility" SecCompat
 ;
@@ -365,7 +365,7 @@ FunctionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDocs} $(DESC_SecDocs)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
 ;  !insertmacro MUI_DESCRIPTION_TEXT ${SecAdmin} $(DESC_SecAdmin)
-  !insertmacro MUI_DESCRIPTION_TEXT ${SecWebapps} $(DESC_SecWebapps)
+;  !insertmacro MUI_DESCRIPTION_TEXT ${SecWebapps} $(DESC_SecWebapps)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
@@ -653,13 +653,12 @@ Section Uninstall
   RMDir /r "$INSTDIR\lib"
   Delete "$INSTDIR\conf\*.dtd"
   RMDir "$INSTDIR\logs"
-  RMDir /r "$INSTDIR\webapps\balancer"
+;  RMDir /r "$INSTDIR\webapps\balancer"
   RMDir /r "$INSTDIR\webapps\docs"
   RMDir /r "$INSTDIR\webapps\examples"
-  RMDir /r "$INSTDIR\webapps\webdav"
+;  RMDir /r "$INSTDIR\webapps\webdav"
   RMDir /r "$INSTDIR\work"
   RMDir /r "$INSTDIR\temp"
-  RMDir /r "$INSTDIR\src"
   RMDir "$INSTDIR"
 
   IfSilent Removed 0

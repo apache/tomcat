@@ -17,7 +17,7 @@
   <Listener className="org.apache.catalina.core.AprLifecycleListener" />
   <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
-  <Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>
+  <!--<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>-->
 
   <!-- Global JNDI resources -->
   <GlobalNamingResources>
@@ -74,4 +74,4 @@
     -->
 
     <!-- Define a non-SSL HTTP/1.1 Connector on port 8080 -->
-    <Connector
+    <Connector 
