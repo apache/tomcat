@@ -4,9 +4,7 @@
 
   ;Compression options
   CRCCheck on
-  SetCompress force
-  SetCompressor lzma
-  SetDatablockOptimize on
+  SetCompressor /SOLID lzma
 
   Name "Apache Tomcat"
 

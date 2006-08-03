@@ -71,15 +71,15 @@
 	  </tr>
 	  <tr>
 	    <td>\${header["host"]}</td>
-	    <td>${header["host"]}</td>
+	    <td>${fn:escapeXml(header["host"])}&nbsp;</td>
 	  </tr>
 	  <tr>
 	    <td>\${header["accept"]}</td>
-	    <td>${header["accept"]}</td>
+	    <td>${fn:escapeXml(header["accept"])}&nbsp;</td>
 	  </tr>
 	  <tr>
 	    <td>\${header["user-agent"]}</td>
-	    <td>${header["user-agent"]}</td>
+	    <td>${fn:escapeXml(header["user-agent"])}&nbsp;</td>
 	  </tr>
 	</table>
       </code>

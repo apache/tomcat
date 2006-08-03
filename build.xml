@@ -176,6 +176,7 @@
     <!-- Catalina Main JAR File -->
     <jar jarfile="${catalina.jar}">
       <fileset dir="${tomcat.classes}">
+        <include name="org/apache/AnnotationProcessor.class" />
         <include name="org/apache/catalina/**" />
         <include name="org/apache/naming/**" />
         <!-- Javadoc and i18n exclusions -->
@@ -217,6 +218,7 @@
     <!-- Jasper Implementation JAR File -->
     <jar  jarfile="${jasper.jar}">
       <fileset dir="${tomcat.classes}">
+        <include name="org/apache/AnnotationProcessor.class" />
         <include name="org/apache/jasper/**" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
@@ -253,7 +255,142 @@
 
   </target>
 
-  <target name="deploy" depends="build-only">
+  <target name="build-docs">
+
+    <copy todir="${tomcat.build}/webapps">
+      <fileset dir=".">
+        <include name="BUILDING.txt"/>
+        <include name="README.txt"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
+      <fileset dir="webapps">
+        <include name="docs/images/**"/>
+        <include name="docs/**/*.html"/>
+        <include name="docs/WEB-INF/**"/>
+        <include name="docs/appdev/*.txt"/>
+        <include name="docs/appdev/sample/**"/>
+      </fileset>
+        <fileset dir="webapps">
+          <include name="docs/architecture/**"/>
+          <exclude name="docs/architecture/*.xml"/>
+        </fileset>
+    </copy>
+
+    <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
+              file="webapps/docs/appdev/build.xml.txt"/>
+  	
+  	<mkdir dir="${tomcat.build}/webapps/docs/funcspec" />
+  	
+  	<!-- XSL processing -->
+    <style basedir="webapps/docs"
+           destdir="${tomcat.build}/webapps/docs"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="build.xml project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="."/>
+    </style>
+    <style basedir="webapps/docs/appdev"
+           destdir="${tomcat.build}/webapps/docs/appdev"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <style basedir="webapps/docs/funcspecs"
+           destdir="${tomcat.build}/webapps/docs/funcspecs"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+    </style>
+    <style basedir="webapps/docs/config"
+           destdir="${tomcat.build}/webapps/docs/config"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <style basedir="webapps/docs/architecture"
+           destdir="${tomcat.build}/webapps/docs/architecture"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+
+  	<!-- Print friendly version -->
+  	<mkdir dir="${tomcat.build}/webapps/docs/printer" />
+    <copy todir="${tomcat.build}/webapps/docs/printer">
+      <fileset dir=".">
+        <include name="BUILDING.txt"/>
+        <include name="README.txt"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
+    </copy>
+  	<mkdir dir="${tomcat.build}/webapps/docs/appdev/printer" />
+    <copy todir="${tomcat.build}/webapps/docs/appdev/printer">
+        <fileset dir="webapps">
+          <include name="docs/appdev/*.txt"/>
+        </fileset>
+    </copy>
+  	<mkdir dir="${tomcat.build}/webapps/docs/funcspecs/printer" />
+    <mkdir dir="${tomcat.build}/webapps/docs/architecture/printer"/>
+    <mkdir dir="${tomcat.build}/webapps/docs/config/printer"/>
+
+  	<style basedir="webapps/docs"
+           destdir="${tomcat.build}/webapps/docs/printer"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="build.xml project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="./.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+    <style basedir="webapps/docs/appdev"
+           destdir="${tomcat.build}/webapps/docs/appdev/printer"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+    <style basedir="webapps/docs/funcspecs"
+           destdir="${tomcat.build}/webapps/docs/funcspecs/printer"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+    <style basedir="webapps/docs/config"
+           destdir="${tomcat.build}/webapps/docs/config/printer"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+    <style basedir="webapps/docs/architecture"
+           destdir="${tomcat.build}/webapps/docs/architecture/printer"
+         extension=".html"
+             style="webapps/docs/tomcat-docs.xsl"
+          excludes="project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+  </target>
+
+  <target name="deploy" depends="build-only,build-docs">
 
     <copy file="${commons-logging-api.jar}" todir="${tomcat.build}/bin" />
 
@@ -275,11 +412,10 @@
       </fileset>
     </copy>
 
-    <!-- FIXME: Copy webapps -->
+    <!-- Copy other regular webapps -->
     <copy todir="${tomcat.build}/webapps">
       <fileset dir="webapps">
         <include name="ROOT/**"/>
-        <include name="docs/**"/>
         <include name="examples/**"/>
         <include name="manager/**"/>
         <include name="host-manager/**"/>

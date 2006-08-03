@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Application Developer's Guide"
-        href="http://jakarta.apache.org/tomcat/">
+        href="http://tomcat.apache.org/">
 
     <title>Application Developer's Guide</title>
 
     <logo href="/images/tomcat.gif">
-      The Tomcat Servlet/JSP Container
+      The Apache Tomcat Servlet/JSP Container
     </logo>
 
     

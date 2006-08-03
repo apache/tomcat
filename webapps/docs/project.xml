@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="Apache Tomcat Documentation - Top Level Directory"
-        href="http://jakarta.apache.org/tomcat/">
+<project name="Apache Tomcat Documentation"
+        href="http://tomcat.apache.org/">
 
-    <title>The Apache Tomcat 6.0 Servlet/JSP Container</title>
+    <title>Apache Tomcat 6.0</title>
 
     <logo href="/images/tomcat.gif">
       The Apache Tomcat Servlet/JSP Container
@@ -13,7 +13,7 @@
 
     <menu name="Links">
         <item name="Docs Home"             href="index.html"/>
-        <item name="FAQ"                   href="../faq" />
+        <item name="FAQ"                   href="http://tomcat.apache.org/faq" />
     </menu>
 
     <menu name="User Guide">
@@ -44,16 +44,15 @@
               href="monitoring.html"/>
         <item name="22) Logging"            href="logging.html"/>
         <item name="23) APR"                href="apr.html"/>
-        <item name="24) Asynchronous APIs"  href="async.html"/>
+        <item name="24) Advanced IO"        href="aio.html"/>
     </menu>
 
     <menu name="Reference">
         <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
-        <item name="Apache Tomcat Configuration"  href="config/index.html"/>
+        <item name="Configuration"         href="config/index.html"/>
+        <item name="Javadocs"              href="api/index.html"/>
         <item name="JK 1.2 Documentation"      
-              href="http://jakarta.apache.org/tomcat/connectors-doc/"/>
-        <item name="Servlet API Javadocs"  href="servletapi/index.html"/>
-        <item name="JSP API Javadocs"      href="jspapi/index.html"/>
+              href="http://tomcat.apache.org/connectors-doc/"/>
     </menu>
 
     <menu name="Apache Tomcat Development">
@@ -61,10 +60,8 @@
         <item name="Changelog"             href="changelog.html"/>
         <item name="Status"                href="status.html"/>
         <item name="Developers"            href="developers.html"/>
-        <item name="Functional Specs."     href="catalina/funcspecs/index.html"/>
-        <item name="Apache Tomcat Javadocs"       href="catalina/docs/api/index.html"/>
-        <item name="Apache Jasper Javadocs"       href="jasper/docs/api/index.html"/>
         <item name="Architecture"          href="architecture/index.html" />
+        <item name="Functional Specs."     href="funcspecs/index.html"/>
     </menu>
 
     </body>
