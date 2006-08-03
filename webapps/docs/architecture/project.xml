@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="Tomcat Architecture"
-        href="http://jakarta.apache.org/tomcat/">
+<project name="Apache Tomcat Architecture"
+        href="http://tomcat.apache.org/">
 
-    <title>Tomcat Architecture</title>
+    <title>Apache Tomcat Architecture</title>
 
     <logo href="/images/tomcat.gif">
-      The Tomcat Servlet/JSP Container
+      The Apache Tomcat Servlet/JSP Container
     </logo>
 
     
