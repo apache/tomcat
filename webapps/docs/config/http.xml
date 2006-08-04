@@ -108,8 +108,22 @@
     </attribute>
 
     <attribute name="protocol" required="false">
-      <p>This attribute value must be <code>HTTP/1.1</code> to use the HTTP
-      handler, which is the default.</p>
+      <p>
+        Sets the protocol to handle incoming traffic.
+        The default value is <code>HTTP/1.1</code> and configures the 
+        <code>org.apache.coyote.http11.Http11Protocol</code>. This is the blocking Java connector.<br/>
+        If the <code>PATH(Windows)</code> or <code>LD_LIBRARY_PATH(on most unix system)</code>  
+        environment variables contain the Tomcat native library, the APR connector
+        will automatically be configured. Please be advised that the APR connector has different
+        settings for HTTPS than the default Java connector.<br/>
+        Other values for this attribute are, but not limited to:<br/>
+        <code>org.apache.coyote.http11.Http11Protocol</code> - same as HTTP/1.1<br/>
+        <code>org.apache.coyote.http11.Http11NioProtocol</code> - non blocking Java connector<br/>
+        <code>org.apache.coyote.http11.Http11AprProtocol</code> - the APR connector.<br/>
+        The configuration for both Java connectors are identical, both for http and https. 
+        For more information on the APR connector, please 
+        visit the <a href="../apr.html">APR documentation</a>
+      </p>
     </attribute>
 
     <attribute name="proxyName" required="false">
