@@ -1,0 +1,408 @@
+package org.apache.tomcat.util.net;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLEngineResult;
+import javax.net.ssl.SSLEngineResult.HandshakeStatus;
+import javax.net.ssl.SSLEngineResult.Status;
+
+/**
+ * 
+ * Implementation of a secure socket channel
+ * @author Filip Hanik
+ * @version 1.0
+ */
+
+public class SecureNioChannel extends NioChannel  {
+    
+    protected ByteBuffer netInBuffer;
+    protected ByteBuffer netOutBuffer;
+    
+    protected SSLEngine sslEngine;
+    
+    protected boolean initHandshakeComplete = false;
+    protected HandshakeStatus initHandshakeStatus; //gets set by begin handshake
+    
+    protected boolean closed = false;
+    protected boolean closing = false;
+    
+    public SecureNioChannel(SocketChannel channel, SSLEngine engine, ApplicationBufferHandler bufHandler) throws IOException {
+        super(channel,bufHandler);
+
+        this.sslEngine = engine;
+
+        
+        int appBufSize = sslEngine.getSession().getApplicationBufferSize();
+        int netBufSize = sslEngine.getSession().getPacketBufferSize();
+        
+        //ensure that the application has a large enough read/write buffers
+        //by doing this, we should not encounter any buffer overflow errors
+        bufHandler.expand(bufHandler.getReadBuffer(), appBufSize);
+        bufHandler.expand(bufHandler.getWriteBuffer(), appBufSize);
+        //allocate network buffers - TODO, add in optional direct buffers
+        this.netInBuffer = ByteBuffer.allocate(netBufSize);
+        this.netOutBuffer = ByteBuffer.allocate(netBufSize);
+        this.netOutBuffer.position(0);
+        this.netOutBuffer.limit(0);
+        this.netInBuffer.position(0);
+        this.netInBuffer.limit(0);
+
+        //initiate handshake
+        sslEngine.beginHandshake();
+        initHandshakeStatus = sslEngine.getHandshakeStatus();
+    }
+    
+//===========================================================================================    
+//                  NIO SSL METHODS
+//===========================================================================================
+    
+    /**
+     * Flushes the buffer to the network
+     * @param buf ByteBuffer
+     * @return boolean true if the buffer has been emptied out, false otherwise
+     * @throws IOException
+     */
+    protected boolean flush(ByteBuffer buf) throws IOException {
+        int remaining = buf.remaining();
+        if ( remaining > 0 ) {
+            int written = sc.write(buf);
+            return written >= remaining;
+        }else {
+            return true;
+        }
+    }
+    
+    /**
+     * Performs SSL handshake, non blocking, but performs NEED_TASK on the same thread.<br>
+     * Hence, you should never call this method using your Acceptor thread, as you would slow down
+     * your system significantly.<br>
+     * The return for this operation is 0 if the handshake is complete and a positive value if it is not complete.
+     * In the event of a positive value coming back, reregister the selection key for the return values interestOps.
+     * @param read boolean - true if the underlying channel is readable
+     * @param write boolean - true if the underlying channel is writable
+     * @return int - 0 if hand shake is complete, otherwise it returns a SelectionKey interestOps value
+     * @throws IOException
+     */
+    public int handshake(boolean read, boolean write) throws IOException {
+        if ( initHandshakeComplete ) return 0; //we have done our initial handshake
+        
+        if (!flush(netOutBuffer)) return SelectionKey.OP_WRITE; //we still have data to write
+        
+        SSLEngineResult handshake = null;
+        
+        while (!initHandshakeComplete) {
+            switch ( initHandshakeStatus ) {
+                case NOT_HANDSHAKING: {
+                    //should never happen
+                    throw new IOException("NOT_HANDSHAKING during handshake");
+                }
+                case FINISHED: {
+                    //we are complete if we have delivered the last package
+                    initHandshakeComplete = !netOutBuffer.hasRemaining();
+                    //return 0 if we are complete, otherwise we still have data to write
+                    return initHandshakeComplete?0:SelectionKey.OP_WRITE; 
+                }
+                case NEED_WRAP: {
+                    //perform the wrap function
+                    handshake = handshakeWrap(write);
+                    if ( handshake.getStatus() == Status.OK ){
+                        if (initHandshakeStatus == HandshakeStatus.NEED_TASK) 
+                            initHandshakeStatus = tasks();
+                    } else {
+                        //wrap should always work with our buffers
+                        throw new IOException("Unexpected status:" + handshake.getStatus() + " during handshake WRAP.");
+                    }
+                    if ( initHandshakeStatus != HandshakeStatus.NEED_UNWRAP || (!flush(netOutBuffer)) ) {
+                        //should actually return OP_READ if we have NEED_UNWRAP
+                        return SelectionKey.OP_WRITE;
+                    }
+                    //fall down to NEED_UNWRAP on the same call, will result in a 
+                    //BUFFER_UNDERFLOW if it needs data
+                }
+                case NEED_UNWRAP: {
+                    //perform the unwrap function
+                    handshake = handshakeUnwrap(read);
+                    if ( handshake.getStatus() == Status.OK ) {
+                        if (initHandshakeStatus == HandshakeStatus.NEED_TASK) 
+                            initHandshakeStatus = tasks();
+                    } else if ( handshake.getStatus() == Status.BUFFER_UNDERFLOW ){
+                        //read more data, reregister for OP_READ
+                        return SelectionKey.OP_READ;
+                    } else {
+                        throw new IOException("Invalid handshake status:"+initHandshakeStatus+" during handshake UNWRAP.");
+                    }//switch
+                    break;
+                }
+                case NEED_TASK: {
+                    initHandshakeStatus = tasks();
+                    break;
+                }
+                default: throw new IllegalStateException("Invalid handshake status:"+initHandshakeStatus);
+            }//switch
+        }//while      
+        //return 0 if we are complete, otherwise reregister for any activity that 
+        //would cause this method to be called again.
+        return initHandshakeComplete?0:(SelectionKey.OP_WRITE|SelectionKey.OP_READ);
+    }
+    
+    /**
+     * Executes all the tasks needed on the same thread.
+     * @return HandshakeStatus
+     */
+    protected SSLEngineResult.HandshakeStatus tasks() {
+        Runnable r = null;
+        while ( (r = sslEngine.getDelegatedTask()) != null) {
+            r.run();
+        }
+        return sslEngine.getHandshakeStatus();
+    }
+
+    /**
+     * Performs the WRAP function
+     * @param doWrite boolean
+     * @return SSLEngineResult
+     * @throws IOException
+     */
+    protected SSLEngineResult handshakeWrap(boolean doWrite) throws IOException {
+        //this should never be called with a network buffer that contains data
+        //so we can clear it here.
+        netOutBuffer.clear();
+        //perform the wrap
+        SSLEngineResult result = sslEngine.wrap(bufHandler.getWriteBuffer(), netOutBuffer);
+        //prepare the results to be written
+        netOutBuffer.flip();
+        //set the status
+        initHandshakeStatus = result.getHandshakeStatus();
+        //optimization, if we do have a writable channel, write it now
+        if ( doWrite ) flush(netOutBuffer);
+        return result;
+    }
+    
+    /**
+     * Perform handshake unwrap
+     * @param doread boolean
+     * @return SSLEngineResult
+     * @throws IOException
+     */
+    protected SSLEngineResult handshakeUnwrap(boolean doread) throws IOException {
+        
+        if (netInBuffer.position() == netInBuffer.limit()) {
+            //clear the buffer if we have emptied it out on data
+            netInBuffer.clear();
+        }
+        if ( doread )  {
+            //if we have data to read, read it
+            int read = sc.read(netInBuffer);
+            if (read == -1) throw new IOException("EOF encountered during handshake.");
+        }        
+        SSLEngineResult result;
+        boolean cont = false;
+        //loop while we can perform pure SSLEngine data
+        do {
+            //prepare the buffer with the incoming data
+            netInBuffer.flip();
+            //call unwrap
+            result = sslEngine.unwrap(netInBuffer, bufHandler.getReadBuffer());
+            //compact the buffer, this is an optional method, wonder what would happen if we didn't
+            netInBuffer.compact();
+            //read in the status
+            initHandshakeStatus = result.getHandshakeStatus();
+            if ( result.getStatus() == SSLEngineResult.Status.OK &&
+                 result.getHandshakeStatus() == HandshakeStatus.NEED_TASK ) {
+                //execute tasks if we need to
+                initHandshakeStatus = tasks();
+            }
+            //perform another unwrap?
+            cont = result.getStatus() == SSLEngineResult.Status.OK &&
+                   initHandshakeStatus == HandshakeStatus.NEED_UNWRAP;
+        }while ( cont );
+        return result;
+    }
+    
+    /**
+     * Sends a SSL close message, will not physically close the connection here.<br>
+     * To close the connection, you could do something like
+     * <pre><code>
+     *   close();
+     *   while (isOpen() && !myTimeoutFunction()) Thread.sleep(25);
+     *   if ( isOpen() ) close(true); //forces a close if you timed out
+     * </code></pre>
+     * @throws IOException if an I/O error occurs
+     * @throws IOException if there is data on the outgoing network buffer and we are unable to flush it
+     * @todo Implement this java.io.Closeable method
+     */
+    public void close() throws IOException {
+        if (closing) return;
+        closing = true;
+        sslEngine.closeOutbound();
+
+        if (!flush(netOutBuffer)) {
+            throw new IOException("Remaining data in the network buffer, can't send SSL close message, force a close with close(true) instead");
+        }
+        //prep the buffer for the close message
+        netOutBuffer.clear();
+        //perform the close, since we called sslEngine.closeOutbound
+        SSLEngineResult handshake = sslEngine.wrap(getEmptyBuf(), netOutBuffer);
+        //we should be in a close state
+        if (handshake.getStatus() != SSLEngineResult.Status.CLOSED) {
+            throw new IOException("Invalid close state, will not send network data.");
+        }
+        //prepare the buffer for writing
+        netOutBuffer.flip();
+        //if there is data to be written
+        flush(netOutBuffer);
+
+        //is the channel closed?
+        closed = (!netOutBuffer.hasRemaining() && (handshake.getHandshakeStatus() != HandshakeStatus.NEED_WRAP));
+    }
+
+    /**
+     * Force a close, can throw an IOException
+     * @param force boolean
+     * @throws IOException
+     */
+    public void close(boolean force) throws IOException {
+        try {
+            close();
+        }finally {
+            closed = true;
+            sc.close();
+        }
+    }
+
+    /**
+     * Reads a sequence of bytes from this channel into the given buffer.
+     *
+     * @param dst The buffer into which bytes are to be transferred
+     * @return The number of bytes read, possibly zero, or <tt>-1</tt> if the channel has reached end-of-stream
+     * @throws IOException If some other I/O error occurs
+     * @throws IllegalArgumentException if the destination buffer is different than bufHandler.getReadBuffer()
+     * @todo Implement this java.nio.channels.ReadableByteChannel method
+     */
+    public int read(ByteBuffer dst) throws IOException {
+        //if we want to take advantage of the expand function, make sure we only use the ApplicationBufferHandler's buffers
+        if ( dst != bufHandler.getReadBuffer() ) throw new IllegalArgumentException("You can only read using the application read buffer provided by the handler.");
+        //are we in the middle of closing or closed?
+        if ( closing || closed) return -1;
+        //did we finish our handshake?
+        if (!initHandshakeComplete) throw new IllegalStateException("Handshake incomplete, you must complete handshake before reading data.");
+
+        //read from the network
+        int netread = sc.read(netInBuffer);
+        //did we reach EOF? if so send EOF up one layer.
+        if (netread == -1) return -1;
+        
+        //the data read
+        int read = 0;
+        //the SSL engine result
+        SSLEngineResult unwrap;
+        do {
+            //prepare the buffer
+            netInBuffer.flip();
+            //unwrap the data
+            unwrap = sslEngine.unwrap(netInBuffer, dst);
+            //compact the buffer
+            netInBuffer.compact();
+            
+            if ( unwrap.getStatus()==Status.OK || unwrap.getStatus()==Status.BUFFER_UNDERFLOW ) {
+                //we did receive some data, add it to our total
+                read += unwrap.bytesProduced();
+                //perform any tasks if needed
+                if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+                //if we need more network data, then bail out for now.
+                if ( unwrap.getStatus() == Status.BUFFER_UNDERFLOW ) break;
+            }else {
+                //here we should trap BUFFER_OVERFLOW and call expand on the buffer
+                //for now, throw an exception, as we initialized the buffers
+                //in the constructor
+                throw new IOException("Unable to unwrap data, invalid status: " + unwrap.getStatus());
+            }
+        } while ( (netInBuffer.position() != 0));
+        return (read);
+    }
+
+    /**
+     * Writes a sequence of bytes to this channel from the given buffer.
+     *
+     * @param src The buffer from which bytes are to be retrieved
+     * @return The number of bytes written, possibly zero
+     * @throws IOException If some other I/O error occurs
+     * @todo Implement this java.nio.channels.WritableByteChannel method
+     */
+    public int write(ByteBuffer src) throws IOException {
+        //make sure we can handle expand, and that we only use on buffer
+        if ( src != bufHandler.getWriteBuffer() ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
+        //are we closing or closed?
+        if ( closing || closed) throw new IOException("Channel is in closing state.");
+        
+        //the number of bytes written
+        int written = 0;
+        
+        if (!flush(netOutBuffer)) {
+            //we haven't emptied out the buffer yet
+            return written;
+        }
+
+        /*
+         * The data buffer is empty, we can reuse the entire buffer.
+         */
+        netOutBuffer.clear();
+
+        SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
+        written = result.bytesConsumed();
+        netOutBuffer.flip();
+
+        if (result.getStatus() == Status.OK) {
+            if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+        } else {
+            throw new IOException("Unable to wrap data, invalid engine state: " +result.getStatus());
+        }        
+
+        //force a flush
+        flush(netOutBuffer);
+
+        return written;
+    }
+    
+    /**
+     * Callback interface to be able to expand buffers
+     * when buffer overflow exceptions happen
+     */
+    public static interface ApplicationBufferHandler {
+        public ByteBuffer expand(ByteBuffer buffer, int remaining);
+        public ByteBuffer getReadBuffer();
+        public ByteBuffer getWriteBuffer();
+    }
+
+    public ApplicationBufferHandler getBufHandler() {
+        return bufHandler;
+    }
+
+    public boolean isInitHandshakeComplete() {
+        return initHandshakeComplete;
+    }
+
+    public boolean isClosing() {
+        return closing;
+    }
+
+    public SSLEngine getSslEngine() {
+        return sslEngine;
+    }
+
+    public ByteBuffer getEmptyBuf() {
+        return emptyBuf;
+    }
+
+    public void setBufHandler(ApplicationBufferHandler bufHandler) {
+        this.bufHandler = bufHandler;
+    }
+    
+    public SocketChannel getIOChannel() {
+        return sc;
+    }
+
+}

@@ -19,7 +19,7 @@ package org.apache.coyote.http11;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.SelectionKey;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -45,11 +45,12 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
-import java.nio.channels.SelectionKey;
 
 
 /**
@@ -73,6 +74,10 @@ public class Http11NioProcessor implements ActionHook {
     protected static StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    /**
+     * SSL information.
+     */
+    protected SSLSupport sslSupport;
 
     // ----------------------------------------------------------- Constructors
 
@@ -99,7 +104,7 @@ public class Http11NioProcessor implements ActionHook {
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
-        ssl = !"off".equalsIgnoreCase(endpoint.getSSLEngine());
+        ssl = endpoint.getSecure();
 
         initializeFilters();
 
@@ -217,7 +222,7 @@ public class Http11NioProcessor implements ActionHook {
     /**
      * Socket associated with the current connection.
      */
-    protected SocketChannel socket = null;
+    protected NioChannel socket = null;
 
 
     /**
@@ -747,7 +752,7 @@ public class Http11NioProcessor implements ActionHook {
             if (request.getAttribute("org.apache.tomcat.comet") == null) {
                 comet = false;
             }
-            SelectionKey key = socket.keyFor(endpoint.getPoller().getSelector());
+            SelectionKey key = socket.getIOChannel().keyFor(endpoint.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                 if ( attach!=null ) {
@@ -787,7 +792,7 @@ public class Http11NioProcessor implements ActionHook {
      *
      * @throws IOException error during an I/O operation
      */
-    public SocketState process(SocketChannel socket)
+    public SocketState process(NioChannel socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -826,7 +831,7 @@ public class Http11NioProcessor implements ActionHook {
             // Parsing the request header
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socket.socket().setSoTimeout((int)soTimeout);
+                    socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
                     inputBuffer.readTimeout = soTimeout;
                 }
                 if (!inputBuffer.parseRequestLine
@@ -842,7 +847,7 @@ public class Http11NioProcessor implements ActionHook {
                 request.setStartTime(System.currentTimeMillis());
                 keptAlive = true;
                 if (!disableUploadTimeout) {
-                    socket.socket().setSoTimeout((int)timeout);
+                    socket.getIOChannel().socket().setSoTimeout((int)timeout);
                     inputBuffer.readTimeout = soTimeout;
                 }
                 inputBuffer.parseHeaders();
@@ -892,7 +897,7 @@ public class Http11NioProcessor implements ActionHook {
                     if (request.getAttribute("org.apache.tomcat.comet") != null) {
                         comet = true;
                     }
-                    SelectionKey key = socket.keyFor(endpoint.getPoller().getSelector());
+                    SelectionKey key = socket.getIOChannel().keyFor(endpoint.getPoller().getSelector());
                     if (key != null) {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                         if (attach != null)  {
@@ -1044,7 +1049,7 @@ public class Http11NioProcessor implements ActionHook {
 
             comet = false;
             cometClose = true;
-            SelectionKey key = socket.keyFor(endpoint.getPoller().getSelector());
+            SelectionKey key = socket.getIOChannel().keyFor(endpoint.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                 if ( attach!=null && attach.getComet()) {
@@ -1078,7 +1083,7 @@ public class Http11NioProcessor implements ActionHook {
 
             // Get remote host address
             if ((remoteAddr == null) && (socket != null)) {
-                InetAddress inetAddr = socket.socket().getInetAddress();
+                InetAddress inetAddr = socket.getIOChannel().socket().getInetAddress();
                 if (inetAddr != null) {
                     remoteAddr = inetAddr.getHostAddress();
                 }
@@ -1089,7 +1094,7 @@ public class Http11NioProcessor implements ActionHook {
 
             // Get local host name
             if ((localName == null) && (socket != null)) {
-                InetAddress inetAddr = socket.socket().getLocalAddress();
+                InetAddress inetAddr = socket.getIOChannel().socket().getLocalAddress();
                 if (inetAddr != null) {
                     localName = inetAddr.getHostName();
                 }
@@ -1100,7 +1105,7 @@ public class Http11NioProcessor implements ActionHook {
 
             // Get remote host name
             if ((remoteHost == null) && (socket != null)) {
-                InetAddress inetAddr = socket.socket().getInetAddress();
+                InetAddress inetAddr = socket.getIOChannel().socket().getInetAddress();
                 if (inetAddr != null) {
                     remoteHost = inetAddr.getHostName();
                 }
@@ -1117,102 +1122,71 @@ public class Http11NioProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_REQ_LOCAL_ADDR_ATTRIBUTE) {
 
             if (localAddr == null)
-               localAddr = socket.socket().getLocalAddress().getHostAddress();
+               localAddr = socket.getIOChannel().socket().getLocalAddress().getHostAddress();
 
             request.localAddr().setString(localAddr);
 
         } else if (actionCode == ActionCode.ACTION_REQ_REMOTEPORT_ATTRIBUTE) {
 
             if ((remotePort == -1 ) && (socket !=null)) {
-                remotePort = socket.socket().getPort();
+                remotePort = socket.getIOChannel().socket().getPort();
             }
             request.setRemotePort(remotePort);
 
         } else if (actionCode == ActionCode.ACTION_REQ_LOCALPORT_ATTRIBUTE) {
 
             if ((localPort == -1 ) && (socket !=null)) {
-                localPort = socket.socket().getLocalPort();
+                localPort = socket.getIOChannel().socket().getLocalPort();
             }
             request.setLocalPort(localPort);
 
         } else if (actionCode == ActionCode.ACTION_REQ_SSL_ATTRIBUTE ) {
 
-//            if (ssl && (socket != 0)) {
-//                try {
-//                    // Cipher suite
-//                    Object sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_CIPHER);
-//                    if (sslO != null) {
-//                        request.setAttribute
-//                            (NioEndpoint.CIPHER_SUITE_KEY, sslO);
-//                    }
-//                    // Client certificate chain if present
-//                    int certLength = SSLSocket.getInfoI(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-//                    X509Certificate[] certs = null;
-//                    if (certLength > 0) {
-//                        certs = new X509Certificate[certLength];
-//                        for (int i = 0; i < certLength; i++) {
-//                            byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-//                            CertificateFactory cf =
-//                                CertificateFactory.getInstance("X.509");
-//                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
-//                            certs[i] = (X509Certificate) cf.generateCertificate(stream);
-//                        }
-//                    }
-//                    if (certs != null) {
-//                        request.setAttribute
-//                            (NioEndpoint.CERTIFICATE_KEY, certs);
-//                    }
-//                    // User key size
-//                    sslO = new Integer(SSLSocket.getInfoI(socket, SSL.SSL_INFO_CIPHER_USEKEYSIZE));
-//                    if (sslO != null) {
-//                        request.setAttribute
-//                            (NioEndpoint.KEY_SIZE_KEY, sslO);
-//                    }
-//                    // SSL session ID
-//                    sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_SESSION_ID);
-//                    if (sslO != null) {
-//                        request.setAttribute
-//                            (NioEndpoint.SESSION_ID_KEY, sslO);
-//                    }
-//                } catch (Exception e) {
-//                    log.warn(sm.getString("http11processor.socket.ssl"), e);
-//                }
-//            }
+            try {
+                if (sslSupport != null) {
+                    Object sslO = sslSupport.getCipherSuite();
+                    if (sslO != null)
+                        request.setAttribute
+                            (SSLSupport.CIPHER_SUITE_KEY, sslO);
+                    sslO = sslSupport.getPeerCertificateChain(false);
+                    if (sslO != null)
+                        request.setAttribute
+                            (SSLSupport.CERTIFICATE_KEY, sslO);
+                    sslO = sslSupport.getKeySize();
+                    if (sslO != null)
+                        request.setAttribute
+                            (SSLSupport.KEY_SIZE_KEY, sslO);
+                    sslO = sslSupport.getSessionId();
+                    if (sslO != null)
+                        request.setAttribute
+                            (SSLSupport.SESSION_ID_KEY, sslO);
+                }
+            } catch (Exception e) {
+                log.warn(sm.getString("http11processor.socket.ssl"), e);
+            }
 
         } else if (actionCode == ActionCode.ACTION_REQ_SSL_CERTIFICATE) {
 
-//            if (ssl && (socket != 0)) {
-//                 // Consume and buffer the request body, so that it does not
-//                 // interfere with the client's handshake messages
-//                InputFilter[] inputFilters = inputBuffer.getFilters();
-//                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
-//                    .setLimit(maxSavePostSize);
-//                inputBuffer.addActiveFilter
-//                    (inputFilters[Constants.BUFFERED_FILTER]);
-//                try {
-//                    // Renegociate certificates
-//                    SSLSocket.renegotiate(socket);
-//                    // Client certificate chain if present
-//                    int certLength = SSLSocket.getInfoI(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
-//                    X509Certificate[] certs = null;
-//                    if (certLength > 0) {
-//                        certs = new X509Certificate[certLength];
-//                        for (int i = 0; i < certLength; i++) {
-//                            byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-//                            CertificateFactory cf =
-//                                CertificateFactory.getInstance("X.509");
-//                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
-//                            certs[i] = (X509Certificate) cf.generateCertificate(stream);
-//                        }
-//                    }
-//                    if (certs != null) {
-//                        request.setAttribute
-//                            (NioEndpoint.CERTIFICATE_KEY, certs);
-//                    }
-//                } catch (Exception e) {
-//                    log.warn(sm.getString("http11processor.socket.ssl"), e);
-//                }
-//            }
+            if( sslSupport != null) {
+                /*
+                 * Consume and buffer the request body, so that it does not
+                 * interfere with the client's handshake messages
+                 */
+                InputFilter[] inputFilters = inputBuffer.getFilters();
+                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
+                    .setLimit(maxSavePostSize);
+                inputBuffer.addActiveFilter
+                    (inputFilters[Constants.BUFFERED_FILTER]);
+                try {
+                    Object sslO = sslSupport.getPeerCertificateChain(true);
+                    if( sslO != null) {
+                        request.setAttribute
+                            (SSLSupport.CERTIFICATE_KEY, sslO);
+                    }
+                } catch (Exception e) {
+                    log.warn(sm.getString("http11processor.socket.ssl"), e);
+                }
+            }
 
         } else if (actionCode == ActionCode.ACTION_REQ_SET_BODY_REPLAY) {
             ByteChunk body = (ByteChunk) param;
@@ -1240,6 +1214,9 @@ public class Http11NioProcessor implements ActionHook {
         this.adapter = adapter;
     }
 
+    public void setSslSupport(SSLSupport sslSupport) {
+        this.sslSupport = sslSupport;
+    }
 
     /**
      * Get the associated adapter.
@@ -1250,6 +1227,9 @@ public class Http11NioProcessor implements ActionHook {
         return adapter;
     }
 
+    public SSLSupport getSslSupport() {
+        return sslSupport;
+    }
 
     // ------------------------------------------------------ Protected Methods
 
