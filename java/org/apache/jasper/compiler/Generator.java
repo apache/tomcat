@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ import org.xml.sax.Attributes;
  * 
  * Tomcat 6.x
  * @author Jacob Hookom
+ * @author Remy Maucherat
  */
 
 class Generator {
@@ -70,6 +71,7 @@ class Generator {
     private static final Class[] OBJECT_CLASS = { Object.class };
 
     private static final String VAR_EXPRESSIONFACTORY = "_el_expressionfactory";
+    private static final String VAR_ANNOTATIONPROCESSOR = "_jsp_annotationprocessor";
 
     private ServletWriter out;
 
@@ -405,7 +407,16 @@ class Generator {
             out.print("getServletConfig()");
         }
         out.println(".getServletContext()).getExpressionFactory();");
-        
+
+        out.printin(VAR_ANNOTATIONPROCESSOR);
+        out.print(" = (org.apache.AnnotationProcessor) ");
+        if (ctxt.isTagFile()) {
+            out.print("config");
+        } else {
+            out.print("getServletConfig()");
+        }
+        out.println(".getServletContext().getAttribute(org.apache.AnnotationProcessor.class.getName());");
+
         out.popIndent();
         out.printil("}");
         out.println();
@@ -504,6 +515,9 @@ class Generator {
         }
         out.printin("private javax.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
+        out.println(";");
+        out.printin("private org.apache.AnnotationProcessor ");
+        out.print(VAR_ANNOTATIONPROCESSOR);
         out.println(";");
         out.println();
     }
@@ -2143,11 +2157,11 @@ class Generator {
                 out.print("new ");
                 out.print(tagHandlerClassName);
                 out.println("();");
-                if (!ctxt.getOptions().getIgnoreAnnotations()) {
-                    out.printin("org.apache.jasper.runtime.AnnotationProcessor.postConstruct(");
-                    out.print(tagHandlerVar);
-                    out.println(");");
-                }
+                out.printin("org.apache.jasper.runtime.AnnotationHelper.postConstruct(");
+                out.print(VAR_ANNOTATIONPROCESSOR);
+                out.print(", ");
+                out.print(tagHandlerVar);
+                out.println(");");
             }
 
             // includes setting the context
@@ -2293,21 +2307,21 @@ class Generator {
                 } else {
                     out.printin(tagHandlerVar);
                     out.println(".release();");
-                    if (!ctxt.getOptions().getIgnoreAnnotations()) {
-                        out.printil("try {");
-                        out.pushIndent();
-                        out.printin("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(");
-                        out.print(tagHandlerVar);
-                        out.println(");");
-                        out.popIndent();
-                        out.printil("} catch (Exception e) {");
-                        out.pushIndent();
-                        out.printin("log(\"Error processing preDestroy on tag instance of \" +");
-                        out.print(tagHandlerVar);
-                        out.println(".getClass().getName());");
-                        out.popIndent();
-                        out.printil("}");
-                    }
+                    out.printil("try {");
+                    out.pushIndent();
+                    out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
+                    out.print(VAR_ANNOTATIONPROCESSOR);
+                    out.print(", ");
+                    out.print(tagHandlerVar);
+                    out.println(");");
+                    out.popIndent();
+                    out.printil("} catch (Exception e) {");
+                    out.pushIndent();
+                    out.printin("log(\"Error processing preDestroy on tag instance of \" +");
+                    out.print(tagHandlerVar);
+                    out.println(".getClass().getName());");
+                    out.popIndent();
+                    out.printil("}");
                 }
             }
             if (isTagFile || isFragment) {
@@ -2350,21 +2364,21 @@ class Generator {
             } else {
                 out.printin(tagHandlerVar);
                 out.println(".release();");
-                if (!ctxt.getOptions().getIgnoreAnnotations()) {
-                    out.printil("try {");
-                    out.pushIndent();
-                    out.printin("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(");
-                    out.print(tagHandlerVar);
-                    out.println(");");
-                    out.popIndent();
-                    out.printil("} catch (Exception e) {");
-                    out.pushIndent();
-                    out.printin("log(\"Error processing preDestroy on tag instance of \" +");
-                    out.print(tagHandlerVar);
-                    out.println(".getClass().getName());");
-                    out.popIndent();
-                    out.printil("}");
-                }
+                out.printil("try {");
+                out.pushIndent();
+                out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
+                out.print(VAR_ANNOTATIONPROCESSOR);
+                out.print(", ");
+                out.print(tagHandlerVar);
+                out.println(");");
+                out.popIndent();
+                out.printil("} catch (Exception e) {");
+                out.pushIndent();
+                out.printin("log(\"Error processing preDestroy on tag instance of \" +");
+                out.print(tagHandlerVar);
+                out.println(".getClass().getName());");
+                out.popIndent();
+                out.printil("}");
             }
 
             if (n.implementsTryCatchFinally()) {
@@ -2405,11 +2419,11 @@ class Generator {
             out.println("();");
 
             // Resource injection
-            if (!ctxt.getOptions().getIgnoreAnnotations()) {
-                out.printin("org.apache.jasper.runtime.AnnotationProcessor.postConstruct(");
-                out.print(tagHandlerVar);
-                out.println(");");
-            }
+            out.printin("org.apache.jasper.runtime.AnnotationHelper.postConstruct(");
+            out.print(VAR_ANNOTATIONPROCESSOR);
+            out.print(", ");
+            out.print(tagHandlerVar);
+            out.println(");");
             
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
@@ -2455,11 +2469,11 @@ class Generator {
             syncScriptingVars(n, VariableInfo.AT_END);
 
             // Resource injection
-            if (!ctxt.getOptions().getIgnoreAnnotations()) {
-                out.printin("org.apache.jasper.runtime.AnnotationProcessor.preDestroy(");
-                out.print(tagHandlerVar);
-                out.println(");");
-            }
+            out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
+            out.print(VAR_ANNOTATIONPROCESSOR);
+            out.print(", ");
+            out.print(tagHandlerVar);
+            out.println(");");
 
             n.setEndJavaLine(out.getJavaLine());
         }
