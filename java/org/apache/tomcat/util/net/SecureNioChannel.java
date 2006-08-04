@@ -323,7 +323,7 @@ public class SecureNioChannel extends NioChannel  {
                 //in the constructor
                 throw new IOException("Unable to unwrap data, invalid status: " + unwrap.getStatus());
             }
-        } while ( (netInBuffer.position() != 0));
+        } while ( (netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
         return (read);
     }
 
