@@ -588,13 +588,12 @@ public class InternalNioInputBuffer implements InputBuffer {
                     if (key != null) key.interestOps(SelectionKey.OP_READ);
                 } catch (CancelledKeyException ckx) {
                     try {
-                        if ( key != null && key.attachment() != null ) {
-                            KeyAttachment ka = (KeyAttachment)key.attachment();
-                            ka.setError(true); //set to collect this socket immediately
+                        if ( att != null ) {
+                            att.setError(true); //set to collect this socket immediately
+                            att.setWakeUp(false);
                         }
-                        socket.getIOChannel().socket().close();
-                        socket.close();
-                        att.setWakeUp(false);
+                        try {socket.close();}catch (Exception ignore){}
+                        if ( socket.isOpen() ) socket.close(true);
                     } catch (Exception ignore) {}
                 }
             }
