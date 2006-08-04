@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.SocketChannel;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
@@ -32,6 +31,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioChannel;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -59,11 +59,11 @@ public class InternalNioInputBuffer implements InputBuffer {
         headers = request.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
-        if (headerBufferSize < (8 * 1024)) {
-            bbuf = ByteBuffer.allocateDirect(6 * 1500);
-        } else {
-            bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
-        }
+//        if (headerBufferSize < (8 * 1024)) {
+//            bbuf = ByteBuffer.allocateDirect(6 * 1500);
+//        } else {
+//            bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
+//        }
 
         inputStreamInputBuffer = new SocketInputBuffer();
 
@@ -145,16 +145,11 @@ public class InternalNioInputBuffer implements InputBuffer {
     protected int end;
 
 
-    /**
-     * Direct byte buffer used to perform actual reading.
-     */
-    protected ByteBuffer bbuf;
-
 
     /**
      * Underlying socket.
      */
-    protected SocketChannel socket;
+    protected NioChannel socket;
 
 
     /**
@@ -195,7 +190,7 @@ public class InternalNioInputBuffer implements InputBuffer {
     /**
      * Set the underlying socket.
      */
-    public void setSocket(SocketChannel socket) {
+    public void setSocket(NioChannel socket) {
         this.socket = socket;
     }
 
@@ -203,7 +198,7 @@ public class InternalNioInputBuffer implements InputBuffer {
     /**
      * Get the underlying socket input stream.
      */
-    public SocketChannel getSocket() {
+    public NioChannel getSocket() {
         return socket;
     }
 
@@ -548,13 +543,14 @@ public class InternalNioInputBuffer implements InputBuffer {
         long start = System.currentTimeMillis();
         boolean timedOut = false;
         do {
-            bbuf.clear();
-            nRead = socket.read(bbuf);
+            
+            socket.getBufHandler().getReadBuffer().clear();
+            nRead = socket.read(socket.getBufHandler().getReadBuffer());
             if (nRead > 0) {
-                bbuf.flip();
-                bbuf.limit(nRead);
+                socket.getBufHandler().getReadBuffer().flip();
+                socket.getBufHandler().getReadBuffer().limit(nRead);
                 expand(nRead + pos);
-                bbuf.get(buf, pos, nRead);
+                socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
                 lastValid = pos + nRead;
                 return true;
             } else if (nRead == -1) {
@@ -564,7 +560,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>this.readTimeout);
             if ( !timedOut && nRead == 0 ) 
                 try {
-                    final SelectionKey key = socket.keyFor(poller.getSelector());
+                    final SelectionKey key = socket.getIOChannel().keyFor(poller.getSelector());
                     final KeyAttachment att = (KeyAttachment)key.attachment();
                     //to do, add in a check, we might have just timed out on the wait,
                     //so there is no need to register us again.
@@ -596,7 +592,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                             KeyAttachment ka = (KeyAttachment)key.attachment();
                             ka.setError(true); //set to collect this socket immediately
                         }
-                        socket.socket().close();
+                        socket.getIOChannel().socket().close();
                         socket.close();
                         att.setWakeUp(false);
                     } catch (Exception ignore) {}

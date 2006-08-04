@@ -18,7 +18,6 @@ package org.apache.coyote.http11;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
-import java.nio.channels.SocketChannel;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -37,6 +36,9 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioChannel;
+import org.apache.tomcat.util.net.SSLImplementation;
+import org.apache.tomcat.util.net.SecureNioChannel;
 
 
 /**
@@ -50,6 +52,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 {
+    protected SSLImplementation sslImplementation = null;
+    
     public Http11NioProtocol() {
         cHandler = new Http11ConnectionHandler( this );
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
@@ -113,9 +117,13 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public void init() throws Exception {
         ep.setName(getName());
         ep.setHandler(cHandler);
-
+        ep.setReadBufSize(getMaxHttpHeaderSize());
+        ep.setWriteBufSize(getMaxHttpHeaderSize());
         try {
             ep.init();
+            
+            sslImplementation = SSLImplementation.getInstance("org.apache.tomcat.util.net.jsse.JSSEImplementation");
+            
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
             throw ex;
@@ -188,7 +196,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     // -------------------- Properties--------------------
     protected NioEndpoint ep=new NioEndpoint();
-    protected boolean secure;
+    protected boolean secure = false;
 
     protected Hashtable attributes = new Hashtable();
 
@@ -430,6 +438,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     }
 
     public void setSecure( boolean b ) {
+        ep.setSecure(b);
         secure=b;
         setAttribute("secure", "" + b);
     }
@@ -489,96 +498,27 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     // --------------------  SSL related properties --------------------
 
-    /**
-     * SSL engine.
-     */
-    public String getSSLEngine() { return ep.getSSLEngine(); }
-    public void setSSLEngine(String SSLEngine) { ep.setSSLEngine(SSLEngine); }
-
-
-    /**
-     * SSL protocol.
-     */
-    public String getSSLProtocol() { return ep.getSSLProtocol(); }
-    public void setSSLProtocol(String SSLProtocol) { ep.setSSLProtocol(SSLProtocol); }
-
-
-    /**
-     * SSL password (if a cert is encrypted, and no password has been provided, a callback
-     * will ask for a password).
-     */
-    public String getSSLPassword() { return ep.getSSLPassword(); }
-    public void setSSLPassword(String SSLPassword) { ep.setSSLPassword(SSLPassword); }
-
-
-    /**
-     * SSL cipher suite.
-     */
-    public String getSSLCipherSuite() { return ep.getSSLCipherSuite(); }
-    public void setSSLCipherSuite(String SSLCipherSuite) { ep.setSSLCipherSuite(SSLCipherSuite); }
-
-
-    /**
-     * SSL certificate file.
-     */
-    public String getSSLCertificateFile() { return ep.getSSLCertificateFile(); }
-    public void setSSLCertificateFile(String SSLCertificateFile) { ep.setSSLCertificateFile(SSLCertificateFile); }
-
-
-    /**
-     * SSL certificate key file.
-     */
-    public String getSSLCertificateKeyFile() { return ep.getSSLCertificateKeyFile(); }
-    public void setSSLCertificateKeyFile(String SSLCertificateKeyFile) { ep.setSSLCertificateKeyFile(SSLCertificateKeyFile); }
-
-
-    /**
-     * SSL certificate chain file.
-     */
-    public String getSSLCertificateChainFile() { return ep.getSSLCertificateChainFile(); }
-    public void setSSLCertificateChainFile(String SSLCertificateChainFile) { ep.setSSLCertificateChainFile(SSLCertificateChainFile); }
-
-
-    /**
-     * SSL CA certificate path.
-     */
-    public String getSSLCACertificatePath() { return ep.getSSLCACertificatePath(); }
-    public void setSSLCACertificatePath(String SSLCACertificatePath) { ep.setSSLCACertificatePath(SSLCACertificatePath); }
-
-
-    /**
-     * SSL CA certificate file.
-     */
-    public String getSSLCACertificateFile() { return ep.getSSLCACertificateFile(); }
-    public void setSSLCACertificateFile(String SSLCACertificateFile) { ep.setSSLCACertificateFile(SSLCACertificateFile); }
-
-
-    /**
-     * SSL CA revocation path.
-     */
-    public String getSSLCARevocationPath() { return ep.getSSLCARevocationPath(); }
-    public void setSSLCARevocationPath(String SSLCARevocationPath) { ep.setSSLCARevocationPath(SSLCARevocationPath); }
-
-
-    /**
-     * SSL CA revocation file.
-     */
-    public String getSSLCARevocationFile() { return ep.getSSLCARevocationFile(); }
-    public void setSSLCARevocationFile(String SSLCARevocationFile) { ep.setSSLCARevocationFile(SSLCARevocationFile); }
-
-
-    /**
-     * SSL verify client.
-     */
-    public String getSSLVerifyClient() { return ep.getSSLVerifyClient(); }
-    public void setSSLVerifyClient(String SSLVerifyClient) { ep.setSSLVerifyClient(SSLVerifyClient); }
-
-
-    /**
-     * SSL verify depth.
-     */
-    public int getSSLVerifyDepth() { return ep.getSSLVerifyDepth(); }
-    public void setSSLVerifyDepth(int SSLVerifyDepth) { ep.setSSLVerifyDepth(SSLVerifyDepth); }
+    public String getKeystoreFile() { return ep.getKeystoreFile();}
+    public void setKeystoreFile(String s ) { ep.setKeystoreFile(s);}
+    
+    public String getAlgorithm() { return ep.getAlgorithm();}
+    public void setAlgorithm(String s ) { ep.setAlgorithm(s);}
+    
+    public boolean getClientAuth() { return ep.getClientAuth();}
+    public void setClientAuth(boolean b ) { ep.setClientAuth(b);}
+    
+    public String getKeystorePass() { return ep.getKeystorePass();}
+    public void setKeystorePass(String s ) { ep.setKeystorePass(s);}
+    
+    public String getKeystoreType() { return ep.getKeystoreType();}
+    public void setKeystoreType(String s ) { ep.setKeystoreType(s);}
+    
+    public String getSslProtocol() { return ep.getSslProtocol();}
+    public void setSslProtocol(String s) { ep.setSslProtocol(s);}
+    
+    public String getCiphers() { return ep.getCiphers();}
+    public void setCiphers(String s) { ep.setCiphers(s);}
+    
 
     // --------------------  Connection handler --------------------
 
@@ -590,8 +530,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
         protected ThreadLocal<Http11NioProcessor> localProcessor = 
             new ThreadLocal<Http11NioProcessor>();
-        protected ConcurrentHashMap<SocketChannel, Http11NioProcessor> connections =
-            new ConcurrentHashMap<SocketChannel, Http11NioProcessor>();
+        protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
+            new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
         protected java.util.Stack<Http11NioProcessor> recycledProcessors = 
             new java.util.Stack<Http11NioProcessor>();
 
@@ -599,7 +539,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             this.proto = proto;
         }
 
-        public SocketState event(SocketChannel socket, boolean error) {
+        public SocketState event(NioChannel socket, boolean error) {
             Http11NioProcessor result = connections.get(socket);
 
             SocketState state = SocketState.CLOSED; 
@@ -638,7 +578,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             return state;
         }
 
-        public SocketState process(SocketChannel socket) {
+        public SocketState process(NioChannel socket) {
             Http11NioProcessor processor = null;
             try {
                 processor = (Http11NioProcessor) localProcessor.get();
@@ -651,40 +591,23 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     }
                 }
                 if (processor == null) {
-                    processor =
-                        new Http11NioProcessor(proto.maxHttpHeaderSize, proto.ep);
-                    processor.setAdapter(proto.adapter);
-                    processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
-                    processor.setTimeout(proto.timeout);
-                    processor.setDisableUploadTimeout(proto.disableUploadTimeout);
-                    processor.setCompression(proto.compression);
-                    processor.setCompressionMinSize(proto.compressionMinSize);
-                    processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
-                    processor.setCompressableMimeTypes(proto.compressableMimeTypes);
-                    processor.setRestrictedUserAgents(proto.restrictedUserAgents);
-                    processor.setSocketBuffer(proto.socketBuffer);
-                    processor.setMaxSavePostSize(proto.maxSavePostSize);
-                    processor.setServer(proto.server);
-                    localProcessor.set(processor);
-                    if (proto.getDomain() != null) {
-                        synchronized (this) {
-                            try {
-                                RequestInfo rp = processor.getRequest().getRequestProcessor();
-                                rp.setGlobalProcessor(global);
-                                ObjectName rpName = new ObjectName
-                                (proto.getDomain() + ":type=RequestProcessor,worker="
-                                        + proto.getName() + ",name=HttpRequest" + count++);
-                                Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                            } catch (Exception e) {
-                                log.warn("Error registering request");
-                            }
-                        }
-                    }
+                    processor = createProcessor();
                 }
 
                 if (processor instanceof ActionHook) {
                     ((ActionHook) processor).action(ActionCode.ACTION_START, null);
                 }
+                
+                
+                if (proto.ep.getSecure() && (proto.sslImplementation != null)) {
+                    if (socket instanceof SecureNioChannel) {
+                        SecureNioChannel ch = (SecureNioChannel)socket;
+                        processor.setSslSupport(proto.sslImplementation.getSSLSupport(ch.getSslEngine().getSession()));
+                    }else processor.setSslSupport(null);
+                } else {
+                    processor.setSslSupport(null);
+                }
+
 
                 SocketState state = processor.process(socket);
                 if (state == SocketState.LONG) {
@@ -719,6 +642,38 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     (sm.getString("http11protocol.proto.error"), e);
             }
             return SocketState.CLOSED;
+        }
+
+        public Http11NioProcessor createProcessor() {
+            Http11NioProcessor processor = new Http11NioProcessor(proto.maxHttpHeaderSize, proto.ep);
+            processor.setAdapter(proto.adapter);
+            processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
+            processor.setTimeout(proto.timeout);
+            processor.setDisableUploadTimeout(proto.disableUploadTimeout);
+            processor.setCompression(proto.compression);
+            processor.setCompressionMinSize(proto.compressionMinSize);
+            processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
+            processor.setCompressableMimeTypes(proto.compressableMimeTypes);
+            processor.setRestrictedUserAgents(proto.restrictedUserAgents);
+            processor.setSocketBuffer(proto.socketBuffer);
+            processor.setMaxSavePostSize(proto.maxSavePostSize);
+            processor.setServer(proto.server);
+            localProcessor.set(processor);
+            if (proto.getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(global);
+                        ObjectName rpName = new ObjectName
+                        (proto.getDomain() + ":type=RequestProcessor,worker="
+                                + proto.getName() + ",name=HttpRequest" + count++);
+                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                    } catch (Exception e) {
+                        log.warn("Error registering request");
+                    }
+                }
+            }
+            return processor;
         }
     }
 

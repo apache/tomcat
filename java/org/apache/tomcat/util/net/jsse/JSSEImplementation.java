@@ -21,6 +21,7 @@ import java.net.Socket;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
+import javax.net.ssl.SSLSession;
 
 /* JSSEImplementation:
 
@@ -58,4 +59,10 @@ public class JSSEImplementation extends SSLImplementation
         SSLSupport ssls = factory.getSSLSupport(s);
         return ssls;
     }
+
+    public SSLSupport getSSLSupport(SSLSession session) {
+        SSLSupport ssls = factory.getSSLSupport(session);
+        return ssls;
+    }
+
 }

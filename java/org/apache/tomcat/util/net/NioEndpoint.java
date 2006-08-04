@@ -16,22 +16,29 @@
 
 package org.apache.tomcat.util.net;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.security.KeyStore;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.Executor;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -128,12 +135,9 @@ public class NioEndpoint {
     protected int sequence = 0;
 
 
-    /**
-     * Root APR memory pool.
-     */
-    protected long rootPool = 0;
-
-
+    protected int readBufSize = 8192;
+    protected int writeBufSize = 8192;
+    
     /**
      * Server socket "pointer".
      */
@@ -146,11 +150,7 @@ public class NioEndpoint {
     protected long serverSockPool = 0;
 
 
-    /**
-     * SSL context.
-     */
-    protected long sslContext = 0;
-
+    
 
     // ------------------------------------------------------------- Properties
 
@@ -341,112 +341,51 @@ public class NioEndpoint {
      */
     public int getMinSpareThreads() { return 0; }
 
+    // --------------------  SSL related properties --------------------
+    protected String keystoreFile = System.getProperty("user.home")+"/.keystore";
+    public String getKeystoreFile() { return keystoreFile;}
+    public void setKeystoreFile(String s ) { this.keystoreFile = s;}
 
-    /**
-     * SSL engine.
-     */
-    protected String SSLEngine = "off";
-    public String getSSLEngine() { return SSLEngine; }
-    public void setSSLEngine(String SSLEngine) { this.SSLEngine = SSLEngine; }
+    protected String algorithm = "SunX509";
+    public String getAlgorithm() { return algorithm;}
+    public void setAlgorithm(String s ) { this.algorithm = s;}
 
+    protected boolean clientAuth = false;
+    public boolean getClientAuth() { return clientAuth;}
+    public void setClientAuth(boolean b ) { this.clientAuth = b;}
+    
+    protected String keystorePass = "changeit";
+    public String getKeystorePass() { return keystorePass;}
+    public void setKeystorePass(String s ) { this.keystorePass = s;}
+    
+    protected String keystoreType = "JKS";
+    public String getKeystoreType() { return keystoreType;}
+    public void setKeystoreType(String s ) { this.keystoreType = s;}
 
-    /**
-     * SSL protocols.
-     */
-    protected String SSLProtocol = "all";
-    public String getSSLProtocol() { return SSLProtocol; }
-    public void setSSLProtocol(String SSLProtocol) { this.SSLProtocol = SSLProtocol; }
+    protected String sslProtocol = "TLS";
+    public String getSslProtocol() { return sslProtocol;}
+    public void setSslProtocol(String s) { sslProtocol = s;}
+    
+    protected String ciphers = null;
+    public String getCiphers() { return ciphers;}
+    public void setCiphers(String s) { ciphers = s;}
+    
+    protected boolean secure = false;
+    public boolean getSecure() { return secure;}
+    public void setSecure(boolean b) { secure = b;}
 
+    public void setWriteBufSize(int writeBufSize) {
+        this.writeBufSize = writeBufSize;
+    }
 
-    /**
-     * SSL password (if a cert is encrypted, and no password has been provided, a callback
-     * will ask for a password).
-     */
-    protected String SSLPassword = null;
-    public String getSSLPassword() { return SSLPassword; }
-    public void setSSLPassword(String SSLPassword) { this.SSLPassword = SSLPassword; }
+    public void setReadBufSize(int readBufSize) {
+        this.readBufSize = readBufSize;
+    }
 
-
-    /**
-     * SSL cipher suite.
-     */
-    protected String SSLCipherSuite = "ALL";
-    public String getSSLCipherSuite() { return SSLCipherSuite; }
-    public void setSSLCipherSuite(String SSLCipherSuite) { this.SSLCipherSuite = SSLCipherSuite; }
-
-
-    /**
-     * SSL certificate file.
-     */
-    protected String SSLCertificateFile = null;
-    public String getSSLCertificateFile() { return SSLCertificateFile; }
-    public void setSSLCertificateFile(String SSLCertificateFile) { this.SSLCertificateFile = SSLCertificateFile; }
-
-
-    /**
-     * SSL certificate key file.
-     */
-    protected String SSLCertificateKeyFile = null;
-    public String getSSLCertificateKeyFile() { return SSLCertificateKeyFile; }
-    public void setSSLCertificateKeyFile(String SSLCertificateKeyFile) { this.SSLCertificateKeyFile = SSLCertificateKeyFile; }
-
-
-    /**
-     * SSL certificate chain file.
-     */
-    protected String SSLCertificateChainFile = null;
-    public String getSSLCertificateChainFile() { return SSLCertificateChainFile; }
-    public void setSSLCertificateChainFile(String SSLCertificateChainFile) { this.SSLCertificateChainFile = SSLCertificateChainFile; }
-
-
-    /**
-     * SSL CA certificate path.
-     */
-    protected String SSLCACertificatePath = null;
-    public String getSSLCACertificatePath() { return SSLCACertificatePath; }
-    public void setSSLCACertificatePath(String SSLCACertificatePath) { this.SSLCACertificatePath = SSLCACertificatePath; }
-
-
-    /**
-     * SSL CA certificate file.
-     */
-    protected String SSLCACertificateFile = null;
-    public String getSSLCACertificateFile() { return SSLCACertificateFile; }
-    public void setSSLCACertificateFile(String SSLCACertificateFile) { this.SSLCACertificateFile = SSLCACertificateFile; }
-
-
-    /**
-     * SSL CA revocation path.
-     */
-    protected String SSLCARevocationPath = null;
-    public String getSSLCARevocationPath() { return SSLCARevocationPath; }
-    public void setSSLCARevocationPath(String SSLCARevocationPath) { this.SSLCARevocationPath = SSLCARevocationPath; }
-
-
-    /**
-     * SSL CA revocation file.
-     */
-    protected String SSLCARevocationFile = null;
-    public String getSSLCARevocationFile() { return SSLCARevocationFile; }
-    public void setSSLCARevocationFile(String SSLCARevocationFile) { this.SSLCARevocationFile = SSLCARevocationFile; }
-
-
-    /**
-     * SSL verify client.
-     */
-    protected String SSLVerifyClient = "none";
-    public String getSSLVerifyClient() { return SSLVerifyClient; }
-    public void setSSLVerifyClient(String SSLVerifyClient) { this.SSLVerifyClient = SSLVerifyClient; }
-
-
-    /**
-     * SSL verify depth.
-     */
-    protected int SSLVerifyDepth = 10;
-    public int getSSLVerifyDepth() { return SSLVerifyDepth; }
-    public void setSSLVerifyDepth(int SSLVerifyDepth) { this.SSLVerifyDepth = SSLVerifyDepth; }
-
-
+    protected SSLContext sslContext = null;
+    public SSLContext getSSLContext() { return sslContext;}
+    public void setSSLContext(SSLContext c) { sslContext = c;}
+    
     // --------------------------------------------------------- Public Methods
 
 
@@ -535,47 +474,24 @@ public class NioEndpoint {
         }
 
         // Initialize SSL if needed
-        if (!"off".equalsIgnoreCase(SSLEngine)) {
+        if (secure) {
             // Initialize SSL
-            // FIXME: one per VM call ?
-            if ("on".equalsIgnoreCase(SSLEngine)) {
-                //SSL.initialize(null);
-            } else {
-                //SSL.initialize(SSLEngine);
-            }
-            // SSL protocol
-            int value = SSL.SSL_PROTOCOL_ALL;
-            if ("SSLv2".equalsIgnoreCase(SSLProtocol)) {
-                value = SSL.SSL_PROTOCOL_SSLV2;
-            } else if ("SSLv3".equalsIgnoreCase(SSLProtocol)) {
-                value = SSL.SSL_PROTOCOL_SSLV3;
-            } else if ("TLSv1".equalsIgnoreCase(SSLProtocol)) {
-                value = SSL.SSL_PROTOCOL_TLSV1;
-            } else if ("SSLv2+SSLv3".equalsIgnoreCase(SSLProtocol)) {
-                value = SSL.SSL_PROTOCOL_SSLV2 | SSL.SSL_PROTOCOL_SSLV3;
-            }
-//            // Create SSL Context
-//            sslContext = SSLContext.make(rootPool, value, SSL.SSL_MODE_SERVER);
-//            // List the ciphers that the client is permitted to negotiate
-//            SSLContext.setCipherSuite(sslContext, SSLCipherSuite);
-//            // Load Server key and certificate
-//            SSLContext.setCertificate(sslContext, SSLCertificateFile, SSLCertificateKeyFile, SSLPassword, SSL.SSL_AIDX_RSA);
-//            // Set certificate chain file
-//            SSLContext.setCertificateChainFile(sslContext, SSLCertificateChainFile, false);
-//            // Support Client Certificates
-//            SSLContext.setCACertificate(sslContext, SSLCACertificateFile, SSLCACertificatePath);
-//            // Set revocation
-//            SSLContext.setCARevocation(sslContext, SSLCARevocationFile, SSLCARevocationPath);
-//            // Client certificate verification
-//            value = SSL.SSL_CVERIFY_NONE;
-//            if ("optional".equalsIgnoreCase(SSLVerifyClient)) {
-//                value = SSL.SSL_CVERIFY_OPTIONAL;
-//            } else if ("require".equalsIgnoreCase(SSLVerifyClient)) {
-//                value = SSL.SSL_CVERIFY_REQUIRE;
-//            } else if ("optionalNoCA".equalsIgnoreCase(SSLVerifyClient)) {
-//                value = SSL.SSL_CVERIFY_OPTIONAL_NO_CA;
-//            }
-//            SSLContext.setVerify(sslContext, value, SSLVerifyDepth);
+            char[] passphrase = getKeystorePass().toCharArray();
+
+            KeyStore ks = KeyStore.getInstance(getKeystoreType());
+            ks.load(new FileInputStream(getKeystoreFile()), passphrase);
+            KeyStore ts = KeyStore.getInstance(getKeystoreType());
+            ts.load(new FileInputStream(getKeystoreFile()), passphrase);
+
+            KeyManagerFactory kmf = KeyManagerFactory.getInstance(getAlgorithm());
+            kmf.init(ks, passphrase);
+
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(getAlgorithm());
+            tmf.init(ts);
+
+            sslContext = SSLContext.getInstance(getSslProtocol());
+            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
         }
 
         initialized = true;
@@ -671,7 +587,7 @@ public class NioEndpoint {
         serverSock.socket().close();
         serverSock.close();
         serverSock = null;
-        sslContext = 0;
+        sslContext = null;
         initialized = false;
     }
 
@@ -686,6 +602,13 @@ public class NioEndpoint {
         return sequence++;
     }
 
+    public int getWriteBufSize() {
+        return writeBufSize;
+    }
+
+    public int getReadBufSize() {
+        return readBufSize;
+    }
 
     /**
      * Unlock the server socket accept using a bugus connection.
@@ -736,20 +659,24 @@ public class NioEndpoint {
             if (soTimeout > 0)
                 socket.socket().setSoTimeout(soTimeout);
 
-
-            // 2: SSL handshake
+            NioChannel channel = null;
+            // 2: SSL setup
             step = 2;
-            if (sslContext != 0) {
-//                SSLSocket.attach(sslContext, socket);
-//                if (SSLSocket.handshake(socket) != 0) {
-//                    if (log.isDebugEnabled()) {
-//                        log.debug(sm.getString("endpoint.err.handshake") + ": " + SSL.getLastError());
-//                    }
-//                    return false;
-//                }
+            if (sslContext != null) {
+                SSLEngine engine = sslContext.createSSLEngine();
+                engine.setNeedClientAuth(getClientAuth());
+                engine.setUseClientMode(false);
+                int appbufsize = engine.getSession().getApplicationBufferSize();
+                int bufsize = Math.max(Math.max(getReadBufSize(),getWriteBufSize()),appbufsize);
+                NioBufferHandler bufhandler = new NioBufferHandler(bufsize,bufsize);
+                channel = new SecureNioChannel(socket,engine,bufhandler);
+                
+            } else {
+                NioBufferHandler bufhandler = new NioBufferHandler(getReadBufSize(),getWriteBufSize());
+                channel = new NioChannel(socket,bufhandler);
             }
             
-            getPoller().register(socket);
+            getPoller().register(channel);
 
         } catch (Throwable t) {
             if (log.isDebugEnabled()) {
@@ -845,7 +772,7 @@ public class NioEndpoint {
     /**
      * Process given socket.
      */
-    protected boolean processSocket(SocketChannel socket) {
+    protected boolean processSocket(NioChannel socket) {
         try {
             if (executor == null) {
                 getWorkerThread().assign(socket);
@@ -865,7 +792,7 @@ public class NioEndpoint {
     /**
      * Process given socket for an event.
      */
-    protected boolean processSocket(SocketChannel socket, boolean error) {
+    protected boolean processSocket(NioChannel socket, boolean error) {
         try {
             if (executor == null) {
                 getWorkerThread().assign(socket, error);
@@ -996,8 +923,8 @@ public class NioEndpoint {
          *
          * @param socket to add to the poller
          */
-        public void add(final SocketChannel socket) {
-            final SelectionKey key = socket.keyFor(selector);
+        public void add(final NioChannel socket) {
+            final SelectionKey key = socket.getIOChannel().keyFor(selector);
             KeyAttachment att = (KeyAttachment)key.attachment();
             if ( att != null ) att.setWakeUp(false);
             Runnable r = new Runnable() {
@@ -1010,7 +937,7 @@ public class NioEndpoint {
                                 KeyAttachment ka = (KeyAttachment)key.attachment();
                                 ka.setError(true); //set to collect this socket immediately
                             }
-                            socket.socket().close();
+                            socket.getIOChannel().socket().close();
                             socket.close();
                         } catch ( Exception ignore ) {}
                     }
@@ -1036,13 +963,15 @@ public class NioEndpoint {
             return result;
         }
         
-        public void register(final SocketChannel socket)
+        public void register(final NioChannel socket)
         {
-            SelectionKey key = socket.keyFor(selector);
+            SelectionKey key = socket.getIOChannel().keyFor(selector);
             Runnable r = new Runnable() {
                 public void run() {
                     try {
-                        socket.register(selector, SelectionKey.OP_READ, new KeyAttachment());
+                        KeyAttachment ka = new KeyAttachment();
+                        ka.setChannel(socket);
+                        socket.getIOChannel().register(selector, SelectionKey.OP_READ, ka);
                     } catch (Exception x) {
                         log.error("", x);
                     }
@@ -1059,7 +988,7 @@ public class NioEndpoint {
             try {
                 KeyAttachment ka = (KeyAttachment) key.attachment();
                 key.cancel();
-                if (ka != null && ka.getComet()) processSocket( (SocketChannel) key.channel(), true);
+                if (ka != null && ka.getComet()) processSocket( ka.getChannel(), true);
                 key.channel().close();
             } catch (IOException e) {
                 if ( log.isDebugEnabled() ) log.debug("",e);
@@ -1115,9 +1044,8 @@ public class NioEndpoint {
                             sk.attach(attachment);
                             int readyOps = sk.readyOps();
                             sk.interestOps(sk.interestOps() & ~readyOps);
-                            SocketChannel channel = (SocketChannel)sk.channel();
-                            boolean read = sk.isReadable();
-                            if (read) {
+                            NioChannel channel = attachment.getChannel();
+                            if (sk.isReadable() || sk.isWritable() ) {
                                 if ( attachment.getWakeUp() ) {
                                     attachment.setWakeUp(false);
                                     synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
@@ -1126,17 +1054,17 @@ public class NioEndpoint {
                                 } else {
                                     boolean close = (!processSocket(channel));
                                     if ( close ) {
-                                        channel.socket().close();
+                                        channel.getIOChannel().socket().close();
                                         channel.close();
                                     }
                                 }
-                            }
+                            } 
                         } else {
                             //invalid key
                             cancelledKey(sk);
                         }
                     } catch ( CancelledKeyException ckx ) {
-                        if (attachment!=null && attachment.getComet()) processSocket( (SocketChannel) sk.channel(), true);
+                        if (attachment!=null && attachment.getComet()) processSocket( attachment.getChannel(), true);
                         try {
                             sk.channel().close();
                         }catch ( Exception ignore){}
@@ -1203,6 +1131,8 @@ public class NioEndpoint {
         public long getTimeout() {return this.timeout;}
         public boolean getError() { return error; }
         public void setError(boolean error) { this.error = error; }
+        public NioChannel getChannel() { return channel;}
+        public void setChannel(NioChannel channel) { this.channel = channel;}
         protected Object mutex = new Object();
         protected boolean wakeUp = false;
         protected long lastAccess = System.currentTimeMillis();
@@ -1210,6 +1140,7 @@ public class NioEndpoint {
         protected boolean comet = false;
         protected long timeout = -1;
         protected boolean error = false;
+        protected NioChannel channel = null;
 
     }
 
@@ -1226,7 +1157,7 @@ public class NioEndpoint {
 
         protected Thread thread = null;
         protected boolean available = false;
-        protected SocketChannel socket = null;
+        protected NioChannel socket = null;
         protected boolean event = false;
         protected boolean error = false;
 
@@ -1240,7 +1171,7 @@ public class NioEndpoint {
          *
          * @param socket TCP socket to process
          */
-        protected synchronized void assign(SocketChannel socket) {
+        protected synchronized void assign(NioChannel socket) {
 
             // Wait for the Processor to get the previous Socket
             while (available) {
@@ -1260,7 +1191,7 @@ public class NioEndpoint {
         }
 
 
-        protected synchronized void assign(SocketChannel socket, boolean error) {
+        protected synchronized void assign(NioChannel socket, boolean error) {
 
             // Wait for the Processor to get the previous Socket
             while (available) {
@@ -1283,7 +1214,7 @@ public class NioEndpoint {
          * Await a newly assigned Socket from our Connector, or <code>null</code>
          * if we are supposed to shut down.
          */
-        protected synchronized SocketChannel await() {
+        protected synchronized NioChannel await() {
 
             // Wait for the Connector to provide a new Socket
             while (!available) {
@@ -1294,7 +1225,7 @@ public class NioEndpoint {
             }
 
             // Notify the Connector that we have received this Socket
-            SocketChannel socket = this.socket;
+            NioChannel socket = this.socket;
             available = false;
             notifyAll();
 
@@ -1312,27 +1243,62 @@ public class NioEndpoint {
             // Process requests until we receive a shutdown signal
             while (running) {
                 // Wait for the next socket to be assigned
-                SocketChannel socket = await();
+                NioChannel socket = await();
                 if (socket == null)
                     continue;
+                SelectionKey key = socket.getIOChannel().keyFor(getPoller().getSelector());
+                int handshake = -1;
+                try {
+                    handshake = socket.handshake(key.isReadable(), key.isWritable());
+                }catch ( IOException x ) {
+                    handshake = -1;
+                    log.error("Error during SSL handshake",x);
+                }
+                if ( handshake == 0 ) {
+                    // Process the request from this socket
+                    if ((event) && (handler.event(socket, error) == Handler.SocketState.CLOSED)) {
+                        // Close socket and pool
+                        try {
+                            socket.getIOChannel().socket().close();
+                            socket.close();
+                        }catch ( Exception x ) {
+                            log.error("",x);
+                        }
+                    } else if ((!event) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
+                        // Close socket and pool
+                        try {
+                            socket.getIOChannel().socket().close();
+                            socket.close();
+                        }catch ( Exception x ) {
+                            log.error("",x);
+                        }
+                    }
+                } else if (handshake == -1 ) {
+                    key.cancel();
+                    try {socket.close(true);}catch (IOException ignore){}
+                } else {
+                    final SelectionKey fk = key;
+                    final int intops = handshake;
+                    //register for handshake ops
+                    Runnable r = new Runnable() {
+                        public void run() {
+                            try {
+                                fk.interestOps(intops);
+                            } catch (CancelledKeyException ckx) {
+                                try {
+                                    if ( fk != null && fk.attachment() != null ) {
+                                        KeyAttachment ka = (KeyAttachment)fk.attachment();
+                                        ka.setError(true); //set to collect this socket immediately
+                                        try {ka.getChannel().getIOChannel().socket().close();}catch(Exception ignore){}
+                                        try {ka.getChannel().close();}catch(Exception ignore){}
+                                        ka.setWakeUp(false);
+                                    }
+                                } catch (Exception ignore) {}
+                            }
 
-                // Process the request from this socket
-                if ((event) && (handler.event(socket, error) == Handler.SocketState.CLOSED)) {
-                    // Close socket and pool
-                    try {
-                        socket.socket().close();
-                        socket.close();
-                    }catch ( Exception x ) {
-                        log.error("",x);
-                    }
-                } else if ((!event) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
-                    // Close socket and pool
-                    try {
-                        socket.socket().close();
-                        socket.close();
-                    }catch ( Exception x ) {
-                        log.error("",x);
-                    }
+                        }
+                    };
+                    getPoller().addEvent(r);
                 }
                 //dereference socket to let GC do its job
                 socket = null;
@@ -1355,7 +1321,21 @@ public class NioEndpoint {
 
     }
 
+    // ------------------------------------------------ Application Buffer Handler
+    public class NioBufferHandler implements ApplicationBufferHandler {
+        protected ByteBuffer readbuf = null;
+        protected ByteBuffer writebuf = null;
+        
+        public NioBufferHandler(int readsize, int writesize) {
+            readbuf = ByteBuffer.allocateDirect(readsize);
+            writebuf = ByteBuffer.allocateDirect(writesize);
+        }
+        
+        public ByteBuffer expand(ByteBuffer buffer, int remaining) {return buffer;}
+        public ByteBuffer getReadBuffer() {return readbuf;}
+        public ByteBuffer getWriteBuffer() {return writebuf;}
 
+    }
 
     // ------------------------------------------------ Handler Inner Interface
 
@@ -1369,8 +1349,8 @@ public class NioEndpoint {
         public enum SocketState {
             OPEN, CLOSED, LONG
         }
-        public SocketState process(SocketChannel socket);
-        public SocketState event(SocketChannel socket, boolean error);
+        public SocketState process(NioChannel socket);
+        public SocketState event(NioChannel socket, boolean error);
     }
 
 
@@ -1439,9 +1419,9 @@ public class NioEndpoint {
      */
     protected class SocketProcessor implements Runnable {
 
-        protected SocketChannel socket = null;
+        protected NioChannel socket = null;
 
-        public SocketProcessor(SocketChannel socket) {
+        public SocketProcessor(NioChannel socket) {
             this.socket = socket;
         }
 
@@ -1451,7 +1431,7 @@ public class NioEndpoint {
             if (handler.process(socket) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 try {
-                    socket.socket().close();
+                    socket.getIOChannel().socket().close();
                     socket.close();
                 } catch ( Exception x ) {
                     log.error("",x);
@@ -1473,10 +1453,10 @@ public class NioEndpoint {
      */
     protected class SocketEventProcessor implements Runnable {
 
-        protected SocketChannel socket = null;
+        protected NioChannel socket = null;
         protected boolean error = false; 
 
-        public SocketEventProcessor(SocketChannel socket, boolean error) {
+        public SocketEventProcessor(NioChannel socket, boolean error) {
             this.socket = socket;
             this.error = error;
         }
@@ -1487,7 +1467,7 @@ public class NioEndpoint {
             if (handler.event(socket, error) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 try {
-                    socket.socket().close();
+                    socket.getIOChannel().socket().close();
                     socket.close();
                 } catch ( Exception x ) {
                     log.error("",x);

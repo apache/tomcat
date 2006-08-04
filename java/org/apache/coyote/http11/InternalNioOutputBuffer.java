@@ -18,7 +18,6 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -32,6 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
 import java.nio.channels.SelectionKey;
 import org.apache.tomcat.util.net.NioEndpoint;
 import java.nio.channels.Selector;
+import org.apache.tomcat.util.net.NioChannel;
 
 /**
  * Output buffer.
@@ -74,7 +74,7 @@ public class InternalNioOutputBuffer
         } else {
             bbufLimit = (headerBufferSize / 1500 + 1) * 1500;
         }
-        bbuf = ByteBuffer.allocateDirect(bbufLimit);
+        //bbuf = ByteBuffer.allocateDirect(bbufLimit);
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
 
@@ -143,7 +143,7 @@ public class InternalNioOutputBuffer
     /**
      * Underlying socket.
      */
-    protected SocketChannel socket;
+    protected NioChannel socket;
 
 
     /**
@@ -171,11 +171,6 @@ public class InternalNioOutputBuffer
     protected int lastActiveFilter;
 
 
-    /**
-     * Direct byte buffer used for writing.
-     */
-    protected ByteBuffer bbuf = null;
-
 
     // ------------------------------------------------------------- Properties
 
@@ -183,7 +178,7 @@ public class InternalNioOutputBuffer
     /**
      * Set the underlying socket.
      */
-    public void setSocket(SocketChannel socket) {
+    public void setSocket(NioChannel socket) {
         this.socket = socket;
     }
 
@@ -194,7 +189,7 @@ public class InternalNioOutputBuffer
     /**
      * Get the underlying socket input stream.
      */
-    public SocketChannel getSocket() {
+    public NioChannel getSocket() {
         return socket;
     }
     /**
@@ -316,7 +311,7 @@ public class InternalNioOutputBuffer
 
         // Recycle Request object
         response.recycle();
-        bbuf.clear();
+        socket.getBufHandler().getWriteBuffer().clear();
 
         socket = null;
         pos = 0;
@@ -405,7 +400,7 @@ public class InternalNioOutputBuffer
         while ( bytebuffer.hasRemaining() ) {
             int written = socket.write(bytebuffer);
         }
-        bbuf.clear();
+        socket.getBufHandler().getWriteBuffer().clear();
         this.total = 0;
     } 
 
@@ -571,10 +566,10 @@ public class InternalNioOutputBuffer
 
     int total = 0;
     private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
-        if (bbuf.capacity() <= (offset + length)) {
+        if (socket.getBufHandler().getWriteBuffer().capacity() <= (offset + length)) {
             flushBuffer();
         }
-        bbuf.put(buf, offset, length);
+        socket.getBufHandler().getWriteBuffer().put(buf, offset, length);
         total += length;
     }
 
@@ -715,15 +710,15 @@ public class InternalNioOutputBuffer
         throws IOException {
 
         //prevent timeout for async,
-        SelectionKey key = socket.keyFor(selector);
+        SelectionKey key = socket.getIOChannel().keyFor(selector);
         if (key != null) {
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
             attach.access();
         }
 
         //write to the socket, if there is anything to write
-        if (bbuf.position() > 0) {
-            writeToSocket(bbuf,true);
+        if (socket.getBufHandler().getWriteBuffer().position() > 0) {
+            writeToSocket(socket.getBufHandler().getWriteBuffer(),true);
         }
     }
 
@@ -750,11 +745,11 @@ public class InternalNioOutputBuffer
             byte[] b = chunk.getBuffer();
             while (len > 0) {
                 int thisTime = len;
-                if (bbuf.position() == bbuf.capacity()) {
+                if (socket.getBufHandler().getWriteBuffer().position() == socket.getBufHandler().getWriteBuffer().capacity()) {
                     flushBuffer();
                 }
-                if (thisTime > bbuf.capacity() - bbuf.position()) {
-                    thisTime = bbuf.capacity() - bbuf.position();
+                if (thisTime > socket.getBufHandler().getWriteBuffer().capacity() - socket.getBufHandler().getWriteBuffer().position()) {
+                    thisTime = socket.getBufHandler().getWriteBuffer().capacity() - socket.getBufHandler().getWriteBuffer().position();
                 }
                 addToBB(b,start,thisTime);
                 len = len - thisTime;

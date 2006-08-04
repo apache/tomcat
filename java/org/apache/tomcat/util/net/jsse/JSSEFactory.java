@@ -22,12 +22,14 @@ import javax.net.ssl.SSLSocket;
 
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.ServerSocketFactory;
+import javax.net.ssl.SSLSession;
 
 /** 
  * Factory interface to construct components based on the JSSE version
  * in use.
  *
  * @author Bill Barker
+ * @author Filip Hanik
  */
 
 public class JSSEFactory {
@@ -44,6 +46,10 @@ public class JSSEFactory {
      */
     public SSLSupport getSSLSupport(Socket socket) {
         return new JSSESupport((SSLSocket)socket);
+    }
+    
+    public SSLSupport getSSLSupport(SSLSession session) {
+        return new JSSESupport(session);
     }
 
 };

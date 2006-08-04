@@ -32,7 +32,7 @@ import javax.security.cert.X509Certificate;
 
 import org.apache.tomcat.util.net.SSLSupport;
 
-/* JSSESupport
+/** JSSESupport
 
    Concrete implementation class for JSSE
    Support classes.
@@ -42,6 +42,7 @@ import org.apache.tomcat.util.net.SSLSupport;
 
    @author EKR
    @author Craig R. McClanahan
+   @author Filip Hanik
    Parts cribbed from JSSECertCompat       
    Parts cribbed from CertificatesValve
 */
@@ -52,17 +53,22 @@ class JSSESupport implements SSLSupport {
         org.apache.commons.logging.LogFactory.getLog(JSSESupport.class);
 
     protected SSLSocket ssl;
+    protected SSLSession session;
 
     Listener listener = new Listener();
 
     JSSESupport(SSLSocket sock){
         ssl=sock;
+        session = sock.getSession();
         sock.addHandshakeCompletedListener(listener);
+    }
+    
+    JSSESupport(SSLSession session) {
+        this.session = session;
     }
 
     public String getCipherSuite() throws IOException {
         // Look up the current SSLSession
-        SSLSession session = ssl.getSession();
         if (session == null)
             return null;
         return session.getCipherSuite();
@@ -114,7 +120,6 @@ class JSSESupport implements SSLSupport {
     public Object[] getPeerCertificateChain(boolean force)
         throws IOException {
         // Look up the current SSLSession
-	SSLSession session = ssl.getSession();
         if (session == null)
             return null;
 
@@ -177,7 +182,6 @@ class JSSESupport implements SSLSupport {
     public Integer getKeySize() 
         throws IOException {
         // Look up the current SSLSession
-        SSLSession session = ssl.getSession();
         SSLSupport.CipherData c_aux[]=ciphers;
         if (session == null)
             return null;
@@ -200,7 +204,6 @@ class JSSESupport implements SSLSupport {
     public String getSessionId()
         throws IOException {
         // Look up the current SSLSession
-        SSLSession session = ssl.getSession();
         if (session == null)
             return null;
         // Expose ssl_session (getId)
