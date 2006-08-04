@@ -937,8 +937,8 @@ public class NioEndpoint {
                                 KeyAttachment ka = (KeyAttachment)key.attachment();
                                 ka.setError(true); //set to collect this socket immediately
                             }
-                            socket.getIOChannel().socket().close();
-                            socket.close();
+                            try {socket.close();}catch (Exception ignore){}
+                            if ( socket.isOpen() ) socket.close(true);
                         } catch ( Exception ignore ) {}
                     }
                 }
@@ -1259,16 +1259,16 @@ public class NioEndpoint {
                     if ((event) && (handler.event(socket, error) == Handler.SocketState.CLOSED)) {
                         // Close socket and pool
                         try {
-                            socket.getIOChannel().socket().close();
-                            socket.close();
+                            try {socket.close();}catch (Exception ignore){}
+                            if ( socket.isOpen() ) socket.close(true);
                         }catch ( Exception x ) {
                             log.error("",x);
                         }
                     } else if ((!event) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
                         // Close socket and pool
                         try {
-                            socket.getIOChannel().socket().close();
-                            socket.close();
+                            try {socket.close();}catch (Exception ignore){}
+                            if ( socket.isOpen() ) socket.close(true);
                         }catch ( Exception x ) {
                             log.error("",x);
                         }
@@ -1431,8 +1431,8 @@ public class NioEndpoint {
             if (handler.process(socket) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 try {
-                    socket.getIOChannel().socket().close();
-                    socket.close();
+                    try {socket.close();}catch (Exception ignore){}
+                    if ( socket.isOpen() ) socket.close(true);
                 } catch ( Exception x ) {
                     log.error("",x);
                 }
@@ -1467,8 +1467,8 @@ public class NioEndpoint {
             if (handler.event(socket, error) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 try {
-                    socket.getIOChannel().socket().close();
-                    socket.close();
+                    try {socket.close();}catch (Exception ignore){}
+                    if ( socket.isOpen() ) socket.close(true);
                 } catch ( Exception x ) {
                     log.error("",x);
                 }

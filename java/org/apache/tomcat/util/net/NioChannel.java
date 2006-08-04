@@ -51,11 +51,12 @@ public class NioChannel implements ByteChannel{
      * @todo Implement this java.nio.channels.Channel method
      */
     public void close() throws IOException {
+        getIOChannel().socket().close();
         sc.close();
     }
 
     public void close(boolean force) throws IOException {
-        close();
+        if (isOpen() || force ) close();
     }
     /**
      * Tells whether or not this channel is open.
