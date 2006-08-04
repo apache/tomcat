@@ -4168,20 +4168,6 @@ public class StandardContext
             }
         }
         
-        // Initialize annotation processor
-        if (ok && !getIgnoreAnnotations()) {
-            if (annotationProcessor == null) {
-                if (isUseNaming() && namingContextListener != null) {
-                    annotationProcessor = 
-                        new DefaultAnnotationProcessor(namingContextListener.getEnvContext());
-                } else {
-                    annotationProcessor = new DefaultAnnotationProcessor(null);
-                }
-            }
-            getServletContext().setAttribute
-                (Globals.ANNOTATION_PROCESSOR_ATTR, annotationProcessor);
-        }
-
         // Standard container startup
         if (log.isDebugEnabled())
             log.debug("Processing standard container startup");
@@ -4303,11 +4289,20 @@ public class StandardContext
         // Set annotation processing parameter for Jasper (unfortunately, since
         // this can be configured in many places and not just in /WEB-INF/web.xml,
         // there are not many solutions)
-        if (ignoreAnnotations) {
-            Wrapper jspServlet = (Wrapper) findChild(Constants.JSP_SERVLET_NAME);
-            jspServlet.addInitParameter("org.apache.jasper.IGNORE_ANNOTATIONS", "true");
+        // Initialize annotation processor
+        if (ok && !getIgnoreAnnotations()) {
+            if (annotationProcessor == null) {
+                if (isUseNaming() && namingContextListener != null) {
+                    annotationProcessor = 
+                        new DefaultAnnotationProcessor(namingContextListener.getEnvContext());
+                } else {
+                    annotationProcessor = new DefaultAnnotationProcessor(null);
+                }
+            }
+            getServletContext().setAttribute
+                (AnnotationProcessor.class.getName(), annotationProcessor);
         }
-        
+
         try {
             
             // Create context attributes that will be required

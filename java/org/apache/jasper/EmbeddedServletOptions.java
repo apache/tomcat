@@ -174,11 +174,6 @@ public final class EmbeddedServletOptions implements Options {
      */
     private boolean xpoweredBy;
     
-    /**
-     * Should annotations be ignored?
-     */
-    private boolean ignoreAnnotations = false;
-    
     public String getProperty(String name ) {
         return settings.getProperty( name );
     }
@@ -249,13 +244,6 @@ public final class EmbeddedServletOptions implements Options {
         return development;
     }
     
-    /**
-     * Should annotations on tags be ignored?
-     */
-    public boolean getIgnoreAnnotations() {
-        return ignoreAnnotations;
-    }
-
     /**
      * Is the generation of SMAP info for JSR45 debuggin suppressed?
      */
@@ -396,11 +384,6 @@ public final class EmbeddedServletOptions implements Options {
         String validating=config.getInitParameter( "validating");
         if( "false".equals( validating )) ParserUtils.validating=false;
         
-        String annotations = config.getInitParameter("org.apache.jasper.IGNORE_ANNOTATIONS");
-        if ("true".equals(annotations)) {
-            ignoreAnnotations = true;
-        }
-
         String keepgen = config.getInitParameter("keepgenerated");
         if (keepgen != null) {
             if (keepgen.equalsIgnoreCase("true")) {

@@ -88,14 +88,6 @@ public final class Globals {
 
 
     /**
-     * The servlet context attribute under which we store the annotation
-     * processor that is used by the JSP engine.
-     */
-    public static final String ANNOTATION_PROCESSOR_ATTR =
-        "org.apache.catalina.annotation_processor";
-
-
-    /**
      * The request attribute under which we forward a Java exception
      * (as an object of type Throwable) to an error page.
      */
