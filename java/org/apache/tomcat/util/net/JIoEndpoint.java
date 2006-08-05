@@ -309,7 +309,7 @@ public class JIoEndpoint {
                     Socket socket = serverSocketFactory.acceptSocket(serverSocket);
                     serverSocketFactory.initSocket(socket);
                     // Hand this socket off to an appropriate processor
-                    if (!setSocketOptions(socket) || !processSocket(socket)) {
+                    if (!processSocket(socket)) {
                         // Close socket right away
                         try {
                             socket.close();
@@ -348,7 +348,7 @@ public class JIoEndpoint {
         public void run() {
 
             // Process the request from this socket
-            if (!handler.process(socket)) {
+            if (!setSocketOptions(socket) || !handler.process(socket)) {
                 // Close socket
                 try {
                     socket.close();
@@ -441,7 +441,7 @@ public class JIoEndpoint {
                     continue;
 
                 // Process the request from this socket
-                if (!handler.process(socket)) {
+                if (!setSocketOptions(socket) || !handler.process(socket)) {
                     // Close socket
                     try {
                         socket.close();
