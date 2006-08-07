@@ -43,6 +43,15 @@ public class NioChannel implements ByteChannel{
         this.bufHandler = bufHandler;
     }
 
+    /**
+     * returns true if the network buffer has 
+     * been flushed out and is empty
+     * @return boolean
+     */
+    public boolean flush() throws IOException {
+        return true; //no network buffer in the regular channel
+    }
+
 
     /**
      * Closes this channel.

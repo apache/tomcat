@@ -58,6 +58,14 @@ public class SecureNioChannel extends NioChannel  {
 //===========================================================================================    
 //                  NIO SSL METHODS
 //===========================================================================================
+    /**
+     * returns true if the network buffer has 
+     * been flushed out and is empty
+     * @return boolean
+     */
+    public boolean flush() throws IOException {
+        return flush(netOutBuffer);
+    }
     
     /**
      * Flushes the buffer to the network

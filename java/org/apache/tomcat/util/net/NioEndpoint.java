@@ -978,20 +978,18 @@ public class NioEndpoint {
                 }
     
             };
-            synchronized (events) {
-                events.add(r);
-            }
-            selector.wakeup();
+            addEvent(r);
         }
         
         public void cancelledKey(SelectionKey key) {
             try {
                 KeyAttachment ka = (KeyAttachment) key.attachment();
-                key.cancel();
+                if ( key.isValid() ) key.cancel();
                 if (ka != null && ka.getComet()) processSocket( ka.getChannel(), true);
-                key.channel().close();
-            } catch (IOException e) {
-                if ( log.isDebugEnabled() ) log.debug("",e);
+                if ( key.channel().isOpen() ) key.channel().close();
+                key.attach(null);
+            } catch (Throwable e) {
+                if ( log.isDebugEnabled() ) log.error("",e);
                 // Ignore
             }
         }
@@ -1054,8 +1052,8 @@ public class NioEndpoint {
                                 } else {
                                     boolean close = (!processSocket(channel));
                                     if ( close ) {
-                                        channel.getIOChannel().socket().close();
                                         channel.close();
+                                        channel.getIOChannel().socket().close();
                                     }
                                 }
                             } 
@@ -1064,10 +1062,7 @@ public class NioEndpoint {
                             cancelledKey(sk);
                         }
                     } catch ( CancelledKeyException ckx ) {
-                        if (attachment!=null && attachment.getComet()) processSocket( attachment.getChannel(), true);
-                        try {
-                            sk.channel().close();
-                        }catch ( Exception ignore){}
+                        cancelledKey(sk);
                     } catch (Throwable t) {
                         log.error("",t);
                     }
@@ -1253,6 +1248,8 @@ public class NioEndpoint {
                 }catch ( IOException x ) {
                     handshake = -1;
                     log.error("Error during SSL handshake",x);
+                }catch ( CancelledKeyException ckx ) {
+                    handshake = -1;
                 }
                 if ( handshake == 0 ) {
                     // Process the request from this socket
@@ -1274,7 +1271,7 @@ public class NioEndpoint {
                         }
                     }
                 } else if (handshake == -1 ) {
-                    key.cancel();
+                    if ( key.isValid() ) key.cancel();
                     try {socket.close(true);}catch (IOException ignore){}
                 } else {
                     final SelectionKey fk = key;

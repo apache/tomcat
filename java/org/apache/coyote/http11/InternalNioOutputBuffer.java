@@ -395,11 +395,16 @@ public class InternalNioOutputBuffer
     }
 
     private synchronized void writeToSocket(ByteBuffer bytebuffer, boolean flip) throws IOException {
-        int limit = bytebuffer.position();
+        //int limit = bytebuffer.position();
         if ( flip ) bytebuffer.flip();
         while ( bytebuffer.hasRemaining() ) {
             int written = socket.write(bytebuffer);
         }
+        //make sure we are flushed 
+        do {
+            if (socket.flush()) break;
+        }while ( true );
+        
         socket.getBufHandler().getWriteBuffer().clear();
         this.total = 0;
     } 

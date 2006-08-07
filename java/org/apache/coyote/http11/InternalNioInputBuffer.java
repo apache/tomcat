@@ -556,23 +556,25 @@ public class InternalNioInputBuffer implements InputBuffer {
             } else if (nRead == -1) {
                 //return false;
                 throw new IOException("end of stream reached.");
-            }
-            timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>this.readTimeout);
-            if ( !timedOut && nRead == 0 ) 
-                try {
-                    final SelectionKey key = socket.getIOChannel().keyFor(poller.getSelector());
-                    final KeyAttachment att = (KeyAttachment)key.attachment();
-                    //to do, add in a check, we might have just timed out on the wait,
-                    //so there is no need to register us again.
-                    boolean addToQueue = false;
-                    try { addToQueue = ((key.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ignore ){}
-                    if ( addToQueue ) {
-                        addToReadQueue(key, att);
-                    }//end if
-                    synchronized (att.getMutex()) {
-                        if ( att.getWakeUp() ) att.getMutex().wait(25);
-                    }
-                }catch ( Exception x ) {}
+            } else {
+                timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>readTimeout);
+                if ( !timedOut && nRead == 0 )  {
+                    try {
+                        final SelectionKey key = socket.getIOChannel().keyFor(poller.getSelector());
+                        final KeyAttachment att = (KeyAttachment)key.attachment();
+                        //to do, add in a check, we might have just timed out on the wait,
+                        //so there is no need to register us again.
+                        boolean addToQueue = false;
+                        try { addToQueue = ((key.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ckx ){ throw new IOException("Socket key cancelled.");}
+                        if ( addToQueue ) {
+                            synchronized (att.getMutex()) {
+                                addToReadQueue(key, att);
+                                att.getMutex().wait(readTimeout);
+                            }
+                        }//end if
+                    }catch ( Exception x ) {}
+                }
+             }
         }while ( nRead == 0 && (!timedOut) );
         //else throw new IOException(sm.getString("iib.failedread"));
         //return false; //timeout
