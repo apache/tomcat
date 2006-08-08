@@ -384,11 +384,11 @@ public class InternalNioInputBuffer implements InputBuffer {
                     return false;
                 }
                 if (readTimeout == -1) {
-                    if (!fill())
+                    if (!fill()) //request line parsing
                         throw new EOFException(sm.getString("iib.eof.error"));
                 } else {
                     // Do a simple read with a short timeout
-                    if ( !readSocket(true) ) return false;
+                    if ( !readSocket(true, false) ) return false;
                 }
             }
 
@@ -406,11 +406,11 @@ public class InternalNioInputBuffer implements InputBuffer {
                 return false;
             }
             if (readTimeout == -1) {
-                if (!fill())
+                if (!fill()) //request line parsing
                     throw new EOFException(sm.getString("iib.eof.error"));
             } else {
                 // Do a simple read with a short timeout
-                if ( !readSocket(true) ) return false;
+                if ( !readSocket(true, false) ) return false;
             }
         }
 
@@ -425,7 +425,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //request line parsing
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
@@ -454,7 +454,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //request line parsing
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
@@ -498,7 +498,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //reques line parsing
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
@@ -534,11 +534,13 @@ public class InternalNioInputBuffer implements InputBuffer {
     }
     /**
      * Perform blocking read with a timeout if desired
-     * @param timeout boolean - set to true if the system will time out
-     * @return boolean - true if data was read, false is EOF is reached
-     * @throws IOException 
+     * @param timeout boolean - if we want to use the timeout data
+     * @param block - true if the system should perform a blocking read, false otherwise
+     * @return boolean - true if data was read, false is no data read, EOFException if EOF is reached
+     * @throws IOException if a socket exception occurs
+     * @throws EOFException if end of stream is reached
      */
-    private boolean readSocket(boolean timeout) throws IOException {
+    private boolean readSocket(boolean timeout, boolean block) throws IOException {
         int nRead = 0;
         long start = System.currentTimeMillis();
         boolean timedOut = false;
@@ -555,7 +557,9 @@ public class InternalNioInputBuffer implements InputBuffer {
                 return true;
             } else if (nRead == -1) {
                 //return false;
-                throw new IOException("end of stream reached.");
+                throw new EOFException(sm.getString("iib.eof.error"));
+            } else if ( !block ) {
+                return false;
             } else {
                 timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>readTimeout);
                 if ( !timedOut && nRead == 0 )  {
@@ -636,7 +640,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //parse header
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
@@ -670,7 +674,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //parse header
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
@@ -707,7 +711,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill())
+                    if (!fill()) //parse header
                         throw new EOFException(sm.getString("iib.eof.error"));
                 }
 
@@ -726,7 +730,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (!fill())
+                    if (!fill()) //parse header
                         throw new EOFException(sm.getString("iib.eof.error"));
                 }
 
@@ -753,7 +757,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //parse header
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
@@ -816,7 +820,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             }
 
             // Do a simple read with a short timeout
-            read = readSocket(true);
+            read = readSocket(true,true);
         } else {
 
             if (buf.length - end < 4500) {
@@ -829,7 +833,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             pos = end;
             lastValid = pos;
             // Do a simple read with a short timeout
-            read = readSocket(true);
+            read = readSocket(true, true);
         }
         return read;
     }
@@ -853,7 +857,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             throws IOException {
 
             if (pos >= lastValid) {
-                if (!fill())
+                if (!fill()) //read body
                     return -1;
             }
 
