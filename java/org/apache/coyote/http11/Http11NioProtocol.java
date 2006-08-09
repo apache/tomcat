@@ -223,6 +223,21 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     // -------------------- Pool setup --------------------
 
+    public void setPollerThreadCount(int count) {
+        ep.setPollerThreadCount(count);
+    }
+    
+    public int getPollerThreadCount() {
+        return ep.getPollerThreadCount();
+    }
+    
+    public void setSelectorTimeout(long timeout) {
+        ep.setSelectorTimeout(timeout);
+    }
+    
+    public long getSelectorTimeout() {
+        return ep.getSelectorTimeout();
+    }
     // *
     public Executor getExecutor() {
         return ep.getExecutor();
@@ -616,7 +631,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     // processor.
                     connections.put(socket, processor);
                     localProcessor.set(null);
-                    proto.ep.getCometPoller().add(socket);
+                    socket.getPoller().add(socket);
                 }
                 return state;
 

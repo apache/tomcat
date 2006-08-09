@@ -182,7 +182,6 @@ public class InternalNioInputBuffer implements InputBuffer {
      * header.
      */
     protected long readTimeout;
-    private Poller poller;
 
     // ------------------------------------------------------------- Properties
 
@@ -200,10 +199,6 @@ public class InternalNioInputBuffer implements InputBuffer {
      */
     public NioChannel getSocket() {
         return socket;
-    }
-
-    public Poller getPoller() {
-        return poller;
     }
 
     /**
@@ -272,10 +267,6 @@ public class InternalNioInputBuffer implements InputBuffer {
      */
     public void setSwallowInput(boolean swallowInput) {
         this.swallowInput = swallowInput;
-    }
-
-    public void setPoller(Poller poller) {
-        this.poller = poller;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -564,7 +555,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                 timedOut = (readTimeout != -1) && ((System.currentTimeMillis()-start)>readTimeout);
                 if ( !timedOut && nRead == 0 )  {
                     try {
-                        final SelectionKey key = socket.getIOChannel().keyFor(poller.getSelector());
+                        final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                         final KeyAttachment att = (KeyAttachment)key.attachment();
                         //to do, add in a check, we might have just timed out on the wait,
                         //so there is no need to register us again.
@@ -587,7 +578,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
     private void addToReadQueue(final SelectionKey key, final KeyAttachment att) {
         att.setWakeUp(true);
-        poller.addEvent(
+        att.getPoller().addEvent(
             new Runnable() {
             public void run() {
                 try {
