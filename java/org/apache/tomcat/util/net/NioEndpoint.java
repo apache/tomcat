@@ -153,7 +153,6 @@ public class NioEndpoint {
 
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
         public boolean offer(NioChannel o) {
-            if ( getSecure() ) return false;
             //avoid over growing our cache or add after we have stopped
             if ( running && (size() < curThreads) ) return super.offer(o);
             else return false;
@@ -961,9 +960,10 @@ public class NioEndpoint {
             // Wait for polltime before doing anything, so that the poller threads
             // exit, otherwise parallel descturction of sockets which are still
             // in the poller can cause problems
+            close = true;
             try {
                 synchronized (this) {
-                    this.wait(pollTime / 1000);
+                    this.wait(selectorTimeout * 2);
                 }
             } catch (InterruptedException e) {
                 // Ignore
@@ -1350,7 +1350,7 @@ public class NioEndpoint {
                             handshake = socket.handshake(key.isReadable(), key.isWritable());
                         }catch ( IOException x ) {
                             handshake = -1;
-                            log.error("Error during SSL handshake",x);
+                            if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
                         }catch ( CancelledKeyException ckx ) {
                             handshake = -1;
                         }
