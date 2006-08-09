@@ -95,7 +95,6 @@ public class Http11NioProcessor implements ActionHook {
             //readTimeout = -1;
         }
         inputBuffer = new InternalNioInputBuffer(request, headerBufferSize,readTimeout);
-        inputBuffer.setPoller(endpoint.getPoller());
         request.setInputBuffer(inputBuffer);
 
         response = new Response();
@@ -752,7 +751,7 @@ public class Http11NioProcessor implements ActionHook {
             if (request.getAttribute("org.apache.tomcat.comet") == null) {
                 comet = false;
             }
-            SelectionKey key = socket.getIOChannel().keyFor(endpoint.getPoller().getSelector());
+            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                 if ( attach!=null ) {
@@ -778,10 +777,10 @@ public class Http11NioProcessor implements ActionHook {
             return SocketState.CLOSED;
         } else if (!comet) {
             recycle();
-            endpoint.getPoller().add(socket);
+            socket.getPoller().add(socket);
             return SocketState.OPEN;
         } else {
-            endpoint.getCometPoller().add(socket);
+            socket.getPoller().add(socket);
             return SocketState.LONG;
         }
     }
@@ -809,7 +808,6 @@ public class Http11NioProcessor implements ActionHook {
         this.socket = socket;
         inputBuffer.setSocket(socket);
         outputBuffer.setSocket(socket);
-        outputBuffer.setSelector(endpoint.getPoller().getSelector());
 
         // Error flag
         error = false;
@@ -841,7 +839,7 @@ public class Http11NioProcessor implements ActionHook {
                     // and the method should return true
                     openSocket = true;
                     // Add the socket to the poller
-                    endpoint.getPoller().add(socket);
+                    socket.getPoller().add(socket);
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
@@ -897,7 +895,7 @@ public class Http11NioProcessor implements ActionHook {
                     if (request.getAttribute("org.apache.tomcat.comet") != null) {
                         comet = true;
                     }
-                    SelectionKey key = socket.getIOChannel().keyFor(endpoint.getPoller().getSelector());
+                    SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                     if (key != null) {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                         if (attach != null)  {
@@ -1049,7 +1047,7 @@ public class Http11NioProcessor implements ActionHook {
 
             comet = false;
             cometClose = true;
-            SelectionKey key = socket.getIOChannel().keyFor(endpoint.getPoller().getSelector());
+            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                 if ( attach!=null && attach.getComet()) {

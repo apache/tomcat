@@ -49,8 +49,7 @@ public class InternalNioOutputBuffer
     // ----------------------------------------------------------- Constructors
     int bbufLimit = 0;
     
-    Selector selector;
-
+    
     /**
      * Default constructor.
      */
@@ -180,10 +179,6 @@ public class InternalNioOutputBuffer
      */
     public void setSocket(NioChannel socket) {
         this.socket = socket;
-    }
-
-    public void setSelector(Selector selector) {
-        this.selector = selector;
     }
 
     /**
@@ -715,7 +710,7 @@ public class InternalNioOutputBuffer
         throws IOException {
 
         //prevent timeout for async,
-        SelectionKey key = socket.getIOChannel().keyFor(selector);
+        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         if (key != null) {
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
             attach.access();

@@ -20,7 +20,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.nio.channels.SocketChannel;
 
+import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
+
 /**
  * 
  * Base class for a SocketChannel wrapper used by the endpoint.
@@ -37,6 +39,8 @@ public class NioChannel implements ByteChannel{
     protected SocketChannel sc = null;
 
     protected ApplicationBufferHandler bufHandler;
+    
+    protected Poller poller;
 
     public NioChannel(SocketChannel channel, ApplicationBufferHandler bufHandler) throws IOException {
         this.sc = channel;
@@ -112,6 +116,10 @@ public class NioChannel implements ByteChannel{
         return bufHandler;
     }
 
+    public Poller getPoller() {
+        return poller;
+    }
+
     /**
      * getIOChannel
      *
@@ -146,5 +154,8 @@ public class NioChannel implements ByteChannel{
         return 0;
     }
 
+    public void setPoller(Poller poller) {
+        this.poller = poller;
+    }
 
 }
