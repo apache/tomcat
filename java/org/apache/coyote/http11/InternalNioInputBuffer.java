@@ -569,7 +569,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                         //to do, add in a check, we might have just timed out on the wait,
                         //so there is no need to register us again.
                         boolean addToQueue = false;
-                        try { addToQueue = ((key.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ckx ){ throw new IOException("Socket key cancelled.");}
+                        try { addToQueue = ((att.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ckx ){ throw new IOException("Socket key cancelled.");}
                         if ( addToQueue ) {
                             synchronized (att.getMutex()) {
                                 addToReadQueue(key, att);
@@ -591,7 +591,10 @@ public class InternalNioInputBuffer implements InputBuffer {
             new Runnable() {
             public void run() {
                 try {
-                    if (key != null) key.interestOps(SelectionKey.OP_READ);
+                    if (key != null) {
+                        key.interestOps(SelectionKey.OP_READ);
+                        att.interestOps(SelectionKey.OP_READ);
+                    }
                 } catch (CancelledKeyException ckx) {
                     try {
                         if ( att != null ) {
