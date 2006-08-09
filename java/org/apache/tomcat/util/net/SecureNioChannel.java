@@ -45,17 +45,23 @@ public class SecureNioChannel extends NioChannel  {
         reset();
     }
     
+    public void reset(SSLEngine engine) throws IOException {
+        this.sslEngine = engine;
+        reset();
+    }
     public void reset() throws IOException {
         super.reset();
         netOutBuffer.position(0);
         netOutBuffer.limit(0);
         netInBuffer.position(0);
         netInBuffer.limit(0);
-
+        initHandshakeComplete = false;
+        closed = false;
+        closing = false;
         //initiate handshake
         sslEngine.beginHandshake();
         initHandshakeStatus = sslEngine.getHandshakeStatus();
-        
+
     }
     
 //===========================================================================================    

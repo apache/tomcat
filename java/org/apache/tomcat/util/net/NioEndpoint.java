@@ -46,6 +46,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.net.Socket;
+import java.util.StringTokenizer;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -152,6 +153,7 @@ public class NioEndpoint {
 
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
         public boolean offer(NioChannel o) {
+            if ( getSecure() ) return false;
             //avoid over growing our cache or add after we have stopped
             if ( running && (size() < curThreads) ) return super.offer(o);
             else return false;
@@ -370,13 +372,33 @@ public class NioEndpoint {
     public String getKeystoreType() { return keystoreType;}
     public void setKeystoreType(String s ) { this.keystoreType = s;}
 
-    protected String sslProtocol = "TLS";
+    protected String sslProtocol = "TLS"; 
+    
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
     
+    protected String sslEnabledProtocols=null; //"TLSv1,SSLv3,SSLv2Hello"
+    protected String[] sslEnabledProtocolsarr =  new String[0];
+    public void setSslEnabledProtocols(String s) {
+        this.sslEnabledProtocols = s;
+        StringTokenizer t = new StringTokenizer(s,",");
+        sslEnabledProtocolsarr = new String[t.countTokens()];
+        for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
+    }
+    
+    
     protected String ciphers = null;
+    protected String[] ciphersarr = new String[0];
     public String getCiphers() { return ciphers;}
-    public void setCiphers(String s) { ciphers = s;}
+    public void setCiphers(String s) { 
+        ciphers = s;
+        if ( s == null ) ciphersarr = new String[0];
+        else {
+            StringTokenizer t = new StringTokenizer(s,",");
+            ciphersarr = new String[t.countTokens()];
+            for (int i=0; i<ciphersarr.length; i++ ) ciphersarr[i] = t.nextToken();
+        }
+    }
     
     protected boolean secure = false;
     public boolean getSecure() { return secure;}
@@ -678,9 +700,7 @@ public class NioEndpoint {
                 step = 2;
 
                 if (sslContext != null) {
-                    SSLEngine engine = sslContext.createSSLEngine();
-                    engine.setNeedClientAuth(getClientAuth());
-                    engine.setUseClientMode(false);
+                    SSLEngine engine = createSSLEngine();
                     int appbufsize = engine.getSession().getApplicationBufferSize();
                     int bufsize = Math.max(Math.max(getReadBufSize(), getWriteBufSize()), appbufsize);
                     NioBufferHandler bufhandler = new NioBufferHandler(bufsize, bufsize);
@@ -690,23 +710,35 @@ public class NioEndpoint {
                     channel = new NioChannel(socket, bufhandler);
                 }
             } else {
+                
                 channel.setIOChannel(socket);
-                channel.reset();
+                if ( channel instanceof SecureNioChannel ) {
+                    SSLEngine engine = createSSLEngine();
+                    ((SecureNioChannel)channel).reset(engine);
+                } else {
+                    channel.reset();
+                }
             }
             getPoller0().register(channel);
 
         } catch (Throwable t) {
-            if (log.isDebugEnabled()) {
-                if (step == 2) {
-                    log.debug(sm.getString("endpoint.err.handshake"), t);
-                } else {
-                    log.debug(sm.getString("endpoint.err.unexpected"), t);
-                }
-            }
+            try {
+                log.error("",t);
+            }catch ( Throwable tt){}
             // Tell to close the socket
             return false;
         }
         return true;
+    }
+
+    protected SSLEngine createSSLEngine() {
+        SSLEngine engine = sslContext.createSSLEngine();
+        engine.setNeedClientAuth(getClientAuth());
+        engine.setUseClientMode(false);
+        if ( ciphersarr.length > 0 ) engine.setEnabledCipherSuites(ciphersarr);
+        if ( sslEnabledProtocolsarr.length > 0 ) engine.setEnabledProtocols(sslEnabledProtocolsarr);
+        
+        return engine;
     }
 
 
@@ -872,14 +904,8 @@ public class NioEndpoint {
                 try {
                     // Accept the next incoming connection from the server socket
                     SocketChannel socket = serverSock.accept();
-                    processSocket(socket);
                     // Hand this socket off to an appropriate processor
-//                    if(!setSocketOptions(socket))
-//                    {
-//                        // Close socket right away
-//                        socket.socket().close();
-//                        socket.close();
-//                    }
+                    if ( running && (!paused) && socket != null ) processSocket(socket);
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
