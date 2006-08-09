@@ -46,6 +46,11 @@ public class NioChannel implements ByteChannel{
         this.sc = channel;
         this.bufHandler = bufHandler;
     }
+    
+    public void reset() throws IOException {
+        bufHandler.getReadBuffer().clear();
+        bufHandler.getWriteBuffer().clear();
+    }
 
     /**
      * returns true if the network buffer has 
@@ -119,7 +124,6 @@ public class NioChannel implements ByteChannel{
     public Poller getPoller() {
         return poller;
     }
-
     /**
      * getIOChannel
      *
@@ -156,6 +160,14 @@ public class NioChannel implements ByteChannel{
 
     public void setPoller(Poller poller) {
         this.poller = poller;
+    }
+
+    public void setIOChannel(SocketChannel IOChannel) {
+        this.sc = IOChannel;
+    }
+
+    public String toString() {
+        return super.toString()+":"+this.sc.toString();
     }
 
 }

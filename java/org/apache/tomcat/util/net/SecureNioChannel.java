@@ -31,28 +31,31 @@ public class SecureNioChannel extends NioChannel  {
     
     public SecureNioChannel(SocketChannel channel, SSLEngine engine, ApplicationBufferHandler bufHandler) throws IOException {
         super(channel,bufHandler);
-
         this.sslEngine = engine;
-
-        
         int appBufSize = sslEngine.getSession().getApplicationBufferSize();
         int netBufSize = sslEngine.getSession().getPacketBufferSize();
-        
+        //allocate network buffers - TODO, add in optional direct non-direct buffers
+        if ( netInBuffer == null ) netInBuffer = ByteBuffer.allocateDirect(netBufSize);
+        if ( netOutBuffer == null ) netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
+
         //ensure that the application has a large enough read/write buffers
         //by doing this, we should not encounter any buffer overflow errors
         bufHandler.expand(bufHandler.getReadBuffer(), appBufSize);
         bufHandler.expand(bufHandler.getWriteBuffer(), appBufSize);
-        //allocate network buffers - TODO, add in optional direct buffers
-        this.netInBuffer = ByteBuffer.allocate(netBufSize);
-        this.netOutBuffer = ByteBuffer.allocate(netBufSize);
-        this.netOutBuffer.position(0);
-        this.netOutBuffer.limit(0);
-        this.netInBuffer.position(0);
-        this.netInBuffer.limit(0);
+        reset();
+    }
+    
+    public void reset() throws IOException {
+        super.reset();
+        netOutBuffer.position(0);
+        netOutBuffer.limit(0);
+        netInBuffer.position(0);
+        netInBuffer.limit(0);
 
         //initiate handshake
         sslEngine.beginHandshake();
         initHandshakeStatus = sslEngine.getHandshakeStatus();
+        
     }
     
 //===========================================================================================    
