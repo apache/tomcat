@@ -557,7 +557,6 @@ public class NioEndpoint {
             }
 
             // Start poller threads
-            log.info("Creating poller threads:"+pollerThreadCount);
             pollers = new Poller[pollerThreadCount];
             for (int i = 0; i < pollerThreadCount; i++) {
                 pollers[i] = new Poller();
