@@ -960,14 +960,7 @@ public class NioEndpoint {
             // exit, otherwise parallel descturction of sockets which are still
             // in the poller can cause problems
             close = true;
-            try {
-                synchronized (this) {
-                    this.wait(selectorTimeout * 2);
-                }
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-            close = true;
+            selector.wakeup();
         }
         
         public void addEvent(Runnable event) {
@@ -1115,7 +1108,7 @@ public class NioEndpoint {
                         if ( sk.isValid() && attachment != null ) {
                             attachment.access();
                             sk.attach(attachment);
-                            sk.interestOps(0);
+                            sk.interestOps(0); //this is a must, so that we don't have multiple threads messing with the socket
                             attachment.interestOps(0);
                             NioChannel channel = attachment.getChannel();
                             if (sk.isReadable() || sk.isWritable() ) {
