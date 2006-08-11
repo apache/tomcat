@@ -154,7 +154,7 @@ public class NioEndpoint {
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
         public boolean offer(NioChannel o) {
             //avoid over growing our cache or add after we have stopped
-            if ( running && (size() < curThreads) ) return super.offer(o);
+            if ( running && (!paused) && (size() < curThreads) ) return super.offer(o);
             else return false;
         }
     };
