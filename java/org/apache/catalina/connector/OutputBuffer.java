@@ -201,6 +201,16 @@ public class OutputBuffer extends Writer
     }
 
 
+    /**
+     * Is the response output closed ?
+     * 
+     * @return closed flag value
+     */
+    public boolean isClosed() {
+        return this.closed;
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 

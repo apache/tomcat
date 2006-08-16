@@ -433,6 +433,14 @@ public class Response
 
 
     /**
+     * Closed flag accessor.
+     */
+    public boolean isClosed() {
+        return outputBuffer.isClosed();
+    }
+
+
+    /**
      * Set the error flag.
      */
     public void setError() {
