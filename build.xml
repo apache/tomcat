@@ -422,7 +422,16 @@
       </fileset>
     </copy>
 
-    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
+    <!-- Build classes for examples webapp -->
+    <javac   srcdir="webapps/examples/WEB-INF/classes" 
+             destdir="${tomcat.build}/webapps/examples/WEB-INF/classes"
+             debug="${compile.debug}" deprecation="${compile.deprecation}"
+             optimize="${compile.optimize}"
+    	     classpath="${tomcat.classes}"
+             excludes="**/CVS/**,**/.svn/**">
+    </javac>
+
+  	<copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
 
   </target>
