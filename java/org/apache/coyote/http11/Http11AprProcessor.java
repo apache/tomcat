@@ -744,9 +744,6 @@ public class Http11AprProcessor implements ActionHook {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !adapter.event(request, response, error);
-            if (request.getAttribute("org.apache.tomcat.comet") == null) {
-                comet = false;
-            }
         } catch (InterruptedIOException e) {
             error = true;
         } catch (Throwable t) {
@@ -874,10 +871,6 @@ public class Http11AprProcessor implements ActionHook {
                     if(keepAlive && !error) { // Avoid checking twice.
                         error = response.getErrorException() != null ||
                                 statusDropsConnection(response.getStatus());
-                    }
-                    // Comet support
-                    if (request.getAttribute("org.apache.tomcat.comet") != null) {
-                        comet = true;
                     }
                 } catch (InterruptedIOException e) {
                     error = true;
@@ -1217,6 +1210,11 @@ public class Http11AprProcessor implements ActionHook {
             InternalAprInputBuffer internalBuffer = (InternalAprInputBuffer)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
+            
+        } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
+            comet = true;
+        } else if (actionCode == ActionCode.ACTION_COMET_END) {
+            comet = false;
         }
 
     }
