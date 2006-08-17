@@ -162,27 +162,27 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>HelloWorldExample</servlet-name>
-        <url-pattern>/servlet/HelloWorldExample</url-pattern>
+        <url-pattern>/servlets/servlet/HelloWorldExample</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RequestInfoExample</servlet-name>
-        <url-pattern>/servlet/RequestInfoExample/*</url-pattern>
+        <url-pattern>/servlets/servlet/RequestInfoExample/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RequestHeaderExample</servlet-name>
-        <url-pattern>/servlet/RequestHeaderExample</url-pattern>
+        <url-pattern>/servlets/servlet/RequestHeaderExample</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>RequestParamExample</servlet-name>
-        <url-pattern>/servlet/RequestParamExample</url-pattern>
+        <url-pattern>/servlets/servlet/RequestParamExample</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CookieExample</servlet-name>
-        <url-pattern>/servlet/CookieExample</url-pattern>
+        <url-pattern>/servlets/servlet/CookieExample</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SessionExample</servlet-name>
-        <url-pattern>/servlet/SessionExample</url-pattern>
+        <url-pattern>/servlets/servlet/SessionExample</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>servletToJsp</servlet-name>
