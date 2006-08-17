@@ -217,6 +217,12 @@ public interface Wrapper extends Container {
 
 
     /**
+     * Return the associated servlet instance.
+     */
+    public Servlet getServlet();
+    
+    
+    /**
      * Return the value for the specified initialization parameter name,
      * if any; otherwise return <code>null</code>.
      *
