@@ -118,7 +118,7 @@ You might end up with something like this:</p>
 app.path=/hello
 
 # Tomcat 5 installation directory
-catalina.home=/usr/local/jakarta-tomcat-5.0
+catalina.home=/usr/local/apache-tomcat-6.0
 
 # Manager webapp username and password
 manager.username=myusername

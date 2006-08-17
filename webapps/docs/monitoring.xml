@@ -88,8 +88,8 @@ controlRole tomcat
       <li>Start your tomcat and look with a browser at http://${JMX.HOST}:${JMX.PORT}</li>
       <li>With the mx connector parameter <code>mx.authMode="basic" mx.authUser="tomcat" mx.authPassword="strange"</code> 
           you can control the access!</li>
-      <li>A complete list of all tomcat core MBeans can you find at <a href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/catalina/funcspecs/mbean-names.html">
-        http://jakarta.apache.org/tomcat/tomcat-5.5-doc/catalina/funcspecs/mbean-names.html</a>.</li>
+      <li>A complete list of all tomcat core MBeans can you find at <a href="funcspecs/mbean-names.html">
+        funcspecs/mbean-names.html</a>.</li>
     </ol>
     </p>
 
@@ -534,8 +534,7 @@ List of Attributes<br/>
   <tr>
     <td>operation</td>
     <td>Existing Mbean operation (see Tomcat 
-        <a href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/catalina/funcspecs/fs-admin-opers.html">
-        http://jakarta.apache.org/tomcat/tomcat-5.5-doc/catalina/funcspecs/fs-admin-opers.html</a>.
+        <a href="funcspecs/fs-admin-opers.html">funcspecs/fs-admin-opers.html</a>.
     </td>
     <td></td>
   </tr>

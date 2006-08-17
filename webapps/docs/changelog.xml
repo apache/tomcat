@@ -14,6 +14,107 @@
 
 <body>
 
+<section name="Tomcat 5.5.18 (yoavs)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Change MD5 release signature files to have md5 (lowercase) extension instead of MD5 (uppercase),
+        as suggested by Henk Penning and specified in the
+        <a href="http://www.apache.org/dev/release-publishing.html">ASF release publishing guidelines</a>. (yoavs)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix that ManagerBase increment expireSessions counter at background task two times. (pero)
+      </fix>
+      <fix>
+        <bug>39406</bug>: Fix that StandardSession#getLastAccessedTime() uses correct exception message,
+        suggested by Takayoshi Kimura. (pero)
+      </fix>
+      <add>
+        <bug>39661</bug>: Add documentation on JULI FileHandler properties. (yoavs)
+      </add>
+      <add>
+        <bug>39657</bug>: Warn (and don't load jar) if JSP API is in webapp classloader repository, as suggested by
+          David Sanchez Crespillo. (yoavs)
+      </add>
+      <add>
+        <bug>39674</bug>: Support JRockit JVM in service.bat script, as suggested by lizongbo. (yoavs)
+      </add>
+      <fix>
+        <bug>39711</bug>: Update Loader configuration documentation, as suggested by Stephane Bailliez. (yoavs)
+      </fix>
+      <fix>
+        <bug>39865</bug>: Add Open Office mime types to conf/web.xml. (markt)
+      </fix>
+      <fix>
+        <bug>38814</bug>: Align CGI handling of indexed queries, parameters and
+        POST content with other CGI providers. The changes: only provide
+        parameters on the command line for indexed queries; always provide the
+        query string via the QUERY_STRING environment variable; provide POST
+        content unmodified to stdin; and never call getParameters(). (markt) 
+      </fix>
+      <fix>
+        <bug>34801</bug>: Partial fix that adds handling of IOExceptions during
+        long running CGI requests. Based on a patch by Chris Davey. (markt)
+      </fix>
+      <fix>
+        <bug>39689</bug>: Allow single quotes (') and backticks (`) as well as
+        double quotes (") to be used to delimit SSI attribute values. (markt)
+      </fix>
+      <fix>
+        <bug>40053</bug>: Correct application deployment documentation so it
+        agrees with the classloader documentation regarding shared lib and
+        CATALINA_BASE. (markt)
+      </fix>
+      <fix>
+        <bug>39592</bug>: Stop HEAD requests for resources handled by SSI
+        servlet or filter generating stack traces in the logs. (markt)
+      </fix>
+      <fix>
+        Improve handling of the ';' character in the URL so that it is now
+        allowed if properly %xx encoded. (remm)
+      </fix>
+  </changelog>
+  </subsection> 
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix APR endpoint so that the acceptor thread now only processes socket
+        accepts. (remm)
+      </fix>
+  </changelog>
+  </subsection> 
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>39813</bug>: Correct handling of new line characters in JMX
+        attributes. Patch provided by R Bramley. (markt)
+      </fix>
+      <fix>
+        <bug>37781</bug>: Make sure that StoreConfig save external referenced war files at context.xml correct. (pero)
+      </fix>
+      <fix>
+        <bug>39791</bug>: Use correct default for useNaming within a Context. (markt)
+      </fix>
+      <fix>
+        Correctly generate re-direct for admin app index.jsp to prevent login page
+        being displayed twice when cookies are disabled. (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>39473</bug>: Session timeout much shorter than setting
+         at web.xml at cluster environment, suggested by Jin Jiang. (pero)
+      </fix>
+    </changelog>
+  </subsection>   
+</section>
+
 <section name="Tomcat 5.5.17 (yoavs)">
   <subsection name="General">
     <changelog>
@@ -225,7 +326,7 @@
       </fix>
       <fix>
         Allow using a custom ContextConfig when using JMX embedding of Tomcat, as
-        is doen by the regular deployer. (remm)
+        is done by the regular deployer. (remm)
       </fix>
       <add>
         Add JMX serverInfo attribute to Server MBean, that we can identify
