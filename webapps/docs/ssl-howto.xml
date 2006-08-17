@@ -208,12 +208,12 @@ format keystores.  The <code>JKS</code> format
 is Java's standard "Java KeyStore" format, and is the format created by the
 <code>keytool</code> command-line utility.  This tool is included in the JDK.
 The <code>PKCS12</code> format is an internet standard, and can be manipulated
-via (among other things) OpenSSL and Microsoft's Key-Manager.  However, 
-currently there are some limitations on the support for <code>PKCS12</code>.
+via (among other things) OpenSSL and Microsoft's Key-Manager.
 </p>
 
 <p>To import an existing certificate into a JKS keystore, please read the
 documentation (in your JDK documentation package) about <code>keytool</code>.
+Note that openssl often adds a readable comments before the key, <code>keytool</code>does not support that, so remove the openssl comments if they exist before importing the key using <code>keytool</code>.
 </p>
 <p>To import an existing certificate signed by your own CA into a PKCS12 
 keystore using OpenSSL you would execute a command like:
@@ -399,6 +399,12 @@ values, depending on how you configured your keystore earlier:</p>
         TrustStore then you are using for the KeyStore.  The valid values are
         <code>JKS</code> and <code>PKCS12</code>.</td>
   </tr>
+  <tr>
+   <td><code>keyAlias</code></td>
+    <td>Add this element if your have more than one key in the KeyStore.
+        If the element is not present the first key read in the KeyStore
+        will be used.</td>
+  </tr>
 </table>
 
 <p>After completing these configuration changes, you must restart Tomcat as
@@ -517,7 +523,7 @@ SSL communications, and what to do about them.</p>
 <strong>TOMCAT-USER</strong> mailing list.  You can find pointers to archives
 of previous messages on this list, as well as subscription and unsubscription
 information, at
-<a href="http://jakarta.apache.org/site/mail.html">http://jakarta.apache.org/site/mail.html"</a>.</p>
+<a href="http://tomcat.apache.org/lists.html">http://tomcat.apache.org/lists.html</a>.</p>
 
 </section>
 
