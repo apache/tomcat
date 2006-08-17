@@ -1,5 +1,5 @@
 /*
- *  Copyright 1999-2004 The Apache Software Foundation
+ *  Copyright 1999-2006 The Apache Software Foundation
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@
 
 package org.apache.tomcat.util.http;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class to generate HTTP dates.
@@ -35,6 +36,10 @@ public final class FastHttpDateFormat {
     // -------------------------------------------------------------- Variables
 
 
+    protected static final int CACHE_SIZE = 
+        Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
+
+    
     /**
      * HTTP date format.
      */
@@ -84,13 +89,15 @@ public final class FastHttpDateFormat {
     /**
      * Formatter cache.
      */
-    protected static final HashMap formatCache = new HashMap();
+    protected static final ConcurrentHashMap<Long, String> formatCache = 
+        new ConcurrentHashMap<Long, String>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    protected static final HashMap parseCache = new HashMap();
+    protected static final ConcurrentHashMap<String, Long> parseCache = 
+        new ConcurrentHashMap<String, Long>(CACHE_SIZE);
 
 
     // --------------------------------------------------------- Public Methods
@@ -121,12 +128,8 @@ public final class FastHttpDateFormat {
     public static final String formatDate
         (long value, DateFormat threadLocalformat) {
 
-        String cachedDate = null;
         Long longValue = new Long(value);
-        try {
-            cachedDate = (String) formatCache.get(longValue);
-        } catch (Exception e) {
-        }
+        String cachedDate = formatCache.get(longValue);
         if (cachedDate != null)
             return cachedDate;
 
@@ -134,15 +137,13 @@ public final class FastHttpDateFormat {
         Date dateValue = new Date(value);
         if (threadLocalformat != null) {
             newDate = threadLocalformat.format(dateValue);
-            synchronized (formatCache) {
-                updateCache(formatCache, longValue, newDate);
-            }
+            updateFormatCache(longValue, newDate);
         } else {
             synchronized (formatCache) {
                 synchronized (format) {
                     newDate = format.format(dateValue);
                 }
-                updateCache(formatCache, longValue, newDate);
+                updateFormatCache(longValue, newDate);
             }
         }
         return newDate;
@@ -156,24 +157,18 @@ public final class FastHttpDateFormat {
     public static final long parseDate(String value, 
                                        DateFormat[] threadLocalformats) {
 
-        Long cachedDate = null;
-        try {
-            cachedDate = (Long) parseCache.get(value);
-        } catch (Exception e) {
-        }
+        Long cachedDate = parseCache.get(value);
         if (cachedDate != null)
             return cachedDate.longValue();
 
         Long date = null;
         if (threadLocalformats != null) {
             date = internalParseDate(value, threadLocalformats);
-            synchronized (parseCache) {
-                updateCache(parseCache, value, date);
-            }
+            updateParseCache(value, date);
         } else {
             synchronized (parseCache) {
                 date = internalParseDate(value, formats);
-                updateCache(parseCache, value, date);
+                updateParseCache(value, date);
             }
         }
         if (date == null) {
@@ -208,15 +203,28 @@ public final class FastHttpDateFormat {
     /**
      * Update cache.
      */
-    private static final void updateCache(HashMap cache, Object key, 
-                                          Object value) {
+    private static void updateFormatCache(Long key, String value) {
         if (value == null) {
             return;
         }
-        if (cache.size() > 1000) {
-            cache.clear();
+        if (formatCache.size() > CACHE_SIZE) {
+            formatCache.clear();
         }
-        cache.put(key, value);
+        formatCache.put(key, value);
+    }
+
+
+    /**
+     * Update cache.
+     */
+    private static void updateParseCache(String key, Long value) {
+        if (value == null) {
+            return;
+        }
+        if (parseCache.size() > CACHE_SIZE) {
+            parseCache.clear();
+        }
+        parseCache.put(key, value);
     }
 
 
