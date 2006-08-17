@@ -47,9 +47,8 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
-import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -748,9 +747,6 @@ public class Http11NioProcessor implements ActionHook {
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !adapter.event(request, response, error);
-            if (request.getAttribute("org.apache.tomcat.comet") == null) {
-                comet = false;
-            }
             SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
@@ -892,9 +888,6 @@ public class Http11NioProcessor implements ActionHook {
                                 statusDropsConnection(response.getStatus());
                     }
                     // Comet support
-                    if (request.getAttribute("org.apache.tomcat.comet") != null) {
-                        comet = true;
-                    }
                     SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                     if (key != null) {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
@@ -1195,6 +1188,11 @@ public class Http11NioProcessor implements ActionHook {
             InternalNioInputBuffer internalBuffer = (InternalNioInputBuffer)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
+
+        } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
+            comet = true;
+        } else if (actionCode == ActionCode.ACTION_COMET_END) {
+            comet = false;
         }
 
     }
