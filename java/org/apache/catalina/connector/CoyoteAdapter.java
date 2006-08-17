@@ -128,7 +128,8 @@ public class CoyoteAdapter
                 servlet = (CometProcessor) request.getWrapper().allocate();
             } catch (Throwable t) {
                 log.error(sm.getString("coyoteAdapter.service"), t);
-                request.removeAttribute("org.apache.tomcat.comet");
+                request.recycle();
+                response.recycle();
                 // Restore the context classloader
                 Thread.currentThread().setContextClassLoader
                     (CoyoteAdapter.class.getClassLoader());
@@ -140,7 +141,6 @@ public class CoyoteAdapter
                 } else {
                     if (!servlet.read(request.getRequest(), response.getResponse())) {
                         error = true;
-                        request.removeAttribute("org.apache.tomcat.comet");
                         try {
                             servlet.error(request.getRequest(), response.getResponse());
                         } catch (Throwable th) {
@@ -148,12 +148,15 @@ public class CoyoteAdapter
                         }
                     }
                 }
+                if (response.isClosed()) {
+                    res.action(ActionCode.ACTION_COMET_END, null);
+                }
                 return (!error);
             } catch (Throwable t) {
                 if (!(t instanceof IOException)) {
                     log.error(sm.getString("coyoteAdapter.service"), t);
                 }
-                request.removeAttribute("org.apache.tomcat.comet");
+                error = true;
                 try {
                     servlet.error(request.getRequest(), response.getResponse());
                 } catch (Throwable th) {
@@ -161,14 +164,14 @@ public class CoyoteAdapter
                 }
                 return false;
             } finally {
-                // Recycle the wrapper request and response
-                if (request.getAttribute("org.apache.tomcat.comet") == null) {
-                    request.recycle();
-                    response.recycle();
-                }
                 // Restore the context classloader
                 Thread.currentThread().setContextClassLoader
                     (CoyoteAdapter.class.getClassLoader());
+                // Recycle the wrapper request and response
+                if (error || response.isClosed()) {
+                    request.recycle();
+                    response.recycle();
+                }
             }
         }
         return true;
@@ -222,14 +225,15 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }
 
-            if (request.getAttribute("org.apache.tomcat.comet") == Boolean.TRUE
-                    && request.getWrapper().allocate() instanceof CometProcessor) {
+            if (request.getWrapper().allocate() instanceof CometProcessor 
+                    && !response.isClosed()) {
                 comet = true;
+                res.action(ActionCode.ACTION_COMET_BEGIN, null);
             }
 
             if (!comet) {
                 response.finishResponse();
-                req.action( ActionCode.ACTION_POST_REQUEST , null);
+                req.action(ActionCode.ACTION_POST_REQUEST , null);
             }
 
         } catch (IOException e) {

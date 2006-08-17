@@ -133,6 +133,18 @@ public final class ActionCode {
     public static final ActionCode ACTION_REQ_SET_BODY_REPLAY = new ActionCode(20);
 
 
+    /**
+     * Callback for begin Comet processing
+     */
+    public static final ActionCode ACTION_COMET_BEGIN = new ActionCode(21);
+
+
+    /**
+     * Callback for begin Comet processing
+     */
+    public static final ActionCode ACTION_COMET_END = new ActionCode(22);
+
+
     // ----------------------------------------------------------- Constructors
     int code;
 
