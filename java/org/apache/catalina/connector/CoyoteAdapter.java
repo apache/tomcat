@@ -19,6 +19,8 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 
+import javax.servlet.Servlet;
+
 import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -117,25 +119,16 @@ public class CoyoteAdapter
 
         if (request.getWrapper() != null) {
             
+            CometProcessor servlet = null;
+
             // Bind the context CL to the current thread
             if (request.getContext().getLoader() != null ) {
                 Thread.currentThread().setContextClassLoader
                         (request.getContext().getLoader().getClassLoader());
             }
             
-            CometProcessor servlet = null;
             try {
                 servlet = (CometProcessor) request.getWrapper().allocate();
-            } catch (Throwable t) {
-                log.error(sm.getString("coyoteAdapter.service"), t);
-                request.recycle();
-                response.recycle();
-                // Restore the context classloader
-                Thread.currentThread().setContextClassLoader
-                    (CoyoteAdapter.class.getClassLoader());
-                return false;
-            }
-            try {
                 if (error) {
                     servlet.error(request.getRequest(), response.getResponse());
                 } else {
@@ -167,6 +160,11 @@ public class CoyoteAdapter
                 // Restore the context classloader
                 Thread.currentThread().setContextClassLoader
                     (CoyoteAdapter.class.getClassLoader());
+                try {
+                    request.getWrapper().deallocate((Servlet) servlet);
+                } catch (Exception e) {
+                    log.error(sm.getString("coyoteAdapter.service"), e);
+                }
                 // Recycle the wrapper request and response
                 if (error || response.isClosed()) {
                     request.recycle();
@@ -225,7 +223,7 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }
 
-            if (request.getWrapper().allocate() instanceof CometProcessor 
+            if (request.getWrapper().getServlet() instanceof CometProcessor 
                     && !response.isClosed()) {
                 comet = true;
                 res.action(ActionCode.ACTION_COMET_BEGIN, null);

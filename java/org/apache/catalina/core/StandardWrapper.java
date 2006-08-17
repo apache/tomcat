@@ -750,6 +750,14 @@ public class StandardWrapper
 
 
     /**
+     * Return the associated servlet instance.
+     */
+    public Servlet getServlet() {
+        return instance;
+    }
+    
+    
+    /**
      * Allocate an initialized instance of this Servlet that is ready to have
      * its <code>service()</code> method called.  If the servlet class does
      * not implement <code>SingleThreadModel</code>, the (only) initialized
