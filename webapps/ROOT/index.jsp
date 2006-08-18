@@ -115,8 +115,8 @@
                 <tr>
                   <td class="menu">
                     <a href="RELEASE-NOTES.txt">Release&nbsp;Notes</a><br/>
-                    <a href="tomcat-docs/changelog.html">Change&nbsp;Log</a><br/>
-                    <a href="tomcat-docs">Tomcat&nbsp;Documentation</a><br/>                        &nbsp;
+                    <a href="docs/changelog.html">Change&nbsp;Log</a><br/>
+                    <a href="docs">Tomcat&nbsp;Documentation</a><br/>                        &nbsp;
                     &nbsp;
 		    </td>
                 </tr>
