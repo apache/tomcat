@@ -224,7 +224,8 @@ public class CoyoteAdapter
             }
 
             if (request.getWrapper().getServlet() instanceof CometProcessor 
-                    && !response.isClosed()) {
+                    && !response.isClosed()
+                    && req.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
                 comet = true;
                 res.action(ActionCode.ACTION_COMET_BEGIN, null);
             }
