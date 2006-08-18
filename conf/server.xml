@@ -15,6 +15,7 @@
   <!-- Comment these entries out to disable JMX MBeans support used for the 
        administration web application -->
   <Listener className="org.apache.catalina.core.AprLifecycleListener" />
+  <Listener className="org.apache.catalina.core.JasperListener" />
   <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
   <!--<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>-->

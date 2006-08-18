@@ -218,16 +218,18 @@ public class CoyoteAdapter
 
             // Parse and set Catalina and configuration specific 
             // request parameters
-            if ( postParseRequest(req, request, res, response) ) {
+            if (postParseRequest(req, request, res, response)) {
+
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
-            }
 
-            if (request.getWrapper().getServlet() instanceof CometProcessor 
-                    && !response.isClosed()
-                    && req.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
-                comet = true;
-                res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                if (request.getWrapper().getServlet() instanceof CometProcessor 
+                        && !response.isClosed()
+                        && req.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
+                    comet = true;
+                    res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                }
+
             }
 
             if (!comet) {
