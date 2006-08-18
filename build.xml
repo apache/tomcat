@@ -423,6 +423,8 @@
       </fileset>
     </copy>
 
+    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES" />
+
     <!-- Build classes for examples webapp -->
     <javac   srcdir="webapps/examples/WEB-INF/classes" 
              destdir="${tomcat.build}/webapps/examples/WEB-INF/classes"
