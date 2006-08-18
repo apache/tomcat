@@ -107,6 +107,10 @@ public class ELSupport {
             return false;
         } else if (obj0 instanceof Boolean || obj1 instanceof Boolean) {
             return coerceToBoolean(obj0).equals(coerceToBoolean(obj1));
+        } else if (obj0.getClass().isEnum()) {
+            return obj0.equals(coerceToEnum(obj1, obj0.getClass()));
+        } else if (obj1.getClass().isEnum()) {
+            return obj1.equals(coerceToEnum(obj0, obj1.getClass()));
         }
         if (isBigDecimalOp(obj0, obj1)) {
             BigDecimal bd0 = (BigDecimal) coerceToNumber(obj0, BigDecimal.class);
@@ -130,6 +134,21 @@ public class ELSupport {
         } else {
             return obj0.equals(obj1);
         }
+    }
+    
+    /**
+     * @param obj
+     * @param type
+     * @return
+     */
+    public final static Enum coerceToEnum(final Object obj, Class type) {
+        if (obj == null || "".equals(obj)) {
+            return null;
+        }
+        if (obj.getClass().isEnum()) {
+            return (Enum) obj;
+        }
+        return Enum.valueOf(type, obj.toString());
     }
 
     /**
@@ -286,6 +305,8 @@ public class ELSupport {
             return "";
         } else if (obj instanceof String) {
             return (String) obj;
+        } else if (obj instanceof Enum) {
+            return ((Enum) obj).name();
         } else {
             return obj.toString();
         }
@@ -310,6 +331,9 @@ public class ELSupport {
         }
         if (obj != null && type.isAssignableFrom(obj.getClass())) {
             return obj;
+        }
+        if (type.isEnum()) {
+            return coerceToEnum(obj, type);
         }
 
         // new to spec
