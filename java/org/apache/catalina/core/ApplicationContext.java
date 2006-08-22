@@ -88,7 +88,7 @@ public class ApplicationContext
     /**
      * The context attributes for this context.
      */
-    private Map attributes = new ConcurrentHashMap();
+    protected Map attributes = new ConcurrentHashMap();
 
 
     /**
