@@ -1243,6 +1243,27 @@ public class StandardSession
      *  invalidated session
      */
     public void setAttribute(String name, Object value) {
+        setAttribute(name,value,true);
+    }
+    /**
+     * Bind an object to this session, using the specified name.  If an object
+     * of the same name is already bound to this session, the object is
+     * replaced.
+     * <p>
+     * After this method executes, and if the object implements
+     * <code>HttpSessionBindingListener</code>, the container calls
+     * <code>valueBound()</code> on the object.
+     *
+     * @param name Name to which the object is bound, cannot be null
+     * @param value Object to be bound, cannot be null
+     * @param notify whether to notify session listeners
+     * @exception IllegalArgumentException if an attempt is made to add a
+     *  non-serializable object in an environment marked distributable.
+     * @exception IllegalStateException if this method is called on an
+     *  invalidated session
+     */
+
+    public void setAttribute(String name, Object value, boolean notify) {
 
         // Name cannot be null
         if (name == null)
@@ -1268,7 +1289,7 @@ public class StandardSession
         HttpSessionBindingEvent event = null;
 
         // Call the valueBound() method if necessary
-        if (value instanceof HttpSessionBindingListener) {
+        if (notify && value instanceof HttpSessionBindingListener) {
             // Don't call any notification if replacing with the same value
             Object oldValue = attributes.get(name);
             if (value != oldValue) {
@@ -1286,7 +1307,7 @@ public class StandardSession
         Object unbound = attributes.put(name, value);
 
         // Call the valueUnbound() method if necessary
-        if ((unbound != null) && (unbound != value) &&
+        if (notify && (unbound != null) && (unbound != value) &&
             (unbound instanceof HttpSessionBindingListener)) {
             try {
                 ((HttpSessionBindingListener) unbound).valueUnbound
@@ -1296,7 +1317,9 @@ public class StandardSession
                     (sm.getString("standardSession.bindingEvent"), t);
             }
         }
-
+        
+        if ( !notify ) return;
+        
         // Notify interested application event listeners
         Context context = (Context) manager.getContainer();
         Object listeners[] = context.getApplicationEventListeners();
