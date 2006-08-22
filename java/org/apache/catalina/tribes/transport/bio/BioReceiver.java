@@ -1,0 +1,160 @@
+/*
+ * Copyright 1999,2006 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
+package org.apache.catalina.tribes.transport.bio;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import org.apache.catalina.tribes.ChannelReceiver;
+import org.apache.catalina.tribes.io.ListenCallback;
+import org.apache.catalina.tribes.io.ObjectReader;
+import org.apache.catalina.tribes.transport.ReceiverBase;
+import org.apache.catalina.tribes.transport.ThreadPool;
+import org.apache.catalina.tribes.transport.WorkerThread;
+
+/**
+ * <p>Title: </p>
+ *
+ * <p>Description: </p>
+ *
+ * <p>Copyright: Copyright (c) 2005</p>
+ *
+ * <p>Company: </p>
+ *
+ * @author not attributable
+ * @version 1.0
+ */
+public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
+
+    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(BioReceiver.class);
+
+    protected ServerSocket serverSocket;
+
+    public BioReceiver() {
+    }
+
+    /**
+     *
+     * @throws IOException
+     * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
+     */
+    public void start() throws IOException {
+        try {
+            setPool(new ThreadPool(getMaxThreads(),getMinThreads(),this));
+        } catch (Exception x) {
+            log.fatal("ThreadPool can initilzed. Listener not started", x);
+            if ( x instanceof IOException ) throw (IOException)x;
+            else throw new IOException(x.getMessage());
+        }
+        try {
+            getBind();
+            bind();
+            Thread t = new Thread(this, "BioReceiver");
+            t.setDaemon(true);
+            t.start();
+        } catch (Exception x) {
+            log.fatal("Unable to start cluster receiver", x);
+            if ( x instanceof IOException ) throw (IOException)x;
+            else throw new IOException(x.getMessage());
+        }
+    }
+    
+    public WorkerThread getWorkerThread() {
+        return getReplicationThread();
+    }
+    
+    protected BioReplicationThread getReplicationThread() {
+        BioReplicationThread result = new BioReplicationThread(this);
+        result.setOptions(getWorkerThreadOptions());
+        result.setUseBufferPool(this.getUseBufferPool());
+        return result;
+    }
+
+    /**
+     *
+     * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
+     */
+    public void stop() {
+        setListen(false);
+        try {
+            this.serverSocket.close();
+        }catch ( Exception x ) {}
+    }
+
+    
+    
+    
+    protected void bind() throws IOException {
+        // allocate an unbound server socket channel
+        serverSocket = new ServerSocket();
+        // set the port the server channel will listen to
+        //serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
+        bind(serverSocket,getPort(),getAutoBind());
+    }
+    
+    
+    
+    public void run() {
+        try {
+            listen();
+        } catch (Exception x) {
+            log.error("Unable to run replication listener.", x);
+        }
+    }
+    
+    public void listen() throws Exception {
+        if (doListen()) {
+            log.warn("ServerSocket already started");
+            return;
+        }
+        setListen(true);
+
+        while ( doListen() ) {
+            Socket socket = null;
+            if ( getPool().available() < 1 ) {
+                if ( log.isWarnEnabled() )
+                    log.warn("All BIO server replication threads are busy, unable to handle more requests until a thread is freed up.");
+            }
+            BioReplicationThread thread = (BioReplicationThread)getPool().getWorker();
+            if ( thread == null ) continue; //should never happen
+            try {
+                socket = serverSocket.accept();
+            }catch ( Exception x ) {
+                if ( doListen() ) throw x;
+            }
+            if ( !doListen() ) {
+                thread.setDoRun(false);
+                thread.serviceSocket(null,null);
+                break; //regular shutdown
+            }
+            if ( socket == null ) continue;
+            socket.setReceiveBufferSize(getRxBufSize());
+            socket.setSendBufferSize(getRxBufSize());
+            socket.setTcpNoDelay(getTcpNoDelay());
+            socket.setKeepAlive(getSoKeepAlive());
+            socket.setOOBInline(getOoBInline());
+            socket.setReuseAddress(getSoReuseAddress());
+            socket.setSoLinger(getSoLingerOn(),getSoLingerTime());
+            socket.setTrafficClass(getSoTrafficClass());
+            socket.setSoTimeout(getTimeout());
+            ObjectReader reader = new ObjectReader(socket);
+            thread.serviceSocket(socket,reader);
+        }//while
+    }
+    
+
+}

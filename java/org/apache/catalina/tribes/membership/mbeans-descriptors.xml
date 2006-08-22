@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
+<mbeans-descriptors>
+
+  <mbean         name="McastService"
+           description="Cluster Membership service implementation"
+               domain="Catalina"
+                group="Cluster"
+                 type="org.apache.catalina.cluster.mcast.McastService">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="mcastAddr"
+          description="Multicast IP Address"
+                 type="java.lang.String"/>
+    <attribute   name="mcastBindAddress"
+          description="Multicast IP Interface address (default auto)"
+                 type="java.lang.String"/>
+    <attribute   name="mcastPort"
+          description="Multicast UDP Port"
+                 type="int"/>
+    <attribute   name="mcastFrequency"
+          description="Ping Frequency at msec"
+                 type="long"/>
+    <attribute   name="mcastClusterDomain"
+          description="Cluster Domain of this member"
+                 type="java.lang.String"/>
+    <attribute   name="mcastDropTime"
+          description="Timeout from frequency ping after member disapper notify"
+                 type="long"/>
+    <attribute   name="mcastSoTimeout"
+          description="Multicast Socket Timeout"
+                 type="int"/>
+    <attribute   name="mcastTTL"
+          description=""
+                 type="int"/>
+    <attribute   name="localMemberName"
+          description="Complete local receiver information"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="membersByName"
+          description="Complete remote sender information"
+                 type="[Ljava.lang.String;"
+                 writeable="false"/>
+
+    <operation   name="start"
+               description="Start the cluster membership"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+    
+    <operation name="stop"
+               description="Stop the cluster membership"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+                 
+  </mbean>
+
+</mbeans-descriptors>
