@@ -543,6 +543,7 @@ public class AjpProcessor implements ActionHook {
             // Set the given bytes as the content
             ByteChunk bc = (ByteChunk) param;
             bodyBytes.setBytes(bc.getBytes(), bc.getStart(), bc.getLength());
+            request.setContentLength(bc.getLength());
             first = false;
             empty = false;
             replay = true;
