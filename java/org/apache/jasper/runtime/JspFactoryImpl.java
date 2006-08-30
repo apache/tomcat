@@ -178,14 +178,7 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
     
-    private final static String APP_CONTEXT_VARIABLE = JspApplicationContextImpl.class.getName();
-
 	public JspApplicationContext getJspApplicationContext(ServletContext context) {
-        JspApplicationContext appContext = (JspApplicationContext) context.getAttribute(APP_CONTEXT_VARIABLE);
-		if (appContext == null) {
-            appContext = new JspApplicationContextImpl();
-            context.setAttribute(APP_CONTEXT_VARIABLE, appContext);
-        }
-        return appContext;
+        return JspApplicationContextImpl.getInstance(context);
 	}
 }
