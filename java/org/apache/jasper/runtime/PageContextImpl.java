@@ -212,6 +212,8 @@ public class PageContextImpl extends PageContext {
 		servlet = null;
 		config = null;
 		context = null;
+        applicationContext = null;
+        elContext = null;
 		needsSession = false;
 		errorPageURL = null;
 		bufferSize = JspWriter.DEFAULT_BUFFER;
