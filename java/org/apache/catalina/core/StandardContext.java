@@ -1538,6 +1538,24 @@ public class StandardContext
         this.originalDocBase = docBase;
     }
     
+
+    /**
+     * Return the parent class loader (if any) for this web application.
+     * This call is meaningful only <strong>after</strong> a Loader has
+     * been configured.
+     */
+    public ClassLoader getParentClassLoader() {
+        if (parentClassLoader != null)
+            return (parentClassLoader);
+        if (getPrivileged()) {
+            return this.getClass().getClassLoader();
+        } else if (parent != null) {
+            return (parent.getParentClassLoader());
+        }
+        return (ClassLoader.getSystemClassLoader());
+    }
+
+    
     /**
      * Return the privileged flag for this web application.
      */
@@ -4117,17 +4135,7 @@ public class StandardContext
         }
         
         if (getLoader() == null) {
-            ClassLoader parent = null;
-            if (getPrivileged()) {
-                if (log.isDebugEnabled())
-                    log.debug("Configuring privileged default Loader");
-                parent = this.getClass().getClassLoader();
-            } else {
-                if (log.isDebugEnabled())
-                    log.debug("Configuring non-privileged default Loader");
-                parent = getParentClassLoader();
-            }
-            WebappLoader webappLoader = new WebappLoader(parent);
+            WebappLoader webappLoader = new WebappLoader(getParentClassLoader());
             webappLoader.setDelegate(getDelegate());
             setLoader(webappLoader);
         }
