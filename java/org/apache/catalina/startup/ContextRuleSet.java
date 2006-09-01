@@ -144,10 +144,9 @@ public class ContextRuleSet extends RuleSetBase {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
-        digester.addRule(prefix + "Context/Loader",
-                         new CreateLoaderRule
-                             ("org.apache.catalina.loader.WebappLoader",
-                              "className"));
+        digester.addObjectCreate(prefix + "Context/Loader",
+                            "org.apache.catalina.loader.WebappLoader",
+                            "className");
         digester.addSetProperties(prefix + "Context/Loader");
         digester.addSetNext(prefix + "Context/Loader",
                             "setLoader",
@@ -217,76 +216,5 @@ public class ContextRuleSet extends RuleSetBase {
                                "addWrapperListener", 0);
 
     }
-
-}
-
-
-// ----------------------------------------------------------- Private Classes
-
-
-/**
- * Rule that creates a new <code>Loader</code> instance, with the parent
- * class loader associated with the top object on the stack (which must be
- * a <code>Container</code>), and pushes it on to the stack.
- */
-
-final class CreateLoaderRule extends Rule {
-
-    public CreateLoaderRule(String loaderClass, String attributeName) {
-
-        this.loaderClass = loaderClass;
-        this.attributeName = attributeName;
-
-    }
-
-    private String attributeName;
-
-    private String loaderClass;
-
-    public void begin(String namespace, String name, Attributes attributes)
-        throws Exception {
-
-        // Look up the required parent class loader
-        ClassLoader parentClassLoader = null;
-        Object ojb = digester.peek();
-        if (ojb instanceof Container) {
-            parentClassLoader = ((Container)ojb).getParentClassLoader();
-        }
-
-        // Bugzilla 36852: http://issues.apache.org/bugzilla/show_bug.cgi?id=36852
-        if((ojb instanceof org.apache.catalina.Context) &&
-           (((org.apache.catalina.Context) ojb).getPrivileged())) {
-            parentClassLoader = ojb.getClass().getClassLoader();
-        }
-
-        // Instantiate a new Loader implementation object
-        String className = loaderClass;
-        if (attributeName != null) {
-            String value = attributes.getValue(attributeName);
-            if (value != null)
-                className = value;
-        }
-        Class clazz = Class.forName(className);
-        Class types[] = { ClassLoader.class };
-        Object args[] = { parentClassLoader };
-        Constructor constructor = clazz.getDeclaredConstructor(types);
-        Loader loader = (Loader) constructor.newInstance(args);
-
-        // Push the new loader onto the stack
-        digester.push(loader);
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("new " + loader.getClass().getName());
-
-    }
-
-    public void end(String namespace, String name)
-        throws Exception {
-
-        Loader loader = (Loader) digester.pop();
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("pop " + loader.getClass().getName());
-
-    }
-
 
 }

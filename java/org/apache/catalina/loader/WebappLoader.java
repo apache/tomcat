@@ -770,7 +770,7 @@ public class WebappLoader
         WebappClassLoader classLoader = null;
 
         if (parentClassLoader == null) {
-            parentClassLoader = Thread.currentThread().getContextClassLoader();
+            parentClassLoader = container.getParentClassLoader();
         }
         Class[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
