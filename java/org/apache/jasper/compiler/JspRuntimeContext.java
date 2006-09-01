@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.jsp.JspFactory;
@@ -148,7 +149,7 @@ public final class JspRuntimeContext implements Runnable {
     /**
      * Maps JSP pages to their JspServletWrapper's
      */
-    private Map jsps = Collections.synchronizedMap( new HashMap());
+    private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<String, JspServletWrapper>();
  
 
     /**
@@ -177,8 +178,7 @@ public final class JspRuntimeContext implements Runnable {
      * @param jsw Servlet wrapper for JSP
      */
     public void addWrapper(String jspUri, JspServletWrapper jsw) {
-        jsps.remove(jspUri);
-        jsps.put(jspUri,jsw);
+        jsps.put(jspUri, jsw);
     }
 
     /**
@@ -188,7 +188,7 @@ public final class JspRuntimeContext implements Runnable {
      * @return JspServletWrapper for JSP
      */
     public JspServletWrapper getWrapper(String jspUri) {
-        return (JspServletWrapper) jsps.get(jspUri);
+        return jsps.get(jspUri);
     }
 
     /**
