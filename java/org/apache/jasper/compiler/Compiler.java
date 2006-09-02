@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004-2005 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -373,7 +373,6 @@ public abstract class Compiler {
             jspRealLastModified = uc.getLastModified();
             uc.getInputStream().close();
         } catch (Exception e) {
-            e.printStackTrace();
             return true;
         }
 
@@ -430,7 +429,6 @@ public abstract class Compiler {
                     return true;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 return true;
             }
         }

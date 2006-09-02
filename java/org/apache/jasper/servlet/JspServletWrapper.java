@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004-2005 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,6 +288,7 @@ public class JspServletWrapper {
                         HttpServletResponse response,
                         boolean precompile)
 	    throws ServletException, IOException, FileNotFoundException {
+        
         try {
 
             if (ctxt.isRemoved()) {
@@ -328,6 +329,53 @@ public class JspServletWrapper {
                 return;
             }
 
+        } catch (FileNotFoundException ex) {
+            ctxt.incrementRemoved();
+            String includeRequestUri = (String)
+                request.getAttribute("javax.servlet.include.request_uri");
+            if (includeRequestUri != null) {
+                // This file was included. Throw an exception as
+                // a response.sendError() will be ignored by the
+                // servlet engine.
+                throw new ServletException(ex);
+            } else {
+                try {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND, 
+                                      ex.getMessage());
+                } catch (IllegalStateException ise) {
+                    log.error(Localizer.getMessage("jsp.error.file.not.found",
+                           ex.getMessage()),
+                  ex);
+                }
+            }
+        } catch (ServletException ex) {
+            if (options.getDevelopment()) {
+                throw handleJspException(ex);
+            } else {
+                throw ex;
+            }
+        } catch (IOException ex) {
+            if (options.getDevelopment()) {
+                throw handleJspException(ex);
+            } else {
+                throw ex;
+            }
+        } catch (IllegalStateException ex) {
+            if (options.getDevelopment()) {
+                throw handleJspException(ex);
+            } else {
+                throw ex;
+            }
+        } catch (Exception ex) {
+            if (options.getDevelopment()) {
+                throw handleJspException(ex);
+            } else {
+                throw new JasperException(ex);
+            }
+        }
+
+        try {
+            
             /*
              * (3) Service request
              */
@@ -359,25 +407,6 @@ public class JspServletWrapper {
                 response.sendError
                     (HttpServletResponse.SC_SERVICE_UNAVAILABLE, 
                      ex.getMessage());
-            }
-        } catch (FileNotFoundException ex) {
-            ctxt.incrementRemoved();
-            String includeRequestUri = (String)
-                request.getAttribute("javax.servlet.include.request_uri");
-            if (includeRequestUri != null) {
-                // This file was included. Throw an exception as
-                // a response.sendError() will be ignored by the
-                // servlet engine.
-                throw new ServletException(ex);
-            } else {
-                try {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, 
-                                      ex.getMessage());
-                } catch (IllegalStateException ise) {
-                    log.error(Localizer.getMessage("jsp.error.file.not.found",
-						   ex.getMessage()),
-			      ex);
-                }
             }
         } catch (ServletException ex) {
             if(options.getDevelopment()) {
