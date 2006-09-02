@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,6 @@ public class JspCompilationContext {
     private String classPath;
 
     private String baseURI;
-    private String baseOutputDir;
     private String outputDir;
     private ServletContext context;
     private URLClassLoader loader;
@@ -538,10 +537,8 @@ public class JspCompilationContext {
     // ==================== Removal ==================== 
 
     public void incrementRemoved() {
-        if (removed > 1) {
-            jspCompiler.removeGeneratedFiles();
-            if( rctxt != null )
-                rctxt.removeWrapper(jspUri);
+        if (removed == 0 && rctxt != null) {
+            rctxt.removeWrapper(jspUri);
         }
         removed++;
     }
@@ -559,6 +556,7 @@ public class JspCompilationContext {
         createCompiler();
         if (isPackagedTagFile || jspCompiler.isOutDated()) {
             try {
+                jspCompiler.removeGeneratedFiles();
                 jspLoader = null;
                 jspCompiler.compile();
                 jsw.setReload(true);
@@ -568,7 +566,6 @@ public class JspCompilationContext {
                 jsw.setCompilationException(ex);
                 throw ex;
             } catch (Exception ex) {
-                ex.printStackTrace();
                 JasperException je = new JasperException(
                             Localizer.getMessage("jsp.error.unable.compile"),
                             ex);
