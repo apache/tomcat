@@ -90,7 +90,7 @@ public class JspServletWrapper {
     /*
      * JspServletWrapper for JSP pages.
      */
-    JspServletWrapper(ServletConfig config, Options options, String jspUri,
+    public JspServletWrapper(ServletConfig config, Options options, String jspUri,
                       boolean isErrorPage, JspRuntimeContext rctxt)
             throws JasperException {
 
