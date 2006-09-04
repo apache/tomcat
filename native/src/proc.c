@@ -34,10 +34,12 @@ static void generic_child_errfn(apr_pool_t *pool, apr_status_t err,
     apr_pool_userdata_get(&data, ERRFN_USERDATA_KEY, pool);
     cb = (tcn_callback_t *)data;
     if (cb) {
-        if (!TCN_IS_NULL(cb->env, cb->obj)) {
-            (*(cb->env))->CallVoidMethod(cb->env, cb->obj, cb->mid[0],
+        JNIEnv *env;
+        tcn_get_java_env(&env);
+        if (!TCN_IS_NULL(env, cb->obj)) {
+            (*(env))->CallVoidMethod(env, cb->obj, cb->mid[0],
                                 P2J(pool), (jint)err,
-                                (*(cb->env))->NewStringUTF(cb->env, description),
+                                (*(env))->NewStringUTF(env, description),
                                 NULL);
         }
     }
@@ -48,8 +50,9 @@ static apr_status_t child_errfn_pool_cleanup(void *data)
     tcn_callback_t *cb = (tcn_callback_t *)data;
 
     if (data) {
-        if (!TCN_IS_NULL(cb->env, cb->obj)) {
-            TCN_UNLOAD_CLASS(cb->env, cb->obj);
+        JNIEnv *env;
+        if (!TCN_IS_NULL(env, cb->obj)) {
+            TCN_UNLOAD_CLASS(env, cb->obj);
         }
         free(cb);
     }
@@ -384,7 +387,6 @@ TCN_IMPLEMENT_CALL(void, Procattr, errfnSet)(TCN_STDARGS, jlong attr,
        return;
     }
     cls = (*e)->GetObjectClass(e, obj);
-    cb->env    = e;
     cb->obj    = (*e)->NewGlobalRef(e, obj);
     cb->mid[0] = (*e)->GetMethodID(e, cls, "callback", "(JILjava/lang/String;)V");
 

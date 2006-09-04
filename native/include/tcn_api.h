@@ -155,6 +155,10 @@ TCN_DECLARE(jclass) tcn_get_string_class(void);
  */
 TCN_DECLARE(JavaVM *) tcn_get_java_vm(void);
 
+/* Get current thread JNIEnv
+ */
+TCN_DECLARE(jint) tcn_get_java_env(JNIEnv **);
+
 #ifdef __cplusplus
 }
 #endif

@@ -458,3 +458,12 @@ TCN_DECLARE(JavaVM *) tcn_get_java_vm()
 {
     return tcn_global_vm;
 }
+
+TCN_DECLARE(jint) tcn_get_java_env(JNIEnv **env)
+{
+    if ((*tcn_global_vm)->GetEnv(tcn_global_vm, (void **)env,
+                                 JNI_VERSION_1_4)) {
+        return JNI_ERR;
+    }
+    return JNI_OK;
+}

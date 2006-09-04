@@ -111,7 +111,9 @@ static apr_status_t ssl_init_cleanup(void *data)
     ssl_initialized = 0;
 
     if (tcn_password_callback.cb.obj) {
-        TCN_UNLOAD_CLASS(tcn_password_callback.cb.env,
+        JNIEnv *env;
+        tcn_get_java_env(&env);
+        TCN_UNLOAD_CLASS(env,
                          tcn_password_callback.cb.obj);
     }
 
@@ -488,7 +490,6 @@ TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
     }
     TCN_FREE_CSTRING(file);
 }
-
 /* OpenSSL Java Stream BIO */
 
 typedef struct  {
@@ -560,8 +561,10 @@ static int jbs_free(BIO *bi)
     if (bi->ptr != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)bi->ptr;
         if (bi->init) {
+            JNIEnv   *e = NULL;
             bi->init = 0;
-            TCN_UNLOAD_CLASS(j->cb.env, j->cb.obj);
+            tcn_get_java_env(&e);            
+            TCN_UNLOAD_CLASS(e, j->cb.obj);
         }
         OPENSSL_free(bi->ptr);
     }
@@ -574,8 +577,9 @@ static int jbs_write(BIO *b, const char *in, int inl)
     jint ret = 0;
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
-        JNIEnv   *e = j->cb.env;
+        JNIEnv   *e = NULL;
         jbyteArray jb = (*e)->NewByteArray(e, inl);
+        tcn_get_java_env(&e);
         if (!(*e)->ExceptionOccurred(e)) {
             (*e)->SetByteArrayRegion(e, jb, 0, inl, (jbyte *)in);
             ret = (*e)->CallIntMethod(e, j->cb.obj,
@@ -592,8 +596,9 @@ static int jbs_read(BIO *b, char *out, int outl)
     jint ret = 0;
     if (b->init && out != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
-        JNIEnv   *e = j->cb.env;
+        JNIEnv   *e = NULL;
         jbyteArray jb = (*e)->NewByteArray(e, outl);
+        tcn_get_java_env(&e);
         if (!(*e)->ExceptionOccurred(e)) {
             ret = (*e)->CallIntMethod(e, j->cb.obj,
                                       j->cb.mid[1], jb);
@@ -613,7 +618,8 @@ static int jbs_puts(BIO *b, const char *in)
     int ret = 0;
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
-        JNIEnv   *e = j->cb.env;
+        JNIEnv   *e = NULL;
+        tcn_get_java_env(&e);        
         ret = (*e)->CallIntMethod(e, j->cb.obj,
                                   j->cb.mid[2],
                                   tcn_new_string(e, in));
@@ -626,8 +632,9 @@ static int jbs_gets(BIO *b, char *out, int outl)
     int ret = 0;
     if (b->init && out != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
-        JNIEnv   *e = j->cb.env;
+        JNIEnv   *e = NULL;
         jobject  o;
+        tcn_get_java_env(&e);
         if ((o = (*e)->CallObjectMethod(e, j->cb.obj,
                             j->cb.mid[3], (jint)(outl - 1)))) {
             TCN_ALLOC_CSTRING(o);
@@ -693,7 +700,6 @@ TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
     }
 
     cls = (*e)->GetObjectClass(e, callback);
-    j->cb.env    = e;
     j->cb.mid[0] = (*e)->GetMethodID(e, cls, "write", "([B)I");
     j->cb.mid[1] = (*e)->GetMethodID(e, cls, "read",  "([B)I");
     j->cb.mid[2] = (*e)->GetMethodID(e, cls, "puts",  "(Ljava/lang/String;)I");
@@ -723,11 +729,10 @@ TCN_IMPLEMENT_CALL(void, SSL, setPasswordCallback)(TCN_STDARGS,
 
     UNREFERENCED(o);
     if (tcn_password_callback.cb.obj) {
-        TCN_UNLOAD_CLASS(tcn_password_callback.cb.env,
+        TCN_UNLOAD_CLASS(e,
                          tcn_password_callback.cb.obj);
     }
     cls = (*e)->GetObjectClass(e, callback);
-    tcn_password_callback.cb.env    = e;
     tcn_password_callback.cb.mid[0] = (*e)->GetMethodID(e, cls, "callback",
                            "(Ljava/lang/String;)Ljava/lang/String;");
     /* TODO: Check if method id is valid */

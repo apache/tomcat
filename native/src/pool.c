@@ -29,10 +29,12 @@ static apr_status_t generic_pool_cleanup(void *data)
     tcn_callback_t *cb = (tcn_callback_t *)data;
 
     if (data) {
-        if (!TCN_IS_NULL(cb->env, cb->obj)) {
-            rv = (*(cb->env))->CallIntMethod(cb->env, cb->obj, cb->mid[0],
-                                             NULL);
-            TCN_UNLOAD_CLASS(cb->env, cb->obj);
+        JNIEnv *env;
+        tcn_get_java_env(&env);
+        if (!TCN_IS_NULL(env, cb->obj)) {
+            rv = (*(env))->CallIntMethod(env, cb->obj, cb->mid[0],
+                                         NULL);
+            TCN_UNLOAD_CLASS(env, cb->obj);
         }
         free(cb);
     }
@@ -113,7 +115,6 @@ TCN_IMPLEMENT_CALL(jlong, Pool, cleanupRegister)(TCN_STDARGS, jlong pool,
        return 0;
     }
     cls = (*e)->GetObjectClass(e, obj);
-    cb->env    = e;
     cb->obj    = (*e)->NewGlobalRef(e, obj);
     cb->mid[0] = (*e)->GetMethodID(e, cls, "callback", "()I");
 
@@ -175,8 +176,11 @@ static apr_status_t generic_pool_data_cleanup(void *data)
     tcn_callback_t *cb = (tcn_callback_t *)data;
 
     if (data) {
-        if (!TCN_IS_NULL(cb->env, cb->obj)) {
-            TCN_UNLOAD_CLASS(cb->env, cb->obj);
+        JNIEnv *env;
+        tcn_get_java_env(&env);
+        
+        if (!TCN_IS_NULL(env, cb->obj)) {
+            TCN_UNLOAD_CLASS(env, cb->obj);
         }
         free(cb);
     }
@@ -199,8 +203,9 @@ TCN_IMPLEMENT_CALL(jint, Pool, dataSet)(TCN_STDARGS, jlong pool,
             apr_pool_cleanup_run(p, old, generic_pool_data_cleanup);
     }
     if (data) {
+        JNIEnv *e;        
         tcn_callback_t *cb = (tcn_callback_t *)malloc(sizeof(tcn_callback_t));
-        cb->env = e;
+        tcn_get_java_env(&e);
         cb->obj = (*e)->NewGlobalRef(e, data);
         if ((rv = apr_pool_userdata_set(cb, J2S(key), generic_pool_data_cleanup,
                                         p)) != APR_SUCCESS) {

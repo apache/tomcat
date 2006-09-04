@@ -231,7 +231,6 @@ apr_status_t    tcn_load_ainfo_class(JNIEnv *, jclass);
 #define TCN_MAX_METHODS 8
 
 typedef struct {
-    JNIEnv      *env;
     jobject     obj;
     jmethodID   mid[TCN_MAX_METHODS];
     void        *opaque;
