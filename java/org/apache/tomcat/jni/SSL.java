@@ -254,6 +254,14 @@ public final class SSL {
                                           boolean base64);
 
     /**
+     * Sets global random filename.
+     * @param filename Filename to use.
+     *        If set it will be used for SSL initialization
+     *        and all contexts where explicitly not set.
+     */
+    public static native void randSet(String filename);
+
+    /**
      * Initialize new BIO
      * @param pool The pool to use.
      * @param callback BIOCallback to use

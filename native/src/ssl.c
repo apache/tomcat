@@ -29,6 +29,7 @@
 #include "ssl_private.h"
 
 static int ssl_initialized = 0;
+static char *ssl_global_rand_file = NULL;
 extern apr_pool_t *tcn_global_pool;
 
 ENGINE *tcn_ssl_engine = NULL;
@@ -252,6 +253,9 @@ static int ssl_rand_load_file(const char *file)
     int n;
 
     if (file == NULL)
+        file = ssl_global_rand_file;
+
+    if (file == NULL)
         file = RAND_file_name(buffer, sizeof(buffer));
     else if ((n = RAND_egd(file)) > 0) {
         return n;
@@ -473,6 +477,16 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
     r = ssl_rand_make(J2S(file), length, base64);
     TCN_FREE_CSTRING(file);
     return r ? JNI_TRUE : JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
+{
+    TCN_ALLOC_CSTRING(file);
+    UNREFERENCED(o);
+    if (J2S(file)) {
+        ssl_global_rand_file = apr_pstrdup(tcn_global_pool, J2S(file));        
+    }
+    TCN_FREE_CSTRING(file);
 }
 
 /* OpenSSL Java Stream BIO */
