@@ -84,7 +84,8 @@ public class StandardSession
 
 
     protected static final boolean ACTIVITY_CHECK = 
-        Boolean.valueOf(System.getProperty("org.apache.catalina.session.StandardSession.ACTIVITY_CHECK", "false")).booleanValue();
+        Globals.STRICT_SERVLET_COMPLIANCE
+        || Boolean.valueOf(System.getProperty("org.apache.catalina.session.StandardSession.ACTIVITY_CHECK", "false")).booleanValue();
 
 
     // ----------------------------------------------------------- Constructors
