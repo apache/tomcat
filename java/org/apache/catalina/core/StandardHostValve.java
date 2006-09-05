@@ -125,6 +125,12 @@ final class StandardHostValve
         // Ask this Context to process this request
         context.getPipeline().getFirst().invoke(request, response);
 
+        // Access a session (if present) to update last accessed time, based on a
+        // strict interpretation of the specification
+        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            request.getSession(false);
+        }
+
         // Error page processing
         response.setSuspended(false);
 

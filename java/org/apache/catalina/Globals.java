@@ -321,4 +321,12 @@ public final class Globals {
         "javax.servlet.context.tempdir";
 
 
+    /**
+     * The master flag which controls strict servlet specification 
+     * compliance.
+     */
+    public static final boolean STRICT_SERVLET_COMPLIANCE =
+        Boolean.valueOf(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false")).booleanValue();
+
+
 }
