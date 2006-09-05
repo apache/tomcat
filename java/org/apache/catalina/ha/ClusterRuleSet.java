@@ -119,7 +119,7 @@ public class ClusterRuleSet extends RuleSetBase {
             digester.addSetProperties(channelPrefix + "Sender/Transport");
             digester.addSetNext(channelPrefix + "Sender/Transport",
                                 "setTransport",
-                                "org.apache.catalina.tribes.tcp.MultiPointSender");
+                                "org.apache.catalina.tribes.transport.MultiPointSender");
 
 
             digester.addObjectCreate(channelPrefix + "Receiver",
