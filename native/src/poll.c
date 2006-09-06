@@ -128,7 +128,7 @@ TCN_IMPLEMENT_CALL(jlong, Poll, create)(TCN_STDARGS, jint size,
     tps->socket_set = apr_palloc(p, size * sizeof(apr_pollfd_t));
     TCN_CHECK_ALLOCATED(tps->socket_set);
     tps->socket_ttl = apr_palloc(p, size * sizeof(apr_interval_time_t));
-    TCN_CHECK_ALLOCATED(tps->socket_set);
+    TCN_CHECK_ALLOCATED(tps->socket_ttl);
     tps->nelts  = 0;
     tps->nalloc = size;
     tps->pool   = p;
