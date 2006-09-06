@@ -188,6 +188,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     sp_created++;
 #endif
     a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+    TCN_CHECK_ALLOCATED(a);
     a->sock = s;
     a->pool = p;
     if (family >= 0)
@@ -325,6 +326,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, acceptx)(TCN_STDARGS, jlong sock,
         apr_atomic_inc32(&sp_accepted);
 #endif
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+        TCN_CHECK_ALLOCATED(a);
         a->sock   = n;
         a->pool   = p;
         a->net    = &apr_socket_layer;
@@ -362,6 +364,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
         apr_atomic_inc32(&sp_accepted);
 #endif
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+        TCN_CHECK_ALLOCATED(a);
         a->sock   = n;
         a->pool   = p;
         a->net    = &apr_socket_layer;

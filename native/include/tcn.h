@@ -154,6 +154,7 @@ typedef struct {
 /* Private helper functions */
 void            tcn_Throw(JNIEnv *, const char *, ...);
 void            tcn_ThrowException(JNIEnv *, const char *);
+void            tcn_ThrowMemoryException(JNIEnv *, const char *, int, const char *);
 void            tcn_ThrowAPRException(JNIEnv *, apr_status_t);
 jstring         tcn_new_string(JNIEnv *, const char *);
 jstring         tcn_new_stringn(JNIEnv *, const char *, size_t);
@@ -189,6 +190,13 @@ apr_status_t    tcn_load_ainfo_class(JNIEnv *, jclass);
         if (c##V)                \
             free(c##V);          \
     TCN_END_MACRO
+
+#define TCN_CHECK_ALLOCATED(x)                              \
+        if (x == NULL) {                                    \
+            tcn_ThrowMemoryException(e, __FILE__, __LINE__, \
+            "APR memory allocation failed");                \
+            goto cleanup;                                   \
+        } else (void)(0)
 
 #define TCN_THROW_IF_ERR(x, r)                  \
     TCN_BEGIN_MACRO                             \

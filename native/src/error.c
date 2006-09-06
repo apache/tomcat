@@ -51,6 +51,34 @@ void tcn_ThrowException(JNIEnv *env, const char *msg)
 
 }
 
+void tcn_ThrowMemoryException(JNIEnv *env, const char *file, int line, const char *msg)
+{
+    jclass javaExceptionClass;
+    javaExceptionClass = (*env)->FindClass(env, "java/lang/OutOfMemoryError");
+    if (javaExceptionClass == NULL) {
+        fprintf(stderr, "Cannot find java/lang/OutOfMemoryError\n");
+        return;
+    }
+
+    if (file) {
+        char fmt[TCN_BUFFER_SZ];
+        char *f = (char *)(file + strlen(file) - 1);
+        while (f != file && '\\' != *f && '/' != *f) {
+            f--;
+        }
+        if (f != file) {
+            f++;
+        }
+        sprintf(fmt, "%s for [%s::%04d]", msg, line, f);
+        (*env)->ThrowNew(env, javaExceptionClass, &fmt[0]);
+    }
+    else
+        (*env)->ThrowNew(env, javaExceptionClass, msg);
+    (*env)->DeleteLocalRef(env, javaExceptionClass);
+
+}
+
+
 void tcn_Throw(JNIEnv *env, const char *fmt, ...)
 {
     char msg[TCN_BUFFER_SZ] = {'\0'};

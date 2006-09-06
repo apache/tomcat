@@ -121,10 +121,14 @@ TCN_IMPLEMENT_CALL(jlong, Poll, create)(TCN_STDARGS, jint size,
                          (apr_uint32_t)size, p, f), pollset);
     }
     tps = apr_pcalloc(p, sizeof(tcn_pollset_t));
+    TCN_CHECK_ALLOCATED(tps);
     tps->pollset = pollset;
     tps->set        = apr_palloc(p, size * sizeof(jlong) * 2);
+    TCN_CHECK_ALLOCATED(tps->set);
     tps->socket_set = apr_palloc(p, size * sizeof(apr_pollfd_t));
+    TCN_CHECK_ALLOCATED(tps->socket_set);
     tps->socket_ttl = apr_palloc(p, size * sizeof(apr_interval_time_t));
+    TCN_CHECK_ALLOCATED(tps->socket_set);
     tps->nelts  = 0;
     tps->nalloc = size;
     tps->pool   = p;
