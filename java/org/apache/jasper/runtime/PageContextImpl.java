@@ -711,9 +711,6 @@ public class PageContextImpl extends PageContext {
 		String includeUri = (String) request
 				.getAttribute(Constants.INC_SERVLET_PATH);
 
-		final ServletResponse fresponse = response;
-		final ServletRequest frequest = request;
-
 		if (includeUri != null)
 			request.removeAttribute(Constants.INC_SERVLET_PATH);
 		try {
@@ -721,7 +718,6 @@ public class PageContextImpl extends PageContext {
 		} finally {
 			if (includeUri != null)
 				request.setAttribute(Constants.INC_SERVLET_PATH, includeUri);
-			request.setAttribute(Constants.FORWARD_SEEN, "true");
 		}
 	}
 

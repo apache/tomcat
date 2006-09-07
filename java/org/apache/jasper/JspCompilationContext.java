@@ -208,15 +208,19 @@ public class JspCompilationContext {
             return jspCompiler;
         }
         jspCompiler = null;
-        if (options.getCompiler() == null) {
-            jspCompiler = createCompiler("org.apache.jasper.compiler.JDTCompiler");
-            if (jspCompiler == null) {
-                jspCompiler = createCompiler("org.apache.jasper.compiler.AntCompiler");
-            }
+        if (options.getCompilerClassName() != null) {
+            jspCompiler = createCompiler(options.getCompilerClassName());
         } else {
-            jspCompiler = createCompiler("org.apache.jasper.compiler.AntCompiler");
-            if (jspCompiler == null) {
+            if (options.getCompiler() == null) {
                 jspCompiler = createCompiler("org.apache.jasper.compiler.JDTCompiler");
+                if (jspCompiler == null) {
+                    jspCompiler = createCompiler("org.apache.jasper.compiler.AntCompiler");
+                }
+            } else {
+                jspCompiler = createCompiler("org.apache.jasper.compiler.AntCompiler");
+                if (jspCompiler == null) {
+                    jspCompiler = createCompiler("org.apache.jasper.compiler.JDTCompiler");
+                }
             }
         }
         if (jspCompiler == null) {
@@ -230,9 +234,13 @@ public class JspCompilationContext {
         Compiler compiler = null; 
         try {
             compiler = (Compiler) Class.forName(className).newInstance();
-        } catch (Throwable t) {
+        } catch (InstantiationException e) {
+            log.warn(Localizer.getMessage("jsp.error.compiler"), e);
+        } catch (IllegalAccessException e) {
+            log.warn(Localizer.getMessage("jsp.error.compiler"), e);
+        } catch (ClassNotFoundException e) {
             if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.error.compiler"), t);
+                log.debug(Localizer.getMessage("jsp.error.compiler"), e);
             }
         }
         return compiler;
@@ -428,19 +436,10 @@ public class JspCompilationContext {
      * generated. 
      */
     public String getServletJavaFileName() {
-
         if (servletJavaFileName == null) {
-            servletJavaFileName =
-		getOutputDir() + getServletClassName() + ".java";
-        } else {
-            // Make sure output dir exists
-            makeOutputDir();
+            servletJavaFileName = getOutputDir() + getServletClassName() + ".java";
         }
         return servletJavaFileName;
-    }
-
-    public void setServletJavaFileName(String servletJavaFileName) {
-        this.servletJavaFileName = servletJavaFileName;
     }
 
     /**
@@ -478,12 +477,8 @@ public class JspCompilationContext {
     }
 
     public String getClassFileName() {
-
         if (classFileName == null) {
             classFileName = getOutputDir() + getServletClassName() + ".class";
-        } else {
-            // Make sure output dir exists
-            makeOutputDir();
         }
         return classFileName;
     }
@@ -606,10 +601,10 @@ public class JspCompilationContext {
 
     static Object outputDirLock = new Object();
 
-    private void makeOutputDir() {
+    private boolean makeOutputDir() {
         synchronized(outputDirLock) {
             File outDirFile = new File(outputDir);
-            outDirFile.mkdirs();
+            return outDirFile.mkdirs();
         }
     }
 
@@ -623,17 +618,18 @@ public class JspCompilationContext {
             path = getServletPackageName().replace('.', '/');
 	}
 
-        try {
             // Append servlet or tag handler path to scratch dir
-            baseUrl = options.getScratchDir().toURL();
-            String outUrlString = baseUrl.toString() + '/' + path;
-            URL outUrl = new URL(outUrlString);
-            outputDir = outUrl.getFile() + File.separator;
-            makeOutputDir();
-        } catch (Exception e) {
-            throw new IllegalStateException("No output directory: " +
-                                            e.getMessage());
-        }
+            try {
+                baseUrl = options.getScratchDir().toURL();
+                String outUrlString = baseUrl.toString() + '/' + path;
+                URL outUrl = new URL(outUrlString);
+                outputDir = outUrl.getFile() + File.separator;
+                if (!makeOutputDir()) {
+                    throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"));
+                }
+            } catch (MalformedURLException e) {
+                throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"), e);
+            }
     }
     
     private static final boolean isPathSeparator(char c) {
