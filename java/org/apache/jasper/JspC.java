@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004-2005 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,143 +94,140 @@ public class JspC implements Options {
             "clsid:8AD9C840-044E-11D1-B3E9-00805F499D93";
 
     // Logger
-    private static Log log = LogFactory.getLog(JspC.class);
+    protected static Log log = LogFactory.getLog(JspC.class);
 
-    private static final String SWITCH_VERBOSE = "-v";
-    private static final String SWITCH_HELP = "-help";
-    private static final String SWITCH_QUIET = "-q";
-    private static final String SWITCH_OUTPUT_DIR = "-d";
-    private static final String SWITCH_IE_CLASS_ID = "-ieplugin";
-    private static final String SWITCH_PACKAGE_NAME = "-p";
-    private static final String SWITCH_CACHE = "-cache";
-    private static final String SWITCH_CLASS_NAME = "-c";
-    private static final String SWITCH_FULL_STOP = "--";
-    private static final String SWITCH_COMPILE = "-compile";
-    private static final String SWITCH_SOURCE = "-source";
-    private static final String SWITCH_TARGET = "-target";
-    private static final String SWITCH_URI_BASE = "-uribase";
-    private static final String SWITCH_URI_ROOT = "-uriroot";
-    private static final String SWITCH_FILE_WEBAPP = "-webapp";
-    private static final String SWITCH_WEBAPP_INC = "-webinc";
-    private static final String SWITCH_WEBAPP_XML = "-webxml";
-    private static final String SWITCH_MAPPED = "-mapped";
-    private static final String SWITCH_XPOWERED_BY = "-xpoweredBy";
-    private static final String SWITCH_TRIM_SPACES = "-trimSpaces";
-    private static final String SWITCH_CLASSPATH = "-classpath";
-    private static final String SWITCH_DIE = "-die";
-    private static final String SWITCH_POOLING = "-poolingEnabled";
-    private static final String SWITCH_ENCODING = "-javaEncoding";
-    private static final String SWITCH_SMAP = "-smap";
-    private static final String SWITCH_DUMP_SMAP = "-dumpsmap";
+    protected static final String SWITCH_VERBOSE = "-v";
+    protected static final String SWITCH_HELP = "-help";
+    protected static final String SWITCH_OUTPUT_DIR = "-d";
+    protected static final String SWITCH_PACKAGE_NAME = "-p";
+    protected static final String SWITCH_CACHE = "-cache";
+    protected static final String SWITCH_CLASS_NAME = "-c";
+    protected static final String SWITCH_FULL_STOP = "--";
+    protected static final String SWITCH_COMPILE = "-compile";
+    protected static final String SWITCH_SOURCE = "-source";
+    protected static final String SWITCH_TARGET = "-target";
+    protected static final String SWITCH_URI_BASE = "-uribase";
+    protected static final String SWITCH_URI_ROOT = "-uriroot";
+    protected static final String SWITCH_FILE_WEBAPP = "-webapp";
+    protected static final String SWITCH_WEBAPP_INC = "-webinc";
+    protected static final String SWITCH_WEBAPP_XML = "-webxml";
+    protected static final String SWITCH_MAPPED = "-mapped";
+    protected static final String SWITCH_XPOWERED_BY = "-xpoweredBy";
+    protected static final String SWITCH_TRIM_SPACES = "-trimSpaces";
+    protected static final String SWITCH_CLASSPATH = "-classpath";
+    protected static final String SWITCH_DIE = "-die";
+    protected static final String SWITCH_POOLING = "-poolingEnabled";
+    protected static final String SWITCH_ENCODING = "-javaEncoding";
+    protected static final String SWITCH_SMAP = "-smap";
+    protected static final String SWITCH_DUMP_SMAP = "-dumpsmap";
 
-    private static final String SHOW_SUCCESS ="-s";
-    private static final String LIST_ERRORS = "-l";
-    private static final int NO_WEBXML = 0;
-    private static final int INC_WEBXML = 10;
-    private static final int ALL_WEBXML = 20;
-    private static final int DEFAULT_DIE_LEVEL = 1;
-    private static final int NO_DIE_LEVEL = 0;
+    protected static final String SHOW_SUCCESS ="-s";
+    protected static final String LIST_ERRORS = "-l";
+    protected static final int INC_WEBXML = 10;
+    protected static final int ALL_WEBXML = 20;
+    protected static final int DEFAULT_DIE_LEVEL = 1;
+    protected static final int NO_DIE_LEVEL = 0;
 
-    private static final String[] insertBefore =
+    protected static final String[] insertBefore =
     { "</web-app>", "<servlet-mapping>", "<session-config>",
       "<mime-mapping>", "<welcome-file-list>", "<error-page>", "<taglib>",
       "<resource-env-ref>", "<resource-ref>", "<security-constraint>",
       "<login-config>", "<security-role>", "<env-entry>", "<ejb-ref>",
       "<ejb-local-ref>" };
 
-    private static int die;
-    private String classPath = null;
-    private URLClassLoader loader = null;
-    private boolean trimSpaces = false;
-    private boolean genStringAsCharArray = false;
-    private boolean xpoweredBy;
-    private boolean mappedFile = false;
-    private boolean poolingEnabled = true;
-    private File scratchDir;
-    private String ieClassId = DEFAULT_IE_CLASS_ID;
-    private String targetPackage;
-    private String targetClassName;
-    private String uriBase;
-    private String uriRoot;
-    private Project project;
-    private int dieLevel;
-    private boolean helpNeeded = false;
-    private boolean compile = false;
-    private boolean smapSuppressed = true;
-    private boolean smapDumped = false;
-    private boolean caching = true;
-    private Map cache = new HashMap();
+    protected static int die;
+    protected String classPath = null;
+    protected URLClassLoader loader = null;
+    protected boolean trimSpaces = false;
+    protected boolean genStringAsCharArray = false;
+    protected boolean xpoweredBy;
+    protected boolean mappedFile = false;
+    protected boolean poolingEnabled = true;
+    protected File scratchDir;
+    protected String ieClassId = DEFAULT_IE_CLASS_ID;
+    protected String targetPackage;
+    protected String targetClassName;
+    protected String uriBase;
+    protected String uriRoot;
+    protected Project project;
+    protected int dieLevel;
+    protected boolean helpNeeded = false;
+    protected boolean compile = false;
+    protected boolean smapSuppressed = true;
+    protected boolean smapDumped = false;
+    protected boolean caching = true;
+    protected Map cache = new HashMap();
 
-    private String compiler = null;
+    protected String compiler = null;
 
-    private String compilerTargetVM = "1.4";
-    private String compilerSourceVM = "1.4";
+    protected String compilerTargetVM = "1.4";
+    protected String compilerSourceVM = "1.4";
 
-    private boolean classDebugInfo = true;
+    protected boolean classDebugInfo = true;
 
     /**
      * Throw an exception if there's a compilation error, or swallow it.
      * Default is true to preserve old behavior.
      */
-    private boolean failOnError = true;
+    protected boolean failOnError = true;
 
     /**
      * The file extensions to be handled as JSP files.
      * Default list is .jsp and .jspx.
      */
-    private List extensions;
+    protected List extensions;
 
     /**
      * The pages.
      */
-    private List pages = new Vector();
+    protected List pages = new Vector();
 
     /**
      * Needs better documentation, this data member does.
      * True by default.
      */
-    private boolean errorOnUseBeanInvalidClassAttribute = true;
+    protected boolean errorOnUseBeanInvalidClassAttribute = true;
 
     /**
      * The java file encoding.  Default
      * is UTF-8.  Added per bugzilla 19622.
      */
-    private String javaEncoding = "UTF-8";
+    protected String javaEncoding = "UTF-8";
 
     // Generation of web.xml fragments
-    private String webxmlFile;
-    private int webxmlLevel;
-    private boolean addWebXmlMappings = false;
+    protected String webxmlFile;
+    protected int webxmlLevel;
+    protected boolean addWebXmlMappings = false;
 
-    private Writer mapout;
-    private CharArrayWriter servletout;
-    private CharArrayWriter mappingout;
+    protected Writer mapout;
+    protected CharArrayWriter servletout;
+    protected CharArrayWriter mappingout;
 
     /**
      * The servlet context.
      */
-    private JspCServletContext context;
+    protected JspCServletContext context;
 
     /**
      * The runtime context.
      * Maintain a dummy JspRuntimeContext for compiling tag files.
      */
-    private JspRuntimeContext rctxt;
+    protected JspRuntimeContext rctxt;
 
     /**
      * Cache for the TLD locations
      */
-    private TldLocationsCache tldLocationsCache = null;
+    protected TldLocationsCache tldLocationsCache = null;
 
-    private JspConfig jspConfig = null;
-    private TagPluginManager tagPluginManager = null;
+    protected JspConfig jspConfig = null;
+    protected TagPluginManager tagPluginManager = null;
 
-    private boolean verbose = false;
-    private boolean listErrors = false;
-    private boolean showSuccess = false;
-    private int argPos;
-    private boolean fullstop = false;
-    private String args[];
+    protected boolean verbose = false;
+    protected boolean listErrors = false;
+    protected boolean showSuccess = false;
+    protected int argPos;
+    protected boolean fullstop = false;
+    protected String args[];
 
     public static void main(String arg[]) {
         if (arg.length == 0) {
@@ -246,7 +243,6 @@ public class JspC implements Options {
                 }
             } catch (JasperException je) {
                 System.err.println(je);
-                //System.err.println(je.getMessage());
                 if (die != NO_DIE_LEVEL) {
                     System.exit(die);
                 }
@@ -565,6 +561,13 @@ public class JspC implements Options {
         compiler=c;
     }
 
+    /**
+     * Compiler class name to use.
+     */
+    public String getCompilerClassName() {
+        return null;
+    }
+    
     /**
      * @see Options#getCompilerTargetVM
      */
@@ -939,7 +942,7 @@ public class JspC implements Options {
 
     }
 
-    private void processFile(String file)
+    protected void processFile(String file)
         throws JasperException
     {
         ClassLoader originalClassLoader = null;
@@ -1029,8 +1032,8 @@ public class JspC implements Options {
      * jsps are specified.
      */
     public void scanFiles( File base ) throws JasperException {
-        Stack dirs = new Stack();
-        dirs.push(base);
+        Stack<String> dirs = new Stack<String>();
+        dirs.push(base.toString());
 
         // Make sure default extensions are always included
         if ((getExtensions() == null) || (getExtensions().size() < 2)) {
@@ -1039,7 +1042,7 @@ public class JspC implements Options {
         }
 
         while (!dirs.isEmpty()) {
-            String s = dirs.pop().toString();
+            String s = dirs.pop();
             File f = new File(s);
             if (f.exists() && f.isDirectory()) {
                 String[] files = f.list();
@@ -1161,9 +1164,9 @@ public class JspC implements Options {
         }
     }
 
-    // ==================== Private utility methods ====================
+    // ==================== protected utility methods ====================
 
-    private String nextArg() {
+    protected String nextArg() {
         if ((argPos >= args.length)
             || (fullstop = SWITCH_FULL_STOP.equals(args[argPos]))) {
             return null;
@@ -1172,7 +1175,7 @@ public class JspC implements Options {
         }
     }
 
-    private String nextFile() {
+    protected String nextFile() {
         if (fullstop) argPos++;
         if (argPos >= args.length) {
             return null;
@@ -1181,7 +1184,7 @@ public class JspC implements Options {
         }
     }
 
-    private void initWebXml() {
+    protected void initWebXml() {
         try {
             if (webxmlLevel >= INC_WEBXML) {
                 File fmapings = new File(webxmlFile);
@@ -1207,7 +1210,7 @@ public class JspC implements Options {
         }
     }
 
-    private void completeWebXml() {
+    protected void completeWebXml() {
         if (mapout != null) {
             try {
                 servletout.writeTo(mapout);
@@ -1224,7 +1227,7 @@ public class JspC implements Options {
         }
     }
 
-    private void initServletContext() {
+    protected void initServletContext() {
         try {
             context =new JspCServletContext
                 (new PrintWriter(System.out),
@@ -1245,7 +1248,7 @@ public class JspC implements Options {
      * @param clctxt The compilation context
      * @throws IOException If an error occurs
      */
-    private void initClassLoader(JspCompilationContext clctxt)
+    protected void initClassLoader(JspCompilationContext clctxt)
         throws IOException {
 
         classPath = getClassPath();
@@ -1257,7 +1260,7 @@ public class JspC implements Options {
         }
 
         // Turn the classPath into URLs
-        ArrayList urls = new ArrayList();
+        ArrayList<URL> urls = new ArrayList<URL>();
         StringTokenizer tokenizer = new StringTokenizer(classPath,
                                                         File.pathSeparator);
         while (tokenizer.hasMoreTokens()) {
@@ -1330,7 +1333,7 @@ public class JspC implements Options {
      * This is used if no explicit docbase is set, but only files.
      * XXX Maybe we should require the docbase.
      */
-    private void locateUriRoot( File f ) {
+    protected void locateUriRoot( File f ) {
         String tUriBase = uriBase;
         if (tUriBase == null) {
             tUriBase = "/";

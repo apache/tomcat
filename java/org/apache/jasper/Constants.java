@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,17 +26,20 @@ package org.apache.jasper;
  * @author Mark Roth
  */
 public class Constants {
+    
     /**
      * The base class of the generated servlets. 
      */
-    public static final String JSP_SERVLET_BASE = "org.apache.jasper.runtime.HttpJspBase";
+    public static final String JSP_SERVLET_BASE = 
+        System.getProperty("org.apache.jasper.Constants.JSP_SERVLET_BASE", "org.apache.jasper.runtime.HttpJspBase");
 
     /**
      * _jspService is the name of the method that is called by 
      * HttpJspBase.service(). This is where most of the code generated
      * from JSPs go.
      */
-    public static final String SERVICE_METHOD_NAME = "_jspService";
+    public static final String SERVICE_METHOD_NAME = 
+        System.getProperty("org.apache.jasper.Constants.SERVICE_METHOD_NAME", "_jspService");
 
     /**
      * Default servlet content type.
@@ -54,37 +57,27 @@ public class Constants {
     };
 
     /**
-     * FIXME
      * ServletContext attribute for classpath. This is tomcat specific. 
      * Other servlet engines may choose to support this attribute if they 
      * want to have this JSP engine running on them. 
      */
-    public static final String SERVLET_CLASSPATH = "org.apache.catalina.jsp_classpath";
+    public static final String SERVLET_CLASSPATH = 
+        System.getProperty("org.apache.jasper.Constants.SERVLET_CLASSPATH", "org.apache.catalina.jsp_classpath");
 
     /**
-     * FIXME
      * Request attribute for <code>&lt;jsp-file&gt;</code> element of a
      * servlet definition.  If present on a request, this overrides the
      * value returned by <code>request.getServletPath()</code> to select
      * the JSP page to be executed.
      */
-    public static final String JSP_FILE = "org.apache.catalina.jsp_file";
+    public static final String JSP_FILE = 
+        System.getProperty("org.apache.jasper.Constants.JSP_FILE", "org.apache.catalina.jsp_file");
 
-
-    /**
-     * FIXME
-     * ServletContext attribute for class loader. This is tomcat specific. 
-     * Other servlet engines can choose to have this attribute if they 
-     * want to have this JSP engine running on them. 
-     */
-    //public static final String SERVLET_CLASS_LOADER = "org.apache.tomcat.classloader";
-    public static final String SERVLET_CLASS_LOADER = "org.apache.catalina.classloader";
 
     /**
      * Default size of the JSP buffer.
      */
-    public static final int K = 1024;
-    public static final int DEFAULT_BUFFER_SIZE = 8*K;
+    public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     /**
      * Default size for the tag buffers.
@@ -100,29 +93,31 @@ public class Constants {
      * The query parameter that causes the JSP engine to just
      * pregenerated the servlet but not invoke it. 
      */
-    public static final String PRECOMPILE = "jsp_precompile";
+    public static final String PRECOMPILE = 
+        System.getProperty("org.apache.jasper.Constants.PRECOMPILE", "jsp_precompile");
 
     /**
      * The default package name for compiled jsp pages.
      */
-    public static final String JSP_PACKAGE_NAME = "org.apache.jsp";
+    public static final String JSP_PACKAGE_NAME = 
+        System.getProperty("org.apache.jasper.Constants.JSP_PACKAGE_NAME", "org.apache.jsp");
 
     /**
      * The default package name for tag handlers generated from tag files
      */
-    public static final String TAG_FILE_PACKAGE_NAME = "org.apache.jsp.tag";
+    public static final String TAG_FILE_PACKAGE_NAME = 
+        System.getProperty("org.apache.jasper.Constants.TAG_FILE_PACKAGE_NAME", "org.apache.jsp.tag");
 
     /**
      * Servlet context and request attributes that the JSP engine
      * uses. 
      */
-    public static final String INC_REQUEST_URI = "javax.servlet.include.request_uri";
     public static final String INC_SERVLET_PATH = "javax.servlet.include.servlet_path";
     public static final String TMP_DIR = "javax.servlet.context.tempdir";
-    public static final String FORWARD_SEEN = "javax.servlet.forward.seen";
 
     // Must be kept in sync with org/apache/catalina/Globals.java
-    public static final String ALT_DD_ATTR = "org.apache.catalina.deploy.alt_dd";
+    public static final String ALT_DD_ATTR = 
+        System.getProperty("org.apache.jasper.Constants.ALT_DD_ATTR", "org.apache.catalina.deploy.alt_dd");
 
     /**
      * Public Id and the Resource path (of the cached copy) 
@@ -182,13 +177,13 @@ public class Constants {
      * Prefix to use for generated temporary variable names
      */
     public static final String TEMP_VARIABLE_NAME_PREFIX =
-        "_jspx_temp";
+        System.getProperty("org.apache.jasper.Constants.TEMP_VARIABLE_NAME_PREFIX", "_jspx_temp");
 
     /**
      * A replacement char for "\$".
      * XXX This is a hack to avoid changing EL interpreter to recognize "\$"
      */
-    public static final char ESC='\u001b';
-    public static final String ESCStr="'\\u001b'";
-}
+    public static final char ESC = '\u001b';
+    public static final String ESCStr = "'\\u001b'";
 
+}

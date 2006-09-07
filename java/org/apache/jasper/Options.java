@@ -123,6 +123,11 @@ public interface Options {
     public String getCompilerSourceVM();   
 
     /**
+     * Java compiler class to use.
+     */
+    public String getCompilerClassName();   
+
+    /**
      * The cache for the location of the TLD's
      * for the various tag libraries 'exposed'
      * by the web application.

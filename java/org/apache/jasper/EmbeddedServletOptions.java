@@ -144,6 +144,11 @@ public final class EmbeddedServletOptions implements Options {
     private String compilerSourceVM = "1.5";
     
     /**
+     * The compiler class name.
+     */
+    private String compilerClassName = null;
+    
+    /**
      * Cache for the TLD locations
      */
     private TldLocationsCache tldLocationsCache = null;
@@ -315,6 +320,13 @@ public final class EmbeddedServletOptions implements Options {
         return compilerSourceVM;
     }
     
+    /**
+     * Java compiler class to use.
+     */
+    public String getCompilerClassName() {
+        return compilerClassName;
+    }
+
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
     }
@@ -608,6 +620,11 @@ public final class EmbeddedServletOptions implements Options {
         String javaEncoding = config.getInitParameter("javaEncoding");
         if (javaEncoding != null) {
             this.javaEncoding = javaEncoding;
+        }
+        
+        String compilerClassName = config.getInitParameter("compilerClassName");
+        if (compilerClassName != null) {
+            this.compilerClassName = compilerClassName;
         }
         
         String fork = config.getInitParameter("fork");
