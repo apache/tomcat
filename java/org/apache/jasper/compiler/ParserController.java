@@ -131,7 +131,7 @@ class ParserController implements TagConstants {
         isTagFile = true;
         directiveOnly = true;
         Node.Nodes page = doParse(inFileName, null,
-                             (URL) ctxt.getTagFileJarUrls().get(inFileName));
+                ctxt.getTagFileJarUrl(inFileName));
         directiveOnly = directiveOnlySave;
         isTagFile = isTagFileSave;
         return page;

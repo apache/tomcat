@@ -65,8 +65,6 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     // Logger
     private Log log = LogFactory.getLog(TagLibraryInfoImpl.class);
 
-    private Hashtable jarEntries;
-
     private JspCompilationContext ctxt;
     
     private PageInfo pi;
@@ -478,7 +476,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         if (path.startsWith("/META-INF/tags")) {
             // Tag file packaged in JAR
-            ctxt.getTagFileJarUrls().put(path, jarFileUrl);
+            ctxt.setTagFileJarUrl(path, jarFileUrl);
         } else if (!path.startsWith("/WEB-INF/tags")) {
             err.jspError("jsp.error.tagfile.illegalPath", path);
         }

@@ -18,8 +18,8 @@ package org.apache.jasper.compiler;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Vector;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 
 import org.apache.jasper.JasperException;
 import org.xml.sax.SAXException;
@@ -428,7 +428,7 @@ public class ErrorDispatcher {
                                 String errMsg, String fname, Node.Nodes page)
 	        throws IOException, JasperException {
 
-        Vector errVec = new Vector();
+        ArrayList<JavacErrorDetail> errors = new ArrayList<JavacErrorDetail>();
         StringBuffer errMsgBuf = null;
         int lineNum = -1;
         JavacErrorDetail javacError = null;
@@ -453,14 +453,14 @@ public class ErrorDispatcher {
             if ((beginColon >= 0) && (endColon >= 0)) {
                 if (javacError != null) {
                     // add previous error to error vector
-                    errVec.add(javacError);
+                    errors.add(javacError);
                 }
                 
                 String lineNumStr = line.substring(beginColon + 1, endColon);
                 try {
                     lineNum = Integer.parseInt(lineNumStr);
                 } catch (NumberFormatException e) {
-                    // XXX
+                    lineNum = -1;
                 }
                 
                 errMsgBuf = new StringBuffer();
@@ -477,15 +477,15 @@ public class ErrorDispatcher {
         
         // Add last error to error vector
         if (javacError != null) {
-            errVec.add(javacError);
+            errors.add(javacError);
         } 
         
         reader.close();
         
         JavacErrorDetail[] errDetails = null;
-        if (errVec.size() > 0) {
-            errDetails = new JavacErrorDetail[errVec.size()];
-            errVec.copyInto(errDetails);
+        if (errors.size() > 0) {
+            errDetails = new JavacErrorDetail[errors.size()];
+            errors.toArray(errDetails);
         }
         
         return errDetails;
