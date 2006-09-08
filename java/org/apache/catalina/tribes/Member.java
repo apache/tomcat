@@ -52,10 +52,19 @@ public interface Member {
 
     /**
      * Returns the listen port for the ChannelReceiver implementation
-     * @return IPv4 or IPv6 representation of the host address this member listens to incoming data
+     * @return the listen port for this member, -1 if its not listening on an unsecure port
      * @see ChannelReceiver
      */
     public int getPort();
+    
+    /**
+     * Returns the secure listen port for the ChannelReceiver implementation.
+     * Returns -1 if its not listening to a secure port.
+     * @return the listen port for this member, -1 if its not listening on a secure port
+     * @see ChannelReceiver
+     */
+    public int getSecurePort();
+    
 
     /**
      * Contains information on how long this member has been online.

@@ -54,6 +54,11 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * The tcp listen port for this member
      */
     protected int port;
+    
+    /**
+     * The tcp/SSL listen port for this member
+     */
+    protected int securePort = -1;
 
     /**
      * Counter for how many broadcast messages have been sent from this member
@@ -170,6 +175,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
                4+ //data length
                8+ //alive time
                4+ //port
+               4+ //secure port
                1+ //host length
                host.length+ //host
                4+ //command length
@@ -206,6 +212,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         //package length - 4 bytes
         //alive - 8 bytes
         //port - 4 bytes
+        //secure port - 4 bytes
         //host length - 1 byte
         //host - hl bytes
         //clen - 4 bytes
@@ -238,6 +245,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
         pos += 8;
         //port
         XByteBuffer.toBytes(port,data,pos);
+        pos += 4;
+        //secure port
+        XByteBuffer.toBytes(securePort,data,pos);
         pos += 4;
         //host length
         data[pos++] = hl;
@@ -288,6 +298,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         //package length - 4 bytes
         //alive - 8 bytes
         //port - 4 bytes
+        //secure port - 4 bytes
         //host length - 1 byte
         //host - hl bytes
         //clen - 4 bytes
@@ -330,6 +341,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
         byte[] portd = new byte[4];
         System.arraycopy(data, pos, portd, 0, 4);
         pos += 4;
+        
+        byte[] sportd = new byte[4];
+        System.arraycopy(data, pos, sportd, 0, 4);
+        pos += 4;
+
+
     
         byte hl = data[pos++];
         byte[] addr = new byte[hl];
@@ -363,6 +380,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     
         member.setHost(addr);
         member.setPort(XByteBuffer.toInt(portd, 0));
+        member.setSecurePort(XByteBuffer.toInt(sportd, 0));
         member.setMemberAliveTime(XByteBuffer.toLong(alived, 0));
         member.setUniqueId(uniqueId);
         member.payload = payload;
@@ -443,6 +461,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     public byte[] getDomain() {
         return domain;
+    }
+
+    public int getSecurePort() {
+        return securePort;
     }
 
     public void setMemberAliveTime(long time) {
@@ -551,6 +573,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public void setDomain(byte[] domain) {
         this.domain = domain!=null?domain:new byte[0];
         getData(true,true);
+    }
+
+    public void setSecurePort(int securePort) {
+        this.securePort = securePort;
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
