@@ -172,10 +172,10 @@ abstract class ELNode {
 	   EL expression, for communication to Generator.
 	 */
 	String mapName = null;	// The function map associated this EL
-	private List list;
+	private List<ELNode> list;
 
 	public Nodes() {
-	    list = new ArrayList();
+	    list = new ArrayList<ELNode>();
 	}
 
 	public void add(ELNode en) {
@@ -187,10 +187,10 @@ abstract class ELNode {
 	 * @param v The visitor used
 	 */
 	public void visit(Visitor v) throws JasperException {
-	    Iterator iter = list.iterator();
+	    Iterator<ELNode> iter = list.iterator();
 	    while (iter.hasNext()) {
-		ELNode n = (ELNode) iter.next();
-		n.accept(v);
+	        ELNode n = iter.next();
+	        n.accept(v);
 	    }
 	}
 
@@ -206,12 +206,12 @@ abstract class ELNode {
 	 * @return true if the expression contains a ${...}
 	 */
 	public boolean containsEL() {
-	    Iterator iter = list.iterator();
+	    Iterator<ELNode> iter = list.iterator();
 	    while (iter.hasNext()) {
-		ELNode n = (ELNode) iter.next();
-		if (n instanceof Root) {
-		    return true;
-		}
+	        ELNode n = iter.next();
+	        if (n instanceof Root) {
+	            return true;
+	        }
 	    }
 	    return false;
 	}

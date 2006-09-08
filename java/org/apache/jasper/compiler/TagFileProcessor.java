@@ -517,8 +517,7 @@ class TagFileProcessor {
             if (wrapper == null) {
                 wrapper = new JspServletWrapper(ctxt.getServletContext(), ctxt
                         .getOptions(), tagFilePath, tagInfo, ctxt
-                        .getRuntimeContext(), (URL) ctxt.getTagFileJarUrls()
-                        .get(tagFilePath));
+                        .getRuntimeContext(), ctxt.getTagFileJarUrl(tagFilePath));
                 rctxt.addWrapper(tagFilePath, wrapper);
 
                 // Use same classloader and classpath for compiling tag files
@@ -545,7 +544,7 @@ class TagFileProcessor {
                     JspServletWrapper tempWrapper = new JspServletWrapper(ctxt
                             .getServletContext(), ctxt.getOptions(),
                             tagFilePath, tagInfo, ctxt.getRuntimeContext(),
-                            (URL) ctxt.getTagFileJarUrls().get(tagFilePath));
+                            ctxt.getTagFileJarUrl(tagFilePath));
                     tagClazz = tempWrapper.loadTagFilePrototype();
                     tempVector.add(tempWrapper.getJspEngineContext()
                             .getCompiler());
@@ -597,7 +596,7 @@ class TagFileProcessor {
             if (tagFileInfo != null) {
                 String tagFilePath = tagFileInfo.getPath();
                 JspCompilationContext ctxt = compiler.getCompilationContext();
-                if (ctxt.getTagFileJarUrls().get(tagFilePath) == null) {
+                if (ctxt.getTagFileJarUrl(tagFilePath) == null) {
                     // Omit tag file dependency info on jar files for now.
                     pageInfo.addDependant(tagFilePath);
                 }

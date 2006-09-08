@@ -70,8 +70,10 @@ class Generator {
 
     private static final Class[] OBJECT_CLASS = { Object.class };
 
-    private static final String VAR_EXPRESSIONFACTORY = "_el_expressionfactory";
-    private static final String VAR_ANNOTATIONPROCESSOR = "_jsp_annotationprocessor";
+    private static final String VAR_EXPRESSIONFACTORY = 
+        System.getProperty("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY", "_el_expressionfactory");
+    private static final String VAR_ANNOTATIONPROCESSOR = 
+        System.getProperty("org.apache.jasper.compiler.Generator.VAR_ANNOTATIONPROCESSOR", "_jsp_annotationprocessor");
 
     private ServletWriter out;
 

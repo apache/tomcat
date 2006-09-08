@@ -21,7 +21,8 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -54,41 +55,41 @@ public class JspCompilationContext {
     protected org.apache.commons.logging.Log log =
         org.apache.commons.logging.LogFactory.getLog(JspCompilationContext.class);
 
-    private Hashtable tagFileJarUrls;
-    private boolean isPackagedTagFile;
+    protected Map<String, URL> tagFileJarUrls;
+    protected boolean isPackagedTagFile;
 
-    private String className;
-    private String jspUri;
-    private boolean isErrPage;
-    private String basePackageName;
-    private String derivedPackageName;
-    private String servletJavaFileName;
-    private String javaPath;
-    private String classFileName;
-    private String contentType;
-    private ServletWriter writer;
-    private Options options;
-    private JspServletWrapper jsw;
-    private Compiler jspCompiler;
-    private String classPath;
+    protected String className;
+    protected String jspUri;
+    protected boolean isErrPage;
+    protected String basePackageName;
+    protected String derivedPackageName;
+    protected String servletJavaFileName;
+    protected String javaPath;
+    protected String classFileName;
+    protected String contentType;
+    protected ServletWriter writer;
+    protected Options options;
+    protected JspServletWrapper jsw;
+    protected Compiler jspCompiler;
+    protected String classPath;
 
-    private String baseURI;
-    private String outputDir;
-    private ServletContext context;
-    private URLClassLoader loader;
+    protected String baseURI;
+    protected String outputDir;
+    protected ServletContext context;
+    protected URLClassLoader loader;
 
-    private JspRuntimeContext rctxt;
+    protected JspRuntimeContext rctxt;
 
-    private int removed = 0;
+    protected int removed = 0;
 
-    private URLClassLoader jspLoader;
-    private URL baseUrl;
-    private Class servletClass;
+    protected URLClassLoader jspLoader;
+    protected URL baseUrl;
+    protected Class servletClass;
 
-    private boolean isTagFile;
-    private boolean protoTypeMode;
-    private TagInfo tagInfo;
-    private URL tagFileJarUrl;
+    protected boolean isTagFile;
+    protected boolean protoTypeMode;
+    protected TagInfo tagInfo;
+    protected URL tagFileJarUrl;
 
     // jspURI _must_ be relative to the context
     public JspCompilationContext(String jspUri,
@@ -118,7 +119,7 @@ public class JspCompilationContext {
         }
 
         this.rctxt = rctxt;
-        this.tagFileJarUrls = new Hashtable();
+        this.tagFileJarUrls = new HashMap<String, URL>();
         this.basePackageName = Constants.JSP_PACKAGE_NAME;
     }
 
@@ -230,7 +231,7 @@ public class JspCompilationContext {
         return jspCompiler;
     }
 
-    private Compiler createCompiler(String className) {
+    protected Compiler createCompiler(String className) {
         Compiler compiler = null; 
         try {
             compiler = (Compiler) Class.forName(className).newInstance();
@@ -304,8 +305,12 @@ public class JspCompilationContext {
      * The map is populated when parsing the tag-file elements of the TLDs
      * of any imported taglibs. 
      */
-    public Hashtable getTagFileJarUrls() {
-        return this.tagFileJarUrls;
+    public URL getTagFileJarUrl(String tagFile) {
+        return this.tagFileJarUrls.get(tagFile);
+    }
+
+    public void setTagFileJarUrl(String tagFile, URL tagFileURL) {
+        this.tagFileJarUrls.put(tagFile, tagFileURL);
     }
 
     /**
@@ -415,7 +420,7 @@ public class JspCompilationContext {
         }
     }
 
-    private String getDerivedPackageName() {
+    protected String getDerivedPackageName() {
         if (derivedPackageName == null) {
             int iSep = jspUri.lastIndexOf('/');
             derivedPackageName = (iSep > 0) ?
@@ -597,18 +602,18 @@ public class JspCompilationContext {
         return servletClass;
     }
 
-    // ==================== Private methods ==================== 
+    // ==================== protected methods ==================== 
 
     static Object outputDirLock = new Object();
 
-    private boolean makeOutputDir() {
+    protected boolean makeOutputDir() {
         synchronized(outputDirLock) {
             File outDirFile = new File(outputDir);
             return outDirFile.mkdirs();
         }
     }
 
-    private void createOutputDir() {
+    protected void createOutputDir() {
         String path = null;
         if (isTagFile()) {
 	    String tagName = tagInfo.getTagClassName();
@@ -632,11 +637,11 @@ public class JspCompilationContext {
             }
     }
     
-    private static final boolean isPathSeparator(char c) {
+    protected static final boolean isPathSeparator(char c) {
        return (c == '/' || c == '\\');
     }
 
-    private static final String canonicalURI(String s) {
+    protected static final String canonicalURI(String s) {
        if (s == null) return null;
        StringBuffer result = new StringBuffer();
        final int len = s.length();

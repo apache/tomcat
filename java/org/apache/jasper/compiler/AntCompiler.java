@@ -1,5 +1,5 @@
 /*
- * Copyright 1999,2004 The Apache Software Foundation.
+ * Copyright 1999,2004-2006 The Apache Software Foundation.
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,13 +42,15 @@ import org.apache.tools.ant.types.PatternSet;
  */
 public class AntCompiler extends Compiler {
 
+    protected static Object javacLock = new Object();
+
     static {
         System.setErr(new SystemLogHandler(System.err));
     }
 
     // ----------------------------------------------------- Instance Variables
 
-    protected Project project=null;
+    protected Project project = null;
     protected JasperAntLogger logger;
 
     // ------------------------------------------------------------ Constructor
@@ -56,7 +58,8 @@ public class AntCompiler extends Compiler {
     // Lazy eval - if we don't need to compile we probably don't need the project
     protected Project getProject() {
         
-        if( project!=null ) return project;
+        if (project != null)
+            return project;
         
         // Initializing project
         project = new Project();
@@ -78,7 +81,7 @@ public class AntCompiler extends Compiler {
         return project;
     }
     
-    class JasperAntLogger extends DefaultLogger {
+    public class JasperAntLogger extends DefaultLogger {
         
         protected StringBuffer reportBuf = new StringBuffer();
         
@@ -221,8 +224,8 @@ public class AntCompiler extends Compiler {
             }
         } catch (BuildException e) {
             be = e;
-            log.error( "Javac exception ", e);
-            log.error( "Env: " + info.toString());
+            log.error(Localizer.getMessage("jsp.error.javac"), e);
+            log.error(Localizer.getMessage("jsp.error.javac.env") + info.toString());
         }
         
         errorReport.append(logger.getReport());
@@ -241,8 +244,7 @@ public class AntCompiler extends Compiler {
         
         if (be != null) {
             String errorReportString = errorReport.toString();
-            log.error("Error compiling file: " + javaFileName + " "
-                    + errorReportString);
+            log.error(Localizer.getMessage("jsp.error.compilation", javaFileName, errorReportString));
             JavacErrorDetail[] javacErrors = ErrorDispatcher.parseJavacErrors(
                     errorReportString, javaFileName, pageNodes);
             if (javacErrors != null) {
@@ -253,7 +255,7 @@ public class AntCompiler extends Compiler {
         }
         
         if( log.isDebugEnabled() ) {
-            long t2=System.currentTimeMillis();
+            long t2 = System.currentTimeMillis();
             log.debug("Compiled " + ctxt.getServletJavaFileName() + " "
                       + (t2-t1) + "ms");
         }
