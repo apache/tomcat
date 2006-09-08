@@ -52,6 +52,12 @@ public interface ChannelReceiver extends Heartbeat {
     public int getPort();
     
     /**
+     * Returns the secure listening port
+     * @return port, -1 if a secure port is not activated
+     */
+    public int getSecurePort();
+    
+    /**
      * Sets the message listener to receive notification of incoming
      * @param listener MessageListener
      * @see MessageListener

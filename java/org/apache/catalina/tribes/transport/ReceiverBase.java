@@ -49,6 +49,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
     private String host = "auto";
     private InetAddress bind;
     private int port  = 4000;
+    private int securePort = -1;
     private int rxBufSize = 43800;
     private int txBufSize = 25188;
     private boolean listen = false;
@@ -299,6 +300,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         return useBufferPool;
     }
 
+    public int getSecurePort() {
+        return securePort;
+    }
+
     public void setTcpSelectorTimeout(long selTimeout) {
         tcpSelectorTimeout = selTimeout;
     }
@@ -375,6 +380,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
 
     public void setUseBufferPool(boolean useBufferPool) {
         this.useBufferPool = useBufferPool;
+    }
+
+    public void setSecurePort(int securePort) {
+        this.securePort = securePort;
     }
 
     public void heartbeat() {
