@@ -130,6 +130,7 @@ public abstract class Compiler {
             pageInfo.setIncludeCoda(jspProperty.getIncludeCoda());
         }
 
+        ctxt.checkOutputDir();
         String javaFileName = ctxt.getServletJavaFileName();
         ServletWriter writer = null;
 
