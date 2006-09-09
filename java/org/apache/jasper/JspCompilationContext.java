@@ -606,6 +606,16 @@ public class JspCompilationContext {
 
     static Object outputDirLock = new Object();
 
+    public void checkOutputDir() {
+        if (outputDir != null) {
+            if (!(new File(outputDir)).exists()) {
+                makeOutputDir();
+            }
+        } else {
+            createOutputDir();
+        }
+    }
+        
     protected boolean makeOutputDir() {
         synchronized(outputDirLock) {
             File outDirFile = new File(outputDir);
