@@ -223,7 +223,7 @@ public class UserDatabaseRealm
         Iterator groups = user.getGroups();
         while(groups.hasNext()) {
             Group group = (Group)groups.next();
-            uroles = user.getRoles();
+            uroles = group.getRoles();
             while(uroles.hasNext()) {
                 Role role = (Role)uroles.next();
                 roles.add(role.getName());
