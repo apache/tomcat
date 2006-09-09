@@ -2924,7 +2924,12 @@ class Generator {
             }
 
             // Set parent
-            if (!simpleTag) {
+            if (isTagFile && parent == null) {
+                out.printin(tagHandlerVar);
+                out.print(".setParent(");
+                out.print("new javax.servlet.jsp.tagext.TagAdapter(");
+                out.print("(javax.servlet.jsp.tagext.SimpleTag) this ));");
+            } else if (!simpleTag) {
                 out.printin(tagHandlerVar);
                 out.print(".setParent(");
                 if (parent != null) {
