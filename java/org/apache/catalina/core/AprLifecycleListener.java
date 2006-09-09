@@ -31,7 +31,7 @@ import org.apache.commons.logging.LogFactory;
  * and destroy APR.
  *
  * @author Remy Maucherat
- * @version $Revision: 374878 $ $Date: 2006-02-04 16:02:39 +0100 (sam., 04 févr. 2006) $
+ * @version $Revision: 441786 $ $Date: 2006-09-09 14:26:11 +0200 (sam., 09 sept. 2006) $
  * @since 4.1
  */
 
@@ -52,7 +52,8 @@ public class AprLifecycleListener
 
     protected static final int REQUIRED_MAJOR = 1;
     protected static final int REQUIRED_MINOR = 1;
-    protected static final int REQUIRED_PATCH = 4;
+    protected static final int REQUIRED_PATCH = 3;
+    protected static final int RECOMMENDED_PV = 4;
 
 
     // ---------------------------------------------- LifecycleListener Methods
@@ -96,6 +97,17 @@ public class AprLifecycleListener
                 log.error(sm.getString("aprListener.tcnInvalid", major + "." 
                         + minor + "." + patch, REQUIRED_MAJOR + "." 
                         + REQUIRED_MINOR + "." + REQUIRED_PATCH));
+            }
+            if (patch < RECOMMENDED_PV) {
+                if (!log.isDebugEnabled()) {
+                    log.info(sm.getString("aprListener.tcnVersion", major + "." 
+                            + minor + "." + patch, REQUIRED_MAJOR + "." 
+                            + REQUIRED_MINOR + "." + RECOMMENDED_PV));
+                } else {
+                    log.debug(sm.getString("aprListener.tcnVersion", major + "." 
+                            + minor + "." + patch, REQUIRED_MAJOR + "." 
+                            + REQUIRED_MINOR + "." + RECOMMENDED_PV));
+                }                
             }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
             try {
