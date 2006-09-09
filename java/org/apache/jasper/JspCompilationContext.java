@@ -609,7 +609,7 @@ public class JspCompilationContext {
     protected boolean makeOutputDir() {
         synchronized(outputDirLock) {
             File outDirFile = new File(outputDir);
-            return outDirFile.mkdirs();
+            return (outDirFile.exists() || outDirFile.mkdirs());
         }
     }
 
