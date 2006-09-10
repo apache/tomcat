@@ -195,6 +195,7 @@ public class ELParser {
                     break;
                 }
                 buf.append(prev);
+                prev = 0;
             }
             if (ch == '\\' || ch == '$' || ch == '#') {
                 prev = ch;
