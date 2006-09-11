@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Apache Tribes Documentation - Top Level Directory"
+        href="http://tomcat.apache.org/">
+
+    <title>Apache Tribes - The Tomcat Cluster Communication Module</title>
+
+    <logo href="/images/tomcat.gif">Apache Tomcat</logo>
+
+
+    <body>
+
+    <menu name="Links">
+        <item name="Docs Home"             href="../index.html"/>
+        <item name="FAQ"                   href="http://tomcat.apache.org/faq" />
+    </menu>
+
+    <menu name="User Guide">
+        <item name="1) Introduction"       href="introduction.html"/>
+        <item name="2) Setup"              href="setup.html"/>
+        <item name="3) FAQ"                href="faq.html"/>
+    </menu>
+
+    <menu name="Reference">
+        <item name="Release Notes"         href="RELEASE-NOTES.txt"/>
+        <item name="JavaDoc"               href="/api/index.html"/>
+    </menu>
+
+    <menu name="Apache Tribes Development">
+        <item name="Membership"            href="membership.html"/>
+        <item name="Transport"             href="transport.html"/>
+        <item name="Interceptors"          href="interceptors.html"/>
+        <item name="Status"                href="status.html"/>
+        <item name="Developers"            href="developers.html"/>
+    </menu>
+
+    </body>
+
+</project>
