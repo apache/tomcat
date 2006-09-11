@@ -346,6 +346,15 @@
           includes="*.xml">
       <param name="relative-path" expression=".."/>
     </style>
+    
+    <style basedir="webapps/docs/tribes"
+               destdir="${tomcat.build}/webapps/docs/tribes"
+             extension=".html"
+                 style="webapps/docs/tomcat-docs.xsl"
+              excludes="project.xml"
+              includes="*.xml">
+          <param name="relative-path" expression=".."/>
+    </style>
 
   	<!-- Print friendly version -->
   	<mkdir dir="${tomcat.build}/webapps/docs/printer" />
