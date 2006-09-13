@@ -94,9 +94,9 @@ public class ResourceBundleELResolver extends ELResolver {
 		return true;
 	}
 
-	public Iterator getFeatureDescriptors(ELContext context, Object base) {
+	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (base instanceof ResourceBundle) {
-			List feats = new ArrayList();
+			List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>();
 			Enumeration e = ((ResourceBundle) base).getKeys();
 			FeatureDescriptor feat;
 			String key;

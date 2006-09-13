@@ -145,6 +145,9 @@ public class ArrayELResolver extends ELResolver {
 		if (property instanceof Boolean) {
 			return (((Boolean) property).booleanValue() ? 1 : 0);
 		}
+        if (property instanceof String) {
+            return Integer.parseInt((String) property);
+        }
 		throw new IllegalArgumentException(property != null ? property
 				.toString() : "null");
 	}
