@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 /**
  * The CometFilter interface.
  * 
+ * @author Remy Maucherat
  * @author Filip Hanik
  */
 public interface CometFilter {
