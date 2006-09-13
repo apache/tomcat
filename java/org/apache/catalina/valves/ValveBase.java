@@ -26,6 +26,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.ServletException;
 
+import org.apache.catalina.CometEvent;
 import org.apache.catalina.Contained;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -177,6 +178,26 @@ public abstract class ValveBase
      */
     public abstract void invoke(Request request, Response response)
         throws IOException, ServletException;
+
+
+    /**
+     * Process a Comet event. This method will rarely need to be provided by
+     * a subclass, unless it needs to reassociate a particular object with 
+     * the thread that is processing the request.
+     *
+     * @param request The servlet request to be processed
+     * @param response The servlet response to be created
+     *
+     * @exception IOException if an input/output error occurs, or is thrown
+     *  by a subsequently invoked Valve, Filter, or Servlet
+     * @exception ServletException if a servlet error occurs, or is thrown
+     *  by a subsequently invoked Valve, Filter, or Servlet
+     */
+    public void event(Request request, Response response, CometEvent event)
+        throws IOException, ServletException {
+        // Perform the request
+        getNext().event(request, response, event);
+    }
 
 
     /**

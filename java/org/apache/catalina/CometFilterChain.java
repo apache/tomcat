@@ -22,20 +22,14 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 /**
- * This interface should be implemented by servlets which would like to handle
- * asynchronous IO, recieving events when data is available for reading, and
- * being able to output data without the need for being invoked by the container.
+ * The CometFilter interface.
+ * 
+ * @author Filip Hanik
  */
-public interface CometProcessor {
+public interface CometFilterChain {
 
-    /**
-     * Process the given Comet event.
-     * 
-     * @param event The Comet event that will be processed
-     * @throws IOException
-     * @throws ServletException
-     */
-    public void event(CometEvent event)
-        throws IOException, ServletException;
+    
+    public void doFilterEvent(CometEvent event) throws IOException, ServletException;
+    
 
 }

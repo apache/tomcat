@@ -41,7 +41,8 @@ public interface CometEvent {
      *  it is possible to use the response object to write data on the open connection.
      *  Note that the response object and depedent OutputStream and Writer are still 
      *  not synchronized, so when they are accessed by multiple threads, 
-     *  synchronization is mandatory.
+     *  synchronization is mandatory. After processing the initial event, the request 
+     *  is considered to be committed.
      * READ - This indicates that input data is available, and that one read can be made
      *  without blocking. The available and ready methods of the InputStream or
      *  Reader may be used to determine if there is a risk of blocking: the servlet
@@ -61,7 +62,7 @@ public interface CometEvent {
      *  been processed, the request and response objects, as well as all their dependent
      *  objects will be recycled and used to process other requests.
      */
-    enum EventType {BEGIN, READ, END, ERROR}
+    public enum EventType {BEGIN, READ, END, ERROR}
     
     
     /**
@@ -73,7 +74,7 @@ public interface CometEvent {
      * SERVER_SHUTDOWN - the server is shutting down (sub type of END)
      * SESSION_END - the servlet ended the session (sub type of END)
      */
-    enum EventSubType { TIMEOUT, CLIENT_DISCONNECT, IOEXCEPTION, WEBAPP_RELOAD, SERVER_SHUTDOWN, SESSION_END }
+    public enum EventSubType { TIMEOUT, CLIENT_DISCONNECT, IOEXCEPTION, WEBAPP_RELOAD, SERVER_SHUTDOWN, SESSION_END }
     
     
     /**

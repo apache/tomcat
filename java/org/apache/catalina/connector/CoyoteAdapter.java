@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import javax.servlet.Servlet;
 
+import org.apache.catalina.CometEvent;
 import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -119,29 +120,16 @@ public class CoyoteAdapter
 
         if (request.getWrapper() != null) {
             
-            CometProcessor servlet = null;
-
-            // Bind the context CL to the current thread
-            if (request.getContext().getLoader() != null ) {
-                Thread.currentThread().setContextClassLoader
-                        (request.getContext().getLoader().getClassLoader());
-            }
-            
             try {
-                servlet = (CometProcessor) request.getWrapper().allocate();
                 if (error) {
-                    servlet.error(request.getRequest(), response.getResponse());
+                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
                 } else {
-                    if (!servlet.read(request.getRequest(), response.getResponse())) {
-                        error = true;
-                        try {
-                            servlet.error(request.getRequest(), response.getResponse());
-                        } catch (Throwable th) {
-                            log.error(sm.getString("coyoteAdapter.service"), th);
-                        }
-                    }
+                    request.getEvent().setEventType(CometEvent.EventType.READ);
                 }
-                if (response.isClosed()) {
+                // Calling the container
+                connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+
+                if (response.isClosed() || !request.isComet()) {
                     res.action(ActionCode.ACTION_COMET_END, null);
                 }
                 return (!error);
@@ -150,24 +138,14 @@ public class CoyoteAdapter
                     log.error(sm.getString("coyoteAdapter.service"), t);
                 }
                 error = true;
-                try {
-                    servlet.error(request.getRequest(), response.getResponse());
-                } catch (Throwable th) {
-                    log.error(sm.getString("coyoteAdapter.service"), th);
-                }
+                // FIXME: Since there's likely some structures kept in the servlet or elsewhere,
+                // a cleanup event of some sort could be needed ?
                 return false;
             } finally {
-                // Restore the context classloader
-                Thread.currentThread().setContextClassLoader
-                    (CoyoteAdapter.class.getClassLoader());
-                try {
-                    request.getWrapper().deallocate((Servlet) servlet);
-                } catch (Exception e) {
-                    log.error(sm.getString("coyoteAdapter.service"), e);
-                }
                 // Recycle the wrapper request and response
-                if (error || response.isClosed()) {
+                if (error || response.isClosed() || !request.isComet()) {
                     request.recycle();
+                    request.setFilterChain(null);
                     response.recycle();
                 }
             }
@@ -223,11 +201,15 @@ public class CoyoteAdapter
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 
-                if (request.getWrapper().getServlet() instanceof CometProcessor 
-                        && !response.isClosed()
-                        && req.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
-                    comet = true;
-                    res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                if (request.isComet()) {
+                    if (!response.isClosed()) {
+                        comet = true;
+                        res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                    } else {
+                        // Clear the filter chain, as otherwise it will not be reset elsewhere
+                        // since this is a Comet request
+                        request.setFilterChain(null);
+                    }
                 }
 
             }

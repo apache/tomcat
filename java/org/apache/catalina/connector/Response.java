@@ -481,13 +481,7 @@ public class Response
     public void finishResponse() 
         throws IOException {
         // Writing leftover bytes
-        try {
-            outputBuffer.close();
-        } catch(IOException e) {
-	    ;
-        } catch(Throwable t) {
-	    t.printStackTrace();
-        }
+        outputBuffer.close();
     }
 
 

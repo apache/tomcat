@@ -4473,15 +4473,15 @@ public class StandardContext
 
         try {
 
-            // Stop our filters
-            filterStop();
-
             // Stop our child containers, if any
             Container[] children = findChildren();
             for (int i = 0; i < children.length; i++) {
                 if (children[i] instanceof Lifecycle)
                     ((Lifecycle) children[i]).stop();
             }
+
+            // Stop our filters
+            filterStop();
 
             // Stop our application listeners
             listenerStop();
