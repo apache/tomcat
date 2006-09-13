@@ -282,11 +282,6 @@
   <target name="build-docs">
 
     <copy todir="${tomcat.build}/webapps">
-      <fileset dir=".">
-        <include name="BUILDING.txt"/>
-        <include name="README.txt"/>
-        <include name="RUNNING.txt"/>
-      </fileset>
       <fileset dir="webapps">
         <include name="docs/images/**"/>
         <include name="docs/**/*.html"/>
@@ -298,6 +293,13 @@
           <include name="docs/architecture/**"/>
           <exclude name="docs/architecture/*.xml"/>
         </fileset>
+    </copy>
+    <copy todir="${tomcat.build}/webapps/docs">
+      <fileset dir=".">
+        <include name="BUILDING.txt"/>
+        <include name="README.txt"/>
+        <include name="RUNNING.txt"/>
+      </fileset>
     </copy>
 
     <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
