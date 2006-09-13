@@ -759,8 +759,8 @@ public class Http11AprProcessor implements ActionHook {
             recycle();
             return SocketState.CLOSED;
         } else if (!comet) {
-            recycle();
             endpoint.getPoller().add(socket);
+            recycle();
             return SocketState.OPEN;
         } else {
             endpoint.getCometPoller().add(socket);
