@@ -75,7 +75,7 @@ public class CometEventImpl implements CometEvent {
         this.eventType = eventType;
     }
     
-    public void serEventSubType(EventSubType eventSubType) {
+    public void setEventSubType(EventSubType eventSubType) {
         this.eventSubType = eventSubType;
     }
     
