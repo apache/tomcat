@@ -128,5 +128,20 @@ public interface Valve {
     public void invoke(Request request, Response response)
         throws IOException, ServletException;
 
+    
+    /**
+     * Process a Comet event.
+     *
+     * @param request The servlet request to be processed
+     * @param response The servlet response to be created
+     *
+     * @exception IOException if an input/output error occurs, or is thrown
+     *  by a subsequently invoked Valve, Filter, or Servlet
+     * @exception ServletException if a servlet error occurs, or is thrown
+     *  by a subsequently invoked Valve, Filter, or Servlet
+     */
+    public void event(Request request, Response response, CometEvent event)
+        throws IOException, ServletException;
+
 
 }

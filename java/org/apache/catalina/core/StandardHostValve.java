@@ -25,6 +25,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.CometEvent;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
@@ -124,6 +125,57 @@ final class StandardHostValve
 
         // Ask this Context to process this request
         context.getPipeline().getFirst().invoke(request, response);
+
+        // Access a session (if present) to update last accessed time, based on a
+        // strict interpretation of the specification
+        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            request.getSession(false);
+        }
+
+        // Error page processing
+        response.setSuspended(false);
+
+        Throwable t = (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
+
+        if (t != null) {
+            throwable(request, response, t);
+        } else {
+            status(request, response);
+        }
+
+        // Restore the context classloader
+        Thread.currentThread().setContextClassLoader
+            (StandardHostValve.class.getClassLoader());
+
+    }
+
+
+    /**
+     * Process Comet event.
+     *
+     * @param request Request to be processed
+     * @param response Response to be produced
+     * @param valveContext Valve context used to forward to the next Valve
+     *
+     * @exception IOException if an input/output error occurred
+     * @exception ServletException if a servlet error occurred
+     */
+    public final void event(Request request, Response response, CometEvent event)
+        throws IOException, ServletException {
+
+        // Select the Context to be used for this Request
+        Context context = request.getContext();
+
+        // Bind the context CL to the current thread
+        if( context.getLoader() != null ) {
+            // Not started - it should check for availability first
+            // This should eventually move to Engine, it's generic.
+            Thread.currentThread().setContextClassLoader
+                    (context.getLoader().getClassLoader());
+        }
+
+        // Ask this Context to process this request
+        context.getPipeline().getFirst().event(request, response, event);
 
         // Access a session (if present) to update last accessed time, based on a
         // strict interpretation of the specification

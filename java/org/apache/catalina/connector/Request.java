@@ -195,7 +195,19 @@ public class Request
      */
     protected String authType = null;
 
+    
+    /**
+     * Associated event.
+     */
+    protected CometEventImpl event = null;
+    
 
+    /**
+     * Comet state
+     */
+    protected boolean comet = false;
+    
+    
     /**
      * The current dispatcher type.
      */
@@ -373,6 +385,12 @@ public class Request
         dispatcherType = null;
         requestDispatcherPath = null;
 
+        comet = false;
+        if (event != null) {
+            event.clear();
+            event = null;
+        }
+        
         authType = null;
         inputBuffer.recycle();
         usingInputStream = false;
@@ -2193,6 +2211,34 @@ public class Request
     }
 
 
+    /**
+     * Get the event associated with the request.
+     * @return
+     */
+    public CometEventImpl getEvent() {
+        if (event == null) {
+            event = new CometEventImpl(this, response);
+        }
+        return event;
+    }
+    
+    
+    /**
+     * Return true if the current request is handling Comet traffic.
+     */
+    public boolean isComet() {
+        return comet;
+    }
+
+    
+    /**
+     * Set comet state.
+     */
+    public void setComet(boolean comet) {
+        this.comet = comet;
+    }
+
+    
     // ------------------------------------------------------ Protected Methods
 
 
@@ -2545,6 +2591,5 @@ public class Request
         }
 
     }
-
 
 }
