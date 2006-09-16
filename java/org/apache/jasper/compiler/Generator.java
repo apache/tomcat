@@ -300,7 +300,7 @@ class Generator {
                 if (hasEmptyBody) {
                     poolName = poolName + "_nobody";
                 }
-                return JspUtil.makeXmlJavaIdentifier(poolName);
+                return JspUtil.makeJavaIdentifier(poolName);
             }
         }
 
@@ -2714,7 +2714,7 @@ class Generator {
                     varName = varName + "0";
                 }
             }
-            return JspUtil.makeXmlJavaIdentifier(varName);
+            return JspUtil.makeJavaIdentifier(varName);
         }
 
         private String evaluateAttribute(TagHandlerInfo handlerInfo,
