@@ -65,19 +65,22 @@ class Validator {
         private ErrorDispatcher err;
 
         private static final JspUtil.ValidAttribute[] pageDirectiveAttrs = {
-                new JspUtil.ValidAttribute("language"),
-                new JspUtil.ValidAttribute("extends"),
-                new JspUtil.ValidAttribute("import"),
-                new JspUtil.ValidAttribute("session"),
-                new JspUtil.ValidAttribute("buffer"),
-                new JspUtil.ValidAttribute("autoFlush"),
-                new JspUtil.ValidAttribute("isThreadSafe"),
-                new JspUtil.ValidAttribute("info"),
-                new JspUtil.ValidAttribute("errorPage"),
-                new JspUtil.ValidAttribute("isErrorPage"),
-                new JspUtil.ValidAttribute("contentType"),
-                new JspUtil.ValidAttribute("pageEncoding"),
-                new JspUtil.ValidAttribute("isELIgnored") };
+            new JspUtil.ValidAttribute("language"),
+            new JspUtil.ValidAttribute("extends"),
+            new JspUtil.ValidAttribute("import"),
+            new JspUtil.ValidAttribute("session"),
+            new JspUtil.ValidAttribute("buffer"),
+            new JspUtil.ValidAttribute("autoFlush"),
+            new JspUtil.ValidAttribute("isThreadSafe"),
+            new JspUtil.ValidAttribute("info"),
+            new JspUtil.ValidAttribute("errorPage"),
+            new JspUtil.ValidAttribute("isErrorPage"),
+            new JspUtil.ValidAttribute("contentType"),
+            new JspUtil.ValidAttribute("pageEncoding"),
+            new JspUtil.ValidAttribute("isELIgnored"),
+            new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"),
+            new JspUtil.ValidAttribute("trimDirectiveWhitespaces")
+        };
 
         private boolean pageEncodingSeen = false;
 

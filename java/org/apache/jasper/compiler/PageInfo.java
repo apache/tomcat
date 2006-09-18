@@ -657,7 +657,7 @@ class PageInfo {
                 err.jspError(n, "jsp.error.tag.invalid.trimdirectivewhitespaces");
         }
 
-        deferredSyntaxAllowedAsLiteralValue = value;
+        trimDirectiveWhitespacesValue = value;
     }
 
     public void setELIgnored(boolean s) {
