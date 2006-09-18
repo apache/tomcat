@@ -898,7 +898,7 @@ class Generator {
                                 n.getEL().getMapName(), false) + ");");
             } else {
                 out.printil("out.write("
-                        + quote("${" + new String(n.getText()) + "}") + ");");
+                        + quote(n.getType() + "{" + new String(n.getText()) + "}") + ");");
             }
             n.setEndJavaLine(out.getJavaLine());
         }
