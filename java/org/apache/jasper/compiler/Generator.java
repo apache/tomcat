@@ -2001,8 +2001,7 @@ class Generator {
 
             // Copy virtual page scope of tag file to page scope of invoking
             // page
-            out
-                    .printil("((org.apache.jasper.runtime.JspContextWrapper) this.jspContext).syncBeforeInvoke();");
+            out.printil("((org.apache.jasper.runtime.JspContextWrapper) this.jspContext).syncBeforeInvoke();");
             String varReaderAttr = n.getTextAttribute("varReader");
             String varAttr = n.getTextAttribute("var");
             if (varReaderAttr != null || varAttr != null) {
@@ -2027,8 +2026,7 @@ class Generator {
                 out.printin("_jspx_page_context.setAttribute(");
                 if (varReaderAttr != null) {
                     out.print(quote(varReaderAttr));
-                    out
-                            .print(", new java.io.StringReader(_jspx_sout.toString())");
+                    out.print(", new java.io.StringReader(_jspx_sout.toString())");
                 } else {
                     out.print(quote(varAttr));
                     out.print(", _jspx_sout.toString()");
@@ -2040,6 +2038,9 @@ class Generator {
                 out.println(");");
             }
 
+            // Restore EL context
+            out.printil("jspContext.getELContext().putContext(JspContext.class,getJspContext());");
+
             n.setEndJavaLine(out.getJavaLine());
         }
 
@@ -2049,8 +2050,7 @@ class Generator {
 
             // Copy virtual page scope of tag file to page scope of invoking
             // page
-            out
-                    .printil("((org.apache.jasper.runtime.JspContextWrapper) this.jspContext).syncBeforeInvoke();");
+            out.printil("((org.apache.jasper.runtime.JspContextWrapper) this.jspContext).syncBeforeInvoke();");
 
             // Invoke body
             String varReaderAttr = n.getTextAttribute("varReader");
@@ -2083,6 +2083,9 @@ class Generator {
                 }
                 out.println(");");
             }
+
+            // Restore EL context
+            out.printil("jspContext.getELContext().putContext(JspContext.class,getJspContext());");
 
             n.setEndJavaLine(out.getJavaLine());
         }
@@ -3518,10 +3521,9 @@ class Generator {
         }
         
         // restore nested JspContext on ELContext
-        out.printil("jspContext.getELContext().putContext(JspContext.class,getJspContext());");
+        out.printil("jspContext.getELContext().putContext(JspContext.class,super.getJspContext());");
         
-        out
-                .printil("((org.apache.jasper.runtime.JspContextWrapper) jspContext).syncEndTagFile();");
+        out.printil("((org.apache.jasper.runtime.JspContextWrapper) jspContext).syncEndTagFile();");
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
             out.printil("_jspDestroy();");
         }
@@ -4095,6 +4097,7 @@ class Generator {
             out.printil("}");
             out.printil("try {");
             out.pushIndent();
+            out.printil("this.jspContext.getELContext().putContext(JspContext.class,this.jspContext);");
             out.printil("switch( this.discriminator ) {");
             out.pushIndent();
             for (int i = 0; i < fragments.size(); i++) {
