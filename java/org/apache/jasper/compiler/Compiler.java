@@ -129,6 +129,14 @@ public abstract class Compiler {
         if (jspProperty.getIncludeCoda() != null) {
             pageInfo.setIncludeCoda(jspProperty.getIncludeCoda());
         }
+        if (jspProperty.isDefferedSyntaxAllowedAsLitteral() != null) {
+            pageInfo.setDeferredSyntaxAllowedAsLiteral(JspUtil.booleanValue(jspProperty
+                    .isDefferedSyntaxAllowedAsLitteral()));
+        }
+        if (jspProperty.isTrimDirectiveWhitespaces() != null) {
+            pageInfo.setTrimDirectiveWhitespaces(JspUtil.booleanValue(jspProperty
+                    .isTrimDirectiveWhitespaces()));
+        }
 
         ctxt.checkOutputDir();
         String javaFileName = ctxt.getServletJavaFileName();
