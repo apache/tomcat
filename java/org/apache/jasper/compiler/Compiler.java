@@ -129,9 +129,9 @@ public abstract class Compiler {
         if (jspProperty.getIncludeCoda() != null) {
             pageInfo.setIncludeCoda(jspProperty.getIncludeCoda());
         }
-        if (jspProperty.isDefferedSyntaxAllowedAsLitteral() != null) {
+        if (jspProperty.isDeferedSyntaxAllowedAsLitteral() != null) {
             pageInfo.setDeferredSyntaxAllowedAsLiteral(JspUtil.booleanValue(jspProperty
-                    .isDefferedSyntaxAllowedAsLitteral()));
+                    .isDeferedSyntaxAllowedAsLitteral()));
         }
         if (jspProperty.isTrimDirectiveWhitespaces() != null) {
             pageInfo.setTrimDirectiveWhitespaces(JspUtil.booleanValue(jspProperty
