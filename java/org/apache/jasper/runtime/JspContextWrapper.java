@@ -33,7 +33,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspContext;
-import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.el.ELException;
@@ -43,7 +42,6 @@ import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.compiler.Localizer;
-import org.apache.jasper.el.ELContextImpl;
 
 /**
  * Implementation of a JSP Context Wrapper.
