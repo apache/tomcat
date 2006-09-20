@@ -95,17 +95,17 @@ public class JspFactoryImpl extends JspFactory {
 					       int bufferSize, 
 					       boolean autoflush) {
         try {
-	    PageContext pc;
-	    if( USE_POOL ) {
+            PageContext pc;
+            if( USE_POOL ) {
                 pc = (PageContext) pool.get();
-		if( pc == null ) {
-		    pc= new PageContextImpl(this);
-		}
-	    } else {
-		pc = new PageContextImpl(this);
-	    }
-	    pc.initialize(servlet, request, response, errorPageURL, 
-                          needsSession, bufferSize, autoflush);
+                if( pc == null ) {
+                    pc = new PageContextImpl();
+                }
+            } else {
+                pc = new PageContextImpl();
+            }
+            pc.initialize(servlet, request, response, errorPageURL, 
+                    needsSession, bufferSize, autoflush);
             return pc;
         } catch (Throwable ex) {
             /* FIXME: need to do something reasonable here!! */
