@@ -45,6 +45,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.catalina.core.ContainerBase;
 
 
 /**
@@ -92,7 +93,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 384293 $ $Date: 2006-03-08 19:09:36 +0100 (mer., 08 mars 2006) $
+ * @version $Revision: 447499 $ $Date: 2006-09-18 20:47:54 +0200 (lun., 18 sept. 2006) $
  */
 
 public class HostManagerServlet
@@ -444,7 +445,7 @@ public class HostManagerServlet
 
         // Add host aliases
         if ((aliases != null) && !("".equals(aliases))) {
-            StringTokenizer tok = new StringTokenizer(aliases, ",");
+            StringTokenizer tok = new StringTokenizer(aliases, ", ");
             while (tok.hasMoreTokens()) {
                 host.addAlias(tok.nextToken());
             }
@@ -511,7 +512,9 @@ public class HostManagerServlet
         // Remove host
         // Note that the host will not get physically removed
         try {
-            engine.removeChild(engine.findChild(name));
+            Container child = engine.findChild(name);
+            engine.removeChild(child);
+            if ( child instanceof ContainerBase ) ((ContainerBase)child).destroy();
         } catch (Exception e) {
             writer.println(sm.getString("hostManagerServlet.exception",
                                         e.toString()));
