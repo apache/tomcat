@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -42,6 +42,7 @@ import javax.servlet.jsp.tagext.BodyContent;
 import javax.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.compiler.Localizer;
+import org.apache.jasper.util.Enumerator;
 
 /**
  * Implementation of a JSP Context Wrapper.
@@ -60,7 +61,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	// Invoking JSP context
 	private PageContext invokingJspCtxt;
 
-	private transient Hashtable pageAttributes;
+	private transient HashMap<String, Object> pageAttributes;
 
 	// ArrayList of NESTED scripting variables
 	private ArrayList nestedVars;
@@ -73,7 +74,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
 	private Map aliases;
 
-	private Hashtable originalNestedVars;
+	private HashMap<String, Object> originalNestedVars;
 
 	public JspContextWrapper(JspContext jspContext, ArrayList nestedVars,
 			ArrayList atBeginVars, ArrayList atEndVars, Map aliases) {
@@ -81,11 +82,11 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 		this.nestedVars = nestedVars;
 		this.atBeginVars = atBeginVars;
 		this.atEndVars = atEndVars;
-		this.pageAttributes = new Hashtable(16);
+		this.pageAttributes = new HashMap<String, Object>(16);
 		this.aliases = aliases;
 
 		if (nestedVars != null) {
-			this.originalNestedVars = new Hashtable(nestedVars.size());
+			this.originalNestedVars = new HashMap<String, Object>(nestedVars.size());
 		}
 		syncBeginTagFile();
 	}
@@ -220,7 +221,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 
 	public Enumeration<String> getAttributeNamesInScope(int scope) {
 		if (scope == PAGE_SCOPE) {
-			return pageAttributes.keys();
+			return new Enumerator(pageAttributes.keySet().iterator());
 		}
 
 		return invokingJspCtxt.getAttributeNamesInScope(scope);
