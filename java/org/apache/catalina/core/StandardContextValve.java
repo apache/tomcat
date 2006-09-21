@@ -162,7 +162,7 @@ final class StandardContextValve
                 try {
                     listener.requestInitialized(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
+                    container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
                                      instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
@@ -186,7 +186,7 @@ final class StandardContextValve
                 try {
                     listener.requestDestroyed(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("requestListenerValve.requestDestroy",
+                    container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
                                      instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
@@ -277,47 +277,6 @@ final class StandardContextValve
 
 
     // -------------------------------------------------------- Private Methods
-
-
-    /**
-     * Report a "bad request" error for the specified resource.  FIXME:  We
-     * should really be using the error reporting settings for this web
-     * application, but currently that code runs at the wrapper level rather
-     * than the context level.
-     *
-     * @param requestURI The request URI for the requested resource
-     * @param response The response we are creating
-     */
-    private void badRequest(String requestURI, HttpServletResponse response) {
-
-        try {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, requestURI);
-        } catch (IllegalStateException e) {
-            ;
-        } catch (IOException e) {
-            ;
-        }
-
-    }
-    
-    
-    /**
-     * Report a "forbidden" error for the specified resource. 
-     *
-     * @param requestURI The request URI for the requested resource
-     * @param response The response we are creating
-     */
-    private void forbidden(String requestURI, HttpServletResponse response) {
-
-        try {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, requestURI);
-        } catch (IllegalStateException e) {
-            ;
-        } catch (IOException e) {
-            ;
-        }
-
-    }
 
 
     /**
