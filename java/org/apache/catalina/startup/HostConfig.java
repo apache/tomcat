@@ -354,6 +354,23 @@ public class HostConfig
     }
     
     
+    /**
+     * Has the specified application been deployed? Note applications defined
+     * in server.xml will not have been deployed.
+     * @return <code>true</code> if the application has been deployed and
+     * <code>false</code> if the applciation has not been deployed or does not
+     * exist
+     */
+    public boolean isDeployed(String name) {
+        DeployedApplication app = (DeployedApplication) deployed.get(name);
+        if (app == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    
     // ------------------------------------------------------ Protected Methods
 
     
@@ -670,8 +687,6 @@ public class HostConfig
         
         if (files == null)
             return;
-        
-        boolean checkAdditionalDeployments = false;
         
         for (int i = 0; i < files.length; i++) {
             

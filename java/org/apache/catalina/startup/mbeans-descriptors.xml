@@ -79,6 +79,15 @@
                  type="java.lang.String"/>
     </operation>
 
+    <operation name="isDeployed"
+               description="Was this web application deployed by this component"
+               impact="ACTION"
+               returnType="boolean">
+      <parameter name="name"
+                 description="Application name"
+                 type="java.lang.String"/>
+    </operation>
+
     <operation name="manageApp"
                description="Add a web application managed externally"
                impact="ACTION"

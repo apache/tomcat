@@ -333,6 +333,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         Iterator iterator = sortedContextPathsMap.entrySet().iterator();
         boolean isHighlighted = true;
+        boolean isDeployed = true;
         String highlightColor = null;
 
         while (iterator.hasNext()) {
@@ -353,6 +354,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
             }
 
             if (context != null ) {
+                try {
+                    isDeployed = isDeployed(contextPath);
+                } catch (Exception e) {
+                    // Assume false on failure for safety
+                    isDeployed = false;
+                }
+                
                 args = new Object[6];
                 args[0] = displayPath;
                 args[1] = context.getDisplayName();
@@ -398,12 +406,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 if (context.getPath().equals(this.context.getPath())) {
                     writer.print(MessageFormat.format(
                         MANAGER_APP_ROW_BUTTON_SECTION, args));
-                } else if (context.getAvailable()) {
+                } else if (context.getAvailable() && isDeployed) {
                     writer.print(MessageFormat.format(
-                        STARTED_APPS_ROW_BUTTON_SECTION, args));
+                        STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION, args));
+                } else if (context.getAvailable() && !isDeployed) {
+                    writer.print(MessageFormat.format(
+                        STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION, args));
+                } else if (!context.getAvailable() && isDeployed) {
+                    writer.print(MessageFormat.format(
+                        STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION, args));
                 } else {
                     writer.print(MessageFormat.format(
-                        STOPPED_APPS_ROW_BUTTON_SECTION, args));
+                        STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION, args));
                 }
 
             }
@@ -584,7 +598,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " </td>\n" +
         "</tr>\n";
 
-    private static final String STARTED_APPS_ROW_BUTTON_SECTION =
+    private static final String STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
         "  <small>\n" +
         "  &nbsp;{1}&nbsp;\n" +
@@ -595,13 +609,35 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " </td>\n" +
         "</tr>\n";
 
-    private static final String STOPPED_APPS_ROW_BUTTON_SECTION =
+    private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
         "  <small>\n" +
         "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm('''Are you sure?'''))\">{1}</a>&nbsp;\n" +
         "  &nbsp;{3}&nbsp;\n" +
         "  &nbsp;{5}&nbsp;\n" +
         "  &nbsp;<a href=\"{6}\" onclick=\"return(confirm('''Are you sure?  This will delete the application.'''))\">{7}</a>&nbsp;\n" +
+        "  </small>\n" +
+        " </td>\n" +
+        "</tr>\n";
+
+    private static final String STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
+        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        "  <small>\n" +
+        "  &nbsp;{1}&nbsp;\n" +
+        "  &nbsp;<a href=\"{2}\" onclick=\"return(confirm('''Are you sure?'''))\">{3}</a>&nbsp;\n" +
+        "  &nbsp;<a href=\"{4}\" onclick=\"return(confirm('''Are you sure?'''))\">{5}</a>&nbsp;\n" +
+        "  &nbsp;{7}&nbsp;\n" +
+        "  </small>\n" +
+        " </td>\n" +
+        "</tr>\n";
+
+    private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
+        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        "  <small>\n" +
+        "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm('''Are you sure?'''))\">{1}</a>&nbsp;\n" +
+        "  &nbsp;{3}&nbsp;\n" +
+        "  &nbsp;{5}&nbsp;\n" +
+        "  &nbsp;{7}&nbsp;\n" +
         "  </small>\n" +
         " </td>\n" +
         "</tr>\n";

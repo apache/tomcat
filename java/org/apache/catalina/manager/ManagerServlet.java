@@ -1277,6 +1277,12 @@ public class ManagerServlet
                 }
             }
 
+            if (!isDeployed(path)) {
+                writer.println(sm.getString("managerServlet.notDeployed",
+                        RequestUtil.filter(displayPath)));
+                return;
+            }
+
             if (!isServiced(path)) {
                 addServiced(path);
                 try {
@@ -1369,6 +1375,19 @@ public class ManagerServlet
 
 
     /**
+     * Invoke the isDeployed method on the deployer.
+     */
+    protected boolean isDeployed(String name) 
+        throws Exception {
+        String[] params = { name };
+        String[] signature = { "java.lang.String" };
+        Boolean result = 
+            (Boolean) mBeanServer.invoke(oname, "isDeployed", params, signature);
+        return result.booleanValue();
+    }
+    
+
+    /**
      * Invoke the check method on the deployer.
      */
     protected void check(String name) 
@@ -1380,7 +1399,7 @@ public class ManagerServlet
     
 
     /**
-     * Invoke the check method on the deployer.
+     * Invoke the isServiced method on the deployer.
      */
     protected boolean isServiced(String name) 
         throws Exception {
@@ -1393,7 +1412,7 @@ public class ManagerServlet
     
 
     /**
-     * Invoke the check method on the deployer.
+     * Invoke the addServiced method on the deployer.
      */
     protected void addServiced(String name) 
         throws Exception {
@@ -1404,7 +1423,7 @@ public class ManagerServlet
     
 
     /**
-     * Invoke the check method on the deployer.
+     * Invoke the removeServiced method on the deployer.
      */
     protected void removeServiced(String name) 
         throws Exception {
