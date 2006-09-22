@@ -19,10 +19,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 
-import javax.servlet.Servlet;
-
 import org.apache.catalina.CometEvent;
-import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
@@ -89,12 +86,6 @@ public class CoyoteAdapter
      */
     private static final String match =
         ";" + Globals.SESSION_PARAMETER_NAME + "=";
-
-
-    /**
-     * The match string for identifying a session ID parameter.
-     */
-    private static final char[] SESSION_ID = match.toCharArray();
 
 
     /**
