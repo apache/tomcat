@@ -39,6 +39,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
+import org.apache.tomcat.util.net.SocketStatus;
 
 
 /**
@@ -554,15 +555,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             this.proto = proto;
         }
 
-        public SocketState event(NioChannel socket, boolean error) {
+        public SocketState event(NioChannel socket, SocketStatus status) {
             Http11NioProcessor result = connections.get(socket);
 
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
-                boolean recycle = error;
                 // Call the appropriate event
                 try {
-                    state = result.event(error);
+                    state = result.event(status);
                 } catch (java.net.SocketException e) {
                     // SocketExceptions are normal
                     Http11NioProtocol.log.debug

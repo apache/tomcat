@@ -34,6 +34,7 @@ import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.net.SocketStatus;
 
 
 /**
@@ -104,19 +105,34 @@ public class CoyoteAdapter
      * @return false to indicate an error, expected or not
      */
     public boolean event(org.apache.coyote.Request req, 
-            org.apache.coyote.Response res, boolean error) {
+            org.apache.coyote.Response res, SocketStatus status) {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request.getWrapper() != null) {
             
+            boolean error = false;
             try {
-                if (error) {
-                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
-                } else {
+                if (status == SocketStatus.OPEN) {
                     request.getEvent().setEventType(CometEvent.EventType.READ);
+                    request.getEvent().setEventSubType(null);
+                } else if (status == SocketStatus.DISCONNECT) {
+                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                    request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
+                    error = true;
+                } else if (status == SocketStatus.ERROR) {
+                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                    request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
+                    error = true;
+                } else if (status == SocketStatus.STOP) {
+                    request.getEvent().setEventType(CometEvent.EventType.END);
+                    request.getEvent().setEventSubType(CometEvent.EventSubType.SERVER_SHUTDOWN);
+                } else if (status == SocketStatus.TIMEOUT) {
+                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                    request.getEvent().setEventSubType(CometEvent.EventSubType.TIMEOUT);
                 }
+                
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
 
@@ -140,8 +156,10 @@ public class CoyoteAdapter
                     response.recycle();
                 }
             }
+            
+        } else {
+            return false;
         }
-        return true;
     }
     
 

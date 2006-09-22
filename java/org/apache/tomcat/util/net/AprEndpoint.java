@@ -1052,12 +1052,12 @@ public class AprEndpoint {
     /**
      * Process given socket for an event.
      */
-    protected boolean processSocket(long socket, boolean error) {
+    protected boolean processSocket(long socket, SocketStatus status) {
         try {
             if (executor == null) {
-                getWorkerThread().assign(socket, error);
+                getWorkerThread().assign(socket, status);
             } else {
-                executor.execute(new SocketEventProcessor(socket, error));
+                executor.execute(new SocketEventProcessor(socket, status));
             }
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
@@ -1186,7 +1186,7 @@ public class AprEndpoint {
             // Close all sockets in the add queue
             for (int i = 0; i < addCount; i++) {
                 if (comet) {
-                    processSocket(addS[i], true);
+                    processSocket(addS[i], SocketStatus.STOP);
                 } else {
                     Socket.destroy(addS[i]);
                 }
@@ -1196,7 +1196,7 @@ public class AprEndpoint {
             if (rv > 0) {
                 for (int n = 0; n < rv; n++) {
                     if (comet) {
-                        processSocket(desc[n*2+1], true);
+                        processSocket(desc[n*2+1], SocketStatus.STOP);
                     } else {
                         Socket.destroy(desc[n*2+1]);
                     }
@@ -1222,7 +1222,7 @@ public class AprEndpoint {
                 if (addCount >= addS.length) {
                     // Can't do anything: close the socket right away
                     if (comet) {
-                        processSocket(socket, true);
+                        processSocket(socket, SocketStatus.ERROR);
                     } else {
                         Socket.destroy(socket);
                     }
@@ -1276,7 +1276,7 @@ public class AprEndpoint {
                                 } else {
                                     // Can't do anything: close the socket right away
                                     if (comet) {
-                                        processSocket(addS[i], true);
+                                        processSocket(addS[i], SocketStatus.ERROR);
                                     } else {
                                         Socket.destroy(addS[i]);
                                     }
@@ -1295,11 +1295,11 @@ public class AprEndpoint {
                             // Check for failed sockets and hand this socket off to a worker
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
-                                    || (comet && (!processSocket(desc[n*2+1], false))) 
+                                    || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN))) 
                                     || (!comet && (!processSocket(desc[n*2+1])))) {
                                 // Close socket and clear pool
                                 if (comet) {
-                                    processSocket(desc[n*2+1], true);
+                                    processSocket(desc[n*2+1], SocketStatus.DISCONNECT);
                                 } else {
                                     Socket.destroy(desc[n*2+1]);
                                 }
@@ -1330,7 +1330,7 @@ public class AprEndpoint {
                             for (int n = 0; n < rv; n++) {
                                 // Close socket and clear pool
                                 if (comet) {
-                                    processSocket(desc[n], true);
+                                    processSocket(desc[n], SocketStatus.TIMEOUT);
                                 } else {
                                     Socket.destroy(desc[n]);
                                 }
@@ -1364,8 +1364,7 @@ public class AprEndpoint {
         protected Thread thread = null;
         protected boolean available = false;
         protected long socket = 0;
-        protected boolean event = false;
-        protected boolean error = false;
+        protected SocketStatus status = null;
         protected boolean options = false;
 
 
@@ -1390,8 +1389,7 @@ public class AprEndpoint {
 
             // Store the newly available Socket and notify our thread
             this.socket = socket;
-            event = false;
-            error = false;
+            status = null;
             options = true;
             available = true;
             notifyAll();
@@ -1420,8 +1418,7 @@ public class AprEndpoint {
 
             // Store the newly available Socket and notify our thread
             this.socket = socket;
-            event = false;
-            error = false;
+            status = null;
             options = false;
             available = true;
             notifyAll();
@@ -1429,7 +1426,7 @@ public class AprEndpoint {
         }
 
 
-        protected synchronized void assign(long socket, boolean error) {
+        protected synchronized void assign(long socket, SocketStatus status) {
 
             // Wait for the Processor to get the previous Socket
             while (available) {
@@ -1441,8 +1438,7 @@ public class AprEndpoint {
 
             // Store the newly available Socket and notify our thread
             this.socket = socket;
-            event = true;
-            this.error = error;
+            this.status = status;
             options = false;
             available = true;
             notifyAll();
@@ -1489,11 +1485,11 @@ public class AprEndpoint {
                     continue;
 
                 // Process the request from this socket
-                if ((event) && (handler.event(socket, error) == Handler.SocketState.CLOSED)) {
+                if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
                     // Close socket and pool
                     Socket.destroy(socket);
                     socket = 0;
-                } else if ((!event) && ((options && !setSocketOptions(socket)) 
+                } else if ((status == null) && ((options && !setSocketOptions(socket)) 
                         || handler.process(socket) == Handler.SocketState.CLOSED)) {
                     // Close socket and pool
                     Socket.destroy(socket);
@@ -1824,7 +1820,7 @@ public class AprEndpoint {
             OPEN, CLOSED, LONG
         }
         public SocketState process(long socket);
-        public SocketState event(long socket, boolean error);
+        public SocketState event(long socket, SocketStatus status);
     }
 
 
@@ -1954,17 +1950,17 @@ public class AprEndpoint {
     protected class SocketEventProcessor implements Runnable {
         
         protected long socket = 0;
-        protected boolean error = false; 
+        protected SocketStatus status = null; 
         
-        public SocketEventProcessor(long socket, boolean error) {
+        public SocketEventProcessor(long socket, SocketStatus status) {
             this.socket = socket;
-            this.error = error;
+            this.status = status;
         }
 
         public void run() {
 
             // Process the request from this socket
-            if (handler.event(socket, error) == Handler.SocketState.CLOSED) {
+            if (handler.event(socket, status) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 Socket.destroy(socket);
                 socket = 0;

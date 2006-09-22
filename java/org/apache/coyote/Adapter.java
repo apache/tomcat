@@ -16,6 +16,8 @@
 
 package org.apache.coyote;
 
+import org.apache.tomcat.util.net.SocketStatus;
+
 
 /**
  * Adapter. This represents the entry point in a coyote-based servlet container.
@@ -25,7 +27,6 @@ package org.apache.coyote;
  * @see ProtocolHandler
  */
 public interface Adapter {
-
 
     /** 
      * Call the service method, and notify all listeners
@@ -45,7 +46,7 @@ public interface Adapter {
     public void service(Request req, Response res)
 	throws Exception;
 
-    public boolean event(Request req, Response res, boolean error)
+    public boolean event(Request req, Response res, SocketStatus status)
     throws Exception;
 
 }

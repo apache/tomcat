@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
@@ -28,9 +29,12 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.KeyStore;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -40,13 +44,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.net.Socket;
-import java.util.StringTokenizer;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -855,12 +852,12 @@ public class NioEndpoint {
     /**
      * Process given socket for an event.
      */
-    protected boolean processSocket(NioChannel socket, boolean error) {
+    protected boolean processSocket(NioChannel socket, SocketStatus status) {
         try {
             if (executor == null) {
-                getWorkerThread().assign(socket, error);
+                getWorkerThread().assign(socket, status);
             } else {
-                executor.execute(new SocketEventProcessor(socket, error));
+                executor.execute(new SocketEventProcessor(socket, status));
             }
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
@@ -1041,11 +1038,14 @@ public class NioEndpoint {
             addEvent(r);
         }
         
-        public void cancelledKey(SelectionKey key) {
+        public void cancelledKey(SelectionKey key, SocketStatus status) {
             try {
                 KeyAttachment ka = (KeyAttachment) key.attachment();
                 if ( key.isValid() ) key.cancel();
-                if (ka != null && ka.getComet()) processSocket( ka.getChannel(), true);
+                if (ka != null && ka.getComet()) processSocket( ka.getChannel(), status);
+                // FIXME: closing in all these cases is a bit mean. IMO, it should leave it
+                // to the worker (or executor) depending on what the request processor
+                // returns
                 if ( key.channel().isOpen() ) key.channel().close();
                 key.attach(null);
             } catch (Throwable e) {
@@ -1116,7 +1116,8 @@ public class NioEndpoint {
                                     attachment.setWakeUp(false);
                                     synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
                                 } else if ( attachment.getComet() ) {
-                                    if (!processSocket(channel,false)) processSocket(channel,true);
+                                    if (!processSocket(channel, SocketStatus.OPEN))
+                                        processSocket(channel, SocketStatus.DISCONNECT);
                                 } else {
                                     boolean close = (!processSocket(channel));
                                     if ( close ) {
@@ -1127,10 +1128,10 @@ public class NioEndpoint {
                             } 
                         } else {
                             //invalid key
-                            cancelledKey(sk);
+                            cancelledKey(sk, SocketStatus.ERROR);
                         }
                     } catch ( CancelledKeyException ckx ) {
-                        cancelledKey(sk);
+                        cancelledKey(sk, SocketStatus.ERROR);
                     } catch (Throwable t) {
                         log.error("",t);
                     }
@@ -1156,23 +1157,23 @@ public class NioEndpoint {
                 try {
                     KeyAttachment ka = (KeyAttachment) key.attachment();
                     if ( ka == null ) {
-                        cancelledKey(key); //we don't support any keys without attachments
+                        cancelledKey(key, SocketStatus.ERROR); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
-                        cancelledKey(key);
+                        cancelledKey(key, SocketStatus.DISCONNECT);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
                         long timeout = (ka.getTimeout()==-1)?((long) soTimeout):(ka.getTimeout());
                         boolean isTimedout = delta > timeout;
                         if (isTimedout) {
-                            cancelledKey(key);
+                            cancelledKey(key, SocketStatus.TIMEOUT);
                         } else {
                             long nextTime = now+(timeout-delta);
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }
                     }//end if
                 }catch ( CancelledKeyException ckx ) {
-                    cancelledKey(key);
+                    cancelledKey(key, SocketStatus.ERROR);
                 }
             }//for
         }
@@ -1230,8 +1231,7 @@ public class NioEndpoint {
         protected Thread thread = null;
         protected boolean available = false;
         protected Object socket = null;
-        protected boolean event = false;
-        protected boolean error = false;
+        protected SocketStatus status = null;
 
 
         /**
@@ -1254,15 +1254,14 @@ public class NioEndpoint {
             }
             // Store the newly available Socket and notify our thread
             this.socket = socket;
-            event = false;
-            error = false;
+            status = null;
             available = true;
             notifyAll();
 
         }
 
 
-        protected synchronized void assign(Object socket, boolean error) {
+        protected synchronized void assign(Object socket, SocketStatus status) {
 
             // Wait for the Processor to get the previous Socket
             while (available) {
@@ -1274,8 +1273,7 @@ public class NioEndpoint {
 
             // Store the newly available Socket and notify our thread
             this.socket = socket;
-            event = true;
-            this.error = error;
+            this.status = status;
             available = true;
             notifyAll();
         }
@@ -1348,7 +1346,7 @@ public class NioEndpoint {
                         }
                         if ( handshake == 0 ) {
                             // Process the request from this socket
-                            if ((event) && (handler.event(socket, error) == Handler.SocketState.CLOSED)) {
+                            if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
                                 // Close socket and pool
                                 try {
                                     
@@ -1358,7 +1356,7 @@ public class NioEndpoint {
                                 }catch ( Exception x ) {
                                     log.error("",x);
                                 }
-                            } else if ((!event) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
+                            } else if ((status == null) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
                                 // Close socket and pool
                                 try {
                                     
@@ -1454,7 +1452,7 @@ public class NioEndpoint {
             OPEN, CLOSED, LONG
         }
         public SocketState process(NioChannel socket);
-        public SocketState event(NioChannel socket, boolean error);
+        public SocketState event(NioChannel socket, SocketStatus status);
     }
 
 
@@ -1584,17 +1582,17 @@ public class NioEndpoint {
     protected class SocketEventProcessor implements Runnable {
 
         protected NioChannel socket = null;
-        protected boolean error = false; 
+        protected SocketStatus status = null; 
 
-        public SocketEventProcessor(NioChannel socket, boolean error) {
+        public SocketEventProcessor(NioChannel socket, SocketStatus status) {
             this.socket = socket;
-            this.error = error;
+            this.status = status;
         }
 
         public void run() {
 
             // Process the request from this socket
-            if (handler.event(socket, error) == Handler.SocketState.CLOSED) {
+            if (handler.event(socket, status) == Handler.SocketState.CLOSED) {
                 // Close socket and pool
                 try {
                     try {socket.close();}catch (Exception ignore){}
