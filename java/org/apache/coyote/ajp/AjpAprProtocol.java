@@ -34,8 +34,8 @@ import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AprEndpoint;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
-import org.apache.tomcat.util.net.AprEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -431,7 +431,7 @@ public class AjpAprProtocol
         }
 
         // FIXME: Support for this could be added in AJP as well
-        public SocketState event(long socket, boolean error) {
+        public SocketState event(long socket, SocketStatus status) {
             return SocketState.CLOSED;
         }
         

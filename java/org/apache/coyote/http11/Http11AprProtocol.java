@@ -35,6 +35,7 @@ import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AprEndpoint;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.AprEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -615,15 +616,14 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
             this.proto = proto;
         }
 
-        public SocketState event(long socket, boolean error) {
+        public SocketState event(long socket, SocketStatus status) {
             Http11AprProcessor result = connections.get(socket);
             
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
-                boolean recycle = error;
                 // Call the appropriate event
                 try {
-                    state = result.event(error);
+                    state = result.event(status);
                 } catch (java.net.SocketException e) {
                     // SocketExceptions are normal
                     Http11AprProtocol.log.debug

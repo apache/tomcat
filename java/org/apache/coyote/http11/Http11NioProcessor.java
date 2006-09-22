@@ -48,6 +48,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -739,14 +740,14 @@ public class Http11NioProcessor implements ActionHook {
      *
      * @throws IOException error during an I/O operation
      */
-    public SocketState event(boolean error)
+    public SocketState event(SocketStatus status)
         throws IOException {
 
         RequestInfo rp = request.getRequestProcessor();
 
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.event(request, response, error);
+            error = !adapter.event(request, response, status);
             SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
