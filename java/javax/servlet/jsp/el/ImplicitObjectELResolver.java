@@ -419,7 +419,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                     }
 
                     protected Object getAttribute(String name) {
-                        return page.getAttribute(name);
+                        return page.getRequest().getAttribute(name);
                     }
                 };
             }
