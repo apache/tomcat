@@ -28,7 +28,9 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.CometEvent;
+import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.CometEventImpl;
@@ -42,8 +44,7 @@ import org.apache.catalina.util.StringManager;
  * <p>Implementation of a Valve that tracks Comet connections, and closes them
  * when the associated session expires or the webapp is reloaded.</p>
  *
- * <p>This Valve may be attached to any Container, depending on the granularity
- * of the concurrency control you wish to perform.</p>
+ * <p>This Valve should be attached to a Context.</p>
  *
  * @author Remy Maucherat
  * @version $Revision: 386404 $ $Date: 2006-03-16 18:50:37 +0100 (jeu., 16 mars 2006) $
@@ -51,7 +52,7 @@ import org.apache.catalina.util.StringManager;
 
 public class CometConnectionManagerValve
     extends ValveBase
-    implements Lifecycle, HttpSessionListener {
+    implements Lifecycle, HttpSessionListener, LifecycleListener {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -148,6 +149,10 @@ public class CometConnectionManagerValve
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
 
+        if (container instanceof Context) {
+            ((Lifecycle) container).addLifecycleListener(this);
+        }
+        
     }
 
 
@@ -168,9 +173,16 @@ public class CometConnectionManagerValve
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
 
+        if (container instanceof Context) {
+            ((Lifecycle) container).removeLifecycleListener(this);
+        }
+
         // The webapp is getting stopped, so all current connections 
         // should be closed
         // Close all Comet connections associated with this session
+        // Note: this will only be done if the container was not a Context
+        // (otherwise, this needs to be done before stop, as the servlet would
+        // be deallocated already)
         Iterator<ConnectionInfo[]> iterator = connections.values().iterator();
         while (iterator.hasNext()) {
             ConnectionInfo[] connectionInfos = iterator.next();
@@ -178,9 +190,6 @@ public class CometConnectionManagerValve
                 for (int i = 0; i < connectionInfos.length; i++) {
                     ConnectionInfo connectionInfo = connectionInfos[i];
                     try {
-                        ((CometEventImpl) connectionInfo.event).setEventType(CometEvent.EventType.END);
-                        ((CometEventImpl) connectionInfo.event).setEventSubType(CometEvent.EventSubType.WEBAPP_RELOAD);
-                        getNext().event(connectionInfo.request, connectionInfo.response, connectionInfo.event);
                         connectionInfo.event.close();
                     } catch (Exception e) {
                         container.getLogger().warn(sm.getString("cometConnectionManagerValve.event"), e);
@@ -188,10 +197,38 @@ public class CometConnectionManagerValve
                 }
             }
         }
+        connections.clear();
 
     }
 
     
+    public void lifecycleEvent(LifecycleEvent event) {
+        if (event.getType() == Lifecycle.BEFORE_STOP_EVENT) {
+            // The webapp is getting stopped, so all current connections 
+            // should be closed
+            // Close all Comet connections associated with this session
+            Iterator<ConnectionInfo[]> iterator = connections.values().iterator();
+            while (iterator.hasNext()) {
+                ConnectionInfo[] connectionInfos = iterator.next();
+                if (connectionInfos != null) {
+                    for (int i = 0; i < connectionInfos.length; i++) {
+                        ConnectionInfo connectionInfo = connectionInfos[i];
+                        try {
+                            ((CometEventImpl) connectionInfo.event).setEventType(CometEvent.EventType.END);
+                            ((CometEventImpl) connectionInfo.event).setEventSubType(CometEvent.EventSubType.WEBAPP_RELOAD);
+                            getNext().event(connectionInfo.request, connectionInfo.response, connectionInfo.event);
+                            connectionInfo.event.close();
+                        } catch (Exception e) {
+                            container.getLogger().warn(sm.getString("cometConnectionManagerValve.event"), e);
+                        }
+                    }
+                }
+            }
+            connections.clear();
+        }
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -328,5 +365,6 @@ public class CometConnectionManagerValve
         public Request request;
         public Response response;
     }
+
 
 }
