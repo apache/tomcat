@@ -31,7 +31,7 @@ public class ListELResolver extends ELResolver {
 			new ArrayList()).getClass();
 
 	public ListELResolver() {
-		this.readOnly = true;
+		this.readOnly = false;
 	}
 
 	public ListELResolver(boolean readOnly) {
