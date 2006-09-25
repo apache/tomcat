@@ -111,6 +111,9 @@ public class ELSupport {
             return obj0.equals(coerceToEnum(obj1, obj0.getClass()));
         } else if (obj1.getClass().isEnum()) {
             return obj1.equals(coerceToEnum(obj0, obj1.getClass()));
+        } else if (obj0 instanceof String || obj1 instanceof String) {
+            int lexCompare = coerceToString(obj0).compareTo(coerceToString(obj1));
+            return (lexCompare == 0) ? true : false;
         }
         if (isBigDecimalOp(obj0, obj1)) {
             BigDecimal bd0 = (BigDecimal) coerceToNumber(obj0, BigDecimal.class);
