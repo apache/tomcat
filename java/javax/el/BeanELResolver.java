@@ -223,8 +223,8 @@ public class BeanELResolver extends ELResolver {
 		}
 
 		public boolean isReadOnly() {
-			return this.write != null
-					|| null == getMethod(type, descriptor.getWriteMethod());
+		    return this.write == null
+		        && (null == (this.write = getMethod(this.owner, descriptor.getWriteMethod())));
 		}
 
 		public Method write(ELContext ctx) {
