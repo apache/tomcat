@@ -203,6 +203,10 @@ public class ContextService extends ResourceBase implements Serializable {
             sb.append(", displayname=");
             sb.append(displayname);
         }
+        if (serviceinterface != null) {
+            sb.append(", serviceinterface=");
+            sb.append(serviceinterface);
+        }
         if (icon != null) {
             sb.append(", icon=");
             sb.append(icon);
