@@ -336,11 +336,11 @@ public class NamingResources implements Serializable {
      * @param service New web service reference
      */
     public void addService(ContextService service) {
-        
+
         if (entries.containsKey(service.getName())) {
             return;
         } else {
-            entries.put(service.getName(), service.getType());
+            entries.put(service.getName(), service.getServiceinterface());
         }
         
         synchronized (services) {
