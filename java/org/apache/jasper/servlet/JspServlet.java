@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.PeriodicEventListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,7 +53,7 @@ import org.apache.jasper.compiler.Localizer;
  * @author Kin-man Chung
  * @author Glenn Nielsen
  */
-public class JspServlet extends HttpServlet {
+public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     // Logger
     private Log log = LogFactory.getLog(JspServlet.class);
@@ -283,6 +284,10 @@ public class JspServlet extends HttpServlet {
     }
 
 
+    public void periodicEvent() {
+        rctxt.checkCompile();
+    }
+
     // -------------------------------------------------------- Private Methods
 
     private void serviceJspFile(HttpServletRequest request,
@@ -314,5 +319,6 @@ public class JspServlet extends HttpServlet {
         wrapper.service(request, response, precompile);
 
     }
+
 
 }
