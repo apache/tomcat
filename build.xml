@@ -179,7 +179,7 @@
     <!-- Catalina Main JAR File -->
     <jar jarfile="${catalina.jar}">
       <fileset dir="${tomcat.classes}">
-        <include name="org/apache/AnnotationProcessor.class" />
+        <include name="org/apache/*" />
         <include name="org/apache/catalina/**" />
         <include name="org/apache/naming/**" />
         <!-- Javadoc and i18n exclusions -->
@@ -242,7 +242,7 @@
     <!-- Jasper Implementation JAR File -->
     <jar  jarfile="${jasper.jar}">
       <fileset dir="${tomcat.classes}">
-        <include name="org/apache/AnnotationProcessor.class" />
+        <include name="org/apache/*" />
         <include name="org/apache/jasper/**" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
