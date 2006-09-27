@@ -38,6 +38,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
@@ -601,6 +602,22 @@ public class Response
         if (usingOutputStream)
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.getWriter.ise"));
+
+        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            /*
+             * If the response's character encoding has not been specified as
+             * described in <code>getCharacterEncoding</code> (i.e., the method
+             * just returns the default value <code>ISO-8859-1</code>),
+             * <code>getWriter</code> updates it to <code>ISO-8859-1</code>
+             * (with the effect that a subsequent call to getContentType() will
+             * include a charset=ISO-8859-1 component which will also be
+             * reflected in the Content-Type response header, thereby satisfying
+             * the Servlet spec requirement that containers must communicate the
+             * character encoding used for the servlet response's writer to the
+             * client).
+             */
+            setCharacterEncoding(getCharacterEncoding());
+        }
 
         usingWriter = true;
         outputBuffer.checkConverter();
