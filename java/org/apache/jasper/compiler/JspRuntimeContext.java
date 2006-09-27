@@ -25,8 +25,6 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.cert.Certificate;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,7 +54,7 @@ import org.apache.jasper.servlet.JspServletWrapper;
  * @author Glenn L. Nielsen
  * @version $Revision: 306189 $
  */
-public final class JspRuntimeContext implements Runnable {
+public final class JspRuntimeContext {
 
     // Logger
     private Log log = LogFactory.getLog(JspRuntimeContext.class);
@@ -124,13 +122,7 @@ public final class JspRuntimeContext implements Runnable {
         if (!options.getDevelopment()
                 && appBase != null
                 && options.getCheckInterval() > 0) {
-            if (appBase.endsWith(File.separator) ) {
-                appBase = appBase.substring(0,appBase.length()-1);
-            }
-            String directory =
-                appBase.substring(appBase.lastIndexOf(File.separator));
-            threadName = threadName + "[" + directory + "]";
-            threadStart();
+            lastCheck = System.currentTimeMillis();
         }                                            
     }
 
@@ -145,29 +137,13 @@ public final class JspRuntimeContext implements Runnable {
     private PermissionCollection permissionCollection;
     private CodeSource codeSource;                    
     private String classpath;
+    private long lastCheck = -1L;
 
     /**
      * Maps JSP pages to their JspServletWrapper's
      */
     private Map<String, JspServletWrapper> jsps = new ConcurrentHashMap<String, JspServletWrapper>();
  
-
-    /**
-     * The background thread.
-     */
-    private Thread thread = null;
-
-
-    /**
-     * The background thread completion semaphore.
-     */
-    private boolean threadDone = false;
-
-
-    /**
-     * Name to register for the background thread.
-     */
-    private String threadName = "JspRuntimeContext";
 
     // ------------------------------------------------------ Public Methods
 
@@ -243,8 +219,6 @@ public final class JspRuntimeContext implements Runnable {
      * Process a "destory" event for this web application context.
      */                                                        
     public void destroy() {
-        threadStop();
-
         Iterator servlets = jsps.values().iterator();
         while (servlets.hasNext()) {
             ((JspServletWrapper) servlets.next()).destroy();
@@ -277,13 +251,23 @@ public final class JspRuntimeContext implements Runnable {
     }
 
 
-    // -------------------------------------------------------- Private Methods
-
     /**
      * Method used by background thread to check the JSP dependencies
      * registered with this class for JSP's.
      */
-    private void checkCompile() {
+    public void checkCompile() {
+
+        if (lastCheck < 0) {
+            // Checking was disabled
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (now > (lastCheck + (options.getCheckInterval() * 1000L))) {
+            lastCheck = now;
+        } else {
+            return;
+        }
+        
         Object [] wrappers = jsps.values().toArray();
         for (int i = 0; i < wrappers.length; i++ ) {
             JspServletWrapper jsw = (JspServletWrapper)wrappers[i];
@@ -301,6 +285,7 @@ public final class JspRuntimeContext implements Runnable {
                 }
             }
         }
+
     }
 
     /**
@@ -309,6 +294,10 @@ public final class JspRuntimeContext implements Runnable {
     public String getClassPath() {
         return classpath;
     }
+
+
+    // -------------------------------------------------------- Private Methods
+
 
     /**
      * Method used to initialize classpath for compiles.
@@ -432,93 +421,5 @@ public final class JspRuntimeContext implements Runnable {
         }
     }
 
-
-    // -------------------------------------------------------- Thread Support
-
-    /**
-     * Start the background thread that will periodically check for
-     * changes to compile time included files in a JSP.
-     *
-     * @exception IllegalStateException if we should not be starting
-     *  a background thread now
-     */
-    protected void threadStart() {
-
-        // Has the background thread already been started?
-        if (thread != null) {
-            return;
-        }
-
-        // Start the background thread
-        threadDone = false;
-        thread = new Thread(this, threadName);
-        thread.setDaemon(true);
-        thread.start();
-
-    }
-
-
-    /**
-     * Stop the background thread that is periodically checking for
-     * changes to compile time included files in a JSP.
-     */ 
-    protected void threadStop() {
-
-        if (thread == null) {
-            return;
-        }
-
-        threadDone = true;
-        thread.interrupt();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            ;
-        }
-        
-        thread = null;
-        
-    }
-
-    /**
-     * Sleep for the duration specified by the <code>checkInterval</code>
-     * property.
-     */ 
-    protected void threadSleep() {
-        
-        try {
-            Thread.sleep(options.getCheckInterval() * 1000L);
-        } catch (InterruptedException e) {
-            ;
-        }
-        
-    }   
-    
-    
-    // ------------------------------------------------------ Background Thread
-        
-        
-    /**
-     * The background thread that checks for changes to files
-     * included by a JSP and flags that a recompile is required.
-     */ 
-    public void run() {
-        
-        // Loop until the termination semaphore is set
-        while (!threadDone) {
-
-            // Wait for our check interval
-            threadSleep();
-
-            // Check for included files which are newer than the
-            // JSP which uses them.
-            try {
-                checkCompile();
-            } catch (Throwable t) {
-                log.error("Exception checking if recompile needed: ", t);
-            }
-        }
-        
-    }
 
 }

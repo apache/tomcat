@@ -47,6 +47,7 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.PeriodicEventListener;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
@@ -651,6 +652,23 @@ public class StandardWrapper
     // --------------------------------------------------------- Public Methods
 
 
+    /**
+     * Execute a periodic task, such as reloading, etc. This method will be
+     * invoked inside the classloading context of this container. Unexpected
+     * throwables will be caught and logged.
+     */
+    public void backgroundProcess() {
+        super.backgroundProcess();
+        
+        if (!started)
+            return;
+        
+        if (getServlet() != null && (getServlet() instanceof PeriodicEventListener)) {
+            ((PeriodicEventListener) getServlet()).periodicEvent();
+        }
+    }
+    
+    
     /**
      * Extract the root cause from a servlet exception.
      * 
