@@ -495,8 +495,8 @@
 
 
   <!-- ==================== RELEASE: Create Release ======================= -->
-  <target name="release" depends="clean,dist-static,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,package-admin-zip,package-admin-tgz,dist-source,dist-javadoc,package-docs-tgz,package-src-zip,package-src-tgz"
-   description="Create a Tomcat 5 packaged distribution">
+  <target name="release" depends="clean,dist-static,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,dist-source,dist-javadoc,package-docs-tgz,package-src-zip,package-src-tgz"
+   description="Create a Tomcat 6 packaged distribution">
 
     <filter token="VERSION" value="${version}"/>
     <copy file="KEYS"
