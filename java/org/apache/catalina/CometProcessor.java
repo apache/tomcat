@@ -25,6 +25,8 @@ import javax.servlet.ServletException;
  * This interface should be implemented by servlets which would like to handle
  * asynchronous IO, recieving events when data is available for reading, and
  * being able to output data without the need for being invoked by the container.
+ * Note: When this interface is implemented, the service method of the servlet will
+ * never be called, and will be replaced with a begin event.
  */
 public interface CometProcessor {
 
