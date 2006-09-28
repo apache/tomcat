@@ -75,6 +75,12 @@ public interface Options {
     public boolean getDevelopment();
 
     /**
+     * Should we include a source fragment in exception messages, which could be displayed
+     * to the developer ?
+     */
+    public boolean getDisplaySourceFragment();
+
+    /**
      * Is the generation of SMAP info for JSR45 debugging suppressed?
      */
     public boolean isSmapSuppressed();

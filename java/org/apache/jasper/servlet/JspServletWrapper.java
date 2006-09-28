@@ -515,43 +515,49 @@ public class JspServletWrapper {
                     throw new JasperException(ex);
                 }
 
-                // Read both files in, so we can inspect them
-                String[] jspLines = readFile
+                if (options.getDisplaySourceFragment()) {
+
+                    // Read both files in, so we can inspect them
+                    String[] jspLines = readFile
                     (this.ctxt.getResourceAsStream(this.ctxt.getJspFile()));
 
-                String[] javaLines = readFile
+                    String[] javaLines = readFile
                     (new FileInputStream(this.ctxt.getServletJavaFileName()));
 
-                // If the line contains the opening of a multi-line scriptlet
-                // block, then the JSP line number we got back is probably
-                // faulty.  Scan forward to match the java line...
-                if (jspLines[jspLineNumber-1].lastIndexOf("<%") >
+                    // If the line contains the opening of a multi-line scriptlet
+                    // block, then the JSP line number we got back is probably
+                    // faulty.  Scan forward to match the java line...
+                    if (jspLines[jspLineNumber-1].lastIndexOf("<%") >
                     jspLines[jspLineNumber-1].lastIndexOf("%>")) {
-                    String javaLine = javaLines[javaLineNumber-1].trim();
+                        String javaLine = javaLines[javaLineNumber-1].trim();
 
-                    for (int i=jspLineNumber-1; i<jspLines.length; i++) {
-                        if (jspLines[i].indexOf(javaLine) != -1) {
-                            jspLineNumber = i+1;
-                            break;
+                        for (int i=jspLineNumber-1; i<jspLines.length; i++) {
+                            if (jspLines[i].indexOf(javaLine) != -1) {
+                                jspLineNumber = i+1;
+                                break;
+                            }
                         }
                     }
+
+                    // copy out a fragment of JSP to display to the user
+                    StringBuffer buffer = new StringBuffer(1024);
+                    int startIndex = Math.max(0, jspLineNumber-1-3);
+                    int endIndex = Math.min(jspLines.length-1, jspLineNumber-1+3);
+
+                    for (int i=startIndex;i<=endIndex; ++i) {
+                        buffer.append(i+1);
+                        buffer.append(": ");
+                        buffer.append(jspLines[i]);
+                        buffer.append("\n");
+                    }
+
+                    return new JasperException(Localizer.getMessage
+                            ("jsp.exception", detail.getJspFileName(), "" + jspLineNumber) + "\n" + buffer, ex);
+                    
+                } else {
+                    return new JasperException(Localizer.getMessage
+                            ("jsp.exception", detail.getJspFileName(), "" + jspLineNumber), ex);
                 }
-
-                // copy out a fragment of JSP to display to the user
-                StringBuffer buffer = new StringBuffer(1024);
-                int startIndex = Math.max(0, jspLineNumber-1-3);
-                int endIndex = Math.min(jspLines.length-1, jspLineNumber-1+3);
-
-                for (int i=startIndex;i<=endIndex; ++i) {
-                    buffer.append(i+1);
-                    buffer.append(": ");
-                    buffer.append(jspLines[i]);
-                    buffer.append("\n");
-                }
-
-                return new JasperException(
-                                           "Exception in JSP: " + detail.getJspFileName() + ":" +
-                                           jspLineNumber + "\n\n" + buffer + "\n\nStacktrace:", ex);
             }
         } catch (Exception je) {
             // If anything goes wrong, just revert to the original behaviour

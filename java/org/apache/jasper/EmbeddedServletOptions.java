@@ -179,6 +179,13 @@ public final class EmbeddedServletOptions implements Options {
      */
     private boolean xpoweredBy;
     
+    /**
+     * Should we include a source fragment in exception messages, which could be displayed
+     * to the developer ?
+     */
+    private boolean displaySourceFragment = true;
+
+    
     public String getProperty(String name ) {
         return settings.getProperty( name );
     }
@@ -365,6 +372,14 @@ public final class EmbeddedServletOptions implements Options {
     
     public Map getCache() {
         return null;
+    }
+
+    /**
+     * Should we include a source fragment in exception messages, which could be displayed
+     * to the developer ?
+     */
+    public boolean getDisplaySourceFragment() {
+        return displaySourceFragment;
     }
 
     /**
@@ -649,6 +664,19 @@ public final class EmbeddedServletOptions implements Options {
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.xpoweredBy"));
+                }
+            }
+        }
+        
+        String displaySourceFragment = config.getInitParameter("displaySourceFragment"); 
+        if (displaySourceFragment != null) {
+            if (displaySourceFragment.equalsIgnoreCase("true")) {
+                this.displaySourceFragment = true;
+            } else if (displaySourceFragment.equalsIgnoreCase("false")) {
+                this.displaySourceFragment = false;
+            } else {
+                if (log.isWarnEnabled()) {
+                    log.warn(Localizer.getMessage("jsp.warning.displaySourceFragment"));
                 }
             }
         }
