@@ -213,15 +213,8 @@ public class WebdavServlet
 
         super.init();
 
-        String value = null;
-        try {
-            value = getServletConfig().getInitParameter("secret");
-            if (value != null)
-                secret = value;
-        } catch (Throwable t) {
-            ;
-        }
-
+        if (getServletConfig().getInitParameter("secret") != null)
+            secret = getServletConfig().getInitParameter("secret");
 
         // Load the MD5 helper used to calculate signatures.
         try {
@@ -415,9 +408,10 @@ public class WebdavServlet
                     break;
                 }
             }
-        } catch(Exception e) {
+        } catch (SAXException e) {
             // Most likely there was no content : we use the defaults.
-            // TODO : Enhance that !
+        } catch (IOException e) {
+            // Most likely there was no content : we use the defaults.
         }
 
         if (type == FIND_BY_PROPERTY) {
@@ -862,7 +856,9 @@ public class WebdavServlet
             // Get the root element of the document
             Element rootElement = document.getDocumentElement();
             lockInfoNode = rootElement;
-        } catch(Exception e) {
+        } catch (IOException e) {
+            lockRequestType = LOCK_REFRESH;
+        } catch (SAXException e) {
             lockRequestType = LOCK_REFRESH;
         }
 
