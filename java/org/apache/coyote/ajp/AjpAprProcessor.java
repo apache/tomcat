@@ -73,7 +73,7 @@ public class AjpAprProcessor implements ActionHook {
     // ----------------------------------------------------------- Constructors
 
 
-    public AjpAprProcessor(AprEndpoint endpoint) {
+    public AjpAprProcessor(int packetSize, AprEndpoint endpoint) {
 
         this.endpoint = endpoint;
 
@@ -85,6 +85,10 @@ public class AjpAprProcessor implements ActionHook {
         response.setOutputBuffer(new SocketOutputBuffer());
         request.setResponse(response);
 
+        requestHeaderMessage = new AjpMessage(packetSize);
+        responseHeaderMessage = new AjpMessage(packetSize);
+        bodyMessage = new AjpMessage(packetSize);
+        
         if (endpoint.getFirstReadTimeout() > 0) {
             readTimeout = endpoint.getFirstReadTimeout() * 1000;
         } else {
@@ -92,9 +96,9 @@ public class AjpAprProcessor implements ActionHook {
         }
 
         // Allocate input and output buffers
-        inputBuffer = ByteBuffer.allocateDirect(Constants.MAX_PACKET_SIZE * 2);
+        inputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
         inputBuffer.limit(0);
-        outputBuffer = ByteBuffer.allocateDirect(Constants.MAX_PACKET_SIZE * 2);
+        outputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
 
         // Cause loading of HexUtils
         int foo = HexUtils.DEC[0];
@@ -131,19 +135,19 @@ public class AjpAprProcessor implements ActionHook {
      * processing of the first message of a "request", so it might not be a request
      * header. It will stay unchanged during the processing of the whole request.
      */
-    protected AjpMessage requestHeaderMessage = new AjpMessage();
+    protected AjpMessage requestHeaderMessage = null;
 
 
     /**
      * Message used for response header composition.
      */
-    protected AjpMessage responseHeaderMessage = new AjpMessage();
+    protected AjpMessage responseHeaderMessage = null;
 
 
     /**
      * Body message.
      */
-    protected AjpMessage bodyMessage = new AjpMessage();
+    protected AjpMessage bodyMessage = null;
 
 
     /**
@@ -267,7 +271,7 @@ public class AjpAprProcessor implements ActionHook {
     static {
 
         // Set the get body message buffer
-        AjpMessage getBodyMessage = new AjpMessage();
+        AjpMessage getBodyMessage = new AjpMessage(128);
         getBodyMessage.reset();
         getBodyMessage.appendByte(Constants.JK_AJP13_GET_BODY_CHUNK);
         getBodyMessage.appendInt(Constants.MAX_READ_SIZE);
@@ -278,7 +282,7 @@ public class AjpAprProcessor implements ActionHook {
                 getBodyMessage.getLen());
 
         // Set the read body message buffer
-        AjpMessage pongMessage = new AjpMessage();
+        AjpMessage pongMessage = new AjpMessage(128);
         pongMessage.reset();
         pongMessage.appendByte(Constants.JK_AJP13_CPONG_REPLY);
         pongMessage.end();
@@ -287,7 +291,7 @@ public class AjpAprProcessor implements ActionHook {
                 pongMessage.getLen());
 
         // Allocate the end message array
-        AjpMessage endMessage = new AjpMessage();
+        AjpMessage endMessage = new AjpMessage(128);
         endMessage.reset();
         endMessage.appendByte(Constants.JK_AJP13_END_RESPONSE);
         endMessage.appendByte(1);
@@ -347,8 +351,6 @@ public class AjpAprProcessor implements ActionHook {
 
         // Error flag
         error = false;
-
-        long soTimeout = endpoint.getSoTimeout();
 
         int limit = 0;
         if (endpoint.getFirstReadTimeout() > 0) {
