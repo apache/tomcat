@@ -47,13 +47,21 @@ public class AjpMessage {
         StringManager.getManager(Constants.Package);
 
 
+    // ------------------------------------------------------------ Constructor
+
+    
+    public AjpMessage(int packetSize) {
+        buf = new byte[packetSize];
+    }
+    
+
     // ----------------------------------------------------- Instance Variables
 
 
     /**
      * Fixed size buffer.
      */
-    protected byte buf[] = new byte[8 * 1024];
+    protected byte buf[] = null;
 
 
     /**

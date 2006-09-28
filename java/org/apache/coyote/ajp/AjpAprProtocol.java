@@ -108,6 +108,12 @@ public class AjpAprProtocol
 
 
     /**
+     * AJP packet size.
+     */
+    protected int packetSize = Constants.MAX_PACKET_SIZE;
+
+    
+    /**
      * Adapter which will process the requests recieved by this endpoint.
      */
     private Adapter adapter;
@@ -417,6 +423,16 @@ public class AjpAprProtocol
     }
     
     
+    public int getPacketSize() {
+        return packetSize;
+    }
+
+
+    public void setPacketSize(int i) {
+        packetSize = i;
+    }
+
+    
     // --------------------------------------  AjpConnectionHandler Inner Class
 
 
@@ -424,7 +440,7 @@ public class AjpAprProtocol
         protected AjpAprProtocol proto;
         protected static int count = 0;
         protected RequestGroupInfo global=new RequestGroupInfo();
-        protected ThreadLocal localProcessor = new ThreadLocal();
+        protected ThreadLocal<AjpAprProcessor> localProcessor = new ThreadLocal<AjpAprProcessor>();
 
         public AjpConnectionHandler(AjpAprProtocol proto) {
             this.proto = proto;
@@ -438,9 +454,9 @@ public class AjpAprProtocol
         public SocketState process(long socket) {
             AjpAprProcessor processor = null;
             try {
-                processor = (AjpAprProcessor) localProcessor.get();
+                processor = localProcessor.get();
                 if (processor == null) {
-                    processor = new AjpAprProcessor(proto.ep);
+                    processor = new AjpAprProcessor(proto.packetSize, proto.ep);
                     processor.setAdapter(proto.adapter);
                     processor.setTomcatAuthentication(proto.tomcatAuthentication);
                     processor.setRequiredSecret(proto.requiredSecret);
