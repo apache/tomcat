@@ -74,7 +74,7 @@ extern "C" {
  *  This symbol is defined for internal, "development" copies of TCN. This
  *  symbol will be #undef'd for releases.
  */
-#define TCN_IS_DEV_VERSION
+#undef TCN_IS_DEV_VERSION
 
 
 /** The formatted string of APU's version */
