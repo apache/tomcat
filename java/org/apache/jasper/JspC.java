@@ -385,6 +385,10 @@ public class JspC implements Options {
         this.xpoweredBy = xpoweredBy;
     }
 
+    public boolean getDisplaySourceFragment() {
+        return true;
+    }
+    
     public boolean getErrorOnUseBeanInvalidClassAttribute() {
         return errorOnUseBeanInvalidClassAttribute;
     }
