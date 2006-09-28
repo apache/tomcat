@@ -78,33 +78,40 @@ public interface CometEvent {
     
     
     /**
-     * Returns the HttpServletRequest or the last HttpServletRequestWrapper if a filter was applied
+     * Returns the HttpServletRequest.
+     * 
      * @return HttpServletRequest
      */
     public HttpServletRequest getHttpServletRequest();
     
     /**
-     * Returns the HttpServletResponse or the last HttpServletResponseWrapper
+     * Returns the HttpServletResponse.
+     * 
      * @return HttpServletResponse
      */
     public HttpServletResponse getHttpServletResponse();
     
     /**
-     * Returns the event type
+     * Returns the event type.
+     * 
      * @return EventType
      */
     public EventType getEventType();
     
     /**
-     * Returns 
+     * Returns the sub type of this event.
+     * 
      * @return EventSubType
      */
     public EventSubType getEventSubType();
     
     /**
      * Ends the Comet session. This signals to the container that 
-     * the container wants to end the comet session.
-     * The container may invoke event(CometEvent.END) synchronously or asynchronously
+     * the container wants to end the comet session. This will send back to the
+     * client a notice that the server has no more data to send as part of this
+     * request. The servlet should perform any needed cleanup as if it had recieved
+     * an END or ERROR event. 
+     * 
      * @throws IOException if an IO exception occurs
      */
     public void close() throws IOException;
@@ -119,6 +126,7 @@ public interface CometEvent {
      * web application SHOULD NOT attempt to reuse the request and response objects after a timeout
      * as the <code>error(HttpServletRequest, HttpServletResponse)</code> method indicates.<br/>
      * This method should not be called asynchronously, as that will have no effect.
+     * 
      * @param timeout The timeout in milliseconds for this connection, must be a positive value, larger than 0
      * @throws IOException An IOException may be thrown to indicate an IO error, 
      *         or that the EOF has been reached on the connection
