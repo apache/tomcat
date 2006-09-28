@@ -178,7 +178,11 @@ TCN_IMPLEMENT_CALL(jint, Poll, add)(TCN_STDARGS, jlong pollset,
     fd.reqevents = (apr_int16_t)reqevents;
     fd.desc.s    = s->sock;
     fd.client_data = s;
-    p->socket_ttl[p->nelts] = apr_time_now();
+    if (p->max_ttl > 0)
+        p->socket_ttl[p->nelts] = apr_time_now();
+    else
+        p->socket_ttl[p->nelts] = 0;
+
     p->socket_set[p->nelts] = fd;
     p->nelts++;
 #ifdef TCN_DO_STATISTICS
@@ -219,6 +223,18 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
     return apr_pollset_remove(p->pollset, fd);
 }
 
+static void remove_all(tcn_pollset_t *p)
+{
+    apr_int32_t i;
+    for (i = 0; i < p->nelts; i++) {
+        apr_pollset_remove(p->pollset, &(p->socket_set[i]));
+#ifdef TCN_DO_STATISTICS
+        p->sp_removed++;
+#endif
+    }
+    p->nelts = 0;
+}
+
 TCN_IMPLEMENT_CALL(jint, Poll, remove)(TCN_STDARGS, jlong pollset,
                                        jlong socket)
 {
@@ -257,7 +273,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
      p->sp_poll++;
 #endif
 
-    if (timeout > 0) {
+    if (ptime > 0 && p->max_ttl >= 0) {
         apr_time_t now = apr_time_now();
 
         /* Find the minimum timeout */
@@ -272,6 +288,8 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
             }
         }
     }
+    else if (ptime < 0)
+        ptime = 0;
     for (;;) {
         rv = apr_pollset_poll(p->pollset, ptime, &num, &fd);
         if (rv != APR_SUCCESS) {
@@ -341,6 +359,19 @@ TCN_IMPLEMENT_CALL(jint, Poll, maintain)(TCN_STDARGS, jlong pollset,
                 fd.desc.s = (J2P(p->set[i], tcn_socket_t *))->sock;
                 do_remove(p, &fd);
             }
+        }
+    }
+    else if (p->max_ttl == 0) {
+        for (i = 0; i < p->nelts; i++) {
+            fd = p->socket_set[i];
+            p->set[num++] = P2J(fd.client_data);
+        }
+        if (remove) {
+            remove_all(p);
+#ifdef TCN_DO_STATISTICS
+            p->sp_maintained += num;
+            p->sp_max_maintained = TCN_MAX(p->sp_max_maintained, num);
+#endif
         }
     }
     if (num)
