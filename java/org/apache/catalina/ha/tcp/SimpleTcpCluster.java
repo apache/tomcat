@@ -37,18 +37,17 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
-import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterValve;
+import org.apache.catalina.ha.session.DeltaManager;
+import org.apache.catalina.ha.util.IDynamicProperty;
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
-
-import org.apache.catalina.ha.session.DeltaManager;
-import org.apache.catalina.ha.util.IDynamicProperty;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
 import org.apache.commons.logging.Log;
@@ -147,8 +146,7 @@ public class SimpleTcpCluster
      */
     protected Map managers = new HashMap();
 
-    private String managerClassName = "org.apache.catalina.ha.session.DeltaManager";
-
+    protected ClusterManager managerTemplate = new DeltaManager();
 
     private List valves = new ArrayList();
 
@@ -252,14 +250,20 @@ public class SimpleTcpCluster
                 this.notifyLifecycleListenerOnFailure);
     }
 
+    /**
+     * @deprecated use getManagerTemplate().getClass().getName() instead.
+     * @return String
+     */
     public String getManagerClassName() {
-        if(managerClassName != null)
-            return managerClassName;
-        return (String)getProperty("manager.className");
+        return managerTemplate.getClass().getName();
     }
 
+    /**
+     * @deprecated use nested &lt;Manager&gt; element inside the cluster config instead.
+     * @param managerClassName String
+     */
     public void setManagerClassName(String managerClassName) {
-        this.managerClassName = managerClassName;
+        log.warn("setManagerClassName is deprecated, use nested <Manager> element inside the <Cluster> element instead, this request will be ignored.");
     }
 
     /**
@@ -335,6 +339,10 @@ public class SimpleTcpCluster
 
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    public void setManagerTemplate(ClusterManager managerTemplate) {
+        this.managerTemplate = managerTemplate;
     }
 
     /**
@@ -465,6 +473,10 @@ public class SimpleTcpCluster
         return channel;
     }
 
+    public ClusterManager getManagerTemplate() {
+        return managerTemplate;
+    }
+
     /**
      * Create new Manager without add to cluster (comes with start the manager)
      * 
@@ -477,26 +489,25 @@ public class SimpleTcpCluster
     public synchronized Manager createManager(String name) {
         if (log.isDebugEnabled()) log.debug("Creating ClusterManager for context " + name + " using class " + getManagerClassName());
         Manager manager = null;
-        ClassLoader oldCtxLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Thread.currentThread().setContextClassLoader(SimpleTcpCluster.class.getClassLoader());
-            manager = (Manager) getClass().getClassLoader().loadClass(getManagerClassName()).newInstance();
+            manager = managerTemplate.cloneFromTemplate();
         } catch (Exception x) {
-            log.error("Unable to load class for replication manager", x);
+            log.error("Unable to clone cluster manager, defaulting to org.apache.catalina.ha.session.DeltaManager", x);
             manager = new org.apache.catalina.ha.session.DeltaManager();
         } finally {
-            Thread.currentThread().setContextClassLoader(oldCtxLoader);
-            if(manager != null) {
-                manager.setDistributable(true);
-                if (manager instanceof ClusterManager) {
-                    ClusterManager cmanager = (ClusterManager) manager ;
-                    cmanager.setDefaultMode(true);
-                    cmanager.setName(getManagerName(name,manager));
-                    cmanager.setCluster(this);
-                }
-            }
+            if(manager != null) registerManager(manager);
         }
         return manager;
+    }
+    
+    public void registerManager(Manager manager) {
+        manager.setDistributable(true);
+        if (manager instanceof ClusterManager) {
+            ClusterManager cmanager = (ClusterManager) manager ;
+            cmanager.setDefaultMode(true);
+            cmanager.setName(getManagerName(((ClusterManager)manager).getName(),manager));
+            cmanager.setCluster(this);
+        }
     }
 
     /**

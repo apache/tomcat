@@ -85,7 +85,16 @@ public class ClusterRuleSet extends RuleSetBase {
      */
     public void addRuleInstances(Digester digester) {
         //Cluster configuration start
+        digester.addObjectCreate(prefix + "Manager",
+                                 null, // MUST be specified in the element
+                                 "className");
+        digester.addSetProperties(prefix + "Manager");
+        digester.addSetNext(prefix + "Manager",
+                            "setManagerTemplate",
+                            "org.apache.catalina.ha.ClusterManager");
         
+
+
         digester.addObjectCreate(prefix + "Channel",
                                  null, // MUST be specified in the element
                                  "className");

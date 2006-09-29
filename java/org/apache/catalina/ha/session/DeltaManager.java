@@ -43,6 +43,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
+import org.apache.catalina.ha.ClusterManager;
 
 /**
  * The DeltaManager manages replicated sessions by only replicating the deltas
@@ -1496,4 +1497,23 @@ public class DeltaManager extends ClusterManagerBase{
         cluster.send(newmsg, sender);
     }
 
+    public ClusterManager cloneFromTemplate() {
+        DeltaManager result = new DeltaManager();
+        result.name = "Clone-from-"+name;
+        result.cluster = cluster;
+        result.replicationValve = replicationValve;
+        result.maxActiveSessions = maxActiveSessions;
+        result.expireSessionsOnShutdown = expireSessionsOnShutdown;
+        result.notifyListenersOnReplication = notifyListenersOnReplication;
+        result.notifySessionListenersOnReplication = notifySessionListenersOnReplication;
+        result.stateTransferTimeout = stateTransferTimeout;
+        result.sendAllSessions = sendAllSessions;
+        result.sendClusterDomainOnly = sendClusterDomainOnly ;
+        result.sendAllSessionsSize = sendAllSessionsSize;
+        result.sendAllSessionsWaitTime = sendAllSessionsWaitTime ; 
+        result.receiverQueue = receiverQueue ;
+        result.stateTimestampDrop = stateTimestampDrop ;
+        result.stateTransferCreateSendTime = stateTransferCreateSendTime; 
+        return result;
+    }
 }

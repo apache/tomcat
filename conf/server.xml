@@ -192,11 +192,11 @@
         -->
         
         <!--
-        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-	         managerClassName="org.apache.catalina.cluster.session.DeltaManager"
-                 expireSessionsOnShutdown="false"
-                 useDirtyFlag="true"
-                 notifyListenersOnReplication="true">
+        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+          <Manager className="org.apache.catalina.ha.session.DeltaManager"
+                   expireSessionsOnShutdown="false"
+                   notifyListenersOnReplication="true"/>
+        
           <Channel className="org.apache.catalina.tribes.group.GroupChannel">
             <Membership className="org.apache.catalina.tribes.membership.McastService"
                         mcastAddr="228.0.0.4"
@@ -215,7 +215,7 @@
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
-	  </Channel>
+          </Channel>
 
           <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
                  filter=".*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;"/>

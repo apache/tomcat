@@ -687,4 +687,8 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         return cluster;
     }
 
+    public ClusterManager cloneFromTemplate() {
+        throw new UnsupportedOperationException();
+    }
+
 }

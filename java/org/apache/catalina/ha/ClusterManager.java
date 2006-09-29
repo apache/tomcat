@@ -107,4 +107,5 @@ public interface ClusterManager extends Manager {
    
    public boolean isNotifyListenersOnReplication();
 
+   public ClusterManager cloneFromTemplate();
 }
