@@ -3276,7 +3276,7 @@ class Generator {
         out.printil("out = _jspx_out;");
         out.printil("if (out != null && out.getBufferSize() != 0)");
         out.pushIndent();
-        out.printil("try { out.clearBuffer(); } catch (java.io.IOException e) {}");
+        out.printil("out.clearBuffer();");
         out.popIndent();
 
         out

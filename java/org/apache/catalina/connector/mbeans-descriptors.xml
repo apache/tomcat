@@ -93,10 +93,6 @@
           description="Maximum number of Keep-Alive requests to honor per connection"
                  type="int"/>
 
-    <attribute   name="keepAliveTimeout"
-          description="The number of seconds Tomcat will wait for a subsequent request before closing the connection"
-                 type="int"/>
-
     <attribute   name="maxPostSize"
           description="Maximum size in bytes of a POST which will be handled by the servlet API provided features"
                  type="int"/>
