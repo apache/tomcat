@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="cluster-valve.html">
+
+  &project;
+
+  <properties>
+    <author email="fhanik@apache.org">Filip Hanik</author>
+    <title>The Channel object</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  
+
+</section>
+
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+  <attributes>
+ 
+    <attribute name="className" required="true">
+
+    </attribute>
+
+
+  </attributes>
+
+
+  </subsection>
+
+
+</section>
+
+
+</body>
+
+</document>
