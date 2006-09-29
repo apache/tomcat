@@ -69,7 +69,7 @@ public class TestDataIntegrity extends TestCase {
         for (int x=0; x<threads.length; x++ ) { threads[x].join();}
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<30000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<120000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
         System.err.println("Finished NO_ACK");
         assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
