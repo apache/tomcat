@@ -15,32 +15,117 @@
 
 
 <section name="Introduction">
-
-  
-
+  <p>
+  The tomcat cluster implementation provides session replication, context attribute replication and
+  cluster wide WAR file deployment.
+  While the <code>Cluster</code> configuration is fairly complex, the default configuration will work
+  for most people out of the box. </p><p>
+  The Tomcat Cluster implementation is very extensible, and hence we have exposed a myriad of options,
+  making the configuration seem like a lot, but don't lose faith, instead you have a tremendous control
+  over what is going on.</p>
+</section>
+<section name="Context Attribute Replication">
+  <p>To configure context attribute replication, simply do this by swapping out the context implementation
+  used for your application context.
+    <source>&lt;Context className=&quot;org.apache.catalina.ha.context.ReplicatedContext&quot;/&gt;</source>
+    This context extends the Tomcat <code><a href="context.html">StandardContext</a></code>
+    so all the options from the <a href="context.html">base implementation</a> are valid.
+  </p>
+</section>
+<section name="Nested Components">
+  <p><b><a href="cluster-manager.html">Manager</a>:</b> <br/>
+    The manager element identifies what kind of session manager is used in this cluster implementation.
+    This manager configuration is identical to the one you would use in a regular <code><a href="context.html#Nested%20xComponents">&lt;Context&gt;</a></code> configuration.
+    <br/>The default value is the <code>org.apache.catalina.ha.session.DeltaManager</code> that is closely coupled with
+    the <code>SimpleTcpCluster</code> implementation. Other managers like the <code>org.apache.catalina.ha.session.BackupManager</code>
+    are/could be loosely coupled and don't rely on the <code>SimpleTcpCluster</code> for its data replication.
+  </p>
+  <p><b><a href="cluster-channel.html">Channel</a>:</b> <br/>
+    The Channel and its sub components are all part of the IO layer 
+    for the cluster group, and is a module in it's own that we have nick named &quot;Tribes&quot;
+    <br/>Any configuring and tuning of the network layer will be done in the channel and its nested components.
+         You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
+         
+  </p>
+  <p><b><a href="cluster-membership.html">Channel/Membership</a>:</b> <br/>
+    The Membership component is responsible for auto discovering new nodes in the cluster
+    and also to provide for notifications for any nodes that have not responded with a heartbeat.
+    The default implementation uses multicast.<br/>
+    You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
+  </p>
+  <p><b><a href="cluster-sender.html">Channel/Sender</a>:</b> <br/>
+    The Sender component manages all outbound connections and data messages that are sent 
+    over the network from one node to another.
+    This component allows messages to be sent in parallel.
+    The default implementation uses TCP client sockets.<br/>
+    You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
+  </p>
+  <p><b><a href="cluster-sender.html#transport">Channel/Sender/Transport</a>:</b> <br/>
+    The Transport component is the bottom IO layer for the sender component.
+    The default implementation uses non-blocking TCP client sockets.<br/>
+    You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
+  </p>
+  <p><b><a href="cluster-receiver.html">Channel/Receiver</a>:</b> <br/>
+    The receiver component listens for messages from other nodes.
+    Here you will configure the cluster thread pool, as it will dispatch incoming
+    messages to a thread pool for faster processing.
+    The default implementation uses non-blocking TCP server sockets.<br/>
+    You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
+  </p>
+  <p><b><a href="cluster-interceptor.html">Channel/Interceptor</a>:</b> <br/>
+    The channel will send messages through an interceptor stack. Because of this, you have the ability to 
+    customize the way messages are sent and received, and even how membership is handled.<br/>
+    You can always find out more about <a href="../tribes/introduction.html">Apache Tribes</a>
+  </p>
+  <p><b><a href="cluster-valve.html">Valve</a>:</b> <br/>
+    The Tomcat Cluster implementation uses <code>Tomcat <a href="valve.html">Valves</a></code> to
+    track when requests enter and exit the servlet container. It uses these valves to be able to make
+    intelligent decisions on when to replicate data, which is always at the end of a request.
+  </p>
+  <p><b><a href="cluster-deployer.html">Deployer</a>:</b> <br/>
+    The Deployer component is the Tomcat Farm Deployer. It allows you to deploy and undeploy applications
+    cluster wide.
+  </p>
+  <p><b><a href="cluster-listener.html">ClusterListener</a>:</b> <br/>
+    ClusterListener's are used to track messages sent and received using the <code>SimpleTcpCluster</code>.
+    If you wish to track messages, you can add a listener here, or you can add a valve to the channel object.
+  </p>
 </section>
 
+<section name="Deprecated configuration options">
+  <p>
+    <b>Deprecated settings:</b> In the previous version of Tomcat you were able to control session
+       manager settings using manager.&lt;property&gt;=value.
+       This has been discontinued, as the way it was written interfers with 
+       the ability to support multiple different manager classes under one cluster implementation,
+       as the same properties might have the different effect on different managers.
+  </p>
+</section>
 
 <section name="Attributes">
-
   <subsection name="Common Attributes">
-
   <attributes>
- 
     <attribute name="className" required="true">
-
+      <p>The main cluster class, currently only one is available,
+         <code>org.apache.catalina.ha.tcp.SimpleTcpCluster</code>
+      </p>
     </attribute>
-
-
+    <attribute name="doClusterLog" required="false">
+      <p><b>Deprecated since 6.0.0</b></p>
+      <p>Possible values are <code>true</code> or <code>false</code><br/>
+         Value is inherited from Tomcat 5.5 and has no official meaning.
+         to configure logging, use the standard tomcat logging configuration.
+      </p>
+    </attribute>
+    <attribute name="clusterLogName" required="false">
+      <p><b>Deprecated since 6.0.0</b></p>
+      <p>
+        Value is inherited from Tomcat 5.5 and has no official meaning.
+         to configure logging, use the standard tomcat logging configuration.
+      </p>
+    </attribute>
   </attributes>
-
-
   </subsection>
-
-
 </section>
-
-
 </body>
-
 </document>
