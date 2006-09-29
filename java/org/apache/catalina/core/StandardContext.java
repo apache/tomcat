@@ -4193,6 +4193,10 @@ public class StandardContext
         	} else {
         		contextManager = new StandardManager();
         	}
+        } else if ((getCluster() != null) && distributable) {
+            //let the cluster know that there is a context that is distributable
+            //and that it has its own manager
+            getCluster().registerManager(manager);
         }
         
         

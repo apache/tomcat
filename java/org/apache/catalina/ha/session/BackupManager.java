@@ -19,16 +19,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.session.StandardManager;
-import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
-import org.apache.catalina.tribes.Channel;
 
 /**
  *@author Filip Hanik
@@ -266,6 +264,16 @@ public class BackupManager extends StandardManager implements ClusterManager
 
     public String[] getInvalidatedSessions() {
         return new String[0];
+    }
+    
+    public ClusterManager cloneFromTemplate() {
+        BackupManager result = new BackupManager();
+        result.mExpireSessionsOnShutdown = mExpireSessionsOnShutdown;
+        result.name = "Clone-from-"+name;
+        result.cluster = cluster;
+        result.notifyListenersOnReplication = notifyListenersOnReplication;
+        result.mapSendOptions = mapSendOptions;
+        return result;
     }
 
 }

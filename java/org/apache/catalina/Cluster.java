@@ -100,6 +100,14 @@ public interface Cluster {
      * associated
      */
     public Manager createManager(String name);
+    
+    /**
+     * Register a manager with the cluster. If the cluster is not responsible 
+     * for creating a manager, then the container will at least notify the 
+     * cluster that this mananger is participating in the cluster.
+     * @param manager Manager
+     */
+    public void registerManager(Manager manager);
 
     // --------------------------------------------------------- Cluster Wide Deployments
     
