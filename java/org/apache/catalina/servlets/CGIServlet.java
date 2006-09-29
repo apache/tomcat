@@ -1772,7 +1772,7 @@ public final class CGIServlet extends HttpServlet {
             }
             catch (IOException e){
                 log ("Caught exception " + e);
-                throw new IOException (e.toString());
+                throw e;
             }
             finally{
                 if (debug > 4) {
