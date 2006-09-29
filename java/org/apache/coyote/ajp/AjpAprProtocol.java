@@ -417,6 +417,15 @@ public class AjpAprProtocol
         setAttribute("soTimeout", "" + i);
     }
 
+    public int getKeepAliveTimeout() {
+        return ep.getKeepAliveTimeout();
+    }
+
+
+    public void setKeepAliveTimeout( int i ) {
+        ep.setKeepAliveTimeout(i);
+        setAttribute("keepAliveTimeout", "" + i);
+    }
     
     public void setRequiredSecret(String requiredSecret) {
         this.requiredSecret = requiredSecret;
