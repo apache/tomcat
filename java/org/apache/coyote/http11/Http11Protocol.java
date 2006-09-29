@@ -281,6 +281,7 @@ public class Http11Protocol
     public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }
     public void setMaxKeepAliveRequests(int mkar) { maxKeepAliveRequests = mkar; }
 
+
     // HTTP
     /**
      * This timeout represents the socket timeout which will be used while

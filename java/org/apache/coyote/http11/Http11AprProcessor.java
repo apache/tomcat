@@ -208,6 +208,7 @@ public class Http11AprProcessor implements ActionHook {
      */
     protected int maxKeepAliveRequests = -1;
 
+
     /**
      * SSL enabled ?
      */
@@ -641,6 +642,7 @@ public class Http11AprProcessor implements ActionHook {
     public int getMaxKeepAliveRequests() {
         return maxKeepAliveRequests;
     }
+
 
     /**
      * Set the maximum size of a POST which will be buffered in SSL mode.

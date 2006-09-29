@@ -54,7 +54,6 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
         cHandler = new Http11ConnectionHandler( this );
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        setKeepAliveTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         //setServerSoTimeout(Constants.DEFAULT_SERVER_SOCKET_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
@@ -461,19 +460,6 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
     public void setMaxKeepAliveRequests(int mkar) {
         maxKeepAliveRequests = mkar;
         setAttribute("maxKeepAliveRequests", "" + mkar);
-    }
-
-    /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection. The default is the same as for
-     * Apache HTTP Server (15 000 milliseconds).
-     */
-    public int getKeepAliveTimeout() {
-        return ep.getKeepAliveTimeout();
-    }
-
-    public void setKeepAliveTimeout(int timeout) {
-        ep.setKeepAliveTimeout(timeout);
     }
 
     /**
