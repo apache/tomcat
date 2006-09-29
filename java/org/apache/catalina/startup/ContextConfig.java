@@ -616,6 +616,7 @@ public class ContextConfig
                 source =
                     new InputSource("file://" + file.getAbsolutePath());
                 stream = new FileInputStream(file);
+                context.addWatchedResource(file.getAbsolutePath());
             }
         } catch (Exception e) {
             log.error(sm.getString("contextConfig.defaultMissing") 
