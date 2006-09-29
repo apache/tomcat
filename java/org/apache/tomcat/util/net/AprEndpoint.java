@@ -255,6 +255,7 @@ public class AprEndpoint {
     public int getSoTimeout() { return soTimeout; }
     public void setSoTimeout(int soTimeout) { this.soTimeout = soTimeout; }
 
+
     /**
      * Keep-Alive timeout.
      */
