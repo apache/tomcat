@@ -258,7 +258,7 @@ public class AprEndpoint {
     /**
      * Keep-Alive timeout.
      */
-    protected int keepAliveTimeout = 15000;
+    protected int keepAliveTimeout = -1;
     public int getKeepAliveTimeout() { return keepAliveTimeout; }
     public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
 
@@ -1573,14 +1573,14 @@ public class AprEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = sendfileSize / sendfileThreadCount;
-            sendfilePollset = allocatePoller(size, pool, keepAliveTimeout);
+            sendfilePollset = allocatePoller(size, pool, soTimeout);
             if (sendfilePollset == 0 && size > 1024) {
                 size = 1024;
-                sendfilePollset = allocatePoller(size, pool, keepAliveTimeout);
+                sendfilePollset = allocatePoller(size, pool, soTimeout);
             }
             if (sendfilePollset == 0) {
                 size = 62;
-                sendfilePollset = allocatePoller(size, pool, keepAliveTimeout);
+                sendfilePollset = allocatePoller(size, pool, soTimeout);
             }
             desc = new long[size * 2];
             sendfileData = new HashMap<Long, SendfileData>(size);
