@@ -110,7 +110,7 @@ sources of authentication information:</p>
 </ul>
 
 <p>It is also possible to write your own <code>Realm</code> implementation,
-and integrate it with Tomcat 5.  To do so, you need to:
+and integrate it with Tomcat 6.  To do so, you need to:
 <ul>
   <li>Implement <code>org.apache.catalina.Realm</code>,</li>
   <li>Place your compiled realm in $CATALINA_HOME/server/lib,</li>

@@ -26,7 +26,7 @@
 
 <section name="Introduction">
 
-<p>Tomcat 5.5 uses the Jasper 2 JSP Engine to implement
+<p>Tomcat 6.0 uses the Jasper 2 JSP Engine to implement
 the <a href="http://java.sun.com/products/jsp/">JavaServer Pages 2.0</a>
 specification.</p>
 
@@ -148,13 +148,12 @@ actions or directives be trimmed ?, default <code>false</code>.</li>
 advanced Java compiler which will load all dependencies from the Tomcat class loader, 
 which will help tremendously when compiling on large installations with tens of JARs.
 On fast servers, this will allow sub-second recompilation cycles for even large JSP 
-pages. This new compiler will be updated to support the Java 5 syntax as soon as
-possible.</p>
+pages.</p>
 
 <p>Apache Ant, which was used in previous Tomcat releases, can be used instead instead of 
-the new compiler by simply removing the <code>common/lib/jasper-compiler-jdt.jar</code> file, 
+the new compiler by simply removing the <code>common/lib/jasper-jdt.jar</code> file, 
 and placing the <code>ant.jar</code> file from the latest Ant distribution in the 
-<code>common/lib</code> folder.  If you do this, you also need to use the "javac"
+<code>lib</code> folder.  If you do this, you also need to use the "javac"
 argument to catalina.sh.</p>
 
 </section>
