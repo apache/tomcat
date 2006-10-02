@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="aio.html">
+
+    &project;
+
+  <properties>
+    <title>Advanced IO and Tomcat</title>
+    <author>Remy Maucherat</author>
+  </properties>
+
+<body>
+
+  <section name="Introduction">
+
+  <p>
+  </p>
+
+  </section>
+
+</body>
+</document>
