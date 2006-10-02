@@ -190,10 +190,14 @@ public class NamingResources implements Serializable {
     public void addEnvironment(ContextEnvironment environment) {
 
         if (entries.containsKey(environment.getName())) {
-            return;
-        } else {
-            entries.put(environment.getName(), environment.getType());
+            if (findEnvironment(environment.getName()).getOverride()) {
+                removeEnvironment(environment.getName());
+            } else {
+                return;
+            }
         }
+        
+        entries.put(environment.getName(), environment.getType());
 
         synchronized (envs) {
             environment.setNamingResources(this);
