@@ -530,6 +530,8 @@ public class StandardPipeline
             current = current.getNext();
         }
 
+        if (first == basic) first = null;
+
         if (valve instanceof Contained)
             ((Contained) valve).setContainer(null);
 
