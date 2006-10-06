@@ -8,7 +8,7 @@
            description="Tcp Cluster implementation"
                domain="Catalina"
                 group="Cluster"
-                 type="org.apache.catalina.cluster.tcp.SimpleTcpCluster">
+                 type="org.apache.catalina.ha.tcp.SimpleTcpCluster">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
@@ -48,7 +48,7 @@
                returnType="void">
       <parameter name="message"
                  description="replication message"
-                 type="org.apache.catalina.cluster.ClusterMessage"/>
+                 type="org.apache.catalina.ha.ClusterMessage"/>
     </operation>
     
     <operation   name="sendClusterDomain"
@@ -57,7 +57,7 @@
                returnType="void">
       <parameter name="message"
                  description="replication message"
-                 type="org.apache.catalina.cluster.ClusterMessage"/>
+                 type="org.apache.catalina.ha.ClusterMessage"/>
     </operation>
         
     <operation   name="sendToMember"
@@ -90,7 +90,7 @@
            description="Tcp Cluster NioReceiver implementation"
                domain="Catalina"
                 group="Cluster"
-                 type="org.apache.catalina.cluster.tcp.ClusterReceiverBase">
+                 type="org.apache.catalina.ha.tcp.ClusterReceiverBase">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
@@ -183,7 +183,7 @@
            description="Tcp Cluster SocketReplicationListener implementation"
                domain="Catalina"
                 group="Cluster"
-                 type="org.apache.catalina.cluster.tcp.SocketReplicationListener">
+                 type="org.apache.catalina.ha.tcp.SocketReplicationListener">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
@@ -276,7 +276,7 @@
           description="Tcp replication transmitter"
                domain="Catalina"
                 group="ClusterSender"
-                 type="org.apache.catalina.cluster.tcp.ReplicationTransmitter">
+                 type="org.apache.catalina.ha.tcp.ReplicationTransmitter">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
@@ -358,7 +358,7 @@
           description="Async Cluster Sender"
                domain="Catalina"
                 group="IDataSender"
-                 type="org.apache.catalina.cluster.tcp.AsyncSocketSender">
+                 type="org.apache.catalina.ha.tcp.AsyncSocketSender">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
@@ -537,7 +537,7 @@
           description="Multi Socket Sender, more than one socket per member"
                domain="Catalina"
                 group="IDataSender"
-                 type="org.apache.catalina.cluster.tcp.PooledSocketSender">
+                 type="org.apache.catalina.ha.tcp.PooledSocketSender">
     <attribute   name="address"
           description="sender ip address"
                  type="java.net.InetAddress"
@@ -617,7 +617,7 @@
           description="Sync Cluster Sender"
                domain="Catalina"
                 group="IDataSender"
-                 type="org.apache.catalina.cluster.tcp.SocketSender">
+                 type="org.apache.catalina.ha.tcp.SocketSender">
     <attribute   name="address"
           description="sender ip address"
                  type="java.net.InetAddress"
@@ -776,7 +776,7 @@
           description="Valve for simple tcp replication"
                domain="Catalina"
                 group="Valve"
-                 type="org.apache.catalina.cluster.tcp.ReplicationValve">
+                 type="org.apache.catalina.ha.tcp.ReplicationValve">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"

@@ -174,7 +174,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /*
      * stop cluster wide deployments
      * 
-     * @see org.apache.catalina.cluster.ClusterDeployer#stop()
+     * @see org.apache.catalina.ha.ClusterDeployer#stop()
      */
     public void stop() throws LifecycleException {
         started = false;
@@ -426,7 +426,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /*
      * Modifcation from watchDir war detected!
      * 
-     * @see org.apache.catalina.cluster.deploy.FileChangeListener#fileModified(java.io.File)
+     * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(java.io.File)
      */
     public void fileModified(File newWar) {
         try {
@@ -450,7 +450,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /*
      * War remvoe from watchDir
      * 
-     * @see org.apache.catalina.cluster.deploy.FileChangeListener#fileRemoved(java.io.File)
+     * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(java.io.File)
      */
     public void fileRemoved(File removeWar) {
         try {
@@ -581,7 +581,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     /*
      * Call watcher to check for deploy changes
      * 
-     * @see org.apache.catalina.cluster.ClusterDeployer#backgroundProcess()
+     * @see org.apache.catalina.ha.ClusterDeployer#backgroundProcess()
      */
     public void backgroundProcess() {
         if (started) {

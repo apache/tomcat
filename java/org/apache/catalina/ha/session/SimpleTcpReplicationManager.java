@@ -46,10 +46,7 @@ import org.apache.catalina.Loader;
  * @author Bela Ban (modifications for synchronous replication)
  * @version 1.0 for TC 4.0
  * Description: The InMemoryReplicationManager is a session manager that replicated
- * session information in memory. It uses <a href="www.javagroups.com">JavaGroups</a> as
- * a communication protocol to ensure guaranteed and ordered message delivery.
- * JavaGroups also provides a very flexible protocol stack to ensure that the replication
- * can be used in any environment.
+ * session information in memory. 
  * <BR><BR>
  * The InMemoryReplicationManager extends the StandardManager hence it allows for us
  * to inherit all the basic session management features like expiration, session listeners etc
@@ -269,7 +266,6 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
                      getName()+"] is not distributable. Ignoring message");
             return null;
         }
-        //notify javagroups
         try
         {
             if ( invalidatedSessions.get(sessionId) != null ) {
@@ -478,7 +474,6 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
     public void start() throws LifecycleException {
         mManagerRunning = true;
         super.start();
-        //start the javagroups channel
         try {
             //the channel is already running
             if ( mChannelStarted ) return;
@@ -488,7 +483,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
                 log.error("Starting... no cluster associated with this context:"+getName());
                 return;
             }
-            cluster.addManager(getName(),this);
+            cluster.registerManager(this);
 
             if (cluster.getMembers().length > 0) {
                 Member mbr = cluster.getMembers()[0];
@@ -543,15 +538,10 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         mManagerRunning = false;
         mChannelStarted = false;
         super.stop();
-        //stop the javagroup channel
         try
         {
             this.sessions.clear();
-            cluster.removeManager(getName(),this);
-//            mReplicationListener.stopListening();
-//            mReplicationTransmitter.stop();
-//            service.stop();
-//            service = null;
+            cluster.removeManager(this);
         }
         catch ( Exception x )
         {

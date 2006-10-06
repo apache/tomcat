@@ -504,7 +504,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         if (!this.channelListeners.contains(channelListener) ) {
             this.channelListeners.add(channelListener);
         } else {
-            throw new IllegalArgumentException("Listener already exists:"+channelListener);
+            throw new IllegalArgumentException("Listener already exists:"+channelListener+"["+channelListener.getClass().getName()+"]");
         }
     }
 

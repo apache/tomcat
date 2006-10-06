@@ -177,9 +177,10 @@ public class BackupManager extends StandardManager implements ClusterManager
      */
     public void start() throws LifecycleException {
         if ( this.started ) return;
+        
         try {
+            cluster.registerManager(this);
             CatalinaCluster catclust = (CatalinaCluster)cluster;
-            catclust.addManager(getName(), this);
             LazyReplicatedMap map = new LazyReplicatedMap(this,
                                                           catclust.getChannel(),
                                                           DEFAULT_REPL_TIMEOUT,
@@ -188,6 +189,7 @@ public class BackupManager extends StandardManager implements ClusterManager
             map.setChannelSendOptions(mapSendOptions);
             this.sessions = map;
             super.start();
+            this.started = true;
         }  catch ( Exception x ) {
             log.error("Unable to start BackupManager",x);
             throw new LifecycleException("Failed to start BackupManager",x);
@@ -196,7 +198,7 @@ public class BackupManager extends StandardManager implements ClusterManager
     
     public String getMapName() {
         CatalinaCluster catclust = (CatalinaCluster)cluster;
-        String name = catclust.getManagerName(getName(),this)+"-"+"";
+        String name = catclust.getManagerName(getName(),this)+"-"+"map";
         if ( log.isDebugEnabled() ) log.debug("Backup manager, Setting map name to:"+name);
         return name;
     }
@@ -225,7 +227,7 @@ public class BackupManager extends StandardManager implements ClusterManager
         } finally {
             super.stop();
         }
-        cluster.removeManager(getName(),this);
+        cluster.removeManager(this);
 
     }
 

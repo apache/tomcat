@@ -192,7 +192,8 @@
         -->
         
         <!--
-        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
+                 channelSendOptions="11">
           <Manager className="org.apache.catalina.ha.session.DeltaManager"
                    expireSessionsOnShutdown="false"
                    notifyListenersOnReplication="true"/>

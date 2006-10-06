@@ -119,12 +119,11 @@ public interface CatalinaCluster extends Cluster {
     public Map getManagers();
 
     public Manager getManager(String name);
-    public void removeManager(String name,Manager manager);
-    public void addManager(String name,Manager manager);
     public String getManagerName(String name, Manager manager);
     public Valve[] getValves();
     
     public void setChannel(Channel channel);
     public Channel getChannel();
+    
 
 }

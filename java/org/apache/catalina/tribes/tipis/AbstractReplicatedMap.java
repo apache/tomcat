@@ -275,6 +275,7 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
         if ( log.isTraceEnabled() )
             log.trace("Replicate invoked on key:"+key);
         MapEntry entry = (MapEntry)super.get(key);
+        if ( entry == null ) return;
         if ( !entry.isSerializable() ) return;
         if (entry != null && entry.isPrimary() && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0) {
             Object value = entry.getValue();

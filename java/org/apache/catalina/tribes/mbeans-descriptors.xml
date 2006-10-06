@@ -6,7 +6,7 @@
           description="Tcp Cluster implementation"
                domain="Catalina"
                 group="Cluster"
-                 type="org.apache.catalina.cluster.tcp.SimpleTcpCluster">
+                 type="org.apache.catalina.ha.tcp.SimpleTcpCluster">
 
     <attribute   name="protocolStack"
           description="JavaGroups protocol stack selection"
@@ -20,7 +20,7 @@
           description="Clustered implementation of the Manager interface"
                domain="Catalina"
                 group="Manager"
-                 type="org.apache.catalina.cluster.tcp.SimpleTcpReplicationManager">
+                 type="org.apache.catalina.ha.tcp.SimpleTcpReplicationManager">
 
     <attribute   name="algorithm"
           description="The message digest algorithm to be used when generating
@@ -77,7 +77,7 @@
           description="Valve for simple tcp replication"
                domain="Catalina"
                 group="Valve"
-                 type="org.apache.catalina.cluster.tcp.ReplicationValve">
+                 type="org.apache.catalina.ha.tcp.ReplicationValve">
 
     <attribute   name="className"
           description="Fully qualified class name of the managed object"

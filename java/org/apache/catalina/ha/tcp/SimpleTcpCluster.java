@@ -345,6 +345,10 @@ public class SimpleTcpCluster
         this.managerTemplate = managerTemplate;
     }
 
+    public void setChannelSendOptions(int channelSendOptions) {
+        this.channelSendOptions = channelSendOptions;
+    }
+
     /**
      * has members
      */
@@ -479,6 +483,10 @@ public class SimpleTcpCluster
         return managerTemplate;
     }
 
+    public int getChannelSendOptions() {
+        return channelSendOptions;
+    }
+
     /**
      * Create new Manager without add to cluster (comes with start the manager)
      * 
@@ -493,6 +501,7 @@ public class SimpleTcpCluster
         Manager manager = null;
         try {
             manager = managerTemplate.cloneFromTemplate();
+            ((ClusterManager)manager).setName(name);
         } catch (Exception x) {
             log.error("Unable to clone cluster manager, defaulting to org.apache.catalina.ha.session.DeltaManager", x);
             manager = new org.apache.catalina.ha.session.DeltaManager();
@@ -503,13 +512,23 @@ public class SimpleTcpCluster
     }
     
     public void registerManager(Manager manager) {
-        manager.setDistributable(true);
-        if (manager instanceof ClusterManager) {
-            ClusterManager cmanager = (ClusterManager) manager ;
-            cmanager.setDefaultMode(false);
-            cmanager.setName(getManagerName(((ClusterManager)manager).getName(),manager));
-            cmanager.setCluster(this);
+    
+        if (! (manager instanceof ClusterManager)) {
+            log.warn("Manager [ " + manager + "] does not implement ClusterManager, addition to cluster has been aborted.");
+            return;
         }
+        ClusterManager cmanager = (ClusterManager) manager ;
+        cmanager.setDistributable(true);
+        // Notify our interested LifecycleListeners
+        lifecycle.fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
+        String clusterName = getManagerName(cmanager.getName(), manager);
+        cmanager.setName(clusterName);
+        cmanager.setCluster(this);
+        cmanager.setDefaultMode(false);
+    
+        managers.put(clusterName, manager);
+        // Notify our interested LifecycleListeners
+        lifecycle.fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);    
     }
 
     /**
@@ -517,45 +536,16 @@ public class SimpleTcpCluster
      * 
      * @see org.apache.catalina.ha.CatalinaCluster#removeManager(java.lang.String,Manager)
      */
-    public void removeManager(String name,Manager manager) {
-        if (manager != null) {
+    public void removeManager(Manager manager) {
+        if (manager != null && manager instanceof ClusterManager ) {
+            ClusterManager cmgr = (ClusterManager) manager;
             // Notify our interested LifecycleListeners
             lifecycle.fireLifecycleEvent(BEFORE_MANAGERUNREGISTER_EVENT,manager);
-            managers.remove(getManagerName(name,manager));
-            if (manager instanceof ClusterManager) ((ClusterManager) manager).setCluster(null);
+            managers.remove(getManagerName(cmgr.getName(),manager));
+            cmgr.setCluster(null);
             // Notify our interested LifecycleListeners
             lifecycle.fireLifecycleEvent(AFTER_MANAGERUNREGISTER_EVENT, manager);
         }
-    }
-
-    /**
-     * add an application to cluster replication bus
-     * 
-     * @param name
-     *            of the context
-     * @param manager
-     *            manager to register
-     * @see org.apache.catalina.ha.CatalinaCluster#addManager(java.lang.String,
-     *      org.apache.catalina.Manager)
-     */
-    public void addManager(String name, Manager manager) {
-        if (!manager.getDistributable()) {
-            log.warn("Manager with name " + name + " is not distributable, can't add as cluster manager");
-            return;
-        }
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
-        String clusterName = getManagerName(name, manager);
-        if (manager instanceof ClusterManager) {
-            ClusterManager cmanager = (ClusterManager) manager ;
-            cmanager.setName(clusterName);
-            cmanager.setCluster(this);
-            //not needed anymore, we have an explicit Manager element
-            //if(cmanager.isDefaultMode()) transferProperty("manager",cmanager);
-        }
-        managers.put(clusterName, manager);
-        // Notify our interested LifecycleListeners
-        lifecycle.fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);
     }
 
     /**

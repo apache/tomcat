@@ -837,7 +837,7 @@ public class DeltaManager extends ClusterManagerBase{
             if (log.isInfoEnabled()) log.info(sm.getString("deltaManager.startClustering", getName()));
             //to survice context reloads, as only a stop/start is called, not
             // createManager
-            ((CatalinaCluster)cluster).addManager(getName(), this);
+            cluster.registerManager(this);
 
             getAllClusterSessions();
 
@@ -1015,7 +1015,7 @@ public class DeltaManager extends ClusterManagerBase{
 
         // Require a new random number generator if we are restarted
         this.random = null;
-        getCluster().removeManager(getName(),this);
+        getCluster().removeManager(this);
         replicationValve = null;
         if (initialized) {
             destroy();
