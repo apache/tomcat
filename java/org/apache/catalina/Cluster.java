@@ -108,6 +108,12 @@ public interface Cluster {
      * @param manager Manager
      */
     public void registerManager(Manager manager);
+    
+    /**
+     * Removes a manager from the cluster
+     * @param manager Manager
+     */
+    public void removeManager(Manager manager);
 
     // --------------------------------------------------------- Cluster Wide Deployments
     

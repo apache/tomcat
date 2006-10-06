@@ -110,6 +110,20 @@
          <code>org.apache.catalina.ha.tcp.SimpleTcpCluster</code>
       </p>
     </attribute>
+    <attribute name="channelSendOptions" required="true">
+      <p>The Tribes channel send options, default is 11
+      <source>
+        int options= Channel.SEND_OPTIONS_ASYNCHRONOUS | 
+                     Channel.SEND_OPTIONS_SYNCHRONIZED_ACK | 
+                     Channel.SEND_OPTIONS_USE_ACK;
+      </source>
+      Some of the values are:<br/>
+      <code>Channel.SEND_OPTIONS_SYNCHRONIZED_ACK = 0x0004</code><br/>
+      <code>Channel.SEND_OPTIONS_ASYNCHRONOUS = 0x0008</code><br/>
+      <code>Channel.SEND_OPTIONS_USE_ACK = 0x0002</code><br/>
+      </p>
+    </attribute>
+
     <attribute name="doClusterLog" required="false">
       <p><b>Deprecated since 6.0.0</b></p>
       <p>Possible values are <code>true</code> or <code>false</code><br/>

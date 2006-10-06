@@ -43,6 +43,7 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.ManagerBase;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -103,6 +104,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     public DeltaSession(Manager manager) {
         super(manager);
+        accessCount = new AtomicInteger();
         this.resetDeltaRequest();
     }
 
@@ -545,6 +547,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         isValid = ( (Boolean) stream.readObject()).booleanValue();
         thisAccessedTime = ( (Long) stream.readObject()).longValue();
         version = ( (Long) stream.readObject()).longValue();
+        this.accessCount = new AtomicInteger();
         boolean hasPrincipal = stream.readBoolean();
         principal = null;
         if (hasPrincipal) {

@@ -8,7 +8,7 @@
            description="Cluster Membership service implementation"
                domain="Catalina"
                 group="Cluster"
-                 type="org.apache.catalina.cluster.mcast.McastService">
+                 type="org.apache.catalina.ha.mcast.McastService">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
