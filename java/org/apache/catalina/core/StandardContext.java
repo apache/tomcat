@@ -4180,25 +4180,6 @@ public class StandardContext
         if (log.isDebugEnabled())
             log.debug("Processing standard container startup");
 
-        // Acquire clustered manager
-        Manager contextManager = null;
-        if (manager == null) {
-        	if ((getCluster() != null) && distributable) {
-        		try {
-        			contextManager = getCluster().createManager(getName());
-        		} catch (Exception ex) {
-        			log.error("standardContext.clusterFail", ex);
-        			ok = false;
-        		}
-        	} else {
-        		contextManager = new StandardManager();
-        	}
-        } else if ((getCluster() != null) && distributable) {
-            //let the cluster know that there is a context that is distributable
-            //and that it has its own manager
-            getCluster().registerManager(manager);
-        }
-        
         
         // Binding thread
         ClassLoader oldCCL = bindThread();
@@ -4254,6 +4235,25 @@ public class StandardContext
                 
                 // Notify our interested LifecycleListeners
                 lifecycle.fireLifecycleEvent(START_EVENT, null);
+                
+                // Acquire clustered manager
+                Manager contextManager = null;
+                if (manager == null) {
+                    if ( (getCluster() != null) && distributable) {
+                        try {
+                            contextManager = getCluster().createManager(getName());
+                        } catch (Exception ex) {
+                            log.error("standardContext.clusterFail", ex);
+                            ok = false;
+                        }
+                    } else {
+                        contextManager = new StandardManager();
+                    }
+                } else if ( (getCluster() != null) && distributable) {
+                    //let the cluster know that there is a context that is distributable
+                    //and that it has its own manager
+                    getCluster().registerManager(manager);
+                }
 
                 // Configure default manager if none was specified
                 if (contextManager != null) {
