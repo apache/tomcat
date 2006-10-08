@@ -128,7 +128,7 @@ Section "Core" SecTomcatCore
   File /nonfatal /r temp
   SetOutPath $INSTDIR\bin
   File bin\bootstrap.jar
-  File bin\commons-logging-api.jar
+  File bin\tomcat-juli.jar
   File bin\*.exe
   SetOutPath $INSTDIR\conf
   File conf\*.*

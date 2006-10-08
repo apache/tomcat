@@ -254,54 +254,6 @@
 
   </target>
 
-  <!-- ====================== Deployer target =================== -->
-
-  <target name="deployer" description="Create the Tomcat deployer binary" >
-
-    <!-- Servlet and JSP -->
-    <copy todir="${tomcat.deployer}/lib">
-      <fileset dir="${tomcat.build}/lib">
-        <include name="el-api.jar"/>
-        <include name="jasper-el.jar"/>
-        <include name="jsp-api.jar"/>
-        <include name="jasper.jar"/>
-        <include name="servlet-api.jar"/>
-      </fileset>
-    </copy>
-
-    <!-- Digester and dependencies -->
-    <copy todir="${tomcat.deployer}/lib"
-           file="${tomcat.build}/lib/catalina-ant.jar"/>
-    <copy todir="${tomcat.deployer}/lib" file="${commons-logging-api.jar}"/>
-    <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar">
-       <fileset dir="${tomcat.build}/classes">
-          <include name="org/apache/catalina/startup/DigesterFactory.class" />
-          <include name="org/apache/catalina/util/SchemaResolver.class" />
-          <include name="org/apache/catalina/util/StringManager.class" />
-          <include name="org/apache/tomcat/util/*" />
-          <include name="org/apache/tomcat/util/digester/*" />
-          <exclude name="**/package.html" />
-          <exclude name="**/LocalStrings_*" />
-       </fileset>
-    </jar>
-
-    <!-- Main build script -->
-    <copy todir="${tomcat.deployer}">
-      <fileset dir="${basedir}/res/deployer" />
-    </copy>
-
-    <!-- Copy deployer documentation -->
-    <copy todir="${tomcat.deployer}">
-      <fileset dir="${tomcat.build}/webapps/docs">
-        <include name="images/jakarta-logo.gif" />
-        <include name="images/tomcat.gif" />
-      </fileset>
-    </copy>
-    <copy tofile="${tomcat.deployer}/docs/manual.html"
-      file="${tomcat.build}/webapps/docs/printer/deployer-howto.html" />
-
-  </target>
-
   <!-- ====================== COMBO: Clean All Directories ================ -->
   <target name="clean"
    description="Clean all components">
@@ -402,18 +354,19 @@
     <!-- Servlet and JSP -->
     <copy todir="${tomcat.deployer}/lib">
       <fileset dir="${tomcat.build}/lib">
+        <include name="catalina-ant.jar"/>
         <include name="el-api.jar"/>
         <include name="jsp-api.jar"/>
         <include name="jasper.jar"/>
         <include name="jasper-el.jar"/>
         <include name="servlet-api.jar"/>
       </fileset>
+      <fileset dir="${tomcat.build}/bin">
+        <include name="tomcat-juli.jar"/>
+      </fileset>
     </copy>
 
     <!-- Digester and dependencies -->
-    <copy todir="${tomcat.deployer}/lib"
-           file="${tomcat.build}/lib/catalina-ant.jar"/>
-    <copy todir="${tomcat.deployer}/lib" file="${commons-logging.jar}"/>
     <jar jarfile="${tomcat.deployer}/lib/catalina-deployer.jar">
        <fileset dir="${tomcat.classes}">
           <include name="org/apache/catalina/startup/DigesterFactory.class" />
