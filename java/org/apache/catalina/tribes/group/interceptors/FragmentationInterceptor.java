@@ -40,7 +40,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * @version 1.0
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase {
-    private static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog( FragmentationInterceptor.class );
+    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( FragmentationInterceptor.class );
     
     protected HashMap fragpieces = new HashMap();
     private int maxSize = 1024*100;

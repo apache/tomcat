@@ -38,8 +38,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
  * @author Costin Manolache
  */
 public class MsgAjp extends Msg {
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( MsgAjp.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( MsgAjp.class );
 
     // that's the original buffer size in ajp13 - otherwise we'll get interoperability problems.
     private byte buf[]=new byte[8*1024]; 

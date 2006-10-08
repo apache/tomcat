@@ -15,9 +15,9 @@
  */
 package org.apache.catalina.tribes.io;
 
-import org.apache.commons.logging.LogFactory;
 
-import org.apache.commons.logging.Log;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  *

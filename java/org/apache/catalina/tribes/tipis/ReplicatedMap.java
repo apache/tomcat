@@ -50,7 +50,7 @@ import org.apache.catalina.tribes.group.RpcCallback;
  */
 public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback, ChannelListener, MembershipListener {
 
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(ReplicatedMap.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReplicatedMap.class);
 
 //------------------------------------------------------------------------------
 //              CONSTRUCTORS / DESTRUCTORS

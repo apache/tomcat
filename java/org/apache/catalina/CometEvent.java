@@ -34,7 +34,7 @@ public interface CometEvent {
     /**
      * Enumeration describing the major events that the container can invoke 
      * the CometProcessors event() method with
-     * BEGIN - will be called by the main service method of the servlet at the beginning 
+     * BEGIN - will be called at the beginning 
      *  of the processing of the connection. It can be used to initialize any relevant 
      *  fields using the request and response objects. Between the end of the processing 
      *  of this event, and the beginning of the processing of the end or error events,
@@ -67,7 +67,8 @@ public interface CometEvent {
     
     /**
      * Event details
-     * TIMEOUT - the connection timed out (sub type of ERROR)
+     * TIMEOUT - the connection timed out (sub type of ERROR); note that this ERROR type is not fatal, and
+     *   the connection will not be closed unless the servlet uses the close method of the event
      * CLIENT_DISCONNECT - the client connection was closed (sub type of ERROR)
      * IOEXCEPTION - an IO exception occurred, such as invalid content, for example, an invalid chunk block (sub type of ERROR)
      * WEBAPP_RELOAD - the webapplication is being reloaded (sub type of END)

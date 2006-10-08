@@ -36,8 +36,8 @@ import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 /**

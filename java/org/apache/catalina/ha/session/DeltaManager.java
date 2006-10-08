@@ -67,7 +67,7 @@ import org.apache.catalina.ha.ClusterManager;
 public class DeltaManager extends ClusterManagerBase{
 
     // ---------------------------------------------------- Security Classes
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(DeltaManager.class);
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(DeltaManager.class);
 
     /**
      * The string manager for this package.

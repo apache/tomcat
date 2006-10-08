@@ -641,8 +641,8 @@ public class JkMain implements MBeanRegistration
         }
     }
 
-    static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( JkMain.class );
+    static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( JkMain.class );
 
     protected String domain;
     protected ObjectName oname;

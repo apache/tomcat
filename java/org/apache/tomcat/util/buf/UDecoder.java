@@ -29,8 +29,8 @@ import java.io.IOException;
  */
 public final class UDecoder {
     
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog(UDecoder.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog(UDecoder.class );
     
     public UDecoder() 
     {

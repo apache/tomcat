@@ -15,8 +15,8 @@
  */
 package org.apache.catalina.tribes.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 /**
  * 
  * Simple class that holds references to global loggers

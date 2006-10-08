@@ -44,7 +44,7 @@ import org.apache.catalina.tribes.util.StringManager;
  */
 public class BioSender extends AbstractSender implements DataSender {
 
-    private static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(BioSender.class);
+    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(BioSender.class);
 
     /**
      * The string manager for this package.

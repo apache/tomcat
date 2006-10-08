@@ -42,8 +42,8 @@ import java.net.InetSocketAddress;
  */
 public class McastServiceImpl
 {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog( McastService.class );
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog( McastService.class );
     
     protected static int MAX_PACKET_SIZE = 65535;
     /**

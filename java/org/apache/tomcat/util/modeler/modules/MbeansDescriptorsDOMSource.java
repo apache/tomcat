@@ -21,8 +21,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.DomUtil;
 import org.apache.tomcat.util.modeler.AttributeInfo;
 import org.apache.tomcat.util.modeler.ManagedBean;

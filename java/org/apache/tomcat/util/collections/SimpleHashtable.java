@@ -58,8 +58,8 @@ import java.util.Enumeration;
 public final class SimpleHashtable implements Enumeration
 {
     
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( SimpleHashtable.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( SimpleHashtable.class );
     
     // entries ...
     private Entry		table[];

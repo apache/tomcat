@@ -40,7 +40,7 @@ import org.apache.catalina.tribes.transport.WorkerThread;
  */
 public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(BioReceiver.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(BioReceiver.class);
 
     protected ServerSocket serverSocket;
 

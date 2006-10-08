@@ -37,8 +37,8 @@ import java.util.Vector;
 public final class IntrospectionUtils {
 
     
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( IntrospectionUtils.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( IntrospectionUtils.class );
     
     /**
      * Call execute() - any ant-like task should work

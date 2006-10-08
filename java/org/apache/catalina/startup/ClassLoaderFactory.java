@@ -23,8 +23,8 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import org.apache.catalina.loader.StandardClassLoader;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 /**

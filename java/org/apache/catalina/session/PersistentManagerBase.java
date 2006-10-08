@@ -31,10 +31,10 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 /**
  * Extends the <b>ManagerBase</b> class to implement most of the
  * functionality required by a Manager which supports any kind of

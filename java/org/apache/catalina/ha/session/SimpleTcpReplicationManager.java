@@ -58,7 +58,7 @@ import org.apache.catalina.Loader;
  */
 public class SimpleTcpReplicationManager extends StandardManager implements ClusterManager
 {
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog( SimpleTcpReplicationManager.class );
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( SimpleTcpReplicationManager.class );
 
     //the channel configuration
     protected String mChannelConfig = null;

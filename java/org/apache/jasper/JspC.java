@@ -39,8 +39,6 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.JspConfig;
 import org.apache.jasper.compiler.JspRuntimeContext;
@@ -48,6 +46,8 @@ import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.TagPluginManager;
 import org.apache.jasper.compiler.TldLocationsCache;
 import org.apache.jasper.servlet.JspCServletContext;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 import org.apache.tools.ant.AntClassLoader;
 import org.apache.tools.ant.Project;

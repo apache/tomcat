@@ -26,10 +26,10 @@ import java.util.jar.JarFile;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * JspReader is an input buffer for the JSP parser. It should allow

@@ -24,7 +24,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ListenCallback;
-import org.apache.commons.logging.Log;
+import org.apache.juli.logging.Log;
 
 /**
  * <p>Title: </p>
@@ -43,7 +43,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
     public static final int OPTION_DIRECT_BUFFER = 0x0004;
 
 
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(ReceiverBase.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReceiverBase.class);
     
     private MessageListener listener;
     private String host = "auto";

@@ -46,8 +46,8 @@ import java.nio.ByteBuffer;
 public class XByteBuffer
 {
     
-    public static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog( XByteBuffer.class );
+    public static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog( XByteBuffer.class );
     
     /**
      * This is a package header, 7 bytes (FLT2002)

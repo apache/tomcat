@@ -62,8 +62,8 @@ import org.apache.tomcat.util.threads.ThreadWithAttributes;
  */
 public class HandlerRequest extends JkHandler
 {
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( HandlerRequest.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( HandlerRequest.class );
 
     /*
      * Note for Host parsing.

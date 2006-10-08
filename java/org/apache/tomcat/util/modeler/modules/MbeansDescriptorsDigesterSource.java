@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 public class MbeansDescriptorsDigesterSource extends ModelerSource
 {

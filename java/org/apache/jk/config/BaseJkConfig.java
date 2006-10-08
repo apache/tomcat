@@ -91,8 +91,8 @@ import org.apache.catalina.Server;
         @version $Revision: 299988 $
  */
 public class BaseJkConfig  implements LifecycleListener {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(BaseJkConfig.class);
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(BaseJkConfig.class);
 
     protected File configHome = null;
     protected File workersConfig = null;

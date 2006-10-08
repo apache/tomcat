@@ -386,8 +386,8 @@ public class JkMX extends JkHandler
         return objN;
     }
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( JkMX.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( JkMX.class );
 
 
 }

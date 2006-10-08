@@ -57,7 +57,7 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class FarmWarDeployer extends ClusterListener implements ClusterDeployer, FileChangeListener {
     /*--Static Variables----------------------------------------*/
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
             .getLog(FarmWarDeployer.class);
     /**
      * The descriptive information about this implementation.

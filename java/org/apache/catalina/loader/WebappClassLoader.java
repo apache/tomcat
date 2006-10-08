@@ -105,8 +105,8 @@ public class WebappClassLoader
     implements Reloader, Lifecycle
  {
 
-    protected static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( WebappClassLoader.class );
+    protected static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( WebappClassLoader.class );
 
     protected class PrivilegedFindResource
         implements PrivilegedAction {
@@ -1633,7 +1633,7 @@ public class WebappClassLoader
         IntrospectionUtils.clear();
         
         // Clear the classloader reference in common-logging
-        org.apache.commons.logging.LogFactory.release(this);
+        org.apache.juli.logging.LogFactory.release(this);
         
         // Clear the classloader reference in the VM's bean introspector
         java.beans.Introspector.flushCaches();

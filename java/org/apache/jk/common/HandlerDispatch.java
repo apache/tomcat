@@ -33,8 +33,8 @@ import org.apache.jk.core.MsgContext;
  */
 public class HandlerDispatch extends JkHandler
 {
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( HandlerDispatch.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( HandlerDispatch.class );
 
     public HandlerDispatch() 
     {

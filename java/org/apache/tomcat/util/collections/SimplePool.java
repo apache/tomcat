@@ -27,8 +27,8 @@ package org.apache.tomcat.util.collections;
 public final class SimplePool  {
     
     
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog(SimplePool.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog(SimplePool.class );
     
     /*
      * Where the threads are held.

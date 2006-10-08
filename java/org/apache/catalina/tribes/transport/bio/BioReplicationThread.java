@@ -46,7 +46,7 @@ import org.apache.catalina.tribes.io.BufferPool;
 public class BioReplicationThread extends WorkerThread {
 
 
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog( BioReplicationThread.class );
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationThread.class );
     
     protected Socket socket;
     protected ObjectReader reader;

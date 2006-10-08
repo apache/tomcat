@@ -28,8 +28,8 @@ import javax.servlet.jsp.JspEngineInfo;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.jasper.util.SimplePool;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Implementation of JspFactory.

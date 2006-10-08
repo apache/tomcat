@@ -21,8 +21,10 @@ package org.apache.catalina.startup;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSetBase;
 import java.lang.reflect.Constructor;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import java.lang.reflect.InvocationTargetException;
 public class ClusterRuleSetFactory {
     

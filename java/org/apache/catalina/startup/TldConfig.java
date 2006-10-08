@@ -64,8 +64,8 @@ public final class TldConfig  {
     // Names of JARs that are known not to contain any TLDs
     private static HashSet noTldJars;
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( TldConfig.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
 
     private static final String FILE_URL_PREFIX = "file:";
     private static final int FILE_URL_PREFIX_LEN = FILE_URL_PREFIX.length();

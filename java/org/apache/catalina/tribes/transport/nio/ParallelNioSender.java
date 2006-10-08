@@ -51,7 +51,7 @@ import org.apache.catalina.tribes.UniqueId;
  */
 public class ParallelNioSender extends AbstractSender implements MultiPointSender {
     
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(ParallelNioSender.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ParallelNioSender.class);
     protected long selectTimeout = 5000; //default 5 seconds, same as send timeout
     protected Selector selector;
     protected HashMap nioSenders = new HashMap();

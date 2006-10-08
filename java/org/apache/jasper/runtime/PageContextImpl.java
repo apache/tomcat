@@ -46,8 +46,6 @@ import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
 import javax.servlet.jsp.tagext.BodyContent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
@@ -56,6 +54,8 @@ import org.apache.jasper.el.FunctionMapperImpl;
 import org.apache.jasper.el.VariableResolverImpl;
 import org.apache.jasper.security.SecurityUtil;
 import org.apache.jasper.util.Enumerator;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Implementation of the PageContext class from the JSP spec. Also doubles as a

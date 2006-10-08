@@ -30,8 +30,8 @@ import java.io.UnsupportedEncodingException;
  */
 public final class C2BConverter {
     
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog(C2BConverter.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog(C2BConverter.class );
     
     private IntermediateOutputStream ios;
     private WriteConvertor conv;
