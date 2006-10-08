@@ -33,7 +33,7 @@ import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
  */
 public class ReplicatedContext extends StandardContext {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog( ReplicatedContext.class );
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( ReplicatedContext.class );
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
     

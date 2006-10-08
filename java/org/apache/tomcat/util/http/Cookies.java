@@ -34,8 +34,8 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public final class Cookies { // extends MultiMap {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog(Cookies.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog(Cookies.class );
     
     // expected average number of cookies per request
     public static final int INITIAL_SIZE=4; 

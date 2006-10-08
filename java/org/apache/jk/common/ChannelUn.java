@@ -354,8 +354,8 @@ public class ChannelUn extends JniHandler implements JkChannel {
         return ("jk-" + encodedAddr);
     }
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( ChannelUn.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( ChannelUn.class );
 }
 
 class AprAcceptor implements ThreadPoolRunnable {

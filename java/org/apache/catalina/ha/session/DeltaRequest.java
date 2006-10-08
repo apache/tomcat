@@ -39,8 +39,8 @@ import java.io.ObjectOutputStream;
 
 public class DeltaRequest implements Externalizable {
 
-    public static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog( DeltaRequest.class );
+    public static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog( DeltaRequest.class );
 
     /**
      * The string manager for this package.

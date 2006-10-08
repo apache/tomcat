@@ -35,8 +35,8 @@ import org.apache.tomcat.util.http.MimeHeaders;
 /** Generic input stream impl on top of ajp
  */
 public class JkInputStream implements InputBuffer, OutputBuffer {
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( JkInputStream.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( JkInputStream.class );
 
     private Msg bodyMsg = new MsgAjp();
     private Msg outputMsg = new MsgAjp();

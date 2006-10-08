@@ -38,8 +38,8 @@ import java.io.IOException;
 
 public class McastService implements MembershipService,MembershipListener {
 
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog( McastService.class );
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog( McastService.class );
 
     /**
      * The string manager for this package.

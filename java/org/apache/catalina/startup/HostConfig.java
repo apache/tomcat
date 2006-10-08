@@ -56,8 +56,8 @@ import org.apache.tomcat.util.modeler.Registry;
 public class HostConfig
     implements LifecycleListener {
     
-    protected static org.apache.commons.logging.Log log=
-         org.apache.commons.logging.LogFactory.getLog( HostConfig.class );
+    protected static org.apache.juli.logging.Log log=
+         org.apache.juli.logging.LogFactory.getLog( HostConfig.class );
 
     // ----------------------------------------------------- Instance Variables
 

@@ -311,6 +311,6 @@ public class AprImpl extends JkHandler { // This will be o.a.t.util.handler.TcHa
                 log.debug( "Error loading native library ", ex);
         }
     }
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( AprImpl.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( AprImpl.class );
 }

@@ -37,8 +37,8 @@ import org.apache.tomcat.util.res.StringManager;
 public class AjpMessage {
 
 
-    protected static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(AjpMessage.class);
+    protected static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(AjpMessage.class);
 
     /**
      * The string manager for this package.

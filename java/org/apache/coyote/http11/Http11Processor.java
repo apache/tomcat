@@ -63,8 +63,8 @@ public class Http11Processor implements ActionHook {
     /**
      * Logger.
      */
-    protected static org.apache.commons.logging.Log log
-        = org.apache.commons.logging.LogFactory.getLog(Http11Processor.class);
+    protected static org.apache.juli.logging.Log log
+        = org.apache.juli.logging.LogFactory.getLog(Http11Processor.class);
 
     /**
      * The string manager for this package.
@@ -753,13 +753,7 @@ public class Http11Processor implements ActionHook {
 
         int threadRatio = (endpoint.getCurrentThreadsBusy() * 100)
                 / endpoint.getMaxThreads();
-        if ((threadRatio > 33) && (threadRatio <= 66)) {
-            soTimeout = soTimeout / 2;
-        } else if ((threadRatio > 66) && (threadRatio <= 90)) {
-            soTimeout = soTimeout / 3;
-            keepAliveLeft = 1;
-        } else if (threadRatio > 90) {
-            soTimeout = soTimeout / 20;
+        if (threadRatio > 75) {
             keepAliveLeft = 1;
         }
         

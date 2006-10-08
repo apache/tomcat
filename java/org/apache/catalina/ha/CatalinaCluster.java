@@ -24,7 +24,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
-import org.apache.commons.logging.Log;
+import org.apache.juli.logging.Log;
 
 
 

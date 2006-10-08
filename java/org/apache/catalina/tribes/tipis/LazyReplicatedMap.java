@@ -65,7 +65,7 @@ import org.apache.catalina.tribes.UniqueId;
  */
 public class LazyReplicatedMap extends AbstractReplicatedMap 
     implements RpcCallback, ChannelListener, MembershipListener {
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(LazyReplicatedMap.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(LazyReplicatedMap.class);
     
     
     

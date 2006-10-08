@@ -35,8 +35,8 @@ public class Shm14 extends Shm {
     
     // Not ready yet.
     
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( Shm14.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( Shm14.class );
     
     MappedByteBuffer bb;
 

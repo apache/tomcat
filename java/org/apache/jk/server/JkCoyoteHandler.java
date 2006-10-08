@@ -49,8 +49,8 @@ import org.apache.tomcat.util.net.SSLSupport;
  * jmx:notification-handler name="org.apache.coyote.ACTION_COMMIT
  */
 public class JkCoyoteHandler extends JkHandler implements ProtocolHandler {
-    protected static org.apache.commons.logging.Log log 
-        = org.apache.commons.logging.LogFactory.getLog(JkCoyoteHandler.class);
+    protected static org.apache.juli.logging.Log log 
+        = org.apache.juli.logging.LogFactory.getLog(JkCoyoteHandler.class);
     // Set debug on this logger to see the container request time
 
     // ----------------------------------------------------------- DoPrivileged

@@ -347,8 +347,8 @@ public class WebXml2Jk {
 
     }
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( WebXml2Jk.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( WebXml2Jk.class );
 
     
     // -------------------- DOM utils --------------------

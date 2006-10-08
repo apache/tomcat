@@ -185,7 +185,7 @@ public class ChannelJni extends JniHandler implements JkChannel {
         return 0;
     }    
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( ChannelJni.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( ChannelJni.class );
 
 }

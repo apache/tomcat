@@ -56,7 +56,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DeltaSession extends StandardSession implements Externalizable,ClusterSession,ReplicatedMapEntry {
 
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(DeltaSession.class);
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(DeltaSession.class);
 
     /**
      * The string manager for this package.

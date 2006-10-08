@@ -23,9 +23,9 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.naming.directory.DirContext;
 
-import org.apache.commons.logging.Log;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.juli.logging.Log;
 
 
 /**

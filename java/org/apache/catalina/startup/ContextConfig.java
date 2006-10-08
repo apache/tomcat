@@ -69,8 +69,8 @@ import org.xml.sax.SAXParseException;
 public class ContextConfig
     implements LifecycleListener {
 
-    protected static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( ContextConfig.class );
+    protected static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( ContextConfig.class );
 
     // ----------------------------------------------------- Instance Variables
 

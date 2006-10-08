@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @version 1.0
  */
 public class ThroughputInterceptor extends ChannelInterceptorBase {
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(ThroughputInterceptor.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class);
 
     double mbTx = 0;
     double mbAppTx = 0;

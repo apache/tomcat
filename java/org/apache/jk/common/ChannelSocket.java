@@ -75,8 +75,8 @@ import org.apache.tomcat.util.threads.ThreadPoolRunnable;
  */
 public class ChannelSocket extends JkHandler
     implements NotificationBroadcaster, JkChannel {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog( ChannelSocket.class );
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog( ChannelSocket.class );
 
     private int startPort=8009;
     private int maxPort=8019; // 0 for backward compat.

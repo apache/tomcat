@@ -31,7 +31,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * @author Filip Hanik
  */
 public class RpcChannel implements ChannelListener{
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(RpcChannel.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(RpcChannel.class);
     
     public static final int FIRST_REPLY = 1;
     public static final int MAJORITY_REPLY = 2;

@@ -84,7 +84,7 @@ import org.apache.catalina.valves.ValveBase;
 public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Lifecycle {
 
     /*--Static Variables----------------------------------------*/
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory
             .getLog(JvmRouteBinderValve.class);
 
     /**

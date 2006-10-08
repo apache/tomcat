@@ -20,8 +20,8 @@ package org.apache.catalina.deploy;
 
 import org.apache.catalina.util.RequestUtil;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 import java.io.Serializable;
 

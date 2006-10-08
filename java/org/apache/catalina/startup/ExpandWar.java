@@ -32,8 +32,8 @@ import java.util.jar.JarFile;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Expand out a WAR in a Host's appBase.

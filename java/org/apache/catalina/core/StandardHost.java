@@ -47,8 +47,8 @@ public class StandardHost
  {
     /* Why do we implement deployer and delegate to deployer ??? */
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( StandardHost.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( StandardHost.class );
     
     // ----------------------------------------------------------- Constructors
 

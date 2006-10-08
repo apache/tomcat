@@ -116,8 +116,8 @@ import org.apache.catalina.Host;
  */
 public class ApacheConfig  extends BaseJkConfig { 
 
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(ApacheConfig.class);
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(ApacheConfig.class);
 
     /** default path to mod_jk .conf location */
     public static final String MOD_JK_CONFIG = "conf/auto/mod_jk.conf";

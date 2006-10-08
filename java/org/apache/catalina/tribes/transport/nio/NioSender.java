@@ -47,7 +47,7 @@ import org.apache.catalina.tribes.RemoteProcessException;
  */
 public class NioSender extends AbstractSender implements DataSender{
 
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(NioSender.class);
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioSender.class);
 
     
     

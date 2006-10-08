@@ -28,8 +28,8 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 

@@ -93,8 +93,8 @@ import org.apache.catalina.Context;
     @author Bill Barker
  */
 public class IISConfig extends BaseJkConfig  { 
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(IISConfig.class);
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(IISConfig.class);
 
     public static final String WORKERS_CONFIG = "/conf/jk/workers.properties";
     public static final String URI_WORKERS_MAP_CONFIG = "/conf/auto/uriworkermap.properties";

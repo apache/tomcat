@@ -52,8 +52,8 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.tomcat.util.modeler.Registry;
 
@@ -121,8 +121,8 @@ import org.apache.tomcat.util.modeler.Registry;
 public abstract class ContainerBase
     implements Container, Lifecycle, Pipeline, MBeanRegistration, Serializable {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( ContainerBase.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( ContainerBase.class );
 
     /**
      * Perform addChild with the permissions of this class.

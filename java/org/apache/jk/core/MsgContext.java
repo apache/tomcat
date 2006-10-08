@@ -43,10 +43,10 @@ import org.apache.jk.common.JkInputStream;
  * @author Costin Manolache
  */
 public class MsgContext implements ActionHook {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(MsgContext.class);
-    private static org.apache.commons.logging.Log logTime=
-        org.apache.commons.logging.LogFactory.getLog( "org.apache.jk.REQ_TIME" );
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(MsgContext.class);
+    private static org.apache.juli.logging.Log logTime=
+        org.apache.juli.logging.LogFactory.getLog( "org.apache.jk.REQ_TIME" );
 
     private int type;
     private Object notes[]=new Object[32];

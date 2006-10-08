@@ -34,8 +34,8 @@ public class JSSEImplementation extends SSLImplementation
 {
     static final String SSLSocketClass = "javax.net.ssl.SSLSocket";
 
-    static org.apache.commons.logging.Log logger = 
-        org.apache.commons.logging.LogFactory.getLog(JSSEImplementation.class);
+    static org.apache.juli.logging.Log logger = 
+        org.apache.juli.logging.LogFactory.getLog(JSSEImplementation.class);
 
     private JSSEFactory factory = null;
 

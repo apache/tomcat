@@ -96,8 +96,8 @@ import org.apache.catalina.Context;
     @author Bill Barker
  */
 public class NSConfig  extends BaseJkConfig { 
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog(NSConfig.class);
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(NSConfig.class);
 
     public static final String WORKERS_CONFIG = "/conf/jk/workers.properties";
     public static final String NS_CONFIG = "/conf/auto/obj.conf";

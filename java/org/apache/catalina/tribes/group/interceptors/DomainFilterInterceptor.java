@@ -32,7 +32,7 @@ import java.util.Arrays;
  */
 public class DomainFilterInterceptor extends ChannelInterceptorBase {
 
-    private static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog( DomainFilterInterceptor.class );
+    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( DomainFilterInterceptor.class );
 
     protected Membership membership = null;
     

@@ -52,8 +52,8 @@ import org.apache.naming.NamingEntry;
 
 public class WARDirContext extends BaseDirContext {
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( WARDirContext.class );
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog( WARDirContext.class );
     
     // ----------------------------------------------------------- Constructors
 

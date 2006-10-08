@@ -34,7 +34,7 @@ import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
  */
 public class BackupManager extends StandardManager implements ClusterManager
 {
-    public static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog( BackupManager.class );
+    public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BackupManager.class );
 
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
 

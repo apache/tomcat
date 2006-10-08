@@ -66,8 +66,8 @@ import org.apache.tomcat.util.modeler.Registry;
 
 public class MBeanFactory extends BaseModelMBean {
 
-    private static org.apache.commons.logging.Log log = 
-        org.apache.commons.logging.LogFactory.getLog(MBeanFactory.class);
+    private static org.apache.juli.logging.Log log = 
+        org.apache.juli.logging.LogFactory.getLog(MBeanFactory.class);
 
     /**
      * The <code>MBeanServer</code> for this application.
