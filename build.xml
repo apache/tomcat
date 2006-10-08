@@ -36,6 +36,7 @@
 
   <!-- JAR artifacts -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
+  <property name="tomcat-juli.jar" value="${tomcat.build}/bin/tomcat-juli.jar"/>
 
   <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
   <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
@@ -60,7 +61,6 @@
   <path id="tomcat.classpath">
     <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
-    <pathelement location="${commons-logging.jar}"/>
   </path>
 
   <!-- Just build Tomcat -->
@@ -167,9 +167,18 @@
         <include name="org/apache/catalina/loader/Extension.class" />
         <include name="org/apache/catalina/loader/Reloader.class" />
         <include name="org/apache/catalina/security/SecurityClassLoad.class" />
-        <include name="org/apache/juli/**" />
         <include name="org/apache/naming/JndiPermission.class" />
         <include name="org/apache/tomcat/util/compat/*" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+    <!-- Tomcat-juli JAR File -->
+    <jar jarfile="${tomcat-juli.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/juli/**" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -427,8 +436,6 @@
 
   <target name="deploy" depends="build-only,build-docs">
 
-    <copy file="${commons-logging-api.jar}" todir="${tomcat.build}/bin" />
-
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
             file="${tomcat-native.tar.gz}" />
 
@@ -516,11 +523,6 @@
 
   <target name="download"
           description="Builds and download dependent components">
-
-    <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-logging.loc}"/>
-      <param name="destfile" value="${commons-logging.jar}"/>
-    </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${tomcat-native.loc}"/>
