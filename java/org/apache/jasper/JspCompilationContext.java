@@ -239,6 +239,10 @@ public class JspCompilationContext {
             log.warn(Localizer.getMessage("jsp.error.compiler"), e);
         } catch (IllegalAccessException e) {
             log.warn(Localizer.getMessage("jsp.error.compiler"), e);
+        } catch (NoClassDefFoundError e) {
+            if (log.isDebugEnabled()) {
+                log.debug(Localizer.getMessage("jsp.error.compiler"), e);
+            }
         } catch (ClassNotFoundException e) {
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.error.compiler"), e);
