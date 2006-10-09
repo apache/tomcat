@@ -664,8 +664,10 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
         MapEntry entry = (MapEntry)super.remove(key);
 
         try {
-            MapMessage msg = new MapMessage(getMapContextName(),MapMessage.MSG_REMOVE,false,(Serializable)key,null,null,null);
-            getChannel().send(getMapMembers(), msg,getChannelSendOptions());
+            if (getMapMembers().length > 0 ) {
+                MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_REMOVE, false, (Serializable) key, null, null, null);
+                getChannel().send(getMapMembers(), msg, getChannelSendOptions());
+            }
         } catch ( ChannelException x ) {
             log.error("Unable to replicate out data for a LazyReplicatedMap.remove operation",x);
         }
@@ -863,9 +865,9 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
             //todo, implement a counter variable instead
             //only count active members in this node
             int counter = 0;
-            Object[] items = super.entrySet().toArray();
-            for (int i=0; i<items.length; i++ ) {
-                Map.Entry e = (Map.Entry) items[i];
+            Iterator it = super.entrySet().iterator();
+            while (it.hasNext() ) {
+                Map.Entry e = (Map.Entry) it.next();
                 if ( e != null ) {
                     MapEntry entry = (MapEntry) e.getValue();
                     if (entry.isPrimary() && entry.getValue() != null) counter++;
@@ -883,7 +885,7 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
         }
     
         public Collection values() {
-            ArrayList values = new ArrayList(super.size());
+            ArrayList values = new ArrayList();
             Iterator i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry e = (Map.Entry)i.next();
