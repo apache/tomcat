@@ -104,7 +104,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     public DeltaSession(Manager manager) {
         super(manager);
-        accessCount = new AtomicInteger();
         this.resetDeltaRequest();
     }
 
@@ -316,7 +315,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (!this.isValid) {
             return false;
         }
-        if (accessCount.get() > 0) {
+        if (ACTIVITY_CHECK && accessCount.get() > 0) {
             return true;
         }
         if (maxInactiveInterval >= 0) {
@@ -547,7 +546,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         isValid = ( (Boolean) stream.readObject()).booleanValue();
         thisAccessedTime = ( (Long) stream.readObject()).longValue();
         version = ( (Long) stream.readObject()).longValue();
-        this.accessCount = new AtomicInteger();
         boolean hasPrincipal = stream.readBoolean();
         principal = null;
         if (hasPrincipal) {
@@ -579,6 +577,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (notes == null) {
             notes = new Hashtable();
         }
+        activate();
     }
 
     public synchronized void writeExternal(ObjectOutput out ) throws java.io.IOException {
@@ -608,7 +607,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      *                if an input/output error occurs
      */
     private void writeObject(ObjectOutput stream) throws IOException {
-
         // Write the scalar instance variables (except Manager)
         stream.writeObject(new Long(creationTime));
         stream.writeObject(new Long(lastAccessedTime));
