@@ -16,6 +16,9 @@
 
 
 <section name="Quick Start">
+<p>This document is pending an update to the latest implementation.<br/>
+   You can also check the <a href="config/cluster.html">configuration reference documentation.</a>
+</p>
 
 <p>To run session replication in your Tomcat 5.5 container, the following steps
 should be completed:</p>
