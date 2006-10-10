@@ -163,6 +163,7 @@ public class McastServiceImpl
     protected void setupSocket() throws IOException {
         if (mcastBindAddress != null) socket = new MulticastSocket(new InetSocketAddress(mcastBindAddress, port));
         else socket = new MulticastSocket(port);
+        socket.setLoopbackMode(false); //hint that we don't need loop back messages
         if (mcastBindAddress != null) {
 			if(log.isInfoEnabled())
                 log.info("Setting multihome multicast interface to:" +mcastBindAddress);

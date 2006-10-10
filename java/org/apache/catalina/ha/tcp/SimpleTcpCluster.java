@@ -555,12 +555,13 @@ public class SimpleTcpCluster
      */
     public String getManagerName(String name, Manager manager) {
         String clusterName = name ;
+        if ( clusterName == null ) clusterName = manager.getContainer().getName();
         if(getContainer() instanceof Engine) {
             Container context = manager.getContainer() ;
             if(context != null && context instanceof Context) {
                 Container host = ((Context)context).getParent();
                 if(host != null && host instanceof Host)
-                    clusterName = host.getName()  + name ;
+                    clusterName = host.getName() +"#" + name ;
             }
         }
         return clusterName;
