@@ -45,6 +45,7 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import java.util.ConcurrentModificationException;
 
 /**
  *
@@ -760,57 +761,63 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
     }
     
     public Object get(Object key) {
-            MapEntry entry = (MapEntry)super.get(key);
-            if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" entry:"+entry);
-            if ( entry == null ) return null;
-            if ( !entry.isPrimary() ) {
-                //if the message is not primary, we need to retrieve the latest value
-                try {
-                    Member[] backup = null;
-                    MapMessage msg = null;
-                    if ( !entry.isBackup() ) {
-                        //make sure we don't retrieve from ourselves
-                        msg = new MapMessage(getMapContextName(), MapMessage.MSG_RETRIEVE_BACKUP, false,
-                                             (Serializable) key, null, null, null);
-                        Response[] resp = getRpcChannel().send(entry.getBackupNodes(),msg, this.getRpcChannel().FIRST_REPLY, Channel.SEND_OPTIONS_DEFAULT, getRpcTimeout());
-                        if (resp == null || resp.length == 0) {
-                            //no responses
-                            log.warn("Unable to retrieve remote object for key:" + key);
-                            return null;
-                        }
-                        msg = (MapMessage) resp[0].getMessage();
-                        msg.deserialize(getExternalLoaders());
-                        backup = entry.getBackupNodes();
-                        if ( entry.getValue() instanceof ReplicatedMapEntry ) {
-                            ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
-                            val.setOwner(getMapOwner());
-                        }
-                        if ( msg.getValue()!=null ) entry.setValue(msg.getValue());
+        MapEntry entry = (MapEntry)super.get(key);
+        if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" entry:"+entry);
+        if ( entry == null ) return null;
+        if ( !entry.isPrimary() ) {
+            //if the message is not primary, we need to retrieve the latest value
+            try {
+                Member[] backup = null;
+                MapMessage msg = null;
+                if ( !entry.isBackup() ) {
+                    //make sure we don't retrieve from ourselves
+                    msg = new MapMessage(getMapContextName(), MapMessage.MSG_RETRIEVE_BACKUP, false,
+                                         (Serializable) key, null, null, null);
+                    Response[] resp = getRpcChannel().send(entry.getBackupNodes(),msg, this.getRpcChannel().FIRST_REPLY, Channel.SEND_OPTIONS_DEFAULT, getRpcTimeout());
+                    if (resp == null || resp.length == 0) {
+                        //no responses
+                        log.warn("Unable to retrieve remote object for key:" + key);
+                        return null;
                     }
-                    if (entry.isBackup()) {
-                        //select a new backup node
-                        backup = publishEntryInfo(key, entry.getValue());
-                    } else if ( entry.isProxy() ) {
-                        //invalidate the previous primary
-                        msg = new MapMessage(getMapContextName(),MapMessage.MSG_PROXY,false,(Serializable)key,null,null,backup);
-                        Member[] dest = getMapMembersExcl(backup);
-                        if ( dest!=null && dest.length >0) {
-                            getChannel().send(dest, msg, getChannelSendOptions());
-                        }
+                    msg = (MapMessage) resp[0].getMessage();
+                    msg.deserialize(getExternalLoaders());
+                    backup = entry.getBackupNodes();
+                    if ( entry.getValue() instanceof ReplicatedMapEntry ) {
+                        ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
+                        val.setOwner(getMapOwner());
                     }
-    
-                    entry.setBackupNodes(backup);
-                    entry.setBackup(false);
-                    entry.setProxy(false);
-    
-    
-                } catch (Exception x) {
-                    log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);
-                    return null;
+                    if ( msg.getValue()!=null ) entry.setValue(msg.getValue());
                 }
+                if (entry.isBackup()) {
+                    //select a new backup node
+                    backup = publishEntryInfo(key, entry.getValue());
+                } else if ( entry.isProxy() ) {
+                    //invalidate the previous primary
+                    msg = new MapMessage(getMapContextName(),MapMessage.MSG_PROXY,false,(Serializable)key,null,null,backup);
+                    Member[] dest = getMapMembersExcl(backup);
+                    if ( dest!=null && dest.length >0) {
+                        getChannel().send(dest, msg, getChannelSendOptions());
+                    }
+                }
+
+                entry.setBackupNodes(backup);
+                entry.setBackup(false);
+                entry.setProxy(false);
+
+
+            } catch (Exception x) {
+                log.error("Unable to replicate out data for a LazyReplicatedMap.get operation", x);
+                return null;
             }
-            if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" result:"+entry.getValue());
-            return entry.getValue();
+        }
+        if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" result:"+entry.getValue());
+        if ( entry.getValue() != null && entry.getValue() instanceof ReplicatedMapEntry ) {
+            ReplicatedMapEntry val = (ReplicatedMapEntry)entry.getValue();
+            //hack, somehow this is not being set above
+            val.setOwner(getMapOwner());
+            
+        }
+        return entry.getValue();
     }    
 
     
@@ -950,7 +957,7 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
             //todo, implement a counter variable instead
             //only count active members in this node
             int counter = 0;
-            Iterator it = super.entrySet().iterator();
+            Iterator it = Collections.unmodifiableSet(super.entrySet()).iterator();
             while (it.hasNext() ) {
                 Map.Entry e = (Map.Entry) it.next();
                 if ( e != null ) {
