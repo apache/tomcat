@@ -197,7 +197,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 this.setValid(true);
                 this.setPrimarySession(false);
                 this.access();
-                if (cm.isNotifyListenersOnReplication()) this.setId(getIdInternal());
                 this.resetDeltaRequest();
                 this.endAccess();
             }
@@ -229,7 +228,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      *            The new session identifier
      */
     public void setIdInternal(String id) {
-        super.setId(id);
+        this.id = id;
         resetDeltaRequest();
     }
 
@@ -240,7 +239,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      *            The new session identifier
      */
     public void setId(String id) {
-        setIdInternal(id);
+        super.setId(id);
+        resetDeltaRequest();
     }
 
    
