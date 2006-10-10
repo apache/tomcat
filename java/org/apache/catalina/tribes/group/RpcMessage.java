@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutput;
+import org.apache.catalina.tribes.util.Arrays;
 
 /**
  * <p>Title: </p>
@@ -69,6 +70,18 @@ public class RpcMessage implements Externalizable {
         out.writeInt(rpcId.length);
         out.write(rpcId, 0, rpcId.length);
         out.writeObject(message);
+    }
+    
+    public String toString() {
+        StringBuffer buf = new StringBuffer("RpcMessage[");
+        buf.append(super.toString());
+        buf.append("] rpcId=");
+        buf.append(Arrays.toString(rpcId));
+        buf.append("; uuid=");
+        buf.append(Arrays.toString(uuid));
+        buf.append("; msg=");
+        buf.append(message);
+        return buf.toString();
     }
     
     public static class NoRpcChannelReply extends RpcMessage {
