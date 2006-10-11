@@ -200,15 +200,15 @@
         
           <Channel className="org.apache.catalina.tribes.group.GroupChannel">
             <Membership className="org.apache.catalina.tribes.membership.McastService"
-                        mcastAddr="228.0.0.4"
-                        mcastPort="45564"
-                        mcastFrequency="500"
-                        mcastDropTime="3000"/>
+                        address="228.0.0.4"
+                        port="45564"
+                        frequency="500"
+                        dropTime="3000"/>
             <Receiver className="org.apache.catalina.tribes.transport.nio.NioReceiver"
-                      tcpListenAddress="auto"
-                      tcpListenPort="auto"
-                      tcpSelectorTimeout="100"
-                      tcpThreadCount="6"/>
+                      address="auto"
+                      port="auto"
+                      selectorTimeout="100"
+                      maxThreads="6"/>
 
             <Sender className="org.apache.catalina.tribes.transport.ReplicationTransmitter">
               <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
