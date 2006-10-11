@@ -42,60 +42,99 @@
   <subsection name="Common Attributes">
   <attributes>
     <attribute name="className" required="true">
+      The implementation of the receiver component. Two implementations available,
+      <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> and 
+      <code>org.apache.catalina.tribes.transport.bio.BioReceiver</code>.<br/>
+      The <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code> is the 
+      preferred implementation
+    </attribute>
+    <attribute name="address" required="false">
+      The address (network interface) to listen for incoming traffic.
+      Same as the bind address. The default value is <code>auto</code> and translates to
+      <code>java.net.InetAddress.getLocalHost().getHostAddress()</code>.
+    </attribute>
+    <attribute name="direct" required="false">
+      Possible values are <code>true</code> or <code>false</code>. 
+      Set to true if you want the receiver to use direct bytebuffers when reading data
+      from the sockets.
+    </attribute>
+    <attribute name="port" required="false">
+      The listen port for incoming data. The default value is <code>4000</code>.
+      To avoid port conflicts the receiver will automatically bind to a free port within the range of 
+      <code> port &lt;= bindPort &lt;= port+autoBind</code>
+      So for example, if port is 4000, and autoBind is set to 10, then the receiver will open up 
+      a server socket on the first available port in the range 4000-4010.
+    </attribute>
+    <attribute name="autoBind" required="false">
+      Default value is <code>10</code>.
+      Use this value if you wish to automatically avoid port conflicts the cluster receiver will try to open a 
+      server socket on the <code>port</code> attribute port, and then work up <code>autoBind</code> number of times.
+    </attribute>
+    <attribute name="securePort" required="false">
+      The secure listen port. This port is SSL enabled. If this attribute is omitted no SSL port is opened up.
+      There default value is unset, meaning there is no SSL socket available.
+    </attribute>
+    <attribute name="selectorTimeout" required="false">
+      The value in milliseconds for the polling timeout in the <code>NioReceiver</code>. On older versions of the JDK
+      there have been bugs, that should all now be cleared out where the selector never woke up.
+      The default value is a very high <code>5000</code> milliseconds.
+    </attribute>
+    <attribute name="maxThreads" required="false">
+      The maximum number of threads in the receiver thread pool. The default value is <code>6</code>
+      Adjust this value relative to the number of nodes in the cluster, the number of messages being exchanged and 
+      the hardware you are running on. A higher value doesn't mean more effiecency, tune this value according to your 
+      own test results.
+    </attribute>
+    <attribute name="minThreads" required="false">
+      Minimum number of threads to be created when the receiver is started up. Default value is <code>6</code>
+    </attribute>
+    <attribute name="ooBInline" required="false">
+      Boolean value for the socket OOBINLINE option. Possible values are <code>true</code> or <code>false</code>.
+    </attribute>
+    <attribute name="rxBufSize" required="false">
+      The receiver buffer size on the receiving sockets. Value is in bytes, the default value is <code>43800</code> bytes.
+    </attribute>
+    <attribute name="txBufSize" required="false">
+      The sending buffer size on the receiving sockets. Value is in bytes, the default value is <code>25188</code> bytes.
+    </attribute>
+    <attribute name="soKeepAlive" required="false">
+      Boolean value for the socket SO_KEEPALIVE option. Possible values are <code>true</code> or <code>false</code>.
+    </attribute>
+    <attribute name="soLingerOn" required="false">
+      Boolean value to determine whether to use the SO_LINGER socket option. 
+      Possible values are <code>true</code> or <code>false</code>. Default value is <code>true</code>.
+    </attribute>
+    <attribute name="soLingerTime" required="false">
+      Sets the SO_LINGER socket option time value. The value is in seconds. 
+      The default value is <code>3</code> seconds.
+    </attribute>
+    <attribute name="soReuseAddress" required="false">
+     Boolean value for the socket SO_REUSEADDR option. Possible values are <code>true</code> or <code>false</code>.
+    </attribute>
+    <attribute name="soTrafficClass" required="false">
+     Sets the traffic class level for the socket, the value is between 0 and 255.
+     Different values are defined in <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setTrafficClass(int)">
+     java.net.Socket#setTrafficClass(int)</a>.
+    </attribute>
+    <attribute name="tcpNoDelay" required="false">
+     Boolean value for the socket TCP_NODELAY option. Possible values are <code>true</code> or <code>false</code>.
+     The default value is <code>true</code>
+    </attribute>
+    <attribute name="timeout" required="false">
+     Sets the SO_TIMEOUT option on the socket. The value is in milliseconds and the default value is <code>3000</code> 
+     milliseconds.
+    </attribute>
+    <attribute name="useBufferPool" required="false">
+     Boolean value whether to use a shared buffer pool of cached <code>org.apache.catalina.tribes.io.XByteBuffer</code>
+     objects. If set to true, the XByteBuffer that is used to pass a message up the channel, will be recycled at the end 
+     of the requests. This means that interceptors in the channel must not maintain a reference to the object
+     after the <code>org.apache.catalina.tribes.ChannelInterceptor#messageReceived</code> method has exited.
     </attribute>
   </attributes>
   </subsection>
   <subsection name="NioReceiver">
-  <attributes>
-    <attribute name="className" required="true">
-    </attribute>
-    <attribute name="address" required="false">
-    </attribute>
-    <attribute name="bind" required="false">
-    </attribute>
-    <attribute name="direct" required="false">
-    </attribute>
-    <attribute name="port" required="false">
-    </attribute>
-    <attribute name="selectorTimeout" required="false">
-    </attribute>
-    <attribute name="maxThreads" required="false">
-    </attribute>
-    <attribute name="minThreads" required="false">
-    </attribute>
-    <attribute name="ooBInline" required="false">
-    </attribute>
-    <attribute name="rxBufSize" required="false">
-    </attribute>
-    <attribute name="txBufSize" required="false">
-    </attribute>
-    <attribute name="securePort" required="false">
-    </attribute>
-    <attribute name="soKeepAlive" required="false">
-    </attribute>
-    <attribute name="soLingerOn" required="false">
-    </attribute>
-    <attribute name="soLingerTime" required="false">
-    </attribute>
-    <attribute name="soReuseAddress" required="false">
-    </attribute>
-    <attribute name="soTrafficClass" required="false">
-    </attribute>
-    <attribute name="tcpNoDelay" required="false">
-    </attribute>
-    <attribute name="timeout" required="false">
-    </attribute>
-    <attribute name="autoBind" required="false">
-    </attribute>
-    <attribute name="useBufferPool" required="false">
-    </attribute>
-  </attributes>
   </subsection>
   <subsection name="BioReceiver">
-  <attributes>
-    <attribute name="className" required="true">
-    </attribute>
-  </attributes>
   </subsection>
 
 </section>
