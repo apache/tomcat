@@ -171,11 +171,19 @@ public abstract class AbstractSender implements DataSender {
     public int getMaxRetryAttempts() {
         return maxRetryAttempts;
     }
+    
+    public void setDirect(boolean direct) {
+        setDirectBuffer(direct);
+    }
 
     public void setDirectBuffer(boolean directBuffer) {
         this.directBuffer = directBuffer;
     }
 
+    public boolean getDirect() {
+        return getDirectBuffer();
+    }
+    
     public boolean getDirectBuffer() {
         return this.directBuffer;
     }
