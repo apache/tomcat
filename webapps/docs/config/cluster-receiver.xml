@@ -15,32 +15,89 @@
 
 
 <section name="Introduction">
-
-  
-
+  <p>
+  The receiver component is responsible for receiving cluster messages.
+  As you might notice through the configuration, is that the receiving of messages
+  and sending of messages are two different components, this is different from many other 
+  frameworks, but there is a good reason for it, to decouple the logic for how messages are sent from
+  how messages are received.<br/>
+  The receiver is very much like the Tomcat Connector, its the base of the thread pool
+  for incoming cluster messages. The receiver is straight forward, but all the socket settings
+  for incoming traffic are managed here.
+  </p>
 </section>
 
+<section name="Blocking vs Non-Blocking Receiver">
+  <p>
+  The receiver supports both a non blocking, <code>org.apache.catalina.tribes.transport.nio.NioReceiver</code>, and a 
+  blocking, <code>org.apache.catalina.tribes.transport.bio.BioReceiver</code>. It is preferred to use the non blocking receiver
+  to be able to grow your cluster without running into thread starvation.<br/>
+  Using the non blocking receiver allows you to with a very limited thread count to serve a large number of messages.
+  Usually the rule is to use 1 thread per node in the cluster for small clusters, and then depending on your message frequency
+  and your hardware, you'll find an optimal number of threads peak out at a certain number.
+  </p>
+</section>
 
 <section name="Attributes">
-
   <subsection name="Common Attributes">
-
   <attributes>
- 
     <attribute name="className" required="true">
-
     </attribute>
-
-
   </attributes>
-
-
+  </subsection>
+  <subsection name="NioReceiver">
+  <attributes>
+    <attribute name="className" required="true">
+    </attribute>
+    <attribute name="address" required="false">
+    </attribute>
+    <attribute name="bind" required="false">
+    </attribute>
+    <attribute name="direct" required="false">
+    </attribute>
+    <attribute name="port" required="false">
+    </attribute>
+    <attribute name="selectorTimeout" required="false">
+    </attribute>
+    <attribute name="maxThreads" required="false">
+    </attribute>
+    <attribute name="minThreads" required="false">
+    </attribute>
+    <attribute name="ooBInline" required="false">
+    </attribute>
+    <attribute name="rxBufSize" required="false">
+    </attribute>
+    <attribute name="txBufSize" required="false">
+    </attribute>
+    <attribute name="securePort" required="false">
+    </attribute>
+    <attribute name="soKeepAlive" required="false">
+    </attribute>
+    <attribute name="soLingerOn" required="false">
+    </attribute>
+    <attribute name="soLingerTime" required="false">
+    </attribute>
+    <attribute name="soReuseAddress" required="false">
+    </attribute>
+    <attribute name="soTrafficClass" required="false">
+    </attribute>
+    <attribute name="tcpNoDelay" required="false">
+    </attribute>
+    <attribute name="timeout" required="false">
+    </attribute>
+    <attribute name="autoBind" required="false">
+    </attribute>
+    <attribute name="useBufferPool" required="false">
+    </attribute>
+  </attributes>
+  </subsection>
+  <subsection name="BioReceiver">
+  <attributes>
+    <attribute name="className" required="true">
+    </attribute>
+  </attributes>
   </subsection>
 
-
 </section>
-
-
 </body>
-
 </document>

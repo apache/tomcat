@@ -26,9 +26,9 @@
     The default implementation of the cluster group notification is built on top of multicast heartbeats
     sent using UDP packets to a multicast IP address.
     Cluster members are grouped together by using the same multicast address/port combination.
-    Each member sends out a heartbeat with a given interval (<code>mcastFrequency</code>), and this
+    Each member sends out a heartbeat with a given interval (<code>frequency</code>), and this
     heartbeat is used for dynamic discovery.
-    In a similar fashion, if a heartbeat has not been received in a timeframe specified by <code>mcastDropTime</code>
+    In a similar fashion, if a heartbeat has not been received in a timeframe specified by <code>dropTime</code>
     ms. a member is considered suspect and the channel and any membership listener will be notified.
   </p>
 </section>
@@ -48,31 +48,32 @@
       This implementation uses multicast heartbeats for member discovery.
       </p>
     </attribute>
-    <attribute name="mcastAddr" required="false">
+    <attribute name="address" required="false">
       <p>
       The multicast address that the membership will broadcast its presence and listen
       for other heartbeats on. The default value is <code>228.0.0.4</code>
       Make sure your network is enabled for multicast traffic.<br/>
-      The multicast address, in conjunction with the <code>mcastPort</code> is what 
+      The multicast address, in conjunction with the <code>port</code> is what 
       creates a cluster group. To divide up your farm into several different group, or to 
-      split up QA from production, change the <code>mcastPort</code> or the <code>mcastAddr</code>
+      split up QA from production, change the <code>port</code> or the <code>address</code>
+      <br/>Previously known as mcastAddr.
       </p>
     </attribute>
-    <attribute name="mcastPort" required="false">
+    <attribute name="port" required="false">
       <p>
       The multicast port, the default value is <code>45564</code><br/>
-      The multicast port, in conjunction with the <code>mcastAddr</code> is what 
+      The multicast port, in conjunction with the <code>address</code> is what 
       creates a cluster group. To divide up your farm into several different group, or to 
-      split up QA from production, change the <code>mcastPort</code> or the <code>mcastAddr</code>
+      split up QA from production, change the <code>port</code> or the <code>address</code>
       </p>
     </attribute>
-    <attribute name="mcastFrequency" required="false">
+    <attribute name="frequency" required="false">
       <p>
       The frequency in milliseconds in which heartbeats are sent out. The default value is <code>500</code> ms.<br/>
       In most cases the default value is sufficient. Changing this value, simply changes the interval in between heartbeats.
       </p>
     </attribute>
-    <attribute name="mcastDropTime" required="false">
+    <attribute name="dropTime" required="false">
       <p>
       The membership component will time out members and notify the Channel if a member fails to send a heartbeat within 
       a give time. The default value is <code>3000</code> ms. This means, that if a heartbeat is not received from a 
@@ -82,14 +83,14 @@
       verify a timeout using a TCP connection when a heartbeat timeout has occurred. This protects against false positives.
       </p>
     </attribute>
-    <attribute name="mcastBindAddress" required="false">
+    <attribute name="bind" required="false">
       <p>
       Use this attribute if you wish to bind your multicast traffic to a specific network interface.
       By default, or when this attribute is unset, it tries to bind to <code>0.0.0.0</code> and sometimes on multihomed hosts
       this becomes a problem.
       </p>
     </attribute>
-    <attribute name="mcastTTL" required="false">
+    <attribute name="ttl" required="false">
       <p>
       The time-to-live setting for the multicast heartbeats.
       This setting should be a value between 0 and 255. The default value is VM implementation specific.
@@ -101,11 +102,11 @@
       The <code>org.apache.catalina.tribes.Member.getDomain()</code> method returns the value specified here.
       </p>
     </attribute>
-    <attribute name="mcastSoTimeout" required="false">
+    <attribute name="soTimeout" required="false">
       <p>
       The sending and receiving of heartbeats is done on a single thread, hence to avoid blocking this thread forever,
       you can control the <code>SO_TIMEOUT</code> value on this socket.<br/>
-      If a value smaller or equal to 0 is presented, the code will default this value to mcastFrequency
+      If a value smaller or equal to 0 is presented, the code will default this value to frequency
       </p>
     </attribute>
 
