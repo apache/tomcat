@@ -106,7 +106,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
      * @return int
      */
     public int getTcpThreadCount() {
-        return getMinThreads();
+        return getMaxThreads();
     }
 
     /**
@@ -119,12 +119,20 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         this.listener = listener;
     }
 
+    /**
+     * @deprecated use setPort
+     * @param tcpListenPort int
+     */
     public void setTcpListenPort(int tcpListenPort) {
-        this.port = tcpListenPort;
+        setPort(tcpListenPort);
     }
 
+    /**
+     * @deprecated use setAddress
+     * @param tcpListenHost String
+     */
     public void setTcpListenAddress(String tcpListenHost) {
-        this.host = tcpListenHost;
+        setAddress(tcpListenHost);
     }
 
     public void setRxBufSize(int rxBufSize) {
@@ -135,7 +143,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         this.txBufSize = txBufSize;
     }
 
+    /**
+     * @deprecated use setMaxThreads/setMinThreads
+     * @param tcpThreadCount int
+     */
     public void setTcpThreadCount(int tcpThreadCount) {
+        setMaxThreads(tcpThreadCount);
         setMinThreads(tcpThreadCount);
     }
 
@@ -172,7 +185,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
             try {
                 addr = new InetSocketAddress(getBind(), portstart);
                 socket.bind(addr);
-                setTcpListenPort(portstart);
+                setPort(portstart);
                 log.info("Receiver Server Socket bound to:"+addr);
                 return 0;
             }catch ( IOException x) {
@@ -209,11 +222,15 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         this.bind = bind;
     }
 
-
+    /**
+     * @deprecated use getPort
+     * @return int
+     */
     public int getTcpListenPort() {
-        return this.port;
+        return getPort();
     }
 
+    
     public boolean getDirect() {
         return direct;
     }
@@ -225,14 +242,24 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
     }
 
 
-
-    public String getHost() {
+    public String getAddress() {
         getBind();
         return this.host;
     }
+    
+    public String getHost() {
+        return getAddress();
+    }
 
-    public long getTcpSelectorTimeout() {
+    public long getSelectorTimeout() {
         return tcpSelectorTimeout;
+    }
+    /**
+     * @deprecated use getSelectorTimeout
+     * @return long
+     */
+    public long getTcpSelectorTimeout() {
+        return getSelectorTimeout();
     }
 
     public boolean doListen() {
@@ -246,9 +273,13 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
     public ThreadPool getPool() {
         return pool;
     }
-
+    
+    /**
+     * @deprecated use getAddress
+     * @return String
+     */
     public String getTcpListenAddress() {
-        return getHost();
+        return getAddress();
     }
 
     public int getAutoBind() {
@@ -304,7 +335,15 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         return securePort;
     }
 
+    /**
+     * @deprecated use setSelectorTimeout
+     * @param selTimeout long
+     */
     public void setTcpSelectorTimeout(long selTimeout) {
+        setSelectorTimeout(selTimeout);
+    }
+    
+    public void setSelectorTimeout(long selTimeout) {
         tcpSelectorTimeout = selTimeout;
     }
 
@@ -312,8 +351,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         this.listen = doListen;
     }
 
-    public void setHost(String host) {
+    
+    public void setAddress(String host) {
         this.host = host;
+    }
+    public void setHost(String host) {
+        setAddress(host);
     }
 
     public void setListener(MessageListener listener) {

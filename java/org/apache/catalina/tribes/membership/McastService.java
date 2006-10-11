@@ -162,45 +162,114 @@ public class McastService implements MembershipService,MembershipListener {
         }
     }
     
-    public void setMcastAddr(String addr) {
+    public void setAddress(String addr) {
         properties.setProperty("mcastAddress", addr);
     }
-
-    public String getMcastAddr() {
+    
+    /**
+     * @deprecated use setAddress
+     * @param addr String
+     */
+    public void setMcastAddr(String addr) {
+        setAddress(addr);
+    }
+    
+    public String getAddress() {
         return properties.getProperty("mcastAddress");
+    }
+    
+    /**
+     * @deprecated use getAddress
+     * @return String
+     */
+    public String getMcastAddr() {
+        return getAddress();
     }
 
     public void setMcastBindAddress(String bindaddr) {
+        setBind(bindaddr);
+    }
+    
+    public void setBind(String bindaddr) {
         properties.setProperty("mcastBindAddress", bindaddr);
     }
-
+    /**
+     * @deprecated use getBind
+     * @return String
+     */
     public String getMcastBindAddress() {
+        return getBind();
+    }
+
+    public String getBind() {
         return properties.getProperty("mcastBindAddress");
     }
 
+    /**
+     * @deprecated use setPort
+     * @param port int
+     */
     public void setMcastPort(int port) {
+        setPort(port);
+    }
+
+    public void setPort(int port) {
         properties.setProperty("mcastPort", String.valueOf(port));
     }
 
+    /**
+     * @deprecated use getPort()
+     * @return int
+     */
     public int getMcastPort() {
+        return getPort();
+    }
+    public int getPort() {
         String p = properties.getProperty("mcastPort");
         return new Integer(p).intValue();
     }
     
+    /**
+     * @deprecated use setFrequency
+     * @param time long
+     */
     public void setMcastFrequency(long time) {
+        setFrequency(time);
+    }
+    
+    public void setFrequency(long time) {
         properties.setProperty("mcastFrequency", String.valueOf(time));
     }
 
+    /**
+     * @deprecated use getFrequency
+     * @return long
+     */
     public long getMcastFrequency() {
+        return getFrequency();
+    }
+
+    public long getFrequency() {
         String p = properties.getProperty("mcastFrequency");
         return new Long(p).longValue();
     }
 
     public void setMcastDropTime(long time) {
+        setDropTime(time);
+    }
+    public void setDropTime(long time) {
         properties.setProperty("memberDropTime", String.valueOf(time));
     }
-
+    
+    /**
+     * @deprecated use getDropTime
+     * @return long
+     */
     public long getMcastDropTime() {
+        return getDropTime();
+    }
+
+    public long getDropTime() {
         String p = properties.getProperty("memberDropTime");
         return new Long(p).longValue();
     }
@@ -373,14 +442,40 @@ public class McastService implements MembershipService,MembershipListener {
         if ( listener!=null ) listener.memberDisappeared(member);
     }
 
+    /**
+     * @deprecated use getSoTimeout
+     * @return int
+     */
     public int getMcastSoTimeout() {
+        return getSoTimeout();
+    }
+    
+    public int getSoTimeout() {
         return mcastSoTimeout;
     }
+    
+    /**
+     * @deprecated use setSoTimeout
+     * @param mcastSoTimeout int
+     */
     public void setMcastSoTimeout(int mcastSoTimeout) {
+        setSoTimeout(mcastSoTimeout);
+    }
+    
+    public void setSoTimeout(int mcastSoTimeout) {
         this.mcastSoTimeout = mcastSoTimeout;
         properties.setProperty("mcastSoTimeout", String.valueOf(mcastSoTimeout));
     }
+    
+    /**
+     * @deprecated use getTtl
+     * @return int
+     */
     public int getMcastTTL() {
+        return getTtl();
+    }
+    
+    public int getTtl() {
         return mcastTTL;
     }
 
@@ -391,8 +486,16 @@ public class McastService implements MembershipService,MembershipListener {
     public byte[] getDomain() {
         return domain;
     }
-
+    
+    /**
+     * @deprecated use setTtl
+     * @param mcastTTL int
+     */
     public void setMcastTTL(int mcastTTL) {
+        setTtl(mcastTTL);
+    }
+
+    public void setTtl(int mcastTTL) {
         this.mcastTTL = mcastTTL;
         properties.setProperty("mcastTTL", String.valueOf(mcastTTL));
     }
