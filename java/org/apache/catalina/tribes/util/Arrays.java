@@ -24,13 +24,18 @@ import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
+import java.io.UnsupportedEncodingException;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import java.util.StringTokenizer;
 
 /**
  * @author Filip Hanik
  * @version 1.0
  */
 public class Arrays {
-
+    protected static Log log = LogFactory.getLog(Arrays.class);
+    
     public static boolean contains(byte[] source, int srcoffset, byte[] key, int keyoffset, int length) {
         if ( srcoffset < 0 || srcoffset >= source.length) throw new ArrayIndexOutOfBoundsException("srcoffset is out of bounds.");
         if ( keyoffset < 0 || keyoffset >= key.length) throw new ArrayIndexOutOfBoundsException("keyoffset is out of bounds.");
@@ -186,6 +191,26 @@ public class Arrays {
             result = 31 * result + element;
         }
         return result;
+    }
+    
+    public static byte[] fromString(String value) { 
+        if ( value == null ) return null;
+        if ( !value.startsWith("{") ) throw new RuntimeException("byte arrays must be represented as {1,3,4,5,6}");
+        StringTokenizer t = new StringTokenizer(value,"{,}",false);
+        byte[] result = new byte[t.countTokens()];
+        for (int i=0; i<result.length; i++ ) result[i] = Byte.parseByte(t.nextToken());
+        return result;
+    }
+
+    
+ 
+    public static byte[] convert(String s) {
+        try {
+            return s.getBytes("ISO-8859-1");
+        }catch (UnsupportedEncodingException ux ) {
+            log.error("Unable to convert ["+s+"] into a byte[] using ISO-8859-1 encoding, falling back to default encoding.");
+            return s.getBytes();
+        }
     }
 
 
