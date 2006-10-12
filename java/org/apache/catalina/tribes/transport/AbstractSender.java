@@ -57,7 +57,7 @@ public abstract class AbstractSender implements DataSender {
     private boolean soLingerOn = false;
     private int soLingerTime = 3;
     private int soTrafficClass = 0x04 | 0x08 | 0x010;
-    private boolean throwOnFailedAck = false;
+    private boolean throwOnFailedAck = true;
     
     /**
      * transfers sender properties from one sender to another
