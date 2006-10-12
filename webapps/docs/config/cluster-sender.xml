@@ -124,6 +124,12 @@
        Boolean value for the socket TCP_NODELAY option. Possible values are <code>true</code> or <code>false</code>.
        The default value is <code>true</code>
       </attribute>
+      <attribute name="throwOnFailedAck" required="false">
+       Boolean value, default value is <code>true</code>.
+       If set to true, the sender will throw a <code>org.apache.catalina.tribes.RemoteProcessException</code>
+       when we receive a negative ack from the remote member.
+       Set to false, and Tribes will treat a positive ack the same way as a negative ack, that the message was received.
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="PooledParallelSender Attributes">
