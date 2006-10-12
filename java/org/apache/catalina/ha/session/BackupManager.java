@@ -76,14 +76,14 @@ public class BackupManager extends StandardManager implements ClusterManager
     public void messageDataReceived(ClusterMessage msg) {
     }
 
-    public boolean isSendClusterDomainOnly() {
+    public boolean doDomainReplication() {
         return false;
     }
 
     /**
      * @param sendClusterDomainOnly The sendClusterDomainOnly to set.
      */
-    public void setSendClusterDomainOnly(boolean sendClusterDomainOnly) {
+    public void setDomainReplication(boolean sendClusterDomainOnly) {
     }
 
     /**

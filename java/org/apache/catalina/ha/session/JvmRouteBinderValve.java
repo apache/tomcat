@@ -386,7 +386,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
         Context context = request.getContext();
         msg.setContextPath(context.getPath());
         msg.setHost(context.getParent().getName());
-        if(manager.isSendClusterDomainOnly())
+        if(manager.doDomainReplication())
             cluster.sendClusterDomain(msg);
         else
             cluster.send(msg);
