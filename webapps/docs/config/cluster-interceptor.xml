@@ -104,7 +104,7 @@
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor Attributes">
    <attributes>
-     <attribute name="interval">
+     <attribute name="interval" required="false">
        Defines the interval in number of messages when we are to report the throughput statistics.
        The report is logged to the <code>org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class)</code>
        logger under the <code>INFO</code> level.
