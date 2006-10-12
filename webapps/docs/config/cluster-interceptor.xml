@@ -113,6 +113,39 @@
    </attributes>
   </subsection>
   
+  <subsection name="Nested element StaticMember Attributes">
+   <attributes>
+     <attribute name="className" required="true">
+       Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
+     </attribute>
+     <attribute name="port" required="true">
+       The port that this static member listens to for cluster messages
+     </attribute>
+     <attribute name="securePort" required="false">
+       The secure port this static member listens to for encrypted cluster messages
+       default value is <code>-1</code>, this value means the member is not listening on a secure port
+     </attribute>
+     <attribute name="host" required="true">
+       The host (or network interface) that this static member listens for cluster messages.
+       Three different type of values are possible:<br/>
+       1. IP address in the form of &quot;216.123.1.23&quot;<br/>
+       2. Hostnames like &quot;tomcat01.mydomain.com&quot; or &quot;tomcat01&quot; as long as they resolve correctly<br/>
+       3. byte array in string form, for example {216,123,12,3}<br/>
+     </attribute>
+     <attribute name="domain" required="true">
+       The logical cluster domain for this this static member listens for cluster messages.
+       Two different type of values are possible:<br/>
+       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes 
+       using ISO-8859-1 encoding.
+       2. byte array in string form, for example {216,123,12,3}<br/>
+     </attribute>
+     <attribute name="uniqueId" required="true">
+       A universally uniqueId for this static member.
+       The values must be 16 bytes in the following form:<br/>
+       1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
+     </attribute>
+   </attributes>
+  </subsection>
   <!--TODO Document all the interceptors-->
   
 </section>
