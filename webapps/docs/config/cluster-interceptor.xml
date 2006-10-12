@@ -15,29 +15,93 @@
 
 
 <section name="Introduction">
-
-  
-
+  <p>
+  Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
+  This architecture allows decoupling of logic and opens the way for some very kewl feature add ons.
+  </p>
 </section>
 
+<section name="Available Interceptors">
+ <p>
+   <ul>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.OrderInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.TwoPhaseCommitInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.GzipInterceptor</code></li>
+   </ul>
+ </p>
+</section>
+
+<section name="Static Membership">
+  <p>
+   In addition to dynamic discovery, Apache Tribes also supports static membership, with membership verification.
+   To achieve this add the <code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code>
+   underneath the <code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code> interceptor.
+   Inside the <code>StaticMembershipInterceptor</code> you can add the static members you wish to have.
+  </p>
+</section>
 
 <section name="Attributes">
 
   <subsection name="Common Attributes">
-
-  <attributes>
- 
-    <attribute name="className" required="true">
-
-    </attribute>
-
-
-  </attributes>
-
-
+   <attributes>
+     <attribute name="className" required="true">
+       Required, as there is no default 
+     </attribute>
+     <attribute name="optionFlag" required="false">
+       If you want the interceptor to trigger on certain message depending on the message's option flag,
+       you can setup the interceptors flag here.
+       The default value is <code>0</code>, meaning this interceptor will trigger on all messages.
+     </attribute>
+   </attributes>
   </subsection>
 
-
+  <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor Attributes">
+   <attributes>
+     <attribute name="className" required="true">
+       Required, This dispatcher uses JDK 1.5 java.util.concurrent package 
+     </attribute>
+     <attribute name="optionFlag" required="false">
+       The default and hard coded value is <code>8 (org.apache.catalina.tribes.Channel.SEND_OPTIONS_ASYNCHRONOUS)</code>.
+       The dispatcher will trigger on this value only, as it is predefined by Tribes.
+     </attribute>
+   </attributes>
+  </subsection>
+  <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor Attributes">
+   <attributes>
+     <attribute name="className" required="true">
+       Required, Same implementation as <code>MessageDispatch15Interceptor</code>, but with JDK 1.4 compliance.
+     </attribute>
+     <attribute name="optionFlag" required="false">
+       The default and hard coded value is <code>8 (org.apache.catalina.tribes.Channel.SEND_OPTIONS_ASYNCHRONOUS)</code>.
+       The dispatcher will trigger on this value only, as it is predefined by Tribes.
+     </attribute>
+   </attributes>
+  </subsection>
+  <subsection name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector Attributes">
+   <attributes>
+   </attributes>
+  </subsection>
+  <subsection name="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor Attributes">
+   <attributes>
+     <attribute name="interval">
+       Defines the interval in number of messages when we are to report the throughput statistics.
+       The report is logged to the <code>org.apache.juli.logging.LogFactory.getLog(ThroughputInterceptor.class)</code>
+       logger under the <code>INFO</code> level.
+       Default value is to report every <code>10000</code> messages.
+     </attribute>
+   </attributes>
+  </subsection>
+  
+  <!--TODO Document all the interceptors-->
+  
 </section>
 
 
