@@ -146,6 +146,15 @@ public class ClusterRuleSet extends RuleSetBase {
             digester.addSetNext(channelPrefix + "Interceptor",
                                 "addInterceptor",
                                 "org.apache.catalina.tribes.ChannelInterceptor");
+
+            
+            digester.addObjectCreate(channelPrefix + "Interceptor/Member",
+                                     null, // MUST be specified in the element
+                                     "className");
+            digester.addSetProperties(channelPrefix + "Interceptor/Member");
+            digester.addSetNext(channelPrefix + "Interceptor/Member",
+                                "addStaticMember",
+                                "org.apache.catalina.tribes.Member");
         }
 
         digester.addObjectCreate(prefix + "Valve",
