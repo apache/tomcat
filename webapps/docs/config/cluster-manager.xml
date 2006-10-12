@@ -15,8 +15,18 @@
 
 
 <section name="Introduction">
-
-  
+  A cluster manager is an extension to Tomcat's session manager interface, 
+  <code>org.apache.catalina.Manager</code>
+  A cluster manager must implement the <code>org.apache.catalina.ha.ClusterManager</code> and is solely 
+  responsible for how the session is replicated.<br/>
+  There are currently two different managers, the <code>org.apache.catalina.ha.session.DeltaManager</code> replicates deltas 
+  of session data to all members in the cluster. This implementation is proven and works very well, but has a limitation
+  as it requires the cluster members to be homogeneous, all nodes must deploy the same applications and be exact replicas.
+  The <code>org.apache.catalina.ha.session.BackupManager</code> also replicates deltas but only to one backup node.
+  The location of the backup node is known to all nodes in the cluster. It also supports heterogeneous deployments,
+  so the manager knows at what locations the webapp is deployed.<br/>
+  We are planning to add more managers with even more sophisticated backup mechanism to support even larger clusters.
+  Check back soon! 
 
 </section>
 
@@ -29,6 +39,21 @@
  
     <attribute name="className" required="true">
 
+    </attribute>
+    <attribute name="domainReplication" required="false">
+      Set to true if you wish sessions to be replicated only to members that have the same logical
+      domain set. If set to false, session replication will ignore the domain setting the 
+      <code><a href="cluster-membership.html">&lt;Membership&gt;</a></code>
+      element.
+    </attribute>
+    <attribute name="defaultMode" required="false">
+      <b>Deprecated since 6.0.0</b>
+    </attribute>
+    <attribute name="expireSessionsOnShutdown" required="false">
+      
+    </attribute>
+    <attribute name="notifyListenersOnReplication" required="false">
+    
     </attribute>
 
 

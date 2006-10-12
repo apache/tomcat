@@ -82,13 +82,13 @@ public interface ClusterManager extends Manager {
     * @return Manager send only to same cluster domain.
     * @since 5.5.10
     */
-   public boolean isSendClusterDomainOnly();
+   public boolean doDomainReplication();
 
    /**
     * @param sendClusterDomainOnly Flag value.
     * @since 5.5.10
     */
-   public void setSendClusterDomainOnly(boolean sendClusterDomainOnly);
+   public void setDomainReplication(boolean domainReplication);
 
    /**
     * @param mode The mode

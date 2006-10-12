@@ -358,14 +358,14 @@ public class DeltaManager extends ClusterManagerBase{
     /**
      * @return Returns the sendClusterDomainOnly.
      */
-    public boolean isSendClusterDomainOnly() {
+    public boolean doDomainReplication() {
         return sendClusterDomainOnly;
     }
     
     /**
      * @param sendClusterDomainOnly The sendClusterDomainOnly to set.
      */
-    public void setSendClusterDomainOnly(boolean sendClusterDomainOnly) {
+    public void setDomainReplication(boolean sendClusterDomainOnly) {
         this.sendClusterDomainOnly = sendClusterDomainOnly;
     }
 
@@ -581,7 +581,7 @@ public class DeltaManager extends ClusterManagerBase{
      */
     protected void send(SessionMessage msg) {
         if(cluster != null) {
-            if(isSendClusterDomainOnly())
+            if(doDomainReplication())
                 cluster.sendClusterDomain(msg);
             else
                 cluster.send(msg);
@@ -1280,7 +1280,7 @@ public class DeltaManager extends ClusterManagerBase{
      *            requesting node
      */
     protected void messageReceived(SessionMessage msg, Member sender) {
-        if(isSendClusterDomainOnly() && !checkSenderDomain(msg,sender)) {
+        if(doDomainReplication() && !checkSenderDomain(msg,sender)) {
             return;
         }
         ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();

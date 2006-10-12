@@ -112,14 +112,14 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         super();
     }
 
-    public boolean isSendClusterDomainOnly() {
+    public boolean doDomainReplication() {
         return sendClusterDomainOnly;
     }
     
     /**
      * @param sendClusterDomainOnly The sendClusterDomainOnly to set.
      */
-    public void setSendClusterDomainOnly(boolean sendClusterDomainOnly) {
+    public void setDomainReplication(boolean sendClusterDomainOnly) {
         this.sendClusterDomainOnly = sendClusterDomainOnly;
     }
   
