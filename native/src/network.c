@@ -1198,7 +1198,7 @@ TCN_IMPLEMENT_CALL(jobject, Socket, dataGet)(TCN_STDARGS, jlong socket,
 {
     tcn_socket_t *s = J2P(socket, tcn_socket_t *);
     TCN_ALLOC_CSTRING(key);
-    jobject rv = NULL;
+    void *rv = NULL;
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
