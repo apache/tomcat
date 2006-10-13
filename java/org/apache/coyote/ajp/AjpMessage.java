@@ -275,7 +275,7 @@ public class AjpMessage {
      * @param numBytes The number of bytes to copy.  
      */
     public void appendBytes(byte[] b, int off, int numBytes) {
-        if (pos + numBytes + 3 >= buf.length) {
+        if (pos + numBytes + 3 > buf.length) {
             log.error(sm.getString("ajpmessage.overflow", "" + numBytes, "" + pos),
                     new ArrayIndexOutOfBoundsException());
             if (log.isDebugEnabled()) {
@@ -381,6 +381,11 @@ public class AjpMessage {
         return 4;
     }
 
+    
+    public int getPacketSize() {
+        return buf.length;
+    }
+    
     
     public int processHeader() {
         pos = 0;
