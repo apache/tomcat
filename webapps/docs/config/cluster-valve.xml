@@ -43,9 +43,16 @@
         The filter uses regular expressions and each filter is delimited by a semi colon.
         <code>Pattern#compile(java.lang.String)</code>
       </attribute>
-      <attribute name="className" required="false">
+      <attribute name="primaryIndicator" required="false">
+        Boolean value, so to true, and the replication valve will insert a request attribute with the name
+        defined by the <code>primaryIndicatorName</code> attribute.
+        The value inserted into the request attribute is either <code>Boolean.TRUE</code> or 
+        <code>Boolean.FALSE</code>
       </attribute>
-      <attribute name="className" required="false">
+      <attribute name="primaryIndicatorName" required="false">
+        Default value is <code>org.apache.catalina.ha.tcp.isPrimarySession</code>
+        The value defined here is the name of the request attribute that contains the boolean value
+        if the session is primary on this server or not.
       </attribute>
       <attribute name="statistics" required="false">
         Boolean value. Set to <code>true</code> if you want the valve to collect request statistics.
@@ -63,7 +70,13 @@
   <subsection name="Attributes">
     <attributes>
       <attribute name="className" required="true">
+        <code>org.apache.catalina.ha.session.JvmRouteBinderValve</code>
       </attribute>
+      <attribute name="enabled" required="false">
+        Default value is <code>true</code>
+        Runtime attribute to turn on and off turn over of the session's jvmRoute value.
+      </attribute>
+      
     </attributes>
   </subsection>
 </section>
