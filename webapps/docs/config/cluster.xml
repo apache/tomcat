@@ -24,6 +24,16 @@
   making the configuration seem like a lot, but don't lose faith, instead you have a tremendous control
   over what is going on.</p>
 </section>
+<section name="Engine vs Host placement">
+  <p>
+   You can place the <code>&lt;Cluster&gt;</code> element inside either the <code>&lt;Engine&gt;</code>
+   container or the <code>&lt;Host&gt;</code> container.<br/>
+   Placing it in the engine, means that you will support clustering in all virtual hosts of Tomcat,
+   and share the messaging component. When you place the <code>&lt;Cluster&gt;</code> inside the <code>&lt;Engine&gt;</code>
+   element, the cluster will append the host name of each session manager to the managers name so that two contexts with 
+   the same name but sitting inside two different hosts will be distinguishable.
+  </p>
+</section>
 <section name="Context Attribute Replication">
   <p>To configure context attribute replication, simply do this by swapping out the context implementation
   used for your application context.

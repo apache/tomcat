@@ -15,13 +15,16 @@
  */
 package org.apache.catalina.ha;
 
+import org.apache.catalina.Valve;
+
 /**
- * Cluster Valve Interface to mark all Cluster Valves 
- * Only those Valve can'be configured as Cluster Valves
+ * Cluster valves are a simple extension to the Tomcat valve architecture
+ * with a small addition of being able to reference the cluster component in the container it sits in.
+ * @author Filip Hanik
  * @author Peter Rossbach
  * @version $Revision: 303842 $, $Date: 2005-04-10 11:20:46 -0500 (Sun, 10 Apr 2005) $
  */
-public interface ClusterValve {
+public interface ClusterValve extends Valve{
     /**
      * Returns the cluster the cluster deployer is associated with
      * @return CatalinaCluster
