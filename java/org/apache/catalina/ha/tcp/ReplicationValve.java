@@ -212,7 +212,7 @@ public class ReplicationValve
     /**
      * Calc processing stats
      */
-    public boolean isDoProcessingStats() {
+    public boolean doStatistics() {
         return doProcessingStats;
     }
 
@@ -220,7 +220,7 @@ public class ReplicationValve
      * Set Calc processing stats
      * @see #resetStatistics()
      */
-    public void setDoProcessingStats(boolean doProcessingStats) {
+    public void setStatistics(boolean doProcessingStats) {
         this.doProcessingStats = doProcessingStats;
     }
 
@@ -326,7 +326,7 @@ public class ReplicationValve
         long totalstart = 0;
 
         //this happens before the request
-        if(isDoProcessingStats()) {
+        if(doStatistics()) {
             totalstart = System.currentTimeMillis();
         }
         if (primaryIndicator) {
@@ -415,7 +415,7 @@ public class ReplicationValve
     protected void sendReplicationMessage(Request request, long totalstart, boolean isCrossContext, ClusterManager clusterManager, CatalinaCluster containerCluster) {
         //this happens after the request
         long start = 0;
-        if(isDoProcessingStats()) {
+        if(doStatistics()) {
             start = System.currentTimeMillis();
         }
         try {
@@ -432,7 +432,7 @@ public class ReplicationValve
             log.error(sm.getString("ReplicationValve.send.failure"), x);
         } finally {
             // FIXME this stats update are not cheap!!
-            if(isDoProcessingStats()) {
+            if(doStatistics()) {
                 updateStats(totalstart,start);
             }
         }
@@ -452,7 +452,7 @@ public class ReplicationValve
                     log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",  
                             session.getManager().getContainer().getName() ));
                 sendMessage(session,(ClusterManager)session.getManager(),containerCluster);
-                if(isDoProcessingStats()) {
+                if(doStatistics()) {
                     nrOfCrossContextSendRequests++;
                 }
             }
@@ -515,7 +515,7 @@ public class ReplicationValve
                     log.debug(sm.getString("ReplicationValve.invoke.uri", uri));
                 sendMessage(session,manager,cluster);
             } else
-                if(isDoProcessingStats())
+                if(doStatistics())
                     nrOfFilterRequests++;
         }
 
@@ -551,7 +551,7 @@ public class ReplicationValve
             } else {
                 cluster.send(msg);
             }
-            if(isDoProcessingStats())
+            if(doStatistics())
                 nrOfSendRequests++;
         }
     }
