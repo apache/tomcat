@@ -24,12 +24,8 @@ compile.debug=true
 base-jakarta.loc=http://archive.apache.org/dist/jakarta
 base-tomcat.loc=http://archive.apache.org/dist/tomcat
 
-# ----- Commons Logging, version 1.0.1 or later -----
-commons-logging.home=${base.path}/commons-logging-1.0.4
-commons-logging.lib=${commons-logging.home}
-commons-logging-api.jar=${commons-logging.lib}/commons-logging-api.jar
-commons-logging.jar=${commons-logging.lib}/commons-logging.jar
-commons-logging.loc=${base-jakarta.loc}/commons/logging/binaries/commons-logging-1.0.4.tar.gz
+# ----- Commons Logging, version 1.1 or later -----
+commons-logging-src.loc=${base-jakarta.loc}/commons/logging/source/commons-logging-1.1-src.tar.gz
 
 # ----- Eclipse JDT, version 3.2 or later -----
 jdt.home=${base.path}/eclipse/plugins

@@ -14,6 +14,16 @@
 
 <body>
 
+  <section name="Important note">
+  <p>
+    By default, only java.util.logging is available for the core Tomcat, as Tomcat uses
+    a package renamed logging implementation which is hardcoded for that logger. Usage of
+    alternate loggers is available after building the extra components (see
+    the <a href="extras.html">extras components</a> documentation), which includes
+    a full commons-logging implementation.
+  </p>
+  </section>
+  
   <section name="Introduction">
   <p>
     Tomcat 6.0 uses 
@@ -61,7 +71,7 @@
     <p>
       <ol>
         <li>Create a file called log4j.properties with the following content 
-            and save it into common/classes.
+            and save it into $CATALINA_HOME/lib.
           <source>
             log4j.rootLogger=debug, R <br />
             log4j.appender.R=org.apache.log4j.RollingFileAppender <br />
@@ -75,12 +85,16 @@
 	</li>
 
 	<li><a href="http://logging.apache.org/log4j">Download Log4J</a> 
-            (v1.2 or later) and place the log4j jar in $CATALINA_HOME/common/lib.</li>
+            (v1.2 or later) and place the log4j jar in $CATALINA_HOME/lib.</li>
 
-        <li><a href="http://jakarta.apache.org/site/downloads/downloads_commons-logging.cgi">
-            Download Commons Logging</a> and place the commons-logging.jar 
-            (not commons-logging-api.jar) in $CATALINA_HOME/common/lib with 
-            the log4j jar.</li>
+        <li>Build the commons-logging additional component using the extras.xml
+        Ant build script which is part of teh Tomcat source bundle.</li>
+        
+        <li>Replace <code>$CATALINA_HOME/bin/tomcat-juli.jar</code> with
+        <code>output/extras/tomcat-juli.jar</code>.</li>
+
+        <li>Place <code>$CATALINA_HOME/bin/tomcat-juli-adapters.jar</code> in 
+        $CATALINA_HOME/lib.</li>
 
 	<li>Start Tomcat</li>
       </ol>
