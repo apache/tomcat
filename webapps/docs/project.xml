@@ -45,6 +45,8 @@
         <item name="22) Logging"            href="logging.html"/>
         <item name="23) APR"                href="apr.html"/>
         <item name="24) Advanced IO"        href="aio.html"/>
+        <item name="25) Additional Components"
+              href="extras.html"/>
     </menu>
 
     <menu name="Reference">

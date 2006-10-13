@@ -1,0 +1,175 @@
+<project name="Tomcat 6.0" default="extras" basedir=".">
+
+
+  <!-- ===================== Initialize Property Values =================== -->
+
+  <!-- See "build.properties.sample" in the top level directory for all     -->
+  <!-- property values you must customize for successful building!!!        -->
+  <property file="${user.home}/build.properties"/>
+  <property file="build.properties"/>
+
+  <property file="build.properties.default"/>
+
+  <!-- Project Properties -->
+  <property name="name"                  value="Apache Tomcat" />
+  <property name="year"                  value="2006" />
+  <property name="version.major"         value="6" />
+  <property name="version.minor"         value="0" />
+  <property name="version.build"         value="0" />
+  <property name="version.patch"         value="0" />
+  <property name="version"               value="6.0.0-dev" />
+  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+
+  <property name="project"               value="apache-tomcat" />
+  <property name="final.name"            value="${project}-${version}" />
+  <property name="final-src.name"        value="${project}-${version}-src" />
+
+  <!-- Build Defaults -->
+  <property name="tomcat.build"      value="${basedir}/output/build"/>
+  <property name="tomcat.classes"    value="${basedir}/output/classes"/>
+  <property name="tomcat.dist"       value="${basedir}/output/dist"/>
+  <property name="tomcat.extras"     value="${basedir}/output/extras"/>
+  <property name="tomcat.deployer"   value="${basedir}/output/deployer"/>
+  <property name="tomcat.release"    value="${basedir}/output/release"/>
+  <property name="test.failonerror"  value="true"/>
+  <property name="test.runner"       value="junit.textui.TestRunner"/>
+
+  <!-- Can't be lower - jsp uses templates -->
+  <property name="compile.source" value="1.5"/>
+
+  <!-- JAR artifacts -->
+  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
+
+  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
+  <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
+  <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
+  <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
+  <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
+  <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
+  <property name="catalina-ant-jmx.jar" value="${tomcat.build}/lib/catalina-ant-jmx.jar"/>
+  <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+
+  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
+  <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
+
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
+  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
+  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
+  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+
+  <property name="tomcat-juli.jar" value="${tomcat.extras}/tomcat-juli.jar"/>
+  <property name="tomcat-juli-adapters.jar" value="${tomcat.extras}/tomcat-juli-adapters.jar"/>
+	
+  <!-- Classpath -->
+  <path id="tomcat.classpath">
+    <pathelement location="${tomcat.classes}"/>
+  </path>
+
+  <target name="prepare">
+    <mkdir dir="${tomcat.extras}"/>
+  </target>
+
+  <target name="clean">
+  	<delete dir="${tomcat.extras}"/>
+  </target>
+
+  <target name="commons-logging">
+    
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${commons-logging-src.loc}"/>
+      <param name="destfile" value="${tomcat.extras}/logging/commons-logging-src.tar.gz"/>
+      <param name="destdir" value="${tomcat.extras}/logging/"/>
+    </antcall>
+    <gunzip src="${tomcat.extras}/logging/commons-logging-src.tar.gz" 
+    	dest="${tomcat.extras}/logging/commons-logging-src.tar"/>
+    <untar src="${tomcat.extras}/logging/commons-logging-src.tar" 
+    	dest="${tomcat.extras}/logging/"/>
+  	
+    <replace dir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/commons" >
+      <replacefilter token="org.apache.commons"
+            value="org.apache.juli" />
+    </replace>
+    <mkdir dir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/juli" />
+    <move todir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/juli">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/commons" />
+    </move>
+
+    <replace dir="${tomcat.extras}/logging/commons-logging-1.1-src" >
+      <replacefilter token="org.apache.commons"
+            value="org.apache.juli" />
+        <replacefilter token="org/apache/commons/"
+              value="org/apache/juli/" />
+    </replace>
+    <copy tofile="${tomcat.extras}/logging/commons-logging-1.1-src/build2.xml" 
+    	file="${tomcat.extras}/logging/commons-logging-1.1-src/build.xml" />
+
+  	<ant antfile="${tomcat.extras}/logging/commons-logging-1.1-src/build2.xml"
+  	     dir="${tomcat.extras}/logging/commons-logging-1.1-src" 
+  	     target="getlibs" />
+    <copy todir="${tomcat.extras}/logging/commons-logging-1.1-src">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/lib" />
+    </copy>
+  	<ant antfile="${tomcat.extras}/logging/commons-logging-1.1-src/build2.xml"
+  	     dir="${tomcat.extras}/logging/commons-logging-1.1-src"
+  	     target="compile" />
+  
+    <jar jarfile="${tomcat-juli.jar}">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/target/classes">
+        <include name="org/apache/juli/logging/*.class" /> 
+        <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" /> 
+        <include name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
+        <include name="org/apache/juli/logging/impl/SimpleLog*.class" /> 
+        <include name="org/apache/juli/logging/impl/NoOpLog*.class" /> 
+        <include name="org/apache/juli/logging/impl/Jdk14Logger.class" /> 
+        <include name="META-INF/LICENSE.txt" /> 
+        <include name="META-INF/NOTICE.txt" /> 
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/juli/*" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+    <jar jarfile="${tomcat-juli-adapters.jar}">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/target/classes">
+        <include name="org/apache/juli/logging/impl/**.class" /> 
+        <exclude name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
+        <exclude name="org/apache/juli/logging/impl/LogFactoryImpl.class" /> 
+        <include name="META-INF/LICENSE.txt" /> 
+        <include name="META-INF/NOTICE.txt" /> 
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+    </jar>
+
+  </target>
+
+  <target name="extras" depends="prepare,commons-logging">
+  </target>
+
+  <!-- Download and dependency building -->
+  <target name="setproxy"  if="useproxy">
+    <taskdef name="setproxy"
+            classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
+    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
+    <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
+  </target>
+
+  <target name="testexist">
+    <echo message="Testing  for ${destfile}"/>
+    <available file="${destfile}" property="exist"/>
+  </target>
+
+  <target name="downloadfile" unless="exist" depends="setproxy,testexist">
+    <!-- Download extract the file -->
+    <mkdir dir="${destdir}" />
+    <get src="${sourcefile}" dest="${destfile}" />
+  </target>
+
+</project>

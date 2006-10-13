@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="extras.html">
+
+    &project;
+
+  <properties>
+    <title>Additional Components</title>
+    <author>Remy Maucherat</author>
+  </properties>
+
+<body>
+
+  <section name="Introduction">
+  <p>
+    A number of additional third party components may be used with Apache Tomcat, but are not
+    provided directly in the downlad bundle for a variety of reasons. These may be built by
+    users should they need it.
+  </p>
+
+  </section>
+
+  <section name="Building">
+
+    <p>
+      The additional components are built using the <code>extras.xml</code> Ant script which is
+      present in the source bundle of Tomcat.
+    </p>
+    
+    <p>The build process is the following:</p>
+    
+    <ul>
+    <li>Follow the <a href="building.html">build instructions</a> to build a Tomcat binary from
+    the source bundle (note: it will be used by the build process of the additional components, but
+    does not need to be actually used later on)</li>
+    <li>Execute the command <code>ant -f extras.xml</code> to run the build script</li>
+    <li>The additional components JARs will be placed in the <code>output/extras</code> folder</li>
+    <li>Refer to the documentation below about the usage of these JARs</li>
+    </ul>
+	
+  </section>
+
+  <section name="Commons-logging">
+
+  <p>
+    Tomcat uses a package renamed commons-logging API implementation which is hardcoded to use
+    the java.util.logging API. The commons-logging additional component builds a full fledged
+    package renames commons-logging implementation which can be used to replace the implementation
+    provided with Tomcat. See the <a href="logging.html">logging</a> page for usage instructions.
+  </p>
+
+  </section>
+
+</body>
+</document>
