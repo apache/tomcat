@@ -9,6 +9,22 @@
 ##    (This may become a configurable parameter at some point.)
 ##
 
+#   Generic path layout that needs --prefix=/some/path
+<Layout generic>
+    exec_prefix:   ${prefix}
+    bindir:        ${exec_prefix}/bin
+    sbindir:       ${exec_prefix}/bin
+    libdir:        ${exec_prefix}/lib
+    libexecdir:    ${exec_prefix}/modules
+    mandir:        ${prefix}/man
+    sysconfdir:    ${prefix}/conf
+    datadir:       ${prefix}
+    installbuilddir: ${datadir}/build
+    includedir:    ${prefix}/include/apr-${TCNATIVE_MAJOR_VERSION}
+    localstatedir: ${prefix}
+    libsuffix:     -${TCNATIVE_MAJOR_VERSION}
+</Layout>
+
 #   Classical Tomcat Native path layout designed for parallel installs.
 <Layout tcnative>
     prefix:        /usr/local/apr
