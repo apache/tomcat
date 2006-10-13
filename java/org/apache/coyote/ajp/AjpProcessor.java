@@ -428,7 +428,9 @@ public class AjpProcessor implements ActionHook {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
         recycle();
-
+        input = null;
+        output = null;
+        
         return true;
 
     }
@@ -1062,9 +1064,6 @@ public class AjpProcessor implements ActionHook {
         response.recycle();
         certificates.recycle();
 
-        input = null;
-        output = null;
-        
     }
 
 
@@ -1157,7 +1156,9 @@ public class AjpProcessor implements ActionHook {
                 responseHeaderMessage.reset();
                 responseHeaderMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
                 responseHeaderMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
+                responseHeaderMessage.end();
                 output.write(responseHeaderMessage.getBuffer(), 0, responseHeaderMessage.getLen());
+
                 off += thisTime;
             }
 
