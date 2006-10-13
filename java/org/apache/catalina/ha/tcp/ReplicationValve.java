@@ -634,12 +634,11 @@ public class ReplicationValve
             if (session instanceof ClusterSession) {
                 ClusterSession cses = (ClusterSession) session;
                 if (cses != null) {
-                    Boolean isPrimary = new Boolean(cses.isPrimarySession());
                     if (log.isDebugEnabled())
                         log.debug(sm.getString(
                                 "ReplicationValve.session.indicator", request.getContext().getName(),id,
-                                primaryIndicatorName, isPrimary));
-                    request.setAttribute(primaryIndicatorName, isPrimary);
+                                primaryIndicatorName, cses.isPrimarySession()));
+                    request.setAttribute(primaryIndicatorName, cses.isPrimarySession()?Boolean.TRUE:Boolean.FALSE);
                 }
             } else {
                 if (log.isDebugEnabled()) {
