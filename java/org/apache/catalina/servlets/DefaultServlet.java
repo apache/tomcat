@@ -749,7 +749,8 @@ public class DefaultServlet
                 // If it fails, we try to get a Writer instead if we're
                 // trying to serve a text file
                 if ( (contentType == null)
-                     || (contentType.startsWith("text")) ) {
+                        || (contentType.startsWith("text"))
+                        || (contentType.endsWith("xml")) ) {
                     writer = response.getWriter();
                 } else {
                     throw e;
