@@ -15,6 +15,7 @@
 
 
 <section name="Introduction">
+  <p>
   A cluster manager is an extension to Tomcat's session manager interface, 
   <code>org.apache.catalina.Manager</code>
   A cluster manager must implement the <code>org.apache.catalina.ha.ClusterManager</code> and is solely 
@@ -27,35 +28,53 @@
   so the manager knows at what locations the webapp is deployed.<br/>
   We are planning to add more managers with even more sophisticated backup mechanism to support even larger clusters.
   Check back soon! 
-
+  </p>
 </section>
 
+<section name="The &lt;Manager&gt;">
+  <p>
+   The <code>&lt;Manager&gt;</code> element defined inside the <code>&lt;Cluster&gt;</code> element
+   is the template defined for all web applications that are marked <code>&lt;distributable/&gt;</code>
+   in their <code>web.xml</code> file. 
+   However, you can still override the manager implementation on a per web application basis,
+   by putting the <code>&lt;Manager&gt;</code> inside the <code>&lt;Context&gt;</code> element either in the 
+   <code><a href="context.html">context.xml</a></code> file or the <code><a href="index.html">server.xml</a></code> file.
+  </p> 
+</section>
 
 <section name="Attributes">
 
   <subsection name="Common Attributes">
-
-  <attributes>
- 
-    <attribute name="className" required="true">
-
-    </attribute>
-    <attribute name="domainReplication" required="false">
+    <attributes>
+     <attribute name="className" required="true">
+     </attribute>
+     <attribute name="domainReplication" required="false">
       Set to true if you wish sessions to be replicated only to members that have the same logical
       domain set. If set to false, session replication will ignore the domain setting the 
       <code><a href="cluster-membership.html">&lt;Membership&gt;</a></code>
       element.
-    </attribute>
-    <attribute name="defaultMode" required="false">
+     </attribute>
+     <attribute name="name" required="false">
+      <b>The name of this cluster manager, the name is used to identify a session manager on a node.
+      The name might get modified by the <code>Cluster</code> element to make it unique in the container.</b>
+     </attribute>
+     <attribute name="defaultMode" required="false">
       <b>Deprecated since 6.0.0</b>
-    </attribute>
-    <attribute name="expireSessionsOnShutdown" required="false">
-      
-    </attribute>
-    <attribute name="notifyListenersOnReplication" required="false">
-    
-    </attribute>
-
+     </attribute>
+     <attribute name="notifyListenersOnReplication" required="false">
+       Set to <code>true</code> if you wish to have session listeners notified when
+       session attributes are being replicated or removed across Tomcat nodes in the cluster.
+     </attribute>
+    </attributes>
+  </subsection> 
+  <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
+    <attributes>
+     <attribute name="expireSessionsOnShutdown" required="false">
+       When a webapplication is being shutdown, Tomcat issues an expire call to each session to 
+       notify all the listeners. If you wish for all sessions to expire on all nodes when
+       a shutdown occurs on one node, set this value to <code>true</code>.
+       Default value is <code>false</code>.
+     </attribute>
 
   </attributes>
 
