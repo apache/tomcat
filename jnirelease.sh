@@ -51,7 +51,7 @@ fi
 # and JKJNIVER by the version like 1.1.0
 JKJNIEXT=trunk
 JKJNIVER=current
-# JKJNIVER="1.1.5"
+# JKJNIVER="1.1.6"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 JKJNIDIST=tomcat-connectors-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
