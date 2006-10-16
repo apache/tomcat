@@ -18,11 +18,14 @@
 package org.apache.catalina.core;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.servlet.Filter;
@@ -35,6 +38,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
+import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.log.SystemLogHandler;
 
 
@@ -50,6 +54,9 @@ import org.apache.tomcat.util.log.SystemLogHandler;
 final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
 
+    protected static StringManager sm =
+        StringManager.getManager(Constants.Package);
+    
     // ----------------------------------------------------------- Constructors
 
 
@@ -78,6 +85,23 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
                ServletException, InvocationTargetException, NamingException {
 
         super();
+
+        if (restrictedFilters == null) {
+            restrictedFilters = new Properties();
+            try {
+                InputStream is = 
+                    this.getClass().getClassLoader().getResourceAsStream
+                        ("org/apache/catalina/core/RestrictedFilters.properties");
+                if (is != null) {
+                    restrictedFilters.load(is);
+                } else {
+                    context.getLogger().error(sm.getString("applicationFilterConfig.restrictedFiltersResources"));
+                }
+            } catch (IOException e) {
+                context.getLogger().error(sm.getString("applicationFilterConfig.restrictedServletsResources"), e);
+            }
+        }
+        
         this.context = context;
         setFilterDef(filterDef);
 
@@ -105,6 +129,12 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
     private FilterDef filterDef = null;
 
 
+    /**
+     * Restricted filters (which can only be loaded by a privileged webapp).
+     */
+    protected static Properties restrictedFilters = null;
+
+    
     // --------------------------------------------------- FilterConfig Methods
 
 
@@ -215,6 +245,11 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
         // Instantiate a new instance of this filter and return it
         Class clazz = classLoader.loadClass(filterClass);
+        if (!isFilterAllowed(clazz)) {
+            throw new SecurityException
+                (sm.getString("applicationFilterConfig.privilegedFilter",
+                        filterClass));
+        }
         this.filter = (Filter) clazz.newInstance();
         if (!context.getIgnoreAnnotations()) {
             if (context instanceof StandardContext) {
@@ -249,6 +284,29 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
     FilterDef getFilterDef() {
 
         return (this.filterDef);
+
+    }
+
+
+    /**
+     * Return <code>true</code> if loading this filter is allowed.
+     */
+    protected boolean isFilterAllowed(Class filterClass) {
+
+        // Privileged webapps may load all servlets without restriction
+        if (context.getPrivileged()) {
+            return true;
+        }
+
+        Class clazz = filterClass;
+        while (clazz != null && !clazz.getName().equals("javax.servlet.Filter")) {
+            if ("restricted".equals(restrictedFilters.getProperty(clazz.getName()))) {
+                return (false);
+            }
+            clazz = clazz.getSuperclass();
+        }
+        
+        return (true);
 
     }
 
