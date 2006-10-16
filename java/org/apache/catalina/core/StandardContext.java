@@ -4249,16 +4249,19 @@ public class StandardContext
                     } else {
                         contextManager = new StandardManager();
                     }
-                } else if ( (getCluster() != null) && distributable) {
+                } 
+                
+                // Configure default manager if none was specified
+                if (contextManager != null) {
+                    setManager(contextManager);
+                }
+
+                if (manager!=null && (getCluster() != null) && distributable) {
                     //let the cluster know that there is a context that is distributable
                     //and that it has its own manager
                     getCluster().registerManager(manager);
                 }
 
-                // Configure default manager if none was specified
-                if (contextManager != null) {
-                	setManager(contextManager);
-                }
                 
                 // Start manager
                 if ((manager != null) && (manager instanceof Lifecycle)) {

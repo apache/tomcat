@@ -221,8 +221,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
             long t1 = System.currentTimeMillis();
             String jvmRoute = getLocalJvmRoute(request);
             if (jvmRoute == null) {
-                if (log.isWarnEnabled())
-                    log.warn(sm.getString("jvmRoute.missingJvmRouteAttribute"));
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("jvmRoute.missingJvmRouteAttribute"));
                 return;
             }
             handleJvmRoute( request, response,session.getIdInternal(), jvmRoute);

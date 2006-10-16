@@ -53,6 +53,11 @@ import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.catalina.ha.session.ClusterSessionListener;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
+import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
+import org.apache.catalina.ha.session.JvmRouteBinderValve;
+import org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener;
 
 /**
  * A <b>Cluster </b> implementation using simple multicast. Responsible for
@@ -167,10 +172,7 @@ public class SimpleTcpCluster
      */
     private Map properties = new HashMap();
     
-    private int channelSendOptions = 
-        Channel.SEND_OPTIONS_ASYNCHRONOUS |
-        Channel.SEND_OPTIONS_SYNCHRONIZED_ACK |
-        Channel.SEND_OPTIONS_USE_ACK;
+    private int channelSendOptions = Channel.SEND_OPTIONS_ASYNCHRONOUS;
 
     // ------------------------------------------------------------- Properties
 
@@ -272,7 +274,7 @@ public class SimpleTcpCluster
      * @param valve The new cluster Valve.
      */
     public void addValve(Valve valve) {
-        if (valve instanceof ClusterValve)
+        if (valve instanceof ClusterValve && (!valves.contains(valve)))
             valves.add(valve);
     }
 
@@ -506,7 +508,7 @@ public class SimpleTcpCluster
             log.error("Unable to clone cluster manager, defaulting to org.apache.catalina.ha.session.DeltaManager", x);
             manager = new org.apache.catalina.ha.session.DeltaManager();
         } finally {
-            if(manager != null) registerManager(manager);
+            if ( manager != null && (manager instanceof ClusterManager)) ((ClusterManager)manager).setCluster(this);
         }
         return manager;
     }
@@ -560,8 +562,8 @@ public class SimpleTcpCluster
             Container context = manager.getContainer() ;
             if(context != null && context instanceof Context) {
                 Container host = ((Context)context).getParent();
-                if(host != null && host instanceof Host)
-                    clusterName = host.getName() +"#" + name ;
+                if(host != null && host instanceof Host && clusterName!=null && !(clusterName.indexOf("#")>=0))
+                    clusterName = host.getName() +"#" + clusterName ;
             }
         }
         return clusterName;
@@ -656,9 +658,8 @@ public class SimpleTcpCluster
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, this);
         try {
-            if ( clusterDeployer != null ) clusterDeployer.setCluster(this);
-            this.registerClusterValve();
-            if ( channel == null ) channel = new GroupChannel();
+            checkDefaults();
+            registerClusterValve();
             channel.addMembershipListener(this);
             channel.addChannelListener(this);
             channel.start(channel.DEFAULT);
@@ -669,6 +670,23 @@ public class SimpleTcpCluster
         } catch (Exception x) {
             log.error("Unable to start cluster.", x);
             throw new LifecycleException(x);
+        }
+    }
+
+    protected void checkDefaults() {
+        if ( clusterListeners.size() == 0 ) {
+            addClusterListener(new JvmRouteSessionIDBinderListener()); 
+            addClusterListener(new ClusterSessionListener());
+        }
+        if ( valves.size() == 0 ) {
+            addValve(new JvmRouteBinderValve());
+            addValve(new ReplicationValve());
+        }
+        if ( clusterDeployer != null ) clusterDeployer.setCluster(this);
+        if ( channel == null ) channel = new GroupChannel();
+        if ( channel instanceof GroupChannel && !((GroupChannel)channel).getInterceptors().hasNext()) {
+            channel.addInterceptor(new MessageDispatch15Interceptor());
+            channel.addInterceptor(new TcpFailureDetector());
         }
     }
 
