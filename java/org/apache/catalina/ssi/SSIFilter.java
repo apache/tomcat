@@ -66,42 +66,22 @@ public class SSIFilter implements Filter {
     public void init(FilterConfig config) throws ServletException {
     	this.config = config;
     	
-        String value = null;
-        try {
-            value = config.getInitParameter("debug");
-            debug = Integer.parseInt(value);
-        } catch (Throwable t) {
-            ;
+        if (config.getInitParameter("debug") != null) {
+            debug = Integer.parseInt(config.getInitParameter("debug"));
         }
-        try {
-            value = config.getInitParameter("contentType");
-            contentTypeRegEx = Pattern.compile(value);
-        } catch (Throwable t) {
+
+        if (config.getInitParameter("contentType") != null) {
+            contentTypeRegEx = Pattern.compile(config.getInitParameter("contentType"));
+        } else {
             contentTypeRegEx = shtmlRegEx;
-            StringBuffer msg = new StringBuffer();
-            msg.append("Invalid format or no contentType initParam; ");
-            msg.append("expected regular expression; defaulting to ");
-            msg.append(shtmlRegEx.pattern());
-            config.getServletContext().log(msg.toString());
         }
-        try {
-            value = config.getInitParameter(
-                    "isVirtualWebappRelative");
-            isVirtualWebappRelative = Integer.parseInt(value) > 0?true:false;
-        } catch (Throwable t) {
-            ;
-        }
-        try {
-            value = config.getInitParameter("expires");
-            expires = Long.valueOf(value);
-        } catch (NumberFormatException e) {
-            expires = null;
-            config.getServletContext().log(
-                "Invalid format for expires initParam; expected integer (seconds)"
-            );
-        } catch (Throwable t) {
-            ;
-        }
+
+        isVirtualWebappRelative = 
+            Boolean.parseBoolean(config.getInitParameter("isVirtualWebappRelative"));
+
+        if (config.getInitParameter("expires") != null)
+            expires = Long.valueOf(config.getInitParameter("expires"));
+
         if (debug > 0)
             config.getServletContext().log(
                     "SSIFilter.init() SSI invoker started with 'debug'=" + debug);
@@ -178,12 +158,16 @@ public class SSIFilter implements Filter {
         }
 
         // write output
+        OutputStream out = null;
         try {
-            OutputStream out = res.getOutputStream();
+            out = res.getOutputStream();
+        } catch (IllegalStateException e) {
+            // Ignore, will try to use a writer
+        }
+        if (out == null) {
+            res.getWriter().write(new String(bytes));
+        } else {
             out.write(bytes);
-        } catch (Throwable t) {
-            Writer out = res.getWriter();
-            out.write(new String(bytes));
         }
     }
 
