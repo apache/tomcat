@@ -21,7 +21,9 @@
 Using the JK native connector</a><br />
 <a href="#Using Apache HTTP Server 2.x with mod_proxy">
 Using Apache HTTP Server 2.x and mod_proxy</a><br />
+<!--
 <a href="#Using the balancer webapp">Using the balancer webapp</a><br />
+-->
 </p>
 </section>
 
@@ -40,6 +42,7 @@ from Apache HTTP Server 2.2.
 
 </section>
 
+<!--
 <section name="Using the balancer webapp">
 
 <subsection name="Overview">
@@ -142,6 +145,7 @@ tomcat-user mailing list.  Thank you.
 </subsection>
 
 </section>
+-->
 
 </body>
 

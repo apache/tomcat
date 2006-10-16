@@ -9,10 +9,164 @@
   <properties>
     <author email="remm@apache.org">Remy Maucherat</author>
     <author email="yoavs@apache.org">Yoav Shapira</author>
+    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>Changelog</title>
   </properties>
 
 <body>
+<section name="Tomcat 6.0.0 (remm)">
+</section>
+
+<section name="Tomcat 5.5.21 (fhanik)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>29727</bug>: If env-entry values in web.xml are changed then
+        ensure new values are applied when context is reloaded. (markt)
+      </fix>
+      <fix>
+        <bug>34956</bug>: Ensure request and response objects passed to a
+        RequestDispatcher meet the requirements of SRV.8.2 and
+        SRV.14.2.5.1. This is disabled by default. The Java option 
+        <code>-Dorg.apache.catalina.STRICT_SERVLET_COMPLIANCE=true</code>
+        is required to enable this test. (markt)
+      </fix>
+      <fix>
+        <bug>36274</bug>: When including static content with the
+        DefaultServlet also treat content types ending in xml as text.
+        (markt)
+      </fix>
+      <fix>
+        <bug>39724</bug>: Removing the last valve from a pipeline did not
+        return the pipeline to the original state. Patch provided by
+        David Gagon. (markt)
+      </fix>
+      <fix>
+        <bug>36976</bug>: Don't use CATALINA_OPTS when stopping Tomcat. This
+        allows options for starting and stopping to be set on JAVA_OPTS and
+        options for starting only to be set on CATALINA_OPTS. Without this
+        fix, some startup options (eg the port for remote JMX) would cause
+        stop to fail. Based on a fix suggested by Michael Vorburger. (markt)
+      </fix>
+      <fix>
+        <bug>40528</bug>: Add missing message localisations as provided by
+        Ben Clifford. (markt)
+      </fix>
+      <fix>
+        <bug>40625</bug>: Stop CGIServlet swallowing the root cause of an
+        exception. Patch provided by Takayoshi Kimura. (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>34952</bug>: Clarify that the Windows Installer always installs
+        a Windows service. (markt)
+      </fix>
+      <fix>
+        <bug>35968</bug>: Make environment entry properties input a text area.
+        Patch provided by Tristan Marly. (markt)
+      </fix>
+      <fix>
+        <bug>40633</bug>: Remove references to the DefaultContext from the
+        documentation. (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+</section>
+
+
+<section name="Tomcat 5.5.20 (fhanik)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix logic error in UserDatbaseRealm.getprincipal() that caused user
+        roles assigned via groups to be ignored. (markt)
+      </fix>
+      <fix>
+        <bug>40518</bug>: Use correct message when a RuntimeException is
+        thrown from the requestInitialized or requestDestroyed method of
+        a listener that implements ServletRequestListener. (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>31804</bug>: Unnested tags within a tag file are now configured
+        with the Tag represented by the containing tag file as their parent
+        tag. (markt)
+      </fix>
+      <fix>
+        <bug>33356</bug>: Tag attributes that contained $ followed by 1 or
+        more non-special characters and then a { character caused an
+        exception. (markt)
+      </fix>
+      <fix>
+        <bug>33407</bug>: The string \$ in template text was reduced to $
+        when the isELIgnored page directive was set to true. (markt)
+      </fix>
+      <fix>
+        <bug>34509</bug>: Tag names may now use the full range of
+        characters permitted by xsd:nmtoken. (markt)
+      </fix>
+    </changelog>
+  </subsection>   
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>34399</bug>: Disable undeploy for applications that have not
+        been deployed such as those defined in server.xml (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+</section>
+
+
+<section name="Tomcat 5.5.19 (fhanik)">
+  <subsection name="General">
+    <changelog>
+      <update>
+         Add multi attribute setting to jmx:set JMX remote ant task.
+         Patch contributed by Didier Donsez (pero)
+      </update>      
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>30762</bug>: Re-fix this bug that was re-introduced by the fix
+        to <bug>37264</bug>. (markt)
+      </fix>
+      <fix>
+        <bug>37588</bug>: Fix JNDI realm creation through JMX. Patch contributed by TerryZhou  (fhanik)
+      </fix>
+      <fix>
+        <bug>39704</bug>: The use of custom classloaders failed when the context
+        was specified in server.xml. Correction of the fault will require setting
+        the new loader attribute useSystemClassLoaderAsParent to false. (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>40418</bug>: APR Endpoint socket evaluation (remm)
+      </fix>
+  </changelog>
+  </subsection> 
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>31339</bug>: Admin app threw exceptions if a name other than Catalina
+        was configured for the Engine. Patch based on a suggestion from Amila
+        Suriarachchi. (markt)
+      </fix>
+    </changelog>
+  </subsection> 
+</section>
+
 
 <section name="Tomcat 5.5.18 (yoavs)">
   <subsection name="General">
@@ -1307,7 +1461,7 @@
         <bug>18477</bug>: Allow symbolic links when precompiling JSPs (markt)
       </fix>
       <add>
-        <bug>34727</bug>: Allow specifying the Option class used by the Jasper engine,
+        <bug>34272</bug>: Allow specifying the Option class used by the Jasper engine,
         submitted by Scott Stark (remm)
       </add>
       <add>

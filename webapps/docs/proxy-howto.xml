@@ -48,7 +48,7 @@ proxy configurations for several common cases.</p>
 
 <p>Apache 1.3 supports an optional module (<code>mod_proxy</code>) that
 configures the web server to act as a proxy server.  This can be used to
-forward requests for a particular web application to a Tomcat 5 instance,
+forward requests for a particular web application to a Tomcat 6 instance,
 without having to configure a web connector such as <code>mod_jk</code>.
 To accomplish this, you need to perform the following tasks:</p>
 <ol>

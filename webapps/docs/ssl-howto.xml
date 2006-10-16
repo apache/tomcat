@@ -22,15 +22,15 @@
 
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 5,
+    to refer to the directory into which you have installed Tomcat 6,
     and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 5 for multiple
+    resolved.  However, if you have configured Tomcat 6 for multiple
     instances by setting a CATALINA_BASE directory, you should use
     $CATALINA_BASE instead of $CATALINA_HOME for each of these
     references.</p>
     </em></blockquote>
 
-<p>To install and configure SSL support on Tomcat 5, you need to follow
+<p>To install and configure SSL support on Tomcat 6, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <ol>
 <li>If you are running a 1.3 JVM, download JSSE 1.0.3 (or later) from
@@ -290,7 +290,7 @@ which contains further references for this issue.</p>
 <p>The final step is to configure your secure socket in the
 <code>$CATALINA_HOME/conf/server.xml</code> file, where
 <code>$CATALINA_HOME</code> represents the directory into which you
-installed Tomcat 5.  An example <code>&lt;Connector&gt;</code> element
+installed Tomcat 6.  An example <code>&lt;Connector&gt;</code> element
 for an SSL connector is included in the default <code>server.xml</code>
 file installed with Tomcat.  It will look something like this:</p>
 <source>

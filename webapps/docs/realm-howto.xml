@@ -60,7 +60,7 @@ see the <a href="http://java.sun.com/products/servlet/download.html">Servlet
 Specification (Version 2.4)</a>, Section 12.</p>
 
 <p>For information about utilizing the <em>Single Sign On</em> feature of
-Tomcat 5 (allowing a user to authenticate themselves once across the entire
+Tomcat 6 (allowing a user to authenticate themselves once across the entire
 set of web applications associated with a virtual host), see
 <a href="config/host.html#Single Sign On">here</a>.</p>
 
@@ -87,7 +87,7 @@ applications to <em>declare</em> their security requirements (in the
 defining the interface between a servlet container and the associated user
 and role information.  In many cases, however, it is desireable to "connect"
 a servlet container to some existing authentication database or mechanism
-that already exists in the production environment.  Therefore, Tomcat 5
+that already exists in the production environment.  Therefore, Tomcat 6
 defines a Java interface (<code>org.apache.catalina.Realm</code>) that
 can be implemented by "plug in" components to establish this connection.
 Five standard plug-ins are provided, supporting connections to various
@@ -218,11 +218,9 @@ java org.apache.catalina.realm.RealmBase \
    <code>testUser:localhost:8080:testPassword</code>.</p>
 
 <p>To use either of the above techniques, the
-<code>$CATALINA_HOME/server/lib/catalina.jar</code> file will need to be
-on your class path to make the <code>RealmBase</code> class available.  In 
-addition, you will need the JMX jar and the commons-logging jar (either 
-commons-logging-api.jar or commons-logging.jar).  Both of these are included
-with the Tomcat distribution.
+<code>$CATALINA_HOME/lib/catalina.jar</code> and 
+<code>$CATALINA_HOME/bin/tomcat-juli.jar</code> files will need to be
+on your class path to make the <code>RealmBase</code> class available.
 </p>
 
 <p>Non-ASCII usernames and/or passwords are supported using
@@ -240,7 +238,7 @@ corrupted in the return, the digest will be invalid.</p>
 
 <subsection name="Example Application">
 
-<p>The example application shipped with Tomcat 5 includes an area that is
+<p>The example application shipped with Tomcat 6 includes an area that is
 protected by a security constraint, utilizing form-based login.  To access it,
 point your browser at
 <a href="http://localhost:8080/jsp-examples/security/protected/">http://localhost:8080/jsp-examples/security/protected/</a>
@@ -253,7 +251,7 @@ and log on with one of the usernames and passwords described for the default
 <subsection name="Manager Application">
 
 <p>If you wish to use the <a href="manager-howto.html">Manager Application</a>
-to deploy and undeploy applications in a running Tomcat 5 installation, you
+to deploy and undeploy applications in a running Tomcat 6 installation, you
 MUST add the "manager" role to at least one username in your selected Realm
 implementation.  This is because the manager web application itself uses a
 security constraint that requires role "manager" to access ANY request URI
@@ -285,7 +283,7 @@ Tomcat administrator specifically assigns this role to one or more users.</p>
 
 <h3>Introduction</h3>
 
-<p><strong>JDBCRealm</strong> is an implementation of the Tomcat 5
+<p><strong>JDBCRealm</strong> is an implementation of the Tomcat 6
 <code>Realm</code> interface that looks up users in a relational database
 accessed via a JDBC driver.  There is substantial configuration flexibility
 that lets you adapt to existing table and column names, as long as your
@@ -325,13 +323,11 @@ database structure conforms to the following requirements:</p>
     at least read only access to the tables described above.  (Tomcat will
     never attempt to write to these tables.)</li>
 <li>Place a copy of the JDBC driver you will be using inside the
-    <code>$CATALINA_HOME/server/lib</code> directory (if you do not need it
-    visible to web applications) or <code>$CATALINA_HOME/common/lib</code>
-    (if it will be used both by Tomcat 5 <em>and</em> by your apps).
+    <code>$CATALINA_HOME/lib</code> directory.
     Note that <strong>only</strong> JAR files are recognized!</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
     <code>$CATALINA_HOME/conf/server.xml</code> file.</li>
-<li>Restart Tomcat 5 if it is already running.</li>
+<li>Restart Tomcat 6 if it is already running.</li>
 </ol>
 
 <h3>Realm Element Attributes</h3>
@@ -441,7 +437,7 @@ described above, and accessed with username "dbuser" and password "dbpass":</p>
 <p>JDBCRealm operates according to the following rules:</p>
 <ul>
 <li>When a user attempts to access a protected resource for the first time,
-    Tomcat 5 will call the <code>authenticate()</code> method of this
+    Tomcat 6 will call the <code>authenticate()</code> method of this
     <code>Realm</code>.  Thus, any changes you have made to the database
     directly (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
@@ -465,7 +461,7 @@ described above, and accessed with username "dbuser" and password "dbpass":</p>
 
 <h3>Introduction</h3>
 
-<p><strong>DataSourceRealm</strong> is an implementation of the Tomcat 5
+<p><strong>DataSourceRealm</strong> is an implementation of the Tomcat 6
 <code>Realm</code> interface that looks up users in a relational database
 accessed via a JNDI named JDBC DataSource.  There is substantial configuration
 flexibility that lets you adapt to existing table and column names, as long
@@ -509,7 +505,7 @@ as your database structure conforms to the following requirements:</p>
     for information on how to configure a JNDI named JDBC DataSource.</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
     <code>$CATALINA_HOME/conf/server.xml</code> file.</li>
-<li>Restart Tomcat 5 if it is already running.</li>
+<li>Restart Tomcat 6 if it is already running.</li>
 </ol>
 
 <h3>Realm Element Attributes</h3>
@@ -613,7 +609,7 @@ name "java:/comp/env/jdbc/authority".</p>
 <p>DataSourceRealm operates according to the following rules:</p>
 <ul>
 <li>When a user attempts to access a protected resource for the first time,
-    Tomcat 5 will call the <code>authenticate()</code> method of this
+    Tomcat 6 will call the <code>authenticate()</code> method of this
     <code>Realm</code>.  Thus, any changes you have made to the database
     directly (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
@@ -637,7 +633,7 @@ name "java:/comp/env/jdbc/authority".</p>
 
 <h3>Introduction</h3>
 
-<p><strong>JNDIRealm</strong> is an implementation of the Tomcat 5
+<p><strong>JNDIRealm</strong> is an implementation of the Tomcat 6
 <code>Realm</code> interface that looks up users in an LDAP directory
 server accessed by a JNDI provider (typically, the standard LDAP
 provider that is available with the JNDI API classes). The realm
@@ -815,12 +811,10 @@ the name of this attribute.</p>
     never attempt to modify this information.)</li>
 <li>Place a copy of the JNDI driver you will be using (typically
     <code>ldap.jar</code> available with JNDI) inside the
-    <code>$CATALINA_HOME/server/lib</code> directory (if you do not need it
-    visible to web applications) or <code>$CATALINA_HOME/common/lib</code>
-    (if it will be used both by Tomcat 5 <em>and</em> by your apps).</li>
+    <code>$CATALINA_HOME/lib</code> directory.</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
     <code>$CATALINA_HOME/conf/server.xml</code> file.</li>
-<li>Restart Tomcat 5 if it is already running.</li>
+<li>Restart Tomcat 6 if it is already running.</li>
 </ol>
 
 <h3>Realm Element Attributes</h3>
@@ -1149,7 +1143,7 @@ authentication is usually to be preferred.</p>
 <p>JNDIRealm operates according to the following rules:</p>
 <ul>
 <li>When a user attempts to access a protected resource for the first time,
-    Tomcat 5 will call the <code>authenticate()</code> method of this
+    Tomcat 6 will call the <code>authenticate()</code> method of this
     <code>Realm</code>.  Thus, any changes you have made to the directory
     (new users, changed passwords or roles, etc.) will be immediately
     reflected.</li>
@@ -1174,7 +1168,7 @@ authentication is usually to be preferred.</p>
 <h3>Introduction</h3>
 
 <p><strong>MemoryRealm</strong> is a simple demonstration implementation of the
-Tomcat 5 <code>Realm</code> interface.  It is not designed for production use.
+Tomcat 6 <code>Realm</code> interface.  It is not designed for production use.
 At startup time, MemoryRealm loads information about all users, and their
 corresponding roles, from an XML document (by default, this document is loaded from <code>$CATALINA_HOME/conf/tomcat-users.xml</code>).  Changes to the data
 in this file are not recognized until Tomcat is restarted.</p>
@@ -1229,7 +1223,7 @@ valid user, consisting of the following attributes:</p>
 
 <h3>Example</h3>
 
-<p>The default installation of Tomcat 5 is configured with a MemoryRealm
+<p>The default installation of Tomcat 6 is configured with a MemoryRealm
 nested inside the <code>&lt;Engine&gt;</code> element, so that it applies
 to all virtual hosts and web applications.  The default contents of the
 <code>conf/tomcat-users.xml</code> file is:</p>
@@ -1250,7 +1244,7 @@ to all virtual hosts and web applications.  The default contents of the
     this file will <strong>not</strong> be recognized until Tomcat is
     restarted.</li>
 <li>When a user attempts to access a protected resource for the first time,
-    Tomcat 5 will call the <code>authenticate()</code> method of this
+    Tomcat 6 will call the <code>authenticate()</code> method of this
     <code>Realm</code>.</li>
 <li>Once a user has been authenticated, the user (and his or her associated
     roles) are cached within Tomcat for the duration of the user's login.
@@ -1322,7 +1316,7 @@ variable: <code>JAVA_OPTS=-DJAVA_OPTS=-Djava.security.auth.login.config==$CATALI
           <li>Configure your security-constraints in your web.xml for
 the resources you want to protect</li>
           <li>Configure the JAASRealm module in your server.xml </li>
-          <li>Restart Tomcat 5 if it is already running.</li>
+          <li>Restart Tomcat 6 if it is already running.</li>
         </ol>
         <h3>Realm Element Attributes</h3>
         <p>To configure JAASRealm as for step 6 above, you create
@@ -1395,7 +1389,7 @@ and restarting the server, without any code changes to your application.</li>
         <h3>Additional Notes</h3>
         <ul>
           <li>When a user attempts to access a protected resource for
-              the first time, Tomcat 5 will call the <code>authenticate()</code>
+              the first time, Tomcat 6 will call the <code>authenticate()</code>
               method of this <code>Realm</code>.  Thus, any changes you have made in
               the security mechanism directly (new users, changed passwords or
               roles, etc.) will be immediately reflected.</li>

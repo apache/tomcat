@@ -52,9 +52,6 @@ external to the Tomcat JVM. If you are using the Java SecurityManager this
 will bypass your security policy configuration in <code>catalina.policy.</code>
 </p>
 
-<p>Rename <code>$CATALINA_BASE/server/lib/servlets-ssi.renametojar</code>
-to <code>$CATALINA_BASE/server/lib/servlets-ssi.jar</code>.</p>
-
 <p>To use the SSI servlet, remove the XML comments from around the SSI servlet
 and servlet-mapping configuration in
 <code>$CATALINA_BASE/conf/web.xml</code>.</p>
@@ -62,6 +59,9 @@ and servlet-mapping configuration in
 <p>To use the SSI filter, remove the XML comments from around the SSI filter
 and filter-mapping configuration in
 <code>$CATALINA_BASE/conf/web.xml</code>.</p>
+
+<p>Only Contexts which are marked as privileged may use SSI features (see the
+privileged property of the Context element).</p>
 
 </section>
 

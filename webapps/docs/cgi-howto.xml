@@ -41,12 +41,12 @@ this servlet is mapped to the URL pattern "/cgi-bin/*".</p>
 external to the Tomcat JVM. If you are using the Java SecurityManager this
 will bypass your security policy configuration in <code>catalina.policy.</code></p>
 
-<p>Rename <code>$CATALINA_BASE/server/lib/servlets-cgi.renametojar</code>
-to <code>$CATALINA_BASE/server/lib/servlets-cgi.jar</code>.</p>
-
 <p>Remove the XML comments from around the CGI servlet and servlet-mapping
 configuration in <code>$CATALINA_BASE/conf/web.xml</code>.</p>
 </section>
+
+<p>Only Contexts which are marked as privileged may use the CGI servlet (see the
+privileged property of the Context element).</p>
 
 <section name="Configuration">
 

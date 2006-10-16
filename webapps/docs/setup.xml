@@ -61,9 +61,6 @@
        Tomcat. It is important to note that the Tomcat administration web 
        application can only be used when Tomcat is running.</p>
 
-    <p>If using a J2SE 1.4 JRE, the compatibility package must be downloaded and
-       expanded inside the folder where Tomcat was installed.</p>
-
   </section>
 
   <section name="Unix daemon">
@@ -88,6 +85,9 @@
     <p>Please note that you should use the GNU make (gmake) instead of
        the native BSD make on FreeBSD systems.</p>
 
+    <p>Download a commons-daemon binary from the Jakarta Commons download page, 
+       and place jsvc.tar.gz and commons-daemon.jar in the 
+       <code>$CATALINA_HOME/bin</code> folder.</p>
 
 <source>
     cd $CATALINA_HOME/bin
@@ -104,7 +104,7 @@
 
 <source>
     cd $CATALINA_HOME
-    ./bin/jsvc -Djava.endorsed.dirs=./common/endorsed -cp ./bin/bootstrap.jar \
+    ./bin/jsvc -cp ./bin/bootstrap.jar \
         -outfile ./logs/catalina.out -errfile ./logs/catalina.err \
         org.apache.catalina.startup.Bootstrap
 </source>
