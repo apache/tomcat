@@ -54,6 +54,7 @@
             &lt;Receiver className=&quot;org.apache.catalina.tribes.transport.nio.NioReceiver&quot;
                       address=&quot;auto&quot;
                       port=&quot;4000&quot;
+                      autoBind=&quot;100&quot;
                       selectorTimeout=&quot;5000&quot;
                       maxThreads=&quot;6&quot;/&gt;
 
@@ -65,7 +66,7 @@
           &lt;/Channel&gt;
 
           &lt;Valve className=&quot;org.apache.catalina.ha.tcp.ReplicationValve&quot;
-                 filter=&quot;.*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;&quot;/&gt;
+                 filter=&quot;&quot;/&gt;
 
           &lt;Deployer className=&quot;org.apache.catalina.ha.deploy.FarmWarDeployer&quot;
                     tempDir=&quot;/tmp/war-temp/&quot;
@@ -73,7 +74,7 @@
                     watchDir=&quot;/tmp/war-listen/&quot;
                     watchEnabled=&quot;false&quot;/&gt;
 
-          &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
+          &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener&quot;/&gt;
           &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
         &lt;/Cluster&gt;    
     </source>
