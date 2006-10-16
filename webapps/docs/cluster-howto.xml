@@ -34,6 +34,54 @@
     2. Multicast port is 45564<br/>
     3. The IP broadcasted is <code>java.net.InetAddress.getLocalHost().getHostAddress()</code><br/>
     4. The TCP port listening for replication messages is the first available server socket in range <code>4000-4100</code><br/>
+    5. Two listeners are configured <code>ClusterSessionListener</code> and <code>JvmRouteSessionIDBinderListener</code><br/>
+    6. Two interceptors are configured <code>TcpFailureDetector</code> and <code>MessageDispatch15Interceptor</code><br/>
+    The following is the default cluster configuration:<br/>
+    <source>
+        &lt;Cluster className=&quot;org.apache.catalina.ha.tcp.SimpleTcpCluster&quot;
+                 channelSendOptions=&quot;6&quot;&gt;
+
+          &lt;Manager className=&quot;org.apache.catalina.ha.session.BackupManager&quot;
+                   expireSessionsOnShutdown=&quot;false&quot;
+                   notifyListenersOnReplication=&quot;true&quot;
+                   mapSendOptions=&quot;6&quot;/&gt;
+          &lt;!--
+          &lt;Manager className=&quot;org.apache.catalina.ha.session.DeltaManager&quot;
+                   expireSessionsOnShutdown=&quot;false&quot;
+                   notifyListenersOnReplication=&quot;true&quot;/&gt;
+          --&gt;        
+          &lt;Channel className=&quot;org.apache.catalina.tribes.group.GroupChannel&quot;&gt;
+            &lt;Membership className=&quot;org.apache.catalina.tribes.membership.McastService&quot;
+                        address=&quot;228.0.0.4&quot;
+                        port=&quot;45564&quot;
+                        frequency=&quot;500&quot;
+                        dropTime=&quot;3000&quot;/&gt;
+            &lt;Receiver className=&quot;org.apache.catalina.tribes.transport.nio.NioReceiver&quot;
+                      address=&quot;auto&quot;
+                      port=&quot;4000&quot;
+                      selectorTimeout=&quot;5000&quot;
+                      maxThreads=&quot;6&quot;/&gt;
+
+            &lt;Sender className=&quot;org.apache.catalina.tribes.transport.ReplicationTransmitter&quot;&gt;
+              &lt;Transport className=&quot;org.apache.catalina.tribes.transport.nio.PooledParallelSender&quot;/&gt;
+            &lt;/Sender&gt;
+            &lt;Interceptor className=&quot;org.apache.catalina.tribes.group.interceptors.TcpFailureDetector&quot;/&gt;
+            &lt;Interceptor className=&quot;org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor&quot;/&gt;
+          &lt;/Channel&gt;
+
+          &lt;Valve className=&quot;org.apache.catalina.ha.tcp.ReplicationValve&quot;
+                 filter=&quot;.*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;&quot;/&gt;
+
+          &lt;Deployer className=&quot;org.apache.catalina.ha.deploy.FarmWarDeployer&quot;
+                    tempDir=&quot;/tmp/war-temp/&quot;
+                    deployDir=&quot;/tmp/war-deploy/&quot;
+                    watchDir=&quot;/tmp/war-listen/&quot;
+                    watchEnabled=&quot;false&quot;/&gt;
+
+          &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
+          &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
+        &lt;/Cluster&gt;    
+    </source>
   </p>
 </section>
 
@@ -254,12 +302,15 @@ should be completed:</p>
         |                   \
         |                   -- DeltaManager
         |
-     -----------------------------
-     |          |         |       \
+     ---------------------------
+        |                       \
+      Channel                    \
+    ----------------------------- \
+     |          |         |        \
    Receiver    Sender   Membership  \
-     \                               -- Valve
-     -- SocketReplicationListener    |      \
-     -- ReplicationListener          |       -- ReplicationValve
+                                     -- Valve
+                                     |      \
+                                     |       -- ReplicationValve
                                      |       -- JvmRouteBinderValve 
                                      |
                                      -- LifecycleListener 
@@ -274,26 +325,6 @@ should be completed:</p>
                                              -- FarmWarDeployer
       
       
-</source>
-<source>
-   Sender
-    \
-    -- ReplicationTransmitter 
-             |
-             ---------
-                      \
-                   IDataSender
-                          \
-                          |
-                          --- (sync)
-                          |  \
-                          |   -- PooledSocketSender   (pooled)
-                          |   -- SockerSender         (synchronous)
-                          |                                
-                          --- (async)
-                             \
-                              -- AsyncSocketSender     (asynchronous)
-                              -- FastAsyncSocketSender (fastasyncqueue)         
 </source>
 </p>
 
@@ -316,7 +347,7 @@ are for the actual TCP replication.
     replication.
 </p>
 <p>
-    One of the most important performance considerations is the synchronous (pooled or not pooled) versus asynchronous replication
+    One of the most important performance considerations is the synchronous versus asynchronous replication
     mode. In a synchronous replication mode the request doesn't return until the replicated session has been
     sent over the wire and reinstantiated on all the other cluster nodes.
     There are two settings for synchronous replication. Pooled or not pooled.
@@ -333,659 +364,6 @@ are for the actual TCP replication.
     During async replication, the request is returned before the data has been replicated. async replication yields shorter
     request times, and synchronous replication guarantees the session to be replicated before the request returns.
 </p>
-<p>
-    The parameter &quot;replicationMode&quot; has four different settings: &quot;pooled&quot;, &quot;synchronous&quot;, &quot;asynchronous&quot; and &quot;fastasyncqueue&quot;
-</p>
-
-<section name="Simple Cluster Configuration">
-<p>
-Simple one line configuration<br/>
-<source>
-   &lt;Server                 port="8011" 
-                       shutdown="SHUTDOWN" &gt;
-    &lt;GlobalNamingResources&gt;
-    &lt;Resource              name="UserDatabase" auth="Container"
-                           type="org.apache.catalina.UserDatabase"
-                    description="User database that can be updated and saved"
-                        factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
-                        pathname="conf/tomcat-users.xml" /&gt;
-  &lt;/GlobalNamingResources&gt;
-    &lt;Service              name="Catalina"&gt;
-        &lt;Connector        port="9012" 
-                      protocol="AJP/1.3"
-        &lt;Connector         port="9013"
-                     maxThreads="100"
-                minSpareThreads="4"
-                maxSpareThreads="4"
-        /&gt;
-        &lt;Engine            name="Catalina" 
-                   defaultHost="localhost" 
-                        jvmRoute="node1"&gt;
-        &lt;Realm        className="org.apache.catalina.realm.UserDatabaseRealm"
-                   resourceName="UserDatabase" /&gt;
-            &lt;Host          name="localhost"
-                        appBase="webapps"&gt;
-             &lt;Cluster className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"/&gt;
-            &lt;/Host&gt;
-        &lt;/Engine&gt;
-    &lt;/Service&gt;
-&lt;/Server&gt;
-</source>
-<br/>
-The default mode configuration setup a <em>fastasyncqueue</em> mode cluster configuration with following
-parameters:
-<ul>
-    <li>Open Membership receiver at <em>228.0.0.4</em> and send to multicast udp port <em>8012</em></li>
-    <li>Send membership every 1 sec and drop member after 30sec.</li>
-    <li>Open message receiver at default ip interface at first free port between <em>8015</em> and <em>8019</em>.</li>
-    <li>Receiver message with <em>SocketReplicationListener</em> </li>
-    <li>Configure a <em>ReplicationTransmitter</em> with <em>fastasyncqueue</em> sender mode.</li>
-    <li>Add <em>ClusterSessionListener</em> and <em>ReplicationValve</em>.</li>
-</ul> 
-</p>
-<p>
-<b>NOTE</b>: Use this configuration when you need very quick a test cluster with
-at your developer machine. You can change the default attributes from cluster sub elements.
-Use following cluster attribute prefixes <em>sender.</em>,
-<b>receiver.</b>, <b>service.</b>, <b>manager.</b>, <b>valve.</b> and <b>listener.</b>.
-<br/><b>Example</b> configure cluster at windows laptop with network connection and
-change receiver port range<br/>
-<source>
-&lt;Cluster                 className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"
-          service.mcastBindAddress="127.0.0.1" 
-            receiver.tcpListenPort="9070" 
-         receiver.tcpListenMaxPort="9075" /&gt;
-</source>    
-<br/>       
-<b>WARNING</b>: When you add you sub elements, there overwrite the defaults complete.
-<br/><b>Example</b> configure cluster with cluster failover jsessionid support. In this
-case you need also the defaultmode Cluster listener <em>ClusterSessionListener</em> and <em>ReplicationValve</em>.<br/>
-<source>
-&lt;Cluster                 className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"
-          service.mcastBindAddress="127.0.0.1" 
-            receiver.tcpListenPort="9070" 
-         receiver.tcpListenMaxPort="9075" &gt;
-       &lt;ClusterListener  className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
-       &lt;ClusterListener  className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
-       &lt;Valve            className="org.apache.catalina.cluster.tcp.ReplicationValve"
-                            filter=".*\.gif;.*\.js;.*\.css;.*\.png;.*\.jpeg;.*\.jpg;.*\.htm;.*\.html;.*\.txt;"
-                  primaryIndicator="true" /&gt;
-	   &lt;Valve            className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
-	                      enabled="true"  /&gt;
-&lt;Cluster/&gt;
-</source> 
-</p>
-</section>
-
-<section name="Simple Engine Cluster Configuration for all hosts">
-<p>
-Simple one line engine configuration<br/>
-<source>
-   &lt;Server                 port="8011" 
-                       shutdown="SHUTDOWN" &gt;
-    &lt;GlobalNamingResources&gt;
-    &lt;Resource              name="UserDatabase" auth="Container"
-                           type="org.apache.catalina.UserDatabase"
-                    description="User database that can be updated and saved"
-                        factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
-                        pathname="conf/tomcat-users.xml" /&gt;
-  &lt;/GlobalNamingResources&gt;
-    &lt;Service              name="Catalina"&gt;
-        &lt;Connector        port="9012" 
-                      protocol="AJP/1.3"
-        &lt;Connector         port="9013"
-                     maxThreads="100"
-                minSpareThreads="4"
-                maxSpareThreads="4"
-        /&gt;
-        &lt;Engine            name="Catalina" 
-                   defaultHost="localhost" 
-                        jvmRoute="node01"&gt;
-        &lt;Realm        className="org.apache.catalina.realm.UserDatabaseRealm"
-                   resourceName="UserDatabase" /&gt;
-        &lt;Cluster      className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"/&gt;
-            &lt;Host          name="localhost"
-                        appBase="webapps"/&gt;
-        &lt;/Engine&gt;
-    &lt;/Service&gt;
-&lt;/Server&gt;
-</source>
-<br/>
-See default mode configuration description as simple host cluster example before.
-</p>
-</section>
-
-<section name="Complex Cluster Configuration">
-<p>
-<br/><b>Example</b> Configure cluster with complete sub elements. Activate this node
-as master farm delopyer. Message receiver is NIO based <em>ReplicationListener</em> with six parallel
-worker threads.
-<br/>
-<source>
-       &lt;Server                 port="8011" 
-                       shutdown="SHUTDOWN" &gt;
-    &lt;GlobalNamingResources&gt;
-    &lt;Resource              name="UserDatabase" auth="Container"
-                           type="org.apache.catalina.UserDatabase"
-                    description="User database that can be updated and saved"
-                        factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
-                        pathname="conf/tomcat-users.xml" /&gt;
-  &lt;/GlobalNamingResources&gt;
-    &lt;Service              name="Catalina"&gt;
-        &lt;Connector        port="9012" 
-                      protocol="AJP/1.3"
-        &lt;Connector         port="9013"
-                     maxThreads="100"
-                minSpareThreads="4"
-                maxSpareThreads="4"
-        /&gt;
-        &lt;Engine            name="Catalina" 
-                   defaultHost="localhost" 
-                        jvmRoute="node01"&gt;
-        &lt;Realm        className="org.apache.catalina.realm.UserDatabaseRealm"
-                   resourceName="UserDatabase" /&gt;
-            &lt;Host          name="localhost"
-                        appBase="webapps"&gt;
-                &lt;Cluster                  className="org.apache.catalina.cluster.tcp.SimpleTcpCluster"
-                                       doClusterLog="true"
-                                     clusterLogName="clusterlog"
-                                  manager.className="org.apache.catalina.cluster.session.DeltaManager"
-                   manager.expireSessionsOnShutdown="false"
-               manager.notifyListenersOnReplication="false"
-        manager.notifySessionListenersOnReplication="false"
-                            manager.sendAllSessions="false"
-                        manager.sendAllSessionsSize="500"
-                    manager.sendAllSessionsWaitTime="20"&gt;
-                  &lt;Membership 
-                                          className="org.apache.catalina.cluster.mcast.McastService"
-                                          mcastAddr="228.0.0.4"
-                                   mcastBindAddress="127.0.0.1" 
-                                 mcastClusterDomain="d10" 
-                                          mcastPort="45564"
-                                     mcastFrequency="1000"
-                                      mcastDropTime="30000"/&gt;
-                  &lt;Receiver 
-                                           className="org.apache.catalina.cluster.tcp.ReplicationListener"
-                                    tcpListenAddress="auto"
-                                       tcpListenPort="9015"
-                                  tcpSelectorTimeout="100"
-                                      tcpThreadCount="6"
-                  &lt;Sender
-                                           className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-                                     replicationMode="fastasyncqueue"
-                        doTransmitterProcessingStats="true"
-                                   doProcessingStats="true"
-                                      doWaitAckStats="true"
-                                       queueTimeWait="true"
-                                        queueDoStats="true"
-                                      queueCheckLock="true"
-                                          ackTimeout="15000"
-                                          waitForAck="true"
-                                    keepAliveTimeout="80000"
-                            keepAliveMaxRequestCount="-1"/&gt;
-                  &lt;Valve                   className="org.apache.catalina.cluster.tcp.ReplicationValve"
-                                              filter=".*\.gif;.*\.js;.*\.css;.*\.png;.*\.jpeg;.*\.jpg;.*\.htm;.*\.html;.*\.txt;"
-                                    primaryIndicator="true" /&gt;
-                  &lt;Valve                    className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
-                                             enabled="true" /&gt;	
-                  &lt;ClusterListener         className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
-                  &lt;ClusterListener         className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
-                  &lt;Deployer                className="org.apache.catalina.cluster.deploy.FarmWarDeployer"
-                                            tempDir="${catalina.base}/war-temp"
-                                          deployDir="${catalina.base}/war-deploy/"
-                                           watchDir="${catalina.base}/war-listen/"
-                                       watchEnabled="true"/&gt;
-                  &lt;/Cluster&gt;
-            &lt;/Host&gt;
-        &lt;/Engine&gt;
-    &lt;/Service&gt;
-&lt;/Server&gt;
-</source>
-</p>
-</section>
-
-<section name="Cluster Configuration for ReplicationTransmitter">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-
-  <tr>
-    <td>replicationMode</td>
-    <td>replication mode (<em>synchronous</em>, <em>pooled</em>, <em>asynchronous</em> or <em>fastasyncqueue</em>)
-    </td>
-    <td><code>pooled</code></td>
-  </tr>
-
-  <tr>
-    <td>processSenderFrequency</td>
-    <td>Control the sender keepalive status and drop sender socket connection after timeout is reached.
-    Check every processSenderFrequency value engine background ticks.
-    </td>
-    <td><code>2</code></td>
-  </tr>
-
-  <tr>
-    <td>compress</td>
-    <td>compress bytes before sending (consume memory, but reduce network traffic - GZIP)</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>ackTimeout</td>
-    <td>acknowledge timeout and only usefull it waitForAck is true</td>
-    <td><code>15000</code></td>
-  </tr>
-  
-  <tr>
-    <td>waitForAck</td>
-    <td>Wait for ack after data send</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>autoConnect</td>
-    <td>is sender disabled, fork a new socket</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>doTransmitterProcessingStats</td>
-    <td>create processing time stats</td>
-    <td><code>false</code></td>
-  </tr>
-</table>
-</p>
-<p>
-Example to get statistic information, wait for ack at every message send and transfer at compressed mode<br/>
-<source>
-    &lt;Sender
-      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-      replicationMode="fastasyncqueue"
-      compress="true"
-      doTransmitterProcessingStats="true"
-      ackTimeout="15000"
-      waitForAck="true"
-      autoConnect="false"/&gt;
-</source>
-</p>  
-</section>
-     
-<section name="Cluster Configuration for ReplicationTransmitter (fastayncqueue - mode)">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-  
-  <tr>
-    <td>keepAliveTimeout</td>
-    <td>active socket keep alive timeout</td>
-    <td><code>60000</code></td>
-  </tr>  
-
-  <tr>
-    <td>keepAliveMaxRequestCount</td>
-    <td>max request over this socket</td>
-    <td><code>-1</code></td>
-  </tr>  
-
-  <tr>
-    <td>doProcessingStats</td>
-    <td>create Processing time stats</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>doWaitAckStats</td>
-    <td>create waitAck time stats</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>resend</td>
-    <td>resend message after failure, can overwrite at message</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>queueDoStats</td>
-    <td>activated queue stats</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>queueCheckLock</td>
-    <td>check to lost locks</td>
-    <td><code>false</code></td>
-  </tr>
-  <tr>
-    <td>queueAddWaitTimeout</td>
-    <td>queue add wait time (tomcat connector thread waits)</td>
-    <td><code>10000</code></td>
-  </tr>
-  <tr>
-    <td>queueRemoveWaitTimeout</td>
-    <td>queue remove wait time (queue thread waits)</td>
-    <td><code>30000</code></td>
-  </tr>
-  
-  <tr>
-    <td>maxQueueLength</td>
-    <td>max queue length (default without limit)</td>
-    <td><code>-1</code></td>
-  </tr>
-  
-  <tr>
-    <td>threadPriority</td>
-    <td>change queue thread priority (1-10 ; 5 is normal)</td>
-    <td><code>5</code></td>
-  </tr>
-</table>
-  
-</p>
-<p>
-Example to get a lot of statistic information and no wait for ACK<br/>
-<source>
-    &lt;Sender
-      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-      replicationMode="fastasyncqueue"
-      doTransmitterProcessingStats="true"
-      doProcessingStats="true"
-      queueTimeWait="true"
-      queueDoStats="true"
-      queueCheckLock="true"
-      waitForAck="false"
-      autoConnect="false"
-      keepAliveTimeout="320000"
-      keepAliveMaxRequestCount="-1"/&gt;
-</source>
-</p>  
-</section>
-
-<section name="Cluster Configuration for ReplicationTransmitter ( asynchronous - mode)">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-  
-  <tr>
-    <td>keepAliveTimeout</td>
-    <td>active socket keep alive timeout</td>
-    <td><code>60000</code></td>
-  </tr>  
-
-  <tr>
-    <td>keepAliveMaxRequestCount</td>
-    <td>max request over this socket</td>
-    <td><code>-1</code></td>
-  </tr>  
-
-  <tr>
-    <td>doProcessingStats</td>
-    <td>create Processing time stats</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>doWaitAckStats</td>
-    <td>create waitAck time stats</td>
-    <td><code>false</code></td>
-  </tr>
-  
-  <tr>
-    <td>resend</td>
-    <td>resend message after failure, can overwrite at message</td>
-    <td><code>false</code></td>
-  </tr>
-
-</table>
-</p>
-<p>
-Example to get a processing statistic information, resend after failure and wait for ACK<br/>
-<source>
-    &lt;Sender
-      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-      replicationMode="asynchronous"
-      doProcessingStats="true"
-      doWaitAckStats="true"
-      waitForAck="true"
-      ackTimeout="30000"
-      resend="true"
-      keepAliveTimeout="320000"
-      keepAliveMaxRequestCount="-1"/&gt;
-</source>
-</p>  
-</section>
-    
-<section name="Cluster Configuration for ReplicationTransmitter ( synchronous - mode)">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-  
-  <tr>
-    <td>keepAliveTimeout</td>
-    <td>active socket keep alive timeout</td>
-    <td><code>60000</code></td>
-  </tr>  
-
-  <tr>
-    <td>keepAliveMaxRequestCount</td>
-    <td>max request over this socket</td>
-    <td><code>-1</code></td>
-  </tr>  
-
-  <tr>
-    <td>doProcessingStats</td>
-    <td>create Processing time stats</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>doWaitAckStats</td>
-    <td>create waitAck time stats</td>
-    <td><code>true</code></td>
-  </tr>
-
-  <tr>
-    <td>resend</td>
-    <td>resend message after failure, can overwrite at message</td>
-    <td><code>false</code></td>
-  </tr>
-
-</table>
-  
-</p>
-<p>
-Example to get a no processing statistic information, no wait for ACK, after 10000 request renew socket and autoconnect before first request is send.<br/>
-<source>
-    &lt;Sender
-      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-      replicationMode="synchronous"
-      autoConnect="true"
-      keepAliveTimeout="-1"
-      keepAliveMaxRequestCount="100000"/&gt;
-</source>
-</p>  
-</section>
-
-<section name="Cluster Configuration for ReplicationTransmitter ( pooled - mode)">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-  
-  <tr>
-    <td>keepAliveTimeout</td>
-    <td>active socket keep alive timeout</td>
-    <td><code>60000</code></td>
-  </tr>  
-
-  <tr>
-    <td>keepAliveMaxRequestCount</td>
-    <td>max request over this socket</td>
-    <td><code>-1</code></td>
-  </tr>  
-
-  <tr>
-    <td>maxPoolSocketLimit</td>
-    <td>max pooled sockets (Sender Sockets)</td>
-    <td><code>25</code></td>
-  </tr>
-  
-  <tr>
-    <td>resend</td>
-    <td>resend message after failure, can overwrite at message</td>
-    <td><code>false</code></td>
-  </tr>
-  
-</table>
-  
-</p>
-<p>
-Example to get a no processing statistic information, wait for ACK, after 10000 request renew socket, only 10 SockerSender available and autoconnect before first request is send.<br/>
-<source>
-    &lt;Sender
-      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-      replicationMode="pooled"
-      autoConnect="true"
-      maxPoolSocketLimit="10"
-      keepAliveTimeout="-1"
-      keepAliveMaxRequestCount="10000"
-      waitForAck="true" /&gt;
-</source>
-</p>  
-</section>
-
-<section name="Cluster Configuration for ReplicationTransmitter ( DeltaManager Attribute)">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-  
-  <tr>
-    <td>expireSessionsOnShutdown</td>
-    <td>When server stopped, expire all sessions also at backup nodes (only for testing)</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>maxActiveSessions</td>
-    <td>Number of active sessions. (Default is no limit)</td>
-    <td><code>-1</code></td>
-  </tr>  
-
-  <tr>
-    <td>notifyListenersOnReplication</td>
-    <td>Notify application session listener to session creation 
-    and expiring events at backup nodes</td>
-    <td><code>true</code></td>
-  </tr>
-
-  <tr>
-    <td>notifySessionListenersOnReplication</td>
-    <td>Notify application session listener to attribute changes at backup nodes</td>
-    <td><code>true</code></td>
-  </tr>
-
-  <tr>
-    <td>stateTransferTimeout</td>
-    <td>Timeout that session state transfer is complete. Is attribute <code>stateTransferTimeout == -1</code> 
-        then application wait that other node send the complete session state</td>
-    <td><code>60</code></td>
-  </tr>
-  
-  <tr>
-    <td>sendAllSessions</td>
-    <td>Flag to send sessions as splited blocks</td>
-    <td><code>true</code></td>
-  </tr>
-
-  <tr>
-    <td>sendAllSessionsSize</td>
-    <td>Number of serialize sessions inside a send block session message. Only useful when <code>sendAllSessions==false</code></td>
-    <td><code>1000</code></td>
-  </tr>
-
-  <tr>
-    <td>sendAllSessionsWaitTime</td>
-    <td>wait time between two session send blocks.</td>
-    <td><code>2000</code></td>
-  </tr>
-
-  <tr>
-    <td>sendClusterDomainOnly</td>
-    <td>Send all session messages only to member inside same cluster domain 
-        (value od Membership attribute mcastClusterDomain). Also don't handle
-        session messages from other domains.</td>
-    <td><code>true</code></td>
-  </tr>  
-
-  <tr>
-    <td>stateTimestampDrop</td>
-    <td>DeltaManager queued Sessions messages when send GET_ALL_SESSION to other node.
-    with stateTimestampDrop all messages before state transfer message creation date (find session) are dropped.
-    Only other GET_ALL_SESSION events are handle with date before state transfer message.</td>
-    <td><code>true</code></td>
-  </tr>  
-  
-</table>
-  
-</p>
-<p>
-Example send all sessions at separate blocks. Serialize and send 100 session inside one block.
-Wait maximale two minutes before the complete backup sessions are loaded inside tomcat boot process.
-Between send blocks wait 5 secs to transfers the session block to other node. This save memory
-when you use the async modes with queues.<br/>
-<source>
-    &lt;Cluster className="org.apache.catalina.tcp.SimpleTcpCluster"
-      managerClassName="org.apache.catalina.cluster.session.DeltaManager"
-      manager.stateTransferTimeout="120"
-      manager.sendAllSessions="false"
-      manager.sendAllSessionsSize="100"
-      manager.sendAllSessionsWaitTime="5000"
-      "/&gt;
-</source>
-</p>
-<p>
-<b>Note:</b><br/>
-As <em>Cluster.defaultMode=true</em> you can configure the manager attributes with prefix <em>manager.</em>. 
-<br/>
-<b>Note:</b><br/>
-With <em>Cluster.setProperty(&lt;String&gt;,&lt;String&gt;)</em> you can modify 
-attributes for all register managers. The method exists as MBeans operation.
-</p>
-</section>
 
 <section name="Bind session after crash to failover node">
 <p>
