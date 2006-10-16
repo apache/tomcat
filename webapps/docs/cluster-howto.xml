@@ -92,7 +92,8 @@ should be completed:</p>
     attribute is unique for each instance.</li>
 <li>Make sure your <code>web.xml</code> has the <code>&lt;distributable/&gt;</code> element 
     or set at your <code>&lt;Context distributable="true" /&gt;</code></li>
-<li>Make sure that jvmRoute attribute is set at your Engine <code>&lt;Engine name="Catalina" jvmRoute="node01" &gt;</code></li>
+<li>If you are using mod_jk, make sure that jvmRoute attribute is set at your Engine <code>&lt;Engine name="Catalina" jvmRoute="node01" &gt;</code>
+    and that the jvmRoute attribute value matches your worker name in workers.properties</li>
 <li>Make sure that all nodes have the same time and sync with NTP service!</li>
 <li>Make sure that your loadbalancer is configured for sticky session mode.</li>
 </ul>
@@ -143,6 +144,128 @@ should be completed:</p>
 
 </section>
 
+<section name="Cluster Information">
+<p>Membership is established using multicast heartbeats. 
+   Hence, if you wish to subdivide your clusters, you can do this by 
+   changing the multicast IP address or port in the <code>&lt;Membership&gt;</code> element.
+</p>
+<p>
+   The heartbeat contains the IP address of the Tomcat node and the TCP port that 
+   Tomcat listens to for replication traffic. All data communication happens over TCP.
+</p>
+<p>
+    The <code>ReplicationValve</code> is used to find out when the request has been completed and initiate the
+    replication, if any. Data is only replicated if the session has changed (by calling setAttribute or removeAttribute
+    on the session).
+</p>
+<p>
+    One of the most important performance considerations is the synchronous versus asynchronous replication.
+    In a synchronous replication mode the request doesn't return until the replicated session has been
+    sent over the wire and reinstantiated on all the other cluster nodes.
+    Synchronous vs asynchronous is configured using the <code>channelSendOptions</code>
+    flag and is an integer value. The default value for the <code>SimpleTcpCluster/DeltaManager</code> combo is
+    8, which is asynchronous. You can read more on the <a href="#pointer-to-Tribes-Channel-Javadoc-here">send flag</a>.
+    During async replication, the request is returned before the data has been replicated. async replication yields shorter
+    request times, and synchronous replication guarantees the session to be replicated before the request returns.
+</p>
+
+
+<section name="Bind session after crash to failover node">
+<p>
+  As you configure more then two nodes at same cluster for backup, most loadbalancer
+  send don't all your requests after failover to the same node.
+</p>
+<p> 
+    The JvmRouteBinderValve handle tomcat jvmRoute takeover using mod_jk module after node
+    failure. After a node crashed the next request going to other cluster node. The JvmRouteBinderValve 
+    now detect the takeover and rewrite the jsessionid
+    information to the backup cluster node. After the next response all client
+    request goes direct to the backup node. The change sessionid send also to all
+    other cluster nodes. Well, now the session stickyness work directly to the
+    backup node, but traffic don't go back too restarted cluster nodes!<br/>
+    As jsessionid was created by cookie, the change JSESSIONID cookie resend with next response.
+</p>
+<p>
+    You must add JvmRouteBinderValve and the corresponding cluster message listener JvmRouteSessionIDBinderListener.
+    As you add the new listener you must also add the default ClusterSessionListener that receiver the normal cluster messages.
+
+<source>
+&lt;Cluster className="org.apache.catalina.tcp.SimpleTcpCluster" &gt;
+...
+     &lt;Valve className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
+               enabled="true" sessionIdAttribute="takeoverSessionid"/&gt;	
+     &lt;ClusterListener className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
+     &lt;ClusterListener className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
+...
+&lt;Cluster&gt;
+</source>
+</p>
+<p>
+    <b>Hint:</b><br/>
+    With attribute <i>sessionIdAttribute</i> you can change the request attribute name that included the old session id.
+    Default attribuite name is <i>org.apache.catalina.cluster.session.JvmRouteOrignalSessionID</i>.
+</p>
+<p>
+    <b>Trick:</b><br/>
+    You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes!
+    Set enable true on all JvmRouteBinderValve backups, disable worker at mod_jk 
+    and then drop node and restart it! Then enable mod_jk Worker and disable JvmRouteBinderValves again. 
+    This use case means that only requested session are migrated.
+</p>
+
+</section>
+
+</section>
+
+<section name="Cluster Architecture">
+
+<p><b>Component Levels:</b>
+<source>
+         Server
+           |
+         Service
+           |
+         Engine
+           |  \ 
+           |  --- Cluster --*
+           |
+         Host
+           |
+         ------
+        /      \
+     Cluster    Context(1-N)                 
+        |             \
+        |             -- Manager
+        |                   \
+        |                   -- DeltaManager
+        |
+     ---------------------------
+        |                       \
+      Channel                    \
+    ----------------------------- \
+     |          |         |        \
+   Receiver    Sender   Membership  \
+                                     -- Valve
+                                     |      \
+                                     |       -- ReplicationValve
+                                     |       -- JvmRouteBinderValve 
+                                     |
+                                     -- LifecycleListener 
+                                     |
+                                     -- ClusterListener 
+                                     |      \
+                                     |       -- ClusterSessionListener
+                                     |       -- JvmRouteSessionIDBinderListener
+                                     |
+                                     -- Deployer 
+                                            \
+                                             -- FarmWarDeployer
+      
+      
+</source>
+</p>
+
+</section>
 <section name="How it Works">
 <p>To make it easy to understand how clustering works, We are gonna take you through a series of scenarios.
    In the scenario we only plan to use two tomcat instances <code>TomcatA</code> and <code>TomcatB</code>.
@@ -275,137 +398,9 @@ should be completed:</p>
 
 </section>
 
-<section name="Cluster Architecture">
-
-<p><b>Component Levels:</b>
-<source>
-         Server
-           |
-         Service
-           |
-         Engine
-           |  \ 
-           |  --- Cluster --*
-           |
-         Host
-           |
-         ------
-        /      \
-     Cluster    Context(1-N)                 
-        |             \
-        |             -- Manager
-        |                   \
-        |                   -- DeltaManager
-        |
-     ---------------------------
-        |                       \
-      Channel                    \
-    ----------------------------- \
-     |          |         |        \
-   Receiver    Sender   Membership  \
-                                     -- Valve
-                                     |      \
-                                     |       -- ReplicationValve
-                                     |       -- JvmRouteBinderValve 
-                                     |
-                                     -- LifecycleListener 
-                                     |
-                                     -- ClusterListener 
-                                     |      \
-                                     |       -- ClusterSessionListener
-                                     |       -- JvmRouteSessionIDBinderListener
-                                     |
-                                     -- Deployer 
-                                            \
-                                             -- FarmWarDeployer
-      
-      
-</source>
-</p>
-
-</section>
 
 
-<section name="Cluster Configuration">
-<p>The cluster configuration is described in the sample server.xml file.
-What is worth to mention is that the attributes starting with mcastXXX
-are for the membership multicast ping, and the attributes starting with tcpXXX
-are for the actual TCP replication.
-</p>
-<p>
-    The membership is established by all the tomcat instances are sending broadcast messages
-    on the same multicast IP and port.
-    The TCP listen port, is the port where the session replication is received from other members.
-</p>
-<p>
-    The replication valve is used to find out when the request has been completed and initiate the
-    replication.
-</p>
-<p>
-    One of the most important performance considerations is the synchronous versus asynchronous replication
-    mode. In a synchronous replication mode the request doesn't return until the replicated session has been
-    sent over the wire and reinstantiated on all the other cluster nodes.
-    There are two settings for synchronous replication. Pooled or not pooled.
-    Not pooled (ie replicationMode=&quot;fastasnycqueue&quot; or &quot;synchronous&quot;) means that all the replication request are sent over a single
-    socket.
-    Using synchronous mode can potentially becomes a bottleneck when a lot of messages generated,
-    You can overcome this bottleneck by setting replicationMode=&quot;pooled&quot; but then you worker threads blocks with replication .
-    What is recommended here is to increase the number of threads that handle
-    incoming replication request. This is the tcpThreadCount property in the cluster
-    section of server.xml. The pooled setting means that we are using multiple sockets, hence increases the performance.
-    Asynchronous replication, should be used if you have sticky sessions until fail over, then
-    your replicated data is not time crucial, but the request time is, at this time leave the tcpThreadCount to
-    be number-of-nodes-1.
-    During async replication, the request is returned before the data has been replicated. async replication yields shorter
-    request times, and synchronous replication guarantees the session to be replicated before the request returns.
-</p>
 
-<section name="Bind session after crash to failover node">
-<p>
-As you configure more then two nodes at same cluster for backup, most loadbalancer
-send don't all your requests after failover to the same node.
-</p>
-<p> 
-The JvmRouteBinderValve handle tomcat jvmRoute takeover using mod_jk module after node
-failure. After a node crashed the next request going to other cluster node. The JvmRouteBinderValve 
-now detect the takeover and rewrite the jsessionid
-information to the backup cluster node. After the next response all client
-request goes direct to the backup node. The change sessionid send also to all
-other cluster nodes. Well, now the session stickyness work directly to the
-backup node, but traffic don't go back too restarted cluster nodes!<br/>
-As jsessionid was created by cookie, the change JSESSIONID cookie resend with next response.
-</p>
-<p>
-You must add JvmRouteBinderValve and the corresponding cluster message listener JvmRouteSessionIDBinderListener.
-As you add the new listener you must also add the default ClusterSessionListener that receiver the normal cluster messages.
-
-<source>
-&lt;Cluster className="org.apache.catalina.tcp.SimpleTcpCluster" &gt;
-...
-     &lt;Valve className="org.apache.catalina.cluster.session.JvmRouteBinderValve"
-               enabled="true" sessionIdAttribute="takeoverSessionid"/&gt;	
-     &lt;ClusterListener className="org.apache.catalina.cluster.session.JvmRouteSessionIDBinderListener" /&gt;
-     &lt;ClusterListener className="org.apache.catalina.cluster.session.ClusterSessionListener" /&gt;
-...
-&lt;Cluster&gt;
-</source>
-</p>
-<p>
-<b>Hint:</b><br/>
-With attribute <i>sessionIdAttribute</i> you can change the request attribute name that included the old session id.
-Default attribuite name is <i>org.apache.catalina.cluster.session.JvmRouteOrignalSessionID</i>.
-</p>
-<p>
-<b>Trick:</b><br/>
-You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes!
-Set enable true on all JvmRouteBinderValve backups, disable worker at mod_jk 
-and then drop node and restart it! Then enable mod_jk Worker and disable JvmRouteBinderValves again. 
-This use case means that only requested session are migrated.
-</p>
-
-</section>
-
-</section>
 
 
 <section name="Monitoring your Cluster with JMX">
