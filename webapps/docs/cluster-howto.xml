@@ -39,7 +39,7 @@
     The following is the default cluster configuration:<br/>
     <source>
         &lt;Cluster className=&quot;org.apache.catalina.ha.tcp.SimpleTcpCluster&quot;
-                 channelSendOptions=&quot;6&quot;&gt;
+                 channelSendOptions=&quot;8&quot;&gt;
 
           &lt;Manager className=&quot;org.apache.catalina.ha.session.BackupManager&quot;
                    expireSessionsOnShutdown=&quot;false&quot;
