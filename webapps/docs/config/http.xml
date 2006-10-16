@@ -32,9 +32,7 @@
   <code>mod_jk 1.2.x</code> connector for Apache 1.3), see
   <a href="ajp.html">here</a> instead.</p>
 
-  <p>At server startup time, this <strong>Connector</strong> will create a
-  number of request processing threads (based on the value configured for
-  the <code>minSpareThreads</code> attribute).  Each incoming request requires
+  <p>Each incoming request requires
   a thread for the duration of that request.  If more simultaneous requests
   are received than can be handled by the currently available request
   processing threads, additional threads will be created up to the
