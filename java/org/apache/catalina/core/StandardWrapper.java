@@ -104,10 +104,10 @@ public class StandardWrapper
                 if (is != null) {
                     restrictedServlets.load(is);
                 } else {
-                    log.error(sm.getString("standardWrapper.restrictedServletsResources"));
+                    log.error(sm.getString("standardWrapper.restrictedServletsResource"));
                 }
             } catch (IOException e) {
-                log.error(sm.getString("standardWrapper.restrictedServletsResources"), e);
+                log.error(sm.getString("standardWrapper.restrictedServletsResource"), e);
             }
         }
         
