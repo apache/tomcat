@@ -77,7 +77,7 @@ number of Jakarta-Commons components:
 <li>Jakarta-Commons Pool</li>
 </ul>
 These libraries are located in a single JAR at 
-<code>$CATALINA_HOME/common/lib/naming-factory-dbcp.jar</code>. However,
+<code>$CATALINA_HOME/lib/tomcat-dbcp.jar</code>. However,
 only the classes needed for connection pooling have been included, and the
 packages have been renamed to avoid interfering with applications.
 </p>
@@ -149,7 +149,7 @@ The default is <code>false</code>.
 </ul>
 </p>
 
-<p>Before you proceed, don't forget to copy the JDBC Driver's jar into <code>$CATALINA_HOME/common/lib</code>.</p>
+<p>Before you proceed, don't forget to copy the JDBC Driver's jar into <code>$CATALINA_HOME/lib</code>.</p>
 
 <h3>1. MySQL configuration</h3>
 <p>
@@ -311,7 +311,7 @@ your hard work.</p>
 usual gotchas :-)</p>
 <p>Drivers for older Oracle versions may be distributed as *.zip files rather
 than *.jar files. Tomcat will only use <code>*.jar</code> files installed in
-<code>$CATALINA_HOME/common/lib</code>. Therefore <code>classes111.zip</code>
+<code>$CATALINA_HOME/lib</code>. Therefore <code>classes111.zip</code>
 or <code>classes12.zip</code> will need to be renamed with a <code>.jar</code>
 extension. Since jarfiles are zipfiles, there is no need to unzip and jar these
 files - a simple rename will suffice.</p>
@@ -373,7 +373,7 @@ Connection conn = ds.getConnection();
 
 <h3>1. Required files </h3>
 <p>
-Copy the Postgres JDBC jar to $CATALINA_HOME/common/lib. As with Oracle, the
+Copy the Postgres JDBC jar to $CATALINA_HOME/lib. As with Oracle, the
 jars need to be in this directory in order for DBCP's Classloader to find
 them. This has to be done regardless of which configuration step you take next.
 </p>
@@ -479,7 +479,7 @@ driver(Oracle8i 8.1.7.1 JDBC/OCI Driver) from <a href="http://otn.oracle.com/">o
 </p>
 <p>
 After renaming <code>classes12.zip</code> file to <code>classes12.jar</code>
-for Tomcat, copy it into <code>$CATALINA_HOME/common/lib</code>. 
+for Tomcat, copy it into <code>$CATALINA_HOME/lib</code>. 
 You may also have to remove the <code>javax.sql.*</code> classes
 from this file depending upon the version of Tomcat and JDK you are using.
 </p>

@@ -53,7 +53,7 @@
   by Tomcat will have.  There are a number of Permission classes that are
   a standard part of the JDK, and you can create your own Permission class
   for use in your own web applications.  Both techniques are used in
-  Tomcat 5.</p>
+  Tomcat 6.</p>
 
 
   <subsection name="Standard Permissions">
@@ -154,7 +154,7 @@ grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
   looks like this:</p>
 <source>
 // ============================================================================
-// catalina.corepolicy - Security Policy Permissions for Tomcat 5
+// catalina.corepolicy - Security Policy Permissions for Tomcat 6
 //
 // This file contains a default set of security policies to be enforced (by the
 // JVM) when Catalina is executed with the "-security" option.  In addition
@@ -163,7 +163,7 @@ grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
 //
 // * Read access to the document root directory
 //
-// $Id: security-manager-howto.xml 301460 2003-01-15 03:40:45Z glenn $
+// $Id: catalina.policy 393732 2006-04-13 06:32:25Z pero $
 // ============================================================================
 
 
@@ -195,8 +195,13 @@ grant codeBase "file:${java.home}/lib/ext/-" {
 // ========== CATALINA CODE PERMISSIONS =======================================
 
 
-// These permissions apply to the launcher code
-grant codeBase "file:${catalina.home}/bin/commons-launcher.jar" {
+// These permissions apply to the daemon code
+grant codeBase "file:${catalina.home}/bin/commons-daemon.jar" {
+        permission java.security.AllPermission;
+};
+
+// These permissions apply to the logging API
+grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         permission java.security.AllPermission;
 };
 
@@ -207,16 +212,17 @@ grant codeBase "file:${catalina.home}/bin/bootstrap.jar" {
 
 // These permissions apply to the servlet API classes
 // and those that are shared across all class loaders
-// located in the "common" directory
-grant codeBase "file:${catalina.home}/common/-" {
+// located in the "lib" directory
+grant codeBase "file:${catalina.home}/lib/-" {
         permission java.security.AllPermission;
 };
 
-// These permissions apply to the container's core code, plus any additional
-// libraries installed in the "server" directory
-grant codeBase "file:${catalina.home}/server/-" {
-        permission java.security.AllPermission;
+// The permissions granted to the balancer WEB-INF/classes and WEB-INF/lib directory
+grant codeBase "file:${catalina.home}/webapps/balancer/-" {
+        permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.util.digester";
+        permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.util.digester.*";
 };
+
 
 // ========== WEB APPLICATION PERMISSIONS =====================================
 
@@ -225,25 +231,25 @@ grant codeBase "file:${catalina.home}/server/-" {
 // In addition, a web application will be given a read FilePermission
 // and JndiPermission for all files and directories in its document root.
 grant { 
-        // Required for JNDI lookup of named JDBC DataSource's and
-        // javamail named MimePart DataSource used to send mail
-        permission java.util.PropertyPermission "java.home", "read";
-        permission java.util.PropertyPermission "java.naming.*", "read";
-        permission java.util.PropertyPermission "javax.sql.*", "read";
+    // Required for JNDI lookup of named JDBC DataSource's and
+    // javamail named MimePart DataSource used to send mail
+    permission java.util.PropertyPermission "java.home", "read";
+    permission java.util.PropertyPermission "java.naming.*", "read";
+    permission java.util.PropertyPermission "javax.sql.*", "read";
 
-        // OS Specific properties to allow read access
-	permission java.util.PropertyPermission "os.name", "read";
-	permission java.util.PropertyPermission "os.version", "read";
-	permission java.util.PropertyPermission "os.arch", "read";
-	permission java.util.PropertyPermission "file.separator", "read";
-	permission java.util.PropertyPermission "path.separator", "read";
-	permission java.util.PropertyPermission "line.separator", "read";
+    // OS Specific properties to allow read access
+    permission java.util.PropertyPermission "os.name", "read";
+    permission java.util.PropertyPermission "os.version", "read";
+    permission java.util.PropertyPermission "os.arch", "read";
+    permission java.util.PropertyPermission "file.separator", "read";
+    permission java.util.PropertyPermission "path.separator", "read";
+    permission java.util.PropertyPermission "line.separator", "read";
 
-        // JVM properties to allow read access
-        permission java.util.PropertyPermission "java.version", "read";
-        permission java.util.PropertyPermission "java.vendor", "read";
-        permission java.util.PropertyPermission "java.vendor.url", "read";
-        permission java.util.PropertyPermission "java.class.version", "read";
+    // JVM properties to allow read access
+    permission java.util.PropertyPermission "java.version", "read";
+    permission java.util.PropertyPermission "java.vendor", "read";
+    permission java.util.PropertyPermission "java.vendor.url", "read";
+    permission java.util.PropertyPermission "java.class.version", "read";
 	permission java.util.PropertyPermission "java.specification.version", "read";
 	permission java.util.PropertyPermission "java.specification.vendor", "read";
 	permission java.util.PropertyPermission "java.specification.name", "read";
@@ -255,14 +261,16 @@ grant {
 	permission java.util.PropertyPermission "java.vm.vendor", "read";
 	permission java.util.PropertyPermission "java.vm.name", "read";
 
-        // Required for getting BeanInfo
-        permission java.lang.RuntimePermission "accessClassInPackage.sun.beans.*";
-
-        // Required for OpenJMX
-        permission java.lang.RuntimePermission "getAttribute";
+    // Required for OpenJMX
+    permission java.lang.RuntimePermission "getAttribute";
 
 	// Allow read of JAXP compliant XML parser debug
 	permission java.util.PropertyPermission "jaxp.debug", "read";
+
+    // Precompiled JSPs need access to this package.
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime.*";
+    
 };
 
 

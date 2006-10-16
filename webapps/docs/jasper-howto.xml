@@ -151,7 +151,7 @@ On fast servers, this will allow sub-second recompilation cycles for even large 
 pages.</p>
 
 <p>Apache Ant, which was used in previous Tomcat releases, can be used instead instead of 
-the new compiler by simply removing the <code>common/lib/jasper-jdt.jar</code> file, 
+the new compiler by simply removing the <code>lib/jasper-jdt.jar</code> file, 
 and placing the <code>ant.jar</code> file from the latest Ant distribution in the 
 <code>lib</code> folder.  If you do this, you also need to use the "javac"
 argument to catalina.sh.</p>
@@ -200,10 +200,7 @@ download) to precompile a webapp:
         &lt;fileset dir="${tomcat.home}/bin"&gt; 
           &lt;include name="*.jar"/&gt; 
         &lt;/fileset&gt; 
-        &lt;fileset dir="${tomcat.home}/server/lib"&gt; 
-          &lt;include name="*.jar"/&gt; 
-        &lt;/fileset&gt; 
-        &lt;fileset dir="${tomcat.home}/common/lib"&gt; 
+        &lt;fileset dir="${tomcat.home}/lib"&gt; 
           &lt;include name="*.jar"/&gt; 
         &lt;/fileset&gt; 
       &lt;/classpath&gt; 
@@ -232,12 +229,8 @@ download) to precompile a webapp:
         &lt;fileset dir="${webapp.path}/WEB-INF/lib"&gt;
           &lt;include name="*.jar"/&gt;
         &lt;/fileset&gt;
-        &lt;pathelement location="${tomcat.home}/common/classes"/&gt;
+        &lt;pathelement location="${tomcat.home}/lib"/&gt;
         &lt;fileset dir="${tomcat.home}/common/lib"&gt;
-          &lt;include name="*.jar"/&gt;
-        &lt;/fileset&gt;
-        &lt;pathelement location="${tomcat.home}/shared/classes"/&gt;
-        &lt;fileset dir="${tomcat.home}/shared/lib"&gt;
           &lt;include name="*.jar"/&gt;
         &lt;/fileset&gt;
         &lt;fileset dir="${tomcat.home}/bin"&gt; 
@@ -323,7 +316,7 @@ Jikes</a> to compile JSP pages:
 <ul>
 <li>From your <a href="ant.apache.org">Ant</a> installation, copy ant.jar
 and (if it's available: Ant 1.5 and later) ant-launcher.jar to 
-<code>$CATALINA_BASE/common/lib</code>.</li>
+<code>$CATALINA_BASE/lib</code>.</li>
 <li>Download and install jikes. jikes must support the -encoding option.
 Execute <code>jikes -help</code> to verify that it was built with support
 for <code>-encoding</code>.</li>

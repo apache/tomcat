@@ -87,10 +87,10 @@ meaning that any change to the files necessitates a restart of the container.
 written and easy to understand, we may have missed something.  Provided
 below are various web sites and mailing lists in case you get stuck.</p>
 
-<p>As Tomcat 5 is a new release of Tomcat, keep in mind that some of the
+<p>As Tomcat 6 is a new release of Tomcat, keep in mind that some of the
 issues and solutions vary between the major versions of Tomcat (4.x versus
 5).  As you search around the web, there will be some documentation that
-is not relevant to Tomcat 5, but 3.x and 4.x.  Doing 3.x or 4.x things to 5
+is not relevant to Tomcat 6, but 3.x, 4.x and 5.x.  Doing 3.x or 4.x things to 6
 will probably not work in most cases as the server.xml files are very
 different.</p>
 
