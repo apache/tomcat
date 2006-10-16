@@ -39,9 +39,9 @@
 
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 5,
+    to refer to the directory into which you have installed Tomcat 6,
     and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 5 for multiple
+    resolved.  However, if you have configured Tomcat 6 for multiple
     instances by setting a CATALINA_BASE directory, you should use
     $CATALINA_BASE instead of $CATALINA_HOME for each of these
     references.</p>
@@ -104,12 +104,6 @@
     common attributes listed above):</p>
 
     <attributes>
-
-      <attribute name="checkInterval" required="false">
-        <p>The number of seconds between checks for modified classes and
-        resources, if <code>reloadable</code> has been set to
-        <code>true</code>.  The default is 15 seconds.</p>
-      </attribute>
 
       <attribute name="loaderClass" required="false">
         <p>Java class name of the <code>java.lang.ClassLoader</code>

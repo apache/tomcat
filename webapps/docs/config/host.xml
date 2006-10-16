@@ -41,9 +41,9 @@
 
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 5,
+    to refer to the directory into which you have installed Tomcat 6,
     and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 5 for multiple
+    resolved.  However, if you have configured Tomcat 6 for multiple
     instances by setting a CATALINA_BASE directory, you should use
     $CATALINA_BASE instead of $CATALINA_HOME for each of these
     references.</p>
