@@ -218,6 +218,54 @@ should be completed:</p>
 
 </section>
 
+<section name="Configuration Example">
+<source>
+        &lt;Cluster className=&quot;org.apache.catalina.ha.tcp.SimpleTcpCluster&quot;
+                 channelSendOptions=&quot;6&quot;&gt;
+
+          &lt;Manager className=&quot;org.apache.catalina.ha.session.BackupManager&quot;
+                   expireSessionsOnShutdown=&quot;false&quot;
+                   notifyListenersOnReplication=&quot;true&quot;
+                   mapSendOptions=&quot;6&quot;/&gt;
+          &lt;!--
+          &lt;Manager className=&quot;org.apache.catalina.ha.session.DeltaManager&quot;
+                   expireSessionsOnShutdown=&quot;false&quot;
+                   notifyListenersOnReplication=&quot;true&quot;/&gt;
+          --&gt;        
+          &lt;Channel className=&quot;org.apache.catalina.tribes.group.GroupChannel&quot;&gt;
+            &lt;Membership className=&quot;org.apache.catalina.tribes.membership.McastService&quot;
+                        address=&quot;228.0.0.4&quot;
+                        port=&quot;45564&quot;
+                        frequency=&quot;500&quot;
+                        dropTime=&quot;3000&quot;/&gt;
+            &lt;Receiver className=&quot;org.apache.catalina.tribes.transport.nio.NioReceiver&quot;
+                      address=&quot;auto&quot;
+                      port=&quot;5000&quot;
+                      selectorTimeout=&quot;100&quot;
+                      maxThreads=&quot;6&quot;/&gt;
+
+            &lt;Sender className=&quot;org.apache.catalina.tribes.transport.ReplicationTransmitter&quot;&gt;
+              &lt;Transport className=&quot;org.apache.catalina.tribes.transport.nio.PooledParallelSender&quot;/&gt;
+            &lt;/Sender&gt;
+            &lt;Interceptor className=&quot;org.apache.catalina.tribes.group.interceptors.TcpFailureDetector&quot;/&gt;
+            &lt;Interceptor className=&quot;org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor&quot;/&gt;
+            &lt;Interceptor className=&quot;org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor&quot;/&gt;
+          &lt;/Channel&gt;
+
+          &lt;Valve className=&quot;org.apache.catalina.ha.tcp.ReplicationValve&quot;
+                 filter=&quot;.*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;&quot;/&gt;
+
+          &lt;Deployer className=&quot;org.apache.catalina.ha.deploy.FarmWarDeployer&quot;
+                    tempDir=&quot;/tmp/war-temp/&quot;
+                    deployDir=&quot;/tmp/war-deploy/&quot;
+                    watchDir=&quot;/tmp/war-listen/&quot;
+                    watchEnabled=&quot;false&quot;/&gt;
+
+          &lt;ClusterListener className=&quot;org.apache.catalina.ha.session.ClusterSessionListener&quot;/&gt;
+        &lt;/Cluster&gt;
+</source>
+</section>
+
 <section name="Cluster Architecture">
 
 <p><b>Component Levels:</b>
