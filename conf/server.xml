@@ -119,6 +119,45 @@
     <!-- Define the top level container in our container hierarchy -->
     <Engine name="Catalina" defaultHost="localhost">
 
+      <!--
+      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
+               channelSendOptions="11">
+        <Manager className="org.apache.catalina.ha.session.DeltaManager"
+                 expireSessionsOnShutdown="false"
+                 notifyListenersOnReplication="true"/>
+      
+        <Channel className="org.apache.catalina.tribes.group.GroupChannel">
+          <Membership className="org.apache.catalina.tribes.membership.McastService"
+                      address="228.0.0.4"
+                      port="45564"
+                      frequency="500"
+                      dropTime="3000"/>
+          <Receiver className="org.apache.catalina.tribes.transport.nio.NioReceiver"
+                    address="auto"
+                    port="auto"
+                    selectorTimeout="100"
+                    maxThreads="6"/>
+          <Sender className="org.apache.catalina.tribes.transport.ReplicationTransmitter">
+            <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
+          </Sender>
+          <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
+          <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
+          <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
+        </Channel>
+
+        <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
+               filter=".*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;"/>
+
+        <Deployer className="org.apache.catalina.ha.deploy.FarmWarDeployer"
+                  tempDir="/tmp/war-temp/"
+                  deployDir="/tmp/war-deploy/"
+                  watchDir="/tmp/war-listen/"
+                  watchEnabled="false"/>
+        <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
+      </Cluster>
+      -->        
+
+
       <!-- The request dumper valve dumps useful debugging information about
            the request headers and cookies that were received, and the response
            headers and cookies that were sent, for all requests received by
@@ -191,48 +230,6 @@
         <!-- Place holder for brief cluster documentation, the rest will be online
         -->
         
-        <!--
-        <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"
-                 channelSendOptions="11">
-          <Manager className="org.apache.catalina.ha.session.DeltaManager"
-                   expireSessionsOnShutdown="false"
-                   notifyListenersOnReplication="true"/>
-        
-          <Channel className="org.apache.catalina.tribes.group.GroupChannel">
-            <Membership className="org.apache.catalina.tribes.membership.McastService"
-                        address="228.0.0.4"
-                        port="45564"
-                        frequency="500"
-                        dropTime="3000"/>
-            <Receiver className="org.apache.catalina.tribes.transport.nio.NioReceiver"
-                      address="auto"
-                      port="auto"
-                      selectorTimeout="100"
-                      maxThreads="6"/>
-
-            <Sender className="org.apache.catalina.tribes.transport.ReplicationTransmitter">
-              <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
-            </Sender>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
-          </Channel>
-
-          <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
-                 filter=".*\.gif;.*\.js;.*\.jpg;.*\.png;.*\.htm;.*\.html;.*\.css;.*\.txt;"/>
-
-          <Deployer className="org.apache.catalina.ha.deploy.FarmWarDeployer"
-                    tempDir="/tmp/war-temp/"
-                    deployDir="/tmp/war-deploy/"
-                    watchDir="/tmp/war-listen/"
-                    watchEnabled="false"/>
-
-          <ClusterListener className="org.apache.catalina.ha.session.ClusterSessionListener"/>
-        </Cluster>
-        -->        
-
-
-
         <!-- Normally, users must authenticate themselves to each web app
              individually.  Uncomment the following entry if you would like
              a user to be authenticated the first time they encounter a
