@@ -57,7 +57,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
     private boolean direct = true;
     private long tcpSelectorTimeout = 5000;
     //how many times to search for an available socket
-    private int autoBind = 10;
+    private int autoBind = 100;
     private int maxThreads = 6;
     private int minThreads = 6;
     private boolean tcpNoDelay = true;

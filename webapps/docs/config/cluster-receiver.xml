@@ -66,7 +66,7 @@
       a server socket on the first available port in the range 4000-4010.
     </attribute>
     <attribute name="autoBind" required="false">
-      Default value is <code>10</code>.
+      Default value is <code>100</code>.
       Use this value if you wish to automatically avoid port conflicts the cluster receiver will try to open a 
       server socket on the <code>port</code> attribute port, and then work up <code>autoBind</code> number of times.
     </attribute>
