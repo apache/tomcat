@@ -41,15 +41,10 @@
         &lt;Cluster className=&quot;org.apache.catalina.ha.tcp.SimpleTcpCluster&quot;
                  channelSendOptions=&quot;8&quot;&gt;
 
-          &lt;Manager className=&quot;org.apache.catalina.ha.session.BackupManager&quot;
-                   expireSessionsOnShutdown=&quot;false&quot;
-                   notifyListenersOnReplication=&quot;true&quot;
-                   mapSendOptions=&quot;6&quot;/&gt;
-          &lt;!--
           &lt;Manager className=&quot;org.apache.catalina.ha.session.DeltaManager&quot;
                    expireSessionsOnShutdown=&quot;false&quot;
                    notifyListenersOnReplication=&quot;true&quot;/&gt;
-          --&gt;        
+
           &lt;Channel className=&quot;org.apache.catalina.tribes.group.GroupChannel&quot;&gt;
             &lt;Membership className=&quot;org.apache.catalina.tribes.membership.McastService&quot;
                         address=&quot;228.0.0.4&quot;
