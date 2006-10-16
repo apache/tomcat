@@ -97,6 +97,7 @@
       <fileset dir="java">
         <include name="**/*.properties"/>
         <include name="**/*.dtd"/>
+        <include name="**/*.tasks"/>
         <include name="**/*.xsd"/>
         <include name="**/*.xml"/>
       </fileset>
