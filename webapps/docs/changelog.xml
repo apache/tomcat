@@ -15,6 +15,38 @@
 
 <body>
 <section name="Tomcat 6.0.0 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add API for Comet IO handling (remm, fhanik)
+      </add>
+      <add>
+        Servlet 2.5 support (remm)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        JSP 2.1 support (jhook, remm)
+      </add>
+      <add>
+        Unifed EL 2.1 support (jhook)
+      </add>
+    </changelog>
+  </subsection> 
+  <subsection name="Coyote">
+    <changelog>
+    </changelog>
+  </subsection> 
+  <subsection name="Cluster">
+    <changelog>
+    </changelog>
+  </subsection> 
+  <subsection name="Webapps">
+    <changelog>
+    </changelog>
+  </subsection> 
 </section>
 
 <section name="Tomcat 5.5.21 (fhanik)">
