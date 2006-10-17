@@ -38,7 +38,7 @@
       <fileset dir="${webapp}" />
     </copy>
 
-    <jasper2 validateXml="false" 
+    <jasper validateXml="false" 
              uriroot="${webapp.path}" 
              webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml"
              addWebXmlMappings="true"
