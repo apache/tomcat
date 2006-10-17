@@ -191,11 +191,11 @@ Section "Native" SecTomcatNative
 
   SectionIn 3
 
-  NSISdl::download /TIMEOUT=30000 http://tomcat.heanet.ie/native/1.1.4/binaries/win32/tcnative-1.dll $INSTDIR\bin\tcnative-1.dll
+  NSISdl::download /TIMEOUT=30000 http://tomcat.heanet.ie/native/1.1.3/binaries/win32/tcnative-1.dll $INSTDIR\bin\tcnative-1.dll
   Pop $0
   StrCmp $0 success success
     SetDetailsView show
-    DetailPrint "download failed from http://tomcat.heanet.ie/native/1.1.4/binaries/win32/tcnative-1.dll: $0"
+    DetailPrint "download failed from http://tomcat.heanet.ie/native/1.1.3/binaries/win32/tcnative-1.dll: $0"
   success:
 
   ClearErrors
