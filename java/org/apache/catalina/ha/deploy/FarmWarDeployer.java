@@ -142,12 +142,18 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             watcher = new WarWatcher(this, new File(getWatchDir()));
             if (log.isInfoEnabled())
                 log.info("Cluster deployment is watching " + getWatchDir()
-                        + " for changes.");
+                         + " for changes.");
         }
-
+    
         // Check to correct engine and host setup
-        host = (Host) getCluster().getContainer();
-        Engine engine = (Engine) host.getParent();
+        Object parent = getCluster().getContainer();
+        Engine engine = null;
+        if ( parent instanceof Host ) {
+            host = (Host) parent;
+            engine = (Engine) host.getParent();
+        }else {
+            engine = (Engine)parent;
+        }
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host="
                     + host.getName());
@@ -157,8 +163,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         configBase = new File(System.getProperty("catalina.base"), "conf");
         if (engine != null) {
             configBase = new File(configBase, engine.getName());
-        }
-        if (host != null) {
+        } else if (host != null) {
             configBase = new File(configBase, host.getName());
         }
 
