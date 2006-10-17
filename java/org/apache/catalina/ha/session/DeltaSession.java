@@ -698,7 +698,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     protected void setAccessCount(int count) {
-        super.accessCount.set(count);
+        if ( accessCount == null && ACTIVITY_CHECK ) accessCount = new AtomicInteger();
+        if ( accessCount != null ) super.accessCount.set(count);
     }
 }
 
