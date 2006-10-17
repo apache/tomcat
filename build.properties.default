@@ -34,9 +34,9 @@ jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.2.0.v_671.jar
 jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/R-3.2-200606291905/eclipse-JDT-3.2.zip
 
 # ----- Tomcat native library -----
-tomcat-native.home=${base.path}/tomcat-native-1.1.3
+tomcat-native.home=${base.path}/tomcat-native-1.1.6
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
-tomcat-native.loc=${base-tomcat.loc}/tomcat-connectors/native/tomcat-native-1.1.3.tar.gz
+tomcat-native.loc=${base-tomcat.loc}/tomcat-connectors/native/tomcat-native-1.1.6-src.tar.gz
 
 # ----- Commons DBCP, version 1.1 or later -----
 commons-dbcp.version=1.2.1
