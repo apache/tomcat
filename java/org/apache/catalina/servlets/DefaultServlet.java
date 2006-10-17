@@ -215,7 +215,8 @@ public class DefaultServlet
      */
     public void init() throws ServletException {
 
-        debug = Integer.parseInt(getServletConfig().getInitParameter("debug"));
+        if (getServletConfig().getInitParameter("debug") != null)
+            debug = Integer.parseInt(getServletConfig().getInitParameter("debug"));
 
         if (getServletConfig().getInitParameter("input") != null)
             input = Integer.parseInt(getServletConfig().getInitParameter("input"));
