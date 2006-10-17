@@ -1,4 +1,3 @@
-<!-- Example Server Configuration File -->
 <!-- Note:  A "Server" is not itself a "Container", so you may not
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
@@ -12,14 +11,11 @@
   <!-- JMX Support for the Tomcat server. Documentation at /docs/non-existent.html -->
   <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
-  <!--<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>-->
 
   <!-- Global JNDI resources
        Documentation at /docs/jndi-resources-howto.html
   -->
   <GlobalNamingResources>
-    <!-- Test entry for demonstration purposes -->
-    <Environment name="simpleValue" type="java.lang.Integer" value="30"/>
     <!-- Editable user database that can also be used by
          UserDatabaseRealm to authenticate users
     -->
@@ -44,7 +40,8 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
-    <Connector port="8080" maxThreads="150" connectionTimeout="20000" 
+    <Connector port="8080" protocol="HTTP/1.1" 
+               maxThreads="150" connectionTimeout="20000" 
                redirectPort="8443" />
 
     <!-- Define a SSL HTTP/1.1 Connector on port 8443
@@ -52,7 +49,8 @@
          connector should be using the OpenSSL style configuration
          described in the APR documentation -->
     <!--
-    <Connector port="8443" maxThreads="150" scheme="https" secure="true"
+    <Connector port="8443" protocol="HTTP/1.1" 
+               maxThreads="150" scheme="https" secure="true"
                clientAuth="false" sslProtocol="TLS" />
     -->
 
@@ -108,7 +106,7 @@
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html -->
         <!--
-        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"  
+        <Valve className="org.apache.catalina.valves.FastCommonAccessLogValve" directory="logs"  
                prefix="localhost_access_log." suffix=".txt" pattern="common" resolveHosts="false"/>
         -->
 
