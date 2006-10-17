@@ -450,6 +450,7 @@
   	<!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
       <fileset dir="conf">
+        <include name="**/*.policy"/>
         <include name="**/*.xml"/>
         <include name="**/*.properties"/>
       </fileset>
