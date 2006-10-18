@@ -37,10 +37,16 @@
   </subsection> 
   <subsection name="Coyote">
     <changelog>
+      <add>
+        SSLEngine attribute required for SSL to be turned on, on all HTTP connectors(fhanik)
+      </add>
     </changelog>
   </subsection> 
   <subsection name="Cluster">
     <changelog>
+      <add>
+        New cluster configuration and new documentation (fhanik)
+      </add>
     </changelog>
   </subsection> 
   <subsection name="Webapps">
