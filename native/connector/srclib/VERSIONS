@@ -1,0 +1,4 @@
+Use the following version of the libraries
+
+- APR 1.2.7, http://apr.apache.org
+- OpenSSL 0.9.8d, http://www.openssl.org
