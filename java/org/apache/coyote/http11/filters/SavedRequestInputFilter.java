@@ -55,6 +55,9 @@ public class SavedRequestInputFilter implements InputFilter {
         	writeLength = input.getLength();
         }
         
+        if(input.getOffset()>= input.getEnd())
+            return -1;
+        
         input.substract(chunk.getBuffer(), 0, writeLength);
         chunk.setOffset(0);
         chunk.setEnd(writeLength);
