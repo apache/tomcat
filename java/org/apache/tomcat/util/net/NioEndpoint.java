@@ -350,8 +350,10 @@ public class NioEndpoint {
     // --------------------  SSL related properties --------------------
     protected String keystoreFile = System.getProperty("user.home")+"/.keystore";
     public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) { this.keystoreFile = s;}
-
+    public void setKeystoreFile(String s ) { this.keystoreFile = s; }
+    public void setKeystore(String s ) { setKeystoreFile(s);}
+    public String getKeystore() { return getKeystoreFile();}
+    
     protected String algorithm = "SunX509";
     public String getAlgorithm() { return algorithm;}
     public void setAlgorithm(String s ) { this.algorithm = s;}
@@ -396,6 +398,13 @@ public class NioEndpoint {
         }
     }
     
+    /**
+     * SSL engine.
+     */
+    protected String SSLEngine = "off";
+    public String getSSLEngine() { return SSLEngine;}
+    public void setSSLEngine(String SSLEngine) {this.SSLEngine = SSLEngine;}
+
     protected boolean secure = false;
     public boolean getSecure() { return secure;}
     public void setSecure(boolean b) { secure = b;}
@@ -500,7 +509,7 @@ public class NioEndpoint {
         }
 
         // Initialize SSL if needed
-        if (secure) {
+        if ("on".equalsIgnoreCase(getSSLEngine())) {
             // Initialize SSL
             char[] passphrase = getKeystorePass().toCharArray();
 
