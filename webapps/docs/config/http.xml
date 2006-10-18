@@ -148,19 +148,35 @@
       number specified here.</p>
     </attribute>
 
+    <attribute name="SSLEngine" required="false">
+      <p>
+      Use this attribute to enable SSL traffic on a connector.
+      To turn on SSL handshake/encryption/decryption on a connector
+      set this value to <code>on</code>.
+      The default value is <code>off</code>.
+      When turning this value <code>on</code> you will want to set the 
+      <code>scheme</code> and the <code>secure</code> attributes as well
+      to pass the correct <code>request.getScheme()</code> and 
+      <code>request.isSecure()</code> values to the servlets
+      See <a href="#SSL Support">SSL Support</a> for more information.
+      </p>
+    </attribute>
+
     <attribute name="scheme" required="false">
       <p>Set this attribute to the name of the protocol you wish to have
       returned by calls to <code>request.getScheme()</code>.  For
       example, you would set this attribute to "<code>https</code>"
       for an SSL Connector.  The default value is "<code>http</code>".
-      See <a href="#SSL Support">SSL Support</a> for more information.</p>
+      </p>
     </attribute>
 
     <attribute name="secure" required="false">
       <p>Set this attribute to <code>true</code> if you wish to have
       calls to <code>request.isSecure()</code> to return <code>true</code>
-      for requests received by this Connector (you would want this on an
-      SSL Connector).  The default value is <code>false</code>.</p>
+      for requests received by this Connector. You would want this on an
+      SSL Connector or a non SSL connector that is receiving data from a 
+      SSL accelerator, like a crypto card, a SSL appliance or even a webserver.
+      The default value is <code>false</code>.</p>
     </attribute>
 
     <attribute name="URIEncoding" required="false">

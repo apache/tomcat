@@ -17,8 +17,9 @@
 
 <section name="Quick Start">
 
-   <p><b>IMPORTANT NOTE: This Howto refers to usage of JSSE. When using APR, Tomcat will
-   use OpenSSL, which uses a different configuration.</b></p>
+   <p><b>IMPORTANT NOTE: This Howto refers to usage of JSSE, that comes included with
+    jdk 1.5 and higher. When using APR, Tomcat will
+    use OpenSSL, which uses a different configuration.</b></p>
 
     <blockquote><em>
     <p>The description below uses the variable name $CATALINA_HOME
@@ -33,11 +34,6 @@
 <p>To install and configure SSL support on Tomcat 6, you need to follow
 these simple steps.  For more information, read the rest of this HOW-TO.</p>
 <ol>
-<li>If you are running a 1.3 JVM, download JSSE 1.0.3 (or later) from
-   <a href="http://java.sun.com/products/jsse/">http://java.sun.com/products/jsse/</a>
-   and either make it an <em>installed extension</em> on the system, or else
-   set an environment variable <code>JSSE_HOME</code> that points at the
-   directory into which you installed JSSE.  </li><br/><br/>
 <li>Create a certificate keystore by executing the following command:
 <p>Windows:</p>
 <source>
@@ -177,30 +173,6 @@ hosts are commonly used with SSL in a production environment.</p>
 
 <section name="Configuration">
 
-<subsection name="Download and Install JSSE (if needed)">
-<p>Note that JSSE is bundled with Sun's JDK 1.4 and later, so if you're using
-JDK 1.4 and later, you can skip this step.</p>
-
-
-<p>Download the <em>Java Secure Socket Extensions</em> (JSSE) package,
-version 1.0.3 or later, from
-<a href="http://java.sun.com/products/jsse/">http://java.sun.com/products/jsse/</a>.
-If you built Tomcat from source, you have probably already downloaded this
-package.</p>
-
-<p>After expanding the package, there are two ways to make it available to
-Tomcat (choose one or the other):</p>
-<ul>
-<li>Make JSSE an <em>installed extension</em> by copying all three JAR files
-    (<code>jcert.jar</code>, <code>jnet.jar</code>, and <code>jsse.jar</code>)
-    into your <code>$JAVA_HOME/jre/lib/ext</code> directory.</li>
-<li>Create a new environment variable <code>JSSE_HOME</code> that contains
-    the absolute path to the directory into which you unpacked the
-    JSSE binary distribution.</li>
-</ul>
-
-</subsection>
-
 <subsection name="Prepare the Certificate Keystore">
 
 <p>Tomcat currently operates only on <code>JKS</code> or <code>PKCS12</code>
@@ -297,9 +269,11 @@ file installed with Tomcat.  It will look something like this:</p>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
 &lt;Connector 
-           port="8443" minProcessors="5" maxProcessors="75"
-           enableLookups="true" disableUploadTimeout="true"
-           acceptCount="100" debug="0" scheme="https" secure="true";
+           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           enableLookups="true" disableUploadTimeout="true" 
+           acceptCount="100"  maxThreads="200"
+           scheme="https" secure="true" SSLEngine="on"
+           keystoreFile="${user.home}/.keystore" keystorePass="changeit"
            clientAuth="false" sslProtocol="TLS"/&gt;
 --&gt;
 </source>
@@ -344,6 +318,18 @@ values, depending on how you configured your keystore earlier:</p>
         to request a client Certificate, but not fail if one isn't presented.
     </td>
   </tr>
+  <tr><td><code>SSLEngine</code></td>
+    <td>
+      Use this attribute to enable SSL traffic on a connector.
+      To turn on SSL handshake/encryption/decryption on a connector
+      set this value to <code>on</code>.
+      The default value is <code>off</code>.
+      When turning this value <code>on</code> you will want to set the 
+      <code>scheme</code> and the <code>secure</code> attributes as well
+      to pass the correct <code>request.getScheme()</code> and 
+      <code>request.isSecure()</code> values to the servlets
+    </td>
+  </tr>  
   <tr>
     <td><code>keystoreFile</code></td>
     <td>Add this attribute if the keystore file you created is not in
