@@ -820,7 +820,7 @@ public class Http11NioProcessor implements ActionHook {
 
         boolean keptAlive = false;
         boolean openSocket = false;
-
+        boolean recycle = true;
         while (!error && keepAlive && !comet) {
 
             // Parsing the request header
@@ -829,8 +829,7 @@ public class Http11NioProcessor implements ActionHook {
                     socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
                     inputBuffer.readTimeout = soTimeout;
                 }
-                if (!inputBuffer.parseRequestLine
-                        (keptAlive && (endpoint.getCurrentThreadsBusy() > limit))) {
+                if (!inputBuffer.parseRequestLine(keptAlive && (endpoint.getCurrentThreadsBusy() > limit))) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
@@ -839,13 +838,18 @@ public class Http11NioProcessor implements ActionHook {
                     socket.getPoller().add(socket);
                     break;
                 }
-                request.setStartTime(System.currentTimeMillis());
                 keptAlive = true;
-                if (!disableUploadTimeout) {
+                if ( !inputBuffer.parseHeaders() ) {
+                    openSocket = true;
+                    socket.getPoller().add(socket);
+                    recycle = false;
+                    break;
+                }
+                request.setStartTime(System.currentTimeMillis());
+                if (!disableUploadTimeout) { //only for body, not for request headers
                     socket.getIOChannel().socket().setSoTimeout((int)timeout);
                     inputBuffer.readTimeout = soTimeout;
                 }
-                inputBuffer.parseHeaders();
             } catch (IOException e) {
                 error = true;
                 break;
@@ -934,7 +938,7 @@ public class Http11NioProcessor implements ActionHook {
                 return SocketState.LONG;
             }
         } else {
-            recycle();
+            if ( recycle ) recycle();
             return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
         }
 
