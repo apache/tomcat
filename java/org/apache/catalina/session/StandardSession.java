@@ -710,7 +710,9 @@ public class StandardSession
                     }
                 }
             }
-            accessCount = null;
+            if (ACTIVITY_CHECK) {
+                accessCount.set(0);
+            }
             setValid(false);
 
             /*
