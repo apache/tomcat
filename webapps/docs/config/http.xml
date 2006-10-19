@@ -148,13 +148,13 @@
       number specified here.</p>
     </attribute>
 
-    <attribute name="SSLEngine" required="false">
+    <attribute name="SSLEnabled" required="false">
       <p>
       Use this attribute to enable SSL traffic on a connector.
       To turn on SSL handshake/encryption/decryption on a connector
-      set this value to <code>on</code>.
-      The default value is <code>off</code>.
-      When turning this value <code>on</code> you will want to set the 
+      set this value to <code>true</code>.
+      The default value is <code>false</code>.
+      When turning this value <code>true</code> you will want to set the 
       <code>scheme</code> and the <code>secure</code> attributes as well
       to pass the correct <code>request.getScheme()</code> and 
       <code>request.isSecure()</code> values to the servlets

@@ -109,6 +109,22 @@
 
   </section>
 
+  <section name="APR Lifecycle Listener Configuration">
+    <subsection name="AprLifecycleListener">
+    <attribute name="SSLEngine" required="false">
+    <p>
+      Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no specific ENGINE.
+      The default value is on.
+      This initializes the native SSL engine, then enable the use of this engine in the connector 
+      using the <code>SSLEnabled</code> attribute. Example:
+      <source>
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
+      </source>
+    </p>
+    </attribute>
+    </subsection>
+  </section>
+
   <section name="APR Connectors Configuration">
 
     <subsection name="HTTP">
@@ -188,10 +204,10 @@
     
     <attributes>
 
-    <attribute name="SSLEngine" required="false">
+    <attribute name="SSLEnabled" required="false">
     <p>
-      Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no specific ENGINE.
-      The default value is off.
+      Enable SSL on the socket, default value is false. Set this value to true
+      to enable SSL handshake/encryption/decryption in the APR connector.
     </p>
     </attribute>
     <attribute name="SSLProtocol" required="false">

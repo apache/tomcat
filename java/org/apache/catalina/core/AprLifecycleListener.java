@@ -24,6 +24,8 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import java.lang.reflect.InvocationTargetException;
+
 
 
 /**
@@ -56,8 +58,11 @@ public class AprLifecycleListener
     protected static final int RECOMMENDED_PV = 6;
 
 
+    // ---------------------------------------------- Properties
+    protected static String SSLEngine = "on"; //default on
+    protected static boolean sslInitialized = false;
+    
     // ---------------------------------------------- LifecycleListener Methods
-
 
     /**
      * Primary entry point for startup and shutdown events.
@@ -83,6 +88,7 @@ public class AprLifecycleListener
                 minor = clazz.getField("TCN_MINOR_VERSION").getInt(null);
                 patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
             } catch (Throwable t) {
+                t.printStackTrace();
                 if (!log.isDebugEnabled()) {
                     log.info(sm.getString("aprListener.aprInit", 
                             System.getProperty("java.library.path")));
@@ -109,6 +115,11 @@ public class AprLifecycleListener
                             + REQUIRED_MINOR + "." + RECOMMENDED_PV));
                 }                
             }
+            try {
+                initializeSSL();
+            }catch ( Throwable t ) {
+                log.error(sm.getString("aprListener.sslInit",t.getMessage()),t);
+            }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
             try {
                 String methodName = "terminate";
@@ -123,6 +134,24 @@ public class AprLifecycleListener
                 }
             }
         }
+
+    }
+    
+    public static synchronized void initializeSSL() 
+        throws ClassNotFoundException,NoSuchMethodException,
+               IllegalAccessException,InvocationTargetException{
+        
+        if ("off".equalsIgnoreCase(SSLEngine) ) return;
+        if ( sslInitialized ) return; //only once per VM
+        String methodName = "initialize";
+        Class paramTypes[] = new Class[1];
+        paramTypes[0] = String.class;
+        Object paramValues[] = new Object[1];
+        paramValues[0] = "on".equalsIgnoreCase(SSLEngine)?null:SSLEngine;
+        Class clazz = Class.forName("org.apache.tomcat.jni.SSL");
+        Method method = clazz.getMethod(methodName, paramTypes);
+        method.invoke(null, paramValues);
+        sslInitialized = true;
 
     }
 

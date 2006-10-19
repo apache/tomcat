@@ -509,8 +509,8 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
     /**
      * SSL engine.
      */
-    public String getSSLEngine() { return ep.getSSLEngine(); }
-    public void setSSLEngine(String SSLEngine) { ep.setSSLEngine(SSLEngine); }
+    public boolean isSSLEnabled() { return ep.isSSLEnabled(); }
+    public void setSSLEnabled(boolean SSLEnabled) { ep.setSSLEnabled(SSLEnabled); }
 
 
     /**

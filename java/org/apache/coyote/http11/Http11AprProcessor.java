@@ -102,7 +102,7 @@ public class Http11AprProcessor implements ActionHook {
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
         
-        ssl = !"off".equalsIgnoreCase(endpoint.getSSLEngine());
+        ssl = endpoint.isSSLEnabled();
 
         initializeFilters();
 

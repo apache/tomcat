@@ -401,9 +401,9 @@ public class NioEndpoint {
     /**
      * SSL engine.
      */
-    protected String SSLEngine = "off";
-    public String getSSLEngine() { return SSLEngine;}
-    public void setSSLEngine(String SSLEngine) {this.SSLEngine = SSLEngine;}
+    protected boolean SSLEnabled = false;
+    public boolean isSSLEnabled() { return SSLEnabled;}
+    public void setSSLEnabled(boolean SSLEnabled) {this.SSLEnabled = SSLEnabled;}
 
     protected boolean secure = false;
     public boolean getSecure() { return secure;}
@@ -509,7 +509,7 @@ public class NioEndpoint {
         }
 
         // Initialize SSL if needed
-        if ("on".equalsIgnoreCase(getSSLEngine())) {
+        if (isSSLEnabled()) {
             // Initialize SSL
             char[] passphrase = getKeystorePass().toCharArray();
 
