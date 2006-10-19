@@ -101,6 +101,11 @@ public class StandardSession
         super();
         this.manager = manager;
 
+        // Initialize access count
+        if (ACTIVITY_CHECK) {
+            accessCount = new AtomicInteger();
+        }
+
     }
 
 
