@@ -88,7 +88,6 @@ public class AprLifecycleListener
                 minor = clazz.getField("TCN_MINOR_VERSION").getInt(null);
                 patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
             } catch (Throwable t) {
-                t.printStackTrace();
                 if (!log.isDebugEnabled()) {
                     log.info(sm.getString("aprListener.aprInit", 
                             System.getProperty("java.library.path")));
