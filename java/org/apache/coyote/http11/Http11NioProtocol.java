@@ -537,8 +537,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public String getCiphers() { return ep.getCiphers();}
     public void setCiphers(String s) { ep.setCiphers(s);}
     
-    public String getSSLEngine() { return ep.getSSLEngine(); }
-    public void setSSLEngine(String SSLEngine) { ep.setSSLEngine(SSLEngine); }
+    public boolean getSSLEnabled() { return ep.isSSLEnabled(); }
+    public void setSSLEnabled(boolean SSLEnabled) { ep.setSSLEnabled(SSLEnabled); }
     
     
 

@@ -258,6 +258,23 @@ which contains further references for this issue.</p>
 </subsection>
 
 <subsection name="Edit the Tomcat Configuration File">
+<p>If you are using APR, you have the option of configuring an alternative engine to openSSL.
+<source>
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="someengine" /&gt;
+</source>
+The default value is
+<source>
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
+</source>
+So to use SSL under APR, make sure the SSLEngine attribute is set to something other than <code>off</code>.
+The default value is <code>on</code> and if you specify another value, it has to be a valid engine name.
+<br/>
+If you haven't compiled in SSL support into your Tomcat Native library, then you can turn this initialization off
+<source>
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="off" /&gt;
+</source>
+
+</p>
 
 <p>The final step is to configure your secure socket in the
 <code>$CATALINA_HOME/conf/server.xml</code> file, where
@@ -272,11 +289,72 @@ file installed with Tomcat.  It will look something like this:</p>
            port="8443" minSpareThreads="5" maxSpareThreads="75"
            enableLookups="true" disableUploadTimeout="true" 
            acceptCount="100"  maxThreads="200"
-           scheme="https" secure="true" SSLEngine="on"
+           scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
            clientAuth="false" sslProtocol="TLS"/&gt;
 --&gt;
 </source>
+<p>
+  The example above will throw an error if you have the APR and the Tomcat Native libraries in your path,
+  as tomcat will try to autoload the APR connector. The APR connector uses different attributes for 
+  SSL keys and certificates. An example of such configuration would be
+<source>
+&lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!--
+&lt;Connector 
+           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           enableLookups="true" disableUploadTimeout="true" 
+           acceptCount="100"  maxThreads="200"
+           scheme="https" secure="true" SSLEnabled="true"
+           SSLCertificateFile="/usr/local/ssl/server.crt" 
+           SSLCertificateKeyFile="/usr/local/ssl/server.pem"
+           clientAuth="false" sslProtocol="TLS"/&gt;
+--&gt;
+</source>
+</p>
+
+<p>
+  To avoid auto configuration you can define which connector to use by specifying a classname 
+  in the protocol attribute.<br/>
+  To define a Java connector, regardless if the APR library is loaded or not do:
+<source>
+&lt;-- Define a blocking Java SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!--
+&lt;Connector protocol="org.apache.coyote.http11.Http11Protocol"
+           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           enableLookups="true" disableUploadTimeout="true" 
+           acceptCount="100"  maxThreads="200"
+           scheme="https" secure="true" SSLEnabled="true"
+           keystoreFile="${user.home}/.keystore" keystorePass="changeit"
+           clientAuth="false" sslProtocol="TLS"/&gt;
+--&gt;
+&lt;-- Define a non-blocking Java SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!--
+&lt;Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
+           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           enableLookups="true" disableUploadTimeout="true" 
+           acceptCount="100"  maxThreads="200"
+           scheme="https" secure="true" SSLEnabled="true"
+           keystoreFile="${user.home}/.keystore" keystorePass="changeit"
+           clientAuth="false" sslProtocol="TLS"/&gt;
+--&gt;
+</source>
+and to specify an APR connector
+<source>
+&lt;-- Define a APR SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
+&lt;!--
+&lt;Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
+           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           enableLookups="true" disableUploadTimeout="true" 
+           acceptCount="100"  maxThreads="200"
+           scheme="https" secure="true" SSLEnabled="true"
+           SSLCertificateFile="/usr/local/ssl/server.crt" 
+           SSLCertificateKeyFile="/usr/local/ssl/server.pem"
+           clientAuth="false" sslProtocol="TLS"/&gt;
+--&gt;
+</source>
+
+</p>
 
 <p>You will note that the Connector element itself is commented out by default,
 so you will need to remove the comment tags around it.  Then, you can
@@ -318,13 +396,13 @@ values, depending on how you configured your keystore earlier:</p>
         to request a client Certificate, but not fail if one isn't presented.
     </td>
   </tr>
-  <tr><td><code>SSLEngine</code></td>
+  <tr><td><code>SSLEnabled</code></td>
     <td>
       Use this attribute to enable SSL traffic on a connector.
       To turn on SSL handshake/encryption/decryption on a connector
-      set this value to <code>on</code>.
-      The default value is <code>off</code>.
-      When turning this value <code>on</code> you will want to set the 
+      set this value to <code>true</code>.
+      The default value is <code>false</code>.
+      When turning this value <code>true</code> you will want to set the 
       <code>scheme</code> and the <code>secure</code> attributes as well
       to pass the correct <code>request.getScheme()</code> and 
       <code>request.isSecure()</code> values to the servlets

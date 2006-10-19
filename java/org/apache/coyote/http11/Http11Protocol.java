@@ -146,7 +146,7 @@ public class Http11Protocol
 
         // Verify the validity of the configured socket factory
         try {
-            if ("on".equalsIgnoreCase(getSSLEngine())) {
+            if (isSSLEnabled()) {
                 sslImplementation =
                     SSLImplementation.getInstance(sslImplementationName);
                 socketFactory = sslImplementation.getServerSocketFactory();
@@ -252,9 +252,9 @@ public class Http11Protocol
     public boolean getSecure() { return secure; }
     public void setSecure(boolean b) { secure = b; }
 
-    protected String SSLEngine = "off";
-    public String getSSLEngine() { return SSLEngine;}
-    public void setSSLEngine(String SSLEngine) {this.SSLEngine = SSLEngine;}    
+    protected boolean SSLEnabled = false;
+    public boolean isSSLEnabled() { return SSLEnabled;}
+    public void setSSLEnabled(boolean SSLEnabled) {this.SSLEnabled = SSLEnabled;}    
     
     /**
      * Name of the socket factory.

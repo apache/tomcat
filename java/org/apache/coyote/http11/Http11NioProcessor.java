@@ -103,7 +103,7 @@ public class Http11NioProcessor implements ActionHook {
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
-        ssl = "on".equalsIgnoreCase(endpoint.getSSLEngine());
+        ssl = endpoint.isSSLEnabled();
 
         initializeFilters();
 

@@ -18,6 +18,9 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        SSLEngine attribute added to the AprLifecycleListener(fhanik)
+      </add>
+      <add>
         Add API for Comet IO handling (remm, fhanik)
       </add>
       <add>
@@ -38,7 +41,7 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        SSLEngine attribute required for SSL to be turned on, on all HTTP connectors(fhanik)
+        SSLEnabled attribute required for SSL to be turned on, on all HTTP connectors(fhanik)
       </add>
     </changelog>
   </subsection> 
