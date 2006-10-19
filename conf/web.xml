@@ -978,10 +978,6 @@
         <mime-type>application/x-sv4crc</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>svg</extension>
-        <mime-type>image/svg+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>swf</extension>
         <mime-type>application/x-shockwave-flash</mime-type>
     </mime-mapping>
@@ -1083,11 +1079,11 @@
     </mime-mapping>
     <mime-mapping>
         <extension>svg</extension>
-        <mime-type>image/svg</mime-type>
+        <mime-type>image/svg+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>svgz</extension>
-        <mime-type>image/svg</mime-type>
+        <mime-type>image/svg+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>vsd</extension>
