@@ -10,7 +10,7 @@
     <author email="craigmcc@apache.org">Craig McClanahan</author>
     <author email="amyroh@apache.org">Amy Roh</author>
     <title>Tomcat MBean Names</title>
-    <revision>$Id: mbean-names.xml 303281 2004-09-27 16:00:31Z yoavs $</revision>
+    <revision>$Id: mbean-names.xml 466611 2006-10-22 00:44:42Z markt $</revision>
   </properties>
 
 <body>
@@ -139,79 +139,6 @@ corresponding values:</p>
   </tr>
 
   <tr>
-    <td>Server / Service / Engine / DefaultContext</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td><code>type=${DEFAULT-CONTEXT}, service=${service.name}</code></td>
-  </tr>
-
-<!--
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / InstanceListener</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / Listener</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td><code>type=${LISTENER}, sequence=${###}</code></td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / Loader</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / Manager</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / Realm</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / Resources</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / Valve</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / WrapperLifecycle</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / DefaultContext / WrapperListener</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
--->
-
-  <tr>
     <td>Server / Service / Engine / Host</td>
     <td align="center">1..n</td>
     <td align="center"><code>name</code></td>
@@ -284,6 +211,16 @@ corresponding values:</p>
   </tr>
 
   <tr>
+    <td>Server / Service / Engine / Host / Context / Wrapper</td>
+    <td align="center">0..n</td>
+    <td align="center">(none)</td>
+    <td><code>j2eeType=Servlet,name=${name},
+        WebModule=//${host.name}/${context.name},
+        J2EEApplication=${context.J2EEApplication},
+        J2EEServer=${context.J2EEServer}</code></td>
+  </tr>
+
+  <tr>
     <td>Server / Service / Engine / Host / Context / WrapperLifecycle</td>
     <td align="center">0..n</td>
     <td align="center">(none)</td>
@@ -298,79 +235,6 @@ corresponding values:</p>
     <td><code>type=${WRAPPER-LISTENER}, sequence=${###}, path=${context.path},
         host=${host.name}, service=${service.name}</code></td>
   </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td><code>type=DefaultContext, host=${host.name},
-        service=${service.name}</code></td>
-  </tr>
-
-<!--
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / InstanceListener</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / Listener</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / Loader</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / Manager</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / Realm</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / Resources</td>
-    <td align="center">0..1</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / Valve</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / WrapperLifecycle</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
-
-  <tr>
-    <td>Server / Service / Engine / Host / DefaultContext / WrapperListener</td>
-    <td align="center">0..n</td>
-    <td align="center">(none)</td>
-    <td></td>
-  </tr>
--->
 
   <tr>
     <td>Server / Service / Engine / Host / Listener</td>
@@ -503,13 +367,6 @@ web application for Tomcat):</p>
     <td align="center"><code>CONNECTOR</code></td>
     <td><code>org.apache.catalina.Connector</code></td>
     <td><code>org.apache.coyote.tomcat4.CoyoteConnector</code></td>
-  </tr>
-
-  <tr>
-    <td><code>DefaultContext</code></td>
-    <td align="center"><code>DEFAULT-CONTEXT</code></td>
-    <td><code>org.apache.catalina.DefaultContext</code></td>
-    <td><code>org.apache.catalina.core.StandardDefaultContext</code></td>
   </tr>
 
   <tr>
@@ -758,6 +615,13 @@ web application for Tomcat):</p>
   </tr>
 
   <tr>
+    <td><code>StandardWrapper</code></td>
+    <td align="center"><code>WRAPPER</code></td>
+    <td><code>org.apache.catalina.Wrapper</code></td>
+    <td><code>org.apache.catalina.core.StandardWrapper</code></td>
+  </tr>
+
+  <tr>
     <td><code>StandardWrapperValve</code></td>
     <td align="center"><code>VALVE</code></td>
     <td><code>org.apache.catalina.Valve</code></td>
@@ -823,7 +687,7 @@ to the specified MBean names or groups as follows:</p>
   <tr>
     <td><code>Servlet</code></td>
     <td><code>${WRAPPER}</code></td>
-    <td><strong>FIXME</strong> - Not yet identified as an MBean</td>
+    <td></td>
   </tr>
 
   <tr>
