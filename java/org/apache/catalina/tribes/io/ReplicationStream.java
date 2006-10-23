@@ -31,7 +31,7 @@ import java.io.ObjectStreamClass;
  * @author Craig R. McClanahan
  * @author Bip Thelin
  * @author Filip Hanik
- * @version $Revision: 377484 $, $Date: 2006-02-13 15:00:05 -0600 (Mon, 13 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 
 public final class ReplicationStream extends ObjectInputStream {
