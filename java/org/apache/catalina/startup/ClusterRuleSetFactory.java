@@ -76,7 +76,7 @@ public class ClusterRuleSetFactory {
                InvocationTargetException {
         Class clazz = Class.forName(className,true,cl);
         Constructor cons = clazz.getConstructor(new Class[] {String.class});
-        return (RuleSetBase)cons.newInstance(new String[] {prefix});
+        return (RuleSetBase)cons.newInstance(prefix);
     }
     
     /**
