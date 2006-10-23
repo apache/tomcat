@@ -50,6 +50,9 @@
           description="are worker threads on daemon mode"
                  type="boolean"
             writeable="false"/>
+    <attribute name="packetSize"
+          description="The maximum AJP packet size"
+          type="int" />
 
     <operation name="start"
                description="Start, if server socket no create call init"

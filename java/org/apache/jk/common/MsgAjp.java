@@ -43,7 +43,7 @@ public class MsgAjp extends Msg {
         org.apache.juli.logging.LogFactory.getLog( MsgAjp.class );
 
     // that's the original buffer size in ajp13 - otherwise we'll get interoperability problems.
-    private byte buf[]=new byte[8*1024]; 
+    private byte buf[];
     // The current read or write position in the buffer
     private int pos;    
     /**
@@ -54,9 +54,31 @@ public class MsgAjp extends Msg {
      */
     private int len; 
 
+    /**
+     * The maximum packet size
+     */
+    private int bufsize;
 
+    /**
+     * Constructor that takes a buffer size
+     */
+    public MsgAjp(int bsize) {
+        if(bsize < 8*1024) {
+            bsize = 8*1024;
+        }
+        bufsize = bsize;
+        buf = new byte[bsize];
     
-    
+    }
+
+    /**
+     * No arg constructor.
+     * @deprecated Use the buffer size constructor.
+     */
+    public MsgAjp() {
+        this(8*1024);
+    }
+
     /**
      * Prepare this packet for accumulating a message from the container to
      * the web server.  Set the write position to just after the header
