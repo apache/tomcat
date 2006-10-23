@@ -35,7 +35,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
-
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -142,6 +141,8 @@ public class NioEndpoint {
 
     protected int readBufSize = 8192;
     protected int writeBufSize = 8192;
+    
+    protected NioSelectorPool selectorPool = new NioSelectorPool();;
     
     /**
      * Server socket "pointer".
@@ -418,6 +419,10 @@ public class NioEndpoint {
         this.readBufSize = readBufSize;
     }
 
+    public void setSelectorPool(NioSelectorPool selectorPool) {
+        this.selectorPool = selectorPool;
+    }
+
     protected SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
@@ -548,6 +553,9 @@ public class NioEndpoint {
             running = true;
             paused = false;
             
+            selectorPool.setMaxSelectors(maxThreads);
+            selectorPool.setMaxSpareSelectors(-1);
+            selectorPool.open();
             
             // Create worker collection
             if (executor == null) {
@@ -611,6 +619,7 @@ public class NioEndpoint {
             }
             pollers = null;
         }
+        try {selectorPool.close();}catch (IOException x){}
         nioChannels.clear();
     }
 
@@ -650,8 +659,12 @@ public class NioEndpoint {
         return readBufSize;
     }
 
+    public NioSelectorPool getSelectorPool() {
+        return selectorPool;
+    }
+
     /**
-     * Unlock the server socket accept using a bugus connection.
+     * Unlock the server socket accept using a bogus connection.
      */
     protected void unlockAccept() {
         java.net.Socket s = null;
@@ -709,7 +722,7 @@ public class NioEndpoint {
                     int appbufsize = engine.getSession().getApplicationBufferSize();
                     int bufsize = Math.max(Math.max(getReadBufSize(), getWriteBufSize()), appbufsize);
                     NioBufferHandler bufhandler = new NioBufferHandler(bufsize, bufsize);
-                    channel = new SecureNioChannel(socket, engine, bufhandler);
+                    channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool);
                 } else {
                     NioBufferHandler bufhandler = new NioBufferHandler(getReadBufSize(), getWriteBufSize());
                     channel = new NioChannel(socket, bufhandler);

@@ -33,6 +33,8 @@ import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioChannel;
+import org.apache.tomcat.util.net.NioSelectorPool;
+import java.nio.channels.Selector;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -157,7 +159,12 @@ public class InternalNioInputBuffer implements InputBuffer {
      * Underlying socket.
      */
     protected NioChannel socket;
-
+    
+    /**
+     * Selector pool, for blocking reads and blocking writes
+     */
+    protected NioSelectorPool pool;
+    
 
     /**
      * Underlying input buffer.
@@ -199,14 +206,22 @@ public class InternalNioInputBuffer implements InputBuffer {
     public void setSocket(NioChannel socket) {
         this.socket = socket;
     }
-
-
+    
     /**
      * Get the underlying socket input stream.
      */
     public NioChannel getSocket() {
         return socket;
     }
+
+    public void setSelectorPool(NioSelectorPool pool) { 
+        this.pool = pool;
+    }
+    
+    public NioSelectorPool getSelectorPool() {
+        return pool;
+    }
+
 
     /**
      * Add an input filter to the filter library.
@@ -549,47 +564,34 @@ public class InternalNioInputBuffer implements InputBuffer {
      */
     private boolean readSocket(boolean timeout, boolean block) throws IOException {
         int nRead = 0;
-        long start = System.currentTimeMillis();
-        boolean timedOut = false;
-        do {
-            
-            socket.getBufHandler().getReadBuffer().clear();
+        long rto = timeout?this.readTimeout:-1;
+        socket.getBufHandler().getReadBuffer().clear();
+        if ( block ) {
+            Selector selector = null;
+            try { selector = getSelectorPool().get(); }catch ( IOException x ) {}
+            try {
+                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket.getIOChannel(),selector,rto);
+            } catch ( EOFException eof ) {
+                nRead = -1;
+            } finally { 
+                if ( selector != null ) getSelectorPool().put(selector);
+            }
+        } else {
             nRead = socket.read(socket.getBufHandler().getReadBuffer());
-            if (nRead > 0) {
-                socket.getBufHandler().getReadBuffer().flip();
-                socket.getBufHandler().getReadBuffer().limit(nRead);
-                expand(nRead + pos);
-                socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
-                lastValid = pos + nRead;
-                return true;
-            } else if (nRead == -1) {
-                //return false;
-                throw new EOFException(sm.getString("iib.eof.error"));
-            } else if ( !block ) {
-                return false;
-            } else {
-                timedOut = timeout && (readTimeout != -1) && ((System.currentTimeMillis()-start)>readTimeout);
-                if ( !timedOut && nRead == 0 )  {
-                    try {
-                        final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                        final KeyAttachment att = (KeyAttachment)key.attachment();
-                        //to do, add in a check, we might have just timed out on the wait,
-                        //so there is no need to register us again.
-                        boolean addToQueue = false;
-                        try { addToQueue = ((att.interestOps()&SelectionKey.OP_READ) != SelectionKey.OP_READ); } catch ( CancelledKeyException ckx ){ throw new IOException("Socket key cancelled.");}
-                        if ( addToQueue ) {
-                            synchronized (att.getMutex()) {
-                                addToReadQueue(key, att);
-                                att.getMutex().wait(readTimeout);
-                            }
-                        }//end if
-                    }catch ( Exception x ) {}
-                }
-             }
-        }while ( nRead == 0 && (!timedOut) );
-        //else throw new IOException(sm.getString("iib.failedread"));
-        //return false; //timeout
-        throw new IOException("read timed out.");
+        }
+        if (nRead > 0) {
+            socket.getBufHandler().getReadBuffer().flip();
+            socket.getBufHandler().getReadBuffer().limit(nRead);
+            expand(nRead + pos);
+            socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
+            lastValid = pos + nRead;
+            return true;
+        } else if (nRead == -1) {
+            //return false;
+            throw new EOFException(sm.getString("iib.eof.error"));
+        } else {
+            return false;
+        }
     }
 
     private void addToReadQueue(final SelectionKey key, final KeyAttachment att) {

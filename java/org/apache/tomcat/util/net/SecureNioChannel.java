@@ -8,6 +8,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
+import java.nio.channels.Selector;
 
 /**
  * 
@@ -29,7 +30,10 @@ public class SecureNioChannel extends NioChannel  {
     protected boolean closed = false;
     protected boolean closing = false;
     
-    public SecureNioChannel(SocketChannel channel, SSLEngine engine, ApplicationBufferHandler bufHandler) throws IOException {
+    protected NioSelectorPool pool;
+    
+    public SecureNioChannel(SocketChannel channel, SSLEngine engine, 
+                            ApplicationBufferHandler bufHandler, NioSelectorPool pool) throws IOException {
         super(channel,bufHandler);
         this.sslEngine = engine;
         int appBufSize = sslEngine.getSession().getApplicationBufferSize();
@@ -37,7 +41,10 @@ public class SecureNioChannel extends NioChannel  {
         //allocate network buffers - TODO, add in optional direct non-direct buffers
         if ( netInBuffer == null ) netInBuffer = ByteBuffer.allocateDirect(netBufSize);
         if ( netOutBuffer == null ) netOutBuffer = ByteBuffer.allocateDirect(netBufSize);
-
+        
+        //selector pool for blocking operations
+        this.pool = pool;
+        
         //ensure that the application has a large enough read/write buffers
         //by doing this, we should not encounter any buffer overflow errors
         bufHandler.expand(bufHandler.getReadBuffer(), appBufSize);
@@ -72,12 +79,13 @@ public class SecureNioChannel extends NioChannel  {
      * been flushed out and is empty
      * @return boolean
      */
-    public boolean flush() throws IOException {
-        return flush(netOutBuffer);
+    public boolean flush(Selector s, long timeout) throws IOException {
+        pool.write(netOutBuffer,sc,s,timeout);
+        return !netOutBuffer.hasRemaining();
     }
     
     /**
-     * Flushes the buffer to the network
+     * Flushes the buffer to the network, non blocking
      * @param buf ByteBuffer
      * @return boolean true if the buffer has been emptied out, false otherwise
      * @throws IOException

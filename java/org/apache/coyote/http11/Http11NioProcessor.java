@@ -100,7 +100,7 @@ public class Http11NioProcessor implements ActionHook {
 
         response = new Response();
         response.setHook(this);
-        outputBuffer = new InternalNioOutputBuffer(response, headerBufferSize);
+        outputBuffer = new InternalNioOutputBuffer(response, headerBufferSize,readTimeout);
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
@@ -806,6 +806,8 @@ public class Http11NioProcessor implements ActionHook {
         this.socket = socket;
         inputBuffer.setSocket(socket);
         outputBuffer.setSocket(socket);
+        inputBuffer.setSelectorPool(endpoint.getSelectorPool());
+        outputBuffer.setSelectorPool(endpoint.getSelectorPool());
 
         // Error flag
         error = false;
