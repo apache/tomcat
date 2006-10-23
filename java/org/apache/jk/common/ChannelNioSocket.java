@@ -99,6 +99,7 @@ public class ChannelNioSocket extends JkHandler
     private boolean nioIsBroken = false;
     private Selector selector = null;
     private int bufferSize = 8*1024;
+    private int packetSize = 8*1024;
 
     private long requestCount=0;
     
@@ -158,6 +159,17 @@ public class ChannelNioSocket extends JkHandler
 
     public int getBufferSize() {
         return bufferSize;
+    }
+
+    public void setPacketSize(int ps) {
+        if(ps < 8*1024) {
+            ps = 8*1024;
+        }
+        packetSize = ps;
+    }
+
+    public int getPacketSize() {
+        return packetSize;
     }
 
 
@@ -792,7 +804,7 @@ public class ChannelNioSocket extends JkHandler
 
     protected class SocketConnection implements ThreadPoolRunnable {
         MsgContext ep;
-        MsgAjp recv = new MsgAjp();
+        MsgAjp recv = new MsgAjp(packetSize);
         boolean inProgress = false;
 
         SocketConnection(MsgContext ep) {
