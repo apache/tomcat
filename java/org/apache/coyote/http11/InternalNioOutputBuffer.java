@@ -17,9 +17,11 @@
 
 package org.apache.coyote.http11;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -31,6 +33,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
+import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -54,14 +57,14 @@ public class InternalNioOutputBuffer
      * Default constructor.
      */
     public InternalNioOutputBuffer(Response response) {
-        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
+        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE, 10000);
     }
 
 
     /**
      * Alternate constructor.
      */
-    public InternalNioOutputBuffer(Response response, int headerBufferSize) {
+    public InternalNioOutputBuffer(Response response, int headerBufferSize, long writeTimeout) {
 
         this.response = response;
         headers = response.getMimeHeaders();
@@ -83,6 +86,8 @@ public class InternalNioOutputBuffer
 
         committed = false;
         finished = false;
+        
+        this.writeTimeout = writeTimeout;
 
         // Cause loading of HttpMessages
         HttpMessages.getMessage(200);
@@ -143,6 +148,12 @@ public class InternalNioOutputBuffer
      * Underlying socket.
      */
     protected NioChannel socket;
+    
+    /**
+     * Selector pool, for blocking reads and blocking writes
+     */
+    protected NioSelectorPool pool;
+
 
 
     /**
@@ -168,7 +179,11 @@ public class InternalNioOutputBuffer
      * Index of the last active filter.
      */
     protected int lastActiveFilter;
-
+    
+    /**
+     * Write time out in milliseconds
+     */
+    protected long writeTimeout = -1;
 
 
     // ------------------------------------------------------------- Properties
@@ -181,12 +196,28 @@ public class InternalNioOutputBuffer
         this.socket = socket;
     }
 
+    public void setWriteTimeout(long writeTimeout) {
+        this.writeTimeout = writeTimeout;
+    }
+
     /**
      * Get the underlying socket input stream.
      */
     public NioChannel getSocket() {
         return socket;
     }
+
+    public long getWriteTimeout() {
+        return writeTimeout;
+    }
+
+    public void setSelectorPool(NioSelectorPool pool) { 
+        this.pool = pool;
+    }
+
+    public NioSelectorPool getSelectorPool() {
+        return pool;
+    }    
     /**
      * Set the socket buffer size.
      */
@@ -392,14 +423,22 @@ public class InternalNioOutputBuffer
     private synchronized void writeToSocket(ByteBuffer bytebuffer, boolean flip) throws IOException {
         //int limit = bytebuffer.position();
         if ( flip ) bytebuffer.flip();
-        while ( bytebuffer.hasRemaining() ) {
-            int written = socket.write(bytebuffer);
+        int written = 0;
+        Selector selector = null;
+        try {
+            selector = getSelectorPool().get();
+        } catch ( IOException x ) {
+            //ignore
         }
-        //make sure we are flushed 
-        do {
-            if (socket.flush()) break;
-        }while ( true );
-        
+        try {
+            written = getSelectorPool().write(bytebuffer, socket.getIOChannel(), selector, writeTimeout);
+            //make sure we are flushed 
+            do {
+                if (socket.flush(selector)) break;
+            }while ( true );
+        }finally { 
+            if ( selector != null ) getSelectorPool().put(selector);
+        }
         socket.getBufHandler().getWriteBuffer().clear();
         this.total = 0;
     } 
