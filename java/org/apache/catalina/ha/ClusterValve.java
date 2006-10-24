@@ -23,7 +23,7 @@ import org.apache.catalina.Valve;
  * with a small addition of being able to reference the cluster component in the container it sits in.
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision: 303842 $, $Date: 2005-04-10 11:20:46 -0500 (Sun, 10 Apr 2005) $
+ * @version $Revision$, $Date$
  */
 public interface ClusterValve extends Valve{
     /**

@@ -29,7 +29,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  *
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision: 387285 $ $Date: 2006-03-20 13:30:50 -0600 (Mon, 20 Mar 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class ClusterRuleSet extends RuleSetBase {

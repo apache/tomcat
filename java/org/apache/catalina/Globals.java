@@ -23,7 +23,7 @@ package org.apache.catalina;
  * Global constants that are applicable to multiple packages within Catalina.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303495 $ $Date: 2004-11-19 07:07:56 +0100 (ven., 19 nov. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public final class Globals {

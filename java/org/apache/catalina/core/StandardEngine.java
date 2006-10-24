@@ -46,7 +46,7 @@ import org.apache.tomcat.util.modeler.modules.MbeansSource;
  * You can set the jvmRoute direct or with the System.property <b>jvmRoute</b>.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303667 $ $Date: 2005-01-29 20:41:16 +0100 (sam., 29 janv. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class StandardEngine

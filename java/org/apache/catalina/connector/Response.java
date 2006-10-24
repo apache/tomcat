@@ -58,7 +58,7 @@ import org.apache.tomcat.util.net.URL;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision: 371866 $ $Date: 2006-01-24 09:52:54 +0100 (mar., 24 janv. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class Response

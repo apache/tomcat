@@ -32,7 +32,7 @@ import org.apache.catalina.connector.Connector;
  * and classes on the system class path.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 302975 $ $Date: 2004-06-23 10:25:04 +0200 (mer., 23 juin 2004) $
+ * @version $Revision$ $Date$
  */
 
 public interface Service {

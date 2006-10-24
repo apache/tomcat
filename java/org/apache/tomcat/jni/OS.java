@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** OS
  *
  * @author Mladen Turk
- * @version $Revision: 386278 $, $Date: 2006-03-16 08:15:58 +0100 (jeu., 16 mars 2006) $
+ * @version $Revision$, $Date$
  */
 
 public class OS {

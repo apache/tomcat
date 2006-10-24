@@ -48,7 +48,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
  * @author Yoav Shapira
- * @version $Revision: 304023 $ $Date: 2005-07-26 14:45:22 +0200 (mar., 26 juil. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class ErrorReportValve

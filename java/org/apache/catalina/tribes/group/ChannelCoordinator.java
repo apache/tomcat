@@ -39,7 +39,7 @@ import org.apache.catalina.tribes.util.Arrays;
  * the sender and the receiver.
  * This is the last interceptor in the chain.
  * @author Filip Hanik
- * @version $Revision: 304032 $, $Date: 2005-07-27 10:11:55 -0500 (Wed, 27 Jul 2005) $
+ * @version $Revision$, $Date$
  */
 public class ChannelCoordinator extends ChannelInterceptorBase implements MessageListener {
     private ChannelReceiver clusterReceiver = new NioReceiver();

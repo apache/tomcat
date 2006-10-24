@@ -24,7 +24,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  * 
  * @author Peter Rossbach
  * 
- * @version $Revision: 326110 $ $Date: 2005-10-18 09:08:36 -0500 (Tue, 18 Oct 2005) $
+ * @version $Revision$ $Date$
  */
 public class SessionIDMessage extends ClusterMessageBase implements ClusterMessage {
 

@@ -24,7 +24,7 @@ package org.apache.catalina.tribes;
  *
  * @author Bip Thelin
  * @author Filip Hanik
- * @version $Revision: 302726 $, $Date: 2004-02-27 08:59:07 -0600 (Fri, 27 Feb 2004) $
+ * @version $Revision$, $Date$
  */
 
 public final class Constants {

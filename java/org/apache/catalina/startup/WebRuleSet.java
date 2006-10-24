@@ -39,7 +39,7 @@ import org.xml.sax.Attributes;
  * deployment descriptor (<code>/WEB-INF/web.xml</code>) resource.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 304108 $ $Date: 2005-09-29 07:55:15 +0200 (jeu., 29 sept. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class WebRuleSet extends RuleSetBase {

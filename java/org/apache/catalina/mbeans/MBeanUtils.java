@@ -60,7 +60,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Craig R. McClanahan
  * @author Amy Roh
- * @version $Revision: 303558 $ $Date: 2004-12-01 12:17:34 +0100 (mer., 01 déc. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class MBeanUtils {

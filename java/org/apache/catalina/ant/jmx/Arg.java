@@ -20,7 +20,7 @@ package org.apache.catalina.ant.jmx;
 /**
  *
  * @author Peter Rossbach
- * @version $Revision: 303958 $ $Date: 2005-06-24 13:53:42 +0200 (ven., 24 juin 2005) $
+ * @version $Revision$ $Date$
  * @since 5.5.10
  */
 public class Arg {

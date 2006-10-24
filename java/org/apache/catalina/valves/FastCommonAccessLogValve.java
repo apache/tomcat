@@ -55,7 +55,7 @@ import org.apache.catalina.util.StringManager;
  * @author Craig R. McClanahan
  * @author Jason Brittain
  * @author Remy Maucherat
- * @version $Revision: 304032 $ $Date: 2005-07-27 17:11:55 +0200 (mer., 27 juil. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public final class FastCommonAccessLogValve

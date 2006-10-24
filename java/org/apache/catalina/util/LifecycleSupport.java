@@ -29,7 +29,7 @@ import org.apache.catalina.LifecycleListener;
  * registered LifecycleListeners.
  *
  * @author Craig R. McClanahan
- * @version $Id: LifecycleSupport.java 302726 2004-02-27 14:59:07Z yoavs $
+ * @version $Id$
  */
 
 public final class LifecycleSupport {

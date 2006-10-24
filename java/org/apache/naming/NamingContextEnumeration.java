@@ -28,7 +28,7 @@ import javax.naming.NamingException;
  * Naming enumeration implementation.
  *
  * @author Remy Maucherat
- * @version $Revision: 303022 $ $Date: 2004-07-24 00:46:08 +0200 (sam., 24 juil. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class NamingContextEnumeration 

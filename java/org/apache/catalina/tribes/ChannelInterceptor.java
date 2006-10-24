@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * Interceptors are tied together in a linked list.
  * @see org.apache.catalina.tribes.group.ChannelInterceptorBase
  * @author Filip Hanik
- * @version $Revision: 304032 $, $Date: 2005-07-27 10:11:55 -0500 (Wed, 27 Jul 2005) $
+ * @version $Revision$, $Date$
  */   
 
 public interface ChannelInterceptor extends MembershipListener, Heartbeat {

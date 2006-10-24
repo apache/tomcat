@@ -44,7 +44,7 @@ import org.apache.juli.logging.LogFactory;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303210 $ $Date: 2004-09-08 01:13:01 +0200 (mer., 08 sept. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public final class ClassLoaderFactory {

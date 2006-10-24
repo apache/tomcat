@@ -63,7 +63,7 @@ import java.util.Properties;
  * @author Craig R. McClanahan
  * @author Costin Manolache
  * @author Richard A. Sitze
- * @version $Revision: 209449 $ $Date: 2005-07-06 05:06:32 -0700 (Wed, 06 Jul 2005) $
+ * @version $Revision$ $Date$
  */
 public /* abstract */ class LogFactory {
 

@@ -54,7 +54,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * 
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision: 390639 $
+ * @version $Revision$
  */
 public class FarmWarDeployer extends ClusterListener implements ClusterDeployer, FileChangeListener {
     /*--Static Variables----------------------------------------*/

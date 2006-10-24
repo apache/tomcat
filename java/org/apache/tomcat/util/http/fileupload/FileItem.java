@@ -52,7 +52,7 @@ import java.io.UnsupportedEncodingException;
  * @author <a href="mailto:jvanzyl@apache.org">Jason van Zyl</a>
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  *
- * @version $Id: FileItem.java,v 1.15 2003/06/01 17:33:24 martinc Exp $
+ * @version $Id$
  */
 public interface FileItem
     extends Serializable

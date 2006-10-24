@@ -32,7 +32,7 @@ import org.apache.catalina.tribes.transport.SenderState;
  * Carries the host, and port of the this or other cluster nodes.
  *
  * @author Filip Hanik
- * @version $Revision: 304032 $, $Date: 2005-07-27 10:11:55 -0500 (Wed, 27 Jul 2005) $
+ * @version $Revision$, $Date$
  */
 public class MemberImpl implements Member, java.io.Externalizable {
 

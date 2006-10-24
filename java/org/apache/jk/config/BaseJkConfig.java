@@ -89,7 +89,7 @@ import org.apache.catalina.Server;
     @author Costin Manolache
     @author Larry Isaacs
     @author Bill Barker
-        @version $Revision: 299988 $
+        @version $Revision$
  */
 public class BaseJkConfig  implements LifecycleListener {
     private static org.apache.juli.logging.Log log =

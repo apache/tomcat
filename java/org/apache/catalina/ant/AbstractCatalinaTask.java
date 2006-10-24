@@ -36,7 +36,7 @@ import org.apache.tools.ant.Project;
  * undeploying applications.  These tasks require Ant 1.4 or later.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303657 $ $Date: 2005-01-22 17:34:47 +0100 (sam., 22 janv. 2005) $
+ * @version $Revision$ $Date$
  * @since 4.1
  */
 

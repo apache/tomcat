@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 /** Socket
  *
  * @author Mladen Turk
- * @version $Revision: 327657 $, $Date: 2005-10-22 14:32:32 +0200 (sam., 22 oct. 2005) $
+ * @version $Revision$, $Date$
  */
 
 public class Socket {

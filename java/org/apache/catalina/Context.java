@@ -50,7 +50,7 @@ import org.apache.catalina.util.CharsetMapper;
  * <p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303431 $ $Date: 2004-10-26 17:42:05 +0200 (mar., 26 oct. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public interface Context extends Container {

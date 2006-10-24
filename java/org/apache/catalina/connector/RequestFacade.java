@@ -44,7 +44,7 @@ import org.apache.catalina.security.SecurityUtil;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
- * @version $Revision: 303900 $ $Date: 2005-04-30 00:22:29 +0200 (sam., 30 avr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 @SuppressWarnings("deprecation")

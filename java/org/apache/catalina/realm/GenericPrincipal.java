@@ -30,7 +30,7 @@ import org.apache.catalina.Realm;
  * is available for use by <code>Realm</code> implementations.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303827 $ $Date: 2005-04-01 13:36:52 +0200 (ven., 01 avr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class GenericPrincipal implements Principal {

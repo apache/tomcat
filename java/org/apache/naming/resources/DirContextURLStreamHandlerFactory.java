@@ -24,7 +24,7 @@ import java.net.URLStreamHandlerFactory;
  * Factory for Stream handlers to a JNDI directory context.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision: 302726 $
+ * @version $Revision$
  */
 public class DirContextURLStreamHandlerFactory 
     implements URLStreamHandlerFactory {

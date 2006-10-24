@@ -62,7 +62,7 @@ import javax.naming.spi.ObjectFactory;
  * </pre>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303771 $ $Date: 2005-03-23 16:30:56 +0100 (mer., 23 mars 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class MailSessionFactory implements ObjectFactory {

@@ -86,7 +86,7 @@ import org.apache.tools.ant.taskdefs.condition.Condition;
  * <b>NOTE</b>:  For numeric expressions the type must be set and use xml entities as operations.<br/>
  * As type we currently support <em>long</em> and <em>double</em>.
  * @author Peter Rossbach
- * @version $Revision: 304032 $ $Date: 2005-07-27 17:11:55 +0200 (mer., 27 juil. 2005) $
+ * @version $Revision$ $Date$
  * @since 5.5.10
  *
  */

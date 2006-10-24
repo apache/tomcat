@@ -105,7 +105,7 @@ import org.apache.catalina.util.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Jason Brittain
- * @version $Revision: 303826 $ $Date: 2005-03-31 12:31:54 +0200 (jeu., 31 mars 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class AccessLogValve

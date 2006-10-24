@@ -130,7 +130,7 @@ import org.apache.juli.logging.LogFactory;
  *
  *
  * @author Tim Funk
- * @version $Revision: 303601 $ $Date: 2004-12-24 00:58:07 +0100 (ven., 24 déc. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class ExtendedAccessLogValve

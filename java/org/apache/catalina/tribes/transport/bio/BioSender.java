@@ -39,7 +39,7 @@ import org.apache.catalina.tribes.util.StringManager;
  * 
  * @author Peter Rossbach
  * @author Filip Hanik
- * @version $Revision: 377484 $ $Date: 2006-02-13 15:00:05 -0600 (Mon, 13 Feb 2006) $
+ * @version $Revision$ $Date$
  * @since 5.5.16
  */
 public class BioSender extends AbstractSender implements DataSender {

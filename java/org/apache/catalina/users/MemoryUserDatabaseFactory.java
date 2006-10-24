@@ -45,7 +45,7 @@ import javax.naming.spi.ObjectFactory;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 304046 $ $Date: 2005-08-04 15:06:56 +0200 (jeu., 04 août 2005) $
+ * @version $Revision$ $Date$
  * @since 4.1
  */
 

@@ -45,7 +45,7 @@ import org.apache.catalina.util.StringManager;
 * @author Craig R. McClanahan
 * @author Carson McDonald
 * @author Ignacio Ortega
-* @version $Revision: 394121 $
+* @version $Revision$
 */
 
 public class DataSourceRealm

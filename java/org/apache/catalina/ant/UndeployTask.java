@@ -27,7 +27,7 @@ import org.apache.tools.ant.BuildException;
  * the Tomcat manager application.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303609 $ $Date: 2005-01-03 17:21:21 +0100 (lun., 03 janv. 2005) $
+ * @version $Revision$ $Date$
  * @since 4.1
  */
 public class UndeployTask extends AbstractCatalinaTask {

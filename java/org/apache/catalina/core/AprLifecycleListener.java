@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Remy Maucherat
  * @author Filip Hanik
- * @version $Revision: 441786 $ $Date: 2006-09-09 14:26:11 +0200 (sam., 09 sept. 2006) $
+ * @version $Revision$ $Date$
  * @since 4.1
  */
 

@@ -37,7 +37,7 @@ import org.apache.naming.StringManager;
  * Directory Context implementation helper class.
  *
  * @author Remy Maucherat
- * @version $Revision: 303999 $ $Date: 2005-07-20 23:25:18 +0200 (mer., 20 juil. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public abstract class BaseDirContext implements DirContext {

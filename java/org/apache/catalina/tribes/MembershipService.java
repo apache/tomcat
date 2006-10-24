@@ -23,7 +23,7 @@ package org.apache.catalina.tribes;
  * The <code>MembershipService</code> interface is the membership component 
  * at the bottom layer, the IO layer (for layers see the javadoc for the {@link Channel} interface).<br>
  * @author Filip Hanik
- * @version $Revision: 378093 $, $Date: 2006-02-15 15:13:45 -0600 (Wed, 15 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 
 

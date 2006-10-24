@@ -62,7 +62,7 @@ import org.apache.catalina.ha.ClusterManager;
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
  * @author Peter Rossbach
- * @version $Revision: 380100 $ $Date: 2006-02-23 06:08:14 -0600 (Thu, 23 Feb 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class DeltaManager extends ClusterManagerBase{

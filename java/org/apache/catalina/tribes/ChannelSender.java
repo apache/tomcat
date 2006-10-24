@@ -25,7 +25,7 @@ package org.apache.catalina.tribes;
  * The channel sender must support "silent" members, ie, be able to send a message to a member
  * that is not in the membership, but is part of the destination parameter
  * @author Filip Hanik
- * @version $Revision: 379904 $, $Date: 2006-02-22 15:16:25 -0600 (Wed, 22 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 public interface ChannelSender extends Heartbeat
 {

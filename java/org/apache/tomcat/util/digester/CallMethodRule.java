@@ -1,4 +1,4 @@
-/* $Id: CallMethodRule.java 299765 2004-08-31 23:52:52Z yoavs $
+/* $Id$
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

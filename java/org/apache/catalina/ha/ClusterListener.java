@@ -33,7 +33,7 @@ import org.apache.catalina.util.StringManager;
  * 
  * @author Peter Rossbach
  * @author Filip Hanik
- * @version $Revision: 378258 $ $Date: 2006-02-16 08:42:35 -0600 (Thu, 16 Feb 2006) $
+ * @version $Revision$ $Date$
  */
 public abstract class ClusterListener implements ChannelListener {
 

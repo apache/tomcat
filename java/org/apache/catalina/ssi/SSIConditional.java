@@ -16,7 +16,7 @@ import java.text.ParseException;
 /**
  * SSI command that handles all conditional directives.
  * 
- * @version $Revision: 303882 $
+ * @version $Revision$
  * @author Paul Speed
  * @author David Becker
  */

@@ -61,7 +61,7 @@ import org.apache.juli.logging.LogFactory;
  * <code>javax.servlet.ServletResponseWrapper</code>.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303947 $ $Date: 2005-06-09 07:50:26 +0200 (jeu., 09 juin 2005) $
+ * @version $Revision$ $Date$
  */
 
 final class ApplicationDispatcher

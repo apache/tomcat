@@ -1,4 +1,4 @@
-/* $Id: AbstractRulesImpl.java 299475 2004-06-26 17:41:32Z remm $
+/* $Id$
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

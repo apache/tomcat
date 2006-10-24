@@ -50,7 +50,7 @@ import java.beans.PropertyChangeListener;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303352 $ $Date: 2004-10-05 19:12:52 +0200 (mar., 05 oct. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public interface Loader {

@@ -33,7 +33,7 @@ import java.io.IOException;
  * If a node fails to send out a heartbeat, the node will be dismissed.
  *
  * @author Filip Hanik
- * @version $Revision: 378093 $, $Date: 2006-02-15 15:13:45 -0600 (Wed, 15 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 
 

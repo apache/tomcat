@@ -59,7 +59,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Amy Roh
- * @version $Revision: 303365 $ $Date: 2004-10-06 18:10:57 +0200 (mer., 06 oct. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class ServerLifecycleListener

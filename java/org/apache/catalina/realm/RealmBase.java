@@ -61,7 +61,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * location) are identical to those currently supported by Tomcat 3.X.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 388949 $ $Date: 2006-03-26 21:55:03 +0200 (dim., 26 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public abstract class RealmBase

@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 304108 $ $Date: 2005-09-29 07:55:15 +0200 (jeu., 29 sept. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public final class Bootstrap {

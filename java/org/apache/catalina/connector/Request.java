@@ -77,7 +77,7 @@ import org.apache.catalina.util.StringParser;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision: 382659 $ $Date: 2006-03-03 06:01:16 +0100 (ven., 03 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class Request

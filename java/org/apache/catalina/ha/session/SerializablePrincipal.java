@@ -30,7 +30,7 @@ import org.apache.catalina.Realm;
  * The GenericPrincipal does NOT implement serializable and I didn't want to change that implementation
  * hence I implemented this one instead.
  * @author Filip Hanik
- * @version $Revision: 303587 $ $Date: 2004-12-09 08:36:43 -0600 (Thu, 09 Dec 2004) $
+ * @version $Revision$ $Date$
  */
 import org.apache.catalina.realm.GenericPrincipal;
 import java.io.ObjectInput;

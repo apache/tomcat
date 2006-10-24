@@ -42,7 +42,7 @@ import org.apache.catalina.util.RequestUtil;
  * use XSLT, that is unnecessarily complex.
  *
  * @author Peter Lin
- * @version $Revision: 303967 $ $Date: 2005-06-29 19:31:56 +0200 (mer., 29 juin 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class StatusTransformer {

@@ -50,7 +50,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 320670 $ $Date: 2005-10-13 07:39:55 +0200 (jeu., 13 oct. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class FormAuthenticator

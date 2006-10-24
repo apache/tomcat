@@ -30,7 +30,7 @@ import org.apache.tools.ant.BuildException;
  * supported by the Tomcat manager application.
  *
  * @author Vivek Chopra
- * @version $Revision: 303657 $
+ * @version $Revision$
  */
 public class SessionsTask extends AbstractCatalinaTask {
 

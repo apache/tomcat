@@ -39,7 +39,7 @@ import java.net.InetSocketAddress;
  * Need to fix this, could use java.nio and only need one thread to send and receive, or
  * just use a timeout on the receive
  * @author Filip Hanik
- * @version $Revision: 356540 $, $Date: 2005-12-13 10:53:40 -0600 (Tue, 13 Dec 2005) $
+ * @version $Revision$, $Date$
  */
 public class McastServiceImpl
 {

@@ -48,7 +48,7 @@ import org.apache.naming.NamingEntry;
  * WAR Directory Context implementation.
  *
  * @author Remy Maucherat
- * @version $Revision: 366304 $ $Date: 2006-01-05 22:42:29 +0100 (jeu., 05 janv. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class WARDirContext extends BaseDirContext {

@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** SSL Socket
  *
  * @author Mladen Turk
- * @version $Revision: 300970 $, $Date: 2005-07-12 19:01:42 +0200 (mar., 12 juil. 2005) $
+ * @version $Revision$, $Date$
  */
 
 public class SSLSocket {

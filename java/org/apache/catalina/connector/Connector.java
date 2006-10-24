@@ -49,7 +49,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 349505 $ $Date: 2005-11-28 22:14:21 +0100 (lun., 28 nov. 2005) $
+ * @version $Revision$ $Date$
  */
 
 

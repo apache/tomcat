@@ -59,7 +59,7 @@ import org.apache.catalina.security.SecurityUtil;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Revision: 387590 $ $Date: 2006-03-21 18:55:07 +0100 (mar., 21 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class StandardManager

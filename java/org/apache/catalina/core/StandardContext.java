@@ -109,7 +109,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 386331 $ $Date: 2006-03-16 15:03:12 +0100 (jeu., 16 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class StandardContext

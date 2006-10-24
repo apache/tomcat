@@ -120,7 +120,7 @@ org.foobar.auth.DatabaseLoginModule REQUIRED
 *
 * @author Craig R. McClanahan
 * @author Yoav Shapira
- * @version $Revision: 303827 $ $Date: 2005-04-01 13:36:52 +0200 (ven., 01 avr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class JAASRealm

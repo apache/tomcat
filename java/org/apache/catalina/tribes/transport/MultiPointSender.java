@@ -22,7 +22,7 @@ import org.apache.catalina.tribes.Member;
 
 /**
  * @author Filip Hanik
- * @version $Revision: 303993 $ $Date: 2005-07-16 16:05:54 -0500 (Sat, 16 Jul 2005) $
+ * @version $Revision$ $Date$
  * @since 5.5.16
  */
 

@@ -50,7 +50,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 304105 $ $Date: 2005-09-27 21:20:54 +0200 (mar., 27 sept. 2005) $
+ * @version $Revision$ $Date$
  */
 
 final class StandardHostValve

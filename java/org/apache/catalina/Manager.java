@@ -40,7 +40,7 @@ import java.io.IOException;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303682 $ $Date: 2005-02-07 22:56:32 +0100 (lun., 07 févr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public interface Manager {

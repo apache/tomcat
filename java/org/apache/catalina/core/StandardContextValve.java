@@ -45,7 +45,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  * when processing HTTP requests.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 302978 $ $Date: 2004-06-23 18:59:42 +0200 (mer., 23 juin 2004) $
+ * @version $Revision$ $Date$
  */
 
 final class StandardContextValve

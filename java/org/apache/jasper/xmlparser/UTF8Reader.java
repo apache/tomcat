@@ -26,7 +26,7 @@ import org.apache.jasper.compiler.Localizer;
 /**
  * @author Andy Clark, IBM
  *
- * @version $Id: UTF8Reader.java 306148 2005-03-21 15:38:13Z remm $
+ * @version $Id$
  */
 public class UTF8Reader
     extends Reader {

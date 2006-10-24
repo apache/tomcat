@@ -19,7 +19,7 @@ import java.util.Date;
  * servlet )
  * 
  * @author Dan Sandberg
- * @version $Revision: 303166 $, $Date: 2004-09-01 20:33:33 +0200 (mer., 01 sept. 2004) $
+ * @version $Revision$, $Date$
  */
 public interface SSIExternalResolver {
     /**

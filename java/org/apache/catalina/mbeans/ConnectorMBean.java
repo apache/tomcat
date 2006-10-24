@@ -34,7 +34,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * <code>org.apache.coyote.tomcat5.CoyoteConnector</code> component.</p>
  *
  * @author Amy Roh
- * @version $Revision: 303320 $ $Date: 2004-10-04 11:25:55 +0200 (lun., 04 oct. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class ConnectorMBean extends ClassNameMBean {

@@ -34,7 +34,7 @@ import java.util.Iterator;
  * synchronized.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 305933 $ $Date: 2004-03-17 13:23:05 -0600 (Wed, 17 Mar 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class TreeNode {

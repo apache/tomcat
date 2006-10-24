@@ -31,7 +31,7 @@ import org.apache.naming.TransactionRef;
  * Object factory for User trasactions.
  * 
  * @author Remy Maucherat
- * @version $Revision: 375650 $ $Date: 2006-02-07 18:55:11 +0100 (mar., 07 févr. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class TransactionFactory

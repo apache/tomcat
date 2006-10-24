@@ -30,7 +30,7 @@ import java.util.Properties;
  * Utility class to read the bootstrap Catalina configuration.
  *
  * @author Remy Maucherat
- * @version $Revision: 304109 $ $Date: 2005-09-29 16:36:25 +0200 (jeu., 29 sept. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class CatalinaProperties {

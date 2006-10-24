@@ -85,7 +85,7 @@ public class ClusterRuleSetFactory {
      *
      * @author Filip Hanik
      * @author Peter Rossbach
-     * @version $Revision: 379550 $ $Date: 2006-02-21 12:06:35 -0600 (Tue, 21 Feb 2006) $
+     * @version $Revision$ $Date$
      */
 
     public static class DefaultClusterRuleSet extends RuleSetBase {

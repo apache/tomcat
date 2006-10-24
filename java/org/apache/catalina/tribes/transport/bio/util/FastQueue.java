@@ -31,7 +31,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * FIXME add i18n support to log messages
  * @author Rainer Jung
  * @author Peter Rossbach
- * @version $Revision: 345567 $ $Date: 2005-11-18 15:07:23 -0600 (Fri, 18 Nov 2005) $
+ * @version $Revision$ $Date$
  */
 public class FastQueue {
 

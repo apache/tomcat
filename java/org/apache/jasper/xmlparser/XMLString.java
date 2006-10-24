@@ -47,7 +47,7 @@ package org.apache.jasper.xmlparser;
  * @author Eric Ye, IBM
  * @author Andy Clark, IBM
  *
- * @version $Id: XMLString.java 306086 2004-10-01 19:24:35Z luehe $
+ * @version $Id$
  */
 public class XMLString {
 

@@ -38,7 +38,7 @@ import java.io.OutputStream;
  *
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  *
- * @version $Id: ThresholdingOutputStream.java,v 1.3 2003/05/31 22:31:08 martinc Exp $
+ * @version $Id$
  */
 public abstract class ThresholdingOutputStream
     extends OutputStream

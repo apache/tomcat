@@ -41,7 +41,7 @@ package org.apache.catalina;
  * of Context (representing an individual servlet context).
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303092 $ $Date: 2004-08-16 11:31:09 +0200 (lun., 16 août 2004) $
+ * @version $Revision$ $Date$
  */
 
 public interface Host extends Container {

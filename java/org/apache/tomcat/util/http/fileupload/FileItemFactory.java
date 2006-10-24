@@ -26,7 +26,7 @@ package org.apache.tomcat.util.http.fileupload;
  *
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * 
- * @version $Id: FileItemFactory.java,v 1.1 2003/04/27 17:30:06 martinc Exp $
+ * @version $Id$
  */
 public interface FileItemFactory
 {

@@ -66,7 +66,7 @@ import org.xml.sax.SAXException;
  * are handled by the DefaultServlet.
  *
  * @author Remy Maucherat
- * @version $Revision: 303599 $ $Date: 2004-12-20 19:54:14 +0100 (lun., 20 déc. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class WebdavServlet
