@@ -18,7 +18,7 @@
                              image files), including the WEB-INF subdirectory
                              and its configuration file contents.
 
-     $Id: build.xml.txt 302898 2004-05-23 19:50:44Z markt $
+     $Id$
 -->
 
 

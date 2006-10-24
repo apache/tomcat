@@ -10,7 +10,7 @@
     <author email="craigmcc@apache.org">Craig McClanahan</author>
     <author email="amyroh@apache.org">Amy Roh</author>
     <title>Tomcat MBean Names</title>
-    <revision>$Id: mbean-names.xml 466611 2006-10-22 00:44:42Z markt $</revision>
+    <revision>$Id$</revision>
   </properties>
 
 <body>

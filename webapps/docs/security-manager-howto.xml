@@ -163,7 +163,7 @@ grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
 //
 // * Read access to the document root directory
 //
-// $Id: catalina.policy 393732 2006-04-13 06:32:25Z pero $
+// $Id$
 // ============================================================================
 
 

@@ -9,7 +9,7 @@
   <properties>
     <author email="craigmcc@apache.org">Craig McClanahan</author>
     <title>Invoker Servlet</title>
-    <revision>$Id: fs-invoker.xml 301460 2003-01-15 03:40:45Z glenn $</revision>
+    <revision>$Id$</revision>
   </properties>
 
 <body>
