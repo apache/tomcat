@@ -1,6 +1,6 @@
 
 ; Tomcat script for Nullsoft Installer
-; $Id: tomcat.nsi 393199 2006-04-11 12:17:55Z remm $
+; $Id$
 
   ;Compression options
   CRCCheck on
