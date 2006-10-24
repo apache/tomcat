@@ -156,7 +156,6 @@ public class NioEndpoint {
             SelectionKey key = sel!=null?socket.getIOChannel().keyFor(sel):null;
             KeyAttachment att = key!=null?(KeyAttachment)key.attachment():null;
             if ( att!=null ) att.reset();
-            if ( key!=null ) key.cancel();
             //avoid over growing our cache or add after we have stopped
             if ( running && (!paused) && (size() < socketProperties.getDirectBufferPool()) ) return super.offer(socket);
             else return false;
