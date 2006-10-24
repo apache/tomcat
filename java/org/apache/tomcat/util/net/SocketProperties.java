@@ -12,11 +12,11 @@ public class SocketProperties {
     protected boolean ooBInline = true;
     protected boolean soReuseAddress = true;
     protected boolean soLingerOn = true;
-    protected int soLingerTime = 10;
+    protected int soLingerTime = 25;
     protected int soTimeout = 5000;
     protected int soTrafficClass = 0x04 | 0x08 | 0x010;
     protected int performanceConnectionTime = 1;
-    protected int performanceLatency = 1;
+    protected int performanceLatency = 0;
     protected int performanceBandwidth = 1;
     private Socket properties;
 
