@@ -14,7 +14,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-/* $Id: RequestInfoExample.java 267129 2004-03-18 16:40:35Z jfarcand $
+/* $Id$
  *
  */
 
