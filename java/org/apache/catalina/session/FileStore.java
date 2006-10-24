@@ -47,7 +47,7 @@ import org.apache.catalina.util.CustomObjectInputStream;
  * saved are still subject to being expired based on inactivity.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303826 $ $Date: 2005-03-31 12:31:54 +0200 (jeu., 31 mars 2005) $
+ * @version $Revision$ $Date$
  */
 
 public final class FileStore

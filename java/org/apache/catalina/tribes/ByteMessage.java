@@ -37,7 +37,7 @@ import java.io.ObjectOutput;
  * so that you can decide with the <code>ChannelListener.accept()</code> whether this message was intended
  * for you.
  * @author Filip Hanik
- * @version $Revision: 304032 $, $Date: 2005-07-27 10:11:55 -0500 (Wed, 27 Jul 2005) $
+ * @version $Revision$, $Date$
  */
 
 public class ByteMessage implements Serializable, Externalizable {

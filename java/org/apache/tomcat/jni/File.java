@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 /** File
  *
  * @author Mladen Turk
- * @version $Revision: 369000 $, $Date: 2006-01-14 09:08:44 +0100 (sam., 14 janv. 2006) $
+ * @version $Revision$, $Date$
  */
 
 public class File {

@@ -77,7 +77,7 @@ import org.apache.catalina.security.SecurityUtil;
  * @author Craig R. McClanahan
  * @author Sean Legassick
  * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
- * @version $Revision: 384817 $ $Date: 2006-03-10 16:27:43 +0100 (ven., 10 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class StandardSession

@@ -24,7 +24,7 @@ package org.apache.catalina.tribes;
  * at the bottom layer, the IO layer (for layers see the javadoc for the {@link Channel} interface).
  * This class may optionally implement a thread pool for parallel processing of incoming messages.
  * @author Filip Hanik
- * @version $Revision: 379904 $, $Date: 2006-02-22 15:16:25 -0600 (Wed, 22 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 public interface ChannelReceiver extends Heartbeat {
     /**

@@ -47,7 +47,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  * <code>StandardWrapper</code> container implementation.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303681 $ $Date: 2005-02-06 11:39:32 +0100 (dim., 06 févr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 final class StandardWrapperValve

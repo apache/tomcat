@@ -44,7 +44,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 370985 $ $Date: 2006-01-21 06:21:15 +0100 (sam., 21 janv. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class DigestAuthenticator

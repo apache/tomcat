@@ -30,7 +30,7 @@ import java.io.Serializable;
  * a URL pattern or a servlet name.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 302879 $ $Date: 2004-05-13 22:40:49 +0200 (jeu., 13 mai 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class FilterMap implements Serializable {

@@ -52,7 +52,7 @@ import org.apache.juli.logging.LogFactory;
  * management and lifecycle support.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 304023 $ $Date: 2005-07-26 14:45:22 +0200 (mar., 26 juil. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public abstract class ValveBase

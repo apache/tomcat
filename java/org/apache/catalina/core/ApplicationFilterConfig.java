@@ -49,7 +49,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  * is first started.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 355530 $ $Date: 2005-12-09 17:42:23 +0100 (ven., 09 déc. 2005) $
+ * @version $Revision$ $Date$
  */
 
 final class ApplicationFilterConfig implements FilterConfig, Serializable {

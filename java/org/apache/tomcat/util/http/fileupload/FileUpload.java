@@ -40,7 +40,7 @@ package org.apache.tomcat.util.http.fileupload;
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * @author Sean C. Sullivan
  *
- * @version $Id: FileUpload.java,v 1.23 2003/06/24 05:45:43 martinc Exp $
+ * @version $Id$
  */
 public class FileUpload
     extends FileUploadBase

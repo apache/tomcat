@@ -30,7 +30,7 @@ import java.lang.reflect.Proxy;
  *
  * @author Craig R. McClanahan
  * @author Bip Thelin
- * @version $Revision: 304082 $, $Date: 2005-09-08 17:41:11 +0200 (jeu., 08 sept. 2005) $
+ * @version $Revision$, $Date$
  */
 
 public final class CustomObjectInputStream

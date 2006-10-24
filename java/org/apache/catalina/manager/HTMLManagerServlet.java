@@ -57,7 +57,7 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 * @author Bip Thelin
 * @author Malcolm Edgar
 * @author Glenn L. Nielsen
-* @version $Revision: 326772 $, $Date: 2005-10-20 03:37:02 +0200 (jeu., 20 oct. 2005) $
+* @version $Revision$, $Date$
 * @see ManagerServlet
 */
 

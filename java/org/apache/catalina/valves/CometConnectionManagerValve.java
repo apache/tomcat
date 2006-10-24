@@ -48,7 +48,7 @@ import org.apache.catalina.util.StringManager;
  * <p>This Valve should be attached to a Context.</p>
  *
  * @author Remy Maucherat
- * @version $Revision: 386404 $ $Date: 2006-03-16 18:50:37 +0100 (jeu., 16 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class CometConnectionManagerValve

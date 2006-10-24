@@ -29,7 +29,7 @@ import javax.management.Notification;
  * Implementation of the NamingService JMX MBean.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision: 303104 $
+ * @version $Revision$
  */
 
 public final class NamingService

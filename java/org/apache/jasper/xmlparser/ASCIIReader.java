@@ -28,7 +28,7 @@ import org.apache.jasper.compiler.Localizer;
  *
  * @author Andy Clark, IBM
  *
- * @version $Id: ASCIIReader.java 305933 2004-03-17 19:23:05Z luehe $
+ * @version $Id$
  */
 public class ASCIIReader
     extends Reader {

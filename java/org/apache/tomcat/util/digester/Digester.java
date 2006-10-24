@@ -1,4 +1,4 @@
-/* $Id: Digester.java 380645 2006-02-24 11:37:46Z remm $
+/* $Id$
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

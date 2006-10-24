@@ -30,7 +30,7 @@ import org.apache.catalina.connector.Response;
  * based on the remote client's host name.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 304096 $ $Date: 2005-09-20 23:02:12 +0200 (mar., 20 sept. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public final class RemoteHostValve

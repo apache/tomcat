@@ -49,7 +49,7 @@ import org.apache.catalina.util.StringManager;
  * method itself.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303523 $ $Date: 2004-11-22 17:35:18 +0100 (lun., 22 nov. 2004) $
+ * @version $Revision$ $Date$
  */
 
 final class ApplicationFilterChain implements FilterChain, CometFilterChain {

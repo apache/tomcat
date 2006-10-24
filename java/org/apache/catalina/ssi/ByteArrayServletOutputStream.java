@@ -26,7 +26,7 @@ import javax.servlet.ServletOutputStream;
  * <code>SsiInclude</code>
  *
  * @author Bip Thelin
- * @version $Revision: 304045 $, $Date: 2005-08-04 14:18:30 +0200 (jeu., 04 août 2005) $
+ * @version $Revision$, $Date$
  * @see ServletOutputStream and ByteArrayOutputStream
  */
 public class ByteArrayServletOutputStream extends ServletOutputStream {

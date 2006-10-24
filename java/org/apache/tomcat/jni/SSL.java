@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** SSL
  *
  * @author Mladen Turk
- * @version $Revision: 301018 $, $Date: 2005-08-01 09:23:09 +0200 (lun., 01 août 2005) $
+ * @version $Revision$, $Date$
  */
 
 public final class SSL {

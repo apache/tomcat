@@ -73,7 +73,7 @@ import org.apache.tomcat.util.digester.Digester;
  * the functionality required of a <code>Realm</code> implementation.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303719 $ $Date: 2005-02-19 00:43:20 +0100 (sam., 19 févr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, Realm {

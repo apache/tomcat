@@ -45,7 +45,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * This servlet will display a complete status of the HTTP/1.1 connector.
  *
  * @author Remy Maucherat
- * @version $Revision: 303870 $ $Date: 2005-04-19 00:50:24 +0200 (mar., 19 avr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class StatusManagerServlet

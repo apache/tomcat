@@ -78,7 +78,7 @@ import org.apache.juli.logging.Log;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 303037 $ $Date: 2004-07-27 09:17:21 +0200 (mar., 27 juil. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public interface Container {

@@ -24,7 +24,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
 
 /**
  * @author Filip Hanik
- * @version $Revision: 366253 $ $Date: 2006-01-05 13:30:42 -0600 (Thu, 05 Jan 2006) $
+ * @version $Revision$ $Date$
  */
 public abstract class WorkerThread extends Thread 
 {

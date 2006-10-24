@@ -18,7 +18,7 @@
 /***************************************************************************
  * Description: Base http request object.                                  *
  * Author:      Keving Seguin [seguin@apache.org]                          *
- * Version:     $Revision: 299484 $                                           *
+ * Version:     $Revision$                                           *
  ***************************************************************************/
 
 package org.apache.tomcat.util.http;

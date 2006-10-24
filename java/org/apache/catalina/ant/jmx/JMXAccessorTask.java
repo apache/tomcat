@@ -85,7 +85,7 @@ import org.apache.tools.ant.Project;
  * </b>: These tasks require Ant 1.6 or later interface.
  * 
  * @author Peter Rossbach
- * @version $Revision: 304089 $ $Date: 2005-09-14 15:28:29 +0200 (mer., 14 sept. 2005) $
+ * @version $Revision$ $Date$
  * @since 5.5.10
  */
 

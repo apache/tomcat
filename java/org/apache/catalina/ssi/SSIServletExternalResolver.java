@@ -32,7 +32,7 @@ import org.apache.coyote.Constants;
  * 
  * @author Dan Sandberg
  * @author David Becker
- * @version $Revision: 349308 $, $Date: 2005-11-27 21:52:55 +0100 (dim., 27 nov. 2005) $
+ * @version $Revision$, $Date$
  */
 public class SSIServletExternalResolver implements SSIExternalResolver {
     protected final String VARIABLE_NAMES[] = {"AUTH_TYPE", "CONTENT_LENGTH",

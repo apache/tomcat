@@ -36,7 +36,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  * <code>org.apache.catalina.deploy.ContextResource</code> component.</p>
  *
  * @author Amy Roh
- * @version $Revision: 303032 $ $Date: 2004-07-26 18:04:02 +0200 (lun., 26 juil. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class ContextResourceMBean extends BaseModelMBean {

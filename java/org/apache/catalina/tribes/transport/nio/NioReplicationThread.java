@@ -45,7 +45,7 @@ import org.apache.catalina.tribes.util.Logs;
  * 
  * @author Filip Hanik
  * 
- * @version $Revision: 378050 $, $Date: 2006-02-15 12:30:02 -0600 (Wed, 15 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 public class NioReplicationThread extends WorkerThread {
     

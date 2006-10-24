@@ -25,7 +25,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * package.
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision: 303753 $ $Date: 2005-03-14 15:24:30 -0600 (Mon, 14 Mar 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class Constants {

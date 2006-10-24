@@ -67,7 +67,7 @@ import org.apache.juli.logging.LogFactory;
  * </ul>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 302983 $ $Date: 2004-06-26 01:56:25 +0200 (sam., 26 juin 2004) $
+ * @version $Revision$ $Date$
  */
 
 public final class Tool {

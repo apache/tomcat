@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
  * between requests for a particular user of a web application.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 384817 $ $Date: 2006-03-10 16:27:43 +0100 (ven., 10 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public interface Session {

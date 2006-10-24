@@ -34,7 +34,7 @@ import org.apache.juli.logging.Log;
  * different cluster implementations
  *
  * @author Filip Hanik
- * @version $Revision: 379550 $, $Date: 2006-02-21 12:06:35 -0600 (Tue, 21 Feb 2006) $
+ * @version $Revision$, $Date$
  */
 
 public interface CatalinaCluster extends Cluster {

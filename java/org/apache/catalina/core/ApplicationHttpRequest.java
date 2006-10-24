@@ -55,7 +55,7 @@ import org.apache.catalina.util.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 303799 $ $Date: 2005-03-25 09:41:23 +0100 (ven., 25 mars 2005) $
+ * @version $Revision$ $Date$
  */
 
 class ApplicationHttpRequest extends HttpServletRequestWrapper {

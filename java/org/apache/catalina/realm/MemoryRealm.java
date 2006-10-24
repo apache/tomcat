@@ -43,7 +43,7 @@ import org.apache.tomcat.util.digester.Digester;
  * synchronization is performed around accesses to the principals collection.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 373023 $ $Date: 2006-01-28 00:17:43 +0100 (sam., 28 janv. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class MemoryRealm  extends RealmBase {

@@ -98,7 +98,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  * of how Tomcat is set up and launched as an Embedded application.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 304107 $ $Date: 2005-09-29 07:52:48 +0200 (jeu., 29 sept. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class Embedded  extends StandardService implements Lifecycle {

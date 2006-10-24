@@ -24,7 +24,7 @@ package org.apache.catalina.startup;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Revision: 303179 $ $Date: 2004-09-02 12:28:00 +0200 (jeu., 02 sept. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public final class Constants {

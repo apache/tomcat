@@ -28,7 +28,7 @@ import org.apache.catalina.authenticator.Constants;
  * reauthentications when SingleSignOn is in use.
  *
  * @author  B Stansberry, based on work by Craig R. McClanahan
- * @version $Revision: 302885 $
+ * @version $Revision$
  *
  * @see SingleSignOn
  * @see AuthenticatorBase#reauthenticateFromSSO

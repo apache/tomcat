@@ -31,7 +31,7 @@ package org.apache.catalina.ha.session;
  *
  * Copyright:    See apache license
  * @author  Filip Hanik
- * @version $Revision: 303842 $ $Date: 2005-04-10 11:20:46 -0500 (Sun, 10 Apr 2005) $
+ * @version $Revision$ $Date$
  * Description:<BR>
  * The ReplicatedSession class is a simple extension of the StandardSession class
  * It overrides a few methods (setAttribute, removeAttribute, expire, access) and has

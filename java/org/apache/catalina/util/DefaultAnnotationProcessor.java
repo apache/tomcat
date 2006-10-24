@@ -39,7 +39,7 @@ import org.apache.AnnotationProcessor;
  *
  * @author Fabien Carrion
  * @author Remy Maucherat
- * @version $Revision: 303236 $, $Date: 2006-03-09 16:46:52 -0600 (Thu, 09 Mar 2006) $
+ * @version $Revision$, $Date$
  */
 public class DefaultAnnotationProcessor implements AnnotationProcessor {
     

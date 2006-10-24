@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * to the servlet, because a new servlet mapping will have been created.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303211 $ $Date: 2004-09-08 12:38:14 +0200 (mer., 08 sept. 2004) $
+ * @version $Revision$ $Date$
  */
 
 class InvokerHttpRequest extends HttpServletRequestWrapper {

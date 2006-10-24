@@ -20,7 +20,7 @@ import org.apache.catalina.tribes.Member;
 
 /**
  * @author Peter Rossbach
- * @version $Revision: 303987 $ $Date: 2005-07-08 15:50:30 -0500 (Fri, 08 Jul 2005) $
+ * @version $Revision$ $Date$
  */
 public class SendMessageData {
 

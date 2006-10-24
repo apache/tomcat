@@ -62,7 +62,7 @@ import org.apache.catalina.util.StringManager;
  * of the filtering you wish to perform.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 303161 $ $Date: 2004-09-01 12:10:10 +0200 (mer., 01 sept. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public abstract class RequestFilterValve

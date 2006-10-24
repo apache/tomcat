@@ -27,7 +27,7 @@ import java.util.ArrayList;
  *  
  * @author Greg Murray
  * @author Justyna Horwat
- * @version $Revision: 360278 $ $Date: 2005-12-31 14:26:41 +0100 (sam., 31 déc. 2005) $
+ * @version $Revision$ $Date$
  * 
  */
 public class ManifestResource {

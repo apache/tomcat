@@ -53,7 +53,7 @@ import org.apache.catalina.util.ServerInfo;
 * @author Malcolm Edgar
 * @author Glenn L. Nielsen
 * @author Peter Rossbach
-* @version $Revision: 384293 $, $Date: 2006-03-08 19:09:36 +0100 (mer., 08 mars 2006) $
+* @version $Revision$, $Date$
 * @see ManagerServlet
 */
 

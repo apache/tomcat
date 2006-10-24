@@ -71,7 +71,7 @@ import org.apache.naming.resources.ResourceAttributes;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 332127 $ $Date: 2005-11-09 20:50:47 +0100 (mer., 09 nov. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class DefaultServlet

@@ -27,7 +27,7 @@ package org.apache.catalina.tribes;
  * since a member that has crashed and the starts up again on the same port/host is 
  * not guaranteed to be the same member, so no state transfers will ever be confused
  * @author Filip Hanik
- * @version $Revision: 303950 $, $Date: 2005-06-09 15:38:30 -0500 (Thu, 09 Jun 2005) $
+ * @version $Revision$, $Date$
  */
 
 

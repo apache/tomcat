@@ -152,7 +152,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 393613 $ $Date: 2006-04-12 23:08:01 +0200 (mer., 12 avr. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class ManagerServlet

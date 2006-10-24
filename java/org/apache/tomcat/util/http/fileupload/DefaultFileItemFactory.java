@@ -41,7 +41,7 @@ import java.io.File;
  *
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  *
- * @version $Id: DefaultFileItemFactory.java,v 1.2 2003/05/31 22:31:08 martinc Exp $
+ * @version $Id$
  */
 public class DefaultFileItemFactory implements FileItemFactory
 {

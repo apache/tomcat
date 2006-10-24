@@ -47,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
- * @version $Revision: 303826 $ $Date: 2005-03-31 12:31:54 +0200 (jeu., 31 mars 2005) $
+ * @version $Revision$ $Date$
  */
 
 public abstract class PersistentManagerBase

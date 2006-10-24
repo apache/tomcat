@@ -25,7 +25,7 @@ import javax.naming.NamingException;
  * Comment
  *
  * @author <a href="mailto:bill@jboss.org">Bill Burke</a>
- * @version $Revision: 1.17 $
+ * @version $Revision$
  */
 public interface AnnotationProcessor {
     public void postConstruct(Object instance)

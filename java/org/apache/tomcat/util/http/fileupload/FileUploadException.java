@@ -23,7 +23,7 @@ package org.apache.tomcat.util.http.fileupload;
  * Exception for errors encountered while processing the request.
  *
  * @author <a href="mailto:jmcnally@collab.net">John McNally</a>
- * @version $Id: FileUploadException.java,v 1.7 2003/04/27 17:30:06 martinc Exp $
+ * @version $Id$
  */
 public class FileUploadException
     extends Exception

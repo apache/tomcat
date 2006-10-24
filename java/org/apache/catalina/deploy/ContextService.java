@@ -26,7 +26,7 @@ import java.io.Serializable;
  * deployment descriptor.
  *
  * @author Fabien Carrion
- * @version $Revision: 303342 $ $Date: 2005-03-15 23:29:49 -0700 (Web, 15 Mar 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class ContextService extends ResourceBase implements Serializable {

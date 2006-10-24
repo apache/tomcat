@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** ProcErrorCallback Interface
  *
  * @author Mladen Turk
- * @version $Revision: 300969 $, $Date: 2005-07-12 16:56:11 +0200 (mar., 12 juil. 2005) $
+ * @version $Revision$, $Date$
  */
 
 public interface ProcErrorCallback {

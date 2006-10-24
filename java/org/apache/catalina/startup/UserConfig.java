@@ -38,7 +38,7 @@ import org.apache.catalina.util.StringManager;
  * xxxxx is the username of the owning user for that web application
  *
  * @author Craig R. McClanahan
- * @version $Revision: 302976 $ $Date: 2004-06-23 15:51:38 +0200 (mer., 23 juin 2004) $
+ * @version $Revision$ $Date$
  */
 
 public final class UserConfig

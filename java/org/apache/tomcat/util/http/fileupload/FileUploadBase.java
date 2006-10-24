@@ -50,7 +50,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author <a href="mailto:martinc@apache.org">Martin Cooper</a>
  * @author Sean C. Sullivan
  *
- * @version $Id: FileUploadBase.java,v 1.3 2003/06/01 00:18:13 martinc Exp $
+ * @version $Id$
  */
 public abstract class FileUploadBase
 {

@@ -150,7 +150,7 @@ import org.apache.tomcat.util.buf.CharChunk;
  *
  * @author John Holman
  * @author Craig R. McClanahan
- * @version $Revision: 373029 $ $Date: 2006-01-28 00:27:16 +0100 (sam., 28 janv. 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class JNDIRealm extends RealmBase {

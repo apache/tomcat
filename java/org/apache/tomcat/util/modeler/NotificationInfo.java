@@ -29,7 +29,7 @@ import javax.management.MBeanNotificationInfo;
  * descriptor.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 155428 $ $Date: 2005-02-26 14:12:25 +0100 (sam., 26 févr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class NotificationInfo extends FeatureInfo implements Serializable {

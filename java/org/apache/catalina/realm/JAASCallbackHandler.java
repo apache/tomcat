@@ -45,7 +45,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Craig R. McClanahan
  * @author Andrew R. Jaquith
- * @version $Revision: 303719 $ $Date: 2005-02-19 00:43:20 +0100 (sam., 19 févr. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class JAASCallbackHandler implements CallbackHandler {

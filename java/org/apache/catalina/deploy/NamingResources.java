@@ -31,7 +31,7 @@ import java.io.Serializable;
  * Naming Context and their associated JNDI context.
  *
  * @author Remy Maucherat
- * @version $Revision: 303133 $ $Date: 2004-08-29 18:46:15 +0200 (dim., 29 août 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class NamingResources implements Serializable {

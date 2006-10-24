@@ -31,7 +31,7 @@ import java.net.URL;
  * @author Bip Thelin
  * @author Remy Maucherat
  * @author Filip Hanik
- * @version $Revision: 303857 $, $Date: 2005-04-15 22:15:45 +0200 (ven., 15 avr. 2005) $
+ * @version $Revision$, $Date$
  */
 
 public interface Cluster {

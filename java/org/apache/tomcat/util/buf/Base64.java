@@ -28,7 +28,7 @@ package org.apache.tomcat.util.buf;
  * This class is used by XML Schema binary format validation
  *
  * @author Jeffrey Rodriguez
- * @version $Revision: 299789 $ $Date: 2004-09-17 20:34:19 +0200 (ven., 17 sept. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public final class Base64 {

@@ -71,7 +71,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 345286 $ $Date: 2005-11-17 18:00:24 +0100 (jeu., 17 nov. 2005) $
+ * @version $Revision$ $Date$
  */
 public class StandardWrapper
     extends ContainerBase

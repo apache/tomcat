@@ -42,7 +42,7 @@ import org.apache.catalina.deploy.NamingResources;
  * class in its constructor(s).
  *
  * @author Craig R. McClanahan
- * @version $Revision: 302899 $ $Date: 2004-05-26 17:29:30 +0200 (mer., 26 mai 2004) $
+ * @version $Revision$ $Date$
  */
 
 public interface Server {

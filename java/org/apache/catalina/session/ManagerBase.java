@@ -60,7 +60,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * be subclassed to create more sophisticated Manager implementations.
  *
  * @author Craig R. McClanahan
- * @version $Revision: 388112 $ $Date: 2006-03-23 10:00:30 +0100 (jeu., 23 mars 2006) $
+ * @version $Revision$ $Date$
  */
 
 public abstract class ManagerBase implements Manager, MBeanRegistration {

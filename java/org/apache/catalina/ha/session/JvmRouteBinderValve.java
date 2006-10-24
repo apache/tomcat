@@ -80,7 +80,7 @@ import org.apache.catalina.valves.ValveBase;
  * This use case means that only requested session are migrated.
  * 
  * @author Peter Rossbach
- * @version $Revision: 326110 $ $Date: 2005-10-18 09:08:36 -0500 (Tue, 18 Oct 2005) $
+ * @version $Revision$ $Date$
  */
 public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Lifecycle {
 

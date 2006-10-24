@@ -1,4 +1,4 @@
-/* $Id: SetNextNamingRule.java 303133 2004-08-29 16:46:15Z yoavs $
+/* $Id$
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

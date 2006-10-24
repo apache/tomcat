@@ -35,7 +35,7 @@ import java.util.Comparator;
  *
  * @author Filip Hanik
  * @author Peter Rossbach
- * @version $Revision: 356540 $, $Date: 2005-12-13 10:53:40 -0600 (Tue, 13 Dec 2005) $
+ * @version $Revision$, $Date$
  */
 public class Membership
 {

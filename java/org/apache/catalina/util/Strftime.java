@@ -40,7 +40,7 @@ import java.util.TimeZone;
  *
  * @author Bip Thelin
  * @author Dan Sandberg
- * @version $Revision: 303133 $, $Date: 2004-08-29 18:46:15 +0200 (dim., 29 août 2004) $
+ * @version $Revision$, $Date$
  */
 public class Strftime {
     protected static Properties translate;

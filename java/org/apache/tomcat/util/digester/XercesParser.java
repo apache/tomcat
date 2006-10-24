@@ -1,4 +1,4 @@
-/* $Id: XercesParser.java 299768 2004-09-02 00:48:12Z yoavs $
+/* $Id$
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with

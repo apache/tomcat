@@ -34,7 +34,7 @@ import org.apache.catalina.util.DateTool;
  * 
  * @author Bip Thelin
  * @author David Becker
- * @version $Revision: 304032 $, $Date: 2005-07-27 17:11:55 +0200 (mer., 27 juil. 2005) $
+ * @version $Revision$, $Date$
  */
 public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     /**

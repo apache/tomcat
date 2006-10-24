@@ -23,7 +23,7 @@ import javax.naming.directory.DirContext;
  * Implements a cache entry.
  * 
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
- * @version $Revision: 302726 $
+ * @version $Revision$
  */
 public class CacheEntry {
     

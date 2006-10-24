@@ -42,7 +42,7 @@ import java.util.ResourceBundle;
  * <p>Please see the documentation for java.util.ResourceBundle for
  * more information.
  *
- * @version $Revision: 299753 $ $Date: 2004-08-29 19:14:42 +0200 (dim., 29 août 2004) $
+ * @version $Revision$ $Date$
  *
  * @author James Duncan Davidson [duncan@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]

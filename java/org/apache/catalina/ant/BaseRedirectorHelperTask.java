@@ -46,7 +46,7 @@ import org.apache.tools.ant.types.RedirectorElement;
  * 
  *
  * @author Gabriele Garuglieri
- * @version $Revision: 303609 $ $Date: 2005-01-03 17:21:21 +0100 (lun., 03 janv. 2005) $
+ * @version $Revision$ $Date$
  * @since 5.5
  */
 

@@ -33,7 +33,7 @@ import org.apache.catalina.ha.*;
  * node is failed.
  * 
  * @author Peter Rossbach
- * @version $Revision: 378258 $ $Date: 2006-02-16 08:42:35 -0600 (Thu, 16 Feb 2006) $
+ * @version $Revision$ $Date$
  */
 public class JvmRouteSessionIDBinderListener extends ClusterListener {
  

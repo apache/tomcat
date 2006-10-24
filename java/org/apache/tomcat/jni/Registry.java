@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** Windows Registy support
  *
  * @author Mladen Turk
- * @version $Revision: 301076 $, $Date: 2005-09-29 14:07:39 +0200 (jeu., 29 sept. 2005) $
+ * @version $Revision$, $Date$
  */
 
 public class Registry {

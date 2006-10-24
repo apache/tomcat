@@ -62,7 +62,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * <code>org.apache.catalina.core.StandardServer</code> component.</p>
  *
  * @author Amy Roh
- * @version $Revision: 304032 $ $Date: 2005-07-27 17:11:55 +0200 (mer., 27 juil. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class MBeanFactory extends BaseModelMBean {

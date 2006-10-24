@@ -45,7 +45,7 @@ import org.apache.catalina.util.StringManager;
  * of <code>UserDatabase</code> that we should consult.</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 373023 $ $Date: 2006-01-28 00:17:43 +0100 (sam., 28 janv. 2006) $
+ * @version $Revision$ $Date$
  * @since 4.1
  */
 

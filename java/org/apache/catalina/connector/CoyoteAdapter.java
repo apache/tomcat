@@ -44,7 +44,7 @@ import org.apache.tomcat.util.net.SocketStatus;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 331249 $ $Date: 2005-11-07 10:57:55 +0100 (lun., 07 nov. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class CoyoteAdapter

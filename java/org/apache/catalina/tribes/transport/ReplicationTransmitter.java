@@ -29,7 +29,7 @@ import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
  * type 
  * 
  * @author Filip Hanik
- * @version $Revision: 379956 $ $Date: 2006-02-22 16:57:35 -0600 (Wed, 22 Feb 2006) $
+ * @version $Revision$ $Date$
  */
 public class ReplicationTransmitter implements ChannelSender {
     private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReplicationTransmitter.class);

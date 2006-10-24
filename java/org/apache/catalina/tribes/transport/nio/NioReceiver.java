@@ -40,7 +40,7 @@ import java.nio.channels.CancelledKeyException;
 
 /**
  * @author Filip Hanik
- * @version $Revision: 379904 $ $Date: 2006-02-22 15:16:25 -0600 (Wed, 22 Feb 2006) $
+ * @version $Revision$ $Date$
  */
 public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 

@@ -35,7 +35,7 @@ import org.xml.sax.Attributes;
  * DefaultContext, be sure to specify a prefix that ends with "/Default".</p>
  *
  * @author Craig R. McClanahan
- * @version $Revision: 345090 $ $Date: 2005-11-16 19:51:09 +0100 (mer., 16 nov. 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class ContextRuleSet extends RuleSetBase {

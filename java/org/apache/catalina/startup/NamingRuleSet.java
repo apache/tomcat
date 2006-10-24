@@ -29,7 +29,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 303177 $ $Date: 2004-09-02 12:05:00 +0200 (jeu., 02 sept. 2004) $
+ * @version $Revision$ $Date$
  */
 
 public class NamingRuleSet extends RuleSetBase {
