@@ -7,6 +7,8 @@ public class SocketProperties {
     protected boolean directBuffer = true;
     protected int rxBufSize = 25188;
     protected int txBufSize = 43800;
+    protected int directBufferPool = 500;
+    
     protected boolean tcpNoDelay = false;
     protected boolean soKeepAlive = false;
     protected boolean ooBInline = true;
@@ -18,7 +20,7 @@ public class SocketProperties {
     protected int performanceConnectionTime = 1;
     protected int performanceLatency = 0;
     protected int performanceBandwidth = 1;
-    private Socket properties;
+    
 
     public void setProperties(Socket socket) throws SocketException{
         socket.setReceiveBufferSize(rxBufSize);
@@ -51,10 +53,6 @@ public class SocketProperties {
 
     public int getPerformanceLatency() {
         return performanceLatency;
-    }
-
-    public Socket getProperties() {
-        return properties;
     }
 
     public int getRxBufSize() {
@@ -91,6 +89,10 @@ public class SocketProperties {
 
     public int getTxBufSize() {
         return txBufSize;
+    }
+
+    public int getDirectBufferPool() {
+        return directBufferPool;
     }
 
     public void setPerformanceConnectionTime(int performanceConnectionTime) {
@@ -147,6 +149,10 @@ public class SocketProperties {
 
     public void setSoLingerOn(boolean soLingerOn) {
         this.soLingerOn = soLingerOn;
+    }
+
+    public void setDirectBufferPool(int directBufferPool) {
+        this.directBufferPool = directBufferPool;
     }
 
 }
