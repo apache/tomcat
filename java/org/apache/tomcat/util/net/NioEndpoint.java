@@ -46,6 +46,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -149,10 +150,20 @@ public class NioEndpoint {
 
 
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
-        public boolean offer(NioChannel o) {
+        public boolean offer(NioChannel socket) {
+            Poller pol = socket.getPoller();
+            Selector sel = pol!=null?pol.getSelector():null;
+            SelectionKey key = sel!=null?socket.getIOChannel().keyFor(sel):null;
+            KeyAttachment att = key!=null?(KeyAttachment)key.attachment():null;
+            if ( att!=null ) att.reset();
+            if ( key!=null ) key.cancel();
             //avoid over growing our cache or add after we have stopped
-            if ( running && (!paused) && (size() < curThreads) ) return super.offer(o);
+            if ( running && (!paused) && (size() < socketProperties.getDirectBufferPool()) ) return super.offer(socket);
             else return false;
+        }
+        
+        public NioChannel poll() {
+            return super.poll();
         }
     };
 
@@ -1199,6 +1210,16 @@ public class NioEndpoint {
         public KeyAttachment(Poller poller) {
             this.poller = poller;
         }
+        public void reset() {
+            //mutex = new Object();
+            wakeUp = false;
+            lastAccess = System.currentTimeMillis();
+            currentAccess = false;
+            comet = false;
+            timeout = -1;
+            error = false;
+            channel = null;
+        }
         public Poller getPoller() { return poller;}
         public void setPoller(Poller poller){this.poller = poller;}
         public long getLastAccess() { return lastAccess; }
@@ -1364,7 +1385,6 @@ public class NioEndpoint {
                             if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
                                 // Close socket and pool
                                 try {
-                                    
                                     try {socket.close();}catch (Exception ignore){}
                                     if ( socket.isOpen() ) socket.close(true);
                                     nioChannels.offer(socket);
@@ -1374,7 +1394,6 @@ public class NioEndpoint {
                             } else if ((status == null) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
                                 // Close socket and pool
                                 try {
-                                    
                                     try {socket.close();}catch (Exception ignore){}
                                     if ( socket.isOpen() ) socket.close(true);
                                     nioChannels.offer(socket);
