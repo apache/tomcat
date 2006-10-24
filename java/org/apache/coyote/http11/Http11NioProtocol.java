@@ -93,6 +93,9 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
      * Set a property.
      */
     public void setProperty(String name, String value) {
+        if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
+            ep.setProperty(name, value);
+        }
         setAttribute(name, value);
     }
 
@@ -119,13 +122,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public void init() throws Exception {
         ep.setName(getName());
         ep.setHandler(cHandler);
-        ep.setReadBufSize(getMaxHttpHeaderSize());
-        ep.setWriteBufSize(getMaxHttpHeaderSize());
+        
+        //todo, determine if we even need these
+        ep.getSocketProperties().setRxBufSize(Math.max(ep.getSocketProperties().getRxBufSize(),getMaxHttpHeaderSize()));
+        ep.getSocketProperties().setTxBufSize(Math.max(ep.getSocketProperties().getTxBufSize(),getMaxHttpHeaderSize()));
+        
         try {
             ep.init();
-            
             sslImplementation = SSLImplementation.getInstance("org.apache.tomcat.util.net.jsse.JSSEImplementation");
-            
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
             throw ex;
@@ -209,6 +213,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     private int socketCloseDelay=-1;
     private boolean disableUploadTimeout = true;
     private int socketBuffer = 9000;
+    
     private Adapter adapter;
     private Http11ConnectionHandler cHandler;
 
@@ -295,24 +300,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public void setFirstReadTimeout( int i ) {
         ep.setFirstReadTimeout(i);
         setAttribute("firstReadTimeout", "" + i);
-    }
-
-    public int getPollTime() {
-        return ep.getPollTime();
-    }
-
-    public void setPollTime( int i ) {
-        ep.setPollTime(i);
-        setAttribute("pollTime", "" + i);
-    }
-
-    public void setPollerSize(int i) {
-        ep.setPollerSize(i); 
-        setAttribute("pollerSize", "" + i);
-    }
-
-    public int getPollerSize() {
-        return ep.getPollerSize();
     }
 
     public InetAddress getAddress() {
@@ -667,7 +654,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         }
 
         public Http11NioProcessor createProcessor() {
-            Http11NioProcessor processor = new Http11NioProcessor(proto.maxHttpHeaderSize, proto.ep);
+            Http11NioProcessor processor = new Http11NioProcessor(
+              Math.max(proto.maxHttpHeaderSize,proto.ep.getSocketProperties().getRxBufSize()),
+              Math.max(proto.maxHttpHeaderSize,proto.ep.getSocketProperties().getRxBufSize()), 
+              proto.ep);
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
             processor.setTimeout(proto.timeout);

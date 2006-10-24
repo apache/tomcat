@@ -83,7 +83,7 @@ public class Http11NioProcessor implements ActionHook {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11NioProcessor(int headerBufferSize, NioEndpoint endpoint) {
+    public Http11NioProcessor(int rxBufSize, int txBufSize, NioEndpoint endpoint) {
 
         this.endpoint = endpoint;
 
@@ -95,12 +95,12 @@ public class Http11NioProcessor implements ActionHook {
             readTimeout = timeout;
             //readTimeout = -1;
         }
-        inputBuffer = new InternalNioInputBuffer(request, headerBufferSize,readTimeout);
+        inputBuffer = new InternalNioInputBuffer(request, rxBufSize,readTimeout);
         request.setInputBuffer(inputBuffer);
 
         response = new Response();
         response.setHook(this);
-        outputBuffer = new InternalNioOutputBuffer(response, headerBufferSize,readTimeout);
+        outputBuffer = new InternalNioOutputBuffer(response, txBufSize,readTimeout);
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
@@ -1004,8 +1004,9 @@ public class Http11NioProcessor implements ActionHook {
                 return;
 
             // Validate and write response headers
-            prepareResponse();
+            
             try {
+                prepareResponse();
                 outputBuffer.commit();
             } catch (IOException e) {
                 // Set error flag
@@ -1552,7 +1553,7 @@ public class Http11NioProcessor implements ActionHook {
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    protected void prepareResponse() {
+    protected void prepareResponse() throws IOException {
 
         boolean entityBody = true;
         contentDelimitation = false;
