@@ -9,7 +9,7 @@
   <properties>
     <author email="craigmcc@apache.org">Craig McClanahan</author>
     <title>Administrative Apps - Administered Objects</title>
-    <revision>$Id: fs-admin-objects.xml 303281 2004-09-27 16:00:31Z yoavs $</revision>
+    <revision>$Id$</revision>
   </properties>
 
 <body>

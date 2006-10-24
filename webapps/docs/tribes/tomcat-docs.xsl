@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- Content Stylesheet for "tomcat-docs" Documentation -->
 
-<!-- $Id: tomcat-docs.xsl 377243 2006-02-12 21:26:03Z markt $ -->
+<!-- $Id$ -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   version="1.0">
