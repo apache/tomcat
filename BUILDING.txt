@@ -1,4 +1,4 @@
-$Id: BUILDING.txt 432252 2006-08-17 14:41:02Z jfclere $
+$Id$
 
             ====================================================
             Building The Apache Tomcat 6.0 Servlet/JSP Container

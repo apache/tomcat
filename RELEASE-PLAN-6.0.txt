@@ -1,4 +1,4 @@
-$Id: RELEASE-PLAN-5.5.txt 304598 2004-08-23 17:26:09Z remm $
+$Id$
 
                       Release Plan for Apache Tomcat 6.0
                       ==================================
