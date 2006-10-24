@@ -20,7 +20,7 @@ package org.apache.tomcat.jni;
 /** Thread
  *
  * @author Mladen Turk
- * @version $Revision: 300969 $, $Date: 2005-07-12 16:56:11 +0200 (uto, 12 srp 2005) $
+ * @version $Revision$, $Date$
  */
 
 public class Thread {

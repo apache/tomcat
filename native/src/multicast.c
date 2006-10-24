@@ -17,7 +17,7 @@
 /*
  *
  * @author Mladen Turk
- * @version $Revision: 416783 $, $Date: 2006-06-23 20:06:15 +0200 (pet, 23 lip 2006) $
+ * @version $Revision$, $Date$
  */
 
 #include "tcn.h"
