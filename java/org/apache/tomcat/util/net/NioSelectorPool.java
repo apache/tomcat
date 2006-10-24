@@ -36,7 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 
 public class NioSelectorPool {
-    protected int maxSelectors = 100;
+    protected int maxSelectors = 200;
     protected int maxSpareSelectors = -1;
     protected boolean enabled = true;
     protected AtomicInteger active = new AtomicInteger(0);
