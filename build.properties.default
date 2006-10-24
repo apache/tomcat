@@ -6,7 +6,7 @@
 # modules that Jasper2 depends on.  Copy this file to "build.properties"
 # in the top-level source directory, and customize it as needed.
 #
-# $Id: build.properties.sample 379500 2006-02-21 15:50:10Z remm $
+# $Id$
 # -----------------------------------------------------------------------------
 
 # ----- Default Base Path for Dependent Packages -----
