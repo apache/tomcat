@@ -46,7 +46,7 @@ public class NioSelectorPool {
     
     public Selector get() throws IOException{
         if ( (!enabled) || active.incrementAndGet() >= maxSelectors ) {
-            active.decrementAndGet();
+            if ( enabled ) active.decrementAndGet();
             return null;
         }
         Selector s = null;
@@ -66,7 +66,7 @@ public class NioSelectorPool {
     
     
     public void put(Selector s) throws IOException {
-        active.decrementAndGet();
+        if ( enabled ) active.decrementAndGet();
         if ( enabled && (maxSpareSelectors==-1 || spare.get() < Math.min(maxSpareSelectors,maxSelectors)) ) {
             spare.incrementAndGet();
             selectors.offer(s);
@@ -79,6 +79,7 @@ public class NioSelectorPool {
         Selector s;
         while ( (s = selectors.poll()) != null ) s.close();
         spare.set(0);
+        active.set(0);
     }
     
     public void open(){
@@ -125,12 +126,14 @@ public class NioSelectorPool {
             }//while
             if ( timedout ) throw new SocketTimeoutException();
         } finally {
-            if (key != null) key.cancel();
-            if (selector != null) selector.selectNow();
+            if (key != null) {
+                key.cancel();
+                if (selector != null) selector.selectNow();//removes the key from this selector
+            }
         }
         return written;
     }
-    
+     
     /**
      * Performs a blocking read using the bytebuffer for data to be read and a selector to block.
      * If the <code>selector</code> parameter is null, then it will perform a busy read that could
@@ -168,8 +171,10 @@ public class NioSelectorPool {
             }//while
             if ( timedout ) throw new SocketTimeoutException();
         } finally {
-            if (key != null) key.cancel();
-            if (selector != null) selector.selectNow();
+            if (key != null) {
+                key.cancel();
+                if (selector != null) selector.selectNow();//removes the key from this selector
+            }
         }
         return read;
     }

@@ -69,15 +69,8 @@ public class InternalNioOutputBuffer
         this.response = response;
         headers = response.getMimeHeaders();
 
-        buf = new byte[headerBufferSize];
+        //buf = new byte[headerBufferSize];
         
-        if (headerBufferSize < (8 * 1024)) {
-            bbufLimit = 6 * 1500;    
-        } else {
-            bbufLimit = (headerBufferSize / 1500 + 1) * 1500;
-        }
-        //bbuf = ByteBuffer.allocateDirect(bbufLimit);
-
         outputStreamOutputBuffer = new SocketOutputBuffer();
 
         filterLibrary = new OutputFilter[0];
@@ -135,7 +128,7 @@ public class InternalNioOutputBuffer
     /**
      * Pointer to the current write buffer.
      */
-    protected byte[] buf;
+    //protected byte[] buf;
 
 
     /**
@@ -447,11 +440,12 @@ public class InternalNioOutputBuffer
     /**
      * Send the response status line.
      */
-    public void sendStatus() {
+    public void sendStatus() throws IOException  {
 
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
-        buf[pos++] = Constants.SP;
+        addToBB(Constants.SP);
+        pos++;
 
         // Write status code
         int status = response.getStatus();
@@ -469,7 +463,8 @@ public class InternalNioOutputBuffer
             write(status);
         }
 
-        buf[pos++] = Constants.SP;
+        addToBB(Constants.SP);
+        pos++;
 
         // Write message
         String message = response.getMessage();
@@ -480,8 +475,10 @@ public class InternalNioOutputBuffer
         }
 
         // End the response status line
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
+        addToBB(Constants.CR);
+        pos++;
+        addToBB(Constants.LF);
+        pos++;
 
     }
 
@@ -492,14 +489,18 @@ public class InternalNioOutputBuffer
      * @param name Header name
      * @param value Header value
      */
-    public void sendHeader(MessageBytes name, MessageBytes value) {
+    public void sendHeader(MessageBytes name, MessageBytes value) throws IOException {
 
         write(name);
-        buf[pos++] = Constants.COLON;
-        buf[pos++] = Constants.SP;
+        addToBB(Constants.COLON);
+        pos++;
+        addToBB(Constants.SP);
+        pos++;
         write(value);
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
+        addToBB(Constants.CR);
+        pos++;
+        addToBB(Constants.LF);
+        pos++;
 
     }
 
@@ -510,15 +511,18 @@ public class InternalNioOutputBuffer
      * @param name Header name
      * @param value Header value
      */
-    public void sendHeader(ByteChunk name, ByteChunk value) {
+    public void sendHeader(ByteChunk name, ByteChunk value) throws IOException {
 
         write(name);
-        buf[pos++] = Constants.COLON;
-        buf[pos++] = Constants.SP;
+        addToBB(Constants.COLON);
+        pos++;
+        addToBB(Constants.SP);
+        pos++;
         write(value);
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
-
+        addToBB(Constants.CR);
+        pos++;
+        addToBB(Constants.LF);
+        pos++;
     }
 
 
@@ -531,11 +535,16 @@ public class InternalNioOutputBuffer
     public void sendHeader(String name, String value) {
 
         write(name);
-        buf[pos++] = Constants.COLON;
-        buf[pos++] = Constants.SP;
+        addToBB(Constants.COLON);
+        pos++;
+        addToBB(Constants.SP);
+        pos++;
         write(value);
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
+        addToBB(Constants.CR);
+        pos++;
+        addToBB(Constants.LF);
+        pos++;
+
 
     }
 
@@ -545,8 +554,10 @@ public class InternalNioOutputBuffer
      */
     public void endHeaders() {
 
-        buf[pos++] = Constants.CR;
-        buf[pos++] = Constants.LF;
+        addToBB(Constants.CR);
+        pos++;
+        addToBB(Constants.LF);
+        pos++;
 
     }
 
@@ -598,17 +609,28 @@ public class InternalNioOutputBuffer
 
         if (pos > 0) {
             // Sending the response header buffer
-            addToBB(buf, 0, pos);
+            //flushBuffer();//do we need this?
         }
 
     }
 
     int total = 0;
+    private void addToBB(byte b)  {
+        ByteBuffer bytebuffer = socket.getBufHandler().getWriteBuffer();
+        final int length = 1;
+        if (bytebuffer.remaining() <= length) {
+            try { flushBuffer();} catch (IOException x) {throw new RuntimeException(x);}
+        }
+        bytebuffer.put(b);
+        total += length;
+    }
+
     private void addToBB(byte[] buf, int offset, int length) throws IOException {
-        if (socket.getBufHandler().getWriteBuffer().capacity() <= (offset + length)) {
+        ByteBuffer bytebuffer = socket.getBufHandler().getWriteBuffer();
+        if (bytebuffer.remaining() <= length) {
             flushBuffer();
         }
-        socket.getBufHandler().getWriteBuffer().put(buf, offset, length);
+        bytebuffer.put(buf, offset, length);
         total += length;
     }
 
@@ -620,7 +642,7 @@ public class InternalNioOutputBuffer
      * 
      * @param mb data to be written
      */
-    protected void write(MessageBytes mb) {
+    protected void write(MessageBytes mb) throws IOException {
 
         if (mb.getType() == MessageBytes.T_BYTES) {
             ByteChunk bc = mb.getByteChunk();
@@ -642,11 +664,10 @@ public class InternalNioOutputBuffer
      * 
      * @param bc data to be written
      */
-    protected void write(ByteChunk bc) {
+    protected void write(ByteChunk bc) throws IOException{
 
         // Writing the byte chunk to the output buffer
-        System.arraycopy(bc.getBytes(), bc.getStart(), buf, pos,
-                         bc.getLength());
+        addToBB(bc.getBytes(), bc.getStart(),bc.getLength());
         pos = pos + bc.getLength();
 
     }
@@ -675,7 +696,8 @@ public class InternalNioOutputBuffer
             } else if (c == 127) {
                 c = ' ';
             }
-            buf[pos++] = (byte) c;
+            addToBB((byte) c);
+            pos++;
         }
 
     }
@@ -688,10 +710,10 @@ public class InternalNioOutputBuffer
      * 
      * @param b data to be written
      */
-    public void write(byte[] b) {
+    public void write(byte[] b) throws IOException  {
 
         // Writing the byte chunk to the output buffer
-        System.arraycopy(b, 0, buf, pos, b.length);
+        addToBB(b,0,b.length);
         pos = pos + b.length;
 
     }
@@ -722,7 +744,8 @@ public class InternalNioOutputBuffer
             } else if (c == 127) {
                 c = ' ';
             }
-            buf[pos++] = (byte) c;
+            addToBB((byte) c);
+            pos++;
         }
 
     }
