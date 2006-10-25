@@ -39,8 +39,8 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
     private static org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( JkInputStream.class );
 
-    private Msg bodyMsg = new MsgAjp();
-    private Msg outputMsg = new MsgAjp();
+    private Msg bodyMsg;
+    private Msg outputMsg;
     private MsgContext mc;
 
     
@@ -62,8 +62,16 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
         }
     }
 
-    public JkInputStream(MsgContext context) {
+    public JkInputStream(MsgContext context, int bsize) {
         mc = context;
+        bodyMsg = new MsgAjp(bsize);
+        outputMsg = new MsgAjp(bsize);
+    }
+    /**
+     * @deprecated
+     */
+    public JkInputStream(MsgContext context) {
+        this(context, 8*1024);
     }
 
     // -------------------- Jk specific methods --------------------
