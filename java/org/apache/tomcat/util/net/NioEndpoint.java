@@ -156,6 +156,7 @@ public class NioEndpoint {
             SelectionKey key = sel!=null?socket.getIOChannel().keyFor(sel):null;
             KeyAttachment att = key!=null?(KeyAttachment)key.attachment():null;
             if ( att!=null ) att.reset();
+            if ( key!=null ) key.attach(null);
             //avoid over growing our cache or add after we have stopped
             if ( running && (!paused) && (size() < socketProperties.getDirectBufferPool()) ) return super.offer(socket);
             else return false;
@@ -986,9 +987,6 @@ public class NioEndpoint {
         }
         
         public void addEvent(Runnable event) {
-            //synchronized (events) {
-            //    events.add(event);
-            //}
             events.offer(event);
             if ( wakeupCounter.incrementAndGet() < 3 ) selector.wakeup();
         }
@@ -1004,7 +1002,6 @@ public class NioEndpoint {
         public void add(final NioChannel socket) {
             final SelectionKey key = socket.getIOChannel().keyFor(selector);
             final KeyAttachment att = (KeyAttachment)key.attachment();
-            if ( att != null ) att.setWakeUp(false);
             Runnable r = new Runnable() {
                 public void run() {
                     try {
@@ -1137,10 +1134,7 @@ public class NioEndpoint {
                             attachment.interestOps(0);
                             NioChannel channel = attachment.getChannel();
                             if (sk.isReadable() || sk.isWritable() ) {
-                                if ( attachment.getWakeUp() ) {
-                                    attachment.setWakeUp(false);
-                                    synchronized (attachment.getMutex()) {attachment.getMutex().notifyAll();}
-                                } else if ( attachment.getComet() ) {
+                                if ( attachment.getComet() ) {
                                     if (!processSocket(channel, SocketStatus.OPEN))
                                         processSocket(channel, SocketStatus.DISCONNECT);
                                 } else {
@@ -1211,7 +1205,6 @@ public class NioEndpoint {
         }
         public void reset() {
             //mutex = new Object();
-            wakeUp = false;
             lastAccess = System.currentTimeMillis();
             currentAccess = false;
             comet = false;
@@ -1228,8 +1221,6 @@ public class NioEndpoint {
         public boolean getComet() { return comet; }
         public boolean getCurrentAccess() { return currentAccess; }
         public void setCurrentAccess(boolean access) { currentAccess = access; }
-        public boolean getWakeUp() { return wakeUp; }
-        public void setWakeUp(boolean wakeUp) { this.wakeUp = wakeUp; }
         public Object getMutex() {return mutex;}
         public void setTimeout(long timeout) {this.timeout = timeout;}
         public long getTimeout() {return this.timeout;}
@@ -1242,7 +1233,6 @@ public class NioEndpoint {
         public int interestOps() { return interestOps;}
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
         protected Object mutex = new Object();
-        protected boolean wakeUp = false;
         protected long lastAccess = System.currentTimeMillis();
         protected boolean currentAccess = false;
         protected boolean comet = false;
@@ -1417,11 +1407,9 @@ public class NioEndpoint {
                                     } catch (CancelledKeyException ckx) {
                                         try {
                                             if ( fk != null && fk.attachment() != null ) {
-
                                                 ka.setError(true); //set to collect this socket immediately
                                                 try {ka.getChannel().getIOChannel().socket().close();}catch(Exception ignore){}
                                                 try {ka.getChannel().close();}catch(Exception ignore){}
-                                                ka.setWakeUp(false);
                                             }
                                         } catch (Exception ignore) {}
                                     }
