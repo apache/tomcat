@@ -47,6 +47,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -150,6 +151,8 @@ public class NioEndpoint {
 
 
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
+        protected AtomicInteger size = new AtomicInteger(0);
+        protected AtomicInteger bytes = new AtomicInteger(0);
         public boolean offer(NioChannel socket) {
             Poller pol = socket.getPoller();
             Selector sel = pol!=null?pol.getSelector():null;
@@ -157,13 +160,32 @@ public class NioEndpoint {
             KeyAttachment att = key!=null?(KeyAttachment)key.attachment():null;
             if ( att!=null ) att.reset();
             if ( key!=null ) key.attach(null);
+            boolean offer = socketProperties.getBufferPool()==-1?true:size.get()<socketProperties.getBufferPool();
+            offer = offer && (socketProperties.getBufferPoolSize()==-1?true:(bytes.get()+socket.getBufferSize())<socketProperties.getBufferPoolSize());
             //avoid over growing our cache or add after we have stopped
-            if ( running && (!paused) && (size() < socketProperties.getDirectBufferPool()) ) return super.offer(socket);
+            if ( running && (!paused) && (offer) ) {
+                boolean result = super.offer(socket);
+                if ( result ) {
+                    size.incrementAndGet();
+                    bytes.addAndGet(socket.getBufferSize());
+                }
+                return result;
+            }
             else return false;
         }
         
         public NioChannel poll() {
-            return super.poll();
+            NioChannel result = super.poll();
+            if ( result != null ) {
+                size.decrementAndGet();
+                bytes.addAndGet(-result.getBufferSize());
+            }
+            return result;
+        }
+        
+        public void clear() {
+            super.clear();
+            size.set(0);
         }
     };
 
@@ -940,16 +962,62 @@ public class NioEndpoint {
     }
 
 
-    // ----------------------------------------------------- Poller Inner Class
+    // ----------------------------------------------------- Poller Inner Classes
 
-
+    /**
+     * 
+     * PollerEvent, cacheable object for poller events to avoid GC
+     */
+    public class PollerEvent implements Runnable {
+        protected NioChannel socket;
+        protected int interestOps;
+        public PollerEvent(NioChannel ch, int intOps) {
+            reset(ch, intOps);
+        }
+    
+        public void reset(NioChannel ch, int intOps) {
+            socket = ch;
+            interestOps = intOps;
+        }
+    
+        public void reset() {
+            reset(null, 0);
+        }
+    
+        public void run() {
+            final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+            final KeyAttachment att = (KeyAttachment) key.attachment();
+            try {
+                if (key != null) {
+                    key.interestOps(interestOps);
+                    att.interestOps(interestOps);
+                }
+            }
+            catch (CancelledKeyException ckx) {
+                try {
+                    if (key != null && key.attachment() != null) {
+                        KeyAttachment ka = (KeyAttachment) key.attachment();
+                        ka.setError(true); //set to collect this socket immediately
+                    }
+                    try {
+                        socket.close();
+                    }
+                    catch (Exception ignore) {}
+                    if (socket.isOpen())
+                        socket.close(true);
+                }
+                catch (Exception ignore) {}
+            }
+        }
+    }
     /**
      * Poller class.
      */
     public class Poller implements Runnable {
 
         protected Selector selector;
-        protected ConcurrentLinkedQueue events = new ConcurrentLinkedQueue();
+        protected ConcurrentLinkedQueue<Runnable> events = new ConcurrentLinkedQueue<Runnable>();
+        protected ConcurrentLinkedQueue<PollerEvent> eventCache = new ConcurrentLinkedQueue<PollerEvent>();
         
         protected boolean close = false;
         protected long nextExpiration = 0;//optimize expiration handling
@@ -1000,30 +1068,15 @@ public class NioEndpoint {
          * @param socket to add to the poller
          */
         public void add(final NioChannel socket) {
-            final SelectionKey key = socket.getIOChannel().keyFor(selector);
-            final KeyAttachment att = (KeyAttachment)key.attachment();
-            Runnable r = new Runnable() {
-                public void run() {
-                    try {
-                        if (key != null) {
-                            key.interestOps(SelectionKey.OP_READ);
-                            att.interestOps(SelectionKey.OP_READ);
-                        }
-                    }catch ( CancelledKeyException ckx ) {
-                        try {
-                            if ( key != null && key.attachment() != null ) {
-                                KeyAttachment ka = (KeyAttachment)key.attachment();
-                                ka.setError(true); //set to collect this socket immediately
-                            }
-                            try {socket.close();}catch (Exception ignore){}
-                            if ( socket.isOpen() ) socket.close(true);
-                        } catch ( Exception ignore ) {}
-                    }
-                }
-            };
+            add(socket,SelectionKey.OP_READ);
+        }
+        
+        public void add(final NioChannel socket, final int interestOps) {
+            PollerEvent r = this.eventCache.poll();
+            if ( r==null) r = new PollerEvent(socket,interestOps);
             addEvent(r);
         }
-
+        
         public boolean events() {
             boolean result = false;
             //synchronized (events) {
@@ -1032,6 +1085,10 @@ public class NioEndpoint {
                 while ( (r = (Runnable)events.poll()) != null ) {
                     try {
                         r.run();
+                        if ( r instanceof PollerEvent ) {
+                            ((PollerEvent)r).reset();
+                            eventCache.offer((PollerEvent)r);
+                        }
                     } catch ( Exception x ) {
                         log.error("",x);
                     }
@@ -1049,7 +1106,6 @@ public class NioEndpoint {
             Runnable r = new Runnable() {
                 public void run() {
                     try {
-                        
                         socket.getIOChannel().register(selector, SelectionKey.OP_READ, ka);
                     } catch (Exception x) {
                         log.error("", x);
@@ -1398,25 +1454,7 @@ public class NioEndpoint {
                             final SelectionKey fk = key;
                             final int intops = handshake;
                             final KeyAttachment ka = (KeyAttachment)fk.attachment();
-                            //register for handshake ops
-                            Runnable r = new Runnable() {
-                                public void run() {
-                                    try {
-                                        fk.interestOps(intops);
-                                        ka.interestOps(intops);
-                                    } catch (CancelledKeyException ckx) {
-                                        try {
-                                            if ( fk != null && fk.attachment() != null ) {
-                                                ka.setError(true); //set to collect this socket immediately
-                                                try {ka.getChannel().getIOChannel().socket().close();}catch(Exception ignore){}
-                                                try {ka.getChannel().close();}catch(Exception ignore){}
-                                            }
-                                        } catch (Exception ignore) {}
-                                    }
-
-                                }
-                            };
-                            ka.getPoller().addEvent(r);
+                            ka.getPoller().add(socket,intops);
                         }
                     }
                 } finally {
