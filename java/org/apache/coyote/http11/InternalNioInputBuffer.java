@@ -594,31 +594,6 @@ public class InternalNioInputBuffer implements InputBuffer {
         }
     }
 
-    private void addToReadQueue(final SelectionKey key, final KeyAttachment att) {
-        att.setWakeUp(true);
-        att.getPoller().addEvent(
-            new Runnable() {
-            public void run() {
-                try {
-                    if (key != null) {
-                        key.interestOps(SelectionKey.OP_READ);
-                        att.interestOps(SelectionKey.OP_READ);
-                    }
-                } catch (CancelledKeyException ckx) {
-                    try {
-                        if ( att != null ) {
-                            att.setError(true); //set to collect this socket immediately
-                            att.setWakeUp(false);
-                        }
-                        try {socket.close();}catch (Exception ignore){}
-                        if ( socket.isOpen() ) socket.close(true);
-                    } catch (Exception ignore) {}
-                }
-            }
-        });
-    }
-
-
     /**
      * Parse the HTTP headers.
      */
