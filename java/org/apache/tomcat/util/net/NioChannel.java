@@ -55,6 +55,14 @@ public class NioChannel implements ByteChannel{
         bufHandler.getReadBuffer().clear();
         bufHandler.getWriteBuffer().clear();
     }
+    
+    public int getBufferSize() {
+        if ( bufHandler == null ) return 0;
+        int size = 0;
+        size += bufHandler.getReadBuffer()!=null?bufHandler.getReadBuffer().capacity():0;
+        size += bufHandler.getWriteBuffer()!=null?bufHandler.getWriteBuffer().capacity():0;
+        return size;
+    }
 
     /**
      * returns true if the network buffer has 
