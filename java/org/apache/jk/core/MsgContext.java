@@ -53,7 +53,7 @@ public class MsgContext implements ActionHook {
     private Object notes[]=new Object[32];
     private JkHandler next;
     private JkChannel source;
-    private JkInputStream jkIS = new JkInputStream(this);
+    private JkInputStream jkIS;
     private C2BConverter c2b;
     private Request req;
     private WorkerEnv wEnv;
@@ -80,12 +80,19 @@ public class MsgContext implements ActionHook {
     public static final int JK_STATUS_CLOSED=2;
     public static final int JK_STATUS_ERROR=3;
 
-    public MsgContext() {
+    public MsgContext(int bsize) {
         try {
             c2b = new C2BConverter("iso-8859-1");
         } catch(IOException iex) {
             log.warn("Can't happen", iex);
         }
+        jkIS = new JkInputStream(this, bsize);
+    }
+    /**
+     * @deprecated
+     */
+    public MsgContext() {
+        this(8*1024);
     }
     
     public final Object getNote( int id ) {
