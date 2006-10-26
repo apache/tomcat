@@ -227,7 +227,8 @@ public class ErrorReportValve
             sb.append(RequestUtil.filter(stackTrace));
             sb.append("</pre></p>");
 
-            while (rootCause != null) {
+            int loops = 0;
+            while (rootCause != null && (loops < 10)) {
                 stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
                 sb.append(sm.getString("errorReportValve.rootCause"));
@@ -235,12 +236,8 @@ public class ErrorReportValve
                 sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre></p>");
                 // In case root cause is somehow heavily nested
-                try {
-                    rootCause = (Throwable)IntrospectionUtils.getProperty
-                                                (rootCause, "rootCause");
-                } catch (ClassCastException e) {
-                    rootCause = null;
-                }
+                rootCause = rootCause.getCause();
+                loops++;
             }
 
             sb.append("<p><b>");
