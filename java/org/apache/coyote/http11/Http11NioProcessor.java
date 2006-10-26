@@ -83,7 +83,7 @@ public class Http11NioProcessor implements ActionHook {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11NioProcessor(int rxBufSize, int txBufSize, NioEndpoint endpoint) {
+    public Http11NioProcessor(int rxBufSize, int txBufSize, int maxHttpHeaderSize, NioEndpoint endpoint) {
 
         this.endpoint = endpoint;
 
@@ -95,12 +95,12 @@ public class Http11NioProcessor implements ActionHook {
             readTimeout = timeout;
             //readTimeout = -1;
         }
-        inputBuffer = new InternalNioInputBuffer(request, rxBufSize,readTimeout);
+        inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize,readTimeout);
         request.setInputBuffer(inputBuffer);
 
         response = new Response();
         response.setHook(this);
-        outputBuffer = new InternalNioOutputBuffer(response, txBufSize,readTimeout);
+        outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize,readTimeout);
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 

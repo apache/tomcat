@@ -61,6 +61,7 @@ public class InternalOutputBuffer
     public InternalOutputBuffer(Response response, int headerBufferSize) {
 
         this.response = response;
+        
         headers = response.getMimeHeaders();
 
         headerBuffer = new byte[headerBufferSize];

@@ -26,6 +26,7 @@ import java.nio.channels.SocketChannel;
 import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import java.nio.channels.Selector;
+import java.nio.channels.SelectionKey;
 
 /**
  * 
@@ -82,7 +83,7 @@ public class NioChannel implements ByteChannel{
      */
     public void close() throws IOException {
         getIOChannel().socket().close();
-        sc.close();
+        getIOChannel().close();
     }
 
     public void close(boolean force) throws IOException {
@@ -122,7 +123,14 @@ public class NioChannel implements ByteChannel{
         return sc.read(dst);
     }
 
-
+    public Object getAttachment(boolean remove) {
+        Poller pol = getPoller();
+        Selector sel = pol!=null?pol.getSelector():null;
+        SelectionKey key = sel!=null?getIOChannel().keyFor(sel):null;
+        Object att = key!=null?key.attachment():null;
+        if (key != null && att != null && remove ) key.attach(null);
+        return att;
+    }
     /**
      * getBufHandler
      *

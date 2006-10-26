@@ -655,8 +655,9 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
         public Http11NioProcessor createProcessor() {
             Http11NioProcessor processor = new Http11NioProcessor(
-              Math.max(proto.maxHttpHeaderSize,proto.ep.getSocketProperties().getRxBufSize()),
-              Math.max(proto.maxHttpHeaderSize,proto.ep.getSocketProperties().getRxBufSize()), 
+              proto.ep.getSocketProperties().getRxBufSize(),
+              proto.ep.getSocketProperties().getTxBufSize(), 
+              proto.maxHttpHeaderSize,
               proto.ep);
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
