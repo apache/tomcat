@@ -664,9 +664,11 @@ class Validator {
 
             // JSP.2.2 - '#{' not allowed in template text
             if (n.getType() == '#') {
-                if (pageInfo.isDeferredSyntaxAllowedAsLiteral())
+                if (!pageInfo.isDeferredSyntaxAllowedAsLiteral()) {
+                    err.jspError(n, "jsp.error.el.template.deferred");
+                } else {
                     return;
-                err.jspError(n, "jsp.error.el.template.deferred");
+                }
             }
 
             // build expression
@@ -1007,10 +1009,7 @@ class Validator {
                             // Attribute does not accept any expressions.
                             // Make sure its value does not contain any.
                             if (isExpression(n, attrs.getValue(i))) {
-                                err
-                                        .jspError(
-                                                n,
-                                                "jsp.error.attribute.custom.non_rt_with_expr",
+                                err .jspError(n, "jsp.error.attribute.custom.non_rt_with_expr",
                                                 tldAttrs[j].getName());
                             }
                             jspAttrs[i] = new Node.JspAttribute(tldAttrs[j],
@@ -1197,7 +1196,9 @@ class Validator {
         private boolean isExpression(Node n, String value) {
             if ((n.getRoot().isXmlSyntax() && value.startsWith("%="))
                     || (!n.getRoot().isXmlSyntax() && value.startsWith("<%="))
-                    || (value.indexOf("${") != -1 && !pageInfo.isELIgnored()))
+                    || (value.indexOf("${") != -1 && !pageInfo.isELIgnored())
+                    || (value.indexOf("#{") != -1 && !pageInfo.isELIgnored()
+                            && !pageInfo.isDeferredSyntaxAllowedAsLiteral()))
                 return true;
             else
                 return false;
