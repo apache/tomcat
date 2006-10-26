@@ -570,7 +570,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             Selector selector = null;
             try { selector = getSelectorPool().get(); }catch ( IOException x ) {}
             try {
-                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket.getIOChannel(),selector,rto);
+                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket,selector,rto);
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally { 
