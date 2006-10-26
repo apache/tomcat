@@ -20,21 +20,16 @@ package org.apache.coyote.http11;
 
 import java.io.EOFException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.CancelledKeyException;
-import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
-import org.apache.tomcat.util.net.NioEndpoint.Poller;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioSelectorPool;
-import java.nio.channels.Selector;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
