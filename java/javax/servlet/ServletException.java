@@ -83,7 +83,7 @@ public class ServletException extends Exception {
      *				necessary
      */
     public ServletException(Throwable rootCause) {
-        this(rootCause.getLocalizedMessage(), rootCause);
+        super(rootCause);
     }
 
     /**
