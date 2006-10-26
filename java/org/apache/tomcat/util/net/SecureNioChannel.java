@@ -87,7 +87,7 @@ public class SecureNioChannel extends NioChannel  {
      * @return boolean
      */
     public boolean flush(Selector s, long timeout) throws IOException {
-        pool.write(netOutBuffer,sc,s,timeout);
+        pool.write(netOutBuffer,this,s,timeout);
         return !netOutBuffer.hasRemaining();
     }
     

@@ -99,7 +99,7 @@ public class NioSelectorPool {
      * @throws SocketTimeoutException if the write times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
-    public int write(ByteBuffer buf, SocketChannel socket, Selector selector, long writeTimeout) throws IOException {
+    public int write(ByteBuffer buf, NioChannel socket, Selector selector, long writeTimeout) throws IOException {
         SelectionKey key = null;
         int written = 0;
         boolean timedout = false;
@@ -118,7 +118,7 @@ public class NioSelectorPool {
                 }
                 if ( selector != null ) {
                     //register OP_WRITE to the selector
-                    if (key==null) key = socket.register(selector, SelectionKey.OP_WRITE);
+                    if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_WRITE);
                     else key.interestOps(SelectionKey.OP_WRITE);
                     keycount = selector.select(writeTimeout);
                 }                
@@ -147,7 +147,7 @@ public class NioSelectorPool {
      * @throws SocketTimeoutException if the read times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
-    public int read(ByteBuffer buf, SocketChannel socket, Selector selector, long readTimeout) throws IOException {
+    public int read(ByteBuffer buf, NioChannel socket, Selector selector, long readTimeout) throws IOException {
         SelectionKey key = null;
         int read = 0;
         boolean timedout = false;
@@ -163,7 +163,7 @@ public class NioSelectorPool {
                 }
                 if ( selector != null ) {
                     //register OP_WRITE to the selector
-                    if (key==null) key = socket.register(selector, SelectionKey.OP_READ);
+                    if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_READ);
                     else key.interestOps(SelectionKey.OP_READ);
                     keycount = selector.select(readTimeout);
                 }                
