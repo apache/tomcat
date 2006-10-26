@@ -892,9 +892,9 @@ class Generator {
 
         public void visit(Node.ELExpression n) throws JasperException {
             n.setBeginJavaLine(out.getJavaLine());
-            if (!pageInfo.isELIgnored()) {
+            if (!pageInfo.isELIgnored() && (n.getEL() != null)) {
                 out.printil("out.write("
-                        + JspUtil.interpreterCall(this.isTagFile, "${"
+                        + JspUtil.interpreterCall(this.isTagFile, n.getType() + "{"
                                 + new String(n.getText()) + "}", String.class,
                                 n.getEL().getMapName(), false) + ");");
             } else {

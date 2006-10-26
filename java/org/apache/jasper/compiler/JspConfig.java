@@ -114,7 +114,7 @@ public class JspConfig {
                 String isXml = null;
                 Vector includePrelude = new Vector();
                 Vector includeCoda = new Vector();
-                String deferedSyntaxAllowedAsLiteral = null;
+                String deferredSyntaxAllowedAsLiteral = null;
                 String trimDirectiveWhitespaces = null;
 
                 while (list.hasNext()) {
@@ -137,7 +137,7 @@ public class JspConfig {
                     else if ("include-coda".equals(tname))
                         includeCoda.addElement(element.getBody());
                     else if ("deferred-syntax-allowed-as-literal".equals(tname))
-                        deferedSyntaxAllowedAsLiteral = element.getBody();
+                        deferredSyntaxAllowedAsLiteral = element.getBody();
                     else if ("trim-directive-whitespaces".equals(tname))
                         trimDirectiveWhitespaces = element.getBody();
                 }
@@ -195,7 +195,7 @@ public class JspConfig {
                             pageEncoding,
                             includePrelude,
                             includeCoda,
-                            deferedSyntaxAllowedAsLiteral,
+                            deferredSyntaxAllowedAsLiteral,
                             trimDirectiveWhitespaces);
                     JspPropertyGroup propertyGroup =
                         new JspPropertyGroup(path, extension, property);
