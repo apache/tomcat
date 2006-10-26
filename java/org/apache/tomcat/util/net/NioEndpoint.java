@@ -170,7 +170,10 @@ public class NioEndpoint {
             Selector sel = pol!=null?pol.getSelector():null;
             SelectionKey key = sel!=null?socket.getIOChannel().keyFor(sel):null;
             KeyAttachment att = key!=null?(KeyAttachment)key.attachment():null;
-            if ( att!=null ) { att.reset(); keyCache.offer(att); }
+            if ( att!=null ) { 
+                att.reset(); 
+                keyCache.offer(att); 
+            }
             if ( key!=null ) key.attach(null);
             boolean offer = socketProperties.getBufferPool()==-1?true:size.get()<socketProperties.getBufferPool();
             offer = offer && (socketProperties.getBufferPoolSize()==-1?true:(bytes.get()+socket.getBufferSize())<socketProperties.getBufferPoolSize());
@@ -217,7 +220,7 @@ public class NioEndpoint {
     /**
      * Maximum amount of worker threads.
      */
-    protected int maxThreads = 40;
+    protected int maxThreads = 400;
     public void setMaxThreads(int maxThreads) { this.maxThreads = maxThreads; }
     public int getMaxThreads() { return maxThreads; }
 
