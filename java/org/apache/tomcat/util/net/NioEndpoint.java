@@ -165,16 +165,7 @@ public class NioEndpoint {
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
         protected AtomicInteger size = new AtomicInteger(0);
         protected AtomicInteger bytes = new AtomicInteger(0);
-        public boolean offer(NioChannel socket) {
-            Poller pol = socket.getPoller();
-            Selector sel = pol!=null?pol.getSelector():null;
-            SelectionKey key = sel!=null?socket.getIOChannel().keyFor(sel):null;
-            KeyAttachment att = key!=null?(KeyAttachment)key.attachment():null;
-            if ( att!=null ) { 
-                att.reset(); 
-                keyCache.offer(att); 
-            }
-            if ( key!=null ) key.attach(null);
+        public boolean offer(NioChannel socket, KeyAttachment att) {
             boolean offer = socketProperties.getBufferPool()==-1?true:size.get()<socketProperties.getBufferPool();
             offer = offer && (socketProperties.getBufferPoolSize()==-1?true:(bytes.get()+socket.getBufferSize())<socketProperties.getBufferPoolSize());
             //avoid over growing our cache or add after we have stopped
@@ -1037,6 +1028,10 @@ public class NioEndpoint {
                 }
             }//end if
         }//run
+        
+        public String toString() {
+            return super.toString()+"[intOps="+this.interestOps+"]";
+        }
     }
     /**
      * Poller class.
@@ -1159,7 +1154,6 @@ public class NioEndpoint {
          * hands them off to an appropriate processor.
          */
         public void run() {
-
             // Loop until we receive a shutdown command
             while (running) {
                 // Loop if endpoint is paused
@@ -1178,8 +1172,8 @@ public class NioEndpoint {
 
                 int keyCount = 0;
                 try {
-                    wakeupCounter.set(0);
                     keyCount = selector.select(selectorTimeout);
+                    wakeupCounter.set(0);
                     if ( close ) { selector.close(); return; }
                 } catch ( NullPointerException x ) {
                     //sun bug 5076772 on windows JDK 1.5
@@ -1456,18 +1450,22 @@ public class NioEndpoint {
                             if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
                                 // Close socket and pool
                                 try {
+                                    KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
                                     try {socket.close();}catch (Exception ignore){}
                                     if ( socket.isOpen() ) socket.close(true);
                                     nioChannels.offer(socket);
+                                    if ( att!=null ) keyCache.offer(att);
                                 }catch ( Exception x ) {
                                     log.error("",x);
                                 }
                             } else if ((status == null) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
                                 // Close socket and pool
                                 try {
+                                    KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
                                     try {socket.close();}catch (Exception ignore){}
                                     if ( socket.isOpen() ) socket.close(true);
                                     nioChannels.offer(socket);
+                                    if ( att!=null ) keyCache.offer(att);
                                 }catch ( Exception x ) {
                                     log.error("",x);
                                 }
