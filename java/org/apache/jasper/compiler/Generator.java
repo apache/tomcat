@@ -35,6 +35,7 @@ import java.util.Vector;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
+import javax.servlet.jsp.tagext.JspIdConsumer;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
@@ -2151,7 +2152,7 @@ class Generator {
             out.print(" ");
             out.print(tagHandlerVar);
             out.print(" = ");
-            if (isPoolingEnabled) {
+            if (isPoolingEnabled && !(JspIdConsumer.class.isAssignableFrom(tagHandlerClass))) {
                 out.print("(");
                 out.print(tagHandlerClassName);
                 out.print(") ");
@@ -2305,7 +2306,7 @@ class Generator {
                     .println(".doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {");
             out.pushIndent();
             if (!n.implementsTryCatchFinally()) {
-                if (isPoolingEnabled) {
+                if (isPoolingEnabled && !(JspIdConsumer.class.isAssignableFrom(n.getTagHandlerClass()))) {
                     out.printin(n.getTagHandlerPoolName());
                     out.print(".reuse(");
                     out.print(tagHandlerVar);
@@ -2835,7 +2836,7 @@ class Generator {
                         sb.append(getJspContextVar());
                         sb.append(".getELContext()");
                         sb.append(")");
-                    } 
+                    }
                     attrValue = sb.toString();
                 } else if (attr.isDeferredMethodInput()
                         || MethodExpression.class.getName().equals(type)) {
@@ -2925,6 +2926,14 @@ class Generator {
                 TagHandlerInfo handlerInfo, boolean simpleTag)
                 throws JasperException {
 
+            // Set the id of the tag
+            if (JspIdConsumer.class.isAssignableFrom(n.getTagHandlerClass())) {
+                out.printin(tagHandlerVar);
+                out.print(".setJspId(\"");
+                out.print(n.getId());
+                out.println("\");");
+            }
+            
             // Set context
             if (simpleTag) {
                 // Generate alias map

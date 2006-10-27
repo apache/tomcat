@@ -1354,6 +1354,8 @@ abstract class Node implements TagConstants {
      */
     public static class CustomTag extends Node {
 
+        private static int id = 0;
+        
         private String uri;
 
         private String prefix;
@@ -1624,6 +1626,10 @@ abstract class Node implements TagConstants {
             return this.numCount;
         }
 
+        public String getId() {
+            return "_" + (++id);
+        }
+        
         public void setScriptingVars(Vector vec, int scope) {
             switch (scope) {
             case VariableInfo.AT_BEGIN:
