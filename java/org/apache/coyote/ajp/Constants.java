@@ -89,19 +89,27 @@ public final class Constants {
     public static final byte SC_A_ARE_DONE      = (byte)0xFF;
 
     // Ajp13 specific -  needs refactoring for the new model
+
     /**
-     * Maximum Total byte size for a AJP packet
+     * Default maximum total byte size for a AJP packet
      */
     public static final int MAX_PACKET_SIZE = 8192;
     /**
      * Size of basic packet header
      */
     public static final int H_SIZE = 4;
+
     /**
-     * Maximum size of data that can be sent in one packet
+     * Size of the header metadata
      */
-    public static final int  MAX_READ_SIZE = MAX_PACKET_SIZE - H_SIZE - 2;
-    public static final int  MAX_SEND_SIZE = MAX_PACKET_SIZE - H_SIZE - 4;
+    public static final int  READ_HEAD_LEN = 6;
+    public static final int  SEND_HEAD_LEN = 8;
+
+    /**
+     * Default maximum size of data that can be sent in one packet
+     */
+    public static final int  MAX_READ_SIZE = MAX_PACKET_SIZE - READ_HEAD_LEN;
+    public static final int  MAX_SEND_SIZE = MAX_PACKET_SIZE - SEND_HEAD_LEN;
 
     // Translates integer codes to names of HTTP methods
     public static final String []methodTransArray = {
