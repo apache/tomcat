@@ -1432,13 +1432,11 @@ public class NioEndpoint {
                             
                         }
                     } else {
-                        
                         NioChannel socket = (NioChannel)channel;
-
                         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                         int handshake = -1;
                         try {
-                            handshake = socket.handshake(key.isReadable(), key.isWritable());
+                            handshake = key!=null?socket.handshake(key.isReadable(), key.isWritable()):-1;
                         }catch ( IOException x ) {
                             handshake = -1;
                             if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
