@@ -1432,11 +1432,13 @@ public class NioEndpoint {
                             
                         }
                     } else {
+                        
                         NioChannel socket = (NioChannel)channel;
+
                         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                         int handshake = -1;
                         try {
-                            handshake = key!=null?socket.handshake(key.isReadable(), key.isWritable()):-1;
+                            handshake = socket.handshake(key.isReadable(), key.isWritable());
                         }catch ( IOException x ) {
                             handshake = -1;
                             if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
@@ -1469,7 +1471,7 @@ public class NioEndpoint {
                                 }
                             }
                         } else if (handshake == -1 ) {
-                            if ( key.isValid() ) key.cancel();
+                            socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT);
                             try {socket.close(true);}catch (IOException ignore){}
                             nioChannels.offer(socket);
                         } else {
