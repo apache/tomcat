@@ -81,8 +81,9 @@ int SSL_password_prompt(tcn_pass_cb_t *data)
     if (data->cb.obj) {
         JNIEnv *e;
         jobject  o;
-        jstring  prompt = AJP_TO_JSTRING(data->prompt);
+        jstring  prompt;
         tcn_get_java_env(&e);
+        prompt = AJP_TO_JSTRING(data->prompt);
         if ((o = (*e)->CallObjectMethod(e, data->cb.obj,
                             data->cb.mid[0], prompt))) {
             TCN_ALLOC_CSTRING(o);
