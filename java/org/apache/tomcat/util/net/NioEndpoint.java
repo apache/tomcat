@@ -1129,6 +1129,7 @@ public class NioEndpoint {
             final KeyAttachment ka = key!=null?key:new KeyAttachment();
             ka.reset(this,socket);
             PollerEvent r = eventCache.poll();
+            ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
             else r.reset(socket,ka,OP_REGISTER);
             addEvent(r);
