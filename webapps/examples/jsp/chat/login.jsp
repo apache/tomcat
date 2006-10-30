@@ -28,4 +28,4 @@ Nickname: <input type="text" name="nickname"/>
 </form>
 
 </body>
-</head>
+</html>

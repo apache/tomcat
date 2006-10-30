@@ -29,5 +29,4 @@
 </frameset>
 
 </body>
-</head>
 </html>
