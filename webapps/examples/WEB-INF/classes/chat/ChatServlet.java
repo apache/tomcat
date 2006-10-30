@@ -114,7 +114,7 @@ public class ChatServlet
         
         PrintWriter writer = response.getWriter();
         writer.println("<!doctype html public \"-//w3c//dtd html 4.0 transitional//en\">");
-        writer.println("<head><title>JSP Chat</title></head><body bgcolor=\"#FFFFFF\">");
+        writer.println("<html><head><title>JSP Chat</title></head><body bgcolor=\"#FFFFFF\">");
         writer.flush();
 
         synchronized(connections) {
@@ -166,7 +166,7 @@ public class ChatServlet
         // Compatibility method: equivalent method using the regular connection model
         PrintWriter writer = response.getWriter();
         writer.println("<!doctype html public \"-//w3c//dtd html 4.0 transitional//en\">");
-        writer.println("<head><title>JSP Chat</title></head><body bgcolor=\"#FFFFFF\">");
+        writer.println("<html><head><title>JSP Chat</title></head><body bgcolor=\"#FFFFFF\">");
         writer.println("Chat example only supports Comet processing");
         writer.println("</body></html>");
     }
@@ -233,7 +233,7 @@ public class ChatServlet
                             PrintWriter writer = connections.get(i).getWriter();
                             for (int j = 0; j < pendingMessages.length; j++) {
                                 // FIXME: Add HTML filtering
-                                writer.println(pendingMessages[j] + "<br>");
+                                writer.println(pendingMessages[j] + "<br/>");
                             }
                             writer.flush();
                         } catch (IOException e) {
