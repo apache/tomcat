@@ -1138,13 +1138,14 @@ public class NioEndpoint {
         public void cancelledKey(SelectionKey key, SocketStatus status) {
             try {
                 KeyAttachment ka = (KeyAttachment) key.attachment();
-                if ( key.isValid() ) key.cancel();
-                if (ka != null && ka.getComet()) processSocket( ka.getChannel(), status);
-                // FIXME: closing in all these cases is a bit mean. IMO, it should leave it
-                // to the worker (or executor) depending on what the request processor
-                // returns
-                if ( key.channel().isOpen() ) key.channel().close();
-                key.attach(null);
+                if (ka != null && ka.getComet()) {
+                    //the comet event takes care of clean up
+                    processSocket(ka.getChannel(), status);
+                }else {
+                    if (key.isValid()) key.cancel();
+                    if (key.channel().isOpen()) key.channel().close();
+                    key.attach(null);
+                }
             } catch (Throwable e) {
                 if ( log.isDebugEnabled() ) log.error("",e);
                 // Ignore
@@ -1257,6 +1258,8 @@ public class NioEndpoint {
                         long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
                         boolean isTimedout = delta > timeout;
                         if (isTimedout) {
+                            key.interestOps(0); 
+                            ka.interestOps(0); //avoid duplicate timeout calls
                             cancelledKey(key, SocketStatus.TIMEOUT);
                         } else {
                             long nextTime = now+(timeout-delta);
