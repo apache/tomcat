@@ -1457,6 +1457,8 @@ public class NioEndpoint {
                                     KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
                                     try {socket.close();}catch (Exception ignore){}
                                     if ( socket.isOpen() ) socket.close(true);
+                                    key.cancel();
+                                    key.attach(null);
                                     nioChannels.offer(socket);
                                     if ( att!=null ) keyCache.offer(att);
                                 }catch ( Exception x ) {
@@ -1468,6 +1470,8 @@ public class NioEndpoint {
                                     KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
                                     try {socket.close();}catch (Exception ignore){}
                                     if ( socket.isOpen() ) socket.close(true);
+                                    key.cancel();
+                                    key.attach(null);
                                     nioChannels.offer(socket);
                                     if ( att!=null ) keyCache.offer(att);
                                 }catch ( Exception x ) {
