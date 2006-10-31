@@ -35,7 +35,6 @@ import java.util.Vector;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
-import javax.servlet.jsp.tagext.JspIdConsumer;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
@@ -2152,7 +2151,7 @@ class Generator {
             out.print(" ");
             out.print(tagHandlerVar);
             out.print(" = ");
-            if (isPoolingEnabled && !(JspIdConsumer.class.isAssignableFrom(tagHandlerClass))) {
+            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
                 out.print("(");
                 out.print(tagHandlerClassName);
                 out.print(") ");
@@ -2306,7 +2305,7 @@ class Generator {
                     .println(".doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {");
             out.pushIndent();
             if (!n.implementsTryCatchFinally()) {
-                if (isPoolingEnabled && !(JspIdConsumer.class.isAssignableFrom(n.getTagHandlerClass()))) {
+                if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
                     out.printin(n.getTagHandlerPoolName());
                     out.print(".reuse(");
                     out.print(tagHandlerVar);
@@ -2433,6 +2432,14 @@ class Generator {
             out.println(");");
             
             generateSetters(n, tagHandlerVar, handlerInfo, true);
+
+            // JspIdConsumer (after context has been set)
+            if (n.implementsJspIdConsumer()) {
+                out.printin(tagHandlerVar);
+                out.print(".setJspId(\"");
+                out.print(createJspId());
+                out.println("\");");
+            }
 
             // Set the body
             if (findJspBody(n) == null) {
@@ -2926,14 +2933,6 @@ class Generator {
                 TagHandlerInfo handlerInfo, boolean simpleTag)
                 throws JasperException {
 
-            // Set the id of the tag
-            if (JspIdConsumer.class.isAssignableFrom(n.getTagHandlerClass())) {
-                out.printin(tagHandlerVar);
-                out.print(".setJspId(\"");
-                out.print(n.getId());
-                out.println("\");");
-            }
-            
             // Set context
             if (simpleTag) {
                 // Generate alias map
