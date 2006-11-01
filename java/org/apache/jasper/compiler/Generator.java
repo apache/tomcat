@@ -3559,8 +3559,7 @@ class Generator {
             throws JasperException {
 
         if (tagInfo.hasDynamicAttributes()) {
-            out
-                    .printil("private java.util.HashMap _jspx_dynamic_attrs = new java.util.HashMap();");
+            out.printil("private java.util.HashMap _jspx_dynamic_attrs = new java.util.HashMap();");
         }
 
         // Declare attributes
@@ -3619,6 +3618,14 @@ class Generator {
                 out.print(" = ");
                 out.print(attrInfos[i].getName());
                 out.println(";");
+                if (ctxt.isTagFile()) {
+                    // Tag files should also set jspContext attributes
+                    out.printin("jspContext.setAttribute(\"");
+                    out.print(attrInfos[i].getName());
+                    out.print("\", ");
+                    out.print(attrInfos[i].getName());
+                    out.println(");");
+                }
                 out.popIndent();
                 out.printil("}");
                 out.println();
