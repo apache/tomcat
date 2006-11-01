@@ -664,7 +664,9 @@ class Validator {
 
             // JSP.2.2 - '#{' not allowed in template text
             if (n.getType() == '#') {
-                if (!pageInfo.isDeferredSyntaxAllowedAsLiteral()) {
+                if (!pageInfo.isDeferredSyntaxAllowedAsLiteral()
+                        && (tagInfo == null 
+                                || ((tagInfo != null) && !tagInfo.getTagLibrary().getRequiredVersion().equals("2.0")))) {
                     err.jspError(n, "jsp.error.el.template.deferred");
                 } else {
                     return;
@@ -982,9 +984,18 @@ class Validator {
                             && (attrs.getURI(i) == null
                                     || attrs.getURI(i).length() == 0 || attrs
                                     .getURI(i).equals(n.getURI()))) {
-                        if (tldAttrs[j].canBeRequestTime()
-                                || tldAttrs[j].isDeferredMethod() // JSP 2.1
-                                || tldAttrs[j].isDeferredValue()) { // JSP 2.1
+                        boolean el = true;
+                        boolean deferredValue = false;
+                        if (!tagInfo.getTagLibrary().getRequiredVersion().equals("2.0") 
+                                && attrs.getValue(i).indexOf("#{") != -1) {
+                            el = false;
+                            if (!pageInfo.isELIgnored() && !pageInfo.isDeferredSyntaxAllowedAsLiteral()) {
+                                deferredValue = true;
+                            }
+                        }
+                        if ((el && tldAttrs[j].canBeRequestTime())
+                                || (deferredValue && tldAttrs[j].isDeferredMethod()) // JSP 2.1
+                                || (deferredValue && tldAttrs[j].isDeferredValue())) { // JSP 2.1
                             Class expectedType = String.class;
                             try {
                                 String typeStr = tldAttrs[j].getTypeName();
