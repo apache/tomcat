@@ -201,7 +201,9 @@ class TagFileProcessor {
             }
             String deferredValueType = n.getAttributeValue("deferredValueType");
             if (deferredValueType != null) {
-                deferredValue = true;
+                if (!deferredValue) {
+                    err.jspError(n, "jsp.error.deferredvaluetypewithoutdeferredvalue");
+                }
             } else if (deferredValue) {
                 deferredValueType = "java.lang.Object";
             } else {
@@ -218,11 +220,17 @@ class TagFileProcessor {
             String deferredMethodSignature = n
                     .getAttributeValue("deferredMethodSignature");
             if (deferredMethodSignature != null) {
-                deferredMethod = true;
+                if (!deferredMethod) {
+                    err.jspError(n, "jsp.error.deferredmethodsignaturewithoutdeferredmethod");
+                }
             } else if (deferredMethod) {
                 deferredMethodSignature = "void methodname()";
             }
 
+            if (deferredMethod && deferredValue) {
+                err.jspError(n, "jsp.error.deferredmethodandvalue");
+            }
+            
             String attrName = n.getAttributeValue("name");
             boolean required = JspUtil.booleanValue(n
                     .getAttributeValue("required"));
