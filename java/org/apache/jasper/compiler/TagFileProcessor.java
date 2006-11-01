@@ -195,14 +195,18 @@ class TagFileProcessor {
             // JSP 2.1 Table JSP.8-3
             // handle deferredValue and deferredValueType
             boolean deferredValue = false;
+            boolean deferredValueSpecified = false;
             String deferredValueString = n.getAttributeValue("deferredValue");
             if (deferredValueString != null) {
+                deferredValueSpecified = true;
                 deferredValue = JspUtil.booleanValue(deferredValueString);
             }
             String deferredValueType = n.getAttributeValue("deferredValueType");
             if (deferredValueType != null) {
-                if (!deferredValue) {
+                if (deferredValueSpecified && !deferredValue) {
                     err.jspError(n, "jsp.error.deferredvaluetypewithoutdeferredvalue");
+                } else {
+                    deferredValue = true;
                 }
             } else if (deferredValue) {
                 deferredValueType = "java.lang.Object";
@@ -213,15 +217,19 @@ class TagFileProcessor {
             // JSP 2.1 Table JSP.8-3
             // handle deferredMethod and deferredMethodSignature
             boolean deferredMethod = false;
+            boolean deferredMethodSpecified = false;
             String deferredMethodString = n.getAttributeValue("deferredMethod");
             if (deferredMethodString != null) {
+                deferredMethodSpecified = true;
                 deferredMethod = JspUtil.booleanValue(deferredMethodString);
             }
             String deferredMethodSignature = n
                     .getAttributeValue("deferredMethodSignature");
             if (deferredMethodSignature != null) {
-                if (!deferredMethod) {
+                if (deferredMethodSpecified && !deferredMethod) {
                     err.jspError(n, "jsp.error.deferredmethodsignaturewithoutdeferredmethod");
+                } else {
+                    deferredMethod = true;
                 }
             } else if (deferredMethod) {
                 deferredMethodSignature = "void methodname()";
