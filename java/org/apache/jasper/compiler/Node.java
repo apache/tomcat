@@ -464,6 +464,12 @@ abstract class Node implements TagConstants {
         private boolean isEncodingSpecifiedInProlog;
 
         /*
+         * Indicates whether an encoding has been explicitly specified in the
+         * page's bom.
+         */
+        private boolean isBomPresent;
+
+        /*
          * Constructor.
          */
         Root(Mark start, Node parent, boolean isXmlSyntax) {
@@ -525,6 +531,14 @@ abstract class Node implements TagConstants {
 
         public boolean isEncodingSpecifiedInProlog() {
             return isEncodingSpecifiedInProlog;
+        }
+
+        public void setIsBomPresent(boolean isBom) {
+            isBomPresent = isBom;
+        }
+
+        public boolean isBomPresent() {
+            return isBomPresent;
         }
 
         /**
