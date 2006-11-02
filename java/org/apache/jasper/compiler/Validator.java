@@ -36,6 +36,7 @@ import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 import javax.servlet.jsp.tagext.ValidationMessage;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -1037,12 +1038,6 @@ class Validator {
                             }
                         }
                         
-                        /*System.out.println("attrs.getLocalName(i): " + attrs.getLocalName(i));
-                        System.out.println("tldAttrs[j].canBeRequestTime(): " + tldAttrs[j].canBeRequestTime());
-                        System.out.println("expression: " + expression);
-                        System.out.println("tldAttrs[j].isDeferredMethod(): " + tldAttrs[j].isDeferredMethod());
-                        System.out.println("tldAttrs[j].isDeferredValue(): " + tldAttrs[j].isDeferredValue());*/
-                        
                         if (tldAttrs[j].canBeRequestTime()
                                 || tldAttrs[j].isDeferredMethod() || tldAttrs[j].isDeferredValue()) { // JSP 2.1
                             
@@ -1053,15 +1048,42 @@ class Validator {
                                             tldAttrs[j].getName());
                                 }
                                 
+                                String expectedType = null;
                                 if (tldAttrs[j].isDeferredMethod()) {
                                     // The String litteral must be castable to what is declared as type
                                     // for the attribute
-                                    
+                                    String m = tldAttrs[j].getMethodSignature();
+                                    if (m != null) {
+                                        int rti = m.trim().indexOf(' ');
+                                        if (rti > 0) {
+                                            expectedType = m.substring(0, rti).trim();
+                                        }
+                                    } else {
+                                        expectedType = "java.lang.Object";
+                                    }
                                 }
                                 if (tldAttrs[j].isDeferredValue()) {
                                     // The String litteral must be castable to what is declared as type
                                     // for the attribute
-                                    
+                                    expectedType = tldAttrs[j].getExpectedTypeName();
+                                }
+                                if (expectedType != null) {
+                                    Class expectedClass = String.class;
+                                    try {
+                                        expectedClass = JspUtil.toClass(expectedType, loader);
+                                    } catch (ClassNotFoundException e) {
+                                        err.jspError
+                                            (n, "jsp.error.unknown_attribute_type",
+                                             tldAttrs[j].getName(), expectedType);
+                                    }
+                                    // Check casting
+                                    try {
+                                        ELSupport.coerceToType(attrs.getValue(i), expectedClass);
+                                    } catch (Exception e) {
+                                        err.jspError
+                                            (n, "jsp.error.coerce_to_type",
+                                             tldAttrs[j].getName(), expectedType, attrs.getValue(i));
+                                    }
                                 }
 
                                 jspAttrs[i] = new Node.JspAttribute(tldAttrs[j],
