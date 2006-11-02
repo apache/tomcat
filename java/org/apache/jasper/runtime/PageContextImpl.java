@@ -191,7 +191,7 @@ public class PageContextImpl extends PageContext {
 				((JspWriterImpl) out).flushBuffer();
 			}
 		} catch (IOException ex) {
-            IllegalStateException ise = new IllegalStateException("Internal error flushing the buffer in release()", ex);
+            IllegalStateException ise = new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ex);
             throw ise;
 		} finally {
 		    servlet = null;
