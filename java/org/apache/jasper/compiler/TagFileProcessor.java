@@ -273,6 +273,12 @@ class TagFileProcessor {
                 }
             }
 
+            if ("2.0".equals(tagLibInfo.getRequiredVersion())
+                    && (deferredMethodSpecified || deferredMethod
+                            || deferredValueSpecified || deferredValue)) {
+                err.jspError("jsp.error.invalid.version", path);
+            }
+            
             TagAttributeInfo tagAttributeInfo = new TagAttributeInfo(attrName,
                     required, type, rtexprvalue, fragment, null, deferredValue,
                     deferredMethod, deferredValueType, deferredMethodSignature);
