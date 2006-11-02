@@ -61,6 +61,7 @@ class ParserController implements TagConstants {
     private Stack baseDirStack = new Stack();
     
     private boolean isEncodingSpecifiedInProlog;
+    private boolean isBomPresent;
 
     private String sourceEnc;
 
@@ -159,6 +160,7 @@ class ParserController implements TagConstants {
 
 	Node.Nodes parsedPage = null;
 	isEncodingSpecifiedInProlog = false;
+    isBomPresent = false;
 	isDefaultPageEncoding = false;
 
 	JarFile jarFile = getJarFile(jarFileUrl);
@@ -174,7 +176,7 @@ class ParserController implements TagConstants {
 	    compiler.getPageInfo().addDependant(absFileName);
 	}
 
-	if (isXml && isEncodingSpecifiedInProlog) {
+	if ((isXml && isEncodingSpecifiedInProlog) || isBomPresent) {
 	    /*
 	     * Make sure the encoding explicitly specified in the XML
 	     * prolog (if any) matches that in the JSP config element
@@ -183,7 +185,7 @@ class ParserController implements TagConstants {
 	     */
 	    if (jspConfigPageEnc != null && !jspConfigPageEnc.equals(sourceEnc)
 		        && (!jspConfigPageEnc.startsWith("UTF-16")
-			    || !sourceEnc.startsWith("UTF-16"))) {
+		                || !sourceEnc.startsWith("UTF-16"))) {
 		err.jspError("jsp.error.prolog_config_encoding_mismatch",
 			     sourceEnc, jspConfigPageEnc);
 	    }
@@ -199,7 +201,8 @@ class ParserController implements TagConstants {
                                                  isTagFile, directiveOnly,
                                                  sourceEnc,
                                                  jspConfigPageEnc,
-                                                 isEncodingSpecifiedInProlog);
+                                                 isEncodingSpecifiedInProlog,
+                                                 isBomPresent);
 	} else {
 	    // Standard syntax
 	    InputStreamReader inStreamReader = null;
@@ -212,7 +215,7 @@ class ParserController implements TagConstants {
                 parsedPage = Parser.parse(this, jspReader, parent, isTagFile,
 					  directiveOnly, jarFileUrl,
 					  sourceEnc, jspConfigPageEnc,
-					  isDefaultPageEncoding);
+					  isDefaultPageEncoding, isBomPresent);
             } finally {
 		if (inStreamReader != null) {
 		    try {
@@ -298,7 +301,7 @@ class ParserController implements TagConstants {
 	    if (sourceEnc != null) {
 		return;
 	    }
-	    // We don't know the encoding
+	    // We don't know the encoding, so use BOM to determine it
 	    sourceEnc = "ISO-8859-1";
 	} else {
 	    // XML syntax or unknown, (auto)detect encoding ...
@@ -306,10 +309,13 @@ class ParserController implements TagConstants {
 							   jarFile, ctxt, err);
 	    sourceEnc = (String) ret[0];
 	    if (((Boolean) ret[1]).booleanValue()) {
-		isEncodingSpecifiedInProlog = true;
+	        isEncodingSpecifiedInProlog = true;
+	    }
+	    if (((Boolean) ret[2]).booleanValue()) {
+	        isBomPresent = true;
 	    }
 
-	    if (!isXml && sourceEnc.equals("UTF-8")) {
+        if (!isXml && sourceEnc.equals("UTF-8")) {
 		/*
 		 * We don't know if we're dealing with XML or standard syntax.
 		 * Therefore, we need to check to see if the page contains
@@ -359,10 +365,11 @@ class ParserController implements TagConstants {
 	if (!isExternal) {
 	    jspReader.reset(startMark);
 	    if (hasJspRoot(jspReader)) {
+            if (revert) sourceEnc = "UTF-8";
 	        isXml = true;
-		if (revert) sourceEnc = "UTF-8";
 		return;
 	    } else {
+            if (revert && isBomPresent) sourceEnc = "UTF-8";
 	        isXml = false;
 	    }
 	}
@@ -373,15 +380,17 @@ class ParserController implements TagConstants {
 	 * Determine the page encoding from the page directive, unless it's
 	 * specified via JSP config.
 	 */
-	sourceEnc = jspConfigPageEnc;
-	if (sourceEnc == null) {
-	    sourceEnc = getPageEncodingForJspSyntax(jspReader, startMark);
-	    if (sourceEnc == null) {
-		// Default to "ISO-8859-1" per JSP spec
-		sourceEnc = "ISO-8859-1";
-		isDefaultPageEncoding = true;
-	    }
-	}
+    if (sourceEnc == null) {
+        sourceEnc = jspConfigPageEnc;
+        if (sourceEnc == null) {
+            sourceEnc = getPageEncodingForJspSyntax(jspReader, startMark);
+            if (sourceEnc == null) {
+                // Default to "ISO-8859-1" per JSP spec
+                sourceEnc = "ISO-8859-1";
+                isDefaultPageEncoding = true;
+            }
+        }
+    }
     }
     
     /*

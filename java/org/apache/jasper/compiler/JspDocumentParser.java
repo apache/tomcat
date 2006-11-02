@@ -143,7 +143,8 @@ class JspDocumentParser
         boolean directivesOnly,
         String pageEnc,
         String jspConfigPageEnc,
-        boolean isEncodingSpecifiedInProlog)
+        boolean isEncodingSpecifiedInProlog,
+        boolean isBomPresent)
         throws JasperException {
 
         JspDocumentParser jspDocParser =
@@ -158,6 +159,7 @@ class JspDocumentParser
             dummyRoot.setJspConfigPageEncoding(jspConfigPageEnc);
             dummyRoot.setIsEncodingSpecifiedInProlog(
                 isEncodingSpecifiedInProlog);
+            dummyRoot.setIsBomPresent(isBomPresent);
             jspDocParser.current = dummyRoot;
             if (parent == null) {
                 jspDocParser.addInclude(

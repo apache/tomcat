@@ -108,7 +108,7 @@ class Parser implements TagConstants {
     public static Node.Nodes parse(ParserController pc, JspReader reader,
             Node parent, boolean isTagFile, boolean directivesOnly,
             URL jarFileUrl, String pageEnc, String jspConfigPageEnc,
-            boolean isDefaultPageEncoding) throws JasperException {
+            boolean isDefaultPageEncoding, boolean isBomPresent) throws JasperException {
 
         Parser parser = new Parser(pc, reader, isTagFile, directivesOnly,
                 jarFileUrl);
@@ -117,6 +117,7 @@ class Parser implements TagConstants {
         root.setPageEncoding(pageEnc);
         root.setJspConfigPageEncoding(jspConfigPageEnc);
         root.setIsDefaultPageEncoding(isDefaultPageEncoding);
+        root.setIsBomPresent(isBomPresent);
 
         if (directivesOnly) {
             parser.parseTagFileDirectives(root);
