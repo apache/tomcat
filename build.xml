@@ -70,7 +70,10 @@
 
     <mkdir dir="${tomcat.classes}"/>
 
-    <mkdir dir="${tomcat.build}"/>
+    <delete dir="${tomcat.build}/temp" />
+    <delete dir="${tomcat.build}/work" />
+
+  	<mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.build}/bin"/>
     <mkdir dir="${tomcat.build}/conf"/>
     <mkdir dir="${tomcat.build}/lib"/>
@@ -440,6 +443,9 @@
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
             file="${tomcat-native.tar.gz}" />
 
+    <copy todir="${tomcat.build}/bin" file="${commons-daemon.jar}" />
+    <copy todir="${tomcat.build}/bin" file="${commons-daemon.jsvc.tar.gz}" />
+
   	<!-- Copy scripts -->
     <copy todir="${tomcat.build}/bin">
       <fileset dir="bin">
@@ -530,6 +536,11 @@
       <param name="sourcefile" value="${tomcat-native.loc}"/>
       <param name="destfile" value="${tomcat-native.tar.gz}"/>
       <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${commons-daemon.loc}"/>
+      <param name="destfile" value="${commons-daemon.jar}"/>
     </antcall>
 
     <!-- Build Tomcat DBCP bundle -->

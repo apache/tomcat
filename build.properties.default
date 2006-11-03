@@ -61,3 +61,10 @@ nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
 nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
 nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-2.18-setup.exe
+
+# ----- Commons Daemon, version 1.0-Alpha or later -----
+commons-daemon.home=${base.path}/commons-daemon-1.0.1
+commons-daemon.lib=${commons-daemon.home}
+commons-daemon.jar=${commons-daemon.lib}/commons-daemon.jar
+commons-daemon.loc=${base-jakarta.loc}/commons/daemon/binaries/commons-daemon-1.0.1.tar.gz
+commons-daemon.jsvc.tar.gz=${commons-daemon.lib}/bin/jsvc.tar.gz
