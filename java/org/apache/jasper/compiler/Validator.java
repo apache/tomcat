@@ -1261,7 +1261,9 @@ class Validator {
                     ELNode.Nodes el = ELParser.parse(value);
 
                     if (el.containsEL() && !pageInfo.isELIgnored()
-                            && (!pageInfo.isDeferredSyntaxAllowedAsLiteral() && value.startsWith("#{"))) {
+                            && ((!pageInfo.isDeferredSyntaxAllowedAsLiteral() && value.startsWith("#{"))
+                                    || value.startsWith("${"))) {
+
                         validateFunctions(el, n);
 
                         result = new Node.JspAttribute(tai, qName, uri,
