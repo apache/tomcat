@@ -423,7 +423,7 @@ public class Request
         requestedSessionId = null;
         requestedSessionURL = false;
 
-        if (Constants.SECURITY) {
+        if (Constants.SECURITY || Connector.RECYCLE_FACADES) {
             parameterMap = new ParameterMap();
         } else {
             parameterMap.setLocked(false);
@@ -432,7 +432,7 @@ public class Request
 
         mappingData.recycle();
 
-        if (Constants.SECURITY) {
+        if (Constants.SECURITY || Connector.RECYCLE_FACADES) {
             if (facade != null) {
                 facade.clear();
                 facade = null;

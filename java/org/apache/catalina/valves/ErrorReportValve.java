@@ -153,8 +153,7 @@ public class ErrorReportValve
      *  a root cause exception
      */
     protected void report(Request request, Response response,
-                          Throwable throwable)
-        throws IOException {
+                          Throwable throwable) {
 
         // Do nothing on non-HTTP responses
         int statusCode = response.getStatus();
