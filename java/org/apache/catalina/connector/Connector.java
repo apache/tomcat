@@ -59,6 +59,13 @@ public class Connector
     private static Log log = LogFactory.getLog(Connector.class);
 
 
+    /**
+     * Alternate flag to enable recycling of facades.
+     */
+    public static final boolean RECYCLE_FACADES =
+        Boolean.valueOf(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false")).booleanValue();
+
+    
     // ------------------------------------------------------------ Constructor
 
 
