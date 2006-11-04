@@ -77,7 +77,10 @@
       </attribute>
 
       <attribute name="name" required="true">
-        <p>Logical name of this Engine, used in log and error messages.</p>
+        <p>Logical name of this Engine, used in log and error messages. <em>When
+        using muliple <a href="service.html">Service</a> elements in the same
+        <a href="server.html">Server</a>, each Engine MUST be assigned a unique
+        name.</em></p>
       </attribute>
 
     </attributes>
