@@ -932,10 +932,8 @@ public final class CGIServlet extends HttpServlet {
                 }
                 path = currentLocation.getAbsolutePath();
                 name = currentLocation.getName();
-                cginame =
-                currentLocation.getParent().substring(webAppRootDir.length())
-                + File.separator
-                + name;
+                cginame = (currentLocation.getParent() + File.separator).
+                        substring(webAppRootDir.length()) + name;
 
                 if (".".equals(contextPath)) {
                     scriptname = servletPath + cginame;
@@ -1133,6 +1131,8 @@ public final class CGIServlet extends HttpServlet {
             command = fCGIFullPath.getCanonicalPath();
 
             envp.put("X_TOMCAT_SCRIPT_PATH", command);  //for kicks
+
+            envp.put("SCRIPT_FILENAME", command);  //for PHP
 
             this.env = envp;
 
