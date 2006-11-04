@@ -1758,63 +1758,58 @@ public class WebappClassLoader
         if (clazz != null)
             return clazz;
 
-        synchronized (this) {
+        synchronized (entry) {
             if (entry.binaryContent == null && entry.loadedClass == null)
                 throw new ClassNotFoundException(name);
-        }
 
-        // Looking up the package
-        String packageName = null;
-        int pos = name.lastIndexOf('.');
-        if (pos != -1)
-            packageName = name.substring(0, pos);
-
-        Package pkg = null;
-
-        if (packageName != null) {
-
-            pkg = getPackage(packageName);
-
-            // Define the package (if null)
-            if (pkg == null) {
-                if (entry.manifest == null) {
-                    definePackage(packageName, null, null, null, null, null,
-                                  null, null);
-                } else {
-                    definePackage(packageName, entry.manifest, entry.codeBase);
+            // Looking up the package
+            String packageName = null;
+            int pos = name.lastIndexOf('.');
+            if (pos != -1)
+                packageName = name.substring(0, pos);
+        
+            Package pkg = null;
+        
+            if (packageName != null) {
+                synchronized (this) {
+                    pkg = getPackage(packageName);
+            
+                    // Define the package (if null)
+                    if (pkg == null) {
+                        if (entry.manifest == null) {
+                            definePackage(packageName, null, null, null, null,
+                                    null, null, null);
+                        } else {
+                            definePackage(packageName, entry.manifest,
+                                    entry.codeBase);
+                        }
+                    }
                 }
             }
+    
+            if (securityManager != null) {
 
-        }
-
-        // Create the code source object
-        CodeSource codeSource =
-            new CodeSource(entry.codeBase, entry.certificates);
-
-        if (securityManager != null) {
-
-            // Checking sealing
-            if (pkg != null) {
-                boolean sealCheck = true;
-                if (pkg.isSealed()) {
-                    sealCheck = pkg.isSealed(entry.codeBase);
-                } else {
-                    sealCheck = (entry.manifest == null)
-                        || !isPackageSealed(packageName, entry.manifest);
+                // Checking sealing
+                if (pkg != null) {
+                    boolean sealCheck = true;
+                    if (pkg.isSealed()) {
+                        sealCheck = pkg.isSealed(entry.codeBase);
+                    } else {
+                        sealCheck = (entry.manifest == null)
+                            || !isPackageSealed(packageName, entry.manifest);
+                    }
+                    if (!sealCheck)
+                        throw new SecurityException
+                            ("Sealing violation loading " + name + " : Package "
+                             + packageName + " is sealed.");
                 }
-                if (!sealCheck)
-                    throw new SecurityException
-                        ("Sealing violation loading " + name + " : Package "
-                         + packageName + " is sealed.");
+    
             }
 
-        }
-
-        synchronized (this) {
             if (entry.loadedClass == null) {
                 clazz = defineClass(name, entry.binaryContent, 0,
                         entry.binaryContent.length, 
-                        codeSource);
+                        new CodeSource(entry.codeBase, entry.certificates));
                 entry.loadedClass = clazz;
                 entry.binaryContent = null;
                 entry.source = null;
