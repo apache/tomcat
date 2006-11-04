@@ -39,7 +39,6 @@ import javax.servlet.jsp.tagext.ValidationMessage;
 import org.apache.el.lang.ELSupport;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
-import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.el.ELContextImpl;
 import org.xml.sax.Attributes;
 
@@ -91,7 +90,6 @@ class Validator {
         DirectiveVisitor(Compiler compiler) throws JasperException {
             this.pageInfo = compiler.getPageInfo();
             this.err = compiler.getErrorDispatcher();
-            JspCompilationContext ctxt = compiler.getCompilationContext();
         }
 
         public void visit(Node.IncludeDirective n) throws JasperException {
@@ -582,7 +580,6 @@ class Validator {
 
         public void visit(Node.SetProperty n) throws JasperException {
             JspUtil.checkAttributes("SetProperty", n, setPropertyAttrs, err);
-            String name = n.getTextAttribute("name");
             String property = n.getTextAttribute("property");
             String param = n.getTextAttribute("param");
             String value = n.getAttributeValue("value");
@@ -816,7 +813,7 @@ class Validator {
             if (jspAttrsSize > 0) {
                 jspAttrs = new Node.JspAttribute[jspAttrsSize];
             }
-            Hashtable tagDataAttrs = new Hashtable(attrsSize);
+            Hashtable<String, Object> tagDataAttrs = new Hashtable<String, Object>(attrsSize);
 
             checkXmlAttributes(n, jspAttrs, tagDataAttrs);
             checkNamedAttributes(n, jspAttrs, attrsSize, tagDataAttrs);
@@ -1010,7 +1007,7 @@ class Validator {
          * considered a dynamic attribute.
          */
         private void checkXmlAttributes(Node.CustomTag n,
-                Node.JspAttribute[] jspAttrs, Hashtable tagDataAttrs)
+                Node.JspAttribute[] jspAttrs, Hashtable<String, Object> tagDataAttrs)
                 throws JasperException {
 
             TagInfo tagInfo = n.getTagInfo();
@@ -1166,7 +1163,8 @@ class Validator {
          * attributes
          */
         private void checkNamedAttributes(Node.CustomTag n,
-                Node.JspAttribute[] jspAttrs, int start, Hashtable tagDataAttrs)
+                Node.JspAttribute[] jspAttrs, int start, 
+                Hashtable<String, Object> tagDataAttrs)
                 throws JasperException {
 
             TagInfo tagInfo = n.getTagInfo();
@@ -1259,10 +1257,21 @@ class Validator {
                     // validate expression syntax if string contains
                     // expression(s)
                     ELNode.Nodes el = ELParser.parse(value);
+                    
+                    boolean deferred = false;
+                    Iterator<ELNode> nodes = el.iterator();
+                    while (nodes.hasNext()) {
+                        ELNode node = nodes.next();
+                        if (node instanceof ELNode.Root) {
+                            if (((ELNode.Root) node).getType() == '#') {
+                                deferred = true;
+                            }
+                        }
+                    }
 
                     if (el.containsEL() && !pageInfo.isELIgnored()
-                            && ((!pageInfo.isDeferredSyntaxAllowedAsLiteral() && value.startsWith("#{"))
-                                    || value.startsWith("${"))) {
+                            && ((!pageInfo.isDeferredSyntaxAllowedAsLiteral() && deferred)
+                                    || !deferred)) {
 
                         validateFunctions(el, n);
 
@@ -1487,7 +1496,7 @@ class Validator {
                 throws JasperException {
             FunctionInfo funcInfo = func.getFunctionInfo();
             String signature = funcInfo.getFunctionSignature();
-            ArrayList params = new ArrayList();
+            ArrayList<String> params = new ArrayList<String>();
             // Signature is of the form
             // <return-type> S <method-name S? '('
             // < <arg-type> ( ',' <arg-type> )* )? ')'
@@ -1520,14 +1529,14 @@ class Validator {
 
             class ValidateFunctionMapper extends FunctionMapper {
 
-                private HashMap fnmap = new java.util.HashMap();
+                private HashMap<String, Method> fnmap = new HashMap<String, Method>();
 
                 public void mapFunction(String fnQName, Method method) {
                     fnmap.put(fnQName, method);
                 }
 
                 public Method resolveFunction(String prefix, String localName) {
-                    return (Method) this.fnmap.get(prefix + ":" + localName);
+                    return this.fnmap.get(prefix + ":" + localName);
                 }
             }
 
@@ -1584,15 +1593,12 @@ class Validator {
      */
     static class TagExtraInfoVisitor extends Node.Visitor {
 
-        private PageInfo pageInfo;
-
         private ErrorDispatcher err;
 
         /*
          * Constructor
          */
         TagExtraInfoVisitor(Compiler compiler) {
-            this.pageInfo = compiler.getPageInfo();
             this.err = compiler.getErrorDispatcher();
         }
 
