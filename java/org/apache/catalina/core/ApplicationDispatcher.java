@@ -325,6 +325,11 @@ final class ApplicationDispatcher
         // Set up to handle the specified request and response
         setup(request, response, false);
 
+        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            // Check SRV.8.2 / SRV.14.2.5.1 compliance
+            checkSameObjects();
+        }
+
         // Identify the HTTP-specific request and response objects (if any)
         HttpServletRequest hrequest = null;
         if (request instanceof HttpServletRequest)
@@ -507,6 +512,11 @@ final class ApplicationDispatcher
         // Set up to handle the specified request and response
         setup(request, response, true);
 
+        if (Globals.STRICT_SERVLET_COMPLIANCE) {
+            // Check SRV.8.2 / SRV.14.2.5.1 compliance
+            checkSameObjects();
+        }
+        
         // Create a wrapped response to use for this request
         // ServletResponse wresponse = null;
         ServletResponse wresponse = wrapResponse();
@@ -958,5 +968,55 @@ final class ApplicationDispatcher
 
     }
 
+    private void checkSameObjects() throws ServletException {
+        ServletRequest originalRequest =
+            ApplicationFilterChain.getLastServicedRequest();
+        ServletResponse originalResponse =
+            ApplicationFilterChain.getLastServicedResponse();
+        
+        // Some forwards, eg from valves will not set original values 
+        if (originalRequest == null || originalResponse == null) {
+            return;
+        }
+        
+        boolean same = false;
+        ServletRequest dispatchedRequest = appRequest;
+        
+        while (!same) {
+            if (originalRequest.equals(dispatchedRequest)) {
+                same = true;
+            }
+            if (!same && dispatchedRequest instanceof ServletRequestWrapper) {
+                dispatchedRequest =
+                    ((ServletRequestWrapper) dispatchedRequest).getRequest();
+            } else {
+                break;
+            }
+        }
+        if (!same) {
+            throw new ServletException(sm.getString(
+                    "applicationDispatcher.specViolation.request"));
+        }
+        
+        same = false;
+        ServletResponse dispatchedResponse = appResponse;
+        
+        while (!same) {
+            if (originalResponse.equals(dispatchedResponse)) {
+                same = true;
+            }
+            
+            if (!same && dispatchedResponse instanceof ServletResponseWrapper) {
+                dispatchedResponse =
+                    ((ServletResponseWrapper) dispatchedResponse).getResponse();
+            } else {
+                break;
+            }
+        }
 
+        if (!same) {
+            throw new ServletException(sm.getString(
+                    "applicationDispatcher.specViolation.response"));
+        }
+    }
 }
