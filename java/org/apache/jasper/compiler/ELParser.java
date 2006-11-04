@@ -71,7 +71,7 @@ public class ELParser {
             }
             ELNode.Nodes elexpr = parser.parseEL();
             if (!elexpr.isEmpty()) {
-                parser.expr.add(new ELNode.Root(elexpr));
+                parser.expr.add(new ELNode.Root(elexpr, parser.type));
             }
         }
         return parser.expr;

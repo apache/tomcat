@@ -45,9 +45,11 @@ abstract class ELNode {
     public static class Root extends ELNode {
 
 	private ELNode.Nodes expr;
+    private char type;
 
-	Root(ELNode.Nodes expr) {
+	Root(ELNode.Nodes expr, char type) {
 	    this.expr = expr;
+        this.type = type;
 	}
 
 	public void accept(Visitor v) throws JasperException {
@@ -57,6 +59,10 @@ abstract class ELNode {
 	public ELNode.Nodes getExpression() {
 	    return expr;
 	}
+
+    public char getType() {
+        return type;
+    }
     }
 
     /**
@@ -195,7 +201,7 @@ abstract class ELNode {
 	    }
 	}
 
-	public Iterator iterator() {
+	public Iterator<ELNode> iterator() {
 	    return list.iterator();
 	}
 
@@ -224,6 +230,7 @@ abstract class ELNode {
 	public String getMapName() {
 	    return mapName;
 	}
+    
     }
 
     /*
