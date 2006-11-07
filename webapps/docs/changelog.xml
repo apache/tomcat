@@ -14,6 +14,59 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.1 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        <bug>37439</bug>, <bug>40823</bug>: Documentation cleanup (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Refactor exception processing using Throwable.getCause to improve exception chaining (remm)
+      </update>
+      <add>
+        Remove dead code involving the Logger (funkman)
+      </add>
+      <fix>
+        <bug>37458</bug>: Fix some exceptions which could happen during classloading (markt)
+      </fix>
+      <fix>
+        <bug>40817</bug>: Fix CGI path (markt)
+      </fix>
+      <fix>
+        <bug>34956</bug>: Add the possibility to enforce usage of request and response
+        wrapper objects (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Many fixes for JSP 2.1 compliance, invloving tag files handling, deferred expressions
+        validation, bom encoding support (remm)
+      </update>
+    </changelog>
+  </subsection> 
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Many HTTP NIO connector fixes and refactorings (fhanik)
+      </update>
+      <update>
+        HTTP NIO connector performance improvements (fhanik)
+      </update>
+      <update>
+        Add packetSize option for the classic AJP connector (jfclere)
+      </update>
+      <update>
+        Implement explicit flushing in AJP (mturk)
+      </update>
+    </changelog>
+  </subsection> 
+</section>
 <section name="Tomcat 6.0.0 (remm)">
   <subsection name="Catalina">
     <changelog>
