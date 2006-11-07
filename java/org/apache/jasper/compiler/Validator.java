@@ -1094,7 +1094,7 @@ class Validator {
                                     err.jspError(n, "jsp.error.attribute.custom.non_rt_with_expr",
                                             tldAttrs[j].getName());
                                 }
-                                if (!deferred && (tldAttrs[j].isDeferredMethod() || tldAttrs[j].isDeferredValue())) {
+                                if (!deferred && !tldAttrs[j].canBeRequestTime()) {
                                     // Only deferred expressions are allowed for this attribute
                                     err.jspError(n, "jsp.error.attribute.custom.non_rt_with_expr",
                                             tldAttrs[j].getName());
