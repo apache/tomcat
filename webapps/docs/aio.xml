@@ -21,6 +21,12 @@
     as provided with support for the Servlet API.
   </p>
 
+  <p>
+    <b>IMPORTANT NOTE: Usage of these features requires using the APR or NIO
+    HTTP connectors. The classic java.io HTTP connector and the AJP connectors
+    do not support them.</b>
+  </p>
+
   </section>
 
   <section name="Comet support">
