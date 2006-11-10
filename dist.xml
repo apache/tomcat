@@ -295,13 +295,13 @@
   <target name="dist-static" depends="dist-prepare">
 
     <!-- Copy the top-level documentation files -->
-    <copy todir="${tomcat.dist}">
+    <filter token="VERSION" value="${version}"/>
+    <copy todir="${tomcat.dist}" filtering="true">
       <fileset dir=".">
         <include name="INSTALLING.txt"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
-        <include name="README.txt"/>
-        <include name="RELEASE*"/>
+        <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>
