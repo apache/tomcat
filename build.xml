@@ -94,8 +94,14 @@
       <classpath refid="tomcat.classpath" />
       <exclude name="org/apache/tomcat/util/net/puretls/**" />
     </javac>
+    <tstamp>
+      <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
+      <format property="TSTAMP" pattern="hh:mm:ss"/>        
+    </tstamp>    
     <!-- Copy static resource files -->
     <filter token="VERSION" value="${version}"/>
+    <filter token="VERSION_NUMBER" value="${version.number}"/>
+    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
     <copy todir="${tomcat.classes}" filtering="true">
       <fileset dir="java">
         <include name="**/*.properties"/>
