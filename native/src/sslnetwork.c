@@ -97,10 +97,15 @@ static apr_status_t ssl_cleanup(void *data)
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)data;
 
     if (con) {
+        /* Pollset was already destroyed by
+         * the pool cleanup/destroy.
+         */
+        con->pollset = NULL;
         if (con->ssl) {
-            ssl_smart_shutdown(con->ssl, con->shutdown_type);
-            SSL_free(con->ssl);
-            con->ssl = NULL;
+            SSL *ssl = con->ssl;
+            con->ssl = NULL;            
+            ssl_smart_shutdown(ssl, con->shutdown_type);
+            SSL_free(ssl);
         }
         if (con->peer) {
             X509_free(con->peer);
@@ -157,6 +162,12 @@ static tcn_ssl_conn_t *ssl_create(JNIEnv *env, tcn_ssl_ctxt_t *ctx, apr_pool_t *
     return con;
 }
 
+#ifdef WIN32
+#define APR_INVALID_SOCKET  INVALID_SOCKET
+#else
+#define APR_INVALID_SOCKET  -1
+#endif
+
 static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
                                            int for_what)
 {
@@ -164,6 +175,18 @@ static apr_status_t wait_for_io_or_timeout(tcn_ssl_conn_t *con,
     apr_pollfd_t pfd;
     int type;
     apr_status_t status;
+    apr_os_sock_t sock;
+
+    if (!con->pollset)
+        return APR_ENOPOLL;    
+    if (!con->sock)
+        return APR_ENOTSOCK;        
+    
+    /* Check if the socket was already closed
+     */    
+    apr_os_sock_get(&sock, con->sock);    
+    if (sock == APR_INVALID_SOCKET)
+        return APR_ENOTSOCK;        
 
     /* Figure out the the poll direction */
     switch (for_what) {
@@ -241,12 +264,13 @@ ssl_socket_shutdown(apr_socket_t *sock, apr_shutdown_how_e how)
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
 
     if (con->ssl) {
+        SSL *ssl = con->ssl;
+        con->ssl = NULL;
         if (how < 1)
             how = con->shutdown_type;
-        rv = ssl_smart_shutdown(con->ssl, how);
+        rv = ssl_smart_shutdown(ssl, how);
         /* TODO: Translate OpenSSL Error codes */
-        SSL_free(con->ssl);
-        con->ssl = NULL;
+        SSL_free(ssl);
     }
     return rv;
 }
@@ -261,9 +285,10 @@ ssl_socket_close(apr_socket_t *sock)
     apr_atomic_inc32(&ssl_closed);
 #endif
     if (con->ssl) {
-        rv = ssl_smart_shutdown(con->ssl, con->shutdown_type);
-        SSL_free(con->ssl);
+        SSL *ssl = con->ssl;
         con->ssl = NULL;
+        rv = ssl_smart_shutdown(ssl, con->shutdown_type);
+        SSL_free(ssl);
     }
     if (con->peer) {
         X509_free(con->peer);
@@ -276,7 +301,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
 {
     tcn_socket_t *ss = J2P(sock, tcn_socket_t *);
     tcn_ssl_conn_t *con;
-    int s;
+    int s, i;
     apr_status_t rv;
     X509 *peer;
 
@@ -287,7 +312,10 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
     con = (tcn_ssl_conn_t *)ss->opaque;
     while (!SSL_is_init_finished(con->ssl)) {
         if ((s = SSL_do_handshake(con->ssl)) <= 0) {
-            int i = SSL_get_error(con->ssl, s);
+            apr_status_t os = apr_get_netos_error();
+            if (!con->ssl)
+                return os == APR_SUCCESS ? APR_ENOTSOCK : os;
+            i = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_NONE:
                     con->shutdown_type = SSL_SHUTDOWN_TYPE_STANDARD;
@@ -302,11 +330,10 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
                 break;
                 case SSL_ERROR_SYSCALL:
                 case SSL_ERROR_SSL:
-                    s = apr_get_netos_error();
-                    if (!APR_STATUS_IS_EAGAIN(s) &&
-                        !APR_STATUS_IS_EINTR(s)) {
+                    if (!APR_STATUS_IS_EAGAIN(os) &&
+                        !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return s;
+                        return os;
                     }
                 break;
                 default:
@@ -318,6 +345,9 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
                 break;
             }
         }
+        if (!con->ssl)
+            return APR_ENOTSOCK;
+        
         /*
         * Check for failed client authentication
         */
@@ -344,13 +374,16 @@ static apr_status_t APR_THREAD_FUNC
 ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
-    int s, wr = (int)(*len);
+    int s, i, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
     for (;;) {
         if ((s = SSL_read(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
-            int i = SSL_get_error(con->ssl, s);
+            if (!con->ssl)
+                return os == APR_SUCCESS ? APR_ENOTSOCK : os;
+            
+            i = SSL_get_error(con->ssl, s);
             /* Special case if the "close notify" alert send by peer */
             if (s == 0 && (con->ssl->shutdown & SSL_RECEIVED_SHUTDOWN)) {
                 *len = 0;
@@ -397,13 +430,16 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                 apr_size_t *len)
 {
     tcn_ssl_conn_t *con = (tcn_ssl_conn_t *)sock;
-    int s, wr = (int)(*len);
+    int s, i, wr = (int)(*len);
     apr_status_t rv = APR_SUCCESS;
 
     for (;;) {
         if ((s = SSL_write(con->ssl, buf, wr)) <= 0) {
             apr_status_t os = apr_get_netos_error();
-            int i = SSL_get_error(con->ssl, s);
+            if (!con->ssl)
+                return os == APR_SUCCESS ? APR_ENOTSOCK : os;
+            
+            i = SSL_get_error(con->ssl, s);
             switch (i) {
                 case SSL_ERROR_ZERO_RETURN:
                     *len = 0;
@@ -490,8 +526,14 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
     TCN_ASSERT(ctx != 0);
     TCN_ASSERT(sock != 0);
 
+    if (!s->sock)
+        return APR_ENOTSOCK;
+
     if ((rv = apr_os_sock_get(&oss, s->sock)) != APR_SUCCESS)
         return rv;
+    if (oss == APR_INVALID_SOCKET)
+        return APR_ENOTSOCK;        
+        
     if ((con = ssl_create(e, c, s->pool)) == NULL)
         return APR_EGENERAL;
     con->sock = s->sock;
