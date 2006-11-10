@@ -145,6 +145,7 @@ typedef struct {
 
 typedef struct {
     apr_pool_t   *pool;
+    apr_pool_t   *child;
     apr_socket_t *sock;
     void         *opaque;
     char         *jsbbuff;
