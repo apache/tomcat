@@ -12,10 +12,9 @@
 # ----- Vesion Control Flags -----
 version.major=6
 version.minor=0
-version.build=2
+version.build=0
 version.patch=0
-#Set the pretty version name
-version=6.0.2
+version=6.0-snapshot
 
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
