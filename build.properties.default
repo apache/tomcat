@@ -9,6 +9,14 @@
 # $Id$
 # -----------------------------------------------------------------------------
 
+# ----- Vesion Control Flags -----
+version.major=6
+version.minor=0
+version.build=2
+version.patch=0
+#Set the pretty version name
+version=6.0.2
+
 # ----- Default Base Path for Dependent Packages -----
 # Please note this path must be absolute, not relative,
 # as it is referenced with different working directory
