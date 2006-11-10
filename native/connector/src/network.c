@@ -83,8 +83,9 @@ static apr_status_t sp_socket_cleanup(void *data)
     if (s->net && s->net->cleanup)
         (*s->net->cleanup)(s->opaque);
     if (s->sock) {
-        apr_socket_close(s->sock);
+        apr_socket_t *as = s->sock;
         s->sock = NULL;
+        apr_socket_close(as);
     }
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&sp_cleared);
@@ -181,6 +182,15 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     GET_S_FAMILY(f, family);
     GET_S_TYPE(t, type);
 
+    a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+    TCN_CHECK_ALLOCATED(a);
+    a->pool = p;
+    if (family >= 0)
+        a->net = &apr_socket_layer;
+    apr_pool_cleanup_register(p, (const void *)a,
+                              sp_socket_cleanup,
+                              apr_pool_cleanup_null);
+
     if (family >= 0) {
         TCN_THROW_IF_ERR(apr_socket_create(&s,
                          f, t, protocol, p), a);
@@ -188,19 +198,15 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
 #ifdef TCN_DO_STATISTICS
     sp_created++;
 #endif
-    a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-    TCN_CHECK_ALLOCATED(a);
     a->sock = s;
-    a->pool = p;
     if (family >= 0)
         a->net = &apr_socket_layer;
     a->opaque   = s;
-    apr_pool_cleanup_register(p, (const void *)a,
-                              sp_socket_cleanup,
-                              apr_pool_cleanup_null);
+    apr_pool_create(&a->child, a->pool);
 
-cleanup:
     return P2J(a);
+cleanup:
+    return 0;
 
 }
 
@@ -209,6 +215,18 @@ TCN_IMPLEMENT_CALL(void, Socket, destroy)(TCN_STDARGS, jlong sock)
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
+
+    apr_pool_cleanup_kill(s->pool, s, sp_socket_cleanup);
+    if (s->net && s->net->cleanup) {
+        (*s->net->cleanup)(s->opaque);
+        s->net = NULL;
+    }
+    if (s->sock) {
+        apr_socket_t *as = s->sock;
+        s->sock = NULL;
+        apr_socket_close(as);
+    }
+    
     apr_pool_destroy(s->pool);
 }
 
@@ -264,6 +282,10 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
 
+    apr_pool_cleanup_kill(s->pool, s, sp_socket_cleanup);
+    if (s->child) {
+        apr_pool_clear(s->child);
+    }
 #ifdef TCN_DO_STATISTICS
     apr_atomic_inc32(&sp_closed);
 #endif
@@ -272,8 +294,9 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
         s->net = NULL;
     }
     if (s->sock) {
-        rv = (jint)apr_socket_close(s->sock);
+        apr_socket_t *as = s->sock;
         s->sock = NULL;
+        rv = (jint)apr_socket_close(as);
     }
     return rv;
 }
@@ -316,6 +339,13 @@ TCN_IMPLEMENT_CALL(jlong, Socket, acceptx)(TCN_STDARGS, jlong sock,
 
     if (s->net->type == TCN_SOCKET_APR) {
         TCN_ASSERT(s->sock != NULL);
+        a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+        TCN_CHECK_ALLOCATED(a);
+        a->pool   = p;
+        apr_pool_cleanup_register(p, (const void *)a,
+                                  sp_socket_cleanup,
+                                  apr_pool_cleanup_null);
+
         TCN_THROW_IF_ERR(apr_socket_accept(&n, s->sock, p), n);
     }
     else {
@@ -326,15 +356,9 @@ TCN_IMPLEMENT_CALL(jlong, Socket, acceptx)(TCN_STDARGS, jlong sock,
 #ifdef TCN_DO_STATISTICS
         apr_atomic_inc32(&sp_accepted);
 #endif
-        a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-        TCN_CHECK_ALLOCATED(a);
-        a->sock   = n;
-        a->pool   = p;
         a->net    = &apr_socket_layer;
+        a->sock   = n;
         a->opaque = n;
-        apr_pool_cleanup_register(p, (const void *)a,
-                                  sp_socket_cleanup,
-                                  apr_pool_cleanup_null);
     }
 
 cleanup:
@@ -354,6 +378,13 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
     TCN_THROW_IF_ERR(apr_pool_create(&p, s->pool), p);
     if (s->net->type == TCN_SOCKET_APR) {
         TCN_ASSERT(s->sock != NULL);
+        a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+        TCN_CHECK_ALLOCATED(a);
+        a->pool   = p;
+        apr_pool_cleanup_register(s->child, (const void *)a,
+                                  sp_socket_cleanup,
+                                  apr_pool_cleanup_null);
+
         TCN_THROW_IF_ERR(apr_socket_accept(&n, s->sock, p), n);
     }
     else {
@@ -364,15 +395,9 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
 #ifdef TCN_DO_STATISTICS
         apr_atomic_inc32(&sp_accepted);
 #endif
-        a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
-        TCN_CHECK_ALLOCATED(a);
-        a->sock   = n;
-        a->pool   = p;
         a->net    = &apr_socket_layer;
+        a->sock   = n;
         a->opaque = n;
-        apr_pool_cleanup_register(p, (const void *)a,
-                                  sp_socket_cleanup,
-                                  apr_pool_cleanup_null);
     }
     return P2J(a);
 cleanup:
@@ -1202,7 +1227,7 @@ TCN_IMPLEMENT_CALL(jobject, Socket, dataGet)(TCN_STDARGS, jlong socket,
     void *rv = NULL;
 
     UNREFERENCED(o);
-    TCN_ASSERT(sock != 0);
+    TCN_ASSERT(socket != 0);
 
     if (apr_socket_data_get(&rv, J2S(key), s->sock) != APR_SUCCESS) {
         rv = NULL;
