@@ -310,7 +310,7 @@
     <copy todir="${tomcat.build}/webapps/docs">
       <fileset dir=".">
         <include name="BUILDING.txt"/>
-        <include name="README.txt"/>
+        <include name="NOTICE"/>
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>
@@ -376,7 +376,7 @@
     <copy todir="${tomcat.build}/webapps/docs/printer">
       <fileset dir=".">
         <include name="BUILDING.txt"/>
-        <include name="README.txt"/>
+        <include name="NOTICE"/>
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>

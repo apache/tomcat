@@ -148,8 +148,8 @@
                 </tr>
                 <tr>
                   <td class="menu">
-                    <a href="jsp-examples/">JSP&nbsp;Examples</a><br/>
-                    <a href="servlets-examples/">Servlet&nbsp;Examples</a><br/>
+                    <a href="examples/servlets/">Servlets Examples</a><br/>
+                    <a href="examples/jsp/">JSP Examples</a><br/>
                     <a href="webdav/">WebDAV&nbsp;capabilities</a><br/>
      		    &nbsp;
                   </td>
