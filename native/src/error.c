@@ -70,7 +70,7 @@ void tcn_ThrowMemoryException(JNIEnv *env, const char *file, int line, const cha
         if (f != file) {
             f++;
         }
-        sprintf(fmt, "%s for [%s::%04d]", msg, line, f);
+        sprintf(fmt, "%s for [%04d@%s]", msg, line, f);
         (*env)->ThrowNew(env, javaExceptionClass, &fmt[0]);
     }
     else
