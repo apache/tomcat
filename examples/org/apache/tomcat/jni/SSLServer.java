@@ -1,10 +1,7 @@
 package org.apache.tomcat.jni;
 
+import java.io.InputStream;
 import java.util.Properties;
-
-import java.io.*;
-import java.net.*;
-import java.lang.*;
 
 /** SSL Server server example
  *
@@ -54,7 +51,6 @@ public class SSLServer {
 
     public SSLServer()
     {
-        int i;
         serverPool = Pool.create(0);
         try {
             /* Create SSL Context, one for each Virtual Host */
@@ -85,7 +81,7 @@ public class SSLServer {
     }
 
     /* Acceptor thread. Listens for new connections */
-    private class Acceptor extends Thread {
+    private class Acceptor extends java.lang.Thread {
         private long serverSock = 0;
         private long inetAddress = 0;
         private long pool = 0;
@@ -164,7 +160,7 @@ public class SSLServer {
         }
     }
 
-    private class Worker extends Thread {
+    private class Worker extends java.lang.Thread {
         private int workerId = 0;
         private long clientSock = 0;
         private byte [] wellcomeMsg = null;

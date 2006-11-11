@@ -17,11 +17,8 @@
 
 package org.apache.tomcat.jni;
 
+import java.io.InputStream;
 import java.util.Properties;
-
-import java.io.*;
-import java.net.*;
-import java.lang.*;
 
 /** Echo server example
  *
@@ -61,7 +58,7 @@ public class Echo {
     }
 
     /* Acceptor thread. Listens for new connections */
-    private class Acceptor extends Thread {
+    private class Acceptor extends java.lang.Thread {
         private long serverSock = 0;
         private long inetAddress = 0;
         private long pool = 0;
@@ -139,7 +136,7 @@ public class Echo {
     }
 
     /* Poller thread. Listens for new recycled connections */
-    private class Poller extends Thread {
+    private class Poller extends java.lang.Thread {
         private long serverPollset = 0;
         private long pool = 0;
         private int nsocks = 0;
@@ -178,7 +175,7 @@ public class Echo {
             while (true) {
                 try {
                     if (nsocks < 1) {
-                        Thread.sleep(1);
+                        java.lang.Thread.sleep(1);
                         continue;
                     }
                     /* Two times size then  created pollset */
@@ -223,7 +220,7 @@ public class Echo {
         }
     }
 
-    private class Worker extends Thread {
+    private class Worker extends java.lang.Thread {
         private int workerId = 0;
         private long clientSock = 0;
         private byte [] wellcomeMsg = null;
@@ -275,7 +272,6 @@ public class Echo {
 
     public Echo()
     {
-        int i;
         echoPool = Pool.create(0);
         try {
             echoAcceptor = new Acceptor();

@@ -1,10 +1,7 @@
 package org.apache.tomcat.jni;
 
+import java.io.InputStream;
 import java.util.Properties;
-
-import java.io.*;
-import java.net.*;
-import java.lang.*;
 
 /** Local Socket server example
  *
@@ -41,7 +38,6 @@ public class LocalServer {
 
     public LocalServer()
     {
-        int i;
         serverPool = Pool.create(0);
         try {
             serverAcceptor = new Acceptor();
@@ -65,7 +61,7 @@ public class LocalServer {
     }
 
     /* Acceptor thread. Listens for new connections */
-    private class Acceptor extends Thread {
+    private class Acceptor extends java.lang.Thread {
         private long serverSock = 0;
         private long inetAddress = 0;
         private long pool = 0;
@@ -107,7 +103,7 @@ public class LocalServer {
         }
     }
 
-    private class Worker extends Thread {
+    private class Worker extends java.lang.Thread {
         private int workerId = 0;
         private long clientSock = 0;
         private byte [] wellcomeMsg = null;
