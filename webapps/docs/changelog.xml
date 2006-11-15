@@ -14,6 +14,35 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.2 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Various tweaks to distribution (remm, funkman)
+      </fix>
+      <update>
+        Update Tomcat native to 1.1.7 (mturk)
+      </update>
+      <update>
+        Update to JDT 3.2.1 (remm)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix EJB annotation interface (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix passing of the keystore password for the NIO connector (fhanik)
+      </fix>
+    </changelog>
+  </subsection> 
+</section>
 <section name="Tomcat 6.0.1 (remm)">
   <subsection name="General">
     <changelog>
