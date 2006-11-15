@@ -18,9 +18,9 @@
 <section name="Introduction">
 
 <p>This is the top-level entry point of the documentation bundle for the
-<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 5.5 
+<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 6.0
 implements the
-Servlet 2.4 and JavaServer Pages 2.0 specifications from the
+Servlet 2.5 and JavaServer Pages 2.1 specifications from the
 <a href="http://www.jcp.org">Java Community Process</a>, and includes many
 additional features that make it a useful platform for developing and deploying
 web applications and web services.</p>
@@ -35,7 +35,7 @@ manual is described in more detail below.</p>
 <section name="Apache Tomcat User Guide">
 
 <p>The following documents will assist you in downloading, installing
-Apache Tomcat 5, and using many of the Apache Tomcat features.</p>
+Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
 
 <ol>
 <li><a href="introduction.html"><strong>Introduction</strong></a> - A
@@ -45,7 +45,7 @@ Apache Tomcat 5, and using many of the Apache Tomcat features.</p>
 <li><a href="appdev/index.html"><strong>First web application</strong></a>
     - An introduction to the concepts of a <em>web application</em> as defined
     in the <a href="http://java.sun.com/products/servlet/download.html">Servlet
-    2.3 Specification</a>.  Covers basic organization of your web application
+    2.4 Specification</a>.  Covers basic organization of your web application
     source tree, the structure of a web application archive, and an
     introduction to the web application deployment descriptor
     (<code>/WEB-INF/web.xml</code>).</li>
@@ -110,7 +110,7 @@ Apache Tomcat 5, and using many of the Apache Tomcat features.</p>
 <section name="Reference">
 
 <p>The following documents are aimed at <em>System Administrators</em> who
-are responsible for installing, configuring, and operating a Apache Tomcat 5 server.
+are responsible for installing, configuring, and operating a Apache Tomcat 6 server.
 </p>
 <ul>
 <li><a href="RELEASE-NOTES.txt"><strong>Release notes</strong></a>
@@ -118,7 +118,7 @@ are responsible for installing, configuring, and operating a Apache Tomcat 5 ser
     </li>
 <li><a href="config/index.html"><strong>Apache Tomcat Server Configuration Reference</strong></a>
     - Reference manual that documents all available elements and attributes
-      that may be placed into a Apache Tomcat 5 <code>conf/server.xml</code> file.
+      that may be placed into a Apache Tomcat 6 <code>conf/server.xml</code> file.
     </li>
 <li><a href="http://tomcat.apache.org/connectors-doc/index.html"><strong>JK Documentation</strong></a>
     - Complete documentation and HOWTOs on the JK native webserver connector,
@@ -138,15 +138,15 @@ are responsible for installing, configuring, and operating a Apache Tomcat 5 ser
 <p>The following documents are for Java developers who wish to contribute to
 the development of the <em>Apache Tomcat</em> project.</p>
 <ul>
-<li><a href="building.html"><strong>Building from Source</strong></a> - 
-    Details the steps necessary to download Apache Tomcat 5 source code (and the 
-    other packages that it depends on), and build a binary distribution from 
+<li><a href="building.html"><strong>Building from Source</strong></a> -
+    Details the steps necessary to download Apache Tomcat 6 source code (and the
+    other packages that it depends on), and build a binary distribution from
     those sources.
     </li>
 <li><a href="changelog.html"><strong>Changelog</strong></a> - Details the
     changes made to Apache Tomcat.
     </li>
-<li><a href="status.html"><strong>Status</strong></a> - Apache Tomcat development 
+<li><a href="status.html"><strong>Status</strong></a> - Apache Tomcat development
     status.
     </li>
 <li><a href="developers.html"><strong>Developers</strong></a> - List of active
@@ -154,16 +154,16 @@ the development of the <em>Apache Tomcat</em> project.</p>
     </li>
 <li><a href="catalina/funcspecs/index.html"><strong>Functional Specifications</strong></a>
     - Requirements specifications for features of the <em>Catalina</em> servlet
-    container portion of Apache Tomcat 5.</li>
+    container portion of Apache Tomcat 6.</li>
 <li><a href="catalina/docs/api/index.html"><strong>Catalina Javadocs</strong></a>
     - Javadoc API documentation for the <em>Catalina</em> servlet
     container and its dependencies.</li>
 <li><a href="jasper/docs/api/index.html"><strong>Jasper Javadocs</strong></a>
     - Javadoc API documentation for the <em>Jasper</em> JSP container
-    portion of Apache Tomcat 5.</li>
+    portion of Apache Tomcat 6.</li>
 <li><a href="architecture/index.html"><strong>Apache Tomcat Architecture</strong></a>
     - Documentation of the Apache Tomcat Server Architecture.</li>
-    
+
 </ul>
 
 </section>
