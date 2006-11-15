@@ -24,7 +24,7 @@
   <display-name>Tomcat Manager Application</display-name>
   <description>
     A scriptable management web application for the Tomcat Web Server;
-	Manager lets you view, load/unload/etc particular web applications.
+    Manager lets you view, load/unload/etc particular web applications.
   </description>
 
   <!-- Define the Manager Servlet
@@ -183,5 +183,10 @@
     </description>
     <role-name>manager</role-name>
   </security-role>
+
+  <error-page>
+    <error-code>401</error-code>
+    <location>/401.jsp</location>
+  </error-page>
 
 </web-app>
