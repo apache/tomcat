@@ -8,7 +8,9 @@
     <!--
     BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px;}
     H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;}
-    PRE, TT {border: 1px dotted #525D76}-->
+    PRE, TT {border: 1px dotted #525D76}
+    A {color : black;}A.name {color : black;}
+    -->
   </style>
  </head>
  <body>
@@ -26,6 +28,10 @@
 &lt;role rolename="manager"/&gt;
 &lt;user username="tomcat" password="s3cret" roles="manager"/&gt;
 </pre>
+   </p>
+   <p>
+    For more information - please see the
+    <a href="/docs/manager-howto.html">Manager App HOW-TO</a>.
    </p>
  </body>
 
