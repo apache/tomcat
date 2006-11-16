@@ -64,8 +64,7 @@ public class InternalOutputBuffer
         
         headers = response.getMimeHeaders();
 
-        headerBuffer = new byte[headerBufferSize];
-        buf = headerBuffer;
+        buf = new byte[headerBufferSize];
 
         outputStreamOutputBuffer = new OutputStreamOutputBuffer();
 
@@ -120,7 +119,7 @@ public class InternalOutputBuffer
 
 
     /**
-     * Pointer to the current read buffer.
+     * The buffer used for header composition.
      */
     protected byte[] buf;
 
@@ -129,12 +128,6 @@ public class InternalOutputBuffer
      * Position in the buffer.
      */
     protected int pos;
-
-
-    /**
-     * HTTP header buffer.
-     */
-    protected byte[] headerBuffer;
 
 
     /**
@@ -336,7 +329,6 @@ public class InternalOutputBuffer
         socketBuffer.recycle();
 
         outputStream = null;
-        buf = headerBuffer;
         pos = 0;
         lastActiveFilter = -1;
         committed = false;
@@ -356,9 +348,6 @@ public class InternalOutputBuffer
         // Recycle Request object
         response.recycle();
         socketBuffer.recycle();
-
-        // Determine the header buffer used for next request
-        buf = headerBuffer;
 
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
