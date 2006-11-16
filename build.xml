@@ -478,7 +478,9 @@
       </fileset>
     </copy>
 
-    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES" />
+    <filter token="VERSION" value="${version}"/>
+    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES" 
+          filtering="true" />
 
     <!-- Build classes for examples webapp -->
     <javac   srcdir="webapps/examples/WEB-INF/classes" 
