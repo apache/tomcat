@@ -592,8 +592,6 @@
       </fileset>
       <fileset dir="${commons-pool.home}">
         <include name="**/*.java" />
-        <exclude name="**/Stack*.java" />
-        <exclude name="**/SoftReferenceObjectPool.java" />
         <exclude name="**/test/**" />
       </fileset>
       <fileset dir="${commons-dbcp.home}">
