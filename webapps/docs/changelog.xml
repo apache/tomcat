@@ -28,6 +28,10 @@
       <fix>
         <bug>40844</bug> Missing syncs in JDBCRealm. (markt)
       </fix>
+       <fix>
+        <bug>40901</bug>: Encode directory listing output. Based on a patch
+        provided by Chris Halstead. (markt)
+      </fix>
       <fix>
         <bug>40929</bug>: Correct JavaDoc for StandardClassLoader. (markt)
         (markt)
