@@ -110,7 +110,7 @@ public class CoyoteOutputStream
 
     public void print(String s)
         throws IOException {
-        ob.write(s);
+        super.print(s);
     }
 
 
