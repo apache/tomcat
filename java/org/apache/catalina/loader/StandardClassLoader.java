@@ -22,23 +22,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 /**
- * Subclass implementation of <b>java.net.URLClassLoader</b> that knows how
- * to load classes from disk directories, as well as local and remote JAR
- * files.  It also implements the <code>Reloader</code> interface, to provide
- * automatic reloading support to the associated loader.
- * <p>
- * In all cases, URLs must conform to the contract specified by
- * <code>URLClassLoader</code> - any URL that ends with a "/" character is
- * assumed to represent a directory; all other URLs are assumed to be the
- * address of a JAR file.
- * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - Local repositories are searched in
- * the order they are added via the initial constructor and/or any subsequent
- * calls to <code>addRepository()</code>.
- * <p>
- * <strong>IMPLEMENTATION NOTE</strong> - At present, there are no dependencies
- * from this class to any other Catalina class, so that it could be used
- * independently.
+ * Subclass implementation of <b>java.net.URLClassLoader</b>. There are no
+ * functional differences between this class and <b>java.net.URLClassLoader</b>.
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
