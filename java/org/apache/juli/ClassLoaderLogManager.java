@@ -453,7 +453,7 @@ public class ClassLoaderLogManager extends LogManager {
      * @return the modified string
      */
     protected String replace(String str) {
-        String result = str.trim();
+        String result = str;
         if (result.startsWith("${")) {
             int pos = result.indexOf('}');
             if (pos != -1) {
