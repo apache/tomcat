@@ -381,9 +381,9 @@ public final class Parameters extends MultiMap {
             pos=valEnd+1;
             
             if( nameEnd<=nameStart ) {
+                log.warn("Parameters: Invalid chunk ignored.");
                 continue;
                 // invalid chunk - it's better to ignore
-                // XXX log it ?
             }
             tmpName.setBytes( bytes, nameStart, nameEnd-nameStart );
             tmpValue.setBytes( bytes, valStart, valEnd-valStart );
@@ -392,6 +392,8 @@ public final class Parameters extends MultiMap {
                 addParam( urlDecode(tmpName, enc), urlDecode(tmpValue, enc) );
             } catch (IOException e) {
                 // Exception during character decoding: skip parameter
+                log.warn("Parameters: Character decoding failed. " + 
+                         "Parameter skipped.", e);
             }
 
             tmpName.recycle();
