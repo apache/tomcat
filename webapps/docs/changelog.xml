@@ -26,6 +26,11 @@
         defined in logging.properties files. (markt)
       </fix>
       <fix>
+        <bug>38198</bug>: Add reference to Context documentation from Host
+        documentation that explains how Context name is obtained from the
+        Context filename. (markt)
+      </fix>
+      <fix>
         <bug>40844</bug> Missing syncs in JDBCRealm. (markt)
       </fix>
        <fix>

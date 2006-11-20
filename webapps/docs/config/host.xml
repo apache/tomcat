@@ -272,7 +272,8 @@
         attribute of this <code>&lt;Context&gt;</code> element will typically
         be the absolute pathname to a web application directory, or the
         absolute pathname of a web application archive (WAR) file (which
-        will not be expanded).</li>
+        will not be expanded). The path attribute will be automatically set
+        as defined in the <a href="context.html">Context</a> documentation.</li>
     <li>Any web application archive file within the application base (appBase)
         directory that does not have a corresponding
         directory of the same name (without the ".war" extension) will be
