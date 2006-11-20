@@ -32,6 +32,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        <bug>40860</bug>: Log exceptions and other problems during parameter
+        processing. (markt)
+      </fix>
     </changelog>
   </subsection> 
 </section>

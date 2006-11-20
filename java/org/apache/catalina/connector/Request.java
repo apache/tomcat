@@ -2444,7 +2444,8 @@ public class Request
                     parameters.processParameters(formData, 0, len);
                 }
             } catch (Throwable t) {
-                ; // Ignore
+                context.getLogger().warn(
+                        sm.getString("coyoteRequest.parseParameters"), t);
             }
         }
 
