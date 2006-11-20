@@ -574,6 +574,7 @@ public class Response
                 (sm.getString("coyoteResponse.getOutputStream.ise"));
 
         usingOutputStream = true;
+        outputBuffer.checkConverter();
         if (outputStream == null) {
             outputStream = new CoyoteOutputStream(outputBuffer);
         }
