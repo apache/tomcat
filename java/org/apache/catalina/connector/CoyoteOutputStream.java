@@ -105,14 +105,5 @@ public class CoyoteOutputStream
     }
 
 
-    // -------------------------------------------- ServletOutputStream Methods
-
-
-    public void print(String s)
-        throws IOException {
-        super.print(s);
-    }
-
-
 }
 
