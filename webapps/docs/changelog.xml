@@ -22,11 +22,15 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>37509</bug>: Do not remove whitespace from the end of values
+        defined in logging.properties files. (markt)
+      </fix>
+      <fix>
         <bug>40844</bug> Missing syncs in JDBCRealm. (markt)
       </fix>
       <fix>
-        <bug>37509</bug>: Do not remove whitespace from the end of values
-        defined in logging.properties files. (markt)
+        <bug>40929</bug>: Correct JavaDoc for StandardClassLoader. (markt)
+        (markt)
       </fix>
     </changelog>
   </subsection>
