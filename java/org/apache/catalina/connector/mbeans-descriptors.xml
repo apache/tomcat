@@ -171,6 +171,18 @@
            description="The thread priority for processors"
                   type="int"/>
 
+    <attribute   name="trustStoreFile"
+          description="Pathname to the trust store file to be used"
+                 type="java.lang.String"/>
+
+    <attribute   name="trustStorePass"
+          description="Password for accessing the trust store file"
+                 type="java.lang.String"/>
+
+    <attribute   name="trustStoreType"
+          description="Type of trust store file to be used for trusted certificates"
+                 type="java.lang.String"/>
+
     <attribute   name="URIEncoding"
           description="Character encoding used to decode the URI"
                  type="java.lang.String"/>

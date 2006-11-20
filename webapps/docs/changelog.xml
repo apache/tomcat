@@ -49,6 +49,9 @@
         <bug>40860</bug>: Log exceptions and other problems during parameter
         processing. (markt)
       </fix>
+      <update>
+        Enable JMX for trust store attributes for SSL connector. (markt)
+      </update>
     </changelog>
   </subsection> 
 </section>
