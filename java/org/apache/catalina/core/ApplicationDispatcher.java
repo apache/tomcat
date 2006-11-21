@@ -969,10 +969,8 @@ final class ApplicationDispatcher
     }
 
     private void checkSameObjects() throws ServletException {
-        ServletRequest originalRequest =
-            ApplicationFilterChain.getLastServicedRequest();
-        ServletResponse originalResponse =
-            ApplicationFilterChain.getLastServicedResponse();
+        ServletRequest originalRequest = ApplicationFilterChain.getLastServicedRequest();
+        ServletResponse originalResponse = ApplicationFilterChain.getLastServicedResponse();
         
         // Some forwards, eg from valves will not set original values 
         if (originalRequest == null || originalResponse == null) {
@@ -982,41 +980,47 @@ final class ApplicationDispatcher
         boolean same = false;
         ServletRequest dispatchedRequest = appRequest;
         
+        //find the bottom most request, the one that was passed into the service method
+        while ( originalRequest instanceof ServletRequestWrapper && ((ServletRequestWrapper) originalRequest).getRequest()!=null ) {
+            originalRequest = ((ServletRequestWrapper) originalRequest).getRequest();
+        }
+        //compare with the dispatched request
         while (!same) {
             if (originalRequest.equals(dispatchedRequest)) {
                 same = true;
             }
             if (!same && dispatchedRequest instanceof ServletRequestWrapper) {
-                dispatchedRequest =
-                    ((ServletRequestWrapper) dispatchedRequest).getRequest();
+                dispatchedRequest = ((ServletRequestWrapper) dispatchedRequest).getRequest();
             } else {
                 break;
             }
         }
         if (!same) {
-            throw new ServletException(sm.getString(
-                    "applicationDispatcher.specViolation.request"));
+            throw new ServletException(sm.getString("applicationDispatcher.specViolation.request"));
         }
         
         same = false;
         ServletResponse dispatchedResponse = appResponse;
         
+        //find the bottom most response, the one that was passed into the service method
+        while ( originalResponse instanceof ServletResponseWrapper && ((ServletResponseWrapper) originalResponse).getResponse()!=null ) {
+            originalResponse = ((ServletResponseWrapper) originalResponse).getResponse();
+        }
+        //compare with the dispatched response
         while (!same) {
             if (originalResponse.equals(dispatchedResponse)) {
                 same = true;
             }
             
             if (!same && dispatchedResponse instanceof ServletResponseWrapper) {
-                dispatchedResponse =
-                    ((ServletResponseWrapper) dispatchedResponse).getResponse();
+                dispatchedResponse = ((ServletResponseWrapper) dispatchedResponse).getResponse();
             } else {
                 break;
             }
         }
 
         if (!same) {
-            throw new ServletException(sm.getString(
-                    "applicationDispatcher.specViolation.response"));
+            throw new ServletException(sm.getString("applicationDispatcher.specViolation.response"));
         }
     }
 }
