@@ -609,6 +609,11 @@
       <replacefilter token="org.apache.commons"
             value="org.apache.tomcat.dbcp" />
     </replace>
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl" >
+      <replacefilter token="enum"
+            value="enumeration" />
+    </replace>
+
     <mkdir dir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp" />
     <move todir="${tomcat-dbcp.home}/src/java/org/apache/tomcat/dbcp">
       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
