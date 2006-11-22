@@ -183,15 +183,18 @@ public final class MessageBytes implements Cloneable, Serializable {
      * Set the content to be a string
      */
     public void setString( String s ) {
-        if (s == null)
-            return;
         strValue=s;
-        hasStrValue=true;
         hasHashCode=false;
         hasIntValue=false;
         hasLongValue=false;
         hasDateValue=false; 
-        type=T_STR;
+        if (s == null) {
+            hasStrValue=false;
+            type=T_NULL;
+        } else {
+            hasStrValue=true;
+            type=T_STR;
+        }
     }
 
     // -------------------- Conversion and getters --------------------
