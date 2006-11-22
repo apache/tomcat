@@ -39,7 +39,14 @@
       </fix>
       <fix>
         <bug>40929</bug>: Correct JavaDoc for StandardClassLoader. (markt)
-        (markt)
+      </fix>
+      <fix>
+        Fix usage of print on the servlet output stream if the processor never used
+        a writer (fhanik)
+      </fix>
+      <fix>
+        Fix logic of sameSameObjects used to determine correct wrapping of request and
+        response objects (fhanik)
       </fix>
     </changelog>
   </subsection>
@@ -52,6 +59,12 @@
       <update>
         Enable JMX for trust store attributes for SSL connector. (markt)
       </update>
+      <update>
+        Port memory usage reduction changes to the java.io HTTP connector. (remm)
+      </update>
+      <fix>
+        MessageBytes.setString(null) will remove the String value. (remm)
+      </fix>
     </changelog>
   </subsection> 
 </section>
@@ -164,8 +177,15 @@
   <subsection name="Coyote">
     <changelog>
       <add>
-        SSLEnabled attribute required for SSL to be turned on, on all HTTP connectors(fhanik)
+        SSLEnabled attribute required for SSL to be turned on, on all HTTP connectors (fhanik)
       </add>
+      <update>
+        Memory usage reduction for the HTTP connectors, except java.io (remm)
+      </update>
+      <update>
+        Modeler update to use dynamic mbeans rather than model mbeans, which consume more
+        resources (costin)
+      </update>
     </changelog>
   </subsection> 
   <subsection name="Cluster">
