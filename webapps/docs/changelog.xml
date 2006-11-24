@@ -41,6 +41,10 @@
         <bug>40929</bug>: Correct JavaDoc for StandardClassLoader. (markt)
       </fix>
       <fix>
+        <bug>41008</bug>: Allow POST to be used for indexed queries with CGI
+        Servlet. Patch provided by Chris Halstead. (markt)
+      </fix>
+      <fix>
         Fix usage of print on the servlet output stream if the processor never used
         a writer (fhanik)
       </fix>
