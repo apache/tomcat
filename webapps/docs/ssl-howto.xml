@@ -175,8 +175,8 @@ hosts are commonly used with SSL in a production environment.</p>
 
 <subsection name="Prepare the Certificate Keystore">
 
-<p>Tomcat currently operates only on <code>JKS</code> or <code>PKCS12</code>
-format keystores.  The <code>JKS</code> format
+<p>Tomcat currently operates only on <code>JKS</code>, <code>PKCS11</code> or
+<code>PKCS12</code> format keystores.  The <code>JKS</code> format
 is Java's standard "Java KeyStore" format, and is the format created by the
 <code>keytool</code> command-line utility.  This tool is included in the JDK.
 The <code>PKCS12</code> format is an internet standard, and can be manipulated
