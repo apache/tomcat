@@ -70,7 +70,15 @@
         MessageBytes.setString(null) will remove the String value. (remm)
       </fix>
     </changelog>
-  </subsection> 
+  </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>40677</bug>: Update SSL documentation to indicate that PKCS11
+        keystores may be used. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 6.0.2 (remm)">
   <subsection name="General">
