@@ -128,7 +128,7 @@ AC_ARG_ENABLE(openssl,
   AC_MSG_RESULT([Disabling SSL support...])
 ])
 
-if test $use_openssl ; then
+if $use_openssl ; then
   TCN_CHECK_SSL_TOOLKIT
 fi
 
