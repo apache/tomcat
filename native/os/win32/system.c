@@ -34,7 +34,9 @@
 #include "apr_arch_atime.h"  /* for FileTimeToAprTime */
 
 #include "tcn.h"
+#ifdef HAVE_OPENSSL
 #include "ssl_private.h"
+#endif
 
 #pragma warning(push)
 #pragma warning(disable : 4201)
@@ -371,6 +373,8 @@ cleanup:
     return rv;
 }
 
+#ifdef HAVE_OPENSSL
+
 static DWORD WINAPI password_thread(void *data)
 {
     tcn_pass_cb_t *cb = (tcn_pass_cb_t *)data;
@@ -461,4 +465,4 @@ int WIN32_SSL_password_prompt(tcn_pass_cb_t *data)
     return (int)strlen(data->password);
 }
 
-
+#endif

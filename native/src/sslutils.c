@@ -672,10 +672,4 @@ int SSL_callback_SSL_verify(int ok, X509_STORE_CTX *ctx)
     return ok;
 }
 
-#else
-/* OpenSSL is not supported
- * If someday we make OpenSSL optional
- * APR_ENOTIMPL will go here
- */
-#error "No OpenSSL Toolkit defined."
 #endif

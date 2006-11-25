@@ -555,9 +555,35 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
 }
 
 #else
-/* OpenSSL is not supported
- * If someday we make OpenSSL optional
- * APR_ENOTIMPL will go here
+/* OpenSSL is not supported.
+ * Create empty stubs.
  */
-#error "No OpenSSL Toolkit defined."
+
+TCN_IMPLEMENT_CALL(jobject, SSLSocket, getInfoB)(TCN_STDARGS, jlong sock,
+                                                 jint what)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    UNREFERENCED(what);
+    return NULL;
+}
+
+TCN_IMPLEMENT_CALL(jstring, SSLSocket, getInfoS)(TCN_STDARGS, jlong sock,
+                                                 jint what)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    UNREFERENCED(what);
+    return NULL;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLSocket, getInfoI)(TCN_STDARGS, jlong sock,
+                                              jint what)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    UNREFERENCED(what);
+    return 0;
+}
+
 #endif
