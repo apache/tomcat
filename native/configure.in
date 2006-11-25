@@ -101,8 +101,7 @@ fi
 APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/$JAVA_INC])
 
 dnl sableVM does not have/need $JAVA_OS/jni_md.h
-if test "$SABLEVM" = "NONE"
-then
+if test "$SABLEVM" = "NONE"; then
   TCN_FIND_JDK_OS
   if test -z "${JAVA_OS}"; then
     AC_MSG_RESULT([jni_md.h found in $JAVA_HOME/$JAVA_INC])
@@ -119,7 +118,18 @@ AC_SUBST(JAVA_OS)
 dnl
 dnl Detect openssl toolkit installation
 dnl
-TCN_CHECK_SSL_TOOLKIT
+
+use_openssl=yes
+AC_ARG_ENABLE(openssl, 
+[ --disable-openssl   avoid using OpenSSL toolkit],
+[
+  use_openssl=no
+  AC_MSG_RESULT([...Disabling SSL support])
+])
+
+if test "x$use_openssl" = "xyes"; then
+  TCN_CHECK_SSL_TOOLKIT
+fi
 
 so_ext=$APR_SO_EXT
 lib_target=$APR_LIB_TARGET
