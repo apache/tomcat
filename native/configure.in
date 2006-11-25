@@ -119,15 +119,16 @@ dnl
 dnl Detect openssl toolkit installation
 dnl
 
-use_openssl=yes
+use_openssl=true;
+
 AC_ARG_ENABLE(openssl, 
 [ --disable-openssl   avoid using OpenSSL toolkit],
 [
-  use_openssl=no
-  AC_MSG_RESULT([...Disabling SSL support])
+  use_openssl=false;
+  AC_MSG_RESULT([Disabling SSL support...])
 ])
 
-if test "x$use_openssl" = "xyes"; then
+if test $use_openssl ; then
   TCN_CHECK_SSL_TOOLKIT
 fi
 
