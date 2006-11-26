@@ -17,6 +17,9 @@
 
 package org.apache.coyote.ajp;
 
+import java.lang.IndexOutOfBoundsException;
+import java.util.Hashtable;
+import java.util.Locale;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 
@@ -67,6 +70,7 @@ public final class Constants {
     public static final int SC_RESP_SERVLET_ENGINE      = 0xA009;
     public static final int SC_RESP_STATUS              = 0xA00A;
     public static final int SC_RESP_WWW_AUTHENTICATE    = 0xA00B;
+    public static final int SC_RESP_AJP13_MAX           = 11;
 
     // Integer codes for common (optional) request attribute names
     public static final byte SC_A_CONTEXT       = 1;  // XXX Unused
@@ -179,7 +183,47 @@ public final class Constants {
             "user-agent"
     };
 
+    // Translates integer codes to response header names
+    public static final String []responseTransArray = {
+            "content-type",
+            "content-language",
+            "content-length",
+            "date",
+            "last-modified",
+            "location",
+            "set-cookie",
+            "set-cookie2",
+            "servlet-engine",
+            "status",
+            "www-authenticate"
+    };
 
+    private static final Hashtable<String,Integer>  responseTransHash =
+        new Hashtable<String,Integer>(20);
+
+    static {
+        try {
+            int i;
+            for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
+                responseTransHash.put(responseTransArray[i],
+                                      new Integer(0xA001 + i));
+            }
+        }
+        catch (Exception e) {
+            // Do nothing
+        }
+    }    
+
+    public static final int getResponseAjpIndex(String header)
+    {
+        Integer i = responseTransHash.get(header.toLowerCase(Locale.US));
+        if (i == null)
+            return 0;
+        else
+            return i.intValue();
+    }
+
+    
     /**
      * CRLF.
      */
