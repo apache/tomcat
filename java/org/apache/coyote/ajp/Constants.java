@@ -185,17 +185,17 @@ public final class Constants {
 
     // Translates integer codes to response header names
     public static final String []responseTransArray = {
-            "content-type",
-            "content-language",
-            "content-length",
-            "date",
-            "last-modified",
-            "location",
-            "set-cookie",
-            "set-cookie2",
-            "servlet-engine",
-            "status",
-            "www-authenticate"
+            "Content-Type",
+            "Content-Language",
+            "Content-Length",
+            "Date",
+            "Last-Modified",
+            "Location",
+            "Set-Cookie",
+            "Set-Cookie2",
+            "Servlet-Engine",
+            "Status",
+            "WWW-Authenticate"
     };
 
     private static final Hashtable<String,Integer>  responseTransHash =
@@ -216,7 +216,7 @@ public final class Constants {
 
     public static final int getResponseAjpIndex(String header)
     {
-        Integer i = responseTransHash.get(header.toLowerCase(Locale.US));
+        Integer i = responseTransHash.get(header);
         if (i == null)
             return 0;
         else
