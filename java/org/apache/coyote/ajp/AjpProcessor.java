@@ -929,7 +929,13 @@ public class AjpProcessor implements ActionHook {
         responseHeaderMessage.appendInt(numHeaders);
         for (int i = 0; i < numHeaders; i++) {
             MessageBytes hN = headers.getName(i);
-            responseHeaderMessage.appendBytes(hN);
+            int hC = Constants.getResponseAjpIndex(hN.toString());
+            if (hC > 0) {
+                responseHeaderMessage.appendInt(hC);
+            }
+            else {
+                responseHeaderMessage.appendBytes(hN);
+            }
             MessageBytes hV=headers.getValue(i);
             responseHeaderMessage.appendBytes(hV);
         }
