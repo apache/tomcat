@@ -114,12 +114,15 @@
     <attribute name="SSLEngine" required="false">
     <p>
       Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no specific ENGINE.
-      The default value is on.
+      The default value is <b>on</b>.
       This initializes the native SSL engine, then enable the use of this engine in the connector 
       using the <code>SSLEnabled</code> attribute. Example:
       <source>
 &lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
       </source>
+    </p>
+    <p>See the <a href="http://www.openssl.org">Official OpenSSL 
+       website</a> for more details on SSL hardware engines and manufacturers.
     </p>
     </attribute>
     </subsection>
@@ -287,7 +290,7 @@
                maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
                enableLookups="false" disableUploadTimeout="true"
                acceptCount="100" scheme="https" secure="true"
-               SSLEngine="on" 
+               SSLEnabled="true" 
                SSLCertificateFile="${catalina.base}/conf/localhost.crt"
                SSLCertificateKeyFile="${catalina.base}/conf/localhost.key" /&gt;</source>
     </p>
