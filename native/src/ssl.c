@@ -369,6 +369,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     UNREFERENCED(o);
     if (!tcn_global_pool) {
         TCN_FREE_CSTRING(engine);
+        tcn_ThrowAPRException(e, APR_EINVAL);
         return (jint)APR_EINVAL;
     }
     /* Check if already initialized */
@@ -378,6 +379,8 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     }
     if (SSLeay() < 0x0090700L) {
         TCN_FREE_CSTRING(engine);
+        tcn_ThrowAPRException(e, APR_EINVAL);
+        ssl_initialized = 0;
         return (jint)APR_EINVAL;
     }
     /* We must register the library in full, to ensure our configuration
@@ -418,6 +421,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         if (err != APR_SUCCESS) {
             TCN_FREE_CSTRING(engine);
             ssl_init_cleanup(NULL);
+            tcn_ThrowAPRException(e, err);
             return (jint)err;
         }
         tcn_ssl_engine = ee;
@@ -437,6 +441,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     if (r) {
         TCN_FREE_CSTRING(engine);
         ssl_init_cleanup(NULL);
+        tcn_ThrowAPRException(e, APR_ENOTIMPL);
         return APR_ENOTIMPL;
     }
     /*
@@ -820,8 +825,9 @@ TCN_IMPLEMENT_CALL(jstring, SSL, versionString)(TCN_STDARGS)
 
 TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
 {
-    UNREFERENCED_STDARGS;
+    UNREFERENCED(o);
     UNREFERENCED(engine);
+    tcn_ThrowAPRException(e, APR_ENOTIMPL);
     return (jint)APR_ENOTIMPL;
 }
 
