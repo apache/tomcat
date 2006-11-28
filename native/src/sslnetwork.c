@@ -567,6 +567,13 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
  * Create empty stubs.
  */
 
+TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(sock);
+    return (jint)APR_ENOTIMPL;
+}
+
 TCN_IMPLEMENT_CALL(jint, SSLSocket, attach)(TCN_STDARGS, jlong ctx,
                                             jlong sock)
 {
