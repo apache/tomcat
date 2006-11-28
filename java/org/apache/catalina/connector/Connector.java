@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,7 +65,7 @@ public class Connector
     public static final boolean RECYCLE_FACADES =
         Boolean.valueOf(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false")).booleanValue();
 
-    
+
     // ------------------------------------------------------------ Constructor
 
 
@@ -73,8 +73,8 @@ public class Connector
         throws Exception {
         this(null);
     }
-    
-    public Connector(String protocol) 
+
+    public Connector(String protocol)
         throws Exception {
         setProtocol(protocol);
         // Instantiate protocol handler
@@ -87,8 +87,8 @@ public class Connector
                  ("coyoteConnector.protocolHandlerInstantiationFailed", e));
         }
     }
-    
-    
+
+
     // ----------------------------------------------------- Instance Variables
 
 
@@ -193,7 +193,7 @@ public class Connector
 
 
     /**
-     * Maximum size of a POST which will be automatically parsed by the 
+     * Maximum size of a POST which will be automatically parsed by the
      * container. 2MB by default.
      */
     protected int maxPostSize = 2 * 1024 * 1024;
@@ -293,8 +293,8 @@ public class Connector
          replacements.put("sslProtocol", "protocol");
          replacements.put("sslProtocols", "protocols");
      }
-     
-     
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -309,7 +309,7 @@ public class Connector
         return IntrospectionUtils.getProperty(protocolHandler, repl);
     }
 
-    
+
     /**
      * Set a configured property.
      */
@@ -321,7 +321,7 @@ public class Connector
         IntrospectionUtils.setProperty(protocolHandler, repl, value);
     }
 
-    
+
     /**
      * Return a configured property.
      */
@@ -329,7 +329,7 @@ public class Connector
         return getProperty(name);
     }
 
-    
+
     /**
      * Set a configured property.
      */
@@ -337,8 +337,8 @@ public class Connector
         setProperty(name, String.valueOf(value));
     }
 
-    
-    /** 
+
+    /**
      * remove a configured property.
      */
     public void removeProperty(String name) {
@@ -346,7 +346,7 @@ public class Connector
         //protocolHandler.removeAttribute(name);
     }
 
-    
+
     /**
      * Return the <code>Service</code> with which we are associated (if any).
      */
@@ -404,7 +404,7 @@ public class Connector
 
     /**
      * Return the input buffer size for this Connector.
-     * 
+     *
      * @deprecated
      */
     public int getBufferSize() {
@@ -420,7 +420,7 @@ public class Connector
     public void setBufferSize(int bufferSize) {
     }
 
-    
+
     /**
      * Return the Container used for processing requests received by this
      * Connector.
@@ -428,7 +428,7 @@ public class Connector
     public Container getContainer() {
         if( container==null ) {
             // Lazy - maybe it was added later
-            findContainer();     
+            findContainer();
         }
         return (container);
 
@@ -529,7 +529,7 @@ public class Connector
      * Set the maximum size of a POST which will be automatically
      * parsed by the container.
      *
-     * @param maxPostSize The new maximum size in bytes of a POST which will 
+     * @param maxPostSize The new maximum size in bytes of a POST which will
      * be automatically parsed by the container
      */
     public void setMaxPostSize(int maxPostSize) {
@@ -605,7 +605,55 @@ public class Connector
         return getProtocolHandlerClassName();
 
     }
+    
+    // ---------------------------------------------- APR Version Constants
 
+    private static final int TCN_REQUIRED_MAJOR = 1;
+    private static final int TCN_REQUIRED_MINOR = 1;
+    private static final int TCN_REQUIRED_PATCH = 3;
+    private static boolean aprInitialized = false;
+
+    // APR init support
+    private static synchronized void initializeAPR()
+    {
+        if (aprInitialized) {
+            return;
+        }
+        int major = 0;
+        int minor = 0;
+        int patch = 0;
+        try {
+            String methodName = "initialize";
+            Class paramTypes[] = new Class[1];
+            paramTypes[0] = String.class;
+            Object paramValues[] = new Object[1];
+            paramValues[0] = null;
+            Class clazz = Class.forName("org.apache.tomcat.jni.Library");
+            Method method = clazz.getMethod(methodName, paramTypes);
+            method.invoke(null, paramValues);
+            major = clazz.getField("TCN_MAJOR_VERSION").getInt(null);
+            minor = clazz.getField("TCN_MINOR_VERSION").getInt(null);
+            patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
+        } catch (Throwable t) {
+            return;
+        }
+        if ((major != TCN_REQUIRED_MAJOR) ||
+            (minor != TCN_REQUIRED_MINOR) ||
+            (patch <  TCN_REQUIRED_PATCH)) {
+            try {
+                // Terminate the APR in case the version
+                // is below required.
+                String methodName = "terminate";
+                Method method = Class.forName("org.apache.tomcat.jni.Library")
+                                    .getMethod(methodName, (Class [])null);
+                method.invoke(null, (Object []) null);
+            } catch (Throwable t) {
+                // Ignore
+            }
+            return;
+        }
+        aprInitialized = true;
+    }
 
     /**
      * Set the Coyote protocol which will be used by the connector.
@@ -615,22 +663,9 @@ public class Connector
     public void setProtocol(String protocol) {
 
         // Test APR support
-        boolean apr = false;
-        try {
-            String methodName = "initialize";
-            Class paramTypes[] = new Class[1];
-            paramTypes[0] = String.class;
-            Object paramValues[] = new Object[1];
-            paramValues[0] = null;
-            Method method = Class.forName("org.apache.tomcat.jni.Library")
-                .getMethod(methodName, paramTypes);
-            method.invoke(null, paramValues);
-            apr = true;
-        } catch (Throwable t) {
-            // Ignore
-        }
+        initializeAPR();
 
-        if (apr) {
+        if (aprInitialized) {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.http11.Http11AprProtocol");
@@ -766,7 +801,7 @@ public class Connector
 
     }
 
-    
+
     /**
      * Return the scheme that will be assigned to requests received
      * through this connector.  Default value is "http".
@@ -970,7 +1005,7 @@ public class Connector
 
     }
 
-    
+
     protected ObjectName createObjectName(String domain, String type)
             throws MalformedObjectNameException {
         String encodedAddr = null;
@@ -983,7 +1018,7 @@ public class Connector
                 + getPort() + addSuffix);
         return _oname;
     }
-    
+
     /**
      * Initialize this connector (create ServerSocket here!)
      */
@@ -1207,13 +1242,13 @@ public class Connector
             log.error( "Unregistering - can't stop", t);
         }
     }
-    
+
     protected void findContainer() {
         try {
             // Register to the service
             ObjectName parentName=new ObjectName( domain + ":" +
                     "type=Service");
-            
+
             if(log.isDebugEnabled())
                 log.debug("Adding to " + parentName );
             if( mserver.isRegistered(parentName )) {
@@ -1231,10 +1266,10 @@ public class Connector
                 if(log.isDebugEnabled())
                       log.debug("Found engine " + obj + " " + obj.getClass());
                 container=(Container)obj;
-                
+
                 // Internal initialize - we now have the Engine
                 initialize();
-                
+
                 if(log.isDebugEnabled())
                     log.debug("Initialized");
                 // As a side effect we'll get the container field set
