@@ -389,6 +389,16 @@ public class AjpProtocol
     }
 
     
+    /**
+     * The number of seconds Tomcat will wait for a subsequent request
+     * before closing the connection. The default is the same as for
+     * Apache HTTP Server (15 000 milliseconds).
+     */
+    protected int keepAliveTimeout = -1;
+    public int getKeepAliveTimeout() { return keepAliveTimeout; }
+    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
+
+
     // --------------------------------------  AjpConnectionHandler Inner Class
 
 
@@ -411,6 +421,7 @@ public class AjpProtocol
                     processor.setAdapter(proto.adapter);
                     processor.setTomcatAuthentication(proto.tomcatAuthentication);
                     processor.setRequiredSecret(proto.requiredSecret);
+                    processor.setKeepAliveTimeout(proto.keepAliveTimeout);
                     localProcessor.set(processor);
                     if (proto.getDomain() != null) {
                         synchronized (this) {
