@@ -1075,7 +1075,7 @@ class Validator {
                                     }
                                     // Check casting
                                     try {
-                                        ELSupport.coerceToType(attrs.getValue(i), expectedClass);
+                                        ELSupport.checkType(attrs.getValue(i), expectedClass);
                                     } catch (Exception e) {
                                         err.jspError
                                             (n, "jsp.error.coerce_to_type",
