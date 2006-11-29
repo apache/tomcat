@@ -56,7 +56,11 @@ public class StringCache {
         Integer.parseInt(System.getProperty("tomcat.util.buf.StringCache.cacheSize", "200"));
     
 
-    /**
+    protected static int maxStringSize = 
+        Integer.parseInt(System.getProperty("tomcat.util.buf.StringCache.maxStringSize", "128"));
+    
+
+   /**
      * Statistics hash map for byte chunk.
      */
     protected static HashMap bcStats = new HashMap(cacheSize);
@@ -210,7 +214,7 @@ public class StringCache {
         // still training
         if (bcCache == null) {
             String value = bc.toStringInternal();
-            if (byteEnabled) {
+            if (byteEnabled && (value.length() < maxStringSize)) {
                 // If training, everything is synced
                 synchronized (bcStats) {
                     // If the cache has been generated on a previous invocation
@@ -324,7 +328,7 @@ public class StringCache {
         // still training
         if (ccCache == null) {
             String value = cc.toStringInternal();
-            if (charEnabled) {
+            if (charEnabled && (value.length() < maxStringSize)) {
                 // If training, everything is synced
                 synchronized (ccStats) {
                     // If the cache has been generated on a previous invocation
