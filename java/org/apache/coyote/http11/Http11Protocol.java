@@ -71,7 +71,6 @@ public class Http11Protocol
     public Http11Protocol() {
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
-        setKeepAliveTimeout(Constants.DEFAULT_KEEPALIVE_TIMEOUT);
         //setServerSoTimeout(Constants.DEFAULT_SERVER_SOCKET_TIMEOUT);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
@@ -292,16 +291,9 @@ public class Http11Protocol
      * before closing the connection. The default is the same as for
      * Apache HTTP Server (15 000 milliseconds).
      */
-    protected int keepAliveTimeout = 15000;
-    public int getKeepAliveTimeout()
-    {
-        return keepAliveTimeout;
-    }
-    
-    public void setKeepAliveTimeout(int timeout)
-    {
-        keepAliveTimeout = timeout;
-    }
+    protected int keepAliveTimeout = -1;
+    public int getKeepAliveTimeout() { return keepAliveTimeout; }
+    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
 
     // HTTP
     /**

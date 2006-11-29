@@ -190,7 +190,7 @@ public class Http11Processor implements ActionHook {
      * The number of seconds Tomcat will wait for a subsequent request
      * before closing the connection.
      */
-    protected int keepAliveTimeout = 15000;
+    protected int keepAliveTimeout = -1;
 
 
     /**

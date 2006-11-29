@@ -652,6 +652,11 @@ public class AprEndpoint {
             }
         }
         
+        // Initialize keepalive timeout if it has not been set
+        if (keepAliveTimeout == -1) {
+            keepAliveTimeout = soTimeout;
+        }
+        
         // Delay accepting of new connections until data is available
         // Only Linux kernels 2.4 + have that implemented
         // on other platforms this call is noop and will return APR_ENOTIMPL.
