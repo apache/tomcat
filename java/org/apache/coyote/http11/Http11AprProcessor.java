@@ -209,12 +209,6 @@ public class Http11AprProcessor implements ActionHook {
      */
     protected int maxKeepAliveRequests = -1;
 
-    /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection.
-     */
-    protected int keepAliveTimeout = 15000;
-
 
     /**
      * SSL enabled ?
@@ -708,20 +702,6 @@ public class Http11AprProcessor implements ActionHook {
      */
     public int getTimeout() {
         return timeout;
-    }
-
-    /**                                           
-     * Set the Keep-Alive timeout.
-     */
-    public void setKeepAliveTimeout(int timeout) {
-        keepAliveTimeout = timeout;
-    }
-
-    /**
-     * Return the number Keep-Alive timeout.
-     */
-    public int getKeepAliveTimeout() {
-        return keepAliveTimeout;
     }
 
     /**
