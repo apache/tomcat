@@ -258,6 +258,21 @@ public class AprEndpoint {
 
 
     /**
+     * Keep-Alive timeout.
+     */
+    protected int keepAliveTimeout = 15000;
+    public int getKeepAliveTimeout()
+    {
+        return keepAliveTimeout;
+    }
+
+    public void setKeepAliveTimeout(int timeout)
+    {
+        keepAliveTimeout = timeout;
+    }
+
+
+    /**
      * Timeout on first request read before going to the poller, in ms.
      */
     protected int firstReadTimeout = -1;
@@ -1143,11 +1158,11 @@ public class AprEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = pollerSize / pollerThreadCount;
-            int timeout = soTimeout;
+            int timeout = keepAliveTimeout;
             if (comet) {
                 // FIXME: Find an appropriate timeout value, for now, "longer than usual"
                 // semms appropriate
-                timeout = soTimeout * 50;
+                timeout = keepAliveTimeout * 50;
             }
             serverPollset = allocatePoller(size, pool, timeout);
             if (serverPollset == 0 && size > 1024) {
@@ -1561,14 +1576,14 @@ public class AprEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = sendfileSize / sendfileThreadCount;
-            sendfilePollset = allocatePoller(size, pool, soTimeout);
+            sendfilePollset = allocatePoller(size, pool, keepAliveTimeout);
             if (sendfilePollset == 0 && size > 1024) {
                 size = 1024;
-                sendfilePollset = allocatePoller(size, pool, soTimeout);
+                sendfilePollset = allocatePoller(size, pool, keepAliveTimeout);
             }
             if (sendfilePollset == 0) {
                 size = 62;
-                sendfilePollset = allocatePoller(size, pool, soTimeout);
+                sendfilePollset = allocatePoller(size, pool, keepAliveTimeout);
             }
             desc = new long[size * 2];
             sendfileData = new HashMap<Long, SendfileData>(size);

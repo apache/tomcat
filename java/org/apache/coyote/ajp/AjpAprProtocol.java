@@ -433,7 +433,17 @@ public class AjpAprProtocol
         packetSize = i;
     }
 
-    
+    public int getKeepAliveTimeout() {
+        return ep.getKeepAliveTimeout();
+    }
+
+
+    public void setKeepAliveTimeout( int i ) {
+        ep.setKeepAliveTimeout(i);
+        setAttribute("keepAliveTimeout", "" + i);
+    }
+
+
     // --------------------------------------  AjpConnectionHandler Inner Class
 
 

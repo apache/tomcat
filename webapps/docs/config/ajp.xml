@@ -218,6 +218,12 @@ with AJP enabled</li>
       presented.  The default value is infinite (i.e. no timeout).</p>
     </attribute>
 
+    <attribute name="keepAliveTimeout" required="false">
+      <p>The number of milliseconds this <strong>Connector</strong> will wait,
+       subsequent request before closing the connection.
+       The default value is infinite (i.e. no timeout).</p>
+    </attribute>
+
     <attribute name="minProcessors" required="false">
       <strong>deprecated</strong>
       <p>The minimum number of processors to start at initialization time.
