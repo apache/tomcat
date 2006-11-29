@@ -476,6 +476,10 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
         ep.setKeepAliveTimeout(timeout);
     }
 
+    public boolean getKeepAlive() {
+        return ((maxKeepAliveRequests != 0) && (maxKeepAliveRequests != 1));
+    }
+
     /**
      * Set the keep-alive policy for this connection.
      */
