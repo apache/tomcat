@@ -529,6 +529,9 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      */
     void release() {
 
+        for (int i = 0; i < n; i++) {
+            filters[i] = null;
+        }
         n = 0;
         pos = 0;
         servlet = null;
