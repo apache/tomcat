@@ -202,6 +202,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
     private int socketBuffer = 9000;
     private Adapter adapter;
     private Http11ConnectionHandler cHandler;
+    private int keepAliveTimeout = 15000; // 15 seconds as in Apache HTTPD server
 
     /**
      * Compression value.
@@ -463,11 +464,20 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration
         setAttribute("maxKeepAliveRequests", "" + mkar);
     }
 
+                                                                                
     /**
-     * Return the Keep-Alive policy for the connection.
+     * The number of seconds Tomcat will wait for a subsequent request
+     * before closing the connection. The default is the same as for
+     * Apache HTTP Server (15 000 milliseconds).
      */
-    public boolean getKeepAlive() {
-        return ((maxKeepAliveRequests != 0) && (maxKeepAliveRequests != 1));
+    public int getKeepAliveTimeout() 
+    {
+        return keepAliveTimeout; 
+    }
+
+    public void setKeepAliveTimeout(int timeout)
+    {
+        keepAliveTimeout = timeout;
     }
 
     /**

@@ -270,6 +270,12 @@
       presented.  The default value is 60000 (i.e. 60 seconds).</p>
     </attribute>
 
+    <attribute name="keepAliveTimeout" required="false">
+      <p>The number of milliseconds this <strong>Connector</strong> will wait,
+       subsequent request before closing the connection.
+       The default value is 15000 (i.e. 15 seconds).</p>
+    </attribute>
+
     <attribute name="disableUploadTimeout" required="false">
       <p>This flag allows the servlet container to use a different, longer
       connection timeout while a servlet is being executed, which in the end

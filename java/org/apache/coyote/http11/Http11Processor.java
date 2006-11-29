@@ -186,6 +186,12 @@ public class Http11Processor implements ActionHook {
      */
     protected int maxKeepAliveRequests = -1;
 
+    /**
+     * The number of seconds Tomcat will wait for a subsequent request
+     * before closing the connection.
+     */
+    protected int keepAliveTimeout = 15000;
+
 
     /**
      * SSL information.
@@ -621,6 +627,21 @@ public class Http11Processor implements ActionHook {
         return maxKeepAliveRequests;
     }
 
+    /**
+     * Set the Keep-Alive timeout.
+     */
+    public void setKeepAliveTimeout(int timeout) {
+        keepAliveTimeout = timeout;
+    }
+
+
+    /**
+     * Return the number Keep-Alive timeout.
+     */
+    public int getKeepAliveTimeout() {
+        return keepAliveTimeout;
+    }
+
 
     /**
      * Set the maximum size of a POST which will be buffered in SSL mode.
@@ -773,8 +794,13 @@ public class Http11Processor implements ActionHook {
 
             // Parsing the request header
             try {
-                if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
-                    socket.setSoTimeout(soTimeout);
+                if (!disableUploadTimeout && keptAlive) {
+                    if (keepAliveTimeout > 0) {
+                        socket.setSoTimeout(keepAliveTimeout);
+                    }
+                    else if (soTimeout > 0) {
+                        socket.setSoTimeout(soTimeout);
+                    }
                 }
                 inputBuffer.parseRequestLine();
                 request.setStartTime(System.currentTimeMillis());
