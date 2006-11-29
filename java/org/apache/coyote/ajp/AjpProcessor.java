@@ -327,6 +327,16 @@ public class AjpProcessor implements ActionHook {
     public void setRequiredSecret(String requiredSecret) { this.requiredSecret = requiredSecret; }
 
 
+    /**
+     * The number of milliseconds Tomcat will wait for a subsequent request
+     * before closing the connection. The default is the same as for
+     * Apache HTTP Server (15 000 milliseconds).
+     */
+    protected int keepAliveTimeout = -1;
+    public int getKeepAliveTimeout() { return keepAliveTimeout; }
+    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -354,6 +364,10 @@ public class AjpProcessor implements ActionHook {
         this.socket = socket;
         input = socket.getInputStream();
         output = socket.getOutputStream();
+        int soTimeout = -1;
+        if (keepAliveTimeout > 0) {
+            soTimeout = socket.getSoTimeout();
+        }
 
         // Error flag
         error = false;
@@ -362,11 +376,19 @@ public class AjpProcessor implements ActionHook {
 
             // Parsing the request header
             try {
+                // Set keep alive timeout if enabled
+                if (keepAliveTimeout > 0) {
+                    socket.setSoTimeout(keepAliveTimeout);
+                }
                 // Get first message of the request
                 if (!readMessage(requestHeaderMessage)) {
                     // This means a connection timeout
                     rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
                     break;
+                }
+                // Set back timeout if keep alive timeout is enabled
+                if (keepAliveTimeout > 0) {
+                    socket.setSoTimeout(soTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
