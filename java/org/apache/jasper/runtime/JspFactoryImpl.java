@@ -42,7 +42,7 @@ public class JspFactoryImpl extends JspFactory {
     // Logger
     private Log log = LogFactory.getLog(JspFactoryImpl.class);
 
-    private static final String SPEC_VERSION = "2.0";
+    private static final String SPEC_VERSION = "2.1";
     private static final boolean USE_POOL = 
         Boolean.valueOf(System.getProperty("org.apache.jasper.runtime.JspFactoryImpl.USE_POOL", "true")).booleanValue();
 
