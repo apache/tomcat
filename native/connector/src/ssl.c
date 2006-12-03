@@ -369,6 +369,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     UNREFERENCED(o);
     if (!tcn_global_pool) {
         TCN_FREE_CSTRING(engine);
+        tcn_ThrowAPRException(e, APR_EINVAL);
         return (jint)APR_EINVAL;
     }
     /* Check if already initialized */
@@ -378,6 +379,8 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     }
     if (SSLeay() < 0x0090700L) {
         TCN_FREE_CSTRING(engine);
+        tcn_ThrowAPRException(e, APR_EINVAL);
+        ssl_initialized = 0;
         return (jint)APR_EINVAL;
     }
     /* We must register the library in full, to ensure our configuration
@@ -418,6 +421,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
         if (err != APR_SUCCESS) {
             TCN_FREE_CSTRING(engine);
             ssl_init_cleanup(NULL);
+            tcn_ThrowAPRException(e, err);
             return (jint)err;
         }
         tcn_ssl_engine = ee;
@@ -437,6 +441,7 @@ TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
     if (r) {
         TCN_FREE_CSTRING(engine);
         ssl_init_cleanup(NULL);
+        tcn_ThrowAPRException(e, APR_ENOTIMPL);
         return APR_ENOTIMPL;
     }
     /*
@@ -802,9 +807,102 @@ TCN_IMPLEMENT_CALL(jstring, SSL, getLastError)(TCN_STDARGS)
 }
 
 #else
-/* OpenSSL is not supported
- * If someday we make OpenSSL optional
- * APR_ENOTIMPL will go here
+/* OpenSSL is not supported.
+ * Create empty stubs.
  */
-#error "No OpenSSL Toolkit defined."
+
+TCN_IMPLEMENT_CALL(jint, SSL, version)(TCN_STDARGS)
+{
+    UNREFERENCED_STDARGS;
+    return 0;
+}
+
+TCN_IMPLEMENT_CALL(jstring, SSL, versionString)(TCN_STDARGS)
+{
+    UNREFERENCED_STDARGS;
+    return NULL;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSL, initialize)(TCN_STDARGS, jstring engine)
+{
+    UNREFERENCED(o);
+    UNREFERENCED(engine);
+    tcn_ThrowAPRException(e, APR_ENOTIMPL);
+    return (jint)APR_ENOTIMPL;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, randLoad)(TCN_STDARGS, jstring file)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(file);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, randSave)(TCN_STDARGS, jstring file)
+{
+    UNREFERENCED_STDARGS;
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
+                                            jint length, jboolean base64)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(file);
+    UNREFERENCED(length);
+    UNREFERENCED(base64);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
+                                       jobject callback)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(pool);
+    UNREFERENCED(callback);
+    return 0;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSL, closeBIO)(TCN_STDARGS, jlong bio)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(bio);
+    return (jint)APR_ENOTIMPL;
+}
+
+TCN_IMPLEMENT_CALL(void, SSL, setPasswordCallback)(TCN_STDARGS,
+                                                   jobject callback)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(callback);
+}
+
+TCN_IMPLEMENT_CALL(void, SSL, setPassword)(TCN_STDARGS, jstring password)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(password);
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, generateRSATempKey)(TCN_STDARGS, jint idx)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(idx);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSL, loadDSATempKey)(TCN_STDARGS, jint idx,
+                                                  jstring file)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(idx);
+    UNREFERENCED(file);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jstring, SSL, getLastError)(TCN_STDARGS)
+{
+    UNREFERENCED_STDARGS;
+    return NULL;
+}
+
 #endif

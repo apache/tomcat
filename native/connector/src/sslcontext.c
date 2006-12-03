@@ -564,9 +564,138 @@ cleanup:
 }
 
 #else
-/* OpenSSL is not supported
- * If someday we make OpenSSL optional
- * APR_ENOTIMPL will go here
+/* OpenSSL is not supported.
+ * Create empty stubs.
  */
-#error "No OpenSSL Toolkit defined."
+
+TCN_IMPLEMENT_CALL(jlong, SSLContext, make)(TCN_STDARGS, jlong pool,
+                                            jint protocol, jint mode)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(pool);
+    UNREFERENCED(protocol);
+    UNREFERENCED(mode);
+    return 0;
+}
+
+TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setContextId)(TCN_STDARGS, jlong ctx,
+                                                   jstring id)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(id);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setBIO)(TCN_STDARGS, jlong ctx,
+                                             jlong bio, jint dir)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(bio);
+    UNREFERENCED(dir);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setOptions)(TCN_STDARGS, jlong ctx,
+                                                 jint opt)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(opt);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setQuietShutdown)(TCN_STDARGS, jlong ctx,
+                                                       jboolean mode)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(mode);
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCipherSuite)(TCN_STDARGS, jlong ctx,
+                                                         jstring ciphers)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(ciphers);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCARevocation)(TCN_STDARGS, jlong ctx,
+                                                          jstring file,
+                                                          jstring path)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(file);
+    UNREFERENCED(path);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificateChainFile)(TCN_STDARGS, jlong ctx,
+                                                                  jstring file,
+                                                                  jboolean skipfirst)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(file);
+    UNREFERENCED(skipfirst);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCACertificate)(TCN_STDARGS,
+                                                           jlong ctx,
+                                                           jstring file,
+                                                           jstring path)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(file);
+    UNREFERENCED(path);
+    return JNI_FALSE;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setShutdownType)(TCN_STDARGS, jlong ctx,
+                                                      jint type)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(type);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setVerify)(TCN_STDARGS, jlong ctx,
+                                                jint level, jint depth)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(level);
+    UNREFERENCED(depth);
+}
+
+TCN_IMPLEMENT_CALL(void, SSLContext, setRandom)(TCN_STDARGS, jlong ctx,
+                                                jstring file)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(file);
+}
+
+TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
+                                                         jstring cert, jstring key,
+                                                         jstring password, jint idx)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(ctx);
+    UNREFERENCED(cert);
+    UNREFERENCED(key);
+    UNREFERENCED(password);
+    UNREFERENCED(idx);
+    return JNI_FALSE;
+}
+
 #endif
