@@ -63,20 +63,16 @@ import org.xml.sax.InputSource;
 public final class TldConfig  {
 
     // Names of JARs that are known not to contain any TLDs
-    private static HashSet noTldJars;
+    private static HashSet<String> noTldJars;
 
     private static org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
-
-    private static final String FILE_URL_PREFIX = "file:";
-    private static final int FILE_URL_PREFIX_LEN = FILE_URL_PREFIX.length();
-
 
     /*
      * Initializes the set of JARs that are known not to contain any TLDs
      */
     static {
-        noTldJars = new HashSet();
+        noTldJars = new HashSet<String>();
         // Bootstrap JARs
         noTldJars.add("bootstrap.jar");
         noTldJars.add("commons-daemon.jar");
@@ -158,7 +154,7 @@ public final class TldConfig  {
 
     private boolean rescan=true;
 
-    private ArrayList listeners=new ArrayList();
+    private ArrayList<String> listeners = new ArrayList<String>();
 
     // --------------------------------------------------------- Public Methods
 
