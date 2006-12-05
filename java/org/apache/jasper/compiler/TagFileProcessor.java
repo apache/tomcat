@@ -273,7 +273,7 @@ class TagFileProcessor {
                 }
             }
 
-            if ("2.0".equals(tagLibInfo.getRequiredVersion())
+            if (("2.0".equals(tagLibInfo.getRequiredVersion()) || ("1.2".equals(tagLibInfo.getRequiredVersion())))
                     && (deferredMethodSpecified || deferredMethod
                             || deferredValueSpecified || deferredValue)) {
                 err.jspError("jsp.error.invalid.version", path);
