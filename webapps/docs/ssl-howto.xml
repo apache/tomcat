@@ -533,7 +533,7 @@ After that you can procede with importing your Certificate.</p>
 </li>
 <li>And finally import your new Certificate
 	<source>keytool -import -alias tomcat -keystore &lt;your_keystore_filename&gt; \
-	-trustcacerts -file &lt;your_certificate_filename&gt;</source>
+	-file &lt;your_certificate_filename&gt;</source>
 </li>
 </ul>
 </subsection>
