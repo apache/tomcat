@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<mbeans-descriptors>
+
+  <mbean name="ClusterSingleSignOn"
+         description="A Valve that supports a 'single signon' user experience on a whole cluster"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.cluster.authenticator.ClusterSingleSignOn">
+
+    <attribute name="className"
+               description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="requireReauthentication"
+               description="Should we attempt to reauthenticate each request against the security Realm?"
+               type="boolean"/>
+
+    <attribute name="cookieDomain"
+               description="(Optiona) Domain to be used by sso cookies"
+               type="java.lang.String" />
+
+  </mbean>
+
+</mbeans-descriptors>
