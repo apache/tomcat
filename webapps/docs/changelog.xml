@@ -59,6 +59,9 @@
         Add system property to WebappClassLoader to allow disabling setting references
         to null when stopping it (remm)
       </update>
+      <add>
+        Add clustered SSO code, submitted by Fabien Carrion (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
