@@ -652,11 +652,6 @@ public class AprEndpoint {
             }
         }
         
-        // Initialize keepalive timeout if it has not been set
-        if (keepAliveTimeout == -1) {
-            keepAliveTimeout = soTimeout;
-        }
-        
         // Delay accepting of new connections until data is available
         // Only Linux kernels 2.4 + have that implemented
         // on other platforms this call is noop and will return APR_ENOTIMPL.
@@ -1151,12 +1146,15 @@ public class AprEndpoint {
         
         /**
          * Create the poller. With some versions of APR, the maximum poller size will
-         * be 62 (reocmpiling APR is necessary to remove this limitation).
+         * be 62 (recompiling APR is necessary to remove this limitation).
          */
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = pollerSize / pollerThreadCount;
             int timeout = keepAliveTimeout;
+            if (timeout < 0) {
+                timeout = soTimeout;
+            }
             if (comet) {
                 // FIXME: Find an appropriate timeout value, for now, "longer than usual"
                 // semms appropriate

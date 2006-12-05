@@ -255,7 +255,7 @@ public final class TldConfig  {
         if (context instanceof StandardContext) {
             File workDir= (File)
                 ((StandardContext)context).getServletContext().getAttribute(Globals.WORK_DIR_ATTR);
-            tldCache=new File( workDir, "tldCache.ser");
+            //tldCache=new File( workDir, "tldCache.ser");
         }
 
         // Option to not rescan
