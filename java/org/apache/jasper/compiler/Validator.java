@@ -706,7 +706,8 @@ class Validator {
             if (n.getType() == '#') {
                 if (!pageInfo.isDeferredSyntaxAllowedAsLiteral()
                         && (tagInfo == null 
-                                || ((tagInfo != null) && !tagInfo.getTagLibrary().getRequiredVersion().equals("2.0")))) {
+                                || ((tagInfo != null) && !(tagInfo.getTagLibrary().getRequiredVersion().equals("2.0")
+                                        || tagInfo.getTagLibrary().getRequiredVersion().equals("1.2"))))) {
                     err.jspError(n, "jsp.error.el.template.deferred");
                 } else {
                     return;
@@ -1024,7 +1025,8 @@ class Validator {
                             && (attrs.getURI(i) == null
                                     || attrs.getURI(i).length() == 0 || attrs
                                     .getURI(i).equals(n.getURI()))) {
-                        boolean checkDeferred = !tagInfo.getTagLibrary().getRequiredVersion().equals("2.0");
+                        boolean checkDeferred = !(tagInfo.getTagLibrary().getRequiredVersion().equals("2.0")
+                                || tagInfo.getTagLibrary().getRequiredVersion().equals("1.2"));
                         boolean deferred = false;
                         boolean deferredValueIsLiteral = false;
                         boolean expression = isExpression(n, attrs.getValue(i), checkDeferred);
