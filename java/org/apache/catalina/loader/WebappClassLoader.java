@@ -109,6 +109,9 @@ public class WebappClassLoader
     protected static org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( WebappClassLoader.class );
 
+    public static final boolean ENABLE_CLEAR_REFERENCES = 
+        Boolean.valueOf(System.getProperty("org.apache.catalina.loader.WebappClassLoader.ENABLE_CLEAR_REFERENCES", "true")).booleanValue();
+    
     protected class PrivilegedFindResource
         implements PrivilegedAction {
 
@@ -1585,46 +1588,48 @@ public class WebappClassLoader
         
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
-        Iterator loadedClasses = ((HashMap) resourceEntries.clone()).values().iterator();
-        while (loadedClasses.hasNext()) {
-            ResourceEntry entry = (ResourceEntry) loadedClasses.next();
-            if (entry.loadedClass != null) {
-                Class clazz = entry.loadedClass;
-                try {
-                    Field[] fields = clazz.getDeclaredFields();
-                    for (int i = 0; i < fields.length; i++) {
-                        Field field = fields[i];
-                        int mods = field.getModifiers();
-                        if (field.getType().isPrimitive() 
-                                || (field.getName().indexOf("$") != -1)) {
-                            continue;
-                        }
-                        if (Modifier.isStatic(mods)) {
-                            try {
-                                field.setAccessible(true);
-                                if (Modifier.isFinal(mods)) {
-                                    if (!((field.getType().getName().startsWith("java."))
-                                            || (field.getType().getName().startsWith("javax.")))) {
-                                        nullInstance(field.get(null));
+        if (ENABLE_CLEAR_REFERENCES) {
+            Iterator loadedClasses = ((HashMap) resourceEntries.clone()).values().iterator();
+            while (loadedClasses.hasNext()) {
+                ResourceEntry entry = (ResourceEntry) loadedClasses.next();
+                if (entry.loadedClass != null) {
+                    Class clazz = entry.loadedClass;
+                    try {
+                        Field[] fields = clazz.getDeclaredFields();
+                        for (int i = 0; i < fields.length; i++) {
+                            Field field = fields[i];
+                            int mods = field.getModifiers();
+                            if (field.getType().isPrimitive() 
+                                    || (field.getName().indexOf("$") != -1)) {
+                                continue;
+                            }
+                            if (Modifier.isStatic(mods)) {
+                                try {
+                                    field.setAccessible(true);
+                                    if (Modifier.isFinal(mods)) {
+                                        if (!((field.getType().getName().startsWith("java."))
+                                                || (field.getType().getName().startsWith("javax.")))) {
+                                            nullInstance(field.get(null));
+                                        }
+                                    } else {
+                                        field.set(null, null);
+                                        if (log.isDebugEnabled()) {
+                                            log.debug("Set field " + field.getName() 
+                                                    + " to null in class " + clazz.getName());
+                                        }
                                     }
-                                } else {
-                                    field.set(null, null);
+                                } catch (Throwable t) {
                                     if (log.isDebugEnabled()) {
-                                        log.debug("Set field " + field.getName() 
-                                                + " to null in class " + clazz.getName());
+                                        log.debug("Could not set field " + field.getName() 
+                                                + " to null in class " + clazz.getName(), t);
                                     }
-                                }
-                            } catch (Throwable t) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Could not set field " + field.getName() 
-                                            + " to null in class " + clazz.getName(), t);
                                 }
                             }
                         }
-                    }
-                } catch (Throwable t) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Could not clean fields for class " + clazz.getName(), t);
+                    } catch (Throwable t) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Could not clean fields for class " + clazz.getName(), t);
+                        }
                     }
                 }
             }
