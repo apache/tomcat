@@ -52,6 +52,13 @@
         Fix logic of sameSameObjects used to determine correct wrapping of request and
         response objects (fhanik)
       </fix>
+      <fix>
+        Update TLD scan lists, and disable caching for now (remm)
+      </fix>
+      <update>
+        Add system property to WebappClassLoader to allow disabling setting references
+        to null when stopping it (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -68,6 +75,30 @@
       </update>
       <fix>
         MessageBytes.setString(null) will remove the String value. (remm)
+      </fix>
+      <fix>
+        <bug>41057</bug>: Caching large strings is not useful and takes too much
+        memory, so don't cache these (remm)
+      </fix>
+      <update>
+        Add keepAliveTimeout attribute to most connectors (mturk, remm)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Relax EL type validation for litterals. (remm)
+      </fix>
+      <fix>
+        Update some version numbers to 2.1. (funkman, remm)
+      </fix>
+      <fix>
+        Add xsds for JSP 2.1 (remm)
+      </fix>
+      <fix>
+        <bug>41106</bug>: Update validation checks for EL to also include 
+        legacy 1.2 tags (remm)
       </fix>
     </changelog>
   </subsection>

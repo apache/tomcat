@@ -273,7 +273,8 @@
     <attribute name="keepAliveTimeout" required="false">
       <p>The number of milliseconds this <strong>Connector</strong> will wait,
        subsequent request before closing the connection.
-       The default value is 15000 (i.e. 15 seconds).</p>
+       The default value is to use the value that has been set for the
+       connectionTimeout.</p>
     </attribute>
 
     <attribute name="disableUploadTimeout" required="false">
