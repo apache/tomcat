@@ -40,7 +40,7 @@ grant codeBase "file:${java.home}/lib/ext/-" {
 // ========== CATALINA CODE PERMISSIONS =======================================
 
 
-/ These permissions apply to the daemon code
+// These permissions apply to the daemon code
 grant codeBase "file:${catalina.home}/bin/commons-daemon.jar" {
         permission java.security.AllPermission;
 };
