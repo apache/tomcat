@@ -7,8 +7,8 @@
          connector should be using the OpenSSL style configuration
          described in the APR documentation -->
     <!--
-    <Connector port="8443" protocol="HTTP/1.1" 
-               maxThreads="150" scheme="https" secure="true"
+    <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true" 
+               maxThreads="150" scheme="https" secure="true" 
                clientAuth="false" sslProtocol="TLS" />
     -->
 
