@@ -154,6 +154,10 @@
         <a href="defaultcontext.html">DefaultContext</a> element associated
         with our owning <a href="host.html">Host</a>.  By default, settings
         in the DefaultContext element will be used.</p>
+        <p>If a symbolic link is used for docBase then changes to the
+        symbolic link will only be effective after a Tomcat restart or
+        by undeploying and redeploying the conext. A context reload is not
+        sufficient.</p>
       </attribute>
 
       <attribute name="privileged" required="false">
