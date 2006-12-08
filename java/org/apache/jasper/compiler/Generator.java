@@ -1385,9 +1385,9 @@ class Generator {
                     // Double check that this is now the correct behavior.
                     if (ie) {
                         // We want something of the form
-                        // out.println( "<PARAM name=\"blah\"
+                        // out.println( "<param name=\"blah\"
                         // value=\"" + ... + "\">" );
-                        out.printil("out.write( \"<PARAM name=\\\""
+                        out.printil("out.write( \"<param name=\\\""
                                 + escape(name)
                                 + "\\\" value=\\\"\" + "
                                 + attributeValue(n.getValue(), false,
@@ -1469,9 +1469,9 @@ class Generator {
             // dynamically. Double-check if this generation is correct.
 
             // IE style plugin
-            // <OBJECT ...>
+            // <object ...>
             // First compose the runtime output string
-            String s0 = "<OBJECT"
+            String s0 = "<object"
                     + makeAttr("classid", ctxt.getOptions().getIeClassId())
                     + makeAttr("name", name);
 
@@ -1494,29 +1494,29 @@ class Generator {
                     + ");");
             out.printil("out.write(\"\\n\");");
 
-            // <PARAM > for java_code
-            s0 = "<PARAM name=\"java_code\"" + makeAttr("value", code) + '>';
+            // <param > for java_code
+            s0 = "<param name=\"java_code\"" + makeAttr("value", code) + '>';
             out.printil("out.write(" + quote(s0) + ");");
             out.printil("out.write(\"\\n\");");
 
-            // <PARAM > for java_codebase
+            // <param > for java_codebase
             if (codebase != null) {
-                s0 = "<PARAM name=\"java_codebase\""
+                s0 = "<param name=\"java_codebase\""
                         + makeAttr("value", codebase) + '>';
                 out.printil("out.write(" + quote(s0) + ");");
                 out.printil("out.write(\"\\n\");");
             }
 
-            // <PARAM > for java_archive
+            // <param > for java_archive
             if (archive != null) {
-                s0 = "<PARAM name=\"java_archive\""
+                s0 = "<param name=\"java_archive\""
                         + makeAttr("value", archive) + '>';
                 out.printil("out.write(" + quote(s0) + ");");
                 out.printil("out.write(\"\\n\");");
             }
 
-            // <PARAM > for type
-            s0 = "<PARAM name=\"type\""
+            // <param > for type
+            s0 = "<param name=\"type\""
                     + makeAttr("value", "application/x-java-"
                             + type
                             + ";"
@@ -1526,7 +1526,7 @@ class Generator {
             out.printil("out.write(\"\\n\");");
 
             /*
-             * generate a <PARAM> for each <jsp:param> in the plugin body
+             * generate a <param> for each <jsp:param> in the plugin body
              */
             if (n.getBody() != null)
                 n.getBody().visit(new ParamVisitor(true));
@@ -1534,7 +1534,7 @@ class Generator {
             /*
              * Netscape style plugin part
              */
-            out.printil("out.write(" + quote("<COMMENT>") + ");");
+            out.printil("out.write(" + quote("<comment>") + ");");
             out.printil("out.write(\"\\n\");");
             s0 = "<EMBED"
                     + makeAttr("type", "application/x-java-"
@@ -1563,7 +1563,7 @@ class Generator {
             out.printil("out.write(" + quote("/>") + ");");
             out.printil("out.write(\"\\n\");");
 
-            out.printil("out.write(" + quote("<NOEMBED>") + ");");
+            out.printil("out.write(" + quote("<noembed>") + ");");
             out.printil("out.write(\"\\n\");");
 
             /*
@@ -1574,13 +1574,13 @@ class Generator {
                 out.printil("out.write(\"\\n\");");
             }
 
-            out.printil("out.write(" + quote("</NOEMBED>") + ");");
+            out.printil("out.write(" + quote("</noembed>") + ");");
             out.printil("out.write(\"\\n\");");
 
-            out.printil("out.write(" + quote("</COMMENT>") + ");");
+            out.printil("out.write(" + quote("</comment>") + ");");
             out.printil("out.write(\"\\n\");");
 
-            out.printil("out.write(" + quote("</OBJECT>") + ");");
+            out.printil("out.write(" + quote("</object>") + ");");
             out.printil("out.write(\"\\n\");");
 
             n.setEndJavaLine(out.getJavaLine());
