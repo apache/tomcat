@@ -444,23 +444,20 @@
   <attributes>
 
     <attribute name="algorithm" required="false">
-      <p>The certificate encoding algorithm to be used.  If not
-      specified, the default value is <code>SunX509</code>.</p>
+      <p>The certificate encoding algorithm to be used. This defaults to the Sun
+      implementation (<code>SunX509</code>). For IBM JVMs you should use the
+      value <code>IbmX509</code>. For other vendors, consult the JVM
+      documentation for the correct value.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">
       <p>Set to <code>true</code> if you want the SSL stack to require a
-      valid certificate chain from the client before
- accepting a connection.
-      Set to <code>want</code> if you
- want the SSL stack to request a client
-      Certificate, but
- not fail if one isn't presented. A <code>false</code>
+      valid certificate chain from the client before accepting a connection.
+      Set to <code>want</code> if you want the SSL stack to request a client
+      Certificate, but not fail if one isn't presented. A <code>false</code>
       value (which is the default) will not require a certificate chain
-      unless
- the client requests a resource protected by a security
-      constraint
- that uses <code>CLIENT-CERT</code> authentication. See the
+      unless the client requests a resource protected by a security
+      constraint that uses <code>CLIENT-CERT</code> authentication. See the
       <a href="../ssl-howto.html">SSL HowTo</a> for an example.</p>
     </attribute>
 
@@ -491,6 +488,25 @@
       <p>A comma seperated list of the encryption ciphers that may be used.
       If not specified, then any available cipher may be used.</p>
     </attribute>
+
+    <attribute name="keyAlias" required="false">
+      <p>The alias used to for the server certificate in the keystore. If not
+      specified the first key read in the keystore will be used.</p>
+    </attribute>
+
+    <attribute name="truststoreFile" required="false">
+      <p>The TrustStore file to use to validate client certificates.</p>
+    </attribute>
+
+    <attribute name="truststorePass" required="false">
+      <p>The password to access the TrustStore. This defaults to the value
+      of <code>keystorePass</code>.</p>
+    </attribute>
+
+    <attribute name="truststoreType" required="false">
+      <p>Add this element if your are using a different format for the
+      TrustStore then you are using for the KeyStore.</p>
+     </attribute>
 
   </attributes>
 

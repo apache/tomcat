@@ -183,6 +183,14 @@ The <code>PKCS12</code> format is an internet standard, and can be manipulated
 via (among other things) OpenSSL and Microsoft's Key-Manager.
 </p>
 
+<p>Each entry in a keystore is identified by an alias string. Whilst many
+keystore implmentations treat alaises in a case insensitive manner, case
+sensitive implementations are available. The <code>PKCS11</code> specification,
+for example, requires that aliases are case sensitive. To avoid issues related
+to the case sensitivity of aliaises, it is not recommended to use aliases that
+differ only in case.
+</p>
+
 <p>To import an existing certificate into a JKS keystore, please read the
 documentation (in your JDK documentation package) about <code>keytool</code>.
 Note that openssl often adds a readable comments before the key, <code>keytool</code>does not support that, so remove the openssl comments if they exist before importing the key using <code>keytool</code>.
@@ -424,8 +432,8 @@ values, depending on how you configured your keystore earlier:</p>
   </tr>
   <tr>
     <td><code>keystoreType</code></td>
-    <td>Add this element if using a PKCS12 keystore.  The valid values are
-        <code>JKS</code> and <code>PKCS12</code>.</td>
+    <td>Add this element if using a keystore type other than
+    <code>JKS</code>.</td>
   </tr>
   <tr>
     <td><code>sslProtocol</code></td>
@@ -460,8 +468,7 @@ values, depending on how you configured your keystore earlier:</p>
   <tr>
    <td><code>truststoreType</code></td>
     <td>Add this element if your are using a different format for the 
-        TrustStore then you are using for the KeyStore.  The valid values are
-        <code>JKS</code> and <code>PKCS12</code>.</td>
+        TrustStore then you are using for the KeyStore.</td>
   </tr>
   <tr>
    <td><code>keyAlias</code></td>
@@ -579,6 +586,20 @@ SSL communications, and what to do about them.</p>
     attribute on the <code>&lt;Connector&gt;</code> element in the
     <a href="#Edit the Tomcat Configuration File">Tomcat configuration
     file</a>.  <strong>REMINDER</strong> - Passwords are case sensitive!</p>
+    </blockquote></li>
+
+<li>When Tomcat starts up, I get an exception like
+    "java.net.SocketException: SSL handshake errorjavax.net.ssl.SSLException: No
+    available certificate or key corresponds to the SSL cipher suites which are
+    enabled."
+    <blockquote>
+    <p>A likely explanation is that Tomcat cannot find the alias for the server
+    key withinthe specified keystore. Check that the correct
+    <code>keystoreFile</code> and <code>keyAlias</code> are specified in the
+    <code>&lt;Connector&gt;</code> element in the
+    <a href="#Edit the Tomcat Configuration File">Tomcat configuration file</a>.
+    <strong>REMINDER</strong> - <code>keyAlias</code> values may be case
+    sensitive!</p>
     </blockquote></li>
 
 </ul>
