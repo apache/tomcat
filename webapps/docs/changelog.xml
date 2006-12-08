@@ -14,6 +14,16 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.5 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>40585</bug>: Fix parameterised constructor for o.a.juli.FileHandler
+        so parameters have an effect. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 6.0.4 (remm)">
   <subsection name="General">
     <changelog>
