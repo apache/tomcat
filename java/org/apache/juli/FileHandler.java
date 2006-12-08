@@ -47,16 +47,16 @@ public class FileHandler
 
     
     public FileHandler() {
-        configure();
-        open();
+        this(null, null, null);
     }
     
     
     public FileHandler(String directory, String prefix, String suffix) {
-        this();
         this.directory = directory;
         this.prefix = prefix;
         this.suffix = suffix;
+        configure();
+        open();
     }
     
 
@@ -189,15 +189,17 @@ public class FileHandler
         String tsString = ts.toString().substring(0, 19);
         date = tsString.substring(0, 10);
 
-        LogManager manager = LogManager.getLogManager();
         String className = FileHandler.class.getName();
         
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         
         // Retrieve configuration of logging file name
-        directory = getProperty(className + ".directory", "logs");
-        prefix = getProperty(className + ".prefix", "juli.");
-        suffix = getProperty(className + ".suffix", ".log");
+        if (directory == null)
+            directory = getProperty(className + ".directory", "logs");
+        if (prefix == null)
+            prefix = getProperty(className + ".prefix", "juli.");
+        if (suffix == null)
+            suffix = getProperty(className + ".suffix", ".log");
 
         // Get logging level for the handler
         setLevel(Level.parse(getProperty(className + ".level", "" + Level.ALL)));
