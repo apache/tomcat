@@ -226,7 +226,7 @@ TCN_IMPLEMENT_CALL(void, Socket, destroy)(TCN_STDARGS, jlong sock)
         s->sock = NULL;
         apr_socket_close(as);
     }
-    
+
     apr_pool_destroy(s->pool);
 }
 
@@ -701,14 +701,22 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_size_t nbytes = (apr_size_t)toread;
     apr_status_t ss;
+    apr_interval_time_t pt;
+    apr_interval_time_t nt = J2T(timeout);
 
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
     TCN_ASSERT(s->opaque != NULL);
     TCN_ASSERT(buf != NULL);
 
-    if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
-        goto cleanup;
+    if ((ss = (*s->net->timeout_get)(s->opaque, &pt)) != APR_SUCCESS) {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+    if (pt != nt) {
+        if ((ss = (*s->net->timeout_set)(s->opaque, nt)) != APR_SUCCESS)
+            goto cleanup;
+    }
     if (toread <= TCN_BUFFER_SZ) {
         jbyte sb[TCN_BUFFER_SZ];
         if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
@@ -722,6 +730,11 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
             (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, &sb[0]);
         free(sb);
     }
+    if (pt != nt) {
+        if ((ss = (*s->net->timeout_set)(s->opaque, pt)) != APR_SUCCESS)
+            goto cleanup;
+    }
+
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
         sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
@@ -854,6 +867,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     apr_status_t ss;
     apr_size_t nbytes = (apr_size_t)len;
     char *bytes;
+    apr_interval_time_t pt;
+    apr_interval_time_t nt = J2T(timeout);
 
     UNREFERENCED(o);
     if (!sock) {
@@ -866,9 +881,24 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbt)(TCN_STDARGS, jlong sock,
     bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
     TCN_ASSERT(bytes != NULL);
 
-    if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
-         return -(jint)ss;
+    if ((ss = (*s->net->timeout_get)(s->opaque, &pt)) != APR_SUCCESS) {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+    if (pt != nt) {
+        if ((ss = (*s->net->timeout_set)(s->opaque, nt)) != APR_SUCCESS) {
+            TCN_ERROR_WRAP(ss);
+            return -(jint)ss;
+        }
+    }
     ss = (*s->net->recv)(s->opaque, bytes + offset, &nbytes);
+    if (pt != nt) {
+        if ((ss = (*s->net->timeout_set)(s->opaque, pt)) != APR_SUCCESS) {
+            TCN_ERROR_WRAP(ss);
+            return -(jint)ss;
+        }
+    }
+
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
         sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
@@ -905,6 +935,8 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_status_t ss;
     apr_size_t nbytes = (apr_size_t)len;
+    apr_interval_time_t pt;
+    apr_interval_time_t nt = J2T(timeout);
 
     UNREFERENCED_STDARGS;
     UNREFERENCED(o);
@@ -916,9 +948,24 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvbbt)(TCN_STDARGS, jlong sock,
     TCN_ASSERT(s->opaque != NULL);
 
 
-    if ((ss = (*s->net->timeout_set)(s->opaque, J2T(timeout))) != APR_SUCCESS)
-         return -(jint)ss;
+    if ((ss = (*s->net->timeout_get)(s->opaque, &pt)) != APR_SUCCESS) {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+    if (pt != nt) {
+        if ((ss = (*s->net->timeout_set)(s->opaque, nt)) != APR_SUCCESS) {
+            TCN_ERROR_WRAP(ss);
+            return -(jint)ss;
+        }
+    }
     ss = (*s->net->recv)(s->opaque, s->jrbbuff + offset, &nbytes);
+    if (pt != nt) {
+        if ((ss = (*s->net->timeout_set)(s->opaque, pt)) != APR_SUCCESS) {
+            TCN_ERROR_WRAP(ss);
+            return -(jint)ss;
+        }
+    }
+
 #ifdef TCN_DO_STATISTICS
     if (ss == APR_SUCCESS) {
         sp_max_recv = TCN_MAX(sp_max_recv, nbytes);
@@ -1018,7 +1065,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, timeoutSet)(TCN_STDARGS, jlong sock,
     if (!sock) {
         tcn_ThrowAPRException(e, APR_ENOTSOCK);
         return APR_ENOTSOCK;
-    }    
+    }
     return (jint)(*s->net->timeout_set)(s->opaque, J2T(timeout));
 }
 
@@ -1031,7 +1078,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, timeoutGet)(TCN_STDARGS, jlong sock)
     if (!sock) {
         tcn_ThrowAPRException(e, APR_ENOTSOCK);
         return 0;
-    }    
+    }
     TCN_ASSERT(s->opaque != NULL);
 
     TCN_THROW_IF_ERR((*s->net->timeout_get)(s->opaque, &timeout), timeout);
