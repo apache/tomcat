@@ -932,25 +932,4 @@ public class SimpleTcpCluster
     public String getProtocol() {
         return null;
     }
-
-    /**
-     * @see org.apache.catalina.Cluster#startContext(java.lang.String)
-     */
-    public void startContext(String contextPath) throws IOException {
-        
-    }
-
-    /**
-     * @see org.apache.catalina.Cluster#installContext(java.lang.String, java.net.URL)
-     */
-    public void installContext(String contextPath, URL war) {
-        
-    }
-
-    /**
-     * @see org.apache.catalina.Cluster#stop(java.lang.String)
-     */
-    public void stop(String contextPath) throws IOException {
-        
-    }
 }
