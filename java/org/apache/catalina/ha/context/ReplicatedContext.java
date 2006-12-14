@@ -27,6 +27,7 @@ import org.apache.catalina.Globals;
 import javax.servlet.ServletContext;
 import java.util.HashMap;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
+import java.util.AbstractMap;
 
 /**
  * @author Filip Hanik
@@ -113,10 +114,10 @@ public class ReplicatedContext extends StandardContext {
              return super.getFacade();
         }
         
-        public HashMap getAttributeMap() {
-            return (HashMap)this.attributes;
+        public AbstractMap getAttributeMap() {
+            return (AbstractMap)this.attributes;
         }
-        public void setAttributeMap(HashMap map) {
+        public void setAttributeMap(AbstractMap map) {
             this.attributes = map;
         }
 
