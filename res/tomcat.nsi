@@ -191,6 +191,10 @@ Section "Native" SecTomcatNative
 
   SectionIn 3
 
+  ; tcnative-1.dll is a symlink to the tcnative-1-ipv4.dll
+  ; If IPV6 support is required, download the tcnative-1-ipv6.dll insted
+  ; The tcnative-1.dll from heanet.ie comes with OpenSSL 0.9.8d compiled in.
+  ; TODO: Depending on the JVM download the 32 or 64 bit version.
   NSISdl::download /TIMEOUT=30000 http://tomcat.heanet.ie/native/1.1.8/binaries/win32/tcnative-1.dll $INSTDIR\bin\tcnative-1.dll
   Pop $0
   StrCmp $0 success success
