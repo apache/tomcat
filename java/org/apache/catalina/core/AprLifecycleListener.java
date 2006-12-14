@@ -75,13 +75,16 @@ public class AprLifecycleListener
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.INIT_EVENT.equals(event.getType())) {
-            aprInitialized = initializeAPR();
+            aprInitialized = init();
             if (aprInitialized) {
                 try {
                     initializeSSL();
                 } catch (Throwable t) {
-                    log.error(sm.getString("aprListener.sslInit",
-                                           t.getMessage()), t);
+                    if (!log.isDebugEnabled()) {
+                        log.info(sm.getString("aprListener.sslInit"));
+                    } else {
+                        log.debug(sm.getString("aprListener.sslInit"));
+                    }
                 }
             }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
@@ -111,7 +114,7 @@ public class AprLifecycleListener
         method.invoke(null, (Object []) null);
     }
 
-    private boolean initializeAPR()
+    private boolean init()
     {
         int major = 0;
         int minor = 0;
@@ -172,6 +175,14 @@ public class AprLifecycleListener
                         TCN_REQUIRED_MINOR + "." +
                         TCN_RECOMMENDED_PV));
             }
+        }
+        if (!log.isDebugEnabled()) {
+           log.info(sm.getString("aprListener.tcnValid", major + "."
+                    + minor + "." + patch));
+        }
+        else {
+           log.debug(sm.getString("aprListener.tcnValid", major + "."
+                     + minor + "." + patch));
         }
         return true;
     }
