@@ -439,14 +439,14 @@ TCN_IMPLEMENT_CALL(jint, Socket, send)(TCN_STDARGS, jlong sock,
     if (tosend <= TCN_BUFFER_SZ) {
         jbyte sb[TCN_BUFFER_SZ];
         (*e)->GetByteArrayRegion(e, buf, offset, tosend, &sb[0]);
-        ss = (*s->net->send)(s->opaque, sb, &nbytes);
+        ss = (*s->net->send)(s->opaque, (const char *)&sb[0], &nbytes);
     }
     else {
         jbyte *sb = (jbyte *)malloc(nbytes);
         if (sb == NULL)
             return -APR_ENOMEM;
         (*e)->GetByteArrayRegion(e, buf, offset, tosend, sb);
-        ss = (*s->net->send)(s->opaque, sb, &nbytes);
+        ss = (*s->net->send)(s->opaque, (const char *)sb, &nbytes);
         free(sb);
     }
     if (ss == APR_SUCCESS)
@@ -719,14 +719,14 @@ TCN_IMPLEMENT_CALL(jint, Socket, recvt)(TCN_STDARGS, jlong sock,
     }
     if (toread <= TCN_BUFFER_SZ) {
         jbyte sb[TCN_BUFFER_SZ];
-        if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
+        if ((ss = (*s->net->recv)(s->opaque, (char *)&sb[0], &nbytes)) == APR_SUCCESS)
             (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, &sb[0]);
     }
     else {
         jbyte *sb = (jbyte *)malloc(nbytes);
         if (sb == NULL)
             return -APR_ENOMEM;
-        if ((ss = (*s->net->recv)(s->opaque, sb, &nbytes)) == APR_SUCCESS)
+        if ((ss = (*s->net->recv)(s->opaque, (char *)sb, &nbytes)) == APR_SUCCESS)
             (*e)->SetByteArrayRegion(e, buf, offset, (jsize)nbytes, &sb[0]);
         free(sb);
     }
