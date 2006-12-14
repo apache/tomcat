@@ -47,13 +47,14 @@ import org.apache.catalina.tribes.util.Arrays;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import java.util.ConcurrentModificationException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
  * @author Filip Hanik
  * @version 1.0
  */
-public abstract class AbstractReplicatedMap extends LinkedHashMap implements RpcCallback, ChannelListener, MembershipListener, Heartbeat {
+public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements RpcCallback, ChannelListener, MembershipListener, Heartbeat {
     protected static Log log = LogFactory.getLog(AbstractReplicatedMap.class);
 
     /**
@@ -159,7 +160,7 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
                                  float loadFactor,
                                  int channelSendOptions,
                                  ClassLoader[] cls) {
-        super(initialCapacity, loadFactor);
+        super(initialCapacity, loadFactor, 15);
         init(owner, channel, mapContextName, timeout, channelSendOptions, cls);
         
     }
@@ -958,7 +959,7 @@ public abstract class AbstractReplicatedMap extends LinkedHashMap implements Rpc
             //todo, implement a counter variable instead
             //only count active members in this node
             int counter = 0;
-            Iterator it = Collections.unmodifiableSet(super.entrySet()).iterator();
+            Iterator it = super.entrySet().iterator();
             while (it.hasNext() ) {
                 Map.Entry e = (Map.Entry) it.next();
                 if ( e != null ) {
