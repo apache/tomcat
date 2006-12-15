@@ -343,6 +343,8 @@ final class StandardHostValve
             if (custom(request, response, errorPage)) {
                 try {
                     response.flushBuffer();
+                } catch (ClientAbortException e) {
+                    // Ignore
                 } catch (IOException e) {
                     container.getLogger().warn("Exception Processing " + errorPage, e);
                 }
