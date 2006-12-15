@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -63,7 +62,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private long tcpSelectorTimeout = 5000;
     //how many times to search for an available socket
     private int autoBind = 100;
-    private int maxThreads = 15;
+    private int maxThreads = Integer.MAX_VALUE;
     private int minThreads = 6;
     private int maxTasks = 100;
     private int minTasks = 10;
@@ -77,7 +76,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int timeout = 3000; //3 seconds
     private boolean useBufferPool = true;
     
-    private Executor executor;
+    private ExecutorService executor;
 
 
     public ReceiverBase() {
@@ -90,7 +89,8 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
     
     public void stop() {
-        if ( executor instanceof ExecutorService ) ((ExecutorService)executor).shutdown();
+        if ( executor != null ) executor.shutdownNow();//ignore left overs
+        executor = null;
     }
     
     /**
@@ -362,7 +362,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return maxTasks;
     }
 
-    public Executor getExecutor() {
+    public ExecutorService getExecutor() {
         return executor;
     }
 
@@ -472,7 +472,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         this.maxTasks = maxTasks;
     }
 
-    public void setExecutor(Executor executor) {
+    public void setExecutor(ExecutorService executor) {
         this.executor = executor;
     }
 
