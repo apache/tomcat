@@ -38,7 +38,7 @@ import org.apache.juli.logging.Log;
  * @author not attributable
  * @version 1.0
  */
-public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, ThreadPool.ThreadCreator {
+public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, RxTaskPool.TaskCreator {
 
     public static final int OPTION_DIRECT_BUFFER = 0x0004;
 
@@ -53,7 +53,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
     private int rxBufSize = 43800;
     private int txBufSize = 25188;
     private boolean listen = false;
-    private ThreadPool pool;
+    private RxTaskPool pool;
     private boolean direct = true;
     private long tcpSelectorTimeout = 5000;
     //how many times to search for an available socket
@@ -270,7 +270,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         return listener;
     }
 
-    public ThreadPool getPool() {
+    public RxTaskPool getPool() {
         return pool;
     }
     
@@ -367,7 +367,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, T
         this.log = log;
     }
 
-    public void setPool(ThreadPool pool) {
+    public void setPool(RxTaskPool pool) {
         this.pool = pool;
     }
 

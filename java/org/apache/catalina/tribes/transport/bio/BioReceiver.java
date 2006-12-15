@@ -23,7 +23,7 @@ import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.ReceiverBase;
-import org.apache.catalina.tribes.transport.ThreadPool;
+import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.transport.WorkerThread;
 
 /**
@@ -54,7 +54,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      */
     public void start() throws IOException {
         try {
-            setPool(new ThreadPool(getMaxThreads(),getMinThreads(),this));
+            setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
             log.fatal("ThreadPool can initilzed. Listener not started", x);
             if ( x instanceof IOException ) throw (IOException)x;
