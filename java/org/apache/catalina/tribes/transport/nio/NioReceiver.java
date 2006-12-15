@@ -313,13 +313,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      * @see org.apache.catalina.tribes.transport.ClusterReceiverBase#stopListening()
      */
     protected void stopListening() {
-        // Bugzilla 37529: http://issues.apache.org/bugzilla/show_bug.cgi?id=37529
         setListen(false);
         if (selector != null) {
             try {
-                for (int i = 0; i < getMaxThreads(); i++) {
-                    selector.wakeup();
-                }
+                selector.wakeup();
                 selector.close();
             } catch (Exception x) {
                 log.error("Unable to close cluster receiver selector.", x);
