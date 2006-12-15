@@ -80,6 +80,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
     public void stop() {
         this.stopListening();
+        super.stop();
     }
 
     /**
@@ -88,8 +89,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      * @see org.apache.catalina.tribes.ClusterReceiver#start()
      */
     public void start() throws IOException {
+        super.start();
         try {
-//            setPool(new ThreadPool(interestOpsMutex, getMaxThreads(),getMinThreads(),this));
             setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
             log.fatal("ThreadPool can initilzed. Listener not started", x);
@@ -109,7 +110,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         }
     }
     
-    public AbstractRxTask getWorkerThread() {
+    public AbstractRxTask createRxTask() {
         NioReplicationTask thread = new NioReplicationTask(this,this);
         thread.setUseBufferPool(this.getUseBufferPool());
         thread.setRxBufSize(getRxBufSize());
@@ -142,7 +143,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                 events.add(event);
             }
             if ( log.isTraceEnabled() ) log.trace("Adding event to selector:"+event);
-            selector.wakeup();
+            if ( isListening() && selector!=null ) selector.wakeup();
         }
     }
 
@@ -177,7 +178,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
     
     protected void socketTimeouts() {
         //timeout
-        Set keys = selector.keys();
+        Selector tmpsel = selector;
+        Set keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
+        if ( keys == null ) return;
         long now = System.currentTimeMillis();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             SelectionKey key = (SelectionKey) iter.next();
@@ -365,17 +368,18 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      *  will then de-register the channel on the next select call.
      */
     protected void readDataFromSocket(SelectionKey key) throws Exception {
-        NioReplicationTask worker = (NioReplicationTask) getPool().getWorker();
-        if (worker == null) {
-            // No threads available, do nothing, the selection
+        NioReplicationTask task = (NioReplicationTask) getTaskPool().getRxTask();
+        if (task == null) {
+            // No threads/tasks available, do nothing, the selection
             // loop will keep calling this method until a
             // thread becomes available, the thread pool itself has a waiting mechanism
             // so we will not wait here.
-            if (log.isDebugEnabled())
-                log.debug("No TcpReplicationThread available");
+            if (log.isDebugEnabled()) log.debug("No TcpReplicationThread available");
         } else {
             // invoking this wakes up the worker thread then returns
-            worker.serviceChannel(key);
+            //add task to thread pool
+            task.serviceChannel(key);
+            getExecutor().execute(task);
         }
     }
 

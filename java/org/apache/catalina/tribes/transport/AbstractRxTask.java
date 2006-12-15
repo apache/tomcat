@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
  * @author Filip Hanik
  * @version $Revision$ $Date$
  */
-public abstract class AbstractRxTask extends Thread 
+public abstract class AbstractRxTask implements Runnable
 { 
     
     public static final int OPTION_DIRECT_BUFFER = ReceiverBase.OPTION_DIRECT_BUFFER;
@@ -41,7 +41,7 @@ public abstract class AbstractRxTask extends Thread
         this.callback = callback;
     }
 
-    public void setPool(RxTaskPool pool) {
+    public void setTaskPool(RxTaskPool pool) {
         this.pool = pool;
     }
 
@@ -57,7 +57,7 @@ public abstract class AbstractRxTask extends Thread
         this.doRun = doRun;
     }
 
-    public RxTaskPool getPool() {
+    public RxTaskPool getTaskPool() {
         return pool;
     }
 

@@ -63,60 +63,50 @@ public class NioReplicationTask extends AbstractRxTask {
 
     // loop forever waiting for work to do
     public synchronized void run() { 
-        this.notify();
         if ( (getOptions() & OPTION_DIRECT_BUFFER) == OPTION_DIRECT_BUFFER ) {
             buffer = ByteBuffer.allocateDirect(getRxBufSize());
         }else {
             buffer = ByteBuffer.allocate (getRxBufSize());
         }
-        while (isDoRun()) {
-            try {
-                // sleep and release object lock
-                this.wait();
-            } catch (InterruptedException e) {
-                if(log.isInfoEnabled()) log.info("TCP worker thread interrupted in cluster",e);
-                // clear interrupt status
-                Thread.interrupted();
-            }
-            if (key == null) {
-                continue;	// just in case
-            }
-            if ( log.isTraceEnabled() ) 
-                log.trace("Servicing key:"+key);
 
-            try {
-                ObjectReader reader = (ObjectReader)key.attachment();
-                if ( reader == null ) {
-                    if ( log.isTraceEnabled() ) 
-                        log.trace("No object reader, cancelling:"+key);
-                    cancelKey(key);
-                } else {
-                    if ( log.isTraceEnabled() ) 
-                        log.trace("Draining channel:"+key);
-
-                    drainChannel(key, reader);
-                }
-            } catch (Exception e) {
-                //this is common, since the sockets on the other
-                //end expire after a certain time.
-                if ( e instanceof CancelledKeyException ) {
-                    //do nothing
-                } else if ( e instanceof IOException ) {
-                    //dont spew out stack traces for IO exceptions unless debug is enabled.
-                    if (log.isDebugEnabled()) log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
-                    else log.warn ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].");
-                } else if ( log.isErrorEnabled() ) {
-                    //this is a real error, log it.
-                    log.error("Exception caught in TcpReplicationThread.drainChannel.",e);
-                } 
-                cancelKey(key);
-            } finally {
-                
-            }
-            key = null;
-            // done, ready for more, return to pool
-            getPool().returnWorker (this);
+        if (key == null) {
+            return;	// just in case
         }
+        if ( log.isTraceEnabled() ) 
+            log.trace("Servicing key:"+key);
+
+        try {
+            ObjectReader reader = (ObjectReader)key.attachment();
+            if ( reader == null ) {
+                if ( log.isTraceEnabled() ) 
+                    log.trace("No object reader, cancelling:"+key);
+                cancelKey(key);
+            } else {
+                if ( log.isTraceEnabled() ) 
+                    log.trace("Draining channel:"+key);
+
+                drainChannel(key, reader);
+            }
+        } catch (Exception e) {
+            //this is common, since the sockets on the other
+            //end expire after a certain time.
+            if ( e instanceof CancelledKeyException ) {
+                //do nothing
+            } else if ( e instanceof IOException ) {
+                //dont spew out stack traces for IO exceptions unless debug is enabled.
+                if (log.isDebugEnabled()) log.debug ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].", e);
+                else log.warn ("IOException in replication worker, unable to drain channel. Probable cause: Keep alive socket closed["+e.getMessage()+"].");
+            } else if ( log.isErrorEnabled() ) {
+                //this is a real error, log it.
+                log.error("Exception caught in TcpReplicationThread.drainChannel.",e);
+            } 
+            cancelKey(key);
+        } finally {
+
+        }
+        key = null;
+        // done, ready for more, return to pool
+        getTaskPool().returnWorker (this);
     }
 
     /**
@@ -131,14 +121,12 @@ public class NioReplicationTask extends AbstractRxTask {
      * worker thread is servicing it.
      */
     public synchronized void serviceChannel (SelectionKey key) {
-        if ( log.isTraceEnabled() ) 
-            log.trace("About to service key:"+key);
+        if ( log.isTraceEnabled() ) log.trace("About to service key:"+key);
         ObjectReader reader = (ObjectReader)key.attachment();
         if ( reader != null ) reader.setLastAccess(System.currentTimeMillis());
         this.key = key;
         key.interestOps (key.interestOps() & (~SelectionKey.OP_READ));
         key.interestOps (key.interestOps() & (~SelectionKey.OP_WRITE));
-        this.notify();		// awaken the thread
     }
 
     /**

@@ -19,6 +19,7 @@ package org.apache.catalina.tribes.transport;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * @author not attributable
@@ -40,8 +41,8 @@ public class RxTaskPool
     boolean running = true;
     
     private static int counter = 1;
-    private int maxThreads;
-    private int minThreads;
+    private int maxTasks;
+    private int minTasks;
     
     private TaskCreator creator = null;
 
@@ -50,34 +51,27 @@ public class RxTaskPool
     }
 
     
-    public RxTaskPool (int maxThreads, int minThreads, TaskCreator creator) throws Exception {
+    public RxTaskPool (int maxTasks, int minTasks, TaskCreator creator) throws Exception {
         // fill up the pool with worker threads
-        this.maxThreads = maxThreads;
-        this.minThreads = minThreads;
+        this.maxTasks = maxTasks;
+        this.minTasks = minTasks;
         this.creator = creator;
-        //for (int i = 0; i < minThreads; i++) {
-        for (int i = 0; i < maxThreads; i++) { //temporary fix for thread hand off problem
-            AbstractRxTask thread = creator.getWorkerThread();
-            setupThread(thread);
-            idle.add (thread);
-        }
     }
     
-    protected void setupThread(AbstractRxTask thread) {
-        synchronized (thread) {
-            thread.setPool(this);
-            thread.setName(thread.getClass().getName() + "[" + inc() + "]");
-            thread.setDaemon(true);
-            thread.setPriority(Thread.MAX_PRIORITY);
-            thread.start();
-            try {thread.wait(500); }catch ( InterruptedException x ) {}
+    protected void configureTask(AbstractRxTask task) {
+        synchronized (task) {
+            task.setTaskPool(this);
+//            task.setName(task.getClass().getName() + "[" + inc() + "]");
+//            task.setDaemon(true);
+//            task.setPriority(Thread.MAX_PRIORITY);
+//            task.start();
         }
     }
 
     /**
      * Find an idle worker thread, if any.  Could return null.
      */
-    public AbstractRxTask getWorker()
+    public AbstractRxTask getRxTask()
     {
         AbstractRxTask worker = null;
         synchronized (mutex) {
@@ -89,9 +83,9 @@ public class RxTaskPool
                         //this means that there are no available workers
                         worker = null;
                     }
-                } else if ( used.size() < this.maxThreads && creator != null) {
-                    worker = creator.getWorkerThread();
-                    setupThread(worker);
+                } else if ( used.size() < this.maxTasks && creator != null) {
+                    worker = creator.createRxTask();
+                    configureTask(worker);
                 } else {
                     try { mutex.wait(); } catch ( java.lang.InterruptedException x ) {Thread.currentThread().interrupted();}
                 }
@@ -114,7 +108,7 @@ public class RxTaskPool
             synchronized (mutex) {
                 used.remove(worker);
                 //if ( idle.size() < minThreads && !idle.contains(worker)) idle.add(worker);
-                if ( idle.size() < maxThreads && !idle.contains(worker)) idle.add(worker); //let max be the upper limit
+                if ( idle.size() < maxTasks && !idle.contains(worker)) idle.add(worker); //let max be the upper limit
                 else {
                     worker.setDoRun(false);
                     synchronized (worker){worker.notify();}
@@ -128,11 +122,11 @@ public class RxTaskPool
     }
 
     public int getMaxThreads() {
-        return maxThreads;
+        return maxTasks;
     }
 
     public int getMinThreads() {
-        return minThreads;
+        return minTasks;
     }
 
     public void stop() {
@@ -147,19 +141,19 @@ public class RxTaskPool
         }
     }
 
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
+    public void setMaxTasks(int maxThreads) {
+        this.maxTasks = maxThreads;
     }
 
-    public void setMinThreads(int minThreads) {
-        this.minThreads = minThreads;
+    public void setMinTasks(int minThreads) {
+        this.minTasks = minThreads;
     }
 
-    public TaskCreator getThreadCreator() {
+    public TaskCreator getTaskCreator() {
         return this.creator;
     }
     
-    public static interface TaskCreator {
-        public AbstractRxTask getWorkerThread();
+    public static interface TaskCreator  {
+        public AbstractRxTask createRxTask();
     }
 }
