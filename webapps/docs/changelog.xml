@@ -21,6 +21,22 @@
         <bug>40585</bug>: Fix parameterised constructor for o.a.juli.FileHandler
         so parameters have an effect. (markt)
       </fix>
+      <fix>
+        Escape invalid characters from request.getLocale. (markt, remm)
+      </fix>
+      <update>
+        Update required version for native to 1.1.8. (remm)
+      </update>
+      <fix>
+        Do not log broken pipe errors which can occur when flushing the content of an error page. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Fix firstReadTimeout behavior for the AJP connector. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -28,6 +44,16 @@
       <fix>
         <bug>41057</bug>: Make jsp:plugin output XHTML compliant. (markt)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <update>
+        Cluster interface cleanup. (fhanik)
+      </update>
+      <update>
+        Refactoring to allow usage of executors. (fhanik)
+      </update>
     </changelog>
   </subsection>
 </section>
