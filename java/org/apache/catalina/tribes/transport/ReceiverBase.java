@@ -19,6 +19,11 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelReceiver;
@@ -58,8 +63,10 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private long tcpSelectorTimeout = 5000;
     //how many times to search for an available socket
     private int autoBind = 100;
-    private int maxThreads = 6;
+    private int maxThreads = 15;
     private int minThreads = 6;
+    private int maxTasks = 100;
+    private int minTasks = 10;
     private boolean tcpNoDelay = true;
     private boolean soKeepAlive = false;
     private boolean ooBInline = true;
@@ -69,9 +76,21 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int soTrafficClass = 0x04 | 0x08 | 0x010;
     private int timeout = 3000; //3 seconds
     private boolean useBufferPool = true;
+    
+    private Executor executor;
 
 
     public ReceiverBase() {
+    }
+    
+    public void start() throws IOException {
+        if ( executor == null ) {
+            executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
+        }
+    }
+    
+    public void stop() {
+        if ( executor instanceof ExecutorService ) ((ExecutorService)executor).shutdown();
     }
     
     /**
@@ -270,7 +289,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return listener;
     }
 
-    public RxTaskPool getPool() {
+    public RxTaskPool getTaskPool() {
         return pool;
     }
     
@@ -333,6 +352,22 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public int getSecurePort() {
         return securePort;
+    }
+
+    public int getMinTasks() {
+        return minTasks;
+    }
+
+    public int getMaxTasks() {
+        return maxTasks;
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public boolean isListening() {
+        return listen;
     }
 
     /**
@@ -429,7 +464,20 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         this.securePort = securePort;
     }
 
+    public void setMinTasks(int minTasks) {
+        this.minTasks = minTasks;
+    }
+
+    public void setMaxTasks(int maxTasks) {
+        this.maxTasks = maxTasks;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
+    }
+
     public void heartbeat() {
         //empty operation
     }
+    
 }

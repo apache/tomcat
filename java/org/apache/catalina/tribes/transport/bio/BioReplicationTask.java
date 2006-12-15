@@ -59,32 +59,19 @@ public class BioReplicationTask extends AbstractRxTask {
     // loop forever waiting for work to do
     public synchronized void run()
     {
-        this.notify();
-        while (isDoRun()) {
-            try {
-                // sleep and release object lock
-                this.wait();
-            } catch (InterruptedException e) {
-                if(log.isInfoEnabled())
-                    log.info("TCP worker thread interrupted in cluster",e);
-                // clear interrupt status
-                Thread.interrupted();
-            }
-            if ( socket == null ) continue;
-            try {
-                drainSocket();
-            } catch ( Exception x ) {
-                log.error("Unable to service bio socket");
-            }finally {
-                try {socket.close();}catch ( Exception ignore){}
-                try {reader.close();}catch ( Exception ignore){}
-                reader = null;
-                socket = null;
-            }
-            // done, ready for more, return to pool
-            if ( getPool() != null ) getPool().returnWorker (this);
-            else setDoRun(false);
+        if ( socket == null ) return;
+        try {
+            drainSocket();
+        } catch ( Exception x ) {
+            log.error("Unable to service bio socket");
+        }finally {
+            try {socket.close();}catch ( Exception ignore){}
+            try {reader.close();}catch ( Exception ignore){}
+            reader = null;
+            socket = null;
         }
+        // done, ready for more, return to pool
+        if ( getTaskPool() != null ) getTaskPool().returnWorker (this);
     }
 
     

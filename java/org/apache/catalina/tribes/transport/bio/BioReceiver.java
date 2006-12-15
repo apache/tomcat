@@ -53,6 +53,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     public void start() throws IOException {
+        super.start();
         try {
             setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
@@ -73,7 +74,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         }
     }
     
-    public AbstractRxTask getWorkerThread() {
+    public AbstractRxTask createRxTask() {
         return getReplicationThread();
     }
     
@@ -93,6 +94,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         try {
             this.serverSocket.close();
         }catch ( Exception x ) {}
+        super.stop();
     }
 
     
@@ -125,20 +127,21 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
         while ( doListen() ) {
             Socket socket = null;
-            if ( getPool().available() < 1 ) {
+            if ( getTaskPool().available() < 1 ) {
                 if ( log.isWarnEnabled() )
                     log.warn("All BIO server replication threads are busy, unable to handle more requests until a thread is freed up.");
             }
-            BioReplicationTask thread = (BioReplicationTask)getPool().getWorker();
-            if ( thread == null ) continue; //should never happen
+            BioReplicationTask task = (BioReplicationTask)getTaskPool().getRxTask();
+            if ( task == null ) continue; //should never happen
             try {
                 socket = serverSocket.accept();
             }catch ( Exception x ) {
                 if ( doListen() ) throw x;
             }
             if ( !doListen() ) {
-                thread.setDoRun(false);
-                thread.serviceSocket(null,null);
+                task.setDoRun(false);
+                task.serviceSocket(null,null);
+                getExecutor().execute(task);
                 break; //regular shutdown
             }
             if ( socket == null ) continue;
@@ -152,7 +155,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             socket.setTrafficClass(getSoTrafficClass());
             socket.setSoTimeout(getTimeout());
             ObjectReader reader = new ObjectReader(socket);
-            thread.serviceSocket(socket,reader);
+            task.serviceSocket(socket,reader);
         }//while
     }
     
