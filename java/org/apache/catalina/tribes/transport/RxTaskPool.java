@@ -25,7 +25,7 @@ import java.util.List;
  * @version 1.0
  */
 
-public class ThreadPool
+public class RxTaskPool
 {
     /**
      * A very simple thread pool class.  The pool size is set at
@@ -43,14 +43,14 @@ public class ThreadPool
     private int maxThreads;
     private int minThreads;
     
-    private ThreadCreator creator = null;
+    private TaskCreator creator = null;
 
     private static synchronized int inc() {
         return counter++;
     }
 
     
-    public ThreadPool (int maxThreads, int minThreads, ThreadCreator creator) throws Exception {
+    public RxTaskPool (int maxThreads, int minThreads, TaskCreator creator) throws Exception {
         // fill up the pool with worker threads
         this.maxThreads = maxThreads;
         this.minThreads = minThreads;
@@ -155,11 +155,11 @@ public class ThreadPool
         this.minThreads = minThreads;
     }
 
-    public ThreadCreator getThreadCreator() {
+    public TaskCreator getThreadCreator() {
         return this.creator;
     }
     
-    public static interface ThreadCreator {
+    public static interface TaskCreator {
         public WorkerThread getWorkerThread();
     }
 }

@@ -31,7 +31,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
-import org.apache.catalina.tribes.transport.ThreadPool;
+import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.transport.WorkerThread;
 import org.apache.catalina.tribes.util.StringManager;
 import java.util.LinkedList;
@@ -90,7 +90,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
     public void start() throws IOException {
         try {
 //            setPool(new ThreadPool(interestOpsMutex, getMaxThreads(),getMinThreads(),this));
-            setPool(new ThreadPool(getMaxThreads(),getMinThreads(),this));
+            setPool(new RxTaskPool(getMaxThreads(),getMinThreads(),this));
         } catch (Exception x) {
             log.fatal("ThreadPool can initilzed. Listener not started", x);
             if ( x instanceof IOException ) throw (IOException)x;

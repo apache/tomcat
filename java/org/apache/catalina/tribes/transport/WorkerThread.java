@@ -27,12 +27,12 @@ import org.apache.catalina.tribes.io.ListenCallback;
  * @version $Revision$ $Date$
  */
 public abstract class WorkerThread extends Thread 
-{
+{ 
     
     public static final int OPTION_DIRECT_BUFFER = ReceiverBase.OPTION_DIRECT_BUFFER;
     
     private ListenCallback callback;
-    private ThreadPool pool;
+    private RxTaskPool pool;
     private boolean doRun = true;
     private int options;
     protected boolean useBufferPool = true;
@@ -41,7 +41,7 @@ public abstract class WorkerThread extends Thread
         this.callback = callback;
     }
 
-    public void setPool(ThreadPool pool) {
+    public void setPool(RxTaskPool pool) {
         this.pool = pool;
     }
 
@@ -57,7 +57,7 @@ public abstract class WorkerThread extends Thread
         this.doRun = doRun;
     }
 
-    public ThreadPool getPool() {
+    public RxTaskPool getPool() {
         return pool;
     }
 
