@@ -23,7 +23,7 @@ import java.nio.channels.SocketChannel;
 
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.Constants;
-import org.apache.catalina.tribes.transport.WorkerThread;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ChannelData;
@@ -47,7 +47,7 @@ import org.apache.catalina.tribes.util.Logs;
  * 
  * @version $Revision$, $Date$
  */
-public class NioReplicationThread extends WorkerThread {
+public class NioReplicationThread extends AbstractRxTask {
     
     private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( NioReplicationThread.class );
     

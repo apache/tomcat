@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.Constants;
-import org.apache.catalina.tribes.transport.WorkerThread;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
 import java.net.Socket;
 import java.io.InputStream;
 import org.apache.catalina.tribes.transport.ReceiverBase;
@@ -44,7 +44,7 @@ import org.apache.catalina.tribes.io.BufferPool;
  * 
  * @version $Revision$, $Date$
  */
-public class BioReplicationThread extends WorkerThread {
+public class BioReplicationThread extends AbstractRxTask {
 
 
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationThread.class );

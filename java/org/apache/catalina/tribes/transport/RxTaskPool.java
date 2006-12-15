@@ -57,13 +57,13 @@ public class RxTaskPool
         this.creator = creator;
         //for (int i = 0; i < minThreads; i++) {
         for (int i = 0; i < maxThreads; i++) { //temporary fix for thread hand off problem
-            WorkerThread thread = creator.getWorkerThread();
+            AbstractRxTask thread = creator.getWorkerThread();
             setupThread(thread);
             idle.add (thread);
         }
     }
     
-    protected void setupThread(WorkerThread thread) {
+    protected void setupThread(AbstractRxTask thread) {
         synchronized (thread) {
             thread.setPool(this);
             thread.setName(thread.getClass().getName() + "[" + inc() + "]");
@@ -77,14 +77,14 @@ public class RxTaskPool
     /**
      * Find an idle worker thread, if any.  Could return null.
      */
-    public WorkerThread getWorker()
+    public AbstractRxTask getWorker()
     {
-        WorkerThread worker = null;
+        AbstractRxTask worker = null;
         synchronized (mutex) {
             while ( worker == null && running ) {
                 if (idle.size() > 0) {
                     try {
-                        worker = (WorkerThread) idle.remove(0);
+                        worker = (AbstractRxTask) idle.remove(0);
                     } catch (java.util.NoSuchElementException x) {
                         //this means that there are no available workers
                         worker = null;
@@ -109,7 +109,7 @@ public class RxTaskPool
      * Called by the worker thread to return itself to the
      * idle pool.
      */
-    public void returnWorker (WorkerThread worker) {
+    public void returnWorker (AbstractRxTask worker) {
         if ( running ) {
             synchronized (mutex) {
                 used.remove(worker);
@@ -140,7 +140,7 @@ public class RxTaskPool
         synchronized (mutex) {
             Iterator i = idle.iterator();
             while ( i.hasNext() ) {
-                WorkerThread worker = (WorkerThread)i.next();
+                AbstractRxTask worker = (AbstractRxTask)i.next();
                 returnWorker(worker);
                 i.remove();
             }
@@ -160,6 +160,6 @@ public class RxTaskPool
     }
     
     public static interface TaskCreator {
-        public WorkerThread getWorkerThread();
+        public AbstractRxTask getWorkerThread();
     }
 }
