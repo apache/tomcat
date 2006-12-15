@@ -77,8 +77,8 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         return getReplicationThread();
     }
     
-    protected BioReplicationThread getReplicationThread() {
-        BioReplicationThread result = new BioReplicationThread(this);
+    protected BioReplicationTask getReplicationThread() {
+        BioReplicationTask result = new BioReplicationTask(this);
         result.setOptions(getWorkerThreadOptions());
         result.setUseBufferPool(this.getUseBufferPool());
         return result;
@@ -129,7 +129,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                 if ( log.isWarnEnabled() )
                     log.warn("All BIO server replication threads are busy, unable to handle more requests until a thread is freed up.");
             }
-            BioReplicationThread thread = (BioReplicationThread)getPool().getWorker();
+            BioReplicationTask thread = (BioReplicationTask)getPool().getWorker();
             if ( thread == null ) continue; //should never happen
             try {
                 socket = serverSocket.accept();
