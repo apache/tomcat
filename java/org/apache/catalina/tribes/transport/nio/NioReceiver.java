@@ -110,7 +110,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
     }
     
     public AbstractRxTask getWorkerThread() {
-        NioReplicationThread thread = new NioReplicationThread(this,this);
+        NioReplicationTask thread = new NioReplicationTask(this,this);
         thread.setUseBufferPool(this.getUseBufferPool());
         thread.setRxBufSize(getRxBufSize());
         thread.setOptions(getWorkerThreadOptions());
@@ -365,7 +365,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      *  will then de-register the channel on the next select call.
      */
     protected void readDataFromSocket(SelectionKey key) throws Exception {
-        NioReplicationThread worker = (NioReplicationThread) getPool().getWorker();
+        NioReplicationTask worker = (NioReplicationTask) getPool().getWorker();
         if (worker == null) {
             // No threads available, do nothing, the selection
             // loop will keep calling this method until a

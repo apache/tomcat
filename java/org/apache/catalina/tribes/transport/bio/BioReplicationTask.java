@@ -44,15 +44,15 @@ import org.apache.catalina.tribes.io.BufferPool;
  * 
  * @version $Revision$, $Date$
  */
-public class BioReplicationThread extends AbstractRxTask {
+public class BioReplicationTask extends AbstractRxTask {
 
 
-    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationThread.class );
+    protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BioReplicationTask.class );
     
     protected Socket socket;
     protected ObjectReader reader;
     
-    public BioReplicationThread (ListenCallback callback) {
+    public BioReplicationTask (ListenCallback callback) {
         super(callback);
     }
 

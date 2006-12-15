@@ -47,15 +47,15 @@ import org.apache.catalina.tribes.util.Logs;
  * 
  * @version $Revision$, $Date$
  */
-public class NioReplicationThread extends AbstractRxTask {
+public class NioReplicationTask extends AbstractRxTask {
     
-    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( NioReplicationThread.class );
+    private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( NioReplicationTask.class );
     
     private ByteBuffer buffer = null;
     private SelectionKey key;
     private int rxBufSize;
     private NioReceiver receiver;
-    public NioReplicationThread (ListenCallback callback, NioReceiver receiver)
+    public NioReplicationTask (ListenCallback callback, NioReceiver receiver)
     {
         super(callback);
         this.receiver = receiver;
