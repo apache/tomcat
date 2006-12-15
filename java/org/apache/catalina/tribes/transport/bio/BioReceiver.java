@@ -24,7 +24,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
-import org.apache.catalina.tribes.transport.WorkerThread;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
 
 /**
  * <p>Title: </p>
@@ -73,7 +73,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         }
     }
     
-    public WorkerThread getWorkerThread() {
+    public AbstractRxTask getWorkerThread() {
         return getReplicationThread();
     }
     

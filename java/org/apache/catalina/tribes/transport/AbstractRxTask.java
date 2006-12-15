@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.io.ListenCallback;
  * @author Filip Hanik
  * @version $Revision$ $Date$
  */
-public abstract class WorkerThread extends Thread 
+public abstract class AbstractRxTask extends Thread 
 { 
     
     public static final int OPTION_DIRECT_BUFFER = ReceiverBase.OPTION_DIRECT_BUFFER;
@@ -37,7 +37,7 @@ public abstract class WorkerThread extends Thread
     private int options;
     protected boolean useBufferPool = true;
 
-    public WorkerThread(ListenCallback callback) {
+    public AbstractRxTask(ListenCallback callback) {
         this.callback = callback;
     }
 

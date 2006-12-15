@@ -32,7 +32,7 @@ import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.RxTaskPool;
-import org.apache.catalina.tribes.transport.WorkerThread;
+import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.util.StringManager;
 import java.util.LinkedList;
 import java.util.Set;
@@ -109,7 +109,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         }
     }
     
-    public WorkerThread getWorkerThread() {
+    public AbstractRxTask getWorkerThread() {
         NioReplicationThread thread = new NioReplicationThread(this,this);
         thread.setUseBufferPool(this.getUseBufferPool());
         thread.setRxBufSize(getRxBufSize());
