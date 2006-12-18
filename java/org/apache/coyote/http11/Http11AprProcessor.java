@@ -1145,6 +1145,15 @@ public class Http11AprProcessor implements ActionHook {
                             ByteArrayInputStream stream = new ByteArrayInputStream(data);
                             certs[i] = (X509Certificate) cf.generateCertificate(stream);
                         }
+                    } else if (certLength == 0) {
+                        byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
+                        if (data != null) {
+                            certs = new X509Certificate[1];
+                            CertificateFactory cf =
+                                CertificateFactory.getInstance("X.509");
+                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
+                            certs[0] = (X509Certificate) cf.generateCertificate(stream);
+                        }
                     }
                     if (certs != null) {
                         request.setAttribute
@@ -1191,6 +1200,15 @@ public class Http11AprProcessor implements ActionHook {
                                 CertificateFactory.getInstance("X.509");
                             ByteArrayInputStream stream = new ByteArrayInputStream(data);
                             certs[i] = (X509Certificate) cf.generateCertificate(stream);
+                        }
+                    } else if (certLength == 0) {
+                        byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
+                        if (data != null) {
+                            certs = new X509Certificate[1];
+                            CertificateFactory cf =
+                                CertificateFactory.getInstance("X.509");
+                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
+                            certs[0] = (X509Certificate) cf.generateCertificate(stream);
                         }
                     }
                     if (certs != null) {
