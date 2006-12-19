@@ -2426,27 +2426,31 @@ public class Request
         if (len > 0) {
             int maxPostSize = connector.getMaxPostSize();
             if ((maxPostSize > 0) && (len > maxPostSize)) {
-                context.getLogger().info
-                    (sm.getString("coyoteRequest.postTooLarge"));
-                throw new IllegalStateException("Post too large");
+                if (context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug("Post too large");
+                }
+                return;
+            }
+            byte[] formData = null;
+            if (len < CACHED_POST_LEN) {
+                if (postData == null)
+                    postData = new byte[CACHED_POST_LEN];
+                formData = postData;
+            } else {
+                formData = new byte[len];
             }
             try {
-                byte[] formData = null;
-                if (len < CACHED_POST_LEN) {
-                    if (postData == null)
-                        postData = new byte[CACHED_POST_LEN];
-                    formData = postData;
-                } else {
-                    formData = new byte[len];
+                if (readPostBody(formData, len) != len) {
+                    return;
                 }
-                int actualLen = readPostBody(formData, len);
-                if (actualLen == len) {
-                    parameters.processParameters(formData, 0, len);
+            } catch (IOException e) {
+                // Client disconnect
+                if (context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(
+                            sm.getString("coyoteRequest.parseParameters"), e);
                 }
-            } catch (Throwable t) {
-                context.getLogger().warn(
-                        sm.getString("coyoteRequest.parseParameters"), t);
             }
+            parameters.processParameters(formData, 0, len);
         }
 
     }
