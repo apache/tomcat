@@ -14,6 +14,39 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.7 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Fix installer's bitmap (mturk)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Refactor logging of errors which may occur when reading a post body (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>37869</bug>: Also use the SSL_INFO_CLIENT_CERT field if the chain is empty,
+        submitted by Grzegorz Grzybek (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 6.0.6 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Fix tagging which did not include 6.0.5's changelog (remm)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 6.0.5 (remm)">
   <subsection name="Catalina">
     <changelog>
