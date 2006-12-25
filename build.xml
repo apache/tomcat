@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <project name="Tomcat 6.0" default="deploy" basedir=".">
 
 
