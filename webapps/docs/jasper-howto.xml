@@ -84,9 +84,11 @@ debugging information?  <code>true</code> or <code>false</code>, default
 <code>true</code>.
 </li>
 
-<li><strong>classpath</strong> - What class path should I use while compiling
-generated servlets?  By default the classpath is created dynamically based on
-the current web application.</li>
+<li><strong>classpath</strong> - Defines the class path to be used to compile
+the generated servlets. This parameter only has an effect if the ServletContext
+attribute org.apache.jasper.Constants.SERVLET_CLASSPATH is not set. This
+attribute is always set when Jasper is used within Tomcat. By default the
+classpath is created dynamically based on the current web application.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files compatible with? (Default JDK 1.4)</li>
 
