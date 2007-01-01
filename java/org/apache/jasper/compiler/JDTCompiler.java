@@ -352,7 +352,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                     try {
                                         problemList.add(ErrorDispatcher.createJavacError
                                                 (name, pageNodes, new StringBuffer(problem.getMessage()), 
-                                                        problem.getSourceLineNumber()));
+                                                        problem.getSourceLineNumber(), ctxt));
                                     } catch (JasperException e) {
                                         log.error("Error visiting node", e);
                                     }

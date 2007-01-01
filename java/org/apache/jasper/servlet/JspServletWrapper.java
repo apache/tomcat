@@ -17,15 +17,9 @@
 
 package org.apache.jasper.servlet;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -504,10 +498,11 @@ public class JspServletWrapper {
             else {
                 int javaLineNumber = jspFrame.getLineNumber();
                 JavacErrorDetail detail = ErrorDispatcher.createJavacError(
-                                                                           jspFrame.getMethodName(),
-                                                                           this.ctxt.getCompiler().getPageNodes(),
-                                                                           null,
-                                                                           javaLineNumber);
+                        jspFrame.getMethodName(),
+                        this.ctxt.getCompiler().getPageNodes(),
+                        null,
+                        javaLineNumber,
+                        ctxt);
 
                 // If the line number is less than one we couldn't find out
                 // where in the JSP things went wrong
@@ -517,69 +512,26 @@ public class JspServletWrapper {
                 }
 
                 if (options.getDisplaySourceFragment()) {
-
-                    // Read both files in, so we can inspect them
-                    String[] jspLines = readFile
-                    (this.ctxt.getResourceAsStream(detail.getJspFileName()));
-
-                    String[] javaLines = readFile
-                    (new FileInputStream(this.ctxt.getServletJavaFileName()));
-
-                    // If the line contains the opening of a multi-line scriptlet
-                    // block, then the JSP line number we got back is probably
-                    // faulty.  Scan forward to match the java line...
-                    if (jspLines[jspLineNumber-1].lastIndexOf("<%") >
-                    jspLines[jspLineNumber-1].lastIndexOf("%>")) {
-                        String javaLine = javaLines[javaLineNumber-1].trim();
-
-                        for (int i=jspLineNumber-1; i<jspLines.length; i++) {
-                            if (jspLines[i].indexOf(javaLine) != -1) {
-                                jspLineNumber = i+1;
-                                break;
-                            }
-                        }
-                    }
-
-                    // copy out a fragment of JSP to display to the user
-                    StringBuffer buffer = new StringBuffer(1024);
-                    int startIndex = Math.max(0, jspLineNumber-1-3);
-                    int endIndex = Math.min(jspLines.length-1, jspLineNumber-1+3);
-
-                    for (int i=startIndex;i<=endIndex; ++i) {
-                        buffer.append(i+1);
-                        buffer.append(": ");
-                        buffer.append(jspLines[i]);
-                        buffer.append("\n");
-                    }
-
                     return new JasperException(Localizer.getMessage
-                            ("jsp.exception", detail.getJspFileName(), "" + jspLineNumber) + "\n" + buffer, ex);
+                            ("jsp.exception", detail.getJspFileName(),
+                                    "" + jspLineNumber) +
+                                    "\n\n" + detail.getJspExtract() +
+                                    "\n\nStacktrace:", ex);
                     
                 } else {
                     return new JasperException(Localizer.getMessage
-                            ("jsp.exception", detail.getJspFileName(), "" + jspLineNumber), ex);
+                            ("jsp.exception", detail.getJspFileName(),
+                                    "" + jspLineNumber), ex);
                 }
             }
         } catch (Exception je) {
             // If anything goes wrong, just revert to the original behaviour
-            return new JasperException(ex);
+            if (ex instanceof JasperException) {
+                return (JasperException) ex;
+            } else {
+                return new JasperException(ex);
+            }
         }
-    }
-
-    /**
-     * Reads a text file from an input stream into a String[]. Used to read in
-     * the JSP and generated Java file when generating error messages.
-     */
-    private String[] readFile(InputStream s) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(s));
-        List lines = new ArrayList();
-        String line;
-
-        while ( (line = reader.readLine()) != null ) {
-            lines.add(line);
-        }
-
-        return (String[]) lines.toArray( new String[lines.size()] );
     }
 
 }
