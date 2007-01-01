@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="virtual-hosting-howto.html">
+
+    &project;
+
+  <properties>
+    <title>Virtual Hosting and Tomcat</title>
+  </properties>
+
+<body>
+
+  <section name="Assumptions">
+    <p>
+      For the sake of this how-to, assume you have a development host with two
+      host names, <code>ren</code> and <code>stimpy</code>. Let's also assume
+      one instance of Tomcat running, so <code>$CATALINA_HOME</code> refers to
+      wherever it's installed, perhaps <code>/usr/local/tomcat</code>.
+    </p>
+    <p>
+      Also, this how-to uses Unix-style path separators and commands; if you're
+      on Windows modify accordingly. 
+    </p>
+  </section>
+
+  <section name="server.xml">
+    <p>
+      At the simplest, edit the <a href="config/engine.html">Engine</a> portion
+      of your <code>server.xml</code> file to look like this:
+    </p>
+    <source>
+&lt;Engine name="Catalina" defaultHost="ren"&gt;
+    &lt;Host name="ren"    appBase="webapps/ren"/&gt;
+    &lt;Host name="stimpy" appBase="webapps/stimpy"/&gt;
+&lt;/Engine&gt;
+    </source>
+    <p>
+      Consult the configuration documentation for other attributes of the
+      <a href="config/engine.html">Engine</a> and <a href="config/host.html">
+      Host</a>elements.
+    </p>
+  </section>
+
+  <section name="Webapps Directory">
+    <p>
+      Create directories for each of the virtual hosts:
+    </p>
+    <source>
+mkdir $CATALINA_HOME/webapps/ren
+mkdir $CATALINA_HOME/webapps/stimpy
+    </source>
+  </section>
+
+  <section name="Configuring Your Contexts">
+    <subsection name="Approach #1">
+      <p>
+        Within your Context, create a <code>META-INF</code> directory and then
+        place your Context definition in it in a file named
+        <code>context.xml</code>. i.e.
+        <code>$CATALINA_HOME/webapps/ren/ROOT/META-INF/context.xml</code>
+        This makes deployment easier, particularly if you're distributing a WAR
+        file.
+      </p>
+    </subsection>
+    <subsection name="Approach #2">
+      <p>
+        Create a structure under <code>$CATALINA_HOME/conf/Catalina</code>
+        corresponding to your virtual hosts, e.g.:
+      </p>
+      <source>
+mkdir $CATALINA_HOME/conf/Catalina/ren
+mkdir $CATALINA_HOME/conf/Catalina/stimpy
+      </source>
+      <p>
+        Note that the ending directory name "Catalina" represents the
+        <code>name</code> attribute of the
+        <a href="config/engine.html">Engine</a> element as shown above.
+      </p>
+      <p>
+        Now, for your default webapps, add:
+      </p>
+      <source>
+$CATALINA_HOME/conf/Catalina/ren/ROOT.xml
+$CATALINA_HOME/conf/Catalina/stimpy/ROOT.xml
+      </source>
+      <p>
+        If you want to use the Tomcat manager webapp for each host, you'll also
+        need to add it here:
+      </p>
+      <source>
+cd $CATALINA_HOME/conf/Catalina
+cp localhost/manager.xml ren/
+cp localhost/manager.xml stimpy/
+      </source>
+    </subsection>
+    <subsection name="Further Information">
+      <p>
+        Consult the configuration documentation for other attributes of the
+        <a href="config/context.html">Context</a> element.
+      </p>
+    </subsection>
+  </section>
+
+</body>
+</document>
