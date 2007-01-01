@@ -520,7 +520,7 @@ public class JspServletWrapper {
 
                     // Read both files in, so we can inspect them
                     String[] jspLines = readFile
-                    (this.ctxt.getResourceAsStream(this.ctxt.getJspFile()));
+                    (this.ctxt.getResourceAsStream(detail.getJspFileName()));
 
                     String[] javaLines = readFile
                     (new FileInputStream(this.ctxt.getServletJavaFileName()));
