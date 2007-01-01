@@ -15,6 +15,13 @@
 
 <body>
 <section name="Tomcat 6.0.8 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Make provided instances of RequestDispatcher thread safe. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
