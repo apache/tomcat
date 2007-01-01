@@ -21,6 +21,10 @@
         When displaying JSP source after an exception, handle included files.
         (markt)
       </fix>
+      <fix>
+        Display the JSP source when a compilation error occurs and display
+        the correct line number rather than start of a scriptlet block. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import org.apache.jasper.JasperException;
+import org.apache.jasper.JspCompilationContext;
 import org.xml.sax.SAXException;
 
 /**
@@ -501,8 +502,25 @@ public class ErrorDispatcher {
      * @return JavacErrorDetail The error details
      * @throws JasperException
      */
-    public static JavacErrorDetail createJavacError(String fname, Node.Nodes page, 
-            StringBuffer errMsgBuf, int lineNum) throws JasperException {
+    public static JavacErrorDetail createJavacError(String fname,
+            Node.Nodes page, StringBuffer errMsgBuf, int lineNum)
+    throws JasperException {
+        return createJavacError(fname, page, errMsgBuf, lineNum, null);
+    }
+    
+    
+    /**
+     * @param fname
+     * @param page
+     * @param errMsgBuf
+     * @param lineNum
+     * @param ctxt
+     * @return JavacErrorDetail The error details
+     * @throws JasperException
+     */
+    public static JavacErrorDetail createJavacError(String fname,
+            Node.Nodes page, StringBuffer errMsgBuf, int lineNum,
+            JspCompilationContext ctxt) throws JasperException {
         JavacErrorDetail javacError;
         // Attempt to map javac error line number to line in JSP page
         ErrorVisitor errVisitor = new ErrorVisitor(lineNum);
@@ -514,7 +532,8 @@ public class ErrorDispatcher {
                     lineNum,
                     errNode.getStart().getFile(),
                     errNode.getStart().getLineNumber(),
-                    errMsgBuf);
+                    errMsgBuf,
+                    ctxt);
         } else {
             /*
              * javac error line number cannot be mapped to JSP page
