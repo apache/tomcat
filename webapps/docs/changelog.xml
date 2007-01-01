@@ -34,6 +34,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <docs>
+        Add a virtual hosting how-to contributed by Hassan Schroeder. (markt)
+      </docs>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 6.0.7 (remm)">
   <subsection name="General">
