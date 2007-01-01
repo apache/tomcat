@@ -100,6 +100,48 @@ final class ApplicationDispatcher
         }
     }
 
+    
+    /**
+     * Used to pass state when the request dispatcher is used. Using instance
+     * variables causes threading issues and state is too complex to pass and
+     * return single ServletRequest or ServletResponse objects.
+     */
+    private class State {
+        State(ServletRequest request, ServletResponse response,
+                boolean including) {
+            this.outerRequest = request;
+            this.outerResponse = response;
+            this.including = including;
+        }
+
+        /**
+         * The outermost request that will be passed on to the invoked servlet.
+         */
+        ServletRequest outerRequest = null;
+
+
+        /**
+         * The outermost response that will be passed on to the invoked servlet.
+         */
+        ServletResponse outerResponse = null;
+        
+        /**
+         * The request wrapper we have created and installed (if any).
+         */
+        ServletRequest wrapRequest = null;
+
+
+        /**
+         * The response wrapper we have created and installed (if any).
+         */
+        ServletResponse wrapResponse = null;
+        
+        /**
+         * Are we performing an include() instead of a forward()?
+         */
+        boolean including = false;
+    }
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -131,7 +173,6 @@ final class ApplicationDispatcher
         this.context = (Context) wrapper.getParent();
         this.requestURI = requestURI;
         this.servletPath = servletPath;
-        this.origServletPath = servletPath;
         this.pathInfo = pathInfo;
         this.queryString = queryString;
         this.name = name;
@@ -153,27 +194,9 @@ final class ApplicationDispatcher
     private static Log log = LogFactory.getLog(ApplicationDispatcher.class);
 
     /**
-     * The request specified by the dispatching application.
-     */
-    private ServletRequest appRequest = null;
-
-
-    /**
-     * The response specified by the dispatching application.
-     */
-    private ServletResponse appResponse = null;
-
-
-    /**
      * The Context this RequestDispatcher is associated with.
      */
     private Context context = null;
-
-
-    /**
-     * Are we performing an include() instead of a forward()?
-     */
-    private boolean including = false;
 
 
     /**
@@ -187,18 +210,6 @@ final class ApplicationDispatcher
      * The servlet name for a named dispatcher.
      */
     private String name = null;
-
-
-    /**
-     * The outermost request that will be passed on to the invoked servlet.
-     */
-    private ServletRequest outerRequest = null;
-
-
-    /**
-     * The outermost response that will be passed on to the invoked servlet.
-     */
-    private ServletResponse outerResponse = null;
 
 
     /**
@@ -218,13 +229,13 @@ final class ApplicationDispatcher
      */
     private String requestURI = null;
 
+
     /**
      * The servlet path for this RequestDispatcher.
      */
     private String servletPath = null;
 
-    private String origServletPath = null;
-    
+
     /**
      * The StringManager for this package.
      */
@@ -244,18 +255,6 @@ final class ApplicationDispatcher
      * or included.
      */
     private Wrapper wrapper = null;
-
-
-    /**
-     * The request wrapper we have created and installed (if any).
-     */
-    private ServletRequest wrapRequest = null;
-
-
-    /**
-     * The response wrapper we have created and installed (if any).
-     */
-    private ServletResponse wrapResponse = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -323,11 +322,11 @@ final class ApplicationDispatcher
         }
 
         // Set up to handle the specified request and response
-        setup(request, response, false);
+        State state = new State(request, response, false);
 
         if (Globals.STRICT_SERVLET_COMPLIANCE) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
-            checkSameObjects();
+            checkSameObjects(request, response);
         }
 
         // Identify the HTTP-specific request and response objects (if any)
@@ -344,7 +343,7 @@ final class ApplicationDispatcher
             if ( log.isDebugEnabled() )
                 log.debug(" Non-HTTP Forward");
             
-            processRequest(hrequest,hresponse);
+            processRequest(hrequest,hresponse,state);
 
         }
 
@@ -355,17 +354,17 @@ final class ApplicationDispatcher
                 log.debug(" Named Dispatcher Forward");
             
             ApplicationHttpRequest wrequest =
-                (ApplicationHttpRequest) wrapRequest();
+                (ApplicationHttpRequest) wrapRequest(state);
             wrequest.setRequestURI(hrequest.getRequestURI());
             wrequest.setContextPath(hrequest.getContextPath());
             wrequest.setServletPath(hrequest.getServletPath());
             wrequest.setPathInfo(hrequest.getPathInfo());
             wrequest.setQueryString(hrequest.getQueryString());
 
-            processRequest(request,response);
+            processRequest(request,response,state);
 
             wrequest.recycle();
-            unwrapRequest();
+            unwrapRequest(state);
 
         }
 
@@ -376,7 +375,7 @@ final class ApplicationDispatcher
                 log.debug(" Path Based Forward");
 
             ApplicationHttpRequest wrequest =
-                (ApplicationHttpRequest) wrapRequest();
+                (ApplicationHttpRequest) wrapRequest(state);
             String contextPath = context.getPath();
 
             if (hrequest.getAttribute(Globals.FORWARD_REQUEST_URI_ATTR) == null) {
@@ -401,10 +400,10 @@ final class ApplicationDispatcher
                 wrequest.setQueryParams(queryString);
             }
 
-            processRequest(request,response);
+            processRequest(request,response,state);
 
             wrequest.recycle();
-            unwrapRequest();
+            unwrapRequest(state);
 
         }
 
@@ -443,32 +442,33 @@ final class ApplicationDispatcher
     }
 
     
-
     /**
      * Prepare the request based on the filter configuration.
      * @param request The servlet request we are processing
      * @param response The servlet response we are creating
+     * @param state The RD state
      *
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
     private void processRequest(ServletRequest request, 
-                                ServletResponse response)
+                                ServletResponse response,
+                                State state)
         throws IOException, ServletException {
                 
         Integer disInt = (Integer) request.getAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR);
         if (disInt != null) {
             if (disInt.intValue() != ApplicationFilterFactory.ERROR) {
-                outerRequest.setAttribute
+                state.outerRequest.setAttribute
                     (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                     origServletPath);
-                outerRequest.setAttribute
+                     servletPath);
+                state.outerRequest.setAttribute
                     (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                      Integer.valueOf(ApplicationFilterFactory.FORWARD));
-                invoke(outerRequest, response);
+                invoke(state.outerRequest, response, state);
             } else {
-                invoke(outerRequest, response);
+                invoke(state.outerRequest, response, state);
             }
         }
 
@@ -510,16 +510,15 @@ final class ApplicationDispatcher
         throws ServletException, IOException
     {
         // Set up to handle the specified request and response
-        setup(request, response, true);
+        State state = new State(request, response, true);
 
         if (Globals.STRICT_SERVLET_COMPLIANCE) {
             // Check SRV.8.2 / SRV.14.2.5.1 compliance
-            checkSameObjects();
+            checkSameObjects(request, response);
         }
         
         // Create a wrapped response to use for this request
-        // ServletResponse wresponse = null;
-        ServletResponse wresponse = wrapResponse();
+        wrapResponse(state);
 
         // Handle a non-HTTP include
         if (!(request instanceof HttpServletRequest) ||
@@ -529,8 +528,10 @@ final class ApplicationDispatcher
                 log.debug(" Non-HTTP Include");
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                     Integer.valueOf(ApplicationFilterFactory.INCLUDE));
-            request.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, origServletPath);
-            invoke(request, outerResponse);
+            request.setAttribute(
+                    ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
+                    servletPath);
+            invoke(request, state.outerResponse, state);
         }
 
         // Handle an HTTP named dispatcher include
@@ -540,14 +541,16 @@ final class ApplicationDispatcher
                 log.debug(" Named Dispatcher Include");
 
             ApplicationHttpRequest wrequest =
-                (ApplicationHttpRequest) wrapRequest();
+                (ApplicationHttpRequest) wrapRequest(state);
             wrequest.setAttribute(Globals.NAMED_DISPATCHER_ATTR, name);
             if (servletPath != null)
                 wrequest.setServletPath(servletPath);
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                     Integer.valueOf(ApplicationFilterFactory.INCLUDE));
-            wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, origServletPath);
-            invoke(outerRequest, outerResponse);
+            wrequest.setAttribute(
+                    ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
+                    servletPath);
+            invoke(state.outerRequest, state.outerResponse, state);
 
             wrequest.recycle();
         }
@@ -559,7 +562,7 @@ final class ApplicationDispatcher
                 log.debug(" Path Based Include");
 
             ApplicationHttpRequest wrequest =
-                (ApplicationHttpRequest) wrapRequest();
+                (ApplicationHttpRequest) wrapRequest(state);
             String contextPath = context.getPath();
             if (requestURI != null)
                 wrequest.setAttribute(Globals.INCLUDE_REQUEST_URI_ATTR,
@@ -581,8 +584,10 @@ final class ApplicationDispatcher
             
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                     Integer.valueOf(ApplicationFilterFactory.INCLUDE));
-            wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR, origServletPath);
-            invoke(outerRequest, outerResponse);
+            wrequest.setAttribute(
+                    ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
+                    servletPath);
+            invoke(state.outerRequest, state.outerResponse, state);
 
             wrequest.recycle();
         }
@@ -608,8 +613,8 @@ final class ApplicationDispatcher
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
-    private void invoke(ServletRequest request, ServletResponse response)
-            throws IOException, ServletException {
+    private void invoke(ServletRequest request, ServletResponse response,
+            State state) throws IOException, ServletException {
 
         // Checking to see if the context classloader is the current context
         // classloader. If it's not, we're saving it, and setting the context
@@ -624,7 +629,6 @@ final class ApplicationDispatcher
         }
 
         // Initialize local variables we may need
-        HttpServletRequest hrequest = (HttpServletRequest) request;
         HttpServletResponse hresponse = (HttpServletResponse) response;
         Servlet servlet = null;
         IOException ioException = null;
@@ -758,8 +762,8 @@ final class ApplicationDispatcher
         
         // Unwrap request/response if needed
         // See Bugzilla 30949
-        unwrapRequest();
-        unwrapResponse();
+        unwrapRequest(state);
+        unwrapResponse(state);
 
         // Rethrow an exception if one was thrown by the invoked servlet
         if (ioException != null)
@@ -773,35 +777,15 @@ final class ApplicationDispatcher
 
 
     /**
-     * Set up to handle the specified request and response
-     *
-     * @param request The servlet request specified by the caller
-     * @param response The servlet response specified by the caller
-     * @param including Are we performing an include() as opposed to
-     *  a forward()?
-     */
-    private void setup(ServletRequest request, ServletResponse response,
-                       boolean including) {
-
-        this.appRequest = request;
-        this.appResponse = response;
-        this.outerRequest = request;
-        this.outerResponse = response;
-        this.including = including;
-
-    }
-
-
-    /**
      * Unwrap the request if we have wrapped it.
      */
-    private void unwrapRequest() {
+    private void unwrapRequest(State state) {
 
-        if (wrapRequest == null)
+        if (state.wrapRequest == null)
             return;
 
         ServletRequest previous = null;
-        ServletRequest current = outerRequest;
+        ServletRequest current = state.outerRequest;
         while (current != null) {
 
             // If we run into the container request we are done
@@ -810,11 +794,11 @@ final class ApplicationDispatcher
                 break;
 
             // Remove the current request if it is our wrapper
-            if (current == wrapRequest) {
+            if (current == state.wrapRequest) {
                 ServletRequest next =
                   ((ServletRequestWrapper) current).getRequest();
                 if (previous == null)
-                    outerRequest = next;
+                    state.outerRequest = next;
                 else
                     ((ServletRequestWrapper) previous).setRequest(next);
                 break;
@@ -832,13 +816,13 @@ final class ApplicationDispatcher
     /**
      * Unwrap the response if we have wrapped it.
      */
-    private void unwrapResponse() {
+    private void unwrapResponse(State state) {
 
-        if (wrapResponse == null)
+        if (state.wrapResponse == null)
             return;
 
         ServletResponse previous = null;
-        ServletResponse current = outerResponse;
+        ServletResponse current = state.outerResponse;
         while (current != null) {
 
             // If we run into the container response we are done
@@ -847,11 +831,11 @@ final class ApplicationDispatcher
                 break;
 
             // Remove the current response if it is our wrapper
-            if (current == wrapResponse) {
+            if (current == state.wrapResponse) {
                 ServletResponse next =
                   ((ServletResponseWrapper) current).getResponse();
                 if (previous == null)
-                    outerResponse = next;
+                    state.outerResponse = next;
                 else
                     ((ServletResponseWrapper) previous).setResponse(next);
                 break;
@@ -870,11 +854,11 @@ final class ApplicationDispatcher
      * Create and return a request wrapper that has been inserted in the
      * appropriate spot in the request chain.
      */
-    private ServletRequest wrapRequest() {
+    private ServletRequest wrapRequest(State state) {
 
         // Locate the request we should insert in front of
         ServletRequest previous = null;
-        ServletRequest current = outerRequest;
+        ServletRequest current = state.outerRequest;
         while (current != null) {
             if ("org.apache.catalina.servlets.InvokerHttpRequest".
                 equals(current.getClass().getName()))
@@ -899,11 +883,11 @@ final class ApplicationDispatcher
             // Compute a crossContext flag
             HttpServletRequest hcurrent = (HttpServletRequest) current;
             boolean crossContext = false;
-            if ((outerRequest instanceof ApplicationHttpRequest) ||
-                (outerRequest instanceof Request) ||
-                (outerRequest instanceof HttpServletRequest)) {
+            if ((state.outerRequest instanceof ApplicationHttpRequest) ||
+                (state.outerRequest instanceof Request) ||
+                (state.outerRequest instanceof HttpServletRequest)) {
                 HttpServletRequest houterRequest = 
-                    (HttpServletRequest) outerRequest;
+                    (HttpServletRequest) state.outerRequest;
                 Object contextPath = houterRequest.getAttribute
                     (Globals.INCLUDE_CONTEXT_PATH_ATTR);
                 if (contextPath == null) {
@@ -918,10 +902,10 @@ final class ApplicationDispatcher
             wrapper = new ApplicationRequest(current);
         }
         if (previous == null)
-            outerRequest = wrapper;
+            state.outerRequest = wrapper;
         else
             ((ServletRequestWrapper) previous).setRequest(wrapper);
-        wrapRequest = wrapper;
+        state.wrapRequest = wrapper;
         return (wrapper);
 
     }
@@ -931,11 +915,11 @@ final class ApplicationDispatcher
      * Create and return a response wrapper that has been inserted in the
      * appropriate spot in the response chain.
      */
-    private ServletResponse wrapResponse() {
+    private ServletResponse wrapResponse(State state) {
 
         // Locate the response we should insert in front of
         ServletResponse previous = null;
-        ServletResponse current = outerResponse;
+        ServletResponse current = state.outerResponse;
         while (current != null) {
             if (!(current instanceof ServletResponseWrapper))
                 break;
@@ -956,21 +940,24 @@ final class ApplicationDispatcher
             (current instanceof HttpServletResponse))
             wrapper =
                 new ApplicationHttpResponse((HttpServletResponse) current,
-                                            including);
+                        state.including);
         else
-            wrapper = new ApplicationResponse(current, including);
+            wrapper = new ApplicationResponse(current, state.including);
         if (previous == null)
-            outerResponse = wrapper;
+            state.outerResponse = wrapper;
         else
             ((ServletResponseWrapper) previous).setResponse(wrapper);
-        wrapResponse = wrapper;
+        state.wrapResponse = wrapper;
         return (wrapper);
 
     }
 
-    private void checkSameObjects() throws ServletException {
-        ServletRequest originalRequest = ApplicationFilterChain.getLastServicedRequest();
-        ServletResponse originalResponse = ApplicationFilterChain.getLastServicedResponse();
+    private void checkSameObjects(ServletRequest appRequest,
+            ServletResponse appResponse) throws ServletException {
+        ServletRequest originalRequest =
+            ApplicationFilterChain.getLastServicedRequest();
+        ServletResponse originalResponse =
+            ApplicationFilterChain.getLastServicedResponse();
         
         // Some forwards, eg from valves will not set original values 
         if (originalRequest == null || originalResponse == null) {
@@ -980,9 +967,11 @@ final class ApplicationDispatcher
         boolean same = false;
         ServletRequest dispatchedRequest = appRequest;
         
-        //find the bottom most request, the one that was passed into the service method
-        while ( originalRequest instanceof ServletRequestWrapper && ((ServletRequestWrapper) originalRequest).getRequest()!=null ) {
-            originalRequest = ((ServletRequestWrapper) originalRequest).getRequest();
+        //find the request that was passed into the service method
+        while (originalRequest instanceof ServletRequestWrapper &&
+                ((ServletRequestWrapper) originalRequest).getRequest()!=null ) {
+            originalRequest =
+                ((ServletRequestWrapper) originalRequest).getRequest();
         }
         //compare with the dispatched request
         while (!same) {
@@ -990,21 +979,26 @@ final class ApplicationDispatcher
                 same = true;
             }
             if (!same && dispatchedRequest instanceof ServletRequestWrapper) {
-                dispatchedRequest = ((ServletRequestWrapper) dispatchedRequest).getRequest();
+                dispatchedRequest =
+                    ((ServletRequestWrapper) dispatchedRequest).getRequest();
             } else {
                 break;
             }
         }
         if (!same) {
-            throw new ServletException(sm.getString("applicationDispatcher.specViolation.request"));
+            throw new ServletException(sm.getString(
+                    "applicationDispatcher.specViolation.request"));
         }
         
         same = false;
         ServletResponse dispatchedResponse = appResponse;
         
-        //find the bottom most response, the one that was passed into the service method
-        while ( originalResponse instanceof ServletResponseWrapper && ((ServletResponseWrapper) originalResponse).getResponse()!=null ) {
-            originalResponse = ((ServletResponseWrapper) originalResponse).getResponse();
+        //find the response that was passed into the service method
+        while (originalResponse instanceof ServletResponseWrapper &&
+                ((ServletResponseWrapper) originalResponse).getResponse() != 
+                    null ) {
+            originalResponse =
+                ((ServletResponseWrapper) originalResponse).getResponse();
         }
         //compare with the dispatched response
         while (!same) {
@@ -1013,14 +1007,16 @@ final class ApplicationDispatcher
             }
             
             if (!same && dispatchedResponse instanceof ServletResponseWrapper) {
-                dispatchedResponse = ((ServletResponseWrapper) dispatchedResponse).getResponse();
+                dispatchedResponse =
+                    ((ServletResponseWrapper) dispatchedResponse).getResponse();
             } else {
                 break;
             }
         }
 
         if (!same) {
-            throw new ServletException(sm.getString("applicationDispatcher.specViolation.response"));
+            throw new ServletException(sm.getString(
+                    "applicationDispatcher.specViolation.response"));
         }
     }
 }
