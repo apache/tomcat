@@ -34,6 +34,14 @@ import org.apache.catalina.LifecycleException;
  *              virtualClasspath="\dir\classes;\somedir\somejar.jar"/>
  * &lt;/Context>
  * </code>
+ *
+ *
+ * <strong>This is not meant to be used for production.
+ * Its meant to ease development with IDE's without the
+ * need for fully republishing jars in WEB-INF/lib</strong>
+ *
+ *
+ *
  * @author Fabrizio Giustina
  * @version $Id: $
  */

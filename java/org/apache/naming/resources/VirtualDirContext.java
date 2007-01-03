@@ -45,6 +45,13 @@ import org.apache.naming.NamingEntry;
  *              virtualClasspath="\dir\classes;\somedir\somejar.jar"/>
  * &lt;/Resources>
  * </code>
+ *
+ *
+ * <strong>This is not meant to be used for production.
+ * Its meant to ease development with IDE's without the
+ * need for fully republishing jars in WEB-INF/lib</strong>
+ *
+ *
  * @author Fabrizio Giustina
  * @version $Id: $
  */
@@ -55,6 +62,12 @@ public class VirtualDirContext extends FileDirContext {
      * the actual file reference.
      */
     private Map<String, File> virtualMappings;
+
+    /**
+     * Map containing a mapping for tag files that should be loaded from the
+     * META-INF dir of referenced jar files.
+     */
+    private Map<String, File> tagfileMappings;
 
     /**
      * <code>;</code> separated list of virtual path elements.
@@ -79,6 +92,7 @@ public class VirtualDirContext extends FileDirContext {
         super.allocate();
 
         virtualMappings = new Hashtable<String, File>();
+        tagfileMappings = new Hashtable<String, File>();
 
         // looks into any META-INF dir found in classpath entries for tld files.
         StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
@@ -110,6 +124,23 @@ public class VirtualDirContext extends FileDirContext {
             if (virtualMappings.containsKey(tldName)) {
                 return new FileResourceAttributes(virtualMappings.get(tldName));
             }
+        } else if (name.startsWith("/META-INF/tags") && name.endsWith(".tag")
+                || name.endsWith(".tagx")) {
+
+            // already loaded tag file
+            if (tagfileMappings.containsKey(name)) {
+                return new FileResourceAttributes(tagfileMappings.get(name));
+            }
+
+            // unknown tagfile, search for it in virtualClasspath
+            StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
+            while (tkn.hasMoreTokens()) {
+                File file = new File(tkn.nextToken(), name);
+                if (file.exists()) {
+                    tagfileMappings.put(name, file);
+                    return new FileResourceAttributes(file);
+                }
+            }
         }
 
         return super.getAttributes(name);
@@ -136,6 +167,15 @@ public class VirtualDirContext extends FileDirContext {
             String tldName = name.substring(name.lastIndexOf("/") + 1);
             if (virtualMappings.containsKey(tldName)) {
                 return new FileResource(virtualMappings.get(tldName));
+            }
+        } else if (name.startsWith("/META-INF/tags") && name.endsWith(".tag")
+                || name.endsWith(".tagx")) {
+
+            // already loaded tag file: we are sure that getAttributes() has
+            // already been called if we are here
+            File tagFile = tagfileMappings.get(name);
+            if (tagFile != null) {
+                return new FileResource(tagFile);
             }
         }
 
