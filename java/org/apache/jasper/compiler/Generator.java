@@ -2774,9 +2774,7 @@ class Generator {
                 StringBuffer sb = new StringBuffer(64);
 
                 TagAttributeInfo tai = attr.getTagAttributeInfo();
-                String type = tai.getTypeName();
-                String returnType = JspUtil.toJavaSourceTypeFromTld(attr
-                        .getExpectedTypeName());
+                String returnType = JspUtil.toJavaSourceTypeFromTld(attr.getExpectedTypeName());
 
                 // generate elContext reference
                 sb.append(getJspContextVar());
@@ -2807,7 +2805,7 @@ class Generator {
 
                 // depending on type
                 if (attr.isDeferredInput()
-                        || ValueExpression.class.getName().equals(type)) {
+                        || ((tai != null) && ValueExpression.class.getName().equals(tai.getTypeName()))) {
                     sb.append("new org.apache.jasper.el.JspValueExpression(");
                     sb.append(quote(mark));
                     sb.append(',');
@@ -2841,7 +2839,7 @@ class Generator {
                     }
                     attrValue = sb.toString();
                 } else if (attr.isDeferredMethodInput()
-                        || MethodExpression.class.getName().equals(type)) {
+                        || ((tai != null) && MethodExpression.class.getName().equals(tai.getTypeName()))) {
                     sb.append("new org.apache.jasper.el.JspMethodExpression(");
                     sb.append(quote(mark));
                     sb.append(',');
