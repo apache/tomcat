@@ -51,6 +51,7 @@ public class TestMemberArrival
         }
         for (int i=0; i<threads.length; i++ ) threads[i].start();
         for (int i=0; i<threads.length; i++ ) threads[i].join();
+        Thread.sleep(2000);
         System.out.println("All channels started.");
         for (int i=listeners.length-1; i>=0; i-- ) assertEquals("Checking member arrival length",channels.length-1,listeners[i].members.size());
     }
