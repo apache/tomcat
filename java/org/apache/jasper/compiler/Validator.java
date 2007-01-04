@@ -1018,24 +1018,46 @@ class Validator {
             TagAttributeInfo[] tldAttrs = tagInfo.getAttributes();
             Attributes attrs = n.getAttributes();
 
+            boolean checkDeferred = !pageInfo.isDeferredSyntaxAllowedAsLiteral()
+                && !(tagInfo.getTagLibrary().getRequiredVersion().equals("2.0")
+                        || tagInfo.getTagLibrary().getRequiredVersion().equals("1.2"));
+
             for (int i = 0; attrs != null && i < attrs.getLength(); i++) {
                 boolean found = false;
+                
+                boolean runtimeExpression = ((n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("%="))
+                        || (!n.getRoot().isXmlSyntax() && attrs.getValue(i).startsWith("<%=")));
+                boolean elExpression = false;
+                boolean deferred = false;
+                boolean deferredValueIsLiteral = false;
+
+                ELNode.Nodes el = null;
+                if (!runtimeExpression) {
+                    el = ELParser.parse(attrs.getValue(i));
+                    Iterator<ELNode> nodes = el.iterator();
+                    while (nodes.hasNext()) {
+                        ELNode node = nodes.next();
+                        if (node instanceof ELNode.Root) {
+                            if (((ELNode.Root) node).getType() == '$') {
+                                elExpression = true;
+                            } else if (checkDeferred && ((ELNode.Root) node).getType() == '#') {
+                                elExpression = true;
+                                deferred = true;
+                                if (pageInfo.isELIgnored()) {
+                                    deferredValueIsLiteral = true;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                boolean expression = runtimeExpression || (elExpression  && !pageInfo.isELIgnored());
+                
                 for (int j = 0; tldAttrs != null && j < tldAttrs.length; j++) {
                     if (attrs.getLocalName(i).equals(tldAttrs[j].getName())
                             && (attrs.getURI(i) == null
                                     || attrs.getURI(i).length() == 0 || attrs
                                     .getURI(i).equals(n.getURI()))) {
-                        boolean checkDeferred = !(tagInfo.getTagLibrary().getRequiredVersion().equals("2.0")
-                                || tagInfo.getTagLibrary().getRequiredVersion().equals("1.2"));
-                        boolean deferred = false;
-                        boolean deferredValueIsLiteral = false;
-                        boolean expression = isExpression(n, attrs.getValue(i), checkDeferred);
-                        if (checkDeferred && attrs.getValue(i).indexOf("#{") != -1) {
-                            deferred = true;
-                            if (pageInfo.isELIgnored()) {
-                                deferredValueIsLiteral = true;
-                            }
-                        }
                         
                         if (tldAttrs[j].canBeRequestTime()
                                 || tldAttrs[j].isDeferredMethod() || tldAttrs[j].isDeferredValue()) { // JSP 2.1
@@ -1327,14 +1349,28 @@ class Validator {
          * expression.
          */
         private boolean isExpression(Node n, String value, boolean checkDeferred) {
-            if ((n.getRoot().isXmlSyntax() && value.startsWith("%="))
-                    || (!n.getRoot().isXmlSyntax() && value.startsWith("<%="))
-                    || (value.indexOf("${") != -1 && !pageInfo.isELIgnored())
-                    || (checkDeferred && value.indexOf("#{") != -1 && !pageInfo.isELIgnored()
-                            && !pageInfo.isDeferredSyntaxAllowedAsLiteral()))
-                return true;
-            else
-                return false;
+            
+            boolean runtimeExpression = ((n.getRoot().isXmlSyntax() && value.startsWith("%="))
+                    || (!n.getRoot().isXmlSyntax() && value.startsWith("<%=")));
+            boolean elExpression = false;
+
+            if (!runtimeExpression && !pageInfo.isELIgnored()) {
+                Iterator<ELNode> nodes = ELParser.parse(value).iterator();
+                while (nodes.hasNext()) {
+                    ELNode node = nodes.next();
+                    if (node instanceof ELNode.Root) {
+                        if (((ELNode.Root) node).getType() == '$') {
+                            elExpression = true;
+                        } else if (checkDeferred && !pageInfo.isDeferredSyntaxAllowedAsLiteral() 
+                                && ((ELNode.Root) node).getType() == '#') {
+                            elExpression = true;
+                        }
+                    }
+                }
+            }
+
+            return runtimeExpression || elExpression;
+
         }
 
         /*
