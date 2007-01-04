@@ -2774,7 +2774,6 @@ class Generator {
                 StringBuffer sb = new StringBuffer(64);
 
                 TagAttributeInfo tai = attr.getTagAttributeInfo();
-                String returnType = JspUtil.toJavaSourceTypeFromTld(attr.getExpectedTypeName());
 
                 // generate elContext reference
                 sb.append(getJspContextVar());
@@ -2817,7 +2816,7 @@ class Generator {
                     }
                     sb.append(quote(attrValue));
                     sb.append(',');
-                    sb.append(returnType);
+                    sb.append(JspUtil.toJavaSourceTypeFromTld(attr.getExpectedTypeName()));
                     sb.append("))");
                     // should the expression be evaluated before passing to
                     // the setter?
@@ -2849,7 +2848,7 @@ class Generator {
                     sb.append(',');
                     sb.append(quote(attrValue));
                     sb.append(',');
-                    sb.append(returnType);
+                    sb.append(JspUtil.toJavaSourceTypeFromTld(attr.getExpectedTypeName()));
                     sb.append(',');
                     sb.append("new Class[] {");
 
