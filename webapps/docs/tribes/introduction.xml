@@ -2,7 +2,7 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="introduction.html">
+<document url="tribes.html">
 
     &project;
 
@@ -244,87 +244,12 @@
 
 <section name="Where can I get Tribes">
   <p>
-    I hope you have enjoyed this short introduction to Tribes. You can download <a href="../apache-tribes.jar">Tribes here</a>
-    or you can download Tribes <a href="../tribes-all.zip">including javadoc and this doc</a>
+    
   </p>
 
 
 </section>
 
-<!--
-<section name="Cluster Configuration for ReplicationTransmitter">
-<p>
-List of Attributes<br/>
-<table border="1" cellpadding="5">
-
-  <tr>
-    <th align="center" bgcolor="aqua">Attribute</th>
-    <th align="center" bgcolor="aqua">Description</th>
-    <th align="center" bgcolor="aqua">Default value</th>
-  </tr>
-
-  <tr>
-    <td>replicationMode</td>
-    <td>replication mode (<em>synchronous</em>, <em>pooled</em>, <em>asynchronous</em> or <em>fastasyncqueue</em>)
-    </td>
-    <td><code>pooled</code></td>
-  </tr>
-
-  <tr>
-    <td>processSenderFrequency</td>
-    <td>Control the sender keepalive status and drop sender socket connection after timeout is reached.
-    Check every processSenderFrequency value engine background ticks.
-    </td>
-    <td><code>2</code></td>
-  </tr>
-
-  <tr>
-    <td>compress</td>
-    <td>compress bytes before sending (consume memory, but reduce network traffic - GZIP)</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>ackTimeout</td>
-    <td>acknowledge timeout and only usefull it waitForAck is true</td>
-    <td><code>15000</code></td>
-  </tr>
-
-  <tr>
-    <td>waitForAck</td>
-    <td>Wait for ack after data send</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>autoConnect</td>
-    <td>is sender disabled, fork a new socket</td>
-    <td><code>false</code></td>
-  </tr>
-
-  <tr>
-    <td>doTransmitterProcessingStats</td>
-    <td>create processing time stats</td>
-    <td><code>false</code></td>
-  </tr>
-</table>
-</p>
-<p>
-Example to get statistic information, wait for ack at every message send and transfer at compressed mode<br/>
-<source>
-    &lt;Sender
-      className="org.apache.catalina.cluster.tcp.ReplicationTransmitter"
-      replicationMode="fastasyncqueue"
-      compress="true"
-      doTransmitterProcessingStats="true"
-      ackTimeout="15000"
-      waitForAck="true"
-      autoConnect="false"/&gt;
-</source>
-</p>
-</section>
-
--->
 </body>
 
 </document>
