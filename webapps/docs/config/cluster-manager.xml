@@ -43,16 +43,9 @@
 </section>
 
 <section name="Attributes">
-
   <subsection name="Common Attributes">
     <attributes>
      <attribute name="className" required="true">
-     </attribute>
-     <attribute name="domainReplication" required="false">
-      Set to true if you wish sessions to be replicated only to members that have the same logical
-      domain set. If set to false, session replication will ignore the domain setting the 
-      <code><a href="cluster-membership.html">&lt;Membership&gt;</a></code>
-      element.
      </attribute>
      <attribute name="name" required="false">
       <b>The name of this cluster manager, the name is used to identify a session manager on a node.
@@ -65,10 +58,6 @@
        Set to <code>true</code> if you wish to have session listeners notified when
        session attributes are being replicated or removed across Tomcat nodes in the cluster.
      </attribute>
-    </attributes>
-  </subsection> 
-  <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
-    <attributes>
      <attribute name="expireSessionsOnShutdown" required="false">
        When a webapplication is being shutdown, Tomcat issues an expire call to each session to 
        notify all the listeners. If you wish for all sessions to expire on all nodes when
@@ -76,15 +65,32 @@
        Default value is <code>false</code>.
      </attribute>
 
-  </attributes>
-
-
+    </attributes>
+  </subsection> 
+  <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
+    <attributes>
+     <attribute name="domainReplication" required="false">
+      Set to true if you wish sessions to be replicated only to members that have the same logical
+      domain set. If set to false, session replication will ignore the domain setting the 
+      <code><a href="cluster-membership.html">&lt;Membership&gt;</a></code>
+      element.
+     </attribute>
+     <attribute name="expireSessionsOnShutdown" required="false">
+       When a webapplication is being shutdown, Tomcat issues an expire call to each session to 
+       notify all the listeners. If you wish for all sessions to expire on all nodes when
+       a shutdown occurs on one node, set this value to <code>true</code>.
+       Default value is <code>false</code>.
+     </attribute>
+    </attributes>
   </subsection>
-
-
+  <subsection name="org.apache.catalina.ha.session.BackupManager Attributes">
+    <attributes>
+     <attribute name="mapSendOptions" required="false">
+       The backup manager uses a replicated map, this map is sending and receiving messages.
+       You can setup the flag for how this map is sending messages, the default value is <code>8</code>(asynchronous).
+     </attribute>
+    </attributes>
+  </subsection>
 </section>
-
-
 </body>
-
 </document>
