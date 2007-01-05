@@ -23,7 +23,7 @@ $ignore = "-";
 $ignore .= "gif-jpg-jpeg-png-ico-bmp-";
 
 # Archive formats
-$ignore .= "tar-gz-z-zip-jar-war-";
+$ignore .= "tar-gz-z-zip-jar-war-bz2-tgz-";
 
 # Many document formats
 $ignore .= "eps-psd-pdf-ai-";
@@ -32,9 +32,9 @@ $ignore .= "eps-psd-pdf-ai-";
 $ignore .= "ucs2-ucs4-";
 
 # Some binary objects
-$ignore .= "class-so-dll-exe-obj-";
+$ignore .= "class-so-dll-exe-obj-a-o-lo-slo-sl-dylib-";
 
-# Some build env files in NW/Win32
+# Some build env files 
 $ignore .= "mcp-xdc-ncb-opt-pdb-ilk-sbr-";
 
 $preservedate = 1;
