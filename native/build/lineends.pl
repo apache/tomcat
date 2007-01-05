@@ -34,7 +34,7 @@ $ignore .= "ucs2-ucs4-";
 # Some binary objects
 $ignore .= "class-so-dll-exe-obj-a-o-lo-slo-sl-dylib-";
 
-# Some build env files 
+# Some build env files
 $ignore .= "mcp-xdc-ncb-opt-pdb-ilk-sbr-";
 
 $preservedate = 1;
