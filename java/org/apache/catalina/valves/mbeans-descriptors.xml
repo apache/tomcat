@@ -49,6 +49,12 @@
     <attribute name="fileDateFormat"
                description="The format for the date date based log rotation."
                type="java.lang.String"/>
+
+    <attribute name="buffered"
+               description="Flag to buffering."
+               is="true"
+               type="boolean"/>
+
   </mbean>
 
   <mbean name="ErrorReportValve"
