@@ -19,15 +19,17 @@
 package org.apache.catalina.valves;
 
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.servlet.ServletException;
@@ -105,7 +107,9 @@ import org.apache.catalina.util.StringManager;
  *
  * @author Craig R. McClanahan
  * @author Jason Brittain
- * @version $Revision$ $Date$
+ * @author Remy Maucherat
+ * @author Takayuki Kaneko
+ * @version $Revision$ $Date: 2007-01-04 12:17:11 +0900
  */
 
 public class AccessLogValve
@@ -120,11 +124,7 @@ public class AccessLogValve
      * Construct a new instance of this class with default property values.
      */
     public AccessLogValve() {
-
-        super();
         setPattern("common");
-
-
     }
 
 
@@ -148,7 +148,7 @@ public class AccessLogValve
      * The descriptive information about this implementation.
      */
     protected static final String info =
-        "org.apache.catalina.valves.AccessLogValve/1.0";
+        "org.apache.catalina.valves.FastAccessLogValve/1.0";
 
 
     /**
@@ -163,21 +163,6 @@ public class AccessLogValve
     protected static final String months[] =
     { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
       "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-
-    /**
-     * If the current log pattern is the same as the common access log
-     * format pattern, then we'll set this variable to true and log in
-     * a more optimal and hard-coded way.
-     */
-    private boolean common = false;
-
-
-    /**
-     * For the combined format (common, plus useragent and referer), we do
-     * the same
-     */
-    private boolean combined = false;
 
 
     /**
@@ -196,6 +181,12 @@ public class AccessLogValve
      * Should we rotate our log file? Default is true (like old behavior)
      */
     private boolean rotatable = true;
+
+
+    /**
+     * Buffered logging.
+     */
+    private boolean buffered = true;
 
 
     /**
@@ -245,12 +236,6 @@ public class AccessLogValve
 
 
     /**
-     * Time taken formatter for 3 decimal places.
-     */
-     private DecimalFormat timeTakenFormatter = null;
-
-
-    /**
      * A date formatter to format a Date into a year string in the format
      * "yyyy".
      */
@@ -289,12 +274,8 @@ public class AccessLogValve
      * uses for log lines.
      */
     private Date currentDate = null;
-
-
-    /**
-     * When formatting log lines, we often use strings like this one (" ").
-     */
-    private String space = " ";
+    
+    private long currentMillis = 0;
 
 
     /**
@@ -319,6 +300,11 @@ public class AccessLogValve
      * Date format to place in log file name. Use at your own risk!
      */
     private String fileDateFormat = null;
+    
+    /**
+     * Array of AccessLogElement, they will be used to make log message.
+     */
+    private AccessLogElement[] logElements = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -327,9 +313,7 @@ public class AccessLogValve
      * Return the directory in which we create log files.
      */
     public String getDirectory() {
-
         return (directory);
-
     }
 
 
@@ -339,9 +323,7 @@ public class AccessLogValve
      * @param directory The new log file directory
      */
     public void setDirectory(String directory) {
-
         this.directory = directory;
-
     }
 
 
@@ -349,9 +331,7 @@ public class AccessLogValve
      * Return descriptive information about this implementation.
      */
     public String getInfo() {
-
         return (info);
-
     }
 
 
@@ -359,9 +339,7 @@ public class AccessLogValve
      * Return the format pattern.
      */
     public String getPattern() {
-
         return (this.pattern);
-
     }
 
 
@@ -371,7 +349,6 @@ public class AccessLogValve
      * @param pattern The new pattern
      */
     public void setPattern(String pattern) {
-
         if (pattern == null)
             pattern = "";
         if (pattern.equals(Constants.AccessLog.COMMON_ALIAS))
@@ -379,17 +356,7 @@ public class AccessLogValve
         if (pattern.equals(Constants.AccessLog.COMBINED_ALIAS))
             pattern = Constants.AccessLog.COMBINED_PATTERN;
         this.pattern = pattern;
-
-        if (this.pattern.equals(Constants.AccessLog.COMMON_PATTERN))
-            common = true;
-        else
-            common = false;
-
-        if (this.pattern.equals(Constants.AccessLog.COMBINED_PATTERN))
-            combined = true;
-        else
-            combined = false;
-
+        logElements = createLogElements();
     }
 
 
@@ -397,9 +364,7 @@ public class AccessLogValve
      * Return the log file prefix.
      */
     public String getPrefix() {
-
         return (prefix);
-
     }
 
 
@@ -409,9 +374,7 @@ public class AccessLogValve
      * @param prefix The new log file prefix
      */
     public void setPrefix(String prefix) {
-
         this.prefix = prefix;
-
     }
 
 
@@ -419,9 +382,7 @@ public class AccessLogValve
      * Should we rotate the logs
      */
     public boolean isRotatable() {
-
         return rotatable;
-
     }
 
 
@@ -431,9 +392,25 @@ public class AccessLogValve
      * @param rotatable true is we should rotate.
      */
     public void setRotatable(boolean rotatable) {
-
         this.rotatable = rotatable;
+    }
 
+
+    /**
+     * Is the logging buffered
+     */
+    public boolean isBuffered() {
+        return buffered;
+    }
+
+
+    /**
+     * Set the value if the logging should be buffered
+     *
+     * @param buffered true if buffered.
+     */
+    public void setBuffered(boolean buffered) {
+        this.buffered = buffered;
     }
 
 
@@ -441,9 +418,7 @@ public class AccessLogValve
      * Return the log file suffix.
      */
     public String getSuffix() {
-
         return (suffix);
-
     }
 
 
@@ -453,9 +428,7 @@ public class AccessLogValve
      * @param suffix The new log file suffix
      */
     public void setSuffix(String suffix) {
-
         this.suffix = suffix;
-
     }
 
 
@@ -465,9 +438,7 @@ public class AccessLogValve
      * @param resolveHosts The new resolve hosts value
      */
     public void setResolveHosts(boolean resolveHosts) {
-
         this.resolveHosts = resolveHosts;
-
     }
 
 
@@ -475,9 +446,7 @@ public class AccessLogValve
      * Get the value of the resolve hosts flag.
      */
     public boolean isResolveHosts() {
-
         return resolveHosts;
-
     }
 
 
@@ -487,9 +456,7 @@ public class AccessLogValve
      * request is logged.
      */
     public String getCondition() {
-
         return condition;
-
     }
 
 
@@ -500,9 +467,7 @@ public class AccessLogValve
      * @param condition Set to null to log everything
      */
     public void setCondition(String condition) {
-
         this.condition = condition;
-
     }
 
     /**
@@ -522,6 +487,16 @@ public class AccessLogValve
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Execute a periodic task, such as reloading, etc. This method will be
+     * invoked inside the classloading context of this container. Unexpected
+     * throwables will be caught and logged.
+     */
+    public void backgroundProcess() {
+        if (writer != null && buffered) {
+            writer.flush();
+        }
+    }    
 
     /**
      * Log a message summarizing the specified request and response, according
@@ -533,141 +508,30 @@ public class AccessLogValve
      * @exception IOException if an input/output error has occurred
      * @exception ServletException if a servlet error has occurred
      */
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException {
+    public void invoke(Request request, Response response) throws IOException,
+            ServletException {
 
         // Pass this request on to the next valve in our pipeline
-        long t1=System.currentTimeMillis();
+        long t1 = System.currentTimeMillis();
 
         getNext().invoke(request, response);
 
-        long t2=System.currentTimeMillis();
-        long time=t2-t1;
+        long t2 = System.currentTimeMillis();
+        long time = t2 - t1;
 
-        if (condition!=null &&
-                null!=request.getRequest().getAttribute(condition)) {
+        if (condition != null
+                && null != request.getRequest().getAttribute(condition)) {
             return;
         }
-
 
         Date date = getDate();
         StringBuffer result = new StringBuffer();
 
-        // Check to see if we should log using the "common" access log pattern
-        if (common || combined) {
-            String value = null;
-
-            if (isResolveHosts())
-                result.append(request.getRemoteHost());
-            else
-                result.append(request.getRemoteAddr());
-
-            result.append(" - ");
-
-            value = request.getRemoteUser();
-            if (value == null)
-                result.append("- ");
-            else {
-                result.append(value);
-                result.append(space);
-            }
-
-            result.append("[");
-            result.append(dayFormatter.format(date));           // Day
-            result.append('/');
-            result.append(lookup(monthFormatter.format(date))); // Month
-            result.append('/');
-            result.append(yearFormatter.format(date));          // Year
-            result.append(':');
-            result.append(timeFormatter.format(date));          // Time
-            result.append(space);
-            result.append(getTimeZone(date));                   // Time Zone
-            result.append("] \"");
-
-            result.append(request.getMethod());
-            result.append(space);
-            result.append(request.getRequestURI());
-            if (request.getQueryString() != null) {
-                result.append('?');
-                result.append(request.getQueryString());
-            }
-            result.append(space);
-            result.append(request.getProtocol());
-            result.append("\" ");
-
-            result.append(response.getStatus());
-
-            result.append(space);
-
-            int length = response.getContentCount();
-
-            if (length <= 0)
-                value = "-";
-            else
-                value = "" + length;
-            result.append(value);
-
-            if (combined) {
-                result.append(space);
-                result.append("\"");
-                String referer = request.getHeader("referer");
-                if(referer != null)
-                    result.append(referer);
-                else
-                    result.append("-");
-                result.append("\"");
-
-                result.append(space);
-                result.append("\"");
-                String ua = request.getHeader("user-agent");
-                if(ua != null)
-                    result.append(ua);
-                else
-                    result.append("-");
-                result.append("\"");
-            }
-
-        } else {
-            // Generate a message based on the defined pattern
-            boolean replace = false;
-            for (int i = 0; i < pattern.length(); i++) {
-                char ch = pattern.charAt(i);
-                if (replace) {
-                    /* For code that processes {, the behavior will be ... if I
-                     * do not enounter a closing } - then I ignore the {
-                     */
-                    if ('{' == ch){
-                        StringBuffer name = new StringBuffer();
-                        int j = i + 1;
-                        for(;j < pattern.length() && '}' != pattern.charAt(j); j++) {
-                            name.append(pattern.charAt(j));
-                        }
-                        if (j+1 < pattern.length()) {
-                            /* the +1 was to account for } which we increment now */
-                            j++;
-                            result.append(replace(name.toString(),
-                                                pattern.charAt(j),
-                                                request,
-                                                response));
-                            i=j; /*Since we walked more than one character*/
-                        } else {
-                            //D'oh - end of string - pretend we never did this
-                            //and do processing the "old way"
-                            result.append(replace(ch, date, request, response, time));
-                        }
-                    } else {
-                        result.append(replace(ch, date, request, response,time ));
-                    }
-                    replace = false;
-                } else if (ch == '%') {
-                    replace = true;
-                } else {
-                    result.append(ch);
-                }
-            }
+        for (int i = 0; i < logElements.length; i++) {
+            logElements[i].addElement(result, date, request, response, time);
         }
-        log(result.toString(), date);
 
+        log(result.toString());
     }
 
 
@@ -678,14 +542,13 @@ public class AccessLogValve
      * Close the currently open log file (if any)
      */
     private synchronized void close() {
-
-        if (writer == null)
+        if (writer == null) {
             return;
+        }
         writer.flush();
         writer.close();
         writer = null;
         dateStamp = "";
-
     }
 
 
@@ -694,12 +557,9 @@ public class AccessLogValve
      * has changed since the previous log call.
      *
      * @param message Message to be logged
-     * @param date the current Date object (so this method doesn't need to
-     *        create a new one)
      */
-    public void log(String message, Date date) {
-
-        if (rotatable){
+    public void log(String message) {
+        if (rotatable) {
             // Only do a logfile switch check once a second, max.
             long systime = System.currentTimeMillis();
             if ((systime - rotationLastChecked) > 1000) {
@@ -721,13 +581,15 @@ public class AccessLogValve
                         }
                     }
                 }
-
             }
         }
 
         // Log this message
         if (writer != null) {
             writer.println(message);
+            if (!buffered) {
+                writer.flush();
+            }
         }
 
     }
@@ -740,7 +602,6 @@ public class AccessLogValve
      * @param month Month number ("01" .. "12").
      */
     private String lookup(String month) {
-
         int index;
         try {
             index = Integer.parseInt(month) - 1;
@@ -748,7 +609,6 @@ public class AccessLogValve
             index = 0;  // Can not happen, in theory
         }
         return (months[index]);
-
     }
 
 
@@ -756,7 +616,6 @@ public class AccessLogValve
      * Open the new log file for the date specified by <code>dateStamp</code>.
      */
     private synchronized void open() {
-
         // Create the directory if necessary
         File dir = new File(directory);
         if (!dir.isAbsolute())
@@ -767,228 +626,40 @@ public class AccessLogValve
         try {
             String pathname;
             // If no rotate - no need for dateStamp in fileName
-            if (rotatable){
-                pathname = dir.getAbsolutePath() + File.separator +
-                            prefix + dateStamp + suffix;
+            if (rotatable) {
+                pathname = dir.getAbsolutePath() + File.separator + prefix
+                        + dateStamp + suffix;
             } else {
-                pathname = dir.getAbsolutePath() + File.separator +
-                            prefix + suffix;
+                pathname = dir.getAbsolutePath() + File.separator + prefix
+                        + suffix;
             }
-            writer = new PrintWriter(new FileWriter(pathname, true), true);
+            writer = new PrintWriter(new BufferedWriter(new FileWriter(
+                    pathname, true), 128000), false);
         } catch (IOException e) {
             writer = null;
         }
-
     }
-
-
+ 
     /**
-     * Return the replacement text for the specified pattern character.
-     *
-     * @param pattern Pattern character identifying the desired text
-     * @param date the current Date so that this method doesn't need to
-     *        create one
-     * @param request Request being processed
-     * @param response Response being processed
-     */
-    private String replace(char pattern, Date date, Request request,
-                           Response response, long time) {
-
-        String value = null;
-
-        if (pattern == 'a') {
-            value = request.getRemoteAddr();
-        } else if (pattern == 'A') {
-            try {
-                value = InetAddress.getLocalHost().getHostAddress();
-            } catch(Throwable e){
-                value = "127.0.0.1";
-            }
-        } else if (pattern == 'b') {
-            int length = response.getContentCount();
-            if (length <= 0)
-                value = "-";
-            else
-                value = "" + length;
-        } else if (pattern == 'B') {
-            value = "" + response.getContentLength();
-        } else if (pattern == 'h') {
-            value = request.getRemoteHost();
-        } else if (pattern == 'H') {
-            value = request.getProtocol();
-        } else if (pattern == 'l') {
-            value = "-";
-        } else if (pattern == 'm') {
-            if (request != null)
-                value = request.getMethod();
-            else
-                value = "";
-        } else if (pattern == 'p') {
-            value = "" + request.getServerPort();
-        } else if (pattern == 'D') {
-                    value = "" + time;
-        } else if (pattern == 'q') {
-            String query = null;
-            if (request != null)
-                query = request.getQueryString();
-            if (query != null)
-                value = "?" + query;
-            else
-                value = "";
-        } else if (pattern == 'r') {
-            StringBuffer sb = new StringBuffer();
-            if (request != null) {
-                sb.append(request.getMethod());
-                sb.append(space);
-                sb.append(request.getRequestURI());
-                if (request.getQueryString() != null) {
-                    sb.append('?');
-                    sb.append(request.getQueryString());
-                }
-                sb.append(space);
-                sb.append(request.getProtocol());
-            } else {
-                sb.append("- - ");
-                sb.append(request.getProtocol());
-            }
-            value = sb.toString();
-        } else if (pattern == 'S') {
-            if (request != null)
-                if (request.getSession(false) != null)
-                    value = request.getSessionInternal(false).getIdInternal();
-                else value = "-";
-            else
-                value = "-";
-        } else if (pattern == 's') {
-            if (response != null)
-                value = "" + response.getStatus();
-            else
-                value = "-";
-        } else if (pattern == 't') {
-            StringBuffer temp = new StringBuffer("[");
-            temp.append(dayFormatter.format(date));             // Day
-            temp.append('/');
-            temp.append(lookup(monthFormatter.format(date)));   // Month
-            temp.append('/');
-            temp.append(yearFormatter.format(date));            // Year
-            temp.append(':');
-            temp.append(timeFormatter.format(date));            // Time
-            temp.append(' ');
-            temp.append(getTimeZone(date));                     // Timezone
-            temp.append(']');
-            value = temp.toString();
-        } else if (pattern == 'T') {
-            value = timeTakenFormatter.format(time/1000d);
-        } else if (pattern == 'u') {
-            if (request != null)
-                value = request.getRemoteUser();
-            if (value == null)
-                value = "-";
-        } else if (pattern == 'U') {
-            if (request != null)
-                value = request.getRequestURI();
-            else
-                value = "-";
-        } else if (pattern == 'v') {
-            value = request.getServerName();
-        } else {
-            value = "???" + pattern + "???";
-        }
-
-        if (value == null)
-            return ("");
-        else
-            return (value);
-
-    }
-
-
-    /**
-     * Return the replacement text for the specified "header/parameter".
-     *
-     * @param header The header/parameter to get
-     * @param type Where to get it from i=input,c=cookie,r=ServletRequest,s=Session
-     * @param request Request being processed
-     * @param response Response being processed
-     */
-    private String replace(String header, char type, Request request,
-                           Response response) {
-
-        Object value = null;
-
-        switch (type) {
-            case 'i':
-                if (null != request)
-                    value = request.getHeader(header);
-                else
-                    value= "??";
-                break;
-/*
-            // Someone please make me work
-            case 'o':
-                break;
-*/
-            case 'c':
-                 Cookie[] c = request.getCookies();
-                 for (int i=0; c != null && i < c.length; i++){
-                     if (header.equals(c[i].getName())){
-                         value = c[i].getValue();
-                         break;
-                     }
-                 }
-                break;
-            case 'r':
-                if (null != request)
-                    value = request.getAttribute(header);
-                else
-                    value= "??";
-                break;
-            case 's':
-                if (null != request) {
-                    HttpSession sess = request.getSession(false);
-                    if (null != sess)
-                        value = sess.getAttribute(header);
-                }
-               break;
-            default:
-                value = "???";
-        }
-
-        /* try catch in case toString() barfs */
-        try {
-            if (value!=null)
-                if (value instanceof String)
-                    return (String)value;
-                else
-                    return value.toString();
-            else
-               return "-";
-        } catch(Throwable e) {
-            return "-";
-        }
-    }
-
-
-    /**
-     * This method returns a Date object that is accurate to within one
-     * second.  If a thread calls this method to get a Date and it's been
-     * less than 1 second since a new Date was created, this method
-     * simply gives out the same Date again so that the system doesn't
-     * spend time creating Date objects unnecessarily.
-     *
+     * This method returns a Date object that is accurate to within one second.
+     * If a thread calls this method to get a Date and it's been less than 1
+     * second since a new Date was created, this method simply gives out the
+     * same Date again so that the system doesn't spend time creating Date
+     * objects unnecessarily.
+     * 
      * @return Date
      */
     private Date getDate() {
-        if(currentDate == null) {
-        currentDate = new Date();
-        } else {
-          // Only create a new Date once per second, max.
-          long systime = System.currentTimeMillis();
-          if ((systime - currentDate.getTime()) > 1000) {
-              currentDate = new Date(systime);
-          }
-    }
-
+        // Only create a new Date once per second, max.
+        long systime = System.currentTimeMillis();
+        if ((systime - currentMillis) > 1000) {
+            synchronized (this) {
+                if ((systime - currentMillis) > 1000) {
+                    currentDate = new Date(systime);
+                    currentMillis = systime;
+                }
+            }
+        }
         return currentDate;
     }
 
@@ -1004,21 +675,21 @@ public class AccessLogValve
     
     private String calculateTimeZoneOffset(long offset) {
         StringBuffer tz = new StringBuffer();
-        if ((offset<0))  {
+        if ((offset < 0)) {
             tz.append("-");
             offset = -offset;
         } else {
             tz.append("+");
         }
 
-        long hourOffset = offset/(1000*60*60);
-        long minuteOffset = (offset/(1000*60)) % 60;
+        long hourOffset = offset / (1000 * 60 * 60);
+        long minuteOffset = (offset / (1000 * 60)) % 60;
 
-        if (hourOffset<10)
+        if (hourOffset < 10)
             tz.append("0");
         tz.append(hourOffset);
 
-        if (minuteOffset<10)
+        if (minuteOffset < 10)
             tz.append("0");
         tz.append(minuteOffset);
 
@@ -1035,9 +706,7 @@ public class AccessLogValve
      * @param listener The listener to add
      */
     public void addLifecycleListener(LifecycleListener listener) {
-
         lifecycle.addLifecycleListener(listener);
-
     }
 
 
@@ -1046,9 +715,7 @@ public class AccessLogValve
      * Lifecycle has no listeners registered, a zero-length array is returned.
      */
     public LifecycleListener[] findLifecycleListeners() {
-
         return lifecycle.findLifecycleListeners();
-
     }
 
 
@@ -1058,9 +725,7 @@ public class AccessLogValve
      * @param listener The listener to add
      */
     public void removeLifecycleListener(LifecycleListener listener) {
-
         lifecycle.removeLifecycleListener(listener);
-
     }
 
 
@@ -1076,8 +741,8 @@ public class AccessLogValve
 
         // Validate and update our current component state
         if (started)
-            throw new LifecycleException
-                (sm.getString("accessLogValve.alreadyStarted"));
+            throw new LifecycleException(sm
+                    .getString("accessLogValve.alreadyStarted"));
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         started = true;
 
@@ -1086,9 +751,9 @@ public class AccessLogValve
         timeZoneNoDST = calculateTimeZoneOffset(timezone.getRawOffset());
         Calendar calendar = Calendar.getInstance(timezone);
         int offset = calendar.get(Calendar.DST_OFFSET);
-        timeZoneDST = calculateTimeZoneOffset(timezone.getRawOffset()+offset);
-        
-        if (fileDateFormat==null || fileDateFormat.length()==0)
+        timeZoneDST = calculateTimeZoneOffset(timezone.getRawOffset() + offset);
+
+        if (fileDateFormat == null || fileDateFormat.length() == 0)
             fileDateFormat = "yyyy-MM-dd";
         dateFormatter = new SimpleDateFormat(fileDateFormat);
         dateFormatter.setTimeZone(timezone);
@@ -1102,10 +767,7 @@ public class AccessLogValve
         timeFormatter.setTimeZone(timezone);
         currentDate = new Date();
         dateStamp = dateFormatter.format(currentDate);
-        timeTakenFormatter = new DecimalFormat("0.000");
-
         open();
-
     }
 
 
@@ -1121,12 +783,539 @@ public class AccessLogValve
 
         // Validate and update our current component state
         if (!started)
-            throw new LifecycleException
-                (sm.getString("accessLogValve.notStarted"));
+            throw new LifecycleException(sm
+                    .getString("accessLogValve.notStarted"));
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
-
         close();
+    }
+    
+    /**
+     * AccessLogElement writes the partial message into the buffer.
+     */
+    private interface AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time);
 
+    }
+    
+    /**
+     * write local IP address - %A
+     */
+    private class LocalAddrElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            String value;
+            try {
+                value = InetAddress.getLocalHost().getHostAddress();
+            } catch (Throwable e) {
+                value = "127.0.0.1";
+            }
+            buf.append(value);
+        }
+    }
+    
+    /**
+     * write remote IP address - %a
+     */
+    private class RemoteAddrElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(request.getRemoteAddr());
+        }
+    }
+    
+    /**
+     * write remote host name - %h
+     */
+    private class HostElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(request.getRemoteHost());
+        }
+    }
+    
+    /**
+     * write remote logical username from identd (always returns '-') - %l
+     */
+    private class LogicalUserNameElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append('-');
+        }
+    }
+    
+    /**
+     * write request protocol - %H
+     */
+    private class ProtocolElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(request.getProtocol());
+        }
+    }
+
+    /**
+     * write remote user that was authenticated (if any), else '-' - %u
+     */
+    private class UserElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (request != null) {
+                String value = request.getRemoteUser();
+                if (value != null) {
+                    buf.append(value);
+                } else {
+                    buf.append('-');
+                }
+            } else {
+                buf.append('-');
+            }
+        }
+    }
+
+    /**
+     * write date and time, in Common Log Format - %t
+     */
+    private class DateAndTimeElement implements AccessLogElement {
+        private Date currentDate = new Date(0);
+
+        private String currentDateString = null;
+        
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (currentDate != date) {
+                synchronized (this) {
+                    if (currentDate != date) {
+                        StringBuffer current = new StringBuffer(32);
+                        current.append('[');
+                        current.append(dayFormatter.format(date)); // Day
+                        current.append('/');
+                        current.append(lookup(monthFormatter.format(date))); // Month
+                        current.append('/');
+                        current.append(yearFormatter.format(date)); // Year
+                        current.append(':');
+                        current.append(timeFormatter.format(date)); // Time
+                        current.append(' ');
+                        current.append(getTimeZone(date)); // Timezone
+                        current.append(']');
+                        currentDateString = current.toString();
+                        currentDate = date;
+                    }
+                }
+            }
+            buf.append(currentDateString);
+        }
+    }
+
+    /**
+     * write first line of the request (method and request URI) - %r
+     */
+    private class RequestElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (request != null) {
+                buf.append(request.getMethod());
+                buf.append(' ');
+                buf.append(request.getRequestURI());
+                if (request.getQueryString() != null) {
+                    buf.append('?');
+                    buf.append(request.getQueryString());
+                }
+                buf.append(' ');
+                buf.append(request.getProtocol());
+            } else {
+                buf.append("- - ");
+                buf.append(request.getProtocol());
+            }
+        }
+    }
+
+    /**
+     * write HTTP status code of the response - %s
+     */
+    private class HttpStatusCodeElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (response != null) {
+                buf.append(response.getStatus());
+            } else {
+                buf.append('-');
+            }
+        }
+    }
+
+    /**
+     * write local port on which this request was received - %p
+     */
+    private class LocalPortElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(request.getServerPort());
+        }
+    }
+
+    /**
+     * write bytes sent, excluding HTTP headers - %b, %B
+     */
+    private class ByteSentElement implements AccessLogElement {
+        private boolean conversion;
+
+        /**
+         * if conversion is true, write '-' instead of 0 - %b
+         */
+        public ByteSentElement(boolean conversion) {
+            this.conversion = conversion;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            int length = response.getContentCount();
+            if (length <= 0 && conversion) {
+                buf.append('-');
+            } else {
+                buf.append(length);
+            }
+        }
+    }
+
+    /**
+     * write request method (GET, POST, etc.) - %m
+     */
+    private class MethodElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (request != null) {
+                buf.append(request.getMethod());
+            }
+        }
+    }
+
+    /**
+     * write time taken to process the request - %D, %T
+     */
+    private class ElapsedTimeElement implements AccessLogElement {
+        private boolean millis;
+
+        /**
+         * if millis is true, write time in millis - %D
+         * if millis is false, write time in seconds - %T
+         */
+        public ElapsedTimeElement(boolean millis) {
+            this.millis = millis;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (millis) {
+                buf.append(time);
+            } else {
+                // second
+                buf.append(time / 1000);
+                buf.append('.');
+                int remains = (int) (time % 1000);
+                buf.append(remains / 100);
+                remains = remains % 100;
+                buf.append(remains / 10);
+                buf.append(remains % 10);
+            }
+        }
+    }
+    
+    /**
+     * write Query string (prepended with a '?' if it exists) - %q
+     */
+    private class QueryElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            String query = null;
+            if (request != null)
+                query = request.getQueryString();
+            if (query != null) {
+                buf.append('?');
+                buf.append(query);
+            }
+        }
+    }
+
+    /**
+     * write user session ID - %S
+     */
+    private class SessionIdElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (request != null) {
+                if (request.getSession(false) != null) {
+                    buf.append(request.getSessionInternal(false)
+                            .getIdInternal());
+                } else {
+                    buf.append('-');
+                }
+            } else {
+                buf.append('-');
+            }
+        }
+    }
+
+    /**
+     * write requested URL path - %U
+     */
+    private class RequestURIElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            if (request != null) {
+                buf.append(request.getRequestURI());
+            } else {
+                buf.append('-');
+            }
+        }
+    }
+
+    /**
+     * write local server name - %v
+     */
+    private class LocalServerNameElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(request.getServerName());
+        }
+    }
+    
+    /**
+     * write any string
+     */
+    private class StringElement implements AccessLogElement {
+        private String str;
+
+        public StringElement(String str) {
+            this.str = str;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(str);
+        }
+    }
+
+    /**
+     * write incoming headers - %{xxx}i
+     */
+    private class HeaderElement implements AccessLogElement {
+        private String header;
+
+        public HeaderElement(String header) {
+            this.header = header;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            buf.append(request.getHeader(header));
+        }
+    }
+
+    /**
+     * write a specific cookie - %{xxx}c
+     */
+    private class CookieElement implements AccessLogElement {
+        private String header;
+
+        public CookieElement(String header) {
+            this.header = header;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            String value = "-";
+            Cookie[] c = request.getCookies();
+            if (c != null) {
+                for (int i = 0; i < c.length; i++) {
+                    if (header.equals(c[i].getName())) {
+                        value = c[i].getValue();
+                        break;
+                    }
+                }
+            }
+            buf.append(value);
+        }
+    }
+
+    /**
+     * write an attribute in the ServletRequest - %{xxx}r
+     */
+    private class RequestAttributeElement implements AccessLogElement {
+        private String header;
+
+        public RequestAttributeElement(String header) {
+            this.header = header;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            Object value = null;
+            if (request != null) {
+                value = request.getAttribute(header);
+            } else {
+                value = "??";
+            }
+            if (value != null) {
+                if (value instanceof String) {
+                    buf.append((String) value);
+                } else {
+                    buf.append(value.toString());
+                }
+            } else {
+                buf.append('-');
+            }
+        }
+    }
+
+    /**
+     * write an attribute in the HttpSession - %{xxx}s
+     */
+    private class SessionAttributeElement implements AccessLogElement {
+        private String header;
+
+        public SessionAttributeElement(String header) {
+            this.header = header;
+        }
+
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            Object value = null;
+            if (null != request) {
+                HttpSession sess = request.getSession(false);
+                if (null != sess)
+                    value = sess.getAttribute(header);
+            } else {
+                value = "??";
+            }
+            if (value != null) {
+                if (value instanceof String) {
+                    buf.append((String) value);
+                } else {
+                    buf.append(value.toString());
+                }
+            } else {
+                buf.append('-');
+            }
+        }
+    }
+
+
+
+
+    /**
+     * parse pattern string and create the array of AccessLogElement
+     */
+    private AccessLogElement[] createLogElements() {
+        List list = new ArrayList();
+        boolean replace = false;
+        StringBuffer buf = new StringBuffer();
+        for (int i = 0; i < pattern.length(); i++) {
+            char ch = pattern.charAt(i);
+            if (replace) {
+                /*
+                 * For code that processes {, the behavior will be ... if I do
+                 * not enounter a closing } - then I ignore the {
+                 */
+                if ('{' == ch) {
+                    StringBuffer name = new StringBuffer();
+                    int j = i + 1;
+                    for (; j < pattern.length() && '}' != pattern.charAt(j); j++) {
+                        name.append(pattern.charAt(j));
+                    }
+                    if (j + 1 < pattern.length()) {
+                        /* the +1 was to account for } which we increment now */
+                        j++;
+                        list.add(createAccessLogElement(name.toString(),
+                                pattern.charAt(j)));
+                        i = j; /* Since we walked more than one character */
+                    } else {
+                        // D'oh - end of string - pretend we never did this
+                        // and do processing the "old way"
+                        list.add(createAccessLogElement(ch));
+                    }
+                } else {
+                    list.add(createAccessLogElement(ch));
+                }
+                replace = false;
+            } else if (ch == '%') {
+                replace = true;
+                list.add(new StringElement(buf.toString()));
+                buf = new StringBuffer();
+            } else {
+                buf.append(ch);
+            }
+        }
+        if (buf.length() > 0) {
+            list.add(new StringElement(buf.toString()));
+        }
+        return (AccessLogElement[]) list.toArray(new AccessLogElement[0]);
+    }
+
+    /**
+     * create an AccessLogElement implementation which needs header string
+     */
+    private AccessLogElement createAccessLogElement(String header, char pattern) {
+        switch (pattern) {
+        case 'i':
+            return new HeaderElement(header);
+        case 'c':
+            return new CookieElement(header);
+        case 'r':
+            return new RequestAttributeElement(header);
+        case 's':
+            return new SessionAttributeElement(header);
+        default:
+            return new StringElement("???");
+        }
+    }
+
+    /**
+     * create an AccessLogElement implementation
+     */
+    private AccessLogElement createAccessLogElement(char pattern) {
+        switch (pattern) {
+        case 'a':
+            return new RemoteAddrElement();
+        case 'A':
+            return new LocalAddrElement();
+        case 'b':
+            return new ByteSentElement(true);
+        case 'B':
+            return new ByteSentElement(false);
+        case 'D':
+            return new ElapsedTimeElement(true);
+        case 'h':
+            return new HostElement();
+        case 'H':
+            return new ProtocolElement();
+        case 'l':
+            return new LogicalUserNameElement();
+        case 'm':
+            return new MethodElement();
+        case 'p':
+            return new LocalPortElement();
+        case 'q':
+            return new QueryElement();
+        case 'r':
+            return new RequestElement();
+        case 's':
+            return new HttpStatusCodeElement();
+        case 'S':
+            return new SessionIdElement();
+        case 't':
+            return new DateAndTimeElement();
+        case 'T':
+            return new ElapsedTimeElement(false);
+        case 'u':
+            return new UserElement();
+        case 'U':
+            return new RequestURIElement();
+        case 'v':
+            return new LocalServerNameElement();
+        default:
+            return new StringElement("???" + pattern + "???");
+        }
     }
 }
