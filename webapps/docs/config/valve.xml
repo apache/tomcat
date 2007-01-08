@@ -61,11 +61,7 @@
       <attribute name="className" required="true">
         <p>Java class name of the implementation to use.  This MUST be set to
         <strong>org.apache.catalina.valves.AccessLogValve</strong> to use the
-        default access log valve. To use a more optimized access log valve
-        designed for production use, you MUST set this attribute to 
-        <strong>org.apache.catalina.valves.FastCommonAccessLogValve</strong>.
-        In this case, only the <code>common</code> and <code>combined</code>
-        patterns are supported.</p>
+        default access log valve.</p>
       </attribute>
 
       <attribute name="directory" required="false">
@@ -128,6 +124,13 @@
            The date format also decides how often the file is rotated.
            If you wish to rotate every hour, then set this value
            to: <tt>yyyy-MM-dd.HH</tt>
+        </p>
+      </attribute>
+
+      <attribute name="buffered" required="false">
+        <p>Deafult true. Flag to determine if logging will be buffered.
+           If set to false, then access logging will be written after each 
+           request.
         </p>
       </attribute>
 
