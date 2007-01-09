@@ -22,8 +22,8 @@
       <passphrase></passphrase>
     </server>
   -->
-  <property file="${basedir}/mvn.properties.default"/>
   <property file="${basedir}/mvn.properties"/>
+  <property file="${basedir}/mvn.properties.default"/>
   
   <target name="maven-deploy">
     <!--replace the version in the pom-->
