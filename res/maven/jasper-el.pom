@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>jasper-el</artifactId>
+  <version>@MAVEN.DEPLOY.VERSION@</version>
+  <description>Jasper Expression Language Impl</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>el-api</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
+
