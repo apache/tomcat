@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>tribes</artifactId>
+  <version>@MAVEN.DEPLOY.VERSION@</version>
+  <description>Tomcat Group Communication Package</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>juli</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project> 

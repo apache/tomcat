@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>juli</artifactId>
+  <version>@MAVEN.DEPLOY.VERSION@</version>
+  <description>Tomcat Core Logging Package</description>
+</project>
