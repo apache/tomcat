@@ -15,7 +15,7 @@
   
   To do password less upload, you can modify either
   $MAVE_HOME/conf/settings.xml or ~/.m2/settings.xml and add this snippet
-    server>
+    <server>
       <id>apache.snapshots</id>
       <username>yourusername</username>
       <privateKey>/home/yourusername/.ssh/id_rsa</privateKey>
@@ -44,6 +44,7 @@
       <arg value="-DrepositoryId=${maven.repo.repositoryId}"/>
       <arg value="-Durl=${maven.repo.url}"/>
       <arg value="-DpomFile=${pom}.tmp"/>
+      <arg value="-Dmaven.scp.executable=${maven.scp.executable}"/>
     </exec>
     <delete file="${pom}.tmp"/>
   </target>
