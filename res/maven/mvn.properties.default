@@ -6,4 +6,3 @@ maven.deploy.version=6.0.7-SNAPSHOT
 tomcat.lib.path=C:/development/tomcat/6.0/tc6.0.x/trunk/output/build/lib
 tomcat.bin.path=C:/development/tomcat/6.0/tc6.0.x/trunk/output/build/bin
 tomcat.pom.path=C:/development/tomcat/6.0/tc6.0.x/trunk/res/maven
-maven.scp.executable=c:/software/unix/usr/local/wbin/pscp.exe -i /home/fhanik/.ssh/id_rsa
