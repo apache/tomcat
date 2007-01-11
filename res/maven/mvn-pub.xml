@@ -122,8 +122,19 @@
       <param name="artifactId" value="jasper"/>
       <param name="pom" value="${tomcat.pom.path}/jasper.pom"/>
     </antcall>
-    
-    
   </target>
-
+  <target name="deploy-extras">
+    <antcall target="maven-deploy"><!--Deploy Extras Juli-->
+      <param name="file" value="${tomcat.extras.path}/tomcat-juli.jar"/>
+      <param name="groupId" value="org.apache.tomcat.extras"/>
+      <param name="artifactId" value="juli"/>
+      <param name="pom" value="${tomcat.pom.path}/juli-extras.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Extras Juli Adapters-->
+      <param name="file" value="${tomcat.extras.path}/tomcat-juli-adapters.jar"/>
+      <param name="groupId" value="org.apache.tomcat.extras"/>
+      <param name="artifactId" value="juli-adapters"/>
+      <param name="pom" value="${tomcat.pom.path}/juli-adapters.pom"/>
+    </antcall>
+  </target>
 </project>
