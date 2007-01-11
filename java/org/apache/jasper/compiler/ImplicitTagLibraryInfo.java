@@ -48,7 +48,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private static final String TAGX_FILE_SUFFIX = ".tagx";
     private static final String TAGS_SHORTNAME = "tags";
     private static final String TLIB_VERSION = "1.0";
-    private static final String JSP_VERSION = "2.1";
+    private static final String JSP_VERSION = "2.0";
     private static final String IMPLICIT_TLD = "implicit.tld";
 
     // Maps tag names to tag file paths
