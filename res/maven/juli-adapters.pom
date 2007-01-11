@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.tomcat.extras</groupId>
+  <artifactId>juli-adapters</artifactId>
+  <version>@MAVEN.DEPLOY.VERSION@</version>
+  <description>Adapters to plug in other logging frameworks in Tomcat</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat.extras</groupId>
+      <artifactId>juli</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project>
