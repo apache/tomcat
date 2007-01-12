@@ -48,7 +48,7 @@ import org.apache.jasper.JasperException;
  */
 class PageDataImpl extends PageData implements TagConstants {
 
-    private static final String JSP_VERSION = "2.1";
+    private static final String JSP_VERSION = "2.0";
     private static final String CDATA_START_SECTION = "<![CDATA[\n";
     private static final String CDATA_END_SECTION = "]]>\n";
 
