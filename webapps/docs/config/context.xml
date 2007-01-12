@@ -174,7 +174,7 @@
         defining the <em>default</em> web application for this Host, which
         will process all requests not assigned to other Contexts. The value of
         this field must not be set except when statically defining a Context in
-        server.xml, as it will be infered from the filenames used for either the 
+        server.xml, as it will be inferred from the filenames used for either the 
         .xml context file or the docBase.</p>
       </attribute>
 
