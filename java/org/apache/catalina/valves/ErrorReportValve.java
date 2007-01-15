@@ -163,15 +163,6 @@ public class ErrorReportValve
         if ((statusCode < 400) || (response.getContentCount() > 0))
             return;
 
-        Throwable rootCause = null;
-
-        if (throwable != null) {
-
-            if (throwable instanceof ServletException)
-                rootCause = ((ServletException) throwable).getRootCause();
-
-        }
-
         String message = RequestUtil.filter(response.getMessage());
         if (message == null)
             message = "";
@@ -227,6 +218,7 @@ public class ErrorReportValve
             sb.append("</pre></p>");
 
             int loops = 0;
+            Throwable rootCause = throwable.getCause();
             while (rootCause != null && (loops < 10)) {
                 stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
