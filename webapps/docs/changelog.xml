@@ -20,6 +20,12 @@
       <fix>
         Make provided instances of RequestDispatcher thread safe. (markt)
       </fix>
+      <add>
+        Optional development oriented loader implementation. (funkman)
+      </add>
+      <add>
+        Optimized access log valve, submitted by Takayuki Kaneko. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -31,6 +37,15 @@
       <fix>
         Display the JSP source when a compilation error occurs and display
         the correct line number rather than start of a scriptlet block. (markt)
+      </fix>
+      <fix>
+        Fix NPE when processing dynamic attributes. (remm)
+      </fix>
+      <fix>
+        More accurate EL usage validation. (remm)
+      </fix>
+      <fix>
+        Fix regression for implicit taglib and page data version numbers. (remm)
       </fix>
     </changelog>
   </subsection>
