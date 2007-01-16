@@ -44,12 +44,11 @@
       <arg value="-DrepositoryId=${maven.repo.repositoryId}"/>
       <arg value="-Durl=${maven.repo.url}"/>
       <arg value="-DpomFile=${pom}.tmp"/>
-      <arg value="-Dmaven.scp.executable=${maven.scp.executable}"/>
     </exec>
     <delete file="${pom}.tmp"/>
   </target>
   
-  <target name="deploy">
+  <target name="generic-deploy">
     <antcall target="maven-deploy"><!--Deploy annotations-->
       <param name="file" value="${tomcat.lib.path}/annotations-api.jar"/>
       <param name="groupId" value="org.apache.tomcat"/>
@@ -122,8 +121,6 @@
       <param name="artifactId" value="jasper"/>
       <param name="pom" value="${tomcat.pom.path}/jasper.pom"/>
     </antcall>
-  </target>
-  <target name="deploy-extras">
     <antcall target="maven-deploy"><!--Deploy Extras Juli-->
       <param name="file" value="${tomcat.extras.path}/tomcat-juli.jar"/>
       <param name="groupId" value="org.apache.tomcat.extras"/>
@@ -137,4 +134,21 @@
       <param name="pom" value="${tomcat.pom.path}/juli-adapters.pom"/>
     </antcall>
   </target>
+
+  <target name="deploy-snapshot">
+    <antcall target="generic-deploy">
+      <param name="maven.repo.repositoryId" value="${maven.snapshot.repo.repositoryId}"/>
+      <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
+      <param name="maven.deploy.version" value="${maven.snapshot.deploy.version}"/>
+    </antcall>
+  </target>
+
+  <target name="deploy-release">
+    <antcall target="generic-deploy">
+      <param name="maven.repo.repositoryId" value="${maven.release.repo.repositoryId}"/>
+      <param name="maven.repo.url" value="${maven.release.repo.url}"/>
+      <param name="maven.deploy.version" value="${maven.release.deploy.version}"/>
+    </antcall>
+  </target>
+
 </project>
