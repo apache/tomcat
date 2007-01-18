@@ -1130,46 +1130,33 @@ public class Http11AprProcessor implements ActionHook {
                     // Cipher suite
                     Object sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_CIPHER);
                     if (sslO != null) {
-                        request.setAttribute
-                            (AprEndpoint.CIPHER_SUITE_KEY, sslO);
+                        request.setAttribute(AprEndpoint.CIPHER_SUITE_KEY, sslO);
                     }
-                    // Client certificate chain if present
+                    // Get client certificate and the certificate chain if present
                     int certLength = SSLSocket.getInfoI(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
+                    byte[] clientCert = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
                     X509Certificate[] certs = null;
-                    if (certLength > 0) {
-                        certs = new X509Certificate[certLength];
+                    if (clientCert != null) {
+                        certs = new X509Certificate[certLength + 1];
+                        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                        certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
                         for (int i = 0; i < certLength; i++) {
                             byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-                            CertificateFactory cf =
-                                CertificateFactory.getInstance("X.509");
-                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
-                            certs[i] = (X509Certificate) cf.generateCertificate(stream);
-                        }
-                    } else if (certLength == 0) {
-                        byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
-                        if (data != null) {
-                            certs = new X509Certificate[1];
-                            CertificateFactory cf =
-                                CertificateFactory.getInstance("X.509");
-                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
-                            certs[0] = (X509Certificate) cf.generateCertificate(stream);
+                            certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
                         }
                     }
                     if (certs != null) {
-                        request.setAttribute
-                            (AprEndpoint.CERTIFICATE_KEY, certs);
+                        request.setAttribute(AprEndpoint.CERTIFICATE_KEY, certs);
                     }
                     // User key size
                     sslO = new Integer(SSLSocket.getInfoI(socket, SSL.SSL_INFO_CIPHER_USEKEYSIZE));
                     if (sslO != null) {
-                        request.setAttribute
-                            (AprEndpoint.KEY_SIZE_KEY, sslO);
+                        request.setAttribute(AprEndpoint.KEY_SIZE_KEY, sslO);
                     }
                     // SSL session ID
                     sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_SESSION_ID);
                     if (sslO != null) {
-                        request.setAttribute
-                            (AprEndpoint.SESSION_ID_KEY, sslO);
+                        request.setAttribute(AprEndpoint.SESSION_ID_KEY, sslO);
                     }
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
@@ -1182,38 +1169,26 @@ public class Http11AprProcessor implements ActionHook {
                  // Consume and buffer the request body, so that it does not
                  // interfere with the client's handshake messages
                 InputFilter[] inputFilters = inputBuffer.getFilters();
-                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER])
-                    .setLimit(maxSavePostSize);
-                inputBuffer.addActiveFilter
-                    (inputFilters[Constants.BUFFERED_FILTER]);
+                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(maxSavePostSize);
+                inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
                 try {
                     // Renegociate certificates
                     SSLSocket.renegotiate(socket);
-                    // Client certificate chain if present
+                    // Get client certificate and the certificate chain if present
                     int certLength = SSLSocket.getInfoI(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
+                    byte[] clientCert = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
                     X509Certificate[] certs = null;
-                    if (certLength > 0) {
-                        certs = new X509Certificate[certLength];
+                    if (clientCert != null) {
+                        certs = new X509Certificate[certLength + 1];
+                        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                        certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
                         for (int i = 0; i < certLength; i++) {
                             byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-                            CertificateFactory cf =
-                                CertificateFactory.getInstance("X.509");
-                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
-                            certs[i] = (X509Certificate) cf.generateCertificate(stream);
-                        }
-                    } else if (certLength == 0) {
-                        byte[] data = SSLSocket.getInfoB(socket, SSL.SSL_INFO_CLIENT_CERT);
-                        if (data != null) {
-                            certs = new X509Certificate[1];
-                            CertificateFactory cf =
-                                CertificateFactory.getInstance("X.509");
-                            ByteArrayInputStream stream = new ByteArrayInputStream(data);
-                            certs[0] = (X509Certificate) cf.generateCertificate(stream);
+                            certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
                         }
                     }
                     if (certs != null) {
-                        request.setAttribute
-                            (AprEndpoint.CERTIFICATE_KEY, certs);
+                        request.setAttribute(AprEndpoint.CERTIFICATE_KEY, certs);
                     }
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
