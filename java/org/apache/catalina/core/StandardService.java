@@ -280,11 +280,8 @@ public class StandardService
 
     public ObjectName[] getConnectorNames() {
         ObjectName results[] = new ObjectName[connectors.length];
-        for( int i=0; i<results.length; i++ ) {
-            // if it's a coyote connector
-            //if( connectors[i] instanceof CoyoteConnector ) {
-            //    results[i]=((CoyoteConnector)connectors[i]).getJmxName();
-            //}
+        for (int i=0; i<results.length; i++) {
+            results[i] = connectors[i].getObjectName();
         }
         return results;
     }
