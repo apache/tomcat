@@ -1051,7 +1051,8 @@ class Validator {
                     }
                 }
 
-                boolean expression = runtimeExpression || (elExpression  && !pageInfo.isELIgnored());
+                boolean expression = runtimeExpression 
+                    || (elExpression  && (!pageInfo.isELIgnored() || (!"true".equalsIgnoreCase(pageInfo.getIsELIgnored()) && checkDeferred && deferred)));
                 
                 for (int j = 0; tldAttrs != null && j < tldAttrs.length; j++) {
                     if (attrs.getLocalName(i).equals(tldAttrs[j].getName())
