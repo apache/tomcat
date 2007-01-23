@@ -1134,11 +1134,31 @@ class Validator {
                                         expectedType = JspUtil.toClass(typeStr,
                                                 loader);
                                     }
-                                    jspAttrs[i] = getJspAttribute(tldAttrs[j],
-                                            attrs.getQName(i), attrs.getURI(i),
-                                            attrs.getLocalName(i), attrs
-                                            .getValue(i), expectedType, n,
-                                            false);
+                                    if (deferred || elExpression) {
+                                        
+                                        validateFunctions(el, n);
+                                        jspAttrs[i] = new Node.JspAttribute(tldAttrs[j],
+                                                attrs.getQName(i), attrs.getURI(i), attrs
+                                                        .getLocalName(i),
+                                                attrs.getValue(i), false, el, false);
+                                        ELContextImpl ctx = new ELContextImpl();
+                                        ctx.setFunctionMapper(getFunctionMapper(el));
+                                        try {
+                                            jspAttrs[i].validateEL(this.pageInfo
+                                                    .getExpressionFactory(), ctx);
+                                        } catch (ELException e) {
+                                            this.err.jspError(n.getStart(),
+                                                    "jsp.error.invalid.expression", attrs.getValue(i), e
+                                                            .toString());
+                                        }
+
+                                    } else {
+                                        jspAttrs[i] = getJspAttribute(tldAttrs[j],
+                                                attrs.getQName(i), attrs.getURI(i),
+                                                attrs.getLocalName(i), attrs
+                                                .getValue(i), expectedType, n,
+                                                false);
+                                    }
                                 } catch (ClassNotFoundException e) {
                                     err.jspError
                                         (n, "jsp.error.unknown_attribute_type",
