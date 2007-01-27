@@ -496,12 +496,6 @@ public final class EmbeddedServletOptions implements Options {
         if (checkInterval != null) {
             try {
                 this.checkInterval = Integer.parseInt(checkInterval);
-                if (this.checkInterval == 0) {
-                    this.checkInterval = 300;
-                    if (log.isWarnEnabled()) {
-                        log.warn(Localizer.getMessage("jsp.warning.checkInterval"));
-                    }
-                }
             } catch(NumberFormatException ex) {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.checkInterval"));

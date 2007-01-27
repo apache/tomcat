@@ -68,6 +68,11 @@
         Fix regression for implicit taglib and page data version numbers. (remm)
       </fix>
       <fix>
+        <bug>41265</bug>: Allow JspServlet checkInterval init parameter to be
+        explicitly set to the stated default value of zero by removing the
+        code that resets it to 300 if explicitly specified as zero. (markt)
+      </fix>
+      <fix>
         <bug>41327</bug>: Show full URI for a 404. Patch provided by Vijay.
         (markt)
       </fix>
