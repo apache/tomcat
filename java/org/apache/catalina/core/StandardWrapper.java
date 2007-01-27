@@ -60,7 +60,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 

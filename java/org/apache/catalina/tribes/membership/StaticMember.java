@@ -18,7 +18,6 @@
 package org.apache.catalina.tribes.membership;
 
 import java.io.IOException;
-import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.catalina.tribes.util.Arrays;
 
 /**

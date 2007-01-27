@@ -34,7 +34,6 @@ import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import java.net.UnknownHostException;
 import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.group.RpcChannel;
 import org.apache.catalina.tribes.util.Logs;
 import org.apache.catalina.tribes.UniqueId;
 

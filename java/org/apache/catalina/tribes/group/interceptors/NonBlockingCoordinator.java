@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelInterceptor;
-import org.apache.catalina.tribes.ChannelInterceptor.InterceptorEvent;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;

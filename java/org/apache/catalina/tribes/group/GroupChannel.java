@@ -40,7 +40,6 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.Heartbeat;
 import org.apache.catalina.tribes.io.BufferPool;
-import java.io.IOException;
 import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.util.Logs;
 import org.apache.catalina.tribes.util.Arrays;

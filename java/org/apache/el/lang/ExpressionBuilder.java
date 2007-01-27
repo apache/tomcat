@@ -18,12 +18,7 @@
 package org.apache.el.lang;
 
 import java.io.StringReader;
-import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.el.ELContext;
 import javax.el.ELException;

@@ -29,20 +29,10 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Constants;
-import org.apache.jk.common.HandlerRequest;
-import org.apache.jk.common.JkInputStream;
-import org.apache.jk.common.MsgAjp;
 import org.apache.jk.core.JkHandler;
 import org.apache.jk.core.Msg;
 import org.apache.jk.core.MsgContext;
-import org.apache.jk.core.WorkerEnv;
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.C2BConverter;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.HttpMessages;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.SSLSupport;
 
 /** Plugs Jk into Coyote. Must be named "type=JkHandler,name=container"
  *

@@ -34,7 +34,6 @@ import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.VariableMapper;
 
-import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.lang.ExpressionBuilder;
 import org.apache.el.parser.Node;

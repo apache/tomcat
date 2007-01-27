@@ -16,9 +16,6 @@
  */
 package org.apache.catalina.ant.jmx;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 

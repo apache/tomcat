@@ -33,7 +33,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
-import org.apache.tomcat.util.IntrospectionUtils;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>

@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.io;
 
-import java.util.Queue;
 import java.util.LinkedList;
 
 

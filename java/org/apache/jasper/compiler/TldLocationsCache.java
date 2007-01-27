@@ -18,7 +18,6 @@
 package org.apache.jasper.compiler;
 
 import java.io.InputStream;
-import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;

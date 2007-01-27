@@ -18,9 +18,7 @@
 package org.apache.catalina.ha.tcp;
 
 import java.beans.PropertyChangeSupport;
-import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

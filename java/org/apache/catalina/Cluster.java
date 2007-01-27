@@ -17,8 +17,6 @@
 
 package org.apache.catalina;
 
-import java.io.IOException;
-import java.net.URL;
 /**
  * A <b>Cluster</b> works as a Cluster client/server for the local host
  * Different Cluster implementations can be used to support different

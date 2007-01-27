@@ -33,7 +33,6 @@ import org.apache.catalina.ServerFactory;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.users.MemoryUser;
 import org.apache.catalina.util.StringManager;
 
 
