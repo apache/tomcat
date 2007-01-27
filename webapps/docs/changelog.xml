@@ -86,6 +86,10 @@
       <update>
         Update all webapps to use the servlet 2.5 xsd. (markt)
       </update>
+      <fix>
+        <bug>39572</bug>: Improvements to CompressionFilter example provided by
+        Eric Hedström. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
