@@ -37,6 +37,18 @@ rem
 rem   JPDA_ADDRESS    (Optional) Java runtime options used when the "jpda start"
 rem                   command is executed. The default is "jdbconn".
 rem
+rem   JPDA_SUSPEND    (Optional) Java runtime options used when the "jpda start"
+rem                   command is executed. Specifies whether JVM should suspend
+rem                   execution immediately after startup. Default is "n".
+rem
+rem   JPDA_OPTS       (Optional) Java runtime options used when the "jpda start"
+rem                   command is executed. If used, JPDA_TRANSPORT, JPDA_ADDRESS,
+rem                   and JPDA_SUSPEND are ignored. Thus, all required jpda
+rem                   options MUST be specified. The default is:
+rem
+rem                   -Xdebug -Xrunjdwp:transport=%JPDA_TRANSPORT%,
+rem                       address=%JPDA_ADDRESS%,server=y,suspend=%JPDA_SUSPEND%
+rem
 rem $Id$
 rem ---------------------------------------------------------------------------
 
@@ -113,7 +125,12 @@ set JPDA_TRANSPORT=dt_shmem
 if not "%JPDA_ADDRESS%" == "" goto gotJpdaAddress
 set JPDA_ADDRESS=jdbconn
 :gotJpdaAddress
-shift
+if not "%JPDA_SUSPEND%" == "" goto gotJpdaSuspend
+set JPDA_SUSPEND=n
+:gotJpdaSuspend
+if not "%JPDA_OPTS%" == "" goto gotJpdaOpts
+set JPDA_OPTS=-Xdebug -Xrunjdwp:transport=%JPDA_TRANSPORT%,address=%JPDA_ADDRESS%,server=y,suspend=%JPDA_SUSPEND%
+:gotJpdaOptsshift
 :noJpda
 
 if ""%1"" == ""debug"" goto doDebug
@@ -197,10 +214,10 @@ goto end
 goto end
 :doJpda
 if not "%SECURITY_POLICY_FILE%" == "" goto doSecurityJpda
-%_EXECJAVA% %JAVA_OPTS% %CATALINA_OPTS% -Xdebug -Xrunjdwp:transport=%JPDA_TRANSPORT%,address=%JPDA_ADDRESS%,server=y,suspend=n %DEBUG_OPTS% -Djava.endorsed.dirs="%JAVA_ENDORSED_DIRS%" -classpath "%CLASSPATH%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
+%_EXECJAVA% %JAVA_OPTS% %CATALINA_OPTS% %JPDA_OPTS% %DEBUG_OPTS% -Djava.endorsed.dirs="%JAVA_ENDORSED_DIRS%" -classpath "%CLASSPATH%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
 goto end
 :doSecurityJpda
-%_EXECJAVA% %JAVA_OPTS% %CATALINA_OPTS% -Xdebug -Xrunjdwp:transport=%JPDA_TRANSPORT%,address=%JPDA_ADDRESS%,server=y,suspend=n %DEBUG_OPTS% -Djava.endorsed.dirs="%JAVA_ENDORSED_DIRS%" -classpath "%CLASSPATH%" -Djava.security.manager -Djava.security.policy=="%SECURITY_POLICY_FILE%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
+%_EXECJAVA% %JAVA_OPTS% %CATALINA_OPTS% %JPDA_OPTS% %DEBUG_OPTS% -Djava.endorsed.dirs="%JAVA_ENDORSED_DIRS%" -classpath "%CLASSPATH%" -Djava.security.manager -Djava.security.policy=="%SECURITY_POLICY_FILE%" -Dcatalina.base="%CATALINA_BASE%" -Dcatalina.home="%CATALINA_HOME%" -Djava.io.tmpdir="%CATALINA_TMPDIR%" %MAINCLASS% %CMD_LINE_ARGS% %ACTION%
 goto end
 
 :end

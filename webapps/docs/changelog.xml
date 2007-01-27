@@ -41,6 +41,11 @@
         as per the spec. Note that web.xml continues to use CLIENT-CERT to
         specify the certificate authentication should be used. (markt)
       </fix>
+      <fix>
+        <bug>41401</bug>: Add support for JPDA_OPTS to catalina.bat and add a
+        JPDA_SUSPEND environment variable to both startup scripts. Patch
+        provided by Kurt Roy. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
