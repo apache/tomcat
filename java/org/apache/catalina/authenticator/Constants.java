@@ -25,7 +25,7 @@ public class Constants {
 
     // Authentication methods for login configuration
     public static final String BASIC_METHOD = "BASIC";
-    public static final String CERT_METHOD = "CLIENT-CERT";
+    public static final String CERT_METHOD = "CLIENT_CERT";
     public static final String DIGEST_METHOD = "DIGEST";
     public static final String FORM_METHOD = "FORM";
 
@@ -55,7 +55,7 @@ public class Constants {
      * or not any user has been authenticated:</p>
      * <ul>
      * <li><strong>request.getAuthType()</strong>
-     *     will return BASIC, CLIENT-CERT, DIGEST, FORM, or <code>null</code>
+     *     will return BASIC, CLIENT_CERT, DIGEST, FORM, or <code>null</code>
      *     if there is no authenticated user.</li>
      * <li><strong>request.getUserPrincipal()</strong>
      *     will return the authenticated <code>Principal</code> returned by the

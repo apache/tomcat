@@ -56,7 +56,7 @@ public class SingleSignOnEntry
      *
      * @param principal the <code>Principal</code> returned by the latest
      *                  call to <code>Realm.authenticate</code>.
-     * @param authType  the type of authenticator used (BASIC, CLIENT-CERT,
+     * @param authType  the type of authenticator used (BASIC, CLIENT_CERT,
      *                  DIGEST or FORM)
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
@@ -119,7 +119,7 @@ public class SingleSignOnEntry
      * Gets the name of the authentication type originally used to authenticate
      * the user associated with the SSO.
      *
-     * @return "BASIC", "CLIENT-CERT", "DIGEST", "FORM" or "NONE"
+     * @return "BASIC", "CLIENT_CERT", "DIGEST", "FORM" or "NONE"
      */
     public String getAuthType() {
         return (this.authType);
@@ -170,7 +170,7 @@ public class SingleSignOnEntry
      *
      * @param principal the <code>Principal</code> returned by the latest
      *                  call to <code>Realm.authenticate</code>.
-     * @param authType  the type of authenticator used (BASIC, CLIENT-CERT,
+     * @param authType  the type of authenticator used (BASIC, CLIENT_CERT,
      *                  DIGEST or FORM)
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
