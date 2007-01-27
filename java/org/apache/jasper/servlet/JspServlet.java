@@ -306,7 +306,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                     // creating unnecessary directories and files.
                     if (null == context.getResource(jspUri)) {
                         response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                                           jspUri);
+                                           request.getRequestURI());
                         return;
                     }
                     boolean isErrorPage = exception != null;
