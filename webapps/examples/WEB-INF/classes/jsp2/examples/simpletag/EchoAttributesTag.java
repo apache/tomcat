@@ -23,7 +23,6 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import javax.servlet.jsp.tagext.DynamicAttributes;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.io.IOException;
 
 /**

@@ -133,24 +133,4 @@ public final class ContextListener
 
     }
 
-
-    /**
-     * Log a message and associated exception to the servlet context
-     * application log.
-     *
-     * @param message Message to be logged
-     * @param throwable Exception to be logged
-     */
-    private void log(String message, Throwable throwable) {
-
-	if (context != null)
-	    context.log("ContextListener: " + message, throwable);
-	else {
-	    System.out.println("ContextListener: " + message);
-	    throwable.printStackTrace(System.out);
-	}
-
-    }
-
-
 }

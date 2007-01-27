@@ -16,8 +16,6 @@
 */
 package jsp2.examples.el;
 
-import java.util.*;
-
 /**
  * Defines the functions for the jsp2 example tag library.
  * 

@@ -17,7 +17,6 @@
 
 package cal;
 
-import java.text.DateFormat;
 import java.util.*;
 
 public class JspCalendar {

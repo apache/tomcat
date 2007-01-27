@@ -17,7 +17,6 @@
 package examples;
 
 
-import javax.servlet.*;
 import javax.servlet.jsp.*;
 import javax.servlet.jsp.tagext.*;
 
@@ -47,8 +46,7 @@ public class ShowSource
         if (in == null)
             throw new JspTagException("Unable to find JSP file: "+jspFile);
 
-        InputStreamReader reader = new InputStreamReader(in);
-	JspWriter out = pageContext.getOut();
+        JspWriter out = pageContext.getOut();
 
 
         try {
