@@ -743,6 +743,9 @@ public abstract class AuthenticatorBase
             cookie.setMaxAge(-1);
             cookie.setPath("/");
             
+            // Bugzilla 41217
+            cookie.setSecure(request.isSecure());
+
             // Bugzilla 34724
             String ssoDomain = sso.getCookieDomain();
             if(ssoDomain != null) {
