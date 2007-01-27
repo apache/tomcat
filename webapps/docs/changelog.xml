@@ -51,6 +51,10 @@
       <fix>
         Fix regression for implicit taglib and page data version numbers. (remm)
       </fix>
+      <fix>
+        <bug>41327</bug>: Show full URI for a 404. Patch provided by Vijay.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Webapps">
