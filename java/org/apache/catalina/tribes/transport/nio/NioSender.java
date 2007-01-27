@@ -19,14 +19,12 @@ package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
-import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.DataSender;

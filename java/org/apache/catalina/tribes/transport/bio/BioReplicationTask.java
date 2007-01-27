@@ -16,14 +16,12 @@
  */
 
 package org.apache.catalina.tribes.transport.bio;
-import java.io.IOException;
 
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import java.net.Socket;
 import java.io.InputStream;
-import org.apache.catalina.tribes.transport.ReceiverBase;
 import java.io.OutputStream;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.ChannelMessage;

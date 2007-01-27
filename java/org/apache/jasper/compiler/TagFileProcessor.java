@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.List;

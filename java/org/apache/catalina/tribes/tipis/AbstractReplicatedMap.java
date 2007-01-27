@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +45,6 @@ import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import java.util.ConcurrentModificationException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

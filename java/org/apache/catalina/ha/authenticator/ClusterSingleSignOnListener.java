@@ -20,7 +20,6 @@ import java.util.Map;
 import java.io.IOException;
 
 import org.apache.catalina.Session;
-import org.apache.catalina.authenticator.SingleSignOnEntry;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.ClusterListener;

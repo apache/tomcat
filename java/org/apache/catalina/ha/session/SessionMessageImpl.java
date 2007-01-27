@@ -17,8 +17,6 @@
 package org.apache.catalina.ha.session;
 
 
-import org.apache.catalina.ha.ClusterMessage;
-import org.apache.catalina.tribes.Member;
 import org.apache.catalina.ha.ClusterMessageBase;
 
 /**

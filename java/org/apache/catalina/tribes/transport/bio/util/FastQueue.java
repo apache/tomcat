@@ -18,7 +18,6 @@
 package org.apache.catalina.tribes.transport.bio.util;
 
 import org.apache.catalina.tribes.ChannelMessage;
-import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 

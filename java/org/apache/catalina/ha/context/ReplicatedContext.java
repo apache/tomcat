@@ -25,8 +25,6 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.core.ApplicationContext;
 import org.apache.catalina.Globals;
 import javax.servlet.ServletContext;
-import java.util.HashMap;
-import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import java.util.AbstractMap;
 
 /**

@@ -17,7 +17,6 @@
 
 package org.apache.coyote.http11;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
