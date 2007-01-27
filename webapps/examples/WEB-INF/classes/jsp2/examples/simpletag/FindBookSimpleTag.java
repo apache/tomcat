@@ -20,7 +20,6 @@ package jsp2.examples.simpletag;
 
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
-import java.util.HashMap;
 import jsp2.examples.BookBean;
 
 /**

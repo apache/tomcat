@@ -18,7 +18,6 @@ package examples;
 
 
 import javax.servlet.jsp.*;
-import javax.servlet.jsp.tagext.*;
 
 import java.io.IOException;
 
@@ -40,7 +39,7 @@ public class LogTag
     }
 
     public int doStartTag() throws JspException {
-        return EVAL_BODY_TAG;
+        return EVAL_BODY_BUFFERED;
     }
     
     public int doAfterBody() throws JspException {

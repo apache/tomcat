@@ -160,24 +160,4 @@ public final class SessionListener
 
     }
 
-
-    /**
-     * Log a message and associated exception to the servlet context
-     * application log.
-     *
-     * @param message Message to be logged
-     * @param throwable Exception to be logged
-     */
-    private void log(String message, Throwable throwable) {
-
-	if (context != null)
-	    context.log("SessionListener: " + message, throwable);
-	else {
-	    System.out.println("SessionListener: " + message);
-	    throwable.printStackTrace(System.out);
-	}
-
-    }
-
-
 }

@@ -21,7 +21,6 @@ package jsp2.examples.simpletag;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * Displays a tile as a single cell in a table.
