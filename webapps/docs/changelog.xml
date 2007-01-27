@@ -73,6 +73,9 @@
       <docs>
         Add a virtual hosting how-to contributed by Hassan Schroeder. (markt)
       </docs>
+      <update>
+        Update all webapps to use the servlet 2.5 xsd. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
