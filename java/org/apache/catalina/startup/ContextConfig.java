@@ -780,8 +780,8 @@ public class ContextConfig
                 context.addWatchedResource(file.getAbsolutePath());
             }
         } catch (Exception e) {
-            log.error(sm.getString("contextConfig.defaultMissing") 
-                      + " " + resourceName + " " + file , e);
+            log.error(sm.getString("contextConfig.contextMissing",  
+                      resourceName + " " + file) , e);
         }
         
         if (source == null)
@@ -805,13 +805,15 @@ public class ContextConfig
                     log.debug("Successfully processed context [" + context.getName() 
                             + "] configuration file " + baseDir + " " + resourceName);
             } catch (SAXParseException e) {
-                log.error(sm.getString("contextConfig.defaultParse"), e);
+                log.error(sm.getString("contextConfig.contextParse",
+                        context.getName()), e);
                 log.error(sm.getString("contextConfig.defaultPosition",
                                  "" + e.getLineNumber(),
                                  "" + e.getColumnNumber()));
                 ok = false;
             } catch (Exception e) {
-                log.error(sm.getString("contextConfig.defaultParse"), e);
+                log.error(sm.getString("contextConfig.contextParse",
+                        context.getName()), e);
                 ok = false;
             } finally {
                 contextDigester.reset();
@@ -821,7 +823,7 @@ public class ContextConfig
                         stream.close();
                     }
                 } catch (IOException e) {
-                    log.error(sm.getString("contextConfig.defaultClose"), e);
+                    log.error(sm.getString("contextConfig.contextClose"), e);
                 }
             }
         }
