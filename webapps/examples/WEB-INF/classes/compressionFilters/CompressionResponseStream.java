@@ -81,7 +81,7 @@ public class CompressionResponseStream
     /**
      * The underlying gzip output stream to which we should write data.
      */
-    protected GZIPOutputStream gzipstream = null;
+    protected OutputStream gzipstream = null;
 
     /**
      * Has this stream been closed?
@@ -295,8 +295,14 @@ public class CompressionResponseStream
             if (debug > 1) {
                 System.out.println("new GZIPOutputStream");
             }
-            response.addHeader("Content-Encoding", "gzip");
-            gzipstream = new GZIPOutputStream(output);
+            if (response.isCommitted()) {
+                if (debug > 1)
+                    System.out.print("Response already committed. Using original output stream");
+                gzipstream = output;
+            } else {
+                response.addHeader("Content-Encoding", "gzip");
+                gzipstream = new GZIPOutputStream(output);
+            }
         }
         gzipstream.write(b, off, len);
 

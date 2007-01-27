@@ -17,16 +17,9 @@
 package compressionFilters;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Locale;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletResponse;
-import javax.servlet.ServletResponseWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
@@ -247,31 +240,6 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
 
 
     public void setContentLength(int length) {
-    }
-
-
-    /**
-     * Returns character from content type. This method was taken from tomcat.
-     * @author rajo
-     */
-    private static String getCharsetFromContentType(String type) {
-
-        if (type == null) {
-            return null;
-        }
-        int semi = type.indexOf(";");
-        if (semi == -1) {
-            return null;
-        }
-        String afterSemi = type.substring(semi + 1);
-        int charsetLocation = afterSemi.indexOf("charset=");
-        if(charsetLocation == -1) {
-            return null;
-        } else {
-            String afterCharset = afterSemi.substring(charsetLocation + 8);
-            String encoding = afterCharset.trim();
-            return encoding;
-        }
     }
 
 }
