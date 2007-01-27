@@ -102,7 +102,7 @@ public class SSLAuthenticator
 
         // NOTE: We don't try to reauthenticate using any existing SSO session,
         // because that will only work if the original authentication was
-        // BASIC or FORM, which are less secure than the CLIENT-CERT auth-type
+        // BASIC or FORM, which are less secure than the CLIENT_CERT auth-type
         // specified for this webapp
         //
         // Uncomment below to allow previous FORM or BASIC authentications

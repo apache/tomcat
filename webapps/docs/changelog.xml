@@ -35,6 +35,12 @@
         created during a secure request. Patch provided by Chris Halstead.
         (markt)
       </fix>
+      <fix>
+        <bug>40524</bug>: HttpServletRequest.getAuthType() now returns
+        CLIENT_CERT rather than CLIENT-CERT for certificate authentication
+        as per the spec. Note that web.xml continues to use CLIENT-CERT to
+        specify the certificate authentication should be used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

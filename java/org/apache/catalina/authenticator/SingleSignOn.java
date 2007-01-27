@@ -616,7 +616,7 @@ public class SingleSignOn
      * <p>
      * The purpose of this method is to allow an SSO entry that was
      * established without a username/password combination (i.e. established
-     * following DIGEST or CLIENT-CERT authentication) to be updated with
+     * following DIGEST or CLIENT_CERT authentication) to be updated with
      * a username and password if one becomes available through a subsequent
      * BASIC or FORM authentication.  The SSO entry will then be usable for
      * reauthentication.
@@ -630,7 +630,7 @@ public class SingleSignOn
      * @param ssoId     identifier of Single sign to be updated
      * @param principal the <code>Principal</code> returned by the latest
      *                  call to <code>Realm.authenticate</code>.
-     * @param authType  the type of authenticator used (BASIC, CLIENT-CERT,
+     * @param authType  the type of authenticator used (BASIC, CLIENT_CERT,
      *                  DIGEST or FORM)
      * @param username  the username (if any) used for the authentication
      * @param password  the password (if any) used for the authentication
