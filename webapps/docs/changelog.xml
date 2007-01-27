@@ -26,6 +26,10 @@
       <add>
         Optimized access log valve, submitted by Takayuki Kaneko. (remm)
       </add>
+      <fix>
+        Fix error messages when parsing context.xml that incorrectly referred to
+        web.xml. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
