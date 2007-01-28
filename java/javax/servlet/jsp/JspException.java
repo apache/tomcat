@@ -39,13 +39,11 @@ public class JspException extends Exception {
      * specified message. The message can be written 
      * to the server log and/or displayed for the user. 
      *
-     * @param msg 		a <code>String</code> 
-     *				specifying the text of 
-     *				the exception message
-     *
+     * @param msg   a <code>String</code> specifying the text of the exception
+     *              message
      */
     public JspException(String msg) {
-	super(msg);
+        super(msg);
     }
 
 
@@ -56,19 +54,17 @@ public class JspException extends Exception {
      * normal operation, including a description message.
      *
      *
-     * @param message 		a <code>String</code> containing 
-     *				the text of the exception message
+     * @param message       a <code>String</code> containing the text of the
+     *                      exception message
      *
-     * @param rootCause		the <code>Throwable</code> exception 
-     *				that interfered with the servlet's
-     *				normal operation, making this servlet
-     *				exception necessary
-     *
+     * @param rootCause     the <code>Throwable</code> exception that
+     *                      interfered with the servlet's normal operation,
+     *                      making this servlet exception necessary
      */
     
     public JspException(String message, Throwable rootCause) {
-	super(message);
-	this.rootCause = rootCause;
+        super(message);
+        this.rootCause = rootCause;
     }
 
 
@@ -85,29 +81,25 @@ public class JspException extends Exception {
      * this method can be overridden to create an exception message 
      * designed for a specific locale.
      *
-     * @param rootCause 	the <code>Throwable</code> exception
-     * 				that interfered with the JSP's
-     *				normal operation, making the JSP exception
-     *				necessary
-     *
+     * @param rootCause     the <code>Throwable</code> exception that
+     *                      interfered with the JSP's normal operation, making
+     *                      the JSP exception necessary
      */
 
     public JspException(Throwable rootCause) {
-	super(rootCause.getLocalizedMessage());
-	this.rootCause = rootCause;
+        super(rootCause.getLocalizedMessage());
+        this.rootCause = rootCause;
     }
 
     
     /**
      * Returns the exception that caused this JSP exception.
      *
-     *
-     * @return			the <code>Throwable</code> 
-     *				that caused this JSP exception
+     * @return  the <code>Throwable</code> that caused this JSP exception
      *
      */
     
     public Throwable getRootCause() {
-	return rootCause;
+        return rootCause;
     }
 }
