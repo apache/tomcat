@@ -31,6 +31,10 @@
         web.xml. (markt)
       </fix>
       <fix>
+        <bug>39088</bug>: Prevent infinte loops when an exception is thrown
+        that returns itself for getRootCause(). (markt)
+      </fix>
+      <fix>
         <bug>41217</bug>: Set secure attribute on SSO cookie when cookie is
         created during a secure request. Patch provided by Chris Halstead.
         (markt)

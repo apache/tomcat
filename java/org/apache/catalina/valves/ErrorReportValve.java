@@ -21,6 +21,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -33,6 +34,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.IntrospectionUtils;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>
@@ -71,6 +73,18 @@ public class ErrorReportValve
         StringManager.getManager(Constants.Package);
 
 
+    private static Class jspExceptionClazz;
+
+    static {
+        try {
+            jspExceptionClazz = Class.forName("javax.servlet.jsp.JspException");
+        } catch (ClassNotFoundException e) {
+            // Expected if jsp-api not on classpath, eg when embedding
+            jspExceptionClazz = null;
+        }
+    }
+    
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -216,9 +230,9 @@ public class ErrorReportValve
             sb.append(RequestUtil.filter(stackTrace));
             sb.append("</pre></p>");
 
-            int loops = 0;
             Throwable rootCause = throwable.getCause();
-            while (rootCause != null && (loops < 10)) {
+            Throwable nestedRootCause = null;
+            while (rootCause != null) {
                 stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
                 sb.append(sm.getString("errorReportValve.rootCause"));
@@ -226,10 +240,33 @@ public class ErrorReportValve
                 sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre></p>");
                 // In case root cause is somehow heavily nested
-                rootCause = rootCause.getCause();
-                loops++;
-            }
+                try {
+                    if (rootCause instanceof ServletException) {
+                        nestedRootCause =
+                            ((ServletException) rootCause).getRootCause();
+                    } else if (jspExceptionClazz!=null &&
+                            jspExceptionClazz.isAssignableFrom(
+                                    rootCause.getClass())) {
+                        nestedRootCause = (Throwable)IntrospectionUtils.
+                                getProperty(rootCause, "rootCause"); 
+                    } else if (rootCause instanceof SQLException) {
+                        nestedRootCause = ((SQLException) rootCause).
+                                getNextException();
+                    }
+                    if (nestedRootCause == null) {
+                        nestedRootCause = rootCause.getCause();
+                    }
 
+                    if (rootCause == nestedRootCause)
+                        rootCause = null;
+                    else {
+                        rootCause = nestedRootCause;
+                        nestedRootCause = null;
+                    }
+                } catch (ClassCastException e) {
+                    rootCause = null;
+                }
+            }
             sb.append("<p><b>");
             sb.append(sm.getString("errorReportValve.note"));
             sb.append("</b> <u>");
