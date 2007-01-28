@@ -55,7 +55,9 @@ public class TestDataIntegrity extends TestCase {
             threads[x] = new Thread() {
                 public void run() {
                     try {
+                        long start = System.currentTimeMillis();
                         for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),0);
+                        System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
                         return;
@@ -69,8 +71,8 @@ public class TestDataIntegrity extends TestCase {
         for (int x=0; x<threads.length; x++ ) { threads[x].join();}
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<120000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
-        System.err.println("Finished NO_ACK");
+        while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+        System.err.println("Finished NO_ACK ["+listener1.count+"]");
         assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
     
@@ -81,7 +83,9 @@ public class TestDataIntegrity extends TestCase {
                 threads[x] = new Thread() {
                     public void run() {
                         try {
+                            long start = System.currentTimeMillis();
                             for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),GroupChannel.SEND_OPTIONS_ASYNCHRONOUS);
+                            System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                         }catch ( Exception x ) {
                             x.printStackTrace();
                             return;
@@ -96,7 +100,7 @@ public class TestDataIntegrity extends TestCase {
             //sleep for 50 sec, let the other messages in
             long start = System.currentTimeMillis();
             while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
-            System.err.println("Finished ASYNC MULTI THREAD");
+            System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
             assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
     public void testDataSendASYNC() throws Exception {
