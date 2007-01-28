@@ -241,10 +241,7 @@ public class ErrorReportValve
                 sb.append("</pre></p>");
                 // In case root cause is somehow heavily nested
                 try {
-                    if (rootCause instanceof ServletException) {
-                        nestedRootCause =
-                            ((ServletException) rootCause).getRootCause();
-                    } else if (jspExceptionClazz!=null &&
+                    if (jspExceptionClazz!=null &&
                             jspExceptionClazz.isAssignableFrom(
                                     rootCause.getClass())) {
                         nestedRootCause = (Throwable)IntrospectionUtils.
