@@ -31,6 +31,8 @@ import java.util.Stack;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.sql.SQLException;
+
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -60,6 +62,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 
@@ -291,7 +294,19 @@ public class StandardWrapper
      */
     protected static Properties restrictedServlets = null;
     
+
+    private static Class jspExceptionClazz;
     
+    static {
+        try {
+            jspExceptionClazz = Class.forName("javax.servlet.jsp.JspException");
+        } catch (ClassNotFoundException e) {
+            // Expected if jsp-api not on classpath, eg when embedding
+            jspExceptionClazz = null;
+        }
+    }
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -675,18 +690,41 @@ public class StandardWrapper
      * @param e The servlet exception
      */
     public static Throwable getRootCause(ServletException e) {
-        Throwable rootCause = e;
-        Throwable rootCauseCheck = null;
-        // Extra aggressive rootCause finding
-        int loops = 0;
-        do {
-            loops++;
-            rootCauseCheck = rootCause.getCause();
-            if (rootCauseCheck != null)
-                rootCause = rootCauseCheck;
-        } while (rootCauseCheck != null && (loops < 20));
-        return rootCause;
+        Throwable rootCause = e.getRootCause();
+        return findRootCause(e, rootCause);
     }
+
+
+    /*
+     * Work through the root causes using specific methods for well known types
+     * and getCause() for the rest. Stop when the next rootCause is null or
+     * an exception is found that has itself as its own rootCause. 
+     */
+    private static final Throwable findRootCause(Throwable theException,
+            Throwable theRootCause) {
+        
+        Throwable deeperRootCause = null;
+
+        if (theRootCause == null || theRootCause == theException) {
+            return theException;
+        }
+        
+        if (theRootCause instanceof ServletException) {
+            deeperRootCause = ((ServletException) theRootCause).getRootCause();
+        } else if (jspExceptionClazz!=null &&
+                jspExceptionClazz.isAssignableFrom(theRootCause.getClass())) {
+            deeperRootCause = (Throwable)IntrospectionUtils.getProperty(
+                    theRootCause, "rootCause"); 
+        } else if (theRootCause instanceof SQLException) {
+            deeperRootCause = ((SQLException) theRootCause).getNextException();
+        }
+        if (deeperRootCause == null) {
+            deeperRootCause = theRootCause.getCause();
+        }
+        
+        return findRootCause(theRootCause, deeperRootCause);
+    }
+
 
 
     /**
