@@ -709,9 +709,7 @@ public class StandardWrapper
             return theException;
         }
         
-        if (theRootCause instanceof ServletException) {
-            deeperRootCause = ((ServletException) theRootCause).getRootCause();
-        } else if (jspExceptionClazz!=null &&
+        if (jspExceptionClazz!=null &&
                 jspExceptionClazz.isAssignableFrom(theRootCause.getClass())) {
             deeperRootCause = (Throwable)IntrospectionUtils.getProperty(
                     theRootCause, "rootCause"); 
