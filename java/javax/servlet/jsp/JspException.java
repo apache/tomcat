@@ -48,55 +48,51 @@ public class JspException extends Exception {
 
 
     /**
-     * Constructs a new JSP exception when the JSP 
-     * needs to throw an exception and include a message 
-     * about the "root cause" exception that interfered with its 
-     * normal operation, including a description message.
-     *
+     * Constructs a new <code>JSPException</code> with the specified detail
+     * message and cause. The cause is saved for later retrieval by the
+     * <code>java.lang.Throwable.getCause()</code> and {@link #getRootCause()}
+     * methods.
+     * 
+     * @see <code>java.lang.Exception.Exception(String, Throwable)</code>
      *
      * @param message       a <code>String</code> containing the text of the
      *                      exception message
      *
-     * @param rootCause     the <code>Throwable</code> exception that
-     *                      interfered with the servlet's normal operation,
-     *                      making this servlet exception necessary
+     * @param cause         the <code>Throwable</code> exception that
+     *                      interfered with the JSP's normal operation,
+     *                      making this JSP exception necessary
      */
     
-    public JspException(String message, Throwable rootCause) {
-        super(message);
-        this.rootCause = rootCause;
+    public JspException(String message, Throwable cause) {
+        super(message, cause);
     }
 
 
     /**
-     * Constructs a new JSP exception when the JSP 
-     * needs to throw an exception and include a message
-     * about the "root cause" exception that interfered with its
-     * normal operation.  The exception's message is based on the localized
-     * message of the underlying exception.
+     * Constructs a new <code>JSPException</code> with the specified cause.
+     * The cause is saved for later retrieval by the
+     * <code>java.lang.Throwable.getCause()</code> and {@link #getRootCause()}
+     * methods.
+     * 
+     * @see <code>java.lang.Exception.Exception(Throwable)</code>
      *
-     * <p>This method calls the <code>getLocalizedMessage</code> method
-     * on the <code>Throwable</code> exception to get a localized exception
-     * message. When subclassing <code>JspException</code>, 
-     * this method can be overridden to create an exception message 
-     * designed for a specific locale.
-     *
-     * @param rootCause     the <code>Throwable</code> exception that
+     * @param cause         the <code>Throwable</code> exception that
      *                      interfered with the JSP's normal operation, making
      *                      the JSP exception necessary
      */
 
-    public JspException(Throwable rootCause) {
-        super(rootCause.getLocalizedMessage());
-        this.rootCause = rootCause;
+    public JspException(Throwable cause) {
+        super(cause);
     }
 
     
     /**
+     * @deprecated As of JSP 2.1, replaced by
+     * <code>java.lang.Throwable.getCause()</code>
+     *  
      * Returns the exception that caused this JSP exception.
      *
      * @return  the <code>Throwable</code> that caused this JSP exception
-     *
      */
     
     public Throwable getRootCause() {

@@ -34,7 +34,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
-import org.apache.tomcat.util.IntrospectionUtils;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>
@@ -73,18 +72,6 @@ public class ErrorReportValve
         StringManager.getManager(Constants.Package);
 
 
-    private static Class jspExceptionClazz;
-
-    static {
-        try {
-            jspExceptionClazz = Class.forName("javax.servlet.jsp.JspException");
-        } catch (ClassNotFoundException e) {
-            // Expected if jsp-api not on classpath, eg when embedding
-            jspExceptionClazz = null;
-        }
-    }
-    
-    
     // ------------------------------------------------------------- Properties
 
 
@@ -241,12 +228,7 @@ public class ErrorReportValve
                 sb.append("</pre></p>");
                 // In case root cause is somehow heavily nested
                 try {
-                    if (jspExceptionClazz!=null &&
-                            jspExceptionClazz.isAssignableFrom(
-                                    rootCause.getClass())) {
-                        nestedRootCause = (Throwable)IntrospectionUtils.
-                                getProperty(rootCause, "rootCause"); 
-                    } else if (rootCause instanceof SQLException) {
+                    if (rootCause instanceof SQLException) {
                         nestedRootCause = ((SQLException) rootCause).
                                 getNextException();
                     }

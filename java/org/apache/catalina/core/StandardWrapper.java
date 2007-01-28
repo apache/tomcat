@@ -62,7 +62,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.log.SystemLogHandler;
 import org.apache.tomcat.util.modeler.Registry;
 
@@ -294,18 +293,6 @@ public class StandardWrapper
      */
     protected static Properties restrictedServlets = null;
     
-
-    private static Class jspExceptionClazz;
-    
-    static {
-        try {
-            jspExceptionClazz = Class.forName("javax.servlet.jsp.JspException");
-        } catch (ClassNotFoundException e) {
-            // Expected if jsp-api not on classpath, eg when embedding
-            jspExceptionClazz = null;
-        }
-    }
-
 
     // ------------------------------------------------------------- Properties
 
@@ -709,11 +696,7 @@ public class StandardWrapper
             return theException;
         }
         
-        if (jspExceptionClazz!=null &&
-                jspExceptionClazz.isAssignableFrom(theRootCause.getClass())) {
-            deeperRootCause = (Throwable)IntrospectionUtils.getProperty(
-                    theRootCause, "rootCause"); 
-        } else if (theRootCause instanceof SQLException) {
+        if (theRootCause instanceof SQLException) {
             deeperRootCause = ((SQLException) theRootCause).getNextException();
         }
         if (deeperRootCause == null) {
