@@ -31,8 +31,8 @@
         web.xml. (markt)
       </fix>
       <fix>
-        <bug>39088</bug>: Prevent infinte loops when an exception is thrown
-        that returns itself for getRootCause(). (markt)
+        <bug>39088</bug>: Port fix from TC5 that improved chances of finding
+        the true root cause. (markt)
       </fix>
       <fix>
         <bug>41217</bug>: Set secure attribute on SSO cookie when cookie is
