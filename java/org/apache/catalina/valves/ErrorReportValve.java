@@ -21,7 +21,6 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.sql.SQLException;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -217,9 +216,9 @@ public class ErrorReportValve
             sb.append(RequestUtil.filter(stackTrace));
             sb.append("</pre></p>");
 
+            int loops = 0;
             Throwable rootCause = throwable.getCause();
-            Throwable nestedRootCause = null;
-            while (rootCause != null) {
+            while (rootCause != null && (loops < 10)) {
                 stackTrace = getPartialServletStackTrace(rootCause);
                 sb.append("<p><b>");
                 sb.append(sm.getString("errorReportValve.rootCause"));
@@ -227,25 +226,10 @@ public class ErrorReportValve
                 sb.append(RequestUtil.filter(stackTrace));
                 sb.append("</pre></p>");
                 // In case root cause is somehow heavily nested
-                try {
-                    if (rootCause instanceof SQLException) {
-                        nestedRootCause = ((SQLException) rootCause).
-                                getNextException();
-                    }
-                    if (nestedRootCause == null) {
-                        nestedRootCause = rootCause.getCause();
-                    }
-
-                    if (rootCause == nestedRootCause)
-                        rootCause = null;
-                    else {
-                        rootCause = nestedRootCause;
-                        nestedRootCause = null;
-                    }
-                } catch (ClassCastException e) {
-                    rootCause = null;
-                }
+                rootCause = rootCause.getCause();
+                loops++;
             }
+
             sb.append("<p><b>");
             sb.append(sm.getString("errorReportValve.note"));
             sb.append("</b> <u>");
