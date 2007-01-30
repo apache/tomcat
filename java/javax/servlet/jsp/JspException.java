@@ -24,9 +24,6 @@ package javax.servlet.jsp;
 
 public class JspException extends Exception {
 
-    private Throwable rootCause;
-
-
     /**
      * Construct a JspException.
      */
@@ -96,6 +93,6 @@ public class JspException extends Exception {
      */
     
     public Throwable getRootCause() {
-        return rootCause;
+        return getCause();
     }
 }
