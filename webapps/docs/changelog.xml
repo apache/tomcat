@@ -14,6 +14,79 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.9 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Use 2.5 xsd in Tomcat webapps. (markt)
+      </fix>
+      <fix>
+        Compression filter improvements, submitted by Eric Hedström. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Properly return connector names. (remm)
+      </fix>
+      <fix>
+        Remove logging of the XML validation flag. (remm)
+      </fix>
+      <fix>
+        Correct error messages for context.xml. (markt)
+      </fix>
+      <fix>
+        <bug>41217</bug>: Set secure flag correctly on SSO cookie, submitted by
+        Chris Halstead. (markt)
+      </fix>
+      <fix>
+        <bug>40524</bug>: request.getAuthType() now returns CLIENT_CERT rather 
+        than CLIENT-CERT. (markt)
+      </fix>
+      <fix>
+        <bug>40526</bug>: Return support for JPDA_OPTS to catalina.bat and add 
+        a new option JPDA_SUSPEND, submitted by by Kurt Roy. (markt)
+      </fix>
+      <fix>
+        <bug>41265</bug>: In embedded, remove the code that resets checkInterval 
+        values of zero to 300. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>37869</bug>: Fix getting client certificate, submitted by Christophe Pierret. (remm)
+      </fix>
+      <fix>
+        <bug>40960</bug>: Throw a timeout exception when getting a timeout rather than a
+        generic IOE, submitted by Christophe Pierret. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        EL validation fixes for attributes. (remm)
+      </fix>
+      <fix>
+        <bug>41327</bug>: Show full URI for a 404. (markt)
+      </fix>
+      <fix>
+        JspException now uses getCause() as the result for getRootCause(). (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        <bug>41466</bug>: When using the NioChannel and SecureNioChannel its 
+        important to use the channels buffers. (fhanik)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 6.0.8 (remm)">
   <subsection name="Catalina">
     <changelog>
