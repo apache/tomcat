@@ -41,34 +41,6 @@ public abstract class HttpJspBase
     
 {
     
-    static {
-        if( JspFactory.getDefaultFactory() == null ) {
-            JspFactoryImpl factory = new JspFactoryImpl();
-            if( System.getSecurityManager() != null ) {
-                String basePackage = "org.apache.jasper.";
-                try {
-                    factory.getClass().getClassLoader().loadClass( basePackage +
-                                                                   "runtime.JspFactoryImpl$PrivilegedGetPageContext");
-                    factory.getClass().getClassLoader().loadClass( basePackage +
-                                                                   "runtime.JspFactoryImpl$PrivilegedReleasePageContext");
-                    factory.getClass().getClassLoader().loadClass( basePackage +
-                                                                   "runtime.JspRuntimeLibrary");
-                    factory.getClass().getClassLoader().loadClass( basePackage +
-                                                                   "runtime.JspRuntimeLibrary$PrivilegedIntrospectHelper");
-                    factory.getClass().getClassLoader().loadClass( basePackage +
-                                                                   "runtime.ServletResponseWrapperInclude");
-                    factory.getClass().getClassLoader().loadClass( basePackage +
-                                                                   "servlet.JspServletWrapper");
-                } catch (ClassNotFoundException ex) {
-                    org.apache.juli.logging.LogFactory.getLog( HttpJspBase.class )
-                        .error("Jasper JspRuntimeContext preload of class failed: " +
-                                       ex.getMessage(), ex);
-                }
-            }
-            JspFactory.setDefaultFactory(factory);
-        }
-    }
-
     protected HttpJspBase() {
     }
 
