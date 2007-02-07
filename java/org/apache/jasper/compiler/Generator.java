@@ -402,7 +402,7 @@ class Generator {
         }
         
         out.printin(VAR_EXPRESSIONFACTORY);
-        out.print(" = JspFactory.getDefaultFactory().getJspApplicationContext(");
+        out.print(" = _jspxFactory.getJspApplicationContext(");
         if (ctxt.isTagFile()) {
             out.print("config");
         } else {
@@ -477,6 +477,9 @@ class Generator {
      * preamble generation)
      */
     private void genPreambleStaticInitializers() throws JasperException {
+        out.printil("private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();");
+        out.println();
+
         // Static data for getDependants()
         out.printil("private static java.util.List _jspx_dependants;");
         out.println();
@@ -594,7 +597,6 @@ class Generator {
         out.println();
 
         // Local variable declarations
-        out.printil("JspFactory _jspxFactory = null;");
         out.printil("PageContext pageContext = null;");
 
         if (pageInfo.isSession())
@@ -623,8 +625,6 @@ class Generator {
 
         out.printil("try {");
         out.pushIndent();
-
-        out.printil("_jspxFactory = JspFactory.getDefaultFactory();");
 
         out.printin("response.setContentType(");
         out.print(quote(pageInfo.getContentType()));
@@ -3307,7 +3307,7 @@ class Generator {
         out.pushIndent();
 
         out
-                .printil("if (_jspxFactory != null) _jspxFactory.releasePageContext(_jspx_page_context);");
+                .printil("_jspxFactory.releasePageContext(_jspx_page_context);");
 
         out.popIndent();
         out.printil("}");
