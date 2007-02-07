@@ -234,7 +234,7 @@ public final class ApplicationFilterFactory {
 
         // Check the specific "*" special URL pattern, which also matches
         // named dispatches
-        if (filterMap.getAllMatch())
+        if (filterMap.getMatchAllUrlPatterns())
             return (true);
         
         if (requestPath == null)
@@ -319,6 +319,10 @@ public final class ApplicationFilterFactory {
 
         if (servletName == null) {
             return (false);
+        }
+        // Check the specific "*" special servlet name
+        else if (filterMap.getMatchAllServletNames()) {
+            return (true);
         } else {
             String[] servletNames = filterMap.getServletNames();
             for (int i = 0; i < servletNames.length; i++) {

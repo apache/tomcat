@@ -87,23 +87,37 @@ public class FilterMap implements Serializable {
     }
 
     public void addServletName(String servletName) {
-        String[] results = new String[servletNames.length + 1];
-        System.arraycopy(servletNames, 0, results, 0, servletNames.length);
-        results[servletNames.length] = servletName;
-        servletNames = results;
+        if ("*".equals(servletName)) {
+            this.matchAllServletNames = true;
+        } else {
+            String[] results = new String[servletNames.length + 1];
+            System.arraycopy(servletNames, 0, results, 0, servletNames.length);
+            results[servletNames.length] = servletName;
+            servletNames = results;
+        }
     }
 
     
     /**
-     * The flag that indicates this mapping will match all.
+     * The flag that indicates this mapping will match all url-patterns
      */
-    private boolean allMatch = false;
+    private boolean matchAllUrlPatterns = false;
     
-    public boolean getAllMatch() {
-        return allMatch;
+    public boolean getMatchAllUrlPatterns() {
+        return matchAllUrlPatterns;
     }
     
 
+    /**
+     * The flag that indicates this mapping will match all servlet-names
+     */
+    private boolean matchAllServletNames = false;
+    
+    public boolean getMatchAllServletNames() {
+        return matchAllServletNames;
+    }
+
+    
     /**
      * The URL pattern this mapping matches.
      */
@@ -115,7 +129,7 @@ public class FilterMap implements Serializable {
 
     public void addURLPattern(String urlPattern) {
         if ("*".equals(urlPattern)) {
-            this.allMatch = true;
+            this.matchAllUrlPatterns = true;
         } else {
             String[] results = new String[urlPatterns.length + 1];
             System.arraycopy(urlPatterns, 0, results, 0, urlPatterns.length);
