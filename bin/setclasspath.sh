@@ -68,8 +68,17 @@ fi
 JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
 
 # Set standard CLASSPATH
+if [ "$1" = "javac" ] ; then
+  if [ ! -f "$JAVA_HOME"/lib/tools.jar ]; then
+    echo "Can't find tools.jar in JAVA_HOME"
+    echo "Need a JDK to run javac"
+    exit 1
+  fi
+fi
 if [ "$1" = "debug" -o "$1" = "javac" ] ; then
-  CLASSPATH="$JAVA_HOME"/lib/tools.jar
+  if [ -f "$JAVA_HOME"/lib/tools.jar ]; then
+    CLASSPATH="$JAVA_HOME"/lib/tools.jar
+  fi
 fi
 
 # OSX hack to CLASSPATH
