@@ -43,7 +43,12 @@ set BASEDIR=%CATALINA_HOME%
 call "%CATALINA_HOME%\bin\setclasspath.bat"
 
 rem Add on extra jar files to CLASSPATH
+if "%CLASSPATH%" == "" goto noclasspath
 set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar;"%BASEDIR%"\lib\servlet-api.jar
+goto :okclasspath
+:noclasspath
+set CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;"%BASEDIR%"\lib\servlet-api.jar
+:okclasspath
 
 rem Get remaining unshifted command line arguments and save them in the
 set CMD_LINE_ARGS=
