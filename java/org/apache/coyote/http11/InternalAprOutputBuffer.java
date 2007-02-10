@@ -585,9 +585,9 @@ public class InternalAprOutputBuffer
     protected void write(ByteChunk bc) {
 
         // Writing the byte chunk to the output buffer
-        System.arraycopy(bc.getBytes(), bc.getStart(), buf, pos,
-                         bc.getLength());
-        pos = pos + bc.getLength();
+        int length = bc.getLength();
+        System.arraycopy(bc.getBytes(), bc.getStart(), buf, pos, length);
+        pos = pos + length;
 
     }
 

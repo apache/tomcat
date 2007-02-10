@@ -165,8 +165,9 @@ public class MsgAjp extends Msg {
 
         byte[] bytes = bc.getBytes();
         int start=bc.getStart();
-        appendInt( bc.getLength() );
-        cpBytes(bytes, start, bc.getLength());
+        int length = bc.getLength();
+        appendInt( length );
+        cpBytes(bytes, start, length);
         appendByte(0);
     }
 
