@@ -884,7 +884,7 @@ public final class CGIServlet extends HttpServlet {
             String path = null;
             String name = null;
             String scriptname = null;
-            String cginame = null;
+            String cginame = "";
 
             if ((webAppRootDir != null)
                 && (webAppRootDir.lastIndexOf(File.separator) ==
@@ -913,8 +913,9 @@ public final class CGIServlet extends HttpServlet {
                 if (debug >= 3) {
                     log("findCGI: currentLoc=" + currentLocation);
                 }
-                currentLocation = new File(currentLocation,
-                                           (String) dirWalker.nextElement());
+                String nextElement = (String) dirWalker.nextElement();
+                currentLocation = new File(currentLocation, nextElement);
+                cginame = cginame + "/" + nextElement;
             }
             if (!currentLocation.isFile()) {
                 return new String[] { null, null, null, null };
@@ -924,13 +925,14 @@ public final class CGIServlet extends HttpServlet {
                 }
                 path = currentLocation.getAbsolutePath();
                 name = currentLocation.getName();
-                cginame = (currentLocation.getParent() + File.separator).
-                        substring(webAppRootDir.length()) + name;
 
                 if (".".equals(contextPath)) {
-                    scriptname = servletPath + cginame;
+                    scriptname = servletPath;
                 } else {
-                    scriptname = contextPath + servletPath + cginame;
+                    scriptname = contextPath + servletPath;
+                }
+                if (!servletPath.equals(cginame)) {
+                    scriptname = scriptname + cginame;
                 }
             }
 

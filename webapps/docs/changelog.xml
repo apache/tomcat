@@ -14,6 +14,15 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.10 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix formatting of CGI variable SCRIPT_NAME. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 6.0.9 (remm)">
   <subsection name="General">
     <changelog>
