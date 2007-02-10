@@ -53,4 +53,12 @@ public final class Constants {
     public static final int STAGE_ENDED = 7;
 
 
+    /**
+     * Has security been turned on?
+     */
+    public static final boolean IS_SECURITY_ENABLED =
+        (System.getSecurityManager() != null);
+
+
+
 }

@@ -36,6 +36,7 @@ import javax.servlet.ServletException;
 
 import org.apache.AnnotationProcessor;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
@@ -320,7 +321,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
         if (this.filter != null)
         {
-            if (System.getSecurityManager() != null) {
+            if (Globals.IS_SECURITY_ENABLED) {
                 try {
                     SecurityUtil.doAsPrivilege("destroy", filter); 
                 } catch(java.lang.Exception ex){                    
@@ -370,7 +371,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
 
             // Release any previously allocated filter instance
             if (this.filter != null){
-                if( System.getSecurityManager() != null) {
+                if( Globals.IS_SECURITY_ENABLED) {
                     try{
                         SecurityUtil.doAsPrivilege("destroy", filter);  
                     } catch(java.lang.Exception ex){    

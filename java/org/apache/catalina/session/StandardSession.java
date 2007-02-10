@@ -863,7 +863,6 @@ public class StandardSession
         id = null;
         lastAccessedTime = 0L;
         maxInactiveInterval = -1;
-        accessCount = null;
         notes.clear();
         setPrincipal(null);
         isNew = false;

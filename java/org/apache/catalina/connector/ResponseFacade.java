@@ -30,6 +30,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.security.SecurityUtil;
 
@@ -446,7 +447,7 @@ public class ResponseFacade
         if (isCommitted())
             return;
 
-        if(System.getSecurityManager() != null) {
+        if(Globals.IS_SECURITY_ENABLED) {
             AccessController.doPrivileged(new DateHeaderPrivilegedAction
                                              (name, date, false));
         } else {
@@ -461,7 +462,7 @@ public class ResponseFacade
         if (isCommitted())
             return;
 
-        if(System.getSecurityManager() != null) {
+        if(Globals.IS_SECURITY_ENABLED) {
             AccessController.doPrivileged(new DateHeaderPrivilegedAction
                                              (name, date, true));
         } else {

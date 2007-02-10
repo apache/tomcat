@@ -178,7 +178,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     public void doFilter(ServletRequest request, ServletResponse response)
         throws IOException, ServletException {
 
-        if( System.getSecurityManager() != null ) {
+        if( Globals.IS_SECURITY_ENABLED ) {
             final ServletRequest req = request;
             final ServletResponse res = response;
             try {
@@ -220,7 +220,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                 support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT,
                                           filter, request, response);
                 
-                if( System.getSecurityManager() != null ) {
+                if( Globals.IS_SECURITY_ENABLED ) {
                     final ServletRequest req = request;
                     final ServletResponse res = response;
                     Principal principal = 
@@ -274,7 +274,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             if ((request instanceof HttpServletRequest) &&
                 (response instanceof HttpServletResponse)) {
                     
-                if( System.getSecurityManager() != null ) {
+                if( Globals.IS_SECURITY_ENABLED ) {
                     final ServletRequest req = request;
                     final ServletResponse res = response;
                     Principal principal = 
@@ -336,7 +336,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
     public void doFilterEvent(CometEvent event)
         throws IOException, ServletException {
 
-        if( System.getSecurityManager() != null ) {
+        if( Globals.IS_SECURITY_ENABLED ) {
             final CometEvent ev = event;
             try {
                 java.security.AccessController.doPrivileged(
@@ -402,7 +402,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                         filter, event);
                         */
 
-                if( System.getSecurityManager() != null ) {
+                if( Globals.IS_SECURITY_ENABLED ) {
                     final CometEvent ev = event;
                     Principal principal = 
                         ev.getHttpServletRequest().getUserPrincipal();
@@ -455,7 +455,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT,
                     servlet, request, response);
                     */
-            if( System.getSecurityManager() != null ) {
+            if( Globals.IS_SECURITY_ENABLED ) {
                 final CometEvent ev = event;
                 Principal principal = 
                     ev.getHttpServletRequest().getUserPrincipal();

@@ -788,7 +788,7 @@ public class WebappLoader
      */
     private void setPermissions() {
 
-        if (System.getSecurityManager() == null)
+        if (!Globals.IS_SECURITY_ENABLED)
             return;
         if (!(container instanceof Context))
             return;

@@ -375,7 +375,7 @@ public final class SecurityUtil{
      * package protection mechanism is enabled.
      */
     public static boolean isPackageProtectionEnabled(){
-        if (packageDefinitionEnabled && System.getSecurityManager() !=  null){
+        if (packageDefinitionEnabled && Globals.IS_SECURITY_ENABLED){
             return true;
         }
         return false;

@@ -16,6 +16,8 @@
  */
 package org.apache.jasper.security;
 
+import org.apache.jasper.Constants;
+
 /**
  * Util class for Security related operations.
  *
@@ -32,7 +34,7 @@ public final class SecurityUtil{
      * package protection mechanism is enabled.
      */
     public static boolean isPackageProtectionEnabled(){
-        if (packageDefinitionEnabled && System.getSecurityManager() !=  null){
+        if (packageDefinitionEnabled && Constants.IS_SECURITY_ENABLED){
             return true;
         }
         return false;

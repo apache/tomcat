@@ -133,7 +133,7 @@ public final class JspRuntimeContext {
 	    return;
 	}
 
-        if (System.getSecurityManager() != null) {
+        if (Constants.IS_SECURITY_ENABLED) {
             initSecurity();
         }
 

@@ -41,6 +41,7 @@ import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -732,7 +733,7 @@ public abstract class ContainerBase
      *  child Containers
      */
     public void addChild(Container child) {
-        if (System.getSecurityManager() != null) {
+        if (Globals.IS_SECURITY_ENABLED) {
             PrivilegedAction dp =
                 new PrivilegedAddChild(child);
             AccessController.doPrivileged(dp);

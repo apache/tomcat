@@ -27,4 +27,9 @@ public final class Constants {
 
     public static final String Package = "org.apache.naming";
 
+    /**
+     * Has security been turned on?
+     */
+    public static final boolean IS_SECURITY_ENABLED =
+        (System.getSecurityManager() != null);
 }

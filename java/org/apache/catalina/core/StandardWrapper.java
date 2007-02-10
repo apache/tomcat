@@ -52,6 +52,7 @@ import org.apache.PeriodicEventListener;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.InstanceEvent;
 import org.apache.catalina.InstanceListener;
 import org.apache.catalina.LifecycleException;
@@ -1148,7 +1149,7 @@ public class StandardWrapper
                 instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT,
                                                   servlet);
 
-                if( System.getSecurityManager() != null) {
+                if( Globals.IS_SECURITY_ENABLED) {
 
                     Object[] args = new Object[]{((ServletConfig)facade)};
                     SecurityUtil.doAsPrivilege("init",
@@ -1168,7 +1169,7 @@ public class StandardWrapper
                     req.setQueryString("jsp_precompile=true");
                     DummyResponse res = new DummyResponse();
 
-                    if( System.getSecurityManager() != null) {
+                    if( Globals.IS_SECURITY_ENABLED) {
                         Object[] args = new Object[]{req, res};
                         SecurityUtil.doAsPrivilege("service",
                                                    servlet,
@@ -1373,7 +1374,7 @@ public class StandardWrapper
             instanceSupport.fireInstanceEvent
               (InstanceEvent.BEFORE_DESTROY_EVENT, instance);
 
-            if( System.getSecurityManager() != null) {
+            if( Globals.IS_SECURITY_ENABLED) {
                 SecurityUtil.doAsPrivilege("destroy",
                                            instance);
                 SecurityUtil.remove(instance);                           
@@ -1421,7 +1422,7 @@ public class StandardWrapper
             try {
                 while (!instancePool.isEmpty()) {
                     Servlet s = (Servlet) instancePool.pop();
-                    if (System.getSecurityManager() != null) {
+                    if (Globals.IS_SECURITY_ENABLED) {
                         SecurityUtil.doAsPrivilege("destroy", s);
                         SecurityUtil.remove(instance);                           
                     } else {

@@ -44,6 +44,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.core.StandardContext;
@@ -506,7 +507,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     public void setRandomFile( String s ) {
         // as a hack, you can use a static file - and genarate the same
         // session ids ( good for strange debugging )
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             randomIS = (DataInputStream)AccessController.doPrivileged(new PrivilegedSetRandomFile());          
         } else {
             try{

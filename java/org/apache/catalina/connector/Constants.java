@@ -39,11 +39,5 @@ public final class Constants {
     public static final int PROCESSOR_IDLE = 0;
     public static final int PROCESSOR_ACTIVE = 1;
 
-    /**
-     * Security flag.
-     */
-    public static final boolean SECURITY = 
-        (System.getSecurityManager() != null);
-
 
 }
