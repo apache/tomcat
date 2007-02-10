@@ -32,6 +32,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.util.StringManager;
 
 
@@ -270,7 +271,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Enumeration)AccessController.doPrivileged(
                 new GetAttributePrivilegedAction());        
         } else {
@@ -286,7 +287,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (String)AccessController.doPrivileged(
                 new GetCharacterEncodingPrivilegedAction());
         } else {
@@ -347,7 +348,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (String)AccessController.doPrivileged(
                 new GetParameterPrivilegedAction(name));
         } else {
@@ -363,7 +364,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Enumeration)AccessController.doPrivileged(
                 new GetParameterNamesPrivilegedAction());
         } else {
@@ -406,7 +407,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Map)AccessController.doPrivileged(
                 new GetParameterMapPrivilegedAction());        
         } else {
@@ -521,7 +522,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Locale)AccessController.doPrivileged(
                 new GetLocalePrivilegedAction());
         } else {
@@ -537,7 +538,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Enumeration)AccessController.doPrivileged(
                 new GetLocalesPrivilegedAction());
         } else {
@@ -564,7 +565,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (RequestDispatcher)AccessController.doPrivileged(
                 new GetRequestDispatcherPrivilegedAction(path));
         } else {
@@ -650,7 +651,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Enumeration)AccessController.doPrivileged(
                 new GetHeadersPrivilegedAction(name));
         } else {
@@ -666,7 +667,7 @@ public class RequestFacade implements HttpServletRequest {
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        if (System.getSecurityManager() != null){
+        if (Globals.IS_SECURITY_ENABLED){
             return (Enumeration)AccessController.doPrivileged(
                 new GetHeaderNamesPrivilegedAction());
         } else {

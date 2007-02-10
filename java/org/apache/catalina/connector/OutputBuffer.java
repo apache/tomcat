@@ -27,6 +27,7 @@ import java.util.HashMap;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
+import org.apache.catalina.Globals;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 
@@ -499,7 +500,7 @@ public class OutputBuffer extends Writer
         conv = (C2BConverter) encoders.get(enc);
         if (conv == null) {
             
-            if (System.getSecurityManager() != null){
+            if (Globals.IS_SECURITY_ENABLED){
                 try{
                     conv = (C2BConverter)AccessController.doPrivileged(
                             new PrivilegedExceptionAction(){

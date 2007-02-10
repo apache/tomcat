@@ -287,7 +287,7 @@ final class ApplicationDispatcher
     public void forward(ServletRequest request, ServletResponse response)
         throws ServletException, IOException
     {
-        if (System.getSecurityManager() != null) {
+        if (Globals.IS_SECURITY_ENABLED) {
             try {
                 PrivilegedForward dp = new PrivilegedForward(request,response);
                 AccessController.doPrivileged(dp);
@@ -490,7 +490,7 @@ final class ApplicationDispatcher
     public void include(ServletRequest request, ServletResponse response)
         throws ServletException, IOException
     {
-        if (System.getSecurityManager() != null) {
+        if (Globals.IS_SECURITY_ENABLED) {
             try {
                 PrivilegedInclude dp = new PrivilegedInclude(request,response);
                 AccessController.doPrivileged(dp);

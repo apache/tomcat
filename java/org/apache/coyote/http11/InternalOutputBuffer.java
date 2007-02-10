@@ -446,7 +446,7 @@ public class InternalOutputBuffer
         }
 
         // End the response status line
-        if (System.getSecurityManager() != null){
+        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
            AccessController.doPrivileged(
                 new PrivilegedAction(){
                     public Object run(){
@@ -464,7 +464,7 @@ public class InternalOutputBuffer
     }
 
     private String getMessage(final int message){
-        if (System.getSecurityManager() != null){
+        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
            return (String)AccessController.doPrivileged(
                 new PrivilegedAction(){
                     public Object run(){

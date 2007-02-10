@@ -59,7 +59,7 @@ public class DirContextURLConnection
         if (context == null)
             throw new IllegalArgumentException
                 ("Directory context can't be null");
-        if (System.getSecurityManager() != null) {
+        if (org.apache.naming.Constants.IS_SECURITY_ENABLED) {
             this.permission = new JndiPermission(url.toString());
 	}
         this.context = context;

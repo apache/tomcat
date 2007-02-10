@@ -1542,7 +1542,7 @@ public class Http11Processor implements ActionHook {
 
         // Add date header
         String date = null;
-        if (System.getSecurityManager() != null){
+        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
             date = (String)AccessController.doPrivileged(
                     new PrivilegedAction() {
                         public Object run(){
