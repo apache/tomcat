@@ -59,6 +59,12 @@ public final class StandardWrapperFacade
     private ServletConfig config = null;
 
 
+    /**
+     * Wrapped context (facade).
+     */
+    private ServletContext context = null;
+
+
     // -------------------------------------------------- ServletConfig Methods
 
 
@@ -68,11 +74,12 @@ public final class StandardWrapperFacade
 
 
     public ServletContext getServletContext() {
-        ServletContext theContext = config.getServletContext();
-        if ((theContext != null) &&
-            (theContext instanceof ApplicationContext))
-            theContext = ((ApplicationContext) theContext).getFacade();
-        return (theContext);
+        if (context == null) {
+            context = config.getServletContext();
+            if ((context != null) && (context instanceof ApplicationContext))
+                context = ((ApplicationContext) context).getFacade();
+        }
+        return (context);
     }
 
 
