@@ -268,7 +268,7 @@ public class Response
         
         cookies.clear();
 
-        if (Constants.SECURITY || Connector.RECYCLE_FACADES) {
+        if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
             if (facade != null) {
                 facade.clear();
                 facade = null;
