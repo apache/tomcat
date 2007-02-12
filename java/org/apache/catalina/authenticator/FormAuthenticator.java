@@ -368,7 +368,7 @@ public class FormAuthenticator
       String requestURI = request.getRequestURI();
       if (requestURI == null)
           return (false);
-      return (requestURI.equals(request.getRequestURI()));
+      return (requestURI.equals(sreq.getRequestURI()));
 
     }
 
