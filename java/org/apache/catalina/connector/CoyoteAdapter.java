@@ -58,6 +58,10 @@ public class CoyoteAdapter
     public static final int ADAPTER_NOTES = 1;
 
 
+    protected static final boolean ALLOW_BACKSLASH = 
+        Boolean.valueOf(System.getProperty("org.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH", "false")).booleanValue();
+
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -310,8 +314,8 @@ public class CoyoteAdapter
                 req.getURLDecoder().convert(decodedURI, false);
             } catch (IOException ioe) {
                 res.setStatus(400);
-                res.setMessage("Invalid URI");
-                throw ioe;
+                res.setMessage("Invalid URI: " + ioe.getMessage());
+                return false;
             }
             // Normalization
             if (!normalize(req.decodedURI())) {
@@ -601,10 +605,16 @@ public class CoyoteAdapter
         // Replace '\' with '/'
         // Check for null byte
         for (pos = start; pos < end; pos++) {
-            if (b[pos] == (byte) '\\')
-                b[pos] = (byte) '/';
-            if (b[pos] == (byte) 0)
+            if (b[pos] == (byte) '\\') {
+                if (ALLOW_BACKSLASH) {
+                    b[pos] = (byte) '/';
+                } else {
+                    return false;
+                }
+            }
+            if (b[pos] == (byte) 0) {
                 return false;
+            }
         }
 
         // The URL must start with '/'

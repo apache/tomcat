@@ -33,6 +33,9 @@ public final class UDecoder {
     private static org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog(UDecoder.class );
     
+    protected static final boolean ALLOW_ENCODED_SLASH = 
+        Boolean.valueOf(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false")).booleanValue();
+
     public UDecoder() 
     {
     }
@@ -67,6 +70,8 @@ public final class UDecoder {
 	if( idx2 >= 0 && idx2 < idx ) idx=idx2;
 	if( idx < 0 ) idx=idx2;
 
+    boolean noSlash = !(ALLOW_ENCODED_SLASH || query);
+    
 	for( int j=idx; j<end; j++, idx++ ) {
 	    if( buff[ j ] == '+' && query) {
 		buff[idx]= (byte)' ' ;
@@ -84,6 +89,9 @@ public final class UDecoder {
 		
 		j+=2;
 		int res=x2c( b1, b2 );
+        if (noSlash && (res == '/')) {
+            throw new CharConversionException( "noSlash");
+        }
 		buff[idx]=(byte)res;
 	    }
 	}
