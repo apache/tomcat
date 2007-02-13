@@ -17,8 +17,41 @@
 <section name="Tomcat 6.0.10 (remm)">
   <subsection name="Catalina">
     <changelog>
+      <update>
+        Unify usage of security manager flag, submitted by Arvind Srinivasan. (remm)
+      </update>
       <fix>
         Fix formatting of CGI variable SCRIPT_NAME. (markt)
+      </fix>
+      <fix>
+        <bug>41521</bug>: Support * for servlet-name, submitted by Paul McMahan. (remm)
+      </fix>
+      <update>
+        Cache getServletContext value, submitted by Arvind Srinivasan. (remm)
+      </update>
+      <fix>
+        Add options for handling special URL characters in paths, and disallow '\' and encoded '/'
+        due to possible differences in behavior between Tomcat and a front end webserver. (remm)
+      </fix>
+      <fix>
+        Fix bad comparison for FORM processing, submitted by Anil Saldhana. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Reduce usage of MessageBytes.getLength(), submitted by Arvind Srinivasan. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>41558</bug>: Don't call synced method on every request, submitted by Arvind Srinivasan. (remm)
+      </fix>
+      <fix>
+        Switch to a thread local page context pool. (remm)
       </fix>
     </changelog>
   </subsection>
