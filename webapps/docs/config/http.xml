@@ -118,9 +118,11 @@
         <code>org.apache.coyote.http11.Http11Protocol</code> - same as HTTP/1.1<br/>
         <code>org.apache.coyote.http11.Http11NioProtocol</code> - non blocking Java connector<br/>
         <code>org.apache.coyote.http11.Http11AprProtocol</code> - the APR connector.<br/>
-        The configuration for both Java connectors are identical, both for http and https. 
-        For more information on the APR connector, please 
+        Take a look at our <a href="#Connector Comparison">Connector Comparison</a> chart.
+        The configuration for both Java connectors are identical, both for http and https. <br/>
+        For more information on the APR connector and APR specific SSL settings please 
         visit the <a href="../apr.html">APR documentation</a>
+        
       </p>
     </attribute>
 
@@ -383,6 +385,76 @@
   </attributes>
 
   </subsection>
+  
+    <subsection name="Nio Implementation">
+
+    <p>The NIO connector exposes all the low level socket properties that can be used to tune the connector.
+    Most of these attributes are directly linked to the socket implementation in the JDK so you can find out 
+    about the actual meaning in the JDK API documentation.<br/>
+    <strong>Note</strong>On some JDK versions, setTrafficClass causes a problem, a work around for this is to add 
+    the -Djava.net.preferIPv4Stack=true value to your command line</p>
+
+    <attributes>
+      <attribute name="socket.directBuffer" required="false">
+        <p>Boolean value, whether to use direct ByteBuffers or java mapped ByteBuffers. Default is <code>true</code></p>
+      </attribute>
+      <attribute name="socket.rxBufSize" required="false">
+        <p>The socket receive buffer (SO_RCVBUF) size in bytes. Default value is 25188</p>
+      </attribute>
+      <attribute name="socket.txBufSize" required="false">
+        <p>The socket send buffer (SO_SNDBUF) size in bytes. Default value is 43800</p>
+      </attribute>
+      <attribute name="socket.bufferPool" required="false">
+        <p>The Nio connector uses a class called NioChannel that holds elements linked to a socket.
+           To reduce garbage collection, the Nio connector caches these channel objects.
+           This value specifies the size of this cache.
+           The default value is 500, and represents that the cache will hold 500 NioChannel objects.
+           Other values are -1. unlimited cache, and 0, no cache.</p>
+      </attribute>
+      <attribute name="socket.bufferPoolSize" required="false">
+        <p>The NioChannel pool can also be size based, not used object based. The size is calculated as follows:<br/>
+        NioChannel buffer size = read buffer size + write buffer size<br/>
+        SecureNioChannel buffer size = application read buffer size + application write buffer size + network read buffer size + network write buffer size<br/>
+        The value is in bytes, the default value is 1024*1024*100 (100MB)
+        </p>
+      </attribute>
+      <attribute name="socket.tcpNoDelay" required="false">
+        <p>same as the standard setting <code>tcpNoDelay</code>. Default value is false</p>
+      </attribute>
+      <attribute name="socket.soKeepAlive" required="false">
+        <p>Boolean value for the socket's keep alive setting (SO_KEEPALIVE). Default is <code>false</code>. </p>
+      </attribute>
+      <attribute name="socket.ooBInline" required="false">
+        <p>Boolean value for the socket OOBINLINE setting. Default value is <code>true</code></p>
+      </attribute>
+      <attribute name="socket.soReuseAddress" required="false">
+        <p>Boolean value for the sockets reuse address option (SO_REUSEADDR). Default value is <code>true</code></p>
+      </attribute>
+      <attribute name="socket.soLingerOn" required="false">
+        <p>Boolean value for the sockets so linger option (SO_LINGER). Default value is <code>true</code>.
+           This option is paired with the soLingerTime value.</p>
+      </attribute>
+      <attribute name="socket.soLingerTime" required="false">
+        <p>Value in seconds for the sockets so linger option (SO_LINGER). Default value is <code>25</code> seconds.
+           This option is paired with the soLinger value.</p>
+      </attribute>
+      <attribute name="socket.soTimeout" required="false">
+        <p>Value in milliseconds for the sockets read timeout (SO_TIMEOUT). Default value is <code>5000</code> milliseconds.</p>
+      </attribute>      
+      <attribute name="socket.soTrafficClass" required="false">
+        <p>Value between 0 and 255 for the traffic class on the socket, <code>0x04 | 0x08 | 0x010</code></p>
+      </attribute>      
+      <attribute name="socket.performanceConnectionTime" required="false">
+        <p>The first value for the performance settings. Default is 1, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+      </attribute>      
+      <attribute name="socket.performanceLatency" required="false">
+        <p>The second value for the performance settings. Default is 0, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+      </attribute>      
+      <attribute name="socket.performanceBandwidth" required="false">
+        <p>The third value for the performance settings. Default is 1, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+      </attribute>      
+    </attributes>
+  </subsection>
 
 </section>
 
@@ -432,6 +504,7 @@
   <a href="../proxy-howto.html">Proxy Support HOW-TO</a>.</p>
 
   </subsection>
+
 
 
   <subsection name="SSL Support">
@@ -514,8 +587,26 @@
   <a href="../ssl-howto.html">SSL Configuration HOW-TO</a>.</p>
 
   </subsection>
+  <subsection name="Connector Comparison">
 
+    <p>Below is a small chart that shows how the connectors differentiate.</p>
+    <source>
+                  Java Blocking Connector       Java Nio Blocking Connector       APR Connector
+    Classname         Http11Protocol                  Http11NioProtocol         Http11AprProtocol
+    Tomcat Version   3.x 4.x 5.x 6.x                       6.x                     5.5.x 6.x
+    Support Polling         NO                             YES                        YES
+    Polling Size           N/A                   Unlimited - Restricted by mem        1024
+    Read HTTP Request     Blocking                     Non Blocking                   Blocking
+    Read HTTP Body        Blocking                     Blocking                       Blocking
+    Write HTTP Response   Blocking                     Blocking                       Blocking
+    SSL Support           Java SSL                     Java SSL                       Open SSL
+    SSL Handshake         Blocking                     Non blocking                   Blocking
+    Max Connections       maxThreads                   See polling size               See polling size
+    
+    
+    </source>
 
+  </subsection>
 </section>
 
 
