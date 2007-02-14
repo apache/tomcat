@@ -37,9 +37,9 @@ public class SocketProperties {
     protected int bufferPoolSize = 1024*1024*100;
     
     /**
-     * TCP_NO_DELAY option, default is false
+     * TCP_NO_DELAY option, default is true
      */
-    protected boolean tcpNoDelay = false;
+    protected boolean tcpNoDelay = true;
     /**
      * SO_KEEPALIVE option, default is false
      */
