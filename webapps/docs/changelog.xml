@@ -36,6 +36,10 @@
       <fix>
         Fix bad comparison for FORM processing, submitted by Anil Saldhana. (remm)
       </fix>
+      <fix>
+        <bug>41608</bug> Make log levels consistent when Servlet.service()
+        throws an exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
