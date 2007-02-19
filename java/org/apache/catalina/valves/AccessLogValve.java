@@ -43,6 +43,8 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 /**
@@ -116,17 +118,7 @@ public class AccessLogValve
     extends ValveBase
     implements Lifecycle {
 
-
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new instance of this class with default property values.
-     */
-    public AccessLogValve() {
-        setPattern("common");
-    }
-
+    private static Log log = LogFactory.getLog(AccessLogValve.class);
 
     // ----------------------------------------------------- Instance Variables
 
@@ -168,19 +160,19 @@ public class AccessLogValve
     /**
      * The pattern used to format our access log lines.
      */
-    private String pattern = null;
+    protected String pattern = null;
 
 
     /**
      * The prefix that is added to log file filenames.
      */
-    private String prefix = "access_log.";
+    protected String prefix = "access_log.";
 
 
     /**
      * Should we rotate our log file? Default is true (like old behavior)
      */
-    private boolean rotatable = true;
+    protected boolean rotatable = true;
 
 
     /**
@@ -192,33 +184,33 @@ public class AccessLogValve
     /**
      * The string manager for this package.
      */
-    private StringManager sm =
+    protected StringManager sm =
         StringManager.getManager(Constants.Package);
 
 
     /**
      * Has this component been started yet?
      */
-    private boolean started = false;
+    protected boolean started = false;
 
 
     /**
      * The suffix that is added to log file filenames.
      */
-    private String suffix = "";
+    protected String suffix = "";
 
 
     /**
      * The PrintWriter to which we are currently logging, if any.
      */
-    private PrintWriter writer = null;
+    protected PrintWriter writer = null;
 
 
     /**
      * A date formatter to format a Date into a date in the format
      * "yyyy-MM-dd".
      */
-    private SimpleDateFormat dateFormatter = null;
+    protected SimpleDateFormat fileDateFormatter = null;
 
 
     /**
@@ -270,6 +262,12 @@ public class AccessLogValve
     
     
     /**
+     * The current log file we are writing to. Helpful when checkExists
+     * is true.
+     */
+    protected File currentLogFile = null;
+    
+    /**
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
@@ -289,22 +287,28 @@ public class AccessLogValve
      */
     private long rotationLastChecked = 0L;
 
-
+    /**
+     * Do we check for log file existence? Helpful if an external
+     * agent renames the log file so we can automagically recreate it.
+     */
+    private boolean checkExists = false;
+    
+    
     /**
      * Are we doing conditional logging. default false.
      */
-    private String condition = null;
+    protected String condition = null;
 
 
     /**
      * Date format to place in log file name. Use at your own risk!
      */
-    private String fileDateFormat = null;
+    protected String fileDateFormat = null;
     
     /**
      * Array of AccessLogElement, they will be used to make log message.
      */
-    private AccessLogElement[] logElements = null;
+    protected AccessLogElement[] logElements = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -360,6 +364,28 @@ public class AccessLogValve
     }
 
 
+    /**
+     * Check for file existence before logging.
+     */
+    public boolean isCheckExists() {
+
+        return checkExists;
+
+    }
+
+
+    /**
+     * Set whether to check for log file existence before logging.
+     *
+     * @param checkExists true meaning to check for file existence.
+     */
+    public void setCheckExists(boolean checkExists) {
+
+        this.checkExists = checkExists;
+
+    }
+    
+    
     /**
      * Return the log file prefix.
      */
@@ -519,7 +545,7 @@ public class AccessLogValve
         long t2 = System.currentTimeMillis();
         long time = t2 - t1;
 
-        if (condition != null
+        if (logElements == null || condition != null
                 && null != request.getRequest().getAttribute(condition)) {
             return;
         }
@@ -534,6 +560,38 @@ public class AccessLogValve
         log(result.toString());
     }
 
+    
+    /**
+     * Rename the existing log file to something else. Then open the
+     * old log file name up once again. Intended to be called by a JMX
+     * agent.
+     *
+     *
+     * @param newFileName The file name to move the log file entry to
+     * @return true if a file was rotated with no error
+     */
+    public synchronized boolean rotate(String newFileName) {
+
+        if (currentLogFile != null) {
+            File holder = currentLogFile;
+            close();
+            try {
+                holder.renameTo(new File(newFileName));
+            } catch (Throwable e) {
+                log.error("rotate failed", e);
+            }
+
+            /* Make sure date is correct */
+            currentDate = new Date(System.currentTimeMillis());
+            dateStamp = fileDateFormatter.format(currentDate);
+
+            open();
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 
     // -------------------------------------------------------- Private Methods
 
@@ -549,6 +607,7 @@ public class AccessLogValve
         writer.close();
         writer = null;
         dateStamp = "";
+        currentLogFile = null;
     }
 
 
@@ -569,7 +628,7 @@ public class AccessLogValve
                 rotationLastChecked = systime;
 
                 // Check for a change of date
-                String tsDate = dateFormatter.format(currentDate);
+                String tsDate = fileDateFormatter.format(currentDate);
 
                 // If the date has changed, switch log files
                 if (!dateStamp.equals(tsDate)) {
@@ -580,6 +639,25 @@ public class AccessLogValve
                             open();
                         }
                     }
+                }
+            }
+        }
+        
+        /* In case something external rotated the file instead */
+        if (checkExists) {
+            synchronized (this) {
+                if (currentLogFile != null && !currentLogFile.exists()) {
+                    try {
+                        close();
+                    } catch (Throwable e) {
+                        log.info("at least this wasn't swallowed", e);
+                    }
+
+                    /* Make sure date is correct */
+                    currentDate = new Date(System.currentTimeMillis());
+                    dateStamp = fileDateFormatter.format(currentDate);
+
+                    open();
                 }
             }
         }
@@ -615,7 +693,7 @@ public class AccessLogValve
     /**
      * Open the new log file for the date specified by <code>dateStamp</code>.
      */
-    private synchronized void open() {
+    protected synchronized void open() {
         // Create the directory if necessary
         File dir = new File(directory);
         if (!dir.isAbsolute())
@@ -635,8 +713,11 @@ public class AccessLogValve
             }
             writer = new PrintWriter(new BufferedWriter(new FileWriter(
                     pathname, true), 128000), false);
+            
+            currentLogFile = new File(pathname);
         } catch (IOException e) {
             writer = null;
+            currentLogFile = null;
         }
     }
  
@@ -755,8 +836,8 @@ public class AccessLogValve
 
         if (fileDateFormat == null || fileDateFormat.length() == 0)
             fileDateFormat = "yyyy-MM-dd";
-        dateFormatter = new SimpleDateFormat(fileDateFormat);
-        dateFormatter.setTimeZone(timezone);
+        fileDateFormatter = new SimpleDateFormat(fileDateFormat);
+        fileDateFormatter.setTimeZone(timezone);
         dayFormatter = new SimpleDateFormat("dd");
         dayFormatter.setTimeZone(timezone);
         monthFormatter = new SimpleDateFormat("MM");
@@ -766,7 +847,7 @@ public class AccessLogValve
         timeFormatter = new SimpleDateFormat("HH:mm:ss");
         timeFormatter.setTimeZone(timezone);
         currentDate = new Date();
-        dateStamp = dateFormatter.format(currentDate);
+        dateStamp = fileDateFormatter.format(currentDate);
         open();
     }
 
@@ -793,7 +874,7 @@ public class AccessLogValve
     /**
      * AccessLogElement writes the partial message into the buffer.
      */
-    private interface AccessLogElement {
+    protected interface AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time);
 
@@ -802,14 +883,20 @@ public class AccessLogValve
     /**
      * write local IP address - %A
      */
-    private class LocalAddrElement implements AccessLogElement {
+    protected class LocalAddrElement implements AccessLogElement {
+        
+        private String value = null;
+        
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            String value;
-            try {
-                value = InetAddress.getLocalHost().getHostAddress();
-            } catch (Throwable e) {
-                value = "127.0.0.1";
+            if (value == null) {
+                synchronized (this) {
+                    try {
+                        value = InetAddress.getLocalHost().getHostAddress();
+                    } catch (Throwable e) {
+                        value = "127.0.0.1";
+                    }
+                }
             }
             buf.append(value);
         }
@@ -818,7 +905,7 @@ public class AccessLogValve
     /**
      * write remote IP address - %a
      */
-    private class RemoteAddrElement implements AccessLogElement {
+    protected class RemoteAddrElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getRemoteAddr());
@@ -828,7 +915,7 @@ public class AccessLogValve
     /**
      * write remote host name - %h
      */
-    private class HostElement implements AccessLogElement {
+    protected class HostElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getRemoteHost());
@@ -838,7 +925,7 @@ public class AccessLogValve
     /**
      * write remote logical username from identd (always returns '-') - %l
      */
-    private class LogicalUserNameElement implements AccessLogElement {
+    protected class LogicalUserNameElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             buf.append('-');
@@ -848,7 +935,7 @@ public class AccessLogValve
     /**
      * write request protocol - %H
      */
-    private class ProtocolElement implements AccessLogElement {
+    protected class ProtocolElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getProtocol());
@@ -858,7 +945,7 @@ public class AccessLogValve
     /**
      * write remote user that was authenticated (if any), else '-' - %u
      */
-    private class UserElement implements AccessLogElement {
+    protected class UserElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -877,7 +964,7 @@ public class AccessLogValve
     /**
      * write date and time, in Common Log Format - %t
      */
-    private class DateAndTimeElement implements AccessLogElement {
+    protected class DateAndTimeElement implements AccessLogElement {
         private Date currentDate = new Date(0);
 
         private String currentDateString = null;
@@ -911,7 +998,7 @@ public class AccessLogValve
     /**
      * write first line of the request (method and request URI) - %r
      */
-    private class RequestElement implements AccessLogElement {
+    protected class RequestElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -934,7 +1021,7 @@ public class AccessLogValve
     /**
      * write HTTP status code of the response - %s
      */
-    private class HttpStatusCodeElement implements AccessLogElement {
+    protected class HttpStatusCodeElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (response != null) {
@@ -948,7 +1035,7 @@ public class AccessLogValve
     /**
      * write local port on which this request was received - %p
      */
-    private class LocalPortElement implements AccessLogElement {
+    protected class LocalPortElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerPort());
@@ -958,7 +1045,7 @@ public class AccessLogValve
     /**
      * write bytes sent, excluding HTTP headers - %b, %B
      */
-    private class ByteSentElement implements AccessLogElement {
+    protected class ByteSentElement implements AccessLogElement {
         private boolean conversion;
 
         /**
@@ -982,7 +1069,7 @@ public class AccessLogValve
     /**
      * write request method (GET, POST, etc.) - %m
      */
-    private class MethodElement implements AccessLogElement {
+    protected class MethodElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -994,7 +1081,7 @@ public class AccessLogValve
     /**
      * write time taken to process the request - %D, %T
      */
-    private class ElapsedTimeElement implements AccessLogElement {
+    protected class ElapsedTimeElement implements AccessLogElement {
         private boolean millis;
 
         /**
@@ -1025,7 +1112,7 @@ public class AccessLogValve
     /**
      * write Query string (prepended with a '?' if it exists) - %q
      */
-    private class QueryElement implements AccessLogElement {
+    protected class QueryElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             String query = null;
@@ -1041,7 +1128,7 @@ public class AccessLogValve
     /**
      * write user session ID - %S
      */
-    private class SessionIdElement implements AccessLogElement {
+    protected class SessionIdElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -1060,7 +1147,7 @@ public class AccessLogValve
     /**
      * write requested URL path - %U
      */
-    private class RequestURIElement implements AccessLogElement {
+    protected class RequestURIElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
@@ -1074,7 +1161,7 @@ public class AccessLogValve
     /**
      * write local server name - %v
      */
-    private class LocalServerNameElement implements AccessLogElement {
+    protected class LocalServerNameElement implements AccessLogElement {
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerName());
@@ -1084,7 +1171,7 @@ public class AccessLogValve
     /**
      * write any string
      */
-    private class StringElement implements AccessLogElement {
+    protected class StringElement implements AccessLogElement {
         private String str;
 
         public StringElement(String str) {
@@ -1100,7 +1187,7 @@ public class AccessLogValve
     /**
      * write incoming headers - %{xxx}i
      */
-    private class HeaderElement implements AccessLogElement {
+    protected class HeaderElement implements AccessLogElement {
         private String header;
 
         public HeaderElement(String header) {
@@ -1116,7 +1203,7 @@ public class AccessLogValve
     /**
      * write a specific cookie - %{xxx}c
      */
-    private class CookieElement implements AccessLogElement {
+    protected class CookieElement implements AccessLogElement {
         private String header;
 
         public CookieElement(String header) {
@@ -1142,7 +1229,7 @@ public class AccessLogValve
     /**
      * write an attribute in the ServletRequest - %{xxx}r
      */
-    private class RequestAttributeElement implements AccessLogElement {
+    protected class RequestAttributeElement implements AccessLogElement {
         private String header;
 
         public RequestAttributeElement(String header) {
@@ -1172,7 +1259,7 @@ public class AccessLogValve
     /**
      * write an attribute in the HttpSession - %{xxx}s
      */
-    private class SessionAttributeElement implements AccessLogElement {
+    protected class SessionAttributeElement implements AccessLogElement {
         private String header;
 
         public SessionAttributeElement(String header) {
@@ -1207,8 +1294,8 @@ public class AccessLogValve
     /**
      * parse pattern string and create the array of AccessLogElement
      */
-    private AccessLogElement[] createLogElements() {
-        List list = new ArrayList();
+    protected AccessLogElement[] createLogElements() {
+        List<AccessLogElement> list = new ArrayList<AccessLogElement>();
         boolean replace = false;
         StringBuffer buf = new StringBuffer();
         for (int i = 0; i < pattern.length(); i++) {
