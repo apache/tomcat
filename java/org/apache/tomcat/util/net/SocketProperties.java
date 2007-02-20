@@ -1,9 +1,50 @@
+/*
+ *  Copyright 2005-2006 The Apache Software Foundation
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.apache.tomcat.util.net;
 
 import java.net.Socket;
 import java.net.SocketException;
-
+/**
+ * Properties that can be set in the &lt;Connector&gt; element 
+ * in server.xml. All properties are prefixed with &quot;socket.&quot;
+ * and are currently only working for the Nio connector
+ * 
+ * @author Filip Hanik
+ */
 public class SocketProperties {
+    /**
+     * Enable/disable key cache, this bounced cache stores 
+     * KeyAttachment objects to reduce GC
+     * Default is 100
+     * -1 is unlimited
+     * 0 is disabled
+     */
+    protected int keyCache = 500;
+    
+    /**
+     * Enable/disable poller event cache, this bounded cache stores 
+     * PollerEvent objects to reduce GC for the poller
+     * Default is -1 (unlimited)
+     * -1 is unlimited
+     * 0 is disabled
+     * >0 the max number of objects to keep in cache.
+     */
+    protected int eventCache = -1;
+    
+
     /**
      * Enable/disable direct buffers for the network buffers
      * Default value is enabled
@@ -91,7 +132,7 @@ public class SocketProperties {
      * Default value is 1
      */
     protected int performanceBandwidth = 1;
-    
+    private Socket properties;
 
     public void setProperties(Socket socket) throws SocketException{
         socket.setReceiveBufferSize(rxBufSize);
@@ -170,6 +211,18 @@ public class SocketProperties {
         return bufferPoolSize;
     }
 
+    public int getEventCache() {
+        return eventCache;
+    }
+
+    public int getKeyCache() {
+        return keyCache;
+    }
+
+    public Socket getProperties() {
+        return properties;
+    }
+
     public int getDirectBufferPool() {
         return bufferPool;
     }
@@ -236,6 +289,14 @@ public class SocketProperties {
 
     public void setBufferPoolSize(int bufferPoolSize) {
         this.bufferPoolSize = bufferPoolSize;
+    }
+
+    public void setEventCache(int eventCache) {
+        this.eventCache = eventCache;
+    }
+
+    public void setKeyCache(int keyCache) {
+        this.keyCache = keyCache;
     }
 
     public void setDirectBufferPool(int directBufferPool) {
