@@ -24,9 +24,11 @@ import java.nio.channels.SelectionKey;
 import java.io.EOFException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
- * 
+ *
  * Thread safe non blocking selector pool
  * @author Filip Hanik
  * @version 1.0
@@ -34,15 +36,33 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 
 public class NioSelectorPool {
+    protected static Log log = LogFactory.getLog(NioSelectorPool.class);
+
+    protected final static boolean SHARED =
+        Boolean.valueOf(System.getProperty("org.apache.tomcat.util.net.NioSelectorShared", "true")).booleanValue();
+    protected static Selector SHARED_SELECTOR;
+    protected static Selector getSharedSelector() throws IOException {
+        if (SHARED && SHARED_SELECTOR == null) {
+            synchronized ( NioSelectorPool.class ) {
+                if ( SHARED_SELECTOR == null )  {
+					SHARED_SELECTOR = Selector.open();
+                    log.info("Using a shared selector for servlet write/read");
+			    }
+            }
+        }
+        return  SHARED_SELECTOR;
+    }
     protected int maxSelectors = 200;
     protected int maxSpareSelectors = -1;
     protected boolean enabled = true;
     protected AtomicInteger active = new AtomicInteger(0);
     protected AtomicInteger spare = new AtomicInteger(0);
-    //protected LinkedList<Selector> selectors = new LinkedList<Selector>();
     protected ConcurrentLinkedQueue<Selector> selectors = new ConcurrentLinkedQueue<Selector>();
-    
+
     public Selector get() throws IOException{
+        if ( SHARED ) {
+            return getSharedSelector();
+        }
         if ( (!enabled) || active.incrementAndGet() >= maxSelectors ) {
             if ( enabled ) active.decrementAndGet();
             return null;
@@ -52,18 +72,19 @@ public class NioSelectorPool {
             s = selectors.size()>0?selectors.poll():null;
             if (s == null) s = Selector.open();
             else spare.decrementAndGet();
-            
+
         }catch (NoSuchElementException x ) {
             try {s = Selector.open();}catch (IOException iox){}
         } finally {
             if ( s == null ) active.decrementAndGet();//we were unable to find a selector
         }
-        return s;            
+        return s;
     }
-    
-    
-    
+
+
+
     public void put(Selector s) throws IOException {
+        if ( SHARED ) return;
         if ( enabled ) active.decrementAndGet();
         if ( enabled && (maxSpareSelectors==-1 || spare.get() < Math.min(maxSpareSelectors,maxSelectors)) ) {
             spare.incrementAndGet();
@@ -71,19 +92,24 @@ public class NioSelectorPool {
         }
         else s.close();
     }
-    
+
     public void close() throws IOException {
         enabled = false;
         Selector s;
         while ( (s = selectors.poll()) != null ) s.close();
         spare.set(0);
         active.set(0);
+        if ( SHARED && getSharedSelector()!=null ) {
+            getSharedSelector().close();
+            SHARED_SELECTOR = null;
+        }
     }
-    
-    public void open(){
+
+    public void open() throws IOException {
         enabled = true;
+        getSharedSelector();
     }
-    
+
     /**
      * Performs a blocking write using the bytebuffer for data to be written and a selector to block.
      * If the <code>selector</code> parameter is null, then it will perform a busy write that could
@@ -98,6 +124,9 @@ public class NioSelectorPool {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int write(ByteBuffer buf, NioChannel socket, Selector selector, long writeTimeout) throws IOException {
+        if ( SHARED ) {
+            return NioBlockingSelector.write(buf,socket,writeTimeout);
+        }
         SelectionKey key = null;
         int written = 0;
         boolean timedout = false;
@@ -123,7 +152,7 @@ public class NioSelectorPool {
                     if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_WRITE);
                     else key.interestOps(SelectionKey.OP_WRITE);
                     keycount = selector.select(writeTimeout);
-                }                
+                }
                 if (writeTimeout > 0 && (selector == null || keycount == 0) ) timedout = (System.currentTimeMillis()-time)>=writeTimeout;
             }//while
             if ( timedout ) throw new SocketTimeoutException();
@@ -135,7 +164,7 @@ public class NioSelectorPool {
         }
         return written;
     }
-     
+
     /**
      * Performs a blocking read using the bytebuffer for data to be read and a selector to block.
      * If the <code>selector</code> parameter is null, then it will perform a busy read that could
@@ -150,6 +179,9 @@ public class NioSelectorPool {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int read(ByteBuffer buf, NioChannel socket, Selector selector, long readTimeout) throws IOException {
+        if ( SHARED ) {
+            return NioBlockingSelector.read(buf,socket,readTimeout);
+        }
         SelectionKey key = null;
         int read = 0;
         boolean timedout = false;
@@ -168,7 +200,7 @@ public class NioSelectorPool {
                     if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_READ);
                     else key.interestOps(SelectionKey.OP_READ);
                     keycount = selector.select(readTimeout);
-                }                
+                }
                 if (readTimeout > 0 && (selector == null || keycount == 0) ) timedout = (System.currentTimeMillis()-time)>=readTimeout;
             }//while
             if ( timedout ) throw new SocketTimeoutException();
@@ -180,7 +212,7 @@ public class NioSelectorPool {
         }
         return read;
     }
-    
+
     public void setMaxSelectors(int maxSelectors) {
         this.maxSelectors = maxSelectors;
     }

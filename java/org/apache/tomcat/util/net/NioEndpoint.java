@@ -46,6 +46,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -150,12 +151,70 @@ public class NioEndpoint {
     /**
      * Cache for key attachment objects
      */
-    protected ConcurrentLinkedQueue<KeyAttachment> keyCache = new ConcurrentLinkedQueue<KeyAttachment>();
+    protected ConcurrentLinkedQueue<KeyAttachment> keyCache = new ConcurrentLinkedQueue<KeyAttachment>() {
+        protected AtomicInteger size = new AtomicInteger(0);
+        public boolean offer(KeyAttachment ka) {
+            ka.reset();
+            boolean offer = socketProperties.getKeyCache()==-1?true:size.get()<socketProperties.getKeyCache();
+            //avoid over growing our cache or add after we have stopped
+            if ( running && (!paused) && (offer) ) {
+                boolean result = super.offer(ka);
+                if ( result ) {
+                    size.incrementAndGet();
+                }
+                return result;
+            }
+            else return false;
+        }
+
+        public KeyAttachment poll() {
+            KeyAttachment result = super.poll();
+            if ( result != null ) {
+                size.decrementAndGet();
+            }
+            return result;
+        }
+
+        public void clear() {
+            super.clear();
+            size.set(0);
+        }
+    };
+
     
     /**
      * Cache for poller events
      */
-    protected ConcurrentLinkedQueue<PollerEvent> eventCache = new ConcurrentLinkedQueue<PollerEvent>();
+    protected ConcurrentLinkedQueue<PollerEvent> eventCache = new ConcurrentLinkedQueue<PollerEvent>() {
+        protected AtomicInteger size = new AtomicInteger(0);
+        public boolean offer(PollerEvent pe) {
+            pe.reset();
+            boolean offer = socketProperties.getEventCache()==-1?true:size.get()<socketProperties.getEventCache();
+            //avoid over growing our cache or add after we have stopped
+            if ( running && (!paused) && (offer) ) {
+                boolean result = super.offer(pe);
+                if ( result ) {
+                    size.incrementAndGet();
+                }
+                return result;
+            }
+            else return false;
+        }
+
+        public PollerEvent poll() {
+            PollerEvent result = super.poll();
+            if ( result != null ) {
+                size.decrementAndGet();
+            }
+            return result;
+        }
+
+        public void clear() {
+            super.clear();
+            size.set(0);
+        }
+    };
+
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
@@ -163,7 +222,7 @@ public class NioEndpoint {
     protected ConcurrentLinkedQueue<NioChannel> nioChannels = new ConcurrentLinkedQueue<NioChannel>() {
         protected AtomicInteger size = new AtomicInteger(0);
         protected AtomicInteger bytes = new AtomicInteger(0);
-        public boolean offer(NioChannel socket, KeyAttachment att) {
+        public boolean offer(NioChannel socket) {
             boolean offer = socketProperties.getBufferPool()==-1?true:size.get()<socketProperties.getBufferPool();
             offer = offer && (socketProperties.getBufferPoolSize()==-1?true:(bytes.get()+socket.getBufferSize())<socketProperties.getBufferPoolSize());
             //avoid over growing our cache or add after we have stopped
@@ -190,6 +249,7 @@ public class NioEndpoint {
         public void clear() {
             super.clear();
             size.set(0);
+            bytes.set(0);
         }
     };
 
@@ -1208,6 +1268,9 @@ public class NioEndpoint {
                                 if ( attachment.getComet() ) {
                                     if (!processSocket(channel, SocketStatus.OPEN))
                                         processSocket(channel, SocketStatus.DISCONNECT);
+                                } else if ( attachment.getLatch() != null ) {
+                                    attachment.getLatch().countDown();
+                                    attachment.resetLatch();
                                 } else {
                                     boolean close = (!processSocket(channel));
                                     if ( close ) {
@@ -1310,6 +1373,12 @@ public class NioEndpoint {
         protected int interestOps = 0;
         public int interestOps() { return interestOps;}
         public int interestOps(int ops) { this.interestOps  = ops; return ops; }
+        public CountDownLatch getLatch() { return latch; }
+        public void resetLatch() { if ( latch.getCount() == 0 ) latch = null; else throw new IllegalStateException("Latch must be at count 0");}
+        public void startLatch(int cnt) { 
+            if ( latch == null || latch.getCount() == 0 ) this.latch = new CountDownLatch(cnt); 
+            else throw new IllegalStateException("Latch must be at count 0 or null.");
+        }
         protected Object mutex = new Object();
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
@@ -1317,6 +1386,7 @@ public class NioEndpoint {
         protected long timeout = -1;
         protected boolean error = false;
         protected NioChannel channel = null;
+        protected CountDownLatch latch = null;
 
     }
 

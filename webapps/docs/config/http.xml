@@ -418,6 +418,14 @@
         The value is in bytes, the default value is 1024*1024*100 (100MB)
         </p>
       </attribute>
+      <attribute name="socket.keyCache" required="false">
+        <p>Document TBD
+          Other values are -1. unlimited cache, and 0, no cache.</p>
+      </attribute>
+      <attribute name="socket.eventCache" required="false">
+        <p>Document TBD
+          Other values are -1. unlimited cache, and 0, no cache.</p>
+      </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
         <p>same as the standard setting <code>tcpNoDelay</code>. Default value is false</p>
       </attribute>
