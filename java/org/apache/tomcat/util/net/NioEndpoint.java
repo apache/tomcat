@@ -876,7 +876,6 @@ public class NioEndpoint {
                 }
             }
         }
-
     }
 
 
@@ -1270,8 +1269,10 @@ public class NioEndpoint {
                                         processSocket(channel, SocketStatus.DISCONNECT);
                                 } else if ( attachment.getLatch() != null ) {
                                     attachment.getLatch().countDown();
-                                    attachment.resetLatch();
                                 } else {
+                                    //this sucker here dead locks with the count down latch
+                                    //since this call is blocking if no threads are available.
+                                    //TODO: FIXME BIG TIME
                                     boolean close = (!processSocket(channel));
                                     if ( close ) {
                                         channel.close();

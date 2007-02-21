@@ -68,6 +68,7 @@ public class NioBlockingSelector {
                     att.startLatch(1);
                     socket.getPoller().add(socket,SelectionKey.OP_WRITE);
                     att.getLatch().await(writeTimeout,TimeUnit.MILLISECONDS);
+                    att.resetLatch();
                 }catch (InterruptedException ignore) {
                 }
                 if ( att.getLatch() == null ) keycount = 1;
@@ -124,6 +125,7 @@ public class NioBlockingSelector {
                     att.startLatch(1);
                     socket.getPoller().add(socket,SelectionKey.OP_READ);
                     att.getLatch().await(readTimeout,TimeUnit.MILLISECONDS);
+                    att.resetLatch();
                 }catch (InterruptedException ignore) {
                 }
                 if ( att.getLatch() == null ) keycount = 1;
