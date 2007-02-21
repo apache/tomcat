@@ -41,23 +41,25 @@ public class NioSelectorPool {
     protected final static boolean SHARED =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.net.NioSelectorShared", "true")).booleanValue();
     protected static Selector SHARED_SELECTOR;
-    protected static Selector getSharedSelector() throws IOException {
-        if (SHARED && SHARED_SELECTOR == null) {
-            synchronized ( NioSelectorPool.class ) {
-                if ( SHARED_SELECTOR == null )  {
-					SHARED_SELECTOR = Selector.open();
-                    log.info("Using a shared selector for servlet write/read");
-			    }
-            }
-        }
-        return  SHARED_SELECTOR;
-    }
+    
     protected int maxSelectors = 200;
     protected int maxSpareSelectors = -1;
     protected boolean enabled = true;
     protected AtomicInteger active = new AtomicInteger(0);
     protected AtomicInteger spare = new AtomicInteger(0);
     protected ConcurrentLinkedQueue<Selector> selectors = new ConcurrentLinkedQueue<Selector>();
+
+    protected static Selector getSharedSelector() throws IOException {
+        if (SHARED && SHARED_SELECTOR == null) {
+            synchronized ( NioSelectorPool.class ) {
+                if ( SHARED_SELECTOR == null )  {
+                    SHARED_SELECTOR = Selector.open();
+                    log.info("Using a shared selector for servlet write/read");
+                }
+            }
+        }
+        return  SHARED_SELECTOR;
+    }
 
     public Selector get() throws IOException{
         if ( SHARED ) {
