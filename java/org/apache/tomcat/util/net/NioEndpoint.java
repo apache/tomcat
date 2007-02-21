@@ -1033,7 +1033,18 @@ public class NioEndpoint {
                     // Hand this socket off to an appropriate processor
                     //TODO FIXME - this is currently a blocking call, meaning we will be blocking
                     //further accepts until there is a thread available.
-                    if ( running && (!paused) && socket != null ) processSocket(socket);
+                    if ( running && (!paused) && socket != null ) {
+                        //processSocket(socket);
+                        if (!setSocketOptions(socket)) {
+                            try {
+                                socket.socket().close();
+                                socket.close();
+                            } catch (IOException ix) {
+                                if (log.isDebugEnabled())
+                                    log.debug("", ix);
+                            }
+                        } 
+                    }
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
