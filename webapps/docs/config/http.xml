@@ -419,12 +419,16 @@
         </p>
       </attribute>
       <attribute name="socket.keyCache" required="false">
-        <p>Document TBD
-          Other values are -1. unlimited cache, and 0, no cache.</p>
+        <p>Tomcat will cache KeyAttachment objects to reduce garbage collection.
+           The integer value specifies how many objects to keep in the cache at most.
+           The default is 500.
+           Other values are -1. unlimited cache, and 0, no cache.</p>
       </attribute>
       <attribute name="socket.eventCache" required="false">
-        <p>Document TBD
-          Other values are -1. unlimited cache, and 0, no cache.</p>
+        <p>Tomcat will cache PollerEvent objects to reduce garbage collection.
+           The integer value specifies how many objects to keep in the cache at most.
+           The default is 500.
+           Other values are -1. unlimited cache, and 0, no cache.</p>
       </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
         <p>same as the standard setting <code>tcpNoDelay</code>. Default value is false</p>
@@ -461,6 +465,23 @@
       <attribute name="socket.performanceBandwidth" required="false">
         <p>The third value for the performance settings. Default is 1, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
       </attribute>      
+      <attribute name="selectorPool.maxSelectors">
+        The max selectors to be used in the pool, to reduce selector contention.
+        Use this option when the command line o.a.t.u.net.NioSelectorShared value is set to false.
+        Default value is 200.
+      </attribute>
+      <attribute name="selectorPool.maxSpareSelectors">
+        The max spare selectors to be used in the pool, to reduce selector contention.
+        When a selector is returned to the pool, the system can decide to keep it or let it be GC:ed.
+        Use this option when the command line o.a.t.u.net.NioSelectorShared value is set to false.
+        Default value is -1 (unlimited)
+      </attribute>
+      <attribute name="command line options">
+        The following command line options are available for the NIO connector:<br/>
+        <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code> - default is true.
+        Set this value to false if you wish to use a selector for each thread.
+        the property. If you do set it to false, you can control the size of the pool of selectors by using the 
+      </attribute>
     </attributes>
   </subsection>
 
