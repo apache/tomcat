@@ -1763,7 +1763,7 @@ public class WebappClassLoader
         if (clazz != null)
             return clazz;
 
-        synchronized (entry) {
+        synchronized (this) {
             if (entry.binaryContent == null && entry.loadedClass == null)
                 throw new ClassNotFoundException(name);
 
@@ -1776,11 +1776,10 @@ public class WebappClassLoader
             Package pkg = null;
         
             if (packageName != null) {
-                synchronized (this) {
-                    pkg = getPackage(packageName);
-            
-                    // Define the package (if null)
-                    if (pkg == null) {
+                pkg = getPackage(packageName);
+                // Define the package (if null)
+                if (pkg == null) {
+                    try {
                         if (entry.manifest == null) {
                             definePackage(packageName, null, null, null, null,
                                     null, null, null);
@@ -1788,7 +1787,10 @@ public class WebappClassLoader
                             definePackage(packageName, entry.manifest,
                                     entry.codeBase);
                         }
+                    } catch (IllegalArgumentException e) {
+                        // Ignore: normal error due to dual definition of package
                     }
+                    pkg = getPackage(packageName);
                 }
             }
     
