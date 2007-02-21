@@ -593,7 +593,7 @@ public class NioEndpoint {
 
         serverSock = ServerSocketChannel.open();
         InetSocketAddress addr = (address!=null?new InetSocketAddress(address,port):new InetSocketAddress(port));
-        serverSock.socket().bind(addr,100); //todo, set backlog value
+        serverSock.socket().bind(addr,backlog); 
         serverSock.configureBlocking(true); //mimic APR behavior
 
         // Initialize thread count defaults for acceptor, poller and sendfile
@@ -852,6 +852,24 @@ public class NioEndpoint {
 
 
     /**
+     * Returns true if a worker thread is available for processing.
+     * @return boolean
+     */
+    protected boolean isWorkerAvailable() {
+        if (workers.size() > 0) {
+            return true;
+        }
+        if ((maxThreads > 0) && (curThreads < maxThreads)) {
+            return true;
+        } else {
+            if (maxThreads < 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+    /**
      * Create (or allocate) and return an available processor for use in
      * processing a specific HTTP request, if possible.  If the maximum
      * allowed processors have already been created and are in use, return
@@ -1013,6 +1031,8 @@ public class NioEndpoint {
                     // Accept the next incoming connection from the server socket
                     SocketChannel socket = serverSock.accept();
                     // Hand this socket off to an appropriate processor
+                    //TODO FIXME - this is currently a blocking call, meaning we will be blocking
+                    //further accepts until there is a thread available.
                     if ( running && (!paused) && socket != null ) processSocket(socket);
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.accept.fail"), t);
@@ -1260,23 +1280,35 @@ public class NioEndpoint {
                         if ( sk.isValid() && attachment != null ) {
                             attachment.access();
                             sk.attach(attachment);
+                            int interestOps = sk.interestOps();
                             sk.interestOps(0); //this is a must, so that we don't have multiple threads messing with the socket
                             attachment.interestOps(0);
                             NioChannel channel = attachment.getChannel();
                             if (sk.isReadable() || sk.isWritable() ) {
                                 if ( attachment.getComet() ) {
-                                    if (!processSocket(channel, SocketStatus.OPEN))
-                                        processSocket(channel, SocketStatus.DISCONNECT);
+                                    //check if thread is available
+                                    if ( isWorkerAvailable() ) {
+                                        if (!processSocket(channel, SocketStatus.OPEN))
+                                            processSocket(channel, SocketStatus.DISCONNECT);
+                                    } else {
+                                        //reregister it
+                                        attachment.interestOps(interestOps);
+                                        sk.interestOps(interestOps);
+                                    }
                                 } else if ( attachment.getLatch() != null ) {
                                     attachment.getLatch().countDown();
                                 } else {
-                                    //this sucker here dead locks with the count down latch
-                                    //since this call is blocking if no threads are available.
-                                    //TODO: FIXME BIG TIME
-                                    boolean close = (!processSocket(channel));
-                                    if ( close ) {
-                                        channel.close();
-                                        channel.getIOChannel().socket().close();
+                                    //later on, improve latch behavior
+                                    if ( isWorkerAvailable() ) {
+                                        boolean close = (!processSocket(channel));
+                                        if (close) {
+                                            channel.close();
+                                            channel.getIOChannel().socket().close();
+                                        }
+                                    } else {
+                                        //reregister it
+                                        attachment.interestOps(interestOps);
+                                        sk.interestOps(interestOps);
                                     }
                                 }
                             } 
