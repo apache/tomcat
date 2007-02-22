@@ -121,10 +121,7 @@ public final class InstanceSupport {
             return;
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -148,10 +145,7 @@ public final class InstanceSupport {
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type,
                                                 exception);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -177,10 +171,7 @@ public final class InstanceSupport {
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type,
                                                 request, response);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -208,10 +199,7 @@ public final class InstanceSupport {
 
         InstanceEvent event = new InstanceEvent(wrapper, filter, type,
                                                 request, response, exception);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -232,10 +220,7 @@ public final class InstanceSupport {
             return;
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -259,10 +244,7 @@ public final class InstanceSupport {
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type,
                                                 exception);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -288,10 +270,7 @@ public final class InstanceSupport {
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type,
                                                 request, response);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
@@ -319,10 +298,7 @@ public final class InstanceSupport {
 
         InstanceEvent event = new InstanceEvent(wrapper, servlet, type,
                                                 request, response, exception);
-        InstanceListener interested[] = null;
-        synchronized (listeners) {
-            interested = (InstanceListener[]) listeners.clone();
-        }
+        InstanceListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].instanceEvent(event);
 
