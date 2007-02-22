@@ -807,13 +807,13 @@ public class NioEndpoint {
                 if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
                     int appbufsize = engine.getSession().getApplicationBufferSize();
-                    NioBufferHandler bufhandler = new NioBufferHandler(Math.max(appbufsize,getReadBufSize()),
-                                                                       Math.max(appbufsize,getWriteBufSize()),
+                    NioBufferHandler bufhandler = new NioBufferHandler(Math.max(appbufsize,socketProperties.getAppReadBufSize()),
+                                                                       Math.max(appbufsize,socketProperties.getAppWriteBufSize()),
                                                                        socketProperties.getDirectBuffer());
                     channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool);
                 } else {
-                    NioBufferHandler bufhandler = new NioBufferHandler(getReadBufSize(),
-                                                                       getWriteBufSize(),
+                    NioBufferHandler bufhandler = new NioBufferHandler(socketProperties.getAppReadBufSize(),
+                                                                       socketProperties.getAppWriteBufSize(),
                                                                        socketProperties.getDirectBuffer());
 
                     channel = new NioChannel(socket, bufhandler);

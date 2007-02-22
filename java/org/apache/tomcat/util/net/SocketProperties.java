@@ -62,6 +62,18 @@ public class SocketProperties {
     protected int txBufSize = 43800;
     
     /**
+     * The application read buffer size in bytes.
+     * Default value is rxBufSize
+     */
+    protected int appReadBufSize = rxBufSize;
+    
+    /**
+     * The application write buffer size in bytes
+     * Default value is txBufSize
+     */
+    protected int appWriteBufSize = txBufSize;
+    
+    /**
      * NioChannel pool size for the endpoint,
      * this value is how many channels
      * -1 means unlimited cached, 0 means no cache
@@ -223,6 +235,14 @@ public class SocketProperties {
         return properties;
     }
 
+    public int getAppReadBufSize() {
+        return appReadBufSize;
+    }
+
+    public int getAppWriteBufSize() {
+        return appWriteBufSize;
+    }
+
     public int getDirectBufferPool() {
         return bufferPool;
     }
@@ -297,6 +317,14 @@ public class SocketProperties {
 
     public void setKeyCache(int keyCache) {
         this.keyCache = keyCache;
+    }
+
+    public void setAppReadBufSize(int appReadBufSize) {
+        this.appReadBufSize = appReadBufSize;
+    }
+
+    public void setAppWriteBufSize(int appWriteBufSize) {
+        this.appWriteBufSize = appWriteBufSize;
     }
 
     public void setDirectBufferPool(int directBufferPool) {
