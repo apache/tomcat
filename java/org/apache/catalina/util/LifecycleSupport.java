@@ -112,10 +112,7 @@ public final class LifecycleSupport {
     public void fireLifecycleEvent(String type, Object data) {
 
         LifecycleEvent event = new LifecycleEvent(lifecycle, type, data);
-        LifecycleListener interested[] = null;
-        synchronized (listeners) {
-            interested = (LifecycleListener[]) listeners.clone();
-        }
+        LifecycleListener interested[] = listeners;
         for (int i = 0; i < interested.length; i++)
             interested[i].lifecycleEvent(event);
 
