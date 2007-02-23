@@ -41,7 +41,7 @@ public class NioBlockingSelector {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public static int write(ByteBuffer buf, NioChannel socket, long writeTimeout) throws IOException {
-        final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         int written = 0;
         boolean timedout = false;
         int keycount = 1; //assume we can write
@@ -86,16 +86,20 @@ public class NioBlockingSelector {
             if (timedout) 
                 throw new SocketTimeoutException();
         } finally {
-//            if (key != null) {
-//                socket.getPoller().addEvent(
-//                    new Runnable() {
-//                    public void run() {
-//                        key.cancel();
-//                    }
-//                });
-//            }
+            if (timedout && key != null) {
+                cancelKey(socket, key);
+            }
         }
         return written;
+    }
+
+    private static void cancelKey(final NioChannel socket, final SelectionKey key) {
+        socket.getPoller().addEvent(
+            new Runnable() {
+            public void run() {
+                key.cancel();
+            }
+        });
     }
 
     /**
@@ -149,14 +153,9 @@ public class NioBlockingSelector {
             if (timedout)
                 throw new SocketTimeoutException();
         } finally {
-//            if (key != null) {
-//                socket.getPoller().addEvent(
-//                    new Runnable() {
-//                    public void run() {
-//                        key.cancel();
-//                    }
-//                });
-//            }
+            if (timedout && key != null) {
+                cancelKey(socket,key);
+            }
         }
         return read;
     }
