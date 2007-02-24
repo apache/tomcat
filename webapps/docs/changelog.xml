@@ -27,6 +27,14 @@
       </update>
     </changelog>  
   </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        Fix previous update to servlet 2.5 xsd to use correct declaration.
+        (markt)
+      </fix>
+    </changelog>  
+  </subsection>
 </section>
 <section name="Tomcat 6.0.10 (remm)">
   <subsection name="Catalina">
