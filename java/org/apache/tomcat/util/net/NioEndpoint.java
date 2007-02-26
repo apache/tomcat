@@ -438,6 +438,8 @@ public class NioEndpoint {
                 IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
             } else if (name.startsWith(socketName)) {
                 IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
+            } else {
+                IntrospectionUtils.setProperty(this,name,value);
             }
         }catch ( Exception x ) {
             log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
