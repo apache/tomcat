@@ -95,6 +95,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public void setProperty(String name, String value) {
         if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
             ep.setProperty(name, value);
+        } else {
+            ep.setProperty(name,value); //make sure we at least try to set all properties
         }
         setAttribute(name, value);
     }
