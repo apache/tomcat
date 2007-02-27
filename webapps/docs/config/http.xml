@@ -412,10 +412,10 @@
       <attribute name="useComet" required="false">
         <p>Whether to allow comet servlets or not, Default value is true.</p>
       </attribute>
-      
-      
       <attribute name="socket.directBuffer" required="false">
-        <p>Boolean value, whether to use direct ByteBuffers or java mapped ByteBuffers. Default is <code>true</code></p>
+        <p>Boolean value, whether to use direct ByteBuffers or java mapped ByteBuffers. Default is <code>true</code>
+           <br/>When you are using direct buffers, make sure you allocate the appropriate amount of memory for the 
+                direct memory space. On Sun's JDK that would be something like <code>-XX:MaxDirectMemorySize=256m</code></p>
       </attribute>
       <attribute name="socket.rxBufSize" required="false">
         <p>The socket receive buffer (SO_RCVBUF) size in bytes. Default value is 25188</p>
@@ -426,12 +426,14 @@
       <attribute name="socket.appReadBufSize" required="false">
         <p>Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
            This attribute controls the size of these buffers. By default this read buffer is sized to match the 
-           socket read buffer (SO_RCVBUF) value, but can be sized separately.</p>
+           socket read buffer (SO_RCVBUF) value, but can be sized separately.
+           For an extreme amount of keep alive connections, decrease this number of increase your heap size.</p>
       </attribute>
       <attribute name="socket.appWriteBufSize" required="false">
         <p>Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
            This attribute controls the size of these buffers. By default this write buffer is sized to match the 
-           socket read buffer (SO_SNDBUF) value, but can be sized separately.</p>
+           socket read buffer (SO_SNDBUF) value, but can be sized separately.
+           For an extreme amount of keep alive connections, decrease this number of increase your heap size.</p>
       </attribute>
       <attribute name="socket.bufferPool" required="false">
         <p>The Nio connector uses a class called NioChannel that holds elements linked to a socket.
@@ -494,22 +496,23 @@
       <attribute name="socket.performanceBandwidth" required="false">
         <p>The third value for the performance settings. Default is 1, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
       </attribute>      
-      <attribute name="selectorPool.maxSelectors">
-        The max selectors to be used in the pool, to reduce selector contention.
+      <attribute name="selectorPool.maxSelectors" required="false">
+        <p>The max selectors to be used in the pool, to reduce selector contention.
         Use this option when the command line o.a.t.u.net.NioSelectorShared value is set to false.
-        Default value is 200.
+        Default value is 200.</p>
       </attribute>
-      <attribute name="selectorPool.maxSpareSelectors">
-        The max spare selectors to be used in the pool, to reduce selector contention.
+      <attribute name="selectorPool.maxSpareSelectors" required="false">
+        <p>The max spare selectors to be used in the pool, to reduce selector contention.
         When a selector is returned to the pool, the system can decide to keep it or let it be GC:ed.
         Use this option when the command line o.a.t.u.net.NioSelectorShared value is set to false.
-        Default value is -1 (unlimited)
+        Default value is -1 (unlimited)</p>
       </attribute>
-      <attribute name="command line options">
-        The following command line options are available for the NIO connector:<br/>
+      <attribute name="command-line-options" required="false">
+        <p>The following command line options are available for the NIO connector:<br/>
         <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true|false</code> - default is true.
         Set this value to false if you wish to use a selector for each thread.
         the property. If you do set it to false, you can control the size of the pool of selectors by using the 
+        selectorPool.maxSelectors attribute</p>
       </attribute>
     </attributes>
   </subsection>

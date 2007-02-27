@@ -42,7 +42,7 @@ public class SocketProperties {
      * 0 is disabled
      * >0 the max number of objects to keep in cache.
      */
-    protected int eventCache = -1;
+    protected int eventCache = 500;
     
 
     /**
