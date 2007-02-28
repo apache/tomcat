@@ -425,15 +425,15 @@
       </attribute>
       <attribute name="socket.appReadBufSize" required="false">
         <p>Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
-           This attribute controls the size of these buffers. By default this read buffer is sized to match the 
-           socket read buffer (SO_RCVBUF) value, but can be sized separately.
-           For an extreme amount of keep alive connections, decrease this number of increase your heap size.</p>
+           This attribute controls the size of these buffers. By default this read buffer is sized at 8192 bytes.
+           For lower concurrency, you can increase this to buffer more data.
+           For an extreme amount of keep alive connections, decrease this number or increase your heap size.</p>
       </attribute>
       <attribute name="socket.appWriteBufSize" required="false">
         <p>Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
-           This attribute controls the size of these buffers. By default this write buffer is sized to match the 
-           socket read buffer (SO_SNDBUF) value, but can be sized separately.
-           For an extreme amount of keep alive connections, decrease this number of increase your heap size.</p>
+           This attribute controls the size of these buffers. By default this write buffer is sized at 8192 bytes.
+           For low concurrency you can increase this to buffer more response data.
+           For an extreme amount of keep alive connections, decrease this number or increase your heap size.</p>
       </attribute>
       <attribute name="socket.bufferPool" required="false">
         <p>The Nio connector uses a class called NioChannel that holds elements linked to a socket.

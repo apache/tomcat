@@ -65,13 +65,13 @@ public class SocketProperties {
      * The application read buffer size in bytes.
      * Default value is rxBufSize
      */
-    protected int appReadBufSize = rxBufSize;
+    protected int appReadBufSize = 8192;
     
     /**
      * The application write buffer size in bytes
      * Default value is txBufSize
      */
-    protected int appWriteBufSize = txBufSize;
+    protected int appWriteBufSize = 8192;
     
     /**
      * NioChannel pool size for the endpoint,
