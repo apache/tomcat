@@ -42,6 +42,12 @@ public final class Constants {
     public static final String DEFAULT_EJB_FACTORY = 
         Package + ".EjbFactory";
 
+    public static final String DEFAULT_SERVICE_FACTORY = 
+        Package + ".ServiceRefFactory";
+
+    public static final String DEFAULT_HANDLER_FACTORY = 
+        Package + ".HandlerFactory";
+
     public static final String DBCP_DATASOURCE_FACTORY = 
         "org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory";
 

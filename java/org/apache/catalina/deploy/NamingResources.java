@@ -345,7 +345,11 @@ public class NamingResources implements Serializable {
         if (entries.containsKey(service.getName())) {
             return;
         } else {
-            entries.put(service.getName(), service.getServiceinterface());
+            Object value = service.getType();
+            if (value == null) {
+                value = "";
+            }
+            entries.put(service.getName(), value);
         }
         
         synchronized (services) {
