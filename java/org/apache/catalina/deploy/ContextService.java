@@ -19,6 +19,9 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.HashMap;
 
 /**
  * Representation of a web service reference for a web application, as
@@ -59,19 +62,6 @@ public class ContextService extends ResourceBase implements Serializable {
 
     public void setIcon(String icon) {
         this.icon = icon;
-    }
-
-    /**
-     * An icon for this WebService.
-     */
-    private String serviceinterface = null;
-
-    public String getServiceinterface() {
-        return (this.serviceinterface);
-    }
-
-    public void setServiceinterface(String serviceinterface) {
-        this.serviceinterface = serviceinterface;
     }
 
     /**
@@ -119,6 +109,18 @@ public class ContextService extends ResourceBase implements Serializable {
         return (this.serviceqname);
     }
 
+    public String getServiceqname(int i) {
+        return this.serviceqname[i];
+    }
+
+    public String getServiceqnameNamespaceURI() {
+        return this.serviceqname[0];
+    }
+
+    public String getServiceqnameLocalpart() {
+        return this.serviceqname[1];
+    }
+
     public void setServiceqname(String[] serviceqname) {
         this.serviceqname = serviceqname;
     }
@@ -127,11 +129,11 @@ public class ContextService extends ResourceBase implements Serializable {
         this.serviceqname[i] = serviceqname;
     }
 
-    public void setNamespaceURI(String namespaceuri) {
+    public void setServiceqnameNamespaceURI(String namespaceuri) {
         this.serviceqname[0] = namespaceuri;
     }
 
-    public void setLocalpart(String localpart) {
+    public void setServiceqnameLocalpart(String localpart) {
         this.serviceqname[1] = localpart;
     }
 
@@ -140,44 +142,38 @@ public class ContextService extends ResourceBase implements Serializable {
      * to a WSDL port. It optionally associates the Service Endpoint Interface with a
      * particular port-component.
      *
-     * portcomponent[0] : service-endpoint-interface
-     * portcomponent[1] : port-component-link
      */
-    private String[] portcomponent = new String[2];
-
-    public String[] getPortcomponent() {
-        return (this.portcomponent);
+    public Iterator getServiceendpoints() {
+        return this.listProperties();
     }
 
-    public void setPortcomponent(String[] portcomponent) {
-        this.portcomponent = portcomponent;
+    public String getPortlink(String serviceendpoint) {
+        return (String) this.getProperty(serviceendpoint);
     }
 
-    public void setPortcomponent(String portcomponent, int i) {
-        this.portcomponent[i] = portcomponent;
-    }
-
-    public void setServiceendpoint(String serviceendpoint) {
-        this.portcomponent[0] = serviceendpoint;
-    }
-
-    public void setPortlink(String portlink) {
-        this.portcomponent[1] = portlink;
+    public void addPortcomponent(String serviceendpoint, String portlink) {
+        if (portlink == null)
+            portlink = "";
+        this.setProperty(serviceendpoint, portlink);
     }
 
     /**
-     * A list of Handler to use for this service-ref.
+     * A list of Handlers to use for this service-ref.
      *
      * The instanciation of the handler have to be done.
      */
-    private String handler = null;
+    private HashMap handlers = new HashMap();
 
-    public String getHandler() {
-        return (this.handler);
+    public Iterator getHandlers() {
+        return handlers.keySet().iterator();
     }
 
-    public void setHandler(String handler) {
-        this.handler = handler;
+    public ContextHandler getHandler(String handlername) {
+        return (ContextHandler) handlers.get(handlername);
+    }
+
+    public void addHandler(ContextHandler handler) {
+        handlers.put(handler.getName(), handler);
     }
 
 
@@ -204,10 +200,6 @@ public class ContextService extends ResourceBase implements Serializable {
             sb.append(", displayname=");
             sb.append(displayname);
         }
-        if (serviceinterface != null) {
-            sb.append(", serviceinterface=");
-            sb.append(serviceinterface);
-        }
         if (icon != null) {
             sb.append(", icon=");
             sb.append(icon);
@@ -220,17 +212,21 @@ public class ContextService extends ResourceBase implements Serializable {
             sb.append(", jaxrpc-mapping-file=");
             sb.append(jaxrpcmappingfile);
         }
-        if (serviceqname != null) {
-            sb.append(", service-qname=");
-            sb.append(serviceqname);
+        if (serviceqname[0] != null) {
+            sb.append(", service-qname/namespaceURI=");
+            sb.append(serviceqname[0]);
         }
-        if (portcomponent != null) {
-            sb.append(", port-component=");
-            sb.append(portcomponent);
+        if (serviceqname[1] != null) {
+            sb.append(", service-qname/localpart=");
+            sb.append(serviceqname[1]);
         }
-        if (handler != null) {
+        if (this.getServiceendpoints() != null) {
+            sb.append(", port-component/service-endpoint-interface=");
+            sb.append(this.getServiceendpoints());
+        }
+        if (handlers != null) {
             sb.append(", handler=");
-            sb.append(handler);
+            sb.append(handlers);
         }
         sb.append("]");
         return (sb.toString());

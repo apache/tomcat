@@ -123,6 +123,13 @@ public class NamingRuleSet extends RuleSetBase {
                 new SetNextNamingRule("addResourceEnvRef",
                             "org.apache.catalina.deploy.ContextResourceEnvRef"));
 
+        digester.addObjectCreate(prefix + "ServiceRef",
+            "org.apache.catalina.deploy.Contextservice");
+        digester.addRule(prefix + "ServiceRef", new SetAllPropertiesRule());
+        digester.addRule(prefix + "ServiceRef",
+                new SetNextNamingRule("addService",
+                            "org.apache.catalina.deploy.ContextService"));
+
         digester.addObjectCreate(prefix + "Transaction",
             "org.apache.catalina.deploy.ContextTransaction");
         digester.addRule(prefix + "Transaction", new SetAllPropertiesRule());
