@@ -22,6 +22,7 @@
         value of zero. These are now the first servlets to be started. (markt)
       </fix>
     </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
@@ -40,7 +41,7 @@
         Fix previous update to servlet 2.5 xsd to use correct declaration.
         (markt)
       </fix>
-    </changelog>  
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 6.0.10 (remm)">
@@ -116,15 +117,15 @@
         Chris Halstead. (markt)
       </fix>
       <fix>
-        <bug>40524</bug>: request.getAuthType() now returns CLIENT_CERT rather 
+        <bug>40524</bug>: request.getAuthType() now returns CLIENT_CERT rather
         than CLIENT-CERT. (markt)
       </fix>
       <fix>
-        <bug>40526</bug>: Return support for JPDA_OPTS to catalina.bat and add 
+        <bug>40526</bug>: Return support for JPDA_OPTS to catalina.bat and add
         a new option JPDA_SUSPEND, submitted by by Kurt Roy. (markt)
       </fix>
       <fix>
-        <bug>41265</bug>: In embedded, remove the code that resets checkInterval 
+        <bug>41265</bug>: In embedded, remove the code that resets checkInterval
         values of zero to 300. (markt)
       </fix>
     </changelog>
@@ -156,7 +157,7 @@
   <subsection name="Cluster">
     <changelog>
       <fix>
-        <bug>41466</bug>: When using the NioChannel and SecureNioChannel its 
+        <bug>41466</bug>: When using the NioChannel and SecureNioChannel its
         important to use the channels buffers. (fhanik)
       </fix>
     </changelog>
@@ -415,7 +416,7 @@
         Add xsds for JSP 2.1 (remm)
       </fix>
       <fix>
-        <bug>41106</bug>: Update validation checks for EL to also include 
+        <bug>41106</bug>: Update validation checks for EL to also include
         legacy 1.2 tags (remm)
       </fix>
     </changelog>
@@ -456,7 +457,7 @@
         Fix passing of the keystore password for the NIO connector (fhanik)
       </fix>
     </changelog>
-  </subsection> 
+  </subsection>
 </section>
 <section name="Tomcat 6.0.1 (remm)">
   <subsection name="General">
@@ -493,7 +494,7 @@
         validation, bom encoding support (remm)
       </update>
     </changelog>
-  </subsection> 
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
@@ -509,7 +510,7 @@
         Implement explicit flushing in AJP (mturk)
       </update>
     </changelog>
-  </subsection> 
+  </subsection>
 </section>
 <section name="Tomcat 6.0.0 (remm)">
   <subsection name="Catalina">
@@ -534,7 +535,7 @@
         Unifed EL 2.1 support (jhook)
       </add>
     </changelog>
-  </subsection> 
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
@@ -548,18 +549,18 @@
         resources (costin)
       </update>
     </changelog>
-  </subsection> 
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
         New cluster configuration and new documentation (fhanik)
       </add>
     </changelog>
-  </subsection> 
+  </subsection>
   <subsection name="Webapps">
     <changelog>
     </changelog>
-  </subsection> 
+  </subsection>
 </section>
 </body>
 </document>
