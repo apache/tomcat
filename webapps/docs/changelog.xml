@@ -15,6 +15,13 @@
 
 <body>
 <section name="Tomcat 6.0.11 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>41739</bug> Correct handling of servlets with a load-on-startup
+        value of zero. These are now the first servlets to be started. (markt)
+      </fix>
+    </changelog>
   <subsection name="Coyote">
     <changelog>
       <update>
@@ -25,11 +32,7 @@
         when the serviet is reading/writing from the input/output streams
         The flag is <code>-Dorg.apache.tomcat.util.net.NioSelectorShared=true</code>
       </update>
-      <fix>
-        <bug>41739</bug> Correct handling of servlets with a load-on-startup
-        value of zero. These are now the first servlets to be started. (markt)
-      </fix>
-    </changelog>  
+    </changelog>
   </subsection>
   <subsection name="Webapps">
     <changelog>
