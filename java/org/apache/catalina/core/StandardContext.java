@@ -4021,8 +4021,6 @@ public class StandardContext
             int loadOnStartup = wrapper.getLoadOnStartup();
             if (loadOnStartup < 0)
                 continue;
-            if (loadOnStartup == 0)     // Arbitrarily put them last
-                loadOnStartup = Integer.MAX_VALUE;
             Integer key = new Integer(loadOnStartup);
             ArrayList list = (ArrayList) map.get(key);
             if (list == null) {
