@@ -101,7 +101,7 @@ public class MimeHeaders {
      * The header fields.
      */
     private MimeHeaderField[] headers = new
-	MimeHeaderField[DEFAULT_HEADER_SIZE];
+        MimeHeaderField[DEFAULT_HEADER_SIZE];
 
     /**
      * The current number of header fields.
@@ -126,10 +126,10 @@ public class MimeHeaders {
      * Clears all header fields.
      */
     public void clear() {
-	for (int i = 0; i < count; i++) {
-	    headers[i].recycle();
-	}
-	count = 0;
+        for (int i = 0; i < count; i++) {
+            headers[i].recycle();
+        }
+        count = 0;
     }
 
     /**
@@ -153,7 +153,7 @@ public class MimeHeaders {
      * Returns the current number of header fields.
      */
     public int size() {
-	return count;
+        return count;
     }
 
     /**
@@ -161,7 +161,7 @@ public class MimeHeaders {
      * This may be used to iterate through all header fields.
      */
     public MessageBytes getName(int n) {
-	return n >= 0 && n < count ? headers[n].getName() : null;
+        return n >= 0 && n < count ? headers[n].getName() : null;
     }
 
     /**
@@ -169,21 +169,21 @@ public class MimeHeaders {
      * This may be used to iterate through all header fields.
      */
     public MessageBytes getValue(int n) {
-	return n >= 0 && n < count ? headers[n].getValue() : null;
+        return n >= 0 && n < count ? headers[n].getValue() : null;
     }
 
     /** Find the index of a header with the given name.
      */
     public int findHeader( String name, int starting ) {
-	// We can use a hash - but it's not clear how much
-	// benefit you can get - there is an  overhead 
-	// and the number of headers is small (4-5 ?)
-	// Another problem is that we'll pay the overhead
-	// of constructing the hashtable
+        // We can use a hash - but it's not clear how much
+        // benefit you can get - there is an  overhead 
+        // and the number of headers is small (4-5 ?)
+        // Another problem is that we'll pay the overhead
+        // of constructing the hashtable
 
-	// A custom search tree may be better
+        // A custom search tree may be better
         for (int i = starting; i < count; i++) {
-	    if (headers[i].getName().equalsIgnoreCase(name)) {
+            if (headers[i].getName().equalsIgnoreCase(name)) {
                 return i;
             }
         }
@@ -198,11 +198,11 @@ public class MimeHeaders {
      * that multiple fields with that name exist in this header.
      */
     public Enumeration names() {
-	return new NamesEnumerator(this);
+        return new NamesEnumerator(this);
     }
 
     public Enumeration values(String name) {
-	return new ValuesEnumerator(this, name);
+        return new ValuesEnumerator(this, name);
     }
 
     // -------------------- Adding headers --------------------
@@ -213,54 +213,54 @@ public class MimeHeaders {
      * field has not had its name or value initialized.
      */
     private MimeHeaderField createHeader() {
-	MimeHeaderField mh;
-	int len = headers.length;
-	if (count >= len) {
-	    // expand header list array
-	    MimeHeaderField tmp[] = new MimeHeaderField[count * 2];
-	    System.arraycopy(headers, 0, tmp, 0, len);
-	    headers = tmp;
-	}
-	if ((mh = headers[count]) == null) {
-	    headers[count] = mh = new MimeHeaderField();
-	}
-	count++;
-	return mh;
+        MimeHeaderField mh;
+        int len = headers.length;
+        if (count >= len) {
+            // expand header list array
+            MimeHeaderField tmp[] = new MimeHeaderField[count * 2];
+            System.arraycopy(headers, 0, tmp, 0, len);
+            headers = tmp;
+        }
+        if ((mh = headers[count]) == null) {
+            headers[count] = mh = new MimeHeaderField();
+        }
+        count++;
+        return mh;
     }
 
     /** Create a new named header , return the MessageBytes
-	container for the new value
+        container for the new value
     */
     public MessageBytes addValue( String name ) {
- 	MimeHeaderField mh = createHeader();
-	mh.getName().setString(name);
-	return mh.getValue();
+         MimeHeaderField mh = createHeader();
+        mh.getName().setString(name);
+        return mh.getValue();
     }
 
     /** Create a new named header using un-translated byte[].
-	The conversion to chars can be delayed until
-	encoding is known.
+        The conversion to chars can be delayed until
+        encoding is known.
      */
     public MessageBytes addValue(byte b[], int startN, int len)
     {
-	MimeHeaderField mhf=createHeader();
-	mhf.getName().setBytes(b, startN, len);
-	return mhf.getValue();
+        MimeHeaderField mhf=createHeader();
+        mhf.getName().setBytes(b, startN, len);
+        return mhf.getValue();
     }
 
     /** Create a new named header using translated char[].
      */
     public MessageBytes addValue(char c[], int startN, int len)
     {
-	MimeHeaderField mhf=createHeader();
-	mhf.getName().setChars(c, startN, len);
-	return mhf.getValue();
+        MimeHeaderField mhf=createHeader();
+        mhf.getName().setChars(c, startN, len);
+        return mhf.getValue();
     }
 
     /** Allow "set" operations - 
         return a MessageBytes container for the
-	header value ( existing header or new
-	if this .
+        header value ( existing header or new
+        if this .
     */
     public MessageBytes setValue( String name ) {
         for ( int i = 0; i < count; i++ ) {
@@ -286,7 +286,7 @@ public class MimeHeaders {
      */
     public MessageBytes getValue(String name) {
         for (int i = 0; i < count; i++) {
-	    if (headers[i].getName().equalsIgnoreCase(name)) {
+            if (headers[i].getName().equalsIgnoreCase(name)) {
                 return headers[i].getValue();
             }
         }
@@ -296,8 +296,8 @@ public class MimeHeaders {
     // bad shortcut - it'll convert to string ( too early probably,
     // encoding is guessed very late )
     public String getHeader(String name) {
-	MessageBytes mh = getValue(name);
-	return mh != null ? mh.toString() : null;
+        MessageBytes mh = getValue(name);
+        return mh != null ? mh.toString() : null;
     }
 
     // -------------------- Removing --------------------
@@ -346,41 +346,41 @@ class NamesEnumerator implements Enumeration {
     MimeHeaders headers;
 
     NamesEnumerator(MimeHeaders headers) {
-	this.headers=headers;
-	pos=0;
-	size = headers.size();
-	findNext();
+        this.headers=headers;
+        pos=0;
+        size = headers.size();
+        findNext();
     }
 
     private void findNext() {
-	next=null;
-	for(  ; pos< size; pos++ ) {
-	    next=headers.getName( pos ).toString();
-	    for( int j=0; j<pos ; j++ ) {
-		if( headers.getName( j ).equalsIgnoreCase( next )) {
-		    // duplicate.
-		    next=null;
-		    break;
-		}
-	    }
-	    if( next!=null ) {
-		// it's not a duplicate
-		break;
-	    }
-	}
-	// next time findNext is called it will try the
-	// next element
-	pos++;
+        next=null;
+        for(  ; pos< size; pos++ ) {
+            next=headers.getName( pos ).toString();
+            for( int j=0; j<pos ; j++ ) {
+                if( headers.getName( j ).equalsIgnoreCase( next )) {
+                    // duplicate.
+                    next=null;
+                    break;
+                }
+            }
+            if( next!=null ) {
+                // it's not a duplicate
+                break;
+            }
+        }
+        // next time findNext is called it will try the
+        // next element
+        pos++;
     }
     
     public boolean hasMoreElements() {
-	return next!=null;
+        return next!=null;
     }
 
     public Object nextElement() {
-	String current=next;
-	findNext();
-	return current;
+        String current=next;
+        findNext();
+        return current;
     }
 }
 
@@ -396,32 +396,32 @@ class ValuesEnumerator implements Enumeration {
 
     ValuesEnumerator(MimeHeaders headers, String name) {
         this.name=name;
-	this.headers=headers;
-	pos=0;
-	size = headers.size();
-	findNext();
+        this.headers=headers;
+        pos=0;
+        size = headers.size();
+        findNext();
     }
 
     private void findNext() {
-	next=null;
-	for( ; pos< size; pos++ ) {
-	    MessageBytes n1=headers.getName( pos );
-	    if( n1.equalsIgnoreCase( name )) {
-		next=headers.getValue( pos );
-		break;
-	    }
-	}
-	pos++;
+        next=null;
+        for( ; pos< size; pos++ ) {
+            MessageBytes n1=headers.getName( pos );
+            if( n1.equalsIgnoreCase( name )) {
+                next=headers.getValue( pos );
+                break;
+            }
+        }
+        pos++;
     }
     
     public boolean hasMoreElements() {
-	return next!=null;
+        return next!=null;
     }
 
     public Object nextElement() {
-	MessageBytes current=next;
-	findNext();
-	return current.toString();
+        MessageBytes current=next;
+        findNext();
+        return current.toString();
     }
 }
 
@@ -442,16 +442,16 @@ class MimeHeaderField {
     }
 
     public void recycle() {
-	nameB.recycle();
-	valueB.recycle();
-	next=null;
+        nameB.recycle();
+        valueB.recycle();
+        next=null;
     }
 
     public MessageBytes getName() {
-	return nameB;
+        return nameB;
     }
 
     public MessageBytes getValue() {
-	return valueB;
+        return valueB;
     }
 }
