@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
@@ -51,12 +50,6 @@ public class MemoryRealm  extends RealmBase {
     private static Log log = LogFactory.getLog(MemoryRealm.class);
 
     // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * The Container with which this Realm is associated.
-     */
-    private Container container = null;
 
 
     /**
@@ -97,12 +90,6 @@ public class MemoryRealm  extends RealmBase {
      */
     private static StringManager sm =
         StringManager.getManager(Constants.Package);
-
-
-    /**
-     * Has this component been started?
-     */
-    private boolean started = false;
 
 
     // ------------------------------------------------------------- Properties
