@@ -293,6 +293,25 @@ public class MimeHeaders {
         return null;
     }
 
+    /**
+     * Finds and returns a unique header field with the given name. If no such
+     * field exists, null is returned. If the specified header field is not
+     * unique then an {@link IllegalArgumentException} is thrown. 
+     */
+    public MessageBytes getUniqueValue(String name) {
+        MessageBytes result = null;
+        for (int i = 0; i < count; i++) {
+            if (headers[i].getName().equalsIgnoreCase(name)) {
+                if (result == null) {
+                    result = headers[i].getValue();
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            }
+        }
+        return result;
+    }
+
     // bad shortcut - it'll convert to string ( too early probably,
     // encoding is guessed very late )
     public String getHeader(String name) {
