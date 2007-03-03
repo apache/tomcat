@@ -26,6 +26,10 @@
         <bug>41739</bug> Correct handling of servlets with a load-on-startup
         value of zero. These are now the first servlets to be started. (markt)
       </fix>
+      <fix>
+        <bug>41752</bug> Correct error message on exception in MemoryRealm.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
