@@ -301,7 +301,8 @@ public class MemoryRealm  extends RealmBase {
                 digester.parse(file);
             }
         } catch (Exception e) {
-            throw new LifecycleException("memoryRealm.readXml", e);
+            throw new LifecycleException
+                (sm.getString("memoryRealm.readXml"), e);
         } finally {
             digester.reset();
         }
