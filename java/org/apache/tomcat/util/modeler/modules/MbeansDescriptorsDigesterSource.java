@@ -38,6 +38,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     String type;
     Object source;
     List mbeans=new ArrayList();
+    protected static Digester digester = null;
     
     protected static Digester createDigester(Registry registry) {
 
@@ -218,18 +219,24 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
         InputStream stream = (InputStream) source;
 
-        Digester digester = createDigester(registry);
-        // Push our registry object onto the stack
-        digester.push(mbeans);
+        if (digester == null) {
+            digester = createDigester(registry);
+        }
         
-        // Process the input file to configure our registry
-        try {
-            digester.parse(stream);
-        } catch (Exception e) {
-            log.error("Error digesting Registry data", e);
-            throw e;
-        } finally {
-            digester.reset();
+        synchronized (digester) {
+
+            // Process the input file to configure our registry
+            try {
+                // Push our registry object onto the stack
+                digester.push(mbeans);
+                digester.parse(stream);
+            } catch (Exception e) {
+                log.error("Error digesting Registry data", e);
+                throw e;
+            } finally {
+                digester.reset();
+            }
+        
         }
             
     }
