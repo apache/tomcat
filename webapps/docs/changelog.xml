@@ -27,6 +27,9 @@
         value of zero. These are now the first servlets to be started. (markt)
       </fix>
       <fix>
+        <bug>41747</bug> Correct example ant script for deploy task. (markt)
+      </fix>
+      <fix>
         <bug>41752</bug> Correct error message on exception in MemoryRealm.
         (markt)
       </fix>
