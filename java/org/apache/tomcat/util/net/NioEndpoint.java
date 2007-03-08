@@ -1291,11 +1291,11 @@ public class NioEndpoint {
                     KeyAttachment attachment = (KeyAttachment)sk.attachment();
                     try {
                         if ( sk.isValid() && attachment != null ) {
-                            attachment.access();
-                            sk.attach(attachment);
-                            int interestOps = sk.interestOps();
+                            attachment.access();//make sure we don't time out valid sockets
+                            sk.attach(attachment);//cant remember why this is here
+                            int interestOps = sk.interestOps();//get the interestops, in case we need to reset them
                             sk.interestOps(0); //this is a must, so that we don't have multiple threads messing with the socket
-                            attachment.interestOps(0);
+                            attachment.interestOps(0);//fast access interestp ops
                             NioChannel channel = attachment.getChannel();
                             if (sk.isReadable() || sk.isWritable() ) {
                                 if ( attachment.getComet() ) {
