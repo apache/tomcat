@@ -1095,6 +1095,8 @@ public class NioEndpoint {
             } else {
                 final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                 final KeyAttachment att = (KeyAttachment) key.attachment();
+                //we are registering the key to start with, reset the fairness counter.
+                att.setFairness(0);
                 try {
                     if (key != null) {
                         key.interestOps(interestOps);
@@ -1304,6 +1306,8 @@ public class NioEndpoint {
                                         if (!processSocket(channel, SocketStatus.OPEN))
                                             processSocket(channel, SocketStatus.DISCONNECT);
                                     } else {
+                                        //increase the fairness counter
+                                        attachment.incFairness();
                                         //reregister it
                                         attachment.interestOps(interestOps);
                                         sk.interestOps(interestOps);
@@ -1319,6 +1323,8 @@ public class NioEndpoint {
                                             channel.getIOChannel().socket().close();
                                         }
                                     } else {
+                                        //increase the fairness counter
+                                        attachment.incFairness();
                                         //reregister it
                                         attachment.interestOps(interestOps);
                                         sk.interestOps(interestOps);
@@ -1393,6 +1399,7 @@ public class NioEndpoint {
             comet = false;
             timeout = -1;
             error = false;
+            fairness = 0;
         }
         
         public void reset() {
@@ -1425,6 +1432,9 @@ public class NioEndpoint {
             if ( latch == null || latch.getCount() == 0 ) this.latch = new CountDownLatch(cnt); 
             else throw new IllegalStateException("Latch must be at count 0 or null.");
         }
+        public int getFairness() { return fairness; }
+        public void setFairness(int f) { fairness = f;}
+        public void incFairness() { fairness++; }
         protected Object mutex = new Object();
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
@@ -1433,7 +1443,7 @@ public class NioEndpoint {
         protected boolean error = false;
         protected NioChannel channel = null;
         protected CountDownLatch latch = null;
-
+        protected int fairness = 0;
     }
 
 
