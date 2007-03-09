@@ -149,15 +149,18 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         // Check to correct engine and host setup
         Object parent = getCluster().getContainer();
         Engine engine = null;
+        String hostname = null;
         if ( parent instanceof Host ) {
             host = (Host) parent;
             engine = (Engine) host.getParent();
+            hostname = host.getName();
         }else {
             engine = (Engine)parent;
+            hostname = engine.getDefaultHost();
         }
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host="
-                    + host.getName());
+                    + hostname);
         } catch (Exception e) {
             log.error("Can't construct MBean object name" + e);
         }

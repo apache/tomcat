@@ -8,10 +8,6 @@
                 group="Cluster"
                  type="org.apache.catalina.ha.tcp.SimpleTcpCluster">
 
-    <attribute   name="protocolStack"
-          description="JavaGroups protocol stack selection"
-                 type="java.lang.String"/>
-
   </mbean>
 
 
