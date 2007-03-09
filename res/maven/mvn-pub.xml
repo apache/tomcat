@@ -143,11 +143,19 @@
     </antcall>
   </target>
 
-  <target name="deploy-release">
+  <target name="deploy-staging">
     <antcall target="generic-deploy">
       <param name="maven.repo.repositoryId" value="${maven.release.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.release.repo.url}"/>
       <param name="maven.deploy.version" value="${maven.release.deploy.version}"/>
+    </antcall>
+  </target>
+
+  <target name="deploy-release">
+    <antcall target="generic-deploy">
+      <param name="maven.repo.repositoryId" value="${maven.asf.release.repo.repositoryId}"/>
+      <param name="maven.repo.url" value="${maven.asf.release.repo.url}"/>
+      <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}"/>
     </antcall>
   </target>
 
