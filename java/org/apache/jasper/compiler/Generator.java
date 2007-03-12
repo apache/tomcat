@@ -2308,21 +2308,11 @@ class Generator {
                 } else {
                     out.printin(tagHandlerVar);
                     out.println(".release();");
-                    out.printil("try {");
-                    out.pushIndent();
                     out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
                     out.print(VAR_ANNOTATIONPROCESSOR);
                     out.print(", ");
                     out.print(tagHandlerVar);
                     out.println(");");
-                    out.popIndent();
-                    out.printil("} catch (Exception e) {");
-                    out.pushIndent();
-                    out.printin("log(\"Error processing preDestroy on tag instance of \" +");
-                    out.print(tagHandlerVar);
-                    out.println(".getClass().getName());");
-                    out.popIndent();
-                    out.printil("}");
                 }
             }
             if (isTagFile || isFragment) {
@@ -2365,21 +2355,11 @@ class Generator {
             } else {
                 out.printin(tagHandlerVar);
                 out.println(".release();");
-                out.printil("try {");
-                out.pushIndent();
                 out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
                 out.print(VAR_ANNOTATIONPROCESSOR);
                 out.print(", ");
                 out.print(tagHandlerVar);
                 out.println(");");
-                out.popIndent();
-                out.printil("} catch (Exception e) {");
-                out.pushIndent();
-                out.printin("log(\"Error processing preDestroy on tag instance of \" +");
-                out.print(tagHandlerVar);
-                out.println(".getClass().getName());");
-                out.popIndent();
-                out.printil("}");
             }
 
             if (n.implementsTryCatchFinally()) {
