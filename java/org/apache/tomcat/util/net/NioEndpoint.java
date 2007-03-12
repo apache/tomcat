@@ -47,6 +47,7 @@ import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CountDownLatch;
+import java.util.Comparator;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -1385,7 +1386,8 @@ public class NioEndpoint {
             }//for
         }
     }
-    
+
+// ----------------------------------------------------- Key Attachment Class   
     public static class KeyAttachment {
         
         public KeyAttachment() {
@@ -1400,6 +1402,7 @@ public class NioEndpoint {
             timeout = -1;
             error = false;
             fairness = 0;
+            lastRegistered = 0;
         }
         
         public void reset() {
@@ -1435,6 +1438,9 @@ public class NioEndpoint {
         public int getFairness() { return fairness; }
         public void setFairness(int f) { fairness = f;}
         public void incFairness() { fairness++; }
+        public long getLastRegistered() { return lastRegistered; };
+        public void setLastRegistered(long reg) { lastRegistered = reg; }
+        
         protected Object mutex = new Object();
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
@@ -1444,6 +1450,28 @@ public class NioEndpoint {
         protected NioChannel channel = null;
         protected CountDownLatch latch = null;
         protected int fairness = 0;
+        protected long lastRegistered = 0;
+    }
+// ----------------------------------------------------- Key Fairness Comparator
+    public static class KeyFairnessComparator implements Comparator<KeyAttachment> {
+        public int compare(KeyAttachment ka1, KeyAttachment ka2) {
+            long lr1 = ka1.getLastRegistered();
+            long lr2 = ka2.getLastRegistered();
+            int f1 = ka1.getFairness();
+            int f2 = ka2.getFairness();
+            if ( f1 == f2 ) {
+                if ( lr1 == lr2 ) return 0;
+                //earlier objects have priorioty
+                else return lr1<lr2?-1:1;                
+            } else {
+                //higher fairness means earlier in the queue
+                //as fairness count means how many times the poller has skipped 
+                //this socket, and the socket has been ready, there just hasn't 
+                //been any worker thread available to handle it
+                return ka1.getFairness()>ka2.getFairness()?-1:1;
+            }
+        }
+
     }
 
 
