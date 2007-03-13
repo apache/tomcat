@@ -395,6 +395,14 @@
     the -Djava.net.preferIPv4Stack=true value to your command line</p>
 
     <attributes>
+      <attribute name="useExecutor" required="false">
+        Set to true to use the NIO thread pool executor. The default value is <code>true</code>.
+        If set to false, it uses a thread pool based on a stack for its execution.
+        Generally, using the executor yields a little bit slower performance, but yields a better
+        fairness for processing connections in a high load environment as the traffic gets queued through a 
+        FIFO queue. If set to true(default) then the max pool size is the <code>maxThreads</code> attribute
+        and the core pool size is the <code>minSpareThreads</code>.
+      </attribute>
       <attribute name="acceptorThreadCount" required="false">
         <p>The number of threads to be used to accept connections. Increase this value on a multi CPU machine,
         although you would never really need more than 2. Also, with a lot of non keep alive connections,
