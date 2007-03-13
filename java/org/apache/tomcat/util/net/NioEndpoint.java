@@ -48,6 +48,9 @@ import org.apache.tomcat.util.res.StringManager;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.CountDownLatch;
 import java.util.Comparator;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -650,8 +653,8 @@ public class NioEndpoint {
             
             // Create worker collection
             if (executor == null) {
-                workers = new WorkerStack(maxThreads);
-                //executor = new ThreadPoolExecutor(getMinSpareThreads(),getMaxThreads(),5000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+                //workers = new WorkerStack(maxThreads);
+                executor = new ThreadPoolExecutor(getMaxThreads(),getMaxThreads(),5000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
             }
 
             // Start acceptor threads
@@ -859,16 +862,20 @@ public class NioEndpoint {
      * @return boolean
      */
     protected boolean isWorkerAvailable() {
-        if (workers.size() > 0) {
-            return true;
-        }
-        if ((maxThreads > 0) && (curThreads < maxThreads)) {
+        if ( executor != null ) {
             return true;
         } else {
-            if (maxThreads < 0) {
+            if (workers.size() > 0) {
+                return true;
+            }
+            if ( (maxThreads > 0) && (curThreads < maxThreads)) {
                 return true;
             } else {
-                return false;
+                if (maxThreads < 0) {
+                    return true;
+                } else {
+                    return false;
+                }
             }
         }
     }
