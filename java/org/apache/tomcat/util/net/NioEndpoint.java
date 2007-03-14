@@ -155,6 +155,40 @@ public class NioEndpoint {
     protected ServerSocketChannel serverSock = null;
 
     /**
+     * Cache for SocketProcessor objects
+     */
+    protected ConcurrentLinkedQueue<SocketProcessor> processorCache = new ConcurrentLinkedQueue<SocketProcessor>() {
+        protected AtomicInteger size = new AtomicInteger(0);
+        public boolean offer(SocketProcessor sc) {
+            sc.reset(null,null);
+            boolean offer = socketProperties.getProcessorCache()==-1?true:size.get()<socketProperties.getProcessorCache();
+            //avoid over growing our cache or add after we have stopped
+            if ( running && (!paused) && (offer) ) {
+                boolean result = super.offer(sc);
+                if ( result ) {
+                    size.incrementAndGet();
+                }
+                return result;
+            }
+            else return false;
+        }
+        
+        public SocketProcessor poll() {
+            SocketProcessor result = super.poll();
+            if ( result != null ) {
+                size.decrementAndGet();
+            }
+            return result;
+        }
+        
+        public void clear() {
+            super.clear();
+            size.set(0);
+        }
+    };
+
+
+    /**
      * Cache for key attachment objects
      */
     protected ConcurrentLinkedQueue<KeyAttachment> keyCache = new ConcurrentLinkedQueue<KeyAttachment>() {
@@ -727,6 +761,7 @@ public class NioEndpoint {
         eventCache.clear();
         keyCache.clear();
         nioChannels.clear();
+        processorCache.clear();
         if ( executor!=null ) {
             ThreadPoolExecutor tpe = (ThreadPoolExecutor)executor;
             tpe.shutdown();
@@ -977,19 +1012,7 @@ public class NioEndpoint {
      * Process given socket.
      */
     protected boolean processSocket(NioChannel socket) {
-        try {
-            if (executor == null) {
-                getWorkerThread().assign(socket);
-            }  else {
-                executor.execute(new SocketProcessor(socket,null));
-            }
-        } catch (Throwable t) {
-            // This means we got an OOM or similar creating a thread, or that
-            // the pool and its queue are full
-            log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
-        }
-        return true;
+        return processSocket(socket,null);
     }
 
 
@@ -1001,7 +1024,10 @@ public class NioEndpoint {
             if (executor == null) {
                 getWorkerThread().assign(socket, status);
             } else {
-                executor.execute(new SocketProcessor(socket, status));
+                SocketProcessor sc = processorCache.poll();
+                if ( sc == null ) sc = new SocketProcessor(socket,status);
+                else sc.reset(socket,status);
+                executor.execute(sc);
             }
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
@@ -1794,32 +1820,6 @@ public class NioEndpoint {
     }
 
 
-    // ---------------------------------------------- SocketOptionsProcessor Inner Class
-
-
-    /**
-     * This class is the equivalent of the Worker, but will simply use in an
-     * external Executor thread pool.
-     */
-    protected class SocketOptionsProcessor implements Runnable {
-
-        protected SocketChannel sc = null;
-
-        public SocketOptionsProcessor(SocketChannel socket) {
-            this.sc = socket;
-        }
-
-        public void run() {
-            if ( !setSocketOptions(sc) ) {
-                try {
-                    sc.socket().close();
-                    sc.close();
-                }catch ( IOException ix ) {
-                    if ( log.isDebugEnabled() ) log.debug("",ix);
-                }
-            }
-        }
-    }
     // ---------------------------------------------- SocketProcessor Inner Class
 
 
@@ -1833,6 +1833,10 @@ public class NioEndpoint {
         protected SocketStatus status = null; 
 
         public SocketProcessor(NioChannel socket, SocketStatus status) {
+            reset(socket,status);
+        }
+        
+        public void reset(NioChannel socket, SocketStatus status) {
             this.socket = socket;
             this.status = status;
         }
@@ -1850,10 +1854,11 @@ public class NioEndpoint {
                 } catch ( Exception x ) {
                     log.error("",x);
                 }
-                socket = null;
-                status = null;
             }
-
+            socket = null;
+            status = null;
+            //return to cache
+            processorCache.offer(this);
         }
 
     }
