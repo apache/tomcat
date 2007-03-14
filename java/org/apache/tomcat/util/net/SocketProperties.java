@@ -26,18 +26,29 @@ import java.net.SocketException;
  */
 public class SocketProperties {
     /**
-     * Enable/disable key cache, this bounced cache stores
+     * Enable/disable key cache, this bounded cache stores
      * KeyAttachment objects to reduce GC
-     * Default is 100
+     * Default is 500
      * -1 is unlimited
      * 0 is disabled
      */
     protected int keyCache = 500;
+    
+    /**
+     * Enable/disable socket processor cache, this bounded cache stores
+     * SocketProcessor objects to reduce GC
+     * Default is 500
+     * -1 is unlimited
+     * 0 is disabled
+     */
+    protected int processorCache = 500;
+
+
 
     /**
      * Enable/disable poller event cache, this bounded cache stores
      * PollerEvent objects to reduce GC for the poller
-     * Default is -1 (unlimited)
+     * Default is 500 
      * -1 is unlimited
      * 0 is disabled
      * >0 the max number of objects to keep in cache.
@@ -243,6 +254,10 @@ public class SocketProperties {
         return appWriteBufSize;
     }
 
+    public int getProcessorCache() {
+        return processorCache;
+    }
+
     public int getDirectBufferPool() {
         return bufferPool;
     }
@@ -325,6 +340,10 @@ public class SocketProperties {
 
     public void setAppWriteBufSize(int appWriteBufSize) {
         this.appWriteBufSize = appWriteBufSize;
+    }
+
+    public void setProcessorCache(int processorCache) {
+        this.processorCache = processorCache;
     }
 
     public void setDirectBufferPool(int directBufferPool) {

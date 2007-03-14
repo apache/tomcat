@@ -457,6 +457,12 @@
         The value is in bytes, the default value is 1024*1024*100 (100MB)
         </p>
       </attribute>
+      <attribute name="socket.processorCache" required="false">
+        <p>Tomcat will cache SocketProcessor objects to reduce garbage collection.
+           The integer value specifies how many objects to keep in the cache at most.
+           The default is 500.
+           Other values are -1. unlimited cache, and 0, no cache.</p>
+      </attribute>
       <attribute name="socket.keyCache" required="false">
         <p>Tomcat will cache KeyAttachment objects to reduce garbage collection.
            The integer value specifies how many objects to keep in the cache at most.
