@@ -155,6 +155,12 @@ public class AprEndpoint {
      */
     protected long sslContext = 0;
 
+    
+    /**
+     * Defer accept.
+     */
+    protected boolean deferAccept = true;
+    
 
     // ------------------------------------------------------------- Properties
 
@@ -619,7 +625,6 @@ public class AprEndpoint {
 
         // Sendfile usage on systems which don't support it cause major problems
         if (useSendfile && !Library.APR_HAS_SENDFILE) {
-            log.warn(sm.getString("endpoint.sendfile.nosupport"));
             useSendfile = false;
         }
 
@@ -655,7 +660,9 @@ public class AprEndpoint {
         // Delay accepting of new connections until data is available
         // Only Linux kernels 2.4 + have that implemented
         // on other platforms this call is noop and will return APR_ENOTIMPL.
-        Socket.optSet(serverSock, Socket.APR_TCP_DEFER_ACCEPT, 1);
+        if (Socket.optSet(serverSock, Socket.APR_TCP_DEFER_ACCEPT, 1) == Status.APR_ENOTIMPL) {
+            deferAccept = false;
+        }
 
         // Initialize SSL if needed
         if (SSLEnabled) {
@@ -1490,16 +1497,27 @@ public class AprEndpoint {
                 if (socket == 0)
                     continue;
 
-                // Process the request from this socket
-                if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
-                    // Close socket and pool
-                    Socket.destroy(socket);
-                    socket = 0;
-                } else if ((status == null) && ((options && !setSocketOptions(socket)) 
-                        || handler.process(socket) == Handler.SocketState.CLOSED)) {
-                    // Close socket and pool
-                    Socket.destroy(socket);
-                    socket = 0;
+                if (!deferAccept && options) {
+                    if (setSocketOptions(socket)) {
+                        getPoller().add(socket);
+                    } else {
+                        // Close socket and pool
+                        Socket.destroy(socket);
+                        socket = 0;
+                    }
+                } else {
+
+                    // Process the request from this socket
+                    if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
+                        // Close socket and pool
+                        Socket.destroy(socket);
+                        socket = 0;
+                    } else if ((status == null) && ((options && !setSocketOptions(socket)) 
+                            || handler.process(socket) == Handler.SocketState.CLOSED)) {
+                        // Close socket and pool
+                        Socket.destroy(socket);
+                        socket = 0;
+                    }
                 }
 
                 // Finish up this request
@@ -1904,12 +1922,22 @@ public class AprEndpoint {
 
         public void run() {
 
-            // Process the request from this socket
-            if (!setSocketOptions(socket) 
-                    || handler.process(socket) == Handler.SocketState.CLOSED) {
-                // Close socket and pool
-                Socket.destroy(socket);
-                socket = 0;
+            if (!deferAccept) {
+                if (setSocketOptions(socket)) {
+                    getPoller().add(socket);
+                } else {
+                    // Close socket and pool
+                    Socket.destroy(socket);
+                    socket = 0;
+                }
+            } else {
+                // Process the request from this socket
+                if (!setSocketOptions(socket) 
+                        || handler.process(socket) == Handler.SocketState.CLOSED) {
+                    // Close socket and pool
+                    Socket.destroy(socket);
+                    socket = 0;
+                }
             }
 
         }
