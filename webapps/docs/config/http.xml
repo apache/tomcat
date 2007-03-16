@@ -412,6 +412,21 @@
         <p>The number of threads to be used to run for the polling events. Default value is 1.
            Can't see a reason to go above that. But experiment and find your own results.</p>
       </attribute>
+      <attribute name="pollerThreadPriority" required="false">
+        <p>The priority of the poller threads.
+          The default value is <code>java.lang.Thread#NORM_PRIORITY</code>.
+          See the JavaDoc for the java.lang.Thread class for more details on
+          what this priority means.
+        </p>
+      </attribute>
+      <attribute name="acceptorThreadPriority" required="false">
+        <p>The priority of the acceptor threads. The threads used to accept new connections.
+          The default value is <code>java.lang.Thread#NORM_PRIORITY</code>.
+          See the JavaDoc for the java.lang.Thread class for more details on
+          what this priority means.
+        </p>
+      </attribute>
+      
       <attribute name="selectorTimeout" required="false">
         <p>The time in milliseconds to timeout on a select() for the poller.
            This value is important, since connection clean up is done on the same thread, so dont set this 

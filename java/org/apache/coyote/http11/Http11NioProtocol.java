@@ -274,11 +274,30 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
       ep.setThreadPriority(threadPriority);
       setAttribute("threadPriority", "" + threadPriority);
     }
+    
+    public void setAcceptorThreadPriority(int threadPriority) {
+      ep.setAcceptorThreadPriority(threadPriority);
+      setAttribute("acceptorThreadPriority", "" + threadPriority);
+    }
+
+    public void setPollerThreadPriority(int threadPriority) {
+      ep.setPollerThreadPriority(threadPriority);
+      setAttribute("pollerThreadPriority", "" + threadPriority);
+    }
 
     public int getThreadPriority() {
       return ep.getThreadPriority();
     }
 
+    public int getAcceptorThreadPriority() {
+      return ep.getAcceptorThreadPriority();
+    }
+    
+    public int getPollerThreadPriority() {
+      return ep.getThreadPriority();
+    }
+    
+    
     // -------------------- Tcp setup --------------------
 
     public int getBacklog() {
