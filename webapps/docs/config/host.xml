@@ -284,10 +284,9 @@
         deployer, if enabled, will automatically expand the updated WAR file
         once the previously expanded directory is removed).</li>
     <li>Any subdirectory within the <em>application base directory</em>
-        that appears to be an unpacked web application (that is, it contains
-        a <code>/WEB-INF/web.xml</code> file) will receive an automatically
-        generated <a href="context.html">Context</a> element, even if this
-        directory is not mentioned in the <code>conf/server.xml</code> file.
+        will receive an automatically generated <a href="context.html">
+        Context</a> element, even if this directory is not mentioned in the
+        <code>conf/server.xml</code> file.
         This generated Context entry will be configured according to the
         properties set in any <a href="defaultcontext.html">DefaultContext</a>
         element nested in this Host element.  The context path for this
@@ -298,8 +297,7 @@
 
     <p>In addition to the automatic deployment that occurs at startup time,
     you can also request that new XML configuration files, WAR files, or
-    subdirectories (containing web applications) that are dropped in to the
-    <code>appBase</code> (or 
+    subdirectories that are dropped in to the <code>appBase</code> (or 
     <code>$CATALINA_HOME/conf/[engine_name]/[host_name]</code> in the case of
     an XML configuration file) directory while Tomcat is running will be
     automatically deployed, according to the rules described above. The 
