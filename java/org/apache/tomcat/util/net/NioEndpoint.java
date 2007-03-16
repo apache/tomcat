@@ -103,6 +103,7 @@ public class NioEndpoint {
     public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
 
     public static final int OP_REGISTER = -1; //register interest op
+    
     // ----------------------------------------------------------------- Fields
 
 
@@ -318,12 +319,25 @@ public class NioEndpoint {
 
 
     /**
-     * Priority of the acceptor and poller threads.
+     * Priority of the worker threads.
      */
     protected int threadPriority = Thread.NORM_PRIORITY;
     public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
     public int getThreadPriority() { return threadPriority; }
 
+    /**
+     * Priority of the acceptor threads.
+     */
+    protected int acceptorThreadPriority = Thread.NORM_PRIORITY;
+    public void setAcceptorThreadPriority(int acceptorThreadPriority) { this.acceptorThreadPriority = acceptorThreadPriority; }
+    public int getAcceptorThreadPriority() { return acceptorThreadPriority; }
+
+    /**
+     * Priority of the poller threads.
+     */
+    protected int pollerThreadPriority = Thread.NORM_PRIORITY;
+    public void setPollerThreadPriority(int pollerThreadPriority) { this.pollerThreadPriority = pollerThreadPriority; }
+    public int getPollerThreadPriority() { return pollerThreadPriority; }
 
     /**
      * Server socket port.
