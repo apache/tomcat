@@ -56,6 +56,10 @@
         Fix previous update to servlet 2.5 xsd to use correct declaration.
         (markt)
       </fix>
+      <update>
+        Update host configuration document for new behaviour for directories
+        in appBase. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
