@@ -1145,11 +1145,11 @@ public class NioEndpoint {
                 }
             } else {
                 final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                final KeyAttachment att = (KeyAttachment) key.attachment();
-                //we are registering the key to start with, reset the fairness counter.
-                att.setFairness(0);
                 try {
                     if (key != null) {
+                        final KeyAttachment att = (KeyAttachment) key.attachment();
+                        //we are registering the key to start with, reset the fairness counter.
+                        att.setFairness(0);
                         key.interestOps(interestOps);
                         att.interestOps(interestOps);
                     }
