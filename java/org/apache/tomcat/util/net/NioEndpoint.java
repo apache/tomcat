@@ -712,7 +712,7 @@ public class NioEndpoint {
                     executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
                     taskqueue.setParent( (ThreadPoolExecutor) executor);
                 }
-            } else {
+            } else if ( executor != null ) {//avoid two thread pools being created
                 workers = new WorkerStack(maxThreads);
             }
 
@@ -1898,7 +1898,7 @@ public class NioEndpoint {
         }
         
         public boolean offer(Runnable o) {
-            if ( parent != null && parent.getPoolSize()<parent.getMaximumPoolSize() ) return false;
+            if ( parent != null && parent.getPoolSize()<parent.getMaximumPoolSize() ) return false;//force creation of new threads
             else return super.offer(o);
         }
     }
@@ -1917,7 +1917,7 @@ public class NioEndpoint {
 
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
-            t.setDaemon(true);
+            t.setDaemon(daemon);
             t.setPriority(getThreadPriority());
             return t;
         }
