@@ -248,6 +248,17 @@ public class ChatServlet
   </source>
   
   </subsection>
+  <subsection name="Comet timeouts">
+    <p>If you are using the NIO connector, you can set individual timeouts for your different comet connections.
+       To set a timeout, simple set a request attribute like the following code shows:
+       <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
+       This sets the timeout to 30 seconds.
+       Important note, in order to set this timeout, it has to be done on the <code>BEGIN</code> event.
+       The default value is <code>soTimeout</code>
+    </p>
+    <p>If you are using the APR connector, all Comet connections will have the same timeout value. It is <code>soTimeout*50</code>
+    </p>
+  </subsection>
 
   </section>
 
