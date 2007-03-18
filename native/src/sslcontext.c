@@ -438,7 +438,8 @@ static EVP_PKEY *load_pem_key(tcn_ssl_ctxt_t *c, const char *file)
 {
     BIO *bio = NULL;
     EVP_PKEY *key = NULL;
-    void *cb_data = c->cb_data;
+    tcn_pass_cb_t *cb_data = c->cb_data;
+    int i;
 
     if ((bio = BIO_new(BIO_s_file())) == NULL) {
         return NULL;
@@ -449,17 +450,25 @@ static EVP_PKEY *load_pem_key(tcn_ssl_ctxt_t *c, const char *file)
     }
     if (!cb_data)
         cb_data = &tcn_password_callback;
-    key = PEM_read_bio_PrivateKey(bio, NULL,
-                (pem_password_cb *)SSL_password_callback,
-                cb_data);
+    for (i = 0; i < 3; i++) {
+        key = PEM_read_bio_PrivateKey(bio, NULL,
+                    (pem_password_cb *)SSL_password_callback,
+                    (void *)cb_data);
+        if (key)
+            break;
+        cb_data->password[0] = '\0';
+        BIO_ctrl(bio, BIO_CTRL_RESET, 0, NULL);
+    }
     BIO_free(bio);
     return key;
 }
 
-static X509 *load_pem_cert(const char *file)
+static X509 *load_pem_cert(tcn_ssl_ctxt_t *c, const char *file)
 {
     BIO *bio = NULL;
     X509 *cert = NULL;
+    tcn_pass_cb_t *cb_data = c->cb_data;
+    int i;
 
     if ((bio = BIO_new(BIO_s_file())) == NULL) {
         return NULL;
@@ -468,9 +477,15 @@ static X509 *load_pem_cert(const char *file)
         BIO_free(bio);
         return NULL;
     }
-    cert = PEM_read_bio_X509_AUX(bio, NULL,
-                (pem_password_cb *)SSL_password_callback,
-                 NULL);
+    for (i = 0; i < 3; i++) {
+        cert = PEM_read_bio_X509_AUX(bio, NULL,
+                    (pem_password_cb *)SSL_password_callback,
+                    (void *)cb_data);
+        if (cert)
+            break;
+        cb_data->password[0] = '\0';
+        BIO_ctrl(bio, BIO_CTRL_RESET, 0, NULL);
+    }
     BIO_free(bio);
     return cert;
 }
@@ -530,7 +545,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
         rv = JNI_FALSE;
         goto cleanup;
     }
-    if ((c->certs[idx] = load_pem_cert(cert_file)) == NULL) {
+    if ((c->certs[idx] = load_pem_cert(c, cert_file)) == NULL) {
         ERR_error_string(ERR_get_error(), err);
         tcn_Throw(e, "Unable to load certificate %s (%s)",
                   cert_file, err);
