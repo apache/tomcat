@@ -1294,11 +1294,10 @@ public class NioEndpoint {
                 if (ka != null && ka.getComet()) {
                     //the comet event takes care of clean up
                     processSocket(ka.getChannel(), status, dispatch);
-                }else {
-                    if (key.isValid()) key.cancel();
-                    if (key.channel().isOpen()) key.channel().close();
-                    key.attach(null);
                 }
+                if (key.isValid()) key.cancel();
+                if (key.channel().isOpen()) key.channel().close();
+                key.attach(null);
             } catch (Throwable e) {
                 if ( log.isDebugEnabled() ) log.error("",e);
                 // Ignore
