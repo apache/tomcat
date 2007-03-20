@@ -597,6 +597,7 @@ TCN_IMPLEMENT_CALL(jint, SSLContext, free)(TCN_STDARGS, jlong ctx)
 {
     UNREFERENCED_STDARGS;
     UNREFERENCED(ctx);
+    return APR_ENOTIMPL;
 }
 
 TCN_IMPLEMENT_CALL(void, SSLContext, setContextId)(TCN_STDARGS, jlong ctx,
