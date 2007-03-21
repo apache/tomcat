@@ -777,10 +777,13 @@ public class NioEndpoint {
         nioChannels.clear();
         processorCache.clear();
         if ( executor!=null ) {
-            ThreadPoolExecutor tpe = (ThreadPoolExecutor)executor;
-            tpe.shutdown();
-            TaskQueue queue = (TaskQueue)tpe.getQueue();
-            queue.setParent(null);
+            if ( executor instanceof ThreadPoolExecutor ) {
+                //this is our internal one, so we need to shut it down
+                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
+                tpe.shutdown();
+                TaskQueue queue = (TaskQueue) tpe.getQueue();
+                queue.setParent(null);
+            }
             executor = null;
         }
     }

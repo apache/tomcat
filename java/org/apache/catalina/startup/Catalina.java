@@ -302,13 +302,27 @@ public class Catalina extends Embedded {
                             "addLifecycleListener",
                             "org.apache.catalina.LifecycleListener");
 
+        //Executor
+        digester.addObjectCreate("Server/Service/Executor",
+                         "org.apache.catalina.core.StandardThreadExecutor",
+                         "className");
+        digester.addSetProperties("Server/Service/Executor");
+
+        digester.addSetNext("Server/Service/Executor",
+                            "addExecutor",
+                            "org.apache.catalina.Executor");
+
+        
         digester.addRule("Server/Service/Connector",
                          new ConnectorCreateRule());
         digester.addRule("Server/Service/Connector", 
-                         new SetAllPropertiesRule());
+                         new SetAllPropertiesRule(new String[]{"executor"}));
         digester.addSetNext("Server/Service/Connector",
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
+        
+        
+
 
         digester.addObjectCreate("Server/Service/Connector/Listener",
                                  null, // MUST be specified in the element

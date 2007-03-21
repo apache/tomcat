@@ -38,6 +38,8 @@ import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
+import java.util.ArrayList;
+import org.apache.catalina.Executor;
 
 
 /**
@@ -103,7 +105,11 @@ public class StandardService
      * The set of Connectors associated with this Service.
      */
     protected Connector connectors[] = new Connector[0];
-
+    
+    /**
+     * 
+     */
+    protected ArrayList<Executor> executors = new ArrayList<Executor>();
 
     /**
      * The Container associated with this Service. (In the case of the
@@ -413,6 +419,68 @@ public class StandardService
         lifecycle.removeLifecycleListener(listener);
 
     }
+    
+    /**
+     * Adds a named executor to the service
+     * @param ex Executor
+     */
+    public void addExecutor(Executor ex) {
+        synchronized (executors) {
+            if (!executors.contains(ex)) {
+                executors.add(ex);
+                if (started)
+                    try {
+                        ex.start();
+                    } catch (LifecycleException x) {
+                        log.error("Executor.start", x);
+                    }
+            }
+        }
+    }
+
+    /**
+     * Retrieves all executors
+     * @return Executor[]
+     */
+    public Executor[] findExecutors() {
+        synchronized (executors) {
+            Executor[] arr = new Executor[executors.size()];
+            executors.toArray(arr);
+            return arr;
+        }
+    }
+
+    /**
+     * Retrieves executor by name, null if not found
+     * @param name String
+     * @return Executor
+     */
+    public Executor getExecutor(String name) {
+        synchronized (executors) {
+            for (int i = 0; i < executors.size(); i++) {
+                if (name.equals(executors.get(i).getName()))
+                    return executors.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Removes an executor from the service
+     * @param ex Executor
+     */
+    public void removeExecutor(Executor ex) {
+        synchronized (executors) {
+            if ( executors.remove(ex) && started ) {
+                try {
+                    ex.stop();
+                } catch (LifecycleException e) {
+                    log.error("Executor.stop", e);
+                }
+            }
+        }
+    }
+
 
 
     /**
@@ -455,6 +523,12 @@ public class StandardService
             for (int i = 0; i < connectors.length; i++) {
                 if (connectors[i] instanceof Lifecycle)
                     ((Lifecycle) connectors[i]).start();
+            }
+        }
+        
+        synchronized (executors) {
+            for ( int i=0; i<executors.size(); i++ ) {
+                executors.get(i).start();
             }
         }
 
