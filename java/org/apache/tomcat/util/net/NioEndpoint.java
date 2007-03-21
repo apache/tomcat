@@ -1225,7 +1225,7 @@ public class NioEndpoint {
             close = true;
             events.clear();
             selector.wakeup();
-            try { stopLatch.await(); } catch (InterruptedException ignore ) {}
+            try { stopLatch.await(5,TimeUnit.SECONDS); } catch (InterruptedException ignore ) {}
         }
         
         public void addEvent(Runnable event) {
