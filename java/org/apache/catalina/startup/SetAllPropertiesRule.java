@@ -22,20 +22,26 @@ import org.xml.sax.Attributes;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
+import java.util.HashMap;
 
 /**
  * Rule that uses the introspection utils to set properties.
  * 
  * @author Remy Maucherat
+ * @author Filip Hanik
  */
 public class SetAllPropertiesRule extends Rule {
 
-
+    
     // ----------------------------------------------------------- Constructors
-
+    public SetAllPropertiesRule() {}
+    
+    public SetAllPropertiesRule(String[] exclude) {
+        for (int i=0; i<exclude.length; i++ ) if (exclude[i]!=null) this.excludes.put(exclude[i],exclude[i]);
+    }
 
     // ----------------------------------------------------- Instance Variables
-
+    protected HashMap<String,String> excludes = new HashMap<String,String>();
 
     // --------------------------------------------------------- Public Methods
 
@@ -56,7 +62,8 @@ public class SetAllPropertiesRule extends Rule {
                 name = attributes.getQName(i);
             }
             String value = attributes.getValue(i);
-            IntrospectionUtils.setProperty(digester.peek(), name, value);
+            if ( !excludes.containsKey(name)) 
+                IntrospectionUtils.setProperty(digester.peek(), name, value);
         }
 
     }
