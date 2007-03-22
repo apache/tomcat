@@ -266,7 +266,7 @@ public class ChatServlet
   <section name="Asynchronous writes">
 
   <p>
-    When APR is enabled, Tomcat supports using sendfile to send large static files.
+    When APR or NIO is enabled, Tomcat supports using sendfile to send large static files.
     These writes, as soon as the system load increases, will be performed 
     asynchronously in the most efficient way. Instead of sending a large response using
     blocking writes, it is possible to write content to a static file, and write it
