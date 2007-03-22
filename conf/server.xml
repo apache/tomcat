@@ -35,7 +35,8 @@
   
     <!--The connectors can use a shared executor, you can define one or more named thread pools-->
     <!--
-    <Executor name="tomcatThreadPool" namePrefix="catalina-exec-" maxThreads="1000" minSpareThreads="4"/>
+    <Executor name="tomcatThreadPool" namePrefix="catalina-exec-" 
+        maxThreads="150" minSpareThreads="4"/>
     -->
     
     
