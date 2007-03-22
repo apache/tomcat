@@ -21,6 +21,10 @@
         <item name="Service"               href="service.html"/>
     </menu>
 
+    <menu name="Executors">
+        <item name="Executor"                  href="executor.html"/>
+    </menu>
+
     <menu name="Connectors">
         <item name="HTTP"                  href="http.html"/>
         <item name="AJP"                   href="ajp.html"/>

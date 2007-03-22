@@ -17,6 +17,10 @@
 <section name="Tomcat 6.0.11 (remm)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Added support for shared thread pools by adding in the &lt;Executor&gt;
+        element as a nested element to the &lt;Service&gt; element. (fhanik)
+      </add>
       <fix>
         <bug>41666</bug> Correct handling of boundary conditions for
         If-Unmodified-Since and If-Modified-Since headers. Patch provided by
