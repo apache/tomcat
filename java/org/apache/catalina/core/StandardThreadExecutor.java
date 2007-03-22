@@ -180,7 +180,7 @@ public class StandardThreadExecutor implements Executor {
         }
         
         public boolean force(Runnable o) {
-            if ( parent.isShutdown() ) throw new RejectedExecutionException();
+            if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
             return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
         }
 
