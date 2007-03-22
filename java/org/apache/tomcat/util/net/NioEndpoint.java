@@ -24,16 +24,25 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
+import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.KeyStore;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -45,14 +54,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.CountDownLatch;
-import java.util.Comparator;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.Collection;
-import java.util.concurrent.ThreadFactory;
+import java.io.File;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -154,7 +156,13 @@ public class NioEndpoint {
      * Server socket "pointer".
      */
     protected ServerSocketChannel serverSock = null;
-
+    
+    /**
+     * use send file
+     */
+    private boolean useSendfile = true;
+    
+    
     /**
      * Cache for SocketProcessor objects
      */
@@ -574,6 +582,11 @@ public class NioEndpoint {
         this.socketProperties = socketProperties;
     }
 
+    public void setUseSendfile(boolean useSendfile) {
+
+        this.useSendfile = useSendfile;
+    }
+
     protected SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
@@ -655,7 +668,7 @@ public class NioEndpoint {
         serverSock.socket().bind(addr,backlog); 
         serverSock.configureBlocking(true); //mimic APR behavior
 
-        // Initialize thread count defaults for acceptor, poller and sendfile
+        // Initialize thread count defaults for acceptor, poller
         if (acceptorThreadCount == 0) {
             // FIXME: Doesn't seem to work that well with multiple accept threads
             acceptorThreadCount = 1;
@@ -830,6 +843,11 @@ public class NioEndpoint {
 
     public SocketProperties getSocketProperties() {
         return socketProperties;
+    }
+
+    public boolean getUseSendfile() {
+
+        return useSendfile;
     }
 
     /**
@@ -1387,7 +1405,9 @@ public class NioEndpoint {
                     sk.attach(attachment);//cant remember why this is here
                     NioChannel channel = attachment.getChannel();
                     if (sk.isReadable() || sk.isWritable() ) {
-                        if ( attachment.getComet() ) {
+                        if ( attachment.getSendfileData() != null ) {
+                            processSendfile(sk,attachment);
+                        } else if ( attachment.getComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 unreg(sk, attachment);
@@ -1430,12 +1450,48 @@ public class NioEndpoint {
             }
             return result;
         }
+        
+        protected void processSendfile(SelectionKey sk, KeyAttachment attachment) {
+            try {
+                //unreg(sk,attachment);//only do this if we do process send file on a separate thread
+                SendfileData sd = attachment.getSendfileData();
+                if ( sd.fchannel == null ) {
+                    File f = new File(sd.fileName);
+                    if ( !f.exists() ) {
+                        cancelledKey(sk,SocketStatus.ERROR,false);
+                        return;
+                    }
+                    sd.fchannel = new FileInputStream(f).getChannel();
+                }
+                SocketChannel sc = attachment.getChannel().getIOChannel();
+                long written = sd.fchannel.transferTo(sd.pos,sd.length,sc);
+                if ( written > 0 ) {
+                    sd.pos += written;
+                    sd.length -= written;
+                }
+                if ( sd.length <= 0 ) {
+                    attachment.setSendfileData(null);
+                    if ( sd.keepAlive ) 
+                        reg(sk,attachment,SelectionKey.OP_READ);
+                    else 
+                        cancelledKey(sk,SocketStatus.STOP,false);
+                }
+            }catch ( Throwable t ) {
+                log.error("",t);
+                cancelledKey(sk, SocketStatus.ERROR);
+            }
+        }
 
         protected void unreg(SelectionKey sk, KeyAttachment attachment) {
-            sk.interestOps(0); //this is a must, so that we don't have multiple threads messing with the socket
-            attachment.interestOps(0);//fast access interestp ops
+            //this is a must, so that we don't have multiple threads messing with the socket
+            reg(sk,attachment,0);
         }
         
+        protected void reg(SelectionKey sk, KeyAttachment attachment, int intops) {
+            sk.interestOps(intops); 
+            attachment.interestOps(intops);
+        }
+
         protected void timeout(int keyCount, boolean hasEvents) {
             long now = System.currentTimeMillis();
             //don't process timeouts too frequently, but if the selector simply timed out
@@ -1531,6 +1587,9 @@ public class NioEndpoint {
         public long getLastRegistered() { return lastRegistered; };
         public void setLastRegistered(long reg) { lastRegistered = reg; }
         
+        public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
+        public SendfileData getSendfileData() { return this.sendfileData;}
+        
         protected Object mutex = new Object();
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
@@ -1541,6 +1600,7 @@ public class NioEndpoint {
         protected CountDownLatch latch = null;
         protected int fairness = 0;
         protected long lastRegistered = 0;
+        protected SendfileData sendfileData = null;
     }
 // ----------------------------------------------------- Key Fairness Comparator
     public static class KeyFairnessComparator implements Comparator<SelectionKey> {
@@ -1951,4 +2011,21 @@ public class NioEndpoint {
             return t;
         }
     }
+    
+    // ----------------------------------------------- SendfileData Inner Class
+
+
+    /**
+     * SendfileData class.
+     */
+    public static class SendfileData {
+        // File
+        public String fileName;
+        public FileChannel fchannel;
+        public long pos;
+        public long length;
+        // KeepAlive flag
+        public boolean keepAlive;
+    }
+
 }
