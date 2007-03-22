@@ -18,6 +18,9 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        Added SENDFILE support for the NIO connector. (fhanik)
+      </add>
+      <add>
         Added support for shared thread pools by adding in the &lt;Executor&gt;
         element as a nested element to the &lt;Service&gt; element. (fhanik)
       </add>
