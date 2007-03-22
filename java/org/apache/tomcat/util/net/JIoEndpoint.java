@@ -261,7 +261,7 @@ public class JIoEndpoint {
     }
     
     public int getCurrentThreadsBusy() {
-        return curThreads - workers.size();
+        return workers!=null?curThreads - workers.size():0;
     }
     
 
