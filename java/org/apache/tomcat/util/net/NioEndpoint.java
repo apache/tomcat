@@ -1476,9 +1476,12 @@ public class NioEndpoint {
                     else 
                         cancelledKey(sk,SocketStatus.STOP,false);
                 }
+            }catch ( IOException x ) {
+                if ( log.isDebugEnabled() ) log.warn("Unable to complete send file", x);
+                cancelledKey(sk,SocketStatus.ERROR,false);
             }catch ( Throwable t ) {
                 log.error("",t);
-                cancelledKey(sk, SocketStatus.ERROR);
+                cancelledKey(sk, SocketStatus.ERROR, false);
             }
         }
 
@@ -1549,6 +1552,7 @@ public class NioEndpoint {
             error = false;
             fairness = 0;
             lastRegistered = 0;
+            sendfileData = null;
         }
         
         public void reset() {
