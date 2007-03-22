@@ -18,7 +18,13 @@
   <subsection name="Catalina">
     <changelog>
       <add>
-        Added SENDFILE support for the NIO connector. (fhanik)
+        Added SENDFILE support for the NIO connector. (fhanik) <br/>
+        There are some Linux bugs reported against the sendfile behavior, make sure you
+        have a JDK that is up to date, or disable sendfile behavior in the Connector.<br/>
+         6427312: (fc) FileChannel.transferTo() throws IOException "system call interrupted"<br/>
+         5103988: (fc) FileChannel.transferTo should return -1 for EAGAIN instead throws IOException<br/>
+         6253145: (fc) FileChannel.transferTo on Linux fails when going beyond 2GB boundary<br/>
+         6470086: (fc) FileChannel.transferTo(2147483647, 1, channel) cause "Value too large" exception<br/>
       </add>
       <add>
         Added support for shared thread pools by adding in the &lt;Executor&gt;
