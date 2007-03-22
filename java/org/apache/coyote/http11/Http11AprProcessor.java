@@ -816,7 +816,7 @@ public class Http11AprProcessor implements ActionHook {
                     Socket.timeoutSet(socket, soTimeout * 1000);
                 }
                 if (!inputBuffer.parseRequestLine
-                        (keptAlive && (endpoint.getCurrentThreadsBusy() > limit))) {
+                        (keptAlive && (endpoint.getCurrentThreadsBusy() >= limit))) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
