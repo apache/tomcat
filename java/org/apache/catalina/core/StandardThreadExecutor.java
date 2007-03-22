@@ -155,9 +155,26 @@ public class StandardThreadExecutor implements Executor {
         lifecycle.removeLifecycleListener(listener);
     }
 
+    // Statistics from the thread pool
+    public int getActiveCount() {
+        return (executor != null) ? executor.getActiveCount() : 0;
+    }
 
-    
+    public long getCompletedTaskCount() {
+        return (executor != null) ? executor.getCompletedTaskCount() : 0;
+    }
 
+    public int getCorePoolSize() {
+        return (executor != null) ? executor.getCorePoolSize() : 0;
+    }
+
+    public int getLargestPoolSize() {
+        return (executor != null) ? executor.getLargestPoolSize() : 0;
+    }
+
+    public int getPoolSize() {
+        return (executor != null) ? executor.getPoolSize() : 0;
+    }
 
     // ---------------------------------------------- TaskQueue Inner Class
     class TaskQueue extends LinkedBlockingQueue<Runnable> {

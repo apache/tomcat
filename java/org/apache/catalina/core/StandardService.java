@@ -518,6 +518,12 @@ public class StandardService
             }
         }
 
+        synchronized (executors) {
+            for ( int i=0; i<executors.size(); i++ ) {
+                executors.get(i).start();
+            }
+        }
+
         // Start our defined Connectors second
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
@@ -526,12 +532,6 @@ public class StandardService
             }
         }
         
-        synchronized (executors) {
-            for ( int i=0; i<executors.size(); i++ ) {
-                executors.get(i).start();
-            }
-        }
-
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
 
@@ -594,11 +594,27 @@ public class StandardService
             }
         }
 
+        synchronized (executors) {
+            for ( int i=0; i<executors.size(); i++ ) {
+                executors.get(i).stop();
+            }
+        }
+
         if( oname==controller ) {
             // we registered ourself on init().
             // That should be the typical case - this object is just for
             // backward compat, nobody should bother to load it explicitely
             Registry.getRegistry(null, null).unregisterComponent(oname);
+            Executor[] executors = findExecutors();
+            for (int i = 0; i < executors.length; i++) {
+                try {
+                    ObjectName executorObjectName = 
+                        new ObjectName(domain + ":type=Executor,name=" + executors[i].getName());
+                    Registry.getRegistry(null, null).unregisterComponent(executorObjectName);
+                } catch (Exception e) {
+                    // Ignore (invalid ON, which cannot happen)
+                }
+            }
         }
         
 
@@ -632,6 +648,15 @@ public class StandardService
                 this.controller=oname;
                 Registry.getRegistry(null, null)
                     .registerComponent(this, oname, null);
+                
+                Executor[] executors = findExecutors();
+                for (int i = 0; i < executors.length; i++) {
+                    ObjectName executorObjectName = 
+                        new ObjectName(domain + ":type=Executor,name=" + executors[i].getName());
+                    Registry.getRegistry(null, null)
+                        .registerComponent(executors[i], executorObjectName, null);
+                }
+                
             } catch (Exception e) {
                 log.error(sm.getString("standardService.register.failed",domain),e);
             }
