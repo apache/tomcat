@@ -11,6 +11,7 @@ import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.util.LifecycleSupport;
+import java.util.concurrent.RejectedExecutionException;
 
 public class StandardThreadExecutor implements Executor {
     
@@ -59,8 +60,14 @@ public class StandardThreadExecutor implements Executor {
     }
     
     public void execute(Runnable command) {
-        if ( executor != null ) executor.execute(command);
-        else throw new IllegalStateException("StandardThreadPool not started.");
+        if ( executor != null ) {
+            try {
+                executor.execute(command);
+            } catch (RejectedExecutionException rx) {
+                //there could have been contention around the queue
+                if ( !( (TaskQueue) executor.getQueue()).force(command) ) throw new RejectedExecutionException();
+            }
+        } else throw new IllegalStateException("StandardThreadPool not started.");
     }
 
     public int getThreadPriority() {
@@ -171,10 +178,15 @@ public class StandardThreadExecutor implements Executor {
         public void setParent(ThreadPoolExecutor tp) {
             parent = tp;
         }
+        
+        public boolean force(Runnable o) {
+            if ( parent.isShutdown() ) throw new RejectedExecutionException();
+            return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
+        }
 
         public boolean offer(Runnable o) {
             if (parent != null && parent.getPoolSize() < parent.getMaximumPoolSize())
-                return false; //force creation of new threads
+                return false; //force creation of new threads by rejecting the task
             else
                 return super.offer(o);
         }
