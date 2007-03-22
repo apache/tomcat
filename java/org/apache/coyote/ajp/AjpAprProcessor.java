@@ -385,7 +385,7 @@ public class AjpAprProcessor implements ActionHook {
             try {
                 // Get first message of the request
                 if (!readMessage(requestHeaderMessage, true,
-                        keptAlive && (endpoint.getCurrentThreadsBusy() > limit))) {
+                        keptAlive && (endpoint.getCurrentThreadsBusy() >= limit))) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
