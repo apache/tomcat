@@ -208,6 +208,8 @@
       support for the Servlet specification using the header recommended in the
       specification.  The default value is <code>false</code>.</p>
     </attribute>
+    
+   
 
 
   </attributes>
@@ -270,6 +272,12 @@
       <p>The number of milliseconds this <strong>Connector</strong> will wait,
       after accepting a connection, for the request URI line to be
       presented.  The default value is 60000 (i.e. 60 seconds).</p>
+    </attribute>
+    
+    <attribute name="executor" required="false">
+      <p>A reference to the name in an <a href="executor.html">Executor</a> element.
+         If this attribute is enabled, and the named executor exists, the connector will
+         use the executor, and all the other thread attributes will be ignored.</p>
     </attribute>
 
     <attribute name="keepAliveTimeout" required="false">
@@ -396,12 +404,14 @@
 
     <attributes>
       <attribute name="useExecutor" required="false">
-        Set to true to use the NIO thread pool executor. The default value is <code>true</code>.
+        <p>Set to true to use the NIO thread pool executor. The default value is <code>true</code>.
         If set to false, it uses a thread pool based on a stack for its execution.
         Generally, using the executor yields a little bit slower performance, but yields a better
         fairness for processing connections in a high load environment as the traffic gets queued through a 
         FIFO queue. If set to true(default) then the max pool size is the <code>maxThreads</code> attribute
         and the core pool size is the <code>minSpareThreads</code>.
+        This value is ignored if the <code>executor</code> attribute is present and points to a valid shared thread pool.
+        </p>
       </attribute>
       <attribute name="acceptorThreadCount" required="false">
         <p>The number of threads to be used to accept connections. Increase this value on a multi CPU machine,
