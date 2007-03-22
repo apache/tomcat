@@ -832,7 +832,7 @@ public class Http11NioProcessor implements ActionHook {
                     socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
                     inputBuffer.readTimeout = soTimeout;
                 }
-                if (!inputBuffer.parseRequestLine(keptAlive && (endpoint.getCurrentThreadsBusy() > limit))) {
+                if (!inputBuffer.parseRequestLine(keptAlive && (endpoint.getCurrentThreadsBusy() >= limit))) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
