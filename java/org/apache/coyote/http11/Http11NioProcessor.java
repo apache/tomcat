@@ -52,6 +52,7 @@ import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 
 /**
@@ -173,7 +174,10 @@ public class Http11NioProcessor implements ActionHook {
      */
     protected boolean http09 = false;
 
-
+    /**
+     * Sendfile data.
+     */
+    protected NioEndpoint.SendfileData sendfileData = null;
 
     /**
      * Comet used.
@@ -926,6 +930,17 @@ public class Http11NioProcessor implements ActionHook {
                 response.setStatus(500);
             }
             request.updateCounters();
+            
+            // Do sendfile as needed: add socket to sendfile and end
+            if (sendfileData != null && !error) {
+                KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
+                ka.setSendfileData(sendfileData);
+                sendfileData.keepAlive = keepAlive;
+                endpoint.getPoller0().add(socket,SelectionKey.OP_WRITE);
+                openSocket = true;
+                break;
+            }
+
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
@@ -1249,6 +1264,7 @@ public class Http11NioProcessor implements ActionHook {
         http09 = false;
         contentDelimitation = false;
         expectation = false;
+        sendfileData = null;
         if (ssl) {
             request.scheme().setString("https");
         }
@@ -1410,6 +1426,9 @@ public class Http11NioProcessor implements ActionHook {
             contentDelimitation = true;
         }
 
+        // Advertise sendfile support through a request attribute
+        if (endpoint.getUseSendfile()) 
+            request.setAttribute("org.apache.tomcat.sendfile.support", Boolean.TRUE);
         // Advertise comet support through a request attribute
         request.setAttribute("org.apache.tomcat.comet.support", Boolean.TRUE);
         // Advertise comet timeout support
@@ -1585,11 +1604,26 @@ public class Http11NioProcessor implements ActionHook {
                 (outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
         }
+        
+        // Sendfile support
+        if (this.endpoint.getUseSendfile()) {
+            String fileName = (String) request.getAttribute("org.apache.tomcat.sendfile.filename");
+            if (fileName != null) {
+                // No entity body sent here
+                outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
+                contentDelimitation = true;
+                sendfileData = new NioEndpoint.SendfileData();
+                sendfileData.fileName = fileName;
+                sendfileData.pos = ((Long) request.getAttribute("org.apache.tomcat.sendfile.start")).longValue();
+                sendfileData.length = ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue() - sendfileData.pos;
+            }
+        }
+
 
 
         // Check for compression
         boolean useCompression = false;
-        if (entityBody && (compressionLevel > 0)) {
+        if (entityBody && (compressionLevel > 0) && (sendfileData == null)) {
             useCompression = isCompressable();
             // Change content-length to -1 to force chunking
             if (useCompression) {
