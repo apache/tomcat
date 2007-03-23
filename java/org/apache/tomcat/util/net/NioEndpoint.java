@@ -1480,7 +1480,6 @@ public class NioEndpoint {
                 }
             }catch ( IOException x ) {
                 if ( log.isDebugEnabled() ) log.warn("Unable to complete sendfile request:", x);
-                else log.warn("Unable to complete sendfile request:"+x.getMessage());
                 cancelledKey(sk,SocketStatus.ERROR,false);
                 return false;
             }catch ( Throwable t ) {
@@ -1968,7 +1967,6 @@ public class NioEndpoint {
                 handshake = -1;
             }
             if ( handshake == 0 ) {
-                // Process the request from this socket
                 // Process the request from this socket
                 boolean closed = (status==null)?(handler.process(socket)==Handler.SocketState.CLOSED) :
                     (handler.event(socket,status)==Handler.SocketState.CLOSED);
