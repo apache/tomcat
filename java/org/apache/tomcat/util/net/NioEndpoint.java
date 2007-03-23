@@ -846,8 +846,8 @@ public class NioEndpoint {
     }
 
     public boolean getUseSendfile() {
-
-        return useSendfile;
+        //send file doesn't work with SSL
+        return useSendfile && (!isSSLEnabled());
     }
 
     /**
@@ -1956,18 +1956,50 @@ public class NioEndpoint {
          
         public void run() {
 
-            // Process the request from this socket
-            boolean closed = (status==null)?(handler.process(socket)==Handler.SocketState.CLOSED) :
-                                            (handler.event(socket,status)==Handler.SocketState.CLOSED);
-            if (closed) {
-                // Close socket and pool
-                try {
-                    try {socket.close();}catch (Exception ignore){}
-                    if ( socket.isOpen() ) socket.close(true);
-                } catch ( Exception x ) {
-                    log.error("",x);
-                }
+           
+            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+            int handshake = -1;
+            try {
+                handshake = socket.handshake(key.isReadable(), key.isWritable());
+            }catch ( IOException x ) {
+                handshake = -1;
+                if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
+            }catch ( CancelledKeyException ckx ) {
+                handshake = -1;
             }
+            if ( handshake == 0 ) {
+                // Process the request from this socket
+                // Process the request from this socket
+                boolean closed = (status==null)?(handler.process(socket)==Handler.SocketState.CLOSED) :
+                    (handler.event(socket,status)==Handler.SocketState.CLOSED);
+
+                if (closed) {
+                    // Close socket and pool
+                    try {
+                        KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
+                        try {socket.close();}catch (Exception ignore){}
+                        if ( socket.isOpen() ) socket.close(true);
+                        key.cancel();
+                        key.attach(null);
+                        nioChannels.offer(socket);
+                        if ( att!=null ) keyCache.offer(att);
+                    }catch ( Exception x ) {
+                        log.error("",x);
+                    }
+                } 
+            } else if (handshake == -1 ) {
+                KeyAttachment ka = (KeyAttachment)key.attachment();
+                socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT,false);
+                try {socket.close(true);}catch (IOException ignore){}
+                nioChannels.offer(socket);
+                if ( ka!=null ) keyCache.offer(ka);
+            } else {
+                final SelectionKey fk = key;
+                final int intops = handshake;
+                final KeyAttachment ka = (KeyAttachment)fk.attachment();
+                ka.getPoller().add(socket,intops);
+            }
+
             socket = null;
             status = null;
             //return to cache
