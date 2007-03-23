@@ -1406,7 +1406,7 @@ public class NioEndpoint {
                     NioChannel channel = attachment.getChannel();
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
-                            processSendfile(sk,attachment);
+                            processSendfile(sk,attachment,true);
                         } else if ( attachment.getComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
@@ -1451,7 +1451,7 @@ public class NioEndpoint {
             return result;
         }
         
-        protected void processSendfile(SelectionKey sk, KeyAttachment attachment) {
+        public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg) {
             try {
                 //unreg(sk,attachment);//only do this if we do process send file on a separate thread
                 SendfileData sd = attachment.getSendfileData();
@@ -1459,7 +1459,7 @@ public class NioEndpoint {
                     File f = new File(sd.fileName);
                     if ( !f.exists() ) {
                         cancelledKey(sk,SocketStatus.ERROR,false);
-                        return;
+                        return false;
                     }
                     sd.fchannel = new FileInputStream(f).getChannel();
                 }
@@ -1472,17 +1472,23 @@ public class NioEndpoint {
                 if ( sd.length <= 0 ) {
                     attachment.setSendfileData(null);
                     if ( sd.keepAlive ) 
-                        reg(sk,attachment,SelectionKey.OP_READ);
+                        if (reg) reg(sk,attachment,SelectionKey.OP_READ);
                     else 
                         cancelledKey(sk,SocketStatus.STOP,false);
+                } else if ( attachment.interestOps() == 0 && reg ) {
+                    reg(sk,attachment,SelectionKey.OP_WRITE);
                 }
             }catch ( IOException x ) {
-                if ( log.isDebugEnabled() ) log.warn("Unable to complete send file", x);
+                if ( log.isDebugEnabled() ) log.warn("Unable to complete sendfile request:", x);
+                else log.warn("Unable to complete sendfile request:"+x.getMessage());
                 cancelledKey(sk,SocketStatus.ERROR,false);
+                return false;
             }catch ( Throwable t ) {
                 log.error("",t);
                 cancelledKey(sk, SocketStatus.ERROR, false);
+                return false;
             }
+            return true;
         }
 
         protected void unreg(SelectionKey sk, KeyAttachment attachment) {

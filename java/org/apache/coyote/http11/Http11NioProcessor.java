@@ -936,8 +936,9 @@ public class Http11NioProcessor implements ActionHook {
                 KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
                 ka.setSendfileData(sendfileData);
                 sendfileData.keepAlive = keepAlive;
-                endpoint.getPoller0().add(socket,SelectionKey.OP_WRITE);
-                openSocket = true;
+                SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+                //do the first write on this thread, might as well
+                openSocket = socket.getPoller().processSendfile(key,ka,true);
                 break;
             }
 
