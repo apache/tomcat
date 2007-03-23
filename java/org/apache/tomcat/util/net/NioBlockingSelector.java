@@ -62,7 +62,7 @@ public class NioBlockingSelector {
                         continue; //we successfully wrote, try again without a selector
                     }
                 }
-                
+                if ( key == null ) throw new IOException("Key no longer registered");
                 KeyAttachment att = (KeyAttachment) key.attachment();
                 try {
                     if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1);
