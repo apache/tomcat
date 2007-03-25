@@ -40,6 +40,10 @@
         <bug>41752</bug> Correct error message on exception in MemoryRealm.
         (markt)
       </fix>
+      <update>
+        <bug>39883</bug> Add documentation warning about using antiResourceLocking
+        on a webapp outside the Host's appBase. (yoavs)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
