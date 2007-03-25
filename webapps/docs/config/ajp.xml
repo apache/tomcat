@@ -32,9 +32,11 @@
 
 <p>The native connectors supported with this Tomcat release are:
 <ul>
-<li>JK 1.2.x with any of the supported servers</li>
-<li>mod_proxy on Apache httpd 2.x (included by default in Apache HTTP Server 2.2), 
-with AJP enabled</li>
+  <li>JK 1.2.x with any of the supported servers</li>
+  <li>mod_proxy on Apache httpd 2.x (included by default in Apache HTTP Server 2.2), 
+      with AJP enabled: see
+      <a href="http://httpd.apache.org/docs/2.2/mod/mod_proxy_ajp.html">the httpd docs</a>
+      for details.</li>
 </ul>
 </p>
 

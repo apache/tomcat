@@ -71,6 +71,9 @@
         Update host configuration document for new behaviour for directories
         in appBase. (markt)
       </update>
+      <update>
+        <bug>39540</bug> Add link to httpd 2.2 mod_proxy_ajp docs in AJP connector doc. (yoavs)
+      </update>
     </changelog>
   </subsection>
 </section>
