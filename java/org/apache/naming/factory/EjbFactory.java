@@ -134,6 +134,10 @@ public class EjbFactory
                     try {
                         factory = (ObjectFactory) factoryClass.newInstance();
                     } catch(Throwable t) {
+                        NamingException ex = new NamingException
+                            ("Could not load resource factory class");
+                        ex.initCause(t);
+                        throw ex;
                     }
                 }
             } else {
