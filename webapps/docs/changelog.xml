@@ -63,6 +63,10 @@
       <fix>
         Requests with multiple content-length headers are now rejected. (markt)
       </fix>
+      <add>
+        <bug>41675</bug> Add a couple of DEBUG-level logging statements to Http11Processors
+          when sending error responses.  Patch by Ralf Hauser. (yoavs)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Webapps">
