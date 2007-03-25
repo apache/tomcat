@@ -44,6 +44,10 @@
         <bug>39883</bug> Add documentation warning about using antiResourceLocking
         on a webapp outside the Host's appBase. (yoavs)
       </update>
+      <fix>
+        <bug>40150</bug> Ensure user and roll classnames are validated on startup.  Patch by
+          Tom. (yoavs)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
