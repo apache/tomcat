@@ -80,6 +80,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>41227</bug> Add a bit of DEBUG-level logging to JspC so users know
+          which file is being compiled. (yoavs)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 6.0.10 (remm)">
   <subsection name="Catalina">
