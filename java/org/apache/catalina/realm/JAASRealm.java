@@ -154,7 +154,7 @@ public class JAASRealm
     /**
      * The list of role class names, split out for easy processing.
      */
-    protected List roleClasses = new ArrayList();
+    protected List<String> roleClasses = new ArrayList<String>();
 
 
     /**
@@ -167,7 +167,7 @@ public class JAASRealm
     /**
      * The set of user class names, split out for easy processing.
      */
-    protected List userClasses = new ArrayList();
+    protected List<String> userClasses = new ArrayList<String>();
 
 
     /**
@@ -230,16 +230,16 @@ public class JAASRealm
         }
     }
 
-    /**
-     * Comma-delimited list of <code>java.security.Principal</code> classes
-     * that represent security roles.
-     */
-    protected String roleClassNames = null;
-
-    public String getRoleClassNames() {
-        return (this.roleClassNames);
-    }
-
+     /**
+      * Comma-delimited list of <code>java.security.Principal</code> classes
+      * that represent security roles.
+      */
+     protected String roleClassNames = null;
+     
+     public String getRoleClassNames() {
+         return (this.roleClassNames);
+     }
+     
      /**
       * Sets the list of comma-delimited classes that represent 
       * roles. The classes in the list must implement <code>java.security.Principal</code>.
@@ -250,36 +250,48 @@ public class JAASRealm
       */
      public void setRoleClassNames(String roleClassNames) {
          this.roleClassNames = roleClassNames;
-        roleClasses.clear();
-        String temp = this.roleClassNames;
-        if (temp == null) {
-            return;
-        }
-        while (true) {
-            int comma = temp.indexOf(',');
-            if (comma < 0) {
-                break;
-            }
-            roleClasses.add(temp.substring(0, comma).trim());
-            temp = temp.substring(comma + 1);
-        }
-        temp = temp.trim();
-        if (temp.length() > 0) {
-            roleClasses.add(temp);
-        }
-    }
-
-
-    /**
-     * Comma-delimited list of <code>java.security.Principal</code> classes
-     * that represent individual users.
-     */
-    protected String userClassNames = null;
-
-    public String getUserClassNames() {
-        return (this.userClassNames);
-    }
-
+         parseClassNames(roleClassNames, roleClasses);
+     }
+     
+     /**
+      * Parses a comma-delimited list of class names, and store the class names
+      * in the provided List. Each class must implement <codejava.security.Principal</code>.
+      * 
+      * @param classNamesString a comma-delimited list of fully qualified class names.
+      * @param classNamesList the list in which the class names will be stored.
+      *        The list is cleared before being populated. 
+      */
+     protected void parseClassNames(String classNamesString, List<String> classNamesList) {
+         classNamesList.clear();
+         if (classNamesString == null) return;
+         
+         String[] classNames = classNamesString.split("[ ]*,[ ]*");
+         for (int i=0; i<classNames.length; i++) {
+             if (classNames[i].length()==0) continue;        
+             try {
+                 Class principalClass = Class.forName(classNames[i]);
+                 if (Principal.class.isAssignableFrom(principalClass)) {
+                     classNamesList.add(classNames[i]);
+                 } else {
+                     log.error("Class "+classNames[i]+" is not implementing "+
+                               "java.security.Principal! Class not added.");
+                 }
+             } catch (ClassNotFoundException e) {
+                 log.error("Class "+classNames[i]+" not found! Class not added.");
+             }
+         }
+     }     
+     
+     /**
+      * Comma-delimited list of <code>java.security.Principal</code> classes
+      * that represent individual users.
+      */
+     protected String userClassNames = null;
+     
+     public String getUserClassNames() {
+         return (this.userClassNames);
+     }
+     
      /**
      * Sets the list of comma-delimited classes that represent individual
      * users. The classes in the list must implement <code>java.security.Principal</code>.
@@ -290,23 +302,7 @@ public class JAASRealm
      */
     public void setUserClassNames(String userClassNames) {
         this.userClassNames = userClassNames;
-        userClasses.clear();
-        String temp = this.userClassNames;
-        if (temp == null) {
-            return;
-        }
-        while (true) {
-            int comma = temp.indexOf(',');
-            if (comma < 0) {
-                break;
-            }
-            userClasses.add(temp.substring(0, comma).trim());
-            temp = temp.substring(comma + 1);
-        }
-        temp = temp.trim();
-        if (temp.length() > 0) {
-            userClasses.add(temp);
-        }
+        parseClassNames(userClassNames, userClasses);
     }
 
 
@@ -463,7 +459,7 @@ public class JAASRealm
         // Prepare to scan the Principals for this Subject
         String password = null; // Will not be carried forward
 
-        List roles = new ArrayList();
+        List<String> roles = new ArrayList<String>();
         Principal userPrincipal = null;
 
         // Scan the Principals for this Subject
