@@ -815,6 +815,11 @@ public class JspC implements Options {
     public void generateWebMapping( String file, JspCompilationContext clctxt )
         throws IOException
     {
+        if (log.isDebugEnabled()) {
+            log.debug("Generating web mapping for file " + file
+                      + " using compilation context " + clctxt);
+        }
+
         String className = clctxt.getServletClassName();
         String packageName = clctxt.getServletPackageName();
 
@@ -950,6 +955,10 @@ public class JspC implements Options {
     protected void processFile(String file)
         throws JasperException
     {
+        if (log.isDebugEnabled()) {
+            log.debug("Processing file: " + file);
+        }
+
         ClassLoader originalClassLoader = null;
 
         try {
@@ -991,6 +1000,10 @@ public class JspC implements Options {
             // Otherwise only generate .java, if .jsp file is newer than
             // the .java file
             if( clc.isOutDated(compile) ) {
+                if (log.isDebugEnabled()) {
+                    log.debug(jspUri + " is out dated, compiling...");
+                }
+
                 clc.compile(compile, true);
             }
 
