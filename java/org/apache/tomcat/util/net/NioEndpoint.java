@@ -17,6 +17,7 @@
 
 package org.apache.tomcat.util.net;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -54,7 +55,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
-import java.io.File;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -160,7 +160,32 @@ public class NioEndpoint {
     /**
      * use send file
      */
-    private boolean useSendfile = true;
+    protected boolean useSendfile = true;
+    
+    /**
+     * The size of the OOM parachute.
+     */
+    protected int oomParachute = 1024*1024;
+    /**
+     * The oom parachute, when an OOM error happens, 
+     * will release the data, giving the JVM instantly 
+     * a chunk of data to be able to recover with.
+     */
+    protected byte[] oomParachuteData = null;
+    
+    /**
+     * Make sure this string has already been allocated
+     */
+    protected static final String oomParachuteMsg = 
+        "SEVERE:Memory usage is low, parachute is non existent, your system may start failing.";
+    
+    /**
+     * Keep track of OOM warning messages.
+     */
+    long lastParachuteCheck = System.currentTimeMillis();
+    
+    
+    
     
     
     /**
@@ -587,13 +612,48 @@ public class NioEndpoint {
         this.useSendfile = useSendfile;
     }
 
+    public void setOomParachute(int oomParachute) {
+        this.oomParachute = oomParachute;
+    }
+
+    public void setOomParachuteData(byte[] oomParachuteData) {
+        this.oomParachuteData = oomParachuteData;
+    }
+
     protected SSLContext sslContext = null;
     public SSLContext getSSLContext() { return sslContext;}
     public void setSSLContext(SSLContext c) { sslContext = c;}
     
+    // --------------------------------------------------------- OOM Parachute Methods
+
+    protected void checkParachute() {
+        boolean para = reclaimParachute(false);
+        if (!para && (System.currentTimeMillis()-lastParachuteCheck)>10000) {
+            try {
+                log.fatal(oomParachuteMsg);
+            }catch (Throwable t) {
+                System.err.println(oomParachuteMsg);
+            }
+            lastParachuteCheck = System.currentTimeMillis();
+        }
+    }
+    
+    protected boolean reclaimParachute(boolean force) {
+        if ( oomParachuteData != null ) return true;
+        if ( oomParachute > 0 && ( force || (Runtime.getRuntime().freeMemory() > (oomParachute*2))) )  
+            oomParachuteData = new byte[oomParachute];
+        return oomParachuteData != null;
+    }
+    
+    protected void releaseCaches() {
+        this.keyCache.clear();
+        this.nioChannels.clear();
+        this.processorCache.clear();
+        if ( handler != null ) handler.releaseCaches();
+        
+    }
+    
     // --------------------------------------------------------- Public Methods
-
-
     /**
      * Number of keepalive sockets.
      */
@@ -664,6 +724,9 @@ public class NioEndpoint {
             return;
 
         serverSock = ServerSocketChannel.open();
+        serverSock.socket().setPerformancePreferences(socketProperties.getPerformanceConnectionTime(),
+                                                      socketProperties.getPerformanceLatency(),
+                                                      socketProperties.getPerformanceBandwidth());
         InetSocketAddress addr = (address!=null?new InetSocketAddress(address,port):new InetSocketAddress(port));
         serverSock.socket().bind(addr,backlog); 
         serverSock.configureBlocking(true); //mimic APR behavior
@@ -698,6 +761,8 @@ public class NioEndpoint {
             sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
 
         }
+        
+        if (oomParachute>0) reclaimParachute(true);
 
         initialized = true;
 
@@ -803,7 +868,7 @@ public class NioEndpoint {
 
 
     /**
-     * Deallocate APR memory pools, and close server socket.
+     * Deallocate NIO memory pools, and close server socket.
      */
     public void destroy() throws Exception {
         if (running) {
@@ -815,7 +880,7 @@ public class NioEndpoint {
         serverSock = null;
         sslContext = null;
         initialized = false;
-        nioChannels.clear();
+        releaseCaches();
     }
 
 
@@ -848,6 +913,14 @@ public class NioEndpoint {
     public boolean getUseSendfile() {
         //send file doesn't work with SSL
         return useSendfile && (!isSSLEnabled());
+    }
+
+    public int getOomParachute() {
+        return oomParachute;
+    }
+
+    public byte[] getOomParachuteData() {
+        return oomParachuteData;
     }
 
     /**
@@ -1086,17 +1159,13 @@ public class NioEndpoint {
      * Server socket acceptor thread.
      */
     protected class Acceptor implements Runnable {
-
-
         /**
          * The background thread that listens for incoming TCP/IP connections and
          * hands them off to an appropriate processor.
          */
         public void run() {
-
             // Loop until we receive a shutdown command
             while (running) {
-
                 // Loop if endpoint is paused
                 while (paused) {
                     try {
@@ -1105,7 +1174,6 @@ public class NioEndpoint {
                         // Ignore
                     }
                 }
-
                 try {
                     // Accept the next incoming connection from the server socket
                     SocketChannel socket = serverSock.accept();
@@ -1124,16 +1192,24 @@ public class NioEndpoint {
                             }
                         } 
                     }
+                } catch (OutOfMemoryError oom) {
+                    try {
+                        oomParachuteData = null;
+                        releaseCaches();
+                        log.error("", oom);
+                    }catch ( Throwable oomt ) {
+                        try {
+                            try {
+                                System.err.println(oomParachuteMsg);
+                                oomt.printStackTrace();
+                            }catch (Throwable letsHopeWeDontGetHere){}
+                        }catch (Throwable letsHopeWeDontGetHere){}
+                    }
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
-
-                // The processor will recycle itself when it finishes
-
-            }
-
-        }
-
+            }//while
+        }//run
     }
 
 
@@ -1285,7 +1361,7 @@ public class NioEndpoint {
                             ((PollerEvent)r).reset();
                             eventCache.offer((PollerEvent)r);
                         }
-                    } catch ( Exception x ) {
+                    } catch ( Throwable x ) {
                         log.error("",x);
                     }
                 }
@@ -1332,62 +1408,76 @@ public class NioEndpoint {
         public void run() {
             // Loop until we receive a shutdown command
             while (running) {
-                // Loop if endpoint is paused
-                while (paused && (!close) ) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
-                boolean hasEvents = false;
-
-                hasEvents = (hasEvents | events());
-                // Time to terminate?
-                if (close) {
-                    timeout(0, false);
-                    stopLatch.countDown();
-                    return;
-                }
-                int keyCount = 0;
                 try {
-                    if ( !close ) {
-                        keyCount = selector.select(selectorTimeout);
-                        wakeupCounter.set(0);
+                    // Loop if endpoint is paused
+                    while (paused && (!close) ) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
                     }
+                    boolean hasEvents = false;
+
+                    hasEvents = (hasEvents | events());
+                    // Time to terminate?
                     if (close) {
                         timeout(0, false);
                         stopLatch.countDown();
-                        selector.close(); 
-                        return; 
+                        return;
                     }
-                } catch ( NullPointerException x ) {
-                    //sun bug 5076772 on windows JDK 1.5
-                    if ( wakeupCounter == null || selector == null ) throw x;
-                    continue;
-                } catch ( CancelledKeyException x ) {
-                    //sun bug 5076772 on windows JDK 1.5
-                    if ( wakeupCounter == null || selector == null ) throw x;
-                    continue;
-                } catch (Throwable x) {
-                    log.error("",x);
-                    continue;
-                }
-                //either we timed out or we woke up, process events first
-                if ( keyCount == 0 ) hasEvents = (hasEvents | events());
+                    int keyCount = 0;
+                    try {
+                        if ( !close ) {
+                            keyCount = selector.select(selectorTimeout);
+                            wakeupCounter.set(0);
+                        }
+                        if (close) {
+                            timeout(0, false);
+                            stopLatch.countDown();
+                            selector.close(); 
+                            return; 
+                        }
+                    } catch ( NullPointerException x ) {
+                        //sun bug 5076772 on windows JDK 1.5
+                        if ( wakeupCounter == null || selector == null ) throw x;
+                        continue;
+                    } catch ( CancelledKeyException x ) {
+                        //sun bug 5076772 on windows JDK 1.5
+                        if ( wakeupCounter == null || selector == null ) throw x;
+                        continue;
+                    } catch (Throwable x) {
+                        log.error("",x);
+                        continue;
+                    }
+                    //either we timed out or we woke up, process events first
+                    if ( keyCount == 0 ) hasEvents = (hasEvents | events());
 
-                Iterator iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
-                // Walk through the collection of ready keys and dispatch
-                // any active event.
-                while (iterator != null && iterator.hasNext()) {
-                    SelectionKey sk = (SelectionKey) iterator.next();
-                    KeyAttachment attachment = (KeyAttachment)sk.attachment();
-                    iterator.remove();
-                    processKey(sk, attachment);
-                }//while
-                
-                //process timeouts
-                timeout(keyCount,hasEvents);
+                    Iterator iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
+                    // Walk through the collection of ready keys and dispatch
+                    // any active event.
+                    while (iterator != null && iterator.hasNext()) {
+                        SelectionKey sk = (SelectionKey) iterator.next();
+                        KeyAttachment attachment = (KeyAttachment)sk.attachment();
+                        iterator.remove();
+                        processKey(sk, attachment);
+                    }//while
+
+                    //process timeouts
+                    timeout(keyCount,hasEvents);
+                    if ( oomParachute > 0 && oomParachuteData == null ) checkParachute();
+                } catch (OutOfMemoryError oom) {
+                    try {
+                        oomParachuteData = null;
+                        releaseCaches();
+                        log.error("", oom);
+                    }catch ( Throwable oomt ) {
+                        try {
+                            System.err.println(oomParachuteMsg);
+                            oomt.printStackTrace();
+                        }catch (Throwable letsHopeWeDontGetHere){}
+                    }
+                }
             }//while
             synchronized (this) {
                 this.notifyAll();
@@ -1395,7 +1485,7 @@ public class NioEndpoint {
             stopLatch.countDown();
 
         }
-
+        
         protected boolean processKey(SelectionKey sk, KeyAttachment attachment) {
             boolean result = true;
             try {
@@ -1815,6 +1905,17 @@ public class NioEndpoint {
                             ka.getPoller().add(socket,intops);
                         }
                     }
+                } catch (OutOfMemoryError oom) {
+                    try {
+                        oomParachuteData = null;
+                        releaseCaches();
+                        log.error("", oom);
+                    }catch ( Throwable oomt ) {
+                        try {
+                            System.err.println(oomParachuteMsg);
+                            oomt.printStackTrace();
+                        }catch (Throwable letsHopeWeDontGetHere){}
+                    }
                 } finally {
                     //dereference socket to let GC do its job
                     socket = null;
@@ -1874,6 +1975,7 @@ public class NioEndpoint {
         }
         public SocketState process(NioChannel socket);
         public SocketState event(NioChannel socket, SocketStatus status);
+        public void releaseCaches();
     }
 
 
@@ -2000,6 +2102,18 @@ public class NioEndpoint {
                 }
             }catch(CancelledKeyException cx) {
                 socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+            } catch (OutOfMemoryError oom) {
+                try {
+                    oomParachuteData = null;
+                    socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                    releaseCaches();
+                    log.error("", oom);
+                }catch ( Throwable oomt ) {
+                    try {
+                        System.err.println(oomParachuteMsg);
+                        oomt.printStackTrace();
+                    }catch (Throwable letsHopeWeDontGetHere){}
+                }
             }catch ( Throwable t ) {
                 log.error("",t);
                 socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);

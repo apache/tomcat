@@ -34,13 +34,13 @@ import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -534,6 +534,11 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         setAttribute("timeout", "" + timeouts);
     }
 
+    public void setOomParachute(int oomParachute) {
+        ep.setOomParachute(oomParachute);
+        setAttribute("oomParachute",oomParachute);
+    }
+
     // --------------------  SSL related properties --------------------
 
     public String getKeystoreFile() { return ep.getKeystoreFile();}
@@ -584,6 +589,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
         Http11ConnectionHandler(Http11NioProtocol proto) {
             this.proto = proto;
+        }
+        
+        public void releaseCaches() {
+            recycledProcessors.clear();
         }
 
         public SocketState event(NioChannel socket, SocketStatus status) {
@@ -742,6 +751,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     public String getDomain() {
         return domain;
+    }
+
+    public int getOomParachute() {
+        return ep.getOomParachute();
     }
 
     public ObjectName preRegister(MBeanServer server,
