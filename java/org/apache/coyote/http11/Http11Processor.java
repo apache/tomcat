@@ -1174,6 +1174,10 @@ public class Http11Processor implements ActionHook {
             http11 = false;
             error = true;
             // Send 505; Unsupported HTTP version
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
+                          " Unsupported HTTP version \""+protocolMB+"\"");
+            }
             response.setStatus(505);
         }
 
@@ -1282,6 +1286,10 @@ public class Http11Processor implements ActionHook {
                 // Unsupported transfer encoding
                 error = true;
                 // 501 - Unimplemented
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.request.prepare")+
+                              " Unsupported transfer encoding \""+encodingName+"\"");
+                }
                 response.setStatus(501);
             }
         }
@@ -1300,6 +1308,10 @@ public class Http11Processor implements ActionHook {
         if (http11 && (valueMB == null)) {
             error = true;
             // 400 - Bad request
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
+                          " host header missing");
+            }
             response.setStatus(400);
         }
 
