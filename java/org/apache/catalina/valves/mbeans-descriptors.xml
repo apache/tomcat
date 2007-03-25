@@ -12,6 +12,11 @@
                type="java.lang.String"
                writeable="false"/>
 
+    <attribute name="info"
+               description="Information about this implementation"
+               type="java.lang.String"
+               writeable="false"/>
+
     <attribute name="containerName"
                description="Object name of the container"
                type="javax.management.ObjectName"/>
@@ -55,6 +60,20 @@
                is="true"
                type="boolean"/>
 
+    <attribute name="checkExists"
+               description="Check for file existence before logging."
+               is="true"
+               type="boolean"/>
+    
+    <operation name="rotate"
+               description="Move the existing log file to a new name"
+               impact="ACTION"
+               returnType="boolean">
+      <parameter name="newFileName"
+                 description="File name to move the log file to."
+                 type="java.lang.String"/>
+    </operation>
+ 
   </mbean>
 
   <mbean name="ErrorReportValve"
@@ -82,6 +101,11 @@
 
     <attribute name="className"
                description="Fully qualified class name of the managed object"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="info"
+               description="Information about this implementation"
                type="java.lang.String"
                writeable="false"/>
 
@@ -122,6 +146,11 @@
     <attribute name="fileDateFormat"
                description="The format for the date date based log rotation."
                type="java.lang.String"/>
+
+    <attribute name="buffered"
+               description="Flag to buffering."
+               is="true"
+               type="boolean"/>
 
     <operation name="rotate"
                description="Move the existing log file to a new name"
