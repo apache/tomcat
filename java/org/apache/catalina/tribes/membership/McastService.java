@@ -411,8 +411,9 @@ public class McastService implements MembershipService,MembershipListener {
     /**
      * Return all the members
      */
+    protected static final Member[]EMPTY_MEMBERS = new Member[0];
     public Member[] getMembers() {
-        if ( impl == null || impl.membership == null ) return null;
+        if ( impl == null || impl.membership == null ) return EMPTY_MEMBERS;
         return impl.membership.getMembers();
     }
     /**
