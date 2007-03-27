@@ -173,6 +173,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
                                           jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
+    apr_pool_t *c = NULL;
     apr_socket_t *s = NULL;
     tcn_socket_t *a = NULL;
     apr_int32_t f, t;
@@ -182,19 +183,22 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     GET_S_FAMILY(f, family);
     GET_S_TYPE(t, type);
 
-    a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
+    TCN_THROW_IF_ERR(apr_pool_create(&c, p), c);
+
+    a = (tcn_socket_t *)apr_pcalloc(c, sizeof(tcn_socket_t));
     TCN_CHECK_ALLOCATED(a);
-    a->pool = p;
-    if (family >= 0)
+    TCN_THROW_IF_ERR(apr_pool_create(&a->child, c), a->child);
+    a->pool = c;
+
+    if (family >= 0) {
         a->net = &apr_socket_layer;
-    apr_pool_cleanup_register(p, (const void *)a,
+        TCN_THROW_IF_ERR(apr_socket_create(&s,
+                         f, t, protocol, c), a);
+    }
+    apr_pool_cleanup_register(c, (const void *)a,
                               sp_socket_cleanup,
                               apr_pool_cleanup_null);
 
-    if (family >= 0) {
-        TCN_THROW_IF_ERR(apr_socket_create(&s,
-                         f, t, protocol, p), a);
-    }
 #ifdef TCN_DO_STATISTICS
     sp_created++;
 #endif
@@ -202,10 +206,11 @@ TCN_IMPLEMENT_CALL(jlong, Socket, create)(TCN_STDARGS, jint family,
     if (family >= 0)
         a->net = &apr_socket_layer;
     a->opaque   = s;
-    apr_pool_create(&a->child, a->pool);
 
     return P2J(a);
 cleanup:
+    if (c)
+        apr_pool_destroy(c);
     return 0;
 
 }
@@ -375,17 +380,18 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
     UNREFERENCED(o);
     TCN_ASSERT(sock != 0);
 
-    TCN_THROW_IF_ERR(apr_pool_create(&p, s->pool), p);
+    TCN_THROW_IF_ERR(apr_pool_create(&p, s->child), p);
     if (s->net->type == TCN_SOCKET_APR) {
         TCN_ASSERT(s->sock != NULL);
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
         TCN_CHECK_ALLOCATED(a);
-        a->pool   = p;
+        TCN_THROW_IF_ERR(apr_socket_accept(&n, s->sock, p), n);
+
+        a->pool = p;
         apr_pool_cleanup_register(s->child, (const void *)a,
                                   sp_socket_cleanup,
                                   apr_pool_cleanup_null);
 
-        TCN_THROW_IF_ERR(apr_socket_accept(&n, s->sock, p), n);
     }
     else {
         tcn_ThrowAPRException(e, APR_ENOTIMPL);
@@ -401,6 +407,8 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
     }
     return P2J(a);
 cleanup:
+    if (p)
+        apr_pool_destory(p);
     return 0;
 }
 
