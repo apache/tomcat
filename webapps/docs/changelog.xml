@@ -17,6 +17,9 @@
 <section name="Tomcat 6.0.11 (remm)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>41166</bug> Invalid handling when using replicated context (fhanik)
+      </fix>
       <add>
         Added SENDFILE support for the NIO connector. (fhanik) <br/>
       </add>
