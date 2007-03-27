@@ -18,6 +18,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>41682</bug> ClassCastException when logging is turned on (fhanik)
+      </fix>
+      <fix>
         <bug>41530  </bug>Don't log error messages when connector is stopped (fhanik)
       </fix>
       <fix>
