@@ -18,6 +18,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>41530  </bug>Don't log error messages when connector is stopped (fhanik)
+      </fix>
+      <fix>
         <bug>41166</bug> Invalid handling when using replicated context (fhanik)
       </fix>
       <add>

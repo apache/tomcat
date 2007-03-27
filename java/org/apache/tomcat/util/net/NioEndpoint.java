@@ -1192,6 +1192,8 @@ public class NioEndpoint {
                             }
                         } 
                     }
+                }catch ( IOException x ) {
+                    if ( running ) log.error(sm.getString("endpoint.accept.fail"), x);
                 } catch (OutOfMemoryError oom) {
                     try {
                         oomParachuteData = null;
@@ -2126,6 +2128,7 @@ public class NioEndpoint {
         }
 
     }
+    
     // ---------------------------------------------- TaskQueue Inner Class
     public static class TaskQueue extends LinkedBlockingQueue<Runnable> {
         ThreadPoolExecutor parent = null;
