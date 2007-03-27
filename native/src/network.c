@@ -218,17 +218,18 @@ cleanup:
 TCN_IMPLEMENT_CALL(void, Socket, destroy)(TCN_STDARGS, jlong sock)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_socket_t *as;
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
 
+    as = s->sock;
+    s->sock = NULL;
     apr_pool_cleanup_kill(s->pool, s, sp_socket_cleanup);
     if (s->net && s->net->cleanup) {
         (*s->net->cleanup)(s->opaque);
         s->net = NULL;
     }
-    if (s->sock) {
-        apr_socket_t *as = s->sock;
-        s->sock = NULL;
+    if (as) {
         apr_socket_close(as);
     }
 
@@ -284,9 +285,12 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     jint rv = APR_SUCCESS;
+    apr_socket_t *as;
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
 
+    as = s->sock;
+    s->sock = NULL;
     apr_pool_cleanup_kill(s->pool, s, sp_socket_cleanup);
     if (s->child) {
         apr_pool_clear(s->child);
@@ -298,9 +302,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, close)(TCN_STDARGS, jlong sock)
         rv = (*s->net->close)(s->opaque);
         s->net = NULL;
     }
-    if (s->sock) {
-        apr_socket_t *as = s->sock;
-        s->sock = NULL;
+    if (as) {
         rv = (jint)apr_socket_close(as);
     }
     return rv;
@@ -347,7 +349,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, acceptx)(TCN_STDARGS, jlong sock,
         a = (tcn_socket_t *)apr_pcalloc(p, sizeof(tcn_socket_t));
         TCN_CHECK_ALLOCATED(a);
         a->pool   = p;
-        apr_pool_cleanup_register(p, (const void *)a,
+        apr_pool_cleanup_register(a->pool, (const void *)a,
                                   sp_socket_cleanup,
                                   apr_pool_cleanup_null);
 
@@ -388,7 +390,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
         TCN_THROW_IF_ERR(apr_socket_accept(&n, s->sock, p), n);
 
         a->pool = p;
-        apr_pool_cleanup_register(s->child, (const void *)a,
+        apr_pool_cleanup_register(a->pool, (const void *)a,
                                   sp_socket_cleanup,
                                   apr_pool_cleanup_null);
 
@@ -407,7 +409,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
     }
     return P2J(a);
 cleanup:
-    if (p)
+    if (p && s->sock)
         apr_pool_destroy(p);
     return 0;
 }
