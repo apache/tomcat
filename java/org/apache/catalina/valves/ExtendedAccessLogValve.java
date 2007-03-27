@@ -403,6 +403,9 @@ public class ExtendedAccessLogValve
         }
         
         public String getToken() throws IOException {
+            if(ended)
+                return null ;
+            
             String result = null;
             subToken = false;
             parameter = false;
@@ -462,6 +465,8 @@ public class ExtendedAccessLogValve
         }
         
         public String getWhiteSpaces() throws IOException {
+            if(isEnded())
+                return "" ;
             StringBuffer whiteSpaces = new StringBuffer();
             if (buf.length() > 0) {
                 whiteSpaces.append(buf);
