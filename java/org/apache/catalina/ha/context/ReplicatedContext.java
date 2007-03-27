@@ -26,6 +26,11 @@ import org.apache.catalina.core.ApplicationContext;
 import org.apache.catalina.Globals;
 import javax.servlet.ServletContext;
 import java.util.AbstractMap;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.ServletContextAttributeEvent;
 
 /**
  * @author Filip Hanik
@@ -98,6 +103,12 @@ public class ReplicatedContext extends StandardContext {
     }
     
     public ServletContext getServletContext() {
+        if (context == null) {
+            context = new ReplApplContext(getBasePath(), this);
+            if (getAltDDName() != null)
+                context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
+        }
+
         return ((ReplApplContext)context).getFacade();
 
     }
@@ -118,8 +129,19 @@ public class ReplicatedContext extends StandardContext {
         public void setAttributeMap(AbstractMap map) {
             this.attributes = map;
         }
-
+        
+        public void removeAttribute(String name) {
+            //do nothing
+            super.removeAttribute(name);
+        }
+        
+        public void setAttribute(String name, Object value) {
+            //do nothing
+            super.setAttribute(name,value);
+        }
+        
     }
+
 
 
 }
