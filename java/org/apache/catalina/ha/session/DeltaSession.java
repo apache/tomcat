@@ -359,7 +359,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (notifyCluster) {
             if (log.isDebugEnabled())
                 log.debug(sm.getString("deltaSession.notifying",
-                                       ((DeltaManager)manager).getName(), 
+                                       ((ClusterManager)manager).getName(), 
                                        new Boolean(isPrimarySession()), 
                                        expiredId));
             if ( manager instanceof DeltaManager ) {
