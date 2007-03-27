@@ -318,6 +318,8 @@ public class JIoEndpoint {
                             // Ignore
                         }
                     }
+                }catch ( IOException x ) {
+                    if ( running ) log.error(sm.getString("endpoint.accept.fail"), x);
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.accept.fail"), t);
                 }
