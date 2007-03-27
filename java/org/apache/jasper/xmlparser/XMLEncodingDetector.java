@@ -44,6 +44,7 @@ public class XMLEncodingDetector {
     private String encoding;
     private boolean isEncodingSetInProlog;
     private boolean isBomPresent;
+    private int skip;
     private Boolean isBigEndian;
     private Reader reader;
     
@@ -122,8 +123,9 @@ public class XMLEncodingDetector {
         scanXMLDecl();
 	
         return new Object[] { this.encoding,
-                              new Boolean(this.isEncodingSetInProlog),
-                              new Boolean(this.isBomPresent) };
+                              Boolean.valueOf(this.isEncodingSetInProlog),
+                              Boolean.valueOf(this.isBomPresent),
+                              Integer.valueOf(this.skip) };
     }
     
     // stub method
@@ -149,10 +151,13 @@ public class XMLEncodingDetector {
 		Object [] encodingDesc = getEncodingName(b4, count);
 		encoding = (String)(encodingDesc[0]);
 		isBigEndian = (Boolean)(encodingDesc[1]);
-        if (encodingDesc.length > 2) {
+        
+        if (encodingDesc.length > 3) {
             isBomPresent = (Boolean)(encodingDesc[2]);
+            skip = (Integer)(encodingDesc[3]);
         } else {
             isBomPresent = true;
+            skip = (Integer)(encodingDesc[2]);
         }
 
 		stream.reset();
@@ -285,7 +290,7 @@ public class XMLEncodingDetector {
     private Object[] getEncodingName(byte[] b4, int count) {
 
         if (count < 2) {
-            return new Object[]{"UTF-8", null, Boolean.FALSE};
+            return new Object[]{"UTF-8", null, Boolean.FALSE, Integer.valueOf(0)};
         }
 
         // UTF-16, with BOM
@@ -293,70 +298,70 @@ public class XMLEncodingDetector {
         int b1 = b4[1] & 0xFF;
         if (b0 == 0xFE && b1 == 0xFF) {
             // UTF-16, big-endian
-            return new Object [] {"UTF-16BE", Boolean.TRUE};
+            return new Object [] {"UTF-16BE", Boolean.TRUE, Integer.valueOf(2)};
         }
         if (b0 == 0xFF && b1 == 0xFE) {
             // UTF-16, little-endian
-            return new Object [] {"UTF-16LE", Boolean.FALSE};
+            return new Object [] {"UTF-16LE", Boolean.FALSE, Integer.valueOf(2)};
         }
 
         // default to UTF-8 if we don't have enough bytes to make a
         // good determination of the encoding
         if (count < 3) {
-            return new Object [] {"UTF-8", null, Boolean.FALSE};
+            return new Object [] {"UTF-8", null, Boolean.FALSE, Integer.valueOf(0)};
         }
 
         // UTF-8 with a BOM
         int b2 = b4[2] & 0xFF;
         if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-            return new Object [] {"UTF-8", null};
+            return new Object [] {"UTF-8", null, Integer.valueOf(3)};
         }
 
         // default to UTF-8 if we don't have enough bytes to make a
         // good determination of the encoding
         if (count < 4) {
-            return new Object [] {"UTF-8", null};
+            return new Object [] {"UTF-8", null, Integer.valueOf(0)};
         }
 
         // other encodings
         int b3 = b4[3] & 0xFF;
         if (b0 == 0x00 && b1 == 0x00 && b2 == 0x00 && b3 == 0x3C) {
             // UCS-4, big endian (1234)
-            return new Object [] {"ISO-10646-UCS-4", new Boolean(true)};
+            return new Object [] {"ISO-10646-UCS-4", new Boolean(true), Integer.valueOf(4)};
         }
         if (b0 == 0x3C && b1 == 0x00 && b2 == 0x00 && b3 == 0x00) {
             // UCS-4, little endian (4321)
-            return new Object [] {"ISO-10646-UCS-4", new Boolean(false)};
+            return new Object [] {"ISO-10646-UCS-4", new Boolean(false), Integer.valueOf(4)};
         }
         if (b0 == 0x00 && b1 == 0x00 && b2 == 0x3C && b3 == 0x00) {
             // UCS-4, unusual octet order (2143)
             // REVISIT: What should this be?
-            return new Object [] {"ISO-10646-UCS-4", null};
+            return new Object [] {"ISO-10646-UCS-4", null, Integer.valueOf(4)};
         }
         if (b0 == 0x00 && b1 == 0x3C && b2 == 0x00 && b3 == 0x00) {
             // UCS-4, unusual octect order (3412)
             // REVISIT: What should this be?
-            return new Object [] {"ISO-10646-UCS-4", null};
+            return new Object [] {"ISO-10646-UCS-4", null, Integer.valueOf(4)};
         }
         if (b0 == 0x00 && b1 == 0x3C && b2 == 0x00 && b3 == 0x3F) {
             // UTF-16, big-endian, no BOM
             // (or could turn out to be UCS-2...
             // REVISIT: What should this be?
-            return new Object [] {"UTF-16BE", new Boolean(true)};
+            return new Object [] {"UTF-16BE", new Boolean(true), Integer.valueOf(4)};
         }
         if (b0 == 0x3C && b1 == 0x00 && b2 == 0x3F && b3 == 0x00) {
             // UTF-16, little-endian, no BOM
             // (or could turn out to be UCS-2...
-            return new Object [] {"UTF-16LE", new Boolean(false)};
+            return new Object [] {"UTF-16LE", new Boolean(false), Integer.valueOf(4)};
         }
         if (b0 == 0x4C && b1 == 0x6F && b2 == 0xA7 && b3 == 0x94) {
             // EBCDIC
             // a la xerces1, return CP037 instead of EBCDIC here
-            return new Object [] {"CP037", null};
+            return new Object [] {"CP037", null, Integer.valueOf(4)};
         }
 
         // default encoding
-        return new Object [] {"UTF-8", null, Boolean.FALSE};
+        return new Object [] {"UTF-8", null, Boolean.FALSE, Integer.valueOf(0)};
 
     }
 

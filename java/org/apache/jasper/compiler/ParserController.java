@@ -62,6 +62,7 @@ class ParserController implements TagConstants {
 
     private boolean isEncodingSpecifiedInProlog;
     private boolean isBomPresent;
+    private int skip;
 
     private String sourceEnc;
 
@@ -208,7 +209,7 @@ class ParserController implements TagConstants {
             InputStreamReader inStreamReader = null;
             try {
                 inStreamReader = JspUtil.getReader(absFileName, sourceEnc,
-                        jarFile, ctxt, err);
+                        jarFile, ctxt, err, skip);
                 JspReader jspReader = new JspReader(ctxt, absFileName,
                         sourceEnc, inStreamReader,
                         err);
@@ -314,6 +315,7 @@ class ParserController implements TagConstants {
             if (((Boolean) ret[2]).booleanValue()) {
                 isBomPresent = true;
             }
+            skip = ((Integer) ret[3]).intValue();
 
             if (!isXml && sourceEnc.equals("UTF-8")) {
                 /*
