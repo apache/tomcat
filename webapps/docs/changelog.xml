@@ -18,6 +18,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Don't log pattern subtoken at ExtendedAccesLogValve (pero)
+      </fix>
+      <fix>
+        Add some missing JMX attributes for new AccessLogValve (pero)
+      </fix>
+      <fix>
         <bug>41786  </bug> Incorrect reference to catalina_home in catalina.sh/bat Patch provided by Mike Hanafey (fhanik)
       </fix>
       <fix>
