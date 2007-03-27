@@ -747,10 +747,13 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @return Object
      */
     public Object remove(Object key) {
+        return remove(key,true);
+    }
+    public Object remove(Object key, boolean notify) {
         MapEntry entry = (MapEntry)super.remove(key);
 
         try {
-            if (getMapMembers().length > 0 ) {
+            if (getMapMembers().length > 0 && notify) {
                 MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_REMOVE, false, (Serializable) key, null, null, null);
                 getChannel().send(getMapMembers(), msg, getChannelSendOptions());
             }
@@ -885,11 +888,20 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 put(entry.getKey(),entry.getValue());
             }
         }
-    
+        
         public void clear() {
-            //only delete active keys
-            Iterator keys = keySet().iterator();
-            while ( keys.hasNext() ) remove(keys.next());
+            clear(true);
+        }
+    
+        public void clear(boolean notify) {
+            if ( notify ) {
+                //only delete active keys
+                Iterator keys = keySet().iterator();
+                while (keys.hasNext())
+                    remove(keys.next());
+            } else {
+                super.clear();
+            }
         }
     
         public boolean containsValue(Object value) {
@@ -933,8 +945,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Iterator i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry e = (Map.Entry)i.next();
-                MapEntry entry = (MapEntry)e.getValue();
-                if ( entry.isPrimary() ) set.add(entry);
+                Object key = e.getKey();
+                MapEntry entry = (MapEntry)super.get(key);
+                if ( entry.isPrimary() ) set.add(entry.getValue());
             }
             return Collections.unmodifiableSet(set);
         }
@@ -946,10 +959,12 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Iterator i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry e = (Map.Entry)i.next();
-                MapEntry entry = (MapEntry)e.getValue();
-                if ( entry.isPrimary() ) set.add(entry.getKey());
+                Object key = e.getKey();
+                MapEntry entry = (MapEntry)super.get(key);
+                if ( entry.isPrimary() ) set.add(key);
             }
             return Collections.unmodifiableSet(set);
+
         }
     
     
@@ -1056,7 +1071,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 
         public Object setValue(Object value) {
             Object old = this.value;
-            this.value = (Serializable) value;
+            this.value = value;
             return old;
         }
 
@@ -1066,7 +1081,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         
         public Object setKey(Object key) {
             Object old = this.key;
-            this.key = (Serializable)key;
+            this.key = key;
             return old;
         }
 

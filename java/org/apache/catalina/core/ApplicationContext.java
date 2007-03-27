@@ -804,12 +804,17 @@ public class ApplicationContext
 
 
     // -------------------------------------------------------- Package Methods
-
-
+    protected StandardContext getContext() {
+        return this.context;
+    }
+    
+    protected Map getReadonlyAttributes() {
+        return this.readOnlyAttributes;
+    }
     /**
      * Clear all application-created attributes.
      */
-    void clearAttributes() {
+    protected void clearAttributes() {
 
         // Create list of attributes to be removed
         ArrayList list = new ArrayList();
