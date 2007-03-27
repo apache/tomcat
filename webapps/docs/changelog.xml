@@ -18,6 +18,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>41703</bug> SingleSignOnMessage invalid setter, patch provided by Nils Hammar (fhanik)
+      </fix>
+      <fix>
         <bug>41682</bug> ClassCastException when logging is turned on (fhanik)
       </fix>
       <fix>

@@ -71,7 +71,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      * @param member Member
      */
     public void setAddress(Member member) {
-	this.address = address;
+	this.address = member;
     }
 
     /**
