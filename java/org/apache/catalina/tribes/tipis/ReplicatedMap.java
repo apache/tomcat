@@ -92,6 +92,10 @@ public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback,
 //------------------------------------------------------------------------------
 //              METHODS TO OVERRIDE
 //------------------------------------------------------------------------------
+    protected int getStateMessageType() {
+        return AbstractReplicatedMap.MapMessage.MSG_STATE_COPY;
+    }
+    
     /**
      * publish info about a map pair (key/value) to other nodes in the cluster
      * @param key Object
@@ -107,8 +111,8 @@ public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback,
         if (backup == null || backup.length == 0) return null;
 
         //publish the data out to all nodes
-        MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_BACKUP, false,
-                                        (Serializable) key, null, null, backup);
+        MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
+                                        (Serializable) key, (Serializable) value, null, backup);
 
         getChannel().send(getMapMembers(), msg, getChannelSendOptions());
 

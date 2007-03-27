@@ -113,6 +113,10 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
 //------------------------------------------------------------------------------    
 //              METHODS TO OVERRIDE    
 //------------------------------------------------------------------------------
+    protected int getStateMessageType() {
+        return AbstractReplicatedMap.MapMessage.MSG_STATE;
+    }
+
     /**
      * publish info about a map pair (key/value) to other nodes in the cluster
      * @param key Object

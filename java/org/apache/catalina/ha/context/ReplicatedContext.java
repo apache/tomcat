@@ -31,21 +31,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextAttributeEvent;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
+import java.util.Enumeration;
+import java.util.concurrent.ConcurrentHashMap;
+import org.apache.catalina.util.Enumerator;
 
 /**
  * @author Filip Hanik
  * @version 1.0
  */
-public class ReplicatedContext extends StandardContext {
+public class ReplicatedContext extends StandardContext implements LifecycleListener {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
     public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( ReplicatedContext.class );
-
+    protected boolean startComplete = false;
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
     
-
+    public void lifecycleEvent(LifecycleEvent event) {
+        if ( event.getType() == AFTER_START_EVENT ) 
+            startComplete = true;
+    }
 
     public synchronized void start() throws LifecycleException {
         if ( this.started ) return;
+        super.addLifecycleListener(this);            
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
             if (this.context == null) this.context = new ReplApplContext(this.getBasePath(), this);
@@ -71,12 +80,15 @@ public class ReplicatedContext extends StandardContext {
         }
         if ( !this.started ) return;
         try {
+            super.lifecycle.removeLifecycleListener(this);
         } catch ( Exception x ){
             log.error("Unable to stop ReplicatedContext",x);
             throw new LifecycleException("Failed to stop ReplicatedContext",x);
         } finally {
+            this.startComplete = false;
             super.stop();
         }
+        
 
     }
 
@@ -115,11 +127,17 @@ public class ReplicatedContext extends StandardContext {
 
     
     protected static class ReplApplContext extends ApplicationContext {
-        public ReplApplContext(String basePath, StandardContext context) {
+        protected ConcurrentHashMap tomcatAttributes = new ConcurrentHashMap();
+        
+        public ReplApplContext(String basePath, ReplicatedContext context) {
             super(basePath,context);
         }
         
-         protected ServletContext getFacade() {
+        protected ReplicatedContext getParent() {
+            return (ReplicatedContext)getContext();
+        }
+        
+        protected ServletContext getFacade() {
              return super.getFacade();
         }
         
@@ -131,17 +149,49 @@ public class ReplicatedContext extends StandardContext {
         }
         
         public void removeAttribute(String name) {
+            tomcatAttributes.remove(name);
             //do nothing
             super.removeAttribute(name);
         }
         
         public void setAttribute(String name, Object value) {
-            //do nothing
-            super.setAttribute(name,value);
+            if ( (!getParent().startComplete) || "org.apache.jasper.runtime.JspApplicationContextImpl".equals(name) ){
+                tomcatAttributes.put(name,value);
+            } else
+                super.setAttribute(name,value);
+        }
+        
+        public Object getAttribute(String name) {
+            if (tomcatAttributes.containsKey(name) )
+                return tomcatAttributes.get(name);
+            else 
+                return super.getAttribute(name);
+        }
+        
+        public Enumeration getAttributeNames() {
+            return new MultiEnumeration(new Enumeration[] {super.getAttributeNames(),new Enumerator(tomcatAttributes.keySet(), true)});
         }
         
     }
 
+    protected static class MultiEnumeration implements Enumeration {
+        Enumeration[] e=null;
+        public MultiEnumeration(Enumeration[] lists) {
+            e = lists;
+        }
+        public boolean hasMoreElements() {
+            for ( int i=0; i<e.length; i++ ) {
+                if ( e[i].hasMoreElements() ) return true;
+            }
+            return false;
+        }
+        public Object nextElement() {
+            for ( int i=0; i<e.length; i++ ) {
+                if ( e[i].hasMoreElements() ) return e[i].nextElement();
+            }
+            return null;
 
+        }
+    }
 
 }

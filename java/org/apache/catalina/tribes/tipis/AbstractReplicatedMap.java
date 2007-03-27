@@ -73,6 +73,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 //------------------------------------------------------------------------------
 //              INSTANCE VARIABLES
 //------------------------------------------------------------------------------
+    protected abstract int getStateMessageType();
+    
     
     /**
      * Timeout for RPC messages, how long we will wait for a reply
@@ -433,7 +435,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Member[] members = getMapMembers();
             Member backup = members.length > 0 ? (Member) members[0] : null;
             if (backup != null) {
-                MapMessage msg = new MapMessage(mapContextName, MapMessage.MSG_STATE, false,
+                MapMessage msg = new MapMessage(mapContextName, getStateMessageType(), false,
                                                 null, null, null, null);
                 Response[] resp = rpcChannel.send(new Member[] {backup}, msg, rpcChannel.FIRST_REPLY, channelSendOptions, rpcTimeout);
                 if (resp.length > 0) {
@@ -490,16 +492,18 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
 
         //state transfer request
-        if (mapmsg.getMsgType() == mapmsg.MSG_STATE) {
+        if (mapmsg.getMsgType() == mapmsg.MSG_STATE || mapmsg.getMsgType() == mapmsg.MSG_STATE_COPY) {
             synchronized (stateMutex) { //make sure we dont do two things at the same time
                 ArrayList list = new ArrayList();
                 Iterator i = super.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry e = (Map.Entry) i.next();
-                    MapEntry entry = (MapEntry) e.getValue();
+                    MapEntry entry = (MapEntry) super.get(e.getKey());
                     if ( entry.isSerializable() ) {
-                        MapMessage me = new MapMessage(mapContextName, MapMessage.MSG_PROXY,
-                            false, (Serializable) entry.getKey(), null, null, entry.getBackupNodes());
+                        boolean copy = (mapmsg.getMsgType() == mapmsg.MSG_STATE_COPY);
+                        MapMessage me = new MapMessage(mapContextName, 
+                                                       copy?MapMessage.MSG_COPY:MapMessage.MSG_PROXY,
+                            false, (Serializable) entry.getKey(), copy?(Serializable) entry.getValue():null, null, entry.getBackupNodes());
                         list.add(me);
                     }
                 }
@@ -584,18 +588,18 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             super.remove(mapmsg.getKey());
         }
 
-        if (mapmsg.getMsgType() == MapMessage.MSG_BACKUP) {
+        if (mapmsg.getMsgType() == MapMessage.MSG_BACKUP || mapmsg.getMsgType() == MapMessage.MSG_COPY) {
             MapEntry entry = (MapEntry)super.get(mapmsg.getKey());
             if (entry == null) {
                 entry = new MapEntry(mapmsg.getKey(), mapmsg.getValue());
-                entry.setBackup(true);
+                entry.setBackup(mapmsg.getMsgType() == MapMessage.MSG_BACKUP);
                 entry.setProxy(false);
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 if (mapmsg.getValue()!=null && mapmsg.getValue() instanceof ReplicatedMapEntry ) {
                     ((ReplicatedMapEntry)mapmsg.getValue()).setOwner(getMapOwner());
                 }
             } else {
-                entry.setBackup(true);
+                entry.setBackup(mapmsg.getMsgType() == MapMessage.MSG_BACKUP);
                 entry.setProxy(false);
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 if (entry.getValue() instanceof ReplicatedMapEntry) {
@@ -650,7 +654,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Iterator i = super.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry e = (Map.Entry) i.next();
-                    MapEntry entry = (MapEntry) e.getValue();
+                    MapEntry entry = (MapEntry) super.get(e.getKey());
                     if ( entry == null ) continue;
                     if (entry.isPrimary() && (entry.getBackupNodes() == null || entry.getBackupNodes().length == 0)) {
                         try {
@@ -696,7 +700,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         Iterator i = super.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
-            MapEntry entry = (MapEntry) e.getValue();
+            MapEntry entry = (MapEntry) super.get(e.getKey());
             if (entry.isPrimary() && inSet(member,entry.getBackupNodes())) {
                 try {
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
@@ -837,7 +841,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 
             while (i.hasNext()) {
                 Map.Entry e = (Map.Entry) i.next();
-                System.out.println( (++cnt) + ". " + e.getValue());
+                System.out.println( (++cnt) + ". " + super.get(e.getKey()));
             }
             System.out.println("EndMap]\n\n");
         }catch ( Exception ignore) {
@@ -856,8 +860,11 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             return super.containsKey(key);
         }
     
-    
         public Object put(Object key, Object value) {
+            return put(key,value,true);
+        }
+    
+        public Object put(Object key, Object value, boolean notify) {
             MapEntry entry = new MapEntry(key,value);
             entry.setBackup(false);
             entry.setProxy(false);
@@ -867,8 +874,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             //make sure that any old values get removed
             if ( containsKey(key) ) old = remove(key);
             try {
-                Member[] backup = publishEntryInfo(key, value);
-                entry.setBackupNodes(backup);
+                if ( notify ) {
+                    Member[] backup = publishEntryInfo(key, value);
+                    entry.setBackupNodes(backup);
+                }
             } catch (ChannelException x) {
                 log.error("Unable to replicate out data for a LazyReplicatedMap.put operation", x);
             }
@@ -911,7 +920,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Iterator i = super.entrySet().iterator();
                 while (i.hasNext()) {
                     Map.Entry e = (Map.Entry) i.next();
-                    MapEntry entry = (MapEntry) e.getValue();
+                    MapEntry entry = (MapEntry) super.get(e.getKey());
                     if (entry.isPrimary() && value.equals(entry.getValue())) return true;
                 }//while
                 return false;
@@ -976,7 +985,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             while (it.hasNext() ) {
                 Map.Entry e = (Map.Entry) it.next();
                 if ( e != null ) {
-                    MapEntry entry = (MapEntry) e.getValue();
+                    MapEntry entry = (MapEntry) super.get(e.getKey());
                     if (entry.isPrimary() && entry.getValue() != null) counter++;
                 }
             }
@@ -996,7 +1005,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Iterator i = super.entrySet().iterator();
             while ( i.hasNext() ) {
                 Map.Entry e = (Map.Entry)i.next();
-                MapEntry entry = (MapEntry)e.getValue();
+                MapEntry entry = (MapEntry)super.get(e.getKey());
                 if ( entry.isPrimary() && entry.getValue()!=null) values.add(entry.getValue());
             }
             return Collections.unmodifiableCollection(values);
@@ -1144,6 +1153,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         public static final int MSG_START = 6;
         public static final int MSG_STOP = 7;
         public static final int MSG_INIT = 8;
+        public static final int MSG_COPY = 9;
+        public static final int MSG_STATE_COPY = 10;
 
         private byte[] mapId;
         private int msgtype;
@@ -1177,6 +1188,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 case MSG_START: return "MSG_START";
                 case MSG_STOP: return "MSG_STOP";
                 case MSG_INIT: return "MSG_INIT";
+                case MSG_STATE_COPY: return "MSG_STATE_COPY";
+                case MSG_COPY: return "MSG_COPY";
                 default : return "UNKNOWN";
             }
         }
