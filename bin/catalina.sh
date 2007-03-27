@@ -162,7 +162,7 @@ if $cygwin; then
 fi
 
 # Set juli LogManager if it is present
-if [ -r "$CATALINA_HOME"/conf/logging.properties ]; then
+if [ -r "$CATALINA_BASE"/conf/logging.properties ]; then
   JAVA_OPTS="$JAVA_OPTS "-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager" "-Djava.util.logging.config.file="$CATALINA_BASE/conf/logging.properties"
 fi
 
