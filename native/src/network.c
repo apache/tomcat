@@ -408,7 +408,7 @@ TCN_IMPLEMENT_CALL(jlong, Socket, accept)(TCN_STDARGS, jlong sock)
     return P2J(a);
 cleanup:
     if (p)
-        apr_pool_destory(p);
+        apr_pool_destroy(p);
     return 0;
 }
 
