@@ -94,7 +94,7 @@ if not "%CATALINA_TMPDIR%" == "" goto gotTmpdir
 set CATALINA_TMPDIR=%CATALINA_BASE%\temp
 :gotTmpdir
 
-if not exist "%CATALINA_HOME%\conf\logging.properties" goto noJuli
+if not exist "%CATALINA_BASE%\conf\logging.properties" goto noJuli
 set JAVA_OPTS=%JAVA_OPTS% -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file="%CATALINA_BASE%\conf\logging.properties"
 :noJuli
 
