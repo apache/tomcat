@@ -90,13 +90,6 @@ public class AjpAprProcessor implements ActionHook {
         responseHeaderMessage = new AjpMessage(packetSize);
         bodyMessage = new AjpMessage(packetSize);
         
-        readTimeout = endpoint.getFirstReadTimeout() * 1000;
-        if (readTimeout == 0) {
-            readTimeout = 100 * 1000;
-        } else if (readTimeout < 0) {
-            readTimeout = -1;
-        }
-
         // Allocate input and output buffers
         inputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
         inputBuffer.limit(0);
@@ -186,13 +179,6 @@ public class AjpAprProcessor implements ActionHook {
      * Associated endpoint.
      */
     protected AprEndpoint endpoint;
-
-
-    /**
-     * The socket timeout used when reading the first block of the request
-     * header.
-     */
-    protected long readTimeout;
 
 
     /**
@@ -371,11 +357,6 @@ public class AjpAprProcessor implements ActionHook {
         // Error flag
         error = false;
 
-        int limit = 0;
-        if (endpoint.getFirstReadTimeout() > 0) {
-            limit = endpoint.getMaxThreads() / 2;
-        }
-
         boolean openSocket = true;
         boolean keptAlive = false;
 
@@ -384,8 +365,7 @@ public class AjpAprProcessor implements ActionHook {
             // Parsing the request header
             try {
                 // Get first message of the request
-                if (!readMessage(requestHeaderMessage, true,
-                        keptAlive && (endpoint.getCurrentThreadsBusy() >= limit))) {
+                if (!readMessage(requestHeaderMessage, true, keptAlive)) {
                     // This means that no data is available right now
                     // (long keepalive), so that the processor should be recycled
                     // and the method should return true
@@ -1061,15 +1041,9 @@ public class AjpAprProcessor implements ActionHook {
         }
         int nRead;
         while (inputBuffer.remaining() < n) {
-            if (readTimeout > 0) {
-                nRead = Socket.recvbbt
-                    (socket, inputBuffer.limit(),
-                        inputBuffer.capacity() - inputBuffer.limit(), readTimeout);
-            } else {
-                nRead = Socket.recvbb
-                    (socket, inputBuffer.limit(),
-                        inputBuffer.capacity() - inputBuffer.limit());
-            }
+            nRead = Socket.recvbb
+                (socket, inputBuffer.limit(),
+                    inputBuffer.capacity() - inputBuffer.limit());
             if (nRead > 0) {
                 inputBuffer.limit(inputBuffer.limit() + nRead);
             } else {

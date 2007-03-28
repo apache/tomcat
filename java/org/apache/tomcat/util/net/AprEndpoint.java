@@ -272,14 +272,6 @@ public class AprEndpoint {
 
 
     /**
-     * Timeout on first request read before going to the poller, in ms.
-     */
-    protected int firstReadTimeout = -1;
-    public int getFirstReadTimeout() { return firstReadTimeout; }
-    public void setFirstReadTimeout(int firstReadTimeout) { this.firstReadTimeout = firstReadTimeout; }
-
-
-    /**
      * Poll interval, in microseconds. The smaller the value, the more CPU the poller
      * will use, but the more responsive to activity it will be.
      */
