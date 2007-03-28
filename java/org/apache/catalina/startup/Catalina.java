@@ -445,6 +445,8 @@ public class Catalina extends Embedded {
      */
     public void load() {
 
+        long t1 = System.nanoTime();
+
         initDirs();
 
         // Before digester - it may be needed
@@ -453,9 +455,7 @@ public class Catalina extends Embedded {
 
         // Create and execute our Digester
         Digester digester = createStartDigester();
-        long t1 = System.currentTimeMillis();
 
-        Exception ex = null;
         InputSource inputSource = null;
         InputStream inputStream = null;
         File file = null;
@@ -521,9 +521,9 @@ public class Catalina extends Embedded {
             }
         }
 
-        long t2 = System.currentTimeMillis();
+        long t2 = System.nanoTime();
         if(log.isInfoEnabled())
-            log.info("Initialization processed in " + (t2 - t1) + " ms");
+            log.info("Initialization processed in " + ((t2 - t1) / 1000000) + " ms");
 
     }
 
@@ -558,8 +558,8 @@ public class Catalina extends Embedded {
             load();
         }
 
-        long t1 = System.currentTimeMillis();
-
+        long t1 = System.nanoTime();
+        
         // Start the new server
         if (server instanceof Lifecycle) {
             try {
@@ -569,9 +569,9 @@ public class Catalina extends Embedded {
             }
         }
 
-        long t2 = System.currentTimeMillis();
+        long t2 = System.nanoTime();
         if(log.isInfoEnabled())
-            log.info("Server startup in " + (t2 - t1) + " ms");
+            log.info("Server startup in " + ((t2 - t1) / 1000000) + " ms");
 
         try {
             // Register shutdown hook
