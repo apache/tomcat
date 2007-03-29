@@ -95,7 +95,7 @@ TCN_IMPLEMENT_CALL(jboolean, OS, is)(TCN_STDARGS, jint type)
     else if (type == 6)
         return JNI_TRUE;
 #endif
-#if defined(__FreeBSD__) || defined(__NetBSD__)
+#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
     else if (type == 7)
         return JNI_TRUE;
 #endif
