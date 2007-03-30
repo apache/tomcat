@@ -121,16 +121,21 @@ public final class ApplicationFilterFactory {
         
         // Create and initialize a filter chain object
         ApplicationFilterChain filterChain = null;
-        if (!Globals.IS_SECURITY_ENABLED && (request instanceof Request)) {
+        if (request instanceof Request) {
             Request req = (Request) request;
-            filterChain = (ApplicationFilterChain) req.getFilterChain();
-            if (filterChain == null) {
+            if (Globals.IS_SECURITY_ENABLED) {
+                // Security: Do not recycle
                 filterChain = new ApplicationFilterChain();
-                req.setFilterChain(filterChain);
+            } else {
+                filterChain = (ApplicationFilterChain) req.getFilterChain();
+                if (filterChain == null) {
+                    filterChain = new ApplicationFilterChain();
+                    req.setFilterChain(filterChain);
+                }
             }
             comet = req.isComet();
         } else {
-            // Security: Do not recycle
+            // Request dispatcher in use
             filterChain = new ApplicationFilterChain();
         }
 

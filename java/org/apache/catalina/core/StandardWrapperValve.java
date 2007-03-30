@@ -159,9 +159,10 @@ final class StandardWrapperValve
         }
 
         // Identify if the request is Comet related now that the servlet has been allocated
+        boolean comet = false;
         if (servlet instanceof CometProcessor 
                 && request.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
-            request.setComet(true);
+            comet = true;
         }
         
         // Acknowlege the request
@@ -209,8 +210,9 @@ final class StandardWrapperValve
                 if (context.getSwallowOutput()) {
                     try {
                         SystemLogHandler.startCapture();
-                        if (request.isComet()) {
+                        if (comet) {
                             filterChain.doFilterEvent(request.getEvent());
+                            request.setComet(true);
                         } else {
                             filterChain.doFilter(request.getRequest(), 
                                     response.getResponse());
@@ -222,8 +224,9 @@ final class StandardWrapperValve
                         }
                     }
                 } else {
-                    if (request.isComet()) {
+                    if (comet) {
                         filterChain.doFilterEvent(request.getEvent());
+                        request.setComet(true);
                     } else {
                         filterChain.doFilter
                             (request.getRequest(), response.getResponse());

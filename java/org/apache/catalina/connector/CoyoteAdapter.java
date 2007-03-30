@@ -216,7 +216,7 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 
                 if (request.isComet()) {
-                    if (!response.isClosed()) {
+                    if (!response.isClosed() && !response.isError()) {
                         comet = true;
                         res.action(ActionCode.ACTION_COMET_BEGIN, null);
                     } else {
