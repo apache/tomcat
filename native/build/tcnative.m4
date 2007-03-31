@@ -9,6 +9,20 @@ AC_DEFUN(TCN_FIND_APR,[
     AC_MSG_ERROR(APR could not be located. Please use the --with-apr option.)
   fi
 
+  sapr_pversion="`$apr_config --version`"
+  if test -z "$sapr_pversion"; then
+    AC_MSG_ERROR(APR config could not be located. Please use the --with-apr option.)
+  fi
+  sapr_version="`echo $sapr_pversion|sed -e 's/\([a-z]*\)$/.\1/'`"
+  IFS=.; set $sapr_version; IFS=' '
+  if test "$1" -lt "1"; then
+    AC_MSG_ERROR(You need APR version 1.2.1 or newer installed.)
+  else
+    if test "$2" -lt "2"; then
+      AC_MSG_ERROR(You need APR version 1.2.1 or newer installed.)
+    fi
+  fi
+
   APR_BUILD_DIR="`$apr_config --installbuilddir`"
 
   dnl make APR_BUILD_DIR an absolute directory (we'll need it in the
