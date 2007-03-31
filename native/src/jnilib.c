@@ -49,12 +49,26 @@ int tcn_parent_pid = 0;
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
     JNIEnv *env;
+    apr_version_t apv;
+    int apvn;
 
     UNREFERENCED(reserved);
     if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_4)) {
         return JNI_ERR;
     }
     tcn_global_vm = vm;
+
+    /* Before doing anything else check if we have a valid
+     * APR version. We need version 1.2.1 as minimum.
+     */
+    apr_version(&apv);
+    apvn = apv.major * 1000 + apv.minor * 100 + apv.patch;
+    if (apvn < 1201) {
+        tcn_Throw(env, "Unupported APR version (%s)",
+                  apr_version_string());
+        return JNI_ERR;
+    }
+
 
     /* Initialize global java.lang.String class */
     TCN_LOAD_CLASS(env, jString_class, "java/lang/String", JNI_ERR);
