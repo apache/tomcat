@@ -19,7 +19,7 @@
 
 # Default place to look for apr source.  Can be overridden with 
 #   --with-apr=[directory]
-apr_src_dir=../apr
+apr_src_dir=`pwd`/srclib/apr-1.2.7
 
 while test $# -gt 0 
 do
