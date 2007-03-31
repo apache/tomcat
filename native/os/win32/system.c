@@ -111,8 +111,6 @@ DllMain(
          *  or FreeLibrary.
          */
         case DLL_PROCESS_DETACH:
-            /* Make sure the library is always terminated */
-            apr_terminate();
             if (h_kernel)
                 FreeLibrary(h_kernel);
             if (h_ntdll)

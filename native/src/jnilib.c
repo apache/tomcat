@@ -93,7 +93,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 #else
     tcn_parent_pid = getppid();
 #endif
-    apr_initialize();
 
     return  JNI_VERSION_1_4;
 }
@@ -109,10 +108,12 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
     if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_2)) {
         return;
     }
-    TCN_UNLOAD_CLASS(env, jString_class);
-    TCN_UNLOAD_CLASS(env, jFinfo_class);
-    TCN_UNLOAD_CLASS(env, jAinfo_class);
-    apr_terminate();
+    if (tcn_global_pool) {
+        TCN_UNLOAD_CLASS(env, jString_class);
+        TCN_UNLOAD_CLASS(env, jFinfo_class);
+        TCN_UNLOAD_CLASS(env, jAinfo_class);
+        apr_terminate();
+    }
 }
 
 jstring tcn_new_stringn(JNIEnv *env, const char *str, size_t l)
@@ -221,6 +222,7 @@ TCN_IMPLEMENT_CALL(jboolean, Library, initialize)(TCN_STDARGS)
 
     UNREFERENCED_STDARGS;
     if (!tcn_global_pool) {
+        apr_initialize();
         if (apr_pool_create(&tcn_global_pool, NULL) != APR_SUCCESS) {
             return JNI_FALSE;
         }
@@ -233,18 +235,20 @@ TCN_IMPLEMENT_CALL(void, Library, terminate)(TCN_STDARGS)
 {
 
     UNREFERENCED_STDARGS;
-    if (tcn_global_pool) {
+    if (tcn_global_pool) {        
+        apr_pool_t *p = tcn_global_pool;
+        tcn_global_pool = NULL;
 #ifdef TCN_DO_STATISTICS
         fprintf(stderr, "APR Statistical data ....\n");
 #endif
-        apr_pool_destroy(tcn_global_pool);
-        tcn_global_pool = NULL;
+        apr_pool_destroy(p);
 #ifdef TCN_DO_STATISTICS
         sp_poll_dump_statistics();
         sp_network_dump_statistics();
         ssl_network_dump_statistics();
         fprintf(stderr, "APR Terminated\n");
 #endif
+        apr_terminate();
     }
 }
 
