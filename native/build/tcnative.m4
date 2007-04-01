@@ -15,10 +15,10 @@ AC_DEFUN(TCN_FIND_APR,[
   fi
   sapr_version="`echo $sapr_pversion|sed -e 's/\([a-z]*\)$/.\1/'`"
   IFS=.; set $sapr_version; IFS=' '
-  if test "$1" -lt "1"; then
+  if test "${1}" -lt "1"; then
     AC_MSG_ERROR(You need APR version 1.2.1 or newer installed.)
   else
-    if test "$2" -lt "2"; then
+    if test "${2}" -lt "2"; then
       AC_MSG_ERROR(You need APR version 1.2.1 or newer installed.)
     fi
   fi
