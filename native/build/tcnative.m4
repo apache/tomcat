@@ -240,118 +240,144 @@ dnl Configure for the detected openssl toolkit installation, giving
 dnl preference to "--with-ssl=<path>" if it was specified.
 dnl
 AC_DEFUN(TCN_CHECK_SSL_TOOLKIT,[
-  dnl initialise the variables we use
-  tcn_ssltk_base=""
-  tcn_ssltk_inc=""
-  tcn_ssltk_lib=""
-  tcn_ssltk_type=""
-  AC_ARG_WITH(ssl, TCN_HELP_STRING(--with-ssl=DIR,OpenSSL SSL/TLS toolkit), [
-    dnl If --with-ssl specifies a directory, we use that directory or fail
-    if test "x$withval" != "xyes" -a "x$withval" != "x"; then
-      dnl This ensures $withval is actually a directory and that it is absolute
-      tcn_ssltk_base="`cd $withval ; pwd`"
-    fi
-  ])
-  if test "x$tcn_ssltk_base" = "x"; then
-    AC_MSG_RESULT(none)
-  else
-    AC_MSG_RESULT($tcn_ssltk_base)
-  fi
+OPENSSL_WARNING=
+AC_MSG_CHECKING(for OpenSSL library)
+AC_ARG_WITH(ssl,
+[  --with-ssl[=PATH]   Build with OpenSSL [yes|no|path]],
+    use_openssl="$withval", use_openssl="auto")
 
-  dnl Run header and version checks
-  saved_CPPFLAGS=$CPPFLAGS
-  if test "x$tcn_ssltk_base" != "x"; then
-    tcn_ssltk_inc="-I$tcn_ssltk_base/include"
-    CPPFLAGS="$CPPFLAGS $tcn_ssltk_inc"
-  fi
-
-  if test "x$tcn_ssltk_type" = "x"; then
-    AC_MSG_CHECKING(for OpenSSL version)
-    dnl First check for manditory headers
-    AC_CHECK_HEADERS([openssl/opensslv.h], [tcn_ssltk_type="openssl"], [])
-    if test "$tcn_ssltk_type" = "openssl"; then
-      dnl so it's OpenSSL - test for a good version
-      AC_TRY_COMPILE([#include <openssl/opensslv.h>],[
-#if !defined(OPENSSL_VERSION_NUMBER)
-  #error "Missing openssl version"
-#endif
-#if  (OPENSSL_VERSION_NUMBER < 0x0090701f)
-  #error "Unsuported openssl version " OPENSSL_VERSION_TEXT
-#endif],
-      [AC_MSG_RESULT(OK)],
-      [dnl Unsuported OpenSSL version
-         AC_MSG_ERROR([Unsupported OpenSSL version. Use 0.9.7a or higher version])
-      ])
-      dnl Look for additional, possibly missing headers
-      AC_CHECK_HEADERS(openssl/engine.h)
-      if test -n "$PKGCONFIG"; then
-        $PKGCONFIG openssl
-        if test $? -eq 0; then
-          tcn_ssltk_inc="$tcn_ssltk_inc `$PKGCONFIG --cflags-only-I openssl`"
-          CPPFLAGS="$CPPFLAGS $tcn_ssltk_inc"
+openssldirs="/usr /usr/local /usr/local/ssl /usr/pkg /usr/sfw"
+if test "$use_openssl" = "auto"
+then
+    for d in $openssldirs
+    do
+        if test -f $d/include/openssl/opensslv.h
+        then
+            use_openssl=$d
+            break
         fi
-      fi
-    else
-      AC_MSG_RESULT([no OpenSSL headers found])
-    fi
-  fi
-  if test "$tcn_ssltk_type" != "openssl"; then
-    AC_MSG_ERROR([... No OpenSSL headers found])
-  fi
-  dnl restore
-  CPPFLAGS=$saved_CPPFLAGS
-  if test "x$tcn_ssltk_type" = "x"; then
-    AC_MSG_ERROR([...No recognized SSL/TLS toolkit detected])
-  fi
+    done
+fi
+case "$use_openssl" in
+    no)
+        AC_MSG_RESULT(no)
+        TCN_OPENSSL_INC=""
+        USE_OPENSSL=""
+        ;;
+    auto)
+        TCN_OPENSSL_INC=""
+        USE_OPENSSL=""
+        AC_MSG_RESULT(not found)
+        ;;
+    *)
+        if test "$use_openssl" = "yes"
+        then
+            # User did not specify a path - guess it
+            for d in $openssldirs
+            do
+                if test -f $d/include/openssl/opensslv.h
+                then
+                    use_openssl=$d
+                    break
+                fi
+            done
+            if test "$use_openssl" = "yes"
+            then
+                AC_MSG_RESULT(not found)
+                AC_MSG_ERROR(
+[OpenSSL was not found in any of $openssldirs; use --with-ssl=/path])
+            fi
+        fi
+        USE_OPENSSL='-DOPENSSL'
 
-  dnl Run library and function checks
-  saved_LDFLAGS=$LDFLAGS
-  saved_LIBS=$LIBS
-  if test "x$tcn_ssltk_base" != "x"; then
-    if test -d "$tcn_ssltk_base/lib64"; then
-      tcn_ssltk_lib="$tcn_ssltk_base/lib64"
-    elif test -d "$tcn_ssltk_base/lib"; then
-      tcn_ssltk_lib="$tcn_ssltk_base/lib"
-    else
-      tcn_ssltk_lib="$tcn_ssltk_base"
-    fi
-    LDFLAGS="$LDFLAGS -L$tcn_ssltk_lib"
-  fi
-  dnl make sure "other" flags are available so libcrypto and libssl can link
-  LIBS="$LIBS `$apr_config --libs`"
-  liberrors=""
-  if test "$tcn_ssltk_type" = "openssl"; then
-    AC_CHECK_LIB(crypto, SSLeay_version, [], [liberrors="yes"])
-    AC_CHECK_LIB(ssl, SSL_CTX_new, [], [liberrors="yes"])
-    AC_CHECK_FUNCS(ENGINE_init)
-    AC_CHECK_FUNCS(ENGINE_load_builtin_engines)
-  else
-    AC_CHECK_LIB(sslc, SSLC_library_version, [], [liberrors="yes"])
-    AC_CHECK_LIB(sslc, SSL_CTX_new, [], [liberrors="yes"])
-    AC_CHECK_FUNCS(SSL_set_state)
-  fi
-  AC_CHECK_FUNCS(SSL_set_cert_store)
-  dnl restore
-  LDFLAGS=$saved_LDFLAGS
-  LIBS=$saved_LIBS
-  if test "x$liberrors" != "x"; then
-    AC_MSG_ERROR([... Error, SSL/TLS libraries were missing or unusable])
-  fi
+        if test "$use_openssl" = "/usr"
+        then
+            TCN_OPENSSL_INC=""
+            TCN_OPENSSL_LIBS="-lssl -lcrypto"
+        else
+            TCN_OPENSSL_INC="-I$use_openssl/include"
+            case $host in
+            *-solaris*)
+                TCN_OPENSSL_LIBS="-L$use_openssl/lib -R$use_openssl/lib -lssl -lcrypto"
+                ;;
+            *-hp-hpux*)
+                TCN_OPENSSL_LIBS="-L$use_openssl/lib -Wl,+b: -lssl -lcrypto"
+                ;;
+            *)
+                TCN_OPENSSL_LIBS="-L$use_openssl/lib -lssl -lcrypto"
+                ;;
+            esac
+        fi
+        AC_MSG_RESULT(using openssl from $use_openssl/lib and $use_openssl/include)
 
-  dnl (b) hook up include paths
-  if test "x$tcn_ssltk_inc" != "x"; then
-    APR_ADDTO(TCNATIVE_PRIV_INCLUDES, [$tcn_ssltk_inc])
-  fi
-  dnl (c) hook up linker paths
-  if test "x$tcn_ssltk_lib" != "x"; then
-    APR_ADDTO(TCNATIVE_LDFLAGS, ["-L$tcn_ssltk_lib"])
-  fi
+        saved_cflags="$CFLAGS"
+        saved_libs="$LIBS"
+        CFLAGS="$CFLAGS $TCN_OPENSSL_INC"
+        LIBS="$LIBS $TCN_OPENSSL_LIBS"
+        AC_MSG_CHECKING(whether linking with OpenSSL works)
+        AC_TRY_RUN([
+#include <openssl/err.h>
+int main() {
+    ERR_clear_error();
+    return (0);
+}
+],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_RESULT(no)
+         AC_MSG_ERROR(Could not run test program using OpenSSL from
+$use_openssl/lib and $use_openssl/include.
+Please check the argument to --with-ssl and your
+shared library configuration (e.g., LD_LIBRARY_PATH).)],
+        [AC_MSG_RESULT(assuming it does work on target platform)])
+         
+AC_ARG_ENABLE(openssl-version-check,
+[AC_HELP_STRING([--enable-openssl-version-check],
+        [Check OpenSSL Version @<:@default=yes@:>@])])
+case "$enable_openssl_version_check" in
+yes|'')
+        AC_MSG_CHECKING(OpenSSL library version)
+        AC_TRY_RUN([
+#include <stdio.h>
+#include <openssl/opensslv.h>
+int main() {
+        if ((OPENSSL_VERSION_NUMBER >= 0x0090701fL &&
+         OPENSSL_VERSION_NUMBER < 0x00908000L) ||
+         OPENSSL_VERSION_NUMBER >= 0x0090802fL)
+            return (0);
+    printf("\n\nFound   OPENSSL_VERSION_NUMBER %#010x\n",
+        OPENSSL_VERSION_NUMBER);
+    printf("Require OPENSSL_VERSION_NUMBER 0x0090701f or greater (0.9.7a)\n"
+           "Require OPENSSL_VERSION_NUMBER 0x0090802f or greater (0.9.8a)\n\n");
+        return (1);
+}
+        ],
+        [AC_MSG_RESULT(ok)],
+        [AC_MSG_RESULT(not compatible)
+            OPENSSL_WARNING=yes
+        ],
+        [AC_MSG_RESULT(assuming target platform has compatible version)])
+;;
+no)
+    AC_MSG_RESULT(Skipped OpenSSL version check)
+;;
+esac
 
-  dnl Adjust configuration based on what we found above.
-  dnl (a) define preprocessor symbols
-  if test "$tcn_ssltk_type" = "openssl"; then
-    APR_SETVAR(SSL_LIBS, [-lssl -lcrypto])
+        AC_MSG_CHECKING(for OpenSSL DSA support)
+        if test -f $use_openssl/include/openssl/dsa.h
+        then
+            AC_DEFINE(HAVE_OPENSSL_DSA)
+            AC_MSG_RESULT(yes)
+        else
+            AC_MSG_RESULT(no)
+        fi
+        CFLAGS="$saved_cflags"
+        LIBS="$saved_libs"
+        ;;
+esac
+if test "x$USE_OPENSSL" != "x"
+then
+    APR_ADDTO(TCNATIVE_PRIV_INCLUDES, [$TCN_OPENSSL_INC])
+    APR_ADDTO(TCNATIVE_LDFLAGS, [$TCN_OPENSSL_LIBS])
     APR_ADDTO(CFLAGS, [-DHAVE_OPENSSL])
-  fi
-  AC_SUBST(SSL_LIBS)
+fi
 ])

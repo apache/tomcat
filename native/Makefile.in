@@ -59,7 +59,7 @@ install: $(TARGET_LIB)
 	$(LIBTOOL) --mode=install $(INSTALL) -m 755 $(TARGET_LIB) $(DESTDIR)$(libdir)
 
 $(TARGET_LIB): $(OBJECTS)
-	$(LINK) @lib_target@ @TCNATIVE_LDFLAGS@ @TCNATIVE_LIBS@ @SSL_LIBS@
+	$(LINK) @lib_target@ @TCNATIVE_LDFLAGS@ @TCNATIVE_LIBS@
 
 check: $(TARGET_LIB)
 	(cd test && $(MAKE) check)
