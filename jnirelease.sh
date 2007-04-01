@@ -17,7 +17,7 @@
 #
 # Default place to look for apr source.  Can be overridden with 
 #   --with-apr=[directory]
-apr_src_dir=../apr
+apr_src_dir=`pwd`/srclib/apr-1.2.7
 
 while test $# -gt 0 
 do
@@ -51,8 +51,8 @@ fi
 # Replace JKJNIEXT with branch/or tag
 # and JKJNIVER by the version like 1.1.0
 JKJNIEXT=trunk
-JKJNIVER=current
-# JKJNIVER="1.1.6"
+# JKJNIVER=current
+JKJNIVER="1.1.9"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 JKJNIDIST=tomcat-connectors-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
