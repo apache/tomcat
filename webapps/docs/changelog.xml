@@ -267,6 +267,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Use the tomcat-native-1.1.10 as recommended version.
+        OpenSSL detection on some platforms was broken 1.1.8 will continue to work,
+        although on some platforms there can be JVM crash if IPV6 is enabled and
+        platform doesn't support IPV4 mapped addresses on IPV6 sockets.
+      </fix>
+  </changelog>
+  </subsection>  
   <subsection name="Jasper">
     <changelog>
       <fix>
