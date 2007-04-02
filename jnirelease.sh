@@ -17,7 +17,7 @@
 #
 # Default place to look for apr source.  Can be overridden with 
 #   --with-apr=[directory]
-apr_src_dir=`pwd`/srclib/apr-1.2.7
+apr_src_dir=`pwd`/srclib/apr-1.2.8
 
 while test $# -gt 0 
 do
@@ -50,12 +50,12 @@ fi
 
 # Replace JKJNIEXT with branch/or tag
 # and JKJNIVER by the version like 1.1.0
-# JKJNIEXT="trunk"
-# JKJNIVER="current"
-JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_9"
-JKJNIVER="1.1.9"
+JKJNIEXT="trunk"
+JKJNIVER="current"
+# JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_10"
+# JKJNIVER="1.1.10"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
-JKJNIDIST=tomcat-connectors-${JKJNIVER}-src
+JKJNIDIST=tomcat-native-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
 svn export $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
@@ -73,7 +73,7 @@ cd ../../../
 tar cfz ${JKJNIDIST}.tar.gz ${JKJNIDIST}
 #
 # Create Win32 source distribution
-JKJNIDIST=tomcat-connectors-${JKJNIVER}-win32-src
+JKJNIDIST=tomcat-native-${JKJNIVER}-win32-src
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
 svn export --native-eol CRLF $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
