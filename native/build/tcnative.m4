@@ -314,21 +314,6 @@ case "$use_openssl" in
         saved_libs="$LIBS"
         CFLAGS="$CFLAGS $TCN_OPENSSL_INC"
         LIBS="$LIBS $TCN_OPENSSL_LIBS"
-        AC_MSG_CHECKING(whether linking with OpenSSL works)
-        AC_TRY_RUN([
-#include <openssl/err.h>
-int main() {
-    ERR_clear_error();
-    return (0);
-}
-],
-        [AC_MSG_RESULT(yes)],
-        [AC_MSG_RESULT(no)
-         AC_MSG_ERROR(Could not run test program using OpenSSL from
-$use_openssl/lib and $use_openssl/include.
-Please check the argument to --with-ssl and your
-shared library configuration (e.g., LD_LIBRARY_PATH).)],
-        [AC_MSG_RESULT(assuming it does work on target platform)])
          
 AC_ARG_ENABLE(openssl-version-check,
 [AC_HELP_STRING([--enable-openssl-version-check],
