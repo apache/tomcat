@@ -259,7 +259,7 @@ static int ssl_rand_load_file(const char *file)
         file = ssl_global_rand_file;
 
     if (file == NULL)
-        file = RAND_file_name(buffer, sizeof(buffer));
+        return -1;
     else if ((n = RAND_egd(file)) > 0) {
         return n;
     }
