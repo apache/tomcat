@@ -141,6 +141,14 @@ public class CoyoteAdapter
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
 
+                if (!error && !response.isClosed() && (request.getAttribute(Globals.EXCEPTION_ATTR) != null)) {
+                    // An unexpected exception occurred while processing the event, so
+                    // error should be called
+                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                    request.getEvent().setEventSubType(null);
+                    error = true;
+                    connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+                }
                 if (response.isClosed() || !request.isComet()) {
                     res.action(ActionCode.ACTION_COMET_END, null);
                 }
