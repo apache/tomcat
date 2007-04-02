@@ -195,11 +195,11 @@ Section "Native" SecTomcatNative
   ; If IPV6 support is required, download the tcnative-1-ipv6.dll insted
   ; The tcnative-1.dll from heanet.ie comes with APR 1.2.8 and OpenSSL 0.9.8e compiled in.
   ; TODO: Depending on the JVM download the 32 or 64 bit version.
-  NSISdl::download /TIMEOUT=30000 http://tomcat.heanet.ie/native/1.1.9/binaries/win32/tcnative-1.dll $INSTDIR\bin\tcnative-1.dll
+  NSISdl::download /TIMEOUT=30000 http://tomcat.heanet.ie/native/1.1.10/binaries/win32/tcnative-1.dll $INSTDIR\bin\tcnative-1.dll
   Pop $0
   StrCmp $0 success success
     SetDetailsView show
-    DetailPrint "download failed from http://tomcat.heanet.ie/native/1.1.9/binaries/win32/tcnative-1.dll: $0"
+    DetailPrint "download failed from http://tomcat.heanet.ie/native/1.1.10/binaries/win32/tcnative-1.dll: $0"
   success:
 
   ClearErrors
