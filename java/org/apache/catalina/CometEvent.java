@@ -48,11 +48,13 @@ public interface CometEvent {
      *  without blocking. The available and ready methods of the InputStream or
      *  Reader may be used to determine if there is a risk of blocking: the servlet
      *  should read while data is reported available, and can make one additional read
-     *  without blocking. When encountering a read error or an EOF, the servlet MUST
-     *  report it by either returning false or throwing an exception such as an 
-     *  IOException. This will cause the error event to be invoked, and the connection
-     *  will be closed. It is not allowed to attempt reading data from the request object
-     *  outside of the execution of this method.
+     *  without blocking. When encountering a read error, the servlet should
+     *  report it by propagating the exception properly. Throwing an exception will 
+     *  cause the error event to be invoked, and the connection will be closed. 
+     *  Alternately, it is also possible to catch any exception, perform clean up
+     *  on any data structure the servlet may be using, and using the close method
+     *  of the event. It is not allowed to attempt reading data from the request 
+     *  object outside of the execution of this method.
      * END - End may be called to end the processing of the request. Fields that have
      *  been initialized in the begin method should be reset. After this event has
      *  been processed, the request and response objects, as well as all their dependent
