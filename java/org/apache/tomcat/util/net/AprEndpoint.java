@@ -596,9 +596,6 @@ public class AprEndpoint {
             }
          }
 
-        if (Library.APR_HAVE_IPV6 && (addressStr == null || addressStr.indexOf(':') >= 0)) {
-            family = Socket.APR_UNSPEC;
-        }
         long inetAddress = Address.info(addressStr, family,
                 port, 0, rootPool);
         // Create the APR server socket
