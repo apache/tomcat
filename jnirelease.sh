@@ -50,10 +50,10 @@ fi
 
 # Replace JKJNIEXT with branch/or tag
 # and JKJNIVER by the version like 1.1.0
-# JKJNIEXT="trunk"
-# JKJNIVER="current"
-JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_10"
-JKJNIVER="1.1.10"
+JKJNIEXT="trunk"
+JKJNIVER="current"
+# JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_10"
+# JKJNIVER="1.1.10"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 JKJNIDIST=tomcat-native-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
