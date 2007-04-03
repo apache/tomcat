@@ -587,6 +587,15 @@ public class AprEndpoint {
             addressStr = address.getHostAddress();
         }
         int family = Socket.APR_INET;
+        if (Library.APR_HAVE_IPV6) {
+            if (addressStr == null) {
+                if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64)
+                    family = Socket.APR_UNSPEC;
+            } else if (addressStr.indexOf(':') >= 0) {
+                family = Socket.APR_UNSPEC;
+            }
+         }
+
         if (Library.APR_HAVE_IPV6 && (addressStr == null || addressStr.indexOf(':') >= 0)) {
             family = Socket.APR_UNSPEC;
         }
