@@ -63,14 +63,16 @@
      synchronization is mandatory. After processing the initial event, the request 
      is considered to be committed.</li>
   <li>EventType.READ: This indicates that input data is available, and that one read can be made
-     without blocking. The available and ready methods of the InputStream or
-     Reader may be used to determine if there is a risk of blocking: the servlet
-     should read while data is reported available, and can make one additional read
-     without blocking. When encountering a read error or an EOF, the servlet MUST
-     report it by either returning false or throwing an exception such as an 
-     IOException. This will cause the error event to be invoked, and the connection
-     will be closed. It is not allowed to attempt reading data from the request object
-     outside of the execution of this method.</li>
+       without blocking. The available and ready methods of the InputStream or
+       Reader may be used to determine if there is a risk of blocking: the servlet
+       should read while data is reported available, and can make one additional read
+       without blocking. When encountering a read error, the servlet should
+       report it by propagating the exception properly. Throwing an exception will 
+       cause the error event to be invoked, and the connection will be closed. 
+       Alternately, it is also possible to catch any exception, perform clean up
+       on any data structure the servlet may be using, and using the close method
+       of the event. It is not allowed to attempt reading data from the request 
+       object outside of the execution of this method.</li>
   <li>EventType.END: End may be called to end the processing of the request. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
@@ -79,7 +81,29 @@
      or a similar unrecoverable error occurs on the connection. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
-     objects will be recycled and used to process other requests.</li>
+     objects will be recycled and used to process other requests.
+  </ul>
+
+  <p>
+    There are some event subtypes which allow finer processing of events (note: some of these
+    events require usage of the org.apache.catalina.valves.CometConnectionManagerValve valve):
+  </p>
+
+  <ul>
+  <li>EventSubType.TIMEOUT: The connection timed out (sub type of ERROR); note that this ERROR 
+    type is not fatal, and the connection will not be closed unless the servlet uses the close 
+    method of the event.
+  </li>
+  <li>EventSubType.CLIENT_DISCONNECT: The client connection was closed (sub type of ERROR).
+    method of the event.
+  </li>
+  <li>EventSubType.IOEXCEPTION: An IO exception occurred, such as invalid content, for example, 
+    an invalid chunk block (sub type of ERROR).
+  </li>
+  <li>EventSubType.WEBAPP_RELOAD: The web application is being reloaded (sub type of END).
+  </li>
+  <li>EventSubType.SESSION_END: The servlet ended the session (sub type of END).
+  </li>
   </ul>
 
   <p>
