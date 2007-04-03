@@ -257,16 +257,21 @@ static int ssl_rand_load_file(const char *file)
 
     if (file == NULL)
         file = ssl_global_rand_file;
-
+    if (file && (strcmp(file, "builtin") == 0))
+        return -1;
     if (file == NULL)
-        return -1;
-    else if ((n = RAND_egd(file)) > 0) {
-        return n;
+        file = RAND_file_name(buffer, sizeof(buffer));
+    if (file) {
+        if (strncmp(file, "egd:", 4) == 0) {
+            if ((n = RAND_egd(file + 4)) > 0)
+                return n;
+            else
+                return -1;
+        }
+        if ((n = RAND_load_file(file, -1)) > 0)
+            return n;
     }
-    if (file && (n = RAND_load_file(file, -1)) > 0)
-        return n;
-    else
-        return -1;
+    return -1;
 }
 
 /*
@@ -492,7 +497,7 @@ TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
     TCN_ALLOC_CSTRING(file);
     UNREFERENCED(o);
     if (J2S(file)) {
-        ssl_global_rand_file = apr_pstrdup(tcn_global_pool, J2S(file));        
+        ssl_global_rand_file = apr_pstrdup(tcn_global_pool, J2S(file));
     }
     TCN_FREE_CSTRING(file);
 }
@@ -569,7 +574,7 @@ static int jbs_free(BIO *bi)
         if (bi->init) {
             JNIEnv   *e = NULL;
             bi->init = 0;
-            tcn_get_java_env(&e);            
+            tcn_get_java_env(&e);
             TCN_UNLOAD_CLASS(e, j->cb.obj);
         }
         OPENSSL_free(bi->ptr);
@@ -625,7 +630,7 @@ static int jbs_puts(BIO *b, const char *in)
     if (b->init && in != NULL) {
         BIO_JAVA *j = (BIO_JAVA *)b->ptr;
         JNIEnv   *e = NULL;
-        tcn_get_java_env(&e);        
+        tcn_get_java_env(&e);
         ret = (*e)->CallIntMethod(e, j->cb.obj,
                                   j->cb.mid[2],
                                   tcn_new_string(e, in));
