@@ -69,6 +69,39 @@
         <bug>40150</bug> Ensure user and roll classnames are validated on startup.  Patch by
           Tom. (yoavs)
       </fix>
+      <update>
+        Refactor extend access log valve using the optimized access log valve. Submitted by
+        Takayuki Kaneko. (remm)
+      </update>
+      <fix>
+        Possible deadlock in classloading when defining packages. (remm)
+      </fix>
+      <fix>
+        Remove excessive syncing from listener support. (remm)
+      </fix>
+      <add>
+        Web services support, except the actual factory implementations. Submitted by
+        Fabien Carrion. (remm)
+      </add>
+      <update>
+        Add logging to display APR capabilities on the platform. (remm)
+      </update>
+      <fix>
+        Expose executors in JMX. (remm)
+      </fix>
+      <fix>
+        CRLF inside a URL pattern is always invalid. (remm)
+      </fix>
+      <fix>
+        Tweak startup time display. (remm)
+      </fix>
+      <fix>
+        Adjustments to handling exceptions with Comet. (remm)
+      </fix>
+      <fix>
+        If the event is closed asynchronously, generate an end event for cleanup on the 
+        next event. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -88,6 +121,20 @@
         <bug>41675</bug> Add a couple of DEBUG-level logging statements to Http11Processors
           when sending error responses.  Patch by Ralf Hauser. (yoavs)
       </add>
+      <fix>
+        Reuse digester used by the modeler. (remm)
+      </fix>
+      <update>
+        When the platform does not support deferred accept, put accepted sockets in the 
+        poller. (remm)
+      </update>
+      <fix>
+        Fix problem with blocking reads for keepalive when using an executor (the number 
+        of busy threads is always 0). (remm)
+      </fix>
+      <update>
+        The poller now has good performance, so remove firstReadTimeout. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Webapps">
@@ -110,6 +157,28 @@
       <fix>
         <bug>41227</bug> Add a bit of DEBUG-level logging to JspC so users know
           which file is being compiled. (yoavs)
+      </fix>
+      <update>
+        Remove some dead utility code, and refactor stream capture as part of the Ant compiler. (remm)
+      </update>
+      <fix>
+        Support the trim directive of JSP 2.1 as an equivalent of Jasper's own parameter. (remm)
+      </fix>
+      <fix>
+        <bug>41790</bug>: Close file stream used to read the Java source. (remm)
+      </fix>
+      <fix>
+        Fix reporting of errors which do not correspond to a portion of the JSP source. (remm)
+      </fix>
+      <fix>
+        Remove try/catch usage for annotation processing in classic tags. The usage 
+        of the log method might have been questionable as well. (remm)
+      </fix>
+      <fix>
+        Cleanup of the message that is displayed for compilation errors. (remm)
+      </fix>
+      <fix>
+        Skip BOM when reading a JSP file. (remm)
       </fix>
     </changelog>
   </subsection>
