@@ -81,7 +81,7 @@
      or a similar unrecoverable error occurs on the connection. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
-     objects will be recycled and used to process other requests.
+     objects will be recycled and used to process other requests.</li>
   </ul>
 
   <p>
