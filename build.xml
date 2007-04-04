@@ -322,6 +322,9 @@
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>
+    <filter token="VERSION" value="${version}"/>
+    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES" 
+          filtering="true" />
 
     <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
               file="webapps/docs/appdev/build.xml.txt"/>
@@ -490,6 +493,14 @@
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              optimize="${compile.optimize}"
     	     classpath="${tomcat.classes}"
+             excludes="**/CVS/**,**/.svn/**">
+    </javac>
+  	
+    <javac   srcdir="webapps/examples/jsp/plugin/applet" 
+             destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
+             debug="${compile.debug}" deprecation="${compile.deprecation}"
+             optimize="${compile.optimize}"
+    	     classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**">
     </javac>
 
