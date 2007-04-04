@@ -43,7 +43,7 @@ public final class Constants {
         Package + ".EjbFactory";
 
     public static final String DEFAULT_SERVICE_FACTORY = 
-        Package + ".ServiceRefFactory";
+        Package + ".webservices.ServiceRefFactory";
 
     public static final String DEFAULT_HANDLER_FACTORY = 
         Package + ".HandlerFactory";
