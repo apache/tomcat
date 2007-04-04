@@ -40,5 +40,5 @@
 </FONT>
 
 <hr>
-<%@ include file ="/sessions/carts.html" %>
+<%@ include file ="carts.html" %>
 </html>

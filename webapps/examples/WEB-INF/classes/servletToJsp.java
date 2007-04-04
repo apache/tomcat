@@ -24,7 +24,7 @@ public class servletToJsp extends HttpServlet {
 	try {
 	    // Set the attribute and Forward to hello.jsp
 	    request.setAttribute ("servletName", "servletToJsp");
-	    getServletConfig().getServletContext().getRequestDispatcher("/jsptoserv/hello.jsp").forward(request, response);
+	    getServletConfig().getServletContext().getRequestDispatcher("/jsp/jsptoserv/hello.jsp").forward(request, response);
 	} catch (Exception ex) {
 	    ex.printStackTrace ();
 	}

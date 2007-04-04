@@ -24,7 +24,7 @@
 
 		if (request.getParameter("name") == null) {
 	%>
-	<%@ include file="/error/error.html" %>
+	<%@ include file="error.html" %>
 	<%
 		} else {
 		  foo.setName(request.getParameter("name"));
