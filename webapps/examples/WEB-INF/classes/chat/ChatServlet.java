@@ -73,15 +73,37 @@ public class ChatServlet
         HttpServletResponse response = event.getHttpServletResponse();
         
         if (event.getEventType() == CometEvent.EventType.BEGIN) {
-            System.out.println("Begin for session: " + request.getSession(true).getId());
+            String action = request.getParameter("action");
+            if (action != null) {
+                if ("login".equals(action)) {
+                    String nickname = request.getParameter("nickname");
+                    request.getSession(true).setAttribute("nickname", nickname);
+                    response.sendRedirect("post.jsp");
+                    event.close();
+                    return;
+                } else {
+                    String nickname = (String) request.getSession(true).getAttribute("nickname");
+                    String message = request.getParameter("message");
+                    messageSender.send(nickname, message);
+                    response.sendRedirect("post.jsp");
+                    event.close();
+                    return;
+                }
+            } else {
+                if (request.getSession(true).getAttribute("nickname") == null) {
+                    // Redirect to "login"
+                    log("Redirect to login for session: " + request.getSession(true).getId());
+                    response.sendRedirect("login.jsp");
+                    event.close();
+                    return;
+                }
+            }
+            begin(event, request, response);
         } else if (event.getEventType() == CometEvent.EventType.ERROR) {
-            System.out.println("Error for session: " + request.getSession(true).getId());
-            throw new ServletException("error: test message");
+            error(event, request, response);
         } else if (event.getEventType() == CometEvent.EventType.END) {
-            System.out.println("End for session: " + request.getSession(true).getId());
-            throw new ServletException("end: test message");
+            end(event, request, response);
         } else if (event.getEventType() == CometEvent.EventType.READ) {
-            System.out.println("Read for session: " + request.getSession(true).getId());
             read(event, request, response);
         }
     }
@@ -117,7 +139,6 @@ public class ChatServlet
     protected void error(CometEvent event, HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
         log("Error for session: " + request.getSession(true).getId());
-        System.out.println("Error2 for session: " + request.getSession(true).getId());
         synchronized(connections) {
             connections.remove(response);
         }
@@ -130,10 +151,7 @@ public class ChatServlet
         byte[] buf = new byte[512];
         do {
             int n = is.read(buf);
-            System.out.println("Read " + n + " for session: " + request.getSession(true).getId());
             if (n > 0) {
-                System.out.println("Read " + n + " bytes: " + new String(buf, 0, n) 
-                    + " for session: " + request.getSession(true).getId());
                 log("Read " + n + " bytes: " + new String(buf, 0, n) 
                         + " for session: " + request.getSession(true).getId());
             } else if (n < 0) {
