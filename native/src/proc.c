@@ -52,6 +52,7 @@ static apr_status_t child_errfn_pool_cleanup(void *data)
 
     if (data) {
         JNIEnv *env;
+        tcn_get_java_env(&env);
         if (!TCN_IS_NULL(env, cb->obj)) {
             TCN_UNLOAD_CLASS(env, cb->obj);
         }
@@ -178,13 +179,11 @@ TCN_IMPLEMENT_CALL(jlong, Proc, alloc)(TCN_STDARGS,
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     apr_proc_t *proc;
 
-
     UNREFERENCED_STDARGS;
     proc = (apr_proc_t *)apr_pcalloc(p, sizeof(apr_proc_t));
 
     return P2J(proc);
 }
-
 
 #define MAX_ARGS_SIZE 1024
 #define MAX_ENV_SIZE  1024
