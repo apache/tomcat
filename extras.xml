@@ -59,6 +59,7 @@
 
   <property name="tomcat-juli.jar" value="${tomcat.extras}/tomcat-juli.jar"/>
   <property name="tomcat-juli-adapters.jar" value="${tomcat.extras}/tomcat-juli-adapters.jar"/>
+  <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
 	
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -150,7 +151,54 @@
 
   </target>
 
-  <target name="extras" depends="prepare,commons-logging">
+  <target name="webservices">
+	
+	    <mkdir dir="${tomcat.extras}/webservices"/>
+	
+	    <antcall target="downloadfile">
+	      <param name="sourcefile" value="${jaxrpc-src.loc}"/>
+	      <param name="destfile" value="${tomcat.extras}/webservices/jaxrpc.jar"/>
+	      <param name="destdir" value="${tomcat.extras}/webservices/"/>
+	    </antcall>
+	
+	    <antcall target="downloadfile">
+	      <param name="sourcefile" value="${wsdl4j-src.loc}"/>
+	      <param name="destfile" value="${tomcat.extras}/webservices/wsdl4j.jar"/>
+	      <param name="destdir" value="${tomcat.extras}/webservices/"/>
+	    </antcall>
+	
+	    <!-- Classpath -->
+	    <path id="tomcat.webservices.classpath">
+	      <pathelement path="${tomcat.classpath}"/>
+	      <fileset dir="${tomcat.extras}/webservices">
+	        <include name="jaxrpc.jar"/>
+	        <include name="wsdl4j.jar"/>
+	      </fileset>
+	    </path>
+	
+	    <!-- Compile internal server components -->
+	    <javac srcdir="java" destdir="${tomcat.classes}"
+	           debug="${compile.debug}"
+	           deprecation="${compile.deprecation}"
+	           source="${compile.source}"
+	           optimize="${compile.optimize}">
+	      <classpath refid="tomcat.webservices.classpath" />
+	      <include name="org/apache/naming/factory/webservices/**" />
+	    </javac>
+	
+	    <!-- Catalina Main JAR File -->
+	    <jar jarfile="${catalina-ws.jar}">
+	      <fileset dir="${tomcat.classes}">
+            <include name="org/apache/naming/factory/webservices/**" />
+	        <!-- Javadoc and i18n exclusions -->
+	        <exclude name="**/package.html" />
+	        <exclude name="**/LocalStrings_*" />
+	      </fileset>
+	    </jar>
+	
+  </target>
+
+  <target name="extras" depends="prepare,commons-logging,webservices">
   </target>
 
   <!-- Download and dependency building -->
