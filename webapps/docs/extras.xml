@@ -55,6 +55,16 @@
 
   </subsection>
 
+  <subsection name="Web Services support (JSR 109)">
+
+  <p>
+    Tomcat provides factories for JSR 109 which may be used to resolve web services references.
+    Place the generated catalina-ws.jar as well as jaxrpc.jar and wsdl4j.jar (or another implementation
+    of JSR 109) in the Tomcat lib folder.
+  </p>
+
+  </subsection>
+
   </section>
 
 </body>

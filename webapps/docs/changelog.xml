@@ -80,8 +80,8 @@
         Remove excessive syncing from listener support. (remm)
       </fix>
       <add>
-        Web services support, except the actual factory implementations. Submitted by
-        Fabien Carrion. (remm)
+        Web services support. The actual factory implementations are implemented in the
+        extras. Submitted by Fabien Carrion. (remm)
       </add>
       <update>
         Add logging to display APR capabilities on the platform. (remm)
