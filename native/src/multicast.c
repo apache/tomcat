@@ -58,8 +58,11 @@ TCN_IMPLEMENT_CALL(jint, Mulicast, loopback)(TCN_STDARGS,
                                              jlong sock, jboolean opt)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_byte_t on = 0;
     UNREFERENCED_STDARGS;
-    return (jint)apr_mcast_loopback(s->sock, opt == JNI_TRUE ? 1 : 0);
+    if (opt)
+        on = 1;
+    return (jint)apr_mcast_loopback(s->sock, on);
 };
 
 TCN_IMPLEMENT_CALL(jint, Mulicast, ointerface)(TCN_STDARGS,
