@@ -102,6 +102,16 @@
         If the event is closed asynchronously, generate an end event for cleanup on the 
         next event. (remm)
       </fix>
+      <fix>
+        Cleanup hello webapp from the docs and fix a XSS issue in the JSP.  (remm)
+      </fix>
+      <fix>
+        Examples webapp cleanup. Submitted by Takayuki Kaneko and Markus Schönhaber. (remm)
+      </fix>
+      <fix>
+        <bug>41289</bug>: Create configBase, since it is no longer created elsewhere.
+        Submitted by Shiva Kumar H R. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
