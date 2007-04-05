@@ -69,22 +69,9 @@ public final class Hello extends HttpServlet {
 	writer.println("<td>");
 	writer.println("<h1>Sample Application Servlet</h1>");
 	writer.println("This is the output of a servlet that is part of");
-	writer.println("the Hello, World application.  It displays the");
-	writer.println("request headers from the request we are currently");
-	writer.println("processing.");
+	writer.println("the Hello, World application.");
 	writer.println("</td>");
 	writer.println("</tr>");
-	writer.println("</table>");
-
-	writer.println("<table border=\"0\" width=\"100%\">");
-	Enumeration names = request.getHeaderNames();
-	while (names.hasMoreElements()) {
-	    String name = (String) names.nextElement();
-	    writer.println("<tr>");
-	    writer.println("  <th align=\"right\">" + name + ":</th>");
-	    writer.println("  <td>" + request.getHeader(name) + "</td>");
-	    writer.println("</tr>");
-	}
 	writer.println("</table>");
 
 	writer.println("</body>");
