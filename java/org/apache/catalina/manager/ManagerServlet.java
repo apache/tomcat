@@ -800,6 +800,7 @@ public class ManagerServlet
                 addServiced(path);
                 try {
                     if (config != null) {
+                        configBase.mkdirs();
                         copy(new File(config), 
                                 new File(configBase, getConfigFile(path) + ".xml"));
                     }
