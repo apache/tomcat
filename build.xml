@@ -517,7 +517,7 @@
   </target>
 
   <!-- Download and dependency building -->
-  <target name="setproxy"  if="useproxy">
+  <target name="setproxy"  if="proxy.use">
     <taskdef name="setproxy"
             classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
     <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
