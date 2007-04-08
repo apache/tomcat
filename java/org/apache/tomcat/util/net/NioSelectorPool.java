@@ -126,7 +126,11 @@ public class NioSelectorPool {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int write(ByteBuffer buf, NioChannel socket, Selector selector, long writeTimeout) throws IOException {
-        if ( SHARED ) {
+        return write(buf,socket,selector,writeTimeout,true);
+    }
+    
+    public int write(ByteBuffer buf, NioChannel socket, Selector selector, long writeTimeout, boolean block) throws IOException {
+        if ( SHARED && block) {
             return NioBlockingSelector.write(buf,socket,writeTimeout);
         }
         SelectionKey key = null;
@@ -140,14 +144,16 @@ public class NioSelectorPool {
         }
         try {
             while ( (!timedout) && buf.hasRemaining() ) {
+                int cnt = 0;
                 if ( keycount > 0 ) { //only write if we were registered for a write
-                    int cnt = socket.write(buf); //write the data
+                    cnt = socket.write(buf); //write the data
                     if (cnt == -1) throw new EOFException();
                     written += cnt;
                     if (cnt > 0) {
                         time = System.currentTimeMillis(); //reset our timeout timer
                         continue; //we successfully wrote, try again without a selector
                     }
+                    if (cnt==0 && (!block)) break; //don't block
                 }
                 if ( selector != null ) {
                     //register OP_WRITE to the selector
@@ -181,7 +187,25 @@ public class NioSelectorPool {
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
     public int read(ByteBuffer buf, NioChannel socket, Selector selector, long readTimeout) throws IOException {
-        if ( SHARED ) {
+        return read(buf,socket,selector,readTimeout,true);
+    }
+    /**
+     * Performs a read using the bytebuffer for data to be read and a selector to register for events should 
+     * you have the block=true.
+     * If the <code>selector</code> parameter is null, then it will perform a busy read that could
+     * take up a lot of CPU cycles.
+     * @param buf ByteBuffer - the buffer containing the data, we will read as until we have read at least one byte or we timed out
+     * @param socket SocketChannel - the socket to write data to
+     * @param selector Selector - the selector to use for blocking, if null then a busy read will be initiated
+     * @param readTimeout long - the timeout for this read operation in milliseconds, -1 means no timeout
+     * @param block - true if you want to block until data becomes available or timeout time has been reached
+     * @return int - returns the number of bytes read
+     * @throws EOFException if read returns -1
+     * @throws SocketTimeoutException if the read times out
+     * @throws IOException if an IO Exception occurs in the underlying socket logic
+     */
+    public int read(ByteBuffer buf, NioChannel socket, Selector selector, long readTimeout, boolean block) throws IOException {
+        if ( SHARED && block) {
             return NioBlockingSelector.read(buf,socket,readTimeout);
         }
         SelectionKey key = null;
@@ -190,14 +214,16 @@ public class NioSelectorPool {
         int keycount = 1; //assume we can write
         long time = System.currentTimeMillis(); //start the timeout timer
         try {
-            while ( (!timedout) && read == 0 ) {
+            while ( (!timedout) ) {
+                int cnt = 0;
                 if ( keycount > 0 ) { //only read if we were registered for a read
-                    int cnt = socket.read(buf);
+                    cnt = socket.read(buf);
                     if (cnt == -1) throw new EOFException();
                     read += cnt;
-                    if (cnt > 0) break;
-                }
-                if ( selector != null ) {
+                    if (cnt > 0) continue; //read some more
+                    if (cnt==0 && (read>0 || (!block) ) ) break; //we are done reading
+                } 
+                if ( selector != null ) {//perform a blocking read
                     //register OP_WRITE to the selector
                     if (key==null) key = socket.getIOChannel().register(selector, SelectionKey.OP_READ);
                     else key.interestOps(SelectionKey.OP_READ);
