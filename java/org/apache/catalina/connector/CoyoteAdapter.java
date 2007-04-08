@@ -151,6 +151,8 @@ public class CoyoteAdapter
                         request.getEvent().setEventSubType(CometEvent.EventSubType.TIMEOUT);
                     }
                 }
+
+                req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
                 
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
@@ -176,6 +178,7 @@ public class CoyoteAdapter
                 // a cleanup event of some sort could be needed ?
                 return false;
             } finally {
+                req.getRequestProcessor().setWorkerThreadName(null);
                 // Recycle the wrapper request and response
                 if (error || response.isClosed() || !request.isComet()) {
                     request.recycle();
@@ -232,8 +235,8 @@ public class CoyoteAdapter
 
             // Parse and set Catalina and configuration specific 
             // request parameters
+            req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
             if (postParseRequest(req, request, res, response)) {
-
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 
@@ -260,6 +263,7 @@ public class CoyoteAdapter
         } catch (Throwable t) {
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
+            req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (!comet) {
                 request.recycle();
