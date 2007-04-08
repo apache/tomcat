@@ -2063,8 +2063,9 @@ public class NioEndpoint {
             try {
                 key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                 int handshake = -1;
+                
                 try {
-                    handshake = socket.handshake(key.isReadable(), key.isWritable());
+                    if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
                 }catch ( IOException x ) {
                     handshake = -1;
                     if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
@@ -2091,8 +2092,11 @@ public class NioEndpoint {
                         }
                     } 
                 } else if (handshake == -1 ) {
-                    KeyAttachment ka = (KeyAttachment)key.attachment();
-                    socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT,false);
+                    KeyAttachment ka = null;
+                    if (key!=null) {
+                        ka = (KeyAttachment) key.attachment();
+                        socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
+                    }
                     try {socket.close(true);}catch (IOException ignore){}
                     nioChannels.offer(socket);
                     if ( ka!=null ) keyCache.offer(ka);
