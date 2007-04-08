@@ -62,6 +62,7 @@ public class RequestInfo  {
     Request req;
     Response res;
     int stage = Constants.STAGE_NEW;
+    String workerThreadName;
 
     // -------------------- Information about the current request  -----------
     // This is usefull for long-running requests only
@@ -212,5 +213,11 @@ public class RequestInfo  {
         this.errorCount = errorCount;
     }
 
+    public String getWorkerThreadName() {
+        return workerThreadName;
+    }
 
+    public void setWorkerThreadName(String workerThreadName) {
+        this.workerThreadName = workerThreadName;
+    }
 }
