@@ -138,13 +138,15 @@ public class JspServletWrapper {
                     // This is to maintain the original protocol.
                     destroy();
                     
+                    Servlet servlet = null;
+                    
                     try {
                         servletClass = ctxt.load();
-                        theServlet = (Servlet) servletClass.newInstance();
+                        servlet = (Servlet) servletClass.newInstance();
                         AnnotationProcessor annotationProcessor = (AnnotationProcessor) config.getServletContext().getAttribute(AnnotationProcessor.class.getName());
                         if (annotationProcessor != null) {
-                           annotationProcessor.processAnnotations(theServlet);
-                           annotationProcessor.postConstruct(theServlet);
+                           annotationProcessor.processAnnotations(servlet);
+                           annotationProcessor.postConstruct(servlet);
                         }
                     } catch (IllegalAccessException e) {
                         throw new JasperException(e);
@@ -154,12 +156,13 @@ public class JspServletWrapper {
                         throw new JasperException(e);
                     }
                     
-                    theServlet.init(config);
+                    servlet.init(config);
 
                     if (!firstTime) {
                         ctxt.getRuntimeContext().incrementJspReloadCount();
                     }
 
+                    theServlet = servlet;
                     reload = false;
                 }
             }    
