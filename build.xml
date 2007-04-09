@@ -510,7 +510,13 @@
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
 
   </target>
-
+	
+  <target name="clean-depend"
+	     description="Clean depend src components">
+	 <delete dir="${tomcat-dbcp.home}"/>    
+	 <delete dir="${jasper-jdt.home}"/>
+  </target>
+	
   <target name="clean">
     <delete dir="${tomcat.classes}" />
     <delete dir="${tomcat.build}" />
@@ -606,12 +612,14 @@
 
   <target name="build-tomcat-dbcp">
     <copy todir="${tomcat-dbcp.home}">
+    <!-- 
       <fileset dir="${commons-collections.home}" >
         <include name="**/collections/CursorableLinkedList.java" />
         <include name="**/collections/KeyValue.java" />
         <include name="**/collections/LRUMap.java" />
         <include name="**/collections/SequencedHashMap.java" />
       </fileset>
+      -->
       <fileset dir="${commons-pool.home}">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
@@ -621,12 +629,14 @@
         <exclude name="**/test/**" />
       </fileset>
     </copy>
+  	<!--
     <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons">
       <replacefilter token="return UnmodifiableList.decorate(l);"
             value="return l;" />
       <replacefilter token="import org.apache.commons.collections.list.UnmodifiableList;"
             value=" " />
     </replace>
+    -->
     <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons" >
       <replacefilter token="org.apache.commons"
             value="org.apache.tomcat.dbcp" />
