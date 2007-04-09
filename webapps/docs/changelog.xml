@@ -190,6 +190,10 @@
       <fix>
         Skip BOM when reading a JSP file. (remm)
       </fix>
+      <fix>
+        <bug>42072</bug> Don't call destroy() if the associated init() fails.
+        Patch provided by Kawasima Kazuh. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
