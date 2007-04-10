@@ -15,6 +15,14 @@
 
 <body>
 <section name="Tomcat 6.0.11 (remm)">
+  <subsection name="General">
+    <changelog>
+      <update>
+        Update DBCP to 1.2.2, pool to 1.3, JDT to 3.2.2 and remove collections
+        build dependency (pero, remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
