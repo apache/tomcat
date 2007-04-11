@@ -209,7 +209,10 @@ public class ServiceRefFactory
                         portComponentRef.put(endpoint, new QName(port.getName()));
                     }
                 } catch (Throwable t) {
-                    // Wsdl File not available
+                    NamingException ex = new NamingException
+                    ("Error while reading Wsdl File");
+                    ex.initCause(t);
+                    throw ex;
                 }
             }
 
