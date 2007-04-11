@@ -212,7 +212,8 @@
   <target name="setproxy" depends="proxyflags" if="useproxy">
     <taskdef name="setproxy"
             classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
-    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"/>
+    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"
+              proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
     <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
   </target>
 
