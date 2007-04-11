@@ -790,7 +790,7 @@ public class NioEndpoint {
                     executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
                     taskqueue.setParent( (ThreadPoolExecutor) executor);
                 }
-            } else if ( executor != null ) {//avoid two thread pools being created
+            } else if ( executor == null ) {//avoid two thread pools being created
                 workers = new WorkerStack(maxThreads);
             }
 
