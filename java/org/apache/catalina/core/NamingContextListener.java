@@ -899,6 +899,40 @@ public class NamingContextListener
                 service.setWsdlfile(wsdlURL.toString());
         }
 
+        if (service.getJaxrpcmappingfile() != null) {
+            URL jaxrpcURL = null;
+
+            try {
+                jaxrpcURL = new URL(service.getJaxrpcmappingfile());
+            } catch (MalformedURLException e) {
+                jaxrpcURL = null;
+            }
+            if (jaxrpcURL == null) {
+                try {
+                    jaxrpcURL = ((Context) container).
+                                                    getServletContext().
+                                                    getResource(service.getJaxrpcmappingfile());
+                } catch (MalformedURLException e) {
+                    jaxrpcURL = null;
+                }
+            }
+            if (jaxrpcURL == null) {
+                try {
+                    jaxrpcURL = ((Context) container).
+                                                    getServletContext().
+                                                    getResource("/" + service.getJaxrpcmappingfile());
+                    logger.debug("  Changing service ref jaxrpc file for /" 
+                                + service.getJaxrpcmappingfile());
+                } catch (MalformedURLException e) {
+                    logger.error(sm.getString("naming.wsdlFailed", e));
+                }
+            }
+            if (jaxrpcURL == null)
+                service.setJaxrpcmappingfile(null);
+            else
+                service.setJaxrpcmappingfile(jaxrpcURL.toString());
+        }
+
         // Create a reference to the resource.
         Reference ref = new ServiceRef
             (service.getName(), service.getType(), service.getServiceqname(),
