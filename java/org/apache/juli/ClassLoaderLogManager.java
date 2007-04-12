@@ -412,18 +412,6 @@ public class ClassLoaderLogManager extends LogManager {
                 }
             }
             
-            // Add handlers to the root logger, if any are defined using the .handlers property.
-            if (rootHandlers != null) {
-                StringTokenizer tok2 = new StringTokenizer(rootHandlers, ",");
-                while (tok2.hasMoreTokens()) {
-                    String handlerName = (tok2.nextToken().trim());
-                    Handler handler = (Handler) info.handlers.get(handlerName);
-                    if (handler != null) {
-                        localRootLogger.addHandler(handler);
-                    }
-                }
-            }
-            
         }
         
     }
