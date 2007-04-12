@@ -1073,7 +1073,6 @@ public class Http11NioProcessor implements ActionHook {
                     //then execute the connection closure at the next selector loop
                     request.getAttributes().remove("org.apache.tomcat.comet.timeout");
                     attach.setError(true);
-                    attach.setComet(false);
                 }
             }
 
