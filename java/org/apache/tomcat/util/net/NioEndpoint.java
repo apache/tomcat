@@ -1836,6 +1836,8 @@ public class NioEndpoint {
 
             // Process requests until we receive a shutdown signal
             while (running) {
+                NioChannel socket = null;
+                SelectionKey key = null;
                 try {
                     // Wait for the next socket to be assigned
                     Object channel = await();
@@ -1857,10 +1859,10 @@ public class NioEndpoint {
                         }
                     } else {
                         
-                        NioChannel socket = (NioChannel)channel;
-
-                        SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
+                        socket = (NioChannel)channel;
+                        key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                         int handshake = -1;
+
                         try {
                             if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
                         }catch ( IOException x ) {
@@ -1871,30 +1873,32 @@ public class NioEndpoint {
                         }
                         if ( handshake == 0 ) {
                             // Process the request from this socket
-                            if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
+                            boolean closed = (status==null)?(handler.process(socket)==Handler.SocketState.CLOSED) :
+                                (handler.event(socket,status)==Handler.SocketState.CLOSED);
+
+                            if (closed) {
                                 // Close socket and pool
                                 try {
-                                    KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
-                                    getPoller0().cancelledKey(key,SocketStatus.ERROR,false);
+                                    KeyAttachment ka = null;
+                                    if (key!=null) {
+                                        ka = (KeyAttachment) key.attachment();
+                                        if (ka!=null) ka.setComet(false);
+                                        socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
+                                    }
                                     nioChannels.offer(socket);
-                                    if ( att!=null ) keyCache.offer(att);
+                                    if ( ka!=null ) keyCache.offer(ka);
                                 }catch ( Exception x ) {
                                     log.error("",x);
                                 }
-                            } else if ((status == null) && (handler.process(socket) == Handler.SocketState.CLOSED)) {
-                                // Close socket and pool
-                                try {
-                                    KeyAttachment att = (KeyAttachment)socket.getAttachment(true);
-                                    getPoller0().cancelledKey(key,SocketStatus.ERROR,false);
-                                    nioChannels.offer(socket);
-                                    if ( att!=null ) keyCache.offer(att);
-                                }catch ( Exception x ) {
-                                    log.error("",x);
-                                }
-                            }
+                            } 
                         } else if (handshake == -1 ) {
-                            socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT);
+                            KeyAttachment ka = null;
+                            if (key!=null) {
+                                ka = (KeyAttachment) key.attachment();
+                                socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
+                            }
                             nioChannels.offer(socket);
+                            if ( ka!=null ) keyCache.offer(ka);
                         } else {
                             final SelectionKey fk = key;
                             final int intops = handshake;
@@ -1902,6 +1906,8 @@ public class NioEndpoint {
                             ka.getPoller().add(socket,intops);
                         }
                     }
+                }catch(CancelledKeyException cx) {
+                    if (socket!=null && key!=null) socket.getPoller().cancelledKey(key,null,false);
                 } catch (OutOfMemoryError oom) {
                     try {
                         oomParachuteData = null;
@@ -2078,8 +2084,8 @@ public class NioEndpoint {
                             KeyAttachment ka = null;
                             if (key!=null) {
                                 ka = (KeyAttachment) key.attachment();
-                                ka.setComet(false);
-                                socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
+                                if (ka!=null) ka.setComet(false);
+                                socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
                             }
                             nioChannels.offer(socket);
                             if ( ka!=null ) keyCache.offer(ka);
@@ -2102,7 +2108,7 @@ public class NioEndpoint {
                     ka.getPoller().add(socket,intops);
                 }
             }catch(CancelledKeyException cx) {
-                socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+                socket.getPoller().cancelledKey(key,null,false);
             } catch (OutOfMemoryError oom) {
                 try {
                     oomParachuteData = null;
