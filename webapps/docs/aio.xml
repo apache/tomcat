@@ -72,7 +72,13 @@
        Alternately, it is also possible to catch any exception, perform clean up
        on any data structure the servlet may be using, and using the close method
        of the event. It is not allowed to attempt reading data from the request 
-       object outside of the execution of this method.</li>
+       object outside of the execution of this method.<br/>
+       On some platforms, like Windows, a client disconnect is indicated by a READ event.
+       Reading from the stream may result in -1, an IOException or an EOFException.
+       Make sure you properly handle all these three cases.
+       If you don't catch the IOException, Tomcat will instantly invoke your event chain with an ERROR as 
+       it catches the error for you, and you will be notified of the error at that time.
+  </li>
   <li>EventType.END: End may be called to end the processing of the request. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
@@ -194,8 +200,8 @@ public class ChatServlet
             InputStream is = request.getInputStream();
             byte[] buf = new byte[512];
             do {
-                int n = is.read(buf);
-                if (n > 0) {
+                int n = is.read(buf); //can throw an IOException
+                if (n &gt; 0) {
                     log("Read " + n + " bytes: " + new String(buf, 0, n) 
                             + " for session: " + request.getSession(true).getId());
                 } else if (n &lt; 0) {
