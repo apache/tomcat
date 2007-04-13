@@ -1862,7 +1862,7 @@ public class NioEndpoint {
                         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                         int handshake = -1;
                         try {
-                            handshake = socket.handshake(key.isReadable(), key.isWritable());
+                            if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
                         }catch ( IOException x ) {
                             handshake = -1;
                             if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
