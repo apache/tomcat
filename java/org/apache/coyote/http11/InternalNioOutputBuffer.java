@@ -609,6 +609,8 @@ public class InternalNioOutputBuffer
         }
         socket.getBufHandler().getWriteBuffer().put(buf, offset, length);
         total += length;
+        NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
     }
 
 
