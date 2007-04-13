@@ -180,53 +180,80 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
     }
     
     public void heartbeat() {
+        checkMembers(false);
+    }
+    public void checkMembers(boolean checkAll) {
+        
         try {
             if (membership == null) setupMembership();
             synchronized (membership) {
-                //update all alive times
-                Member[] members = super.getMembers();
-                for (int i = 0; members != null && i < members.length; i++) {
-                    if (membership.memberAlive( (MemberImpl) members[i])) {
-                        //we don't have this one in our membership, check to see if he/she is alive
-                        if (memberAlive(members[i])) {
-                            log.warn("Member added, even though we werent notified:" + members[i]);
-                            super.memberAdded(members[i]);
-                        } else {
-                            membership.removeMember( (MemberImpl) members[i]);
-                        } //end if
-                    } //end if
-                } //for
-
-                //check suspect members if they are still alive,
-                //if not, simply issue the memberDisappeared message
-                MemberImpl[] keys = (MemberImpl[]) removeSuspects.keySet().toArray(new MemberImpl[removeSuspects.size()]);
-                for (int i = 0; i < keys.length; i++) {
-                    MemberImpl m = (MemberImpl) keys[i];
-                    if (membership.getMember(m) != null && (!memberAlive(m))) {
-                        membership.removeMember(m);
-                        super.memberDisappeared(m);
-                        removeSuspects.remove(m);
-                        log.info("Suspect member, confirmed dead.["+m+"]");
-                    } //end if
-                }
-
-                //check add suspects members if they are alive now,
-                //if they are, simply issue the memberAdded message
-                keys = (MemberImpl[]) addSuspects.keySet().toArray(new MemberImpl[addSuspects.size()]);
-                for (int i = 0; i < keys.length; i++) {
-                    MemberImpl m = (MemberImpl) keys[i];
-                    if ( membership.getMember(m) == null && (memberAlive(m))) {
-                        membership.memberAlive(m);
-                        super.memberAdded(m);
-                        addSuspects.remove(m);
-                        log.info("Suspect member, confirmed alive.["+m+"]");
-                    } //end if
-                }
+                if ( !checkAll ) performBasicCheck();
+                else performForcedCheck();
             }
         }catch ( Exception x ) {
             log.warn("Unable to perform heartbeat on the TcpFailureDetector.",x);
         } finally {
             super.heartbeat();
+        }
+    }
+    
+    protected void performForcedCheck() {
+        //update all alive times
+        Member[] members = super.getMembers();
+        for (int i = 0; members != null && i < members.length; i++) {
+            if (memberAlive(members[i])) {
+                if (membership.memberAlive((MemberImpl)members[i])) super.memberAdded(members[i]);
+                addSuspects.remove(members[i]);
+            } else {
+                if (membership.getMember(members[i])!=null) {
+                    membership.removeMember((MemberImpl)members[i]);
+                    removeSuspects.remove(members[i]);
+                    super.memberDisappeared((MemberImpl)members[i]);
+                }
+            } //end if
+        } //for
+
+    }
+
+    protected void performBasicCheck() {
+        //update all alive times
+        Member[] members = super.getMembers();
+        for (int i = 0; members != null && i < members.length; i++) {
+            if (membership.memberAlive( (MemberImpl) members[i])) {
+                //we don't have this one in our membership, check to see if he/she is alive
+                if (memberAlive(members[i])) {
+                    log.warn("Member added, even though we werent notified:" + members[i]);
+                    super.memberAdded(members[i]);
+                } else {
+                    membership.removeMember( (MemberImpl) members[i]);
+                } //end if
+            } //end if
+        } //for
+
+        //check suspect members if they are still alive,
+        //if not, simply issue the memberDisappeared message
+        MemberImpl[] keys = (MemberImpl[]) removeSuspects.keySet().toArray(new MemberImpl[removeSuspects.size()]);
+        for (int i = 0; i < keys.length; i++) {
+            MemberImpl m = (MemberImpl) keys[i];
+            if (membership.getMember(m) != null && (!memberAlive(m))) {
+                membership.removeMember(m);
+                super.memberDisappeared(m);
+                removeSuspects.remove(m);
+                log.info("Suspect member, confirmed dead.["+m+"]");
+            } //end if
+        }
+
+        //check add suspects members if they are alive now,
+        //if they are, simply issue the memberAdded message
+        keys = (MemberImpl[]) addSuspects.keySet().toArray(new MemberImpl[addSuspects.size()]);
+        for (int i = 0; i < keys.length; i++) {
+            MemberImpl m = (MemberImpl) keys[i];
+            if ( membership.getMember(m) == null && (memberAlive(m))) {
+                membership.memberAlive(m);
+                super.memberAdded(m);
+                addSuspects.remove(m);
+                log.info("Suspect member, confirmed alive.["+m+"]");
+            } //end if
         }
     }
     
