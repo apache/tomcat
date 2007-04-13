@@ -450,6 +450,12 @@
       <attribute name="useComet" required="false">
         <p>(bool)Whether to allow comet servlets or not, Default value is true.</p>
       </attribute>
+      <attribute name="processCache" required="false">
+        <p>(int)The protocol handler caches Http11NioProcessor objects to speed up performance.
+           This setting dictates how many of these objects get cached.
+           -1 means unlimited, default is 200. Set this value somewhere close to your maxThreads value.
+        </p>
+      </attribute>
       <attribute name="socket.directBuffer" required="false">
         <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped ByteBuffers. Default is <code>false</code>
            <br/>When you are using direct buffers, make sure you allocate the appropriate amount of memory for the 
