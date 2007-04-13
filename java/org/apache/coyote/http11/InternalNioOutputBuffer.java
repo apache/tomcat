@@ -603,7 +603,7 @@ public class InternalNioOutputBuffer
     }
 
     int total = 0;
-    private void addToBB(byte[] buf, int offset, int length) throws IOException {
+    private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
         if (socket.getBufHandler().getWriteBuffer().remaining() < length) {
             flushBuffer();
         }
