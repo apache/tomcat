@@ -17,6 +17,8 @@
 
 package org.apache.coyote;
 
+import javax.management.ObjectName;
+
 
 /**
  * Structure holding the Request and Response objects. It also holds statistical
@@ -63,6 +65,7 @@ public class RequestInfo  {
     Response res;
     int stage = Constants.STAGE_NEW;
     String workerThreadName;
+    ObjectName rpName;
 
     // -------------------- Information about the current request  -----------
     // This is usefull for long-running requests only
@@ -217,7 +220,15 @@ public class RequestInfo  {
         return workerThreadName;
     }
 
+    public ObjectName getRpName() {
+        return rpName;
+    }
+
     public void setWorkerThreadName(String workerThreadName) {
         this.workerThreadName = workerThreadName;
+    }
+
+    public void setRpName(ObjectName rpName) {
+        this.rpName = rpName;
     }
 }

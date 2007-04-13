@@ -22,7 +22,9 @@ import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -212,6 +214,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     private int timeout = 300000;   // 5 minutes as in Apache HTTPD server
     private int maxSavePostSize = 4 * 1024;
     private int maxHttpHeaderSize = 8 * 1024;
+    protected int processorCache = 200; //max number of Http11NioProcessor objects cached
     private int socketCloseDelay=-1;
     private boolean disableUploadTimeout = true;
     private int socketBuffer = 9000;
@@ -534,6 +537,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         setAttribute("timeout", "" + timeouts);
     }
 
+    public void setProcessorCache(int processorCache) {
+        this.processorCache = processorCache;
+    }
+
     public void setOomParachute(int oomParachute) {
         ep.setOomParachute(oomParachute);
         setAttribute("oomParachute",oomParachute);
@@ -580,12 +587,42 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         protected static int count = 0;
         protected RequestGroupInfo global = new RequestGroupInfo();
 
-        protected ThreadLocal<Http11NioProcessor> localProcessor = 
-            new ThreadLocal<Http11NioProcessor>();
         protected ConcurrentHashMap<NioChannel, Http11NioProcessor> connections =
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
-        protected java.util.Stack<Http11NioProcessor> recycledProcessors = 
-            new java.util.Stack<Http11NioProcessor>();
+        protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors = new ConcurrentLinkedQueue<Http11NioProcessor>() {
+            protected AtomicInteger size = new AtomicInteger(0);
+            public boolean offer(Http11NioProcessor processor) {
+                boolean offer = proto.processorCache==-1?true:size.get() < proto.processorCache;
+                //avoid over growing our cache or add after we have stopped
+                boolean result = false;
+                if ( offer ) {
+                    result = super.offer(processor);
+                    if ( result ) {
+                        size.incrementAndGet();
+                    }
+                }
+                if (!result) deregister(processor);
+                return result;
+            }
+            
+            public Http11NioProcessor poll() {
+                Http11NioProcessor result = super.poll();
+                if ( result != null ) {
+                    size.decrementAndGet();
+                }
+                return result;
+            }
+            
+            public void clear() {
+                Http11NioProcessor next = poll();
+                while ( next != null ) {
+                    deregister(next);
+                    next = poll();
+                }
+                super.clear();
+                size.set(0);
+            }
+        };
 
         Http11ConnectionHandler(Http11NioProtocol proto) {
             this.proto = proto;
@@ -600,6 +637,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
+                if (log.isDebugEnabled()) log.debug("Http11NioProcessor.error="+result.error);
                 // Call the appropriate event
                 try {
                     state = result.event(status);
@@ -626,7 +664,9 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                 } finally {
                     if (state != SocketState.LONG) {
                         connections.remove(socket);
-                        recycledProcessors.push(result);
+                        recycledProcessors.offer(result);
+                    } else {
+                        if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
                     }
                 }
             }
@@ -636,14 +676,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public SocketState process(NioChannel socket) {
             Http11NioProcessor processor = null;
             try {
-                processor = (Http11NioProcessor) localProcessor.get();
                 if (processor == null) {
-                    synchronized (recycledProcessors) {
-                        if (!recycledProcessors.isEmpty()) {
-                            processor = recycledProcessors.pop();
-                            localProcessor.set(processor);
-                        }
-                    }
+                    processor = recycledProcessors.poll();
                 }
                 if (processor == null) {
                     processor = createProcessor();
@@ -669,9 +703,11 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     // Associate the connection with the processor. The next request 
                     // processed by this thread will use either a new or a recycled
                     // processor.
+                    if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
                     connections.put(socket, processor);
-                    localProcessor.set(null);
                     socket.getPoller().add(socket);
+                } else {
+                    recycledProcessors.offer(processor);
                 }
                 return state;
 
@@ -696,6 +732,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                 Http11NioProtocol.log.error
                     (sm.getString("http11protocol.proto.error"), e);
             }
+            recycledProcessors.offer(processor);
             return SocketState.CLOSED;
         }
 
@@ -717,24 +754,51 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             processor.setSocketBuffer(proto.socketBuffer);
             processor.setMaxSavePostSize(proto.maxSavePostSize);
             processor.setServer(proto.server);
-            localProcessor.set(processor);
+            register(processor);
+            return processor;
+        }
+        AtomicInteger registerCount = new AtomicInteger(0);
+        public void register(Http11NioProcessor processor) {
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
+                        registerCount.addAndGet(1);
+                        if (log.isDebugEnabled()) log.debug("Register ["+processor+"] count="+registerCount.get());
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
                         ObjectName rpName = new ObjectName
-                        (proto.getDomain() + ":type=RequestProcessor,worker="
-                                + proto.getName() + ",name=HttpRequest" + count++);
+                            (proto.getDomain() + ":type=RequestProcessor,worker="
+                             + proto.getName() + ",name=HttpRequest" + count++);
                         Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        rp.setRpName(rpName);
                     } catch (Exception e) {
                         log.warn("Error registering request");
                     }
                 }
             }
-            return processor;
         }
+    
+        public void deregister(Http11NioProcessor processor) {
+            if (proto.getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        registerCount.addAndGet(-1);
+                        if (log.isDebugEnabled()) log.debug("Deregister ["+processor+"] count="+registerCount.get());
+                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(null);
+                        ObjectName rpName = rp.getRpName();
+                        Registry.getRegistry(null, null).unregisterComponent(rpName);
+                        rp.setRpName(null);
+                    } catch (Exception e) {
+                        log.warn("Error unregistering request", e);
+                    }
+                }
+            }
+        }
+
     }
+    
+
 
     protected static org.apache.juli.logging.Log log
         = org.apache.juli.logging.LogFactory.getLog(Http11NioProtocol.class);
@@ -751,6 +815,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     public String getDomain() {
         return domain;
+    }
+
+    public int getProcessorCache() {
+        return processorCache;
     }
 
     public int getOomParachute() {
