@@ -788,8 +788,8 @@ public class InternalNioOutputBuffer
                 if (socket.getBufHandler().getWriteBuffer().position() == socket.getBufHandler().getWriteBuffer().capacity()) {
                     flushBuffer();
                 }
-                if (thisTime > socket.getBufHandler().getWriteBuffer().capacity() - socket.getBufHandler().getWriteBuffer().position()) {
-                    thisTime = socket.getBufHandler().getWriteBuffer().capacity() - socket.getBufHandler().getWriteBuffer().position();
+                if (thisTime > socket.getBufHandler().getWriteBuffer().remaining()) {
+                    thisTime = socket.getBufHandler().getWriteBuffer().remaining();
                 }
                 addToBB(b,start,thisTime);
                 len = len - thisTime;
