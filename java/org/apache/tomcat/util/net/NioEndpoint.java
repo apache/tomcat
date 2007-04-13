@@ -1381,9 +1381,6 @@ public class NioEndpoint {
             else r.reset(socket,ka,OP_REGISTER);
             addEvent(r);
         }
-        public void cancelledKey(SelectionKey key, SocketStatus status) {
-            cancelledKey(key, status, true);
-        }
         public void cancelledKey(SelectionKey key, SocketStatus status, boolean dispatch) {
             try {
                 if ( key == null ) return;//nothing to do
@@ -1533,10 +1530,10 @@ public class NioEndpoint {
                     } 
                 } else {
                     //invalid key
-                    cancelledKey(sk, SocketStatus.ERROR);
+                    cancelledKey(sk, SocketStatus.ERROR,false);
                 }
             } catch ( CancelledKeyException ckx ) {
-                cancelledKey(sk, SocketStatus.ERROR);
+                cancelledKey(sk, SocketStatus.ERROR,false);
             } catch (Throwable t) {
                 log.error("",t);
             }
@@ -1607,9 +1604,9 @@ public class NioEndpoint {
                 try {
                     KeyAttachment ka = (KeyAttachment) key.attachment();
                     if ( ka == null ) {
-                        cancelledKey(key, SocketStatus.ERROR); //we don't support any keys without attachments
+                        cancelledKey(key, SocketStatus.ERROR,false); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
-                        cancelledKey(key, SocketStatus.ERROR);
+                        cancelledKey(key, SocketStatus.ERROR,true);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
@@ -1622,14 +1619,14 @@ public class NioEndpoint {
                         } else if (isTimedout) {
                             key.interestOps(0); 
                             ka.interestOps(0); //avoid duplicate timeout calls
-                            cancelledKey(key, SocketStatus.TIMEOUT);
+                            cancelledKey(key, SocketStatus.TIMEOUT,true);
                         } else {
                             long nextTime = now+(timeout-delta);
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }
                     }//end if
                 }catch ( CancelledKeyException ckx ) {
-                    cancelledKey(key, SocketStatus.ERROR);
+                    cancelledKey(key, SocketStatus.ERROR,false);
                 }
             }//for
             if ( log.isDebugEnabled() ) log.debug("Poller processed "+keycount+" keys through timeout");
