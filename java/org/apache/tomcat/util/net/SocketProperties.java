@@ -82,7 +82,7 @@ public class SocketProperties {
      * The application write buffer size in bytes
      * Default value is txBufSize
      */
-    protected int appWriteBufSize = 8192;
+    protected int appWriteBufSize = txBufSize;
 
     /**
      * NioChannel pool size for the endpoint,
