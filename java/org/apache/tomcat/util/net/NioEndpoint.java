@@ -1855,53 +1855,11 @@ public class NioEndpoint {
                             
                         }
                     } else {
-                        
                         socket = (NioChannel)channel;
-                        key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
-                        int handshake = -1;
-
-                        try {
-                            if (key!=null) handshake = socket.handshake(key.isReadable(), key.isWritable());
-                        }catch ( IOException x ) {
-                            handshake = -1;
-                            if ( log.isDebugEnabled() ) log.debug("Error during SSL handshake",x);
-                        }catch ( CancelledKeyException ckx ) {
-                            handshake = -1;
-                        }
-                        if ( handshake == 0 ) {
-                            // Process the request from this socket
-                            boolean closed = (status==null)?(handler.process(socket)==Handler.SocketState.CLOSED) :
-                                (handler.event(socket,status)==Handler.SocketState.CLOSED);
-
-                            if (closed) {
-                                // Close socket and pool
-                                try {
-                                    KeyAttachment ka = null;
-                                    if (key!=null) {
-                                        ka = (KeyAttachment) key.attachment();
-                                        if (ka!=null) ka.setComet(false);
-                                        socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
-                                    }
-                                    nioChannels.offer(socket);
-                                    if ( ka!=null ) keyCache.offer(ka);
-                                }catch ( Exception x ) {
-                                    log.error("",x);
-                                }
-                            } 
-                        } else if (handshake == -1 ) {
-                            KeyAttachment ka = null;
-                            if (key!=null) {
-                                ka = (KeyAttachment) key.attachment();
-                                socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
-                            }
-                            nioChannels.offer(socket);
-                            if ( ka!=null ) keyCache.offer(ka);
-                        } else {
-                            final SelectionKey fk = key;
-                            final int intops = handshake;
-                            final KeyAttachment ka = (KeyAttachment)fk.attachment();
-                            ka.getPoller().add(socket,intops);
-                        }
+                        SocketProcessor sc = processorCache.poll();
+                        if ( sc == null ) sc = new SocketProcessor(socket,status);
+                        else sc.reset(socket,status);
+                        sc.run();
                     }
                 }catch(CancelledKeyException cx) {
                     if (socket!=null && key!=null) socket.getPoller().cancelledKey(key,null,false);
@@ -2084,8 +2042,10 @@ public class NioEndpoint {
                                 if (ka!=null) ka.setComet(false);
                                 socket.getPoller().cancelledKey(key, SocketStatus.ERROR, false);
                             }
-                            nioChannels.offer(socket);
+                            if (socket!=null) nioChannels.offer(socket);
+                            socket = null;
                             if ( ka!=null ) keyCache.offer(ka);
+                            ka = null;
                         }catch ( Exception x ) {
                             log.error("",x);
                         }
@@ -2096,8 +2056,10 @@ public class NioEndpoint {
                         ka = (KeyAttachment) key.attachment();
                         socket.getPoller().cancelledKey(key, SocketStatus.DISCONNECT, false);
                     }
-                    nioChannels.offer(socket);
+                    if (socket!=null) nioChannels.offer(socket);
+                    socket = null;
                     if ( ka!=null ) keyCache.offer(ka);
+                    ka = null;
                 } else {
                     final SelectionKey fk = key;
                     final int intops = handshake;
