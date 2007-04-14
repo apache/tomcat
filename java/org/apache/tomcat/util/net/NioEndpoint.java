@@ -1024,8 +1024,6 @@ public class NioEndpoint {
      */
     protected boolean isWorkerAvailable() {
         if ( executor != null ) {
-//            ThreadPoolExecutor tpe = (ThreadPoolExecutor)executor;
-//            TaskQueue queue = (TaskQueue)tpe.getQueue();
             return true;
         } else {
             if (workers.size() > 0) {
