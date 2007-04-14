@@ -1116,21 +1116,11 @@ public class NioEndpoint {
             workers.notify();
         }
     }
-    /**
-     * Process given socket.
-     */
-    protected boolean processSocket(NioChannel socket) {
-        return processSocket(socket,null);
-    }
 
 
     /**
      * Process given socket for an event.
      */
-    protected boolean processSocket(NioChannel socket, SocketStatus status) {
-        return processSocket(socket,status,true);
-    }
-    
     protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
             if (executor == null) {
@@ -1504,8 +1494,8 @@ public class NioEndpoint {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 unreg(sk, attachment);
-                                if (!processSocket(channel, SocketStatus.OPEN))
-                                    processSocket(channel, SocketStatus.DISCONNECT);
+                                if (!processSocket(channel, SocketStatus.OPEN,true))
+                                    processSocket(channel, SocketStatus.DISCONNECT,true);
                                 attachment.setFairness(0);
                             } else {
                                 //increase the fairness counter
@@ -1519,7 +1509,7 @@ public class NioEndpoint {
                             //later on, improve latch behavior
                             if ( isWorkerAvailable() ) {
                                 unreg(sk, attachment);
-                                boolean close = (!processSocket(channel));
+                                boolean close = (!processSocket(channel,null,true));
                                 if (close) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT,false);
                                 }
@@ -1632,7 +1622,6 @@ public class NioEndpoint {
                     cancelledKey(key, SocketStatus.ERROR,false);
                 }
             }//for
-            if ( log.isDebugEnabled() ) log.debug("Poller processed "+keycount+" keys through timeout");
         }
     }
 
@@ -1922,6 +1911,8 @@ public class NioEndpoint {
                 } finally {
                     //dereference socket to let GC do its job
                     socket = null;
+                    this.socket = null;
+                    key = null;
                     // Finish up this request
                     recycleWorkerThread(this);
                 }
