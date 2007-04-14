@@ -1326,7 +1326,7 @@ public class NioEndpoint {
         
         public void addEvent(Runnable event) {
             events.offer(event);
-            if ( wakeupCounter.incrementAndGet() < 3 ) selector.wakeup();
+            if ( wakeupCounter.incrementAndGet() == 1 || wakeupCounter.get() > 5 ) selector.wakeup();
         }
 
         /**
@@ -1428,7 +1428,10 @@ public class NioEndpoint {
                     int keyCount = 0;
                     try {
                         if ( !close ) {
-                            keyCount = selector.select(selectorTimeout);
+                            if ( wakeupCounter.get() > 0 )
+                                keyCount = selector.selectNow(); //we have events that need to be processed
+                            else
+                                keyCount = selector.select(selectorTimeout);
                             wakeupCounter.set(0);
                         }
                         if (close) {
