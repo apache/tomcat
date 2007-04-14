@@ -950,12 +950,14 @@ public class Http11NioProcessor implements ActionHook {
 
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            //we're at a keep alive stage,
-            openSocket = true;
-            //Add the socket to the poller
-            socket.getPoller().add(socket);
-            //free up the thread
-            break;
+            if (!error && keepAlive && !comet) {
+                //we're at a keep alive stage,
+                openSocket = true;
+                //Add the socket to the poller
+                socket.getPoller().add(socket);
+                //free up the thread
+                break;
+            }
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
