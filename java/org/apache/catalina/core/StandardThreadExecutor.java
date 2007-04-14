@@ -219,10 +219,17 @@ public class StandardThreadExecutor implements Executor {
         }
 
         public boolean offer(Runnable o) {
-            if (parent != null && parent.getPoolSize() < parent.getMaximumPoolSize())
-                return false; //force creation of new threads by rejecting the task
-            else
-                return super.offer(o);
+            //we can't do any checks
+            if (parent==null) return super.offer(o);
+            //we are maxed out on threads, simply queue the object
+            if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
+            //we have idle threads, just add it to the queue
+            //this is an approximation, so it could use some tuning
+            if (parent.getActiveCount()<(parent.getPoolSize())) return super.offer(o);
+            //if we have less threads than maximum force creation of a new thread
+            if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
+            //if we reached here, we need to add it to the queue
+            return super.offer(o);
         }
     }
 
