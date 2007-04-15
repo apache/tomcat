@@ -14,6 +14,24 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.12 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>42039</bug> Log a stack trace if a servlet throws an
+         UnavailableException. Patch provided by Kawasima Kazuh. (markt)
+      </fix>
+    </changelog>
+</section>
+<subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>42119</bug> Fix return value for request.getCharacterEncoding() when
+        Content-Type headers contain parameters other than charset. Patch by
+        Leigh L Klotz Jr. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 <section name="Tomcat 6.0.11 (remm)">
   <subsection name="General">
     <changelog>
@@ -202,10 +220,6 @@
       </fix>
       <fix>
         Skip BOM when reading a JSP file. (remm)
-      </fix>
-      <fix>
-        <bug>42072</bug> Don't call destroy() if the associated init() fails.
-        Patch provided by Kawasima Kazuh. (markt)
       </fix>
     </changelog>
   </subsection>
