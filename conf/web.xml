@@ -734,6 +734,10 @@
         <mime-type>audio/x-mpeg</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>mp4</extension>
+        <mime-type>video/mp4</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>mpa</extension>
         <mime-type>audio/x-mpeg</mime-type>
     </mime-mapping>
@@ -1113,6 +1117,10 @@
         <!-- Compiled WML Script -->
         <extension>wmlscriptc</extension>
         <mime-type>application/vnd.wap.wmlscriptc</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>wmv</extension>
+        <mime-type>video/x-ms-wmv</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>wrl</extension>
