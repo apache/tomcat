@@ -205,10 +205,9 @@
     presented to this container for processing before it will be passed on.</p>
 
     <p>The syntax for <em>regular expressions</em> is different than that for
-    'standard' wildcard matching. Tomcat uses the
-    <a href="http://jakarta.apache.org/regexp/">Jakarta Regexp</a> library.
-    Please consult the Regexp documentation for details of the expressions
-    supported.</p>
+    'standard' wildcard matching. Tomcat uses the <code>java.util.regex</code>
+    package. Please consult the Java documentation for details of the
+    expressions supported.</p>
 
   </subsection>
 
@@ -262,10 +261,9 @@
     presented to this container for processing before it will be passed on.</p>
 
     <p>The syntax for <em>regular expressions</em> is different than that for
-    'standard' wildcard matching. Tomcat uses the
-    <a href="http://jakarta.apache.org/regexp/">Jakarta Regexp</a> library.
-    Please consult the Regexp documentation for details of the expressions
-    supported.</p>
+    'standard' wildcard matching. Tomcat uses the <code>java.util.regex</code>
+    package. Please consult the Java documentation for details of the
+    expressions supported.</p>
 
   </subsection>
 
