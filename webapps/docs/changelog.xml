@@ -153,6 +153,11 @@
       <update>
         The poller now has good performance, so remove firstReadTimeout. (remm)
       </update>
+      <fix>
+        <bug>42119</bug> Fix return value for request.getCharacterEncoding() when
+        Content-Type headers contain parameters other than charset. Patch by
+        Leigh L Klotz Jr. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Webapps">
