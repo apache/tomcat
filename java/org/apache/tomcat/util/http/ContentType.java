@@ -29,27 +29,30 @@ package org.apache.tomcat.util.http;
  */
 public class ContentType {
 
-    // Basically return everything after ";charset="
-    // If no charset specified, use the HTTP default (ASCII) character set.
-    public static String getCharsetFromContentType(String type) {
-        if (type == null) {
-            return null;
-        }
-        int semi = type.indexOf(";");
-        if (semi == -1) {
-            return null;
-        }
-        int charsetLocation = type.indexOf("charset=", semi);
-        if (charsetLocation == -1) {
-            return null;
-        }
-	String afterCharset = type.substring(charsetLocation + 8);
-        // The charset value in a Content-Type header is allowed to be quoted
-        // and charset values can't contain quotes.  Just convert any quote
-        // chars into spaces and let trim clean things up.
-        afterCharset = afterCharset.replace('"', ' ');
-        String encoding = afterCharset.trim();
-        return encoding;
+    /**
+     * Parse the character encoding from the specified content type header.
+     * If the content type is null, or there is no explicit character encoding,
+     * <code>null</code> is returned.
+     *
+     * @param contentType a content type header
+     */
+    public static String getCharsetFromContentType(String contentType) {
+
+        if (contentType == null)
+            return (null);
+        int start = contentType.indexOf("charset=");
+        if (start < 0)
+            return (null);
+        String encoding = contentType.substring(start + 8);
+        int end = encoding.indexOf(';');
+        if (end >= 0)
+            encoding = encoding.substring(0, end);
+        encoding = encoding.trim();
+        if ((encoding.length() > 2) && (encoding.startsWith("\""))
+            && (encoding.endsWith("\"")))
+            encoding = encoding.substring(1, encoding.length() - 1);
+        return (encoding.trim());
+
     }
 
 
