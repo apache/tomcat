@@ -21,6 +21,9 @@
         <bug>42039</bug> Log a stack trace if a servlet throws an
          UnavailableException. Patch provided by Kawasima Kazuh. (markt)
       </fix>
+      <fix>
+        <bug>41990</bug> Add some additional mime-type mappings. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
