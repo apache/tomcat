@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +34,14 @@ import java.util.TreeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Session;
+import org.apache.catalina.manager.util.BaseSessionComparator;
+import org.apache.catalina.manager.util.ReverseComparator;
+import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.http.fileupload.DiskFileUpload;
@@ -50,7 +59,7 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 * makes it easier to administrate.
 * <p>
 * However if you use a software that parses the output of
-* <code>ManagerServlet</code you won't be able to upgrade
+* <code>ManagerServlet</code> you won't be able to upgrade
 * to this Servlet since the output are not in the
 * same format ar from <code>ManagerServlet</code>
 *
@@ -62,6 +71,11 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 */
 
 public final class HTMLManagerServlet extends ManagerServlet {
+
+    protected static final String APPLICATION_MESSAGE = "message";
+    protected static final String APPLICATION_ERROR = "error";
+    protected String sessionsListJspPath  = "/sessionsList.jsp";
+    protected String sessionDetailJspPath = "/sessionDetail.jsp";
 
     // --------------------------------------------------------- Public Methods
 
@@ -100,7 +114,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else if (command.equals("/undeploy")) {
             message = undeploy(path);
         } else if (command.equals("/sessions")) {
-            message = sessions(path);
+            //message = sessions(path);
+            try {
+                doSessions(path, request, response);
+                return;
+            } catch (Exception e) {
+                log("HTMLManagerServlet.sessions[" + path + "]", e);
+                message = sm.getString("managerServlet.exception",
+                        e.toString());
+            }
         } else if (command.equals("/start")) {
             message = start(path);
         } else if (command.equals("/stop")) {
@@ -562,6 +584,309 @@ public final class HTMLManagerServlet extends ManagerServlet {
         return stringWriter.toString();
     }
 
+    /**
+     * @see javax.servlet.Servlet#getServletInfo()
+     */
+    public String getServletInfo() {
+        return "HTMLManagerServlet, Copyright (c) The Apache Software Foundation";
+    }   
+    
+    /**
+     * @see javax.servlet.GenericServlet#init()
+     */
+    public void init() throws ServletException {
+        super.init();
+    }   
+
+    // ------------------------------------------------ Sessions administration
+
+    /**
+     * 
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException 
+     */
+    protected void doSessions(String path, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setAttribute("path", path);
+        String action = req.getParameter("action");
+        if (debug >= 1) {
+            log("sessions: Session action '" + action + "' for web application at '" + path + "'");
+        }
+        if ("sessionDetail".equals(action)) {
+	        String sessionId = req.getParameter("sessionId");
+	        displaySessionDetailPage(req, resp, path, sessionId);
+	        return;
+        } else if ("invalidateSessions".equals(action)) {
+            String[] sessionIds = req.getParameterValues("sessionIds");
+            int i = invalidateSessions(path, sessionIds);
+            req.setAttribute(APPLICATION_MESSAGE, "" + i + " sessions invalidated.");
+        } else if ("removeSessionAttribute".equals(action)) {
+            String sessionId = req.getParameter("sessionId");
+            String name = req.getParameter("attributeName");
+            boolean removed = removeSessionAttribute(path, sessionId, name);
+            String outMessage = removed ? "Session attribute '" + name + "' removed." : "Session did not contain any attribute named '" + name + "'";
+            req.setAttribute(APPLICATION_MESSAGE, outMessage);
+            resp.sendRedirect(resp.encodeRedirectURL(req.getRequestURL().append("?path=").append(path).append("&action=sessionDetail&sessionId=").append(sessionId).toString()));
+            return;
+        } // else
+        displaySessionsListPage(path, req, resp);
+    }
+
+    protected Session[] getSessionsForPath(String path) {
+        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
+            throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
+                                        RequestUtil.filter(path)));
+        }
+        String displayPath = path;
+        if( path.equals("/") )
+            path = "";
+        Context context = (Context) host.findChild(path);
+        if (null == context) {
+            throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
+                                        RequestUtil.filter(displayPath)));
+        }
+        Session[] sessions = context.getManager().findSessions();
+        return sessions;
+    }
+    protected Session getSessionForPathAndId(String path, String id) throws IOException {
+        if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
+            throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
+                                        RequestUtil.filter(path)));
+        }
+        String displayPath = path;
+        if( path.equals("/") )
+            path = "";
+        Context context = (Context) host.findChild(path);
+        if (null == context) {
+            throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
+                                        RequestUtil.filter(displayPath)));
+        }
+        Session session = context.getManager().findSession(id);
+        return session;
+    }
+
+    /**
+     * 
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    protected void displaySessionsListPage(String path, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        List/*<Session>*/ activeSessions = Arrays.asList(getSessionsForPath(path));
+        String sortBy = req.getParameter("sort");
+        String orderBy = null;
+        if (null != sortBy && !"".equals(sortBy.trim())) {
+            Comparator comparator = getComparator(sortBy);
+            if (comparator != null) {
+                orderBy = req.getParameter("order");
+                if ("DESC".equalsIgnoreCase(orderBy)) {
+                    comparator = new ReverseComparator(comparator);
+                    // orderBy = "ASC";
+                } else {
+                    //orderBy = "DESC";
+                }
+                try {
+					Collections.sort(activeSessions, comparator);
+				} catch (IllegalStateException ise) {
+					// at least 1 of the sessions is invalidated
+					req.setAttribute(APPLICATION_ERROR, "Can't sort session list: one session is invalidated");
+				}
+            } else {
+                log("WARNING: unknown sort order: " + sortBy);
+            }
+        }
+        // keep sort order
+        req.setAttribute("sort", sortBy);
+        req.setAttribute("order", orderBy);
+        req.setAttribute("activeSessions", activeSessions);
+        //strong>NOTE</strong> - This header will be overridden
+        // automatically if a <code>RequestDispatcher.forward()</code> call is
+        // ultimately invoked.
+        resp.setHeader("Pragma", "No-cache"); // HTTP 1.0
+        resp.setHeader("Cache-Control", "no-cache,no-store,max-age=0"); // HTTP 1.1
+        resp.setDateHeader("Expires", 0); // 0 means now
+        getServletContext().getRequestDispatcher(sessionsListJspPath).include(req, resp);
+    }
+
+    /**
+     * 
+     * @param req
+     * @param resp
+     * @throws ServletException
+     * @throws IOException
+     */
+    protected void displaySessionDetailPage(HttpServletRequest req, HttpServletResponse resp, String path, String sessionId) throws ServletException, IOException {
+        Session session = getSessionForPathAndId(path, sessionId);
+        //strong>NOTE</strong> - This header will be overridden
+        // automatically if a <code>RequestDispatcher.forward()</code> call is
+        // ultimately invoked.
+        resp.setHeader("Pragma", "No-cache"); // HTTP 1.0
+        resp.setHeader("Cache-Control", "no-cache,no-store,max-age=0"); // HTTP 1.1
+        resp.setDateHeader("Expires", 0); // 0 means now
+        req.setAttribute("currentSession", session);
+        getServletContext().getRequestDispatcher(sessionDetailJspPath).include(req, resp);
+    }
+
+    /**
+     * Invalidate HttpSessions
+     * @param sessionIds
+     * @return number of invalidated sessions
+     * @throws IOException 
+     */
+    public int invalidateSessions(String path, String[] sessionIds) throws IOException {
+        if (null == sessionIds) {
+            return 0;
+        }
+        int nbAffectedSessions = 0;
+        for (int i = 0; i < sessionIds.length; ++i) {
+            String sessionId = sessionIds[i];
+            HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
+            if (null == session) {
+                // Shouldn't happen, but let's play nice...
+            	if (debug >= 1) {
+            		log("WARNING: can't invalidate null session " + sessionId);
+            	}
+                continue;
+            }
+            try {
+				session.invalidate();
+				++nbAffectedSessions;
+	            if (debug >= 1) {
+	                log("Invalidating session id " + sessionId);
+	            }
+			} catch (IllegalStateException ise) {
+				if (debug >= 1) {
+					log("Can't invalidate already invalidated session id " + sessionId);
+				}
+			}
+        }
+        return nbAffectedSessions;
+    }
+
+    /**
+     * Removes an attribute from an HttpSession
+     * @param sessionId
+     * @param attributeName
+     * @return true if there was an attribute removed, false otherwise
+     * @throws IOException 
+     */
+    public boolean removeSessionAttribute(String path, String sessionId, String attributeName) throws IOException {
+        HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
+        if (null == session) {
+            // Shouldn't happen, but let's play nice...
+        	if (debug >= 1) {
+        		log("WARNING: can't remove attribute '" + attributeName + "' for null session " + sessionId);
+        	}
+            return false;
+        }
+        boolean wasPresent = (null != session.getAttribute(attributeName));
+        try {
+            session.removeAttribute(attributeName);
+        } catch (IllegalStateException ise) {
+        	if (debug >= 1) {
+        		log("Can't remote attribute '" + attributeName + "' for invalidated session id " + sessionId);
+        	}
+        }
+        return wasPresent;
+    }
+
+    /**
+     * Sets the maximum inactive interval (session timeout) an HttpSession
+     * @param sessionId
+     * @param maxInactiveInterval in seconds
+     * @return old value for maxInactiveInterval
+     * @throws IOException 
+     */
+    public int setSessionMaxInactiveInterval(String path, String sessionId, int maxInactiveInterval) throws IOException {
+        HttpSession session = getSessionForPathAndId(path, sessionId).getSession();
+        if (null == session) {
+            // Shouldn't happen, but let's play nice...
+        	if (debug >= 1) {
+        		log("WARNING: can't set timout for null session " + sessionId);
+        	}
+            return 0;
+        }
+        try {
+			int oldMaxInactiveInterval = session.getMaxInactiveInterval();
+			session.setMaxInactiveInterval(maxInactiveInterval);
+			return oldMaxInactiveInterval;
+        } catch (IllegalStateException ise) {
+        	if (debug >= 1) {
+        		log("Can't set MaxInactiveInterval '" + maxInactiveInterval + "' for invalidated session id " + sessionId);
+        	}
+        	return 0;
+		}
+    }
+
+    protected Comparator getComparator(String sortBy) {
+        Comparator comparator = null;
+        if ("CreationTime".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return new Date(session.getCreationTime());
+                }
+            };
+        } else if ("id".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return session.getId();
+                }
+            };
+        } else if ("LastAccessedTime".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return new Date(session.getLastAccessedTime());
+                }
+            };
+        } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return new Date(session.getMaxInactiveInterval());
+                }
+            };
+        } else if ("new".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return Boolean.valueOf(session.getSession().isNew());
+                }
+            };
+        } else if ("locale".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return JspHelper.guessDisplayLocaleFromSession(session);
+                }
+            };
+        } else if ("user".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return JspHelper.guessDisplayUserFromSession(session);
+                }
+            };
+        } else if ("UsedTime".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return new Date(SessionUtils.getUsedTimeForSession(session));
+                }
+            };
+        } else if ("InactiveTime".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return new Date(SessionUtils.getInactiveTimeForSession(session));
+                }
+            };
+        } else if ("TTL".equalsIgnoreCase(sortBy)) {
+            comparator = new BaseSessionComparator() {
+                public Comparable getComparableObject(Session session) {
+                    return new Date(SessionUtils.getTTLForSession(session));
+                }
+            };
+        }
+        //TODO: complete this to TTL, etc.
+        return comparator;
+    }
+
     // ------------------------------------------------------ Private Constants
 
     // These HTML sections are broken in relatively small sections, because of
@@ -586,7 +911,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{5}\"><small><a href=\"{0}\">{0}</a></small></td>\n" +
         " <td class=\"row-left\" bgcolor=\"{5}\"><small>{1}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{5}\"><small>{2}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{5}\"><small><a href=\"{3}\">{4}</a></small></td>\n";
+        " <td class=\"row-center\" bgcolor=\"{5}\"><small><a href=\"{3}\" target=\"_new\">{4}</a></small></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
