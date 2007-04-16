@@ -7,7 +7,7 @@
 -->
 
 
-<Context docBase="${catalina.home}/server/webapps/manager"
+<Context docBase="${catalina.home}/webapps/manager"
          privileged="true" antiResourceLocking="false" antiJARLocking="false">
 
 </Context>
