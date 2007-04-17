@@ -180,8 +180,15 @@ public class JspHelper {
     }
 
     public static String escapeXml(Object obj) {
-    	return obj == null ? "" : escapeXml(String.valueOf(obj));
+        String value = null;
+        try {
+            value = (obj == null) ? null : String.valueOf(obj);
+        } catch (Exception e) {
+            // Ignore
+        }
+        return escapeXml(value);
     }
+
     /**
      * Performs the following substring replacements
      * (to facilitate output to XML/HTML pages):
