@@ -189,110 +189,6 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 
-    // -------------------- Properties--------------------
-    protected AprEndpoint endpoint=new AprEndpoint();
-
-    protected HashMap<String, Object> attributes = new HashMap<String, Object>();
-
-    private Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
-
-    // -------------------- Tcp setup --------------------
-
-    // *
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
-    }
-    
-    // *
-    public void setExecutor(Executor executor) {
-        endpoint.setExecutor(executor);
-    }
-    
-    // *
-    public int getMaxThreads() {
-        return endpoint.getMaxThreads();
-    }
-
-    // *
-    public void setMaxThreads( int maxThreads ) {
-        endpoint.setMaxThreads(maxThreads);
-    }
-
-    // *
-    public void setThreadPriority(int threadPriority) {
-        endpoint.setThreadPriority(threadPriority);
-    }
-
-    // *
-    public int getThreadPriority() {
-        return endpoint.getThreadPriority();
-    }
-
-    // *
-    public int getBacklog() {
-        return endpoint.getBacklog();
-    }
-
-    // *
-    public void setBacklog( int i ) {
-        endpoint.setBacklog(i);
-    }
-
-    // *
-    public int getPort() {
-        return endpoint.getPort();
-    }
-
-    // *
-    public void setPort( int port ) {
-        endpoint.setPort(port);
-    }
-
-    // *
-    public InetAddress getAddress() {
-        return endpoint.getAddress();
-    }
-
-    // *
-    public void setAddress(InetAddress ia) {
-        endpoint.setAddress( ia );
-    }
-
-    public int getPollTime() {
-        return endpoint.getPollTime();
-    }
-
-    public void setPollTime( int i ) {
-        endpoint.setPollTime(i);
-        setAttribute("pollTime", "" + i);
-    }
-
-    public void setPollerSize(int i) {
-        endpoint.setPollerSize(i); 
-        setAttribute("pollerSize", "" + i);
-    }
-    
-    public int getPollerSize() {
-        return endpoint.getPollerSize();
-    }
-    
-    public void setSendfileSize(int i) {
-        endpoint.setSendfileSize(i); 
-        setAttribute("sendfileSize", "" + i);
-    }
-    
-    public int getSendfileSize() {
-        return endpoint.getSendfileSize();
-    }
-    
-    public boolean getUseSendfile() {
-        return endpoint.getUseSendfile();
-    }
-
-    public void setUseSendfile(boolean useSendfile) {
-        endpoint.setUseSendfile(useSendfile);
-    }
-
     public String getName() {
         String encodedAddr = "";
         if (getAddress() != null) {
@@ -304,16 +200,65 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         return ("http-" + encodedAddr + endpoint.getPort());
     }
 
-    // *
-    public boolean getTcpNoDelay() {
-        return endpoint.getTcpNoDelay();
-    }
+    protected AprEndpoint endpoint=new AprEndpoint();
 
-    // *
-    public void setTcpNoDelay( boolean b ) {
-        endpoint.setTcpNoDelay( b );
-    }
+    protected HashMap<String, Object> attributes = new HashMap<String, Object>();
 
+    private Http11ConnectionHandler cHandler = new Http11ConnectionHandler(this);
+
+    /**
+     * Processor cache.
+     */
+    protected int processorCache = -1;
+    public int getProcessorCache() { return this.processorCache; }
+    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
+
+    public Executor getExecutor() { return endpoint.getExecutor(); }
+    public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
+    
+    public int getMaxThreads() { return endpoint.getMaxThreads(); }
+    public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
+
+    public int getThreadPriority() { return endpoint.getThreadPriority(); }
+    public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
+
+    public int getBacklog() { return endpoint.getBacklog(); }
+    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
+
+    public int getPort() { return endpoint.getPort(); }
+    public void setPort(int port) { endpoint.setPort(port); }
+
+    public InetAddress getAddress() { return endpoint.getAddress(); }
+    public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
+
+    public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
+    public void setTcpNoDelay(boolean tcpNoDelay) { endpoint.setTcpNoDelay(tcpNoDelay); }
+
+    public int getSoLinger() { return endpoint.getSoLinger(); }
+    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
+
+    public int getSoTimeout() { return endpoint.getSoTimeout(); }
+    public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
+
+    /**
+     * The number of seconds Tomcat will wait for a subsequent request
+     * before closing the connection.
+     */
+    public int getKeepAliveTimeout() { return endpoint.getKeepAliveTimeout(); }
+    public void setKeepAliveTimeout(int timeout) { endpoint.setKeepAliveTimeout(timeout); }
+
+    public boolean getUseSendfile() { return endpoint.getUseSendfile(); }
+    public void setUseSendfile(boolean useSendfile) { endpoint.setUseSendfile(useSendfile); }
+
+    public int getPollTime() { return endpoint.getPollTime(); }
+    public void setPollTime(int pollTime) { endpoint.setPollTime(pollTime); }
+
+    public void setPollerSize(int pollerSize) { endpoint.setPollerSize(pollerSize); }
+    public int getPollerSize() { return endpoint.getPollerSize(); }
+
+    public int getSendfileSize() { return endpoint.getSendfileSize(); }
+    public void setSendfileSize(int sendfileSize) { endpoint.setSendfileSize(sendfileSize); }
+    
     protected int socketBuffer = 9000;
     public int getSocketBuffer() { return socketBuffer; }
     public void setSocketBuffer(int socketBuffer) { this.socketBuffer = socketBuffer; }
@@ -380,26 +325,6 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     public void setRestrictedUserAgents(String valueS) { restrictedUserAgents = valueS; }
     
     
-    // *
-    public int getSoLinger() {
-        return endpoint.getSoLinger();
-    }
-
-    // *
-    public void setSoLinger( int i ) {
-        endpoint.setSoLinger( i );
-    }
-
-    // *
-    public int getSoTimeout() {
-        return endpoint.getSoTimeout();
-    }
-
-    // *
-    public void setSoTimeout( int i ) {
-        endpoint.setSoTimeout(i);
-    }
-
     public String getProtocol() {
         return getProperty("protocol");
     }
@@ -416,13 +341,6 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     protected int maxKeepAliveRequests = 100;
     public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }
     public void setMaxKeepAliveRequests(int mkar) { maxKeepAliveRequests = mkar; }
-
-    /**
-     * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection.
-     */
-    public int getKeepAliveTimeout() { return endpoint.getKeepAliveTimeout(); }
-    public void setKeepAliveTimeout(int timeout) { endpoint.setKeepAliveTimeout(timeout); }
 
     /**
      * Return the Keep-Alive policy for the connection.
@@ -456,13 +374,6 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     protected int timeout = 300000;
     public int getTimeout() { return timeout; }
     public void setTimeout(int timeout) { this.timeout = timeout; }
-
-    /**
-     * Processor cache.
-     */
-    protected int processorCache = -1;
-    public int getProcessorCache() { return this.processorCache; }
-    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
     /**
      * This field indicates if the protocol is secure from the perspective of
@@ -579,7 +490,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             new ConcurrentLinkedQueue<Http11AprProcessor>() {
             protected AtomicInteger size = new AtomicInteger(0);
             public boolean offer(Http11AprProcessor processor) {
-                boolean offer = proto.processorCache==-1?true:size.get() < proto.processorCache;
+                boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
                 //avoid over growing our cache or add after we have stopped
                 boolean result = false;
                 if ( offer ) {
