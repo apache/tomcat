@@ -22,7 +22,9 @@ import java.net.Socket;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -49,7 +51,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  * @author Costin Manolache
- * @deprecated
  */
 public class Http11Protocol 
     implements ProtocolHandler, MBeanRegistration {
@@ -240,10 +241,27 @@ public class Http11Protocol
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
     }
 
-    
+    public String getName() {
+        String encodedAddr = "";
+        if (getAddress() != null) {
+            encodedAddr = "" + getAddress();
+            if (encodedAddr.startsWith("/"))
+                encodedAddr = encodedAddr.substring(1);
+            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
+        }
+        return ("http-" + encodedAddr + endpoint.getPort());
+    }
+
     // ------------------------------------------------------------- Properties
 
     
+    /**
+     * Processor cache.
+     */
+    protected int processorCache = -1;
+    public int getProcessorCache() { return this.processorCache; }
+    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
+
     // *
     /**
      * This field indicates if the protocol is secure from the perspective of
@@ -263,7 +281,6 @@ public class Http11Protocol
     protected String socketFactoryName = null;
     public String getSocketFactory() { return socketFactoryName; }
     public void setSocketFactory(String valueS) { socketFactoryName = valueS; }
-    
     
     /**
      * Name of the SSL implementation.
@@ -371,7 +388,6 @@ public class Http11Protocol
     public String getRestrictedUserAgents() { return restrictedUserAgents; }
     public void setRestrictedUserAgents(String valueS) { restrictedUserAgents = valueS; }
     
-    
     // HTTP
     /**
      * Server header.
@@ -380,110 +396,32 @@ public class Http11Protocol
     public void setServer( String server ) { this.server = server; }
     public String getServer() { return server; }
 
-
-    // --------------------------------------------------------- Public methods
-
-    // *
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
-    }
+    public Executor getExecutor() { return endpoint.getExecutor(); }
+    public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
     
-    // *
-    public void setExecutor(Executor executor) {
-        endpoint.setExecutor(executor);
-    }
-    
-    // *
-    public int getMaxThreads() {
-        return endpoint.getMaxThreads();
-    }
+    public int getMaxThreads() { return endpoint.getMaxThreads(); }
+    public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
 
-    // *
-    public void setMaxThreads( int maxThreads ) {
-        endpoint.setMaxThreads(maxThreads);
-    }
+    public int getThreadPriority() { return endpoint.getThreadPriority(); }
+    public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
 
-    // *
-    public void setThreadPriority(int threadPriority) {
-        endpoint.setThreadPriority(threadPriority);
-    }
+    public int getBacklog() { return endpoint.getBacklog(); }
+    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
 
-    // *
-    public int getThreadPriority() {
-        return endpoint.getThreadPriority();
-    }
+    public int getPort() { return endpoint.getPort(); }
+    public void setPort(int port) { endpoint.setPort(port); }
 
-    // *
-    public int getBacklog() {
-        return endpoint.getBacklog();
-    }
+    public InetAddress getAddress() { return endpoint.getAddress(); }
+    public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
 
-    // *
-    public void setBacklog( int i ) {
-        endpoint.setBacklog(i);
-    }
+    public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
+    public void setTcpNoDelay(boolean tcpNoDelay) { endpoint.setTcpNoDelay(tcpNoDelay); }
 
-    // *
-    public int getPort() {
-        return endpoint.getPort();
-    }
+    public int getSoLinger() { return endpoint.getSoLinger(); }
+    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
-    // *
-    public void setPort( int port ) {
-        endpoint.setPort(port);
-    }
-
-    // *
-    public InetAddress getAddress() {
-        return endpoint.getAddress();
-    }
-
-    // *
-    public void setAddress(InetAddress ia) {
-        endpoint.setAddress( ia );
-    }
-
-    // *
-    public String getName() {
-        String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
-            if (encodedAddr.startsWith("/"))
-                encodedAddr = encodedAddr.substring(1);
-            encodedAddr = URLEncoder.encode(encodedAddr) + "-";
-        }
-        return ("http-" + encodedAddr + endpoint.getPort());
-    }
-
-    // *
-    public boolean getTcpNoDelay() {
-        return endpoint.getTcpNoDelay();
-    }
-
-    // *
-    public void setTcpNoDelay( boolean b ) {
-        endpoint.setTcpNoDelay( b );
-    }
-
-    // *
-    public int getSoLinger() {
-        return endpoint.getSoLinger();
-    }
-
-    // *
-    public void setSoLinger( int i ) {
-        endpoint.setSoLinger( i );
-    }
-
-    // *
-    public int getSoTimeout() {
-        return endpoint.getSoTimeout();
-    }
-
-    // *
-    public void setSoTimeout( int i ) {
-        endpoint.setSoTimeout(i);
-    }
+    public int getSoTimeout() { return endpoint.getSoTimeout(); }
+    public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
 
     // HTTP
     /**
@@ -575,58 +513,66 @@ public class Http11Protocol
     // -----------------------------------  Http11ConnectionHandler Inner Class
 
     protected static class Http11ConnectionHandler implements Handler {
-        protected Http11Protocol protocol;
-        protected static int count = 0;
+
+        protected Http11Protocol proto;
+        protected AtomicInteger registerCount = new AtomicInteger(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
-        protected ThreadLocal<Http11Processor> localProcessor = new ThreadLocal<Http11Processor>();
+
+        protected ConcurrentLinkedQueue<Http11Processor> recycledProcessors = 
+            new ConcurrentLinkedQueue<Http11Processor>() {
+            protected AtomicInteger size = new AtomicInteger(0);
+            public boolean offer(Http11Processor processor) {
+                boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
+                //avoid over growing our cache or add after we have stopped
+                boolean result = false;
+                if ( offer ) {
+                    result = super.offer(processor);
+                    if ( result ) {
+                        size.incrementAndGet();
+                    }
+                }
+                if (!result) unregister(processor);
+                return result;
+            }
+            
+            public Http11Processor poll() {
+                Http11Processor result = super.poll();
+                if ( result != null ) {
+                    size.decrementAndGet();
+                }
+                return result;
+            }
+            
+            public void clear() {
+                Http11Processor next = poll();
+                while ( next != null ) {
+                    unregister(next);
+                    next = poll();
+                }
+                super.clear();
+                size.set(0);
+            }
+        };
 
         Http11ConnectionHandler(Http11Protocol proto) {
-            this.protocol = proto;
+            this.proto = proto;
         }
 
         public boolean process(Socket socket) {
-            Http11Processor processor = null;
+            Http11Processor processor = recycledProcessors.poll();
             try {
-                processor = localProcessor.get();
+
                 if (processor == null) {
-                    processor =
-                        new Http11Processor(protocol.maxHttpHeaderSize, protocol.endpoint);
-                    processor.setAdapter(protocol.adapter);
-                    processor.setMaxKeepAliveRequests(protocol.maxKeepAliveRequests);
-                    processor.setKeepAliveTimeout(protocol.keepAliveTimeout);
-                    processor.setTimeout(protocol.timeout);
-                    processor.setDisableUploadTimeout(protocol.disableUploadTimeout);
-                    processor.setCompression(protocol.compression);
-                    processor.setCompressionMinSize(protocol.compressionMinSize);
-                    processor.setNoCompressionUserAgents(protocol.noCompressionUserAgents);
-                    processor.setCompressableMimeTypes(protocol.compressableMimeTypes);
-                    processor.setRestrictedUserAgents(protocol.restrictedUserAgents);
-                    processor.setMaxSavePostSize(protocol.maxSavePostSize);
-                    processor.setServer(protocol.server);
-                    localProcessor.set(processor);
-                    if (protocol.getDomain() != null) {
-                        synchronized (this) {
-                            try {
-                                RequestInfo rp = processor.getRequest().getRequestProcessor();
-                                rp.setGlobalProcessor(global);
-                                ObjectName rpName = new ObjectName
-                                (protocol.getDomain() + ":type=RequestProcessor,worker="
-                                        + protocol.getName() + ",name=HttpRequest" + count++);
-                                Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
-                            } catch (Exception e) {
-                                log.warn("Error registering request");
-                            }
-                        }
-                    }
+                    processor = createProcessor();
                 }
 
                 if (processor instanceof ActionHook) {
                     ((ActionHook) processor).action(ActionCode.ACTION_START, null);
                 }
 
-                if (protocol.secure && (protocol.sslImplementation != null)) {
+                if (proto.secure && (proto.sslImplementation != null)) {
                     processor.setSSLSupport
-                        (protocol.sslImplementation.getSSLSupport(socket));
+                        (proto.sslImplementation.getSSLSupport(socket));
                 } else {
                     processor.setSSLSupport(null);
                 }
@@ -661,9 +607,72 @@ public class Http11Protocol
                 if (processor instanceof ActionHook) {
                     ((ActionHook) processor).action(ActionCode.ACTION_STOP, null);
                 }
+                recycledProcessors.offer(processor);
             }
             return false;
         }
+        
+        protected Http11Processor createProcessor() {
+            Http11Processor processor =
+                new Http11Processor(proto.maxHttpHeaderSize, proto.endpoint);
+            processor.setAdapter(proto.adapter);
+            processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
+            processor.setKeepAliveTimeout(proto.keepAliveTimeout);
+            processor.setTimeout(proto.timeout);
+            processor.setDisableUploadTimeout(proto.disableUploadTimeout);
+            processor.setCompression(proto.compression);
+            processor.setCompressionMinSize(proto.compressionMinSize);
+            processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
+            processor.setCompressableMimeTypes(proto.compressableMimeTypes);
+            processor.setRestrictedUserAgents(proto.restrictedUserAgents);
+            processor.setMaxSavePostSize(proto.maxSavePostSize);
+            processor.setServer(proto.server);
+            register(processor);
+            return processor;
+        }
+        
+        protected void register(Http11Processor processor) {
+            if (proto.getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        int count = registerCount.incrementAndGet();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Register ["+processor+"] count=" + count);
+                        }
+                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(global);
+                        ObjectName rpName = new ObjectName
+                            (proto.getDomain() + ":type=RequestProcessor,worker="
+                                + proto.getName() + ",name=HttpRequest" + count);
+                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        rp.setRpName(rpName);
+                    } catch (Exception e) {
+                        log.warn("Error registering request");
+                    }
+                }
+            }
+        }
+
+        protected void unregister(Http11Processor processor) {
+            if (proto.getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        int count = registerCount.decrementAndGet();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unregister [" + processor + "] count=" + count);
+                        }
+                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(null);
+                        ObjectName rpName = rp.getRpName();
+                        Registry.getRegistry(null, null).unregisterComponent(rpName);
+                        rp.setRpName(null);
+                    } catch (Exception e) {
+                        log.warn("Error unregistering request", e);
+                    }
+                }
+            }
+        }
+
     }
 
 

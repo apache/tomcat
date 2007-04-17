@@ -22,7 +22,9 @@ import java.net.Socket;
 import java.net.URLEncoder;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -86,7 +88,7 @@ public class AjpProtocol
     /**
      * Associated java.io endpoint.
      */
-    protected JIoEndpoint ep = new JIoEndpoint();
+    protected JIoEndpoint endpoint = new JIoEndpoint();
 
 
     /**
@@ -95,25 +97,6 @@ public class AjpProtocol
     protected Hashtable attributes = new Hashtable();
 
 
-    /**
-     * Should authentication be done in the native webserver layer, 
-     * or in the Servlet container ?
-     */
-    protected boolean tomcatAuthentication = true;
-
-
-    /**
-     * Required secret.
-     */
-    protected String requiredSecret = null;
-
-
-    /**
-     * AJP packet size.
-     */
-    protected int packetSize = Constants.MAX_PACKET_SIZE;
-
-    
     /**
      * Adapter which will process the requests recieved by this endpoint.
      */
@@ -184,11 +167,11 @@ public class AjpProtocol
     /** Start the protocol
      */
     public void init() throws Exception {
-        ep.setName(getName());
-        ep.setHandler(cHandler);
+        endpoint.setName(getName());
+        endpoint.setHandler(cHandler);
 
         try {
-            ep.init();
+            endpoint.init();
         } catch (Exception ex) {
             log.error(sm.getString("ajpprotocol.endpoint.initerror"), ex);
             throw ex;
@@ -205,7 +188,7 @@ public class AjpProtocol
                 tpOname = new ObjectName
                     (domain + ":" + "type=ThreadPool,name=" + getName());
                 Registry.getRegistry(null, null)
-                    .registerComponent(ep, tpOname, null );
+                    .registerComponent(endpoint, tpOname, null );
             } catch (Exception e) {
                 log.error("Can't register threadpool" );
             }
@@ -216,7 +199,7 @@ public class AjpProtocol
         }
 
         try {
-            ep.start();
+            endpoint.start();
         } catch (Exception ex) {
             log.error(sm.getString("ajpprotocol.endpoint.starterror"), ex);
             throw ex;
@@ -227,7 +210,7 @@ public class AjpProtocol
 
     public void pause() throws Exception {
         try {
-            ep.pause();
+            endpoint.pause();
         } catch (Exception ex) {
             log.error(sm.getString("ajpprotocol.endpoint.pauseerror"), ex);
             throw ex;
@@ -238,7 +221,7 @@ public class AjpProtocol
 
     public void resume() throws Exception {
         try {
-            ep.resume();
+            endpoint.resume();
         } catch (Exception ex) {
             log.error(sm.getString("ajpprotocol.endpoint.resumeerror"), ex);
             throw ex;
@@ -250,7 +233,7 @@ public class AjpProtocol
     public void destroy() throws Exception {
         if (log.isInfoEnabled())
             log.info(sm.getString("ajpprotocol.stop", getName()));
-        ep.destroy();
+        endpoint.destroy();
         if (tpOname!=null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
         if (rgOname != null)
@@ -258,67 +241,6 @@ public class AjpProtocol
     }
 
     // *
-    public Executor getExecutor() {
-        return ep.getExecutor();
-    }
-    
-    // *
-    public void setExecutor(Executor executor) {
-        ep.setExecutor(executor);
-    }
-    
-    public int getMaxThreads() {
-        return ep.getMaxThreads();
-    }
-
-    public void setMaxThreads(int maxThreads) {
-        ep.setMaxThreads(maxThreads);
-        setAttribute("maxThreads", "" + maxThreads);
-    }
-
-    public void setThreadPriority(int threadPriority) {
-        ep.setThreadPriority(threadPriority);
-        setAttribute("threadPriority", "" + threadPriority);
-    }
-    
-    public int getThreadPriority() {
-        return ep.getThreadPriority();
-    }
-    
-
-    public int getBacklog() {
-        return ep.getBacklog();
-    }
-
-
-    public void setBacklog( int i ) {
-        ep.setBacklog(i);
-        setAttribute("backlog", "" + i);
-    }
-
-
-    public int getPort() {
-        return ep.getPort();
-    }
-
-
-    public void setPort( int port ) {
-        ep.setPort(port);
-        setAttribute("port", "" + port);
-    }
-
-
-    public InetAddress getAddress() {
-        return ep.getAddress();
-    }
-
-
-    public void setAddress(InetAddress ia) {
-        ep.setAddress(ia);
-        setAttribute("address", "" + ia);
-    }
-
-
     public String getName() {
         String encodedAddr = "";
         if (getAddress() != null) {
@@ -327,72 +249,68 @@ public class AjpProtocol
                 encodedAddr = encodedAddr.substring(1);
             encodedAddr = URLEncoder.encode(encodedAddr) + "-";
         }
-        return ("ajp-" + encodedAddr + ep.getPort());
+        return ("ajp-" + encodedAddr + endpoint.getPort());
     }
 
+    /**
+     * Processor cache.
+     */
+    protected int processorCache = -1;
+    public int getProcessorCache() { return this.processorCache; }
+    public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
-    public boolean getTcpNoDelay() {
-        return ep.getTcpNoDelay();
-    }
-
-
-    public void setTcpNoDelay(boolean b) {
-        ep.setTcpNoDelay(b);
-        setAttribute("tcpNoDelay", "" + b);
-    }
-
-
-    public boolean getTomcatAuthentication() {
-        return tomcatAuthentication;
-    }
-
-
-    public void setTomcatAuthentication(boolean tomcatAuthentication) {
-        this.tomcatAuthentication = tomcatAuthentication;
-    }
-
-
-    public int getSoLinger() {
-        return ep.getSoLinger();
-    }
-
-
-    public void setSoLinger(int i) {
-        ep.setSoLinger(i);
-        setAttribute("soLinger", "" + i);
-    }
-
-
-    public int getSoTimeout() {
-        return ep.getSoTimeout();
-    }
-
-
-    public void setSoTimeout( int i ) {
-        ep.setSoTimeout(i);
-        setAttribute("soTimeout", "" + i);
-    }
-
+    public Executor getExecutor() { return endpoint.getExecutor(); }
+    public void setExecutor(Executor executor) { endpoint.setExecutor(executor); }
     
-    public void setRequiredSecret(String requiredSecret) {
-        this.requiredSecret = requiredSecret;
-    }
-    
-    
-    public int getPacketSize() {
-        return packetSize;
-    }
+    public int getMaxThreads() { return endpoint.getMaxThreads(); }
+    public void setMaxThreads(int maxThreads) { endpoint.setMaxThreads(maxThreads); }
 
+    public int getThreadPriority() { return endpoint.getThreadPriority(); }
+    public void setThreadPriority(int threadPriority) { endpoint.setThreadPriority(threadPriority); }
 
-    public void setPacketSize(int i) {
-        packetSize = i;
-    }
+    public int getBacklog() { return endpoint.getBacklog(); }
+    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
+
+    public int getPort() { return endpoint.getPort(); }
+    public void setPort(int port) { endpoint.setPort(port); }
+
+    public InetAddress getAddress() { return endpoint.getAddress(); }
+    public void setAddress(InetAddress ia) { endpoint.setAddress(ia); }
+
+    public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
+    public void setTcpNoDelay(boolean tcpNoDelay) { endpoint.setTcpNoDelay(tcpNoDelay); }
+
+    public int getSoLinger() { return endpoint.getSoLinger(); }
+    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
+
+    public int getSoTimeout() { return endpoint.getSoTimeout(); }
+    public void setSoTimeout(int soTimeout) { endpoint.setSoTimeout(soTimeout); }
+
+    /**
+     * Should authentication be done in the native webserver layer, 
+     * or in the Servlet container ?
+     */
+    protected boolean tomcatAuthentication = true;
+    public boolean getTomcatAuthentication() { return tomcatAuthentication; }
+    public void setTomcatAuthentication(boolean tomcatAuthentication) { this.tomcatAuthentication = tomcatAuthentication; }
+
+    /**
+     * Required secret.
+     */
+    protected String requiredSecret = null;
+    public void setRequiredSecret(String requiredSecret) { this.requiredSecret = requiredSecret; }
+    
+    /**
+     * AJP packet size.
+     */
+    protected int packetSize = Constants.MAX_PACKET_SIZE;
+    public int getPacketSize() { return packetSize; }
+    public void setPacketSize(int packetSize) { this.packetSize = packetSize; }
 
     
     /**
      * The number of seconds Tomcat will wait for a subsequent request
-     * before closing the connection. The default is the same as for
-     * Apache HTTP Server (15 000 milliseconds).
+     * before closing the connection.
      */
     protected int keepAliveTimeout = -1;
     public int getKeepAliveTimeout() { return keepAliveTimeout; }
@@ -403,41 +321,57 @@ public class AjpProtocol
 
 
     protected static class AjpConnectionHandler implements Handler {
+
         protected AjpProtocol proto;
-        protected static int count = 0;
-        protected RequestGroupInfo global=new RequestGroupInfo();
-        protected ThreadLocal<AjpProcessor> localProcessor = new ThreadLocal<AjpProcessor>();
+        protected AtomicInteger registerCount = new AtomicInteger(0);
+        protected RequestGroupInfo global = new RequestGroupInfo();
+
+        protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
+            new ConcurrentLinkedQueue<AjpProcessor>() {
+            protected AtomicInteger size = new AtomicInteger(0);
+            public boolean offer(AjpProcessor processor) {
+                boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
+                //avoid over growing our cache or add after we have stopped
+                boolean result = false;
+                if ( offer ) {
+                    result = super.offer(processor);
+                    if ( result ) {
+                        size.incrementAndGet();
+                    }
+                }
+                if (!result) unregister(processor);
+                return result;
+            }
+            
+            public AjpProcessor poll() {
+                AjpProcessor result = super.poll();
+                if ( result != null ) {
+                    size.decrementAndGet();
+                }
+                return result;
+            }
+            
+            public void clear() {
+                AjpProcessor next = poll();
+                while ( next != null ) {
+                    unregister(next);
+                    next = poll();
+                }
+                super.clear();
+                size.set(0);
+            }
+        };
 
         public AjpConnectionHandler(AjpProtocol proto) {
             this.proto = proto;
         }
 
         public boolean process(Socket socket) {
-            AjpProcessor processor = null;
+            AjpProcessor processor = recycledProcessors.poll();
             try {
-                processor = localProcessor.get();
+
                 if (processor == null) {
-                    processor = new AjpProcessor(proto.packetSize, proto.ep);
-                    processor.setAdapter(proto.adapter);
-                    processor.setTomcatAuthentication(proto.tomcatAuthentication);
-                    processor.setRequiredSecret(proto.requiredSecret);
-                    processor.setKeepAliveTimeout(proto.keepAliveTimeout);
-                    localProcessor.set(processor);
-                    if (proto.getDomain() != null) {
-                        synchronized (this) {
-                            try {
-                                RequestInfo rp = processor.getRequest().getRequestProcessor();
-                                rp.setGlobalProcessor(global);
-                                ObjectName rpName = new ObjectName
-                                    (proto.getDomain() + ":type=RequestProcessor,worker="
-                                        + proto.getName() + ",name=AjpRequest" + count++ );
-                                Registry.getRegistry(null, null)
-                                    .registerComponent(rp, rpName, null);
-                            } catch (Exception ex) {
-                                log.warn(sm.getString("ajpprotocol.request.register"));
-                            }
-                        }
-                    }
+                    processor = createProcessor();
                 }
 
                 if (processor instanceof ActionHook) {
@@ -470,9 +404,63 @@ public class AjpProtocol
                 if (processor instanceof ActionHook) {
                     ((ActionHook) processor).action(ActionCode.ACTION_STOP, null);
                 }
+                recycledProcessors.offer(processor);
             }
             return false;
         }
+
+        protected AjpProcessor createProcessor() {
+            AjpProcessor processor = new AjpProcessor(proto.packetSize, proto.endpoint);
+            processor.setAdapter(proto.adapter);
+            processor.setTomcatAuthentication(proto.tomcatAuthentication);
+            processor.setRequiredSecret(proto.requiredSecret);
+            processor.setKeepAliveTimeout(proto.keepAliveTimeout);
+            register(processor);
+            return processor;
+        }
+        
+        protected void register(AjpProcessor processor) {
+            if (proto.getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        int count = registerCount.incrementAndGet();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Register ["+processor+"] count=" + count);
+                        }
+                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(global);
+                        ObjectName rpName = new ObjectName
+                            (proto.getDomain() + ":type=RequestProcessor,worker="
+                                + proto.getName() + ",name=AjpRequest" + count);
+                        Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
+                        rp.setRpName(rpName);
+                    } catch (Exception e) {
+                        log.warn("Error registering request");
+                    }
+                }
+            }
+        }
+
+        protected void unregister(AjpProcessor processor) {
+            if (proto.getDomain() != null) {
+                synchronized (this) {
+                    try {
+                        int count = registerCount.decrementAndGet();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unregister [" + processor + "] count=" + count);
+                        }
+                        RequestInfo rp = processor.getRequest().getRequestProcessor();
+                        rp.setGlobalProcessor(null);
+                        ObjectName rpName = rp.getRpName();
+                        Registry.getRegistry(null, null).unregisterComponent(rpName);
+                        rp.setRpName(null);
+                    } catch (Exception e) {
+                        log.warn("Error unregistering request", e);
+                    }
+                }
+            }
+        }
+
     }
 
 
