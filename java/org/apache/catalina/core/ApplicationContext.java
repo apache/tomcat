@@ -137,15 +137,10 @@ public class ApplicationContext
 
 
     /**
-     * Thread local mapping data.
+     * Thread local data used during request dispatch.
      */
-    private ThreadLocal localMappingData = new ThreadLocal();
-
-
-    /**
-     * Thread local URI message bytes.
-     */
-    private ThreadLocal localUriMB = new ThreadLocal();
+    private ThreadLocal<DispatchData> dispatchData =
+        new ThreadLocal<DispatchData>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -377,16 +372,15 @@ public class ApplicationContext
         if (path == null)
             return (null);
 
-        // Retrieve the thread local URI
-        MessageBytes uriMB = (MessageBytes) localUriMB.get();
-        if (uriMB == null) {
-            uriMB = MessageBytes.newInstance();
-            CharChunk uriCC = uriMB.getCharChunk();
-            uriCC.setLimit(-1);
-            localUriMB.set(uriMB);
-        } else {
-            uriMB.recycle();
+        // Use the thread local URI and mapping data
+        DispatchData dd = dispatchData.get();
+        if (dd == null) {
+            dd = new DispatchData();
+            dispatchData.set(dd);
         }
+
+        MessageBytes uriMB = dd.uriMB;
+        uriMB.recycle();
 
         // Get query string
         String queryString = null;
@@ -397,12 +391,8 @@ public class ApplicationContext
             pos = path.length();
         }
  
-        // Retrieve the thread local mapping data
-        MappingData mappingData = (MappingData) localMappingData.get();
-        if (mappingData == null) {
-            mappingData = new MappingData();
-            localMappingData.set(mappingData);
-        }
+        // Use the thread local mapping data
+        MappingData mappingData = dd.mappingData;
 
         // Map the URI
         CharChunk uriCC = uriMB.getCharChunk();
@@ -960,6 +950,24 @@ public class ApplicationContext
             return "/" + hostName + "/" + path;
         else
             return "/" + hostName + path;
+    }
+
+
+    /**
+     * Internal class used as thread-local storage when doing path
+     * mapping during dispatch.
+     */
+    private final class DispatchData {
+
+        public MessageBytes uriMB;
+        public MappingData mappingData;
+
+        public DispatchData() {
+            uriMB = MessageBytes.newInstance();
+            CharChunk uriCC = uriMB.getCharChunk();
+            uriCC.setLimit(-1);
+            mappingData = new MappingData();
+        }
     }
 
 
