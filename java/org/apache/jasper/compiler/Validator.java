@@ -1320,7 +1320,7 @@ class Validator {
                         validateFunctions(el, n);
 
                         result = new Node.JspAttribute(tai, qName, uri,
-                                localName, value, false, el, dynamic);
+                                localName, value, true, el, dynamic);
 
                         ELContextImpl ctx = new ELContextImpl();
                         ctx.setFunctionMapper(getFunctionMapper(el));

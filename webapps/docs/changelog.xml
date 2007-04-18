@@ -43,6 +43,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>41869</bug> TagData.getAttribute() should return
+        TagData.REQUEST_TIME_VALUE when the attribute value is an EL expression.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 6.0.11 (remm)">
   <subsection name="General">
