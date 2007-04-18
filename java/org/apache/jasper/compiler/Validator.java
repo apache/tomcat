@@ -1177,7 +1177,7 @@ class Validator {
                                             .getLocalName(i),
                                     attrs.getValue(i), false, null, false);
                         }
-                        if (jspAttrs[i].isExpression()) {
+                        if (expression) {
                             tagDataAttrs.put(attrs.getQName(i),
                                     TagData.REQUEST_TIME_VALUE);
                         } else {
@@ -1320,7 +1320,7 @@ class Validator {
                         validateFunctions(el, n);
 
                         result = new Node.JspAttribute(tai, qName, uri,
-                                localName, value, true, el, dynamic);
+                                localName, value, false, el, dynamic);
 
                         ELContextImpl ctx = new ELContextImpl();
                         ctx.setFunctionMapper(getFunctionMapper(el));
