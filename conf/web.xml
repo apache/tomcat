@@ -133,8 +133,8 @@
   <!--                       Used in development mode only. [4]             -->
   <!--                                                                      -->
   <!--   compiler            Which compiler Ant should use to compile JSP   -->
-  <!--                       pages.  See the Ant documentation for more     -->
-  <!--                       information. [javac]                           -->
+  <!--                       pages.  See the jasper documentation for more  -->
+  <!--                       information.                                   -->
   <!--                                                                      -->
   <!--   classdebuginfo      Should the class file be compiled with         -->
   <!--                       debugging information?  [true]                 -->
