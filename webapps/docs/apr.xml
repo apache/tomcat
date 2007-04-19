@@ -145,20 +145,6 @@
 
     <attributes>
  
-    <attribute name="firstReadTimeout" required="false">
-      <p>The first read of a request will be made using the specified timeout. If no data is available
-      after the specified time, the socket will be placed in the poller. The value of this attribute is
-      in ms. Setting this value to 0 or -1 will
-      increase scalability by always using a poller to handle keepalive, but will have a minor impact 
-      on latency (see the related pollTime attribute). The difference is that with 0, the first read of
-      a request will be made using a short timeout, while with -1, the first read will be made using the
-      regular socket timeout that is configured on the connector. Setting this to -2 will cause
-      the connector to not use the poller for keepalive in most situations, emulating the behavior of
-      the java.io HTTP connector.
-      The default value is -1. Note: on Windows, the actual value of firstReadTimeout will
-      be 500 + the specified value, if the specified value is strictly positive.</p>
-    </attribute>
-
     <attribute name="pollTime" required="false">
       <p>Duration of a poll call. Lowering this value will slightly decrease latency of connections 
       being kept alive in some cases, but will use more CPU as more poll calls are being made. The
@@ -314,20 +300,6 @@
 
     <attributes>
  
-    <attribute name="firstReadTimeout" required="false">
-      <p>The first read of a request will be made using the specified timeout. If no data is available
-      after the specified time, the socket will be placed in the poller. The value of this attribute is
-      in ms. Setting this value to 0 or -1 will
-      increase scalability by always using a poller to handle keepalive, but will have a minor impact 
-      on latency (see the related pollTime attribute). The difference is that with 0, the first read of
-      a request will be made using a short timeout, while with -1, the first read will be made using the
-      regular socket timeout that is configured on the connector. Setting this to -2 will cause
-      the connector to not use the poller for keepalive in most situations, emulating the behavior of
-      the java.io HTTP connector.
-      The default value is -1. Note: on Windows, the actual value of firstReadTimeout will
-      be 500 + the specified value, if the specified value is strictly positive.</p>
-    </attribute>
-
     <attribute name="pollTime" required="false">
       <p>Duration of a poll call. Lowering this value will slightly decrease latency of connections 
       being kept alive in some cases, but will use more CPU as more poll calls are being made. The
