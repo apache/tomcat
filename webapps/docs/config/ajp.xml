@@ -235,44 +235,13 @@
        connectionTimeout.</p>
     </attribute>
 
-    <attribute name="minProcessors" required="false">
-      <strong>deprecated</strong>
-      <p>The minimum number of processors to start at initialization time.
-      If not specified, this atttribute is set to 5.</p>
-    </attribute>
-
-    <attribute name="maxProcessors" required="false">
-      <strong>deprecated</strong>
-      <p>The maximum number of processors allowed. This should be
-      set to a value that is greater than or equal to the maximum number
-      of concurrent connections the remote web server can open to Tomcat 
-      simultaneously. For example, if the web server is Apache 1.x or 2.x
-      Tomcat's <code>maxProcessors</code> should be set to the 
-      value of Apache's <code>maxClients</code> directive.</p>
-      <p>A <code>maxProcessors</code> value of zero (0) signifies that 
-      the number of processors is unlimited. If not specified, this
-      atttribute defaults to 20.</p>
-     </attribute>
-
-    <attribute name="maxSpareThreads" required="false">
-      <p>The maximum number of unused request processing threads that
-      will be allowed to exist until the thread pool starts stopping the
-      unnecessary threads.  The default value is 50.</p>
-    </attribute>
-
     <attribute name="maxThreads" required="false">
       <p>The maximum number of request processing threads to be created
       by this <strong>Connector</strong>, which therefore determines the
       maximum number of simultaneous requests that can be handled.  If
-      not specified, this attribute is set to 200.</p>
-    </attribute>
-
-    <attribute name="minSpareThreads" required="false">
-      <p>The number of request processing threads that will be created
-      when this <strong>Connector</strong> is first started.  The connector
-      will also make sure it has the specified number of idle processing
-      threads available. This attribute should be set to a value smaller
-      than that set for <code>maxThreads</code>.  The default value is 4.</p>
+      not specified, this attribute is set to 40. If an executor is associated
+      with this connector, this attribute is ignored as the connector will 
+      execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
     <attribute name="port" required="true">
