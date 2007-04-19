@@ -24,6 +24,10 @@
       <fix>
         <bug>41990</bug> Add some additional mime-type mappings. (markt)
       </fix>
+      <fix>
+        <bug>41655</bug> Fix message translations. Japanese translations
+        provided by Suzuki Yuichiro. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
