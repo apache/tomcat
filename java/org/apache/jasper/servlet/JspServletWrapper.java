@@ -294,10 +294,16 @@ public class JspServletWrapper {
             }
 
             if ((available > 0L) && (available < Long.MAX_VALUE)) {
-                response.setDateHeader("Retry-After", available);
-                response.sendError
-                    (HttpServletResponse.SC_SERVICE_UNAVAILABLE,
-                     Localizer.getMessage("jsp.error.unavailable"));
+                if (available > System.currentTimeMillis()) {
+                    response.setDateHeader("Retry-After", available);
+                    response.sendError
+                        (HttpServletResponse.SC_SERVICE_UNAVAILABLE,
+                         Localizer.getMessage("jsp.error.unavailable"));
+                    return;
+                } else {
+                    // Wait period has expired. Reset.
+                    available = 0;
+                }
             }
 
             /*

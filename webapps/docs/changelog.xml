@@ -50,6 +50,14 @@
         TagData.REQUEST_TIME_VALUE when the attribute value is an EL expression.
         (markt)
       </fix>
+      <fix>
+        <bug>42071</bug> Fix IllegalStateException on multiple requests to
+        an unavailable JSP. Patch provided by Kawasima Kazuh. (markt)
+      </fix>
+      <fix>
+        After a JSP throws an UnavailableException allow it to be accessed once
+        the unavailable period has expired. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
