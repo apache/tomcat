@@ -243,7 +243,8 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 membership.removeMember(m);
                 super.memberDisappeared(m);
                 removeSuspects.remove(m);
-                log.info("Suspect member, confirmed dead.["+m+"]");
+                if(log.isInfoEnabled())
+                    log.info("Suspect member, confirmed dead.["+m+"]");
             } //end if
         }
 
@@ -256,7 +257,8 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 membership.memberAlive(m);
                 super.memberAdded(m);
                 addSuspects.remove(m);
-                log.info("Suspect member, confirmed alive.["+m+"]");
+                if(log.isInfoEnabled())
+                    log.info("Suspect member, confirmed alive.["+m+"]");
             } //end if
         }
     }
