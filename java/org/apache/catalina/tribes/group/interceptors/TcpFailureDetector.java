@@ -137,7 +137,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         if ( membership == null ) setupMembership();
         boolean notify = false;
         boolean shutdown = Arrays.equals(member.getCommand(),Member.SHUTDOWN_PAYLOAD);
-        if ( !shutdown ) log.info("Received memberDisappeared["+member+"] message. Will verify.");
+        if ( !shutdown ) 
+            if(log.isInfoEnabled())
+                log.info("Received memberDisappeared["+member+"] message. Will verify.");
         synchronized (membership) {
             //check to see if the member really is gone
             //if the payload is not a shutdown message
@@ -152,10 +154,12 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             }
         }
         if ( notify ) {
-            log.info("Verification complete. Member disappeared["+member+"]");
+            if(log.isInfoEnabled())
+                log.info("Verification complete. Member disappeared["+member+"]");
             super.memberDisappeared(member);
         } else {
-            log.info("Verification complete. Member still alive["+member+"]");
+            if(log.isInfoEnabled())
+                log.info("Verification complete. Member still alive["+member+"]");
 
         }
     }
