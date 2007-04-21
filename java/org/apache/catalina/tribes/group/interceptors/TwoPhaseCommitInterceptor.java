@@ -119,7 +119,8 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
             for (int i=0; i<entries.length; i++ ) {
                 MapEntry entry = (MapEntry)entries[i].getValue();
                 if ( entry.expired(now,expire) ) {
-                    log.info("Message ["+entry.id+"] has expired. Removing.");
+                    if(log.isInfoEnabled())
+                        log.info("Message ["+entry.id+"] has expired. Removing.");
                     messages.remove(entry.id);
                 }//end if
             }
