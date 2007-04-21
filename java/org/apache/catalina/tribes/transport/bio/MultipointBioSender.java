@@ -1,3 +1,18 @@
+/*
+ * Copyright 1999,2006 The Apache Software Foundation.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ */
 package org.apache.catalina.tribes.transport.bio;
 
 import java.io.IOException;
@@ -14,16 +29,10 @@ import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.Channel;
 
 /**
- * <p>Title: </p>
  *
- * <p>Description: </p>
+ * @author Filip Hanik
+ * @version $Revision:$ $Date:$
  *
- * <p>Copyright: Copyright (c) 2005</p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
  */
 public class MultipointBioSender extends AbstractSender implements MultiPointSender {
     public MultipointBioSender() {
@@ -31,7 +40,6 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     
     protected long selectTimeout = 1000; 
     protected HashMap bioSenders = new HashMap();
-    private boolean autoConnect;
 
     public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         byte[] data = XByteBuffer.createDataPackage((ChannelData)msg);
