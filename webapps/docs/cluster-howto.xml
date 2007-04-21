@@ -272,7 +272,7 @@ should be completed:</p>
     <p>
       The main element, inside this element all cluster details can be configured.
       The <code>channelSendOptions</code> is the flag that is attached to each message sent by the
-      SimplTcpCluster class or any objects that are invoking the SimplTcpCluster.send method.
+      SimpleTcpCluster class or any objects that are invoking the SimpleTcpCluster.send method.
       The description of the send flags is available at <a href="http://tomcat.apache.org/tomcat-6.0-doc/api/org/apache/catalina/tribes/Channel.html">
       our javadoc site</a>
       The <code>DeltaManager</code> sends information using the SimpleTcpCluster.send method, while the backup manager
