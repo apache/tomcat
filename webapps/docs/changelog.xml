@@ -28,6 +28,9 @@
         <bug>41655</bug> Fix message translations. Japanese translations
         provided by Suzuki Yuichiro. (markt)
       </fix>
+      <add>
+        Add enabled attribute to AccessLogValve (pero)
+      </add>      
     </changelog>
   </subsection>
   <subsection name="Coyote">
