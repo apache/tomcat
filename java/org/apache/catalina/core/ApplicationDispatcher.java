@@ -47,8 +47,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.InstanceSupport;
 import org.apache.catalina.util.StringManager;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /**
  * Standard implementation of <code>RequestDispatcher</code> that allows a
@@ -181,17 +179,10 @@ final class ApplicationDispatcher
         else
             this.support = new InstanceSupport(wrapper);
 
-        if ( log.isDebugEnabled() )
-            log.debug("servletPath=" + this.servletPath + ", pathInfo=" +
-                this.pathInfo + ", queryString=" + queryString +
-                ", name=" + this.name);
-
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
-    private static Log log = LogFactory.getLog(ApplicationDispatcher.class);
 
     /**
      * The Context this RequestDispatcher is associated with.
@@ -308,16 +299,12 @@ final class ApplicationDispatcher
         
         // Reset any output that has been buffered, but keep headers/cookies
         if (response.isCommitted()) {
-            if ( log.isDebugEnabled() )
-                log.debug("  Forward on committed response --> ISE");
             throw new IllegalStateException
                 (sm.getString("applicationDispatcher.forward.ise"));
         }
         try {
             response.resetBuffer();
         } catch (IllegalStateException e) {
-            if ( log.isDebugEnabled() )
-                log.debug("  Forward resetBuffer() returned ISE: " + e);
             throw e;
         }
 
@@ -339,20 +326,12 @@ final class ApplicationDispatcher
 
         // Handle a non-HTTP forward by passing the existing request/response
         if ((hrequest == null) || (hresponse == null)) {
-
-            if ( log.isDebugEnabled() )
-                log.debug(" Non-HTTP Forward");
-            
             processRequest(hrequest,hresponse,state);
-
         }
 
         // Handle an HTTP named dispatcher forward
         else if ((servletPath == null) && (pathInfo == null)) {
 
-            if ( log.isDebugEnabled() )
-                log.debug(" Named Dispatcher Forward");
-            
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
             wrequest.setRequestURI(hrequest.getRequestURI());
@@ -370,9 +349,6 @@ final class ApplicationDispatcher
 
         // Handle an HTTP path-based forward
         else {
-
-            if ( log.isDebugEnabled() )
-                log.debug(" Path Based Forward");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -408,16 +384,16 @@ final class ApplicationDispatcher
         }
 
         // This is not a real close in order to support error processing
-        if ( log.isDebugEnabled() )
-            log.debug(" Disabling the response for futher output");
+        if (wrapper.getLogger().isDebugEnabled() )
+            wrapper.getLogger().debug(" Disabling the response for futher output");
 
         if  (response instanceof ResponseFacade) {
             ((ResponseFacade) response).finish();
         } else {
             // Servlet SRV.6.2.2. The Resquest/Response may have been wrapped
             // and may no longer be instance of RequestFacade 
-            if (log.isDebugEnabled()){
-                log.debug( " The Response is vehiculed using a wrapper: " 
+            if (wrapper.getLogger().isDebugEnabled()){
+                wrapper.getLogger().debug( " The Response is vehiculed using a wrapper: " 
                            + response.getClass().getName() );
             }
 
@@ -523,9 +499,6 @@ final class ApplicationDispatcher
         // Handle a non-HTTP include
         if (!(request instanceof HttpServletRequest) ||
             !(response instanceof HttpServletResponse)) {
-
-            if ( log.isDebugEnabled() )
-                log.debug(" Non-HTTP Include");
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
                     Integer.valueOf(ApplicationFilterFactory.INCLUDE));
             request.setAttribute(
@@ -536,9 +509,6 @@ final class ApplicationDispatcher
 
         // Handle an HTTP named dispatcher include
         else if (name != null) {
-
-            if ( log.isDebugEnabled() )
-                log.debug(" Named Dispatcher Include");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -557,9 +527,6 @@ final class ApplicationDispatcher
 
         // Handle an HTTP path based include
         else {
-
-            if ( log.isDebugEnabled() )
-                log.debug(" Path Based Include");
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -734,9 +701,9 @@ final class ApplicationDispatcher
             if (filterChain != null)
                 filterChain.release();
         } catch (Throwable e) {
-            log.error(sm.getString("standardWrapper.releaseFilters",
+            wrapper.getLogger().error(sm.getString("standardWrapper.releaseFilters",
                              wrapper.getName()), e);
-          //FIXME Exception handling needs to be simpiler to what is in the StandardWrapperValue
+            // FIXME: Exception handling needs to be simpiler to what is in the StandardWrapperValue
         }
 
         // Deallocate the allocated servlet instance
