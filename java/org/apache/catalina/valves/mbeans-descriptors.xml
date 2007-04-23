@@ -17,6 +17,11 @@
                type="java.lang.String"
                writeable="false"/>
 
+     <attribute name="enabled"
+               description="Enable Access Logging"
+               is="true"
+               type="boolean"/>
+
     <attribute name="containerName"
                description="Object name of the container"
                type="javax.management.ObjectName"/>
@@ -109,6 +114,11 @@
                type="java.lang.String"
                writeable="false"/>
 
+     <attribute name="enabled"
+               description="Enable Access Logging"
+               is="true"
+               type="boolean"/>
+ 
     <attribute name="containerName"
                description="Object name of the container"
                type="javax.management.ObjectName"/>
@@ -173,6 +183,11 @@
                description="Fully qualified class name of the managed object"
                type="java.lang.String"
                writeable="false"/>
+
+    <attribute name="enabled"
+               description="Enable Access Logging"
+               is="true"
+               type="boolean"/>
 
     <attribute name="containerName"
                description="Object name of the container"
