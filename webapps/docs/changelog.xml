@@ -64,6 +64,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+         Add toString method to better logging session replication message at tribes MESSAGES (pero)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 6.0.11 (remm)">
   <subsection name="General">
@@ -171,7 +178,7 @@
         <bug>41289</bug>: Create configBase, since it is no longer created elsewhere.
         Submitted by Shiva Kumar H R. (remm)
       </fix>
-    </changelog>
+     </changelog>
   </subsection>
   <subsection name="Coyote">
     <changelog>
@@ -256,14 +263,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Cluster">
-    <changelog>
-      <fix>
-         Add toString method to better logging session replication message at tribes MESSAGES (pero)
-      </fix>
-    </changelog>
-  </subsection>
-</section>
+ </section>
 <section name="Tomcat 6.0.10 (remm)">
   <subsection name="Catalina">
     <changelog>
