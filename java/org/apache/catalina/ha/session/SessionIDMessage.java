@@ -122,8 +122,9 @@ public class SessionIDMessage extends ClusterMessageBase implements ClusterMessa
 		this.orignalSessionID = orignalSessionID;
 	}
 
-    
-
+	public String toString() {
+	    return "SESSIONID-UPDATE#" + getHost() + "." + getContextPath() + "#" + getOrignalSessionID() + ":" + getBackupSessionID();
+	}
 
 }
 
