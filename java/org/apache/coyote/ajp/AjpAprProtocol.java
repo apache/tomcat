@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -330,7 +331,7 @@ public class AjpAprProtocol
     protected static class AjpConnectionHandler implements Handler {
 
         protected AjpAprProtocol proto;
-        protected AtomicInteger registerCount = new AtomicInteger(0);
+        protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
 
         protected ConcurrentLinkedQueue<AjpAprProcessor> recycledProcessors = 
@@ -438,15 +439,15 @@ public class AjpAprProtocol
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
-                        int count = registerCount.incrementAndGet();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Register ["+processor+"] count=" + count);
-                        }
+                        long count = registerCount.incrementAndGet();
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
                         ObjectName rpName = new ObjectName
                             (proto.getDomain() + ":type=RequestProcessor,worker="
                                 + proto.getName() + ",name=AjpRequest" + count);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Register " + rpName);
+                        }
                         Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
                         rp.setRpName(rpName);
                     } catch (Exception e) {
@@ -460,13 +461,12 @@ public class AjpAprProtocol
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
-                        int count = registerCount.decrementAndGet();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Unregister [" + processor + "] count=" + count);
-                        }
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
                         ObjectName rpName = rp.getRpName();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unregister " + rpName);
+                        }
                         Registry.getRegistry(null, null).unregisterComponent(rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {

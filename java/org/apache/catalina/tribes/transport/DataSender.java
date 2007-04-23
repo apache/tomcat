@@ -23,8 +23,6 @@ import java.io.IOException;
  *
  * <p>Description: </p>
  *
- * <p>Copyright: Copyright (c) 2005</p>
- *
  * <p>Company: </p>
  *
  * @author not attributable

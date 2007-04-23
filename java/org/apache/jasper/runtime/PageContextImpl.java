@@ -55,8 +55,6 @@ import org.apache.jasper.el.FunctionMapperImpl;
 import org.apache.jasper.el.VariableResolverImpl;
 import org.apache.jasper.security.SecurityUtil;
 import org.apache.jasper.util.Enumerator;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /**
  * Implementation of the PageContext class from the JSP spec. Also doubles as a
@@ -71,9 +69,6 @@ import org.apache.juli.logging.LogFactory;
  * @author Jacob Hookom
  */
 public class PageContextImpl extends PageContext {
-
-	// Logger
-	private static Log log = LogFactory.getLog(PageContextImpl.class);
 
 	private BodyContentImpl[] outs;
 
