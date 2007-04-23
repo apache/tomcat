@@ -25,8 +25,6 @@ import org.apache.catalina.tribes.util.Arrays;
  *
  * <p>Description: </p>
  *
- * <p>Copyright: Copyright (c) 2006</p>
- *
  * <p>Company: </p>
  *
  * @author not attributable

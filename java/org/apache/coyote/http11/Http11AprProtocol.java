@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -481,7 +482,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     static class Http11ConnectionHandler implements Handler {
         
         protected Http11AprProtocol proto;
-        protected AtomicInteger registerCount = new AtomicInteger(0);
+        protected AtomicLong registerCount = new AtomicLong(0);
         protected RequestGroupInfo global = new RequestGroupInfo();
         
         protected ConcurrentHashMap<Long, Http11AprProcessor> connections =
@@ -636,15 +637,15 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
-                        int count = registerCount.incrementAndGet();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Register ["+processor+"] count=" + count);
-                        }
+                        long count = registerCount.incrementAndGet();
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(global);
                         ObjectName rpName = new ObjectName
                             (proto.getDomain() + ":type=RequestProcessor,worker="
                                 + proto.getName() + ",name=HttpRequest" + count);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Register " + rpName);
+                        }
                         Registry.getRegistry(null, null).registerComponent(rp, rpName, null);
                         rp.setRpName(rpName);
                     } catch (Exception e) {
@@ -658,13 +659,12 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
             if (proto.getDomain() != null) {
                 synchronized (this) {
                     try {
-                        int count = registerCount.decrementAndGet();
-                        if (log.isDebugEnabled()) {
-                            log.debug("Unregister [" + processor + "] count=" + count);
-                        }
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
                         ObjectName rpName = rp.getRpName();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Unregister " + rpName);
+                        }
                         Registry.getRegistry(null, null).unregisterComponent(rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {
