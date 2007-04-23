@@ -152,5 +152,8 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
-
+    
+    public String toString() {
+        return getEventTypeString() + "#" + getContextName() + "#" + getSessionID() ;
+    }
 }
