@@ -701,6 +701,8 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         if( initialized ) return;
         initialized=true;        
         
+        log = LogFactory.getLog(ManagerBase.class);
+        
         if( oname==null ) {
             try {
                 StandardContext ctx=(StandardContext)this.getContainer();
