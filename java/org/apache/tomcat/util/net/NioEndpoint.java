@@ -1252,6 +1252,7 @@ public class NioEndpoint {
                     if (key != null) {
                         final KeyAttachment att = (KeyAttachment) key.attachment();
                         if ( att!=null ) {
+                            att.access();//to prevent timeout
                             //we are registering the key to start with, reset the fairness counter.
                             att.setFairness(0);
                             att.interestOps(interestOps);
