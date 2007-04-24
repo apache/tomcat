@@ -174,8 +174,6 @@ public class CoyoteAdapter
                     log.error(sm.getString("coyoteAdapter.service"), t);
                 }
                 error = true;
-                // FIXME: Since there's likely some structures kept in the servlet or elsewhere,
-                // a cleanup event of some sort could be needed ?
                 return false;
             } finally {
                 req.getRequestProcessor().setWorkerThreadName(null);
