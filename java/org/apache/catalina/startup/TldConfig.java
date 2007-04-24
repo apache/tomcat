@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -427,8 +428,18 @@ public final class TldConfig  {
                                               resourcePath));
         }
 
-        File file = new File(url.getFile());
-        file = file.getCanonicalFile();
+        File file = null;
+        try {
+            file = new File(url.toURI());
+        } catch (URISyntaxException e) {
+            // Ignore, probably an unencoded char
+            file = new File(url.getFile());
+        }
+        try {
+            file = file.getCanonicalFile();
+        } catch (IOException e) {
+            // Ignore
+        }
         tldScanJar(file);
 
     }
@@ -674,11 +685,18 @@ public final class TldConfig  {
             if (loader instanceof URLClassLoader) {
                 URL[] urls = ((URLClassLoader) loader).getURLs();
                 for (int i=0; i<urls.length; i++) {
-                    // Expect file URLs
+                    // Expect file URLs, these are %xx encoded or not depending on
+                    // the class loader
                     // This is definitely not as clean as using JAR URLs either
                     // over file or the custom jndi handler, but a lot less
                     // buggy overall
-                    File file = new File(urls[i].getFile());
+                    File file = null;
+                    try {
+                        file = new File(urls[i].toURI());
+                    } catch (URISyntaxException e) {
+                        // Ignore, probably an unencoded char
+                        file = new File(urls[i].getFile());
+                    }
                     try {
                         file = file.getCanonicalFile();
                     } catch (IOException e) {
