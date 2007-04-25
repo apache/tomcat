@@ -184,6 +184,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
     }
     
     public void heartbeat() {
+        super.heartbeat();
         checkMembers(false);
     }
     public void checkMembers(boolean checkAll) {

@@ -275,7 +275,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         this.membershipService.setMembershipListener(this);
     }
     
-    public void hearbeat() {
+    public void heartbeat() {
         if ( clusterSender!=null ) clusterSender.heartbeat();
         super.heartbeat();
     }
