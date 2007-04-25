@@ -198,7 +198,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         }catch ( Exception x ) {
             log.warn("Unable to perform heartbeat on the TcpFailureDetector.",x);
         } finally {
-            super.heartbeat();
+            
         }
     }
     

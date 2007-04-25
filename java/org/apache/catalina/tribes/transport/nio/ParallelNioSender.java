@@ -285,6 +285,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             NioSender sender = (NioSender)entry.getValue();
             if ( sender.keepalive() ) {
                 nioSenders.remove(entry.getKey());
+                result = true;
             }
         }
         return result;

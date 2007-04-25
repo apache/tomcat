@@ -80,7 +80,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
     public boolean keepalive() {
         //do nothing, the pool checks on every return
-        return false;
+        return (queue==null)?false:queue.checkIdleKeepAlive();
     }
 
     
@@ -129,6 +129,16 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
          */
         public int getInPoolSize() {
             return notinuse.size();
+        }
+        
+        public synchronized boolean checkIdleKeepAlive() {
+            DataSender[] list = new DataSender[notinuse.size()];
+            notinuse.toArray(list);
+            boolean result = false;
+            for (int i=0; i<list.length; i++) {
+                result = result | list[i].keepalive();
+            }
+            return result;
         }
 
         public synchronized DataSender getSender(long timeout) {
