@@ -66,9 +66,10 @@ public class NioBlockingSelector {
                 if ( key == null ) throw new IOException("Key no longer registered");
                 KeyAttachment att = (KeyAttachment) key.attachment();
                 try {
-                    if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1);
-                    if ( att.interestOps() == 0) socket.getPoller().add(socket,SelectionKey.OP_WRITE);
-                    att.getLatch().await(writeTimeout,TimeUnit.MILLISECONDS);
+                    if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1,SelectionKey.OP_WRITE);
+                    //only register for write if a write has not yet been issued
+                    if ( (att.interestOps() & SelectionKey.OP_WRITE) == 0) socket.getPoller().add(socket,SelectionKey.OP_WRITE);
+                    att.awaitLatch(writeTimeout,TimeUnit.MILLISECONDS,SelectionKey.OP_WRITE);
                 }catch (InterruptedException ignore) {
                     Thread.interrupted();
                 }
@@ -134,9 +135,9 @@ public class NioBlockingSelector {
                 }
                 KeyAttachment att = (KeyAttachment) key.attachment();
                 try {
-                    if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1);
+                    if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1,SelectionKey.OP_READ);
                     if ( att.interestOps() == 0) socket.getPoller().add(socket,SelectionKey.OP_READ);
-                    att.getLatch().await(readTimeout,TimeUnit.MILLISECONDS);
+                    att.awaitLatch(readTimeout,TimeUnit.MILLISECONDS, SelectionKey.OP_READ);
                 }catch (InterruptedException ignore) {
                     Thread.interrupted();
                 }
