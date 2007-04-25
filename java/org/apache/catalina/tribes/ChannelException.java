@@ -31,6 +31,10 @@ import java.util.ArrayList;
  */
 
 public class ChannelException extends Exception {
+    /**
+     * Empty list to avoid reinstatiating lists
+     */
+    protected static final FaultyMember[] EMPTY_LIST = new FaultyMember[0];
     /*
      * Holds a list of faulty members
      */
@@ -96,27 +100,30 @@ public class ChannelException extends Exception {
      * @param mbr Member
      * @param x Exception
      */
-    public void addFaultyMember(Member mbr, Exception x ) {
-        addFaultyMember(new FaultyMember(mbr,x));
+    public boolean addFaultyMember(Member mbr, Exception x ) {
+        return addFaultyMember(new FaultyMember(mbr,x));
     }
     
     /**
      * Adds a list of faulty members
      * @param mbrs FaultyMember[]
      */
-    public void addFaultyMember(FaultyMember[] mbrs) {
+    public int addFaultyMember(FaultyMember[] mbrs) {
+        int result = 0;
         for (int i=0; mbrs!=null && i<mbrs.length; i++ ) {
-            addFaultyMember(mbrs[i]);
+            if ( addFaultyMember(mbrs[i]) ) result++;
         }
+        return result;
     }
 
     /**
      * Adds a faulty member
      * @param mbr FaultyMember
      */
-    public void addFaultyMember(FaultyMember mbr) {
+    public boolean addFaultyMember(FaultyMember mbr) {
         if ( this.faultyMembers==null ) this.faultyMembers = new ArrayList();
-        faultyMembers.add(mbr);
+        if ( !faultyMembers.contains(mbr) ) return faultyMembers.add(mbr);
+        else return false;
     }
     
     /**
@@ -124,7 +131,7 @@ public class ChannelException extends Exception {
      * @return FaultyMember[]
      */
     public FaultyMember[] getFaultyMembers() {
-        if ( this.faultyMembers==null ) return new FaultyMember[0];
+        if ( this.faultyMembers==null ) return EMPTY_LIST;
         return (FaultyMember[])faultyMembers.toArray(new FaultyMember[faultyMembers.size()]);
     }
     
@@ -156,6 +163,15 @@ public class ChannelException extends Exception {
         
         public String toString() {
             return "FaultyMember:"+member.toString();
+        }
+        
+        public int hashCode() {
+            return (member!=null)?member.hashCode():0;
+        }
+        
+        public boolean equals(Object o) {
+            if (member==null || (!(o instanceof FaultyMember)) || (((FaultyMember)o).member==null)) return false;
+            return member.equals(((FaultyMember)o).member);
         }
     }
 
