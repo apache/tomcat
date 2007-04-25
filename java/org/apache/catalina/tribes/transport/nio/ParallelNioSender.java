@@ -77,12 +77,15 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 try {
                     remaining -= doLoop(selectTimeout, getMaxRetryAttempts(),waitForAck,msg);
                 } catch (Exception x ) {
+                    int faulty = (cx == null)?0:cx.getFaultyMembers().length;
                     if ( cx == null ) {
                         if ( x instanceof ChannelException ) cx = (ChannelException)x;
                         else cx = new ChannelException("Parallel NIO send failed.", x);
                     } else {
                         if (x instanceof ChannelException) cx.addFaultyMember( ( (ChannelException) x).getFaultyMembers());
                     }
+                    //count down the remaining on an error
+                    if (faulty<cx.getFaultyMembers().length) remaining -= (cx.getFaultyMembers().length-faulty);
                 }
                 //bail out if all remaining senders are failing
                 if ( cx != null && cx.getFaultyMembers().length == remaining ) throw cx;
@@ -90,10 +93,14 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             }
             if ( remaining > 0 ) {
                 //timeout has occured
-                cx = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
+                ChannelException cxtimeout = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
+                if ( cx==null ) cx = new ChannelException("Operation has timed out("+getTimeout()+" ms.).");
                 for (int i=0; i<senders.length; i++ ) {
-                    if (!senders[i].isComplete() ) cx.addFaultyMember(senders[i].getDestination(),null);
+                    if (!senders[i].isComplete() ) cx.addFaultyMember(senders[i].getDestination(),cxtimeout);
                 }
+                throw cx;
+            } else if ( cx != null ) {
+                //there was an error
                 throw cx;
             }
         } catch (Exception x ) {
