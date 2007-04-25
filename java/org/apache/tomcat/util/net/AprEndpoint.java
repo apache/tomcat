@@ -1160,11 +1160,6 @@ public class AprEndpoint {
             if (timeout < 0) {
                 timeout = soTimeout;
             }
-            if (comet) {
-                // FIXME: Find an appropriate timeout value, for now, "longer than usual"
-                // semms appropriate
-                timeout = soTimeout * 50;
-            }
             serverPollset = allocatePoller(size, pool, timeout);
             if (serverPollset == 0 && size > 1024) {
                 size = 1024;
