@@ -15,6 +15,13 @@
 
 <body>
 <section name="Tomcat 6.0.12 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        License source headers. Submitted by Niall Pemberton. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -30,7 +37,23 @@
       </fix>
       <add>
         Add enabled attribute to AccessLogValve (pero)
-      </add>      
+      </add>
+      <fix>
+        <bug>42085</bug>: Avoid adding handlers for the root logger twice when they are explicitly 
+        specified. (remm)
+      </fix>
+      <fix>
+        Reduce thread local manipulation in the request dispatcher. Submitted by
+        Arvind Srinivasan. (remm)
+      </fix>
+      <fix>
+        Avoid keeping references to loggers tied to the webapp classloaders after a reload in
+        a couple more places. (remm)
+      </fix>
+      <fix>
+        <bug>42202</bug>: Fix container parsing of TLDs in webapps when Tomcat is installed in
+        a URL encodable path. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -40,6 +63,14 @@
         Content-Type headers contain parameters other than charset. Patch by
         Leigh L Klotz Jr. (markt)
       </fix>
+      <update>
+        Move away from using a thread local processor for the APR and java.io 
+        connectors, as this does not work well when using an executor. (remm)
+      </update>
+      <fix>
+        Remove Comet timeout hack in the APR connector. Comet connections will now
+        use the regular timeout or the keepalive timeout if specified. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Webapps">
@@ -48,6 +79,15 @@
         <bug>42025</bug>: Update valve documentation to refer to correct regular
         expression implementation. (markt)
       </fix>
+      <fix>
+        Fix various paths in the manager webapps (remm)
+      </fix>
+      <add>
+        Session viewer and editor for the HTML manager. Submitted by Cédrik Lime. (remm)
+      </add>
+      <add>
+        Session handling tools for the manager. Submitted by Rainer Jung. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
