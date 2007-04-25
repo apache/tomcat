@@ -113,8 +113,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
             message = reload(path);
         } else if (command.equals("/undeploy")) {
             message = undeploy(path);
+        } else if (command.equals("/expire")) {
+            message = expireSessions(path, request);
         } else if (command.equals("/sessions")) {
-            //message = sessions(path);
             try {
                 doSessions(path, request, response);
                 return;
@@ -353,6 +354,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String appsStop = sm.getString("htmlManagerServlet.appsStop");
         String appsReload = sm.getString("htmlManagerServlet.appsReload");
         String appsUndeploy = sm.getString("htmlManagerServlet.appsUndeploy");
+        String appsExpire = sm.getString("htmlManagerServlet.appsExpire");
 
         Iterator iterator = sortedContextPathsMap.entrySet().iterator();
         boolean isHighlighted = true;
@@ -406,7 +408,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 writer.print
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[9];
+                args = new Object[14];
                 args[0] = response.encodeURL
                     (request.getContextPath() +
                      "/html/start?path=" + displayPath);
@@ -424,7 +426,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
                      "/html/undeploy?path=" + displayPath);
                 args[7] = appsUndeploy;
                 
-                args[8] = highlightColor;
+                args[8] = response.encodeURL
+                    (request.getContextPath() +
+                     "/html/expire?path=" + displayPath);
+                args[9] = appsExpire;
+                args[10] = sm.getString("htmlManagerServlet.expire.explain");
+                args[11] = new Integer(context.getManager().getMaxInactiveInterval()/60);
+                args[12] = sm.getString("htmlManagerServlet.expire.unit");
+                
+                args[13] = highlightColor;
 
                 if (context.getPath().equals(this.context.getPath())) {
                     writer.print(MessageFormat.format(
@@ -533,6 +543,25 @@ public final class HTMLManagerServlet extends ManagerServlet {
     /**
      * Display session information and invoke list.
      *
+     * @see ManagerServlet#sessions(PrintWriter, String, int)
+     *
+     * @param path Context path of the application to list session information
+     * @param idle Expire all sessions with idle time &ge; idle for this context
+     * @return message String
+     */
+    public String sessions(String path, int idle) {
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        super.sessions(printWriter, path, idle);
+
+        return stringWriter.toString();
+    }
+
+    /**
+     * Display session information and invoke list.
+     *
      * @see ManagerServlet#sessions(PrintWriter, String)
      *
      * @param path Context path of the application to list session information
@@ -540,12 +569,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      */
     public String sessions(String path) {
 
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-
-        super.sessions(printWriter, path);
-
-        return stringWriter.toString();
+        return sessions(path, -1);
     }
 
     /**
@@ -599,6 +623,26 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }   
 
     // ------------------------------------------------ Sessions administration
+
+    /**
+     *
+     * Extract the expiration request parameter
+     * 
+     * @param path
+     * @param req
+     */
+    protected String expireSessions(String path, HttpServletRequest req) {
+        int idle = -1;
+        String idleParam = req.getParameter("idle");
+        if (idleParam != null) {
+            try {
+                idle = Integer.parseInt(idleParam);
+            } catch (NumberFormatException e) {
+                log("Could not parse idle parameter to an int: " + idleParam);
+            }
+        }
+        return sessions(path, idle);
+    }
 
     /**
      * 
@@ -903,18 +947,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"header-left\"><small>{2}</small></td>\n" +
         " <td class=\"header-center\"><small>{3}</small></td>\n" +
         " <td class=\"header-center\"><small>{4}</small></td>\n" +
-        " <td class=\"header-center\"><small>{5}</small></td>\n" +
+        " <td class=\"header-left\"><small>{5}</small></td>\n" +
         "</tr>\n";
 
     private static final String APPS_ROW_DETAILS_SECTION =
         "<tr>\n" +
-        " <td class=\"row-left\" bgcolor=\"{5}\"><small><a href=\"{0}\">{0}</a></small></td>\n" +
-        " <td class=\"row-left\" bgcolor=\"{5}\"><small>{1}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{5}\"><small>{2}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{5}\"><small><a href=\"{3}\" target=\"_new\">{4}</a></small></td>\n";
+        " <td class=\"row-left\" bgcolor=\"{5}\" rowspan=\"2\"><small><a href=\"{0}\">{0}</a>" +
+        "</small></td>\n" +
+        " <td class=\"row-left\" bgcolor=\"{5}\" rowspan=\"2\"><small>{1}</small></td>\n" +
+        " <td class=\"row-center\" bgcolor=\"{5}\" rowspan=\"2\"><small>{2}</small></td>\n" +
+        " <td class=\"row-center\" bgcolor=\"{5}\" rowspan=\"2\">" +
+        "<small><a href=\"{3}\" target=\"_new\">{4}</a></small></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
-        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <small>\n" +
         "  &nbsp;{1}&nbsp;\n" +
         "  &nbsp;{3}&nbsp;\n" +
@@ -922,10 +968,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;{7}&nbsp;\n" +
         "  </small>\n" +
         " </td>\n" +
+        "</tr><tr>\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+        "  <form method=\"POST\" action=\"{8}\">\n" +
+        "  <small>\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"expire\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  </small>\n" +
+        "  </form>\n" +
+        " </td>\n" +
         "</tr>\n";
 
     private static final String STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
-        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <small>\n" +
         "  &nbsp;{1}&nbsp;\n" +
         "  &nbsp;<a href=\"{2}\" onclick=\"return(confirm('''Are you sure?'''))\">{3}</a>&nbsp;\n" +
@@ -933,10 +987,18 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;<a href=\"{6}\" onclick=\"return(confirm('''Are you sure?'''))\">{7}</a>&nbsp;\n" +
         "  </small>\n" +
         " </td>\n" +
+        " </tr><tr>\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
+        "  <form method=\"POST\" action=\"{8}\">\n" +
+        "  <small>\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"expire\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  </small>\n" +
+        "  </form>\n" +
+        " </td>\n" +
         "</tr>\n";
 
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
-        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <small>\n" +
         "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm('''Are you sure?'''))\">{1}</a>&nbsp;\n" +
         "  &nbsp;{3}&nbsp;\n" +
@@ -947,7 +1009,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n";
 
     private static final String STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
-        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <small>\n" +
         "  &nbsp;{1}&nbsp;\n" +
         "  &nbsp;<a href=\"{2}\" onclick=\"return(confirm('''Are you sure?'''))\">{3}</a>&nbsp;\n" +
@@ -958,7 +1020,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n";
 
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
-        " <td class=\"row-left\" bgcolor=\"{8}\">\n" +
+        " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  <small>\n" +
         "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm('''Are you sure?'''))\">{1}</a>&nbsp;\n" +
         "  &nbsp;{3}&nbsp;\n" +

@@ -100,9 +100,12 @@ import org.apache.tomcat.util.modeler.Registry;
  *     descriptions from the user database connected to the <code>users</code>
  *     resource reference.
  * <li><b>/serverinfo</b> - Display system OS and JVM properties.
- * <li><b>/sessions?path=/xxx</b> - List session information about the web
- *     application attached to context path <code>/xxx</code> for this
+ * <li><b>/expire?path=/xxx</b> - List session idle timeinformation about the
+ *     web application attached to context path <code>/xxx</code> for this
  *     virtual host.</li>
+ * <li><b>/expire?path=/xxx&idle=mm</b> - Expire sessions
+ *     for the context path <code>/xxx</code> which were idle for at
+ *     least mm minutes.</li>
  * <li><b>/start?path=/xxx</b> - Start the web application attached to
  *     context path <code>/xxx</code> for this virtual host.</li>
  * <li><b>/stop?path=/xxx</b> - Stop the web application attached to
@@ -364,8 +367,8 @@ public class ManagerServlet
             save(writer, path);
         } else if (command.equals("/serverinfo")) {
             serverinfo(writer);
-        } else if (command.equals("/sessions")) {
-            sessions(writer, path);
+        } else if (command.equals("/expire")) {
+            expireSessions(writer, path, request);
         } else if (command.equals("/start")) {
             start(writer, path);
         } else if (command.equals("/stop")) {
@@ -1082,16 +1085,20 @@ public class ManagerServlet
 
     /**
      * Session information for the web application at the specified context path.
-     * Displays a profile of session MaxInactiveInterval timeouts listing number
-     * of sessions for each 10 minute timeout interval up to 10 hours.
+     * Displays a profile of session lastAccessedTime listing number
+     * of sessions for each 10 minute interval up to 10 hours.
      *
      * @param writer Writer to render to
      * @param path Context path of the application to list session information for
+     * @param idle Expire all sessions with idle time &ge; idle for this context
      */
-    protected void sessions(PrintWriter writer, String path) {
+    protected void sessions(PrintWriter writer, String path, int idle) {
 
-        if (debug >= 1)
+        if (debug >= 1) {
             log("sessions: Session information for web application at '" + path + "'");
+            if (idle >= 0)
+                log("sessions: Session expiration for " + idle + " minutes '" + path + "'");
+        }
 
         if ((path == null) || (!path.startsWith("/") && path.equals(""))) {
             writer.println(sm.getString("managerServlet.invalidPath",
@@ -1108,37 +1115,56 @@ public class ManagerServlet
                                             RequestUtil.filter(displayPath)));
                 return;
             }
+            int maxCount = 60;
+            int maxInactiveInterval = context.getManager().getMaxInactiveInterval()/60;
+            int histoInterval = maxInactiveInterval / maxCount;
+            if ( histoInterval * maxCount < maxInactiveInterval ) 
+                histoInterval++;
+            maxCount = maxInactiveInterval / histoInterval;
+            if ( histoInterval * maxCount < maxInactiveInterval ) 
+                maxCount++;
+
             writer.println(sm.getString("managerServlet.sessions", displayPath));
             writer.println(sm.getString("managerServlet.sessiondefaultmax",
-                                "" + context.getManager().getMaxInactiveInterval()/60));
+                                "" + maxInactiveInterval));
             Session [] sessions = context.getManager().findSessions();
-            int [] timeout = new int[60];
+            int [] timeout = new int[maxCount];
             int notimeout = 0;
+            int expired = 0;
+            long now = System.currentTimeMillis();
             for (int i = 0; i < sessions.length; i++) {
-                int time = sessions[i].getMaxInactiveInterval()/(10*60);
+                int time = (int)((now-sessions[i].getLastAccessedTime())/1000);
+                if (idle >= 0 && time >= idle*60) {
+                    sessions[i].expire();
+                    idle++;
+                }
+                time=time/60/histoInterval;
                 if (time < 0)
                     notimeout++;
-                else if (time >= timeout.length)
-                    timeout[timeout.length-1]++;
+                else if (time >= maxCount)
+                    timeout[maxCount-1]++;
                 else
                     timeout[time]++;
             }
             if (timeout[0] > 0)
                 writer.println(sm.getString("managerServlet.sessiontimeout",
-                                            "<10", "" + timeout[0]));
-            for (int i = 1; i < timeout.length-1; i++) {
+                                            "<" + histoInterval, "" + timeout[0]));
+            for (int i = 1; i < maxCount-1; i++) {
                 if (timeout[i] > 0)
                     writer.println(sm.getString("managerServlet.sessiontimeout",
-                                     "" + (i)*10 + " - <" + (i+1)*10,
+                                     "" + (i)*histoInterval + " - <" + (i+1)*histoInterval,
                                                 "" + timeout[i]));
             }
-            if (timeout[timeout.length-1] > 0)
+            if (timeout[maxCount-1] > 0)
                 writer.println(sm.getString("managerServlet.sessiontimeout",
-                                            ">=" + timeout.length*10,
-                                            "" + timeout[timeout.length-1]));
+                                            ">=" + maxCount*histoInterval,
+                                            "" + timeout[maxCount-1]));
             if (notimeout > 0)
                 writer.println(sm.getString("managerServlet.sessiontimeout",
                                             "unlimited","" + notimeout));
+            if (idle >= 0)
+                writer.println(sm.getString("managerServlet.sessiontimeout",
+                                            "" + idle,"expired " + expired));
         } catch (Throwable t) {
             log("ManagerServlet.sessions[" + displayPath + "]", t);
             writer.println(sm.getString("managerServlet.exception",
@@ -1147,6 +1173,39 @@ public class ManagerServlet
 
     }
 
+
+    /**
+     * Session information for the web application at the specified context path.
+     * Displays a profile of session lastAccessedTime listing number
+     * of sessions for each 10 minute interval up to 10 hours.
+     *
+     * @param writer Writer to render to
+     * @param path Context path of the application to list session information for
+     */
+    protected void sessions(PrintWriter writer, String path) {
+        sessions(writer, path, -1);
+    }
+
+
+    /**
+     *
+     * Extract the expiration request parameter
+     *
+     * @param path
+     * @param req
+     */
+    protected void expireSessions(PrintWriter writer, String path, HttpServletRequest req) {
+        int idle = -1;
+        String idleParam = req.getParameter("idle");
+        if (idleParam != null) {
+            try {
+                idle = Integer.parseInt(idleParam);
+            } catch (NumberFormatException e) {
+                log("Could not parse idle parameter to an int: " + idleParam);
+            }
+        }
+        sessions(writer, path, idle);
+    }
 
     /**
      * Start the web application at the specified context path.
