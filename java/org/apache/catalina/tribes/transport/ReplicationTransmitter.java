@@ -106,7 +106,7 @@ public class ReplicationTransmitter implements ChannelSender {
      */
 
     public void heartbeat() {
-        
+        if (getTransport()!=null) getTransport().keepalive();
     }
 
     /**
