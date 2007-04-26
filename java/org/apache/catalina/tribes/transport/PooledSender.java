@@ -19,6 +19,8 @@ package org.apache.catalina.tribes.transport;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.catalina.tribes.Member;
+
 /**
  * <p>Title: </p>
  *
@@ -83,7 +85,13 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
         return (queue==null)?false:queue.checkIdleKeepAlive();
     }
 
+    public void add(Member member) {
+        // we don't need it senders are pooled...
+    }
     
+    public void remove(Member member) {
+        queue.remove(member) ;
+    }     
 
     //  ----------------------------------------------------- Inner Class
 
@@ -92,17 +100,17 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
         PooledSender parent = null;
 
-        private List notinuse = null;
+        private List<DataSender> notinuse = null;
 
-        private List inuse = null;
+        private List<DataSender> inuse = null;
 
         private boolean isOpen = true;
 
         public SenderQueue(PooledSender parent, int limit) {
             this.limit = limit;
             this.parent = parent;
-            notinuse = new java.util.LinkedList();
-            inuse = new java.util.LinkedList();
+            notinuse = new java.util.LinkedList<DataSender>();
+            inuse = new java.util.LinkedList<DataSender>();
         }
 
         /**
@@ -141,6 +149,18 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             return result;
         }
 
+        // FIXME: remove also inuse senders. but then we must synch with sendMessage!
+        public synchronized void remove(Member member) {
+            if (isOpen) {
+                DataSender[] list = new DataSender[notinuse.size()];
+                notinuse.toArray(list);
+                for (int i=0; i<list.length; i++) {
+                    if(list[i] instanceof MultiPointSender)
+                        ((MultiPointSender)list[i]).remove(member);
+                }
+            }
+        }
+        
         public synchronized DataSender getSender(long timeout) {
             long start = System.currentTimeMillis();
             while ( true ) {
@@ -193,9 +213,6 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             notinuse.clear();
             inuse.clear();
             notify();
-            
-
-
         }
 
         public synchronized void open() {
