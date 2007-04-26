@@ -126,6 +126,12 @@ public class SimpleTcpCluster
     protected String clusterName ;
 
     /**
+     * call Channel.heartbeat() at container background thread
+     * @see org.apache.catalina.tribes.group.GroupChannel#heartbeat()
+     */
+    protected boolean heartbeatBackgroundEnabled =false ;
+    
+    /**
      * The Container associated with this Cluster.
      */
     protected Container container = null;
@@ -185,6 +191,22 @@ public class SimpleTcpCluster
      */
     public String getInfo() {
         return (info);
+    }
+
+    /**
+     * Return heartbeat enable flag (default false)
+     * @return the heartbeatBackgroundEnabled
+     */
+    public boolean isHeartbeatBackgroundEnabled() {
+        return heartbeatBackgroundEnabled;
+    }
+
+    /**
+     * enabled that container backgroundThread call heartbeat at channel
+     * @param heartbeatBackgroundEnabled the heartbeatBackgroundEnabled to set
+     */
+    public void setHeartbeatBackgroundEnabled(boolean heartbeatBackgroundEnabled) {
+        this.heartbeatBackgroundEnabled = heartbeatBackgroundEnabled;
     }
 
     /**
@@ -584,12 +606,15 @@ public class SimpleTcpCluster
      * invoked inside the classloading context of this container. Unexpected
      * throwables will be caught and logged.
      * @see org.apache.catalina.ha.deploy.FarmWarDeployer#backgroundProcess()
-     * @see ReplicationTransmitter#backgroundProcess()
+     * @see org.apache.catalina.tribes.group.GroupChannel#heartbeat()
+     * @see org.apache.catalina.tribes.group.GroupChannel.HeartbeatThread#run()
+     * 
      */
     public void backgroundProcess() {
         if (clusterDeployer != null) clusterDeployer.backgroundProcess();
-        //send a heartbeat through the channel
-        if ( channel !=null ) channel.heartbeat();
+       
+        //send a heartbeat through the channel        
+        if ( isHeartbeatBackgroundEnabled() && channel !=null ) channel.heartbeat();
     }
 
     /**

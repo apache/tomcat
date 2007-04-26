@@ -16,8 +16,12 @@
     <attribute   name="notifyLifecycleListenerOnFailure"
           description="notify lifecycleListener from message transfer failure"
 			     is="true"
-                 type="boolean"/>                 
-    <attribute   name="clusterName"
+                 type="boolean"/>  
+    <attribute   name="heartbeatBackgroundEnabled"
+          description="enable that container background thread call channel heartbeat, default is that channel mangage heartbeat itself."
+			     is="true"
+                 type="boolean"/>  
+     <attribute   name="clusterName"
           description="name of cluster"
                  type="java.lang.String"/>
     <attribute   name="managerClassName"
@@ -60,18 +64,6 @@
                  type="org.apache.catalina.ha.ClusterMessage"/>
     </operation>
         
-    <operation   name="sendToMember"
-               description="send message to one cluster member"
-               impact="ACTION"
-               returnType="void">
-      <parameter name="message"
-                 description="replication message"
-                 type="org.apache.catalina..cluster.ClusterMessage"/>
-      <parameter name="member"
-                 description="cluster member"
-                 type="java.lang.String"/>
-    </operation>
-
     <operation   name="start"
                description="Start the cluster"
                impact="ACTION"
