@@ -72,12 +72,5 @@ public class PooledParallelSender extends PooledSender implements MultiPointSend
         this.connected = true;
         super.connect();
     }
-
-    public void add(Member member) {
-    
-    }
-    
-    public void remove(Member member) {
-        //disconnect senders
-    }    
+   
 }
