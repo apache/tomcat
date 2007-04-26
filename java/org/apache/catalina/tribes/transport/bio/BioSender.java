@@ -118,13 +118,11 @@ public class BioSender extends AbstractSender implements DataSender {
      *      ChannelMessage)
      */
     public  void sendMessage(byte[] data, boolean waitForAck) throws IOException {
-        boolean messageTransfered = false ;
         IOException exception = null;
         setAttempt(0);
         try {
              // first try with existing connection
              pushMessage(data,false,waitForAck);
-             messageTransfered = true ;
         } catch (IOException x) {
             SenderState.getSenderState(getDestination()).setSuspect();
             exception = x;
@@ -134,7 +132,6 @@ public class BioSender extends AbstractSender implements DataSender {
                     setAttempt(getAttempt()+1);
                     // second try with fresh connection
                     pushMessage(data, true,waitForAck);
-                    messageTransfered = true;
                     exception = null;
                 } catch (IOException xx) {
                     exception = xx;
@@ -144,13 +141,8 @@ public class BioSender extends AbstractSender implements DataSender {
         } finally {
             setRequestCount(getRequestCount()+1);
             keepalive();
-            if(messageTransfered) {
-
-            } else {
-                if ( exception != null ) throw exception;
-            }
+            if ( exception != null ) throw exception;
         }
-
     }
 
     
@@ -170,7 +162,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * open real socket and set time out when waitForAck is enabled
      * is socket open return directly
      */
-    protected  void openSocket() throws IOException {
+    protected void openSocket() throws IOException {
        if(isConnected()) return ;
        try {
            socket = new Socket();
@@ -207,7 +199,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * @see DataSender#disconnect()
      * @see DataSender#closeSocket()
      */
-    protected  void closeSocket() {
+    protected void closeSocket() {
         if(isConnected()) {
              if (socket != null) {
                 try {
@@ -244,7 +236,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * @since 5.5.10
      */
     
-    protected  void pushMessage(byte[] data, boolean reconnect, boolean waitForAck) throws IOException {
+    protected void pushMessage(byte[] data, boolean reconnect, boolean waitForAck) throws IOException {
         keepalive();
         if ( reconnect ) closeSocket();
         if (!isConnected()) openSocket();
@@ -262,7 +254,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * @throws java.io.IOException
      * @throws java.net.SocketTimeoutException
      */
-    protected  void waitForAck() throws java.io.IOException {
+    protected void waitForAck() throws java.io.IOException {
         try {
             boolean ackReceived = false;
             boolean failAckReceived = false;
