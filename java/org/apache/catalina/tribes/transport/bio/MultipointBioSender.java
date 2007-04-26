@@ -107,11 +107,11 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         if ( x != null ) throw x;
     }
 
-    public void memberAdded(Member member) {
+    public void add(Member member) {
 
     }
 
-    public void memberDisappeared(Member member) {
+    public void remove(Member member) {
         //disconnect senders
         BioSender sender = (BioSender)bioSenders.remove(member);
         if ( sender != null ) sender.disconnect();

@@ -256,11 +256,11 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         if ( x != null ) throw x;
     }
     
-    public void memberAdded(Member member) {
+    public void add(Member member) {
         
     }
     
-    public void memberDisappeared(Member member) {
+    public void remove(Member member) {
         //disconnect senders
         NioSender sender = (NioSender)nioSenders.remove(member);
         if ( sender != null ) sender.disconnect();
