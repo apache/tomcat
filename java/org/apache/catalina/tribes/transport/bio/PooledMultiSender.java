@@ -70,11 +70,11 @@ public class PooledMultiSender extends PooledSender {
     }
 
 
-    public void memberAdded(Member member) {
+    public void add(Member member) {
 
     }
 
-    public void memberDisappeared(Member member) {
+    public void remove(Member member) {
         //disconnect senders
     } 
 
