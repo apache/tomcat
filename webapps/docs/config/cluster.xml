@@ -109,6 +109,11 @@
       </p>
     </attribute>
 
+    <attribute name="heartbeatBackgroundEnabled" required="false">
+      <p>Enable this flag don't forget to disable the channel heartbeat thread.
+      </p>
+    </attribute>
+ 
     <attribute name="doClusterLog" required="false">
       <p><b>Deprecated since 6.0.0</b></p>
       <p>Possible values are <code>true</code> or <code>false</code><br/>
