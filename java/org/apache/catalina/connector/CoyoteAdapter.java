@@ -118,6 +118,7 @@ public class CoyoteAdapter
         if (request.getWrapper() != null) {
             
             boolean error = false;
+            boolean read = false;
             try {
                 if (status == SocketStatus.OPEN) {
                     if (response.isClosed()) {
@@ -128,6 +129,8 @@ public class CoyoteAdapter
                     } else {
                         request.getEvent().setEventType(CometEvent.EventType.READ);
                         request.getEvent().setEventSubType(null);
+                        read = true;
+                        request.resetDidRead();
                     }
                 } else if (status == SocketStatus.DISCONNECT) {
                     request.getEvent().setEventType(CometEvent.EventType.ERROR);
@@ -167,6 +170,11 @@ public class CoyoteAdapter
                 }
                 if (response.isClosed() || !request.isComet()) {
                     res.action(ActionCode.ACTION_COMET_END, null);
+                } else if (!error && read && (!request.didRead() || request.getAvailable())) {
+                    // If this was a read and not all bytes have been read, or if no data
+                    // was read from the connector, then it is an error
+                    error = true;
+                    log.error(sm.getString("coyoteAdapter.read"));
                 }
                 return (!error);
             } catch (Throwable t) {
@@ -240,8 +248,16 @@ public class CoyoteAdapter
 
                 if (request.isComet()) {
                     if (!response.isClosed() && !response.isError()) {
-                        comet = true;
-                        res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                        if (request.getAvailable()) {
+                            // Invoke a read event right away if there are available bytes
+                            if (event(req, res, SocketStatus.OPEN)) {
+                                comet = true;
+                                res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                            }
+                        } else {
+                            comet = true;
+                            res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                        }
                     } else {
                         // Clear the filter chain, as otherwise it will not be reset elsewhere
                         // since this is a Comet request
