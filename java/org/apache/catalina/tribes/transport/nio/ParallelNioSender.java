@@ -278,7 +278,6 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     }
 
     public boolean keepalive() {
-        //throw new UnsupportedOperationException("Method ParallelNioSender.checkKeepAlive() not implemented");
         boolean result = false;
         for ( Iterator i = nioSenders.entrySet().iterator(); i.hasNext();  ) {
             Map.Entry entry = (Map.Entry)i.next();
@@ -286,8 +285,21 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             if ( sender.keepalive() ) {
                 nioSenders.remove(entry.getKey());
                 result = true;
+            } else {
+                try {
+                    sender.read(null);
+                }catch ( IOException x ) {
+                    sender.disconnect();
+                    sender.reset();
+                    nioSenders.remove(entry.getKey());
+                    result = true;
+                }catch ( Exception x ) {
+                    log.warn("Error during keepalive test for sender:"+sender,x);
+                }
             }
         }
+        //clean up any cancelled keys
+        if ( result ) try { selector.selectNow(); }catch (Exception ignore){}
         return result;
     }
 
