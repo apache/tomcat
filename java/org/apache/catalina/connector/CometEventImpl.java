@@ -25,8 +25,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.CometEvent;
+import org.apache.catalina.util.StringManager;
 
 public class CometEventImpl implements CometEvent {
+
+
+    /**
+     * The string manager for this package.
+     */
+    protected static StringManager sm =
+        StringManager.getManager(Constants.Package);
 
 
     public CometEventImpl(Request request, Response response) {
@@ -81,6 +89,9 @@ public class CometEventImpl implements CometEvent {
     }
     
     public void close() throws IOException {
+        if (request == null) {
+            throw new IllegalStateException(sm.getString("cometEvent.nullRequest"));
+        }
         request.setComet(false);
         response.finishResponse();
     }
