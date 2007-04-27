@@ -2240,6 +2240,24 @@ public class Request
     }
 
     
+    /**
+     * Return true if bytes are available.
+     */
+    public boolean getAvailable() {
+        return (inputBuffer.available() > 0);
+    }
+
+    
+    public boolean didRead() {
+        return inputBuffer.didRead();
+    }
+
+
+    public void resetDidRead() {
+        inputBuffer.resetDidRead();
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
 

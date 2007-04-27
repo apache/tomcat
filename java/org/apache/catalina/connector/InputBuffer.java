@@ -99,6 +99,12 @@ public class InputBuffer extends Reader
 
 
     /**
+     * Flag which if a read was performed.
+     */
+    private boolean didRead = false;
+
+
+    /**
      * Byte chunk used to input bytes.
      */
     private ByteChunk inputChunk = new ByteChunk();
@@ -257,8 +263,7 @@ public class InputBuffer extends Reader
     }
 
 
-    public int available()
-        throws IOException {
+    public int available() {
         int available = 0;
         if (state == BYTE_STATE) {
             available = bb.getLength();
@@ -270,6 +275,16 @@ public class InputBuffer extends Reader
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
         return available;
+    }
+
+
+    public boolean didRead() {
+        return didRead();
+    }
+
+
+    public void resetDidRead() {
+        didRead = false;
     }
 
 
@@ -294,6 +309,7 @@ public class InputBuffer extends Reader
             return -1;
 
         state = BYTE_STATE;
+        didRead = true;
 
         int result = coyoteRequest.doRead(bb);
 
