@@ -25,6 +25,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -258,13 +259,17 @@ public class InputBuffer extends Reader
 
     public int available()
         throws IOException {
+        int available = 0;
         if (state == BYTE_STATE) {
-            return bb.getLength();
+            available = bb.getLength();
         } else if (state == CHAR_STATE) {
-            return cb.getLength();
-        } else {
-            return 0;
+            available = cb.getLength();
         }
+        if (available == 0) {
+            coyoteRequest.action(ActionCode.ACTION_AVAILABLE, null);
+            available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
+        }
+        return available;
     }
 
 
@@ -411,7 +416,7 @@ public class InputBuffer extends Reader
 
     public boolean ready()
         throws IOException {
-        return (cb.getLength() > 0);
+        return (available() > 0);
     }
 
 

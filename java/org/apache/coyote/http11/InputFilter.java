@@ -79,4 +79,10 @@ public interface InputFilter extends InputBuffer {
         throws IOException;
 
 
+    /**
+     * Amount of bytes still available in a buffer.
+     */
+    public int available();
+
+
 }

@@ -116,4 +116,11 @@ public class VoidInputFilter implements InputFilter {
     }
 
 
+    /**
+     * Amount of bytes still available in a buffer.
+     */
+    public int available() {
+        return 0;
+    }
+    
 }

@@ -1221,6 +1221,8 @@ public class Http11NioProcessor implements ActionHook {
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
 
+        } else if (actionCode == ActionCode.ACTION_AVAILABLE) {
+            request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
             comet = true;
         } else if (actionCode == ActionCode.ACTION_COMET_END) {

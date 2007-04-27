@@ -120,4 +120,8 @@ public class BufferedInputFilter implements InputFilter {
         return 0;
     }
 
+    public int available() {
+        return buffered.getLength();
+    }
+    
 }

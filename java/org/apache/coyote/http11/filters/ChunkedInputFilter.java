@@ -189,6 +189,14 @@ public class ChunkedInputFilter implements InputFilter {
 
 
     /**
+     * Amount of bytes still available in a buffer.
+     */
+    public int available() {
+        return (lastValid - pos);
+    }
+    
+
+    /**
      * Set the next buffer in the filter pipeline.
      */
     public void setBuffer(InputBuffer buffer) {

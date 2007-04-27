@@ -143,6 +143,7 @@ public final class Request {
     private int bytesRead=0;
     // Time of the request - usefull to avoid repeated calls to System.currentTime
     private long startTime = 0L;
+    private int available = 0;
 
     private RequestInfo reqProcessorMX=new RequestInfo(this);
     // ------------------------------------------------------------- Properties
@@ -392,6 +393,14 @@ public final class Request {
         return authType;
     }
 
+    public int getAvailable() {
+        return available;
+    }
+
+    public void setAvailable(int available) {
+        this.available = available;
+    }
+
     // -------------------- Input Buffer --------------------
 
 
@@ -484,6 +493,7 @@ public final class Request {
         serverPort=-1;
         localPort = -1;
         remotePort = -1;
+        available = 0;
 
         cookies.recycle();
         parameters.recycle();

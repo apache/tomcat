@@ -228,7 +228,7 @@ public class CoyoteInputStream
             }
         } else {
              ib.close();
-        }            
+        }
     }
 
 }
