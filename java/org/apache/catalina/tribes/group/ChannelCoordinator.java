@@ -226,13 +226,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
     
     public void memberAdded(Member member){
         SenderState.getSenderState(member);
-        if ( clusterSender!=null ) clusterSender.add(member);
         super.memberAdded(member);
     }
     
     public void memberDisappeared(Member member){
         SenderState.removeSenderState(member);
-        if ( clusterSender!=null ) clusterSender.remove(member);
         super.memberDisappeared(member);
     }
     
