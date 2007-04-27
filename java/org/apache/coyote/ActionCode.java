@@ -146,6 +146,12 @@ public final class ActionCode {
     public static final ActionCode ACTION_COMET_END = new ActionCode(22);
 
 
+    /**
+     * Callback for getting the amount of available bytes
+     */
+    public static final ActionCode ACTION_AVAILABLE = new ActionCode(23);
+
+
     // ----------------------------------------------------------- Constructors
     int code;
 

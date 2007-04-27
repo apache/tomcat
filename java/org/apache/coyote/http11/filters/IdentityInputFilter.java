@@ -173,6 +173,14 @@ public class IdentityInputFilter implements InputFilter {
 
 
     /**
+     * Amount of bytes still available in a buffer.
+     */
+    public int available() {
+        return 0;
+    }
+    
+
+    /**
      * Set the next buffer in the filter pipeline.
      */
     public void setBuffer(InputBuffer buffer) {

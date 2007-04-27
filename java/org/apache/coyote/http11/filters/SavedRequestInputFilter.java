@@ -94,6 +94,13 @@ public class SavedRequestInputFilter implements InputFilter {
     }
 
     /**
+     * Amount of bytes still available in a buffer.
+     */
+    public int available() {
+        return input.getLength();
+    }
+    
+    /**
      * End the current request (has no effect).
      */
     public long end() throws IOException {
