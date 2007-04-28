@@ -782,11 +782,9 @@ public class Http11NioProcessor implements ActionHook {
             recycle();
             return SocketState.CLOSED;
         } else if (!comet) {
-            socket.getPoller().add(socket);
             recycle();
             return SocketState.OPEN;
         } else {
-            socket.getPoller().add(socket);
             return SocketState.LONG;
         }
     }
