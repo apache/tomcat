@@ -665,8 +665,12 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     if (state != SocketState.LONG) {
                         connections.remove(socket);
                         recycledProcessors.offer(result);
+                        if (state == SocketState.OPEN) {
+                            socket.getPoller().add(socket);
+                        }
                     } else {
                         if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
+                        socket.getPoller().add(socket);
                     }
                 }
             }
