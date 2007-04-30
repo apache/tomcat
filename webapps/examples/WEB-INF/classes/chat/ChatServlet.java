@@ -149,16 +149,18 @@ public class ChatServlet
         throws IOException, ServletException {
         InputStream is = request.getInputStream();
         byte[] buf = new byte[512];
-        do {
+        while (is.available() > 0) {
+            log("Available: " + is.available());
             int n = is.read(buf);
             if (n > 0) {
                 log("Read " + n + " bytes: " + new String(buf, 0, n) 
                         + " for session: " + request.getSession(true).getId());
             } else if (n < 0) {
-                error(event, request, response);
+                log("End of file: " + n);
+                end(event, request, response);
                 return;
             }
-        } while (is.available() > 0);
+        }
     }
 
     protected void service(HttpServletRequest request, HttpServletResponse response)
