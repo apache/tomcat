@@ -257,6 +257,11 @@ public abstract class ContainerBase
     protected boolean initialized=false;
 
     /**
+     * Will children be started automatically when they are added.
+     */
+    protected boolean startChildren = true;
+
+    /**
      * The property change support for this component.
      */
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
@@ -538,6 +543,31 @@ public abstract class ContainerBase
 
 
     /**
+     * Return if children of this container will be started automatically when
+     * they are added to this container.
+     */
+    public boolean getStartChildren() {
+
+        return (startChildren);
+
+    }
+
+
+    /**
+     * Set if children of this container will be started automatically when
+     * they are added to this container.
+     *
+     * @param startChildren New value of the startChildren flag
+     */
+    public void setStartChildren(boolean startChildren) {
+
+        boolean oldStartChildren = this.startChildren;
+        this.startChildren = startChildren;
+        support.firePropertyChange("startChildren", oldStartChildren, this.startChildren);
+    }
+
+
+    /**
      * Return the Container for which this Container is a child, if there is
      * one.  If there is no defined parent, return <code>null</code>.
      */
@@ -755,7 +785,7 @@ public abstract class ContainerBase
             children.put(child.getName(), child);
 
             // Start child
-            if (started && (child instanceof Lifecycle)) {
+            if (started && startChildren && (child instanceof Lifecycle)) {
                 boolean success = false;
                 try {
                     ((Lifecycle) child).start();
