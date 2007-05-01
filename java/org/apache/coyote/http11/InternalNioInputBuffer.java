@@ -322,7 +322,6 @@ public class InternalNioInputBuffer implements InputBuffer {
         // Recycle Request object
         request.recycle();
 
-        //System.out.println("LV-pos: " + (lastValid - pos));
         // Copy leftover bytes to the beginning of the buffer
         if (lastValid - pos > 0) {
             int npos = 0;

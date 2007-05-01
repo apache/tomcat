@@ -20,7 +20,6 @@ package org.apache.coyote.http11;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
