@@ -880,6 +880,12 @@ public class Http11AprProcessor implements ActionHook {
             }
             request.updateCounters();
 
+            if (!comet) {
+                // Next request
+                inputBuffer.nextRequest();
+                outputBuffer.nextRequest();
+            }
+            
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
                 sendfileData.socket = socket;
@@ -933,10 +939,6 @@ public class Http11AprProcessor implements ActionHook {
             error = true;
         }
 
-        // Next request
-        inputBuffer.nextRequest();
-        outputBuffer.nextRequest();
-        
     }
     
     

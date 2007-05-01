@@ -934,6 +934,12 @@ public class Http11NioProcessor implements ActionHook {
                 response.setStatus(500);
             }
             request.updateCounters();
+
+            if (!comet) {
+                // Next request
+                inputBuffer.nextRequest();
+                outputBuffer.nextRequest();
+            }
             
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
@@ -989,10 +995,6 @@ public class Http11NioProcessor implements ActionHook {
             log.error(sm.getString("http11processor.response.finish"), t);
             error = true;
         }
-
-        // Next request
-        inputBuffer.nextRequest();
-        outputBuffer.nextRequest();
 
     }
 
