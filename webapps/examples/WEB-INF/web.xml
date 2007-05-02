@@ -237,7 +237,7 @@
       <web-resource-collection>
          <web-resource-name>Protected Area</web-resource-name>
 	 <!-- Define the context-relative URL(s) to be protected -->
-         <url-pattern>/security/protected/*</url-pattern>
+         <url-pattern>/jsp/security/protected/*</url-pattern>
 	 <!-- If you list http methods, only those methods are protected -->
 	 <http-method>DELETE</http-method>
          <http-method>GET</http-method>
