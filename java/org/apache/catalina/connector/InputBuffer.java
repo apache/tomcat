@@ -99,12 +99,6 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Flag which if a read was performed.
-     */
-    private boolean didRead = true;
-
-
-    /**
      * Byte chunk used to input bytes.
      */
     private ByteChunk inputChunk = new ByteChunk();
@@ -274,25 +268,7 @@ public class InputBuffer extends Reader
             coyoteRequest.action(ActionCode.ACTION_AVAILABLE, null);
             available = (coyoteRequest.getAvailable() > 0) ? 1 : 0;
         }
-        if ((available == 0) && !didRead) {
-            // This is a comet read and no read was done: at least one
-            // read can be made without blocking (in very rare cases, it will
-            // reach the end of the stream, for example if the bytes sent 
-            // were from a next request, or if the request content-length is
-            // wrong)
-            available = 1;
-        }
         return available;
-    }
-
-
-    public boolean didRead() {
-        return didRead;
-    }
-
-
-    public void resetDidRead() {
-        didRead = false;
     }
 
 
@@ -317,7 +293,6 @@ public class InputBuffer extends Reader
             return -1;
 
         state = BYTE_STATE;
-        didRead = true;
 
         int result = coyoteRequest.doRead(bb);
 
