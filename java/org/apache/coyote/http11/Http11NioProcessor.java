@@ -818,6 +818,8 @@ public class Http11NioProcessor implements ActionHook {
         // Error flag
         error = false;
         keepAlive = true;
+        comet = false;
+        
 
         int keepAliveLeft = maxKeepAliveRequests;
         long soTimeout = endpoint.getSoTimeout();
