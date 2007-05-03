@@ -127,10 +127,24 @@ public class CoyoteAdapter
                         request.getEvent().setEventType(CometEvent.EventType.END);
                         request.getEvent().setEventSubType(null);
                     } else {
-                        request.getEvent().setEventType(CometEvent.EventType.READ);
-                        request.getEvent().setEventSubType(null);
-                        read = true;
-                        request.resetDidRead();
+                        try {
+                            // Fill the read buffer of the servlet layer
+                            if (request.read()) {
+                                read = true;
+                            }
+                        } catch (Exception e) {
+                            error = true;
+                        }
+                        if (read) {
+                            request.getEvent().setEventType(CometEvent.EventType.READ);
+                            request.getEvent().setEventSubType(null);
+                        } else if (error) {
+                            request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                            request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
+                        } else {
+                            request.getEvent().setEventType(CometEvent.EventType.END);
+                            request.getEvent().setEventSubType(null);
+                        }
                     }
                 } else if (status == SocketStatus.DISCONNECT) {
                     request.getEvent().setEventType(CometEvent.EventType.ERROR);
@@ -170,7 +184,7 @@ public class CoyoteAdapter
                 }
                 if (response.isClosed() || !request.isComet()) {
                     res.action(ActionCode.ACTION_COMET_END, null);
-                } else if (!error && read && (!request.didRead() || request.getAvailable())) {
+                } else if (!error && read && request.getAvailable()) {
                     // If this was a read and not all bytes have been read, or if no data
                     // was read from the connector, then it is an error
                     error = true;

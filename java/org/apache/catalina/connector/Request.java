@@ -458,6 +458,15 @@ public class Request
     }
     
 
+    /**
+     * Clear cached encoders (to save memory for Comet requests).
+     */
+    public boolean read()
+        throws IOException {
+        return (inputBuffer.realReadBytes(null, 0, 0) > 0);
+    }
+    
+
     // -------------------------------------------------------- Request Methods
 
 
@@ -2248,16 +2257,6 @@ public class Request
     }
 
     
-    public boolean didRead() {
-        return inputBuffer.didRead();
-    }
-
-
-    public void resetDidRead() {
-        inputBuffer.resetDidRead();
-    }
-
-
     // ------------------------------------------------------ Protected Methods
 
 
