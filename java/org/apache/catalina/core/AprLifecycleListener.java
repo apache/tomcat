@@ -18,7 +18,9 @@
 package org.apache.catalina.core;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -26,8 +28,6 @@ import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.Library;
-
-import java.lang.reflect.InvocationTargetException;
 
 
 
@@ -213,6 +213,14 @@ public class AprLifecycleListener
         Method method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
         sslInitialized = true;
+    }
+
+    public String getSSLEngine() {
+        return SSLEngine;
+    }
+
+    public void setSSLEngine(String SSLEngine) {
+        this.SSLEngine = SSLEngine;
     }
 
 }
