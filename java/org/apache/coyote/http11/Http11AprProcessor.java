@@ -786,6 +786,7 @@ public class Http11AprProcessor implements ActionHook {
 
         // Error flag
         error = false;
+        comet = false;
         keepAlive = true;
 
         int keepAliveLeft = maxKeepAliveRequests;
