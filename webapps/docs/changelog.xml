@@ -15,11 +15,70 @@
 
 <body>
 <section name="Tomcat 6.0.13 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+         More accurate available() method. (remm)
+      </fix>
+      <fix>
+         Add recycle check in the event object, since it is a facade like the others. (remm)
+      </fix>
+      <fix>
+         When processing a read event, enforce that the servlet consumes all available bytes. (remm)
+      </fix>
+      <update>
+         Add a flag in ContainerBase which could be used in embedded scenarios to avoid a double start
+         of contexts (this problem generally occurs when adding contexts to a started host). (remm)
+      </update>
+      <fix>
+         <bug>42309</bug>: Ability to create a connector using a custom protocol specification for embedded.
+         (fhanik)
+      </fix>
+      <fix>
+         Add SSL engine flag to AprLifecycleListener. (fhanik)
+      </fix>
+      <fix>
+         Improve event processing, so that an END event is generated when encountering EOF, and an
+         ERROR is always generated on client disconnects. (remm)
+      </fix>
+      <fix>
+         Add declarations for the new XSD files. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+         Add heartbeatBackgroundEnabled flag to SimpleTcpCluster. 
+         Enable this flag don't forget to disable the channel heartbeat thread (pero)
+      </fix>
+      <fix>
+         Possible memory leak when using comet, caused by adding the socket to the poller before
+         cleaning up the connection tracking structure. (remm)
+      </fix>
+      <fix>
+         <bug>42308</bug>: nextRequest recycles the request, which caused issues with statistics. (remm)
+      </fix>
+      <fix>
+         Fix non recycled comet flag in the APR connector. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <fix>
          Add heartbeatBackgroundEnabled flag to SimpleTcpCluster. 
          Enable this flag don't forget to disable the channel heartbeat thread (pero)
+      </fix>
+      <fix>
+         Method name cleanup. (fhanik)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+         Some examples webapp fixes. Submitted by Frank McCown. (remm)
       </fix>
     </changelog>
   </subsection>
