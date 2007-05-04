@@ -104,6 +104,10 @@ public class DigesterFactory {
         // JSP
         register(Constants.JspSchemaResourcePath_20,
                  Constants.JspSchemaPublicId_20);
+
+        register(Constants.JspSchemaResourcePath_21,
+                Constants.JspSchemaPublicId_21);
+
         // TLD
         register(Constants.TldDtdResourcePath_11,  
                  Constants.TldDtdPublicId_11);
@@ -114,6 +118,9 @@ public class DigesterFactory {
         register(Constants.TldSchemaResourcePath_20,
                  Constants.TldSchemaPublicId_20);
 
+        register(Constants.TldSchemaResourcePath_21,
+                Constants.TldSchemaPublicId_21);
+
         // web.xml    
         register(Constants.WebDtdResourcePath_22,
                  Constants.WebDtdPublicId_22);
@@ -123,6 +130,9 @@ public class DigesterFactory {
 
         register(Constants.WebSchemaResourcePath_24,
                  Constants.WebSchemaPublicId_24);
+
+        register(Constants.WebSchemaResourcePath_25,
+                Constants.WebSchemaPublicId_25);
 
         // Web Service
         register(Constants.J2eeWebServiceSchemaResourcePath_11,
