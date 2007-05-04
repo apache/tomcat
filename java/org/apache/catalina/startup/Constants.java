@@ -49,9 +49,14 @@ public final class Constants {
         "/javax/servlet/jsp/resources/web-jsptaglibrary_1_2.dtd";
 
     public static final String TldSchemaPublicId_20 =
-        "web-jsptaglibrary_2_0.xsd";;
+        "web-jsptaglibrary_2_0.xsd";
     public static final String TldSchemaResourcePath_20 =
         "/javax/servlet/jsp/resources/web-jsptaglibrary_2_0.xsd";
+
+    public static final String TldSchemaPublicId_21 =
+        "web-jsptaglibrary_2_1.xsd";
+    public static final String TldSchemaResourcePath_21 =
+        "/javax/servlet/jsp/resources/web-jsptaglibrary_2_1.xsd";
 
     public static final String WebDtdPublicId_22 =
         "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN";
@@ -64,24 +69,34 @@ public final class Constants {
         "/javax/servlet/resources/web-app_2_3.dtd";
 
     public static final String WebSchemaPublicId_24 =
-        "web-app_2_4.xsd";;
+        "web-app_2_4.xsd";
     public static final String WebSchemaResourcePath_24 =
         "/javax/servlet/resources/web-app_2_4.xsd";
 
+    public static final String WebSchemaPublicId_25 =
+        "web-app_2_5.xsd";
+    public static final String WebSchemaResourcePath_25 =
+        "/javax/servlet/resources/web-app_2_5.xsd";
+
     public static final String J2eeSchemaPublicId_14 =
-        "j2ee_1_4.xsd";;
+        "j2ee_1_4.xsd";
     public static final String J2eeSchemaResourcePath_14 =
         "/javax/servlet/resources/j2ee_1_4.xsd";
 
     public static final String W3cSchemaPublicId_10 =
-        "xml.xsd";;
+        "xml.xsd";
     public static final String W3cSchemaResourcePath_10 =
         "/javax/servlet/resources/xml.xsd";
 
     public static final String JspSchemaPublicId_20 =
-        "jsp_2_0.xsd";;
+        "jsp_2_0.xsd";
     public static final String JspSchemaResourcePath_20 =
         "/javax/servlet/jsp/resources/jsp_2_0.xsd";
+    
+    public static final String JspSchemaPublicId_21 =
+        "jsp_2_1.xsd";
+    public static final String JspSchemaResourcePath_21 =
+        "/javax/servlet/jsp/resources/jsp_2_1.xsd";
     
     public static final String J2eeWebServiceSchemaPublicId_11 =
             "j2ee_web_services_1_1.xsd";
