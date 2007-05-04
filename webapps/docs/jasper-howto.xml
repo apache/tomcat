@@ -194,21 +194,11 @@ download) to precompile a webapp:
 <source>
 &lt;project name="Webapp Precompilation" default="all" basedir="."&gt; 
 
-  &lt;target name="jspc"&gt; 
+   &lt;import file="${tomcat.home}/bin/catalina-tasks.xml"/&gt;
+  
+   &lt;target name="jspc"&gt; 
 
-    &lt;taskdef classname="org.apache.jasper.JspC" name="jasper2" &gt; 
-      &lt;classpath id="jspc.classpath"&gt; 
-        &lt;pathelement location="${java.home}/../lib/tools.jar"/&gt; 
-        &lt;fileset dir="${tomcat.home}/bin"&gt; 
-          &lt;include name="*.jar"/&gt; 
-        &lt;/fileset&gt; 
-        &lt;fileset dir="${tomcat.home}/lib"&gt; 
-          &lt;include name="*.jar"/&gt; 
-        &lt;/fileset&gt; 
-      &lt;/classpath&gt; 
-    &lt;/taskdef&gt; 
-
-    &lt;jasper2 
+    &lt;jasper 
              validateXml="false" 
              uriroot="${webapp.path}" 
              webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml" 
