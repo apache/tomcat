@@ -132,7 +132,7 @@ public class CoyoteAdapter
                             if (request.read()) {
                                 read = true;
                             }
-                        } catch (Exception e) {
+                        } catch (IOException e) {
                             error = true;
                         }
                         if (read) {
