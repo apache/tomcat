@@ -62,8 +62,7 @@ configuration file.</p>
 (installed by default on context path <code>/manager</code>) that supports
 the following functions:</p>
 <ul>
-<li>Deploy a new web application, on a specified context path, from
-    the uploaded contents of a WAR file.</li>
+<li>Deploy a new web application from the uploaded contents of a WAR file.</li>
 <li>Deploy a new web application, on a specified context path, from the
     server file system.</li>
 <li>List the currently deployed web applications, as well as the
@@ -118,17 +117,6 @@ Supported Manager Commands</a> for more information.</li>
 (version 1.4 or later) build tool.  See
 <a href="#Executing Manager Commands With Ant">Executing Manager Commands
 With Ant</a> for more information.</li>
-</ul>
-</p>
-
-<p>Future versions of Tomcat 6 will include administrative functionality that
-is presented in (at least) the following forms:
-<ul>
-<li>As web services, so that Tomcat administration can be easily integrated
-    into remote and/or non-Java mnagement environments.</li>
-<li>As a web application with a nice user interface (built on top of the
-    web services processing layer) for easy Tomcat administration via a
-    web browser.</li>
 </ul>
 </p>
 
@@ -203,7 +191,7 @@ an example of restricting access to the localhost by IP address:
 &lt;Context path="/manager" privileged="true"
          docBase="/usr/local/kinetic/tomcat6/server/webapps/manager"&gt;
          &lt;Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                allow="127.0.0.1"/&gt;
+                allow="127\.0\.0\.1"/&gt;
 &lt;/Context&gt;
 </pre>
 </p>
@@ -286,12 +274,10 @@ http://localhost:8080/manager/deploy?path=/foo
 
 <p>Upload the web application archive (WAR) file that is specified as the
 request data in this HTTP PUT request, install it into the <code>appBase</code>
-directory of our corresponding virtual host, and start it on the context path
-specified by the <code>path</code> request parameter.  If no <code>path</code>
-is specified the directory name or the war file name without the .war extension
-is used as the path.  The application can
-later be undeployed (and the corresponding application directory removed)
-by use of the <code>/undeploy</code>.</p>
+directory of our corresponding virtual host, and start , using the directory
+name or the war file name without the .war extension as the path.  The
+application can later be undeployed (and the corresponding application directory
+removed) by use of the <code>/undeploy</code> command.</p>
 
 <p>The .WAR file may include Tomcat specific deployment configuration, by 
 including a Context configuration XML file in 
@@ -336,15 +322,6 @@ error message.  Possible causes for problems include:</p>
     problems parsing your <code>/WEB-INF/web.xml</code> file, or missing
     classes encountered when initializing application event listeners and
     filters.</p>
-    </blockquote></li>
-<li><em>Invalid context path was specified</em>
-    <blockquote>
-    <p>The context path must start with a slash character. To reference the
-    ROOT web application use "/".</p>
-    </blockquote></li>
-<li><em>No context path was specified</em>
-    <blockquote>
-    The <code>path</code> parameter is required.
     </blockquote></li>
 </ul>
 
@@ -401,14 +378,13 @@ http://localhost:8080/manager/deploy?war=jar:file:/path/to/bar.war!/
 <h3>Deploy a Directory or War from the Host appBase</h3>
 
 <p>Deploy a web application directory or ".war" file located in your Host
-appBase directory. If no <code>path</code> is specified the directory name
-or the war file name without the ".war" extension is used as the path.</p>
+appBase directory. The directory name or the war file name without the ".war"
+extension is used as the path.</p>
 
 <p>In this example the web application located in a sub directory named
 <code>foo</code> in the Host appBase directory of the Tomcat server is
 deployed as the web application context named <code>/foo</code>. Notice
-that there is no <code>path</code> parameter so the context path defaults
-to the name of the web application directory.
+that the context path used is the name of the web application directory.
 <source>
 http://localhost:8080/manager/deploy?war=foo
 </source>
@@ -416,9 +392,9 @@ http://localhost:8080/manager/deploy?war=foo
 
 <p>In this example the ".war" file <code>bar.war</code> located in your
 Host appBase directory on the Tomcat server is deployed as the web
-application context named <code>/bartoo</code>.
+application context named <code>/bar</code>.
 <source>
-http://localhost:8080/manager/deploy?path=/bartoo&amp;war=bar.war
+http://localhost:8080/manager/deploy?war=bar.war
 </source>
 </p>
 
