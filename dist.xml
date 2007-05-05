@@ -13,7 +13,7 @@
 
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2006" />
+  <property name="year"                  value="2007" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
@@ -30,6 +30,7 @@
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
   <property name="tomcat.dist"       value="${basedir}/output/dist"/>
   <property name="tomcat.deployer"   value="${basedir}/output/deployer"/>
+  <property name="tomcat.extras"     value="${basedir}/output/extras"/>
   <property name="tomcat.release"    value="${basedir}/output/release"/>
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
@@ -344,7 +345,7 @@
       author="true" version="true"
       windowtitle="Tomcat API Documentation"
       doctitle="Tomcat API"
-      bottom="Copyright &#169; 2000-2006 Apache Software Foundation.  All Rights Reserved."
+      bottom="Copyright &#169; 2000-2007 Apache Software Foundation.  All Rights Reserved."
       additionalparam="-breakiterator"
       maxmemory="256m" >
     </javadoc>
@@ -465,6 +466,13 @@
         tofile="${tomcat.release}/v${version}/bin/README.html"
      filtering="true"/>
 
+    <mkdir dir="${tomcat.release}/v${version}/bin/extras" />
+    <copy todir="${tomcat.release}/v${version}/bin/extras">
+      <fileset dir="${tomcat.extras}">
+        <include name="*.*"/>
+      </fileset>
+    </copy>
+  	
   </target>
 
   <!-- Packages the core zip distro -->

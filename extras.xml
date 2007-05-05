@@ -13,7 +13,7 @@
 
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2006" />
+  <property name="year"                  value="2007" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
@@ -136,6 +136,8 @@
         <exclude name="**/LocalStrings_*" />
       </fileset>
     </jar>
+    <checksum file="${tomcat-juli.jar}"
+              forceOverwrite="yes" fileext=".md5" />
 
     <jar jarfile="${tomcat-juli-adapters.jar}">
       <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/target/classes">
@@ -149,6 +151,8 @@
         <exclude name="**/LocalStrings_*" />
       </fileset>
     </jar>
+    <checksum file="${tomcat-juli-adapters.jar}"
+              forceOverwrite="yes" fileext=".md5" />
 
   </target>
 
@@ -196,6 +200,8 @@
 	        <exclude name="**/LocalStrings_*" />
 	      </fileset>
 	    </jar>
+        <checksum file="${catalina-ws.jar}"
+              forceOverwrite="yes" fileext=".md5" />
 	
   </target>
 
