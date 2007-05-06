@@ -263,7 +263,10 @@ public class Http11Protocol
     public int getProcessorCache() { return this.processorCache; }
     public void setProcessorCache(int processorCache) { this.processorCache = processorCache; }
 
-    // *
+    protected int socketBuffer = 9000;
+    public int getSocketBuffer() { return socketBuffer; }
+    public void setSocketBuffer(int socketBuffer) { this.socketBuffer = socketBuffer; }
+
     /**
      * This field indicates if the protocol is secure from the perspective of
      * the client (= https is used).
@@ -626,6 +629,7 @@ public class Http11Protocol
             processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
             processor.setCompressableMimeTypes(proto.compressableMimeTypes);
             processor.setRestrictedUserAgents(proto.restrictedUserAgents);
+            processor.setSocketBuffer(proto.socketBuffer);
             processor.setMaxSavePostSize(proto.maxSavePostSize);
             processor.setServer(proto.server);
             register(processor);
