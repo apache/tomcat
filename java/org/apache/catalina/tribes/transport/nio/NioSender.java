@@ -138,7 +138,7 @@ public class NioSender extends AbstractSender implements DataSender{
         socketChannel.socket().setSendBufferSize(getTxBufSize());
         socketChannel.socket().setReceiveBufferSize(getRxBufSize());
         socketChannel.socket().setSoTimeout((int)getTimeout());
-        socketChannel.socket().setSoLinger(getSoLingerOn(),0);
+        socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerOn()?getSoLingerTime():0);
         socketChannel.socket().setTcpNoDelay(getTcpNoDelay());
         socketChannel.socket().setKeepAlive(getSoKeepAlive());
         socketChannel.socket().setReuseAddress(getSoReuseAddress());
