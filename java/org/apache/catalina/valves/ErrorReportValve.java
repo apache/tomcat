@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
@@ -103,12 +101,10 @@ public class ErrorReportValve
         // Perform the request
         getNext().invoke(request, response);
 
-        ServletRequest sreq = (ServletRequest) request;
         Throwable throwable =
-            (Throwable) sreq.getAttribute(Globals.EXCEPTION_ATTR);
+            (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
 
-        ServletResponse sresp = (ServletResponse) response;
-        if (sresp.isCommitted()) {
+        if (response.isAppCommitted()) {
             return;
         }
 
@@ -119,7 +115,7 @@ public class ErrorReportValve
 
             // Reset the response (if possible)
             try {
-                sresp.reset();
+                response.reset();
             } catch (IllegalStateException e) {
                 ;
             }
