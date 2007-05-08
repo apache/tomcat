@@ -14,6 +14,16 @@
   </properties>
 
 <body>
+<section name="Tomcat 6.0.14 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+         <bug>42361</bug>: Handle multi-part forms when saving requests during
+         FORM authentication process. Patch provided by Peter Runge. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 6.0.13 (remm)">
   <subsection name="Catalina">
     <changelog>

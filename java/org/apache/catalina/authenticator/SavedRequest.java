@@ -180,4 +180,17 @@ public final class SavedRequest {
     public void setBody(ByteChunk body) {
         this.body = body;
     }
+    
+    /**
+     * The content type of the request, used if this is a POST.
+     */
+    private String contentType = null;
+    
+    public String getContentType() {
+        return (this.contentType);
+    }
+    
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
 }
