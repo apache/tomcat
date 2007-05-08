@@ -74,7 +74,8 @@ public class SingleSignOn
      * The cache of SingleSignOnEntry instances for authenticated Principals,
      * keyed by the cookie value that is used to select them.
      */
-    protected Map cache = new HashMap();
+    protected Map<String,SingleSignOnEntry> cache =
+        new HashMap<String,SingleSignOnEntry>();
 
 
     /**
@@ -100,7 +101,7 @@ public class SingleSignOn
      * The cache of single sign on identifiers, keyed by the Session that is
      * associated with them.
      */
-    protected Map reverse = new HashMap();
+    protected Map<Session,String> reverse = new HashMap<Session,String>();
 
 
     /**
