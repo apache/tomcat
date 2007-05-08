@@ -1389,9 +1389,10 @@ public class NioEndpoint {
                     //processSocket(ka.getChannel(), status, dispatch);
                     ka.setComet(false);//to avoid a loop
                     processSocket(ka.getChannel(), status, false);//don't dispatch if the lines below are cancelling the key
+                    if (status == SocketStatus.TIMEOUT ) return; // don't close on comet timeout
                 }
                 if (key.isValid()) key.cancel();
-                if (key.channel().isOpen()) key.channel().close();
+                if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {ka.channel.close(true);}catch (Exception ignore){}
                 key.attach(null);
             } catch (Throwable e) {
