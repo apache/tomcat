@@ -428,7 +428,14 @@ public class FormAuthenticator
     
                 // Set content type
                 MessageBytes contentType = MessageBytes.newInstance();
-                contentType.setString("application/x-www-form-urlencoded");
+                
+                //If no content type specified, use default for POST
+                String savedContentType = saved.getContentType();
+                if (savedContentType == null) {
+                    savedContentType = "application/x-www-form-urlencoded";
+                }
+
+                contentType.setString(savedContentType);
                 request.getCoyoteRequest().setContentType(contentType);
             }
         }
@@ -487,6 +494,7 @@ public class FormAuthenticator
             while ( (bytesRead = is.read(buffer) ) >= 0) {
                 body.append(buffer, 0, bytesRead);
             }
+            saved.setContentType(request.getContentType());
             saved.setBody(body);
         }
 
