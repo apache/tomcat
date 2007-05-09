@@ -66,20 +66,20 @@ public class NioBlockingSelector {
                 if ( key == null ) throw new IOException("Key no longer registered");
                 KeyAttachment att = (KeyAttachment) key.attachment();
                 try {
-                    if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1,SelectionKey.OP_WRITE);
+                    if ( att.getWriteLatch()==null || att.getWriteLatch().getCount()==0) att.startWriteLatch(1);
                     //only register for write if a write has not yet been issued
                     if ( (att.interestOps() & SelectionKey.OP_WRITE) == 0) socket.getPoller().add(socket,SelectionKey.OP_WRITE);
-                    att.awaitLatch(writeTimeout,TimeUnit.MILLISECONDS,SelectionKey.OP_WRITE);
+                    att.awaitWriteLatch(writeTimeout,TimeUnit.MILLISECONDS);
                 }catch (InterruptedException ignore) {
                     Thread.interrupted();
                 }
-                if ( att.getLatch()!=null && att.getLatch().getCount()> 0) {
+                if ( att.getWriteLatch()!=null && att.getWriteLatch().getCount()> 0) {
                     //we got interrupted, but we haven't received notification from the poller.
                     keycount = 0;
                 }else {
                     //latch countdown has happened
                     keycount = 1;
-                    att.resetLatch();
+                    att.resetWriteLatch();
                 }
 
                 if (writeTimeout > 0 && (keycount == 0))
@@ -135,19 +135,19 @@ public class NioBlockingSelector {
                 }
                 KeyAttachment att = (KeyAttachment) key.attachment();
                 try {
-                    if ( att.getLatch()==null || att.getLatch().getCount()==0) att.startLatch(1,SelectionKey.OP_READ);
+                    if ( att.getReadLatch()==null || att.getReadLatch().getCount()==0) att.startReadLatch(1);
                     if ( att.interestOps() == 0) socket.getPoller().add(socket,SelectionKey.OP_READ);
-                    att.awaitLatch(readTimeout,TimeUnit.MILLISECONDS, SelectionKey.OP_READ);
+                    att.awaitReadLatch(readTimeout,TimeUnit.MILLISECONDS);
                 }catch (InterruptedException ignore) {
                     Thread.interrupted();
                 }
-                if ( att.getLatch()!=null && att.getLatch().getCount()> 0) {
+                if ( att.getReadLatch()!=null && att.getReadLatch().getCount()> 0) {
                     //we got interrupted, but we haven't received notification from the poller.
                     keycount = 0;
                 }else {
                     //latch countdown has happened
                     keycount = 1;
-                    att.resetLatch();
+                    att.resetReadLatch();
                 }
                 if (readTimeout > 0 && (keycount == 0))
                     timedout = (System.currentTimeMillis() - time) >= readTimeout;
