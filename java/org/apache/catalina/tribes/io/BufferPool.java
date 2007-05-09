@@ -33,7 +33,7 @@ public class BufferPool {
 
 
 
-    protected static BufferPool instance = null;
+    protected static volatile BufferPool instance = null;
     protected BufferPoolAPI pool = null;
 
     private BufferPool(BufferPoolAPI pool) {
