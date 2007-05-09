@@ -179,7 +179,7 @@
 
 
     <p>The shorthand pattern name <code>common</code> (which is also the
-    default) corresponds to <strong>%h %l %u %t "%r" %s %b"</strong>.</p>
+    default) corresponds to <strong>"%h %l %u %t %r %s %b"</strong>.</p>
 
     <p>The shorthand pattern name <code>combined</code> appends the
     values of the <code>Referer</code> and <code>User-Agent</code> headers,
