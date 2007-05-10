@@ -138,6 +138,11 @@ public class CometEventImpl implements CometEvent {
         throws IOException, IllegalStateException {
         throw new UnsupportedOperationException();
     }
+
+    public void unregister(CometOperation... operations)
+        throws IOException, IllegalStateException {
+        throw new UnsupportedOperationException();
+    }
     
     public CometConfiguration[] getConfiguration() {
         throw new UnsupportedOperationException();

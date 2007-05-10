@@ -210,6 +210,15 @@ public interface CometEvent {
         throws IOException, IllegalStateException;
     
     /**
+     * Unregisters Comet operations for this CometConnection
+     * @param operations CometOperation[]
+     * @throws IOException
+     * @throws IllegalStateException
+     */
+    public void unregister(CometOperation... operations)
+        throws IOException, IllegalStateException;
+
+    /**
      * Returns what the current IO notifications that the Comet
      * connection is registered for.
      * @return CometOperations[]
