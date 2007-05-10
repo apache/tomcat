@@ -134,9 +134,17 @@ public class CometEventImpl implements CometEvent {
         throw new UnsupportedOperationException();
     }
 
-    public void register(CometEvent.CometOperations... operations)
+    public void register(CometEvent.CometOperation... operations)
         throws IOException, IllegalStateException {
         throw new UnsupportedOperationException();
+    }
+    
+    public CometConfiguration[] getConfiguration() {
+        throw new UnsupportedOperationException();
+    }
+    
+    public CometOperation[] getRegisteredOps() {
+        throw new UnsupportedOperationException();        
     }
 
 }
