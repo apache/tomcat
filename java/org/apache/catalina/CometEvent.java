@@ -85,7 +85,7 @@ public interface CometEvent {
      * NOW - instant notification from the container (sub type of NOTIFY)
      * WRITE - notification that 
      */
-    public enum EventSubType { TIMEOUT, CLIENT_DISCONNECT, IOEXCEPTION, WEBAPP_RELOAD, SERVER_SHUTDOWN, SESSION_END }
+    public enum EventSubType { TIMEOUT, CLIENT_DISCONNECT, IOEXCEPTION, WEBAPP_RELOAD, SERVER_SHUTDOWN, SESSION_END, NOW, WRITE }
     
     
     /**
