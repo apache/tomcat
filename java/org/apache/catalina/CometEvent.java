@@ -184,12 +184,19 @@ public interface CometEvent {
         throws IOException, IllegalStateException;
     
     /**
+     * Returns the configuration for this Comet connection
+     * @return CometConfiguration[]
+     * @see #configure(CometConfiguration...)
+     */
+    public CometConfiguration[] getConfiguration();
+    
+    /**
      * OP_CALLBACK - receive a CALLBACK event from the container
      * OP_READ - receive a READ event when the connection has data to be read
      * OP_WRITE - receive a WRITE event when the connection is able to receive data to be written
      * @see #register(CometOperations)
      */
-    public enum CometOperations {OP_CALLBACK, OP_READ, OP_WRITE};
+    public enum CometOperation {OP_CALLBACK, OP_READ, OP_WRITE};
     
     /**
      * Registers the Comet connection with the container for IO notifications.
@@ -199,8 +206,16 @@ public interface CometEvent {
      * @throws IllegalStateException - if you are trying to register with a socket that already is registered
      * or if the operation you are trying to register is invalid.
      */
-    public void register(CometOperations... operations)
+    public void register(CometOperation... operations)
         throws IOException, IllegalStateException;
+    
+    /**
+     * Returns what the current IO notifications that the Comet
+     * connection is registered for.
+     * @return CometOperations[]
+     * @see #register(CometOperations...)
+     */
+    public CometOperation[] getRegisteredOps();
     
     /**
      * Returns true if the Comet connection is blocking or non blocking and you can write
