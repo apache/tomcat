@@ -120,5 +120,23 @@ public class CometEventImpl implements CometEvent {
             throw new UnsupportedOperationException();
         }
     }
+    
+    public boolean isReadable() {
+        throw new UnsupportedOperationException();
+    }
+    
+    public boolean isWriteable() {
+        throw new UnsupportedOperationException();
+    }
+    
+    public void configure(int cometOptions)
+        throws IOException, ServletException, IllegalStateException {
+        throw new UnsupportedOperationException();
+    }
+
+    public void register(int notificationOptions)
+        throws IOException, ServletException, IllegalStateException {
+        throw new UnsupportedOperationException();
+    }
 
 }
