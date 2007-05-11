@@ -114,11 +114,9 @@
                 <li>$CATALINA_HOME/conf/[enginename]/[hostname]/context.xml</li>
                 <li>$CATALINA_HOME/webapps/[webappname]/META-INF/context.xml</li>
             </ol>
-            If a Context Descriptor is not provided for a Context, Tomcat
-            automatically creates one and places it in (1) with a filename of
-            [webappname].xml although if manually created, the filename need not
-            match the web application name as Tomcat is concerned only with the
-            Context configuration contained within the Context Descriptor file(s).
+            Files in (1) are named [webappname].xml but files in (2) are named
+            context.xml. If a Context Descriptor is not provided for a Context,
+            Tomcat configures the Context using default values. 
         </p>
     </section>
     
