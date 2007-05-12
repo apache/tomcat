@@ -21,6 +21,10 @@
          <bug>42361</bug>: Handle multi-part forms when saving requests during
          FORM authentication process. Patch provided by Peter Runge. (markt)
       </fix>
+      <fix>
+         <bug>42401</bug>: Update RUNNING.txt with better JRE/JDK information.
+         (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
