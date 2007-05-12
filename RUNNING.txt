@@ -18,9 +18,13 @@ Running With JRE 5.0 Or Later
 
 (1.2) Install the JRE according to the instructions included with the
       release.
+(1.3) Set an environment variable named JRE_HOME to the pathname of
+      the directory into which you installed the JRE, e.g. c:\jre5.0
+      or /usr/local/java/jre5.0.
 
-(1.3) Set an environment variable named JAVA_HOME to the pathname of
-      the directory into which you installed the JRE, e.g. c:\j2sdk5.0
+NOTE: You may also use the full JDK rather than just the JRE. In this
+      case set your JAVA_HOME environment variable to the pathname of
+      the directory into which you installed the JDK, e.g. c:\j2sdk5.0
       or /usr/local/java/j2sdk5.0.
 
 
