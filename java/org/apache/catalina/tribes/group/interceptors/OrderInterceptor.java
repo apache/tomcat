@@ -60,6 +60,10 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     private int maxQueue = Integer.MAX_VALUE;
 
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
+        if ( !okToProcess(msg.getOptions()) ) {
+            super.sendMessage(destination, msg, payload);
+            return;
+        }
         for ( int i=0; i<destination.length; i++ ) {
             int nr = incCounter(destination[i]);
             //reduce byte copy
@@ -73,6 +77,10 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     public void messageReceived(ChannelMessage msg) {
+        if ( !okToProcess(msg.getOptions()) ) {
+            super.messageReceived(msg);
+            return;
+        }
         int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
         msg.getMessage().trim(4);
         MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
