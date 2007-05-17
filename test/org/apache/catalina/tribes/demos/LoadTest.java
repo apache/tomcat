@@ -28,6 +28,8 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.Channel;
 import java.io.Externalizable;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 
 /**
@@ -41,7 +43,7 @@ import java.io.Externalizable;
  * @version 1.0
  */
 public class LoadTest implements MembershipListener,ChannelListener, Runnable {
-    protected static org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(LoadTest.class);
+    protected static Log log = LogFactory.getLog(LoadTest.class);
     public static int size = 24000;
     public static Object mutex = new Object();
     public boolean doRun = true;
@@ -227,6 +229,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             float seconds = ((float)(System.currentTimeMillis()-receiveStart)) / 1000f;
             log.info("****RECEIVE STATS-"+Thread.currentThread().getName()+"*****"+
                      "\n\tMessage count :"+(long)messagesReceived+
+                     "\n\tMessage/sec   :"+messagesReceived/seconds+
                      "\n\tTotal bytes   :"+(long)bytes+
                      "\n\tTotal mbytes  :"+(long)mBytesReceived+
                      "\n\tTime since 1st:"+seconds+" seconds"+

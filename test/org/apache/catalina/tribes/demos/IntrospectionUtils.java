@@ -29,6 +29,8 @@ import java.net.UnknownHostException;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import org.apache.juli.logging.LogFactory;
+import org.apache.juli.logging.Log;
 
 // Depends: JDK1.1
 
@@ -38,8 +40,7 @@ import java.util.Vector;
 public final class IntrospectionUtils {
 
 
-    private static org.apache.commons.logging.Log log=
-        org.apache.commons.logging.LogFactory.getLog( IntrospectionUtils.class );
+    private static Log log= LogFactory.getLog( IntrospectionUtils.class );
 
     /**
      * Call execute() - any ant-like task should work
