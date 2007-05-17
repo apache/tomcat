@@ -398,6 +398,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
        return getMember(data,new MemberImpl());
     }
 
+    public static MemberImpl getMember(byte[] data, int offset, int length) {
+       return getMember(data,offset,length,new MemberImpl());
+    }
+
     /**
      * Return the name of this object
      * @return a unique name to the cluster

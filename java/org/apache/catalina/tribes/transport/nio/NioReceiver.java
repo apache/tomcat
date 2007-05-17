@@ -175,13 +175,14 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
         
     }
-    
+    protected long lastCheck = System.currentTimeMillis();
     protected void socketTimeouts() {
+        long now = System.currentTimeMillis();
+        if ( (now-lastCheck) < getSelectorTimeout() ) return;
         //timeout
         Selector tmpsel = selector;
         Set keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
         if ( keys == null ) return;
-        long now = System.currentTimeMillis();
         for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
             SelectionKey key = (SelectionKey) iter.next();
             try {
@@ -215,6 +216,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                 cancelledKey(key);
             }
         }
+        lastCheck = System.currentTimeMillis();
     }
 
 

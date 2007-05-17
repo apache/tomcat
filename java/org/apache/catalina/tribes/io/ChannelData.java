@@ -229,11 +229,13 @@ public class ChannelData implements ChannelMessage {
         offset += 4; //uniqueId length
         System.arraycopy(xbuf.getBytesDirect(),offset,data.uniqueId,0,data.uniqueId.length);
         offset += data.uniqueId.length; //uniqueId data
-        byte[] addr = new byte[XByteBuffer.toInt(xbuf.getBytesDirect(),offset)];
+        //byte[] addr = new byte[XByteBuffer.toInt(xbuf.getBytesDirect(),offset)];
+        int addrlen = XByteBuffer.toInt(xbuf.getBytesDirect(),offset);
         offset += 4; //addr length
-        System.arraycopy(xbuf.getBytesDirect(),offset,addr,0,addr.length);
-        data.setAddress(MemberImpl.getMember(addr));
-        offset += addr.length; //addr data
+        //System.arraycopy(xbuf.getBytesDirect(),offset,addr,0,addr.length);
+        data.setAddress(MemberImpl.getMember(xbuf.getBytesDirect(),offset,addrlen));
+        //offset += addr.length; //addr data
+        offset += addrlen;
         int xsize = XByteBuffer.toInt(xbuf.getBytesDirect(),offset);
         offset += 4; //xsize length
         System.arraycopy(xbuf.getBytesDirect(),offset,xbuf.getBytesDirect(),0,xsize);
