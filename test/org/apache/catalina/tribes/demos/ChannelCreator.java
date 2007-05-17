@@ -52,7 +52,7 @@ import org.apache.catalina.tribes.Member;
  */
 public class ChannelCreator {
     
-    org.apache.commons.logging.impl.LogFactoryImpl impl=null;
+    
     public static StringBuffer usage() {
         StringBuffer buf = new StringBuffer();
         buf.append("\n\t\t[-bind tcpbindaddress]")
