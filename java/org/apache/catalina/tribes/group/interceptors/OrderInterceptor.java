@@ -25,6 +25,7 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 
@@ -59,36 +60,49 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     private long expire = 3000;
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
+    
+    ReentrantReadWriteLock inLock = new ReentrantReadWriteLock(true);
+    ReentrantReadWriteLock outLock= new ReentrantReadWriteLock(true);
 
-    public synchronized void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
+    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         if ( !okToProcess(msg.getOptions()) ) {
             super.sendMessage(destination, msg, payload);
             return;
         }
-        for ( int i=0; i<destination.length; i++ ) {
-            int nr = incCounter(destination[i]);
-            //reduce byte copy
-            msg.getMessage().append(nr);
-            try {
-                getNext().sendMessage(new Member[] {destination[i]}, msg, payload);
-            }finally {
-                msg.getMessage().trim(4);
+        try {
+            outLock.writeLock().lock();
+            for ( int i=0; i<destination.length; i++ ) {
+                int nr = incCounter(destination[i]);
+                //reduce byte copy
+                msg.getMessage().append(nr);
+                try {
+                    getNext().sendMessage(new Member[] {destination[i]}, msg, payload);
+                }finally {
+                    msg.getMessage().trim(4);
+                }
             }
+        }finally {
+            outLock.writeLock().unlock();
         }
     }
 
-    public synchronized void messageReceived(ChannelMessage msg) {
+    public void messageReceived(ChannelMessage msg) {
         if ( !okToProcess(msg.getOptions()) ) {
             super.messageReceived(msg);
             return;
         }
-        int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
-        msg.getMessage().trim(4);
-        MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
-        if ( processIncoming(order) ) processLeftOvers(msg.getAddress(),false);
-    }
+        try {
+            inLock.writeLock().lock();
+            int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
+            msg.getMessage().trim(4);
+            MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
+            if ( processIncoming(order) ) processLeftOvers(msg.getAddress(),false);
     
-    public void processLeftOvers(Member member, boolean force) {
+        }finally {
+            inLock.writeLock().unlock();
+        }
+    }
+    protected void processLeftOvers(Member member, boolean force) {
         MessageOrder tmp = (MessageOrder)incoming.get(member);
         if ( force ) {
             Counter cnt = getInCounter(member);
@@ -101,7 +115,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
      * @param order MessageOrder
      * @return boolean - true if a message expired and was processed
      */
-    public boolean processIncoming(MessageOrder order) {
+    protected boolean processIncoming(MessageOrder order) {
         boolean result = false;
         Member member = order.getMessage().getAddress();
         Counter cnt = getInCounter(member);
@@ -147,28 +161,50 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return result;
     }
     
-    public synchronized void memberAdded(Member member) {
+    public void memberAdded(Member member) {
+        //reset counters
+        try {
+            inLock.writeLock().lock();
+            getInCounter(member);
+        }finally {
+            inLock.writeLock().unlock();
+        }
+        try {
+            outLock.writeLock().lock();
+            getOutCounter(member);
+        }finally {
+            outLock.writeLock().unlock();
+        }
         //notify upwards
-        getInCounter(member);
-        getOutCounter(member);
         super.memberAdded(member);
     }
 
-    public synchronized void memberDisappeared(Member member) {
-        //notify upwards
-        outcounter.remove(member);
-        incounter.remove(member);
+    public void memberDisappeared(Member member) {
+        //reset counters
+        try {
+            inLock.writeLock().lock();
+            incounter.remove(member);
+        }finally {
+            inLock.writeLock().unlock();
+        }
+        try {
+            outLock.writeLock().lock();
+            outcounter.remove(member);
+        }finally {
+            outLock.writeLock().unlock();
+        }
         //clear the remaining queue
         processLeftOvers(member,true);
+        //notify upwards
         super.memberDisappeared(member);
     }
     
-    public int incCounter(Member mbr) { 
+    protected int incCounter(Member mbr) { 
         Counter cnt = getOutCounter(mbr);
         return cnt.inc();
     }
     
-    public Counter getInCounter(Member mbr) {
+    protected Counter getInCounter(Member mbr) {
         Counter cnt = (Counter)incounter.get(mbr);
         if ( cnt == null ) {
             cnt = new Counter();
@@ -178,7 +214,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return cnt;
     }
 
-    public Counter getOutCounter(Member mbr) {
+    protected Counter getOutCounter(Member mbr) {
         Counter cnt = (Counter)outcounter.get(mbr);
         if ( cnt == null ) {
             cnt = new Counter();
@@ -187,7 +223,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return cnt;
     }
 
-    public static class Counter {
+    protected static class Counter {
         private AtomicInteger value = new AtomicInteger(0);
         
         public int getCounter() {
@@ -203,7 +239,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         }
     }
     
-    public static class MessageOrder {
+    protected static class MessageOrder {
         private long received = System.currentTimeMillis();
         private MessageOrder next;
         private int msgNr;
