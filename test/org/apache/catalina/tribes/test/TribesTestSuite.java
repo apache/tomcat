@@ -35,6 +35,7 @@ public class TribesTestSuite
         suite.addTestSuite(org.apache.catalina.tribes.test.membership.TestMemberArrival.class);
         suite.addTestSuite(org.apache.catalina.tribes.test.membership.TestTcpFailureDetector.class);
         suite.addTestSuite(org.apache.catalina.tribes.test.channel.TestDataIntegrity.class);
+        suite.addTestSuite(org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor.class);
         return suite;
     }
 }

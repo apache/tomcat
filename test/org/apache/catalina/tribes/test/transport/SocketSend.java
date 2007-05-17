@@ -50,7 +50,7 @@ public class SocketSend {
         boolean first = true;
         int count = 0;
         DecimalFormat df = new DecimalFormat("##.00");
-        while ( count<100000 ) {
+        while ( count<1000000 ) {
             if ( first ) { first = false; start = System.currentTimeMillis();}
             out.write(buf,0,buf.length);
             mb += ( (double) buf.length) / 1024 / 1024;
