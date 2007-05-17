@@ -24,6 +24,7 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 
@@ -59,7 +60,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
 
-    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
+    public synchronized void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         if ( !okToProcess(msg.getOptions()) ) {
             super.sendMessage(destination, msg, payload);
             return;
@@ -76,7 +77,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         }
     }
 
-    public void messageReceived(ChannelMessage msg) {
+    public synchronized void messageReceived(ChannelMessage msg) {
         if ( !okToProcess(msg.getOptions()) ) {
             super.messageReceived(msg);
             return;
@@ -87,7 +88,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         if ( processIncoming(order) ) processLeftOvers(msg.getAddress(),false);
     }
     
-    public synchronized void processLeftOvers(Member member, boolean force) {
+    public void processLeftOvers(Member member, boolean force) {
         MessageOrder tmp = (MessageOrder)incoming.get(member);
         if ( force ) {
             Counter cnt = getInCounter(member);
@@ -100,7 +101,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
      * @param order MessageOrder
      * @return boolean - true if a message expired and was processed
      */
-    public synchronized boolean processIncoming(MessageOrder order) {
+    public boolean processIncoming(MessageOrder order) {
         boolean result = false;
         Member member = order.getMessage().getAddress();
         Counter cnt = getInCounter(member);
@@ -130,7 +131,8 @@ public class OrderInterceptor extends ChannelInterceptorBase {
                 //reset the head
                 if ( tmp == head ) head = tmp.next;
                 cnt.setCounter(tmp.getMsgNr()+1);
-                if ( getForwardExpired() ) super.messageReceived(tmp.getMessage());
+                if ( getForwardExpired() ) 
+                    super.messageReceived(tmp.getMessage());
                 tmp.setMessage(null);
                 tmp = tmp.next;
                 if ( prev != null ) prev.next = tmp;  
@@ -145,14 +147,14 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return result;
     }
     
-    public void memberAdded(Member member) {
+    public synchronized void memberAdded(Member member) {
         //notify upwards
         getInCounter(member);
         getOutCounter(member);
         super.memberAdded(member);
     }
 
-    public void memberDisappeared(Member member) {
+    public synchronized void memberDisappeared(Member member) {
         //notify upwards
         outcounter.remove(member);
         incounter.remove(member);
@@ -166,7 +168,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return cnt.inc();
     }
     
-    public synchronized Counter getInCounter(Member mbr) {
+    public Counter getInCounter(Member mbr) {
         Counter cnt = (Counter)incounter.get(mbr);
         if ( cnt == null ) {
             cnt = new Counter();
@@ -176,7 +178,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         return cnt;
     }
 
-    public synchronized Counter getOutCounter(Member mbr) {
+    public Counter getOutCounter(Member mbr) {
         Counter cnt = (Counter)outcounter.get(mbr);
         if ( cnt == null ) {
             cnt = new Counter();
@@ -186,18 +188,18 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     public static class Counter {
-        private int value = 0;
+        private AtomicInteger value = new AtomicInteger(0);
         
         public int getCounter() {
-            return value;
+            return value.get();
         }
         
-        public synchronized void setCounter(int counter) {
-            this.value = counter;
+        public void setCounter(int counter) {
+            this.value.set(counter);
         }
         
-        public synchronized int inc() {
-            return ++value;
+        public int inc() {
+            return value.addAndGet(1);
         }
     }
     
