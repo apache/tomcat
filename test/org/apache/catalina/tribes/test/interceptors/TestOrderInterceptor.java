@@ -31,6 +31,7 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.ChannelException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestOrderInterceptor extends TestCase {
 
@@ -76,8 +77,9 @@ public class TestOrderInterceptor extends TestCase {
     
     public void testOrder1() throws Exception {
         Member[] dest = channels[0].getMembers();
+        final AtomicInteger value = new AtomicInteger(0);
         for ( int i=0; i<100; i++ ) {
-            channels[0].send(dest,new Integer(i),0);
+            channels[0].send(dest,new Integer(value.getAndAdd(1)),0);
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
@@ -85,6 +87,40 @@ public class TestOrderInterceptor extends TestCase {
         }
     }
     
+    public void testOrder2() throws Exception {
+        final Member[] dest = channels[0].getMembers();
+        final AtomicInteger value = new AtomicInteger(0);
+        Runnable run = new Runnable() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    try {
+                        synchronized (channels[0]) {
+                            channels[0].send(dest, new Integer(value.getAndAdd(1)), 0);
+                        }
+                    }catch ( Exception x ) {
+                        x.printStackTrace();
+                        assertEquals(true,false);
+                    }
+                }
+            }
+        };
+        Thread[] threads = new Thread[5];
+        for (int i=0;i<threads.length;i++) {
+            threads[i] = new Thread(run);
+        }
+        for (int i=0;i<threads.length;i++) {
+            threads[i].start();
+        }
+        for (int i=0;i<threads.length;i++) {
+            threads[i].join();
+        }
+        Thread.sleep(5000);
+        for ( int i=0; i<test.length; i++ ) {
+            super.assertEquals(false,test[i].fail);
+        }
+    }
+
+
     protected void tearDown() throws Exception {
         System.out.println("tearDown");
         super.tearDown();
@@ -112,7 +148,7 @@ public class TestOrderInterceptor extends TestCase {
             Integer i = (Integer)msg;
             if ( i.intValue() != cnt ) fail = true;
             else cnt++;
-            System.out.println("Listener["+id+"] Message received:"+i+" Count:"+total);
+            System.out.println("Listener["+id+"] Message received:"+i+" Count:"+total+" Fail:"+fail);
 
         }
 
