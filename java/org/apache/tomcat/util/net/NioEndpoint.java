@@ -949,7 +949,6 @@ public class NioEndpoint {
      */
     protected boolean setSocketOptions(SocketChannel socket) {
         // Process the connection
-        int step = 1;
         try {
             //disable blocking, APR style, we are gonna be polling it
             socket.configureBlocking(false);
@@ -958,9 +957,7 @@ public class NioEndpoint {
 
             NioChannel channel = nioChannels.poll();
             if ( channel == null ) {
-                // 2: SSL setup
-                step = 2;
-
+                // SSL setup
                 if (sslContext != null) {
                     SSLEngine engine = createSSLEngine();
                     int appbufsize = engine.getSession().getApplicationBufferSize();
@@ -969,14 +966,14 @@ public class NioEndpoint {
                                                                        socketProperties.getDirectBuffer());
                     channel = new SecureNioChannel(socket, engine, bufhandler, selectorPool);
                 } else {
+                    // normal tcp setup
                     NioBufferHandler bufhandler = new NioBufferHandler(socketProperties.getAppReadBufSize(),
                                                                        socketProperties.getAppWriteBufSize(),
                                                                        socketProperties.getDirectBuffer());
 
                     channel = new NioChannel(socket, bufhandler);
                 }
-            } else {
-                
+            } else {                
                 channel.setIOChannel(socket);
                 if ( channel instanceof SecureNioChannel ) {
                     SSLEngine engine = createSSLEngine();
@@ -986,7 +983,6 @@ public class NioEndpoint {
                 }
             }
             getPoller0().register(channel);
-
         } catch (Throwable t) {
             try {
                 log.error("",t);
