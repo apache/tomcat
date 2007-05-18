@@ -32,7 +32,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.security.KeyStore;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -430,15 +429,6 @@ public class NioEndpoint {
     public int getSoTimeout() { return socketProperties.getSoTimeout(); }
     public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
 
-
-    /**
-     * Timeout on first request read before going to the poller, in ms.
-     */
-    protected int firstReadTimeout = 60000;
-    public int getFirstReadTimeout() { return firstReadTimeout; }
-    public void setFirstReadTimeout(int firstReadTimeout) { this.firstReadTimeout = firstReadTimeout; }
-
-
     /**
      * The default is true - the created threads will be
      *  in daemon mode. If set to false, the control thread
@@ -478,7 +468,7 @@ public class NioEndpoint {
     /**
      * Poller thread count.
      */
-    protected int pollerThreadCount = 0;
+    protected int pollerThreadCount = 1;
     public void setPollerThreadCount(int pollerThreadCount) { this.pollerThreadCount = pollerThreadCount; }
     public int getPollerThreadCount() { return pollerThreadCount; }
 
