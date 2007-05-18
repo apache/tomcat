@@ -378,7 +378,7 @@
     Most of these attributes are directly linked to the socket implementation in the JDK so you can find out 
     about the actual meaning in the JDK API documentation.<br/>
     <strong>Note</strong>On some JDK versions, setTrafficClass causes a problem, a work around for this is to add 
-    the -Djava.net.preferIPv4Stack=true value to your command line</p>
+    the <code>-Djava.net.preferIPv4Stack=true</code> value to your command line</p>
 
     <attributes>
       <attribute name="useSendfile" required="false">
@@ -398,11 +398,11 @@
       </attribute>
       <attribute name="acceptorThreadCount" required="false">
         <p>(int)The number of threads to be used to accept connections. Increase this value on a multi CPU machine,
-        although you would never really need more than 2. Also, with a lot of non keep alive connections,
-        you might want to increase this value as well. Default value is 1.</p>
+        although you would never really need more than <code>2</code>. Also, with a lot of non keep alive connections,
+        you might want to increase this value as well. Default value is <code>1</code>.</p>
       </attribute>
       <attribute name="pollerThreadCount" required="false">
-        <p>(int)The number of threads to be used to run for the polling events. Default value is 1.
+        <p>(int)The number of threads to be used to run for the polling events. Default value is <code>1</code>.
            Can't see a reason to go above that. But experiment and find your own results.</p>
       </attribute>
       <attribute name="pollerThreadPriority" required="false">
@@ -423,15 +423,15 @@
       <attribute name="selectorTimeout" required="false">
         <p>(int)The time in milliseconds to timeout on a select() for the poller.
            This value is important, since connection clean up is done on the same thread, so dont set this 
-           value to an extremely high one.</p>
+           value to an extremely high one. The default value is <code>1000</code> milliseconds.</p>
       </attribute>
       <attribute name="useComet" required="false">
-        <p>(bool)Whether to allow comet servlets or not, Default value is true.</p>
+        <p>(bool)Whether to allow comet servlets or not, Default value is <code>true</code>.</p>
       </attribute>
       <attribute name="processCache" required="false">
         <p>(int)The protocol handler caches Http11NioProcessor objects to speed up performance.
            This setting dictates how many of these objects get cached.
-           -1 means unlimited, default is 200. Set this value somewhere close to your maxThreads value.
+           <code>-1</code> means unlimited, default is <code>200</code>. Set this value somewhere close to your maxThreads value.
         </p>
       </attribute>
       <attribute name="socket.directBuffer" required="false">
@@ -440,20 +440,20 @@
                 direct memory space. On Sun's JDK that would be something like <code>-XX:MaxDirectMemorySize=256m</code></p>
       </attribute>
       <attribute name="socket.rxBufSize" required="false">
-        <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. Default value is 25188</p>
+        <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. Default value is <code>25188</code></p>
       </attribute>
       <attribute name="socket.txBufSize" required="false">
-        <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. Default value is 43800</p>
+        <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. Default value is <code>43800</code></p>
       </attribute>
       <attribute name="socket.appReadBufSize" required="false">
         <p>(int)Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
-           This attribute controls the size of these buffers. By default this read buffer is sized at 8192 bytes.
+           This attribute controls the size of these buffers. By default this read buffer is sized at <code>8192</code> bytes.
            For lower concurrency, you can increase this to buffer more data.
            For an extreme amount of keep alive connections, decrease this number or increase your heap size.</p>
       </attribute>
       <attribute name="socket.appWriteBufSize" required="false">
         <p>(int)Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
-           This attribute controls the size of these buffers. By default this write buffer is sized at 8192 bytes.
+           This attribute controls the size of these buffers. By default this write buffer is sized at <code>8192</code> bytes.
            For low concurrency you can increase this to buffer more response data.
            For an extreme amount of keep alive connections, decrease this number or increase your heap size.
            <br/>
@@ -464,36 +464,36 @@
         <p>(int)The Nio connector uses a class called NioChannel that holds elements linked to a socket.
            To reduce garbage collection, the Nio connector caches these channel objects.
            This value specifies the size of this cache.
-           The default value is 500, and represents that the cache will hold 500 NioChannel objects.
-           Other values are -1. unlimited cache, and 0, no cache.</p>
+           The default value is <code>500</code>, and represents that the cache will hold 500 NioChannel objects.
+           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
       </attribute>
       <attribute name="socket.bufferPoolSize" required="false">
         <p>(int)The NioChannel pool can also be size based, not used object based. The size is calculated as follows:<br/>
-        NioChannel buffer size = read buffer size + write buffer size<br/>
-        SecureNioChannel buffer size = application read buffer size + application write buffer size + network read buffer size + network write buffer size<br/>
-        The value is in bytes, the default value is 1024*1024*100 (100MB)
+        NioChannel <code>buffer size = read buffer size + write buffer size</code><br/>
+        SecureNioChannel <code>buffer size = application read buffer size + application write buffer size + network read buffer size + network write buffer size</code><br/>
+        The value is in bytes, the default value is <code>1024*1024*100</code> (100MB)
         </p>
       </attribute>
       <attribute name="socket.processorCache" required="false">
         <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage collection.
            The integer value specifies how many objects to keep in the cache at most.
-           The default is 500.
-           Other values are -1. unlimited cache, and 0, no cache.</p>
+           The default is <code>500</code>.
+           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
       </attribute>
       <attribute name="socket.keyCache" required="false">
         <p>(int)Tomcat will cache KeyAttachment objects to reduce garbage collection.
            The integer value specifies how many objects to keep in the cache at most.
-           The default is 500.
-           Other values are -1. unlimited cache, and 0, no cache.</p>
+           The default is <code>500</code>.
+           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
       </attribute>
       <attribute name="socket.eventCache" required="false">
         <p>(int)Tomcat will cache PollerEvent objects to reduce garbage collection.
            The integer value specifies how many objects to keep in the cache at most.
-           The default is 500.
-           Other values are -1. unlimited cache, and 0, no cache.</p>
+           The default is <code>500</code>.
+           Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
       </attribute>
       <attribute name="socket.tcpNoDelay" required="false">
-        <p>(bool)same as the standard setting <code>tcpNoDelay</code>. Default value is false</p>
+        <p>(bool)same as the standard setting <code>tcpNoDelay</code>. Default value is <code>false</code></p>
       </attribute>
       <attribute name="socket.soKeepAlive" required="false">
         <p>(bool)Boolean value for the socket's keep alive setting (SO_KEEPALIVE). Default is <code>false</code>. </p>
@@ -506,7 +506,7 @@
       </attribute>
       <attribute name="socket.soLingerOn" required="false">
         <p>(bool)Boolean value for the sockets so linger option (SO_LINGER). Default value is <code>true</code>.
-           This option is paired with the soLingerTime value.</p>
+           This option is paired with the <code>soLingerTime</code> value.</p>
       </attribute>
       <attribute name="socket.soLingerTime" required="false">
         <p>(bool)Value in seconds for the sockets so linger option (SO_LINGER). Default value is <code>25</code> seconds.
@@ -516,27 +516,27 @@
         <p>(int)Value in milliseconds for the sockets read timeout (SO_TIMEOUT). Default value is <code>5000</code> milliseconds.</p>
       </attribute>      
       <attribute name="socket.soTrafficClass" required="false">
-        <p>(byte)Value between 0 and 255 for the traffic class on the socket, <code>0x04 | 0x08 | 0x010</code></p>
+        <p>(byte)Value between <code>0</code> and <code>255</code> for the traffic class on the socket, <code>0x04 | 0x08 | 0x010</code></p>
       </attribute>      
       <attribute name="socket.performanceConnectionTime" required="false">
-        <p>(int)The first value for the performance settings. Default is 1, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+        <p>(int)The first value for the performance settings. Default is <code>1</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
       </attribute>      
       <attribute name="socket.performanceLatency" required="false">
-        <p>(int)The second value for the performance settings. Default is 0, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+        <p>(int)The second value for the performance settings. Default is <code>0</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
       </attribute>      
       <attribute name="socket.performanceBandwidth" required="false">
-        <p>(int)The third value for the performance settings. Default is 1, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+        <p>(int)The third value for the performance settings. Default is <code>1</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
       </attribute>      
       <attribute name="selectorPool.maxSelectors" required="false">
         <p>(int)The max selectors to be used in the pool, to reduce selector contention.
-        Use this option when the command line o.a.t.u.net.NioSelectorShared value is set to false.
-        Default value is 200.</p>
+        Use this option when the command line <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set to false.
+        Default value is <code>200</code>.</p>
       </attribute>
       <attribute name="selectorPool.maxSpareSelectors" required="false">
         <p>(int)The max spare selectors to be used in the pool, to reduce selector contention.
         When a selector is returned to the pool, the system can decide to keep it or let it be GC:ed.
-        Use this option when the command line o.a.t.u.net.NioSelectorShared value is set to false.
-        Default value is -1 (unlimited)</p>
+        Use this option when the command line <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set to false.
+        Default value is <code>-1</code> (unlimited)</p>
       </attribute>
       <attribute name="command-line-options" required="false">
         <p>The following command line options are available for the NIO connector:<br/>
