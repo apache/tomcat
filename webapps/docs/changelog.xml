@@ -18,6 +18,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+         <bug>42444</bug>: prevent NPE 
+         Patch provided by Nils Hammar (funkman)
+      </fix>
+      <fix>
          <bug>42361</bug>: Handle multi-part forms when saving requests during
          FORM authentication process. Patch provided by Peter Runge. (markt)
       </fix>
