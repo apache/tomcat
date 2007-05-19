@@ -1035,7 +1035,6 @@ public class AccessLogValve
                 buf.append(request.getProtocol());
             } else {
                 buf.append("- - ");
-                buf.append(request.getProtocol());
             }
         }
     }
