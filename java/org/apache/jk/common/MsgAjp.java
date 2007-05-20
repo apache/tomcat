@@ -237,8 +237,8 @@ public class MsgAjp extends Msg {
 
     public void getBytes(MessageBytes mb) {
         int length = getInt();
+        mb.recycle();
         if( (length == 0xFFFF) || (length == -1) ) {
-            mb.recycle();
             return;
         }
         mb.setBytes( buf, pos, length );
