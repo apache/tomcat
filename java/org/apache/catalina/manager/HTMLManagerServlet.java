@@ -1006,7 +1006,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;<a href=\"{6}\" onclick=\"return(confirm('''Are you sure?  This will delete the application.'''))\">{7}</a>&nbsp;\n" +
         "  </small>\n" +
         " </td>\n" +
-        "</tr>\n";
+        "</tr>\n<tr></tr>\n";
 
     private static final String STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
@@ -1017,7 +1017,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;{7}&nbsp;\n" +
         "  </small>\n" +
         " </td>\n" +
-        "</tr>\n";
+        "</tr>\n<tr></tr>\n";
 
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
@@ -1028,7 +1028,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;{7}&nbsp;\n" +
         "  </small>\n" +
         " </td>\n" +
-        "</tr>\n";
+        "</tr>\n<tr></tr>\n";
 
     private static final String DEPLOY_SECTION =
         "</table>\n" +
