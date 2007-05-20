@@ -31,6 +31,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+         <bug>42459</bug>: Tomcat Web Application Manager table error (rjung)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 6.0.13 (remm)">
   <subsection name="Catalina">
