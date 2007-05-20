@@ -18,7 +18,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-         <bug>42444</bug>: prevent NPE 
+         <bug>42449</bug>:
+         JNDIRealm does not catch NullPointerException for Sun's
+         LDAP provider (See bug for details) (funkman)
+      </fix>
+      <fix>
+         <bug>42444</bug>: prevent NPE for AccessLogValve
          Patch provided by Nils Hammar (funkman)
       </fix>
       <fix>

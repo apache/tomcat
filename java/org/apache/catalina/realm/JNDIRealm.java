@@ -808,6 +808,23 @@ public class JNDIRealm extends RealmBase {
                 // Authenticate the specified username if possible
                 principal = authenticate(context, username, credentials);
 
+            } catch (NullPointerException e) {
+                /* BZ 42449 - Kludge Sun's LDAP provider
+                   with broken SSL
+                */
+                // log the exception so we know it's there.
+                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+
+                // close the connection so we know it will be reopened.
+                if (context != null)
+                    close(context);
+
+                // open a new directory context.
+                context = open();
+
+                // Try the authentication again.
+                principal = authenticate(context, username, credentials);
+
             } catch (CommunicationException e) {
 
                 // log the exception so we know it's there.
