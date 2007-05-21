@@ -162,37 +162,17 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
     
     public void memberAdded(Member member) {
-        //reset counters
-        try {
-            inLock.writeLock().lock();
-            getInCounter(member);
-        }finally {
-            inLock.writeLock().unlock();
-        }
-        try {
-            outLock.writeLock().lock();
-            getOutCounter(member);
-        }finally {
-            outLock.writeLock().unlock();
-        }
+        //reset counters - lock free
+        getInCounter(member);
+        getOutCounter(member);
         //notify upwards
         super.memberAdded(member);
     }
 
     public void memberDisappeared(Member member) {
-        //reset counters
-        try {
-            inLock.writeLock().lock();
-            incounter.remove(member);
-        }finally {
-            inLock.writeLock().unlock();
-        }
-        try {
-            outLock.writeLock().lock();
-            outcounter.remove(member);
-        }finally {
-            outLock.writeLock().unlock();
-        }
+        //reset counters - lock free
+        incounter.remove(member);
+        outcounter.remove(member);
         //clear the remaining queue
         processLeftOvers(member,true);
         //notify upwards
