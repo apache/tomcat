@@ -767,6 +767,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         return entry!=null?entry.getValue():null;
     }
     
+    public MapEntry getInternal(Object key) {
+        return (MapEntry)super.get(key);
+    }
+    
     public Object get(Object key) {
         MapEntry entry = (MapEntry)super.get(key);
         if (log.isTraceEnabled()) log.trace("Requesting id:"+key+" entry:"+entry);
