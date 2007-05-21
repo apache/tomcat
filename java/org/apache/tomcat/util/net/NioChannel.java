@@ -70,7 +70,7 @@ public class NioChannel implements ByteChannel{
      * been flushed out and is empty
      * @return boolean
      */
-    public boolean flush(Selector s) throws IOException {
+    public boolean flush(boolean block, Selector s,long timeout) throws IOException {
         return true; //no network buffer in the regular channel
     }
 
