@@ -169,9 +169,6 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
     
     public void memberAdded(Member member) {
-        //reset counters - lock free
-        getInCounter(member);
-        getOutCounter(member);
         //notify upwards
         super.memberAdded(member);
     }
