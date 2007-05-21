@@ -330,15 +330,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         setAttribute("port", "" + port);
     }
 
-    public int getFirstReadTimeout() {
-        return ep.getFirstReadTimeout();
-    }
-
-    public void setFirstReadTimeout( int i ) {
-        ep.setFirstReadTimeout(i);
-        setAttribute("firstReadTimeout", "" + i);
-    }
-
     public InetAddress getAddress() {
         return ep.getAddress();
     }

@@ -89,13 +89,7 @@ public class Http11NioProcessor implements ActionHook {
         this.endpoint = endpoint;
 
         request = new Request();
-        int readTimeout = endpoint.getFirstReadTimeout();
-        if (readTimeout == 0) {
-            readTimeout = 100;
-        } else if (readTimeout < 0) {
-            readTimeout = timeout;
-            //readTimeout = -1;
-        }
+        int readTimeout = endpoint.getSoTimeout();
         inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize,readTimeout);
         request.setInputBuffer(inputBuffer);
 
@@ -825,9 +819,6 @@ public class Http11NioProcessor implements ActionHook {
         long soTimeout = endpoint.getSoTimeout();
 
         int limit = 0;
-        if (endpoint.getFirstReadTimeout() > 0 || endpoint.getFirstReadTimeout() < -1) {
-            limit = endpoint.getMaxThreads() / 2;
-        }
 
         boolean keptAlive = false;
         boolean openSocket = false;

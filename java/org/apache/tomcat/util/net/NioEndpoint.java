@@ -430,13 +430,6 @@ public class NioEndpoint {
     public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
 
     /**
-      * Timeout on first request read before going to the poller, in ms.
-     */
-    protected int firstReadTimeout = 60000;
-    public int getFirstReadTimeout() { return firstReadTimeout; }
-    public void setFirstReadTimeout(int firstReadTimeout) { this.firstReadTimeout = firstReadTimeout; }
-    
-    /**
      * The default is true - the created threads will be
      *  in daemon mode. If set to false, the control thread
      *  will not be daemon - and will keep the process alive.
