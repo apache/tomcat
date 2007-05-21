@@ -48,6 +48,7 @@ import java.awt.Component;
 import javax.swing.table.TableColumn;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.catalina.tribes.util.Arrays;
+import java.util.Set;
 
 /**
  * <p>Title: </p>
@@ -191,9 +192,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     return "";
                 }
                 if ( row == 0 ) return columnNames[col];
-                Object[] entries = map.entrySetFull().toArray();
-                Map.Entry e = (Map.Entry)entries [row-1];
-                LazyReplicatedMap.MapEntry entry = (LazyReplicatedMap.MapEntry)e.getValue();
+                Object[] keys = map.keySetFull().toArray();
+                String key = (String)keys [row-1];
+                LazyReplicatedMap.MapEntry entry = map.getInternal(key);
                 switch (col) {
                     case 0: return entry.getKey();
                     case 1: return entry.getValue();
@@ -329,7 +330,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     public void run() {
                         for (int i = 0; i < 100; i++) {
                             String key = Arrays.toString(UUIDGenerator.randomUUID(false));
-                            map.put(key, key);
+                            map.put(key, new StringBuffer(key));
                             dataModel.fireTableDataChanged();
                             table.paint(table.getGraphics());
                             try {
