@@ -433,7 +433,7 @@ public class InternalNioOutputBuffer
             written = getSelectorPool().write(bytebuffer, socket, selector, writeTimeout);
             //make sure we are flushed 
             do {
-                if (socket.flush(selector)) break;
+                if (socket.flush(true,selector,writeTimeout)) break;
             }while ( true );
         }finally { 
             if ( selector != null ) getSelectorPool().put(selector);
