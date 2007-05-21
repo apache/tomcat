@@ -99,13 +99,12 @@ public class OrderInterceptor extends ChannelInterceptorBase {
             super.messageReceived(msg);
             return;
         }
+        int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
+        msg.getMessage().trim(4);
+        MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
         try {
             inLock.writeLock().lock();
-            int msgnr = XByteBuffer.toInt(msg.getMessage().getBytesDirect(),msg.getMessage().getLength()-4);
-            msg.getMessage().trim(4);
-            MessageOrder order = new MessageOrder(msgnr,(ChannelMessage)msg.deepclone());
             if ( processIncoming(order) ) processLeftOvers(msg.getAddress(),false);
-    
         }finally {
             inLock.writeLock().unlock();
         }
