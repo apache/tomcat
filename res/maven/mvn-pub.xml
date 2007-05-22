@@ -34,14 +34,43 @@
   -->
   <property file="${basedir}/mvn.properties"/>
   <property file="${basedir}/mvn.properties.default"/>
+  <property name="local.repo" value="${user.home}/.m2/repository"/>
+  
+  <target name="init-maven">
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
+      <classpath>
+        <pathelement location="${basedir}/maven-ant-tasks-attached-patch.jar" />
+        <pathelement location="${basedir}/maven-artifact-ant-2.0.4-dep.jar" />
+      </classpath>
+    </typedef>
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-beta-2"/>
+  </target>
 
-  <target name="maven-deploy">
+  <target name="maven-deploy" depends="init-maven">
     <!--replace the version in the pom-->
     <copy file="${pom}" tofile="${pom}.tmp">
       <filterset>
         <filter token="MAVEN.DEPLOY.VERSION" value="${maven.deploy.version}"/>
       </filterset>
     </copy>
+    
+    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="${file}"/>
+    </exec>
+
+    <artifact:deploy file="${file}">
+        <pom file="${pom}.tmp"/>
+        <remoteRepository url="${maven.repo.url}" layout="default">
+          <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
+        </remoteRepository>
+        <attach file="${file}.asc" type="jar.asc"/>
+    </artifact:deploy>
+
+    <!--
     <exec executable="${maven.home}/bin/${maven.bin}" failonerror="true">
       <env key="MAVEN_HOME" value="${maven.home}"/>
       <arg value="deploy:deploy-file"/>
@@ -55,10 +84,11 @@
       <arg value="-Durl=${maven.repo.url}"/>
       <arg value="-DpomFile=${pom}.tmp"/>
     </exec>
+    -->
     <delete file="${pom}.tmp"/>
   </target>
   
-  <target name="generic-deploy">
+  <target name="generic-deploy" depends="init-maven">
     <antcall target="maven-deploy"><!--Deploy annotations-->
       <param name="file" value="${tomcat.lib.path}/annotations-api.jar"/>
       <param name="groupId" value="org.apache.tomcat"/>
@@ -130,6 +160,12 @@
       <param name="groupId" value="org.apache.tomcat"/>
       <param name="artifactId" value="jasper"/>
       <param name="pom" value="${tomcat.pom.path}/jasper.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy DBCP-->
+      <param name="file" value="${tomcat.lib.path}/tomcat-dbcp.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="dbcp"/>
+      <param name="pom" value="${tomcat.pom.path}/dbcp.pom"/>
     </antcall>
     <antcall target="maven-deploy"><!--Deploy Extras Juli-->
       <param name="file" value="${tomcat.extras.path}/tomcat-juli.jar"/>
