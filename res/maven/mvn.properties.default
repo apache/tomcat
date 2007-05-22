@@ -1,4 +1,12 @@
+# 
+# To create custom properties, simply create
+# the file mvn.properties
+# in this directory
+# no need to change this file
+#
+
 #Maven properties
+
 maven.home=/development/maven-2.0.4
 #Define mvn for Unix systems and mvn.bat for Windows as ANT exec requires the full name
 maven.bin=mvn.bat
