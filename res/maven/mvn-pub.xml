@@ -47,6 +47,10 @@
   </target>
 
   <target name="maven-deploy" depends="init-maven">
+    <!--cleanup-->
+    <delete file="${pom}.tmp"/>
+    <delete file="${file}.asc"/>
+
     <!--replace the version in the pom-->
     <copy file="${pom}" tofile="${pom}.tmp">
       <filterset>
@@ -54,6 +58,7 @@
       </filterset>
     </copy>
     
+    <!--sign the jar-->
     <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
@@ -61,7 +66,8 @@
       <arg value="-b"/>
       <arg value="${file}"/>
     </exec>
-
+    
+    <!--deploy it-->
     <artifact:deploy file="${file}">
         <pom file="${pom}.tmp"/>
         <remoteRepository url="${maven.repo.url}" layout="default">
@@ -86,6 +92,7 @@
     </exec>
     -->
     <delete file="${pom}.tmp"/>
+    <delete file="${file}.asc"/>
   </target>
   
   <target name="generic-deploy" depends="init-maven">
