@@ -24,6 +24,8 @@ import java.util.ArrayList;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.deploy.ContextHandler;
+import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.CallMethodRule;
@@ -391,10 +393,7 @@ public class WebRuleSet extends RuleSetBase {
                                "setWsdlfile", 0);
         digester.addCallMethod(prefix + "web-app/service-ref/jaxrpc-mapping-file",
                                "setJaxrpcmappingfile", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/service-qname/namespaceURI",
-                               "setServiceqnameNamespaceURI", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/service-qname/localpart",
-                               "setServiceqnameLocalpart", 0);
+        digester.addRule(prefix + "web-app/service-ref/service-qname", new ServiceQnameRule());
 
         digester.addRule(prefix + "web-app/service-ref/port-component-ref",
                                new CallMethodMultiRule("addPortcomponent", 2, 1));
@@ -419,12 +418,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallParam(prefix + "web-app/service-ref/handler/init-param/param-value",
                               1);
 
-        digester.addCallMethod(prefix + "web-app/service-ref/handler/soap-header",
-                               "addSoapHeaders", 2);
-        digester.addCallParam(prefix + "web-app/service-ref/handler/soap-header/localpart",
-                              0);
-        digester.addCallParam(prefix + "web-app/service-ref/handler/soap-header/namespaceURI",
-                              1);
+        digester.addRule(prefix + "web-app/service-ref/handler/soap-header", new SoapHeaderRule());
 
         digester.addCallMethod(prefix + "web-app/service-ref/handler/soap-role",
                                "addSoapRole", 0);
@@ -826,3 +820,53 @@ final class IgnoreAnnotationsRule extends Rule {
     }
 
 }
+
+/**
+ * A Rule that sets soap headers on the ContextHandler.
+ * 
+ */
+final class SoapHeaderRule extends Rule {
+
+    public SoapHeaderRule() {
+    }
+
+    public void body(String text)
+        throws Exception {
+        String namespaceuri = null;
+        String localpart = text;
+        int colon = text.indexOf(':');
+        if (colon >= 0) {
+            String prefix = text.substring(0,colon);
+            namespaceuri = digester.findNamespaceURI(prefix);
+            localpart = text.substring(colon+1);
+        }
+        ContextHandler contextHandler = (ContextHandler)digester.peek();
+        contextHandler.addSoapHeaders(localpart,namespaceuri);
+    }
+}
+
+/**
+ * A Rule that sets service qname on the ContextService.
+ * 
+ */
+final class ServiceQnameRule extends Rule {
+
+    public ServiceQnameRule() {
+    }
+
+    public void body(String text)
+        throws Exception {
+        String namespaceuri = null;
+        String localpart = text;
+        int colon = text.indexOf(':');
+        if (colon >= 0) {
+            String prefix = text.substring(0,colon);
+            namespaceuri = digester.findNamespaceURI(prefix);
+            localpart = text.substring(colon+1);
+        }
+        ContextService contextService = (ContextService)digester.peek();
+        contextService.setServiceqnameLocalpart(localpart);
+        contextService.setServiceqnameNamespaceURI(namespaceuri);
+    }
+}
+
