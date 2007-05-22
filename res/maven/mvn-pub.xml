@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="Tomcat 6.0" default="deploy" basedir=".">
+<project name="Tomcat 6.0" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <!--
   Properties required to be set:
@@ -21,10 +21,20 @@
       <privateKey>/home/yourusername/.ssh/id_rsa</privateKey>
       <passphrase></passphrase>
     </server>
+    
+  To get a private key to work on Windows, I followed these steps
+  1. on a linux box execute 'ssh-keygen -t rsa'
+  2. same linux box execute 'cat id_rsa.pub >> authorized_keys' and 'cat id_rsa.pub >> authorized_keys2'
+  3. Copy id_rsa and id_rsa.pub to my windows box
+  4. Import id_rsa into puttygen
+  5. export id_rsa from puttygen to OpenSSH key
+  6. The key you exported from puttygen is the one you reference from the <privateKey> element
+  7. Manually create the %USERPROFILE%\.ssh directory
+  8. Manually add the %USERPROFILE%\.ssh\known_hosts file with the entry for the host
   -->
   <property file="${basedir}/mvn.properties"/>
   <property file="${basedir}/mvn.properties.default"/>
-  
+
   <target name="maven-deploy">
     <!--replace the version in the pom-->
     <copy file="${pom}" tofile="${pom}.tmp">
@@ -157,6 +167,10 @@
       <param name="maven.repo.url" value="${maven.asf.release.repo.url}"/>
       <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}"/>
     </antcall>
+  </target>
+  
+  <target name="help">
+    <echo>Help is on the way!</echo>
   </target>
 
 </project>
