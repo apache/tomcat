@@ -36,6 +36,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>42438</bug> Duplicate temporary variables were created when
+        jsp:attribute was used in conjunction with custom tags. Patch provided
+        by Brian Lenz. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Webapps">
     <changelog>
       <fix>
