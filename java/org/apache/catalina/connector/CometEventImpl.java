@@ -120,36 +120,5 @@ public class CometEventImpl implements CometEvent {
             throw new UnsupportedOperationException();
         }
     }
-    
-    public boolean isReadable() {
-        throw new UnsupportedOperationException();
-    }
-    
-    public boolean isWriteable() {
-        throw new UnsupportedOperationException();
-    }
-    
-    public void configure(CometEvent.CometConfiguration... options)
-        throws IOException, IllegalStateException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void register(CometEvent.CometOperation... operations)
-        throws IOException, IllegalStateException {
-        throw new UnsupportedOperationException();
-    }
-
-    public void unregister(CometOperation... operations)
-        throws IOException, IllegalStateException {
-        throw new UnsupportedOperationException();
-    }
-    
-    public CometConfiguration[] getConfiguration() {
-        throw new UnsupportedOperationException();
-    }
-    
-    public CometOperation[] getRegisteredOps() {
-        throw new UnsupportedOperationException();        
-    }
 
 }

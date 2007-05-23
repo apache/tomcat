@@ -66,14 +66,8 @@ public interface CometEvent {
      *  been initialized in the begin method should be reset. After this event has
      *  been processed, the request and response objects, as well as all their dependent
      *  objects will be recycled and used to process other requests.
-     * CALLBACK - Callback will be called by the container after the comet processor
-     *  has registered for the OP_CALLBACK operation.
-     *  This allows you get an event instantly, and you can perform IO actions
-     *  or close the Comet connection.
-     * WRITE - Write is called, only if the Comet processor has registered for the OP_WRITE
-     *  event. This means that connection is ready to receive data to be written out.
      */
-    public enum EventType {BEGIN, READ, END, ERROR, WRITE, CALLBACK}
+    public enum EventType {BEGIN, READ, END, ERROR}
     
     
     /**
@@ -85,7 +79,6 @@ public interface CometEvent {
      * WEBAPP_RELOAD - the webapplication is being reloaded (sub type of END)
      * SERVER_SHUTDOWN - the server is shutting down (sub type of END)
      * SESSION_END - the servlet ended the session (sub type of END)
-
      */
     public enum EventSubType { TIMEOUT, CLIENT_DISCONNECT, IOEXCEPTION, WEBAPP_RELOAD, SERVER_SHUTDOWN, SESSION_END }
     
@@ -108,7 +101,6 @@ public interface CometEvent {
      * Returns the event type.
      * 
      * @return EventType
-     * @see #EventType
      */
     public EventType getEventType();
     
@@ -116,7 +108,6 @@ public interface CometEvent {
      * Returns the sub type of this event.
      * 
      * @return EventSubType
-     * @see #EventSubType
      */
     public EventSubType getEventSubType();
     
@@ -152,92 +143,5 @@ public interface CometEvent {
      */
     public void setTimeout(int timeout)
         throws IOException, ServletException, UnsupportedOperationException;
-    
-    
-
-    /**
-     * COMET_NON_BLOCKING
-     * Option bit set for allowing non blocking IO
-     * when reading from the request or writing to the response
-     * COMET_NO_IO
-     * Option bit set to not register for any IO events
-     * Connections can be reregistered for IO events using the 
-     * @see #configure(int)
-     */
-    public enum CometConfiguration {COMET_NON_BLOCKING,COMET_NO_IO};
-        
-    /**
-     * Configures the connection for desired IO options.
-     * By default a Comet connection is configured for <br/>
-     * a) Blocking IO - standard servlet usage<br/>
-     * b) Register for READ events when data arrives<br/>
-     * Tomcat Comet allows you to configure for additional options:<br/>
-     * the <code>COMET_NON_BLOCKING</code> bit signals whether writing and reading from the request 
-     * or writing to the response will be non blocking.<br/>
-     * the <code>COMET_NO_IO</code> bit signals the container that you are not interested in 
-     * receiving any IO events from the container.
-     * @param cometOptions int - the option bit set, see #COMET_NON_BLOCKING and #COMET_NO_IO
-     * @throws IOException -
-     * @throws IllegalStateException - if this method is invoked outside of the BEGIN event
-     */
-    public void configure(CometConfiguration... options)
-        throws IOException, IllegalStateException;
-    
-    /**
-     * Returns the configuration for this Comet connection
-     * @return CometConfiguration[]
-     * @see #configure(CometConfiguration...)
-     */
-    public CometConfiguration[] getConfiguration();
-    
-    /**
-     * OP_CALLBACK - receive a CALLBACK event from the container
-     * OP_READ - receive a READ event when the connection has data to be read
-     * OP_WRITE - receive a WRITE event when the connection is able to receive data to be written
-     * @see #register(CometOperations)
-     */
-    public enum CometOperation {OP_CALLBACK, OP_READ, OP_WRITE};
-    
-    /**
-     * Registers the Comet connection with the container for IO notifications.
-     * These could be notifications 
-     * @param operations
-     * @throws IOException
-     * @throws IllegalStateException - if you are trying to register with a socket that already is registered
-     * or if the operation you are trying to register is invalid.
-     */
-    public void register(CometOperation... operations)
-        throws IOException, IllegalStateException;
-    
-    /**
-     * Unregisters Comet operations for this CometConnection
-     * @param operations CometOperation[]
-     * @throws IOException
-     * @throws IllegalStateException
-     */
-    public void unregister(CometOperation... operations)
-        throws IOException, IllegalStateException;
-
-    /**
-     * Returns what the current IO notifications that the Comet
-     * connection is registered for.
-     * @return CometOperations[]
-     * @see #register(CometOperations...)
-     */
-    public CometOperation[] getRegisteredOps();
-    
-    /**
-     * Returns true if the Comet connection is blocking or non blocking and you can write
-     * without blocking data to the response
-     * @return boolean - true if you can write to the response 
-     */
-    public boolean isWriteable();
-    
-    /**
-     * Returns true if the Comet connection is blocking or non blocking and data is available to be read
-     * @see javax.servlet.ServletRequest#getInputStream()#available()>0
-     * @return boolean
-     */
-    public boolean isReadable();
 
 }

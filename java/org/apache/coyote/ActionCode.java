@@ -151,27 +151,6 @@ public final class ActionCode {
      */
     public static final ActionCode ACTION_AVAILABLE = new ActionCode(23);
 
-    /**
-     * Set a Comet connection timeout
-     */
-    public static final ActionCode ACTION_COMET_TIMEOUT = new ActionCode(24);
-    
-    /**
-     * Configure a Comet connection
-     */
-    public static final ActionCode ACTION_COMET_CONFIGURE = new ActionCode(25);
-    
-    /**
-     * Register notifications for events for a certain comet connection
-     */
-    public static final ActionCode ACTION_COMET_REGISTER = new ActionCode(26);
-    
-    /**
-     * Unregister for notifications for a comet connection
-     */
-    public static final ActionCode ACTION_COMET_UNREGISTER = new ActionCode(27);
-    
-
 
     // ----------------------------------------------------------- Constructors
     int code;
