@@ -1861,7 +1861,6 @@ abstract class Node implements TagConstants {
 
             super(qName, ATTRIBUTE_ACTION, attrs, nonTaglibXmlnsAttrs,
                     taglibAttrs, start, parent);
-            temporaryVariableName = JspUtil.nextTemporaryVariableName();
             if ("false".equals(this.getAttributeValue("trim"))) {
                 // (if null or true, leave default of true)
                 trim = false;
@@ -1908,6 +1907,9 @@ abstract class Node implements TagConstants {
          *         (this probably could go elsewhere, but it's convenient here)
          */
         public String getTemporaryVariableName() {
+            if (temporaryVariableName == null) {
+                temporaryVariableName = JspUtil.nextTemporaryVariableName();
+            }
             return temporaryVariableName;
         }
 
