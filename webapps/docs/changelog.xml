@@ -34,6 +34,10 @@
          <bug>42401</bug>: Update RUNNING.txt with better JRE/JDK information.
          (markt)
       </fix>
+      <fix>
+         <bug>39875</bug>: Fix BPE in RealmBase.init(). Port of yoavs's fix from
+         Tomcat 5. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
