@@ -317,7 +317,7 @@ public class Http11AprProcessor implements ActionHook {
      */
     protected String server = null;
 
-
+    
     // ------------------------------------------------------------- Properties
 
 
