@@ -19,7 +19,7 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
-
+import java.util.HashSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +28,6 @@ import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
 
 public class CometEventImpl implements CometEvent {
-
 
     /**
      * The string manager for this package.
@@ -69,7 +68,14 @@ public class CometEventImpl implements CometEvent {
      */
     protected EventSubType eventSubType = null;
     
+    /**
+     * Current set of operations
+     */
+    protected HashSet<CometOperation> cometOperations = new HashSet<CometOperation>(3);
+    
+    protected WorkerThreadCheck threadCheck = new WorkerThreadCheck();
 
+    private static final Object threadCheckHolder = new Object();
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -136,7 +142,13 @@ public class CometEventImpl implements CometEvent {
 
     public void register(CometEvent.CometOperation... operations)
         throws IOException, IllegalStateException {
-        throw new UnsupportedOperationException();
+        //add it to the registered set
+        for (CometEvent.CometOperation co : operations ) {
+            if ( !cometOperations.contains(co) ) {
+                cometOperations.add(co);
+                //TODO notify poller
+            }
+        }
     }
 
     public void unregister(CometOperation... operations)
@@ -150,6 +162,25 @@ public class CometEventImpl implements CometEvent {
     
     public CometOperation[] getRegisteredOps() {
         throw new UnsupportedOperationException();        
+    }
+    
+    protected void setWorkerThread() {
+        threadCheck.set(threadCheckHolder);
+    }
+    
+    protected void unsetWorkerThread() {
+        threadCheck.set(null);
+    }
+
+    protected void checkWorkerThread() throws IllegalStateException {
+        //throw exception if not on worker thread
+        if ( !(threadCheck.get() == threadCheckHolder) ) 
+            throw new IllegalStateException("The operation can only be performed when invoked by a Tomcat worker thread.");
+    }
+    
+    //inner class used to keep track if the current thread is a worker thread.
+    private static class WorkerThreadCheck extends ThreadLocal {
+        
     }
 
 }

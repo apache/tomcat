@@ -119,7 +119,10 @@ public class CoyoteAdapter
             
             boolean error = false;
             boolean read = false;
+            CometEvent event = request.getEvent();
             try {
+                if ( event!=null && (event instanceof CometEventImpl)) 
+                    ((CometEventImpl)event).setWorkerThread();
                 if (status == SocketStatus.OPEN) {
                     if (response.isClosed()) {
                         // The event has been closed asynchronously, so call end instead of
@@ -198,6 +201,9 @@ public class CoyoteAdapter
                 error = true;
                 return false;
             } finally {
+                if ( event!=null && (event instanceof CometEventImpl)) 
+                    ((CometEventImpl)event).unsetWorkerThread();
+
                 req.getRequestProcessor().setWorkerThreadName(null);
                 // Recycle the wrapper request and response
                 if (error || response.isClosed() || !request.isComet()) {
@@ -250,7 +256,7 @@ public class CoyoteAdapter
         }
 
         boolean comet = false;
-        
+        CometEvent event = null;
         try {
 
             // Parse and set Catalina and configuration specific 
@@ -261,6 +267,10 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 
                 if (request.isComet()) {
+                    event = request.getEvent();
+                    if ( event!=null && (event instanceof CometEventImpl)) 
+                        ((CometEventImpl)event).setWorkerThread();
+
                     if (!response.isClosed() && !response.isError()) {
                         if (request.getAvailable()) {
                             // Invoke a read event right away if there are available bytes
@@ -291,6 +301,9 @@ public class CoyoteAdapter
         } catch (Throwable t) {
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
+            if ( event!=null && (event instanceof CometEventImpl)) 
+                ((CometEventImpl)event).unsetWorkerThread();
+
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (!comet) {
