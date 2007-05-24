@@ -418,7 +418,7 @@
 
   <!-- ================= DIST: Create Windows Installer =================== -->
   <target name="installer"
-   description="Create Windows installer" if="execute.installer">
+   description="Create Windows 32-bit installer" if="execute.installer">
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
       <fileset dir="res" />
@@ -426,10 +426,9 @@
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-    <copy file="res/procrun/tomcat6.exe"
-        tofile="${tomcat.dist}/bin/tomcat6.exe" />
-    <copy file="res/procrun/tomcat6w.exe"
-        tofile="${tomcat.dist}/bin/tomcat6w.exe" />
+    <copy todir="${tomcat.dist}/bin">
+       <fileset dir="res/procrun/" includes="tomcat*.exe"/>
+    </copy>
 
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_NUMBER" value="${version.number}"/>
@@ -477,6 +476,15 @@
 
   <!-- Packages the core zip distro -->
   <target name="package-zip">
+    <copy todir="${tomcat.dist}/bin">
+       <fileset dir="res/procrun/" includes="tomcat*.exe"/>
+    </copy>
+    <copy todir="${tomcat.dist}/bin/amd64">
+       <fileset dir="res/procrun/amd64" includes="tomcat*.exe"/>
+    </copy>
+    <copy todir="${tomcat.dist}/bin/ia64">
+       <fileset dir="res/procrun/ia64" includes="tomcat*.exe"/>
+    </copy>  
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -493,7 +501,15 @@
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
         <exclude name="webapps/admin/**"/>
-        <exclude name="conf/Catalina/localhost/admin.xml"/>
+        <exclude name="conf/Catalina/localhost/admin.xml"/>        
+        <!-- If we choose not to have service binaries by default
+             the exclude.service.binaries must be defined
+             in build.properties or in this file
+        -->
+        <exclude name="bin/*.exe" if="exclude.service.binaries"/>
+        <exclude name="bin/amd64/" if="exclude.service.binaries"/>
+        <exclude name="bin/ia64/" if="exclude.service.binaries"/>
+        <exclude name="bin/service.bat" if="exclude.service.binaries"/>
       </zipfileset>
     </zip>
 
@@ -589,6 +605,14 @@
         <exclude name="conf/**" />
         <exclude name="src/**" />
         <exclude name="webapps/admin/**" />
+        <exclude name="bin/*.exe"/>
+        <exclude name="bin/amd64/"/>
+        <exclude name="bin/ia64/"/>
+        <exclude name="bin/service.bat"/>
+        <!-- Do we need windows .bat files as part of .tgz?
+             If not apply the following rule
+        <exclude name="bin/*.bat"/>
+        -->                     
       </tarfileset>
     </tar>
 
