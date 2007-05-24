@@ -15,30 +15,45 @@ rem $Id$
 rem ---------------------------------------------------------------------------
 
 rem Guess CATALINA_HOME if not defined
-set CURRENT_DIR=%cd%
-if not "%CATALINA_HOME%" == "" goto gotHome
-set CATALINA_HOME=%cd%
-if exist "%CATALINA_HOME%\bin\tomcat6.exe" goto okHome
-rem CD to the upper dir
-cd ..
-set CATALINA_HOME=%cd%
-:gotHome
-if exist "%CATALINA_HOME%\bin\tomcat6.exe" goto okHome
-echo The tomcat.exe was not found...
-echo The CATALINA_HOME environment variable is not defined correctly.
-echo This environment variable is needed to run this program
-goto end
+
 rem Make sure prerequisite environment variables are set
-if not "%JAVA_HOME%" == "" goto okHome
+if not "%JAVA_HOME%" == "" goto okJavaHome
 echo The JAVA_HOME environment variable is not defined
 echo This environment variable is needed to run this program
 goto end 
+
+:okJavaHome
+
+rem Detect Java Version and CPU
+set JVM_PLATFORM=%PROCESSOR_ARCHITEW6432%
+if "%JVM_PLATFORM%" == "" set JVM_PLATFORM=%PROCESSOR_ARCHITECTURE%
+
+set EXECUTABLE_CPU=
+java -version 2>&1 | findstr /I 64-bit > NUL
+if not ERRORLEVEL == 1 set EXECUTABLE_CPU=%JVM_PLATFORM%\
+
+set CURRENT_DIR=%cd%
+if not "%CATALINA_HOME%" == "" goto gotHome
+set CURRENT_DIR=.\
+if "%OS%" == "Windows_NT" set CURRENT_DIR=%~dp0%
+
+pushd %CURRENT_DIR%..
+set CATALINA_HOME=%CD%
+popd
+
+:gotHome
+if exist "%CATALINA_HOME%\bin\%EXECUTABLE_CPU%tomcat6.exe" goto okHome
+echo Tomcat6.exe for %JVM_PLATFORM% was not found...
+echo The CATALINA_HOME environment variable is not defined correctly.
+echo This environment variable is needed to run this program
+goto end
+
 :okHome
 if not "%CATALINA_BASE%" == "" goto gotBase
 set CATALINA_BASE=%CATALINA_HOME%
 :gotBase
- 
-set EXECUTABLE=%CATALINA_HOME%\bin\tomcat6.exe
+
+set EXECUTABLE=%CATALINA_HOME%\bin\%EXECUTABLE_CPU%tomcat6.exe
 
 rem Set default Service name
 set SERVICE_NAME=Tomcat6
@@ -61,15 +76,15 @@ goto end
 :doRemove
 rem Remove the service
 "%EXECUTABLE%" //DS//%SERVICE_NAME%
-echo The service '%SERVICE_NAME%' has been removed
+echo Service '%SERVICE_NAME%' has been removed
 goto end
 
 :doInstall
 rem Install the service
-echo Installing the service '%SERVICE_NAME%' ...
-echo Using CATALINA_HOME:    %CATALINA_HOME%
-echo Using CATALINA_BASE:    %CATALINA_BASE%
-echo Using JAVA_HOME:        %JAVA_HOME%
+echo Installing service '%SERVICE_NAME%' ...
+echo Using CATALINA_HOME: %CATALINA_HOME%
+echo Using CATALINA_BASE: %CATALINA_BASE%
+echo Using JAVA_HOME    : %JAVA_HOME%
 
 rem Use the environment variables as an example
 rem Each command line option is prefixed with PR_
@@ -86,7 +101,8 @@ set PR_JVM=%JAVA_HOME%\jre\bin\client\jvm.dll
 if exist "%PR_JVM%" goto foundJvm
 set PR_JVM=auto
 :foundJvm
-echo Using JVM:              %PR_JVM%
+echo Using JVM          : %PR_JVM%
+echo Using JVM_PLATFORM : %JVM_PLATFORM%
 "%EXECUTABLE%" //IS//%SERVICE_NAME% --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop
 if not errorlevel 1 goto installed
 echo Failed installing '%SERVICE_NAME%' service
@@ -106,7 +122,7 @@ set PR_LOGPATH=%CATALINA_BASE%\logs
 set PR_STDOUTPUT=auto
 set PR_STDERROR=auto
 "%EXECUTABLE%" //US//%SERVICE_NAME% ++JvmOptions "-Djava.io.tmpdir=%CATALINA_BASE%\temp" --JvmMs 128 --JvmMx 256
-echo The service '%SERVICE_NAME%' has been installed.
+echo Service '%SERVICE_NAME%' has been installed.
 
 :end
 cd %CURRENT_DIR%
