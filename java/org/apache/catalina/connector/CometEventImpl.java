@@ -74,6 +74,11 @@ public class CometEventImpl implements CometEvent {
      */
     protected HashSet<CometOperation> cometOperations = new HashSet<CometOperation>(3);
     
+    /**
+     * Current set of configurations
+     */
+    protected HashSet<CometConfiguration> cometConfigurations = new HashSet<CometConfiguration>(3);
+
     protected WorkerThreadCheck threadCheck = new WorkerThreadCheck();
 
     private static final Object threadCheckHolder = new Object();
@@ -139,31 +144,47 @@ public class CometEventImpl implements CometEvent {
     public void configure(CometEvent.CometConfiguration... options)
         throws IOException, IllegalStateException {
         checkWorkerThread();
-        throw new UnsupportedOperationException();
+        synchronized (cometConfigurations) {
+            cometConfigurations.clear();
+            for (CometEvent.CometConfiguration cc : options) {
+                cometConfigurations.add(cc);
+            }
+            request.action(ActionCode.ACTION_COMET_CONFIGURE,options);
+        }
     }
 
     public void register(CometEvent.CometOperation... operations)
         throws IOException, IllegalStateException {
-        //add it to the registered set
-        for (CometEvent.CometOperation co : operations ) {
-            if ( !cometOperations.contains(co) ) {
-                cometOperations.add(co);
-                //TODO notify poller
+        synchronized (cometOperations) {
+            //add it to the registered set
+            for (CometEvent.CometOperation co : operations) {
+                if (!cometOperations.contains(co)) {
+                    cometOperations.add(co);
+                    request.action(ActionCode.ACTION_COMET_REGISTER, co);
+                }
             }
         }
     }
 
     public void unregister(CometOperation... operations)
         throws IOException, IllegalStateException {
-        throw new UnsupportedOperationException();
+        synchronized (cometOperations) {
+            //remove from the registered set
+            for (CometEvent.CometOperation co : operations) {
+                if (cometOperations.contains(co)) {
+                    cometOperations.remove(co);
+                    request.action(ActionCode.ACTION_COMET_UNREGISTER, co);
+                }
+            }
+        }
     }
     
     public CometConfiguration[] getConfiguration() {
-        throw new UnsupportedOperationException();
+        return (CometConfiguration[])cometConfigurations.toArray(new CometConfiguration[0]);
     }
     
     public CometOperation[] getRegisteredOps() {
-        throw new UnsupportedOperationException();        
+        return (CometOperation[])cometOperations.toArray(new CometOperation[0]);
     }
     
     public String toString() {
