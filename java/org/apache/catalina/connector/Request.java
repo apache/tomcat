@@ -2259,6 +2259,9 @@ public class Request
     
     // ------------------------------------------------------ Protected Methods
 
+    protected void action(ActionCode actionCode, Object param) {
+        coyoteRequest.action(actionCode,param);
+    }
 
     protected Session doGetSession(boolean create) {
 

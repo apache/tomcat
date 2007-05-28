@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
+import org.apache.coyote.ActionCode;
 
 public class CometEventImpl implements CometEvent {
 
@@ -121,7 +122,10 @@ public class CometEventImpl implements CometEvent {
     public void setTimeout(int timeout) throws IOException, ServletException,
             UnsupportedOperationException {
         if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
-            request.setAttribute("org.apache.tomcat.comet.timeout", new Integer(timeout));
+            checkWorkerThread();
+            Integer to = new Integer(timeout);
+            request.action(ActionCode.ACTION_COMET_TIMEOUT,to);
+            //request.setAttribute("org.apache.tomcat.comet.timeout", to);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -137,6 +141,10 @@ public class CometEventImpl implements CometEvent {
     
     public void configure(CometEvent.CometConfiguration... options)
         throws IOException, IllegalStateException {
+        checkWorkerThread();
+        if (getEventType()!=EventType.BEGIN) {
+            throw new IllegalStateException("Configure can only be called during the BEGIN event.");
+        }
         throw new UnsupportedOperationException();
     }
 
@@ -164,6 +172,16 @@ public class CometEventImpl implements CometEvent {
         throw new UnsupportedOperationException();        
     }
     
+    public String toString() {
+        StringBuffer buf = new StringBuffer("CometEventImpl[");
+        buf.append(super.toString());
+        buf.append("] Event:");
+        buf.append(getEventType());
+        buf.append(" SubType:");
+        buf.append(getEventSubType());
+        return buf.toString();
+    }
+
     protected void setWorkerThread() {
         threadCheck.set(threadCheckHolder);
     }

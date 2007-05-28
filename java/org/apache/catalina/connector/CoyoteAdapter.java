@@ -263,13 +263,14 @@ public class CoyoteAdapter
             // request parameters
             req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
             if (postParseRequest(req, request, res, response)) {
+                event = request.getEvent();
+                if ( event!=null && (event instanceof CometEventImpl)) 
+                    ((CometEventImpl)event).setWorkerThread();
+
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 
                 if (request.isComet()) {
-                    event = request.getEvent();
-                    if ( event!=null && (event instanceof CometEventImpl)) 
-                        ((CometEventImpl)event).setWorkerThread();
 
                     if (!response.isClosed() && !response.isError()) {
                         if (request.getAvailable()) {
