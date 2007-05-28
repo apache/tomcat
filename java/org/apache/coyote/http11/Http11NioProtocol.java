@@ -661,6 +661,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                         }
                     } else {
                         if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
+                        //add correct poller events here based on Comet stuff
                         socket.getPoller().add(socket);
                     }
                 }

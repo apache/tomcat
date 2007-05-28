@@ -1218,6 +1218,14 @@ public class Http11NioProcessor implements ActionHook {
             request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
             comet = true;
+        } else if (actionCode == ActionCode.ACTION_COMET_TIMEOUT) {
+            if ( socket == null ) 
+                throw new IllegalStateException("Connection must be in Comet state to set the timeout");
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            if ( param == null || (!(param instanceof Integer)) )
+                throw new IllegalArgumentException("Action parameter must be an Integer object to set the timeout");
+            Integer to = (Integer)param;
+            attach.setTimeout(to.longValue());
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
         }
