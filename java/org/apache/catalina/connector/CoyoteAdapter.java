@@ -271,7 +271,6 @@ public class CoyoteAdapter
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 
                 if (request.isComet()) {
-
                     if (!response.isClosed() && !response.isError()) {
                         if (request.getAvailable()) {
                             // Invoke a read event right away if there are available bytes
