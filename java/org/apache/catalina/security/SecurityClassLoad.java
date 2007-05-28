@@ -65,6 +65,9 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
              "core.StandardWrapper$1");
+        loader.loadClass
+        	(basePackage +
+             "core.ApplicationHttpRequest$AttributeNamesEnumerator");
     }
     
     
