@@ -751,10 +751,7 @@ public class Http11NioProcessor implements ActionHook {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                 if (attach != null) {
                     attach.setComet(comet);
-                    if (comet) {
-                        Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
-                        if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
-                    } else {
+                    if (!comet) {
                         //reset the timeout
                         attach.setTimeout(endpoint.getSocketProperties().getSoTimeout());
                     }
@@ -900,10 +897,6 @@ public class Http11NioProcessor implements ActionHook {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                         if (attach != null)  {
                             attach.setComet(comet);
-                            if (comet) {
-                                Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
-                                if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
-                            }
                         }
                     }
                 } catch (InterruptedIOException e) {
@@ -1070,7 +1063,7 @@ public class Http11NioProcessor implements ActionHook {
                 if ( attach!=null && attach.getComet()) {
                     //if this is a comet connection
                     //then execute the connection closure at the next selector loop
-                    request.getAttributes().remove("org.apache.tomcat.comet.timeout");
+                    //request.getAttributes().remove("org.apache.tomcat.comet.timeout");
                     //attach.setTimeout(5000); //force a cleanup in 5 seconds
                     //attach.setError(true); //this has caused concurrency errors
                 }
