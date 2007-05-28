@@ -193,4 +193,7 @@ public class Constants {
     public static final boolean IS_SECURITY_ENABLED = 
         (System.getSecurityManager() != null);
 
+    public static final boolean USE_INSTANCE_MANAGER_FOR_TAGS =
+        Boolean.valueOf(System.getProperty("org.apache.jasper.Constants.USE_INSTANCE_MANAGER_FOR_TAGS", "false")).booleanValue();
+
 }

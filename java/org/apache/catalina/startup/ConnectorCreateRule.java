@@ -20,13 +20,12 @@
 package org.apache.catalina.startup;
 
 
+import org.apache.catalina.Executor;
+import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
-import org.apache.catalina.Service;
-import org.apache.catalina.Executor;
-import org.apache.tomcat.util.IntrospectionUtils;
-import java.lang.reflect.Method;
 
 
 /**
@@ -51,14 +50,14 @@ public class ConnectorCreateRule extends Rule {
             ex = svc.getExecutor(attributes.getValue("executor"));
         }
         Connector con = new Connector(attributes.getValue("protocol"));
-        if ( ex != null )  _setExecutor(con,ex);
+        if ( ex != null )  setExecutor(con,ex);
         
         digester.push(con);
     }
     
-    public void _setExecutor(Connector con, Executor ex) throws Exception {
-        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setExecutor",new Class[] {java.util.concurrent.Executor.class});
-        m.invoke(con.getProtocolHandler(),new Object[] {ex});
+    public void setExecutor(Connector con, Executor ex) throws Exception {
+    	IntrospectionUtils.callMethod1(con.getProtocolHandler(), "setExecutor", 
+    			ex, java.util.concurrent.Executor.class.getName(), getClass().getClassLoader());
     }
 
 
@@ -66,7 +65,7 @@ public class ConnectorCreateRule extends Rule {
      * Process the end of this element.
      */
     public void end() throws Exception {
-        Object top = digester.pop();
+        digester.pop();
     }
 
 
