@@ -82,6 +82,10 @@ public class CometEventImpl implements CometEvent {
     protected WorkerThreadCheck threadCheck = new WorkerThreadCheck();
 
     private static final Object threadCheckHolder = new Object();
+    
+    protected boolean readable = false;
+    
+    protected boolean writeable = false;
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -134,11 +138,19 @@ public class CometEventImpl implements CometEvent {
     }
     
     public boolean isReadable() {
-        throw new UnsupportedOperationException();
+        return readable;
+    }
+    
+    public void setReadable(boolean r) {
+        this.readable = r;
     }
     
     public boolean isWriteable() {
-        throw new UnsupportedOperationException();
+        return writeable;
+    }
+    
+    public void setWriteable(boolean w) {
+        this.writeable = w;
     }
     
     public void configure(CometEvent.CometConfiguration... options)
