@@ -1240,7 +1240,6 @@ public class NioEndpoint {
                         if ( att!=null ) {
                             att.access();//to prevent timeout
                             //we are registering the key to start with, reset the fairness counter.
-                            att.setFairness(0);
                             att.interestOps(interestOps);
                             key.interestOps(interestOps);
                         } else {
@@ -1495,10 +1494,7 @@ public class NioEndpoint {
                                 unreg(sk, attachment, sk.readyOps());
                                 if (!processSocket(channel, SocketStatus.OPEN))
                                     processSocket(channel, SocketStatus.DISCONNECT);
-                                attachment.setFairness(0);
                             } else {
-                                //increase the fairness counter
-                                attachment.incFairness();
                                 result = false;
                             }
                         } else {
@@ -1509,10 +1505,7 @@ public class NioEndpoint {
                                 if (close) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT,false);
                                 }
-                                attachment.setFairness(0);
                             } else {
-                                //increase the fairness counter
-                                attachment.incFairness();
                                 result = false;
                             }
                         }
@@ -1636,7 +1629,6 @@ public class NioEndpoint {
             comet = false;
             timeout = -1;
             error = false;
-            fairness = 0;
             lastRegistered = 0;
             sendfileData = null;
             if ( readLatch!=null ) try {for (int i=0; i<(int)readLatch.getCount();i++) readLatch.countDown();}catch (Exception ignore){}
@@ -1695,9 +1687,6 @@ public class NioEndpoint {
         public void awaitReadLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(readLatch,timeout,unit);}
         public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch,timeout,unit);}
         
-        public int getFairness() { return fairness; }
-        public void setFairness(int f) { fairness = f;}
-        public void incFairness() { fairness++; }
         public long getLastRegistered() { return lastRegistered; };
         public void setLastRegistered(long reg) { lastRegistered = reg; }
         
@@ -1713,7 +1702,6 @@ public class NioEndpoint {
         protected NioChannel channel = null;
         protected CountDownLatch readLatch = null;
         protected CountDownLatch writeLatch = null;
-        protected int fairness = 0;
         protected long lastRegistered = 0;
         protected SendfileData sendfileData = null;
     }
