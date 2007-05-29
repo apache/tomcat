@@ -2252,7 +2252,7 @@ public class Request
     /**
      * Return true if bytes are available.
      */
-    public boolean getAvailable() {
+    public boolean isReadable() {
         return (inputBuffer.available() > 0);
     }
 

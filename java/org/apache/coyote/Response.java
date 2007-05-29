@@ -124,6 +124,8 @@ public final class Response {
 
     protected Request req;
 
+    protected int lastWrite = 1;
+    
     // ------------------------------------------------------------- Properties
 
     public Request getRequest() {
@@ -186,6 +188,16 @@ public final class Response {
 
 
     // -------------------- State --------------------
+
+
+    public int getLastWrite() {
+        return lastWrite;
+    }
+
+    
+    public void setLastWrite(int lastWrite) {
+        this.lastWrite = lastWrite;
+    }
 
 
     public int getStatus() {
@@ -579,6 +591,7 @@ public final class Response {
         headers.clear();
 
         // update counters
+        lastWrite = 1;
         bytesWritten=0;
     }
 
