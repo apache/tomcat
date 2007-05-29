@@ -1227,11 +1227,17 @@ public class Http11NioProcessor implements ActionHook {
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             attach.setCometOps(attach.getCometOps()|interest);
             //notify poller if not on a tomcat thread
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
+                socket.getPoller().cometInterest(socket);
         } else if (actionCode == ActionCode.ACTION_COMET_UNREGISTER) {
             int interest = getPollerInterest(param);
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             attach.setCometOps(attach.getCometOps()& (~interest));
             //notify poller if not on a tomcat thread
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
+                socket.getPoller().cometInterest(socket);
         } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE) {
         }
 
