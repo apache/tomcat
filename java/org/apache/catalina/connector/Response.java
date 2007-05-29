@@ -529,6 +529,14 @@ public class Response
     }
 
 
+    /**
+     * Return true if bytes are available.
+     */
+    public boolean isWriteable() {
+        return (outputBuffer.lastWrite() > 0);
+    }
+
+    
     // ------------------------------------------------ ServletResponse Methods
 
 
