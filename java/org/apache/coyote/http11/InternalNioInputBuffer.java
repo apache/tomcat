@@ -115,7 +115,8 @@ public class InternalNioInputBuffer implements InputBuffer {
 
 
     /**
-     * State.
+     * Parsing state - used for non blocking parsing so that
+     * when more data arrives, we can pick up where we left off.
      */
     protected boolean parsingHeader;
     protected boolean parsingRequestLine;
