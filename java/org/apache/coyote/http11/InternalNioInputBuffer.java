@@ -75,6 +75,7 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
+        parsingRequestLineQPos = -1;
         headerParsePos = HeaderParsePosition.HEADER_START;
         headerData.recycle();
         swallowInput = true;
@@ -121,6 +122,7 @@ public class InternalNioInputBuffer implements InputBuffer {
     protected int parsingRequestLinePhase = 0;
     protected boolean parsingRequestLineEol = false;
     protected int parsingRequestLineStart = 0;
+    protected int parsingRequestLineQPos = -1;
     protected HeaderParsePosition headerParsePos;
 
 
@@ -314,6 +316,7 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
+        parsingRequestLineQPos = -1;
         headerData.recycle();
         swallowInput = true;
 
@@ -358,6 +361,7 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingRequestLinePhase = 0;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
+        parsingRequestLineQPos = -1;
         headerData.recycle();
         swallowInput = true;
 
@@ -464,7 +468,6 @@ public class InternalNioInputBuffer implements InputBuffer {
             // Mark the current buffer position
             
             int end = 0;
-            int questionPos = -1;
             //
             // Reading the URI
             //
@@ -485,16 +488,16 @@ public class InternalNioInputBuffer implements InputBuffer {
                     space = true;
                     end = pos;
                 } else if ((buf[pos] == Constants.QUESTION) 
-                           && (questionPos == -1)) {
-                    questionPos = pos;
+                           && (parsingRequestLineQPos == -1)) {
+                    parsingRequestLineQPos = pos;
                 }
                 pos++;
             }
             request.unparsedURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
-            if (questionPos >= 0) {
-                request.queryString().setBytes(buf, questionPos + 1, 
-                                               end - questionPos - 1);
-                request.requestURI().setBytes(buf, parsingRequestLineStart, questionPos - parsingRequestLineStart);
+            if (parsingRequestLineQPos >= 0) {
+                request.queryString().setBytes(buf, parsingRequestLineQPos + 1, 
+                                               end - parsingRequestLineQPos - 1);
+                request.requestURI().setBytes(buf, parsingRequestLineStart, parsingRequestLineQPos - parsingRequestLineStart);
             } else {
                 request.requestURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
             }
