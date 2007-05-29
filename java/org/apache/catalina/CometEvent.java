@@ -156,15 +156,15 @@ public interface CometEvent {
     
 
     /**
-     * COMET_NON_BLOCKING
+     * COMET_NON_BLOCKING<br/>
      * Option bit set for allowing non blocking IO
-     * when reading from the request or writing to the response
-     * COMET_NO_IO
-     * Option bit set to not register for any IO events
-     * Connections can be reregistered for IO events using the 
+     * when reading from the request or writing to the response<br/>
+     * COMET_BLOCKING<br/>
+     * Configure the comet connection for blocking IO, this is the default setting
+     * 
      * @see #configure(int)
      */
-    public enum CometConfiguration {COMET_NON_BLOCKING,COMET_NO_IO};
+    public enum CometConfiguration {COMET_BLOCKING, COMET_NON_BLOCKING};
         
     /**
      * Configures the connection for desired IO options.
