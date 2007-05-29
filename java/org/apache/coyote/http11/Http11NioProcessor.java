@@ -955,7 +955,8 @@ public class Http11NioProcessor implements ActionHook {
             }
         } else {
             if ( recycle ) recycle();
-            return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
+            //return (openSocket) ? (SocketState.OPEN) : SocketState.CLOSED;
+            return (openSocket) ? (recycle?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
         }
 
     }

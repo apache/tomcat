@@ -622,6 +622,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public void releaseCaches() {
             recycledProcessors.clear();
         }
+        
+        public void release(NioChannel socket) {
+            Http11NioProcessor result = connections.remove(socket);
+            if ( result != null ) {
+                result.recycle();
+                recycledProcessors.offer(result);
+            }
+        }
 
         public SocketState event(NioChannel socket, SocketStatus status) {
             Http11NioProcessor result = connections.get(socket);
@@ -672,6 +680,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public SocketState process(NioChannel socket) {
             Http11NioProcessor processor = null;
             try {
+                processor = connections.remove(socket);
+                
                 if (processor == null) {
                     processor = recycledProcessors.poll();
                 }
