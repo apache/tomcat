@@ -1501,7 +1501,7 @@ public class NioEndpoint {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 unreg(sk, attachment, sk.readyOps());
-                                if (!processSocket(channel, SocketStatus.OPEN))
+                                if (!processSocket(channel, SocketStatus.OPEN_READ))
                                     processSocket(channel, SocketStatus.DISCONNECT);
                             } else {
                                 result = false;
