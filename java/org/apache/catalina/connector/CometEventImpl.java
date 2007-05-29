@@ -41,6 +41,11 @@ public class CometEventImpl implements CometEvent {
     public CometEventImpl(Request request, Response response) {
         this.request = request;
         this.response = response;
+        try {
+            this.register(CometOperation.OP_READ);
+        }catch ( IOException x ) {
+            throw new IllegalStateException(x.getMessage(),x);
+        }
     }
 
 
