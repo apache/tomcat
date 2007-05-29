@@ -99,7 +99,7 @@ public class NioBlockingSelector {
         socket.getPoller().addEvent(
             new Runnable() {
             public void run() {
-                key.cancel();
+                socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
             }
         });
     }
