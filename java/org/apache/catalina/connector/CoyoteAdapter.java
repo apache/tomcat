@@ -123,7 +123,27 @@ public class CoyoteAdapter
             try {
                 if ( event!=null && (event instanceof CometEventImpl)) 
                     ((CometEventImpl)event).setWorkerThread();
-                if (status == SocketStatus.OPEN) {
+                if (status == SocketStatus.OPEN_CALLBACK) {
+                    if (response.isClosed()) {
+                        // The event has been closed asynchronously, so call end instead of
+                        // read to cleanup the pipeline
+                        request.getEvent().setEventType(CometEvent.EventType.END);
+                        request.getEvent().setEventSubType(null);
+                    } else {
+                        request.getEvent().setEventType(CometEvent.EventType.CALLBACK);
+                        request.getEvent().setEventSubType(null);
+                    }
+                } else if (status == SocketStatus.OPEN_WRITE) {
+                    if (response.isClosed()) {
+                        // The event has been closed asynchronously, so call end instead of
+                        // read to cleanup the pipeline
+                        request.getEvent().setEventType(CometEvent.EventType.END);
+                        request.getEvent().setEventSubType(null);
+                    } else {
+                        request.getEvent().setEventType(CometEvent.EventType.WRITE);
+                        request.getEvent().setEventSubType(null);
+                    }
+                } else if (status == SocketStatus.OPEN_READ) {
                     if (response.isClosed()) {
                         // The event has been closed asynchronously, so call end instead of
                         // read to cleanup the pipeline
@@ -274,7 +294,7 @@ public class CoyoteAdapter
                     if (!response.isClosed() && !response.isError()) {
                         if (request.getAvailable()) {
                             // Invoke a read event right away if there are available bytes
-                            if (event(req, res, SocketStatus.OPEN)) {
+                            if (event(req, res, SocketStatus.OPEN_READ)) {
                                 comet = true;
                                 res.action(ActionCode.ACTION_COMET_BEGIN, null);
                             }
