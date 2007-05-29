@@ -699,7 +699,7 @@
     Tomcat Version   3.x 4.x 5.x 6.x                       6.x                     5.5.x 6.x
     Support Polling         NO                             YES                        YES
     Polling Size           N/A                   Unlimited - Restricted by mem        Unlimited
-    Read HTTP Request     Blocking                     Non Blocking                   Blocking
+    Read HTTP Request     Blocking                     Blocking                       Blocking
     Read HTTP Body        Blocking                     Blocking                       Blocking
     Write HTTP Response   Blocking                     Blocking                       Blocking
     SSL Support           Java SSL                     Java SSL                       OpenSSL

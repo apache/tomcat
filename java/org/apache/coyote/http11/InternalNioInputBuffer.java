@@ -422,11 +422,11 @@ public class InternalNioInputBuffer implements InputBuffer {
                 return false;
             }
             if (readTimeout == -1) {
-                if (!fill(false,false)) //request line parsing
+                if (!fill(false,true)) //request line parsing
                     return false;
             } else {
                 // Do a simple read with a short timeout
-                if ( !readSocket(true, false) ) return false;
+                if ( !readSocket(true, true) ) return false;
             }
         }
 
@@ -441,7 +441,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,false)) //request line parsing
+                if (!fill(true,true)) //request line parsing
                     return false;
             }
 
@@ -470,7 +470,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,false)) //request line parsing
+                if (!fill(true,true)) //request line parsing
                     return false;
             }
 
@@ -514,7 +514,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,false)) //reques line parsing
+                if (!fill(true,true)) //reques line parsing
                     return false;
             }
 
@@ -626,7 +626,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,false)) {//parse header 
+                if (!fill(true,true)) {//parse header 
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     return HeaderParseStatus.NEED_MORE_DATA;
                 }
@@ -664,7 +664,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,false)) { //parse header 
+                if (!fill(true,true)) { //parse header 
                     return HeaderParseStatus.NEED_MORE_DATA;
                 }
             }
@@ -704,7 +704,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
                     // Read new bytes if needed
                     if (pos >= lastValid) {
-                        if (!fill(true,false)) {//parse header 
+                        if (!fill(true,true)) {//parse header 
                             //HEADER_VALUE, should already be set
                             return HeaderParseStatus.NEED_MORE_DATA;
                         }
@@ -725,7 +725,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
                     // Read new bytes if needed
                     if (pos >= lastValid) {
-                        if (!fill(true,false)) {//parse header 
+                        if (!fill(true,true)) {//parse header 
                             //HEADER_VALUE
                             return HeaderParseStatus.NEED_MORE_DATA;
                         }
@@ -756,7 +756,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             }
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,false)) {//parse header
+                if (!fill(true,true)) {//parse header
                     
                     //HEADER_MULTI_LINE
                     return HeaderParseStatus.NEED_MORE_DATA;
