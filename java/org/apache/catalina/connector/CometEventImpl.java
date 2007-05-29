@@ -84,9 +84,6 @@ public class CometEventImpl implements CometEvent {
 
     private static final Object threadCheckHolder = new Object();
     
-    protected boolean readable = false;
-    
-    protected boolean writeable = false;
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -139,19 +136,10 @@ public class CometEventImpl implements CometEvent {
     }
     
     public boolean isReadable() {
-        return readable;
-    }
-    
-    public void setReadable(boolean r) {
-        this.readable = r;
-    }
-    
+        return request.isReadable();
+    }    
     public boolean isWriteable() {
-        return writeable;
-    }
-    
-    public void setWriteable(boolean w) {
-        this.writeable = w;
+        return response.isWriteable();
     }
     
     public void configure(CometEvent.CometConfiguration... options)
