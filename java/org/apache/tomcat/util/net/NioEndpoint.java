@@ -103,7 +103,8 @@ public class NioEndpoint {
      */
     public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
 
-    public static final int OP_REGISTER = -1; //register interest op
+    public static final int OP_REGISTER = 0x100; //register interest op
+    public static final int OP_CALLBACK = 0x200; //callback interest op
     
     // ----------------------------------------------------------------- Fields
 
@@ -1312,6 +1313,14 @@ public class NioEndpoint {
             events.offer(event);
             if ( wakeupCounter.incrementAndGet() < 3 ) selector.wakeup();
         }
+        
+        public void cometInterest(NioChannel socket) {
+            throw new UnsupportedOperationException();
+        }
+        
+        public void wakeup() {
+            selector.wakeup();
+        }
 
         /**
          * Add specified socket and associated pool to the poller. The socket will
@@ -1648,6 +1657,8 @@ public class NioEndpoint {
         public void access(long access) { lastAccess = access; }
         public void setComet(boolean comet) { this.comet = comet; }
         public boolean getComet() { return comet; }
+        public void setCometOps(int ops) { this.cometOps = ops; }
+        public int getCometOps() { return cometOps; }
         public boolean getCurrentAccess() { return currentAccess; }
         public void setCurrentAccess(boolean access) { currentAccess = access; }
         public Object getMutex() {return mutex;}
@@ -1697,6 +1708,7 @@ public class NioEndpoint {
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
         protected boolean comet = false;
+        protected int cometOps = 0;
         protected long timeout = -1;
         protected boolean error = false;
         protected NioChannel channel = null;

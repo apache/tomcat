@@ -53,6 +53,7 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import org.apache.tomcat.util.net.PollerInterest;
 
 
 /**
@@ -1221,8 +1222,35 @@ public class Http11NioProcessor implements ActionHook {
             attach.setTimeout(to.longValue());
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
+        } else if (actionCode == ActionCode.ACTION_COMET_REGISTER) {
+            int interest = getPollerInterest(param);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            attach.setCometOps(attach.getCometOps()|interest);
+            attach.getPoller().cometInterest(socket);
+        } else if (actionCode == ActionCode.ACTION_COMET_UNREGISTER) {
+            int interest = getPollerInterest(param);
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            attach.setCometOps(attach.getCometOps()& (~interest));
+            attach.getPoller().cometInterest(socket);
+        } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE) {
         }
 
+    }
+
+    private int getPollerInterest(Object param) throws IllegalArgumentException {
+        if ( param == null || (!(param instanceof PollerInterest)) )
+            throw new IllegalArgumentException("Action parameter must be a PollerInterest object.");
+        int interest = 0;
+        PollerInterest pi = (PollerInterest)param;
+        if ( pi == PollerInterest.CALLBACK )
+            interest = NioEndpoint.OP_CALLBACK;
+        else if ( pi == PollerInterest.READ ) 
+            interest  = SelectionKey.OP_READ;
+        else if ( pi == PollerInterest.WRITE ) 
+            interest = SelectionKey.OP_WRITE;
+        else
+            throw new IllegalArgumentException(pi!=null?pi.toString():"null");
+        return interest;
     }
 
 
