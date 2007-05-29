@@ -792,14 +792,6 @@ public class Http11NioProcessor implements ActionHook {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
-        // Set the remote address
-        remoteAddr = null;
-        remoteHost = null;
-        localAddr = null;
-        localName = null;
-        remotePort = -1;
-        localPort = -1;
-
         // Setting up the socket
         this.socket = socket;
         inputBuffer.setSocket(socket);
@@ -829,17 +821,17 @@ public class Http11NioProcessor implements ActionHook {
                     socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
                     inputBuffer.readTimeout = soTimeout;
                 }
-                if (!inputBuffer.parseRequestLine(keptAlive && (endpoint.getCurrentThreadsBusy() >= limit))) {
-                    // This means that no data is available right now
-                    // (long keepalive), so that the processor should be recycled
-                    // and the method should return true
+                if (!inputBuffer.parseRequestLine(keptAlive)) {
+                    //no data available yet, since we might have read part
+                    //of the request line, we can't recycle the processor
                     openSocket = true;
-                    // Add the socket to the poller
-                    socket.getPoller().add(socket);
+                    recycle = false;
                     break;
                 }
                 keptAlive = true;
                 if ( !inputBuffer.parseHeaders() ) {
+                    //we've read part of the request, don't recycle it
+                    //instead associate it with the socket
                     openSocket = true;
                     recycle = false;
                     break;
@@ -992,6 +984,12 @@ public class Http11NioProcessor implements ActionHook {
         this.socket = null;
         this.cometClose = false;
         this.comet = false;
+        remoteAddr = null;
+        remoteHost = null;
+        localAddr = null;
+        localName = null;
+        remotePort = -1;
+        localPort = -1;
     }
 
 

@@ -72,6 +72,9 @@ public class InternalNioInputBuffer implements InputBuffer {
 
         parsingHeader = true;
         parsingRequestLine = true;
+        parsingRequestLinePhase = 0;
+        parsingRequestLineEol = false;
+        parsingRequestLineStart = 0;
         headerParsePos = HeaderParsePosition.HEADER_START;
         headerData.recycle();
         swallowInput = true;
@@ -115,6 +118,9 @@ public class InternalNioInputBuffer implements InputBuffer {
      */
     protected boolean parsingHeader;
     protected boolean parsingRequestLine;
+    protected int parsingRequestLinePhase = 0;
+    protected boolean parsingRequestLineEol = false;
+    protected int parsingRequestLineStart = 0;
     protected HeaderParsePosition headerParsePos;
 
 
@@ -305,6 +311,9 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
+        parsingRequestLinePhase = 0;
+        parsingRequestLineEol = false;
+        parsingRequestLineStart = 0;
         headerData.recycle();
         swallowInput = true;
 
@@ -346,6 +355,9 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
+        parsingRequestLinePhase = 0;
+        parsingRequestLineEol = false;
+        parsingRequestLineStart = 0;
         headerData.recycle();
         swallowInput = true;
 
@@ -384,160 +396,148 @@ public class InternalNioInputBuffer implements InputBuffer {
 
         //check state
         if ( !parsingRequestLine ) return true;
-        
-        int start = 0;
-
         //
         // Skipping blank lines
         //
-
-        byte chr = 0;
-        do {
-
-            // Read new bytes if needed
+        if ( parsingRequestLinePhase == 0 ) {
+            byte chr = 0;
+            do {
+                
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (useAvailableData) {
+                        return false;
+                    }
+                    if (readTimeout == -1) {
+                        if (!fill(false,true)) //request line parsing
+                            throw new EOFException(sm.getString("iib.eof.error"));
+                    } else {
+                        // Do a simple read with a short timeout
+                        if ( !readSocket(true, false) ) return false;
+                    }
+                }
+                chr = buf[pos++];
+            } while ((chr == Constants.CR) || (chr == Constants.LF));
+            pos--;
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 1;
+        } 
+        if ( parsingRequestLinePhase == 1 ) {
+            // Mark the current buffer position
+            
             if (pos >= lastValid) {
                 if (useAvailableData) {
                     return false;
                 }
                 if (readTimeout == -1) {
-                    if (!fill(false,true)) //request line parsing
-                        throw new EOFException(sm.getString("iib.eof.error"));
+                    if (!fill(false,false)) //request line parsing
+                        return false;
                 } else {
                     // Do a simple read with a short timeout
                     if ( !readSocket(true, false) ) return false;
                 }
             }
-
-            chr = buf[pos++];
-
-        } while ((chr == Constants.CR) || (chr == Constants.LF));
-
-        pos--;
-
-        // Mark the current buffer position
-        start = pos;
-
-        if (pos >= lastValid) {
-            if (useAvailableData) {
-                return false;
-            }
-            if (readTimeout == -1) {
-                if (!fill(false,false)) //request line parsing
-                    return false;
-            } else {
-                // Do a simple read with a short timeout
-                if ( !readSocket(true, false) ) return false;
-            }
+            parsingRequestLinePhase = 2;
         }
-
-        //
-        // Reading the method name
-        // Method name is always US-ASCII
-        //
-
-        boolean space = false;
-
-        while (!space) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true,false)) //request line parsing
-                    return false;
+        if ( parsingRequestLinePhase == 2 ) {
+            //
+            // Reading the method name
+            // Method name is always US-ASCII
+            //
+            boolean space = false;
+            while (!space) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true, false)) //request line parsing
+                        return false;
+                }
+                if (buf[pos] == Constants.SP) {
+                    space = true;
+                    request.method().setBytes(buf, parsingRequestLineStart, pos - parsingRequestLineStart);
+                }
+                pos++;
             }
-
-            if (buf[pos] == Constants.SP) {
-                space = true;
-                request.method().setBytes(buf, start, pos - start);
-            }
-
-            pos++;
-
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 3;
         }
-
-        // Mark the current buffer position
-        start = pos;
-        int end = 0;
-        int questionPos = -1;
-
-        //
-        // Reading the URI
-        //
-
-        space = false;
-        boolean eol = false;
-
-        while (!space) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true,false)) //request line parsing
-                    return false;
-            }
-
-            if (buf[pos] == Constants.SP) {
-                space = true;
-                end = pos;
-            } else if ((buf[pos] == Constants.CR) 
-                       || (buf[pos] == Constants.LF)) {
-                // HTTP/0.9 style request
-                eol = true;
-                space = true;
-                end = pos;
-            } else if ((buf[pos] == Constants.QUESTION) 
-                       && (questionPos == -1)) {
-                questionPos = pos;
-            }
-
-            pos++;
-
-        }
-
-        request.unparsedURI().setBytes(buf, start, end - start);
-        if (questionPos >= 0) {
-            request.queryString().setBytes(buf, questionPos + 1, 
-                                           end - questionPos - 1);
-            request.requestURI().setBytes(buf, start, questionPos - start);
-        } else {
-            request.requestURI().setBytes(buf, start, end - start);
-        }
-
-        // Mark the current buffer position
-        start = pos;
-        end = 0;
-
-        //
-        // Reading the protocol
-        // Protocol is always US-ASCII
-        //
-
-        while (!eol) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true,false)) //reques line parsing
-                    return false;
-            }
-
-            if (buf[pos] == Constants.CR) {
-                end = pos;
-            } else if (buf[pos] == Constants.LF) {
-                if (end == 0)
+        if ( parsingRequestLinePhase == 3 ) {
+            // Mark the current buffer position
+            
+            int end = 0;
+            int questionPos = -1;
+            //
+            // Reading the URI
+            //
+            boolean space = false;
+            while (!space) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true,false)) //request line parsing
+                        return false;
+                }
+                if (buf[pos] == Constants.SP) {
+                    space = true;
                     end = pos;
-                eol = true;
+                } else if ((buf[pos] == Constants.CR) 
+                           || (buf[pos] == Constants.LF)) {
+                    // HTTP/0.9 style request
+                    parsingRequestLineEol = true;
+                    space = true;
+                    end = pos;
+                } else if ((buf[pos] == Constants.QUESTION) 
+                           && (questionPos == -1)) {
+                    questionPos = pos;
+                }
+                pos++;
             }
-
-            pos++;
-
+            request.unparsedURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
+            if (questionPos >= 0) {
+                request.queryString().setBytes(buf, questionPos + 1, 
+                                               end - questionPos - 1);
+                request.requestURI().setBytes(buf, parsingRequestLineStart, questionPos - parsingRequestLineStart);
+            } else {
+                request.requestURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
+            }
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 4;
         }
-
-        if ((end - start) > 0) {
-            request.protocol().setBytes(buf, start, end - start);
-        } else {
-            request.protocol().setString("");
+        if ( parsingRequestLinePhase == 4 ) {
+            // Mark the current buffer position
+            
+            end = 0;
+            //
+            // Reading the protocol
+            // Protocol is always US-ASCII
+            //
+            while (!parsingRequestLineEol) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true, false)) //reques line parsing
+                        return false;
+                }
+        
+                if (buf[pos] == Constants.CR) {
+                    end = pos;
+                } else if (buf[pos] == Constants.LF) {
+                    if (end == 0)
+                        end = pos;
+                    parsingRequestLineEol = true;
+                }
+                pos++;
+            }
+        
+            if ( (end - parsingRequestLineStart) > 0) {
+                request.protocol().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
+            } else {
+                request.protocol().setString("");
+            }
+            parsingRequestLine = false;
+            parsingRequestLinePhase = 0;
+            parsingRequestLineEol = false;
+            parsingRequestLineStart = 0;
+            return true;
         }
-        parsingRequestLine = false;
-        return true;
-
+        throw new IllegalStateException("Invalid request line parse phase:"+parsingRequestLinePhase);
     }
     
     private void expand(int newsize) {
