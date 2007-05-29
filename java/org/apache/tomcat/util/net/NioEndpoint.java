@@ -1239,6 +1239,13 @@ public class NioEndpoint {
                     if (key != null) {
                         final KeyAttachment att = (KeyAttachment) key.attachment();
                         if ( att!=null ) {
+                            //handle callback flag
+                            if (att.getComet() && (interestOps & OP_CALLBACK) == OP_CALLBACK ) {
+                                att.setCometNotify(true);
+                            } else {
+                                att.setCometNotify(false);
+                            }
+                            interestOps = (interestOps & (~OP_CALLBACK));//remove the callback flag
                             att.access();//to prevent timeout
                             //we are registering the key to start with, reset the fairness counter.
                             att.interestOps(interestOps);
@@ -1315,7 +1322,8 @@ public class NioEndpoint {
         }
         
         public void cometInterest(NioChannel socket) {
-            throw new UnsupportedOperationException();
+            KeyAttachment att = (KeyAttachment)socket.getAttachment(false);
+            add(socket,att.getCometOps());
         }
         
         public void wakeup() {
@@ -1644,6 +1652,9 @@ public class NioEndpoint {
             readLatch = null;
             if ( writeLatch!=null ) try {for (int i=0; i<(int)writeLatch.getCount();i++) writeLatch.countDown();}catch (Exception ignore){}
             writeLatch = null;
+            cometNotify = false;
+            cometOps = 0;
+            sendfileData = null;
         }
         
         public void reset() {
@@ -1657,11 +1668,12 @@ public class NioEndpoint {
         public void access(long access) { lastAccess = access; }
         public void setComet(boolean comet) { this.comet = comet; }
         public boolean getComet() { return comet; }
+        public void setCometNotify(boolean notify) { this.cometNotify = notify; }
+        public boolean getCometNotify() { return cometNotify; }
         public void setCometOps(int ops) { this.cometOps = ops; }
         public int getCometOps() { return cometOps; }
         public boolean getCurrentAccess() { return currentAccess; }
         public void setCurrentAccess(boolean access) { currentAccess = access; }
-        public Object getMutex() {return mutex;}
         public void setTimeout(long timeout) {this.timeout = timeout;}
         public long getTimeout() {return this.timeout;}
         public boolean getError() { return error; }
@@ -1704,11 +1716,11 @@ public class NioEndpoint {
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
         
-        protected Object mutex = new Object();
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
         protected boolean comet = false;
         protected int cometOps = 0;
+        protected boolean cometNotify = false;
         protected long timeout = -1;
         protected boolean error = false;
         protected NioChannel channel = null;
