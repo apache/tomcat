@@ -17,6 +17,7 @@ package org.apache.catalina.tribes.test.channel;
 
 import org.apache.catalina.tribes.group.GroupChannel;
 import junit.framework.TestCase;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 
 /**
  * @author Filip Hanik
@@ -47,6 +48,12 @@ public class ChannelStartStop extends TestCase {
         assertEquals(count,2);
         channel.stop(channel.DEFAULT);
     }
+
+    public void testScrap() throws Exception {
+        System.out.println(channel.getChannelReceiver().getClass());
+        ((ReceiverBase)channel.getChannelReceiver()).setMaxThreads(1);
+    } 
+
 
     public void testDoublePartialStart() throws Exception {
         //try to double start the RX 
