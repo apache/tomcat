@@ -841,7 +841,6 @@ public class Http11NioProcessor implements ActionHook {
                 keptAlive = true;
                 if ( !inputBuffer.parseHeaders() ) {
                     openSocket = true;
-                    socket.getPoller().add(socket);
                     recycle = false;
                     break;
                 }
