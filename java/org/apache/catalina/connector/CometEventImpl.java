@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
 import org.apache.coyote.ActionCode;
+import org.apache.tomcat.util.net.PollerInterest;
 
 public class CometEventImpl implements CometEvent {
 
@@ -172,7 +173,7 @@ public class CometEventImpl implements CometEvent {
             for (CometEvent.CometOperation co : operations) {
                 if (!cometOperations.contains(co)) {
                     cometOperations.add(co);
-                    request.action(ActionCode.ACTION_COMET_REGISTER, co);
+                    request.action(ActionCode.ACTION_COMET_REGISTER, translate(co));
                 }
             }
         }
@@ -185,7 +186,7 @@ public class CometEventImpl implements CometEvent {
             for (CometEvent.CometOperation co : operations) {
                 if (cometOperations.contains(co)) {
                     cometOperations.remove(co);
-                    request.action(ActionCode.ACTION_COMET_UNREGISTER, co);
+                    request.action(ActionCode.ACTION_COMET_UNREGISTER, translate(co));
                 }
             }
         }
@@ -223,9 +224,22 @@ public class CometEventImpl implements CometEvent {
             throw new IllegalStateException("The operation can only be performed when invoked by a Tomcat worker thread.");
     }
     
+    protected PollerInterest translate(CometOperation op) {
+        if ( op == CometEvent.CometOperation.OP_READ )
+            return PollerInterest.READ;
+        else if ( op == CometEvent.CometOperation.OP_WRITE )
+            return PollerInterest.WRITE;
+        else if ( op == CometEvent.CometOperation.OP_CALLBACK )
+            return PollerInterest.CALLBACK;
+        else 
+            throw new IllegalArgumentException(op!=null?op.toString():"null");
+    }
+    
     //inner class used to keep track if the current thread is a worker thread.
     private static class WorkerThreadCheck extends ThreadLocal {
         
     }
+    
+    
 
 }
