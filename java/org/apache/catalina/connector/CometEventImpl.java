@@ -150,37 +150,31 @@ public class CometEventImpl implements CometEvent {
     public void configure(CometEvent.CometConfiguration... options)
         throws IOException, IllegalStateException {
         checkWorkerThread();
-        synchronized (cometConfigurations) {
-            cometConfigurations.clear();
-            for (CometEvent.CometConfiguration cc : options) {
-                cometConfigurations.add(cc);
-            }
-            request.action(ActionCode.ACTION_COMET_CONFIGURE,options);
+        cometConfigurations.clear();
+        for (CometEvent.CometConfiguration cc : options) {
+            cometConfigurations.add(cc);
         }
+        request.action(ActionCode.ACTION_COMET_CONFIGURE,options);
     }
 
     public void register(CometEvent.CometOperation... operations)
         throws IOException, IllegalStateException {
-        synchronized (cometOperations) {
-            //add it to the registered set
-            for (CometEvent.CometOperation co : operations) {
-                if (!cometOperations.contains(co)) {
-                    cometOperations.add(co);
-                    request.action(ActionCode.ACTION_COMET_REGISTER, translate(co));
-                }
+        //add it to the registered set
+        for (CometEvent.CometOperation co : operations) {
+            if (!cometOperations.contains(co)) {
+                cometOperations.add(co);
+                request.action(ActionCode.ACTION_COMET_REGISTER, translate(co));
             }
         }
     }
 
     public void unregister(CometOperation... operations)
         throws IOException, IllegalStateException {
-        synchronized (cometOperations) {
-            //remove from the registered set
-            for (CometEvent.CometOperation co : operations) {
-                if (cometOperations.contains(co)) {
-                    cometOperations.remove(co);
-                    request.action(ActionCode.ACTION_COMET_UNREGISTER, translate(co));
-                }
+        //remove from the registered set
+        for (CometEvent.CometOperation co : operations) {
+            if (cometOperations.contains(co)) {
+                cometOperations.remove(co);
+                request.action(ActionCode.ACTION_COMET_UNREGISTER, translate(co));
             }
         }
     }
