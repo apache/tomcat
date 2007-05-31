@@ -24,6 +24,7 @@ import java.nio.channels.SelectionKey;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import org.apache.tomcat.util.MutableInteger;
 
 public class NioBlockingSelector {
     public NioBlockingSelector() {
@@ -41,7 +42,7 @@ public class NioBlockingSelector {
      * @throws SocketTimeoutException if the write times out
      * @throws IOException if an IO Exception occurs in the underlying socket logic
      */
-    public static int write(ByteBuffer buf, NioChannel socket, long writeTimeout) throws IOException {
+    public static int write(ByteBuffer buf, NioChannel socket, long writeTimeout,MutableInteger lastWrite) throws IOException {
         SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
         int written = 0;
         boolean timedout = false;
@@ -55,6 +56,7 @@ public class NioBlockingSelector {
             while ( (!timedout) && buf.hasRemaining()) {
                 if (keycount > 0) { //only write if we were registered for a write
                     int cnt = socket.write(buf); //write the data
+                    lastWrite.set(cnt);
                     if (cnt == -1)
                         throw new EOFException();
                     written += cnt;

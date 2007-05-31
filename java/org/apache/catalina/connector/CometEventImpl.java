@@ -29,6 +29,7 @@ import org.apache.catalina.util.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.net.PollerInterest;
 import java.util.Arrays;
+import org.apache.tomcat.util.MutableBoolean;
 
 public class CometEventImpl implements CometEvent {
 
@@ -142,10 +143,14 @@ public class CometEventImpl implements CometEvent {
     }
     
     public boolean isReadable() {
-        return request.isReadable();
+        return request.isAvailable() || request.isReadable();
     }    
     public boolean isWriteable() {
         return response.isWriteable();
+    }
+    
+    public boolean hasOp(CometEvent.CometOperation op) {
+        return cometOperations.contains(op);
     }
     
     public void configure(CometEvent.CometConfiguration... options)
@@ -169,7 +174,7 @@ public class CometEventImpl implements CometEvent {
         throws IOException, IllegalStateException {
         //remove from the registered set
         cometOperations.removeAll(Arrays.asList(operations));
-        request.action(ActionCode.ACTION_COMET_UNREGISTER, translate(cometOperations.toArray(new CometOperation[0])));
+        request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
     }
     
     public CometConfiguration[] getConfiguration() {

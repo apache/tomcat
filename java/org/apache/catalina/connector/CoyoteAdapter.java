@@ -227,7 +227,7 @@ public class CoyoteAdapter
                 }
                 if (response.isClosed() || !request.isComet()) {
                     res.action(ActionCode.ACTION_COMET_END, null);
-                } else if (!error && read && request.isReadable()) {
+                } else if (!error && read && request.isAvailable()) {
                     // If this was a read and not all bytes have been read, or if no data
                     // was read from the connector, then it is an error
                     error = true;
@@ -312,7 +312,7 @@ public class CoyoteAdapter
 
                 if (request.isComet()) {
                     if (!response.isClosed() && !response.isError()) {
-                        if (request.isReadable()) {
+                        if (request.isAvailable() && request.hasOp(CometEvent.CometOperation.OP_READ)) {
                             // Invoke a read event right away if there are available bytes
                             if (event(req, res, SocketStatus.OPEN_READ)) {
                                 comet = true;

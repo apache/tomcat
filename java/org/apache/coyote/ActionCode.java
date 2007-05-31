@@ -167,11 +167,14 @@ public final class ActionCode {
     public static final ActionCode ACTION_COMET_REGISTER = new ActionCode(26);
     
     /**
-     * Unregister for notifications for a comet connection
+     * Action for getting the readable status
      */
-    public static final ActionCode ACTION_COMET_UNREGISTER = new ActionCode(27);
-    
+    public static final ActionCode ACTION_COMET_READABLE = new ActionCode(28);
 
+    /**
+     * Action for getting the writeable status
+     */
+    public static final ActionCode ACTION_COMET_WRITEABLE = new ActionCode(29);
 
     // ----------------------------------------------------------- Constructors
     int code;

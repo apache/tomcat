@@ -25,6 +25,7 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import java.nio.channels.Selector;
+import org.apache.tomcat.util.MutableInteger;
 
 /**
  * 
@@ -102,11 +103,11 @@ public class SecureNioChannel extends NioChannel  {
      * been flushed out and is empty
      * @return boolean
      */
-    public boolean flush(boolean block, Selector s, long timeout) throws IOException {
+    public boolean flush(boolean block, Selector s, long timeout,MutableInteger lastWrite) throws IOException {
         if (!block) {
             flush(netOutBuffer);
         } else {
-            pool.write(netOutBuffer, this, s, timeout);
+            pool.write(netOutBuffer, this, s, timeout,block,lastWrite);
         }
         return !netOutBuffer.hasRemaining();
     }
