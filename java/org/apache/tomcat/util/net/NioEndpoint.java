@@ -1518,10 +1518,13 @@ public class NioEndpoint {
                                 //invokations for both read and write on separate threads
                                 reg(sk, attachment, 0);
                                 //read goes before write
-                                if (sk.isReadable())
-                                    if (!processSocket(channel, SocketStatus.OPEN_READ)) processSocket(channel, SocketStatus.DISCONNECT);
-                                else
-                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE)) processSocket(channel, SocketStatus.DISCONNECT);
+                                if (sk.isReadable()) {
+                                    if (!processSocket(channel, SocketStatus.OPEN_READ))
+                                        processSocket(channel, SocketStatus.DISCONNECT);
+                                } else {
+                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE))
+                                        processSocket(channel, SocketStatus.DISCONNECT);
+                                }
                             } else {
                                 result = false;
                             }
