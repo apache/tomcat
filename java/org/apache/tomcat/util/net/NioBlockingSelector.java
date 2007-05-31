@@ -97,15 +97,6 @@ public class NioBlockingSelector {
         return written;
     }
 
-    private static void cancelKey(final NioChannel socket, final SelectionKey key) {
-        socket.getPoller().addEvent(
-            new Runnable() {
-            public void run() {
-                socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
-            }
-        });
-    }
-
     /**
      * Performs a blocking read using the bytebuffer for data to be read
      * If the <code>selector</code> parameter is null, then it will perform a busy read that could
@@ -162,6 +153,15 @@ public class NioBlockingSelector {
             }
         }
         return read;
+    }
+
+    private static void cancelKey(final NioChannel socket, final SelectionKey key) {
+        socket.getPoller().addEvent(
+            new Runnable() {
+            public void run() {
+                socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
+            }
+        });
     }
 
 }
