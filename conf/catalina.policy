@@ -89,27 +89,30 @@ grant {
     permission java.util.PropertyPermission "java.vendor", "read";
     permission java.util.PropertyPermission "java.vendor.url", "read";
     permission java.util.PropertyPermission "java.class.version", "read";
-	permission java.util.PropertyPermission "java.specification.version", "read";
-	permission java.util.PropertyPermission "java.specification.vendor", "read";
-	permission java.util.PropertyPermission "java.specification.name", "read";
+    permission java.util.PropertyPermission "java.specification.version", "read";
+    permission java.util.PropertyPermission "java.specification.vendor", "read";
+    permission java.util.PropertyPermission "java.specification.name", "read";
 
-	permission java.util.PropertyPermission "java.vm.specification.version", "read";
-	permission java.util.PropertyPermission "java.vm.specification.vendor", "read";
-	permission java.util.PropertyPermission "java.vm.specification.name", "read";
-	permission java.util.PropertyPermission "java.vm.version", "read";
-	permission java.util.PropertyPermission "java.vm.vendor", "read";
-	permission java.util.PropertyPermission "java.vm.name", "read";
+    permission java.util.PropertyPermission "java.vm.specification.version", "read";
+    permission java.util.PropertyPermission "java.vm.specification.vendor", "read";
+    permission java.util.PropertyPermission "java.vm.specification.name", "read";
+    permission java.util.PropertyPermission "java.vm.version", "read";
+    permission java.util.PropertyPermission "java.vm.vendor", "read";
+    permission java.util.PropertyPermission "java.vm.name", "read";
 
     // Required for OpenJMX
     permission java.lang.RuntimePermission "getAttribute";
 
-	// Allow read of JAXP compliant XML parser debug
-	permission java.util.PropertyPermission "jaxp.debug", "read";
+    // Allow read of JAXP compliant XML parser debug
+    permission java.util.PropertyPermission "jaxp.debug", "read";
 
     // Precompiled JSPs need access to this package.
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime.*";
     
+    // Precompiled JSPs need access to this system property.
+    permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
+
 };
 
 
