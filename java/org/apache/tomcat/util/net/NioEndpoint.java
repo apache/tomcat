@@ -484,8 +484,6 @@ public class NioEndpoint {
         return poller;
     }
 
-    protected Poller readWritePoller = null;
-    
     /**
      * Dummy maxSpareThreads property.
      */
