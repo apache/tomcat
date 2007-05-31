@@ -1242,18 +1242,20 @@ public class Http11NioProcessor implements ActionHook {
     }
 
     private int getPollerInterest(Object param) throws IllegalArgumentException {
-        if ( param == null || (!(param instanceof PollerInterest)) )
-            throw new IllegalArgumentException("Action parameter must be a PollerInterest object.");
+        if ( param == null || (!(param instanceof PollerInterest[])) )
+            throw new IllegalArgumentException("Action parameter must be a PollerInterest[] object.");
         int interest = 0;
-        PollerInterest pi = (PollerInterest)param;
-        if ( pi == PollerInterest.CALLBACK )
-            interest = NioEndpoint.OP_CALLBACK;
-        else if ( pi == PollerInterest.READ ) 
-            interest  = SelectionKey.OP_READ;
-        else if ( pi == PollerInterest.WRITE ) 
-            interest = SelectionKey.OP_WRITE;
-        else
-            throw new IllegalArgumentException(pi!=null?pi.toString():"null");
+        PollerInterest[] piarr = (PollerInterest[])param;
+        for ( PollerInterest pi : piarr ) {
+            if (pi == PollerInterest.CALLBACK)
+                interest = interest | NioEndpoint.OP_CALLBACK;
+            else if (pi == PollerInterest.READ)
+                interest = interest | SelectionKey.OP_READ;
+            else if (pi == PollerInterest.WRITE)
+                interest = interest | SelectionKey.OP_WRITE;
+            else
+                throw new IllegalArgumentException(pi != null ? pi.toString() : "null");
+        }
         return interest;
     }
 

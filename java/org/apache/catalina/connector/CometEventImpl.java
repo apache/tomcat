@@ -28,6 +28,7 @@ import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.net.PollerInterest;
+import java.util.Arrays;
 
 public class CometEventImpl implements CometEvent {
 
@@ -160,23 +161,15 @@ public class CometEventImpl implements CometEvent {
     public void register(CometEvent.CometOperation... operations)
         throws IOException, IllegalStateException {
         //add it to the registered set
-        for (CometEvent.CometOperation co : operations) {
-            if (!cometOperations.contains(co)) {
-                cometOperations.add(co);
-                request.action(ActionCode.ACTION_COMET_REGISTER, translate(co));
-            }
-        }
+        cometOperations.addAll(Arrays.asList(operations));
+        request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
     }
 
     public void unregister(CometOperation... operations)
         throws IOException, IllegalStateException {
         //remove from the registered set
-        for (CometEvent.CometOperation co : operations) {
-            if (cometOperations.contains(co)) {
-                cometOperations.remove(co);
-                request.action(ActionCode.ACTION_COMET_UNREGISTER, translate(co));
-            }
-        }
+        cometOperations.removeAll(Arrays.asList(operations));
+        request.action(ActionCode.ACTION_COMET_UNREGISTER, translate(cometOperations.toArray(new CometOperation[0])));
     }
     
     public CometConfiguration[] getConfiguration() {
@@ -211,15 +204,19 @@ public class CometEventImpl implements CometEvent {
             throw new IllegalStateException("The operation can only be performed when invoked by a Tomcat worker thread.");
     }
     
-    protected PollerInterest translate(CometOperation op) {
-        if ( op == CometEvent.CometOperation.OP_READ )
-            return PollerInterest.READ;
-        else if ( op == CometEvent.CometOperation.OP_WRITE )
-            return PollerInterest.WRITE;
-        else if ( op == CometEvent.CometOperation.OP_CALLBACK )
-            return PollerInterest.CALLBACK;
-        else 
-            throw new IllegalArgumentException(op!=null?op.toString():"null");
+    protected PollerInterest[] translate(CometOperation... op) {
+        PollerInterest[] result = new PollerInterest[op.length];
+        for (int i=0; i<result.length; i++) {
+            if (op[i] == CometEvent.CometOperation.OP_READ)
+                result[i] = PollerInterest.READ;
+            else if (op[i] == CometEvent.CometOperation.OP_WRITE)
+                result[i] = PollerInterest.WRITE;
+            else if (op[i] == CometEvent.CometOperation.OP_CALLBACK)
+                result[i] = PollerInterest.CALLBACK;
+            else
+                throw new IllegalArgumentException(op != null ? op.toString() : "null");
+        }
+        return result;
     }
     
     //inner class used to keep track if the current thread is a worker thread.
