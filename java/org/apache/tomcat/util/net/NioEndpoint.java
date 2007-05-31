@@ -1515,7 +1515,7 @@ public class NioEndpoint {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
                                 //set interest ops to 0 so we don't get multiple
-                                //invokations
+                                //invokations for both read and write on separate threads
                                 reg(sk, attachment, 0);
                                 //read goes before write
                                 if (sk.isReadable())
@@ -1617,6 +1617,10 @@ public class NioEndpoint {
                         cancelledKey(key, SocketStatus.ERROR,false); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
                         cancelledKey(key, SocketStatus.ERROR,true);
+                    } else if (ka.getComet() && ka.getCometNotify() ) {
+                        ka.setCometNotify(false);//this will get reset after invokation if callback is still in there
+                        reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
+                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();

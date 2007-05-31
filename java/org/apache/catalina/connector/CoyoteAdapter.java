@@ -169,6 +169,26 @@ public class CoyoteAdapter
                             request.getEvent().setEventSubType(null);
                         }
                     }
+                } else if (status == SocketStatus.OPEN_WRITE) {
+                    if (response.isClosed()) {
+                        // The event has been closed asynchronously, so call end instead of
+                        // read to cleanup the pipeline
+                        request.getEvent().setEventType(CometEvent.EventType.END);
+                        request.getEvent().setEventSubType(null);
+                    } else {
+                        request.getEvent().setEventType(CometEvent.EventType.WRITE);
+                        request.getEvent().setEventSubType(null);
+                    }
+                } else if (status == SocketStatus.OPEN_CALLBACK) {
+                    if (response.isClosed()) {
+                        // The event has been closed asynchronously, so call end instead of
+                        // read to cleanup the pipeline
+                        request.getEvent().setEventType(CometEvent.EventType.END);
+                        request.getEvent().setEventSubType(null);
+                    } else {
+                        request.getEvent().setEventType(CometEvent.EventType.CALLBACK);
+                        request.getEvent().setEventSubType(null);
+                    }
                 } else if (status == SocketStatus.DISCONNECT) {
                     request.getEvent().setEventType(CometEvent.EventType.ERROR);
                     request.getEvent().setEventSubType(CometEvent.EventSubType.CLIENT_DISCONNECT);
