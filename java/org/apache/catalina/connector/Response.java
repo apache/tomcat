@@ -52,6 +52,8 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.net.URL;
+import org.apache.coyote.ActionCode;
+import org.apache.tomcat.util.MutableBoolean;
 
 /**
  * Wrapper object for the Coyote response.
@@ -533,7 +535,9 @@ public class Response
      * Return true if bytes are available.
      */
     public boolean isWriteable() {
-        return (outputBuffer.lastWrite() > 0);
+        MutableBoolean bool = new MutableBoolean(false);
+        coyoteResponse.action(ActionCode.ACTION_COMET_WRITEABLE,bool);
+        return bool.get();    
     }
 
     

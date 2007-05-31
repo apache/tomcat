@@ -324,13 +324,6 @@ public class OutputBuffer extends Writer
     }
 
     
-    /**
-     * Return the amount of bytes written by the lower layer.
-     */
-    protected int lastWrite() {
-        return coyoteResponse.getLastWrite();
-    }
-    
 
     // ------------------------------------------------- Bytes Handling Methods
 

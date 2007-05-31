@@ -54,6 +54,7 @@ import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 import org.apache.tomcat.util.net.PollerInterest;
+import org.apache.tomcat.util.MutableBoolean;
 
 
 /**
@@ -91,12 +92,12 @@ public class Http11NioProcessor implements ActionHook {
 
         request = new Request();
         int readTimeout = endpoint.getSoTimeout();
-        inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize,readTimeout);
+        inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(inputBuffer);
 
         response = new Response();
         response.setHook(this);
-        outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize,readTimeout);
+        outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize);
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
@@ -819,7 +820,6 @@ public class Http11NioProcessor implements ActionHook {
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
                     socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
-                    inputBuffer.readTimeout = soTimeout;
                 }
                 if (!inputBuffer.parseRequestLine(keptAlive)) {
                     //no data available yet, since we might have read part
@@ -839,7 +839,6 @@ public class Http11NioProcessor implements ActionHook {
                 request.setStartTime(System.currentTimeMillis());
                 if (!disableUploadTimeout) { //only for body, not for request headers
                     socket.getIOChannel().socket().setSoTimeout((int)timeout);
-                    inputBuffer.readTimeout = soTimeout;
                 }
             } catch (IOException e) {
                 error = true;
@@ -1223,20 +1222,22 @@ public class Http11NioProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_COMET_REGISTER) {
             int interest = getPollerInterest(param);
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            attach.setCometOps(attach.getCometOps()|interest);
-            //notify poller if not on a tomcat thread
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
-                socket.getPoller().cometInterest(socket);
-        } else if (actionCode == ActionCode.ACTION_COMET_UNREGISTER) {
-            int interest = getPollerInterest(param);
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            attach.setCometOps(attach.getCometOps()& (~interest));
+            attach.setCometOps(interest);
             //notify poller if not on a tomcat thread
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
                 socket.getPoller().cometInterest(socket);
         } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE) {
+        } else if (actionCode == ActionCode.ACTION_COMET_READABLE) {
+            MutableBoolean bool = (MutableBoolean)param;
+            try {
+                bool.set(inputBuffer.isReadable());
+            }catch ( IOException x ) {
+                throw new RuntimeException(x);
+            }
+        } else if (actionCode == ActionCode.ACTION_COMET_WRITEABLE) {
+            MutableBoolean bool = (MutableBoolean)param;
+            bool.set(outputBuffer.isWritable());
         }
 
     }

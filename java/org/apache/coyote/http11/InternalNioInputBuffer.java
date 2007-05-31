@@ -30,6 +30,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioEndpoint;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -51,8 +52,7 @@ public class InternalNioInputBuffer implements InputBuffer {
     /**
      * Alternate constructor.
      */
-    public InternalNioInputBuffer(Request request, int headerBufferSize, 
-                                  long readTimeout) {
+    public InternalNioInputBuffer(Request request, int headerBufferSize) {
 
         this.request = request;
         headers = request.getMimeHeaders();
@@ -79,12 +79,6 @@ public class InternalNioInputBuffer implements InputBuffer {
         headerParsePos = HeaderParsePosition.HEADER_START;
         headerData.recycle();
         swallowInput = true;
-
-        if (readTimeout < 0) {
-            this.readTimeout = -1;
-        } else {
-            this.readTimeout = readTimeout;
-        }
 
     }
 
@@ -195,12 +189,6 @@ public class InternalNioInputBuffer implements InputBuffer {
     protected int lastActiveFilter;
 
 
-    /**
-     * The socket timeout used when reading the first block of the request
-     * header.
-     */
-    protected long readTimeout;
-
     // ------------------------------------------------------------- Properties
 
 
@@ -296,7 +284,23 @@ public class InternalNioInputBuffer implements InputBuffer {
     }
 
     // --------------------------------------------------------- Public Methods
-
+    /**
+     * Returns true if there are bytes available from the socket layer
+     * @return boolean
+     * @throws IOException
+     */
+    public boolean isReadable() throws IOException {
+        return (pos < lastValid) || (nbRead()>0);
+    }
+    
+    /**
+     * Issues a non blocking read
+     * @return int
+     * @throws IOException
+     */
+    public int nbRead() throws IOException {
+        return readSocket(true,false);
+    }
 
     /**
      * Recycle the input buffer. This should be called when closing the 
@@ -413,13 +417,8 @@ public class InternalNioInputBuffer implements InputBuffer {
                     if (useAvailableData) {
                         return false;
                     }
-                    if (readTimeout == -1) {
-                        if (!fill(false,true)) //request line parsing
-                            throw new EOFException(sm.getString("iib.eof.error"));
-                    } else {
-                        // Do a simple read with a short timeout
-                        if ( !readSocket(true, false) ) return false;
-                    }
+                    // Do a simple read with a short timeout
+                    if ( readSocket(true, false)==0 ) return false;
                 }
                 chr = buf[pos++];
             } while ((chr == Constants.CR) || (chr == Constants.LF));
@@ -434,13 +433,8 @@ public class InternalNioInputBuffer implements InputBuffer {
                 if (useAvailableData) {
                     return false;
                 }
-                if (readTimeout == -1) {
-                    if (!fill(false,false)) //request line parsing
-                        return false;
-                } else {
-                    // Do a simple read with a short timeout
-                    if ( !readSocket(true, false) ) return false;
-                }
+                // Do a simple read with a short timeout
+                if ( readSocket(true, false)==0 ) return false;
             }
             parsingRequestLinePhase = 2;
         }
@@ -552,6 +546,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             tmp = null;
         }
     }
+    
     /**
      * Perform blocking read with a timeout if desired
      * @param timeout boolean - if we want to use the timeout data
@@ -560,15 +555,16 @@ public class InternalNioInputBuffer implements InputBuffer {
      * @throws IOException if a socket exception occurs
      * @throws EOFException if end of stream is reached
      */
-    private boolean readSocket(boolean timeout, boolean block) throws IOException {
+    private int readSocket(boolean timeout, boolean block) throws IOException {
         int nRead = 0;
-        long rto = timeout?this.readTimeout:-1;
         socket.getBufHandler().getReadBuffer().clear();
         if ( block ) {
             Selector selector = null;
             try { selector = getSelectorPool().get(); }catch ( IOException x ) {}
             try {
-                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket,selector,rto);
+                NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                if ( att == null ) throw new IOException("Key must be cancelled.");
+                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket,selector,att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally { 
@@ -583,12 +579,12 @@ public class InternalNioInputBuffer implements InputBuffer {
             expand(nRead + pos);
             socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
             lastValid = pos + nRead;
-            return true;
+            return nRead;
         } else if (nRead == -1) {
             //return false;
             throw new EOFException(sm.getString("iib.eof.error"));
         } else {
-            return false;
+            return 0;
         }
     }
 
@@ -852,7 +848,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             }
 
             // Do a simple read with a short timeout
-            read = readSocket(timeout,block);
+            read = readSocket(timeout,block)>0;
         } else {
 
             if (buf.length - end < 4500) {
@@ -865,7 +861,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             pos = end;
             lastValid = pos;
             // Do a simple read with a short timeout
-            read = readSocket(timeout, block);
+            read = readSocket(timeout, block)>0;
         }
         return read;
     }

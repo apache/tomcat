@@ -479,24 +479,13 @@ public class NioEndpoint {
     /**
      * The socket poller.
      */
-    protected Poller[] pollers = null;
-    protected int pollerRoundRobin = 0;
+    protected Poller poller = null;
     public Poller getPoller0() {
-        pollerRoundRobin = (pollerRoundRobin + 1) % pollers.length;
-        Poller poller = pollers[pollerRoundRobin];
         return poller;
     }
 
-
-    /**
-     * The socket poller used for Comet support.
-     */
-    public Poller getCometPoller0() {
-        Poller poller = getPoller0();
-        return poller;
-    }
-
-
+    protected Poller readWritePoller = null;
+    
     /**
      * Dummy maxSpareThreads property.
      */
@@ -649,14 +638,10 @@ public class NioEndpoint {
      * Number of keepalive sockets.
      */
     public int getKeepAliveCount() {
-        if (pollers == null) {
+        if (poller == null) {
             return 0;
         } else {
-            int keepAliveCount = 0;
-            for (int i = 0; i < pollers.length; i++) {
-                keepAliveCount += pollers[i].getKeepAliveCount();
-            }
-            return keepAliveCount;
+                return poller.selector.keys().size();
         }
     }
 
@@ -793,16 +778,12 @@ public class NioEndpoint {
                 acceptorThread.start();
             }
 
-            // Start poller threads
-            pollers = new Poller[pollerThreadCount];
-            for (int i = 0; i < pollerThreadCount; i++) {
-                pollers[i] = new Poller();
-                pollers[i].init();
-                Thread pollerThread = new Thread(pollers[i], getName() + "-Poller-" + i);
-                pollerThread.setPriority(threadPriority);
-                pollerThread.setDaemon(true);
-                pollerThread.start();
-            }
+            // Start poller thread
+            poller = new Poller();
+            Thread pollerThread = new Thread(poller, getName() + "-ClientPoller");
+            pollerThread.setPriority(threadPriority);
+            pollerThread.setDaemon(true);
+            pollerThread.start();
         }
     }
 
@@ -836,10 +817,8 @@ public class NioEndpoint {
         if (running) {
             running = false;
             unlockAccept();
-            for (int i = 0; i < pollers.length; i++) {
-                pollers[i].destroy();
-            }
-            pollers = null;
+                poller.destroy();
+            poller = null;
         }
         eventCache.clear();
         keyCache.clear();
@@ -1118,6 +1097,8 @@ public class NioEndpoint {
     
     protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
+            KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
+            attachment.setCometNotify(false); //will get reset upon next reg
             if (executor == null) {
                 getWorkerThread().assign(socket, status);
             } else {
@@ -1248,8 +1229,9 @@ public class NioEndpoint {
                             interestOps = (interestOps & (~OP_CALLBACK));//remove the callback flag
                             att.access();//to prevent timeout
                             //we are registering the key to start with, reset the fairness counter.
-                            att.interestOps(interestOps);
-                            key.interestOps(interestOps);
+                            int ops = key.interestOps() | interestOps;
+                            att.interestOps(ops);
+                            key.interestOps(ops);
                         } else {
                             cancel = true;
                         }
@@ -1269,6 +1251,7 @@ public class NioEndpoint {
             return super.toString()+"[intOps="+this.interestOps+"]";
         }
     }
+    
     /**
      * Poller class.
      */
@@ -1279,9 +1262,6 @@ public class NioEndpoint {
         
         protected boolean close = false;
         protected long nextExpiration = 0;//optimize expiration handling
-
-        protected int keepAliveCount = 0;
-        public int getKeepAliveCount() { return keepAliveCount; }
         
         protected AtomicLong wakeupCounter = new AtomicLong(0l);
         
@@ -1294,14 +1274,6 @@ public class NioEndpoint {
         }
         
         public Selector getSelector() { return selector;}
-
-        /**
-         * Create the poller. With some versions of APR, the maximum poller size will
-         * be 62 (reocmpiling APR is necessary to remove this limitation).
-         */
-        protected void init() {
-            keepAliveCount = 0;
-        }
 
         /**
          * Destroy the poller.
@@ -1379,7 +1351,7 @@ public class NioEndpoint {
             socket.setPoller(this);
             KeyAttachment key = keyCache.poll();
             final KeyAttachment ka = key!=null?key:new KeyAttachment();
-            ka.reset(this,socket);
+            ka.reset(this,socket,getSocketProperties().getSoTimeout());
             PollerEvent r = eventCache.poll();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
@@ -1621,7 +1593,6 @@ public class NioEndpoint {
                     } else if ( ka.getError() ) {
                         cancelledKey(key, SocketStatus.ERROR,true);
                     } else if (ka.getComet() && ka.getCometNotify() ) {
-                        ka.setCometNotify(false);//this will get reset after invokation if callback is still in there
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
@@ -1656,13 +1627,13 @@ public class NioEndpoint {
         public KeyAttachment() {
             
         }
-        public void reset(Poller poller, NioChannel channel) {
+        public void reset(Poller poller, NioChannel channel, long soTimeout) {
             this.channel = channel;
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
             currentAccess = false;
             comet = false;
-            timeout = -1;
+            timeout = soTimeout;
             error = false;
             lastRegistered = 0;
             sendfileData = null;
@@ -1676,7 +1647,7 @@ public class NioEndpoint {
         }
         
         public void reset() {
-            reset(null,null);
+            reset(null,null,-1);
         }
         
         public Poller getPoller() { return poller;}
