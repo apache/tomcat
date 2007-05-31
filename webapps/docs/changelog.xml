@@ -43,6 +43,10 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>39425</bug> Add additional system property permission to
+        catalina.policy for pre-compiled JSPs. (markt)
+      </fix>
+      <fix>
         <bug>42438</bug> Duplicate temporary variables were created when
         jsp:attribute was used in conjunction with custom tags. Patch provided
         by Brian Lenz. (markt)
