@@ -1324,6 +1324,10 @@ public class NioEndpoint {
         public void cometInterest(NioChannel socket) {
             KeyAttachment att = (KeyAttachment)socket.getAttachment(false);
             add(socket,att.getCometOps());
+            if ( (att.getCometOps()&OP_CALLBACK) == OP_CALLBACK ) {
+                nextExpiration = 0; //force the check for faster callback
+                selector.wakeup();
+            }
         }
         
         public void wakeup() {
@@ -1510,9 +1514,14 @@ public class NioEndpoint {
                         } else if ( attachment.getComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
-                                unreg(sk, attachment, sk.readyOps());
-                                if (!processSocket(channel, SocketStatus.OPEN_READ))
-                                    processSocket(channel, SocketStatus.DISCONNECT);
+                                //set interest ops to 0 so we don't get multiple
+                                //invokations
+                                reg(sk, attachment, 0);
+                                //read goes before write
+                                if (sk.isReadable())
+                                    if (!processSocket(channel, SocketStatus.OPEN_READ)) processSocket(channel, SocketStatus.DISCONNECT);
+                                else
+                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE)) processSocket(channel, SocketStatus.DISCONNECT);
                             } else {
                                 result = false;
                             }
