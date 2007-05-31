@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.MutableInteger;
-import java.util.Iterator;
 
 /**
  *
@@ -138,6 +137,10 @@ public class NioSelectorPool {
     
     public int write(ByteBuffer buf, NioChannel socket, Selector selector, 
                      long writeTimeout, boolean block,MutableInteger lastWrite) throws IOException {
+        if (socket.getBufHandler().getWriteBuffer() != buf) {
+            socket.getBufHandler().getWriteBuffer().put(buf);
+            buf = socket.getBufHandler().getWriteBuffer();
+        }
         if ( SHARED && block ) {
             return NioBlockingSelector.write(buf,socket,writeTimeout,lastWrite);
         }
@@ -146,10 +149,6 @@ public class NioSelectorPool {
         boolean timedout = false;
         int keycount = 1; //assume we can write
         long time = System.currentTimeMillis(); //start the timeout timer
-        if ( socket.getBufHandler().getWriteBuffer()!= buf ) {
-            socket.getBufHandler().getWriteBuffer().put(buf);
-            buf = socket.getBufHandler().getWriteBuffer();
-        }
         try {
             while ( (!timedout) && buf.hasRemaining() ) {
                 int cnt = 0;
