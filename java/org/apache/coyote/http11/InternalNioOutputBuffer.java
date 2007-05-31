@@ -419,7 +419,7 @@ public class InternalNioOutputBuffer
 
     }
 
-    private synchronized void writeToSocket(ByteBuffer bytebuffer, boolean flip) throws IOException {
+    private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean flip) throws IOException {
         //int limit = bytebuffer.position();
         if ( flip ) bytebuffer.flip();
         int written = 0;
@@ -440,6 +440,7 @@ public class InternalNioOutputBuffer
         }
         socket.getBufHandler().getWriteBuffer().clear();
         this.total = 0;
+        return written;
     } 
 
 
