@@ -81,7 +81,7 @@ public class BeanELResolver extends ELResolver {
 		}
 
 		context.setPropertyResolved(true);
-		return this.property(context, base, property).getType();
+		return this.property(context, base, property).getPropertyType();
 	}
 
 	public void setValue(ELContext context, Object base, Object property,
@@ -105,7 +105,7 @@ public class BeanELResolver extends ELResolver {
 
 		Method m = this.property(context, base, property).write(context);
 		try {
-			m.invoke(base, new Object[] { value });
+			m.invoke(base, value);
 		} catch (IllegalAccessException e) {
 			throw new ELException(e);
 		} catch (InvocationTargetException e) {
@@ -187,7 +187,7 @@ public class BeanELResolver extends ELResolver {
 			}
 		}
 
-		public BeanProperty get(ELContext ctx, String name) {
+		private BeanProperty get(ELContext ctx, String name) {
 			BeanProperty property = this.properties.get(name);
 			if (property == null) {
 				throw new PropertyNotFoundException(message(ctx,
@@ -196,8 +196,12 @@ public class BeanELResolver extends ELResolver {
 			}
 			return property;
 		}
+
+        public BeanProperty getBeanProperty(String name) {
+            return get(null, name);
+        }
         
-        public Class<?> getType() {
+        private Class<?> getType() {
             return type;
         }
 	}
@@ -213,13 +217,13 @@ public class BeanELResolver extends ELResolver {
 
 		private Method write;
 
-		public BeanProperty(Class owner, PropertyDescriptor descriptor) {
+		public BeanProperty(Class<?> owner, PropertyDescriptor descriptor) {
 			this.owner = owner;
 			this.descriptor = descriptor;
 			this.type = descriptor.getPropertyType();
 		}
 
-		public Class<?> getType() {
+		public Class getPropertyType() {
 			return this.type;
 		}
 
@@ -228,7 +232,15 @@ public class BeanELResolver extends ELResolver {
 		        && (null == (this.write = getMethod(this.owner, descriptor.getWriteMethod())));
 		}
 
-		public Method write(ELContext ctx) {
+		public Method getWriteMethod() {
+			return write(null);
+		}
+
+		public Method getReadMethod() {
+			return this.read(null);
+		}
+
+		private Method write(ELContext ctx) {
 			if (this.write == null) {
 				this.write = getMethod(this.owner, descriptor.getWriteMethod());
 				if (this.write == null) {
@@ -240,7 +252,7 @@ public class BeanELResolver extends ELResolver {
 			return this.write;
 		}
 
-		public Method read(ELContext ctx) {
+		private Method read(ELContext ctx) {
 			if (this.read == null) {
 				this.read = getMethod(this.owner, descriptor.getReadMethod());
 				if (this.read == null) {
