@@ -57,7 +57,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 		return null;
 	}
 
-	public Class getType(ELContext context, Object base, Object property)
+	public Class<Object> getType(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
