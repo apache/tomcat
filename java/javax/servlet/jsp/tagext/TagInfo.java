@@ -38,21 +38,21 @@ public class TagInfo {
      * Static constant for getBodyContent() when it is Tag dependent.
      */
 
-    public static final String BODY_CONTENT_TAG_DEPENDENT = "TAGDEPENDENT";
+    public static final String BODY_CONTENT_TAG_DEPENDENT = "tagdependent";
 
 
     /**
      * Static constant for getBodyContent() when it is empty.
      */
 
-    public static final String BODY_CONTENT_EMPTY = "EMPTY";
+    public static final String BODY_CONTENT_EMPTY = "empty";
     
     /**
      * Static constant for getBodyContent() when it is scriptless.
      * 
      * @since 2.0
      */ 
-    public static final String BODY_CONTENT_SCRIPTLESS = "SCRIPTLESS";
+    public static final String BODY_CONTENT_SCRIPTLESS = "scriptless";
 
     /**
      * Constructor for TagInfo from data in the JSP 1.1 format for TLD.
