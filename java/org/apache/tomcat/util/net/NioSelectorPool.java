@@ -39,12 +39,19 @@ import org.apache.tomcat.util.MutableInteger;
  */
 
 public class NioSelectorPool {
+    
+    public NioSelectorPool() {
+    }
+    
     protected static int threadCount = 0;
     
     protected static Log log = LogFactory.getLog(NioSelectorPool.class);
 
     protected final static boolean SHARED =
         Boolean.valueOf(System.getProperty("org.apache.tomcat.util.net.NioSelectorShared", "true")).booleanValue();
+    
+    protected NioBlockingSelector blockingSelector;
+    
     protected Selector SHARED_SELECTOR;
     
     protected int maxSelectors = 200;
@@ -107,6 +114,9 @@ public class NioSelectorPool {
         while ( (s = selectors.poll()) != null ) s.close();
         spare.set(0);
         active.set(0);
+        if (blockingSelector!=null) {
+            blockingSelector.close();
+        }
         if ( SHARED && getSharedSelector()!=null ) {
             getSharedSelector().close();
             SHARED_SELECTOR = null;
@@ -116,6 +126,11 @@ public class NioSelectorPool {
     public void open() throws IOException {
         enabled = true;
         getSharedSelector();
+        if (SHARED) {
+            blockingSelector = new NioBlockingSelector();
+            blockingSelector.open(getSharedSelector());
+        }
+
     }
 
     /**
@@ -142,7 +157,7 @@ public class NioSelectorPool {
             buf = socket.getBufHandler().getWriteBuffer();
         }
         if ( SHARED && block ) {
-            return NioBlockingSelector.write(buf,socket,writeTimeout,lastWrite);
+            return blockingSelector.write(buf,socket,writeTimeout,lastWrite);
         }
         SelectionKey key = null;
         int written = 0;
@@ -215,7 +230,7 @@ public class NioSelectorPool {
      */
     public int read(ByteBuffer buf, NioChannel socket, Selector selector, long readTimeout, boolean block) throws IOException {
         if ( SHARED && block ) {
-            return NioBlockingSelector.read(buf,socket,readTimeout);
+            return blockingSelector.read(buf,socket,readTimeout);
         }
         SelectionKey key = null;
         int read = 0;

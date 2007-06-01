@@ -737,7 +737,7 @@ public class NioEndpoint {
         }
         
         if (oomParachute>0) reclaimParachute(true);
-
+        selectorPool.open();
         initialized = true;
 
     }
@@ -832,6 +832,7 @@ public class NioEndpoint {
             }
             executor = null;
         }
+        
     }
 
 
@@ -849,6 +850,7 @@ public class NioEndpoint {
         sslContext = null;
         initialized = false;
         releaseCaches();
+        selectorPool.close();
     }
 
 
@@ -1473,13 +1475,7 @@ public class NioEndpoint {
                     sk.attach(attachment);//cant remember why this is here
                     NioChannel channel = attachment.getChannel();
                     if (sk.isReadable() || sk.isWritable() ) {
-                        if ( sk.isReadable() && attachment.getReadLatch() != null ) {
-                            unreg(sk, attachment,SelectionKey.OP_READ);
-                            attachment.getReadLatch().countDown();
-                        } else if ( sk.isWritable() && attachment.getWriteLatch() != null ) {
-                            unreg(sk, attachment,SelectionKey.OP_WRITE);
-                            attachment.getWriteLatch().countDown();
-                        } else if ( attachment.getSendfileData() != null ) {
+                        if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment,true);
                         } else if ( attachment.getComet() ) {
                             //check if thread is available
@@ -1674,7 +1670,7 @@ public class NioEndpoint {
         public CountDownLatch getReadLatch() { return readLatch; }
         public CountDownLatch getWriteLatch() { return writeLatch; }
         protected CountDownLatch resetLatch(CountDownLatch latch) {
-            if ( latch.getCount() == 0 ) return null;
+            if ( latch==null || latch.getCount() == 0 ) return null;
             else throw new IllegalStateException("Latch must be at count 0");
         }
         public void resetReadLatch() { readLatch = resetLatch(readLatch); }
