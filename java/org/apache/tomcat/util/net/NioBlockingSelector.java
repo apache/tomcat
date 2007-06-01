@@ -20,20 +20,20 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.channels.CancelledKeyException;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
-import org.apache.tomcat.util.MutableInteger;
-import java.nio.channels.Selector;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import java.util.Iterator;
-import java.nio.channels.SocketChannel;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.CancelledKeyException;
-import java.util.concurrent.CountDownLatch;
+import org.apache.tomcat.util.MutableInteger;
+import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 public class NioBlockingSelector {
     
@@ -61,6 +61,7 @@ public class NioBlockingSelector {
         if (poller!=null) {
             poller.disable();
             poller.interrupt();
+            poller = null;
         }
     }
 
@@ -214,7 +215,12 @@ public class NioBlockingSelector {
                             sk.interestOps(sk.interestOps() | ops);
                         }
                     }catch (ClosedChannelException cx) {
-                        if (sk!=null) sk.cancel();
+                        if (sk!=null) {
+                            sk.cancel();
+                            sk.attach(null);
+                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
+                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                        }
                     }
                 }
             };
