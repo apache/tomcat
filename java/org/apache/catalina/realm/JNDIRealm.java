@@ -35,6 +35,7 @@ import javax.naming.NamingException;
 import javax.naming.NameParser;
 import javax.naming.Name;
 import javax.naming.AuthenticationException;
+import javax.naming.ServiceUnavailableException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
@@ -826,6 +827,21 @@ public class JNDIRealm extends RealmBase {
                 principal = authenticate(context, username, credentials);
 
             } catch (CommunicationException e) {
+
+                // log the exception so we know it's there.
+                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+
+                // close the connection so we know it will be reopened.
+                if (context != null)
+                    close(context);
+
+                // open a new directory context.
+                context = open();
+
+                // Try the authentication again.
+                principal = authenticate(context, username, credentials);
+
+            } catch (ServiceUnavailableException e) {
 
                 // log the exception so we know it's there.
                 containerLog.warn(sm.getString("jndiRealm.exception"), e);
