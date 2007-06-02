@@ -18,6 +18,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>33774</bug> Retry JNDI authentiction on ServiceUnavailableException
+        as at least one provider throws this after an idle connection has been
+        closed. (markt)
+      </fix>
+      <fix>
          <bug>39875</bug>: Fix BPE in RealmBase.init(). Port of yoavs's fix from
          Tomcat 5. (markt)
       </fix>
