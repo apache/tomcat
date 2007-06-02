@@ -82,7 +82,8 @@ public class MemoryRealm  extends RealmBase {
     /**
      * The set of valid Principals for this Realm, keyed by user name.
      */
-    private Map principals = new HashMap();
+    private Map<String,GenericPrincipal> principals =
+        new HashMap<String,GenericPrincipal>();
 
 
     /**
@@ -184,7 +185,7 @@ public class MemoryRealm  extends RealmBase {
     void addUser(String username, String password, String roles) {
 
         // Accumulate the list of roles for this user
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList<String>();
         roles += ",";
         while (true) {
             int comma = roles.indexOf(',');

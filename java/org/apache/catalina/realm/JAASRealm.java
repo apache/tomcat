@@ -457,7 +457,6 @@ public class JAASRealm
      */
     protected Principal createPrincipal(String username, Subject subject) {
         // Prepare to scan the Principals for this Subject
-        String password = null; // Will not be carried forward
 
         List<String> roles = new ArrayList<String>();
         Principal userPrincipal = null;
