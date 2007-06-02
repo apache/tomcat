@@ -18,13 +18,8 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-         <bug>42449</bug>:
-         JNDIRealm does not catch NullPointerException for Sun's
-         LDAP provider (See bug for details) (funkman)
-      </fix>
-      <fix>
-         <bug>42444</bug>: prevent NPE for AccessLogValve
-         Patch provided by Nils Hammar (funkman)
+         <bug>39875</bug>: Fix BPE in RealmBase.init(). Port of yoavs's fix from
+         Tomcat 5. (markt)
       </fix>
       <fix>
          <bug>42361</bug>: Handle multi-part forms when saving requests during
@@ -35,8 +30,17 @@
          (markt)
       </fix>
       <fix>
-         <bug>39875</bug>: Fix BPE in RealmBase.init(). Port of yoavs's fix from
-         Tomcat 5. (markt)
+         <bug>42444</bug>: prevent NPE for AccessLogValve
+         Patch provided by Nils Hammar (funkman)
+      </fix>
+      <fix>
+         <bug>42449</bug>:
+         JNDIRealm does not catch NullPointerException for Sun's
+         LDAP provider (See bug for details) (funkman)
+      </fix>
+      <fix>
+         <bug>42497</bug>: Ensure ETag header is present in a 304 response.
+         Patch provided by Len Popp. (markt)
       </fix>
     </changelog>
   </subsection>
