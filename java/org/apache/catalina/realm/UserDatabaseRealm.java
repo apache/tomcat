@@ -214,7 +214,7 @@ public class UserDatabaseRealm
             return null;
         }
 
-        List roles = new ArrayList();
+        List<String> roles = new ArrayList<String>();
         Iterator uroles = user.getRoles();
         while(uroles.hasNext()) {
             Role role = (Role)uroles.next();

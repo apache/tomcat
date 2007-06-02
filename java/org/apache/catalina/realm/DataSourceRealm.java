@@ -345,7 +345,7 @@ public class DataSourceRealm
             return (null);
         }
 
-        ArrayList list = getRoles(dbConnection, username);
+        ArrayList<String> list = getRoles(dbConnection, username);
 
         // Create and return a suitable Principal for this user
         return (new GenericPrincipal(this, username, credentials, list));
@@ -527,17 +527,17 @@ public class DataSourceRealm
      * @param dbConnection The database connection to be used
      * @param username Username for which roles should be retrieved
      */
-    protected ArrayList getRoles(Connection dbConnection,
+    protected ArrayList<String> getRoles(Connection dbConnection,
                                      String username) {
     	
         ResultSet rs = null;
         PreparedStatement stmt = null;
-        ArrayList list = null;
+        ArrayList<String> list = null;
     	
         try {
     		stmt = roles(dbConnection, username);
     		rs = stmt.executeQuery();
-    		list = new ArrayList();
+    		list = new ArrayList<String>();
     		
     		while (rs.next()) {
     			String role = rs.getString(1);
