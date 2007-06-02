@@ -174,7 +174,8 @@ public class WebdavServlet
      * Key : path <br>
      * Value : LockInfo
      */
-    private Hashtable resourceLocks = new Hashtable();
+    private Hashtable<String,LockInfo> resourceLocks =
+        new Hashtable<String,LockInfo>();
 
 
     /**
@@ -185,7 +186,8 @@ public class WebdavServlet
      * collection. Each element of the Vector is the path associated with
      * the lock-null resource.
      */
-    private Hashtable lockNullResources = new Hashtable();
+    private Hashtable<String,Vector<String>> lockNullResources =
+        new Hashtable<String,Vector<String>>();
 
 
     /**
@@ -194,7 +196,7 @@ public class WebdavServlet
      * Key : path <br>
      * Value : LockInfo
      */
-    private Vector collectionLocks = new Vector();
+    private Vector<LockInfo> collectionLocks = new Vector<LockInfo>();
 
 
     /**
@@ -358,7 +360,7 @@ public class WebdavServlet
         }
 
         // Properties which are to be displayed.
-        Vector properties = null;
+        Vector<String> properties = null;
         // Propfind depth
         int depth = INFINITY;
         // Propfind type
@@ -416,7 +418,7 @@ public class WebdavServlet
         }
 
         if (type == FIND_BY_PROPERTY) {
-            properties = new Vector();
+            properties = new Vector<String>();
             NodeList childList = propNode.getChildNodes();
 
             for (int i=0; i < childList.getLength(); i++) {
@@ -504,11 +506,11 @@ public class WebdavServlet
                             properties);
         } else {
             // The stack always contains the object of the current level
-            Stack stack = new Stack();
+            Stack<String> stack = new Stack<String>();
             stack.push(path);
 
             // Stack of the objects one level below
-            Stack stackBelow = new Stack();
+            Stack<String> stackBelow = new Stack<String>();
 
             while ((!stack.isEmpty()) && (depth >= 0)) {
 
@@ -567,7 +569,7 @@ public class WebdavServlet
                 if (stack.isEmpty()) {
                     depth--;
                     stack = stackBelow;
-                    stackBelow = new Stack();
+                    stackBelow = new Stack<String>();
                 }
 
                 generatedXML.sendData();
@@ -1017,7 +1019,7 @@ public class WebdavServlet
 
                 // Checking if a child resource of this collection is
                 // already locked
-                Vector lockPaths = new Vector();
+                Vector<String> lockPaths = new Vector<String>();
                 locksList = collectionLocks.elements();
                 while (locksList.hasMoreElements()) {
                     LockInfo currentLock = (LockInfo) locksList.nextElement();
@@ -1164,10 +1166,10 @@ public class WebdavServlet
                         int slash = lock.path.lastIndexOf('/');
                         String parentPath = lock.path.substring(0, slash);
 
-                        Vector lockNulls =
-                            (Vector) lockNullResources.get(parentPath);
+                        Vector<String> lockNulls =
+                            lockNullResources.get(parentPath);
                         if (lockNulls == null) {
-                            lockNulls = new Vector();
+                            lockNulls = new Vector<String>();
                             lockNullResources.put(parentPath, lockNulls);
                         }
 
@@ -1636,7 +1638,7 @@ public class WebdavServlet
 
         // Copying source to destination
 
-        Hashtable errorList = new Hashtable();
+        Hashtable<String,Integer> errorList = new Hashtable<String,Integer>();
 
         boolean result = copyResource(resources, errorList,
                                       path, destinationPath);
@@ -1666,8 +1668,8 @@ public class WebdavServlet
      * @param source Path of the resource to be copied
      * @param dest Destination path
      */
-    private boolean copyResource(DirContext resources, Hashtable errorList,
-                                 String source, String dest) {
+    private boolean copyResource(DirContext resources,
+            Hashtable<String,Integer> errorList, String source, String dest) {
 
         if (debug > 1)
             log("Copy: " + source + " To: " + dest);
@@ -1807,7 +1809,8 @@ public class WebdavServlet
             }
         } else {
 
-            Hashtable errorList = new Hashtable();
+            Hashtable<String,Integer> errorList =
+                new Hashtable<String,Integer>();
 
             deleteCollection(req, resources, path, errorList);
             try {
@@ -1842,7 +1845,8 @@ public class WebdavServlet
      */
     private void deleteCollection(HttpServletRequest req,
                                   DirContext resources,
-                                  String path, Hashtable errorList) {
+                                  String path,
+                                  Hashtable<String,Integer> errorList) {
 
         if (debug > 1)
             log("Delete:" + path);
@@ -1983,7 +1987,7 @@ public class WebdavServlet
     private void parseProperties(HttpServletRequest req,
                                  XMLWriter generatedXML,
                                  String path, int type,
-                                 Vector propertiesVector) {
+                                 Vector<String> propertiesVector) {
 
         // Exclude any resource in the /WEB-INF and /META-INF subdirectories
         // (the "toUpperCase()" avoids problems on Windows systems)
@@ -2119,14 +2123,14 @@ public class WebdavServlet
 
         case FIND_BY_PROPERTY :
 
-            Vector propertiesNotFound = new Vector();
+            Vector<String> propertiesNotFound = new Vector<String>();
 
             // Parse the list of properties
 
             generatedXML.writeElement(null, "propstat", XMLWriter.OPENING);
             generatedXML.writeElement(null, "prop", XMLWriter.OPENING);
 
-            Enumeration properties = propertiesVector.elements();
+            Enumeration<String> properties = propertiesVector.elements();
 
             while (properties.hasMoreElements()) {
 
@@ -2396,7 +2400,7 @@ public class WebdavServlet
 
         case FIND_BY_PROPERTY :
 
-            Vector propertiesNotFound = new Vector();
+            Vector<String> propertiesNotFound = new Vector<String>();
 
             // Parse the list of properties
 
@@ -2645,7 +2649,7 @@ public class WebdavServlet
         String scope = "exclusive";
         int depth = 0;
         String owner = "";
-        Vector tokens = new Vector();
+        Vector<String> tokens = new Vector<String>();
         long expiresAt = 0;
         Date creationDate = new Date();
 
@@ -2742,20 +2746,6 @@ public class WebdavServlet
     }
 
 
-    // --------------------------------------------------- Property Inner Class
-
-
-    private class Property {
-
-        public String name;
-        public String value;
-        public String namespace;
-        public String namespaceAbbrev;
-        public int status = WebdavStatus.SC_OK;
-
-    }
-
-
 };
 
 
@@ -2782,7 +2772,8 @@ class WebdavStatus {
      * status codes to descriptive text.  This is a static
      * variable.
      */
-    private static Hashtable mapStatusCodes = new Hashtable();
+    private static Hashtable<Integer,String> mapStatusCodes =
+        new Hashtable<Integer,String>();
 
 
     // ------------------------------------------------------ HTTP Status Codes
