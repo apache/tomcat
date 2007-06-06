@@ -74,7 +74,7 @@ echo Using JAVA_HOME:        %JAVA_HOME%
 rem Use the environment variables as an example
 rem Each command line option is prefixed with PR_
 
-set PR_DESCRIPTION=Apache Tomcat Server - http://jakarta.apache.org/tomcat
+set PR_DESCRIPTION=Apache Tomcat Server - http://tomcat.apache.org/
 set PR_INSTALL=%EXECUTABLE%
 set PR_LOGPATH=%CATALINA_BASE%\logs
 set PR_CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar
