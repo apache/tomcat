@@ -22,9 +22,51 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Apr {
-    private static String aprInfo = null;
+    public  static String Platform = null;
+    public  static String Cpu      = null;
+    public  static String[] Libraries = null;
 
     static {
+        String prop = System.getProperty("os.name");
+        String platform = "unknown";
+
+        if (name.startsWith("Windows"))
+            Platform = "windows";
+        else if (name.equals("Linux"))
+            Platform = "linux2";
+        else if (name.equals("SunOS"))
+            Platform = "solaris";
+        else if (name.equals("HP-UX"))
+            Platform = "hpux";
+        else
+            Platform = "unknown";
+       prop = System.getProperty("os.arch");
+
+        if (Platform.equals("windows")) {
+            if (prop.equals("x86"))
+                Cpu = "i686";
+            else
+                Cpu = prop;
+        }
+        else if (Platform.equals("linux2")) {
+            if (prop.equals("x86"))
+                Cpu = "i686";
+            else
+                Cpu = prop;
+        }
+        else if (Platform.equals("solaris")) {
+            Cpu = prop;
+        }
+        else if (Platform.equals("hpux")) {
+            if (prop.startsWith("PA_RISC"))
+                Cpu = "parisc2";
+            else if (prop.startsWith("IA64"))
+                Cpu = "ia64";
+            else
+                Cpu = prop;
+        }
+        else
+            Cpu = "unknown";
 
         try {
             InputStream is = Apr.class.getResourceAsStream
@@ -32,7 +74,11 @@ public class Apr {
             Properties props = new Properties();
             props.load(is);
             is.close();
-            aprInfo = props.getProperty("tcn.info");
+            int count = Integer.parseInt(props.getProperty(Platform + ".count"));
+            Libraries = new String[count];
+            for (int i = 0; i < count; i++) {
+                Libraries[i] = props.getProperty(Platfrom + "." + i);
+            }
         }
         catch (Throwable t) {
             ; // Nothing
