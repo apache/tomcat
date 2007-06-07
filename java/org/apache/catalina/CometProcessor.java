@@ -28,7 +28,17 @@ import javax.servlet.Servlet;
  * asynchronous IO, recieving events when data is available for reading, and
  * being able to output data without the need for being invoked by the container.
  * Note: When this interface is implemented, the service method of the servlet will
- * never be called, and will be replaced with a begin event.
+ * never be called, and will be replaced with a begin event. Should the connector you 
+ * have configured not support Comet, the service method will be called, and the 
+ * request/response will not be marked as comet, but instead behave like a regular 
+ * Servlet<br/>
+ * 
+ * A Comet request, aka Comet connection, referenced through the #CometEvent and the request/response pair
+ * and has a lifecycle somewhat different to a regular servlet.<br/>
+ * 
+ * Read more about it in the Tomcat documentation about Advanced IO, 
+ * 
+ * 
  */
 public interface CometProcessor extends Servlet 
 {
