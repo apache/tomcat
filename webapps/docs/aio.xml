@@ -409,7 +409,7 @@ public class ChatServlet
   <subsection name="Comet timeouts">
     <p>If you are using the NIO connector, you can set individual timeouts for your different comet connections.
        To set a timeout, simple set a request attribute like the following code shows:
-       <source>CometEvent event.... event.setTimeout(30*1000);</source> 
+       <source>event.setTimeout(30*1000);</source> 
        <br/>You can set the timeout on the comet connection at any point in time, even asynchronously.
        Setting a timeout to 1 (one milliseconds) doesn't guarantee that it will timeout at that time.
        Setting the timeout gurantees that Tomcat wont timeout the connection before the connection has been idle

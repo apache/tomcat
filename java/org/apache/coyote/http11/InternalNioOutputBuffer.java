@@ -417,6 +417,7 @@ public class InternalNioOutputBuffer
      * @param flip boolean
      * @return int
      * @throws IOException
+     * @todo Fix non blocking write properly
      */
     private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean flip, boolean block) throws IOException {
         //int limit = bytebuffer.position();
@@ -440,7 +441,7 @@ public class InternalNioOutputBuffer
         }finally { 
             if ( selector != null ) getSelectorPool().put(selector);
         }
-        socket.getBufHandler().getWriteBuffer().clear();
+        if ( block ) socket.getBufHandler().getWriteBuffer().clear(); //only clear
         this.total = 0;
         return written;
     } 
