@@ -9,6 +9,7 @@
   <properties>
     <title>Advanced IO and Tomcat</title>
     <author>Remy Maucherat</author>
+    <author>Filip Hanik</author>
   </properties>
 
 <body>
@@ -39,6 +40,118 @@
     other source).
   </p>
 
+  <subsection name="Comet Terms"> 
+  <p>
+    Comet Connection - For the readability of this document we will be referring an open ended HTTP request and an open
+    ended HTTP response that are mapped to a Cometprocessor as a &quot;Comet Connection&quot;.
+  </p>
+  <p>
+    Comet Processor - a servlet that implements the <code>org.apache.catalina.CometProcessor</code> interface.
+    Used to process comet connections and the events on the connection
+  </p>
+  <p>
+    Comet Event - an event triggered by the container related to a Comet Connection
+  </p>
+  <p>
+    Open Ended Request - a HTTP request that is either chunked or has a very large content length, allowing 
+    data to be sent at different times. This is how Tomcat gets around the request/response methodology of 
+    the HTTP protocol allowing Comet Processors to send and receive data on the socket synchronously and asynchronously.
+  </p>
+  <p>
+    Open Ended Response - see Open Ended Request
+  </p>
+  <p>
+    Active Comet Connection, a comet connection that currently is associated with a TCP connection and an open ended request/response.
+  </p>
+  <p>
+    Blocking Comet Connection, an invocation of the read/write methods will block until data was received/sent.
+  </p>
+  <p>
+    Non blocking Comet Connection, an invocation of the read/write methods will not block.
+  </p>
+  <p>
+    Comet operation - comet connections can register themselves for a set of events to be 
+    notified of. The different operations are:<br/>
+    OP_READ - results in a READ event when data has been received<br/>
+    OP_WRITE - results in a WRITE event when the socket is ready to receive data<br/>
+    OP_CALLBACK - results in a CALLBACK event on a Tomcat thread. 
+  </p>
+  <p>
+    Connection Centric - Comet connections are based on actual IO events on a TCP connection from the TCP layer. 
+    This is different from servlets that are based on HTTP requests and responses, by the HTTP protocol above the TCP layer.
+  </p>
+  <p>
+    Closing a comet connection - may not actually mean that the underlying TCP connection is closed. Tomcat still
+    respects the <code>maxKeepAliveRequests</code> attribute of the connector, and may decide to keep the connection
+    open. This is the case in the event of a connection timeout, the event ERROR/TIMEOUT is signaled and the 
+    TCP connection is reused for the next HTTP request.
+  </p>
+  </subsection>
+  
+  <subsection name="Comet Lifecycle"> 
+  <p>
+    The lifecycle and event cycle of a Comet Connection is slightly different than a regular servlet.
+    Instead the life/event cycle is very &quot;connection centric&quot; and based on IO events, rater then 
+    a request/response cycle like a normal HTTP request. This is the most common mistake developers make when they 
+    start writing comet servlets, is that they don't realize that it is all based around these different events, and 
+    that the events are some what connection centric.
+  </p>
+  <p>
+    A comet interaction is started by the container invoking the event method on the Comet Processor 
+    and the event will have a BEGIN type. For a deeper explanation of types, keep reading.
+    Once a BEGIN event has been invoked, the Comet Connection is active. At this type, the Comet Event object
+    reference can be used to reference the HttpServletRequest/HttpServletResponse objects for asynchronous actions
+    such as reading or writing from the streams or readers/writers. At this point the comet connection is considered active
+    or initiated.
+  </p>
+  <p>
+    Once the Comet connection is active, the comet processor will receive events from the container.
+    These events are defined in the section <a href="#CometEvent">below</a>.<br/>
+    A comet processor may register itself for events, and receive the events when they happen.
+    In a similar fashion, a comet processor may unregister itself from comet events and
+    use the <code>isReadable/isWriteable</code> methods on the comet event to detect the state 
+    of the comet connection. The registered events will be in effect until they are unregistered,
+    the comet connection is closed or terminated.
+    By default a comet connection gets registered for READ events upon initiation.
+    <br/>
+    The event registration can be compared to poll or select structures of different operating systems,
+    and also bear some resemblances with the <code>java.nio</code> API.
+  </p>
+  <p>
+    Since Comet Connections deal directly with the IO layer of the container/connection and read and writes can be done 
+    asynchronously, caution and care should be excersized when programming this. the comet connection itself is not thread safe
+    as such an implementation would suffer performance issues, instead it is up to the comet processor developer to ensure that
+    thread safety is reached and properly handled. 
+    As an example, registering the comet connection for READ events and at the same time performing asynchronous reads
+    on the input stream or the reader, can cause data corruption and dead locks.
+    Same way, using multiple threads to do writes to the output stream or writer can have the same effect.
+    <br/>To be thread safe, one can synchronize on the event object, but you will also need to coordinate it with 
+    events that are registered.
+  </p>
+  <p>
+    There is an event that is not IO based, that is the <code>CometEvent.EventType.CALLBACK</code> event.
+    This is an event that is forced by Tomcat when the <code>OP_CALLBACK</code> operation is registered.
+    Using the OP_CALLBACK operation, Tomcat will spawn a Tomcat worker thread that you can use to piggy back
+    on for reading/writing data or performing other operations, and not having to have spawn and synchronize 
+    your own background threads.<br/>
+    An example scenarion would be where you have one thread pulling content for different comet clients.
+    When the background thread has content for a client, it can store it in the request object as an attribute,
+    then register for the OP_CALLBACK event. Once the CALLBACK event, then the application can use Tomcat's worker
+    thread to write the data to the client.<br/>
+    Tomcat guarantees that only one thread will be invoking the CometProcessor event for a particular client,
+    so by using the Tomcat worker threads to perform your actions, you are thread safe without the expense of 
+    locks or synchronized methods.<br/>
+    Another usage scenario for the CALLBACK event, is when you close the comet connection asynchronously and you want 
+    it processed by tomcat without depending on a timeout or another IO event. This would look like
+    <source>
+      ...
+      event.close();
+      event.register(CometEvent.CometOperation.OP_CALLBACK);
+      ...
+    </source>
+  </p>
+  </subsection>
+
   <subsection name="CometEvent">
   
   <p>
@@ -55,42 +168,54 @@
   <ul>
   <li>EventType.BEGIN: will be called at the beginning 
      of the processing of the connection. It can be used to initialize any relevant 
-     fields using the request and response objects. Between the end of the processing 
+     fields using the request and response objects. During the BEGIN event you may also configure 
+     your comet connection for blocking or non blocking mode. using the <code>configure</code>
+     method on the comet event object. Between the end of the processing  
      of this event, and the beginning of the processing of the end or error events,
      it is possible to use the response object to write data on the open connection.
      Note that the response object and depedent OutputStream and Writer are still 
      not synchronized, so when they are accessed by multiple threads, 
      synchronization is mandatory. After processing the initial event, the request 
-     is considered to be committed.</li>
+     is considered to be committed.<br/><br/></li>
   <li>EventType.READ: This indicates that input data is available, and that one read can be made
-       without blocking. The available and ready methods of the InputStream or
-       Reader may be used to determine if there is a risk of blocking: the servlet
-       should read while data is reported available, and can make one additional read
-       should read while data is reported available. When encountering a read error, 
-       the servlet should report it by propagating the exception properly. Throwing 
-       an exception will cause the error event to be invoked, and the connection 
-       will be closed. 
-       Alternately, it is also possible to catch any exception, perform clean up
-       on any data structure the servlet may be using, and using the close method
-       of the event. It is not allowed to attempt reading data from the request 
-       object outside of the execution of this method.<br/>
-       On some platforms, like Windows, a client disconnect is indicated by a READ event.
-       Reading from the stream may result in -1, an IOException or an EOFException.
-       Make sure you properly handle all these three cases.
-       If you don't catch the IOException, Tomcat will instantly invoke your event chain with an ERROR as 
-       it catches the error for you, and you will be notified of the error at that time.
+     without blocking. The <code>available()</code> and <code>ready()</code> methods of the InputStream or
+     Reader may be used to determine if there is a risk of blocking: the servlet
+     should read while data is reported available, and can make one additional read
+     should read while data is reported available. Not reading all the data, is not recommended,
+     as it may lead to unexpected behavior depending on the connector implementation.<br/>
+     When encountering a read error, the servlet should report it by propagating the exception properly. 
+     Throwing an exception will cause the error event to be invoked, and the connection 
+     will be closed. <br/>
+     Alternately, it is also possible to catch any exception, perform clean up
+     on any data structure the servlet may be using, and using the <code>close()</code> method
+     of the event object. It is not recommended to attempt reading data from the request 
+     object outside of the execution of this method/event if the comet connection is registered for 
+     the READ event. Instead unregister the read event to perform asynchronous reads.<br/>
+     On some platforms, like Windows, a client disconnect is indicated by a READ event.
+     Reading from the stream may result in -1, an IOException or an EOFException.
+     Make sure you properly handle all these three cases.
+     If you don't catch the IOException, Tomcat will instantly invoke your event chain with an ERROR as 
+     it catches the error for you, and you will be notified of the error at that time.<br/><br/>
+  </li>
+  <li>EventType.WRITE: If you wish to be notified whether you can write data to the underlying TCP socket,
+      register your comet connection for this event. Tomcat will invoke this event, and you can write to the response 
+      object. This event is not needed nor should be used unless you are running the comet connection in non blocking mode.<br/><br/>
+  </li>
+ <li>EventType.CALLBACK: When a comet connection is registered using the OP_CALLBACK operation,
+     Tomcat will generate the CALLBACK event periodically. The CALLBACK will always 
+     be invoked using a Tomcat worker thread, just like the other event types.<br/><br/>
   </li>
   <li>EventType.END: End may be called to end the processing of the request. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
      objects will be recycled and used to process other requests. End will also be 
      called when data is available and the end of file is reached on the request input
-     (this usually indicates the client has pipelined a request).</li>
+     (this usually indicates the client has pipelined a request).<br/><br/></li>
   <li>EventType.ERROR: Error will be called by the container in the case where an IO exception
      or a similar unrecoverable error occurs on the connection. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
-     objects will be recycled and used to process other requests.</li>
+     objects will be recycled and used to process other requests.<br/><br/></li>
   </ul>
 
   <p>
@@ -284,11 +409,12 @@ public class ChatServlet
   <subsection name="Comet timeouts">
     <p>If you are using the NIO connector, you can set individual timeouts for your different comet connections.
        To set a timeout, simple set a request attribute like the following code shows:
-       <source>CometEvent event.... event.setTimeout(30*1000);</source> or
-       <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
-       This sets the timeout to 30 seconds.
-       Important note, in order to set this timeout, it has to be done on the <code>BEGIN</code> event.
-       The default value is <code>soTimeout</code>
+       <source>CometEvent event.... event.setTimeout(30*1000);</source> 
+       <br/>You can set the timeout on the comet connection at any point in time, even asynchronously.
+       Setting a timeout to 1 (one milliseconds) doesn't guarantee that it will timeout at that time.
+       Setting the timeout gurantees that Tomcat wont timeout the connection before the connection has been idle
+       for the configured time. The time it actually times out depends on many factors, such as how busy the server is,
+       when the last timeout scan was run, etc., but generally a timeout will occur fairly close to its configured value.
     </p>
     <p>If you are using the APR connector, all Comet connections will have the same timeout value. It is <code>soTimeout*50</code>
     </p>

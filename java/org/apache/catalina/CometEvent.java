@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * The CometEvent interface.
+ * A comet event is the contract between the servlet container and the servlet implementation(CometProcessor) for handling comet connections.
  * 
+ * @see CometProcessor
  * @author Filip Hanik
  * @author Remy Maucherat
  */
@@ -174,14 +176,14 @@ public interface CometEvent {
      * Tomcat Comet allows you to configure for additional options:<br/>
      * the <code>COMET_NON_BLOCKING</code> bit signals whether writing and reading from the request 
      * or writing to the response will be non blocking.<br/>
-     * the <code>COMET_NO_IO</code> bit signals the container that you are not interested in 
-     * receiving any IO events from the container.
-     * @param cometOptions int - the option bit set, see #COMET_NON_BLOCKING and #COMET_NO_IO
-     * @throws IOException -
+     * the <code>COMET_BLOCKING</code> bit signals the container you wish for read and write to be done in a blocking fashion
+     * @param cometOptions int - the option bit set
      * @throws IllegalStateException - if this method is invoked outside of the BEGIN event
+     * @see #CometConfiguration
+     * @see #isReadable()
+     * @see #isWriteable()
      */
-    public void configure(CometConfiguration... options)
-        throws IOException, IllegalStateException;
+    public void configure(CometConfiguration... options) throws IllegalStateException;
     
     /**
      * Returns the configuration for this Comet connection
@@ -202,21 +204,17 @@ public interface CometEvent {
      * Registers the Comet connection with the container for IO notifications.
      * These could be notifications 
      * @param operations
-     * @throws IOException
      * @throws IllegalStateException - if you are trying to register with a socket that already is registered
      * or if the operation you are trying to register is invalid.
      */
-    public void register(CometOperation... operations)
-        throws IOException, IllegalStateException;
+    public void register(CometOperation... operations) throws IllegalStateException;
     
     /**
      * Unregisters Comet operations for this CometConnection
      * @param operations CometOperation[]
-     * @throws IOException
      * @throws IllegalStateException
      */
-    public void unregister(CometOperation... operations)
-        throws IOException, IllegalStateException;
+    public void unregister(CometOperation... operations) throws IllegalStateException;
 
     /**
      * Returns what the current IO notifications that the Comet

@@ -19,6 +19,7 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -28,8 +29,6 @@ import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.net.PollerInterest;
-import java.util.Arrays;
-import org.apache.tomcat.util.MutableBoolean;
 
 public class CometEventImpl implements CometEvent {
 
@@ -43,11 +42,8 @@ public class CometEventImpl implements CometEvent {
     public CometEventImpl(Request request, Response response) {
         this.request = request;
         this.response = response;
-        try {
-            this.register(CometOperation.OP_READ);
-        }catch ( IOException x ) {
-            throw new IllegalStateException(x.getMessage(),x);
-        }
+        //default behavior is to only listen for read events
+        register(CometOperation.OP_READ);
     }
 
 
@@ -99,6 +95,8 @@ public class CometEventImpl implements CometEvent {
     public void clear() {
         request = null;
         response = null;
+        cometConfigurations.clear();
+        cometOperations.clear();
     }
 
     public void setEventType(EventType eventType) {
@@ -153,8 +151,7 @@ public class CometEventImpl implements CometEvent {
         return cometOperations.contains(op);
     }
     
-    public void configure(CometEvent.CometConfiguration... options)
-        throws IOException, IllegalStateException {
+    public void configure(CometEvent.CometConfiguration... options) throws IllegalStateException {
         checkWorkerThread();
         cometConfigurations.clear();
         for (CometEvent.CometConfiguration cc : options) {
@@ -163,15 +160,13 @@ public class CometEventImpl implements CometEvent {
         request.action(ActionCode.ACTION_COMET_CONFIGURE,options);
     }
 
-    public void register(CometEvent.CometOperation... operations)
-        throws IOException, IllegalStateException {
+    public void register(CometEvent.CometOperation... operations) throws IllegalStateException {
         //add it to the registered set
         cometOperations.addAll(Arrays.asList(operations));
         request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
     }
 
-    public void unregister(CometOperation... operations)
-        throws IOException, IllegalStateException {
+    public void unregister(CometOperation... operations) throws IllegalStateException {
         //remove from the registered set
         cometOperations.removeAll(Arrays.asList(operations));
         request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
