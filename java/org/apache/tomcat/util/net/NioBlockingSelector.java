@@ -122,7 +122,7 @@ public class NioBlockingSelector {
         } finally {
             poller.remove(att,SelectionKey.OP_WRITE);
             if (timedout && key != null) {
-                cancelKey(socket, key);
+                poller.cancelKey(socket, key);
             }
         }
         return written;
@@ -182,26 +182,29 @@ public class NioBlockingSelector {
         } finally {
             poller.remove(att,SelectionKey.OP_READ);
             if (timedout && key != null) {
-                cancelKey(socket,key);
+                poller.cancelKey(socket,key);
             }
         }
         return read;
     }
 
-    private static void cancelKey(final NioChannel socket, final SelectionKey key) {
-        socket.getPoller().addEvent(
-            new Runnable() {
-            public void run() {
-                socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
-            }
-        });
-    }
     
     protected class BlockPoller extends Thread {
         protected boolean run = true;
         protected Selector selector = null;
         protected ConcurrentLinkedQueue events = new ConcurrentLinkedQueue();
         public void disable() { run = false; selector.wakeup();}
+
+        public void cancelKey(final NioChannel socket, final SelectionKey key) {
+            Runnable r = new Runnable() {
+                public void run() {
+                    key.cancel();
+                }
+            };
+            events.offer(r);
+            selector.wakeup();
+        }
+
         
         public void add(final KeyAttachment key, final int ops) {
             Runnable r = new Runnable() {
