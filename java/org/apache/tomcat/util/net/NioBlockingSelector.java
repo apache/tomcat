@@ -34,6 +34,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.MutableInteger;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class NioBlockingSelector {
     
@@ -194,7 +195,7 @@ public class NioBlockingSelector {
         protected Selector selector = null;
         protected ConcurrentLinkedQueue events = new ConcurrentLinkedQueue();
         public void disable() { run = false; selector.wakeup();}
-
+        protected AtomicInteger wakeupCounter = new AtomicInteger(0);
         public void cancelKey(final NioChannel socket, final SelectionKey key) {
             Runnable r = new Runnable() {
                 public void run() {
@@ -202,9 +203,22 @@ public class NioBlockingSelector {
                 }
             };
             events.offer(r);
-            selector.wakeup();
+            wakeup();
         }
 
+        public void wakeup() {
+            int i = wakeupCounter.addAndGet(1);
+            if (i==1) selector.wakeup();
+        }
+
+        public void cancel(SelectionKey sk, KeyAttachment key, int ops){
+            if (sk!=null) {
+                sk.cancel();
+                sk.attach(null);
+                if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
+                if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+            }
+        }
         
         public void add(final KeyAttachment key, final int ops) {
             Runnable r = new Runnable() {
@@ -221,17 +235,15 @@ public class NioBlockingSelector {
                         } else {
                             sk.interestOps(sk.interestOps() | ops);
                         }
+                    }catch (CancelledKeyException cx) {
+                        cancel(sk,key,ops);
                     }catch (ClosedChannelException cx) {
-                        if (sk!=null) {
-                            sk.cancel();
-                            sk.attach(null);
-                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
-                        }
+                        cancel(sk,key,ops);
                     }
                 }
             };
             events.offer(r);
+            wakeup();
         }
         
         public void remove(final KeyAttachment key, final int ops) {
@@ -265,7 +277,7 @@ public class NioBlockingSelector {
                 }
             };
             events.offer(r);
-            selector.wakeup();
+            wakeup();
         }
 
 
@@ -286,7 +298,12 @@ public class NioBlockingSelector {
                     events();
                     int keyCount = 0;
                     try {
-                        keyCount = selector.select(1000);
+                        int i = wakeupCounter.get();
+                        if (i>0) 
+                            keyCount = selector.selectNow();
+                        else
+                            keyCount = selector.select(1000);
+                        wakeupCounter.set(0);
                         if (!run) break;
                     }catch ( NullPointerException x ) {
                         //sun bug 5076772 on windows JDK 1.5
