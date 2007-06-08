@@ -406,7 +406,7 @@ public class InternalNioOutputBuffer
         if (!committed) {
             //Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0
             ByteBuffer buf = ByteBuffer.wrap(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
-            writeToSocket(buf,false,true);
+            writeToSocket(buf,true);
         }
 
     }
@@ -419,9 +419,12 @@ public class InternalNioOutputBuffer
      * @throws IOException
      * @todo Fix non blocking write properly
      */
-    private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean flip, boolean block) throws IOException {
-        //int limit = bytebuffer.position();
-        if ( flip ) bytebuffer.flip();
+    private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block) throws IOException {
+        if (socket.getBufHandler().getWriteBuffer() != bytebuffer) {
+            socket.getBufHandler().getWriteBuffer().put(bytebuffer);
+            bytebuffer = socket.getBufHandler().getWriteBuffer();
+        }
+
         int written = 0;
         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         if ( att == null ) throw new IOException("Key must be cancelled");
@@ -441,7 +444,7 @@ public class InternalNioOutputBuffer
         }finally { 
             if ( selector != null ) getSelectorPool().put(selector);
         }
-        if ( block ) socket.getBufHandler().getWriteBuffer().clear(); //only clear
+        if ( block ) bytebuffer.clear(); //only clear
         this.total = 0;
         return written;
     } 
@@ -762,7 +765,8 @@ public class InternalNioOutputBuffer
 
         //write to the socket, if there is anything to write
         if (socket.getBufHandler().getWriteBuffer().position() > 0) {
-            writeToSocket(socket.getBufHandler().getWriteBuffer(),true,true);
+            socket.getBufHandler().getWriteBuffer().flip();
+            writeToSocket(socket.getBufHandler().getWriteBuffer(),true);
         }
     }
 

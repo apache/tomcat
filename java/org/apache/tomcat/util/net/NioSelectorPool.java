@@ -152,10 +152,6 @@ public class NioSelectorPool {
     
     public int write(ByteBuffer buf, NioChannel socket, Selector selector, 
                      long writeTimeout, boolean block,MutableInteger lastWrite) throws IOException {
-        if (socket.getBufHandler().getWriteBuffer() != buf) {
-            socket.getBufHandler().getWriteBuffer().put(buf);
-            buf = socket.getBufHandler().getWriteBuffer();
-        }
         if ( SHARED && block ) {
             return blockingSelector.write(buf,socket,writeTimeout,lastWrite);
         }
