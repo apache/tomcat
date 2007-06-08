@@ -288,9 +288,11 @@ public class NioBlockingSelector {
                     }catch ( NullPointerException x ) {
                         //sun bug 5076772 on windows JDK 1.5
                         if (selector==null) throw x;
+                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
                         continue;
                     } catch ( CancelledKeyException x ) {
                         //sun bug 5076772 on windows JDK 1.5
+                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
                         continue;
                     } catch (Throwable x) {
                         log.error("",x);
