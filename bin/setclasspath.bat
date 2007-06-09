@@ -51,7 +51,7 @@ set JAVA_ENDORSED_DIRS=%BASEDIR%\endorsed
 rem Set standard CLASSPATH
 rem Note that there are no quotes as we do not want to introduce random
 rem quotes into the CLASSPATH
-if not exist "%JAVA_HOME%\bin\tools.jar" goto noJavac
+if not exist "%JAVA_HOME%\lib\tools.jar" goto noJavac
 set CLASSPATH=%JAVA_HOME%\lib\tools.jar
 :noJavac
 
