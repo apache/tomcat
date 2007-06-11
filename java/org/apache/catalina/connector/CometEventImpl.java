@@ -131,7 +131,7 @@ public class CometEventImpl implements CometEvent {
         return response.getResponse();
     }
 
-    public void setTimeout(int timeout) throws IOException, ServletException,UnsupportedOperationException {
+    public void setTimeout(int timeout) throws ServletException,UnsupportedOperationException {
         //this check should get removed as soon as connection timeout is implemented everywhere.
         if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
             request.action(ActionCode.ACTION_COMET_TIMEOUT,new Integer(timeout));

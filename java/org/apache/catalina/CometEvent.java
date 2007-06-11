@@ -141,7 +141,7 @@ public interface CometEvent {
      * 
      * @see #register(CometOperation)
      */
-    public void close();
+    public void close() throws IOException;
     
     /**
      * Sets the timeout for this Comet connection. Please NOTE, that the implementation 
