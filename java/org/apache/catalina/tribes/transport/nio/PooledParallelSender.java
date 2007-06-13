@@ -44,12 +44,18 @@ public class PooledParallelSender extends PooledSender implements MultiPointSend
     public void sendMessage(Member[] destination, ChannelMessage message) throws ChannelException {
         if ( !connected ) throw new ChannelException("Sender not connected.");
         ParallelNioSender sender = (ParallelNioSender)getSender();
-        try {
-            sender.sendMessage(destination, message);
-            sender.keepalive();
-        }finally {
-            if ( !connected ) disconnect();
-            returnSender(sender);
+        if (sender == null) {
+            ChannelException cx = new ChannelException("Unable to retrieve a data sender, time out error.");
+            for (int i = 0; i < destination.length; i++) cx.addFaultyMember(destination[i], new NullPointerException("Unable to retrieve a sender from the sender pool"));
+            throw cx;
+        } else {
+            try {
+                sender.sendMessage(destination, message);
+                sender.keepalive();
+            } finally {
+                if (!connected) disconnect();
+                returnSender(sender);
+            }
         }
     }
 
