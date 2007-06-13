@@ -163,44 +163,28 @@ public interface CometEvent {
     public void setTimeout(int timeout)
         throws ServletException, UnsupportedOperationException;
     
-    
-
-    /**
-     * Enumeration for a comet connection state.
-     * A comet session can be blocking or non blocking.
-     * COMET_NON_BLOCKING<br/>
-     * Option bit set for allowing non blocking IO
-     * when reading from the request or writing to the response<br/>
-     * COMET_BLOCKING<br/>
-     * Configure the comet connection for blocking IO, this is the default setting
-     * 
-     * @see #configure(int)
-     */
-    public enum CometConfiguration {COMET_BLOCKING, COMET_NON_BLOCKING};
-        
+            
     /**
      * Configures the connection for desired IO options.
      * By default a Comet connection is configured for <br/>
      * a) Blocking IO - standard servlet usage<br/>
      * b) Register for READ events when data arrives<br/>
      * Tomcat Comet allows you to configure for additional options:<br/>
-     * the <code>COMET_NON_BLOCKING</code> bit signals whether writing and reading from the request 
+     * the <code>configureBlocking(false)</code> bit signals whether writing and reading from the request 
      * or writing to the response will be non blocking.<br/>
-     * the <code>COMET_BLOCKING</code> bit signals the container you wish for read and write to be done in a blocking fashion
-     * @param cometOptions int - the option bit set
+     * the <code>configureBlocking(true)</code> bit signals the container you wish for read and write to be done in a blocking fashion
+     * @param blocking - true to make read and writes blocking
      * @throws IllegalStateException - if this method is invoked outside of the BEGIN event
-     * @see #CometConfiguration
      * @see #isReadable()
      * @see #isWriteable()
      */
-    public void configure(CometConfiguration... options) throws IllegalStateException;
+    public void configureBlocking(boolean blocking) throws IllegalStateException;
     
     /**
      * Returns the configuration for this Comet connection
-     * @return CometConfiguration[]
-     * @see #configure(CometConfiguration...)
+     * @return true if the connection is configured to be blocking, false for non blocing
      */
-    public CometConfiguration[] getConfiguration();
+    public boolean isBlocking();
     
     /**
      * OP_CALLBACK - receive a CALLBACK event from the container

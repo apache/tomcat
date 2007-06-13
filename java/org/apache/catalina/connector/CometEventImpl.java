@@ -29,6 +29,7 @@ import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.net.PollerInterest;
+import org.apache.tomcat.util.MutableBoolean;
 
 public class CometEventImpl implements CometEvent {
 
@@ -79,9 +80,9 @@ public class CometEventImpl implements CometEvent {
     protected HashSet<CometOperation> cometOperations = new HashSet<CometOperation>(3);
     
     /**
-     * Current set of configurations
+     * Blocking or not blocking
      */
-    protected HashSet<CometConfiguration> cometConfigurations = new HashSet<CometConfiguration>(3);
+    protected boolean blocking = true;
 
     protected WorkerThreadCheck threadCheck = new WorkerThreadCheck();
 
@@ -95,7 +96,7 @@ public class CometEventImpl implements CometEvent {
     public void clear() {
         request = null;
         response = null;
-        cometConfigurations.clear();
+        blocking = true;
         cometOperations.clear();
     }
 
@@ -151,13 +152,12 @@ public class CometEventImpl implements CometEvent {
         return cometOperations.contains(op);
     }
     
-    public void configure(CometEvent.CometConfiguration... options) throws IllegalStateException {
+    public void configureBlocking(boolean blocking) throws IllegalStateException {
         checkWorkerThread();
-        cometConfigurations.clear();
-        for (CometEvent.CometConfiguration cc : options) {
-            cometConfigurations.add(cc);
-        }
-        request.action(ActionCode.ACTION_COMET_CONFIGURE,options);
+        if ( getEventType() != EventType.BEGIN ) throw new IllegalStateException("Can only be configured during the BEGIN event.");
+        MutableBoolean bool = new MutableBoolean(blocking);
+        request.action(ActionCode.ACTION_COMET_CONFIGURE_BLOCKING,bool);
+        this.blocking = bool.get();
     }
 
     public void register(CometEvent.CometOperation... operations) throws IllegalStateException {
@@ -172,8 +172,8 @@ public class CometEventImpl implements CometEvent {
         request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
     }
     
-    public CometConfiguration[] getConfiguration() {
-        return (CometConfiguration[])cometConfigurations.toArray(new CometConfiguration[0]);
+    public boolean isBlocking() {
+        return blocking;
     }
     
     public CometOperation[] getRegisteredOps() {
