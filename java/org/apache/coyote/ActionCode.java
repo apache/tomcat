@@ -159,7 +159,7 @@ public final class ActionCode {
     /**
      * Configure a Comet connection
      */
-    public static final ActionCode ACTION_COMET_CONFIGURE = new ActionCode(25);
+    public static final ActionCode ACTION_COMET_CONFIGURE_BLOCKING = new ActionCode(25);
     
     /**
      * Register notifications for events for a certain comet connection

@@ -1227,7 +1227,9 @@ public class Http11NioProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
                 socket.getPoller().cometInterest(socket);
-        } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE) {
+        } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE_BLOCKING) {
+            MutableBoolean bool = (MutableBoolean)param;
+            if ( bool.get() ) throw new IllegalStateException("Not yet implemented");
         } else if (actionCode == ActionCode.ACTION_COMET_READABLE) {
             MutableBoolean bool = (MutableBoolean)param;
             try {
