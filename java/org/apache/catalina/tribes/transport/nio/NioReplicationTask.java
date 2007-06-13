@@ -63,12 +63,15 @@ public class NioReplicationTask extends AbstractRxTask {
 
     // loop forever waiting for work to do
     public synchronized void run() { 
-        if ( (getOptions() & OPTION_DIRECT_BUFFER) == OPTION_DIRECT_BUFFER ) {
-            buffer = ByteBuffer.allocateDirect(getRxBufSize());
-        }else {
-            buffer = ByteBuffer.allocate (getRxBufSize());
+        if ( buffer == null ) {
+            if ( (getOptions() & OPTION_DIRECT_BUFFER) == OPTION_DIRECT_BUFFER) {
+                buffer = ByteBuffer.allocateDirect(getRxBufSize());
+            } else {
+                buffer = ByteBuffer.allocate(getRxBufSize());
+            }
+        } else {
+            buffer.clear();
         }
-
         if (key == null) {
             return;	// just in case
         }
