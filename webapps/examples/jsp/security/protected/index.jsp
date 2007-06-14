@@ -27,14 +27,16 @@
 </head>
 <body bgcolor="white">
 
-You are logged in as remote user <b><%= request.getRemoteUser() %></b>
+You are logged in as remote user
+<b><%= util.HTMLFilter.filter(request.getRemoteUser()) %></b>
 in session <b><%= session.getId() %></b><br><br>
 
 <%
   if (request.getUserPrincipal() != null) {
 %>
     Your user principal name is
-    <b><%= request.getUserPrincipal().getName() %></b><br><br>
+    <b><%= util.HTMLFilter.filter(request.getUserPrincipal().getName()) %></b>
+    <br><br>
 <%
   } else {
 %>

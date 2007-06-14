@@ -17,4 +17,4 @@
 <%@ taglib uri="http://jakarta.apache.org/tomcat/examples-taglib"
         prefix="eg" %>
 
-<eg:ShowSource jspFile="<%= request.getQueryString() %>"/>
+<eg:ShowSource jspFile="<%= util.HTMLFilter.filter(request.getQueryString()) %>"/>
