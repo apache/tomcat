@@ -407,7 +407,7 @@ public class HandlerRequest extends JkHandler
 
         // Check to see if there should be a body packet coming along
         // immediately after
-        int cl=req.getContentLength();
+        long cl=req.getContentLengthLong();
         if(cl > 0) {
             JkInputStream jkIS = ep.getInputStream();
             jkIS.setIsReadRequired(true);
@@ -577,7 +577,9 @@ public class HandlerRequest extends JkHandler
             if (hId == AjpConstants.SC_REQ_CONTENT_LENGTH ||
                 (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
                 // just read the content-length header, so set it
-                req.setContentLength( vMB.getInt() );
+                long cl = vMB.getLong();
+                if(cl < Integer.MAX_VALUE)
+                    req.setContentLength( (int)cl );
             } else if (hId == AjpConstants.SC_REQ_CONTENT_TYPE ||
                 (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
