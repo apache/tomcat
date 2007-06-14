@@ -680,7 +680,9 @@ public class AjpAprProcessor implements ActionHook {
             if (hId == Constants.SC_REQ_CONTENT_LENGTH ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
                 // just read the content-length header, so set it
-                request.setContentLength( vMB.getInt() );
+                long cl = vMB.getLong();
+                if(cl < Integer.MAX_VALUE)
+                    request.setContentLength( (int)cl );
             } else if (hId == Constants.SC_REQ_CONTENT_TYPE ||
                     (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {
                 // just read the content-type header, so set it
@@ -1204,7 +1206,7 @@ public class AjpAprProcessor implements ActionHook {
             if (endOfStream) {
                 return -1;
             }
-            if (first && req.getContentLength() > 0) {
+            if (first && req.getContentLengthLong() > 0) {
                 // Handle special first-body-chunk
                 if (!receive()) {
                     return 0;
