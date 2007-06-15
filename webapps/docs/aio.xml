@@ -309,7 +309,8 @@ public class ExampleDelayedAjaxResponse implements CometProcessor {
            if (event.isWriteable()) { //did we write it all?
               event.close(); //close the event, in anticipation of the next request
               event.register(OP_CALLBACK); //triggers an END event
-           } else { //we didn't write it all, trigger a WRITE event when we are done with the write               event.register(OP_WRITE);
+           } else { //we didn't write it all, trigger a WRITE event when we are done with the write               
+             event.register(OP_WRITE);
            }
          } else {
            //we are not able to write, let us know when we can
@@ -329,7 +330,8 @@ public class ExampleDelayedAjaxResponse implements CometProcessor {
    if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
      //configure non blocking
      event.configureBlocking(false);
-     //deregister for READ since we want to enable pipe lining on the connection      //for the next HTTP request
+     //deregister for READ since we want to enable pipe lining on the connection      
+     //for the next HTTP request
      event.unregister(OP_READ);
      //add the client to the list
      clients.add(event);
@@ -349,7 +351,8 @@ public class ExampleDelayedAjaxResponse implements CometProcessor {
        event.close();
      }
    } if ( event.getEventType() == CometEvent.EventType.END ) {
-     clients.remove(event);         } else if (...) {
+     clients.remove(event);         
+   } else if (...) {
      ...
    }
    ...
@@ -383,7 +386,8 @@ public class ExampleDelayedAjaxResponse implements CometProcessor {
    if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
      //configure blocking
      event.configureBlocking(true);
-     //deregister for READ since we want to enable pipe lining on the connection      //for the next HTTP request
+     //deregister for READ since we want to enable pipe lining on the connection      
+     //for the next HTTP request
      event.unregister(OP_READ);
      //add the client to the list
      clients.add(event);
@@ -395,7 +399,8 @@ public class ExampleDelayedAjaxResponse implements CometProcessor {
      //unregister from the write event
      event.unregister(OP_WRITE);
      //we can now write
-     byte[] data = getDelayedResponse(event);           //note we don't have to check for null data here
+     byte[] data = getDelayedResponse(event);           
+     //note we don't have to check for null data here
      event.getHttpServletResponse().getOutputStream().write(data);
      event.close();
    } if ( event.getEventType() == CometEvent.EventType.END ) {
