@@ -282,6 +282,133 @@
   </subsection>
 
   <subsection name="Example code snippets">
+  <p>Let's start with a real world example of how you could use Comet to handle AJAX requests.
+     An AJAX request is a complete HTTP request, followed by a complete HTTP response.
+     The next request is a new HTTP request.
+     There are many AJAX frameworks, and they can be used with regular servlets, so why
+     would I want to do this using Comet?
+     The answer is simply, with Comet you can do the response asynchronously and therefor
+     release the Tomcat thread to handle other requests.
+  
+  </p>
+  <source>
+Non blocking read and writes 
+
+public class ExampleDelayedAjaxResponse implements CometProcessor {
+ ...
+ public class DelayedResponder extends Thread {
+   public void run() {
+     ...
+     Client[] clients = getClients();
+     for (int i=0; i&lt;clients.length; i++ ) {
+       CometEvent event = client.getEvent();
+       byte[] data = getDelayedResponse(event);
+       if (data!=null) {
+         if (event.isWriteable()) {
+           event.getHttpServletResponse().getOutputStream().write(data);
+           if (event.isWriteable()) { //did we write it all?
+              event.close(); //close the event, in anticipation of the next request
+              event.register(OP_CALLBACK); //triggers an END event
+           } else { //we didn't write it all, trigger a WRITE event when we are done with the write               event.register(OP_WRITE);
+           }
+         } else {
+           //we are not able to write, let us know when we can
+           event.register(OP_WRITE);
+         }
+         //remove the client from the  async thread
+         //since we have received the data for this client.
+         clients.remove(event);
+       }
+     }
+     ...
+   }
+ }
+ ...
+ public void event(CometEvent event) throws IOException, ServletException {
+   ...
+   if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
+     //configure non blocking
+     event.configureBlocking(false);
+     //deregister for READ since we want to enable pipe lining on the connection      //for the next HTTP request
+     event.unregister(OP_READ);
+     //add the client to the list
+     clients.add(event);
+   } if ( event.getEventType() == CometEvent.EventType.READ ) {
+     //read client Id and stock list from client
+     //and add the event to our list
+     assert("this should never happen");
+   } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
+     //unregister from the write event
+     event.unregister(OP_WRITE);
+     //we can now write
+     byte[] data = getDelayedResponse(event);           
+     if ( data != null ) {
+       event.getHttpServletResponse().getOutputStream().write(data);
+     }
+     if( data==null || event.isWriteable() ) {
+       event.close();
+     }
+   } if ( event.getEventType() == CometEvent.EventType.END ) {
+     clients.remove(event);         } else if (...) {
+     ...
+   }
+   ...
+ }
+}
+
+Blocking read and writes
+public class ExampleDelayedAjaxResponse implements CometProcessor {
+ ...
+ public class DelayedResponder extends Thread {
+   public void run() {
+     ...
+     Client[] clients = getClients();
+     for (int i=0; i&lt;clients.length; i++ ) {
+       CometEvent event = client.getEvent();
+       byte[] data = getDelayedResponse(event);
+       if (data!=null) {
+         //register for a write, better do that on a thread pool thread
+         //since write is blocking
+         event.register(OP_WRITE);
+         //remove the client from the  async thread
+         clients.remove(event);
+       }
+     }
+     ...
+   }
+ }
+ ...
+ public void event(CometEvent event) throws IOException, ServletException {
+   ...
+   if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
+     //configure blocking
+     event.configureBlocking(true);
+     //deregister for READ since we want to enable pipe lining on the connection      //for the next HTTP request
+     event.unregister(OP_READ);
+     //add the client to the list
+     clients.add(event);
+   } if ( event.getEventType() == CometEvent.EventType.READ ) {
+     //read client Id and stock list from client
+     //and add the event to our list
+     assert("this should never happen");
+   } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
+     //unregister from the write event
+     event.unregister(OP_WRITE);
+     //we can now write
+     byte[] data = getDelayedResponse(event);           //note we don't have to check for null data here
+     event.getHttpServletResponse().getOutputStream().write(data);
+     event.close();
+   } if ( event.getEventType() == CometEvent.EventType.END ) {
+     clients.remove(event);
+   } else if (...) {
+     ...
+   }
+   ...
+ }
+}   
+  
+  </source>
+
   <p>
     Imagine you are writing a servlet that is updating a set of 
     stock tickers. You have a back ground thread that is receiving 
