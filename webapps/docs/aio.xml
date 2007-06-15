@@ -154,7 +154,7 @@
   <subsection name="Comet Operations">
   <p>
     The previous section touched a little bit on the comet connection lifecycle. 
-    It is important to remember that comet events are based around IO on an actual socket.<br/>
+    It is important to remember that comet events are based around IO events of an actual socket.<br/>
     To clarify the Comet API, it has been created to resemble the java.nio channel/selector APIs.
     In the case of Comet, Tomcat is the selector and using the CometEvent object, you can 
     register and unregister your Comet event for different event type notifications.
@@ -189,7 +189,7 @@
   <li>EventType.BEGIN: will be called at the beginning 
      of the processing of the connection. It can be used to initialize any relevant 
      fields using the request and response objects. During the BEGIN event you may also configure 
-     your comet connection for blocking or non blocking mode. using the <code>configure</code>
+     your comet connection for blocking or non blocking mode. using the <code>configureBlocking(boolean)</code>
      method on the comet event object. Between the end of the processing  
      of this event, and the beginning of the processing of the end or error events,
      it is possible to use the response object to write data on the open connection.
