@@ -47,6 +47,10 @@
          <bug>42497</bug>: Ensure ETag header is present in a 304 response.
          Patch provided by Len Popp. (markt)
       </fix>
+      <fix>
+        Fix XSS security vulnerability (CVE-2007-2450) in the Manager and Host
+        Manager. Reported by Daiki Fukumori. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -60,12 +64,20 @@
         jsp:attribute was used in conjunction with custom tags. Patch provided
         by Brian Lenz. (markt)
       </fix>
+      <fix>
+        <bug>42643</bug> Prevent creation of duplicate JSP function mapper
+        variables. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Webapps">
     <changelog>
       <fix>
          <bug>42459</bug>: Tomcat Web Application Manager table error (rjung)
+      </fix>
+      <fix>
+        Fix XSS security vulnerabilities (CVE-2007-2449) in the examples.
+        Reported by Toshiharu Sugiyama. (markt)
       </fix>
     </changelog>
   </subsection>
