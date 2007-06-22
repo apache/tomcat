@@ -190,13 +190,7 @@
 
   <p>You can nest one or more <a href="context.html">Context</a> elements
   inside this <strong>Host</strong> element, each representing a different web
-  application associated with this virtual host.  In addition, you can nest a
-  single <a href="defaultcontext.html">DefaultContext</a> element that defines
-  default values for subsequently deployed web applications.</p>
-
-  <p>You can optional nest a <a href="defaultcontext.html">DefaultContext</a>
-  element inside this <strong>Host</strong> element, to define the default
-  characteristics of web applications that are automatically deployed.</p>
+  application associated with this virtual host.</p>
 
   <p>You can nest at most one instance of the following utility components
   by nesting a corresponding element inside your <strong>Host</strong>
