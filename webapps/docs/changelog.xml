@@ -51,6 +51,10 @@
         Fix XSS security vulnerability (CVE-2007-2450) in the Manager and Host
         Manager. Reported by Daiki Fukumori. (markt)
       </fix>
+      <fix>
+        <bug>42547</bug>: Fix NPE when a ResourceLink in context.xml tries to
+        override an env-entry in web.xml.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
