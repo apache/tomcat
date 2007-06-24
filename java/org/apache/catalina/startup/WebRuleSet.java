@@ -27,6 +27,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ContextHandler;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.deploy.SecurityRoleRef;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.CallMethodRule;
 import org.apache.tomcat.util.digester.CallParamRule;
@@ -445,10 +446,14 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "web-app/servlet/run-as/role-name",
                                "setRunAs", 0);
 
-        digester.addCallMethod(prefix + "web-app/servlet/security-role-ref",
-                               "addSecurityReference", 2);
-        digester.addCallParam(prefix + "web-app/servlet/security-role-ref/role-link", 1);
-        digester.addCallParam(prefix + "web-app/servlet/security-role-ref/role-name", 0);
+        digester.addRule(prefix + "web-app/servlet/security-role-ref",
+                new SecurityRoleRefCreateRule());
+        digester.addCallMethod(
+                prefix + "web-app/servlet/security-role-ref/role-link",
+                "setLink", 0);
+        digester.addCallMethod(
+                prefix + "web-app/servlet/security-role-ref/role-name",
+                "setName", 0);
 
         digester.addCallMethod(prefix + "web-app/servlet/servlet-class",
                               "setServletClass", 0);
@@ -623,7 +628,6 @@ final class SetPublicIdRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
-        Context context = (Context) digester.peek(digester.getCount() - 1);
         Object top = digester.peek();
         Class paramClasses[] = new Class[1];
         paramClasses[0] = "String".getClass();
@@ -870,3 +874,32 @@ final class ServiceQnameRule extends Rule {
     }
 }
 
+/**
+ * A Rule that adds a security-role-ref to a servlet, allowing for the fact that
+ * role-link is an optional element.
+ */
+final class SecurityRoleRefCreateRule extends Rule {
+    
+    public SecurityRoleRefCreateRule() {
+    }
+    
+    public void begin(String namespace, String name, Attributes attributes)
+            throws Exception {
+        SecurityRoleRef securityRoleRef = new SecurityRoleRef();
+        digester.push(securityRoleRef);
+        if (digester.getLogger().isDebugEnabled())
+            digester.getLogger().debug("new SecurityRoleRef");
+    }
+
+    public void end(String namespace, String name)
+            throws Exception {
+        SecurityRoleRef securityRoleRef = (SecurityRoleRef) digester.pop();
+        Wrapper wrapper = (Wrapper) digester.peek();
+        
+        wrapper.addSecurityReference(securityRoleRef.getName(),
+                securityRoleRef.getLink());
+
+        if (digester.getLogger().isDebugEnabled())
+            digester.getLogger().debug("pop SecurityRoleRef");
+    }
+}
