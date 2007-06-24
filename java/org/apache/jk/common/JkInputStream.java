@@ -293,9 +293,9 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
         if( contentLanguage != null ) {
             headers.setValue("Content-Language").setString(contentLanguage);
         }
-        int contentLength = res.getContentLength();
+        long contentLength = res.getContentLengthLong();
         if( contentLength >= 0 ) {
-            headers.setValue("Content-Length").setInt(contentLength);
+            headers.setValue("Content-Length").setLong(contentLength);
         }
         int numHeaders = headers.size();
         outputMsg.appendInt(numHeaders);
