@@ -27,6 +27,10 @@
          Tomcat 5. (markt)
       </fix>
       <fix>
+        <bug>41722</bug>: Make the role-link element optional (as required by
+        the spec) when using a security-role-ref element. (markt)
+      </fix>
+      <fix>
          <bug>42361</bug>: Handle multi-part forms when saving requests during
          FORM authentication process. Patch provided by Peter Runge. (markt)
       </fix>
@@ -53,7 +57,7 @@
       </fix>
       <fix>
         <bug>42547</bug>: Fix NPE when a ResourceLink in context.xml tries to
-        override an env-entry in web.xml.
+        override an env-entry in web.xml. (markt)
       </fix>
     </changelog>
   </subsection>
