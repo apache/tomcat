@@ -944,9 +944,9 @@ public class AjpProcessor implements ActionHook {
         if (contentLanguage != null) {
             headers.setValue("Content-Language").setString(contentLanguage);
         }
-        int contentLength = response.getContentLength();
+        long contentLength = response.getContentLengthLong();
         if (contentLength >= 0) {
-            headers.setValue("Content-Length").setInt(contentLength);
+            headers.setValue("Content-Length").setLong(contentLength);
         }
 
         // Other headers
