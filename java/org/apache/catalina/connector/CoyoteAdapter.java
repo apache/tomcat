@@ -187,8 +187,10 @@ public class CoyoteAdapter
                 } else if (!error && read && request.getAvailable()) {
                     // If this was a read and not all bytes have been read, or if no data
                     // was read from the connector, then it is an error
+                    request.getEvent().setEventType(CometEvent.EventType.ERROR);
+                    request.getEvent().setEventSubType(CometEvent.EventSubType.IOEXCEPTION);
                     error = true;
-                    log.error(sm.getString("coyoteAdapter.read"));
+                    connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                 }
                 return (!error);
             } catch (Throwable t) {
