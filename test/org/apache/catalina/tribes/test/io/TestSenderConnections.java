@@ -29,6 +29,9 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.HashMap;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
+import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.transport.DataSender;
+import org.apache.catalina.tribes.transport.AbstractSender;
 
 public class TestSenderConnections extends TestCase {
     private static int count = 2;
@@ -66,6 +69,15 @@ public class TestSenderConnections extends TestCase {
 
     public void testConnectionLinger() throws Exception {
         sendMessages(0,15000);
+    }
+    
+    public void testSendToNonExistent() throws Exception {
+        ReplicationTransmitter transmitter = (ReplicationTransmitter) channels[0].getChannelSender();
+        AbstractSender sender = (AbstractSender)transmitter.getTransport();
+        sender.setMaxRetryAttempts(0);
+        sender.setTimeout(60000);
+        MemberImpl impl = new MemberImpl("127.0.0.1",9443,1000,new byte[]{1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8});
+        channels[0].send(new Member[]{impl},new TestMsg(),0);
     }
     
     public void testKeepAliveCount() throws Exception {
