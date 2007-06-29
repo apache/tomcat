@@ -123,9 +123,13 @@ public final class ApplicationFilterFactory {
         ApplicationFilterChain filterChain = null;
         if (request instanceof Request) {
             Request req = (Request) request;
+            comet = req.isComet();
             if (Globals.IS_SECURITY_ENABLED) {
                 // Security: Do not recycle
                 filterChain = new ApplicationFilterChain();
+                if (comet) {
+                    req.setFilterChain(filterChain);
+                }
             } else {
                 filterChain = (ApplicationFilterChain) req.getFilterChain();
                 if (filterChain == null) {
@@ -133,7 +137,6 @@ public final class ApplicationFilterFactory {
                     req.setFilterChain(filterChain);
                 }
             }
-            comet = req.isComet();
         } else {
             // Request dispatcher in use
             filterChain = new ApplicationFilterChain();
