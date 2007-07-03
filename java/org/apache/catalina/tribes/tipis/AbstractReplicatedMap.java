@@ -986,11 +986,11 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             //only count active members in this node
             int counter = 0;
             Iterator it = super.entrySet().iterator();
-            while (it.hasNext() ) {
+            while (it!=null && it.hasNext() ) {
                 Map.Entry e = (Map.Entry) it.next();
                 if ( e != null ) {
                     MapEntry entry = (MapEntry) super.get(e.getKey());
-                    if (entry.isPrimary() && entry.getValue() != null) counter++;
+                    if (entry!=null && entry.isPrimary() && entry.getValue() != null) counter++;
                 }
             }
             return counter;
