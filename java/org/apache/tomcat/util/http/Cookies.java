@@ -250,8 +250,10 @@ public final class Cookies { // extends MultiMap {
             
             cc=bytes[pos];
             if(  cc== '\'' || cc=='"' ) {
-                startValue++;
-                endValue=indexOf( bytes, startValue, end, cc );
+                endValue=findDelim3( bytes, startValue+1, end, cc );
+                if (endValue == -1) {
+                    endValue=findDelim2( bytes, startValue+1, end );
+                } else startValue++;
                 pos=endValue+1; // to skip to next cookie
              } else {
                 endValue=findDelim2( bytes, startValue, end );
@@ -335,28 +337,27 @@ public final class Cookies { // extends MultiMap {
         return off;
     }
 
-    public static int indexOf( byte bytes[], int off, int end, byte qq )
+    /*
+     *  search for cc but skip \cc as required by rfc2616
+     *   (according to rfc2616 cc should be ")
+    */
+    public static int findDelim3( byte bytes[], int off, int end, byte cc )
     {
+        byte prev = bytes[off]; 
         while( off < end ) {
             byte b=bytes[off];
-            if( b==qq )
+            if ( b== '\\' ) {
+              off++;
+              off++;
+              continue;
+            }
+            if( b==cc )
                 return off;
             off++;
         }
-        return off;
+        return -1;
     }
 
-    public static int indexOf( byte bytes[], int off, int end, char qq )
-    {
-        while( off < end ) {
-            byte b=bytes[off];
-            if( b==qq )
-                return off;
-            off++;
-        }
-        return off;
-    }
-    
     // XXX will be refactored soon!
     public static boolean equals( String s, byte b[], int start, int end) {
         int blen = end-start;
