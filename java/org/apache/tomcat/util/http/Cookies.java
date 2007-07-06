@@ -343,7 +343,6 @@ public final class Cookies { // extends MultiMap {
     */
     public static int findDelim3( byte bytes[], int off, int end, byte cc )
     {
-        byte prev = bytes[off]; 
         while( off < end ) {
             byte b=bytes[off];
             if ( b== '\\' ) {
