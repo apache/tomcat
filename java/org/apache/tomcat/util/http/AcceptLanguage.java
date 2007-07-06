@@ -38,44 +38,46 @@ import java.util.Vector;
 public class AcceptLanguage {
 
     public static Locale getLocale(String acceptLanguage) {
-	if( acceptLanguage == null ) return Locale.getDefault();
+        if( acceptLanguage == null ) return Locale.getDefault();
 
-        Hashtable languages = new Hashtable();
-        Vector quality=new Vector();
-        processAcceptLanguage(acceptLanguage, languages,quality);
+        Hashtable<String,Vector<String>> languages =
+            new Hashtable<String,Vector<String>>();
+        Vector<Double> quality = new Vector<Double>();
+        processAcceptLanguage(acceptLanguage, languages, quality);
 
         if (languages.size() == 0) return Locale.getDefault();
 
-        Vector l = new Vector();
+        Vector<Locale> l = new Vector<Locale>();
         extractLocales( languages,quality, l);
 
         return (Locale)l.elementAt(0);
     }
 
     public static Enumeration getLocales(String acceptLanguage) {
-    	// Short circuit with an empty enumeration if null header
+            // Short circuit with an empty enumeration if null header
         if (acceptLanguage == null) {
-            Vector v = new Vector();
+            Vector<Locale> v = new Vector<Locale>();
             v.addElement(Locale.getDefault());
             return v.elements();
         }
-	
-        Hashtable languages = new Hashtable();
-        Vector quality=new Vector();
-    	processAcceptLanguage(acceptLanguage, languages , quality);
+        
+        Hashtable<String,Vector<String>> languages =
+            new Hashtable<String,Vector<String>>();
+        Vector<Double> quality=new Vector<Double>();
+            processAcceptLanguage(acceptLanguage, languages , quality);
 
         if (languages.size() == 0) {
-            Vector v = new Vector();
+            Vector<Locale> v = new Vector<Locale>();
             v.addElement(Locale.getDefault());
             return v.elements();
         }
-    	Vector l = new Vector();
-    	extractLocales( languages, quality , l);
-    	return l.elements();
+            Vector<Locale> l = new Vector<Locale>();
+            extractLocales( languages, quality , l);
+            return l.elements();
     }
 
     private static void processAcceptLanguage( String acceptLanguage,
-					      Hashtable languages, Vector q)
+            Hashtable<String,Vector<String>> languages, Vector<Double> q)
     {
         StringTokenizer languageTokenizer =
             new StringTokenizer(acceptLanguage, ",");
@@ -90,7 +92,7 @@ public class AcceptLanguage {
             if (qValueIndex > -1 &&
                     qValueIndex < qIndex &&
                     qIndex < equalIndex) {
-    	        String qValueStr = language.substring(qValueIndex + 1);
+                    String qValueStr = language.substring(qValueIndex + 1);
                 language = language.substring(0, qValueIndex);
                 qValueStr = qValueStr.trim().toLowerCase();
                 qValueIndex = qValueStr.indexOf('=');
@@ -110,11 +112,11 @@ public class AcceptLanguage {
 
             if (! language.equals("*")) {
                 String key = qValue.toString();
-                Vector v;
+                Vector<String> v;
                 if (languages.containsKey(key)) {
-                    v = (Vector)languages.get(key) ;
+                    v = languages.get(key) ;
                 } else {
-                    v= new Vector();
+                    v= new Vector<String>();
                     q.addElement(qValue);
                 }
                 v.addElement(language);
@@ -123,7 +125,8 @@ public class AcceptLanguage {
         }
     }
 
-    private static void extractLocales(Hashtable languages, Vector q,Vector l)
+    private static void extractLocales(Hashtable languages, Vector q,
+            Vector<Locale> l)
     {
         // XXX We will need to order by q value Vector in the Future ?
         Enumeration e = q.elements();
@@ -132,9 +135,9 @@ public class AcceptLanguage {
                 (Vector)languages.get(((Double)e.nextElement()).toString());
             Enumeration le = v.elements();
             while (le.hasMoreElements()) {
-    	        String language = (String)le.nextElement();
-	        	String country = "";
-        		int countryIndex = language.indexOf("-");
+                    String language = (String)le.nextElement();
+                        String country = "";
+                        int countryIndex = language.indexOf("-");
                 if (countryIndex > -1) {
                     country = language.substring(countryIndex + 1).trim();
                     language = language.substring(0, countryIndex).trim();

@@ -59,7 +59,7 @@ public class BaseRequest {
     MessageBytes contentType = MessageBytes.newInstance();
     MimeHeaders headers = new MimeHeaders();
     Cookies cookies = new Cookies();
-    HashMap attributes = new HashMap();
+    HashMap<String,Object> attributes = new HashMap<String,Object>();
 
     MessageBytes tomcatInstanceId = MessageBytes.newInstance();
     
