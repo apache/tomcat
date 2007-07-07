@@ -970,7 +970,7 @@ public class JDBCStore
 
     /**
      * Gracefully terminate everything associated with our db.
-     * Called once when this Store is stoping.
+     * Called once when this Store is stopping.
      *
      */
     public void stop() throws LifecycleException {
