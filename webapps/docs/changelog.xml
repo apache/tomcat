@@ -39,6 +39,9 @@
   <subsection name="Webapps">
     <changelog>
       <fix>
+        Don't write error on System.out, use log() instead. (rjung)
+      </fix>
+      <fix>
         <bug>39813</bug>: Correct handling of new line characters in JMX
         attributes. Patch provided by R Bramley. Ported from tc5.5.x r415029. (markt,rjung)
       </fix>

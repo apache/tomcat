@@ -176,8 +176,8 @@ public class JMXProxyServlet extends HttpServlet  {
                     try {
                         value=mBeanServer.getAttribute(oname, attName);
                     } catch( Throwable t) {
-                        System.out.println("Error getting attribute " + oname +
-                                " " + attName + " " + t.toString());
+                        log("Error getting attribute " + oname +
+                            " " + attName + " " + t.toString());
                         continue;
                     }
                     if( value==null ) continue;
