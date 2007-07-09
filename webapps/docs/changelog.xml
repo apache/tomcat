@@ -98,6 +98,10 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        Separate sequence increment from getter in ThreadPool to avoid
+        misleading increments during monitoring via JMX. (rjung)
+      </fix>
+      <fix>
         Add back missing socketBuffer attribute in the java.io HTTP connector (remm)
       </fix>
     </changelog>
