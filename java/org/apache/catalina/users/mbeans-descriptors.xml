@@ -136,10 +136,6 @@
                 group="UserDatabase"
                  type="org.apache.catalina.users.MemoryUserDatabase">
 
-    <attribute   name="encoding"
-          description="Character encoding to use when writing XML file"
-                 type="java.lang.String"/>
-
     <attribute   name="groups"
           description="MBean Names of all defined groups"
                  type="[Ljava.lang.String;"
