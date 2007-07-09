@@ -257,7 +257,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             while ( it.hasNext() ) {
                 Map.Entry entry = (Map.Entry)it.next();
                 long access = ((Long)entry.getValue()).longValue(); 
-                if ( (now - access) > timeout ) memberDisappeared((Member)entry.getKey());
+                if ( (now - access) > timeout ) {
+                    it.remove();
+                    memberDisappeared( (Member) entry.getKey());
+                }
             }
         }//synch
     }
