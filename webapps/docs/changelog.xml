@@ -39,7 +39,11 @@
   <subsection name="Webapps">
     <changelog>
       <fix>
-         <bug>42459</bug>: Tomcat Web Application Manager table error (rjung)
+        <bug>39813</bug>: Correct handling of new line characters in JMX
+        attributes. Patch provided by R Bramley. Ported from tc5.5.x r415029. (markt,rjung)
+      </fix>
+      <fix>
+         <bug>42459</bug>: Fix Tomcat Web Application Manager table error. (rjung)
       </fix>
     </changelog>
   </subsection>
