@@ -18,6 +18,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+         Remove invalid attribute "encoding" of MBean MemoryUserDatabase,
+         which lead to errors in the manager webapp JMXProxy output. (rjung)
+      </fix>
+      <fix>
          <bug>42449</bug>:
          JNDIRealm does not catch NullPointerException for Sun's
          LDAP provider (See bug for details) (funkman)
