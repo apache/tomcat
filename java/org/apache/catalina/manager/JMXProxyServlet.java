@@ -79,7 +79,6 @@ public class JMXProxyServlet extends HttpServlet  {
         response.setContentType("text/plain");
 
         PrintWriter writer = response.getWriter();
-        String qryString= request.getQueryString();
 
         if( mBeanServer==null ) {
             writer.println("Error - No mbean server");
@@ -113,7 +112,8 @@ public class JMXProxyServlet extends HttpServlet  {
         try {
             ObjectName oname = new ObjectName(onameStr);
             Object value = mBeanServer.getAttribute(oname, att);
-            writer.println("OK - Attribute get '" + onameStr + "' - " + att + "= " + value.toString() );
+            writer.println("OK - Attribute get '" + onameStr + "' - " + att
+                    + "= " + escape(value.toString()));
         } catch (Exception ex) {
             writer.println("Error - " + ex.toString());
         }
@@ -203,7 +203,7 @@ public class JMXProxyServlet extends HttpServlet  {
         int prev=0;
         StringBuffer sb=new StringBuffer();
         while( idx >= 0 ) {
-            appendHead(sb, value, prev, idx-1);
+            appendHead(sb, value, prev, idx);
 
             sb.append( "\\n\n ");
             prev=idx+1;
@@ -216,6 +216,8 @@ public class JMXProxyServlet extends HttpServlet  {
     }
 
     private void appendHead( StringBuffer sb, String value, int start, int end) {
+        if (end < 1) return;
+
         int pos=start;
         while( end-pos > 78 ) {
             sb.append( value.substring(pos, pos+78));
