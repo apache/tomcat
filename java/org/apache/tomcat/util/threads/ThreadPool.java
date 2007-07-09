@@ -260,6 +260,10 @@ public class ThreadPool  {
     }
 
     public int getSequence() {
+        return sequence;
+    }
+
+    public int incSequence() {
         return sequence++;
     }
 
@@ -638,7 +642,7 @@ public class ThreadPool  {
             this.p = p;
             t = new ThreadWithAttributes(p, this);
             t.setDaemon(true);
-            t.setName(p.getName() + "-Processor" + p.getSequence());
+            t.setName(p.getName() + "-Processor" + p.incSequence());
             t.setPriority(p.getThreadPriority());
             p.addThread( t, this );
 	    noThData=true;
