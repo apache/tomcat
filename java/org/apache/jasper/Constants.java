@@ -193,4 +193,10 @@ public class Constants {
     public static final boolean IS_SECURITY_ENABLED = 
         (System.getSecurityManager() != null);
 
+    /**
+     * The name of the path parameter used to pass the session identifier
+     * back and forth with the client.
+     */
+    public static final String SESSION_PARAMETER_NAME = "jsessionid";
+
 }
