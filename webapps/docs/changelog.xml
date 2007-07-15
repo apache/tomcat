@@ -15,6 +15,13 @@
 
 <body>
 <section name="Tomcat 6.0.14 (remm)">
+  <subsection name="General">
+    <changelog>
+      <docs>
+        Correct j.u.l log levels in JULI docs. (rjung)
+      </docs>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
