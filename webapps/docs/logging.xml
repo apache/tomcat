@@ -171,8 +171,8 @@
   </p>
   <p>
     The default logging.properties specifies a ConsoleHandler for routing logging to stdout and
-    also a FileHandler. A handler's log level threshold can be set using SEVERE, CONFIG, INFO, 
-    WARN, FINE, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You
+    also a FileHandler. A handler's log level threshold can be set using SEVERE, WARNING, INFO,
+    CONFIG, FINE, FINER, FINEST or ALL. The logging.properties shipped with JDK is set to INFO. You
     can also target specific packages to collect logging from and specify a level. Here is how
     you would set debugging from Tomcat. You would need to ensure the ConsoleHandler's level is also
     set to collect this threshold, so FINEST or ALL should be set. Please refer to Sun's java.util.logging
