@@ -25,6 +25,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Handle special case of ROOT when re-loading webapp after ROOT.xml has
+        been modified. In some circumstances the reloaded ROOT webapp had no
+        associated resources. (markt)
+      </fix>
+      <fix>
         Remove invalid attribute "encoding" of MBean MemoryUserDatabase,
         which lead to errors in the manager webapp JMXProxy output. (rjung)
       </fix>
