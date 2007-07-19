@@ -140,7 +140,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
             Member next = members[nextIdx];
             
             //increment for the next round of back up selection
-            nextIdx = firstIdx + 1;
+            nextIdx = nextIdx + 1;
             if ( nextIdx >= members.length ) nextIdx = 0;
             
             if (next == null) {
