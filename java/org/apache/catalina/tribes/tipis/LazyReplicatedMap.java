@@ -137,7 +137,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
         boolean success = false;
         do {
             //select a backup node
-            Member next = members[firstIdx];
+            Member next = members[nextIdx];
             
             //increment for the next round of back up selection
             nextIdx = firstIdx + 1;
