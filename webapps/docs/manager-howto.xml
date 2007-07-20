@@ -82,22 +82,16 @@ the following functions:</p>
     directory (unless it was deployed from file system).</li>
 </ul>
 
-<p>There are two ways to configure the Manager web application
-<code>Context</code>:
-<ul>
-<li>Install the <code>manager.xml</code> context configuration file
-    in the <code>$CATALINA_HOME/conf/[enginename]/[hostname]</code> folder.
-</li>
-<li>Configure the Manager <code>Context</code> within the
-    <code>Host</code> configuration in your Tomcat <code>server.xml</code>
-    configuration. Here is an example:
+<p>A default Tomcat installation includes the manager. To add an instance of the
+Manager web application <code>Context</code> to a new host install the
+<code>manager.xml</code> context configuration file in the
+<code>$CATALINA_HOME/conf/[enginename]/[hostname]</code> folder. Here is an
+example:
 <pre>
-&lt;Context path="/manager" privileged="true"
+&lt;Context path="/manager" debug="0" privileged="true"
          docBase="/usr/local/kinetic/tomcat6/server/webapps/manager"&gt;
 &lt;/Context&gt;
 </pre>
-</li>
-</ul>
 </p>
 
 <p>If you have Tomcat configured to support multiple virtual hosts
