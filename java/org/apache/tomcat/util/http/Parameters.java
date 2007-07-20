@@ -40,7 +40,8 @@ public final class Parameters extends MultiMap {
     // Transition: we'll use the same Hashtable( String->String[] )
     // for the beginning. When we are sure all accesses happen through
     // this class - we can switch to MultiMap
-    private Hashtable paramHashStringArray=new Hashtable();
+    private Hashtable<String,String[]> paramHashStringArray =
+        new Hashtable<String,String[]>();
     private boolean didQueryParameters=false;
     private boolean didMerge=false;
     
@@ -225,7 +226,7 @@ public final class Parameters extends MultiMap {
 
         // Add the parent props to the child ( lower precedence )
         parent.merge();
-        Hashtable parentProps=parent.paramHashStringArray;
+        Hashtable<String,String[]> parentProps=parent.paramHashStringArray;
         merge2( paramHashStringArray , parentProps);
         didMerge=true;
         if(debug > 0 )
@@ -273,13 +274,14 @@ public final class Parameters extends MultiMap {
      *  Used to combine child parameters ( RequestDispatcher's query )
      *  with parent parameters ( original query or parent dispatcher )
      */
-    private static void merge2(Hashtable one, Hashtable two ) {
+    private static void merge2(Hashtable<String,String[]> one,
+            Hashtable<String,String[]> two ) {
         Enumeration e = two.keys();
 
         while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
-            String[] oneValue = (String[]) one.get(name);
-            String[] twoValue = (String[]) two.get(name);
+            String[] oneValue = one.get(name);
+            String[] twoValue = two.get(name);
             String[] combinedValue;
 
             if (twoValue == null) {
