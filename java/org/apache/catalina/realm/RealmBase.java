@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -944,7 +945,9 @@ public abstract class RealmBase
         String requestedSessionId = request.getRequestedSessionId();
         if ((requestedSessionId != null) &&
             request.isRequestedSessionIdFromURL()) {
-            file.append(";jsessionid=");
+            file.append(";");
+            file.append(Globals.SESSION_PARAMETER_NAME);
+            file.append("=");
             file.append(requestedSessionId);
         }
         String queryString = request.getQueryString();
