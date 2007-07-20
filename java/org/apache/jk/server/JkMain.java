@@ -283,7 +283,7 @@ public class JkMain implements MBeanRegistration
                 try {
                     wEnv.getHandler(i).destroy();
                 } catch( IOException ex) {
-                    log.error("Error stoping " + wEnv.getHandler(i).getName(), ex);
+                    log.error("Error stopping " + wEnv.getHandler(i).getName(), ex);
                 }
             }
         }
