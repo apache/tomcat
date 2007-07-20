@@ -104,7 +104,7 @@ public class ErrorReportValve
         Throwable throwable =
             (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
 
-        if (response.isAppCommitted()) {
+        if (response.isCommitted()) {
             return;
         }
 
