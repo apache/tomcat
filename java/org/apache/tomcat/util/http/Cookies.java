@@ -249,9 +249,11 @@ public final class Cookies { // extends MultiMap {
             int endValue=startValue;
             
             cc=bytes[pos];
-            if(  cc== '\'' || cc=='"' ) {
-                startValue++;
-                endValue=indexOf( bytes, startValue, end, cc );
+            if( cc=='"' ) {
+                endValue=findDelim3( bytes, startValue+1, end, cc );
+                if (endValue == -1) {
+                    endValue=findDelim2( bytes, startValue+1, end );
+                } else startValue++;
                 pos=endValue+1; // to skip to next cookie
              } else {
                 endValue=findDelim2( bytes, startValue, end );
@@ -335,28 +337,26 @@ public final class Cookies { // extends MultiMap {
         return off;
     }
 
-    public static int indexOf( byte bytes[], int off, int end, byte qq )
+    /*
+     *  search for cc but skip \cc as required by rfc2616
+     *   (according to rfc2616 cc should be ")
+    */
+    public static int findDelim3( byte bytes[], int off, int end, byte cc )
     {
         while( off < end ) {
             byte b=bytes[off];
-            if( b==qq )
+            if ( b== '\\' ) {
+              off++;
+              off++;
+              continue;
+            }
+            if( b==cc )
                 return off;
             off++;
         }
-        return off;
+        return -1;
     }
 
-    public static int indexOf( byte bytes[], int off, int end, char qq )
-    {
-        while( off < end ) {
-            byte b=bytes[off];
-            if( b==qq )
-                return off;
-            off++;
-        }
-        return off;
-    }
-    
     // XXX will be refactored soon!
     public static boolean equals( String s, byte b[], int start, int end) {
         int blen = end-start;
@@ -412,7 +412,7 @@ public final class Cookies { // extends MultiMap {
     /**
      *
      * Strips quotes from the start and end of the cookie string
-     * This conforms to RFC 2109
+     * This conforms to RFC 2965
      * 
      * @param value            a <code>String</code> specifying the cookie 
      *                         value (possibly quoted).
@@ -423,8 +423,7 @@ public final class Cookies { // extends MultiMap {
     private static String stripQuote( String value )
     {
         //        log("Strip quote from " + value );
-        if (((value.startsWith("\"")) && (value.endsWith("\""))) ||
-            ((value.startsWith("'") && (value.endsWith("'"))))) {
+        if (value.startsWith("\"") && value.endsWith("\"")) {
             try {
                 return value.substring(1,value.length()-1);
             } catch (Exception ex) { 
