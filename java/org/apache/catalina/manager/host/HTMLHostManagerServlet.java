@@ -229,7 +229,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         for (int i = 0; i < children.length; i++)
             hostNames[i] = children[i].getName();
 
-        TreeMap sortedHostNamesMap = new TreeMap();
+        TreeMap<String,String> sortedHostNamesMap =
+            new TreeMap<String,String>();
 
         for (int i = 0; i < hostNames.length; i++) {
             String displayPath = hostNames[i];
@@ -240,15 +241,16 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         String hostsStop = sm.getString("htmlHostManagerServlet.hostsStop");
         String hostsRemove = sm.getString("htmlHostManagerServlet.hostsRemove");
 
-        Iterator iterator = sortedHostNamesMap.entrySet().iterator();
+        Iterator<Map.Entry<String,String>> iterator =
+            sortedHostNamesMap.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) iterator.next();
+            Map.Entry<String,String> entry = iterator.next();
             String hostName = (String) entry.getKey();
             Host host = (Host) engine.findChild(hostName);
 
             if (host != null ) {
                 args = new Object[2];
-                args[0] = hostName;
+                args[0] = RequestUtil.filter(hostName);
                 String[] aliases = host.findAliases();
                 StringBuffer buf = new StringBuffer();
                 if (aliases.length > 0) {
@@ -260,9 +262,11 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
                 if (buf.length() == 0) {
                     buf.append("&nbsp;");
+                    args[1] = buf.toString();
+                } else {
+                    args[1] = RequestUtil.filter(buf.toString());
                 }
 
-                args[1] = buf.toString();
                 writer.print
                     (MessageFormat.format(HOSTS_ROW_DETAILS_SECTION, args));
 
