@@ -42,10 +42,10 @@ know if you have any other tested configurations that you feel may be of use
 to the wider audience, or if you feel we can improve this section in anyway.</p>
 
 <p>
-<b>Please note that JNDI resource configuration has changed somewhat between
-Tomcat 5.0.x and Tomcat 5.5.x.</b>  You will most likely need to modify your JNDI
-resource configurations to match the syntax in the example below in order
-to make them work in Tomcat 5.5.x.
+<b>Please note that JNDI resource configuration changed somewhat between
+Tomcat 5.0.x and Tomcat 5.5.x.</b>  You will most likely need to modify older
+JNDI resource configurations to match the syntax in the example below in order
+to make them work in Tomcat 6.x.x.
 </p>
 
 <p>
@@ -192,15 +192,10 @@ mysql&gt;
 </source>
 </p>
 
-<h3>2. server.xml configuration</h3>
+<h3>2. Context configuration</h3>
 <p>Configure the JNDI DataSource in Tomcat by adding a declaration for your
-resource to <code>$CATALINA_HOME/conf/server.xml</code>.</p>
-<p>Add this in between the <code>&lt;/Context&gt;</code> tag of the examples
-context and the <code>&lt;/Host&gt;</code> tag closing the localhost definition.
-If there is no such tag, you can add one as illustrated in the 
-<a href="config/context.html">Context</a> and
-<a href="config/host.html">Host</a> configuration references, and repeated below
-for your convenience.
+resource to your <a href="config/context.html">Context</a>.</p>
+<p>For example:
 
 <source>
 &lt;Context path="/DBTest" docBase="DBTest"
@@ -316,22 +311,19 @@ or <code>classes12.zip</code> will need to be renamed with a <code>.jar</code>
 extension. Since jarfiles are zipfiles, there is no need to unzip and jar these
 files - a simple rename will suffice.</p>
 
-<p>Some early versions of Tomcat 4.0 when used with JDK 1.4 will not load
-classes12.zip unless you unzip the file, remove the <code>javax.sql.*</code>
-class heirarchy and rejar.</p>
-
 <p>For Oracle 9i onwards you should use <code>oracle.jdbc.OracleDriver</code>
 rather than <code>oracle.jdbc.driver.OracleDriver</code> as Oracle have stated
 that <code>oracle.jdbc.driver.OracleDriver</code> is deprecated and support
 for this driver class will be discontinued in the next major release.
 </p>
 
-<h3>1.    server.xml configuration</h3>
+<h3>1. Context configuration</h3>
 <p>In a similar manner to the mysql config above, you will need to define your
-Datasource in your server.xml file. Here we define a Datasource called myoracle
-using the thin driver to connect as user scott, password tiger to the sid
-called mysid. (Note: with the thin driver this sid is not the same as the
-tnsname). The schema used will be the default schema for the user scott.</p>
+Datasource in your <a href="config/context.html">Context</a>. Here we define a
+Datasource called myoracle using the thin driver to connect as user scott,
+password tiger to the sid called mysid. (Note: with the thin driver this sid is
+not the same as the tnsname). The schema used will be the default schema for the
+user scott.</p>
 
 <p>Use of the OCI driver should simply involve a changing thin to oci in the URL string.
 <source>
@@ -344,7 +336,7 @@ tnsname). The schema used will be the default schema for the user scott.</p>
 </p>
 
 <h3>2.    web.xml configuration</h3>
-<p>You should ensure that you respect the elemeent ordering defined by the DTD when you
+<p>You should ensure that you respect the element ordering defined by the DTD when you
 create you applications web.xml file.</p>
 <source>
 &lt;resource-ref&gt;
@@ -409,10 +401,8 @@ Tomcat installation.
 </p>
 
 <p>
-Create a resource definition file for your application defining the
-datasource. This file must have the same name as your application, so if
-your application deploys as <code>someApp.war</code>, this filename must
-be <code>someApp.xml</code>. This file should look something like the following.
+Create a resource definition for your <a href="config/context.html">Context</a>.
+The Context element should look something like the following.
 </p>
 
 <source>
