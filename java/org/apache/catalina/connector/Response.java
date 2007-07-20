@@ -1447,7 +1447,8 @@ public class Response
             String file = url.getFile();
             if ((file == null) || !file.startsWith(contextPath))
                 return (false);
-            if( file.indexOf(";jsessionid=" + session.getIdInternal()) >= 0 )
+            String tok = ";" + Globals.SESSION_PARAMETER_NAME + "=" + session.getIdInternal();
+            if( file.indexOf(tok, contextPath.length()) >= 0 )
                 return (false);
         }
 
@@ -1581,7 +1582,9 @@ public class Response
         }
         StringBuffer sb = new StringBuffer(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
-            sb.append(";jsessionid=");
+            sb.append(";");
+            sb.append(Globals.SESSION_PARAMETER_NAME);
+            sb.append("=");
             sb.append(sessionId);
         }
         sb.append(anchor);

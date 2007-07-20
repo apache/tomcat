@@ -344,7 +344,7 @@
 
     <attribute name="server" required="false">
       <p>The Server header for the http response.
-         Unless your paranoid, you won't need this feature.
+         Unless you are paranoid, you won't need this feature.
       </p>
     </attribute>
 
