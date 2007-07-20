@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,11 +33,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
 import org.apache.catalina.util.ServerInfo;
-
+import org.apache.catalina.util.RequestUtil;
 /**
 * Servlet that enables remote management of the virtual hosts deployed
 * on the server.  Normally, this functionality will be protected by a security
-* constraint in the web application deployment descriptor.  However, 
+* constraint in the web application deployment descriptor.  However,
 * this requirement can be relaxed during testing.
 * <p>
 * The difference between the <code>HostManagerServlet</code> and this
@@ -78,7 +78,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         String command = request.getPathInfo();
 
         String name = request.getParameter("name");
- 
+
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
@@ -102,7 +102,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         list(request, response, message);
     }
 
-    
+
     /**
      * Add a host using the specified parameters.
      *
@@ -135,7 +135,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         return stringWriter.toString();
     }
 
-    
+
     /**
      * Start the host with the specified name.
      *
@@ -151,7 +151,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         return stringWriter.toString();
     }
 
-    
+
     /**
      * Stop the host with the specified name.
      *
@@ -167,7 +167,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         return stringWriter.toString();
     }
 
-    
+
     /**
      * Render a HTML list of the currently active Contexts in our virtual host,
      * and memory and server status information.
@@ -304,7 +304,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args[4] = sm.getString("htmlHostManagerServlet.addAliases");
         args[5] = sm.getString("htmlHostManagerServlet.addAppBase");
         writer.print(MessageFormat.format(ADD_SECTION_START, args));
- 
+
         args = new Object[3];
         args[0] = sm.getString("htmlHostManagerServlet.addAutoDeploy");
         args[1] = "autoDeploy";
@@ -335,7 +335,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args[1] = "manager";
         args[2] = "checked";
         writer.print(MessageFormat.format(ADD_SECTION_BOOLEAN, args));
-        
+
         args = new Object[1];
         args[0] = sm.getString("htmlHostManagerServlet.addButton");
         writer.print(MessageFormat.format(ADD_SECTION_END, args));
@@ -370,7 +370,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         writer.close();
     }
 
-    
+
     // ------------------------------------------------------ Private Constants
 
     // These HTML sections are broken in relatively small sections, because of
@@ -452,7 +452,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "  <input type=\"text\" name=\"appBase\" size=\"64\">\n" +
         " </td>\n" +
         "</tr>\n" ;
-    
+
         private static final String ADD_SECTION_BOOLEAN =
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
@@ -462,7 +462,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "  <input type=\"checkbox\" name=\"{1}\" {2}>\n" +
         " </td>\n" +
         "</tr>\n" ;
-        
+
         private static final String ADD_SECTION_END =
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
