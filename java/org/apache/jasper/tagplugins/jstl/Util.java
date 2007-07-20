@@ -18,6 +18,8 @@
 
 package org.apache.jasper.tagplugins.jstl;
 
+import org.apache.jasper.Constants;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -150,7 +152,7 @@ public class Util {
     public static String stripSession(String url) {
         StringBuffer u = new StringBuffer(url);
         int sessionStart;
-        while ((sessionStart = u.toString().indexOf(";jsessionid=")) != -1) {
+        while ((sessionStart = u.toString().indexOf(";" + Constants.SESSION_PARAMETER_NAME + "=")) != -1) {
             int sessionEnd = u.toString().indexOf(";", sessionStart + 1);
             if (sessionEnd == -1)
                 sessionEnd = u.toString().indexOf("?", sessionStart + 1);
