@@ -32,7 +32,8 @@ public class MimeMap implements FileNameMap {
     // Defaults - all of them are "well-known" types,
     // you can add using normal web.xml.
     
-    public static Hashtable defaultMap=new Hashtable(101);
+    public static Hashtable<String,String> defaultMap =
+        new Hashtable<String,String>(101);
     static {
         defaultMap.put("txt", "text/plain");
         defaultMap.put("html","text/html");
@@ -42,7 +43,7 @@ public class MimeMap implements FileNameMap {
         defaultMap.put("jpe", "image/jpeg");
         defaultMap.put("jpeg", "image/jpeg");
         defaultMap.put("png", "image/png");
-		defaultMap.put("java", "text/plain");
+                defaultMap.put("java", "text/plain");
         defaultMap.put("body", "text/html");
         defaultMap.put("rtx", "text/richtext");
         defaultMap.put("tsv", "text/tab-separated-values");
@@ -133,7 +134,7 @@ public class MimeMap implements FileNameMap {
     }
     
 
-    private Hashtable map = new Hashtable();
+    private Hashtable<String,String> map = new Hashtable<String,String>();
 
     public void addContentType(String extn, String type) {
         map.put(extn, type.toLowerCase());
@@ -145,8 +146,8 @@ public class MimeMap implements FileNameMap {
 
     public String getContentType(String extn) {
         String type = (String)map.get(extn.toLowerCase());
-	if( type == null ) type=(String)defaultMap.get( extn );
-	return type;
+        if( type == null ) type=(String)defaultMap.get( extn );
+        return type;
     }
 
     public void removeContentType(String extn) {
@@ -158,14 +159,14 @@ public class MimeMap implements FileNameMap {
     public static String getExtension( String fileName ) {
         // play it safe and get rid of any fragment id
         // that might be there
-	int length=fileName.length();
-	
+        int length=fileName.length();
+        
         int newEnd = fileName.lastIndexOf('#');
-	if( newEnd== -1 ) newEnd=length;
-	// Instead of creating a new string.
-	//         if (i != -1) {
-	//             fileName = fileName.substring(0, i);
-	//         }
+        if( newEnd== -1 ) newEnd=length;
+        // Instead of creating a new string.
+        //         if (i != -1) {
+        //             fileName = fileName.substring(0, i);
+        //         }
         int i = fileName.lastIndexOf('.', newEnd );
         if (i != -1) {
              return  fileName.substring(i + 1, newEnd );
@@ -176,7 +177,7 @@ public class MimeMap implements FileNameMap {
     }
     
     public String getContentTypeFor(String fileName) {
-	String extn=getExtension( fileName );
+        String extn=getExtension( fileName );
         if (extn!=null) {
             return getContentType(extn);
         } else {
