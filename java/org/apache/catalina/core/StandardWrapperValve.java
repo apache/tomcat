@@ -55,7 +55,7 @@ final class StandardWrapperValve
 
 
     // Some JMX statistics. This vavle is associated with a StandardWrapper.
-    // We exponse the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
+    // We expose the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
     // are here for performance.
     private volatile long processingTime;
     private volatile long maxTime;
@@ -162,9 +162,10 @@ final class StandardWrapperValve
         if (servlet instanceof CometProcessor 
                 && request.getAttribute("org.apache.tomcat.comet.support") == Boolean.TRUE) {
             comet = true;
+            request.setComet(true);
         }
         
-        // Acknowlege the request
+        // Acknowledge the request
         try {
             response.sendAcknowledgement();
         } catch (IOException e) {
@@ -195,6 +196,8 @@ final class StandardWrapperValve
             ApplicationFilterFactory.getInstance();
         ApplicationFilterChain filterChain =
             factory.createFilterChain(request, wrapper, servlet);
+        // Reset comet flag value after creating the filter chain
+        request.setComet(false);
 
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method
