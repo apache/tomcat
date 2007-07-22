@@ -11,7 +11,7 @@
 #                   the same directory that CATALINA_HOME points to.
 #
 #   CATALINA_OPTS   (Optional) Java runtime options used when the "start",
-#                   "stop", or "run" command is executed.
+#                   or "run" command is executed.
 #
 #   CATALINA_TMPDIR (Optional) Directory path location of temporary directory
 #                   the JVM should use (java.io.tmpdir).  Defaults to
@@ -292,7 +292,7 @@ elif [ "$1" = "stop" ] ; then
     FORCE=1
   fi
 
-  "$_RUNJAVA" $JAVA_OPTS $CATALINA_OPTS \
+  "$_RUNJAVA" $JAVA_OPTS \
     -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
     -Dcatalina.base="$CATALINA_BASE" \
     -Dcatalina.home="$CATALINA_HOME" \
