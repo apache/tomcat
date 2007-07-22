@@ -10,10 +10,25 @@
     <author email="remm@apache.org">Remy Maucherat</author>
     <author email="yoavs@apache.org">Yoav Shapira</author>
     <author email="fhanik@apache.org">Filip Hanik</author>
+    <author email="rjung@apache.org">Rainer Jung</author>
     <title>Changelog</title>
   </properties>
 
 <body>
+<section name="Tomcat 6.0.15 (remm)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+         <bug>42951</bug>: Don't use CATALINA_OPTS when stopping Tomcat. This
+         allows options for starting and stopping to be set on JAVA_OPTS and
+         options for starting only to be set on CATALINA_OPTS. Without this
+         fix, some startup options (eg the port for remote JMX) would cause
+         stop to fail. Based on a fix suggested by Michael Vorburger.
+         Port of r454193 (<bug>36976</bug>) from Tomcat 5.5.x. (markt,rjung)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 6.0.14 (remm)">
   <subsection name="General">
     <changelog>
