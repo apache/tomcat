@@ -89,6 +89,12 @@
        The backup manager uses a replicated map, this map is sending and receiving messages.
        You can setup the flag for how this map is sending messages, the default value is <code>8</code>(asynchronous).
      </attribute>
+     <attribute name="stateTransferTimeout" required="false">
+       The timeout in seconds for doing a state transfer of all sessions when a node is started up. 
+       the default is <code>60</code> seconds.
+     </attribute>
+
+     
     </attributes>
   </subsection>
 </section>
