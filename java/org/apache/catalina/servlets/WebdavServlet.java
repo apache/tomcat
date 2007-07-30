@@ -44,6 +44,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.catalina.util.RequestUtil;
@@ -312,6 +313,35 @@ public class WebdavServlet
 
 
     /**
+     * Override the DefaultServlet implementation and only use the PathInfo. If
+     * the ServletPath is non-null, it will be because the WebDAV servlet has
+     * been mapped to a url other than /* to configure editing at different url
+     * than normal viewing.
+     *
+     * @param request The servlet request we are processing
+     */
+    protected String getRelativePath(HttpServletRequest request) {
+
+        // Are we being processed by a RequestDispatcher.include()?
+        if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
+            String result = (String) request.getAttribute(
+                                            Globals.INCLUDE_PATH_INFO_ATTR);
+            if ((result == null) || (result.equals("")))
+                result = "/";
+            return (result);
+        }
+
+        // No, extract the desired path directly from the request
+        String result = request.getPathInfo();
+        if ((result == null) || (result.equals(""))) {
+            result = "/";
+        }
+        return (result);
+
+    }
+
+
+    /**
      * OPTIONS Method.
      *
      * @param req The request
@@ -381,40 +411,42 @@ public class WebdavServlet
         }
 
         Node propNode = null;
-
-        DocumentBuilder documentBuilder = getDocumentBuilder();
-
-        try {
-            Document document = documentBuilder.parse
-                (new InputSource(req.getInputStream()));
-
-            // Get the root element of the document
-            Element rootElement = document.getDocumentElement();
-            NodeList childList = rootElement.getChildNodes();
-
-            for (int i=0; i < childList.getLength(); i++) {
-                Node currentNode = childList.item(i);
-                switch (currentNode.getNodeType()) {
-                case Node.TEXT_NODE:
-                    break;
-                case Node.ELEMENT_NODE:
-                    if (currentNode.getNodeName().endsWith("prop")) {
-                        type = FIND_BY_PROPERTY;
-                        propNode = currentNode;
+        
+        if (req.getInputStream().available() > 0) {
+            DocumentBuilder documentBuilder = getDocumentBuilder();
+    
+            try {
+                Document document = documentBuilder.parse
+                    (new InputSource(req.getInputStream()));
+    
+                // Get the root element of the document
+                Element rootElement = document.getDocumentElement();
+                NodeList childList = rootElement.getChildNodes();
+    
+                for (int i=0; i < childList.getLength(); i++) {
+                    Node currentNode = childList.item(i);
+                    switch (currentNode.getNodeType()) {
+                    case Node.TEXT_NODE:
+                        break;
+                    case Node.ELEMENT_NODE:
+                        if (currentNode.getNodeName().endsWith("prop")) {
+                            type = FIND_BY_PROPERTY;
+                            propNode = currentNode;
+                        }
+                        if (currentNode.getNodeName().endsWith("propname")) {
+                            type = FIND_PROPERTY_NAMES;
+                        }
+                        if (currentNode.getNodeName().endsWith("allprop")) {
+                            type = FIND_ALL_PROP;
+                        }
+                        break;
                     }
-                    if (currentNode.getNodeName().endsWith("propname")) {
-                        type = FIND_PROPERTY_NAMES;
-                    }
-                    if (currentNode.getNodeName().endsWith("allprop")) {
-                        type = FIND_ALL_PROP;
-                    }
-                    break;
                 }
+            } catch (SAXException e) {
+                // Something went wrong - use the defaults.
+            } catch (IOException e) {
+                // Something went wrong - use the defaults.
             }
-        } catch (SAXException e) {
-            // Most likely there was no content : we use the defaults.
-        } catch (IOException e) {
-            // Most likely there was no content : we use the defaults.
         }
 
         if (type == FIND_BY_PROPERTY) {
