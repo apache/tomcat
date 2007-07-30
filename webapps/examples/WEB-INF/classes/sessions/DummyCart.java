@@ -16,7 +16,6 @@
 */
 package sessions;
 
-import javax.servlet.http.*;
 import java.util.Vector;
 
 public class DummyCart {
@@ -46,13 +45,10 @@ public class DummyCart {
         return s;
     }
     
-    public void processRequest(HttpServletRequest request) {
+    public void processRequest() {
         // null value for submit - user hit enter instead of clicking on 
         // "add" or "remove"
-        if (submit == null) 
-            addItem(item);
-
-        if (submit.equals("add"))
+        if (submit == null || submit.equals("add"))
             addItem(item);
         else if (submit.equals("remove")) 
             removeItem(item);

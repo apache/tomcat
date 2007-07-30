@@ -20,7 +20,7 @@
 
 <jsp:setProperty name="cart" property="*" />
 <%
-	cart.processRequest(request);
+	cart.processRequest();
 %>
 
 
