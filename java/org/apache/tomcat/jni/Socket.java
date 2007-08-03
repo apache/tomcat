@@ -241,11 +241,42 @@ public class Socket {
      */
     public static native int sendb(long sock, ByteBuffer buf,
                                    int offset, int len);
+
+    /**
+     * Send data over a network without retry
+     * <PRE>
+     * This functions acts like a blocking write by default.  To change
+     * this behavior, use apr_socket_timeout_set() or the APR_SO_NONBLOCK
+     * socket option.
+     *
+     * It is possible for both bytes to be sent and an error to be returned.
+     *
+     * </PRE>
+     * @param sock The socket to send the data over.
+     * @param buf The Byte buffer which contains the data to be sent.
+     * @param offset The offset within the buffer array of the first buffer from
+     *               which bytes are to be retrieved; must be non-negative
+     *               and no larger than buf.length
+     * @param len The maximum number of buffers to be accessed; must be non-negative
+     *            and no larger than buf.length - offset
+     * @return The number of bytes send.
+     *
+     */
+    public static native int sendib(long sock, ByteBuffer buf,
+                                    int offset, int len);
+
     /**
      * Send data over a network using internally set ByteBuffer
      */
     public static native int sendbb(long sock,
                                    int offset, int len);
+
+    /**
+     * Send data over a network using internally set ByteBuffer
+     * without internal retry.
+     */
+    public static native int sendibb(long sock,
+                                     int offset, int len);
 
     /**
      * Send multiple packets of data over a network.

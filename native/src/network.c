@@ -540,6 +540,40 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendb)(TCN_STDARGS, jlong sock,
     }
 }
 
+TCN_IMPLEMENT_CALL(jint, Socket, sendib)(TCN_STDARGS, jlong sock,
+                                         jobject buf, jint offset, jint len)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_size_t nbytes = (apr_size_t)len;
+    char *bytes;
+    apr_status_t ss = APR_SUCCESS;
+
+    UNREFERENCED(o);
+    if (!sock) {
+        tcn_ThrowAPRException(e, APR_ENOTSOCK);
+        return -(jint)APR_ENOTSOCK;
+    }
+    TCN_ASSERT(s->opaque != NULL);
+    TCN_ASSERT(buf != NULL);
+#ifdef TCN_DO_STATISTICS
+    sp_max_send = TCN_MAX(sp_max_send, nbytes);
+    sp_min_send = TCN_MIN(sp_min_send, nbytes);
+    sp_tot_send += nbytes;
+    sp_num_send++;
+#endif
+
+    bytes  = (char *)(*e)->GetDirectBufferAddress(e, buf);
+
+    ss = (*s->net->send)(s->opaque, bytes + offset, &nbytes);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)ss;
+    }
+}
+
 TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
                                          jint offset, jint len)
 {
@@ -574,6 +608,37 @@ TCN_IMPLEMENT_CALL(jint, Socket, sendbb)(TCN_STDARGS, jlong sock,
     else {
         TCN_ERROR_WRAP(ss);
         return -(jint)ss;
+    }
+}
+
+TCN_IMPLEMENT_CALL(jint, Socket, sendibb)(TCN_STDARGS, jlong sock,
+                                          jint offset, jint len)
+{
+    tcn_socket_t *s = J2P(sock, tcn_socket_t *);
+    apr_size_t nbytes = (apr_size_t)len;
+    apr_status_t ss = APR_SUCCESS;
+
+    UNREFERENCED(o);
+    if (!sock) {
+        tcn_ThrowAPRException(e, APR_ENOTSOCK);
+        return -(jint)APR_ENOTSOCK;
+    }
+    TCN_ASSERT(s->opaque != NULL);
+    TCN_ASSERT(s->jsbbuff != NULL);
+#ifdef TCN_DO_STATISTICS
+    sp_max_send = TCN_MAX(sp_max_send, nbytes);
+    sp_min_send = TCN_MIN(sp_min_send, nbytes);
+    sp_tot_send += nbytes;
+    sp_num_send++;
+#endif
+
+    ss = (*s->net->send)(s->opaque, s->jsbbuff + offset, &nbytes);
+
+    if (ss == APR_SUCCESS)
+        return (jint)nbytes;
+    else {
+        TCN_ERROR_WRAP(ss);
+        return -(jint)nbytes;
     }
 }
 

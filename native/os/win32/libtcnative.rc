@@ -3,7 +3,7 @@
 LANGUAGE 0x9,0x1
 1 11 logmessages.bin
 
-#define TCN_COPYRIGHT "Copyright 2000-2006 The Apache Software " \
+#define TCN_COPYRIGHT "Copyright 2000-2007 The Apache Software " \
                       "Foundation or its licensors, as applicable."
 
 #define TCN_LICENSE "Licensed under the Apache License, Version 2.0 " \
@@ -19,7 +19,7 @@ LANGUAGE 0x9,0x1
                     "specific language governing permissions and " \
                     "limitations under the License."
 
-#define TCN_VERISON "1.1.11"
+#define TCN_VERISON "1.1.12"
 1000 ICON "apache.ico"
 
 1001 DIALOGEX 0, 0, 252, 51
@@ -35,8 +35,8 @@ BEGIN
 END
 
 1 VERSIONINFO
- FILEVERSION 1,1,11,0
- PRODUCTVERSION 1,1,11,0
+ FILEVERSION 1,1,12,0
+ PRODUCTVERSION 1,1,12,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
