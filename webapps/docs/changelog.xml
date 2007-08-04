@@ -19,6 +19,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>42944</bug>: Correctly handle servlet mappings that use a '+'
+        character as part of the url pattern. (markt)
+      </fix>
+      <fix>
          <bug>42951</bug>: Don't use CATALINA_OPTS when stopping Tomcat. This
          allows options for starting and stopping to be set on JAVA_OPTS and
          options for starting only to be set on CATALINA_OPTS. Without this
