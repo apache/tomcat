@@ -305,8 +305,25 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                     // Check if the requested JSP page exists, to avoid
                     // creating unnecessary directories and files.
                     if (null == context.getResource(jspUri)) {
-                        response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                                           request.getRequestURI());
+                        String includeRequestUri = (String)
+                        request.getAttribute(
+                                "javax.servlet.include.request_uri");
+                        if (includeRequestUri != null) {
+                            // This file was included. Throw an exception as
+                            // a response.sendError() will be ignored
+                            throw new ServletException(Localizer.getMessage(
+                                    "jsp.error.file.not.found",jspUri));
+                        } else {
+                            try {
+                                response.sendError(
+                                        HttpServletResponse.SC_NOT_FOUND,
+                                        request.getRequestURI());
+                            } catch (IllegalStateException ise) {
+                                log.error(Localizer.getMessage(
+                                        "jsp.error.file.not.found",
+                                        jspUri));
+                            }
+                        }
                         return;
                     }
                     boolean isErrorPage = exception != null;
