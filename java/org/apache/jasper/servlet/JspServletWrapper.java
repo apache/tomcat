@@ -328,25 +328,6 @@ public class JspServletWrapper {
                 return;
             }
 
-        } catch (FileNotFoundException ex) {
-            ctxt.incrementRemoved();
-            String includeRequestUri = (String)
-                request.getAttribute("javax.servlet.include.request_uri");
-            if (includeRequestUri != null) {
-                // This file was included. Throw an exception as
-                // a response.sendError() will be ignored by the
-                // servlet engine.
-                throw new ServletException(ex);
-            } else {
-                try {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND, 
-                                      ex.getMessage());
-                } catch (IllegalStateException ise) {
-                    log.error(Localizer.getMessage("jsp.error.file.not.found",
-                           ex.getMessage()),
-                  ex);
-                }
-            }
         } catch (ServletException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
