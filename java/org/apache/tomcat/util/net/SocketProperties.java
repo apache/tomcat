@@ -156,6 +156,14 @@ public class SocketProperties {
      * Default value is 1
      */
     protected int performanceBandwidth = 1;
+    
+    /**
+     * The minimum frequency of the timeout interval to avoid the 
+     * poller going boinkers during high traffic
+     */
+    protected long timeoutInterval = 1000;
+
+
     private Socket properties;
 
     public void setProperties(Socket socket) throws SocketException{
@@ -259,6 +267,10 @@ public class SocketProperties {
         return processorCache;
     }
 
+    public long getTimeoutInterval() {
+        return timeoutInterval;
+    }
+
     public int getDirectBufferPool() {
         return bufferPool;
     }
@@ -345,6 +357,10 @@ public class SocketProperties {
 
     public void setProcessorCache(int processorCache) {
         this.processorCache = processorCache;
+    }
+
+    public void setTimeoutInterval(long timeoutInterval) {
+        this.timeoutInterval = timeoutInterval;
     }
 
     public void setDirectBufferPool(int directBufferPool) {
