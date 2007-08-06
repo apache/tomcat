@@ -1582,8 +1582,11 @@ public class NioEndpoint {
             long now = System.currentTimeMillis();
             //don't process timeouts too frequently, but if the selector simply timed out
             //then we can check timeouts to avoid gaps
-            if ( (now < nextExpiration) && (keyCount>0 || hasEvents) && (!close) ) return;
-            nextExpiration = now + (long)socketProperties.getSoTimeout();
+            if ( ((keyCount>0 || hasEvents) ||(now < nextExpiration)) && (!close) ) {
+                return;
+            }
+            long prevExp = nextExpiration;
+            nextExpiration = now + socketProperties.getTimeoutInterval();
             //timeout
             Set<SelectionKey> keys = selector.keys();
             int keycount = 0;
@@ -1618,7 +1621,9 @@ public class NioEndpoint {
                     cancelledKey(key, SocketStatus.ERROR,false);
                 }
             }//for
-            if ( log.isDebugEnabled() ) log.debug("Poller processed "+keycount+" keys through timeout");
+           if ( log.isDebugEnabled() ) log.debug("timeout completed: keycount="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
+                                                  "keyCount="+keyCount+"; hasEvents="+hasEvents +"; eval="+( (now < prevExp) && (keyCount>0 || hasEvents) && (!close) ));
+
         }
     }
 
