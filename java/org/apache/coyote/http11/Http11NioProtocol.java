@@ -710,7 +710,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     // Associate the connection with the processor. The next request 
                     // processed by this thread will use either a new or a recycled
                     // processor.
-                    if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
+                    //if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
                     connections.put(socket, processor);
                     if (processor.comet) {
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);

@@ -156,6 +156,13 @@ public class SocketProperties {
      * Default value is 1
      */
     protected int performanceBandwidth = 1;
+    
+    /**
+     * Minimum time to pass by before another socket expiration run performs
+     * This avoids unncessary loops over all sockets when the poller is busy
+     */
+    protected long timeoutInterval = 1000;
+    
     private Socket properties;
 
     public void setProperties(Socket socket) throws SocketException{
@@ -349,6 +356,14 @@ public class SocketProperties {
 
     public void setDirectBufferPool(int directBufferPool) {
         this.bufferPool = directBufferPool;
+    }
+
+    public void setTimeoutInterval(long toi){
+        this.timeoutInterval = toi;
+    }
+
+    public long getTimeoutInterval(){
+        return timeoutInterval;
     }
 
 }
