@@ -175,7 +175,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      * The set of currently active Sessions for this Manager, keyed by
      * session identifier.
      */
-    protected Map sessions = new ConcurrentHashMap();
+    protected Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
     // Number of sessions created by this manager
     protected int sessionCounter=0;
@@ -870,12 +870,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      */
     public Session[] findSessions() {
 
-        Session results[] = null;
-        synchronized (sessions) {
-            results = new Session[sessions.size()];
-            results = (Session[]) sessions.values().toArray(results);
-        }
-        return (results);
+        return sessions.values().toArray(new Session[0]);
 
     }
 
