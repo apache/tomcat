@@ -48,6 +48,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        In the APR connector, start accepting connections after fully starting
+        the connector, to prevent possible exceptions due to non initialized fields. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
