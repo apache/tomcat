@@ -732,6 +732,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                         entry.getBackupNodes().length == 1 &&
                         entry.getBackupNodes()[0].equals(channel.getLocalMember(false)) ) {
                 try {
+                    entry.setPrimary(channel.getLocalMember(false));
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
                 } catch (ChannelException x) {
@@ -840,7 +841,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                         getChannel().send(dest, msg, getChannelSendOptions());
                     }
                 }
-
+                entry.setPrimary(channel.getLocalMember(false));
                 entry.setBackupNodes(backup);
                 entry.setBackup(false);
                 entry.setProxy(false);
