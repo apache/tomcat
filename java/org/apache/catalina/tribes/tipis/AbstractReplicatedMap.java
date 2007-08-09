@@ -113,7 +113,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
     /**
      * The owner of this map, ala a SessionManager for example
      */
-    protected transient Object mapOwner;
+    protected transient MapOwner mapOwner;
     /**
      * External class loaders if serialization and deserialization is to be performed successfully.
      */
@@ -137,7 +137,14 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * Readable string of the mapContextName value
      */
     protected transient String mapname = "";
+
+//------------------------------------------------------------------------------
+//              map owner interface
+//------------------------------------------------------------------------------
     
+    public static interface MapOwner {
+        public void objectMadePrimay(Object key, Object value);
+    }
 
 //------------------------------------------------------------------------------
 //              CONSTRUCTORS
@@ -152,7 +159,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param loadFactor float - load factor, see HashMap
      * @param cls - a list of classloaders to be used for deserialization of objects.
      */
-    public AbstractReplicatedMap(Object owner,
+    public AbstractReplicatedMap(MapOwner owner,
                                  Channel channel, 
                                  long timeout, 
                                  String mapContextName, 
@@ -185,7 +192,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
      * @param channelSendOptions int
      * @param cls ClassLoader[]
      */
-    protected void init(Object owner, Channel channel, String mapContextName, long timeout, int channelSendOptions,ClassLoader[] cls) {
+    protected void init(MapOwner owner, Channel channel, String mapContextName, long timeout, int channelSendOptions,ClassLoader[] cls) {
         log.info("Initializing AbstractReplicatedMap with context name:"+mapContextName);
         this.mapOwner = owner;
         this.externalLoaders = cls;
@@ -741,6 +748,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                     entry.setProxy(false);
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
+                    mapOwner.objectMadePrimay(entry.getKey(),entry.getValue());
+                    
                 } catch (ChannelException x) {
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
                 }
@@ -1420,7 +1429,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         return stateTransferred;
     }
 
-    public Object getMapOwner() {
+    public MapOwner getMapOwner() {
         return mapOwner;
     }
 
@@ -1436,7 +1445,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         return accessTimeout;
     }
 
-    public void setMapOwner(Object mapOwner) {
+    public void setMapOwner(MapOwner mapOwner) {
         this.mapOwner = mapOwner;
     }
 
