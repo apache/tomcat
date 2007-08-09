@@ -719,6 +719,13 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             } else if (member.equals(entry.getPrimary())) {
                 entry.setPrimary(null);
             } //end if
+            if ( entry.getPrimary() == null && 
+                 entry.getBackupNodes()!=null && 
+                 entry.getBackupNodes().length == 1 &&
+                 entry.getBackupNodes()[0].equals(member) ) {
+                //remove proxies that have no backup nor primaries
+                i.remove();
+            }
         } //while
     }
 
