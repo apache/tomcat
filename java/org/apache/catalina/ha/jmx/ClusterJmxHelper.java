@@ -100,12 +100,17 @@ public class ClusterJmxHelper {
         }
     }
 
-    public static boolean unregisterDefaultCluster(SimpleTcpCluster cluster) throws Exception {
-        ObjectName clusterName = getDefaultClusterName(cluster);
-        if (getMBeanServer().isRegistered(clusterName)) {
-            getMBeanServer().unregisterMBean(clusterName);
+    public static boolean unregisterDefaultCluster(SimpleTcpCluster cluster) {
+        try {
+            ObjectName clusterName = getDefaultClusterName(cluster);
+            if (getMBeanServer().isRegistered(clusterName)) {
+                getMBeanServer().unregisterMBean(clusterName);
+            }
+            return true;
+        }catch ( Exception x ) {
+            log.warn("Unable to unregister default cluster implementation with JMX",x);
+            return false;
         }
-        return true;
     }
 
     private static ObjectName getDefaultClusterName(SimpleTcpCluster cluster) throws Exception {
