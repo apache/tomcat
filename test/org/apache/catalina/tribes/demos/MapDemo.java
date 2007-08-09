@@ -166,6 +166,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             String[] columnNames = {
                                    "Key",
                                    "Value",
+                                   "Primary Node",
                                    "Backup Node",
                                    "isPrimary",
                                    "isProxy",
@@ -198,10 +199,11 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 switch (col) {
                     case 0: return entry.getKey();
                     case 1: return entry.getValue();
-                    case 2: return getMemberNames(entry.getBackupNodes());
-                    case 3: return new Boolean(entry.isPrimary());
-                    case 4: return new Boolean(entry.isProxy());
-                    case 5: return new Boolean(entry.isBackup());
+                    case 2: return entry.getPrimary()!=null?entry.getPrimary().getName():"null";
+                    case 3: return getMemberNames(entry.getBackupNodes());
+                    case 4: return new Boolean(entry.isPrimary());
+                    case 5: return new Boolean(entry.isProxy());
+                    case 6: return new Boolean(entry.isBackup());
                     default: return "";
                 }
                 
@@ -408,9 +410,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
             cell.setBackground(Color.WHITE);
             if ( row > 0 ) {
                 Color color = null;
-                boolean primary = ( (Boolean) table.getValueAt(row, 3)).booleanValue();
-                boolean proxy = ( (Boolean) table.getValueAt(row, 4)).booleanValue();
-                boolean backup = ( (Boolean) table.getValueAt(row, 5)).booleanValue();
+                boolean primary = ( (Boolean) table.getValueAt(row, 4)).booleanValue();
+                boolean proxy = ( (Boolean) table.getValueAt(row, 5)).booleanValue();
+                boolean backup = ( (Boolean) table.getValueAt(row, 6)).booleanValue();
                 if (primary) color = Color.GREEN;
                 else if (proxy) color = Color.RED;
                 else if (backup) color = Color.BLUE;
