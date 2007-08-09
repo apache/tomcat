@@ -28,12 +28,14 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap;
 
 /**
  *@author Filip Hanik
  *@version 1.0
  */
-public class BackupManager extends StandardManager implements ClusterManager
+public class BackupManager extends StandardManager implements ClusterManager, MapOwner
 {
     public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( BackupManager.class );
 
@@ -133,6 +135,15 @@ public class BackupManager extends StandardManager implements ClusterManager
 //=========================================================================
 // OVERRIDE THESE METHODS TO IMPLEMENT THE REPLICATION
 //=========================================================================
+    public void objectMadePrimay(Object key, Object value) {
+        if (value!=null && value instanceof DeltaSession) {
+            DeltaSession session = (DeltaSession)value;
+            synchronized (session) {
+                session.access();
+                session.endAccess();
+            }
+        }
+    }
 
     public Session createEmptySession() {
         return new DeltaSession(this);
