@@ -151,7 +151,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
                 backup = wrap(next);
                 //publish the backup data to one node
                 msg = new MapMessage(getMapContextName(), MapMessage.MSG_BACKUP, false,
-                                     (Serializable) key, (Serializable) value, null, backup);
+                                     (Serializable) key, (Serializable) value, null, channel.getLocalMember(false), backup);
                 if ( log.isTraceEnabled() ) 
                     log.trace("Publishing backup data:"+msg+" to: "+next.getName());
                 UniqueId id = getChannel().send(backup, msg, getChannelSendOptions());
@@ -167,7 +167,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
                 Member[] proxies = excludeFromSet(backup, getMapMembers());
                 if (success && proxies.length > 0 ) {
                     msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false,
-                                         (Serializable) key, null, null, backup);
+                                         (Serializable) key, null, null, channel.getLocalMember(false),backup);
                     if ( log.isTraceEnabled() ) 
                     log.trace("Publishing proxy data:"+msg+" to: "+Arrays.toNameString(proxies));
                     getChannel().send(proxies, msg, getChannelSendOptions());

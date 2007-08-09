@@ -112,7 +112,7 @@ public class ReplicatedMap extends AbstractReplicatedMap implements RpcCallback,
 
         //publish the data out to all nodes
         MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
-                                        (Serializable) key, (Serializable) value, null, backup);
+                                        (Serializable) key, (Serializable) value, null,channel.getLocalMember(false), backup);
 
         getChannel().send(getMapMembers(), msg, getChannelSendOptions());
 
