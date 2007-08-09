@@ -610,6 +610,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 entry.setBackup(mapmsg.getMsgType() == MapMessage.MSG_BACKUP);
                 entry.setProxy(false);
                 entry.setBackupNodes(mapmsg.getBackupNodes());
+                entry.setPrimary(mapmsg.getPrimary());
                 if (entry.getValue() instanceof ReplicatedMapEntry) {
                     ReplicatedMapEntry diff = (ReplicatedMapEntry) entry.getValue();
                     if (mapmsg.isDiff()) {
@@ -668,6 +669,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                         try {
                             Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                             entry.setBackupNodes(backup);
+                            entry.setPrimary(channel.getLocalMember(false));
                         } catch (ChannelException x) {
                             log.error("Unable to select backup node.", x);
                         } //catch
@@ -705,6 +707,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         synchronized (mapMembers) {
             removed = (mapMembers.remove(member) != null );
         }
+        
         Iterator i = super.entrySet().iterator();
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
@@ -713,6 +716,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 try {
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
+                    entry.setPrimary(channel.getLocalMember(false));
                 } catch (ChannelException x) {
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
                 }
@@ -733,6 +737,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                         entry.getBackupNodes()[0].equals(channel.getLocalMember(false)) ) {
                 try {
                     entry.setPrimary(channel.getLocalMember(false));
+                    entry.setBackup(false);
+                    entry.setProxy(false);
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
                 } catch (ChannelException x) {
