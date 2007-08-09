@@ -26,6 +26,7 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.UniqueId;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 
 /**
  * A smart implementation of a stateful replicated map. uses primary/secondary backup strategy. 
@@ -68,7 +69,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
     implements RpcCallback, ChannelListener, MembershipListener {
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(LazyReplicatedMap.class);
     
-    
+
     
 //------------------------------------------------------------------------------    
 //              CONSTRUCTORS / DESTRUCTORS
@@ -81,7 +82,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
          * @param initialCapacity int - the size of this map, see HashMap
          * @param loadFactor float - load factor, see HashMap
          */
-        public LazyReplicatedMap(Object owner, Channel channel, long timeout, String mapContextName, int initialCapacity, float loadFactor, ClassLoader[] cls) {
+        public LazyReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, int initialCapacity, float loadFactor, ClassLoader[] cls) {
             super(owner,channel,timeout,mapContextName,initialCapacity,loadFactor, Channel.SEND_OPTIONS_DEFAULT,cls);
         }
 
@@ -92,7 +93,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
          * @param mapContextName String - unique name for this map, to allow multiple maps per channel
          * @param initialCapacity int - the size of this map, see HashMap
          */
-        public LazyReplicatedMap(Object owner, Channel channel, long timeout, String mapContextName, int initialCapacity, ClassLoader[] cls) {
+        public LazyReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, int initialCapacity, ClassLoader[] cls) {
             super(owner, channel,timeout,mapContextName,initialCapacity, LazyReplicatedMap.DEFAULT_LOAD_FACTOR, Channel.SEND_OPTIONS_DEFAULT, cls);
         }
 
@@ -102,7 +103,7 @@ public class LazyReplicatedMap extends AbstractReplicatedMap
          * @param timeout long - timeout for RPC messags
          * @param mapContextName String - unique name for this map, to allow multiple maps per channel
          */
-        public LazyReplicatedMap(Object owner, Channel channel, long timeout, String mapContextName, ClassLoader[] cls) {
+        public LazyReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, ClassLoader[] cls) {
             super(owner, channel,timeout,mapContextName, LazyReplicatedMap.DEFAULT_INITIAL_CAPACITY,LazyReplicatedMap.DEFAULT_LOAD_FACTOR,Channel.SEND_OPTIONS_DEFAULT, cls);
         }
 

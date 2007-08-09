@@ -36,12 +36,14 @@ import org.apache.catalina.LifecycleListener;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.catalina.util.Enumerator;
+import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
+import org.apache.catalina.ha.session.DeltaSession;
 
 /**
  * @author Filip Hanik
  * @version 1.0
  */
-public class ReplicatedContext extends StandardContext implements LifecycleListener {
+public class ReplicatedContext extends StandardContext implements LifecycleListener,MapOwner {
     private int mapSendOptions = Channel.SEND_OPTIONS_DEFAULT;
     public static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( ReplicatedContext.class );
     protected boolean startComplete = false;
@@ -193,5 +195,10 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
 
         }
     }
+    
+    public void objectMadePrimay(Object key, Object value) {
+        //noop
+    }
+
 
 }
