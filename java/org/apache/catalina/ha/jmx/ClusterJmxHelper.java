@@ -111,13 +111,10 @@ public class ClusterJmxHelper {
     private static ObjectName getDefaultClusterName(SimpleTcpCluster cluster) throws Exception {
         String domain = getMBeanServer().getDefaultDomain();
         String type = ":type=";
-        boolean hostParent = false;
-        //Step 1. Register the Cluster MBean
         String clusterType= type+"Cluster";
         if (cluster.getContainer() instanceof StandardHost) {
             domain = ((StandardHost) cluster.getContainer()).getDomain();
             clusterType += ",host=" + cluster.getContainer().getName();
-            hostParent = true;
         } else {
             if (cluster.getContainer() instanceof StandardEngine) {
                 domain = ((StandardEngine) cluster.getContainer()).getDomain();
