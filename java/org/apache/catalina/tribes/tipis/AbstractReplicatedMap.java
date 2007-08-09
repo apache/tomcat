@@ -716,6 +716,8 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 } catch (ChannelException x) {
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
                 }
+            } else if (member.equals(entry.getPrimary())) {
+                entry.setPrimary(null);
             } //end if
         } //while
     }
