@@ -719,13 +719,26 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             } else if (member.equals(entry.getPrimary())) {
                 entry.setPrimary(null);
             } //end if
-            if ( entry.getPrimary() == null && 
+            
+            if ( entry.isProxy() &&
+                 entry.getPrimary() == null && 
                  entry.getBackupNodes()!=null && 
                  entry.getBackupNodes().length == 1 &&
                  entry.getBackupNodes()[0].equals(member) ) {
                 //remove proxies that have no backup nor primaries
                 i.remove();
+            } else if ( entry.isBackup() &&
+                        entry.getBackupNodes()!=null && 
+                        entry.getBackupNodes().length == 1 &&
+                        entry.getBackupNodes()[0].equals(channel.getLocalMember(false)) ) {
+                try {
+                    Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
+                    entry.setBackupNodes(backup);
+                } catch (ChannelException x) {
+                    log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
+                }
             }
+
         } //while
     }
 
@@ -979,7 +992,6 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
                 if ( entry != null && entry.isPrimary() ) set.add(entry.getValue());
-                else if ( entry != null && entry.getPrimary() == null && entry.isBackup() ) set.add(entry.getValue());
             }
             return Collections.unmodifiableSet(set);
         }
@@ -994,7 +1006,6 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
                 if ( entry!=null && entry.isPrimary() ) set.add(key);
-                else if ( entry != null && entry.getPrimary() == null && entry.isBackup() ) set.add(key);
             }
             return Collections.unmodifiableSet(set);
 
@@ -1011,7 +1022,6 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 if ( e != null ) {
                     MapEntry entry = (MapEntry) super.get(e.getKey());
                     if (entry!=null && entry.isPrimary() && entry.getValue() != null) counter++;
-                    else if ( entry != null && entry.getPrimary() == null && entry.isBackup() ) counter++;
                 }
             }
             return counter;
