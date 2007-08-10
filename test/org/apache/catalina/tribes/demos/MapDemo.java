@@ -49,6 +49,7 @@ import javax.swing.table.TableColumn;
 import org.apache.catalina.tribes.util.UUIDGenerator;
 import org.apache.catalina.tribes.util.Arrays;
 import java.util.Set;
+import java.util.Random;
 
 /**
  * <p>Title: </p>
@@ -164,6 +165,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             
             
             String[] columnNames = {
+                                   "Rownum",
                                    "Key",
                                    "Value",
                                    "Primary Node",
@@ -197,13 +199,14 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 String key = (String)keys [row-1];
                 LazyReplicatedMap.MapEntry entry = map.getInternal(key);
                 switch (col) {
-                    case 0: return entry.getKey();
-                    case 1: return entry.getValue();
-                    case 2: return entry.getPrimary()!=null?entry.getPrimary().getName():"null";
-                    case 3: return getMemberNames(entry.getBackupNodes());
-                    case 4: return new Boolean(entry.isPrimary());
-                    case 5: return new Boolean(entry.isProxy());
-                    case 6: return new Boolean(entry.isBackup());
+                    case 0: return String.valueOf(row);
+                    case 1: return entry.getKey();
+                    case 2: return entry.getValue();
+                    case 3: return entry.getPrimary()!=null?entry.getPrimary().getName():"null";
+                    case 4: return getMemberNames(entry.getBackupNodes());
+                    case 5: return new Boolean(entry.isPrimary());
+                    case 6: return new Boolean(entry.isProxy());
+                    case 7: return new Boolean(entry.isBackup());
                     default: return "";
                 }
                 
@@ -330,8 +333,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
             if ( "random".equals(e.getActionCommand()) ) {
                 Thread t = new Thread() {
                     public void run() {
-                        for (int i = 0; i < 100; i++) {
-                            String key = Arrays.toString(UUIDGenerator.randomUUID(false));
+                        for (int i = 0; i < 5; i++) {
+                            String key = random(5,0,0,true,true,null);
                             map.put(key, new StringBuffer(key));
                             dataModel.fireTableDataChanged();
                             table.paint(table.getGraphics());
@@ -352,6 +355,68 @@ public class MapDemo implements ChannelListener, MembershipListener{
             }
             dataModel.getValueAt(-1,-1);
         }
+
+        public static Random random = new Random(System.currentTimeMillis());
+        public static String random(int count, int start, int end, boolean letters, boolean numbers,
+                                    char[] chars ) {
+            if (count == 0) {
+                return "";
+            } else if (count < 0) {
+                throw new IllegalArgumentException("Requested random string length " + count + " is less than 0.");
+            }
+            if ((start == 0) && (end == 0)) {
+                end = 'z' + 1;
+                start = ' ';
+                if (!letters && !numbers) {
+                    start = 0;
+                    end = Integer.MAX_VALUE;
+                }
+            }
+    
+            char[] buffer = new char[count];
+            int gap = end - start;
+    
+            while (count-- != 0) {
+                char ch;
+                if (chars == null) {
+                    ch = (char) (random.nextInt(gap) + start);
+                } else {
+                    ch = chars[random.nextInt(gap) + start];
+                }
+                if ((letters && Character.isLetter(ch))
+                    || (numbers && Character.isDigit(ch))
+                    || (!letters && !numbers)) 
+                {
+                    if(ch >= 56320 && ch <= 57343) {
+                        if(count == 0) {
+                            count++;
+                        } else {
+                            // low surrogate, insert high surrogate after putting it in
+                            buffer[count] = ch;
+                            count--;
+                            buffer[count] = (char) (55296 + random.nextInt(128));
+                        }
+                    } else if(ch >= 55296 && ch <= 56191) {
+                        if(count == 0) {
+                            count++;
+                        } else {
+                            // high surrogate, insert low surrogate before putting it in
+                            buffer[count] = (char) (56320 + random.nextInt(128));
+                            count--;
+                            buffer[count] = ch;
+                        }
+                    } else if(ch >= 56192 && ch <= 56319) {
+                        // private high surrogate, no effing clue, so skip it
+                        count++;
+                    } else {
+                        buffer[count] = ch;
+                    }
+                } else {
+                    count++;
+                }
+            }
+            return new String(buffer);
+    }
 
         private void printDebugData(JTable table) {
             int numRows = table.getRowCount();
@@ -410,9 +475,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
             cell.setBackground(Color.WHITE);
             if ( row > 0 ) {
                 Color color = null;
-                boolean primary = ( (Boolean) table.getValueAt(row, 4)).booleanValue();
-                boolean proxy = ( (Boolean) table.getValueAt(row, 5)).booleanValue();
-                boolean backup = ( (Boolean) table.getValueAt(row, 6)).booleanValue();
+                boolean primary = ( (Boolean) table.getValueAt(row, 5)).booleanValue();
+                boolean proxy = ( (Boolean) table.getValueAt(row, 6)).booleanValue();
+                boolean backup = ( (Boolean) table.getValueAt(row, 7)).booleanValue();
                 if (primary) color = Color.GREEN;
                 else if (proxy) color = Color.RED;
                 else if (backup) color = Color.BLUE;
