@@ -989,6 +989,16 @@ public class Http11NioProcessor implements ActionHook {
         localName = null;
         remotePort = -1;
         localPort = -1;
+        //fix the synchronization scenario due to 
+        //dual comet flags.
+        //while the response/request
+        //might already be recycled, this circumvents the bug
+        //and should not be an expensive operation
+        //however, this is a TODO and FIXME
+        //as it would be better coordinate the recycling of the request/response
+        //instead
+        response.recycle();
+        request.recycle();
     }
 
 
