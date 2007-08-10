@@ -720,7 +720,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Map.Entry e = (Map.Entry) i.next();
             MapEntry entry = (MapEntry) super.get(e.getKey());
             if (entry.isPrimary() && inSet(member,entry.getBackupNodes())) {
-                System.out.println("[1] Primary choosing a new backup");
+                if (log.isDebugEnabled()) log.debug("[1] Primary choosing a new backup");
                 try {
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
@@ -729,7 +729,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
                 }
             } else if (member.equals(entry.getPrimary())) {
-                System.out.println("[2] Primary disappeared");
+                if (log.isDebugEnabled()) log.debug("[2] Primary disappeared");
                 entry.setPrimary(null);
             } //end if
             
@@ -739,7 +739,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                  entry.getBackupNodes().length == 1 &&
                  entry.getBackupNodes()[0].equals(member) ) {
                 //remove proxies that have no backup nor primaries
-                System.out.println("[3] Removing orphaned proxy");
+                if (log.isDebugEnabled()) log.debug("[3] Removing orphaned proxy");
                 i.remove();
             } else if ( entry.getPrimary() == null &&
                         entry.isBackup() &&
@@ -747,7 +747,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                         entry.getBackupNodes().length == 1 &&
                         entry.getBackupNodes()[0].equals(channel.getLocalMember(false)) ) {
                 try {
-                    System.out.println("[4] Backup becoming primary");
+                    if (log.isDebugEnabled()) log.debug("[4] Backup becoming primary");
                     entry.setPrimary(channel.getLocalMember(false));
                     entry.setBackup(false);
                     entry.setProxy(false);
