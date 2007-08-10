@@ -247,7 +247,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                                         null, 
                                         null, 
                                         channel.getLocalMember(false),
-                                        new Member[0]);
+                                        null);
         if ( channel.getMembers().length > 0 ) {
             //send a ping, wait for all nodes to reply
             Response[] resp = rpcChannel.send(channel.getMembers(), 
@@ -295,7 +295,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
     protected void broadcast(int msgtype, boolean rpc) throws ChannelException {
         //send out a map membership message, only wait for the first reply
         MapMessage msg = new MapMessage(this.mapContextName, msgtype,
-                                        false, null, null, null, channel.getLocalMember(false), new Member[0]);
+                                        false, null, null, null, channel.getLocalMember(false), null);
         if ( rpc) {
             Response[] resp = rpcChannel.send(channel.getMembers(), msg, rpcChannel.FIRST_REPLY, (channelSendOptions),rpcTimeout);
             for (int i = 0; i < resp.length; i++) {
@@ -484,13 +484,13 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
 
         //map init request
         if (mapmsg.getMsgType() == mapmsg.MSG_INIT) {
-            mapmsg.setBackUpNodes(wrap(channel.getLocalMember(false)));
+            mapmsg.setPrimary(channel.getLocalMember(false));
             return mapmsg;
         }
         
         //map start request
         if (mapmsg.getMsgType() == mapmsg.MSG_START) {
-            mapmsg.setBackUpNodes(wrap(channel.getLocalMember(false)));
+            mapmsg.setPrimary(channel.getLocalMember(false));
             mapMemberAdded(sender);
             return mapmsg;
         }
@@ -720,6 +720,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             Map.Entry e = (Map.Entry) i.next();
             MapEntry entry = (MapEntry) super.get(e.getKey());
             if (entry.isPrimary() && inSet(member,entry.getBackupNodes())) {
+                System.out.println("[1] Primary choosing a new backup");
                 try {
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
@@ -728,6 +729,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
                 }
             } else if (member.equals(entry.getPrimary())) {
+                System.out.println("[2] Primary disappeared");
                 entry.setPrimary(null);
             } //end if
             
@@ -737,18 +739,21 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                  entry.getBackupNodes().length == 1 &&
                  entry.getBackupNodes()[0].equals(member) ) {
                 //remove proxies that have no backup nor primaries
+                System.out.println("[3] Removing orphaned proxy");
                 i.remove();
-            } else if ( entry.isBackup() &&
+            } else if ( entry.getPrimary() == null &&
+                        entry.isBackup() &&
                         entry.getBackupNodes()!=null && 
                         entry.getBackupNodes().length == 1 &&
                         entry.getBackupNodes()[0].equals(channel.getLocalMember(false)) ) {
                 try {
+                    System.out.println("[4] Backup becoming primary");
                     entry.setPrimary(channel.getLocalMember(false));
                     entry.setBackup(false);
                     entry.setProxy(false);
                     Member[] backup = publishEntryInfo(entry.getKey(), entry.getValue());
                     entry.setBackupNodes(backup);
-                    mapOwner.objectMadePrimay(entry.getKey(),entry.getValue());
+                    if ( mapOwner!=null ) mapOwner.objectMadePrimay(entry.getKey(),entry.getValue());
                     
                 } catch (ChannelException x) {
                     log.error("Unable to relocate[" + entry.getKey() + "] to a new backup node", x);
