@@ -511,7 +511,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 while (i.hasNext()) {
                     Map.Entry e = (Map.Entry) i.next();
                     MapEntry entry = (MapEntry) super.get(e.getKey());
-                    if ( entry.isSerializable() ) {
+                    if ( entry != null && entry.isSerializable() ) {
                         boolean copy = (mapmsg.getMsgType() == mapmsg.MSG_STATE_COPY);
                         MapMessage me = new MapMessage(mapContextName, 
                                                        copy?MapMessage.MSG_COPY:MapMessage.MSG_PROXY,
@@ -719,6 +719,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         while (i.hasNext()) {
             Map.Entry e = (Map.Entry) i.next();
             MapEntry entry = (MapEntry) super.get(e.getKey());
+            if (entry==null) continue;
             if (entry.isPrimary() && inSet(member,entry.getBackupNodes())) {
                 if (log.isDebugEnabled()) log.debug("[1] Primary choosing a new backup");
                 try {
@@ -977,7 +978,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 while (i.hasNext()) {
                     Map.Entry e = (Map.Entry) i.next();
                     MapEntry entry = (MapEntry) super.get(e.getKey());
-                    if (entry.isPrimary() && value.equals(entry.getValue())) return true;
+                    if (entry!=null && entry.isPrimary() && value.equals(entry.getValue())) return true;
                 }//while
                 return false;
             }//end if
@@ -1062,7 +1063,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
             while ( i.hasNext() ) {
                 Map.Entry e = (Map.Entry)i.next();
                 MapEntry entry = (MapEntry)super.get(e.getKey());
-                if ( entry.isPrimary() && entry.getValue()!=null) values.add(entry.getValue());
+                if (entry!=null && entry.isPrimary() && entry.getValue()!=null) values.add(entry.getValue());
             }
             return Collections.unmodifiableCollection(values);
         }
