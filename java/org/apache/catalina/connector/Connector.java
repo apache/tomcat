@@ -318,6 +318,20 @@ public class Connector
         if (replacements.get(name) != null) {
             repl = (String) replacements.get(name);
         }
+        if (!IntrospectionUtils.setProperty(protocolHandler, repl, value)) {
+            log.warn("Property " + name + " not found on the protocol handler.");
+        }
+    }
+
+
+    /**
+     * Set a configured property.
+     */
+    public void setPropertyInternal(String name, String value) {
+        String repl = name;
+        if (replacements.get(name) != null) {
+            repl = (String) replacements.get(name);
+        }
         IntrospectionUtils.setProperty(protocolHandler, repl, value);
     }
 
@@ -388,7 +402,7 @@ public class Connector
     public void setAllowTrace(boolean allowTrace) {
 
         this.allowTrace = allowTrace;
-        setProperty("allowTrace", String.valueOf(allowTrace));
+        setPropertyInternal("allowTrace", String.valueOf(allowTrace));
 
     }
 
@@ -466,7 +480,7 @@ public class Connector
     public void setEmptySessionPath(boolean emptySessionPath) {
 
         this.emptySessionPath = emptySessionPath;
-        setProperty("emptySessionPath", String.valueOf(emptySessionPath));
+        setPropertyInternal("emptySessionPath", String.valueOf(emptySessionPath));
 
     }
 
@@ -489,7 +503,7 @@ public class Connector
     public void setEnableLookups(boolean enableLookups) {
 
         this.enableLookups = enableLookups;
-        setProperty("enableLookups", String.valueOf(enableLookups));
+        setPropertyInternal("enableLookups", String.valueOf(enableLookups));
 
     }
 
@@ -559,7 +573,7 @@ public class Connector
     public void setMaxSavePostSize(int maxSavePostSize) {
 
         this.maxSavePostSize = maxSavePostSize;
-        setProperty("maxSavePostSize", String.valueOf(maxSavePostSize));
+        setPropertyInternal("maxSavePostSize", String.valueOf(maxSavePostSize));
     }
 
 
@@ -581,7 +595,7 @@ public class Connector
     public void setPort(int port) {
 
         this.port = port;
-        setProperty("port", String.valueOf(port));
+        setPropertyInternal("port", String.valueOf(port));
 
     }
 
@@ -745,7 +759,7 @@ public class Connector
 
         if(proxyName != null && proxyName.length() > 0) {
             this.proxyName = proxyName;
-            setProperty("proxyName", proxyName);
+            setPropertyInternal("proxyName", proxyName);
         } else {
             this.proxyName = null;
             removeProperty("proxyName");
@@ -772,7 +786,7 @@ public class Connector
     public void setProxyPort(int proxyPort) {
 
         this.proxyPort = proxyPort;
-        setProperty("proxyPort", String.valueOf(proxyPort));
+        setPropertyInternal("proxyPort", String.valueOf(proxyPort));
 
     }
 
@@ -797,7 +811,7 @@ public class Connector
     public void setRedirectPort(int redirectPort) {
 
         this.redirectPort = redirectPort;
-        setProperty("redirectPort", String.valueOf(redirectPort));
+        setPropertyInternal("redirectPort", String.valueOf(redirectPort));
 
     }
 
@@ -846,7 +860,7 @@ public class Connector
     public void setSecure(boolean secure) {
 
         this.secure = secure;
-        setProperty("secure", Boolean.toString(secure));
+        setPropertyInternal("secure", Boolean.toString(secure));
     }
 
      /**
@@ -867,7 +881,7 @@ public class Connector
      public void setURIEncoding(String URIEncoding) {
 
          this.URIEncoding = URIEncoding;
-         setProperty("uRIEncoding", URIEncoding);
+         setPropertyInternal("uRIEncoding", URIEncoding);
 
      }
 
@@ -890,7 +904,7 @@ public class Connector
      public void setUseBodyEncodingForURI(boolean useBodyEncodingForURI) {
 
          this.useBodyEncodingForURI = useBodyEncodingForURI;
-         setProperty
+         setPropertyInternal
              ("useBodyEncodingForURI", String.valueOf(useBodyEncodingForURI));
 
      }
@@ -918,7 +932,7 @@ public class Connector
      */
     public void setXpoweredBy(boolean xpoweredBy) {
         this.xpoweredBy = xpoweredBy;
-        setProperty("xpoweredBy", String.valueOf(xpoweredBy));
+        setPropertyInternal("xpoweredBy", String.valueOf(xpoweredBy));
     }
 
     /**
@@ -929,7 +943,7 @@ public class Connector
      */
     public void setUseIPVHosts(boolean useIPVHosts) {
         this.useIPVHosts = useIPVHosts;
-        setProperty("useIPVHosts", String.valueOf(useIPVHosts));
+        setPropertyInternal("useIPVHosts", String.valueOf(useIPVHosts));
     }
 
     /**

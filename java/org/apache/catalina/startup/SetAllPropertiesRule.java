@@ -62,8 +62,15 @@ public class SetAllPropertiesRule extends Rule {
                 name = attributes.getQName(i);
             }
             String value = attributes.getValue(i);
-            if ( !excludes.containsKey(name)) 
-                IntrospectionUtils.setProperty(digester.peek(), name, value);
+            if ( !excludes.containsKey(name)) {
+                if (!digester.isFakeAttribute(digester.peek(), name) 
+                        && !IntrospectionUtils.setProperty(digester.peek(), name, value) 
+                        && digester.getRulesValidation()) {
+                    digester.getLogger().warn("[SetAllPropertiesRule]{" + digester.getMatch() +
+                            "} Setting property '" + name + "' to '" +
+                            value + "' did not find a matching property.");
+                }
+            }
         }
 
     }

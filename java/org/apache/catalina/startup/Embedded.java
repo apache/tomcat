@@ -427,7 +427,7 @@ public class Embedded  extends StandardService implements Lifecycle {
                 connector = new Connector();
                 connector.setScheme("https");
                 connector.setSecure(true);
-                connector.setProperty("SSLEnabled","true");
+                connector.setPropertyInternal("SSLEnabled","true");
                 // FIXME !!!! SET SSL PROPERTIES
             } else {
                 connector = new Connector(protocol);

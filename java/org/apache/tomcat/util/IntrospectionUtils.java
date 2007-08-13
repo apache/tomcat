@@ -258,7 +258,7 @@ public final class IntrospectionUtils {
      * int or boolean we'll convert value to the right type before) - that means
      * you can have setDebug(1).
      */
-    public static void setProperty(Object o, String name, String value) {
+    public static boolean setProperty(Object o, String name, String value) {
         if (dbg > 1)
             d("setProperty(" + o.getClass() + " " + name + "=" + value + ")");
 
@@ -275,7 +275,7 @@ public final class IntrospectionUtils {
                         && "java.lang.String".equals(paramT[0].getName())) {
 
                     methods[i].invoke(o, new Object[] { value });
-                    return;
+                    return true;
                 }
             }
 
@@ -328,7 +328,7 @@ public final class IntrospectionUtils {
 
                     if (ok) {
                         methods[i].invoke(o, params);
-                        return;
+                        return true;
                     }
                 }
 
@@ -344,6 +344,7 @@ public final class IntrospectionUtils {
                 params[0] = name;
                 params[1] = value;
                 setPropertyMethod.invoke(o, params);
+                return true;
             }
 
         } catch (IllegalArgumentException ex2) {
@@ -367,6 +368,7 @@ public final class IntrospectionUtils {
             if (dbg > 1)
                 ie.printStackTrace();
         }
+        return false;
     }
 
     public static Object getProperty(Object o, String name) {
