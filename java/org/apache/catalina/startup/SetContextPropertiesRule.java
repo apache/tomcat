@@ -60,7 +60,13 @@ public class SetContextPropertiesRule extends Rule {
                 continue;
             }
             String value = attributes.getValue(i);
-            IntrospectionUtils.setProperty(digester.peek(), name, value);
+            if (!digester.isFakeAttribute(digester.peek(), name) 
+                    && !IntrospectionUtils.setProperty(digester.peek(), name, value) 
+                    && digester.getRulesValidation()) {
+                digester.getLogger().warn("[SetContextPropertiesRule]{" + digester.getMatch() +
+                        "} Setting property '" + name + "' to '" +
+                        value + "' did not find a matching property.");
+            }
         }
 
     }
