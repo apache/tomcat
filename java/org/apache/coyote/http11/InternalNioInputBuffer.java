@@ -307,6 +307,10 @@ public class InternalNioInputBuffer implements InputBuffer {
      * connection.
      */
     public void recycle() {
+        // Recycle filters
+        for (int i = 0; i <= lastActiveFilter; i++) {
+            activeFilters[i].recycle();
+        }
 
         // Recycle Request object
         request.recycle();

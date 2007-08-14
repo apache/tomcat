@@ -322,6 +322,10 @@ public class InternalNioOutputBuffer
      * connection.
      */
     public void recycle() {
+        // Recycle filters
+        for (int i = 0; i <= lastActiveFilter; i++) {
+            activeFilters[i].recycle();
+        }
 
         // Recycle Request object
         response.recycle();
