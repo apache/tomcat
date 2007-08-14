@@ -18,6 +18,7 @@ package org.apache.catalina.ha.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
@@ -290,4 +291,18 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
         return result;
     }
 
+    public int getActiveSessionsFull() {
+        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+        return map.sizeFull();
+    }
+
+    public String listSessionIdsFull() {
+        StringBuffer sb=new StringBuffer();
+        LazyReplicatedMap map = (LazyReplicatedMap)sessions;
+        Iterator keys = map.keySetFull().iterator();
+        while (keys.hasNext()) {
+            sb.append(keys.next()).append(" ");
+        }
+        return sb.toString();
+    }
 }
