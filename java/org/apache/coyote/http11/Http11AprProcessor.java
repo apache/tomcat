@@ -750,9 +750,13 @@ public class Http11AprProcessor implements ActionHook {
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (error) {
+            inputBuffer.nextRequest();
+            outputBuffer.nextRequest();
             recycle();
             return SocketState.CLOSED;
         } else if (!comet) {
+            inputBuffer.nextRequest();
+            outputBuffer.nextRequest();
             recycle();
             return SocketState.OPEN;
         } else {
@@ -905,6 +909,8 @@ public class Http11AprProcessor implements ActionHook {
 
         if (comet) {
             if (error) {
+                inputBuffer.nextRequest();
+                outputBuffer.nextRequest();
                 recycle();
                 return SocketState.CLOSED;
             } else {
