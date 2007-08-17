@@ -82,11 +82,10 @@ public class VirtualWebappLoader extends WebappLoader {
 
     @Override
     public void start() throws LifecycleException {
-
         // just add any jar/directory set in virtual classpath to the
         // repositories list before calling start on the standard WebappLoader
         StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
-        while (tkn.hasMoreTokens()) {
+        while (tkn!=null && tkn.hasMoreTokens()) {
             File file = new File(tkn.nextToken());
             if (!file.exists()) {
                 continue;
