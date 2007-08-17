@@ -33,6 +33,7 @@ import javax.management.ObjectName;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.catalina.loader.NamedClassLoader;
 
 
 /**
@@ -172,6 +173,10 @@ public final class Bootstrap {
  
         ClassLoader classLoader = ClassLoaderFactory.createClassLoader
             (locations, types, parent);
+        
+        if ( classLoader instanceof NamedClassLoader ) {
+            ((NamedClassLoader)classLoader).setName(name);
+        }
 
         // Retrieving MBean server
         MBeanServer mBeanServer = null;
