@@ -217,6 +217,19 @@ public class McastService implements MembershipService,MembershipListener {
     public void setPort(int port) {
         properties.setProperty("mcastPort", String.valueOf(port));
     }
+    
+    public void setRecoveryCounter(int recoveryCounter) {
+        properties.setProperty("recoveryCounter", String.valueOf(recoveryCounter));
+    }
+
+    public void setRecoveryEnabled(boolean recoveryEnabled) {
+        properties.setProperty("recoveryEnabled", String.valueOf(recoveryEnabled));
+    }
+
+    public void setRecoverySleepTime(long recoverySleepTime) {
+        properties.setProperty("recoverySleepTime", String.valueOf(recoverySleepTime));
+    }
+
 
     /**
      * @deprecated use getPort()
@@ -348,6 +361,13 @@ public class McastService implements MembershipService,MembershipListener {
                                     ttl,
                                     soTimeout,
                                     this);
+        boolean recEnabled = Boolean.getBoolean(properties.getProperty("recoveryEnabled","true"));
+        impl.setRecoveryEnabled(recEnabled);        
+        int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter","10"));
+        impl.setRecoveryCounter(recCnt);
+        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime","5000"));
+        impl.setRecoverySleepTime(recSlpTime);
+        
         
         impl.start(level);
 		
