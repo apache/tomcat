@@ -50,7 +50,7 @@ public class VirtualWebappLoader extends WebappLoader {
     /**
      * <code>;</code> separated list of additional path elements.
      */
-    private String virtualClasspath;
+    private String virtualClasspath = "";
 
     /**
      * Construct a new WebappLoader with no defined parent class loader (so that
@@ -86,7 +86,9 @@ public class VirtualWebappLoader extends WebappLoader {
         // repositories list before calling start on the standard WebappLoader
         StringTokenizer tkn = new StringTokenizer(virtualClasspath, ";");
         while (tkn!=null && tkn.hasMoreTokens()) {
-            File file = new File(tkn.nextToken());
+            String ftkn = tkn.nextToken();
+            if (ftkn==null) continue;
+            File file = new File(ftkn);
             if (!file.exists()) {
                 continue;
             }
