@@ -64,6 +64,7 @@ import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.util.IntrospectionUtils;
 
+
 /**
  * Specialized web application class loader.
  * <p>
@@ -103,7 +104,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class WebappClassLoader
     extends URLClassLoader
-    implements Reloader, Lifecycle
+    implements Reloader, Lifecycle, NamedClassLoader
  {
 
     protected static org.apache.juli.logging.Log log=
@@ -370,6 +371,11 @@ public class WebappClassLoader
      */
     protected Permission allPermission = new java.security.AllPermission();
 
+    /**
+     * The name of this classloader
+     * typically a concatenated string of Engine/Host/Context names
+     */
+    protected String name = null;
 
     // ------------------------------------------------------------- Properties
 
@@ -522,6 +528,14 @@ public class WebappClassLoader
       */
      protected void setParentClassLoader(ClassLoader pcl) {
          parent = pcl;
+     }
+     
+     public void setName(String name) {
+         this.name = name;
+     }
+     
+     public String getName() {
+         return name;
      }
 
     // ------------------------------------------------------- Reloader Methods

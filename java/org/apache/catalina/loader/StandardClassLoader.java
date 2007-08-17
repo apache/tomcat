@@ -21,6 +21,7 @@ package org.apache.catalina.loader;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+
 /**
  * Subclass implementation of <b>java.net.URLClassLoader</b>. There are no
  * functional differences between this class and <b>java.net.URLClassLoader</b>.
@@ -32,7 +33,9 @@ import java.net.URLClassLoader;
 
 public class StandardClassLoader
     extends URLClassLoader
-    implements StandardClassLoaderMBean {
+    implements StandardClassLoaderMBean, NamedClassLoader {
+
+    protected String name;
 
 	public StandardClassLoader(URL repositories[]) {
         super(repositories);
@@ -41,6 +44,16 @@ public class StandardClassLoader
     public StandardClassLoader(URL repositories[], ClassLoader parent) {
         super(repositories, parent);
     }
+    
+    public void setName(String name) {
+        this.name = name;
+    }
+    
+    public String getName() {
+        return this.name;
+    }
+    
+    
 
 }
 

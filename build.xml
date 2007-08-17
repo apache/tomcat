@@ -182,6 +182,7 @@
         <include name="org/apache/catalina/security/SecurityClassLoad.class" />
         <include name="org/apache/naming/JndiPermission.class" />
         <include name="org/apache/tomcat/util/compat/*" />
+        <include name="org/apache/catalina/loader/NamedClassLoader.class" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -215,6 +216,7 @@
         <exclude name="org/apache/catalina/launcher/**" />
         <exclude name="org/apache/catalina/storeconfig/**" />
         <exclude name="org/apache/naming/factory/webservices/**" />
+        <exclude name="org/apache/catalina/loader/NamedClassLoader.class" />
       </fileset>
     </jar>
     
