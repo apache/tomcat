@@ -21,14 +21,14 @@ package org.apache.catalina.tribes.membership;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
-import java.net.MulticastSocket;
-
-import org.apache.catalina.tribes.MembershipListener;
-import java.util.Arrays;
-import java.net.SocketTimeoutException;
-import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.Channel;
 import java.net.InetSocketAddress;
+import java.net.MulticastSocket;
+import java.net.SocketTimeoutException;
+import java.util.Arrays;
+
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.MembershipListener;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -125,6 +125,15 @@ public class McastServiceImpl
      */
     protected int recoveryCounter = 10;
     
+    /**
+     * The time the recovery thread sleeps between recovery attempts
+     */
+    protected long recoverySleepTime = 5000;
+    
+    /**
+     * Add the ability to turn on/off recovery
+     */
+    protected boolean recoveryEnabled = true;
     /**
      * Create a new mcast service impl
      * @param member - the local member
@@ -365,6 +374,17 @@ public class McastServiceImpl
        return this.serviceStartTime;
     }
 
+    public int getRecoveryCounter() {
+        return recoveryCounter;
+    }
+
+    public boolean isRecoveryEnabled() {
+        return recoveryEnabled;
+    }
+
+    public long getRecoverySleepTime() {
+        return recoverySleepTime;
+    }
 
     public class ReceiverThread extends Thread {
         int errorCounter = 0;
@@ -431,6 +451,7 @@ public class McastServiceImpl
         
         public static synchronized boolean init(RecoveryThread t) {
             if ( running ) return false;
+            if ( !t.parent.isRecoveryEnabled()) return false;
             running = true;
             t.setName("Tribes-MembershipRecovery");
             t.setDaemon(true);
@@ -470,7 +491,7 @@ public class McastServiceImpl
                     try {
                         if (!success) {
                             log.info("Recovery attempt "+(++attempt)+" failed, trying again in 5 seconds");
-                            Thread.sleep(5000);
+                            Thread.sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {
                     }
@@ -479,5 +500,17 @@ public class McastServiceImpl
                 running = false;
             }
         }//run
+    }
+
+    public void setRecoveryCounter(int recoveryCounter) {
+        this.recoveryCounter = recoveryCounter;
+    }
+
+    public void setRecoveryEnabled(boolean recoveryEnabled) {
+        this.recoveryEnabled = recoveryEnabled;
+    }
+
+    public void setRecoverySleepTime(long recoverySleepTime) {
+        this.recoverySleepTime = recoverySleepTime;
     }
 }
