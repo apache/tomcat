@@ -169,7 +169,7 @@ public class McastServiceImpl
         receivePacket.setPort(port);
         member.setCommand(new byte[0]);
         member.getData(true, true);
-        membership = new Membership(member);
+        if ( membership == null ) membership = new Membership(member);
     }
     
     protected void setupSocket() throws IOException {
