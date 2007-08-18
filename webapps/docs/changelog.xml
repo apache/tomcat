@@ -75,6 +75,14 @@
       </fix>
     </changelog>
   </subsection>
+   <subsection name="Cluster">
+    <changelog>
+      <fix>
+         Set correct BioReceiver transfer buffer size. (pero)
+      </fix>
+    </changelog>
+  </subsection>
+  
 </section>
 <section name="Tomcat 6.0.14 (remm)">
   <subsection name="General">
