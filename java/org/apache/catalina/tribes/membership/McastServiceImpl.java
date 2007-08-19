@@ -483,23 +483,26 @@ public class McastServiceImpl
             int attempt = 0;
             try {
                 while (!success) {
-                    log.info("Tribes membership, running recovery thread, multicasting is not functional.");
+                    if(log.isInfoEnabled())
+                        log.info("Tribes membership, running recovery thread, multicasting is not functional.");
                     if (stopService() & startService()) {
                         success = true;
-                        log.info("Membership recovery was successful.");
+                        if(log.isInfoEnabled())
+                            log.info("Membership recovery was successful.");
                     }
                     try {
                         if (!success) {
-                            log.info("Recovery attempt "+(++attempt)+" failed, trying again in 5 seconds");
+                            if(log.isInfoEnabled())
+                                log.info("Recovery attempt "+(++attempt)+" failed, trying again in " +parent.recoverySleepTime+ " seconds");
                             Thread.sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {
                     }
-                }//while
+                }
             }finally {
                 running = false;
             }
-        }//run
+        }
     }
 
     public void setRecoveryCounter(int recoveryCounter) {
