@@ -361,7 +361,8 @@ public class McastService implements MembershipService,MembershipListener {
                                     ttl,
                                     soTimeout,
                                     this);
-        boolean recEnabled = Boolean.getBoolean(properties.getProperty("recoveryEnabled","true"));
+        String value = properties.getProperty("recoveryEnabled","true");
+        boolean recEnabled = Boolean.valueOf(value).booleanValue() ;
         impl.setRecoveryEnabled(recEnabled);        
         int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter","10"));
         impl.setRecoveryCounter(recCnt);
