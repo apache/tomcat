@@ -19,6 +19,25 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Fix B2CConverter, adding in invalid characters when end of stream reached.
+        <a href="http://svn.apache.org/viewvc?rev=568307&amp;view=rev">SVN Link</a>
+      </fix>
+    </changelog>
+    <changelog>
+      <fix>
+        Add a recovery mechanism for the UDP socket when the network interface becomes disabled
+        <a href="http://svn.apache.org/viewvc?view=rev&amp;rev=567104">SVN Link</a>
+      </fix>
+    </changelog>
+    <changelog>
+      <update>
+        Enable the VirtualWebappLoader to load from virtual classpath, separate out JAR files to not be locked
+        and also read from the WAR's META-INF/MANIFEST.MF Class-Path
+      </update>
+    </changelog>
+    
+    <changelog>
+      <fix>
          <bug>42951</bug>: Don't use CATALINA_OPTS when stopping Tomcat. This
          allows options for starting and stopping to be set on JAVA_OPTS and
          options for starting only to be set on CATALINA_OPTS. Without this
