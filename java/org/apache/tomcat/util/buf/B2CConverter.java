@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.CharBuffer;
 
 /** Efficient conversion of bytes  to character .
  *  
@@ -82,7 +83,7 @@ public class B2CConverter {
     {
 	try {
 	    // read from the reader
-	    while( true ) { // conv.ready() ) {
+	    while( iis.available()>0 ) { // conv.ready() ) {
 		int cnt=conv.read( result, 0, BUFFER_SIZE );
 		if( cnt <= 0 ) {
 		    // End of stream ! - we may be in a bad state
@@ -211,6 +212,18 @@ final class  ReadConvertor extends InputStreamReader {
 	return super.read( cbuf, off, len );
     }
     
+    public final int read() throws IOException {
+        return super.read();
+    }
+    
+    public final int read(CharBuffer cb) throws IOException {
+        return super.read(cb);
+    }
+    
+    public final int read(char[] cbuf) throws IOException {
+        return super.read(cbuf);
+    }
+    
     /** Reset the buffer
      */
     public  final void recycle() {
@@ -254,7 +267,7 @@ final class IntermediateInputStream extends InputStream {
     public  final int read() throws IOException {
 	return (pos < end ) ? (buf[pos++] & 0xff) : -1;
     }
-
+    
     // -------------------- Internal methods --------------------
 
     void setBuffer( byte b[], int p, int l ) {
@@ -269,6 +282,34 @@ final class IntermediateInputStream extends InputStream {
 	pos=mb.getStart();
 	len=mb.getLength();
 	end=pos+len;
+    }
+
+    public int available() throws IOException {
+        return end-pos;
+    }
+
+    public boolean markSupported() {
+        return false;
+    }
+
+    public int read(byte[] b) throws IOException {
+        return read(b,0,b.length);
+    }
+
+    /**
+     * Repositions this stream to the position at the time the <code>mark</code> method was last called on this input
+     * stream.
+     *
+     * @throws IOException if this stream has not been marked or if the mark has been invalidated.
+     * @todo Implement this java.io.InputStream method
+     */
+    public synchronized void reset() throws IOException {
+        //not implemented
+    }
+
+    public long skip(long n) throws IOException {
+        //not implemented
+        return 0L;
     }
 
 }
