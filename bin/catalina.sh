@@ -148,7 +148,7 @@ fi
 if [ -n "$JSSE_HOME" ]; then
   CLASSPATH="$CLASSPATH":"$JSSE_HOME"/lib/jcert.jar:"$JSSE_HOME"/lib/jnet.jar:"$JSSE_HOME"/lib/jsse.jar
 fi
-CLASSPATH="$CLASSPATH":"$CATALINA_HOME"/bin/bootstrap.jar:"$CATALINA_HOME"/bin/commons-logging-api.jar
+CLASSPATH="$CLASSPATH":"$CATALINA_HOME"/bin/bootstrap.jar
 
 if [ -z "$CATALINA_BASE" ] ; then
   CATALINA_BASE="$CATALINA_HOME"
