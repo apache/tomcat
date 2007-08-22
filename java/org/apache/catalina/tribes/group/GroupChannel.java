@@ -248,7 +248,12 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             if ( (msg.getOptions() & SEND_OPTIONS_BYTE_MESSAGE) == SEND_OPTIONS_BYTE_MESSAGE ) {
                 fwd = new ByteMessage(msg.getMessage().getBytes());
             } else {
-                fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(),0,msg.getMessage().getLength());
+                try {
+                    fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(), 0, msg.getMessage().getLength());
+                }catch (Exception sx) {
+                    log.error("Unable to deserialize message:"+msg,sx);
+                    return;
+                }
             }
             if ( Logs.MESSAGES.isTraceEnabled() ) {
                 Logs.MESSAGES.trace("GroupChannel - Receive Message:" + new UniqueId(msg.getUniqueId()) + " is " +fwd);
@@ -278,8 +283,10 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }
 
         } catch ( Exception x ) {
-            if ( log.isDebugEnabled() ) log.error("Unable to process channel:IOException.",x);
-            throw new RemoteProcessException("IOException:"+x.getMessage(),x);
+            //this could be the channel listener throwing an exception, we should log it 
+            //as a warning.
+            if ( log.isWarnEnabled() ) log.warn("Error receiving message:",x);
+            throw new RemoteProcessException("Exception:"+x.getMessage(),x);
         }
     }
 
