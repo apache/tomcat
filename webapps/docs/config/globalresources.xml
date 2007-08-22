@@ -205,7 +205,7 @@
     per-web-application contexts. Here is an example of making a custom 
     factory available to all applications in the server, based on the example 
     definition in the 
-    <a href="../jndi-resource-howto.html#Generic JavaBean Resources">
+    <a href="../jndi-resources-howto.html#Generic JavaBean Resources">
     JNDI Resource HOW-TO</a>:
     </p>
 
