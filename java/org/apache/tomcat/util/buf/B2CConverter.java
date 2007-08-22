@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.nio.CharBuffer;
 
 /** Efficient conversion of bytes  to character .
  *  
@@ -214,14 +213,6 @@ final class  ReadConvertor extends InputStreamReader {
     
     public final int read() throws IOException {
         return super.read();
-    }
-    
-    public final int read(CharBuffer cb) throws IOException {
-        return super.read(cb);
-    }
-    
-    public final int read(char[] cbuf) throws IOException {
-        return super.read(cbuf);
     }
     
     /** Reset the buffer
