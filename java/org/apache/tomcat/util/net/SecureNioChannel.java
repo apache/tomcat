@@ -370,6 +370,10 @@ public class SecureNioChannel extends NioChannel  {
                 if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
                 //if we need more network data, then bail out for now.
                 if ( unwrap.getStatus() == Status.BUFFER_UNDERFLOW ) break;
+            }else if ( unwrap.getStatus()==Status.BUFFER_OVERFLOW && read>0 ) {
+                //buffer overflow can happen, if we have read data, then 
+                //empty out the dst buffer before we do another read
+                break;
             }else {
                 //here we should trap BUFFER_OVERFLOW and call expand on the buffer
                 //for now, throw an exception, as we initialized the buffers
