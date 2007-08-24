@@ -841,6 +841,9 @@ public class Http11NioProcessor implements ActionHook {
                     socket.getIOChannel().socket().setSoTimeout((int)timeout);
                 }
             } catch (IOException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.header.parse"), e);
+                }
                 error = true;
                 break;
             } catch (Throwable t) {
