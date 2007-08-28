@@ -120,6 +120,19 @@ public class Http11Protocol
         return attributes.keySet().iterator();
     }
 
+    /**
+     * Set a property.
+     */
+    public void setProperty(String name, String value) {
+        setAttribute(name, value);
+    }
+
+    /**
+     * Get a property
+     */
+    public String getProperty(String name) {
+        return (String)getAttribute(name);
+    }
 
     /**
      * The adapter, used to call the connector.
