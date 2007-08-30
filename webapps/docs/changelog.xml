@@ -47,6 +47,10 @@
          Port of r454193 (<bug>36976</bug>) from Tomcat 5.5.x. (markt,rjung)
       </fix>
       <fix>
+        <bug>43175</bug>: Fix typos in servlet XSD files. Patch provided by
+        Takayuki Kaneko. (markt)
+      </fix>
+      <fix>
          <bug>43216</bug>: Set correct StandardSession#accessCount as StandardSession.ACTIVITY_CHECK is true.
           Patch provided by Takayuki Kaneko (pero)
       </fix>
