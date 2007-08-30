@@ -15,7 +15,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
 	    targetNamespace="http://java.sun.com/xml/ns/j2ee"
 	    xmlns:j2ee="http://java.sun.com/xml/ns/j2ee"
