@@ -124,7 +124,7 @@ public class NamingRuleSet extends RuleSetBase {
                             "org.apache.catalina.deploy.ContextResourceEnvRef"));
 
         digester.addObjectCreate(prefix + "ServiceRef",
-            "org.apache.catalina.deploy.Contextservice");
+            "org.apache.catalina.deploy.ContextService");
         digester.addRule(prefix + "ServiceRef", new SetAllPropertiesRule());
         digester.addRule(prefix + "ServiceRef",
                 new SetNextNamingRule("addService",

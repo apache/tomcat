@@ -92,7 +92,7 @@
       </p>
     </attribute>
     <attribute name="channelSendOptions" required="true">
-      <p>The Tribes channel send options, default is 11.<br/>
+      <p>The Tribes channel send options, default is <code>8</code>.<br/>
          This option is used to set the flag that all messages sent through the 
          SimpleTcpCluster uses. The flag decides how the messages are sent, and is a simple logical OR.<br/>
          
