@@ -2268,7 +2268,7 @@ public class Request
         return bool.get();    
     }
 
-    public boolean hasOp(CometEvent.CometOperation op) {
+    public boolean hasOp(int op) {
         if ( !comet || getEvent()==null ) return false;
         return event.hasOp(op);
     }

@@ -1233,7 +1233,7 @@ public class Http11NioProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
         } else if (actionCode == ActionCode.ACTION_COMET_REGISTER) {
-            int interest = getPollerInterest(param);
+            int interest = ((Integer)param).intValue();
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             attach.setCometOps(interest);
             //notify poller if not on a tomcat thread
@@ -1248,31 +1248,14 @@ public class Http11NioProcessor implements ActionHook {
             try {
                 bool.set(inputBuffer.isReadable());
             }catch ( IOException x ) {
-                throw new RuntimeException(x);
+                if (log.isDebugEnabled()) log.debug("Unable to check readability on NIO socket.",x);
+                bool.set(false);
             }
         } else if (actionCode == ActionCode.ACTION_COMET_WRITEABLE) {
             MutableBoolean bool = (MutableBoolean)param;
             bool.set(outputBuffer.isWritable());
         }
 
-    }
-
-    private int getPollerInterest(Object param) throws IllegalArgumentException {
-        if ( param == null || (!(param instanceof PollerInterest[])) )
-            throw new IllegalArgumentException("Action parameter must be a PollerInterest[] object.");
-        int interest = 0;
-        PollerInterest[] piarr = (PollerInterest[])param;
-        for ( PollerInterest pi : piarr ) {
-            if (pi == PollerInterest.CALLBACK)
-                interest = interest | NioEndpoint.OP_CALLBACK;
-            else if (pi == PollerInterest.READ)
-                interest = interest | SelectionKey.OP_READ;
-            else if (pi == PollerInterest.WRITE)
-                interest = interest | SelectionKey.OP_WRITE;
-            else
-                throw new IllegalArgumentException(pi != null ? pi.toString() : "null");
-        }
-        return interest;
     }
 
 

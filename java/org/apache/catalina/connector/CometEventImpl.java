@@ -77,7 +77,7 @@ public class CometEventImpl implements CometEvent {
     /**
      * Current set of operations
      */
-    protected HashSet<CometOperation> cometOperations = new HashSet<CometOperation>(3);
+    protected int cometOperations = 0;
     
     /**
      * Blocking or not blocking
@@ -97,7 +97,7 @@ public class CometEventImpl implements CometEvent {
         request = null;
         response = null;
         blocking = true;
-        cometOperations.clear();
+        cometOperations = 0;
     }
 
     public void setEventType(EventType eventType) {
@@ -148,8 +148,8 @@ public class CometEventImpl implements CometEvent {
         return response.isWriteable();
     }
     
-    public boolean hasOp(CometEvent.CometOperation op) {
-        return cometOperations.contains(op);
+    public boolean hasOp(int op) {
+        return (cometOperations & op ) == op;
     }
     
     public void configureBlocking(boolean blocking) throws IllegalStateException {
@@ -160,24 +160,24 @@ public class CometEventImpl implements CometEvent {
         this.blocking = bool.get();
     }
 
-    public void register(CometEvent.CometOperation... operations) throws IllegalStateException {
+    public void register(int operations) throws IllegalStateException {
         //add it to the registered set
-        cometOperations.addAll(Arrays.asList(operations));
-        request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
+        cometOperations = cometOperations | operations;
+        request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations));
     }
 
-    public void unregister(CometOperation... operations) throws IllegalStateException {
+    public void unregister(int operations) throws IllegalStateException {
         //remove from the registered set
-        cometOperations.removeAll(Arrays.asList(operations));
-        request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations.toArray(new CometOperation[0])));
+        cometOperations = cometOperations & (~operations);
+        request.action(ActionCode.ACTION_COMET_REGISTER, translate(cometOperations));
     }
     
     public boolean isBlocking() {
         return blocking;
     }
     
-    public CometOperation[] getRegisteredOps() {
-        return (CometOperation[])cometOperations.toArray(new CometOperation[0]);
+    public int getRegisteredOps() {
+        return cometOperations;
     }
     
     public String toString() {
@@ -204,19 +204,8 @@ public class CometEventImpl implements CometEvent {
             throw new IllegalStateException("The operation can only be performed when invoked by a Tomcat worker thread.");
     }
     
-    protected PollerInterest[] translate(CometOperation... op) {
-        PollerInterest[] result = new PollerInterest[op.length];
-        for (int i=0; i<result.length; i++) {
-            if (op[i] == CometEvent.CometOperation.OP_READ)
-                result[i] = PollerInterest.READ;
-            else if (op[i] == CometEvent.CometOperation.OP_WRITE)
-                result[i] = PollerInterest.WRITE;
-            else if (op[i] == CometEvent.CometOperation.OP_CALLBACK)
-                result[i] = PollerInterest.CALLBACK;
-            else
-                throw new IllegalArgumentException(op != null ? op.toString() : "null");
-        }
-        return result;
+    protected Integer translate(int op) {
+        return new Integer(op);
     }
     
     //inner class used to keep track if the current thread is a worker thread.
