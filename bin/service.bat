@@ -19,7 +19,7 @@ rem ---------------------------------------------------------------------------
 rem NT Service Install/Uninstall script
 rem
 rem Options
-rem install                Install the service using Tomcat5 as service name.
+rem install                Install the service using Tomcat6 as service name.
 rem                        Service is installed using default settings.
 rem remove                 Remove the service from the System.
 rem
