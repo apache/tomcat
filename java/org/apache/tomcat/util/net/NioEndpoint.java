@@ -184,7 +184,10 @@ public class NioEndpoint {
      */
     long lastParachuteCheck = System.currentTimeMillis();
     
-    
+    /**
+     * Keep track of how many threads are in use
+     */
+    protected AtomicInteger activeSocketProcessors = new AtomicInteger(0);
     
     
     
@@ -762,7 +765,7 @@ public class NioEndpoint {
                     TaskQueue taskqueue = new TaskQueue();
                     TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-");
                     executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-                    taskqueue.setParent( (ThreadPoolExecutor) executor);
+                    taskqueue.setParent( (ThreadPoolExecutor) executor, this);
                 }
             } else if ( executor == null ) {//avoid two thread pools being created
                 workers = new WorkerStack(maxThreads);
@@ -828,7 +831,7 @@ public class NioEndpoint {
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdown();
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
-                queue.setParent(null);
+                queue.setParent(null,null);
             }
             executor = null;
         }
@@ -1994,6 +1997,7 @@ public class NioEndpoint {
         }
          
         public void run() {
+            NioEndpoint.this.activeSocketProcessors.addAndGet(1);
             SelectionKey key = null;
             try {
                 key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
@@ -2067,7 +2071,7 @@ public class NioEndpoint {
                 status = null;
                 //return to cache
                 processorCache.offer(this);
-            }
+                NioEndpoint.this.activeSocketProcessors.addAndGet(-1);            }
         }
 
     }
@@ -2075,6 +2079,7 @@ public class NioEndpoint {
     // ---------------------------------------------- TaskQueue Inner Class
     public static class TaskQueue extends LinkedBlockingQueue<Runnable> {
         ThreadPoolExecutor parent = null;
+        NioEndpoint endpoint = null;
         
         public TaskQueue() {
             super();
@@ -2089,8 +2094,9 @@ public class NioEndpoint {
         }
 
         
-        public void setParent(ThreadPoolExecutor tp) {
+        public void setParent(ThreadPoolExecutor tp, NioEndpoint ep) {
             parent = tp;
+            this.endpoint = ep;
         }
         
         public boolean offer(Runnable o) {
@@ -2100,7 +2106,7 @@ public class NioEndpoint {
             if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
             //we have idle threads, just add it to the queue
             //this is an approximation, so it could use some tuning
-            if (parent.getActiveCount()<(parent.getPoolSize())) return super.offer(o);
+            if (endpoint.activeSocketProcessors.get()<(parent.getPoolSize())) return super.offer(o);
             //if we have less threads than maximum force creation of a new thread
             if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
             //if we reached here, we need to add it to the queue
