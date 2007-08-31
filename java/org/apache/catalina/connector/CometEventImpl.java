@@ -45,6 +45,7 @@ public class CometEventImpl implements CometEvent {
         this.response = response;
         //default behavior is to only listen for read events
         register(CometOperation.OP_READ);
+        setWorkerThread();
     }
 
 
