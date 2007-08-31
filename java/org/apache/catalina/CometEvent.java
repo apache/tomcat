@@ -23,6 +23,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.channels.SelectionKey;
 
 /**
  * The CometEvent interface.
@@ -139,7 +140,7 @@ public interface CometEvent {
      * asycnhronously, then issue a 
      * register(OP_CALLBACK) immediately after this method has been invoked.
      * 
-     * @see #register(CometOperation)
+     * @see #register(int)
      */
     public void close() throws IOException;
     
@@ -190,9 +191,14 @@ public interface CometEvent {
      * OP_CALLBACK - receive a CALLBACK event from the container
      * OP_READ - receive a READ event when the connection has data to be read
      * OP_WRITE - receive a WRITE event when the connection is able to receive data to be written
-     * @see #register(CometOperations)
+     * @see #register(int)
      */
-    public enum CometOperation {OP_CALLBACK, OP_READ, OP_WRITE};
+    public static class CometOperation {
+        //currently map these to the same values as org.apache.tomcat.util.net.PollerInterest
+        public static final int OP_CALLBACK = 0x200;
+        public static final int OP_READ = SelectionKey.OP_READ;
+        public static final int OP_WRITE = SelectionKey.OP_WRITE;
+    };
     
     /**
      * Registers the Comet connection with the container for IO and event notifications.
@@ -203,22 +209,22 @@ public interface CometEvent {
      * @see #EventType
      * @see #CometOperation
      */
-    public void register(CometOperation... operations) throws IllegalStateException;
+    public void register(int operations) throws IllegalStateException;
     
     /**
      * Unregisters Comet operations for this CometConnection
      * @param operations CometOperation[]
      * @throws IllegalStateException
      */
-    public void unregister(CometOperation... operations) throws IllegalStateException;
+    public void unregister(int operations) throws IllegalStateException;
 
     /**
      * Returns what the current IO notifications that the Comet
      * connection is registered for.
-     * @return CometOperations[]
-     * @see #register(CometOperations...)
+     * @return integer representing registered operations
+     * @see #register(int)
      */
-    public CometOperation[] getRegisteredOps();
+    public int getRegisteredOps();
     
     /**
      * Returns true if the Comet connection is blocking or non blocking and you can write

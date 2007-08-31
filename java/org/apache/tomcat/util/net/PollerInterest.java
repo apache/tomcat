@@ -17,10 +17,14 @@
 
 package org.apache.tomcat.util.net;
 
+import java.nio.channels.SelectionKey;
+
 /**
  * Different poller inter
  * @author fhanik
  */
-public enum PollerInterest {
-    READ, WRITE, CALLBACK;
+public class PollerInterest {
+    public static final int READ = SelectionKey.OP_READ;
+    public static final int WRITE = SelectionKey.OP_WRITE;
+    public static final int CALLBACK = NioEndpoint.OP_CALLBACK;
 }
