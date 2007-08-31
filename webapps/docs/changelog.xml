@@ -46,6 +46,9 @@
          stop to fail. Based on a fix suggested by Michael Vorburger.
          Port of r454193 (<bug>36976</bug>) from Tomcat 5.5.x. (markt,rjung)
       </fix>
+      <add>
+         Validation of attributes and elements used in server.xml. (remm)
+      </add>
       <fix>
         <bug>43175</bug>: Fix typos in servlet XSD files. Patch provided by
         Takayuki Kaneko. (markt)
