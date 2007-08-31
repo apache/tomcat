@@ -1243,6 +1243,9 @@ public class Http11NioProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE_BLOCKING) {
             MutableBoolean bool = (MutableBoolean)param;
             if ( bool.get() ) throw new IllegalStateException("Not yet implemented");
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
+                throw new IllegalStateException("Can only be configured during an event.");
         } else if (actionCode == ActionCode.ACTION_COMET_READABLE) {
             MutableBoolean bool = (MutableBoolean)param;
             try {

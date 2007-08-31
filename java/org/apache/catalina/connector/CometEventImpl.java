@@ -45,7 +45,6 @@ public class CometEventImpl implements CometEvent {
         this.response = response;
         //default behavior is to only listen for read events
         register(CometOperation.OP_READ);
-        setWorkerThread();
     }
 
 
@@ -85,10 +84,6 @@ public class CometEventImpl implements CometEvent {
      */
     protected boolean blocking = true;
 
-    protected WorkerThreadCheck threadCheck = new WorkerThreadCheck();
-
-    private static final Object threadCheckHolder = new Object();
-    
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -154,7 +149,6 @@ public class CometEventImpl implements CometEvent {
     }
     
     public void configureBlocking(boolean blocking) throws IllegalStateException {
-        checkWorkerThread();
         if ( getEventType() != EventType.BEGIN ) throw new IllegalStateException("Can only be configured during the BEGIN event.");
         MutableBoolean bool = new MutableBoolean(blocking);
         request.action(ActionCode.ACTION_COMET_CONFIGURE_BLOCKING,bool);
@@ -191,29 +185,9 @@ public class CometEventImpl implements CometEvent {
         return buf.toString();
     }
 
-    protected void setWorkerThread() {
-        threadCheck.set(threadCheckHolder);
-    }
-    
-    protected void unsetWorkerThread() {
-        threadCheck.set(null);
-    }
-
-    protected void checkWorkerThread() throws IllegalStateException {
-        //throw exception if not on worker thread
-        if ( !(threadCheck.get() == threadCheckHolder) ) 
-            throw new IllegalStateException("The operation can only be performed when invoked by a Tomcat worker thread.");
-    }
-    
     protected Integer translate(int op) {
         return new Integer(op);
     }
-    
-    //inner class used to keep track if the current thread is a worker thread.
-    private static class WorkerThreadCheck extends ThreadLocal {
-        
-    }
-    
     
 
 }
