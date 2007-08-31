@@ -265,7 +265,7 @@ public class CoyoteAdapter
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
-
+        
         if (request == null) {
 
             // Create objects
@@ -286,8 +286,14 @@ public class CoyoteAdapter
             req.getParameters().setQueryStringEncoding
                 (connector.getURIEncoding());
 
+        } else if (request.wasComet()) {
+            //if we enter here, means that the
+            //request response was not recycled
+            //do to an async close of the CometEvent
+            request.recycle();
+            response.recycle();
         }
-
+        
         if (connector.getXpoweredBy()) {
             response.addHeader("X-Powered-By", "Servlet/2.5");
         }
