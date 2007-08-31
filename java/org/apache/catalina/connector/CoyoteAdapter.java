@@ -121,8 +121,6 @@ public class CoyoteAdapter
             boolean read = false;
             CometEvent event = request.getEvent();
             try {
-                if ( event!=null && (event instanceof CometEventImpl)) 
-                    ((CometEventImpl)event).setWorkerThread();
                 if (status == SocketStatus.OPEN_CALLBACK) {
                     if (response.isClosed()) {
                         // The event has been closed asynchronously, so call end instead of
@@ -243,9 +241,6 @@ public class CoyoteAdapter
                 error = true;
                 return false;
             } finally {
-                if ( event!=null && (event instanceof CometEventImpl)) 
-                    ((CometEventImpl)event).unsetWorkerThread();
-
                 req.getRequestProcessor().setWorkerThreadName(null);
                 // Recycle the wrapper request and response
                 if (error || response.isClosed() || !request.isComet()) {
@@ -340,9 +335,6 @@ public class CoyoteAdapter
         } catch (Throwable t) {
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
-            if ( event!=null && (event instanceof CometEventImpl)) 
-                ((CometEventImpl)event).unsetWorkerThread();
-
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (!comet) {
