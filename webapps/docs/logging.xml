@@ -43,7 +43,7 @@
   <section name="Introduction">
   <p>
     Tomcat 6.0 uses 
-    <a href="http://jakarta.apache.org/commons/logging">Commons Logging</a>
+    <a href="http://commons.apache.org/logging">Commons Logging</a>
     throughout its internal code allowing the 
     developer to choose a logging configuration that suits their needs, e.g
     java.util.logging or 
