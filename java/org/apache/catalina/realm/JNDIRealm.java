@@ -1549,6 +1549,21 @@ public class JNDIRealm extends RealmBase {
                 // Try the authentication again.
                 principal = getPrincipal(context, username);
 
+            } catch (ServiceUnavailableException e) {
+
+                // log the exception so we know it's there.
+                containerLog.warn(sm.getString("jndiRealm.exception"), e);
+
+                // close the connection so we know it will be reopened.
+                if (context != null)
+                    close(context);
+
+                // open a new directory context.
+                context = open();
+
+                // Try the authentication again.
+                principal = getPrincipal(context, username);
+
             }
 
 
