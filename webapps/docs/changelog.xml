@@ -35,6 +35,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>30949</bug>: Improve previous fix. Ensure requests are re-cycled
+        on cross-context includes and forwards when an exception occurs in the
+        target page. (markt)
+      </fix>
+      <fix>
         <bug>42944</bug>: Correctly handle servlet mappings that use a '+'
         character as part of the url pattern. (markt)
       </fix>

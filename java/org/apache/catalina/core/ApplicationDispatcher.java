@@ -341,10 +341,6 @@ final class ApplicationDispatcher
             wrequest.setQueryString(hrequest.getQueryString());
 
             processRequest(request,response,state);
-
-            wrequest.recycle();
-            unwrapRequest(state);
-
         }
 
         // Handle an HTTP path-based forward
@@ -377,10 +373,6 @@ final class ApplicationDispatcher
             }
 
             processRequest(request,response,state);
-
-            wrequest.recycle();
-            unwrapRequest(state);
-
         }
 
         // This is not a real close in order to support error processing
@@ -521,8 +513,6 @@ final class ApplicationDispatcher
                     ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                     servletPath);
             invoke(state.outerRequest, state.outerResponse, state);
-
-            wrequest.recycle();
         }
 
         // Handle an HTTP path based include
@@ -555,8 +545,6 @@ final class ApplicationDispatcher
                     ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                     servletPath);
             invoke(state.outerRequest, state.outerResponse, state);
-
-            wrequest.recycle();
         }
 
     }
@@ -731,7 +719,9 @@ final class ApplicationDispatcher
         // See Bugzilla 30949
         unwrapRequest(state);
         unwrapResponse(state);
-
+        // Recycle request if necessary (also BZ 30949)
+        recycleRequestWrapper(state);
+        
         // Rethrow an exception if one was thrown by the invoked servlet
         if (ioException != null)
             throw ioException;
@@ -985,5 +975,10 @@ final class ApplicationDispatcher
             throw new ServletException(sm.getString(
                     "applicationDispatcher.specViolation.response"));
         }
+    }
+
+    private void recycleRequestWrapper(State state) {
+        if (state.wrapRequest instanceof ApplicationHttpRequest) {
+            ((ApplicationHttpRequest) state.wrapRequest).recycle();        }
     }
 }
