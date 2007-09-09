@@ -24,7 +24,7 @@
            description="Cluster Membership service implementation"
                domain="Catalina"
                 group="Cluster"
-                 type="org.apache.catalina.ha.mcast.McastService">
+                 type="org.apache.catalina.tribes.membership.McastService">
     <attribute   name="info"
           description="Class version info"
                  type="java.lang.String"
@@ -53,6 +53,16 @@
     <attribute   name="mcastTTL"
           description=""
                  type="int"/>
+    <attribute   name="recoveryCounter"
+          description="Counter after membership failure socket restarted"
+                 type="int"/>
+    <attribute   name="recoveryEnabled"
+          description="Membership recovery enabled"
+                   is="true"
+                 type="boolean"/>
+    <attribute   name="recoverySleepTime"
+          description="Sleep time between next socket recovery (5000 msec)"
+                 type="long"/> 
     <attribute   name="localMemberName"
           description="Complete local receiver information"
                  type="java.lang.String"
