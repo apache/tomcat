@@ -334,6 +334,14 @@ created by this Manager"
         description="Id of the session"
         type="java.lang.String"/>
     </operation>
+    <operation   name="getCreationTime"
+          description="Get the creation time"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
     <operation
       name="expireAllLocalSessions"
       description="Exipre all active local sessions and replicate the invalid sessions"
@@ -562,5 +570,14 @@ created by this Manager"
         description="Id of the session"
         type="java.lang.String"/>
     </operation>
+    <operation   name="getCreationTime"
+          description="Get the creation time"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+    
   </mbean>
 </mbeans-descriptors>
