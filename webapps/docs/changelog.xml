@@ -59,9 +59,12 @@
         Takayuki Kaneko. (markt)
       </fix>
       <fix>
-         <bug>43216</bug>: Set correct StandardSession#accessCount as StandardSession.ACTIVITY_CHECK is true.
-          Patch provided by Takayuki Kaneko (pero)
+        <bug>43216</bug>: Set correct StandardSession#accessCount as StandardSession.ACTIVITY_CHECK is true.
+        Patch provided by Takayuki Kaneko (pero)
       </fix>
+      <add>
+        Made session createTime accessible for all SessionManager via JMX (pero)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
