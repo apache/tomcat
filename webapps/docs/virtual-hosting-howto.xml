@@ -48,8 +48,8 @@
     </p>
     <source>
 &lt;Engine name="Catalina" defaultHost="ren"&gt;
-    &lt;Host name="ren"    appBase="webapps-ren"/&gt;
-    &lt;Host name="stimpy" appBase="webapps-stimpy"/&gt;
+    &lt;Host name="ren"    appBase="renapps"/&gt;
+    &lt;Host name="stimpy" appBase="stimpyapps"/&gt;
 &lt;/Engine&gt;
     </source>
     <p>
@@ -68,8 +68,8 @@
       Create directories for each of the virtual hosts:
     </p>
     <source>
-mkdir $CATALINA_HOME/webapps-ren
-mkdir $CATALINA_HOME/webapps-stimpy
+mkdir $CATALINA_HOME/renapps
+mkdir $CATALINA_HOME/stimpyapps
     </source>
   </section>
 
@@ -78,10 +78,10 @@ mkdir $CATALINA_HOME/webapps-stimpy
       <p>Contexts are normally located underneath the appBase directory. For
        example, to deploy the <code>foobar</code> context as a war file in
        the <code>ren</code> host, use
-       <code>$CATALINA_HOME/webapps-ren/foobar.war</code>. Note that the
+       <code>$CATALINA_HOME/renapps/foobar.war</code>. Note that the
        default or ROOT context for <code>ren</code> would be deployed as
-       <code>$CATALINA_HOME/webapps-ren/ROOT.war</code> (WAR) or
-       <code>$CATALINA_HOME/webapps-ren/ROOR</code> (directory).
+       <code>$CATALINA_HOME/renapps/ROOT.war</code> (WAR) or
+       <code>$CATALINA_HOME/renapps/ROOR</code> (directory).
       </p>
       <p><strong>NOTE: The <code>docBase</code> for a context should never be
         the same as the <code>appBase</code> for a host.</strong>
@@ -92,7 +92,7 @@ mkdir $CATALINA_HOME/webapps-stimpy
         Within your Context, create a <code>META-INF</code> directory and then
         place your Context definition in it in a file named
         <code>context.xml</code>. i.e.
-        <code>$CATALINA_HOME/webapps-ren/ROOT/META-INF/context.xml</code>
+        <code>$CATALINA_HOME/renapps/ROOT/META-INF/context.xml</code>
         This makes deployment easier, particularly if you're distributing a WAR
         file.
       </p>
