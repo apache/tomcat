@@ -121,7 +121,7 @@
         </p>
         <p>        
             Context Descriptors not only help Tomcat to know how to configure 
-            Contexts but other tools such as the Tomcat Manager and TDC often use 
+            Contexts but other tools such as the Tomcat Manager and TCD often use 
             these Context Descriptors to perform their roles properly.
         </p>
         <p>
