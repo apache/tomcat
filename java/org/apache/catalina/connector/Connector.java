@@ -924,7 +924,7 @@ public class Connector
 
     /**
      * Enables or disables the generation of an X-Powered-By header (with value
-     * Servlet/2.4) for all servlet-generated responses returned by this
+     * Servlet/2.5) for all servlet-generated responses returned by this
      * Connector.
      *
      * @param xpoweredBy true if generation of X-Powered-By response header is
