@@ -27,6 +27,7 @@
     <author email="yoavs@apache.org">Yoav Shapira</author>
     <author email="fhanik@apache.org">Filip Hanik</author>
     <author email="rjung@apache.org">Rainer Jung</author>
+    <author email="pero@apache.org">Peter Rossbach</author>
     <title>Changelog</title>
   </properties>
 
@@ -74,7 +75,10 @@
       <add>
         Support logging of current thread name at AccessLogValve (ex. add %I to your pattern).
         Usefull to compare access logging entry later with a stacktraces. (pero)
-      </add>     
+      </add>
+      <fix>
+        Improve large-file support (more then 4 Gb) at all AccessLogValves, backport from 5.5.25. (pero)
+      </fix>     
     </changelog>
   </subsection>
   <subsection name="Coyote">
