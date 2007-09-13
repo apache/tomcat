@@ -71,6 +71,10 @@
       <add>
         Support logging of all response header values at ExtendedAccessLogValve (ex. add x-O(Set-Cookie) to your pattern). (pero)
       </add>     
+      <add>
+        Support logging of current thread name at AccessLogValve (ex. add %I to your pattern).
+        Usefull to compare access logging entry later with a stacktraces. (pero)
+      </add>     
     </changelog>
   </subsection>
   <subsection name="Coyote">
