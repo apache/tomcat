@@ -43,6 +43,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
+import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -79,6 +80,7 @@ import org.apache.juli.logging.LogFactory;
  * <li><b>%v</b> - Local server name
  * <li><b>%D</b> - Time taken to process the request, in millis
  * <li><b>%T</b> - Time taken to process the request, in seconds
+ * <li><b>%I</b> - current Request thread name (can compare later with stacktraces)
  * </ul>
  * <p>In addition, the caller can specify one of the following aliases for
  * commonly utilized patterns:</p>
@@ -893,6 +895,7 @@ public class AccessLogValve
                     .getString("accessLogValve.notStarted"));
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
+        
         close();
     }
     
@@ -903,6 +906,21 @@ public class AccessLogValve
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time);
 
+    }
+    
+    /**
+     * write thread name - %I
+     */
+    protected class ThreadNameElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            RequestInfo info = request.getCoyoteRequest().getRequestProcessor();
+            if(info != null) {
+                buf.append(info.getWorkerThreadName());
+            } else {
+                buf.append("-");
+            }
+        }
     }
     
     /**
@@ -1455,6 +1473,8 @@ public class AccessLogValve
             return new RequestURIElement();
         case 'v':
             return new LocalServerNameElement();
+        case 'I':
+            return new ThreadNameElement();
         default:
             return new StringElement("???" + pattern + "???");
         }
