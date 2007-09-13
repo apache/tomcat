@@ -187,6 +187,7 @@
     It is modeled after the apache syntax:
     <ul>
     <li><b><code>%{xxx}i</code></b> for incoming headers</li>
+    <li><b><code>%{xxx}o</code></b> for outgoing response headers</li>
     <li><b><code>%{xxx}c</code></b> for a specific cookie</li>
     <li><b><code>%{xxx}r</code></b> xxx is an attribute in the ServletRequest</li>
     <li><b><code>%{xxx}s</code></b> xxx is an attribute in the HttpSession</li>
