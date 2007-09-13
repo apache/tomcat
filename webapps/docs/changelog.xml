@@ -65,6 +65,12 @@
       <add>
         Made session createTime accessible for all SessionManager via JMX (pero)
       </add>
+      <update>
+        <bug>43129</bug>: Support logging of all response header values at AccessLogValve (ex. add %{Set-Cookie}o to your pattern). (pero)
+      </update>
+      <add>
+        Support logging of all response header values at ExtendedAccessLogValve (ex. add x-O(Set-Cookie) to your pattern). (pero)
+      </add>     
     </changelog>
   </subsection>
   <subsection name="Coyote">
