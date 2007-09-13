@@ -158,10 +158,13 @@
         <p>The <em>Document Base</em> (also known as the <em>Context
         Root</em>) directory for this web application, or the pathname
         to the web application archive file (if this web application is
-        being executed directly from the WAR file).    You may specify
+        being executed directly from the WAR file). You may specify
         an absolute pathname for this directory or WAR file, or a pathname
         that is relative to the <code>appBase</code> directory of the
         owning <a href="host.html">Host</a>.</p>
+        <p>The value of this field must not be set when the Context is
+        configured using a <code>META-INF/context.xml</code> file as it will be
+        inferred by the automatic deployment process.</p>
       </attribute>
 
       <attribute name="override" required="false">
@@ -188,10 +191,10 @@
         within a particular <a href="host.html">Host</a> must be unique.
         If you specify a context path of an empty string (""), you are
         defining the <em>default</em> web application for this Host, which
-        will process all requests not assigned to other Contexts. The value of
-        this field must not be set except when statically defining a Context in
-        server.xml, as it will be inferred from the filenames used for either the 
-        .xml context file or the docBase.</p>
+        will process all requests not assigned to other Contexts.</p>
+        <p>The value of this field must not be set except when statically
+        defining a Context in server.xml, as it will be inferred from the
+        filenames used for either the .xml context file or the docBase.</p>
       </attribute>
 
       <attribute name="reloadable" required="false">
