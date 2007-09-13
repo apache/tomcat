@@ -1099,7 +1099,7 @@ public class AccessLogValve
 
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            int length = response.getContentCount();
+            long length = response.getContentCountLong() ;
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {
