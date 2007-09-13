@@ -79,6 +79,9 @@
       <fix>
         Improve large-file support (more then 4 Gb) at all AccessLogValves, backport from 5.5.25. (pero)
       </fix>     
+      <update>
+        Optimized JDBCAccessLogValve combined pattern request attribute access. (pero)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

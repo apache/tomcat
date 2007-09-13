@@ -458,15 +458,16 @@ public final class JDBCAccessLogValve
      */    
     public void invoke(Request request, Response response) 
         throws IOException, ServletException {
-
+        final String EMPTY = "" ;
+        
         getNext().invoke(request, response);
 
-        String remoteHost = "";
+        String remoteHost = EMPTY;
         if(resolveHosts)
             remoteHost = request.getRemoteHost();
         else
             remoteHost = request.getRemoteAddr();
-        String user = "";
+        String user = EMPTY;
         if(request != null)
             user = request.getRemoteUser();
         String query="";
@@ -477,19 +478,15 @@ public final class JDBCAccessLogValve
         if(bytes < 0)
             bytes = 0;
         int status = response.getStatus();
-        if (pattern.equals("combined")) {
-                String virtualHost = "";
-                if(request != null)
-                    virtualHost = request.getServerName();
-                String method = "";
-                if(request != null)
-                    method = request.getMethod();
-                String referer = "";
-                if(request != null)
-                    referer = request.getHeader("referer");
-                String userAgent = "";
-                if(request != null)
-                    userAgent = request.getHeader("user-agent");
+        String virtualHost = EMPTY;
+        String method = EMPTY;
+        String referer = EMPTY;
+        String userAgent = EMPTY;
+        if (pattern.equals("combined") && request != null) {
+            virtualHost = request.getServerName();
+            method = request.getMethod();
+            referer = request.getHeader("referer");
+            userAgent = request.getHeader("user-agent");
         }
         synchronized (this) {
           int numberOfTries = 2;
@@ -511,19 +508,6 @@ public final class JDBCAccessLogValve
                     ps.setInt(6, (int) bytes);
                 }               
                 if (pattern.equals("combined")) {
-     
-                      String virtualHost = "";
-                      if(request != null)
-                         virtualHost = request.getServerName();
-                      String method = "";
-                      if(request != null)
-                         method = request.getMethod();
-                      String referer = "";
-                      if(request != null)
-                         referer = request.getHeader("referer");
-                      String userAgent = "";
-                      if(request != null)
-                         userAgent = request.getHeader("user-agent");
                       ps.setString(7, virtualHost);
                       ps.setString(8, method);
                       ps.setString(9, referer);
