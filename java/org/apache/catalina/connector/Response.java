@@ -305,7 +305,13 @@ public class Response
     public int getContentCount() {
         return outputBuffer.getContentWritten();
     }
-
+    
+    /**
+     * Return the number of bytes actually written to the output stream.
+     */
+    public long getContentCountLong() {
+        return outputBuffer.getContentWrittenLong();
+    }
 
     /**
      * Set the application commit flag.
