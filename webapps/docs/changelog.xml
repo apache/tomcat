@@ -82,6 +82,9 @@
       <update>
         Optimized JDBCAccessLogValve combined pattern request attribute access. (pero)
       </update>
+      <fix>
+        o.a.juli.ClassLoaderLogManager handle more then one system property replacement at file logging.properties. (pero)
+      </fix>     
     </changelog>
   </subsection>
   <subsection name="Coyote">
