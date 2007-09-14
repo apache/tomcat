@@ -527,20 +527,50 @@ public class NioEndpoint {
     }
 
 
+    public String adjustRelativePath(String path, String relativeTo) {
+        File f = new File(path);
+        if ( !f.isAbsolute()) {
+            path = relativeTo + File.separator + path;
+            f = new File(path);
+        }
+        if (!f.exists()) {
+            log.warn("configured file:["+path+"] does not exist.");
+        }
+        return path;
+    }
+    
+    public String defaultIfNull(String val, String defaultValue) {
+        if (val==null) return defaultValue;
+        else return val;
+    }
     // --------------------  SSL related properties --------------------
+    protected String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    public void setTruststoreFile(String s) {
+        s = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.truststoreFile = s;
+    }
+    public String getTruststoreFile() {return truststoreFile;}
+    protected String truststorePass = System.getProperty("javax.net.ssl.trustStorePassword");
+    public void setTruststorePass(String truststorePass) {this.truststorePass = truststorePass;}
+    public String getTruststorePass() {return truststorePass;}
+    protected String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+    public void setTruststoreType(String truststoreType) {this.truststoreType = truststoreType;}
+    public String getTruststoreType() {return truststoreType;}
+    
     protected String keystoreFile = System.getProperty("user.home")+"/.keystore";
     public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) { this.keystoreFile = s; }
-    public void setKeystore(String s ) { setKeystoreFile(s);}
-    public String getKeystore() { return getKeystoreFile();}
+    public void setKeystoreFile(String s ) { 
+        s = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.keystoreFile = s; 
+    }
     
     protected String algorithm = "SunX509";
     public String getAlgorithm() { return algorithm;}
     public void setAlgorithm(String s ) { this.algorithm = s;}
 
-    protected boolean clientAuth = false;
-    public boolean getClientAuth() { return clientAuth;}
-    public void setClientAuth(boolean b ) { this.clientAuth = b;}
+    protected String clientAuth = "false";
+    public String getClientAuth() { return clientAuth;}
+    public void setClientAuth(String s ) { this.clientAuth = s;}
     
     protected String keystorePass = "changeit";
     public String getKeystorePass() { return keystorePass;}
@@ -738,11 +768,21 @@ public class NioEndpoint {
 
             KeyStore ks = KeyStore.getInstance(getKeystoreType());
             ks.load(new FileInputStream(getKeystoreFile()), passphrase);
-            KeyStore ts = KeyStore.getInstance(getKeystoreType());
-            ts.load(new FileInputStream(getKeystoreFile()), passphrase);
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(getAlgorithm());
             kmf.init(ks, passphrase);
+
+            char[] tpassphrase = (getTruststorePass()!=null)?getTruststorePass().toCharArray():passphrase;
+            String ttype = (getTruststoreType()!=null)?getTruststoreType():getKeystoreType();
+
+            KeyStore ts = null;
+            if (getTruststoreFile()==null) {
+                ts = KeyStore.getInstance(getKeystoreType());
+                ts.load(new FileInputStream(getKeystoreFile()), passphrase);
+            }else {
+                ts = KeyStore.getInstance(ttype);
+                ts.load(new FileInputStream(getTruststoreFile()), tpassphrase);
+            }
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(getAlgorithm());
             tmf.init(ts);
@@ -995,7 +1035,14 @@ public class NioEndpoint {
 
     protected SSLEngine createSSLEngine() {
         SSLEngine engine = sslContext.createSSLEngine();
-        engine.setNeedClientAuth(getClientAuth());
+        if ("false".equals(getClientAuth())) {
+            engine.setNeedClientAuth(false);
+            engine.setWantClientAuth(false);
+        } else if ("true".equals(getClientAuth()) || "yes".equals(getClientAuth())){
+            engine.setNeedClientAuth(true);
+        } else if ("want".equals(getClientAuth())) {
+            engine.setWantClientAuth(true);
+        }        
         engine.setUseClientMode(false);
         if ( ciphersarr.length > 0 ) engine.setEnabledCipherSuites(ciphersarr);
         if ( sslEnabledProtocolsarr.length > 0 ) engine.setEnabledProtocols(sslEnabledProtocolsarr);
