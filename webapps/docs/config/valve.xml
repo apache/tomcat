@@ -399,7 +399,10 @@
         rechecking with the <strong>Realm</strong>.</p>
       </attribute>
  
-
+      <attribute name="cookieDomain" required="false">
+        <p>Sets the host domain to be used for sso cookies.</p>
+      </attribute>
+      
     </attributes>
 
   </subsection>
