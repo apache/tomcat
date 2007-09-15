@@ -84,7 +84,11 @@
       </update>
       <fix>
         o.a.juli.ClassLoaderLogManager handle more then one system property replacement at file logging.properties. (pero)
-      </fix>     
+      </fix>
+      <fix>
+        <bug>43338</bug>: Support '*' servlet-name mapping at filter-mapping.
+        Patch provided by Keiichi Fujino. (pero)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
