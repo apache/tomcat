@@ -2156,7 +2156,13 @@ public class StandardContext
         if (findFilterDef(filterName) == null)
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.name", filterName));
-        if ((servletNames.length == 0) && (urlPatterns.length == 0))
+//      <= Servlet API 2.4
+//      if ((servletNames.length == 0) && (urlPatterns.length == 0))
+//      Servlet API 2.5 (FIX 43338)
+//      SRV 6.2.5 says supporting for '*' as the servlet-name in filter-mapping.
+        if (!filterMap.getMatchAllServletNames() && 
+            !filterMap.getMatchAllUrlPatterns() && 
+            (servletNames.length == 0) && (urlPatterns.length == 0))
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
         // FIXME: Older spec revisions may still check this
