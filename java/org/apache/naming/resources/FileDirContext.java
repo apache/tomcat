@@ -108,17 +108,6 @@ public class FileDirContext extends BaseDirContext {
     protected boolean allowLinking = false;
 
 
-    /**
-     * Aliases
-     */
-    protected String aliases;
-
-
-    /**
-     * Aliases in decoded form.
-     */
-    protected Alias[] pathAliases;
-
     // ------------------------------------------------------------- Properties
 
 
@@ -134,22 +123,22 @@ public class FileDirContext extends BaseDirContext {
      */
     public void setDocBase(String docBase) {
 
-        // Validate the format of the proposed document root
-        if (docBase == null)
-            throw new IllegalArgumentException
-            (sm.getString("resources.null"));
+    // Validate the format of the proposed document root
+    if (docBase == null)
+        throw new IllegalArgumentException
+        (sm.getString("resources.null"));
 
-        // Calculate a File object referencing this document base directory
-        base = new File(docBase);
+    // Calculate a File object referencing this document base directory
+    base = new File(docBase);
         try {
             base = base.getCanonicalFile();
         } catch (IOException e) {
             // Ignore
         }
 
-        // Validate that the document base is an existing directory
-        if (!base.exists() || !base.isDirectory() || !base.canRead())
-            throw new IllegalArgumentException
+    // Validate that the document base is an existing directory
+    if (!base.exists() || !base.isDirectory() || !base.canRead())
+        throw new IllegalArgumentException
         (sm.getString("fileResources.base", docBase));
         this.absoluteBase = base.getAbsolutePath();
         super.setDocBase(docBase);
@@ -188,67 +177,16 @@ public class FileDirContext extends BaseDirContext {
         return allowLinking;
     }
 
-    /**
-     * Get the alias string in use.
-     */
-    public String getAliases(String aliases) {
-        return aliases;
-    }
-
-
-    /**
-     * Set files system aliases. Aliases are of the form
-     * <pre>prefix=path,prefix2=path2</pre>
-     * For example: 
-     * <pre>
-     *   /images/=/tmp/images/,
-     *   /pdf/=/usr/local/data/pdfs/
-     * </pre>
-     */
-    public void setAliases(String aliases) {
-        this.aliases = aliases;
-
-        pathAliases = null;
-        if (this.aliases!=null) {
-            this.aliases = this.aliases.trim();
-        }
-        if (this.aliases==null||this.aliases.length()==0) {
-            this.aliases=null;
-            return;
-        }
-
-        String[] split1 = this.aliases.split(",");
-        ArrayList aliasList = new ArrayList();
-        for (int i=0; split1!=null && i<split1.length; i++) {
-            String[] kvp = split1[i].split("=");
-            if (kvp!=null&&kvp.length==2) {
-                kvp[0] = kvp[0].trim();
-                kvp[1] = kvp[1].trim();
-
-                if (kvp[0].length()>0 && kvp[1].length()>0) {
-                    Alias alias = new Alias();
-                    alias.prefix=kvp[0];
-                    alias.basePath= new File(kvp[1]);
-                    alias.absPath=alias.basePath.getAbsolutePath();
-                    aliasList.add(alias);
-                }
-            }
-        }
-
-        if (aliasList.size()>0) {
-            pathAliases = new Alias[aliasList.size()];
-            for (int i=0; i<aliasList.size(); i++) {
-                pathAliases[i] = (Alias)aliasList.get(i);
-            }
-        } else {
-            this.aliases=null;
-        }
-    }
-
 
     // --------------------------------------------------------- Public Methods
 
 
+    /**
+     * Release any resources allocated for this directory context.
+     */
+    public void release() {
+        super.release();
+    }
 
 
     // -------------------------------------------------------- Context Methods
@@ -335,20 +273,7 @@ public class FileDirContext extends BaseDirContext {
             throw new NamingException
                 (sm.getString("resources.notFound", oldName));
 
-        File baseDir = base;
-        String absoluteBaseDir = absoluteBase;
-
-        if (pathAliases!=null) {
-            for (int i=0; i<pathAliases.length; i++) {
-                if (newName.startsWith(pathAliases[i].prefix)) {
-                    baseDir = pathAliases[i].basePath;
-                    newName = newName.substring(pathAliases[i].prefix.length());
-                    break;
-                }
-            }
-        }
-
-        File newFile = new File(baseDir, newName);
+        File newFile = new File(base, newName);
 
         file.renameTo(newFile);
 
@@ -570,19 +495,8 @@ public class FileDirContext extends BaseDirContext {
         throws NamingException {
 
         // Note: No custom attributes allowed
-        File baseDir = base;
 
-        if (pathAliases!=null) {
-            for (int i=0; i<pathAliases.length; i++) {
-                if (name.startsWith(pathAliases[i].prefix)) {
-                    baseDir = pathAliases[i].basePath;
-                    name = name.substring(pathAliases[i].prefix.length());
-                    break;
-                }
-            }
-        }
-
-        File file = new File(baseDir, name);
+        File file = new File(base, name);
         if (file.exists())
             throw new NameAlreadyBoundException
                 (sm.getString("resources.alreadyBound", name));
@@ -616,19 +530,7 @@ public class FileDirContext extends BaseDirContext {
         // Note: No custom attributes allowed
         // Check obj type
 
-        File baseDir = base;
-
-        if (pathAliases!=null) {
-            for (int i=0; i<pathAliases.length; i++) {
-                if (name.startsWith(pathAliases[i].prefix)) {
-                    baseDir = pathAliases[i].basePath;
-                    name = name.substring(pathAliases[i].prefix.length());
-                    break;
-                }
-            }
-        }
-
-        File file = new File(baseDir, name);
+        File file = new File(base, name);
 
         InputStream is = null;
         if (obj instanceof Resource) {
@@ -699,19 +601,7 @@ public class FileDirContext extends BaseDirContext {
     public DirContext createSubcontext(String name, Attributes attrs)
         throws NamingException {
 
-        File baseDir = base;
-
-        if (pathAliases!=null) {
-            for (int i=0; i<pathAliases.length; i++) {
-                if (name.startsWith(pathAliases[i].prefix)) {
-                    baseDir = pathAliases[i].basePath;
-                    name = name.substring(pathAliases[i].prefix.length());
-                    break;
-                }
-            }
-        }
-
-        File file = new File(baseDir, name);
+        File file = new File(base, name);
         if (file.exists())
             throw new NameAlreadyBoundException
                 (sm.getString("resources.alreadyBound", name));
@@ -875,46 +765,46 @@ public class FileDirContext extends BaseDirContext {
      */
     protected String normalize(String path) {
 
-        String normalized = path;
+    String normalized = path;
 
-        // Normalize the slashes and add leading slash if necessary
-        if (File.separatorChar == '\\' && normalized.indexOf('\\') >= 0)
-            normalized = normalized.replace('\\', '/');
-        if (!normalized.startsWith("/"))
-            normalized = "/" + normalized;
+    // Normalize the slashes and add leading slash if necessary
+    if (File.separatorChar == '\\' && normalized.indexOf('\\') >= 0)
+        normalized = normalized.replace('\\', '/');
+    if (!normalized.startsWith("/"))
+        normalized = "/" + normalized;
 
-        // Resolve occurrences of "//" in the normalized path
-        while (true) {
-            int index = normalized.indexOf("//");
-            if (index < 0)
-            break;
-            normalized = normalized.substring(0, index) +
-            normalized.substring(index + 1);
-        }
+    // Resolve occurrences of "//" in the normalized path
+    while (true) {
+        int index = normalized.indexOf("//");
+        if (index < 0)
+        break;
+        normalized = normalized.substring(0, index) +
+        normalized.substring(index + 1);
+    }
 
-        // Resolve occurrences of "/./" in the normalized path
-        while (true) {
-            int index = normalized.indexOf("/./");
-            if (index < 0)
-            break;
-            normalized = normalized.substring(0, index) +
-            normalized.substring(index + 2);
-        }
+    // Resolve occurrences of "/./" in the normalized path
+    while (true) {
+        int index = normalized.indexOf("/./");
+        if (index < 0)
+        break;
+        normalized = normalized.substring(0, index) +
+        normalized.substring(index + 2);
+    }
 
-        // Resolve occurrences of "/../" in the normalized path
-        while (true) {
-            int index = normalized.indexOf("/../");
-            if (index < 0)
-            break;
-            if (index == 0)
-            return (null);  // Trying to go outside our context
-            int index2 = normalized.lastIndexOf('/', index - 1);
-            normalized = normalized.substring(0, index2) +
-            normalized.substring(index + 3);
-        }
+    // Resolve occurrences of "/../" in the normalized path
+    while (true) {
+        int index = normalized.indexOf("/../");
+        if (index < 0)
+        break;
+        if (index == 0)
+        return (null);  // Trying to go outside our context
+        int index2 = normalized.lastIndexOf('/', index - 1);
+        normalized = normalized.substring(0, index2) +
+        normalized.substring(index + 3);
+    }
 
-        // Return the normalized path that we have completed
-        return (normalized);
+    // Return the normalized path that we have completed
+    return (normalized);
 
     }
 
@@ -928,27 +818,12 @@ public class FileDirContext extends BaseDirContext {
      */
     protected File file(String name) {
 
-        File baseDir = base;
-        String absoluteBaseDir = absoluteBase;
-
-        if (pathAliases!=null) {
-            for (int i=0; i<pathAliases.length; i++) {
-                if (name.startsWith(pathAliases[i].prefix)) {
-                    baseDir = pathAliases[i].basePath;
-                    absoluteBaseDir = pathAliases[i].absPath;
-                    name = name.substring(pathAliases[i].prefix.length());
-                    break;
-                }
-            }
-        }
-
-        File file = new File(baseDir, name);
-
+        File file = new File(base, name);
         if (file.exists() && file.canRead()) {
 
-            if (allowLinking)
-                return file;
-
+        	if (allowLinking)
+        		return file;
+        	
             // Check that this file belongs to our root path
             String canPath = null;
             try {
@@ -959,7 +834,7 @@ public class FileDirContext extends BaseDirContext {
                 return null;
 
             // Check to see if going outside of the web application root
-            if (!canPath.startsWith(absoluteBaseDir)) {
+            if (!canPath.startsWith(absoluteBase)) {
                 return null;
             }
 
@@ -971,14 +846,14 @@ public class FileDirContext extends BaseDirContext {
                 String absPath = normalize(fileAbsPath);
                 if (canPath != null)
                     canPath = normalize(canPath);
-                if ((absoluteBaseDir.length() < absPath.length())
-                    && (absoluteBaseDir.length() < canPath.length())) {
-                    absPath = absPath.substring(absoluteBaseDir.length() + 1);
+                if ((absoluteBase.length() < absPath.length())
+                    && (absoluteBase.length() < canPath.length())) {
+                    absPath = absPath.substring(absoluteBase.length() + 1);
                     if ((canPath == null) || (absPath == null))
                         return null;
                     if (absPath.equals(""))
                         absPath = "/";
-                    canPath = canPath.substring(absoluteBaseDir.length() + 1);
+                    canPath = canPath.substring(absoluteBase.length() + 1);
                     if (canPath.equals(""))
                         canPath = "/";
                     if (!canPath.equals(absPath))
@@ -1230,10 +1105,10 @@ public class FileDirContext extends BaseDirContext {
             return super.getResourceType();
         }
 
-
+        
         /**
          * Get canonical path.
-         *
+         * 
          * @return String the file's canonical path
          */
         public String getCanonicalPath() {
@@ -1246,15 +1121,10 @@ public class FileDirContext extends BaseDirContext {
             }
             return canonicalPath;
         }
-
+        
 
     }
 
-    protected class Alias {
-        String prefix;
-        File basePath;
-        String absPath;
-    }
 
 }
 

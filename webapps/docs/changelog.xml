@@ -97,9 +97,6 @@
         In the APR connector, start accepting connections after fully starting
         the connector, to prevent possible exceptions due to non initialized fields. (remm)
       </fix>
-      <add>
-         Allow for aliases in FileDirContext. (funkman)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
