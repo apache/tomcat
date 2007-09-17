@@ -36,6 +36,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>43356</bug>: Keystore parameter is relative to CATALINA_BASE,
+        Truststore is either defined as parameter, javax.net.ssl.trustStore or if empty
+        defaults to the keystore.
+        SSL Client cert authentication changed from boolean to &quot;true|false|want&quot; (fhanik)
+      </fix>
+      <fix>
         <bug>30949</bug>: Improve previous fix. Ensure requests are re-cycled
         on cross-context includes and forwards when an exception occurs in the
         target page. (markt)
