@@ -239,6 +239,21 @@ AC_DEFUN(
     then
       AC_MSG_RESULT([Using sableVM: $SABLEVM])
       CFLAGS="$CFLAGS -DHAVE_SABLEVM"
+      NEED_JNI_MD=no
+    fi
+  fi
+  ])
+dnl check for IBM J9VM
+AC_DEFUN(
+  [TCN_J9VM],
+  [
+  if test x"$JAVA_HOME" != x
+  then
+    J9VM=`$JAVA_HOME/bin/java -version 2>&1 | grep J9VM`
+    if test x"$J9VM" != x
+    then
+      AC_MSG_RESULT([Using J9VM: $J9VM])
+      NEED_JNI_MD=no
     fi
   fi
   ])

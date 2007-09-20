@@ -106,8 +106,10 @@ AC_PROG_INSTALL
 dnl
 dnl  Find the JVM related information
 dnl
+NEED_JNI_MD=yes
 TCN_FIND_JDK
 TCN_SABLEVM
+TCN_J9VM
 
 dnl MAC OS X does not used include but Headers
 if test -d ${JAVA_HOME}/Headers; then
@@ -118,7 +120,7 @@ fi
 APR_ADDTO(TCNATIVE_PRIV_INCLUDES,[-I$JAVA_HOME/$JAVA_INC])
 
 dnl sableVM does not have/need $JAVA_OS/jni_md.h
-if test "$SABLEVM" = "NONE"; then
+if test "$NEED_JNI_MD" = "yes"; then
   TCN_FIND_JDK_OS
   if test -z "${JAVA_OS}"; then
     AC_MSG_RESULT([jni_md.h found in $JAVA_HOME/$JAVA_INC])
