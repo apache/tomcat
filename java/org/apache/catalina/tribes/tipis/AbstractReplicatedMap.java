@@ -713,6 +713,10 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         boolean removed = false;
         synchronized (mapMembers) {
             removed = (mapMembers.remove(member) != null );
+            if (!removed) {
+                if (log.isDebugEnabled()) log.debug("Member["+member+"] disappeared, but was not present in the map.");
+                return; //the member was not part of our map.
+            }
         }
         
         Iterator i = super.entrySet().iterator();

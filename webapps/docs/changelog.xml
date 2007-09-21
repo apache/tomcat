@@ -36,6 +36,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>43435</bug>: Don't iterate and relocate sessions if they are not part of the map.
+      </fix>
+      <fix>
         <bug>43356</bug>: Keystore parameter is relative to CATALINA_BASE,
         Truststore is either defined as parameter, javax.net.ssl.trustStore or if empty
         defaults to the keystore.
