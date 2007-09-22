@@ -98,6 +98,10 @@
         <bug>43338</bug>: Support '*' servlet-name mapping at filter-mapping.
         Patch provided by Keiichi Fujino. (pero)
       </fix>
+      <fix>
+        <bug>41797</bug>: CNFE/NPE thrown from function mapper when externalizing
+        Patch by Tuomas Kiviaho- tuomas.kiviahos at ikis fi
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
