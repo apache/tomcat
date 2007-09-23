@@ -100,7 +100,12 @@
       </fix>
       <fix>
         <bug>41797</bug>: CNFE/NPE thrown from function mapper when externalizing
-        Patch by Tuomas Kiviaho- tuomas.kiviahos at ikis fi
+        Patch by Tuomas Kiviaho- tuomas.kiviahos at ikis fi (funkman)
+      </fix>
+      <fix>
+        <bug>43453</bug>: ClassCastException at 
+        org.apache.catalina.core.StandardContext.findStatusPage(int)
+         (funkman)
       </fix>
     </changelog>
   </subsection>
