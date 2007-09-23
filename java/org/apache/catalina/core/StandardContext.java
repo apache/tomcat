@@ -2938,7 +2938,11 @@ public class StandardContext
      */
     public String findStatusPage(int status) {
 
-        return ((String) statusPages.get(new Integer(status)));
+        ErrorPage errorPage = (ErrorPage)statusPages.get(new Integer(status));
+        if (errorPage!=null) {
+            return errorPage.getLocation();
+        }
+        return null;
 
     }
 
