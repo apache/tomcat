@@ -26,6 +26,7 @@ PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
 * New cookie parser (third party contribution)
+  http://people.apache.org/~jfclere/patches/Cookies.java.patch
   +1: 
-  -1: 
+  -1: jfclere: The tests must done another way.
 
