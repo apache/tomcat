@@ -30,3 +30,8 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~jfclere/patches/CookiesTest.patch
   +1: jfclere
   -1: 
+
+* Fix request processing time on the Coyote statistics info
+  http://issues.apache.org/bugzilla/show_bug.cgi?id=43487
+  +1: fhanik
+  -1: 
