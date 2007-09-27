@@ -33,5 +33,5 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Fix request processing time on the Coyote statistics info
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43487
-  +1: fhanik, pero
+  +1: fhanik, pero, rjung
   -1: 
