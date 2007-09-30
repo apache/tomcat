@@ -25,12 +25,6 @@ $Revision: $ $Date: $
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* New cookie parser (third party contribution)
-  http://people.apache.org/~jfclere/patches/Cookies.java.remy.patch
-  http://people.apache.org/~jfclere/patches/CookiesTest.patch
-  +1: jfclere, fhanik, pero
-  -1: 
-
 * Fix request processing time on the Coyote statistics info
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43487
   +1: fhanik, pero, rjung
