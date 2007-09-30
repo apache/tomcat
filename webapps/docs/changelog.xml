@@ -115,6 +115,9 @@
         In the APR connector, start accepting connections after fully starting
         the connector, to prevent possible exceptions due to non initialized fields. (remm)
       </fix>
+      <update>
+        Cookie parser refactoring, submitted by John Kew. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">
