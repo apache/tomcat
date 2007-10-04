@@ -25,7 +25,3 @@ $Revision: $ $Date: $
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Fix request processing time on the Coyote statistics info
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43487
-  +1: fhanik, pero, rjung
-  -1: 

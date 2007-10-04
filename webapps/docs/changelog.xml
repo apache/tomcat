@@ -35,6 +35,9 @@
 <section name="Tomcat 6.0.15 (remm)">
   <subsection name="Catalina">
     <changelog>
+      <fix><bug>43487</bug>
+        Fix request processing stats
+      </fix>  
       <fix>
         <bug>43435</bug>: Don't iterate and relocate sessions if they are not part of the map.
       </fix>
