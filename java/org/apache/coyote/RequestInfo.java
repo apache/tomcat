@@ -112,7 +112,8 @@ public class RequestInfo  {
     }
 
     public long getRequestProcessingTime() {
-        return (System.currentTimeMillis() - req.getStartTime());
+        if ( getStage() == org.apache.coyote.Constants.STAGE_ENDED ) return 0;
+        else return (System.currentTimeMillis() - req.getStartTime());
     }
 
     // -------------------- Statistical data  --------------------
@@ -130,6 +131,9 @@ public class RequestInfo  {
     private int requestCount;
     // number of response codes >= 400
     private int errorCount;
+    
+    //the time of the last request
+    private long lastRequestProcessingTime = 0;
 
 
     /** Called by the processor before recycling the request. It'll collect
@@ -145,6 +149,7 @@ public class RequestInfo  {
         long t0=req.getStartTime();
         long t1=System.currentTimeMillis();
         long time=t1-t0;
+        this.lastRequestProcessingTime = time;
         processingTime+=time;
         if( maxTime < time ) {
             maxTime=time;
@@ -224,11 +229,19 @@ public class RequestInfo  {
         return rpName;
     }
 
+    public long getLastRequestProcessingTime() {
+        return lastRequestProcessingTime;
+    }
+
     public void setWorkerThreadName(String workerThreadName) {
         this.workerThreadName = workerThreadName;
     }
 
     public void setRpName(ObjectName rpName) {
         this.rpName = rpName;
+    }
+
+    public void setLastRequestProcessingTime(long lastRequestProcessingTime) {
+        this.lastRequestProcessingTime = lastRequestProcessingTime;
     }
 }
