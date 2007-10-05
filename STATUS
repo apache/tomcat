@@ -25,3 +25,9 @@ $Revision: $ $Date: $
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
+* Fix explicit flush before response commit in the org.apache.jk AJP connector.
+  http://svn.apache.org/viewvc?view=rev&revision=580815
+  
+  +1: remm
+  -1:
+
