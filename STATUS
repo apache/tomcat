@@ -32,10 +32,10 @@ PATCHES PROPOSED TO BACKPORT:
 
 * 43479: Memory leak cleaning up sendfile connections (submitted by the bug reporter)
   http://issues.apache.org/bugzilla/attachment.cgi?id=20883
-  +1: remm
+  +1: remm, pero
   -1: 
 
 * 42925: No timeout for sendfile
   http://issues.apache.org/bugzilla/attachment.cgi?id=20930
-  +1: remm
+  +1: remm, pero
   -1: 
