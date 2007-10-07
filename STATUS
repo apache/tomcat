@@ -44,4 +44,7 @@ PATCHES PROPOSED TO BACKPORT:
   update to jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/R-3.3.1-200709211145/eclipse-JDT-3.3.1.zip
   +1: pero
   -1: 
-  
+
+* Call StopAwait at StandardServer.stop as port==-1
+  +1: pero
+  -1: 
