@@ -27,22 +27,22 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Fix explicit flush before response commit in the org.apache.jk AJP connector.
   http://svn.apache.org/viewvc?view=rev&revision=580815
-  +1: remm, pero
+  +1: remm, pero, funkman
   -1: 
 
 * 43479: Memory leak cleaning up sendfile connections (submitted by the bug reporter)
   http://issues.apache.org/bugzilla/attachment.cgi?id=20883
-  +1: remm, pero
+  +1: remm, pero, funkman
   -1: 
 
 * 42925: No timeout for sendfile
   http://issues.apache.org/bugzilla/attachment.cgi?id=20930
-  +1: remm, pero
+  +1: remm, pero, funkman
   -1: 
 
 * Use newer eclipse jdt - old location is gone (reported by Jason Britian via email)
   update to jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/R-3.3.1-200709211145/eclipse-JDT-3.3.1.zip
-  +1: pero
+  +1: pero, funkman
   -1: 
 
 * Call StopAwait at StandardServer.stop as port==-1
