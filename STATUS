@@ -48,3 +48,8 @@ PATCHES PROPOSED TO BACKPORT:
 * Call StopAwait at StandardServer.stop as port==-1
   +1: pero
   -1: 
+
+* Arrange doc of connectors.
+  http://people.apache.org/~jfclere/patches/tc.docs.patch
+  +1: jfclere
+  -1:
