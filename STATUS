@@ -61,8 +61,8 @@ Index: java/org/apache/catalina/core/StandardServer.java
  
      public void init() throws Exception {
 
-  +1: pero, remm
-  -1: No link to proposed fix given.
+  +1: pero, remm, fhanik
+  -1: 
   
 * Arrange doc of connectors.
   http://people.apache.org/~jfclere/patches/tc.docs.patch
