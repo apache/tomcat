@@ -121,6 +121,12 @@
       <update>
         Cookie parser refactoring, submitted by John Kew. (remm)
       </update>
+      <fix>
+        <bug>43479</bug>: Memory leak cleaning up sendfile connections, submitted by Chris Elving. (remm)
+      </fix>
+      <fix>
+        <bug>42925</bug>: Add maintain for sendfile. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
