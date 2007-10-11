@@ -50,4 +50,4 @@ PATCHES PROPOSED TO BACKPORT:
 * to accept or reject the property
   http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
   +1: fhanik
-  -1: 
+  -1: remm (removes support for the production APR connectors, no real benefit of the patch)
