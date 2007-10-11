@@ -51,3 +51,8 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
   +1: fhanik
   -1: remm (removes support for the production APR connectors, no real benefit of the patch)
+
+* Add missing mbean descriptor
+  http://people.apache.org/~fhanik/patches/loader-mbean.patch
+  +1: fhanik
+  -1:
