@@ -37,7 +37,6 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Call StopAwait at StandardServer.stop as port==-1
   +1: pero
-  -1: remm (would like clarification on the sleep value, currently 100s)
   -1: No link to proposed fix given.
   
 * Arrange doc of connectors.
@@ -50,7 +49,7 @@ PATCHES PROPOSED TO BACKPORT:
 * to accept or reject the property
   http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
   +1: fhanik
-  -1: remm (removes support for the production APR connectors, no real benefit of the patch)
+  -1: 
 
 * Add missing mbean descriptor
   http://people.apache.org/~fhanik/patches/loader-mbean.patch
