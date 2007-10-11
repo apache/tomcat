@@ -38,8 +38,16 @@ PATCHES PROPOSED TO BACKPORT:
 * Call StopAwait at StandardServer.stop as port==-1
   +1: pero
   -1: remm (would like clarification on the sleep value, currently 100s)
-
+  -1: No link to proposed fix given.
+  
 * Arrange doc of connectors.
   http://people.apache.org/~jfclere/patches/tc.docs.patch
   +1: jfclere, remm
   -1:
+
+* Make server.xml parsing warnings more generic, add support for the NIO connector
+* Connector is no longer an exception case. Any new component can still use setProperty and return a boolean 
+* to accept or reject the property
+  http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
+  +1: fhanik
+  -1: 
