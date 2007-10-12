@@ -80,3 +80,10 @@ Index: java/org/apache/catalina/core/StandardServer.java
   http://people.apache.org/~fhanik/patches/loader-mbean.patch
   +1: fhanik
   -1:
+
+* Proposed solution to http://issues.apache.org/bugzilla/show_bug.cgi?id=42693
+  Patch: http://issues.apache.org/bugzilla/attachment.cgi?id=20940
+  +1: 
+  -1: 
+  
+  
