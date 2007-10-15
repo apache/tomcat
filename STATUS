@@ -66,7 +66,7 @@ Index: java/org/apache/catalina/core/StandardServer.java
   
 * Arrange doc of connectors.
   http://people.apache.org/~jfclere/patches/tc.docs.patch
-  +1: jfclere, remm
+  +1: jfclere, remm, markt
   -1:
 
 * Make server.xml parsing warnings more generic, add support for the NIO connector
@@ -86,4 +86,7 @@ Index: java/org/apache/catalina/core/StandardServer.java
   +1: 
   -1: 
   
-  
+* Fix important vulnerability when webdav is enabled for write
+  Patch: http://marc.info/?l=tomcat-dev&m=119245116910632&w=2
+  +1: markt
+  -1:
