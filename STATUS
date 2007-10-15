@@ -88,5 +88,5 @@ Index: java/org/apache/catalina/core/StandardServer.java
   
 * Fix important vulnerability when webdav is enabled for write
   Patch: http://marc.info/?l=tomcat-dev&m=119245116910632&w=2
-  +1: markt
+  +1: markt,funkman
   -1:
