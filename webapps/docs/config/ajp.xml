@@ -77,9 +77,7 @@
 
     <attribute name="emptySessionPath" required="false">
       <p>If set to <code>true</code>, all paths for session cookies will be set
-      to <code>/</code>. This can be useful for portlet specification implementations,
-      but will greatly affect performance if many applications are accessed on a given
-      server by the client.
+      to <code>/</code>. This can be useful for portlet specification implementations.
       If not specified, this attribute is set to <code>false</code>.</p>
     </attribute>
 
