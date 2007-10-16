@@ -33,6 +33,13 @@
 
 <body>
 <section name="Tomcat 6.0.15 (remm)">
+  <subsection name="General">
+    <changelog>
+      <fix>
+        Use Eclipse JDT 3.3.1. (pero)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix><bug>43487</bug>
@@ -110,6 +117,12 @@
         org.apache.catalina.core.StandardContext.findStatusPage(int)
          (funkman)
       </fix>
+      <fix>
+        Fix important vulnerability when webdav is enabled for write. (markt)
+      </fix>
+      <fix>
+        Call stopAwait in StandardServer.stop if port == -1. (pero)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -126,6 +139,9 @@
       </fix>
       <fix>
         <bug>42925</bug>: Add maintain for sendfile. (remm)
+      </fix>
+      <fix>
+        Fix explicit flush before response commit in the org.apache.jk AJP connector. (pero)
       </fix>
     </changelog>
   </subsection>
@@ -145,6 +161,9 @@
       <fix>
         <bug>42979</bug>: Update sample.war to include recent security fixes
         in the source code. (markt)
+      </fix>
+      <fix>
+        Minor connector doc fix. (jfclere)
       </fix>
     </changelog>
   </subsection>

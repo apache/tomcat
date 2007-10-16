@@ -25,50 +25,6 @@ $Revision$ $Date$
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Fix explicit flush before response commit in the org.apache.jk AJP connector.
-  http://svn.apache.org/viewvc?view=rev&revision=580815
-  +1: remm, pero, funkman
-  -1: 
-
-* Use newer eclipse jdt - old location is gone (reported by Jason Britian via email)
-  update to jdt.loc=http://sunsite.informatik.rwth-aachen.de/eclipse/downloads/drops/R-3.3.1-200709211145/eclipse-JDT-3.3.1.zip
-  +1: pero, funkman, remm
-  -1: 
-
-* Call StopAwait at StandardServer.stop as port==-1
-
-Index: java/org/apache/catalina/core/StandardServer.java
-===================================================================
---- java/org/apache/catalina/core/StandardServer.java	(revision 583866)
-+++ java/org/apache/catalina/core/StandardServer.java	(working copy)
-@@ -360,7 +360,7 @@
-         if( port==-1 ) {
-             while( true ) {
-                 try {
--                    Thread.sleep( 100000 );
-+                    Thread.sleep( 10000 );
-                 } catch( InterruptedException ex ) {
-                 }
-                 if( stopAwait ) return;
-@@ -747,6 +747,9 @@
-         // Notify our interested LifecycleListeners
-         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
- 
-+        if (port == -1)
-+            stopAwait();
-+
-     }
- 
-     public void init() throws Exception {
-
-  +1: pero, remm, fhanik
-  -1: 
-  
-* Arrange doc of connectors.
-  http://people.apache.org/~jfclere/patches/tc.docs.patch
-  +1: jfclere, remm, markt
-  -1:
-
 * Make server.xml parsing warnings more generic, add support for the NIO connector
 * Connector is no longer an exception case. Any new component can still use setProperty and return a boolean 
 * to accept or reject the property
@@ -88,5 +44,5 @@ Index: java/org/apache/catalina/core/StandardServer.java
   
 * Fix important vulnerability when webdav is enabled for write
   Patch: http://marc.info/?l=tomcat-dev&m=119245116910632&w=2
-  +1: markt,funkman
-  -1:
+  +1: markt, funkman, remm
+  -1: 
