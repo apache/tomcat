@@ -39,15 +39,20 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Proposed solution to http://issues.apache.org/bugzilla/show_bug.cgi?id=42693
   Patch: http://issues.apache.org/bugzilla/attachment.cgi?id=20940
-  +1: 
+  +1: fhanik
   -1: 
   
 * Fix important vulnerability when webdav is enabled for write
   Patch: http://marc.info/?l=tomcat-dev&m=119245116910632&w=2
-  +1: markt, funkman, remm
+  +1: markt, funkman, remm, fhanik
   -1: 
 
 * Fix for JDT update: update jdt.jar in build.properties.default to:
   jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar
-  +1: remm
+  +1: remm, fhanik
+  -1: 
+
+* Fix property setter for keystore type
+  http://issues.apache.org/bugzilla/show_bug.cgi?id=43634
+  +1: fhanik
   -1: 
