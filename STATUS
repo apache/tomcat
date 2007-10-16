@@ -46,3 +46,8 @@ PATCHES PROPOSED TO BACKPORT:
   Patch: http://marc.info/?l=tomcat-dev&m=119245116910632&w=2
   +1: markt, funkman, remm
   -1: 
+
+* Fix for JDT update: update jdt.jar in build.properties.default to:
+  jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar
+  +1: remm
+  -1: 
