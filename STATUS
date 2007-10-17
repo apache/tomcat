@@ -52,11 +52,6 @@ PATCHES PROPOSED TO BACKPORT:
   +1: remm, fhanik,funkman, pero
   -1: 
 
-* Fix property setter for keystore type
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43634
-  +1: fhanik,funkman,remm, pero
-  -1: 
-
 * IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
   available in /usr. As a result, it could now be possible to use a "/usr/bin/java" binary
   if one is present and expect results. [tested on Fedora 8 test 3]
