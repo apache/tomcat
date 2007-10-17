@@ -83,3 +83,9 @@ PATCHES PROPOSED TO BACKPORT:
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43641
   +1: fhanik, pero
   -1: 
+
+* Warn if connector can not use external executors
+  http://issues.apache.org/bugzilla/show_bug.cgi?id=43643
+  +1: fhanik
+  -1:
+  
