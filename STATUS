@@ -49,12 +49,12 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Fix for JDT update: update jdt.jar in build.properties.default to:
   jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar
-  +1: remm, fhanik,funkman
+  +1: remm, fhanik,funkman, pero
   -1: 
 
 * Fix property setter for keystore type
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43634
-  +1: fhanik,funkman,remm
+  +1: fhanik,funkman,remm, pero
   -1: 
 
 * IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
