@@ -81,5 +81,5 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Fix multicasting bind address on multihomed computers
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43641
-  +1: fhanik
+  +1: fhanik, pero
   -1: 
