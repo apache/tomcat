@@ -79,3 +79,7 @@ PATCHES PROPOSED TO BACKPORT:
   +1: fhanik, pero
   -1:
   
+* Fix SSL buffer bug
+  http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
+  +1: fhanik
+  -1: 
