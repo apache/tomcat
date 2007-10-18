@@ -42,11 +42,6 @@ PATCHES PROPOSED TO BACKPORT:
   +1: fhanik,funkman
   -1: 
   
-* Fix for JDT update: update jdt.jar in build.properties.default to:
-  jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar
-  +1: remm, fhanik,funkman, pero
-  -1: 
-
 * IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
   available in /usr. As a result, it could now be possible to use a "/usr/bin/java" binary
   if one is present and expect results. [tested on Fedora 8 test 3]
