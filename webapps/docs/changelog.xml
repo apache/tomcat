@@ -159,6 +159,10 @@
         Fix WebDAV Servlet so it works correctly with MS clients. (markt)
       </fix>
       <fix>
+        Fix CVE-2007-5461, an important information disclosure vulnerability in
+        the WebDAV Servlet. (markt)
+      </fix>
+      <fix>
         <bug>42979</bug>: Update sample.war to include recent security fixes
         in the source code. (markt)
       </fix>
