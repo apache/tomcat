@@ -83,3 +83,8 @@ PATCHES PROPOSED TO BACKPORT:
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
   +1: fhanik
   -1: 
+  
+* Add a working ANT script that signs and publishes JARs to a maven repo
+  http://people.apache.org/~fhanik/patches/maven-publish.patch
+  +1: fhanik
+  -1: 
