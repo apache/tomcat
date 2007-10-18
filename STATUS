@@ -72,20 +72,28 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Fix multicasting bind address on multihomed computers
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43641
-  +1: fhanik, pero, yoavs
+  +1: fhanik, pero, yoavs, markt
   -1: 
 
 * Warn if connector can not use external executors
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43643
-  +1: fhanik, pero, yoavs
+  +1: fhanik, pero, yoavs, markt
   -1:
   
 * Fix SSL buffer bug
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
-  +1: fhanik, yoavs
+  +1: fhanik, yoavs, markt
   -1: 
   
 * Add a working ANT script that signs and publishes JARs to a maven repo
   http://people.apache.org/~fhanik/patches/maven-publish.patch
   +1: fhanik, yoavs
-  -1: 
+  -1: markt (you removed the AL2 license from the file mvn.properties.default)
+
+* Final fixes to the Cookie handling. This makes sure that we unescape any value
+  that has been quoted and ensures the unescaping is the exact reverse of the
+  escaping. This patch also tidies up ServerCookie to make it clearer what
+  applies to which particular cookie spec.
+  http://people.apache.org/~markt/patches/2007-10-18-cookies.patch
+  +1: markt
+  -1:
