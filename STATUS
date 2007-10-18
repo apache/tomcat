@@ -86,6 +86,6 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Warn if connector can not use external executors
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43643
-  +1: fhanik
+  +1: fhanik, pero
   -1:
   
