@@ -63,11 +63,6 @@ PATCHES PROPOSED TO BACKPORT:
                      This way the error exit stays the last case which seems more natural.
 
     
-* Add a working ANT script that signs and publishes JARs to a maven repo
-  http://people.apache.org/~fhanik/patches/maven-publish.patch
-  +1: fhanik, yoavs, markt
-  -1: 
-
 * Final fixes to the Cookie handling. This makes sure that we unescape any value
   that has been quoted and ensures the unescaping is the exact reverse of the
   escaping. This patch also tidies up ServerCookie to make it clearer what
