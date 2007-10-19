@@ -36,8 +36,10 @@ PATCHES PROPOSED TO BACKPORT:
   available in /usr. As a result, it could now be possible to use a "/usr/bin/java" binary
   if one is present and expect results. [tested on Fedora 8 test 3]
 
---- bin/setclasspath.sh	(revision 585189)
-+++ bin/setclasspath.sh	(working copy)
+Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspath.sh
+===================================================================
+--- /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspath.sh	(revision 586293)
++++ /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspath.sh	(working copy)
 @@ -30,9 +30,13 @@
    if $darwin && [ -d "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]; then
      export JAVA_HOME="/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home"
@@ -45,12 +47,12 @@ PATCHES PROPOSED TO BACKPORT:
 -    echo "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
 -    echo "At least one of these environment variable is needed to run this program"
 -    exit 1
-+    if [ ! -x /usr/bin/java ]; then
++    if [ -x /usr/bin/java ]; then
++      JRE_HOME=/usr
++    else
 +      echo "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
 +      echo "At least one of these environment variable is needed to run this program"
 +      exit 1
-+    else
-+      JRE_HOME=/usr
 +    fi
    fi
  fi
