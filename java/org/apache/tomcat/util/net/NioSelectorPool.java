@@ -139,10 +139,6 @@ public class NioSelectorPool {
         boolean timedout = false;
         int keycount = 1; //assume we can write
         long time = System.currentTimeMillis(); //start the timeout timer
-        if ( socket.getBufHandler().getWriteBuffer()!= buf ) {
-            socket.getBufHandler().getWriteBuffer().put(buf);
-            buf = socket.getBufHandler().getWriteBuffer();
-        }
         try {
             while ( (!timedout) && buf.hasRemaining() ) {
                 int cnt = 0;
