@@ -73,3 +73,9 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~markt/patches/2007-10-18-cookies.patch
   +1: markt, fhanik
   -1:
+
+* Fix MD5 files for distribution
+  http://issues.apache.org/bugzilla/attachment.cgi?id=21009&action=view
+  +1: fhanik
+  -1: 
+  
