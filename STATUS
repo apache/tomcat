@@ -31,16 +31,6 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
   +1: fhanik, yoavs
   -1: 
-
-* Add missing mbean descriptor
-  http://people.apache.org/~fhanik/patches/loader-mbean.patch
-  +1: fhanik,funkman,yoavs
-  -1:
-
-* Proposed solution to http://issues.apache.org/bugzilla/show_bug.cgi?id=42693
-  Patch: http://issues.apache.org/bugzilla/attachment.cgi?id=20940
-  +1: fhanik,funkman, yoavs
-  -1: 
   
 * IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
   available in /usr. As a result, it could now be possible to use a "/usr/bin/java" binary
@@ -70,21 +60,7 @@ PATCHES PROPOSED TO BACKPORT:
   -1:
    0: yoavs
 
-* Fix multicasting bind address on multihomed computers
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43641
-  +1: fhanik, pero, yoavs, markt
-  -1: 
-
-* Warn if connector can not use external executors
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43643
-  +1: fhanik, pero, yoavs, markt
-  -1:
-  
-* Fix SSL buffer bug
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
-  +1: fhanik, yoavs, markt
-  -1: 
-  
+    
 * Add a working ANT script that signs and publishes JARs to a maven repo
   http://people.apache.org/~fhanik/patches/maven-publish.patch
   +1: fhanik, yoavs

@@ -29,6 +29,7 @@ import java.util.Arrays;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
+import java.net.BindException;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -182,8 +183,22 @@ public class McastServiceImpl
     }
     
     protected void setupSocket() throws IOException {
-        if (mcastBindAddress != null) socket = new MulticastSocket(new InetSocketAddress(mcastBindAddress, port));
-        else socket = new MulticastSocket(port);
+        if (mcastBindAddress != null) {
+            try {
+                log.info("Attempting to bind the multicast socket to "+address+":"+port);
+                socket = new MulticastSocket(new InetSocketAddress(address,port));
+            } catch (BindException e) {
+                /*
+                 * On some plattforms (e.g. Linux) it is not possible to bind
+                 * to the multicast address. In this case only bind to the
+                 * port.
+                 */
+                log.info("Binding to multicast address, failed. Binding to port only.");
+                socket = new MulticastSocket(port);
+            }
+        } else {
+            socket = new MulticastSocket(port);
+        }
         socket.setLoopbackMode(false); //hint that we don't need loop back messages
         if (mcastBindAddress != null) {
 			if(log.isInfoEnabled())

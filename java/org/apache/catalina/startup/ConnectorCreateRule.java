@@ -27,6 +27,8 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Executor;
 import org.apache.tomcat.util.IntrospectionUtils;
 import java.lang.reflect.Method;
+import org.apache.juli.logging.LogFactory;
+import org.apache.juli.logging.Log;
 
 
 /**
@@ -35,7 +37,7 @@ import java.lang.reflect.Method;
 
 public class ConnectorCreateRule extends Rule {
 
-
+    protected static Log log = LogFactory.getLog(ConnectorCreateRule.class);
     // --------------------------------------------------------- Public Methods
 
 
@@ -58,7 +60,11 @@ public class ConnectorCreateRule extends Rule {
     
     public void _setExecutor(Connector con, Executor ex) throws Exception {
         Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setExecutor",new Class[] {java.util.concurrent.Executor.class});
-        m.invoke(con.getProtocolHandler(),new Object[] {ex});
+        if (m!=null) {
+            m.invoke(con.getProtocolHandler(), new Object[] {ex});
+        }else {
+            log.warn("Connector ["+con+"] does not support external executors. Method setExecutor(java.util.concurrent.Executor) not found.");
+        }
     }
 
 
