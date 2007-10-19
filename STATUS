@@ -58,7 +58,9 @@ PATCHES PROPOSED TO BACKPORT:
 
   +1: 
   -1:
-   0: yoavs
+   0: yoavs,rjung
+   Comment by rjung: Maybe switching "then" and "else" cases by using "-x" instead of "! -x".
+                     This way the error exit stays the last case which seems more natural.
 
     
 * Add a working ANT script that signs and publishes JARs to a maven repo
