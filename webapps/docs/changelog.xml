@@ -35,6 +35,9 @@
 <section name="Tomcat 6.0.15 (remm)">
   <subsection name="General">
     <changelog>
+      <update>
+        Add ANT script to be able to publish signed Tomcat JAR's to ASF Maven repo (fhanik)
+      </update>
       <fix>
         Use Eclipse JDT 3.3.1. (pero)
       </fix>
