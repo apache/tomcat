@@ -29,7 +29,7 @@ PATCHES PROPOSED TO BACKPORT:
 * Connector is no longer an exception case. Any new component can still use setProperty and return a boolean 
 * to accept or reject the property
   http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
-  +1: fhanik, yoavs
+  +1: fhanik, yoavs,funkman
   -1: 
   
 * IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
@@ -70,11 +70,11 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   escaping. This patch also tidies up ServerCookie to make it clearer what
   applies to which particular cookie spec.
   http://people.apache.org/~markt/patches/2007-10-18-cookies.patch
-  +1: markt, fhanik
+  +1: markt, fhanik,funkman
   -1:
 
 * Fix MD5 files for distribution
   http://issues.apache.org/bugzilla/attachment.cgi?id=21009&action=view
-  +1: fhanik
+  +1: fhanik,funkman
   -1: 
   
