@@ -25,13 +25,6 @@ $Revision$ $Date$
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Make server.xml parsing warnings more generic, add support for the NIO connector
-* Connector is no longer an exception case. Any new component can still use setProperty and return a boolean 
-* to accept or reject the property
-  http://people.apache.org/~fhanik/patches/digester-attribute-warnings.patch
-  +1: fhanik, yoavs,funkman
-  -1: 
-  
 * IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
   available in /usr. As a result, it could now be possible to use a "/usr/bin/java" binary
   if one is present and expect results. [tested on Fedora 8 test 3]
