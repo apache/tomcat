@@ -71,3 +71,10 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   +1: fhanik,funkman
   -1: 
   
+* Final fix for http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
+  Fixes the 100 Continue response, that got reversed through byte buffer manipulation
+  last patch before tag, promise :)
+  http://people.apache.org/~fhanik/patches/bz-43653-complimentary.patch
+  +1: fhanik
+  -1: 
+  
