@@ -38,9 +38,9 @@
       <update>
         Add ANT script to be able to publish signed Tomcat JAR's to ASF Maven repo (fhanik)
       </update>
-      <fix>
+      <update>
         Use Eclipse JDT 3.3.1. (pero)
-      </fix>
+      </update>
     </changelog>
   </subsection>
   <subsection name="Catalina">
@@ -143,6 +143,9 @@
       <update>
         Cookie parser refactoring, submitted by John Kew. (remm)
       </update>
+      <fix>
+        Make cookie escaping / unescaping consistent. (markt)
+      </fix>
       <fix>
         <bug>43479</bug>: Memory leak cleaning up sendfile connections, submitted by Chris Elving. (remm)
       </fix>

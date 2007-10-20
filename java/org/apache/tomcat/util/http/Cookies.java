@@ -345,9 +345,11 @@ public final class Cookies { // extends MultiMap {
         int version = 0;
         ServerCookie sc=null;
         boolean isSpecial;
+        boolean isQuoted;
 
         while (pos < end) {
             isSpecial = false;
+            isQuoted = false;
 
             // Skip whitespace and non-token characters (separators)
             while (pos < end && 
@@ -389,6 +391,7 @@ public final class Cookies { // extends MultiMap {
                 // token, name-only with an '=', or other (bad)
                 switch (bytes[pos]) {
                 case '"':; // Quoted Value
+                    isQuoted = true;
                     valueStart=pos + 1; // strip "
                     // getQuotedValue returns the position before 
                     // at the last qoute. This must be dealt with
@@ -532,7 +535,12 @@ public final class Cookies { // extends MultiMap {
                 
                 if (valueStart != -1) { // Normal AVPair
                     sc.getValue().setBytes( bytes, valueStart,
-                                            valueEnd-valueStart);
+                            valueEnd-valueStart);
+                    if (isQuoted) {
+                        // We know this is a byte value so this is safe
+                        ServerCookie.unescapeDoubleQuotes(
+                                sc.getValue().getByteChunk());
+                    }
                 } else {
                     // Name Only
                     sc.getValue().setString(""); 

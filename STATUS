@@ -57,15 +57,6 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
    Comment by rjung: Maybe switching "then" and "else" cases by using "-x" instead of "! -x".
                      This way the error exit stays the last case which seems more natural.
 
-    
-* Final fixes to the Cookie handling. This makes sure that we unescape any value
-  that has been quoted and ensures the unescaping is the exact reverse of the
-  escaping. This patch also tidies up ServerCookie to make it clearer what
-  applies to which particular cookie spec.
-  http://people.apache.org/~markt/patches/2007-10-18-cookies.patch
-  +1: markt, fhanik,funkman
-  -1:
-
 * Fix MD5 files for distribution
   http://issues.apache.org/bugzilla/attachment.cgi?id=21009&action=view
   +1: fhanik,funkman
