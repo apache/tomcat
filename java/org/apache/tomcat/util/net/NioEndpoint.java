@@ -510,19 +510,20 @@ public class NioEndpoint {
     /**
      * Generic properties, introspected
      */
-    public void setProperty(String name, String value) {
+    public boolean setProperty(String name, String value) {
         final String selectorPoolName = "selectorPool.";
         final String socketName = "socket.";
         try {
             if (name.startsWith(selectorPoolName)) {
-                IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
+                return IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
             } else if (name.startsWith(socketName)) {
-                IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
+                return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
             } else {
-                IntrospectionUtils.setProperty(this,name,value);
+                return IntrospectionUtils.setProperty(this,name,value);
             }
         }catch ( Exception x ) {
             log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
+            return false;
         }
     }
 
