@@ -68,4 +68,9 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   http://people.apache.org/~fhanik/patches/bz-43653-complimentary.patch
   +1: fhanik
   -1: 
-  
+
+* Improve fix for webdav vulnerability to workaround what looks like a parser
+  bug
+  http://people.apache.org/~markt/patches/2007-10-20-webdav.patch
+  +1: markt
+  -1:
