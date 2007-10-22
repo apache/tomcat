@@ -85,3 +85,6 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   +1: billbarker
   -1:
 
+* Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
+  +1:
+  -1:
