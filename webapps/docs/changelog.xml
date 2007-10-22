@@ -35,6 +35,7 @@
 <section name="Tomcat 6.0.15 (remm)">
   <subsection name="General">
     <changelog>
+      <update>Fix the MD5 file contents in distribution</update>
       <update>
         Add ANT script to be able to publish signed Tomcat JAR's to ASF Maven repo (fhanik)
       </update>
