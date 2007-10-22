@@ -25,43 +25,11 @@ $Revision$ $Date$
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* IcedTea support. Upcoming Linux distributions will package a (working) open source JRE,
-  available in /usr. As a result, it could now be possible to use a "/usr/bin/java" binary
-  if one is present and expect results. [tested on Fedora 8 test 3]
-
-Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspath.sh
-===================================================================
---- /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspath.sh	(revision 586293)
-+++ /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspath.sh	(working copy)
-@@ -30,9 +30,13 @@
-   if $darwin && [ -d "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]; then
-     export JAVA_HOME="/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home"
-   else
--    echo "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
--    echo "At least one of these environment variable is needed to run this program"
--    exit 1
-+    if [ -x /usr/bin/java ]; then
-+      JRE_HOME=/usr
-+    else
-+      echo "Neither the JAVA_HOME nor the JRE_HOME environment variable is defined"
-+      echo "At least one of these environment variable is needed to run this program"
-+      exit 1
-+    fi
-   fi
- fi
- if [ -z "$JAVA_HOME" -a "$1" = "debug" ]; then
-
-  +1: 
-  -1: jfclere. I have proposed a "better" patch below.
-   0: yoavs,rjung
-   Comment by rjung: Maybe switching "then" and "else" cases by using "-x" instead of "! -x".
-                     This way the error exit stays the last case which seems more natural.
-
 * Fix MD5 files for distribution
   http://issues.apache.org/bugzilla/attachment.cgi?id=21009&action=view
   +1: fhanik,funkman, markt
   -1: 
-  
+
 * Final fix for http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
   Fixes the 100 Continue response, that got reversed through byte buffer manipulation
   last patch before tag, promise :)
@@ -72,7 +40,7 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
 * Improve fix for webdav vulnerability to workaround what looks like a parser
   bug
   http://people.apache.org/~markt/patches/2007-10-20-webdav.patch
-  +1: markt,fhanik
+  +1: markt,fhanik, remm
   -1:
 
 * Fix possible DoS condition for the experimental NIO/AJP module (reported by William Leung via email)
@@ -83,7 +51,7 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
 * Fix problem on a Forward when the outer most wrapper isn't a HttpServletRequest/ResponseWrapper.
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43668
   +1: billbarker
-  -1:
+  -1: remm (I don't feel comfortable including this sort of fix right before a release)
 
 * Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
   +1:
