@@ -51,6 +51,9 @@
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
+  <!-- constant to declare a file binary for md5sum -->
+  <property name="md5sum.binary-prefix" value=" *" />
+
   <!-- Can't be lower - jsp uses templates -->
   <property name="compile.source" value="1.5"/>
 
