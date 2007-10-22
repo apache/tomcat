@@ -90,5 +90,6 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   -1:
 
 * Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
+  And improve fix for 37284.
   +1:
   -1:
