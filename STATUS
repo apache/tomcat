@@ -79,3 +79,9 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43621
   +1: billbarker,fhanik
   -1:
+
+* Fix problem on a Forward when the outer most wrapper isn't a HttpServletRequest/ResponseWrapper.
+  http://issues.apache.org/bugzilla/show_bug.cgi?id=43668
+  +1: billbarker
+  -1:
+
