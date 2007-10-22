@@ -172,7 +172,7 @@
       </fix>
       <fix>
         Fix CVE-2007-5461, an important information disclosure vulnerability in
-        the WebDAV Servlet. (markt)
+        the WebDAV Servlet. Based on a patch by Marc Schoenefeld. (markt)
       </fix>
       <fix>
         <bug>42979</bug>: Update sample.war to include recent security fixes

@@ -37,12 +37,6 @@ PATCHES PROPOSED TO BACKPORT:
   +1: fhanik
   -1: 
 
-* Improve fix for webdav vulnerability to workaround what looks like a parser
-  bug
-  http://people.apache.org/~markt/patches/2007-10-20-webdav.patch
-  +1: markt,fhanik, remm
-  -1:
-
 * Fix possible DoS condition for the experimental NIO/AJP module (reported by William Leung via email)
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43621
   +1: billbarker,fhanik

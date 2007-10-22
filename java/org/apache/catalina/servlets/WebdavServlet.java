@@ -20,6 +20,7 @@ package org.apache.catalina.servlets;
 
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.security.MessageDigest;
@@ -36,6 +37,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +59,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -245,6 +248,8 @@ public class WebdavServlet
             documentBuilderFactory.setNamespaceAware(true);
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            documentBuilder.setEntityResolver(
+                    new WebdavResolver(this.getServletContext()));
         } catch(ParserConfigurationException e) {
             throw new ServletException
                 (sm.getString("webdavservlet.jaxpfailed"));
@@ -2779,6 +2784,26 @@ public class WebdavServlet
     }
 
 
+    // --------------------------------------------- WebdavResolver Inner Class
+    /**
+     * Work around for XML parsers that don't fully respect
+     * {@link DocumentBuilderFactory#setExpandEntityReferences(false)}. External
+     * references are filtered out for security reasons. See CVE-2007-5461.
+     */
+    private class WebdavResolver implements EntityResolver {
+        private ServletContext context;
+        
+        public WebdavResolver(ServletContext theContext) {
+            context = theContext;
+        }
+     
+        public InputSource resolveEntity (String publicId, String systemId) {
+            context.log(sm.getString("webdavservlet.enternalEntityIgnored",
+                    publicId, systemId));
+            return new InputSource(
+                    new StringReader("Ignored external entity"));
+        }
+    }
 };
 
 
@@ -3100,4 +3125,5 @@ class WebdavStatus {
     }
 
 };
+
 
