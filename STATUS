@@ -52,7 +52,7 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
  if [ -z "$JAVA_HOME" -a "$1" = "debug" ]; then
 
   +1: 
-  -1:
+  -1: jfclere. I have proposed a "better" patch below.
    0: yoavs,rjung
    Comment by rjung: Maybe switching "then" and "else" cases by using "-x" instead of "! -x".
                      This way the error exit stays the last case which seems more natural.
@@ -86,5 +86,9 @@ Index: /home/remm/Work/eclipse/jbossweb-2.1.x/apache-tomcat-6.0.x/bin/setclasspa
   -1:
 
 * Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
+  +1:
+  -1:
+
+* Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
   +1:
   -1:
