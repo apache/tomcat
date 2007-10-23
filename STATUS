@@ -50,3 +50,7 @@ PATCHES PROPOSED TO BACKPORT:
   And improve fix for 37284.
   +1:
   -1:
+
+* Harmonize with HTTP java.io code. Otherwise the socket is not closed. http://people.apache.org/~jfclere/patches/AjpPro.patch
+  +1: jfclere
+  -1:
