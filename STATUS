@@ -48,7 +48,7 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
   And improve fix for 37284.
-  +1:
+  +1: fhanik
   -1:
 
 * Harmonize with HTTP java.io code. Otherwise the socket is not closed. http://people.apache.org/~jfclere/patches/AjpPro.patch
