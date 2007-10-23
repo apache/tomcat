@@ -43,7 +43,7 @@ PATCHES PROPOSED TO BACKPORT:
   -1: remm (I don't feel comfortable including this sort of fix right before a release)
 
 * Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
-  +1:
+  +1: fhanik
   -1:
 
 * Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
@@ -52,5 +52,5 @@ PATCHES PROPOSED TO BACKPORT:
   -1:
 
 * Harmonize with HTTP java.io code. Otherwise the socket is not closed. http://people.apache.org/~jfclere/patches/AjpPro.patch
-  +1: jfclere
+  +1: jfclere, fhanik
   -1:
