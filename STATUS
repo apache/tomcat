@@ -39,8 +39,8 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Fix problem on a Forward when the outer most wrapper isn't a HttpServletRequest/ResponseWrapper.
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43668
-  +1: billbarker
-  -1: remm (I don't feel comfortable including this sort of fix right before a release)
+  +1: billbarker, remm
+  -1: 
 
 * Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
   +1: fhanik
@@ -48,9 +48,9 @@ PATCHES PROPOSED TO BACKPORT:
 
 * Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
   And improve fix for 37284.
-  +1: fhanik
+  +1: fhanik, remm
   -1:
 
 * Harmonize with HTTP java.io code. Otherwise the socket is not closed. http://people.apache.org/~jfclere/patches/AjpPro.patch
-  +1: jfclere, fhanik
+  +1: jfclere, fhanik, remm
   -1:
