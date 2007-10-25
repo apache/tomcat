@@ -417,8 +417,8 @@ public class InternalNioOutputBuffer
 
         if (!committed) {
             //Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0
-            ByteBuffer buf = ByteBuffer.wrap(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
-            writeToSocket(buf,false);
+            socket.getBufHandler() .getWriteBuffer().put(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
+            writeToSocket(socket.getBufHandler() .getWriteBuffer(),true);
         }
 
     }
