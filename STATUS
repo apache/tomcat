@@ -25,13 +25,6 @@ $Revision$ $Date$
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Final fix for http://issues.apache.org/bugzilla/show_bug.cgi?id=43653
-  Fixes the 100 Continue response, that got reversed through byte buffer manipulation
-  last patch before tag, promise :)
-  http://people.apache.org/~fhanik/patches/bz-43653-complimentary.patch
-  +1: fhanik, funkman, jim
-  -1: 
-
 * Fix possible DoS condition for the experimental NIO/AJP module (reported by William Leung via email)
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43621
   +1: billbarker,fhanik,funkman, pero, jim
