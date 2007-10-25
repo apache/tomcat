@@ -29,26 +29,26 @@ PATCHES PROPOSED TO BACKPORT:
   Fixes the 100 Continue response, that got reversed through byte buffer manipulation
   last patch before tag, promise :)
   http://people.apache.org/~fhanik/patches/bz-43653-complimentary.patch
-  +1: fhanik
+  +1: fhanik, funkman
   -1: 
 
 * Fix possible DoS condition for the experimental NIO/AJP module (reported by William Leung via email)
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43621
-  +1: billbarker,fhanik
+  +1: billbarker,fhanik,funkman
   -1:
 
 * Fix problem on a Forward when the outer most wrapper isn't a HttpServletRequest/ResponseWrapper.
   http://issues.apache.org/bugzilla/show_bug.cgi?id=43668
-  +1: billbarker, remm
+  +1: billbarker, remm, funkman
   -1: 
 
 * Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
-  +1: fhanik
+  +1: fhanik, funkman
   -1:
 
 * Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
   And improve fix for 37284.
-  +1: fhanik, remm
+  +1: fhanik, remm, funkman
   -1:
 
 * Harmonize with HTTP java.io code. Otherwise the socket is not closed. http://people.apache.org/~jfclere/patches/AjpPro.patch
@@ -58,4 +58,6 @@ PATCHES PROPOSED TO BACKPORT:
 * Fix BZ 43588 - hard coded 127.0.0.1 for localhost
   http://issues.apache.org/bugzilla/attachment.cgi?id=21039&action=view
   +1: 
-  -1: 
+  -1: funkman InetAddress.getLocalHost() != localhost - it should be
+            InetAddress.getByName("localhost").getHostAddress()
+
