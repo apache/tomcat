@@ -47,7 +47,7 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
-import org.apache.commons.modeler.Registry;
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.jk.core.JkHandler;
 import org.apache.jk.core.Msg;
 import org.apache.jk.core.MsgContext;
@@ -86,8 +86,8 @@ import org.apache.tomcat.util.threads.ThreadPoolRunnable;
  */
 public class ChannelNioSocket extends JkHandler
     implements NotificationBroadcaster, JkChannel {
-    private static org.apache.commons.logging.Log log =
-        org.apache.commons.logging.LogFactory.getLog( ChannelNioSocket.class );
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog( ChannelNioSocket.class );
 
     private int startPort=8009;
     private int maxPort=8019; // 0 for backward compat.
