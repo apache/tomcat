@@ -133,6 +133,9 @@
       <fix>
         Call stopAwait in StandardServer.stop if port == -1. (pero)
       </fix>
+      <fix>
+        <bug>43668</bug> Fix NPE when the outer most wrapper is a ServletRequest/ResponseWrapper, but not a HttpServletRequest/ResponseWrapper on a Forward. (billbarker)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -155,6 +158,9 @@
       </fix>
       <fix>
         Fix explicit flush before response commit in the org.apache.jk AJP connector. (pero)
+      </fix>
+      <fix>
+        <bug>43621</bug> Fix possible Dos condition when using the experimental NIO/AJP Connector (billbarker)
       </fix>
     </changelog>
   </subsection>
