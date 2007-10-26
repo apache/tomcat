@@ -197,6 +197,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+         Tests for unit tests for the cookie issues. (jfclere)
+      </add>
+    </changelog>
+  </subsection>
   
 </section>
 <section name="Tomcat 6.0.14 (remm)">
