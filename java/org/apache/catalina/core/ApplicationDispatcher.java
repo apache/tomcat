@@ -138,6 +138,16 @@ final class ApplicationDispatcher
          * Are we performing an include() instead of a forward()?
          */
         boolean including = false;
+
+        /**
+         * Outer most HttpServletRequest in the chain
+         */
+        HttpServletRequest hrequest = null;
+
+        /**
+         * Outermost HttpServletResponse in the chain
+         */
+        HttpServletResponse hresponse = null;
     }
 
     // ----------------------------------------------------------- Constructors
@@ -316,24 +326,13 @@ final class ApplicationDispatcher
             checkSameObjects(request, response);
         }
 
-        // Identify the HTTP-specific request and response objects (if any)
-        HttpServletRequest hrequest = null;
-        if (request instanceof HttpServletRequest)
-            hrequest = (HttpServletRequest) request;
-        HttpServletResponse hresponse = null;
-        if (response instanceof HttpServletResponse)
-            hresponse = (HttpServletResponse) response;
-
-        // Handle a non-HTTP forward by passing the existing request/response
-        if ((hrequest == null) || (hresponse == null)) {
-            processRequest(hrequest,hresponse,state);
-        }
-
+        wrapResponse(state);
         // Handle an HTTP named dispatcher forward
-        else if ((servletPath == null) && (pathInfo == null)) {
+        if ((servletPath == null) && (pathInfo == null)) {
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
+            HttpServletRequest hrequest = state.hrequest;
             wrequest.setRequestURI(hrequest.getRequestURI());
             wrequest.setContextPath(hrequest.getContextPath());
             wrequest.setServletPath(hrequest.getServletPath());
@@ -349,7 +348,7 @@ final class ApplicationDispatcher
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
             String contextPath = context.getPath();
-
+            HttpServletRequest hrequest = state.hrequest;
             if (hrequest.getAttribute(Globals.FORWARD_REQUEST_URI_ATTR) == null) {
                 wrequest.setAttribute(Globals.FORWARD_REQUEST_URI_ATTR,
                                       hrequest.getRequestURI());
@@ -488,19 +487,8 @@ final class ApplicationDispatcher
         // Create a wrapped response to use for this request
         wrapResponse(state);
 
-        // Handle a non-HTTP include
-        if (!(request instanceof HttpServletRequest) ||
-            !(response instanceof HttpServletResponse)) {
-            request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                    Integer.valueOf(ApplicationFilterFactory.INCLUDE));
-            request.setAttribute(
-                    ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
-                    servletPath);
-            invoke(request, state.outerResponse, state);
-        }
-
         // Handle an HTTP named dispatcher include
-        else if (name != null) {
+        if (name != null) {
 
             ApplicationHttpRequest wrequest =
                 (ApplicationHttpRequest) wrapRequest(state);
@@ -584,7 +572,7 @@ final class ApplicationDispatcher
         }
 
         // Initialize local variables we may need
-        HttpServletResponse hresponse = (HttpServletResponse) response;
+        HttpServletResponse hresponse = state.hresponse;
         Servlet servlet = null;
         IOException ioException = null;
         ServletException servletException = null;
@@ -817,6 +805,8 @@ final class ApplicationDispatcher
         ServletRequest previous = null;
         ServletRequest current = state.outerRequest;
         while (current != null) {
+            if(state.hrequest == null && (current instanceof HttpServletRequest))
+                state.hrequest = (HttpServletRequest)current;
             if ("org.apache.catalina.servlets.InvokerHttpRequest".
                 equals(current.getClass().getName()))
                 break; // KLUDGE - Make nested RD.forward() using invoker work
@@ -878,6 +868,11 @@ final class ApplicationDispatcher
         ServletResponse previous = null;
         ServletResponse current = state.outerResponse;
         while (current != null) {
+            if(state.hresponse == null && (current instanceof HttpServletResponse)) {
+                state.hresponse = (HttpServletResponse)current;
+                if(!state.including) // Forward only needs hresponse
+                    return null;
+            }
             if (!(current instanceof ServletResponseWrapper))
                 break;
             if (current instanceof ApplicationHttpResponse)
