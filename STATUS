@@ -26,10 +26,6 @@ PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
 
-* Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
-  +1: fhanik, funkman, pero, jim
-  -1:
-
 * Guess java location from the PATH environment. http://people.apache.org/~jfclere/patches/setclasspath.sh.patch
   And improve fix for 37284.
   +1: fhanik, remm, funkman, pero, jim
