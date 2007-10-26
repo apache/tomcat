@@ -25,15 +25,6 @@ $Revision$ $Date$
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Fix possible DoS condition for the experimental NIO/AJP module (reported by William Leung via email)
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43621
-  +1: billbarker,fhanik,funkman, pero, jim
-  -1:
-
-* Fix problem on a Forward when the outer most wrapper isn't a HttpServletRequest/ResponseWrapper.
-  http://issues.apache.org/bugzilla/show_bug.cgi?id=43668
-  +1: billbarker, remm, funkman, pero, jim
-  -1: 
 
 * Tests for unit tests for the cookie issues. http://people.apache.org/~jfclere/patches/CookiesTest.patch
   +1: fhanik, funkman, pero, jim
