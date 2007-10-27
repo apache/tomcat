@@ -26,10 +26,6 @@ PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
 
-* Harmonize with HTTP java.io code. Otherwise the socket is not closed. http://people.apache.org/~jfclere/patches/AjpPro.patch
-  +1: jfclere, fhanik, remm, pero, jim
-  -1:
-
 * Fix BZ 43588 - hard coded 127.0.0.1 for localhost
   http://issues.apache.org/bugzilla/attachment.cgi?id=21039&action=view
   +1: 

@@ -355,7 +355,7 @@ public class AjpProcessor implements ActionHook {
      *
      * @throws IOException error during an I/O operation
      */
-    public boolean process(Socket socket)
+    public void process(Socket socket)
         throws IOException {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
@@ -471,8 +471,6 @@ public class AjpProcessor implements ActionHook {
         input = null;
         output = null;
         
-        return true;
-
     }
 
 

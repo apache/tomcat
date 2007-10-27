@@ -142,6 +142,9 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        Harmonize with HTTP java.io code. Otherwise the socket is not closed.
+      </fix>
+      <fix>
         In the APR connector, start accepting connections after fully starting
         the connector, to prevent possible exceptions due to non initialized fields. (remm)
       </fix>
