@@ -363,7 +363,8 @@ public class AjpProtocol
                     ((ActionHook) processor).action(ActionCode.ACTION_START, null);
                 }
 
-                return processor.process(socket);
+                processor.process(socket);
+                return false;
 
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal
