@@ -48,12 +48,12 @@
     <changelog>
       <update>Guess java location from the PATH environment and improve fix for 37284</update>
       <update>Add NIO connector to server.xml parsing warning, remove Connector as exception case</update>
-      <fix><bug>43653</bug>Fix SSL buffer mixup when response is unable to write more than socket buffer can handle</fix>
-      <fix><bug>43643</bug>If connector doesn't support external executor, display warning</fix>
-      <fix><bug>43641</bug>Property bind multicast address for cluster membership</fix>
-      <fix><bug>42693</bug> Fix JSP compiler bug</fix>
+      <fix><bug>43653</bug>: Fix SSL buffer mixup when response is unable to write more than socket buffer can handle</fix>
+      <fix><bug>43643</bug>: If connector doesn't support external executor, display warning</fix>
+      <fix><bug>43641</bug>: Property bind multicast address for cluster membership</fix>
+      <fix><bug>42693</bug>: Fix JSP compiler bug</fix>
       <update>Add mbean descriptor for virtual webapp loader</update>
-      <fix><bug>43487</bug>
+      <fix><bug>43487</bug>:
         Fix request processing stats
       </fix>  
       <fix>
