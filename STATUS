@@ -32,3 +32,7 @@ PATCHES PROPOSED TO BACKPORT:
   -1: funkman InetAddress.getLocalHost() != localhost - it should be
             InetAddress.getByName("localhost").getHostAddress()
 
+* Fix bug in CGI servlet that causes it to fail when included
+  http://people.apache.org/~markt/patches/2007-10-28-cgi-include.patch
+  +1: markt
+  -1:
