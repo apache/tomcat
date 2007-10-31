@@ -36,3 +36,6 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~markt/patches/2007-10-28-cgi-include.patch
   +1: markt
   -1:
+
+* Fix BZ 43702 - Inner class files have unnecessarily long names
+  http://people.apache.org/~markt/patches/2007-10-30-Bug43702.patch
