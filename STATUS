@@ -46,4 +46,21 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~markt/patches/2007-10-30-Bug43675.patch
   +1: markt
   -1:
+
+* Fix cookie $Version parsing
+  Index: java/org/apache/tomcat/util/http/Cookies.java
+  ===================================================================
+  --- java/org/apache/tomcat/util/http/Cookies.java	(revision 589807)
+  +++ java/org/apache/tomcat/util/http/Cookies.java	(working copy)
+  @@ -487,7 +487,7 @@
+                   if (equals( "Version", bytes, nameStart, nameEnd) && 
+                       sc == null) {
+                       // Set version
+  -                    if( bytes[valueStart] =='1' && valueEnd == valueStart) {
+  +                    if( bytes[valueStart] =='1' && valueEnd == (valueStart+1)) {
+                           version=1;
+                       } else {
+                           // unknown version (Versioning is not very strict)
   
+ +1: fhanik
+ -1: 
