@@ -47,7 +47,7 @@ PATCHES PROPOSED TO BACKPORT:
   +1: markt
   -1:
 
-* Fix cookie $Version parsing
+* Fix cookie $Version parsing 
   Index: java/org/apache/tomcat/util/http/Cookies.java
   ===================================================================
   --- java/org/apache/tomcat/util/http/Cookies.java	(revision 589807)
@@ -62,5 +62,5 @@ PATCHES PROPOSED TO BACKPORT:
                        } else {
                            // unknown version (Versioning is not very strict)
   
- +1: fhanik
- -1: 
+ +1: fhanik, jfclere
+ -1:
