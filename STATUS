@@ -50,4 +50,5 @@ PATCHES PROPOSED TO BACKPORT:
 * Fix double quoting of quoted-string. http://people.apache.org/~jfclere/patches/cookies.tck.patch
   and $Version parsing
   +1: jfclere, fhanik
-  -1:
+  -1: markt - only the double quoting part - see http://marc.info/?l=tomcat-dev&m=119454915422424&w=2 for reasons
+
