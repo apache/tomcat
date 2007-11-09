@@ -275,12 +275,15 @@ public class MsgContext implements ActionHook {
             
         } else if( actionCode==ActionCode.ACTION_CLIENT_FLUSH ) {
             if( log.isDebugEnabled() ) log.debug("CLIENT_FLUSH " );
+            Response res = (Response)param;
+            if(!res.isCommitted()) {
+                action(ActionCode.ACTION_COMMIT, res);
+            }
             try {
                 source.flush( null, this );
             } catch(IOException iex) {
                 // This is logged elsewhere, so debug only here
                 log.debug("Error during flush",iex);
-                Response res = (Response)param;
                 res.setErrorException(iex);
                 setStatus(JK_STATUS_ERROR);
             }

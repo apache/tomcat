@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
@@ -9,7 +25,6 @@
   <properties>
     <title>Advanced IO and Tomcat</title>
     <author>Remy Maucherat</author>
-    <author>Filip Hanik</author>
   </properties>
 
 <body>
@@ -40,138 +55,6 @@
     other source).
   </p>
 
-  <subsection name="Comet Terms"> 
-  <p>
-    Comet Connection - For the readability of this document we will be referring an open ended HTTP request and an open
-    ended HTTP response that are mapped to a Cometprocessor as a &quot;Comet Connection&quot;.
-  </p>
-  <p>
-    Comet Processor - a servlet that implements the <code>org.apache.catalina.CometProcessor</code> interface.
-    Used to process comet connections and the events on the connection
-  </p>
-  <p>
-    Comet Event - an event triggered by the container related to a Comet Connection
-  </p>
-  <p>
-    Open Ended Request - a HTTP request that is either chunked or has a very large content length, allowing 
-    data to be sent at different times. This is how Tomcat gets around the request/response methodology of 
-    the HTTP protocol allowing Comet Processors to send and receive data on the socket synchronously and asynchronously.
-  </p>
-  <p>
-    Open Ended Response - see Open Ended Request
-  </p>
-  <p>
-    Active Comet Connection, a comet connection that currently is associated with a TCP connection and an open ended request/response.
-  </p>
-  <p>
-    Blocking Comet Connection, an invocation of the read/write methods will block until data was received/sent.
-  </p>
-  <p>
-    Non blocking Comet Connection, an invocation of the read/write methods will not block.
-  </p>
-  <p>
-    Comet operation - comet connections can register themselves for a set of events to be 
-    notified of. The different operations are:<br/>
-    OP_READ - results in a READ event when data has been received<br/>
-    OP_WRITE - results in a WRITE event when the socket is ready to receive data<br/>
-    OP_CALLBACK - results in a CALLBACK event on a Tomcat thread. 
-  </p>
-  <p>
-    Connection Centric - Comet connections are based on actual IO events on a TCP connection from the TCP layer. 
-    This is different from servlets that are based on HTTP requests and responses, by the HTTP protocol above the TCP layer.
-  </p>
-  <p>
-    Closing a comet connection - may not actually mean that the underlying TCP connection is closed. Tomcat still
-    respects the <code>maxKeepAliveRequests</code> attribute of the connector, and may decide to keep the connection
-    open. This is the case in the event of a connection timeout, the event ERROR/TIMEOUT is signaled and the 
-    TCP connection is reused for the next HTTP request.
-  </p>
-  </subsection>
-  
-  <subsection name="Comet Lifecycle"> 
-  <p>
-    The lifecycle and event cycle of a Comet Connection is slightly different than a regular servlet.
-    Instead the life/event cycle is very &quot;connection centric&quot; and based on IO events, rater then 
-    a request/response cycle like a normal HTTP request. This is the most common mistake developers make when they 
-    start writing comet servlets, is that they don't realize that it is all based around these different events, and 
-    that the events are some what connection centric.
-  </p>
-  <p>
-    A comet interaction is started by the container invoking the event method on the Comet Processor 
-    and the event will have a BEGIN type. For a deeper explanation of types, keep reading.
-    Once a BEGIN event has been invoked, the Comet Connection is active. At this type, the Comet Event object
-    reference can be used to reference the HttpServletRequest/HttpServletResponse objects for asynchronous actions
-    such as reading or writing from the streams or readers/writers. At this point the comet connection is considered active
-    or initiated.
-  </p>
-  <p>
-    Once the Comet connection is active, the comet processor will receive events from the container.
-    These events are defined in the section <a href="#CometEvent">below</a>.<br/>
-    A comet processor may register itself for events, and receive the events when they happen.
-    In a similar fashion, a comet processor may unregister itself from comet events and
-    use the <code>isReadable/isWriteable</code> methods on the comet event to detect the state 
-    of the comet connection. The registered events will be in effect until they are unregistered,
-    the comet connection is closed or terminated.
-    By default a comet connection gets registered for READ events upon initiation.
-    <br/>
-    The event registration can be compared to poll or select structures of different operating systems,
-    and also bear some resemblances with the <code>java.nio</code> API.
-  </p>
-  <p>
-    Since Comet Connections deal directly with the IO layer of the container/connection and read and writes can be done 
-    asynchronously, caution and care should be excersized when programming this. the comet connection itself is not thread safe
-    as such an implementation would suffer performance issues, instead it is up to the comet processor developer to ensure that
-    thread safety is reached and properly handled. 
-    As an example, registering the comet connection for READ events and at the same time performing asynchronous reads
-    on the input stream or the reader, can cause data corruption and dead locks.
-    Same way, using multiple threads to do writes to the output stream or writer can have the same effect.
-    <br/>To be thread safe, one can synchronize on the event object, but you will also need to coordinate it with 
-    events that are registered.
-  </p>
-  <p>
-    There is an event that is not IO based, that is the <code>CometEvent.EventType.CALLBACK</code> event.
-    This is an event that is forced by Tomcat when the <code>OP_CALLBACK</code> operation is registered.
-    Using the OP_CALLBACK operation, Tomcat will spawn a Tomcat worker thread that you can use to piggy back
-    on for reading/writing data or performing other operations, and not having to have spawn and synchronize 
-    your own background threads.<br/>
-    An example scenarion would be where you have one thread pulling content for different comet clients.
-    When the background thread has content for a client, it can store it in the request object as an attribute,
-    then register for the OP_CALLBACK event. Once the CALLBACK event, then the application can use Tomcat's worker
-    thread to write the data to the client.<br/>
-    Tomcat guarantees that only one thread will be invoking the CometProcessor event for a particular client,
-    so by using the Tomcat worker threads to perform your actions, you are thread safe without the expense of 
-    locks or synchronized methods.<br/>
-    Another usage scenario for the CALLBACK event, is when you close the comet connection asynchronously and you want 
-    it processed by tomcat without depending on a timeout or another IO event. This would look like
-    <source>
-      ...
-      event.close();
-      event.register(CometEvent.CometOperation.OP_CALLBACK);
-      ...
-    </source>
-  </p>
-  </subsection>
-  <subsection name="Comet Operations">
-  <p>
-    The previous section touched a little bit on the comet connection lifecycle. 
-    It is important to remember that comet events are based around IO events of an actual socket.<br/>
-    To clarify the Comet API, it has been created to resemble the java.nio channel/selector APIs.
-    In the case of Comet, Tomcat is the selector and using the CometEvent object, you can 
-    register and unregister your Comet event for different event type notifications.
-    We call the parameter to the <code>CometEvent.register/unregister</code> method a comet operation.
-    This is similar to the interestOps method of a <code>SelectionKey</code> in the java.nio implementation.
-    <br/>The Comet implementation of register and unregister has been greatly simplified to not force the 
-    comet developer to implement complex synchronizations around the register and unregister code.
-  </p>
-  <p>
-    It is important to realize, just like the java.nio API, that once an operation has been registered, it will
-    remain registered until it is unregistered. If you have registered OP_READ, then the comet connection will
-    fire READ events, every time data arrives until your unregister the OP_READ operation.<br/>
-    OP_CALLBACK/OP_WRITE work in the same way, essentially, register(OP_CALLBACK|OP_WRITE) will keep spawning 
-    CALLBACK/WRITE events until you unregister the operation(s).
-  </p>
-  </subsection>
-
   <subsection name="CometEvent">
   
   <p>
@@ -188,54 +71,42 @@
   <ul>
   <li>EventType.BEGIN: will be called at the beginning 
      of the processing of the connection. It can be used to initialize any relevant 
-     fields using the request and response objects. During the BEGIN event you may also configure 
-     your comet connection for blocking or non blocking mode. using the <code>configureBlocking(boolean)</code>
-     method on the comet event object. Between the end of the processing  
+     fields using the request and response objects. Between the end of the processing 
      of this event, and the beginning of the processing of the end or error events,
      it is possible to use the response object to write data on the open connection.
      Note that the response object and depedent OutputStream and Writer are still 
      not synchronized, so when they are accessed by multiple threads, 
      synchronization is mandatory. After processing the initial event, the request 
-     is considered to be committed.<br/><br/></li>
+     is considered to be committed.</li>
   <li>EventType.READ: This indicates that input data is available, and that one read can be made
-     without blocking. The <code>available()</code> and <code>ready()</code> methods of the InputStream or
-     Reader may be used to determine if there is a risk of blocking: the servlet
-     should read while data is reported available, and can make one additional read
-     should read while data is reported available. Not reading all the data, is not recommended,
-     as it may lead to unexpected behavior depending on the connector implementation.<br/>
-     When encountering a read error, the servlet should report it by propagating the exception properly. 
-     Throwing an exception will cause the error event to be invoked, and the connection 
-     will be closed. <br/>
-     Alternately, it is also possible to catch any exception, perform clean up
-     on any data structure the servlet may be using, and using the <code>close()</code> method
-     of the event object. It is not recommended to attempt reading data from the request 
-     object outside of the execution of this method/event if the comet connection is registered for 
-     the READ event. Instead unregister the read event to perform asynchronous reads.<br/>
-     On some platforms, like Windows, a client disconnect is indicated by a READ event.
-     Reading from the stream may result in -1, an IOException or an EOFException.
-     Make sure you properly handle all these three cases.
-     If you don't catch the IOException, Tomcat will instantly invoke your event chain with an ERROR as 
-     it catches the error for you, and you will be notified of the error at that time.<br/><br/>
-  </li>
-  <li>EventType.WRITE: If you wish to be notified whether you can write data to the underlying TCP socket,
-      register your comet connection for this event. Tomcat will invoke this event, and you can write to the response 
-      object. This event is not needed nor should be used unless you are running the comet connection in non blocking mode.<br/><br/>
-  </li>
- <li>EventType.CALLBACK: When a comet connection is registered using the OP_CALLBACK operation,
-     Tomcat will generate the CALLBACK event periodically. The CALLBACK will always 
-     be invoked using a Tomcat worker thread, just like the other event types.<br/><br/>
+       without blocking. The available and ready methods of the InputStream or
+       Reader may be used to determine if there is a risk of blocking: the servlet
+       should read while data is reported available, and can make one additional read
+       should read while data is reported available. When encountering a read error, 
+       the servlet should report it by propagating the exception properly. Throwing 
+       an exception will cause the error event to be invoked, and the connection 
+       will be closed. 
+       Alternately, it is also possible to catch any exception, perform clean up
+       on any data structure the servlet may be using, and using the close method
+       of the event. It is not allowed to attempt reading data from the request 
+       object outside of the execution of this method.<br/>
+       On some platforms, like Windows, a client disconnect is indicated by a READ event.
+       Reading from the stream may result in -1, an IOException or an EOFException.
+       Make sure you properly handle all these three cases.
+       If you don't catch the IOException, Tomcat will instantly invoke your event chain with an ERROR as 
+       it catches the error for you, and you will be notified of the error at that time.
   </li>
   <li>EventType.END: End may be called to end the processing of the request. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
      objects will be recycled and used to process other requests. End will also be 
      called when data is available and the end of file is reached on the request input
-     (this usually indicates the client has pipelined a request).<br/><br/></li>
+     (this usually indicates the client has pipelined a request).</li>
   <li>EventType.ERROR: Error will be called by the container in the case where an IO exception
      or a similar unrecoverable error occurs on the connection. Fields that have
      been initialized in the begin method should be reset. After this event has
      been processed, the request and response objects, as well as all their dependent
-     objects will be recycled and used to process other requests.<br/><br/></li>
+     objects will be recycled and used to process other requests.</li>
   </ul>
 
   <p>
@@ -281,401 +152,8 @@
   
   </subsection>
 
-  <subsection name="Example code snippets">
-  <p>Let's start with a real world example of how you could use Comet to handle AJAX requests.
-     An AJAX request is a complete HTTP request, followed by a complete HTTP response.
-     The next request is a new HTTP request.
-     There are many AJAX frameworks, and they can be used with regular servlets, so why
-     would I want to do this using Comet?
-     The answer is simply, with Comet you can do the response asynchronously and therefor
-     release the Tomcat thread to handle other requests.
-  
-  </p>
-  <source>
-Non blocking read and writes 
-
-public class ExampleDelayedAjaxResponse implements CometProcessor {
- ...
- public class DelayedResponder extends Thread {
-   public void run() {
-     ...
-     Client[] clients = getClients();
-     for (int i=0; i&lt;clients.length; i++ ) {
-       CometEvent event = client.getEvent();
-       byte[] data = getDelayedResponse(event);
-       if (data!=null) {
-         if (event.isWriteable()) {
-           event.getHttpServletResponse().getOutputStream().write(data);
-           if (event.isWriteable()) { //did we write it all?
-              event.close(); //close the event, in anticipation of the next request
-              event.register(OP_CALLBACK); //triggers an END event
-           } else { //we didn't write it all, trigger a WRITE event when we are done with the write               
-             event.register(OP_WRITE);
-           }
-         } else {
-           //we are not able to write, let us know when we can
-           event.register(OP_WRITE);
-         }
-         //remove the client from the  async thread
-         //since we have received the data for this client.
-         clients.remove(event);
-       }
-     }
-     ...
-   }
- }
- ...
- public void event(CometEvent event) throws IOException, ServletException {
-   ...
-   if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
-     //configure non blocking
-     event.configureBlocking(false);
-     //deregister for READ since we want to enable pipe lining on the connection      
-     //for the next HTTP request
-     event.unregister(OP_READ);
-     //add the client to the list
-     clients.add(event);
-   } if ( event.getEventType() == CometEvent.EventType.READ ) {
-     //read client Id and stock list from client
-     //and add the event to our list
-     assert("this should never happen");
-   } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
-     //unregister from the write event
-     event.unregister(OP_WRITE);
-     //we can now write
-     byte[] data = getDelayedResponse(event);           
-     if ( data != null ) {
-       event.getHttpServletResponse().getOutputStream().write(data);
-     }
-     if( data==null || event.isWriteable() ) {
-       event.close();
-     }
-   } if ( event.getEventType() == CometEvent.EventType.END ) {
-     clients.remove(event);         
-   } else if (...) {
-     ...
-   }
-   ...
- }
-}
-
-Blocking read and writes
-public class ExampleDelayedAjaxResponse implements CometProcessor {
- ...
- public class DelayedResponder extends Thread {
-   public void run() {
-     ...
-     Client[] clients = getClients();
-     for (int i=0; i&lt;clients.length; i++ ) {
-       CometEvent event = client.getEvent();
-       byte[] data = getDelayedResponse(event);
-       if (data!=null) {
-         //register for a write, better do that on a thread pool thread
-         //since write is blocking
-         event.register(OP_WRITE);
-         //remove the client from the  async thread
-         clients.remove(event);
-       }
-     }
-     ...
-   }
- }
- ...
- public void event(CometEvent event) throws IOException, ServletException {
-   ...
-   if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
-     //configure blocking
-     event.configureBlocking(true);
-     //deregister for READ since we want to enable pipe lining on the connection      
-     //for the next HTTP request
-     event.unregister(OP_READ);
-     //add the client to the list
-     clients.add(event);
-   } if ( event.getEventType() == CometEvent.EventType.READ ) {
-     //read client Id and stock list from client
-     //and add the event to our list
-     assert("this should never happen");
-   } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
-     //unregister from the write event
-     event.unregister(OP_WRITE);
-     //we can now write
-     byte[] data = getDelayedResponse(event);           
-     //note we don't have to check for null data here
-     event.getHttpServletResponse().getOutputStream().write(data);
-     event.close();
-   } if ( event.getEventType() == CometEvent.EventType.END ) {
-     clients.remove(event);
-   } else if (...) {
-     ...
-   }
-   ...
- }
-}   
-  
-  </source>
-
-  <p>
-    Imagine you are writing a servlet that is updating a set of 
-    stock tickers. You have a back ground thread that is receiving 
-    updates for tickers as they happen, and you wish to push out these
-    to all the tickers that have the stocks in their list.<br/>
-    In the following example, you can accomplish maximum through put by 
-    taking advantage of Tomcat's non blocking Comet features.<br/>
-    When the StockUpdater thread is running, it receives a set of stock updates.
-    It gets all the clients that are registered for the stocks that have changed.<br/>
-    For each client, there is an associated CometEvent object, the StockUpdater
-    checks if it can write without blocking, if so it writes directly, otherwise
-    it registers the client for a WRITE event, that will tell the 
-    system that we can write the data now.
-    This is a perfect example of how we can take advantage of the combination of the write event
-    and the isWriteable method to determine, when we can write the data.<br/>
-    As with any kind of non blocking IO, you will need to synchronize your code,
-    this has not been done in the example below since the focus is on the 
-    data delivery, not synchronization.
-  </p>
-  <source>
-public class ExampleCometStockStreamer implements CometProcessor {
-  ...
-  public class StockUpdater extends Thread {
-    public void run() {
-      ...
-      StockUpdates[] updates = fetchUpdates();
-      Client[] clients = getClients(updates);
-      for (int i=0; i&lt;clients.length; i++ ) {
-        CometEvent event = client.getEvent();
-        StockUpdates[] clientList = getClientUpdates(client,updates);
-        client.setAndMergeNextUpdates(clientList);
-        if (event.isWriteable()) {
-          byte[] data = getUpdateChunk(client.getNextUpdates());
-          event.getHttpServletResponse().getOutputStream().write(data);
-        } else {
-          event.register(OP_WRITE);
-        }
-      }
-      ...
-    }
-  }
-  ...
-  public void event(CometEvent event) throws IOException, ServletException {
-    ...
-    if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
-      //configure non blocking
-      event.configureBlocking(false);
-    } if ( event.getEventType() == CometEvent.EventType.READ ) {
-      //read client Id and stock list from client
-      //and add the event to our list
-      String clientId = readClientInfo(event,stocks);
-      clients.add(clientId, event, stocks);
-    } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
-      //unregister from the write event
-      event.unregister(OP_WRITE);
-      //we can now write
-      byte[] data = getUpdateChunk(client.getNextUpdates());
-      event.getHttpServletResponse().getOutputStream().write(data);
-    } else if (...) {
-      ...
-    }
-    ...
-  }
-  
-}
-  </source>
-
-  <p>
-    The above stock ticker example is extremely powerful, 
-    but also creates a great deal of complexity trying to 
-    synchronize between the registration of interested events
-    between the threads. <br/>
-    Another option is to simplify this by using blocking IO.
-    That implementation would look like this.<br/>
-    Notice that writing data to the client is only done
-    upon an event and never asynchronously. Assuming that the data written is smaller 
-    than the socket network buffer, this write is almost always guaranteed
-    to be written without a delay. Should the write be blocked,
-    the system is still concurrent, as the writing happens on a thread
-    from Tomcat's thread pool. <br/>
-    In this case, the only synchronization that needs to be done is in between
-    <code>client.getNextUpdates()</code> and <code>client.setAndMergeNextUpdates(clientList)</code>.
-  </p>
-  <source>
-public class ExampleCometStockStreamer implements CometProcessor {
-  ...
-  public class StockUpdater extends Thread {
-    public void run() {
-      ...
-      StockUpdates[] updates = fetchUpdates();
-      Client[] clients = getClients(updates);
-      for (int i=0; i&lt;clients.length; i++ ) {
-        StockUpdates[] clientList = getClientUpdates(client,updates);
-        client.setAndMergeNextUpdates(clientList);
-        client.getEvent().register(OP_WRITE);
-      }
-      ...
-    }
-  }
-  ...
-  public void event(CometEvent event) throws IOException, ServletException {
-    ...
-    if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
-      //configure blocking
-      event.configureBlocking(true);
-    } if ( event.getEventType() == CometEvent.EventType.READ ) {
-      //read client Id and stock list from client
-      //and add the event to our list
-      String clientId = readClientInfo(event,stocks);
-      clients.add(clientId, event, stocks);
-    } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
-      Client client = clients.get(event);
-      //unregister from the write event
-      event.unregister(OP_WRITE);
-      //we can now write
-      byte[] data = getUpdateChunk(client.getNextUpdates());
-      event.getHttpServletResponse().getOutputStream().write(data);
-    } else if (...) {
-      ...
-    }
-    ...
-  }
-  
-}
-  </source>
-
-  <p>
-    Imagine that you wish to write a pseudo transactional system,
-    (please take the word transaction with a grain of salt),
-    and be able to do your own write scheduling.<br/>
-    In the next example we are going to demonstrate the ability to 
-    use the isReadable() and isWriteable() methods in a poller sense,
-    and do all writes and reads asynchronously on a single thread.<br/>
-    Our goal here is to implement a comet servlet that reads a client request,
-    then writes a chunk of data when the request has been received.
-    The servlet will not write the next chunk until the first request has been read 
-    and first chunk has been written to all clients.
-    The code below is far from optimal, but it demonstrates the ability
-    to not rely on any IO events, and schedule yourself when you wish to read
-    or write data. All operations are non blocking, so the AllWriterThread
-    will never block on any operation. <br/>In the example below,
-    we just do a busy spin cycle.
-    other
-  </p>
-  <source>
-public class ExampleAllReadThenWriteComet implements CometProcessor {
-  ...
-  public class AllWriterThread extends Thread {
-    byte[] dataChunks = ...;
-    public void run() {
-      ...
-      for (int i=0; i&lt;dataChunks.length; i++ ) {
-        for (int j=0; j&lt;clients.size(); j++) {
-          boolean done = false;
-          while (!done) {
-            //first read the first request
-            //but only if our previous write was completed
-            if ( clients[j].getEvent().isWriteable() &amp;&amp; clients[j].getEvent().isReadable() ) {
-              done = readClientData(clients[j]); //returns true if all data has been received for a request
-            }
-          }
-          done = false;
-          while (!done) {
-            //write the response
-            if ( clients[j].getEvent().isWriteable() {
-               clients[j].getEvent().getHttpServletResponse().write(dataChunks[i]);
-               done = true;
-            }
-          }
-        }
-      }
-      ...
-    }
-  }
-  ...
-  public void event(CometEvent event) throws IOException, ServletException {
-    ...
-    if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
-      //configure non blocking
-      event.configureBlocking(false);
-      //disable all events
-      event.unregister(event.getRegisteredOps());
-      //add the event to our client list
-      clients.add(event);
-      //start our writer if all clients have arrived
-      if (clients.size()==5) {
-        AllWriterThread thread = new AllWriterThread();
-        thread.start();
-      }
-    } if ( event.getEventType() == CometEvent.EventType.READ ) {
-    } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
-    } else if (...) {
-      ...
-    }
-    ...
-  }
-  
-}
-  </source>
-
-  <p>
-    Ok, so the previous example was kind of silly, but we demonstrated that 
-    you are able to read/write on a single thread, in a non blocking fashion.
-    Now we are going to achieve the exact same functionality, but not using 
-    any asynchronous data, instead we are going to use 
-    blocking IO and tomcat's worker threads
-  </p>
-  <source>
-public class ExampleAllReadThenWriteComet implements CometProcessor {
-  ...
-  byte[] dataChunks = ...;
-  ...
-  public void event(CometEvent event) throws IOException, ServletException {
-    ...
-    if ( event.getEventType() == CometEvent.EventType.BEGIN ) {
-      //configure blocking
-      event.configureBlocking(true);
-      //disable all events
-      event.unregister(event.getRegisteredOps());
-      //add the event to our client list
-      clients.add(event);
-      //if all our clients have arrived, register them for read.
-      if (atomicClientCounter.addAndGet(1)==5) { 
-        atomicClientReadCounter.set(5);
-        for (Client c : clients) {
-          c.getEvent().register(OP_READ);
-        }
-      }
-    } if ( event.getEventType() == CometEvent.EventType.READ ) {
-      event.unregister(OP_READ);  
-      Client client = clients.get(event);
-      readClientData(client);
-      if (atomicClientReadCounter.addAndGet(-1) == 0 ) {
-        //all clients have read
-        atomicClientWriteCounter.set(5);
-        for (Client c : clients) {
-          c.getEvent().register(OP_WRITE);
-        }
-      }
-    } if ( event.getEventType() == CometEvent.EventType.WRITE ) {
-      event.unregister(OP_WRITE);  
-      Client client = clients.get(event);
-      writeNextChunk(client);
-      if (atomicClientWriteCounter.addAndGet(-1) == 0 ) {
-        //all clients have been written, start reading the next request
-        atomicClientReadCounter.set(5);
-        for (Client c : clients) {
-          c.getEvent().register(OP_READ);
-        }
-      }
-    } else if (...) {
-      ...
-    }
-    ...
-  }
-}
-  </source>
-
-
-  </subsection>
-
   <subsection name="Example code">
+  
   <p>
     The following pseudo code servlet implments asynchronous chat functionality using the API
     described above:
@@ -822,12 +300,11 @@ public class ChatServlet
   <subsection name="Comet timeouts">
     <p>If you are using the NIO connector, you can set individual timeouts for your different comet connections.
        To set a timeout, simple set a request attribute like the following code shows:
-       <source>event.setTimeout(30*1000);</source> 
-       <br/>You can set the timeout on the comet connection at any point in time, even asynchronously.
-       Setting a timeout to 1 (one milliseconds) doesn't guarantee that it will timeout at that time.
-       Setting the timeout gurantees that Tomcat wont timeout the connection before the connection has been idle
-       for the configured time. The time it actually times out depends on many factors, such as how busy the server is,
-       when the last timeout scan was run, etc., but generally a timeout will occur fairly close to its configured value.
+       <source>CometEvent event.... event.setTimeout(30*1000);</source> or
+       <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
+       This sets the timeout to 30 seconds.
+       Important note, in order to set this timeout, it has to be done on the <code>BEGIN</code> event.
+       The default value is <code>soTimeout</code>
     </p>
     <p>If you are using the APR connector, all Comet connections will have the same timeout value. It is <code>soTimeout*50</code>
     </p>

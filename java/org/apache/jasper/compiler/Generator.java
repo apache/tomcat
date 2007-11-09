@@ -73,8 +73,8 @@ class Generator {
 
     private static final String VAR_EXPRESSIONFACTORY = 
         System.getProperty("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY", "_el_expressionfactory");
-    private static final String VAR_INSTANCEMANAGER =
-        System.getProperty("org.apache.jasper.compiler.Generator.VAR_INSTANCEMANAGER", "_jsp_instancemanager");
+    private static final String VAR_ANNOTATIONPROCESSOR = 
+        System.getProperty("org.apache.jasper.compiler.Generator.VAR_ANNOTATIONPROCESSOR", "_jsp_annotationprocessor");
 
     private ServletWriter out;
 
@@ -410,14 +410,14 @@ class Generator {
         }
         out.println(".getServletContext()).getExpressionFactory();");
 
-        out.printin(VAR_INSTANCEMANAGER);
-        out.print(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(");
+        out.printin(VAR_ANNOTATIONPROCESSOR);
+        out.print(" = (org.apache.AnnotationProcessor) ");
         if (ctxt.isTagFile()) {
             out.print("config");
         } else {
             out.print("getServletConfig()");
         }
-        out.println(");");
+        out.println(".getServletContext().getAttribute(org.apache.AnnotationProcessor.class.getName());");
 
         out.popIndent();
         out.printil("}");
@@ -521,8 +521,8 @@ class Generator {
         out.printin("private javax.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
         out.println(";");
-        out.printin("private org.apache.InstanceManager ");
-        out.print(VAR_INSTANCEMANAGER);
+        out.printin("private org.apache.AnnotationProcessor ");
+        out.print(VAR_ANNOTATIONPROCESSOR);
         out.println(";");
         out.println();
     }
@@ -2142,11 +2142,11 @@ class Generator {
 
             String tagHandlerClassName = JspUtil
                     .getCanonicalName(tagHandlerClass);
+            out.printin(tagHandlerClassName);
+            out.print(" ");
+            out.print(tagHandlerVar);
+            out.print(" = ");
             if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
-                out.printin(tagHandlerClassName);
-                out.print(" ");
-                out.print(tagHandlerVar);
-                out.print(" = ");
                 out.print("(");
                 out.print(tagHandlerClassName);
                 out.print(") ");
@@ -2155,7 +2155,14 @@ class Generator {
                 out.print(tagHandlerClassName);
                 out.println(".class);");
             } else {
-                writeNewInstance(tagHandlerVar, tagHandlerClassName);
+                out.print("new ");
+                out.print(tagHandlerClassName);
+                out.println("();");
+                out.printin("org.apache.jasper.runtime.AnnotationHelper.postConstruct(");
+                out.print(VAR_ANNOTATIONPROCESSOR);
+                out.print(", ");
+                out.print(tagHandlerVar);
+                out.println(");");
             }
 
             // includes setting the context
@@ -2213,7 +2220,8 @@ class Generator {
                         out.println("[0]++;");
                     }
                     out.printin(tagHandlerVar);
-                    out.println(".setBodyContent((javax.servlet.jsp.tagext.BodyContent) out);");
+                    out
+                            .println(".setBodyContent((javax.servlet.jsp.tagext.BodyContent) out);");
                     out.printin(tagHandlerVar);
                     out.println(".doInitBody();");
 
@@ -2237,40 +2245,6 @@ class Generator {
             // Map the Java lines that handles start of custom tags to the
             // JSP line for this tag
             n.setEndJavaLine(out.getJavaLine());
-        }
-
-        private void writeNewInstance(String tagHandlerVar, String tagHandlerClassName) {
-        	if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
-        		out.printin(tagHandlerClassName);
-        		out.print(" ");
-        		out.print(tagHandlerVar);
-        		out.print(" = (");
-        		out.print(tagHandlerClassName);
-        		out.print(")");
-        		out.print(VAR_INSTANCEMANAGER);
-        		out.print(".newInstance(\"");
-        		out.print(tagHandlerClassName);
-        		out.println("\", this.getClass().getClassLoader());");
-        	} else {
-        		out.printin(tagHandlerClassName);
-        		out.print(" ");
-        		out.print(tagHandlerVar);
-        		out.print(" = (");
-        		out.print("new ");
-        		out.print(tagHandlerClassName);
-        		out.println("());");
-        		out.printin(VAR_INSTANCEMANAGER);
-        		out.print(".newInstance(");
-        		out.print(tagHandlerVar);
-        		out.println(");");
-        	}
-        }
-
-        private void writeDestroyInstance(String tagHandlerVar) {
-            out.printin(VAR_INSTANCEMANAGER);
-            out.print(".destroyInstance(");
-            out.print(tagHandlerVar);
-            out.println(");");
         }
 
         private void generateCustomEnd(Node.CustomTag n, String tagHandlerVar,
@@ -2334,7 +2308,11 @@ class Generator {
                 } else {
                     out.printin(tagHandlerVar);
                     out.println(".release();");
-                    writeDestroyInstance(tagHandlerVar);
+                    out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
+                    out.print(VAR_ANNOTATIONPROCESSOR);
+                    out.print(", ");
+                    out.print(tagHandlerVar);
+                    out.println(");");
                 }
             }
             if (isTagFile || isFragment) {
@@ -2377,7 +2355,11 @@ class Generator {
             } else {
                 out.printin(tagHandlerVar);
                 out.println(".release();");
-                writeDestroyInstance(tagHandlerVar);
+                out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
+                out.print(VAR_ANNOTATIONPROCESSOR);
+                out.print(", ");
+                out.print(tagHandlerVar);
+                out.println(");");
             }
 
             if (n.implementsTryCatchFinally()) {
@@ -2409,8 +2391,21 @@ class Generator {
 
             String tagHandlerClassName = JspUtil
                     .getCanonicalName(tagHandlerClass);
-            writeNewInstance(tagHandlerVar, tagHandlerClassName);
+            out.printin(tagHandlerClassName);
+            out.print(" ");
+            out.print(tagHandlerVar);
+            out.print(" = ");
+            out.print("new ");
+            out.print(tagHandlerClassName);
+            out.println("();");
 
+            // Resource injection
+            out.printin("org.apache.jasper.runtime.AnnotationHelper.postConstruct(");
+            out.print(VAR_ANNOTATIONPROCESSOR);
+            out.print(", ");
+            out.print(tagHandlerVar);
+            out.println(");");
+            
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
             // JspIdConsumer (after context has been set)
@@ -2463,7 +2458,11 @@ class Generator {
             syncScriptingVars(n, VariableInfo.AT_END);
 
             // Resource injection
-            writeDestroyInstance(tagHandlerVar);
+            out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
+            out.print(VAR_ANNOTATIONPROCESSOR);
+            out.print(", ");
+            out.print(tagHandlerVar);
+            out.println(");");
 
             n.setEndJavaLine(out.getJavaLine());
         }

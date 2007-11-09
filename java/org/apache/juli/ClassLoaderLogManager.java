@@ -442,13 +442,19 @@ public class ClassLoaderLogManager extends LogManager {
      */
     protected String replace(String str) {
         String result = str;
-        if (result.startsWith("${")) {
-            int pos = result.indexOf('}');
-            if (pos != -1) {
-                String propName = result.substring(2, pos);
+        int pos_start = result.indexOf("${");
+        if (pos_start != -1) {
+            int pos_end = result.indexOf('}');
+            if (pos_end != -1) {
+                String propName = result.substring(pos_start + 2, pos_end);
                 String replacement = System.getProperty(propName);
                 if (replacement != null) {
-                    result = replacement + result.substring(pos + 1);
+                    if(pos_start >0) {
+                        result = result.substring(0,pos_start) + 
+                            replacement + replace(result.substring(pos_end + 1));
+                    } else {                       
+                        result = replacement + replace(result.substring(pos_end + 1));
+                    }
                 }
             }
         }

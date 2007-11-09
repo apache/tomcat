@@ -20,6 +20,7 @@ package org.apache.catalina.servlets;
 
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.security.MessageDigest;
@@ -36,6 +37,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +46,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.catalina.util.RequestUtil;
@@ -56,6 +59,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -174,7 +178,8 @@ public class WebdavServlet
      * Key : path <br>
      * Value : LockInfo
      */
-    private Hashtable resourceLocks = new Hashtable();
+    private Hashtable<String,LockInfo> resourceLocks =
+        new Hashtable<String,LockInfo>();
 
 
     /**
@@ -185,7 +190,8 @@ public class WebdavServlet
      * collection. Each element of the Vector is the path associated with
      * the lock-null resource.
      */
-    private Hashtable lockNullResources = new Hashtable();
+    private Hashtable<String,Vector<String>> lockNullResources =
+        new Hashtable<String,Vector<String>>();
 
 
     /**
@@ -194,7 +200,7 @@ public class WebdavServlet
      * Key : path <br>
      * Value : LockInfo
      */
-    private Vector collectionLocks = new Vector();
+    private Vector<LockInfo> collectionLocks = new Vector<LockInfo>();
 
 
     /**
@@ -240,7 +246,10 @@ public class WebdavServlet
         try {
             documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
+            documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            documentBuilder.setEntityResolver(
+                    new WebdavResolver(this.getServletContext()));
         } catch(ParserConfigurationException e) {
             throw new ServletException
                 (sm.getString("webdavservlet.jaxpfailed"));
@@ -310,6 +319,35 @@ public class WebdavServlet
 
 
     /**
+     * Override the DefaultServlet implementation and only use the PathInfo. If
+     * the ServletPath is non-null, it will be because the WebDAV servlet has
+     * been mapped to a url other than /* to configure editing at different url
+     * than normal viewing.
+     *
+     * @param request The servlet request we are processing
+     */
+    protected String getRelativePath(HttpServletRequest request) {
+
+        // Are we being processed by a RequestDispatcher.include()?
+        if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
+            String result = (String) request.getAttribute(
+                                            Globals.INCLUDE_PATH_INFO_ATTR);
+            if ((result == null) || (result.equals("")))
+                result = "/";
+            return (result);
+        }
+
+        // No, extract the desired path directly from the request
+        String result = request.getPathInfo();
+        if ((result == null) || (result.equals(""))) {
+            result = "/";
+        }
+        return (result);
+
+    }
+
+
+    /**
      * OPTIONS Method.
      *
      * @param req The request
@@ -358,7 +396,7 @@ public class WebdavServlet
         }
 
         // Properties which are to be displayed.
-        Vector properties = null;
+        Vector<String> properties = null;
         // Propfind depth
         int depth = INFINITY;
         // Propfind type
@@ -379,44 +417,46 @@ public class WebdavServlet
         }
 
         Node propNode = null;
-
-        DocumentBuilder documentBuilder = getDocumentBuilder();
-
-        try {
-            Document document = documentBuilder.parse
-                (new InputSource(req.getInputStream()));
-
-            // Get the root element of the document
-            Element rootElement = document.getDocumentElement();
-            NodeList childList = rootElement.getChildNodes();
-
-            for (int i=0; i < childList.getLength(); i++) {
-                Node currentNode = childList.item(i);
-                switch (currentNode.getNodeType()) {
-                case Node.TEXT_NODE:
-                    break;
-                case Node.ELEMENT_NODE:
-                    if (currentNode.getNodeName().endsWith("prop")) {
-                        type = FIND_BY_PROPERTY;
-                        propNode = currentNode;
+        
+        if (req.getInputStream().available() > 0) {
+            DocumentBuilder documentBuilder = getDocumentBuilder();
+    
+            try {
+                Document document = documentBuilder.parse
+                    (new InputSource(req.getInputStream()));
+    
+                // Get the root element of the document
+                Element rootElement = document.getDocumentElement();
+                NodeList childList = rootElement.getChildNodes();
+    
+                for (int i=0; i < childList.getLength(); i++) {
+                    Node currentNode = childList.item(i);
+                    switch (currentNode.getNodeType()) {
+                    case Node.TEXT_NODE:
+                        break;
+                    case Node.ELEMENT_NODE:
+                        if (currentNode.getNodeName().endsWith("prop")) {
+                            type = FIND_BY_PROPERTY;
+                            propNode = currentNode;
+                        }
+                        if (currentNode.getNodeName().endsWith("propname")) {
+                            type = FIND_PROPERTY_NAMES;
+                        }
+                        if (currentNode.getNodeName().endsWith("allprop")) {
+                            type = FIND_ALL_PROP;
+                        }
+                        break;
                     }
-                    if (currentNode.getNodeName().endsWith("propname")) {
-                        type = FIND_PROPERTY_NAMES;
-                    }
-                    if (currentNode.getNodeName().endsWith("allprop")) {
-                        type = FIND_ALL_PROP;
-                    }
-                    break;
                 }
+            } catch (SAXException e) {
+                // Something went wrong - use the defaults.
+            } catch (IOException e) {
+                // Something went wrong - use the defaults.
             }
-        } catch (SAXException e) {
-            // Most likely there was no content : we use the defaults.
-        } catch (IOException e) {
-            // Most likely there was no content : we use the defaults.
         }
 
         if (type == FIND_BY_PROPERTY) {
-            properties = new Vector();
+            properties = new Vector<String>();
             NodeList childList = propNode.getChildNodes();
 
             for (int i=0; i < childList.getLength(); i++) {
@@ -504,11 +544,11 @@ public class WebdavServlet
                             properties);
         } else {
             // The stack always contains the object of the current level
-            Stack stack = new Stack();
+            Stack<String> stack = new Stack<String>();
             stack.push(path);
 
             // Stack of the objects one level below
-            Stack stackBelow = new Stack();
+            Stack<String> stackBelow = new Stack<String>();
 
             while ((!stack.isEmpty()) && (depth >= 0)) {
 
@@ -567,7 +607,7 @@ public class WebdavServlet
                 if (stack.isEmpty()) {
                     depth--;
                     stack = stackBelow;
-                    stackBelow = new Stack();
+                    stackBelow = new Stack<String>();
                 }
 
                 generatedXML.sendData();
@@ -1017,7 +1057,7 @@ public class WebdavServlet
 
                 // Checking if a child resource of this collection is
                 // already locked
-                Vector lockPaths = new Vector();
+                Vector<String> lockPaths = new Vector<String>();
                 locksList = collectionLocks.elements();
                 while (locksList.hasMoreElements()) {
                     LockInfo currentLock = (LockInfo) locksList.nextElement();
@@ -1164,10 +1204,10 @@ public class WebdavServlet
                         int slash = lock.path.lastIndexOf('/');
                         String parentPath = lock.path.substring(0, slash);
 
-                        Vector lockNulls =
-                            (Vector) lockNullResources.get(parentPath);
+                        Vector<String> lockNulls =
+                            lockNullResources.get(parentPath);
                         if (lockNulls == null) {
-                            lockNulls = new Vector();
+                            lockNulls = new Vector<String>();
                             lockNullResources.put(parentPath, lockNulls);
                         }
 
@@ -1636,7 +1676,7 @@ public class WebdavServlet
 
         // Copying source to destination
 
-        Hashtable errorList = new Hashtable();
+        Hashtable<String,Integer> errorList = new Hashtable<String,Integer>();
 
         boolean result = copyResource(resources, errorList,
                                       path, destinationPath);
@@ -1666,8 +1706,8 @@ public class WebdavServlet
      * @param source Path of the resource to be copied
      * @param dest Destination path
      */
-    private boolean copyResource(DirContext resources, Hashtable errorList,
-                                 String source, String dest) {
+    private boolean copyResource(DirContext resources,
+            Hashtable<String,Integer> errorList, String source, String dest) {
 
         if (debug > 1)
             log("Copy: " + source + " To: " + dest);
@@ -1807,7 +1847,8 @@ public class WebdavServlet
             }
         } else {
 
-            Hashtable errorList = new Hashtable();
+            Hashtable<String,Integer> errorList =
+                new Hashtable<String,Integer>();
 
             deleteCollection(req, resources, path, errorList);
             try {
@@ -1842,7 +1883,8 @@ public class WebdavServlet
      */
     private void deleteCollection(HttpServletRequest req,
                                   DirContext resources,
-                                  String path, Hashtable errorList) {
+                                  String path,
+                                  Hashtable<String,Integer> errorList) {
 
         if (debug > 1)
             log("Delete:" + path);
@@ -1983,7 +2025,7 @@ public class WebdavServlet
     private void parseProperties(HttpServletRequest req,
                                  XMLWriter generatedXML,
                                  String path, int type,
-                                 Vector propertiesVector) {
+                                 Vector<String> propertiesVector) {
 
         // Exclude any resource in the /WEB-INF and /META-INF subdirectories
         // (the "toUpperCase()" avoids problems on Windows systems)
@@ -2119,14 +2161,14 @@ public class WebdavServlet
 
         case FIND_BY_PROPERTY :
 
-            Vector propertiesNotFound = new Vector();
+            Vector<String> propertiesNotFound = new Vector<String>();
 
             // Parse the list of properties
 
             generatedXML.writeElement(null, "propstat", XMLWriter.OPENING);
             generatedXML.writeElement(null, "prop", XMLWriter.OPENING);
 
-            Enumeration properties = propertiesVector.elements();
+            Enumeration<String> properties = propertiesVector.elements();
 
             while (properties.hasMoreElements()) {
 
@@ -2396,7 +2438,7 @@ public class WebdavServlet
 
         case FIND_BY_PROPERTY :
 
-            Vector propertiesNotFound = new Vector();
+            Vector<String> propertiesNotFound = new Vector<String>();
 
             // Parse the list of properties
 
@@ -2645,7 +2687,7 @@ public class WebdavServlet
         String scope = "exclusive";
         int depth = 0;
         String owner = "";
-        Vector tokens = new Vector();
+        Vector<String> tokens = new Vector<String>();
         long expiresAt = 0;
         Date creationDate = new Date();
 
@@ -2742,20 +2784,26 @@ public class WebdavServlet
     }
 
 
-    // --------------------------------------------------- Property Inner Class
-
-
-    private class Property {
-
-        public String name;
-        public String value;
-        public String namespace;
-        public String namespaceAbbrev;
-        public int status = WebdavStatus.SC_OK;
-
+    // --------------------------------------------- WebdavResolver Inner Class
+    /**
+     * Work around for XML parsers that don't fully respect
+     * {@link DocumentBuilderFactory#setExpandEntityReferences(false)}. External
+     * references are filtered out for security reasons. See CVE-2007-5461.
+     */
+    private class WebdavResolver implements EntityResolver {
+        private ServletContext context;
+        
+        public WebdavResolver(ServletContext theContext) {
+            context = theContext;
+        }
+     
+        public InputSource resolveEntity (String publicId, String systemId) {
+            context.log(sm.getString("webdavservlet.enternalEntityIgnored",
+                    publicId, systemId));
+            return new InputSource(
+                    new StringReader("Ignored external entity"));
+        }
     }
-
-
 };
 
 
@@ -2782,7 +2830,8 @@ class WebdavStatus {
      * status codes to descriptive text.  This is a static
      * variable.
      */
-    private static Hashtable mapStatusCodes = new Hashtable();
+    private static Hashtable<Integer,String> mapStatusCodes =
+        new Hashtable<Integer,String>();
 
 
     // ------------------------------------------------------ HTTP Status Codes
@@ -3076,4 +3125,5 @@ class WebdavStatus {
     }
 
 };
+
 

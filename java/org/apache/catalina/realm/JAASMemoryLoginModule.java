@@ -212,7 +212,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
      */
     public SecurityConstraint [] findSecurityConstraints(Request request,
                                                      Context context) {
-        ArrayList results = null;
+        ArrayList<SecurityConstraint> results = null;
         // Are there any defined security constraints?
         SecurityConstraint constraints[] = context.findConstraints();
         if ((constraints == null) || (constraints.length == 0)) {
@@ -235,7 +235,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
                     constraints[i].included(uri, method));
             if (constraints[i].included(uri, method)) {
                 if(results == null) {
-                    results = new ArrayList();
+                    results = new ArrayList<SecurityConstraint>();
                 }
                 results.add(constraints[i]);
             }

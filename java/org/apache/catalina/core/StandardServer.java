@@ -360,7 +360,7 @@ public final class StandardServer
         if( port==-1 ) {
             while( true ) {
                 try {
-                    Thread.sleep( 100000 );
+                    Thread.sleep( 10000 );
                 } catch( InterruptedException ex ) {
                 }
                 if( stopAwait ) return;
@@ -746,6 +746,9 @@ public final class StandardServer
 
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
+
+        if (port == -1)
+            stopAwait();
 
     }
 

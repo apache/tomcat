@@ -313,14 +313,13 @@ public class Connector
     /**
      * Set a configured property.
      */
-    public void setProperty(String name, String value) {
+    public boolean setProperty(String name, String value) {
         String repl = name;
         if (replacements.get(name) != null) {
             repl = (String) replacements.get(name);
         }
-        IntrospectionUtils.setProperty(protocolHandler, repl, value);
+        return IntrospectionUtils.setProperty(protocolHandler, repl, value);
     }
-
 
     /**
      * Return a configured property.
@@ -910,7 +909,7 @@ public class Connector
 
     /**
      * Enables or disables the generation of an X-Powered-By header (with value
-     * Servlet/2.4) for all servlet-generated responses returned by this
+     * Servlet/2.5) for all servlet-generated responses returned by this
      * Connector.
      *
      * @param xpoweredBy true if generation of X-Powered-By response header is

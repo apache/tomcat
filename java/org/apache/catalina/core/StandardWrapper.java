@@ -18,22 +18,19 @@
 
 package org.apache.catalina.core;
 
-import java.io.PrintStream;
 import java.lang.reflect.Method;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Stack;
-
-import javax.management.ListenerNotFoundException;
-import javax.management.MBeanNotificationInfo;
-import javax.management.Notification;
-import javax.management.NotificationBroadcasterSupport;
-import javax.management.NotificationEmitter;
-import javax.management.NotificationFilter;
-import javax.management.NotificationListener;
-import javax.management.ObjectName;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -42,6 +39,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
+import javax.management.NotificationBroadcasterSupport;
+import javax.management.NotificationEmitter;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
+import javax.management.ObjectName;
 
 import org.apache.PeriodicEventListener;
 import org.apache.catalina.Container;
@@ -51,8 +56,8 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.InstanceEvent;
 import org.apache.catalina.InstanceListener;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Loader;
 import org.apache.catalina.Wrapper;
-import org.apache.InstanceManager;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.InstanceSupport;
@@ -91,6 +96,22 @@ public class StandardWrapper
         pipeline.setBasic(swValve);
         broadcaster = new NotificationBroadcasterSupport();
 
+        if (restrictedServlets == null) {
+            restrictedServlets = new Properties();
+            try {
+                InputStream is = 
+                    this.getClass().getClassLoader().getResourceAsStream
+                        ("org/apache/catalina/core/RestrictedServlets.properties");
+                if (is != null) {
+                    restrictedServlets.load(is);
+                } else {
+                    log.error(sm.getString("standardWrapper.restrictedServletsResource"));
+                }
+            } catch (IOException e) {
+                log.error(sm.getString("standardWrapper.restrictedServletsResource"), e);
+            }
+        }
+        
     }
 
 
@@ -266,7 +287,12 @@ public class StandardWrapper
                                                          ServletRequest.class,
                                                          ServletResponse.class};
     
-
+    /**
+     * Restricted servlets (which can only be loaded by a privileged webapp).
+     */
+    protected static Properties restrictedServlets = null;
+    
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -1006,9 +1032,83 @@ public class StandardWrapper
                     (sm.getString("standardWrapper.notClass", getName()));
             }
 
-            InstanceManager instanceManager = ((StandardContext)getParent()).getInstanceManager();
+            // Acquire an instance of the class loader to be used
+            Loader loader = getLoader();
+            if (loader == null) {
+                unavailable(null);
+                throw new ServletException
+                    (sm.getString("standardWrapper.missingLoader", getName()));
+            }
+
+            ClassLoader classLoader = loader.getClassLoader();
+
+            // Special case class loader for a container provided servlet
+            //  
+            if (isContainerProvidedServlet(actualClass) && 
+                    ! ((Context)getParent()).getPrivileged() ) {
+                // If it is a priviledged context - using its own
+                // class loader will work, since it's a child of the container
+                // loader
+                classLoader = this.getClass().getClassLoader();
+            }
+
+            // Load the specified servlet class from the appropriate class loader
+            Class classClass = null;
             try {
-                servlet = (Servlet) instanceManager.newInstance(actualClass);
+                if (SecurityUtil.isPackageProtectionEnabled()){
+                    final ClassLoader fclassLoader = classLoader;
+                    final String factualClass = actualClass;
+                    try{
+                        classClass = (Class)AccessController.doPrivileged(
+                                new PrivilegedExceptionAction(){
+                                    public Object run() throws Exception{
+                                        if (fclassLoader != null) {
+                                            return fclassLoader.loadClass(factualClass);
+                                        } else {
+                                            return Class.forName(factualClass);
+                                        }
+                                    }
+                        });
+                    } catch(PrivilegedActionException pax){
+                        Exception ex = pax.getException();
+                        if (ex instanceof ClassNotFoundException){
+                            throw (ClassNotFoundException)ex;
+                        } else {
+                            getServletContext().log( "Error loading "
+                                + fclassLoader + " " + factualClass, ex );
+                        }
+                    }
+                } else {
+                    if (classLoader != null) {
+                        classClass = classLoader.loadClass(actualClass);
+                    } else {
+                        classClass = Class.forName(actualClass);
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                unavailable(null);
+                getServletContext().log( "Error loading " + classLoader + " " + actualClass, e );
+                throw new ServletException
+                    (sm.getString("standardWrapper.missingClass", actualClass),
+                     e);
+            }
+
+            if (classClass == null) {
+                unavailable(null);
+                throw new ServletException
+                    (sm.getString("standardWrapper.missingClass", actualClass));
+            }
+
+            // Instantiate and initialize an instance of the servlet class itself
+            try {
+                servlet = (Servlet) classClass.newInstance();
+                // Annotation processing
+                if (!((Context) getParent()).getIgnoreAnnotations()) {
+                    if (getParent() instanceof StandardContext) {
+                       ((StandardContext)getParent()).getAnnotationProcessor().processAnnotations(servlet);
+                       ((StandardContext)getParent()).getAnnotationProcessor().postConstruct(servlet);
+                    }
+                }
             } catch (ClassCastException e) {
                 unavailable(null);
                 // Restore the context ClassLoader
@@ -1016,7 +1116,7 @@ public class StandardWrapper
                     (sm.getString("standardWrapper.notServlet", actualClass), e);
             } catch (Throwable e) {
                 unavailable(null);
-
+              
                 // Added extra log statement for Bugzilla 36630:
                 // http://issues.apache.org/bugzilla/show_bug.cgi?id=36630
                 if(log.isDebugEnabled()) {
@@ -1026,6 +1126,14 @@ public class StandardWrapper
                 // Restore the context ClassLoader
                 throw new ServletException
                     (sm.getString("standardWrapper.instantiate", actualClass), e);
+            }
+
+            // Check if loading the servlet in this web application should be
+            // allowed
+            if (!isServletAllowed(servlet)) {
+                throw new SecurityException
+                    (sm.getString("standardWrapper.privilegedServlet",
+                                  actualClass));
             }
 
             // Special handling for ContainerServlet instances
@@ -1279,7 +1387,7 @@ public class StandardWrapper
 
             // Annotation processing
             if (!((Context) getParent()).getIgnoreAnnotations()) {
-               ((StandardContext)getParent()).getInstanceManager().destroyInstance(instance);
+               ((StandardContext)getParent()).getAnnotationProcessor().preDestroy(instance);
             }
 
         } catch (Throwable t) {
@@ -1322,7 +1430,7 @@ public class StandardWrapper
                     }
                     // Annotation processing
                     if (!((Context) getParent()).getIgnoreAnnotations()) {
-                       ((StandardContext)getParent()).getInstanceManager().destroyInstance(s);
+                       ((StandardContext)getParent()).getAnnotationProcessor().preDestroy(s);
                     }
                 }
             } catch (Throwable t) {
@@ -1496,6 +1604,33 @@ public class StandardWrapper
         } catch (Throwable t) {
             return (false);
         }
+
+    }
+
+
+    /**
+     * Return <code>true</code> if loading this servlet is allowed.
+     */
+    protected boolean isServletAllowed(Object servlet) {
+
+        // Privileged webapps may load all servlets without restriction
+        if (((Context) getParent()).getPrivileged()) {
+            return true;
+        }
+        
+        if (servlet instanceof ContainerServlet) {
+            return (false);
+        }
+
+        Class clazz = servlet.getClass();
+        while (clazz != null && !clazz.getName().equals("javax.servlet.http.HttpServlet")) {
+            if ("restricted".equals(restrictedServlets.getProperty(clazz.getName()))) {
+                return (false);
+            }
+            clazz = clazz.getSuperclass();
+        }
+        
+        return (true);
 
     }
 

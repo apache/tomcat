@@ -65,7 +65,7 @@ public class GenericPrincipal implements Principal {
      * @param roles List of roles (must be Strings) possessed by this user
      */
     public GenericPrincipal(Realm realm, String name, String password,
-                            List roles) {
+                            List<String> roles) {
         this(realm, name, password, roles, null);
     }
 
@@ -82,7 +82,7 @@ public class GenericPrincipal implements Principal {
      *        getUserPrincipal call if not null; if null, this will be returned
      */
     public GenericPrincipal(Realm realm, String name, String password,
-                            List roles, Principal userPrincipal) {
+                            List<String> roles, Principal userPrincipal) {
 
         super();
         this.realm = realm;

@@ -123,7 +123,7 @@ public final class Response {
     protected String errorURI = null;
 
     protected Request req;
-    
+
     // ------------------------------------------------------------- Properties
 
     public Request getRequest() {

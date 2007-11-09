@@ -267,7 +267,7 @@ public final class CGIServlet extends HttpServlet {
     static Object expandFileLock = new Object();
 
     /** the shell environment variables to be passed to the CGI script */
-    static Hashtable shellEnv = new Hashtable();
+    static Hashtable<String,String> shellEnv = new Hashtable<String,String>();
 
     /**
      * Sets instance variables.
@@ -644,8 +644,8 @@ public final class CGIServlet extends HttpServlet {
      * See <a href="http://www.rgagnon.com/javadetails/java-0150.html">Read environment
      * variables from an application</a> for original source and article.
      */
-    private Hashtable getShellEnvironment() throws IOException {
-        Hashtable envVars = new Hashtable();
+    private Hashtable<String,String> getShellEnvironment() throws IOException {
+        Hashtable<String,String> envVars = new Hashtable<String,String>();
         Process p = null;
         Runtime r = Runtime.getRuntime();
         String OS = System.getProperty("os.name").toLowerCase();
@@ -729,7 +729,7 @@ public final class CGIServlet extends HttpServlet {
         private File workingDirectory = null;
 
         /** cgi command's command line parameters */
-        private ArrayList cmdLineParameters = new ArrayList();
+        private ArrayList<String> cmdLineParameters = new ArrayList<String>();
 
         /** whether or not this object is valid or not */
         private boolean valid = false;
@@ -961,7 +961,7 @@ public final class CGIServlet extends HttpServlet {
              * (apologies to Marv Albert regarding MJ)
              */
 
-            Hashtable envp = new Hashtable();
+            Hashtable<String,String> envp = new Hashtable<String,String>();
 
             // Add the shell environment variables (if any)
             envp.putAll(shellEnv);
@@ -1539,7 +1539,7 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String[] hashToStringArray(Hashtable h)
             throws NullPointerException {
-            Vector v = new Vector();
+            Vector<String> v = new Vector<String>();
             Enumeration e = h.keys();
             while (e.hasMoreElements()) {
                 String k = e.nextElement().toString();

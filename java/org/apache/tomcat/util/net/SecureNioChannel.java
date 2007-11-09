@@ -25,7 +25,6 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import java.nio.channels.Selector;
-import org.apache.tomcat.util.MutableInteger;
 
 /**
  * 
@@ -103,11 +102,11 @@ public class SecureNioChannel extends NioChannel  {
      * been flushed out and is empty
      * @return boolean
      */
-    public boolean flush(boolean block, Selector s, long timeout,MutableInteger lastWrite) throws IOException {
+    public boolean flush(boolean block, Selector s, long timeout) throws IOException {
         if (!block) {
             flush(netOutBuffer);
         } else {
-            pool.write(netOutBuffer, this, s, timeout,block,lastWrite);
+            pool.write(netOutBuffer, this, s, timeout);
         }
         return !netOutBuffer.hasRemaining();
     }
@@ -393,38 +392,44 @@ public class SecureNioChannel extends NioChannel  {
      * @todo Implement this java.nio.channels.WritableByteChannel method
      */
     public int write(ByteBuffer src) throws IOException {
-        //make sure we can handle expand, and that we only use on buffer
-        if ( src != bufHandler.getWriteBuffer() ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
-        //are we closing or closed?
-        if ( closing || closed) throw new IOException("Channel is in closing state.");
-        
-        //the number of bytes written
-        int written = 0;
-        
-        if (!flush(netOutBuffer)) {
-            //we haven't emptied out the buffer yet
+        if ( src == this.netOutBuffer ) {
+            //we can get here through a recursive call
+            //by using the NioBlockingSelector
+            int written = sc.write(src);
+            return written;
+        } else {
+            //make sure we can handle expand, and that we only use on buffer
+            if ( src != bufHandler.getWriteBuffer() ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
+            //are we closing or closed?
+            if ( closing || closed) throw new IOException("Channel is in closing state.");
+    
+            //the number of bytes written
+            int written = 0;
+    
+            if (!flush(netOutBuffer)) {
+                //we haven't emptied out the buffer yet
+                return written;
+            }
+    
+            /*
+             * The data buffer is empty, we can reuse the entire buffer.
+             */
+            netOutBuffer.clear();
+    
+            SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
+            written = result.bytesConsumed();
+            netOutBuffer.flip();
+    
+            if (result.getStatus() == Status.OK) {
+                if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
+            } else {
+                throw new IOException("Unable to wrap data, invalid engine state: " +result.getStatus());
+            }        
+    
+            //force a flush
+            flush(netOutBuffer);
             return written;
         }
-
-        /*
-         * The data buffer is empty, we can reuse the entire buffer.
-         */
-        netOutBuffer.clear();
-
-        SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
-        written = result.bytesConsumed();
-        netOutBuffer.flip();
-
-        if (result.getStatus() == Status.OK) {
-            if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
-        } else {
-            throw new IOException("Unable to wrap data, invalid engine state: " +result.getStatus());
-        }        
-
-        //force a flush
-        flush(netOutBuffer);
-
-        return written;
     }
     
     /**

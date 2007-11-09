@@ -32,7 +32,7 @@ public interface IDynamicProperty {
      * @param name
      * @param value
      */
-    public void setProperty(String name, Object value) ;
+    public boolean setProperty(String name, Object value) ;
 
     /**
      * get current config

@@ -53,8 +53,6 @@ import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.NioEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
-import org.apache.tomcat.util.net.PollerInterest;
-import org.apache.tomcat.util.MutableBoolean;
 
 
 /**
@@ -92,12 +90,12 @@ public class Http11NioProcessor implements ActionHook {
 
         request = new Request();
         int readTimeout = endpoint.getSoTimeout();
-        inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize);
+        inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize,readTimeout);
         request.setInputBuffer(inputBuffer);
 
         response = new Response();
         response.setHook(this);
-        outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize);
+        outputBuffer = new InternalNioOutputBuffer(response, maxHttpHeaderSize,readTimeout);
         response.setOutputBuffer(outputBuffer);
         request.setResponse(response);
 
@@ -753,7 +751,10 @@ public class Http11NioProcessor implements ActionHook {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                 if (attach != null) {
                     attach.setComet(comet);
-                    if (!comet) {
+                    if (comet) {
+                        Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                        if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
+                    } else {
                         //reset the timeout
                         attach.setTimeout(endpoint.getSocketProperties().getSoTimeout());
                     }
@@ -793,6 +794,14 @@ public class Http11NioProcessor implements ActionHook {
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
+        // Set the remote address
+        remoteAddr = null;
+        remoteHost = null;
+        localAddr = null;
+        localName = null;
+        remotePort = -1;
+        localPort = -1;
+
         // Setting up the socket
         this.socket = socket;
         inputBuffer.setSocket(socket);
@@ -820,30 +829,30 @@ public class Http11NioProcessor implements ActionHook {
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
                     socket.getIOChannel().socket().setSoTimeout((int)soTimeout);
+                    inputBuffer.readTimeout = soTimeout;
                 }
-                if (!inputBuffer.parseRequestLine(keptAlive)) {
-                    //no data available yet, since we might have read part
-                    //of the request line, we can't recycle the processor
+                if (!inputBuffer.parseRequestLine(keptAlive && (endpoint.getCurrentThreadsBusy() >= limit))) {
+                    // This means that no data is available right now
+                    // (long keepalive), so that the processor should be recycled
+                    // and the method should return true
                     openSocket = true;
-                    recycle = false;
+                    // Add the socket to the poller
+                    socket.getPoller().add(socket);
                     break;
                 }
                 keptAlive = true;
                 if ( !inputBuffer.parseHeaders() ) {
-                    //we've read part of the request, don't recycle it
-                    //instead associate it with the socket
                     openSocket = true;
+                    socket.getPoller().add(socket);
                     recycle = false;
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
                 if (!disableUploadTimeout) { //only for body, not for request headers
                     socket.getIOChannel().socket().setSoTimeout((int)timeout);
+                    inputBuffer.readTimeout = soTimeout;
                 }
             } catch (IOException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.header.parse"), e);
-                }
                 error = true;
                 break;
             } catch (Throwable t) {
@@ -891,6 +900,10 @@ public class Http11NioProcessor implements ActionHook {
                         NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
                         if (attach != null)  {
                             attach.setComet(comet);
+                            if (comet) {
+                                Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                                if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
+                            }
                         }
                     }
                 } catch (InterruptedIOException e) {
@@ -948,8 +961,7 @@ public class Http11NioProcessor implements ActionHook {
             }
         } else {
             if ( recycle ) recycle();
-            //return (openSocket) ? (SocketState.OPEN) : SocketState.CLOSED;
-            return (openSocket) ? (recycle?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
+            return (openSocket) ? SocketState.OPEN : SocketState.CLOSED;
         }
 
     }
@@ -986,22 +998,6 @@ public class Http11NioProcessor implements ActionHook {
         this.socket = null;
         this.cometClose = false;
         this.comet = false;
-        remoteAddr = null;
-        remoteHost = null;
-        localAddr = null;
-        localName = null;
-        remotePort = -1;
-        localPort = -1;
-        //fix the synchronization scenario due to 
-        //dual comet flags.
-        //while the response/request
-        //might already be recycled, this circumvents the bug
-        //and should not be an expensive operation
-        //however, this is a TODO and FIXME
-        //as it would be better coordinate the recycling of the request/response
-        //instead
-        response.recycle();
-        request.recycle();
     }
 
 
@@ -1074,7 +1070,7 @@ public class Http11NioProcessor implements ActionHook {
                 if ( attach!=null && attach.getComet()) {
                     //if this is a comet connection
                     //then execute the connection closure at the next selector loop
-                    //request.getAttributes().remove("org.apache.tomcat.comet.timeout");
+                    request.getAttributes().remove("org.apache.tomcat.comet.timeout");
                     //attach.setTimeout(5000); //force a cleanup in 5 seconds
                     //attach.setError(true); //this has caused concurrency errors
                 }
@@ -1222,41 +1218,8 @@ public class Http11NioProcessor implements ActionHook {
             request.setAvailable(inputBuffer.available());
         } else if (actionCode == ActionCode.ACTION_COMET_BEGIN) {
             comet = true;
-        } else if (actionCode == ActionCode.ACTION_COMET_TIMEOUT) {
-            if ( socket == null ) 
-                throw new IllegalStateException("Connection must be in Comet state to set the timeout");
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            if ( param == null || (!(param instanceof Integer)) )
-                throw new IllegalArgumentException("Action parameter must be an Integer object to set the timeout");
-            Integer to = (Integer)param;
-            attach.setTimeout(to.longValue());
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
-        } else if (actionCode == ActionCode.ACTION_COMET_REGISTER) {
-            int interest = ((Integer)param).intValue();
-            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-            attach.setCometOps(interest);
-            //notify poller if not on a tomcat thread
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
-                socket.getPoller().cometInterest(socket);
-        } else if (actionCode == ActionCode.ACTION_COMET_CONFIGURE_BLOCKING) {
-            MutableBoolean bool = (MutableBoolean)param;
-            if ( bool.get() ) throw new IllegalStateException("Not yet implemented");
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE )
-                throw new IllegalStateException("Can only be configured during an event.");
-        } else if (actionCode == ActionCode.ACTION_COMET_READABLE) {
-            MutableBoolean bool = (MutableBoolean)param;
-            try {
-                bool.set(inputBuffer.isReadable());
-            }catch ( IOException x ) {
-                if (log.isDebugEnabled()) log.debug("Unable to check readability on NIO socket.",x);
-                bool.set(false);
-            }
-        } else if (actionCode == ActionCode.ACTION_COMET_WRITEABLE) {
-            MutableBoolean bool = (MutableBoolean)param;
-            bool.set(outputBuffer.isWritable());
         }
 
     }

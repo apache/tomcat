@@ -51,6 +51,7 @@ public class TestOrderInterceptor extends TestCase {
         threads = new Thread[channelCount];
         for ( int i=0; i<channelCount; i++ ) {
             channels[i] = new GroupChannel();
+            
             orderitcs[i] = new OrderInterceptor();
             mangleitcs[i] = new MangleOrderInterceptor();
             orderitcs[i].setExpire(Long.MAX_VALUE);

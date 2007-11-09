@@ -27,10 +27,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 
 public @interface PersistenceContext {
-    public enum PersistenceContextType {
-        TRANSACTION,
-        EXTENDED
-    }
    String name() default "";
    String unitName() default "";
    PersistenceContextType type() default PersistenceContextType.TRANSACTION;

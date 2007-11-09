@@ -19,9 +19,9 @@
 package org.apache.catalina.connector;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
+import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
@@ -33,6 +33,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
+
 import javax.security.auth.Subject;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -43,6 +44,17 @@ import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringCache;
+import org.apache.tomcat.util.http.Cookies;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.mapper.MappingData;
+
+import org.apache.coyote.ActionCode;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -58,16 +70,6 @@ import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.util.StringParser;
-import org.apache.coyote.ActionCode;
-import org.apache.tomcat.util.MutableBoolean;
-import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.buf.StringCache;
-import org.apache.tomcat.util.http.Cookies;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
-import org.apache.tomcat.util.http.Parameters;
-import org.apache.tomcat.util.http.ServerCookie;
-import org.apache.tomcat.util.http.mapper.MappingData;
 
 
 /**
@@ -205,10 +207,6 @@ public class Request
      * Comet state
      */
     protected boolean comet = false;
-    /**
-     * Recycling flag if comet state changed async
-     */
-    protected boolean wasComet = false;
     
     
     /**
@@ -389,7 +387,6 @@ public class Request
         requestDispatcherPath = null;
 
         comet = false;
-        wasComet = false;
         if (event != null) {
             event.clear();
             event = null;
@@ -2242,10 +2239,6 @@ public class Request
     public boolean isComet() {
         return comet;
     }
-    
-    public boolean wasComet() {
-        return wasComet;
-    }
 
     
     /**
@@ -2253,40 +2246,19 @@ public class Request
      */
     public void setComet(boolean comet) {
         this.comet = comet;
-        if (comet) setWasComet(true);
-    }
-    
-    public void setWasComet(boolean comet) {
-        wasComet = comet;
     }
 
     
     /**
-     * Return true if bytes are available at the servlet layer
+     * Return true if bytes are available.
      */
-    public boolean isAvailable() {
+    public boolean getAvailable() {
         return (inputBuffer.available() > 0);
     }
-    
-    /**
-     * returns true if we read data from the socket
-     * @return boolean
-     */
-    public boolean isReadable() {
-        MutableBoolean bool = new MutableBoolean(false);
-        action(ActionCode.ACTION_COMET_READABLE,bool);
-        return bool.get();    
-    }
 
-    public boolean hasOp(int op) {
-        if ( !comet || getEvent()==null ) return false;
-        return event.hasOp(op);
-    }
+    
     // ------------------------------------------------------ Protected Methods
 
-    protected void action(ActionCode actionCode, Object param) {
-        coyoteRequest.action(actionCode,param);
-    }
 
     protected Session doGetSession(boolean create) {
 

@@ -64,6 +64,7 @@ import org.apache.juli.logging.LogFactory;
  * <li><code>time-taken</code>:  Time (in seconds) taken to serve the request</li>
  * <li><code>x-A(XXX)</code>: Pull XXX attribute from the servlet context </li>
  * <li><code>x-C(XXX)</code>: Pull the first cookie of the name XXX </li>
+ * <li><code>x-O(XXX)</code>: Pull the all response header values XXX </li>
  * <li><code>x-R(XXX)</code>: Pull XXX attribute from the servlet request </li>
  * <li><code>x-S(XXX)</code>: Pull XXX attribute from the session </li>
  * <li><code>x-P(...)</code>:  Call request.getParameter(...)
@@ -122,6 +123,8 @@ import org.apache.juli.logging.LogFactory;
  *
  *
  * @author Tim Funk
+ * @author Peter Rossbach
+ * 
  * @version $Revision$ $Date$
  */
 
@@ -138,7 +141,7 @@ public class ExtendedAccessLogValve
      * The descriptive information about this implementation.
      */
     protected static final String extendedAccessLogInfo =
-        "org.apache.catalina.valves.ExtendedAccessLogValve/1.0";
+        "org.apache.catalina.valves.ExtendedAccessLogValve/2.1";
 
 
     // ------------------------------------------------------------- Properties
@@ -209,7 +212,7 @@ public class ExtendedAccessLogValve
         super.open();
         if (currentLogFile.length()==0) {
             writer.println("#Fields: " + pattern);
-            writer.println("#Version: 1.0");
+            writer.println("#Version: 2.0");
             writer.println("#Software: " + ServerInfo.getServerInfo());
         }
     }
@@ -328,6 +331,36 @@ public class ExtendedAccessLogValve
                     buf.append(wrap(c[i].getValue()));
                 }
             }
+        }
+    }
+    
+    /**
+     * write a specific response header - x-O(xxx)
+     */
+    protected class ResponseAllHeaderElement implements AccessLogElement {
+        private String header;
+
+        public ResponseAllHeaderElement(String header) {
+            this.header = header;
+        }
+        
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+           if (null != response) {
+                String[] values = response.getHeaderValues(header);
+                if(values.length > 0) {
+                    StringBuffer buffer = new StringBuffer();
+                    for (int i = 0; i < values.length; i++) {
+                        String string = values[i];
+                        buffer.append(string) ;
+                        if(i+1<values.length)
+                            buffer.append(",");
+                    }
+                    buf.append(wrap(buffer.toString()));
+                    return ;
+                }
+            }
+            buf.append("-");
         }
     }
     
@@ -718,6 +751,8 @@ public class ExtendedAccessLogValve
             return getServletRequestElement(parameter);
         } else if ("P".equals(token)) {
             return new RequestParameterElement(parameter);
+        } else if ("O".equals(token)) {
+            return new ResponseAllHeaderElement(parameter);
         }
         log.error("x param for servlet request, couldn't decode value: "
                 + token);
