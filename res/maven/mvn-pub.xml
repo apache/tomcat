@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project name="Tomcat 6.0" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+
+  <!--
+    Built for using Maven 2.0.4
+    Two additional jar files required, please download from
+    http://people.apache.org/~fhanik/tomcat/maven/
+    
+  -->
+  <!--
+  Properties required to be set:
+  maven.home - full path to Maven2 installation, mvn or mvn.bat is assumed to be in ${maven.home}/bin/
+  maven.bin  - the script to execute for maven, would be mvn or mvn.bat
+  maven.repo.url - the URL of the repository, for example scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository
+  maven.repo.repositoryId - the id of the repository, for example apache.snapshots
+  maven.deploy.version - the version that the components will be deployed as, for example @MAVEN.DEPLOY.VERSION@
+  tomcat.lib.path - the path to tomcat JAR files
+  tomcat.bin.path - the path to tomcat's bin directory (for other JAR files)
+  tomcat.pom.path - the path to the POM files
+  All these can be defined by mvn.properties (and defaults are in mvn.properties.default)
+  
+  To do password less upload, you can modify either
+  $MAVE_HOME/conf/settings.xml or ~/.m2/settings.xml and add this snippet
+    <server>
+      <id>apache.snapshots</id>
+      <username>yourusername</username>
+      <privateKey>/home/yourusername/.ssh/id_rsa</privateKey>
+      <passphrase></passphrase>
+    </server>
+    
+  To get a private key to work on Windows, I followed these steps
+  1. on a linux box execute 'ssh-keygen -t rsa'
+  2. same linux box execute 'cat id_rsa.pub >> authorized_keys' and 'cat id_rsa.pub >> authorized_keys2'
+  3. Copy id_rsa and id_rsa.pub to my windows box
+  4. Import id_rsa into puttygen
+  5. export id_rsa from puttygen to OpenSSH key
+  6. The key you exported from puttygen is the one you reference from the <privateKey> element
+  7. Manually create the %USERPROFILE%\.ssh directory
+  8. Manually add the %USERPROFILE%\.ssh\known_hosts file with the entry for the host
+  -->
+  <property file="${basedir}/mvn.properties"/>
+  <property file="${basedir}/mvn.properties.default"/>
+  <property name="local.repo" value="${user.home}/.m2/repository"/>
+  
+  <target name="init-maven">
+    <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
+      <classpath>
+        <pathelement location="${basedir}/maven-ant-tasks-attached-patch.jar" />
+        <pathelement location="${basedir}/maven-artifact-ant-2.0.4-dep.jar" />
+      </classpath>
+    </typedef>
+    <artifact:install-provider artifactId="wagon-ssh" version="1.0-beta-2"/>
+  </target>
+
+  <target name="maven-deploy" depends="init-maven">
+    <!--cleanup-->
+    <delete file="${pom}.tmp"/>
+    <delete file="${file}.asc"/>
+
+    <!--replace the version in the pom-->
+    <copy file="${pom}" tofile="${pom}.tmp">
+      <filterset>
+        <filter token="MAVEN.DEPLOY.VERSION" value="${maven.deploy.version}"/>
+      </filterset>
+    </copy>
+    
+    <!--sign the jar-->
+    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="${file}"/>
+    </exec>
+    
+    <!--deploy it-->
+    <artifact:deploy file="${file}">
+        <pom file="${pom}.tmp"/>
+        <remoteRepository url="${maven.repo.url}" layout="default">
+          <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
+        </remoteRepository>
+        <attach file="${file}.asc" type="jar.asc"/>
+    </artifact:deploy>
+
+    <!--
+    <exec executable="${maven.home}/bin/${maven.bin}" failonerror="true">
+      <env key="MAVEN_HOME" value="${maven.home}"/>
+      <arg value="deploy:deploy-file"/>
+      <arg value="-Dfile=${file}"/>
+      <arg value="-DgroupId=${groupId}"/>
+      <arg value="-DartifactId=${artifactId}"/>
+      <arg value="-Dversion=${maven.deploy.version}"/>
+      <arg value="-Dpackaging=jar"/>
+      <arg value="-DgeneratePom=false"/>
+      <arg value="-DrepositoryId=${maven.repo.repositoryId}"/>
+      <arg value="-Durl=${maven.repo.url}"/>
+      <arg value="-DpomFile=${pom}.tmp"/>
+    </exec>
+    -->
+    <delete file="${pom}.tmp"/>
+    <delete file="${file}.asc"/>
+  </target>
+  
+  <target name="generic-deploy" depends="init-maven">
+    <antcall target="maven-deploy"><!--Deploy annotations-->
+      <param name="file" value="${tomcat.lib.path}/annotations-api.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="annotations-api"/>
+      <param name="pom" value="${tomcat.pom.path}/annotations-api.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Servlet api-->
+      <param name="file" value="${tomcat.lib.path}/servlet-api.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="servlet-api"/>
+      <param name="pom" value="${tomcat.pom.path}/servlet-api.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy expression lanaguage api-->
+      <param name="file" value="${tomcat.lib.path}/el-api.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="el-api"/>
+      <param name="pom" value="${tomcat.pom.path}/el-api.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy JSP api-->
+      <param name="file" value="${tomcat.lib.path}/jsp-api.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="jsp-api"/>
+      <param name="pom" value="${tomcat.pom.path}/jsp-api.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy JULI-->
+      <param name="file" value="${tomcat.bin.path}/tomcat-juli.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="juli"/>
+      <param name="pom" value="${tomcat.pom.path}/juli.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Tribes-->
+      <param name="file" value="${tomcat.lib.path}/catalina-tribes.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="tribes"/>
+      <param name="pom" value="${tomcat.pom.path}/tribes.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Jasper EL-->
+      <param name="file" value="${tomcat.lib.path}/jasper-el.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="jasper-el"/>
+      <param name="pom" value="${tomcat.pom.path}/jasper-el.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Jasper JDT-->
+      <param name="file" value="${tomcat.lib.path}/jasper-jdt.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="jasper-jdt"/>
+      <param name="pom" value="${tomcat.pom.path}/jasper-jdt.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Coyote-->
+      <param name="file" value="${tomcat.lib.path}/tomcat-coyote.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="coyote"/>
+      <param name="pom" value="${tomcat.pom.path}/coyote.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Catalina-->
+      <param name="file" value="${tomcat.lib.path}/catalina.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="catalina"/>
+      <param name="pom" value="${tomcat.pom.path}/catalina.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Catalina-HA-->
+      <param name="file" value="${tomcat.lib.path}/catalina-ha.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="catalina-ha"/>
+      <param name="pom" value="${tomcat.pom.path}/catalina-ha.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Jasper-->
+      <param name="file" value="${tomcat.lib.path}/jasper.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="jasper"/>
+      <param name="pom" value="${tomcat.pom.path}/jasper.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy DBCP-->
+      <param name="file" value="${tomcat.lib.path}/tomcat-dbcp.jar"/>
+      <param name="groupId" value="org.apache.tomcat"/>
+      <param name="artifactId" value="dbcp"/>
+      <param name="pom" value="${tomcat.pom.path}/dbcp.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Extras Juli-->
+      <param name="file" value="${tomcat.extras.path}/tomcat-juli.jar"/>
+      <param name="groupId" value="org.apache.tomcat.extras"/>
+      <param name="artifactId" value="juli"/>
+      <param name="pom" value="${tomcat.pom.path}/juli-extras.pom"/>
+    </antcall>
+    <antcall target="maven-deploy"><!--Deploy Extras Juli Adapters-->
+      <param name="file" value="${tomcat.extras.path}/tomcat-juli-adapters.jar"/>
+      <param name="groupId" value="org.apache.tomcat.extras"/>
+      <param name="artifactId" value="juli-adapters"/>
+      <param name="pom" value="${tomcat.pom.path}/juli-adapters.pom"/>
+    </antcall>
+  </target>
+
+  <target name="deploy-snapshot">
+    <antcall target="generic-deploy">
+      <param name="maven.repo.repositoryId" value="${maven.snapshot.repo.repositoryId}"/>
+      <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
+      <param name="maven.deploy.version" value="${maven.snapshot.deploy.version}"/>
+    </antcall>
+  </target>
+
+  <target name="deploy-staging">
+    <antcall target="generic-deploy">
+      <param name="maven.repo.repositoryId" value="${maven.release.repo.repositoryId}"/>
+      <param name="maven.repo.url" value="${maven.release.repo.url}"/>
+      <param name="maven.deploy.version" value="${maven.release.deploy.version}"/>
+    </antcall>
+  </target>
+
+  <target name="deploy-release">
+    <antcall target="generic-deploy">
+      <param name="maven.repo.repositoryId" value="${maven.asf.release.repo.repositoryId}"/>
+      <param name="maven.repo.url" value="${maven.asf.release.repo.url}"/>
+      <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}"/>
+    </antcall>
+  </target>
+  
+  <target name="help">
+    <echo>Help is on the way!</echo>
+  </target>
+
+</project>

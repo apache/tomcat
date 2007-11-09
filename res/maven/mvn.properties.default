@@ -1,0 +1,56 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+# To create custom properties, simply create
+# the file mvn.properties
+# in this directory
+# no need to change this file
+#
+
+#Maven properties
+maven.scp.username=fhanik
+maven.scp.privateKey=${user.home}/.ssh/id_rsa.export
+maven.scp.passphrase=
+maven.gpg.exec=C:/software/GNU/GnuPG/gpg.exe
+maven.gpg.passphrase=*****
+
+
+maven.home=/development/maven-2.0.4
+#Define mvn for Unix systems and mvn.bat for Windows as ANT exec requires the full name
+maven.bin=mvn.bat
+
+#Maven snapshot properties
+maven.snapshot.repo.url=scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository
+maven.snapshot.repo.repositoryId=apache.snapshots
+maven.snapshot.deploy.version=6.T.X-SNAPSHOT
+
+#Maven release properties for Tomcat staging
+maven.release.repo.url=scp://people.apache.org/www/tomcat.apache.org/dev/dist/m2-repository
+maven.release.repo.repositoryId=tomcat-staging
+maven.release.deploy.version=6.T.X
+
+#Maven release properties for the main ASF repo
+maven.asf.release.repo.url=scp://people.apache.org/www/people.apache.org/repo/m2-ibiblio-rsync-repository
+maven.asf.release.repo.repositoryId=apache.releases
+maven.asf.release.deploy.version=6.T.T
+
+
+#Where do we load the libraries from
+tomcat.lib.path=../../output/build/lib
+tomcat.bin.path=../../output/build/bin
+tomcat.extras.path=../../output/extras
+
+#Where do we find the POM files
+tomcat.pom.path=../../res/maven

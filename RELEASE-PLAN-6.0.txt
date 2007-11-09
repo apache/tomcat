@@ -1,0 +1,58 @@
+================================================================================
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+================================================================================
+
+$Id$
+
+
+                      Release Plan for Apache Tomcat 6.0
+                      ==================================
+
+
+Introduction:
+------------
+
+This document is a release plan for the final release of Apache Tomcat 6.0.
+
+The goal of the Apache Tomcat 6.0 final release is to provide a stable
+container that supports 100% of the mandatory requirements of the Servlet 2.5
+and JSP 2.1 specifications, as well as to improve and add many useful 
+additional features on top of the existing Apache Tomcat 5.5.x releases.
+
+Apache Tomcat 6.0 includes the following major new features over 
+Apache Tomcat 5.5:
+
+    * Servlet 2.5 implementation
+    * JSP 2.1 implementation
+    * Unified EL 2.1 implementation, which may be used independently
+    * Pluggable JEE 5 annotation support for Servlet & JSP
+    * Refactored session clustering implementation
+    * New asynchronous IO capabilities and API
+    * Simpler distribution layout
+
+Apache Tomcat 6.0 will use the build numbering and release process first used 
+in the Apache HTTPd 2.0.x project.
+Milestone builds, numbered 6.0.x, will be released as needed and will 
+recieve a stability rating after a one week testing period. The rating can be
+either: Alpha, Beta, or Stable.
+
+This Release Plan proposes the following prospective target dates 
+for stability:
+
+  October 20, 2006
+  ----------------
+
+Tomcat 6.0.0 should be tagged by this date.

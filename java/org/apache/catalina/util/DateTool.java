@@ -1,0 +1,99 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+package org.apache.catalina.util;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
+
+/**
+ *  Common place for date utils.
+ *
+ * @author dac@eng.sun.com
+ * @author Jason Hunter [jch@eng.sun.com]
+ * @author James Todd [gonzo@eng.sun.com]
+ * @author Costin Manolache
+ */
+public class DateTool {
+
+    private static StringManager sm =
+        StringManager.getManager("org.apache.catalina.util");
+
+    /**
+     * US locale - all HTTP dates are in english
+     */
+    public final static Locale LOCALE_US = Locale.US;
+
+    /**
+     * GMT timezone - all HTTP dates are on GMT
+     */
+    public final static TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");
+
+    /**
+     * format for RFC 1123 date string -- "Sun, 06 Nov 1994 08:49:37 GMT"
+     */
+    public final static String RFC1123_PATTERN =
+        "EEE, dd MMM yyyyy HH:mm:ss z";
+
+    /** 
+     * Format for http response header date field
+     */
+    public static final String HTTP_RESPONSE_DATE_HEADER =
+        "EEE, dd MMM yyyy HH:mm:ss zzz";
+
+    // format for RFC 1036 date string -- "Sunday, 06-Nov-94 08:49:37 GMT"
+    private final static String rfc1036Pattern =
+        "EEEEEEEEE, dd-MMM-yy HH:mm:ss z";
+
+    // format for C asctime() date string -- "Sun Nov  6 08:49:37 1994"
+    private final static String asctimePattern =
+        "EEE MMM d HH:mm:ss yyyyy";
+
+    /**
+     * Pattern used for old cookies
+     */
+    public final static String OLD_COOKIE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
+
+    /**
+     * DateFormat to be used to format dates
+     */
+    public final static DateFormat rfc1123Format =
+        new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
+
+    /**
+     * DateFormat to be used to format old netscape cookies
+     */
+    public final static DateFormat oldCookieFormat =
+        new SimpleDateFormat(OLD_COOKIE_PATTERN, LOCALE_US);
+
+    public final static DateFormat rfc1036Format =
+        new SimpleDateFormat(rfc1036Pattern, LOCALE_US);
+
+    public final static DateFormat asctimeFormat =
+        new SimpleDateFormat(asctimePattern, LOCALE_US);
+
+    static {
+        rfc1123Format.setTimeZone(GMT_ZONE);
+        oldCookieFormat.setTimeZone(GMT_ZONE);
+        rfc1036Format.setTimeZone(GMT_ZONE);
+        asctimeFormat.setTimeZone(GMT_ZONE);
+    }
+
+}

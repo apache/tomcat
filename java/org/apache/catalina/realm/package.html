@@ -1,0 +1,80 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<body>
+
+<p>This package contains <code>Realm</code> implementations for the
+various supported realm technologies for authenticating users and
+identifying their associated roles.  The <code>Realm</code> that is
+associated with a web application's <code>Context</code> (or a hierarchically
+superior Container) is used to resolve authentication and role presence
+questions when a web application uses container managed security as described
+in the Servlet API Specification, version 2.2.</p>
+
+<p>The implementations share a common base class that supports basic
+functionality for all of the standard <code>Realm</code> implementations,
+and can be configured by setting the following properties (default values
+are in square brackets):</p>
+<ul>
+<li><b>debug</b> - Debugging detail level for this component. [0]</li>
+</ul>
+
+<p>The standard <code>Realm</code> implementations that are currently
+available include the following (with additional configuration properties
+as specified):</p>
+<ul>
+<li><b>JDBCRealm</b> - Implementation of <code>Realm</code> that operates
+    from data stored in a relational database that is accessed via a JDBC
+    driver.  The name of the driver, database connection information, and
+    the names of the relevant tables and columns are configured with the
+    following additional properties:
+    <ul>
+    <li><b>connectionURL</b> - The URL to use when connecting to this database.
+        [REQUIRED - NO DEFAULT]</li>
+    <li><b>driverName</b> - Fully qualified Java class name of the JDBC driver
+        to be used.  [REQUIRED - NO DEFAULT]</li>
+    <li><b>roleNameCol</b> - Name of the database column that contains role
+        names.  [REQUIRED - NO DEFAULT]</li>
+    <li><b>userCredCol</b> - Name of the database column that contains the
+        user's credentials (i.e. password) in cleartext.  [REQUIRED -
+        NO DEFAULT]</li>
+    <li><b>userNameCol</b> - Name of the database column that contains the
+        user's logon username.  [REQUIRED - NO DEFAULT]</li>
+    <li><b>userRoleTable</b> - Name of the database table containing user
+        role information.  This table must include the columns specified by
+        the <code>userNameCol</code> and <code>roleNameCol</code> properties.
+        [REQUIRED - NO DEFAULT]</li>
+    <li><b>userTable</b> - Name of the database table containing user
+        information.  This table must include the columns specified by the
+        <code>userNameCol</code> and <code>userCredCol</code> properties.
+        [REQUIRED - NO DEFAULT]</li>
+    </ul>
+    </li>
+<li><b>MemoryRealm</b> - Implementation of <code>Realm</code> that uses the
+    contents of a simple XML file (<code>conf/tomcat-users.xml</code>) as the
+    list of valid users and their roles.  This implementation is primarily to
+    demonstrate that the authentication technology functions correctly, and is
+    not anticipated as adequate for general purpose use.  This component
+    supports the following additional properties:
+    <ul>
+    <li><b>pathname</b> - Pathname of the XML file containing our user and
+        role information.  If a relative pathname is specified, it is resolved
+        against the pathname specified by the "catalina.home" system property.
+        [conf/tomcat-users.xml]</li>
+    </ul>
+</ul>
+
+</body>

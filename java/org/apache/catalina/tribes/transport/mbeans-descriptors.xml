@@ -1,0 +1,851 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
+<mbeans-descriptors>
+
+  <mbean         name="SimpleTcpCluster"
+           description="Tcp Cluster implementation"
+               domain="Catalina"
+                group="Cluster"
+                 type="org.apache.catalina.ha.tcp.SimpleTcpCluster">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="notifyLifecycleListenerOnFailure"
+          description="notify lifecycleListener from message transfer failure"
+			     is="true"
+                 type="boolean"/>                 
+    <attribute   name="clusterName"
+          description="name of cluster"
+                 type="java.lang.String"/>
+    <attribute   name="managerClassName"
+          description="session mananager classname"
+                 type="java.lang.String"/>
+    <attribute   name="clusterLogName"
+          description="Name of cluster transfer log device"
+                 type="java.lang.String"/>
+    <attribute   name="doClusterLog"
+			     is="true"
+          description="enable cluster log transfer logging"
+                 type="boolean"/>
+    <operation   name="setProperty"
+               description="set a property to all cluster managers (with prefix 'manager.')"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="key"
+                 description="Property name"
+                 type="java.lang.String"/>
+      <parameter name="value"
+                 description="Property value"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="send"
+               description="send message to all cluster members"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="message"
+                 description="replication message"
+                 type="org.apache.catalina.ha.ClusterMessage"/>
+    </operation>
+    
+    <operation   name="sendClusterDomain"
+               description="send message to all cluster members with same domain"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="message"
+                 description="replication message"
+                 type="org.apache.catalina.ha.ClusterMessage"/>
+    </operation>
+        
+    <operation   name="sendToMember"
+               description="send message to one cluster member"
+               impact="ACTION"
+               returnType="void">
+      <parameter name="message"
+                 description="replication message"
+                 type="org.apache.catalina..cluster.ClusterMessage"/>
+      <parameter name="member"
+                 description="cluster member"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="start"
+               description="Start the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+    
+    <operation name="stop"
+               description="Stop the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+                 
+  </mbean>
+
+  <mbean         name="ClusterReceiverBase"
+           description="Tcp Cluster NioReceiver implementation"
+               domain="Catalina"
+                group="Cluster"
+                 type="org.apache.catalina.ha.tcp.ClusterReceiverBase">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="tcpListenAddress"
+          description="tcp listener address"
+                 type="java.lang.String"/>
+    <attribute   name="tcpListenPort"
+          description="tcp listener port"
+                 type="int"/>
+    <attribute   name="tcpThreadCount"
+          description="number of tcp listener worker threads"
+                 type="int"/>
+    <attribute   name="tcpSelectorTimeout"
+          description="tcp listener Selector timeout"
+                 type="long"/>
+    <attribute   name="nrOfMsgsReceived"
+          description="number of messages received from other nodes"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="receivedTime"
+          description="total time message send time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="receivedProcessingTime"
+          description="received processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minReceivedProcessingTime"
+          description="minimal received processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgReceivedProcessingTime"
+          description="received processing time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxReceivedProcessingTime"
+          description="maximal received processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doReceivedProcessingStats"
+          description="create received processing time stats"
+			     is="true"
+                 type="boolean" />                
+    <attribute   name="avgTotalReceivedBytes"
+          description="received totalReceivedBytes / nrOfMsgsReceived"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalReceivedBytes"
+          description="number of bytes received"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="sendAck"
+          description="send ack after data received"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+    <attribute   name="compress"
+          description="data received compressed"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+    <attribute   name="doListen"
+          description="is port really started"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+                 
+	<operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>	
+
+    <operation   name="start"
+               description="Start the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+    
+    <operation name="stop"
+               description="Stop the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+                 
+  </mbean>
+
+  <mbean         name="SocketReplicationListener"
+           description="Tcp Cluster SocketReplicationListener implementation"
+               domain="Catalina"
+                group="Cluster"
+                 type="org.apache.catalina.ha.tcp.SocketReplicationListener">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="tcpListenAddress"
+          description="tcp listener address"
+                 type="java.lang.String"/>
+    <attribute   name="tcpListenPort"
+          description="tcp listener port"
+                 type="int"/>
+    <attribute   name="tcpListenMaxPort"
+          description="max tcp listen used port"
+                 type="int"/>
+    <attribute   name="tcpListenTimeout"
+          description="max tcp listen timeout (sec) wait for ServerSocket start"
+                 type="int"/>                
+    <attribute   name="nrOfMsgsReceived"
+          description="number of messages received from other nodes"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="receivedTime"
+          description="total time message send time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="receivedProcessingTime"
+          description="received processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minReceivedProcessingTime"
+          description="minimal received processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgReceivedProcessingTime"
+          description="received processing time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxReceivedProcessingTime"
+          description="maximal received processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doReceivedProcessingStats"
+          description="create received processing time stats"
+			     is="true"
+                 type="boolean" />                
+    <attribute   name="avgTotalReceivedBytes"
+          description="received totalReceivedBytes / nrOfMsgsReceived"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalReceivedBytes"
+          description="number of bytes received"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="sendAck"
+          description="send ack after data received"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+   <attribute   name="compress"
+          description="data received compressed"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+   <attribute   name="doListen"
+          description="is port really started"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+                 
+	<operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>	
+
+    <operation   name="start"
+               description="Start the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+    
+    <operation name="stop"
+               description="Stop the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+                 
+  </mbean>
+  
+  <mbean         name="ReplicationTransmitter"
+          description="Tcp replication transmitter"
+               domain="Catalina"
+                group="ClusterSender"
+                 type="org.apache.catalina.ha.tcp.ReplicationTransmitter">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="replicationMode"
+          description="replication mode (synchnous,pooled.asynchnous,fastasyncqueue)"
+                 type="java.lang.String"/>
+    <attribute   name="ackTimeout"
+          description="acknowledge timeout"
+                 type="long"/>
+    <attribute   name="autoConnect"
+          description="is sender disabled, fork a new socket"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="waitForAck"
+          description="Wait for ack after data send"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+    <attribute   name="processingTime"
+          description="sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minProcessingTime"
+          description="minimal sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgProcessingTime"
+          description="processing time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxProcessingTime"
+          description="maximal sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doTransmitterProcessingStats"
+          description="create processing time stats"
+			     is="true"
+                 type="boolean" />                
+    <attribute   name="nrOfRequests"
+          description="number of send messages to other members"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalBytes"
+          description="number of bytes transfered"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="failureCounter"
+          description="number of wrong transfers"
+                 type="long"
+                 writeable="false"/>
+	<attribute name="senderObjectNames"
+               description="get all sender object names"
+               type="[Ljavax.management.ObjectName;"
+               writeable="false"/>
+    <operation   name="start"
+               description="Start the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>    
+    <operation name="stop"
+               description="Stop the cluster"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>	
+	<operation name="checkKeepAlive"
+               description="Check all sender connection for close socket (keepalive)"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+  </mbean>
+
+  <mbean         name="AsyncSocketSender"
+          description="Async Cluster Sender"
+               domain="Catalina"
+                group="IDataSender"
+                 type="org.apache.catalina.ha.tcp.AsyncSocketSender">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="address"
+          description="sender ip address"
+                 type="java.net.InetAddress"
+                 writeable="false"/>
+    <attribute   name="port"
+          description="sender port"
+                 type="int"
+                 writeable="false" />
+    <attribute   name="suspect"
+          description="Socket is gone"
+                 type="boolean"/>
+    <attribute   name="waitForAck"
+          description="Wait for ack after data send"
+			     is="true"
+                 type="boolean"
+                 writeable="false"/>
+    <attribute   name="ackTimeout"
+          description="acknowledge timeout"
+                 type="long"/>                 
+    <attribute   name="avgMessageSize"
+                 writeable="false"
+          description="avg message size (totalbytes/nrOfRequests"
+                 type="long"/>
+    <attribute   name="queueSize"
+                 writeable="false"
+          description="queue size"
+                 type="int"/>
+    <attribute   name="queuedNrOfBytes"
+                 writeable="false"
+          description="number of bytes over all queued messages"
+                 type="long"/>
+    <attribute   name="messageTransferStarted"
+          description="message is in transfer"
+                 type="boolean"
+                 is="true"
+                 writeable="false"/>
+    <attribute   name="keepAliveTimeout"
+          description="active socket keep alive timeout"
+                 type="long"/>
+    <attribute   name="keepAliveMaxRequestCount"
+          description="max request over this socket"
+                 type="int"/>
+    <attribute   name="keepAliveCount"
+          description="keep Alive request count"
+                 type="int"
+                 writeable="false"/>
+    <attribute   name="keepAliveConnectTime"
+          description="Connect time for keep alive"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="resend"
+          description="after send failure make a resend"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="connected"
+                 is="true"
+          description="socket connected"
+                 type="boolean"
+                 writeable="false"/>
+    <attribute   name="nrOfRequests"
+          description="number of send messages to other members"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalBytes"
+          description="number of bytes transfered"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="processingTime"
+          description="sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minProcessingTime"
+          description="minimal sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgProcessingTime"
+          description="processing time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxProcessingTime"
+          description="maximal sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doProcessingStats"
+          description="create processing time stats"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="waitAckTime"
+          description="sending waitAck time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minWaitAckTime"
+          description="minimal sending waitAck time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgWaitAckTime"
+          description="waitAck time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxWaitAckTime"
+          description="maximal sending waitAck time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doWaitAckStats"
+          description="create waitAck time stats"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="connectCounter"
+          description="counts connects"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="disconnectCounter"
+          description="counts disconnects"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="socketOpenCounter"
+          description="counts open socket (KeepAlive and connects)"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="socketOpenFailureCounter"
+          description="counts open socket failures"
+                 type="long"
+                 writeable="false"/>                 				 
+    <attribute   name="socketCloseCounter"
+          description="counts closed socket (KeepAlive and disconnects)"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="missingAckCounter"
+          description="counts missing ack"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="dataResendCounter"
+          description="counts data resends"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="dataFailureCounter"
+          description="counts data send failures"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="inQueueCounter"
+          description="counts all queued messages"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="outQueueCounter"
+          description="counts all successfully sended messages"
+                 type="long"
+                 writeable="false"/>
+	<operation name="connect"
+               description="connect to other replication node"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="disconnect"
+               description="disconnect to other replication node"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="checkKeepAlive"
+               description="Check connection for close socket"
+               impact="ACTION"
+               returnType="boolean">
+    </operation>
+	<operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+				 
+  </mbean>
+
+  <mbean         name="MultiSocketSender"
+          description="Multi Socket Sender, more than one socket per member"
+               domain="Catalina"
+                group="IDataSender"
+                 type="org.apache.catalina.ha.tcp.PooledSocketSender">
+    <attribute   name="address"
+          description="sender ip address"
+                 type="java.net.InetAddress"
+                 writeable="false"/>
+    <attribute   name="port"
+          description="sender port"
+                 type="int"
+                 writeable="false" />
+    <attribute   name="suspect"
+          description="Socket is gone"
+                 type="boolean"/>
+    <attribute   name="ackTimeout"
+          description="acknowledge timeout"
+                 type="long"/>
+    <attribute   name="waitForAck"
+          description="Wait for ack after data send"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+    <attribute   name="maxPoolSocketLimit"
+          description="Max parallel sockets"
+                 type="int"/>
+    <attribute   name="keepAliveTimeout"
+          description="active socket keep alive timeout"
+                 type="long"/>
+    <attribute   name="keepAliveMaxRequestCount"
+          description="max request over this socket"
+                 type="int"/>
+    <attribute   name="resend"
+          description="after send failure make a resend"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="connected"
+                 is="true"
+          description="socket connected"
+                 type="boolean"
+                 writeable="false"/>
+    <attribute   name="avgMessageSize"
+                 writeable="false"
+          description="avg message size (totalbytes/nrOfRequests"
+                 type="long"/>
+    <attribute   name="nrOfRequests"
+          description="number of send messages to other members"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalBytes"
+          description="number of bytes transfered"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="connectCounter"
+          description="counts connects"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="disconnectCounter"
+          description="counts disconnects"
+                 type="long"
+                 writeable="false"/>
+	<operation name="connect"
+               description="start Queue to connect to ohter replication node"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="disconnect"
+               description="stop Queue to other replication node"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+				 
+  </mbean>
+
+  <mbean         name="SocketSender"
+          description="Sync Cluster Sender"
+               domain="Catalina"
+                group="IDataSender"
+                 type="org.apache.catalina.ha.tcp.SocketSender">
+    <attribute   name="address"
+          description="sender ip address"
+                 type="java.net.InetAddress"
+                 writeable="false"/>
+    <attribute   name="port"
+          description="sender port"
+                 type="int"
+                 writeable="false" />
+    <attribute   name="suspect"
+          description="Socket is gone"
+                 type="boolean"/>
+    <attribute   name="ackTimeout"
+          description="acknowledge timeout"
+                 type="long"/>
+    <attribute   name="waitForAck"
+          description="Wait for ack after data send"
+			     is="true"
+                 type="boolean"
+                 writeable="false" />
+    <attribute   name="keepAliveTimeout"
+          description="active socket keep alive timeout"
+                 type="long"/>
+    <attribute   name="keepAliveMaxRequestCount"
+          description="max request over this socket"
+                 type="int"/>
+    <attribute   name="messageTransferStarted"
+          description="message is in transfer"
+                 type="boolean"
+                 is="true"
+                 writeable="false"/>
+    <attribute   name="keepAliveCount"
+          description="keep Alive request count"
+                 type="int"
+                 writeable="false"/>
+    <attribute   name="keepAliveConnectTime"
+          description="Connect time for keep alive"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="resend"
+          description="after send failure make a resend"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="connected"
+                 is="true"
+          description="socket connected"
+                 type="boolean"
+                 writeable="false"/>
+    <attribute   name="avgMessageSize"
+                 writeable="false"
+          description="avg message size (totalbytes/nrOfRequests"
+                 type="long"/>
+    <attribute   name="nrOfRequests"
+          description="number of send messages to other members"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalBytes"
+          description="number of bytes transfered"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="processingTime"
+          description="sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minProcessingTime"
+          description="minimal sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgProcessingTime"
+          description="processing time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxProcessingTime"
+          description="maximal sending processing time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doProcessingStats"
+          description="create Processing time stats"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="waitAckTime"
+          description="sending waitAck time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="minWaitAckTime"
+          description="minimal sending waitAck time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="avgWaitAckTime"
+          description="waitAck time / nrOfRequests"
+                 type="double"
+                 writeable="false"/>
+    <attribute   name="maxWaitAckTime"
+          description="maximal sending waitAck time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="doWaitAckStats"
+          description="create waitAck time stats"
+			     is="true"
+                 type="boolean" />
+    <attribute   name="connectCounter"
+          description="counts connects"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="disconnectCounter"
+          description="counts disconnects"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="socketCloseCounter"
+          description="counts closed socket (KeepAlive and disconnects)"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="socketOpenFailureCounter"
+          description="counts open socket failures"
+                 type="long"
+                 writeable="false"/>                 				 
+    <attribute   name="socketOpenCounter"
+          description="counts open socket (KeepAlive and connects)"
+                 type="long"
+                 writeable="false"/>				 
+    <attribute   name="missingAckCounter"
+          description="counts missing ack"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="dataResendCounter"
+          description="counts data resends"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="dataFailureCounter"
+          description="counts data send failures"
+                 type="long"
+                 writeable="false"/>
+	<operation name="connect"
+               description="connect to other replication node"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="disconnect"
+               description="disconnect to other replication node"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+	<operation name="checkKeepAlive"
+               description="Check connection for close socket"
+               impact="ACTION"
+               returnType="boolean">
+    </operation>
+	<operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+				 
+  </mbean>
+    
+  <mbean         name="ReplicationValve"
+          description="Valve for simple tcp replication"
+               domain="Catalina"
+                group="Valve"
+                 type="org.apache.catalina.ha.tcp.ReplicationValve">
+    <attribute   name="info"
+          description="Class version info"
+                 type="java.lang.String"
+                 writeable="false"/>
+    <attribute   name="filter"
+          description="resource filter to disable session replication check"
+                 type="java.lang.String"/>
+    <attribute   name="primaryIndicator"
+ 			     is="true"
+          description="set indicator that request processing is at primary session node"
+                 type="boolean"/>
+    <attribute   name="primaryIndicatorName"
+          description="Request attribute name to indicate that request processing is at primary session node"
+                 type="java.lang.String"/>
+    <attribute   name="doProcessingStats"
+ 			     is="true"
+          description="active statistics counting"
+                 type="boolean"/>
+	<attribute   name="nrOfRequests"
+          description="number of replicated requests"
+                 type="long"
+                 writeable="false"/>
+	<attribute   name="nrOfFilterRequests"
+          description="number of filtered requests"
+                 type="long"
+                 writeable="false"/>
+	<attribute   name="nrOfSendRequests"
+          description="number of send requests"
+                 type="long"
+                 writeable="false"/>
+	<attribute   name="nrOfCrossContextSendRequests"
+          description="number of send cross context session requests"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalRequestTime"
+          description="total replicated request time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="totalSendTime"
+          description="total replicated send time"
+                 type="long"
+                 writeable="false"/>
+    <attribute   name="lastSendTime"
+          description="last replicated request time"
+                 type="long"
+                 writeable="false"/>
+    <operation name="resetStatistics"
+               description="Reset all statistics"
+               impact="ACTION"
+               returnType="void">
+    </operation>
+                 
+  </mbean>
+
+
+</mbeans-descriptors>
