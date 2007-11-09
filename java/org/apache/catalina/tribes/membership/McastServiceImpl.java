@@ -29,6 +29,7 @@ import java.util.Arrays;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
+import java.net.BindException;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -182,8 +183,22 @@ public class McastServiceImpl
     }
     
     protected void setupSocket() throws IOException {
-        if (mcastBindAddress != null) socket = new MulticastSocket(new InetSocketAddress(mcastBindAddress, port));
-        else socket = new MulticastSocket(port);
+        if (mcastBindAddress != null) {
+            try {
+                log.info("Attempting to bind the multicast socket to "+address+":"+port);
+                socket = new MulticastSocket(new InetSocketAddress(address,port));
+            } catch (BindException e) {
+                /*
+                 * On some plattforms (e.g. Linux) it is not possible to bind
+                 * to the multicast address. In this case only bind to the
+                 * port.
+                 */
+                log.info("Binding to multicast address, failed. Binding to port only.");
+                socket = new MulticastSocket(port);
+            }
+        } else {
+            socket = new MulticastSocket(port);
+        }
         socket.setLoopbackMode(false); //hint that we don't need loop back messages
         if (mcastBindAddress != null) {
 			if(log.isInfoEnabled())
@@ -483,23 +498,26 @@ public class McastServiceImpl
             int attempt = 0;
             try {
                 while (!success) {
-                    log.info("Tribes membership, running recovery thread, multicasting is not functional.");
+                    if(log.isInfoEnabled())
+                        log.info("Tribes membership, running recovery thread, multicasting is not functional.");
                     if (stopService() & startService()) {
                         success = true;
-                        log.info("Membership recovery was successful.");
+                        if(log.isInfoEnabled())
+                            log.info("Membership recovery was successful.");
                     }
                     try {
                         if (!success) {
-                            log.info("Recovery attempt "+(++attempt)+" failed, trying again in 5 seconds");
+                            if(log.isInfoEnabled())
+                                log.info("Recovery attempt "+(++attempt)+" failed, trying again in " +parent.recoverySleepTime+ " seconds");
                             Thread.sleep(parent.recoverySleepTime);
                         }
                     }catch (InterruptedException ignore) {
                     }
-                }//while
+                }
             }finally {
                 running = false;
             }
-        }//run
+        }
     }
 
     public void setRecoveryCounter(int recoveryCounter) {

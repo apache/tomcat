@@ -21,8 +21,6 @@ package org.apache.catalina.deploy;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 
 
 /**
@@ -32,7 +30,7 @@ import java.util.ArrayList;
  * @version $Revision$ $Date$
  */
 
-public class ResourceBase implements Serializable, Injectable {
+public class ResourceBase implements Serializable {
 
 
     // ------------------------------------------------------------- Properties
@@ -113,18 +111,8 @@ public class ResourceBase implements Serializable, Injectable {
     public Iterator listProperties() {
         return properties.keySet().iterator();
     }
-
-    private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
-
-    public void addInjectionTarget(String injectionTargetName, String jndiName) {
-        InjectionTarget target = new InjectionTarget(injectionTargetName, jndiName);
-        injectionTargets.add(target);
-    }
-
-    public List<InjectionTarget> getInjectionTargets() {
-        return injectionTargets;
-    }
-
+    
+    
     // -------------------------------------------------------- Package Methods
 
 

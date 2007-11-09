@@ -57,7 +57,6 @@ import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Intercepto
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.ha.session.JvmRouteBinderValve;
 import org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener;
-import org.apache.catalina.ha.jmx.ClusterJmxHelper;
 
 /**
  * A <b>Cluster </b> implementation using simple multicast. Responsible for
@@ -407,8 +406,8 @@ public class SimpleTcpCluster
      * @param name
      * @param value
      */
-    public void setProperty(String name, String value) {
-        setProperty(name, (Object) value);
+    public boolean setProperty(String name, String value) {
+        return setProperty(name, (Object) value);
     }
 
     /**
@@ -417,29 +416,9 @@ public class SimpleTcpCluster
      * @param name
      * @param value
      */
-    public void setProperty(String name, Object value) {
-        if (log.isTraceEnabled())
-            log.trace(sm.getString("SimpleTcpCluster.setProperty", name, value,properties.get(name)));
+    public boolean setProperty(String name, Object value) {
         properties.put(name, value);
-        //using a dynamic way of setting properties is nice, but a security risk
-        //if exposed through JMX. This way you can sit and try to guess property names,
-        //we will only allow explicit property names
-        log.warn("Dynamic setProperty("+name+",value) has been disabled, please use explicit properties for the element you are trying to identify");
-        if(started) {
-            // FIXME Hmm, is that correct when some DeltaManagers are direct configured inside Context?
-            // Why we not support it for other elements, like sender, receiver or membership?
-            // Must we restart element after change?
-//            if (name.startsWith("manager")) {
-//                String key = name.substring("manager".length() + 1);
-//                String pvalue = value.toString();
-//                for (Iterator iter = managers.values().iterator(); iter.hasNext();) {
-//                    Manager manager = (Manager) iter.next();
-//                    if(manager instanceof DeltaManager && ((ClusterManager) manager).isDefaultMode()) {
-//                        IntrospectionUtils.setProperty(manager, key, pvalue );
-//                    }
-//                }
-//            } 
-        }
+        return false;
     }
 
     /**
@@ -690,8 +669,6 @@ public class SimpleTcpCluster
             channel.start(channel.DEFAULT);
             if (clusterDeployer != null) clusterDeployer.start();
             this.started = true;
-            //register JMX objects
-            ClusterJmxHelper.registerDefaultCluster(this);
             // Notify our interested LifecycleListeners
             lifecycle.fireLifecycleEvent(AFTER_START_EVENT, this);
         } catch (Exception x) {
@@ -787,9 +764,6 @@ public class SimpleTcpCluster
             channel.removeChannelListener(this);
             channel.removeMembershipListener(this);
             this.unregisterClusterValve();
-            //unregister JMX objects
-            ClusterJmxHelper.unregisterDefaultCluster(this);
-
         } catch (Exception x) {
             log.error("Unable to stop cluster valve.", x);
         }

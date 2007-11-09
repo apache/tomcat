@@ -45,7 +45,28 @@ public final class Cookies { // extends MultiMap {
     boolean unprocessed=true;
 
     MimeHeaders headers;
-    
+
+    /*
+    List of Separator Characters (see isSeparator())
+    Excluding the '/' char violates the RFC, but 
+    it looks like a lot of people put '/'
+    in unquoted values: '/': ; //47 
+    '\t':9 ' ':32 '\"':34 '\'':39 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
+    '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
+    */
+    public static final char SEPARATORS[] = { '\t', ' ', '\"', '\'', '(', ')', ',', 
+        ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
+
+    protected static final boolean separators[] = new boolean[128];
+    static {
+        for (int i = 0; i < 128; i++) {
+            separators[i] = false;
+        }
+        for (int i = 0; i < SEPARATORS.length; i++) {
+            separators[SEPARATORS[i]] = true;
+        }
+    }
+
     /**
      *  Construct a new cookie collection, that will extract
      *  the information from headers.
@@ -182,181 +203,6 @@ public final class Cookies { // extends MultiMap {
         }
     }
 
-    /** Process a byte[] header - allowing fast processing of the
-     *  raw data
-     */
-    void processCookieHeader(  byte bytes[], int off, int len )
-    {
-        if( len<=0 || bytes==null ) return;
-        int end=off+len;
-        int pos=off;
-        
-        int version=0; //sticky
-        ServerCookie sc=null;
-        
-
-        while( pos<end ) {
-            byte cc;
-            // [ skip_spaces name skip_spaces "=" skip_spaces value EXTRA ; ] *
-            if( dbg>0 ) log( "Start: " + pos + " " + end );
-            
-            pos=skipSpaces(bytes, pos, end);
-            if( pos>=end )
-                return; // only spaces
-            int startName=pos;
-            if( dbg>0 ) log( "SN: " + pos );
-            
-            // Version should be the first token
-            boolean isSpecial=false;
-            if(bytes[pos]=='$') { pos++; isSpecial=true; }
-
-            pos= findDelim1( bytes, startName, end); // " =;,"
-            int endName=pos;
-            // current = "=" or " " or DELIM
-            pos= skipSpaces( bytes, endName, end ); 
-            if( dbg>0 ) log( "DELIM: " + endName + " " + (char)bytes[pos]);
-
-            if(pos >= end ) {
-                // it's a name-only cookie ( valid in RFC2109 )
-                if( ! isSpecial ) {
-                    sc=addCookie();
-                    sc.getName().setBytes( bytes, startName,
-                                           endName-startName );
-                    sc.getValue().setString("");
-                    sc.setVersion( version );
-                    if( dbg>0 ) log( "Name only, end: " + startName + " " +
-                                     endName);
-                }
-                return;
-            }
-
-            cc=bytes[pos];
-            pos++;
-            if( cc==';' || cc==',' || pos>=end ) {
-                if( ! isSpecial && startName!= endName ) {
-                    sc=addCookie();
-                    sc.getName().setBytes( bytes, startName,
-                                           endName-startName );
-                    sc.getValue().setString("");
-                    sc.setVersion( version );
-                    if( dbg>0 ) log( "Name only: " + startName + " " + endName);
-                }
-                continue;
-            }
-            
-            // we should have "=" ( tested all other alternatives )
-            int startValue=skipSpaces( bytes, pos, end);
-            int endValue=startValue;
-            
-            cc=bytes[pos];
-            if( cc=='"' ) {
-                endValue=findDelim3( bytes, startValue+1, end, cc );
-                if (endValue == -1) {
-                    endValue=findDelim2( bytes, startValue+1, end );
-                } else startValue++;
-                pos=endValue+1; // to skip to next cookie
-             } else {
-                endValue=findDelim2( bytes, startValue, end );
-                pos=endValue+1;
-            }
-            
-            // if not $Version, etc
-            if( ! isSpecial ) {
-                sc=addCookie();
-                sc.getName().setBytes( bytes, startName, endName-startName );
-                sc.getValue().setBytes( bytes, startValue, endValue-startValue);
-                sc.setVersion( version );
-                if( dbg>0 ) {
-                    log( "New: " + sc.getName() + "X=X" + sc.getValue());
-                }
-                continue;
-            }
-            
-            // special - Path, Version, Domain, Port
-            if( dbg>0 ) log( "Special: " + startName + " " + endName);
-            // XXX TODO
-            if( equals( "$Version", bytes, startName, endName ) ) {
-                if(dbg>0 ) log( "Found version " );
-                if( bytes[startValue]=='1' && endValue==startValue+1 ) {
-                    version=1;
-                    if(dbg>0 ) log( "Found version=1" );
-                }
-                continue;
-            }
-            if( sc==null ) {
-                // Path, etc without a previous cookie
-                continue;
-            }
-            if( equals( "$Path", bytes, startName, endName ) ) {
-                sc.getPath().setBytes( bytes,
-                                       startValue,
-                                       endValue-startValue );
-            }
-            if( equals( "$Domain", bytes, startName, endName ) ) {
-                sc.getDomain().setBytes( bytes,
-                                         startValue,
-                                         endValue-startValue );
-            }
-            if( equals( "$Port", bytes, startName, endName ) ) {
-                // sc.getPort().setBytes( bytes,
-                //                        startValue,
-                //                        endValue-startValue );
-            }
-        }
-    }
-
-    // -------------------- Utils --------------------
-    public static int skipSpaces(  byte bytes[], int off, int end ) {
-        while( off < end ) {
-            byte b=bytes[off];
-            if( b!= ' ' ) return off;
-            off ++;
-        }
-        return off;
-    }
-
-    public static int findDelim1( byte bytes[], int off, int end )
-    {
-        while( off < end ) {
-            byte b=bytes[off];
-            if( b==' ' || b=='=' || b==';' || b==',' )
-                return off;
-            off++;
-        }
-        return off;
-    }
-
-    public static int findDelim2( byte bytes[], int off, int end )
-    {
-        while( off < end ) {
-            byte b=bytes[off];
-            if( b==';' || b==',' )
-                return off;
-            off++;
-        }
-        return off;
-    }
-
-    /*
-     *  search for cc but skip \cc as required by rfc2616
-     *   (according to rfc2616 cc should be ")
-    */
-    public static int findDelim3( byte bytes[], int off, int end, byte cc )
-    {
-        while( off < end ) {
-            byte b=bytes[off];
-            if ( b== '\\' ) {
-              off++;
-              off++;
-              continue;
-            }
-            if( b==cc )
-                return off;
-            off++;
-        }
-        return -1;
-    }
-
     // XXX will be refactored soon!
     public static boolean equals( String s, byte b[], int start, int end) {
         int blen = end-start;
@@ -440,42 +286,302 @@ public final class Cookies { // extends MultiMap {
             log.debug("Cookies: " + s);
     }
 
-    /*
-    public static void main( String args[] ) {
-        test("foo=bar; a=b");
-        test("foo=bar;a=b");
-        test("foo=bar;a=b;");
-        test("foo=bar;a=b; ");
-        test("foo=bar;a=b; ;");
-        test("foo=;a=b; ;");
-        test("foo;a=b; ;");
-        // v1 
-        test("$Version=1; foo=bar;a=b"); 
-        test("$Version=\"1\"; foo='bar'; $Path=/path; $Domain=\"localhost\"");
-        test("$Version=1;foo=bar;a=b; ; ");
-        test("$Version=1;foo=;a=b; ; ");
-        test("$Version=1;foo= ;a=b; ; ");
-        test("$Version=1;foo;a=b; ; ");
-        test("$Version=1;foo=\"bar\";a=b; ; ");
-        test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ");
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b");
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;a=b;$Domain=yahoo.com");
-        // rfc2965
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b");
 
-        // wrong
-        test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b");
+   /**
+     * Returns true if the byte is a separator character as
+     * defined in RFC2619. Since this is called often, this
+     * function should be organized with the most probable
+     * outcomes first.
+     * JVK
+     */
+    public static final boolean isSeparator(final byte c) {
+         if (c > 0 && c < 126)
+             return separators[c];
+         else
+             return false;
     }
-
-    public static void test( String s ) {
-        System.out.println("Processing " + s );
-        Cookies cs=new Cookies(null);
-        cs.processCookieHeader( s.getBytes(), 0, s.length());
-        for( int i=0; i< cs.getCookieCount() ; i++ ) {
-            System.out.println("Cookie: " + cs.getCookie( i ));
+    
+    /**
+     * Returns true if the byte is a whitespace character as
+     * defined in RFC2619
+     * JVK
+     */
+    public static final boolean isWhiteSpace(final byte c) {
+        // This switch statement is slightly slower
+        // for my vm than the if statement.
+        // Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_07-164)
+        /* 
+        switch (c) {
+        case ' ':;
+        case '\t':;
+        case '\n':;
+        case '\r':;
+        case '\f':;
+            return true;
+        default:;
+            return false;
         }
-            
+        */
+       if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f')
+           return true;
+       else
+           return false;
     }
-    */
+
+    /**
+     * Parses a cookie header after the initial "Cookie:"
+     * [WS][$]token[WS]=[WS](token|QV)[;|,]
+     * RFC 2965
+     * JVK
+     */
+    public final void processCookieHeader(byte bytes[], int off, int len){
+        if( len<=0 || bytes==null ) return;
+        int end=off+len;
+        int pos=off;
+        int nameStart=0;
+        int nameEnd=0;
+        int valueStart=0;
+        int valueEnd=0;
+        int version = 0;
+        ServerCookie sc=null;
+        boolean isSpecial;
+        boolean isQuoted;
+
+        while (pos < end) {
+            isSpecial = false;
+            isQuoted = false;
+
+            // Skip whitespace and non-token characters (separators)
+            while (pos < end && 
+                   (isSeparator(bytes[pos]) || isWhiteSpace(bytes[pos]))) 
+                {pos++; } 
+
+            if (pos >= end)
+                return;
+
+            // Detect Special cookies
+            if (bytes[pos] == '$') {
+                isSpecial = true;
+                pos++;
+            }
+
+            // Get the cookie name. This must be a token            
+            valueEnd = valueStart = nameStart = pos; 
+            pos = nameEnd = getTokenEndPosition(bytes,pos,end);
+
+            // Skip whitespace
+            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }; 
+         
+
+            // Check for an '=' -- This could also be a name-only
+            // cookie at the end of the cookie header, so if we
+            // are past the end of the header, but we have a name
+            // skip to the name-only part.
+            if (pos < end && bytes[pos] == '=') {                
+
+                // Skip whitespace
+                do {
+                    pos++;
+                } while (pos < end && isWhiteSpace(bytes[pos])); 
+
+                if (pos >= end)
+                    return;
+
+                // Determine what type of value this is, quoted value,
+                // token, name-only with an '=', or other (bad)
+                switch (bytes[pos]) {
+                case '"':; // Quoted Value
+                    isQuoted = true;
+                    valueStart=pos + 1; // strip "
+                    // getQuotedValue returns the position before 
+                    // at the last qoute. This must be dealt with
+                    // when the bytes are copied into the cookie
+                    valueEnd=getQuotedValueEndPosition(bytes, 
+                                                       valueStart, end);
+                    // We need pos to advance
+                    pos = valueEnd; 
+                    // Handles cases where the quoted value is 
+                    // unterminated and at the end of the header, 
+                    // e.g. [myname="value]
+                    if (pos >= end)
+                        return;
+                    break;
+                case ';':
+                case ',':
+                    // Name-only cookie with an '=' after the name token
+                    // This may not be RFC compliant
+                    valueStart = valueEnd = -1;
+                    // The position is OK (On a delimiter)
+                    break;
+                default:;
+                    if (!isSeparator(bytes[pos])) {
+                        // Token
+                        valueStart=pos;
+                        // getToken returns the position at the delimeter
+                        // or other non-token character
+                        valueEnd=getTokenEndPosition(bytes, valueStart, end);
+                        // We need pos to advance
+                        pos = valueEnd;
+                    } else  {
+                        // INVALID COOKIE, advance to next delimiter
+                        // The starting character of the cookie value was
+                        // not valid.
+                        log("Invalid cookie. Value not a token or quoted value");
+                        while (pos < end && bytes[pos] != ';' && 
+                               bytes[pos] != ',') 
+                            {pos++; };
+                        pos++;
+                        // Make sure no special avpairs can be attributed to 
+                        // the previous cookie by setting the current cookie
+                        // to null
+                        sc = null;
+                        continue;                        
+                    }
+                }
+            } else {
+                // Name only cookie
+                valueStart = valueEnd = -1;
+                pos = nameEnd;
+
+            }
+          
+            // We should have an avpair or name-only cookie at this
+            // point. Perform some basic checks to make sure we are
+            // in a good state.
+  
+            // Skip whitespace
+            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }; 
+
+
+            // Make sure that after the cookie we have a separator. This
+            // is only important if this is not the last cookie pair
+            while (pos < end && bytes[pos] != ';' && bytes[pos] != ',') { 
+                pos++;
+            }
+            
+            pos++;
+
+            /*
+            if (nameEnd <= nameStart || valueEnd < valueStart ) {
+                // Something is wrong, but this may be a case
+                // of having two ';' characters in a row.
+                // log("Cookie name/value does not conform to RFC 2965");
+                // Advance to next delimiter (ignoring everything else)
+                while (pos < end && bytes[pos] != ';' && bytes[pos] != ',') 
+                    { pos++; };
+                pos++;
+                // Make sure no special cookies can be attributed to 
+                // the previous cookie by setting the current cookie
+                // to null
+                sc = null;
+                continue;
+            }
+            */
+
+            // All checks passed. Add the cookie, start with the 
+            // special avpairs first
+            if (isSpecial) {
+                isSpecial = false;
+                // $Version must be the first avpair in the cookie header
+                // (sc must be null)
+                if (equals( "Version", bytes, nameStart, nameEnd) && 
+                    sc == null) {
+                    // Set version
+                    if( bytes[valueStart] =='1' && valueEnd == valueStart) {
+                        version=1;
+                    } else {
+                        // unknown version (Versioning is not very strict)
+                    }
+                    continue;
+                } 
+                
+                // We need an active cookie for Path/Port/etc.
+                if (sc == null) {
+                    continue;
+                }
+
+                // Domain is more common, so it goes first
+                if (equals( "Domain", bytes, nameStart, nameEnd)) {
+                    sc.getDomain().setBytes( bytes,
+                                           valueStart,
+                                           valueEnd-valueStart);
+                    continue;
+                } 
+
+                if (equals( "Path", bytes, nameStart, nameEnd)) {
+                    sc.getPath().setBytes( bytes,
+                                           valueStart,
+                                           valueEnd-valueStart);
+                    continue;
+                } 
+
+
+                if (equals( "Port", bytes, nameStart, nameEnd)) {
+                    // sc.getPort is not currently implemented.
+                    // sc.getPort().setBytes( bytes,
+                    //                        valueStart,
+                    //                        valueEnd-valueStart );
+                    continue;
+                } 
+
+                // Unknown cookie, complain
+                log("Unknown Special Cookie");
+
+            } else { // Normal Cookie
+                sc = addCookie();
+                sc.setVersion( version );
+                sc.getName().setBytes( bytes, nameStart,
+                                       nameEnd-nameStart);
+                
+                if (valueStart != -1) { // Normal AVPair
+                    sc.getValue().setBytes( bytes, valueStart,
+                            valueEnd-valueStart);
+                    if (isQuoted) {
+                        // We know this is a byte value so this is safe
+                        ServerCookie.unescapeDoubleQuotes(
+                                sc.getValue().getByteChunk());
+                    }
+                } else {
+                    // Name Only
+                    sc.getValue().setString(""); 
+                }
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Given the starting position of a token, this gets the end of the
+     * token, with no separator characters in between.
+     * JVK
+     */
+    public static final int getTokenEndPosition(byte bytes[], int off, int end){
+        int pos = off;
+        while (pos < end && !isSeparator(bytes[pos])) {pos++; };
+        
+        if (pos > end)
+            return end;
+        return pos;
+    }
+
+    /** 
+     * Given a starting position after an initial quote chracter, this gets
+     * the position of the end quote. This escapes anything after a '\' char
+     * JVK RFC 2616
+     */
+    public static final int getQuotedValueEndPosition(byte bytes[], int off, int end){
+        int pos = off;
+        while (pos < end) {
+            if (bytes[pos] == '"') {
+                return pos;                
+            } else if (bytes[pos] == '\\' && pos < (end - 1)) {
+                pos+=2;
+            } else {
+                pos++;
+            }
+        }
+        // Error, we have reached the end of the header w/o a end quote
+        return end;
+    }
 
 }

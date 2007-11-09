@@ -36,6 +36,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.MBeanNotificationInfo;
@@ -46,6 +47,7 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.tomcat.util.modeler.Registry;
 import org.apache.jk.core.JkHandler;
 import org.apache.jk.core.Msg;
 import org.apache.jk.core.MsgContext;
@@ -54,7 +56,6 @@ import org.apache.jk.core.WorkerEnv;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
-import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.threads.ThreadPool;
 import org.apache.tomcat.util.threads.ThreadPoolRunnable;
 
@@ -171,7 +172,6 @@ public class ChannelNioSocket extends JkHandler
     public int getPacketSize() {
         return packetSize;
     }
-
 
     /**
      * jmx:managed-attribute description="Bind on a specified address" access="READ_WRITE"
@@ -883,6 +883,8 @@ public class ChannelNioSocket extends JkHandler
 
         synchronized void  process(SelectionKey sk) {
             if(!sk.isValid()) {
+                SocketInputStream sis = (SocketInputStream)ep.getNote(isNote);
+                sis.closeIt();
                 return;
             }
             if(sk.isReadable()) {
@@ -960,15 +962,11 @@ public class ChannelNioSocket extends JkHandler
                         Iterator it = sels.iterator();
                         while(it.hasNext()) {
                             SelectionKey sk = (SelectionKey)it.next();
-                            if(sk.isValid()) {
-                                if(sk.isAcceptable()) {
-                                    acceptConnections();
-                                } else {
-                                    SocketConnection sc = (SocketConnection)sk.attachment();
-                                    sc.process(sk);
-                                }
+                            if(sk.isAcceptable()) {
+                                acceptConnections();
                             } else {
-                                sk.cancel();
+                                SocketConnection sc = (SocketConnection)sk.attachment();
+                                sc.process(sk);
                             }
                             it.remove();
                         }
@@ -1082,8 +1080,7 @@ public class ChannelNioSocket extends JkHandler
                     nr = -1; // Can't handle this yet
                 }
                 if(nr < 0) {
-                    isClosed = true;
-                    notify();
+                    closeIt();
                     return false;
                 } else if(nr == 0) {
                     if(!nioIsBroken) {
@@ -1092,6 +1089,12 @@ public class ChannelNioSocket extends JkHandler
                 }
             }
             return true;
+        }
+
+        synchronized void closeIt() {
+            isClosed = true;
+            if(blocking)
+                notify();
         }
 
         public int read(byte [] data) throws IOException {
@@ -1133,7 +1136,9 @@ public class ChannelNioSocket extends JkHandler
                 if(fill(len) < 0) {
                     isClosed = true;
                 } 
-            }
+            } else if(!isClosed) {
+		throw new SocketTimeoutException("Read request timed out");
+	    }
         }
     }
 

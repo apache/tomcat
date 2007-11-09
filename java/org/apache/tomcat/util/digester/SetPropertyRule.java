@@ -125,8 +125,13 @@ public class SetPropertyRule extends Rule {
         }
 
         // Set the property (with conversion as necessary)
-        // FIXME: Exception if property doesn't exist ?
-        IntrospectionUtils.setProperty(top, actualName, actualValue);
+        if (!digester.isFakeAttribute(top, actualName) 
+                && !IntrospectionUtils.setProperty(top, actualName, actualValue) 
+                && digester.getRulesValidation()) {
+            digester.log.warn("[SetPropertyRule]{" + digester.match +
+                    "} Setting property '" + name + "' to '" +
+                    value + "' did not find a matching property.");
+        }
 
     }
 

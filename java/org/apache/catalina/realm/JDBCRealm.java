@@ -420,7 +420,7 @@ public class JDBCRealm
             return (null);
         }
 
-        ArrayList roles = getRoles(username);
+        ArrayList<String> roles = getRoles(username);
         
         // Create and return a suitable Principal for this user
         return (new GenericPrincipal(this, username, credentials, roles));
@@ -604,7 +604,7 @@ public class JDBCRealm
     /**
      * Return the roles associated with the gven user name.
      */
-    protected ArrayList getRoles(String username) {
+    protected ArrayList<String> getRoles(String username) {
         
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -626,7 +626,7 @@ public class JDBCRealm
                 
                 try {
                     // Accumulate the user's roles
-                    ArrayList roleList = new ArrayList();
+                    ArrayList<String> roleList = new ArrayList<String>();
                     stmt = roles(dbConnection, username);
                     rs = stmt.executeQuery();
                     while (rs.next()) {

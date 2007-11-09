@@ -578,7 +578,7 @@ public class HandlerRequest extends JkHandler
                 (hId == -1 && tmpMB.equalsIgnoreCase("Content-Length"))) {
                 // just read the content-length header, so set it
                 long cl = vMB.getLong();
-                if(cl < Integer.MAX_VALUE)
+                if(cl < Integer.MAX_VALUE) 
                     req.setContentLength( (int)cl );
             } else if (hId == AjpConstants.SC_REQ_CONTENT_TYPE ||
                 (hId == -1 && tmpMB.equalsIgnoreCase("Content-Type"))) {

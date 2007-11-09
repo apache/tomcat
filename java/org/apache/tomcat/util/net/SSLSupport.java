@@ -61,7 +61,9 @@ public interface SSLSupport {
         new CipherData("_WITH_RC4_128_", 128),
         new CipherData("_WITH_DES40_CBC_", 40),
         new CipherData("_WITH_DES_CBC_", 56),
-        new CipherData("_WITH_3DES_EDE_CBC_", 168)
+        new CipherData("_WITH_3DES_EDE_CBC_", 168),
+        new CipherData("_WITH_AES_128_CBC_", 128),
+        new CipherData("_WITH_AES_256_CBC_", 256)
     };
 
     /**

@@ -395,7 +395,6 @@ public class StandardManager
                     session.setManager(this);
                     sessions.put(session.getIdInternal(), session);
                     session.activate();
-                    session.endAccess();
                 }
             } catch (ClassNotFoundException e) {
               log.error(sm.getString("standardManager.loading.cnfe", e), e);

@@ -292,7 +292,8 @@ public class InputBuffer extends Reader
         if (coyoteRequest == null)
             return -1;
 
-        state = BYTE_STATE;
+        if(state == INITIAL_STATE)
+            state = BYTE_STATE;
 
         int result = coyoteRequest.doRead(bb);
 
@@ -325,6 +326,8 @@ public class InputBuffer extends Reader
     public void realWriteChars(char c[], int off, int len) 
         throws IOException {
         markPos = -1;
+        cb.setOffset(0);
+        cb.setEnd(0);
     }
 
 
@@ -351,12 +354,9 @@ public class InputBuffer extends Reader
             cb.setEnd(0);
         }
 
-        int limit = bb.getLength()+cb.getStart();
-        if( cb.getLimit() < limit ) 
-	    cb.setLimit(limit);
-        conv.convert(bb, cb);
-        bb.setOffset(bb.getEnd());
         state = CHAR_STATE;
+        conv.convert(bb, cb, len);
+        bb.setOffset(bb.getEnd());
 
         return cb.getLength();
 

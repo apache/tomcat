@@ -158,11 +158,12 @@ public class SocketProperties {
     protected int performanceBandwidth = 1;
     
     /**
-     * Minimum time to pass by before another socket expiration run performs
-     * This avoids unncessary loops over all sockets when the poller is busy
+     * The minimum frequency of the timeout interval to avoid the 
+     * poller going boinkers during high traffic
      */
     protected long timeoutInterval = 1000;
-    
+
+
     private Socket properties;
 
     public void setProperties(Socket socket) throws SocketException{
@@ -266,6 +267,10 @@ public class SocketProperties {
         return processorCache;
     }
 
+    public long getTimeoutInterval() {
+        return timeoutInterval;
+    }
+
     public int getDirectBufferPool() {
         return bufferPool;
     }
@@ -354,16 +359,12 @@ public class SocketProperties {
         this.processorCache = processorCache;
     }
 
+    public void setTimeoutInterval(long timeoutInterval) {
+        this.timeoutInterval = timeoutInterval;
+    }
+
     public void setDirectBufferPool(int directBufferPool) {
         this.bufferPool = directBufferPool;
-    }
-
-    public void setTimeoutInterval(long toi){
-        this.timeoutInterval = toi;
-    }
-
-    public long getTimeoutInterval(){
-        return timeoutInterval;
     }
 
 }

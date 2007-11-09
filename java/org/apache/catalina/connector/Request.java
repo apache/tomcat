@@ -70,8 +70,6 @@ import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.util.StringParser;
-import org.apache.tomcat.util.MutableBoolean;
-import org.apache.catalina.CometEvent;
 
 
 /**
@@ -2252,31 +2250,15 @@ public class Request
 
     
     /**
-     * Return true if bytes are available at the servlet layer
+     * Return true if bytes are available.
      */
-    public boolean isAvailable() {
+    public boolean getAvailable() {
         return (inputBuffer.available() > 0);
     }
-    
-    /**
-     * returns true if we read data from the socket
-     * @return boolean
-     */
-    public boolean isReadable() {
-        MutableBoolean bool = new MutableBoolean(false);
-        action(ActionCode.ACTION_COMET_READABLE,bool);
-        return bool.get();    
-    }
 
-    public boolean hasOp(CometEvent.CometOperation op) {
-        if ( !comet || getEvent()==null ) return false;
-        return event.hasOp(op);
-    }
+    
     // ------------------------------------------------------ Protected Methods
 
-    protected void action(ActionCode actionCode, Object param) {
-        coyoteRequest.action(actionCode,param);
-    }
 
     protected Session doGetSession(boolean create) {
 

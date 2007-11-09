@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <project name="Tomcat 6.0" default="release" basedir=".">
 
 
@@ -34,6 +50,9 @@
   <property name="tomcat.release"    value="${basedir}/output/release"/>
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
+
+  <!-- constant to declare a file binary for md5sum -->
+  <property name="md5sum.binary-prefix" value=" *" />
 
   <!-- Can't be lower - jsp uses templates -->
   <property name="compile.source" value="1.5"/>
@@ -418,7 +437,7 @@
 
   <!-- ================= DIST: Create Windows Installer =================== -->
   <target name="installer"
-   description="Create Windows 32-bit installer" if="execute.installer">
+   description="Create Windows installer" if="execute.installer">
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
       <fileset dir="res" />
@@ -426,9 +445,10 @@
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-    <copy todir="${tomcat.dist}/bin">
-       <fileset dir="res/procrun/" includes="tomcat*.exe"/>
-    </copy>
+    <copy file="res/procrun/tomcat6.exe"
+        tofile="${tomcat.dist}/bin/tomcat6.exe" />
+    <copy file="res/procrun/tomcat6w.exe"
+        tofile="${tomcat.dist}/bin/tomcat6w.exe" />
 
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_NUMBER" value="${version.number}"/>
@@ -476,15 +496,6 @@
 
   <!-- Packages the core zip distro -->
   <target name="package-zip">
-    <copy todir="${tomcat.dist}/bin">
-       <fileset dir="res/procrun/" includes="tomcat*.exe"/>
-    </copy>
-    <copy todir="${tomcat.dist}/bin/amd64">
-       <fileset dir="res/procrun/amd64" includes="tomcat*.exe"/>
-    </copy>
-    <copy todir="${tomcat.dist}/bin/ia64">
-       <fileset dir="res/procrun/ia64" includes="tomcat*.exe"/>
-    </copy>  
     <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}.zip">
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**"/>
@@ -501,15 +512,7 @@
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
         <exclude name="webapps/admin/**"/>
-        <exclude name="conf/Catalina/localhost/admin.xml"/>        
-        <!-- If we choose not to have service binaries by default
-             the exclude.service.binaries must be defined
-             in build.properties or in this file
-        -->
-        <exclude name="bin/*.exe" if="exclude.service.binaries"/>
-        <exclude name="bin/amd64/" if="exclude.service.binaries"/>
-        <exclude name="bin/ia64/" if="exclude.service.binaries"/>
-        <exclude name="bin/service.bat" if="exclude.service.binaries"/>
+        <exclude name="conf/Catalina/localhost/admin.xml"/>
       </zipfileset>
     </zip>
 
@@ -573,6 +576,7 @@
         <include name="bin/tool-wrapper-using-launcher.sh" />
         <include name="bin/shutdown-using-launcher.sh" />
         <include name="bin/startup-using-launcher.sh" />
+        <include name="bin/version.sh" />
       </tarfileset>
       <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
         <include name="conf/**" />
@@ -602,17 +606,10 @@
         <exclude name="bin/tool-wrapper-using-launcher.sh" />
         <exclude name="bin/shutdown-using-launcher.sh" />
         <exclude name="bin/startup-using-launcher.sh" />
+        <exclude name="bin/version.sh" />
         <exclude name="conf/**" />
         <exclude name="src/**" />
         <exclude name="webapps/admin/**" />
-        <exclude name="bin/*.exe"/>
-        <exclude name="bin/amd64/"/>
-        <exclude name="bin/ia64/"/>
-        <exclude name="bin/service.bat"/>
-        <!-- Do we need windows .bat files as part of .tgz?
-             If not apply the following rule
-        <exclude name="bin/*.bat"/>
-        -->                     
       </tarfileset>
     </tar>
 

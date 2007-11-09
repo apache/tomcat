@@ -27,8 +27,6 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
 import org.apache.catalina.util.StringManager;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /**
  * <p>Implementation of the JAAS <code>CallbackHandler</code> interface,
@@ -49,7 +47,6 @@ import org.apache.juli.logging.LogFactory;
  */
 
 public class JAASCallbackHandler implements CallbackHandler {
-    private static Log log = LogFactory.getLog(JAASCallbackHandler.class);
 
     // ------------------------------------------------------------ Constructor
 

@@ -94,13 +94,13 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     /**
      * Set a property.
      */
-    public void setProperty(String name, String value) {
-        if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
-            ep.setProperty(name, value);
-        } else {
-            ep.setProperty(name,value); //make sure we at least try to set all properties
-        }
+    public boolean setProperty(String name, String value) {
         setAttribute(name, value);
+        if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
+            return ep.setProperty(name, value);
+        } else {
+            return ep.setProperty(name,value); //make sure we at least try to set all properties
+        }
     }
 
     /**
@@ -547,17 +547,27 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public String getAlgorithm() { return ep.getAlgorithm();}
     public void setAlgorithm(String s ) { ep.setAlgorithm(s);}
     
-    public boolean getClientAuth() { return ep.getClientAuth();}
-    public void setClientAuth(boolean b ) { ep.setClientAuth(b);}
+    public void setClientauth(String s) {setClientAuth(s);}
+    public String getClientauth(){ return getClientAuth();}
+    public String getClientAuth() { return ep.getClientAuth();}
+    public void setClientAuth(String s ) { ep.setClientAuth(s);}
     
     public String getKeystorePass() { return ep.getKeystorePass();}
     public void setKeystorePass(String s ) { ep.setKeystorePass(s);}
     public void setKeypass(String s) { setKeystorePass(s);}
     public String getKeypass() { return getKeystorePass();}
-    
-    
     public String getKeystoreType() { return ep.getKeystoreType();}
     public void setKeystoreType(String s ) { ep.setKeystoreType(s);}
+    public String getKeytype() { return getKeystoreType();}
+    public void setKeytype(String s ) { setKeystoreType(s);}
+
+    public void setTruststoreFile(String f){ep.setTruststoreFile(f);}
+    public String getTruststoreFile(){return ep.getTruststoreFile();}
+    public void setTruststorePass(String p){ep.setTruststorePass(p);}
+    public String getTruststorePass(){return ep.getTruststorePass();}
+    public void setTruststoreType(String t){ep.setTruststoreType(t);}
+    public String getTruststoreType(){ return ep.getTruststoreType();}
+    
     
     public String getSslProtocol() { return ep.getSslProtocol();}
     public void setSslProtocol(String s) { ep.setSslProtocol(s);}
@@ -622,14 +632,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public void releaseCaches() {
             recycledProcessors.clear();
         }
-        
-        public void release(NioChannel socket) {
-            Http11NioProcessor result = connections.remove(socket);
-            if ( result != null ) {
-                result.recycle();
-                recycledProcessors.offer(result);
-            }
-        }
 
         public SocketState event(NioChannel socket, SocketStatus status) {
             Http11NioProcessor result = connections.get(socket);
@@ -669,9 +671,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                         }
                     } else {
                         if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
-                        //add correct poller events here based on Comet stuff
-                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-                        socket.getPoller().add(socket,att.getCometOps());
+                        socket.getPoller().add(socket);
                     }
                 }
             }
@@ -681,8 +681,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public SocketState process(NioChannel socket) {
             Http11NioProcessor processor = null;
             try {
-                processor = connections.remove(socket);
-                
                 if (processor == null) {
                     processor = recycledProcessors.poll();
                 }
@@ -710,14 +708,9 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     // Associate the connection with the processor. The next request 
                     // processed by this thread will use either a new or a recycled
                     // processor.
-                    //if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
+                    if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
                     connections.put(socket, processor);
-                    if (processor.comet) {
-                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-                        socket.getPoller().add(socket,att.getCometOps());
-                    } else {
-                        socket.getPoller().add(socket);
-                    }
+                    socket.getPoller().add(socket);
                 } else {
                     recycledProcessors.offer(processor);
                 }

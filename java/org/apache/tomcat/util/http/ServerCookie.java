@@ -21,13 +21,14 @@ import java.io.Serializable;
 import java.text.FieldPosition;
 import java.util.Date;
 
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.DateTool;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 
 /**
  *  Server-side cookie representation.
- *   Allows recycling and uses MessageBytes as low-level
+ *  Allows recycling and uses MessageBytes as low-level
  *  representation ( and thus the byte-> char conversion can be delayed
  *  until we know the charset ).
  *
@@ -37,38 +38,43 @@ import org.apache.tomcat.util.buf.MessageBytes;
 public class ServerCookie implements Serializable {
     
     
-    private static org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog(ServerCookie.class );
-    
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(ServerCookie.class);
+
+    // Version 0 (Netscape) attributes
     private MessageBytes name=MessageBytes.newInstance();
     private MessageBytes value=MessageBytes.newInstance();
-
-    private MessageBytes comment=MessageBytes.newInstance();   // ;Comment=VALUE
-    private MessageBytes domain=MessageBytes.newInstance();    // ;Domain=VALUE
-
-    private int maxAge = -1;        // ;Max-Age=VALUE
-                                // ;Discard ... implied by maxAge < 0
-    // RFC2109: maxAge=0 will end a session
-    private MessageBytes path=MessageBytes.newInstance();        // ;Path=VALUE
-    private boolean secure;        // ;Secure
-    private int version = 0;        // ;Version=1
-
-    //XXX CommentURL, Port -> use notes ?
+    // Expires - Not stored explicitly. Generated from Max-Age (see V1)
+    private MessageBytes path=MessageBytes.newInstance();
+    private MessageBytes domain=MessageBytes.newInstance();
+    private boolean secure;
     
-    public ServerCookie() {
+    // Version 1 (RFC2109) attributes
+    private MessageBytes comment=MessageBytes.newInstance();
+    private int maxAge = -1;
+    private int version = 0;
 
+    // Note: Servlet Spec =< 2.5 only refers to Netscape and RFC2109,
+    // not RFC2965
+
+    // Version 1 (RFC2965) attributes
+    // TODO Add support for CommentURL
+    // Discard - implied by maxAge <0
+    // TODO Add support for Port
+
+    public ServerCookie() {
     }
 
     public void recycle() {
         path.recycle();
-            name.recycle();
-            value.recycle();
-            comment.recycle();
-            maxAge=-1;
-            path.recycle();
+        name.recycle();
+        value.recycle();
+        comment.recycle();
+        maxAge=-1;
+        path.recycle();
         domain.recycle();
-            version=0;
-            secure=false;
+        version=0;
+        secure=false;
     }
 
     public MessageBytes getComment() {
@@ -86,7 +92,6 @@ public class ServerCookie implements Serializable {
     public int getMaxAge() {
         return maxAge;
     }
-
 
     public MessageBytes getPath() {
         return path;
@@ -112,7 +117,6 @@ public class ServerCookie implements Serializable {
         return version;
     }
 
-
     public void setVersion(int v) {
         version = v;
     }
@@ -120,17 +124,18 @@ public class ServerCookie implements Serializable {
 
     // -------------------- utils --------------------
 
+    public static void log(String s ) {
+        if (log.isDebugEnabled())
+            log.debug("ServerCookie: " + s);
+    }
+
     public String toString() {
         return "Cookie " + getName() + "=" + getValue() + " ; "
             + getVersion() + " " + getPath() + " " + getDomain();
     }
     
-    // Note -- disabled for now to allow full Netscape compatibility
-    // from RFC 2068, token special case characters
-    //
-    // private static final String tspecials = "()<>@,;:\\\"/[]?={} \t";
     private static final String tspecials = ",; ";
-    private static final String tspecials2 = ",; \"";
+    private static final String tspecials2 = "()<>@,;:\\\"/[]?={} \t";
 
     /*
      * Tests a string and returns true if the string counts as a
@@ -167,16 +172,20 @@ public class ServerCookie implements Serializable {
         return true;
     }
 
+    /**
+     * @deprecated - Not used
+     */
     public static boolean checkName( String name ) {
         if (!isToken(name)
-                || name.equalsIgnoreCase("Comment")        // rfc2019
-                || name.equalsIgnoreCase("Discard")        // 2019++
-                || name.equalsIgnoreCase("Domain")
-                || name.equalsIgnoreCase("Expires")        // (old cookies)
-                || name.equalsIgnoreCase("Max-Age")        // rfc2019
-                || name.equalsIgnoreCase("Path")
-                || name.equalsIgnoreCase("Secure")
-                || name.equalsIgnoreCase("Version")
+                || name.equalsIgnoreCase("Comment")     // rfc2019
+                || name.equalsIgnoreCase("Discard")     // rfc2965
+                || name.equalsIgnoreCase("Domain")      // rfc2019
+                || name.equalsIgnoreCase("Expires")     // Netscape
+                || name.equalsIgnoreCase("Max-Age")     // rfc2019
+                || name.equalsIgnoreCase("Path")        // rfc2019
+                || name.equalsIgnoreCase("Secure")      // rfc2019
+                || name.equalsIgnoreCase("Version")     // rfc2019
+                // TODO remaining RFC2965 attributes
             ) {
             return false;
         }
@@ -186,25 +195,27 @@ public class ServerCookie implements Serializable {
     // -------------------- Cookie parsing tools
 
     
-    /** Return the header name to set the cookie, based on cookie
-     *  version
+    /**
+     * Return the header name to set the cookie, based on cookie version.
      */
     public String getCookieHeaderName() {
         return getCookieHeaderName(version);
     }
 
-    /** Return the header name to set the cookie, based on cookie
-     *  version
+    /**
+     * Return the header name to set the cookie, based on cookie version.
      */
     public static String getCookieHeaderName(int version) {
-        if( dbg>0 ) log( (version==1) ? "Set-Cookie2" : "Set-Cookie");
+        // TODO Re-enable logging when RFC2965 is implemented
+        // log( (version==1) ? "Set-Cookie2" : "Set-Cookie");
         if (version == 1) {
+            // XXX RFC2965 not referenced in Servlet Spec
+            // Set-Cookie2 is not supported by Netscape 4, 6, IE 3, 5
+            // Set-Cookie2 is supported by Lynx and Opera
+            // Need to check on later IE and FF releases but for now... 
             // RFC2109
             return "Set-Cookie";
-            // XXX RFC2965 is not standard yet, and Set-Cookie2
-            // is not supported by Netscape 4, 6, IE 3, 5 .
-            // It is supported by Lynx, and there is hope 
-            //            return "Set-Cookie2";
+            // return "Set-Cookie2";
         } else {
             // Old Netscape
             return "Set-Cookie";
@@ -214,6 +225,7 @@ public class ServerCookie implements Serializable {
     private static final String ancientDate =
         DateTool.formatOldCookie(new Date(10000));
 
+    // TODO RFC2965 fields also need to be passed
     public static void appendCookieValue( StringBuffer buf,
                                           int version,
                                           String name,
@@ -224,13 +236,14 @@ public class ServerCookie implements Serializable {
                                           int maxAge,
                                           boolean isSecure )
     {
-        // this part is the same for all cookies
+        // Servlet implementation checks name
         buf.append( name );
         buf.append("=");
+        // Servlet implementation does not check anything else
+        
         maybeQuote2(version, buf, value);
 
-        // XXX Netscape cookie: "; "
-         // add version 1 specific information
+        // Add version 1 specific information
         if (version == 1) {
             // Version=1 ... required
             buf.append ("; Version=1");
@@ -238,26 +251,23 @@ public class ServerCookie implements Serializable {
             // Comment=comment
             if ( comment!=null ) {
                 buf.append ("; Comment=");
-                maybeQuote (version, buf, comment);
+                maybeQuote2(version, buf, comment);
             }
         }
         
-        // add domain information, if present
-
+        // Add domain information, if present
         if (domain!=null) {
             buf.append("; Domain=");
-            maybeQuote (version, buf, domain);
+            maybeQuote2(version, buf, domain);
         }
 
-        // Max-Age=secs/Discard ... or use old "Expires" format
+        // Max-Age=secs ... or use old "Expires" format
+        // TODO RFC2965 Discard
         if (maxAge >= 0) {
             if (version == 0) {
-                // XXX XXX XXX We need to send both, for
-                // interoperatibility (long word )
+                // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
                 buf.append ("; Expires=");
-                // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires netscape format )
-                // To expire we need to set the time back in future
-                // ( pfrieden@dChain.com )
+                // To expire immediately we need to set the time in past
                 if (maxAge == 0)
                     buf.append( ancientDate );
                 else
@@ -275,7 +285,7 @@ public class ServerCookie implements Serializable {
         // Path=path
         if (path!=null) {
             buf.append ("; Path=");
-            maybeQuote (version, buf, path);
+            maybeQuote2(version, buf, path);
         }
 
         // Secure
@@ -286,6 +296,9 @@ public class ServerCookie implements Serializable {
         
     }
 
+    /**
+     * @deprecated - Not used
+     */
     public static void maybeQuote (int version, StringBuffer buf,
             String value) {
         // special case - a \n or \r  shouldn't happen in any case
@@ -297,23 +310,23 @@ public class ServerCookie implements Serializable {
             buf.append('"');
         }
     }
+    
+    /**
+     * Quotes values using rules that vary depending on Cookie version.
+     * @param version
+     * @param buf
+     * @param value
+     */
     public static void maybeQuote2 (int version, StringBuffer buf,
             String value) {
         // special case - a \n or \r  shouldn't happen in any case
-        if (isToken2(value)) {
+        if (version == 0 && isToken(value) || version == 1 && isToken2(value)) {
             buf.append(value);
         } else {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value));
             buf.append('"');
         }
-    }
-
-    // log
-    static final int dbg=1;
-    public static void log(String s ) {
-        if (log.isDebugEnabled())
-            log.debug("ServerCookie: " + s);
     }
 
 
@@ -331,18 +344,42 @@ public class ServerCookie implements Serializable {
         }
 
         StringBuffer b = new StringBuffer();
-        char p = s.charAt(0);
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (c == '"' && p != '\\')
+            if (c == '"')
                 b.append('\\').append('"');
             else
                 b.append(c);
-            p = c;
         }
 
         return b.toString();
     }
 
+    /**
+     * Unescapes any double quotes in the given cookie value.
+     *
+     * @param bc The cookie value to modify
+     */
+    public static void unescapeDoubleQuotes(ByteChunk bc) {
+
+        if (bc == null || bc.getLength() == 0 || bc.indexOf('"', 0) == -1) {
+            return;
+        }
+
+        int src = bc.getStart();
+        int end = bc.getEnd();
+        int dest = src;
+        byte[] buffer = bc.getBuffer();
+        
+        while (src < end) {
+            if (buffer[src] == '\\' && src < end && buffer[src+1]  == '"') {
+                src++;
+            }
+            buffer[dest] = buffer[src];
+            dest ++;
+            src ++;
+        }
+        bc.setEnd(dest);
+    }
 }
 

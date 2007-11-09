@@ -589,7 +589,12 @@ public class JspCompilationContext {
         try {
             getJspLoader();
             
-            String name = getFQCN();
+            String name;
+            if (isTagFile()) {
+                name = tagInfo.getTagClassName();
+            } else {
+                name = getServletPackageName() + "." + getServletClassName();
+            }
             servletClass = jspLoader.loadClass(name);
         } catch (ClassNotFoundException cex) {
             throw new JasperException(Localizer.getMessage("jsp.error.unable.load"),
@@ -600,16 +605,6 @@ public class JspCompilationContext {
         }
         removed = 0;
         return servletClass;
-    }
-
-    public String getFQCN() {
-        String name;
-        if (isTagFile()) {
-            name = tagInfo.getTagClassName();
-        } else {
-            name = getServletPackageName() + "." + getServletClassName();
-        }
-        return name;
     }
 
     // ==================== protected methods ==================== 

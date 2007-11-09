@@ -1302,7 +1302,7 @@ public class AprEndpoint {
                             // Check for failed sockets and hand this socket off to a worker
                             if (((desc[n*2] & Poll.APR_POLLHUP) == Poll.APR_POLLHUP)
                                     || ((desc[n*2] & Poll.APR_POLLERR) == Poll.APR_POLLERR)
-                                    || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN_READ))) 
+                                    || (comet && (!processSocket(desc[n*2+1], SocketStatus.OPEN))) 
                                     || (!comet && (!processSocket(desc[n*2+1])))) {
                                 // Close socket and clear pool
                                 if (comet) {
@@ -1695,7 +1695,7 @@ public class AprEndpoint {
             if (rv == Status.APR_SUCCESS) {
                 sendfileCount--;
             }
-            sendfileData.remove(data);
+            sendfileData.remove(new Long(data.socket));
         }
 
         /**
@@ -1704,6 +1704,7 @@ public class AprEndpoint {
          */
         public void run() {
 
+            long maintainTime = 0;
             // Loop until we receive a shutdown command
             while (running) {
 
@@ -1717,6 +1718,8 @@ public class AprEndpoint {
                 }
 
                 while (sendfileCount < 1 && addS.size() < 1) {
+                    // Reset maintain time.
+                    maintainTime = 0;
                     try {
                         synchronized (this) {
                             this.wait();
@@ -1745,6 +1748,8 @@ public class AprEndpoint {
                             addS.clear();
                         }
                     }
+
+                    maintainTime += pollTime;
                     // Pool for the specified interval
                     int rv = Poll.poll(sendfilePollset, pollTime, desc, false);
                     if (rv > 0) {
@@ -1810,7 +1815,22 @@ public class AprEndpoint {
                             continue;
                         }
                     }
-                    /* TODO: See if we need to call the maintain for sendfile poller */
+                    // Call maintain for the sendfile poller
+                    if (soTimeout > 0 && maintainTime > 1000000L && running) {
+                        rv = Poll.maintain(sendfilePollset, desc, true);
+                        maintainTime = 0;
+                        if (rv > 0) {
+                            for (int n = 0; n < rv; n++) {
+                                // Get the sendfile state
+                                SendfileData state = sendfileData.get(new Long(desc[n]));
+                                // Close socket and clear pool
+                                remove(state);
+                                // Destroy file descriptor pool, which should close the file
+                                // Close the socket, as the response would be incomplete
+                                Socket.destroy(state.socket);
+                            }
+                        }
+                    }
                 } catch (Throwable t) {
                     log.error(sm.getString("endpoint.poll.error"), t);
                 }

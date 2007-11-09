@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
@@ -32,14 +48,18 @@
     </p>
     <source>
 &lt;Engine name="Catalina" defaultHost="ren"&gt;
-    &lt;Host name="ren"    appBase="webapps/ren"/&gt;
-    &lt;Host name="stimpy" appBase="webapps/stimpy"/&gt;
+    &lt;Host name="ren"    appBase="renapps"/&gt;
+    &lt;Host name="stimpy" appBase="stimpyapps"/&gt;
 &lt;/Engine&gt;
     </source>
     <p>
+      Note that the directory structures under the appBase for each host should
+      not overlap each other.
+    </p>
+    <p>
       Consult the configuration documentation for other attributes of the
       <a href="config/engine.html">Engine</a> and <a href="config/host.html">
-      Host</a>elements.
+      Host</a> elements.
     </p>
   </section>
 
@@ -48,23 +68,36 @@
       Create directories for each of the virtual hosts:
     </p>
     <source>
-mkdir $CATALINA_HOME/webapps/ren
-mkdir $CATALINA_HOME/webapps/stimpy
+mkdir $CATALINA_HOME/renapps
+mkdir $CATALINA_HOME/stimpyapps
     </source>
   </section>
 
   <section name="Configuring Your Contexts">
-    <subsection name="Approach #1">
+    <subsection name="General">
+      <p>Contexts are normally located underneath the appBase directory. For
+       example, to deploy the <code>foobar</code> context as a war file in
+       the <code>ren</code> host, use
+       <code>$CATALINA_HOME/renapps/foobar.war</code>. Note that the
+       default or ROOT context for <code>ren</code> would be deployed as
+       <code>$CATALINA_HOME/renapps/ROOT.war</code> (WAR) or
+       <code>$CATALINA_HOME/renapps/ROOR</code> (directory).
+      </p>
+      <p><strong>NOTE: The <code>docBase</code> for a context should never be
+        the same as the <code>appBase</code> for a host.</strong>
+      </p>
+    </subsection>
+    <subsection name="context.xml - approach #1">
       <p>
         Within your Context, create a <code>META-INF</code> directory and then
         place your Context definition in it in a file named
         <code>context.xml</code>. i.e.
-        <code>$CATALINA_HOME/webapps/ren/ROOT/META-INF/context.xml</code>
+        <code>$CATALINA_HOME/renapps/ROOT/META-INF/context.xml</code>
         This makes deployment easier, particularly if you're distributing a WAR
         file.
       </p>
     </subsection>
-    <subsection name="Approach #2">
+    <subsection name="context.xml - approach #2">
       <p>
         Create a structure under <code>$CATALINA_HOME/conf/Catalina</code>
         corresponding to your virtual hosts, e.g.:
@@ -102,6 +135,5 @@ cp localhost/manager.xml stimpy/
       </p>
     </subsection>
   </section>
-
 </body>
 </document>

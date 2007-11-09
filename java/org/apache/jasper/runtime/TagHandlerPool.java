@@ -21,7 +21,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.apache.InstanceManager;
+import org.apache.AnnotationProcessor;
 import org.apache.jasper.Constants;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -42,7 +42,7 @@ public class TagHandlerPool {
     
     // index of next available tag handler
     private int current;
-    protected InstanceManager instanceManager = null;
+    protected AnnotationProcessor annotationProcessor = null;
 
     public static TagHandlerPool getTagHandlerPool( ServletConfig config) {
         TagHandlerPool result=null;
@@ -78,7 +78,8 @@ public class TagHandlerPool {
         }
         this.handlers = new Tag[maxSize];
         this.current = -1;
-        instanceManager = InstanceManagerFactory.getInstanceManager(config);
+        this.annotationProcessor = 
+            (AnnotationProcessor) config.getServletContext().getAttribute(AnnotationProcessor.class.getName());
     }
 
     /**
@@ -111,7 +112,7 @@ public class TagHandlerPool {
      * @throws JspException if a tag handler cannot be instantiated
      */
     public Tag get(Class handlerClass) throws JspException {
-    	Tag handler;
+	Tag handler = null;
         synchronized( this ) {
             if (current >= 0) {
                 handler = handlers[current--];
@@ -122,13 +123,9 @@ public class TagHandlerPool {
         // Out of sync block - there is no need for other threads to
         // wait for us to construct a tag for this thread.
         try {
-        	if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
-        		return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
-        	} else {
-                Tag instance = (Tag) handlerClass.newInstance();
-                instanceManager.newInstance(instance);
-                return instance;
-        	}
+            Tag instance = (Tag) handlerClass.newInstance();
+            AnnotationHelper.postConstruct(annotationProcessor, instance);
+            return instance;
         } catch (Exception e) {
             throw new JspException(e.getMessage(), e);
         }
@@ -150,11 +147,13 @@ public class TagHandlerPool {
         }
         // There is no need for other threads to wait for us to release
         handler.release();
-        try {
-            instanceManager.destroyInstance(handler);
-        } catch (Exception e) {
-            log.warn("Error processing preDestroy on tag instance of "
-                    + handler.getClass().getName(), e);
+        if (annotationProcessor != null) {
+            try {
+                AnnotationHelper.preDestroy(annotationProcessor, handler);
+            } catch (Exception e) {
+                log.warn("Error processing preDestroy on tag instance of " 
+                        + handler.getClass().getName(), e);
+            }
         }
     }
 
@@ -165,11 +164,13 @@ public class TagHandlerPool {
     public synchronized void release() {
         for (int i = current; i >= 0; i--) {
             handlers[i].release();
-            try {
-                instanceManager.destroyInstance(handlers[i]);
-            } catch (Exception e) {
-                log.warn("Error processing preDestroy on tag instance of "
-                        + handlers[i].getClass().getName(), e);
+            if (annotationProcessor != null) {
+                try {
+                    AnnotationHelper.preDestroy(annotationProcessor, handlers[i]);
+                } catch (Exception e) {
+                    log.warn("Error processing preDestroy on tag instance of " 
+                            + handlers[i].getClass().getName(), e);
+                }
             }
         }
     }

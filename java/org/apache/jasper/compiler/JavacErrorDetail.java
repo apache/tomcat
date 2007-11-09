@@ -94,13 +94,16 @@ public class JavacErrorDetail {
         this.jspBeginLineNum = jspBeginLineNum;
         
         if (jspBeginLineNum > 0 && ctxt != null) {
+            InputStream is = null;
+            FileInputStream  fis = null;
+            
             try {
                 // Read both files in, so we can inspect them
-                String[] jspLines = readFile
-                    (ctxt.getResourceAsStream(jspFileName));
+                is = ctxt.getResourceAsStream(jspFileName);
+                String[] jspLines = readFile(is);
     
-                String[] javaLines = readFile
-                    (new FileInputStream(ctxt.getServletJavaFileName()));
+                fis = new FileInputStream(ctxt.getServletJavaFileName());
+                String[] javaLines = readFile(fis);
     
                 // If the line contains the opening of a multi-line scriptlet
                 // block, then the JSP line number we got back is probably
@@ -134,6 +137,21 @@ public class JavacErrorDetail {
     
             } catch (IOException ioe) {
                 // Can't read files - ignore
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
             }
         }
     }

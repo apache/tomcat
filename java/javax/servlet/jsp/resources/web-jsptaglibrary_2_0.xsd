@@ -19,6 +19,7 @@
      targetNamespace="http://java.sun.com/xml/ns/j2ee"
      xmlns:j2ee="http://java.sun.com/xml/ns/j2ee"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
      elementFormDefault="qualified"
      attributeFormDefault="unqualified"
      version="2.0">
@@ -28,42 +29,6 @@
       %W% %G%
     </xsd:documentation>
   </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
-
-      Copyright 2003 Sun Microsystems, Inc., 901 San Antonio
-      Road, Palo Alto, California 94303, U.S.A. All rights
-      reserved.
-
-      Sun Microsystems, Inc. has intellectual property rights
-      relating to technology described in this document. In
-      particular, and without limitation, these intellectual
-      property rights may include one or more of the U.S. patents
-      listed at http://www.sun.com/patents and one or more
-      additional patents or pending patent applications in the
-      U.S. and other countries.
-
-      This document and the technology which it describes are
-      distributed under licenses restricting their use, copying,
-      distribution, and decompilation. No part of this document
-      may be reproduced in any form by any means without prior
-      written authorization of Sun and its licensors, if any.
-
-      Third-party software, including font technology, is
-      copyrighted and licensed from Sun suppliers.
-
-      Sun, Sun Microsystems, the Sun logo, Solaris, Java, J2EE,
-      JavaServer Pages, Enterprise JavaBeans and the Java Coffee
-      Cup logo are trademarks or registered trademarks of Sun
-      Microsystems, Inc. in the U.S. and other countries.
-
-      Federal Acquisitions: Commercial Software - Government Users
-      Subject to Standard License Terms and Conditions.
-
-    </xsd:documentation>
-  </xsd:annotation>
-
   <xsd:annotation>
     <xsd:documentation>
       <![CDATA[
@@ -286,15 +251,13 @@
 
 		Where:
 
- 		    * Type is a basic type or a fully qualified
-		      Java class name (including package name),
-		      as per the 'Type' production in the Java
-		      Language Specification, Second Edition,
+ 		    * Type is a basic type or a fully qualified Java class name
+		      (including package name), as per the 'Type' production
+		      in the Java Language Specification, Second Edition,
 		      Chapter 18.
 
-                    * Identifier is a Java identifier, as per
-		      the 'Identifier' production in the Java
-		      Language Specification, Second
+                    * Identifier is a Java identifier, as per the 'Identifier'
+		      production in the Java Language Specification, Second
 		      Edition, Chapter 18.
 
 	    Example:
@@ -711,8 +674,8 @@
 
 	The taglib tag is the document root, it defines:
 
-	description     a simple string describing the "use" of this
-			taglib, should be user discernable
+	description     a simple string describing the "use" of this taglib,
+			should be user discernable
 
 	display-name    the display-name element contains a
 			short name that is intended to be displayed

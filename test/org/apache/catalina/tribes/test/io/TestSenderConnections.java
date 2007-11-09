@@ -29,9 +29,6 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.HashMap;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
-import org.apache.catalina.tribes.membership.MemberImpl;
-import org.apache.catalina.tribes.transport.DataSender;
-import org.apache.catalina.tribes.transport.AbstractSender;
 
 public class TestSenderConnections extends TestCase {
     private static int count = 2;
@@ -71,54 +68,6 @@ public class TestSenderConnections extends TestCase {
         sendMessages(0,15000);
     }
     
-    public void testSendToNonExistent() throws Exception {
-        ReplicationTransmitter transmitter = (ReplicationTransmitter) channels[0].getChannelSender();
-        AbstractSender sender = (AbstractSender)transmitter.getTransport();
-        sender.setMaxRetryAttempts(0);
-        sender.setTimeout(60000);
-        MemberImpl impl = new MemberImpl("127.0.0.1",9443,1000,new byte[]{1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8});
-        channels[0].send(new Member[]{impl},new TestMsg(),0);
-    }
-    
-
-    public void testSendToRemote() throws Exception {
-        ReplicationTransmitter transmitter = (ReplicationTransmitter) channels[0].getChannelSender();
-        AbstractSender sender = (AbstractSender)transmitter.getTransport();
-        sender.setMaxRetryAttempts(0);
-        sender.setTimeout(60000);
-        MemberImpl impl = new MemberImpl("127.0.0.1",9999,1000,new byte[]{1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8});
-        for (int i=0; i<1000; i++) {
-            if (i%100==0) System.out.println("Sending message:"+(i+1));
-            channels[0].send(new Member[] {impl}, new TestMsg(), 0);
-        }
-    }
-
-
-    public void testSendToFailing() throws Exception {
-        ReplicationTransmitter transmitter = (ReplicationTransmitter) channels[0].getChannelSender();
-        AbstractSender sender = (AbstractSender)transmitter.getTransport();
-        sender.setMaxRetryAttempts(0);
-        sender.setTimeout(60000);
-        Member[] ma = channels[0].getMembers();
-        final Member m = channels[1].getLocalMember(true);
-        Thread st = new Thread() {
-            public void run() {
-                try {
-                    for (int i=0; i<10000; i++ ) { 
-                        channels[0].send(new Member[] {m}, new TestMsg(), 0);
-                    }
-                } catch (Exception x) {
-                    x.printStackTrace();
-                }
-            }
-        };
-        st.start();
-        Thread.sleep(250);
-        channels[1].stop(Channel.DEFAULT);
-        st.join();
-    }
-
-
     public void testKeepAliveCount() throws Exception {
         System.out.println("Setting keep alive count to 0");
         for (int i = 0; i < channels.length; i++) {

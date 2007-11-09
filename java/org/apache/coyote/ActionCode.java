@@ -151,30 +151,6 @@ public final class ActionCode {
      */
     public static final ActionCode ACTION_AVAILABLE = new ActionCode(23);
 
-    /**
-     * Set a Comet connection timeout
-     */
-    public static final ActionCode ACTION_COMET_TIMEOUT = new ActionCode(24);
-    
-    /**
-     * Configure a Comet connection
-     */
-    public static final ActionCode ACTION_COMET_CONFIGURE_BLOCKING = new ActionCode(25);
-    
-    /**
-     * Register notifications for events for a certain comet connection
-     */
-    public static final ActionCode ACTION_COMET_REGISTER = new ActionCode(26);
-    
-    /**
-     * Action for getting the readable status
-     */
-    public static final ActionCode ACTION_COMET_READABLE = new ActionCode(28);
-
-    /**
-     * Action for getting the writeable status
-     */
-    public static final ActionCode ACTION_COMET_WRITEABLE = new ActionCode(29);
 
     // ----------------------------------------------------------- Constructors
     int code;

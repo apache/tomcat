@@ -23,5 +23,5 @@ package org.apache.tomcat.util.net;
  * @author remm
  */
 public enum SocketStatus {
-    OPEN_READ, OPEN_WRITE, OPEN_CALLBACK, STOP, TIMEOUT, DISCONNECT, ERROR
+    OPEN, STOP, TIMEOUT, DISCONNECT, ERROR
 }

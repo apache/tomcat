@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <project name="Tomcat 6.0" default="deploy" basedir=".">
 
 
@@ -182,7 +198,6 @@
         <include name="org/apache/catalina/security/SecurityClassLoad.class" />
         <include name="org/apache/naming/JndiPermission.class" />
         <include name="org/apache/tomcat/util/compat/*" />
-        <include name="org/apache/catalina/loader/NamedClassLoader.class" />
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -216,7 +231,6 @@
         <exclude name="org/apache/catalina/launcher/**" />
         <exclude name="org/apache/catalina/storeconfig/**" />
         <exclude name="org/apache/naming/factory/webservices/**" />
-        <exclude name="org/apache/catalina/loader/NamedClassLoader.class" />
       </fileset>
     </jar>
     
@@ -507,6 +521,84 @@
     	     classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**">
     </javac>
+
+  	<!-- Add sources for examples -->
+	<taskdef    name="txt2html"
+		   classname="org.apache.tomcat.buildutil.Txt2Html"
+           classpath="${tomcat.classes}" />
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/simpletag">
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples">
+        <include name="BookBean.java"/>
+      </fileset>
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples/simpletag">
+        <include name="FindBookSimpleTag.java"/>
+        <include name="RepeatSimpleTag.java"/>
+        <include name="HelloWorldSimpleTag.java"/>
+      </fileset>
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples/el">
+        <include name="Functions.java"/>
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/jspattribute">
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples">
+        <include name="FooBean.java"/>
+      </fileset>
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples/simpletag">
+        <include name="ShuffleSimpleTag.java"/>
+        <include name="TileSimpleTag.java"/>
+        <include name="HelloWorldSimpleTag.java"/>
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/cal">
+      <fileset dir="webapps/examples/WEB-INF/classes/cal">
+        <include name="Entries.java"/>
+        <include name="Entry.java"/>
+        <include name="JspCalendar.java"/>
+        <include name="TableBean.java"/>
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsptoserv">
+      <fileset dir="webapps/examples/WEB-INF/classes">
+        <include name="servletToJsp.java"/>
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/el">
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples/el">
+        <include name="Functions.java"/>
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/misc">
+      <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples/simpletag">
+        <include name="EchoAttributesTag.java"/>
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/tagfiles">
+      <fileset dir="webapps/examples/WEB-INF/tags">
+        <include name="**/*.tag" />
+      </fileset>
+    </txt2html>
+
+    <txt2html todir="${tomcat.build}/webapps/examples">
+      <fileset dir="webapps/examples">
+        <include name="**/*.jsp" />
+        <include name="**/*.jspx" />
+        <include name="**/*.jspf" />
+        <exclude name="error/errorpge.jsp"/>
+        <exclude name="forward/one.jsp"/>
+        <exclude name="include/foo.jsp"/>
+        <exclude name="jsptoserv/hello.jsp"/>
+        <exclude name="security/protected/error.jsp"/>
+        <exclude name="security/protected/index.jsp"/>
+        <exclude name="security/protected/login.jsp"/>
+        <exclude name="source.jsp"/>
+      </fileset>
+    </txt2html>
 
   	<copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
