@@ -27,7 +27,6 @@ import org.apache.tomcat.util.net.NioEndpoint.Poller;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import java.nio.channels.Selector;
 import java.nio.channels.SelectionKey;
-import org.apache.tomcat.util.MutableInteger;
 
 /**
  * 
@@ -71,8 +70,7 @@ public class NioChannel implements ByteChannel{
      * been flushed out and is empty
      * @return boolean
      */
-    public boolean flush(boolean block, Selector s, long timeout,MutableInteger lastWrite) throws IOException {
-        if (lastWrite!=null) lastWrite.set(1);
+    public boolean flush(boolean block, Selector s,long timeout) throws IOException {
         return true; //no network buffer in the regular channel
     }
 

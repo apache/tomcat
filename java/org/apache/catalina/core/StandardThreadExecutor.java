@@ -49,8 +49,6 @@ public class StandardThreadExecutor implements Executor {
     
     protected String name;
     
-    protected AtomicInteger activeCount = new AtomicInteger(0);
-    
     private LifecycleSupport lifecycle = new LifecycleSupport(this);
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
@@ -65,15 +63,7 @@ public class StandardThreadExecutor implements Executor {
         TaskQueue taskqueue = new TaskQueue();
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix);
         lifecycle.fireLifecycleEvent(START_EVENT, null);
-        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf) {
-            protected void beforeExecute(Thread t,Runnable r) {
-                activeCount.addAndGet(1);
-            }
-            
-            protected void afterExecute(Runnable r,Throwable t) {
-                activeCount.addAndGet(-1);
-            }
-        };
+        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
         taskqueue.setParent( (ThreadPoolExecutor) executor);
         lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
     }
@@ -84,7 +74,6 @@ public class StandardThreadExecutor implements Executor {
         if ( executor != null ) executor.shutdown();
         executor = null;
         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
-        activeCount.set(0);
     }
     
     public void execute(Runnable command) {
@@ -185,7 +174,7 @@ public class StandardThreadExecutor implements Executor {
 
     // Statistics from the thread pool
     public int getActiveCount() {
-        return activeCount.get();
+        return (executor != null) ? executor.getActiveCount() : 0;
     }
 
     public long getCompletedTaskCount() {
@@ -236,7 +225,7 @@ public class StandardThreadExecutor implements Executor {
             if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
             //we have idle threads, just add it to the queue
             //this is an approximation, so it could use some tuning
-            if (activeCount.get()<(parent.getPoolSize())) return super.offer(o);
+            if (parent.getActiveCount()<(parent.getPoolSize())) return super.offer(o);
             //if we have less threads than maximum force creation of a new thread
             if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
             //if we reached here, we need to add it to the queue

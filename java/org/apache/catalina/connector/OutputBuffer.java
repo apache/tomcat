@@ -70,13 +70,13 @@ public class OutputBuffer extends Writer
     /**
      * Number of bytes written.
      */
-    private int bytesWritten = 0;
+    private long bytesWritten = 0;
 
 
     /**
      * Number of chars written.
      */
-    private int charsWritten = 0;
+    private long charsWritten = 0;
 
 
     /**
@@ -323,7 +323,6 @@ public class OutputBuffer extends Writer
 
     }
 
-    
 
     // ------------------------------------------------- Bytes Handling Methods
 
@@ -540,22 +539,32 @@ public class OutputBuffer extends Writer
 
     }
 
-
     public int getBytesWritten() {
-        return bytesWritten;
+        if (bytesWritten < Integer.MAX_VALUE) {
+            return (int) bytesWritten;
+        }
+        return -1;
     }
-
 
     public int getCharsWritten() {
-        return charsWritten;
+        if (charsWritten < Integer.MAX_VALUE) {
+            return (int) charsWritten;
+        }
+        return -1;
     }
-
 
     public int getContentWritten() {
-        return bytesWritten + charsWritten;
+        long size = bytesWritten + charsWritten ;
+        if (size < Integer.MAX_VALUE) {
+            return (int) size;
+        }
+        return -1;
     }
 
-
+    public long getContentWrittenLong() {
+        return bytesWritten + charsWritten;
+    }
+    
     /** 
      * True if this buffer hasn't been used ( since recycle() ) -
      * i.e. no chars or bytes have been added to the buffer.  

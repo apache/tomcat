@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
@@ -133,10 +149,10 @@ are responsible for installing, configuring, and operating a Apache Tomcat 6 ser
     - Complete documentation and HOWTOs on the JK native webserver connector,
       used to interface Apache Tomcat with servers like Apache HTTPd, IIS
       and others.</li>
-<li><a href="servletapi/index.html"><strong>Servlet API Javadocs</strong></a> -
-    The Servlet 2.4 API Javadocs.</li>
-<li><a href="jspapi/index.html"><strong>JSP API Javadocs</strong></a> -
-    The JSP 2.0 API Javadocs.</li>
+<li><a href="http://java.sun.com/products/servlet/2.5/docs/servlet-2_5-mr2/index.html">
+    <strong>Servlet API Javadocs</strong></a> - The Servlet 2.5 API Javadocs.</li>
+<li><a href="http://java.sun.com/products/jsp/2.1/docs/jsp-2_1-pfd2/index.html">
+    <strong>JSP API Javadocs</strong></a> - The JSP 2.1 API Javadocs.</li>
 </ul>
 
 </section>
@@ -164,15 +180,10 @@ the development of the <em>Apache Tomcat</em> project.</p>
 <li><a href="catalina/funcspecs/index.html"><strong>Functional Specifications</strong></a>
     - Requirements specifications for features of the <em>Catalina</em> servlet
     container portion of Apache Tomcat 6.</li>
-<li><a href="catalina/docs/api/index.html"><strong>Catalina Javadocs</strong></a>
-    - Javadoc API documentation for the <em>Catalina</em> servlet
-    container and its dependencies.</li>
-<li><a href="jasper/docs/api/index.html"><strong>Jasper Javadocs</strong></a>
-    - Javadoc API documentation for the <em>Jasper</em> JSP container
-    portion of Apache Tomcat 6.</li>
+<li><a href="api/index.html"><strong>Javadocs</strong></a>
+    - Javadoc API documentation for Apache Tomcat's internals.</li>
 <li><a href="architecture/index.html"><strong>Apache Tomcat Architecture</strong></a>
     - Documentation of the Apache Tomcat Server Architecture.</li>
-
 </ul>
 
 </section>

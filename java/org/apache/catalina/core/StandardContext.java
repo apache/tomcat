@@ -31,8 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -61,7 +59,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
-import org.apache.InstanceManager;
+import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -79,8 +77,6 @@ import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
-import org.apache.catalina.deploy.Injectable;
-import org.apache.catalina.deploy.InjectionTarget;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.MessageDestination;
 import org.apache.catalina.deploy.MessageDestinationRef;
@@ -92,6 +88,7 @@ import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
+import org.apache.catalina.util.DefaultAnnotationProcessor;
 import org.apache.catalina.util.ExtensionValidator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.URLEncoder;
@@ -177,9 +174,9 @@ public class StandardContext
 
 
     /**
-     * Lifecycle provider.
+     * Annotation processor.
      */
-    private InstanceManager instanceManager = null;
+    private AnnotationProcessor annotationProcessor = null;
 
 
    /**
@@ -682,13 +679,13 @@ public class StandardContext
     // ----------------------------------------------------- Context Properties
 
 
-    public InstanceManager getInstanceManager() {
-       return instanceManager;
+    public AnnotationProcessor getAnnotationProcessor() {
+       return annotationProcessor;
     }
 
 
-    public void setInstanceManager(InstanceManager instanceManager) {
-       this.instanceManager = instanceManager;
+    public void setAnnotationProcessor(AnnotationProcessor annotationProcessor) {
+       this.annotationProcessor = annotationProcessor;
     }
 
     
@@ -1878,6 +1875,9 @@ public class StandardContext
      * @return The work path
      */ 
     public String getWorkPath() {
+        if (getWorkDir() == null) {
+            return null;
+        }
         File workDir = new File(getWorkDir());
         if (!workDir.isAbsolute()) {
             File catalinaHome = engineBase();
@@ -2156,7 +2156,13 @@ public class StandardContext
         if (findFilterDef(filterName) == null)
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.name", filterName));
-        if ((servletNames.length == 0) && (urlPatterns.length == 0))
+//      <= Servlet API 2.4
+//      if ((servletNames.length == 0) && (urlPatterns.length == 0))
+//      Servlet API 2.5 (FIX 43338)
+//      SRV 6.2.5 says supporting for '*' as the servlet-name in filter-mapping.
+        if (!filterMap.getMatchAllServletNames() && 
+            !filterMap.getMatchAllUrlPatterns() && 
+            (servletNames.length == 0) && (urlPatterns.length == 0))
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
         // FIXME: Older spec revisions may still check this
@@ -2932,7 +2938,11 @@ public class StandardContext
      */
     public String findStatusPage(int status) {
 
-        return ((String) statusPages.get(new Integer(status)));
+        ErrorPage errorPage = (ErrorPage)statusPages.get(new Integer(status));
+        if (errorPage!=null) {
+            return errorPage.getLocation();
+        }
+        return null;
 
     }
 
@@ -3761,6 +3771,7 @@ public class StandardContext
             log.debug("Configuring application event listeners");
 
         // Instantiate the required listeners
+        ClassLoader loader = getLoader().getClassLoader();
         String listeners[] = findApplicationListeners();
         Object results[] = new Object[listeners.length];
         boolean ok = true;
@@ -3769,7 +3780,13 @@ public class StandardContext
                 getLogger().debug(" Configuring event listener class '" +
                     listeners[i] + "'");
             try {
-                results[i] = instanceManager.newInstance(listeners[i]);
+                Class clazz = loader.loadClass(listeners[i]);
+                results[i] = clazz.newInstance();
+                // Annotation processing
+                if (!getIgnoreAnnotations()) {
+                    getAnnotationProcessor().processAnnotations(results[i]);
+                    getAnnotationProcessor().postConstruct(results[i]);
+                }
             } catch (Throwable t) {
                 getLogger().error
                     (sm.getString("standardContext.applicationListener",
@@ -3869,26 +3886,29 @@ public class StandardContext
                         ok = false;
                     }
                 }
-                try {
-                    getInstanceManager().destroyInstance(listeners[j]);
-                } catch (Throwable t) {
-                    getLogger().error
-                       (sm.getString("standardContext.listenerStop",
-                            listeners[j].getClass().getName()), t);
-                    ok = false;
+                // Annotation processing
+                if (!getIgnoreAnnotations()) {
+                    try {
+                        getAnnotationProcessor().preDestroy(listeners[j]);
+                    } catch (Throwable t) {
+                        getLogger().error
+                            (sm.getString("standardContext.listenerStop",
+                                listeners[j].getClass().getName()), t);
+                        ok = false;
+                    }
                 }
             }
         }
 
         // Annotation processing
         listeners = getApplicationEventListeners();
-        if (listeners != null) {
+        if (!getIgnoreAnnotations() && listeners != null) {
             for (int i = 0; i < listeners.length; i++) {
                 int j = (listeners.length - 1) - i;
                 if (listeners[j] == null)
                     continue;
                 try {
-                    getInstanceManager().destroyInstance(listeners[j]);
+                    getAnnotationProcessor().preDestroy(listeners[j]);
                 } catch (Throwable t) {
                     getLogger().error
                         (sm.getString("standardContext.listenerStop",
@@ -4293,18 +4313,21 @@ public class StandardContext
         // Binding thread
         oldCCL = bindThread();
 
-        if (ok ) {
-            if (instanceManager == null) {
-                javax.naming.Context context = null;
+        // Set annotation processing parameter for Jasper (unfortunately, since
+        // this can be configured in many places and not just in /WEB-INF/web.xml,
+        // there are not many solutions)
+        // Initialize annotation processor
+        if (ok && !getIgnoreAnnotations()) {
+            if (annotationProcessor == null) {
                 if (isUseNaming() && namingContextListener != null) {
-                    context = namingContextListener.getEnvContext();
+                    annotationProcessor = 
+                        new DefaultAnnotationProcessor(namingContextListener.getEnvContext());
+                } else {
+                    annotationProcessor = new DefaultAnnotationProcessor(null);
                 }
-                Map<String, Map<String, String>> injectionMap = 
-                	buildInjectionMap(getIgnoreAnnotations() ? new NamingResources(): getNamingResources());
-                instanceManager = new DefaultInstanceManager
-                	(context, injectionMap, this, this.getClass().getClassLoader());
-                getServletContext().setAttribute(InstanceManager.class.getName(), instanceManager);
             }
+            getServletContext().setAttribute
+                (AnnotationProcessor.class.getName(), annotationProcessor);
         }
 
         try {
@@ -4383,48 +4406,6 @@ public class StandardContext
         }
 
         //cacheContext();
-    }
-
-    private Map<String, Map<String, String>> buildInjectionMap(NamingResources namingResources) {
-        Map<String, Map<String, String>> injectionMap = new HashMap<String, Map<String, String>>();
-        for (Injectable resource: namingResources.findLocalEjbs()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        for (Injectable resource: namingResources.findEjbs()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        for (Injectable resource: namingResources.findEnvironments()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        for (Injectable resource: namingResources.findMessageDestinationRefs()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        for (Injectable resource: namingResources.findResourceEnvRefs()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        for (Injectable resource: namingResources.findResources()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        for (Injectable resource: namingResources.findServices()) {
-            addInjectionTarget(resource, injectionMap);
-        }
-        return injectionMap;
-    }
-
-    private void addInjectionTarget(Injectable resource, Map<String, Map<String, String>> injectionMap) {
-        List<InjectionTarget> injectionTargets = resource.getInjectionTargets();
-        if (injectionTargets != null && injectionTargets.size() > 0) {
-            String jndiName = resource.getName();
-            for (InjectionTarget injectionTarget: injectionTargets) {
-                String clazz = injectionTarget.getTargetClass();
-                Map<String, String> injections = injectionMap.get(clazz);
-                if (injections == null) {
-                    injections = new HashMap<String, String>();
-                    injectionMap.put(clazz, injections);
-                }
-                injections.put(injectionTarget.getTargetName(), jndiName);
-            }
-        }
     }
 
     /**

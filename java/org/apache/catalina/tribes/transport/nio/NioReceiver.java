@@ -37,7 +37,6 @@ import org.apache.catalina.tribes.util.StringManager;
 import java.util.LinkedList;
 import java.util.Set;
 import java.nio.channels.CancelledKeyException;
-import java.nio.channels.ClosedSelectorException;
 
 /**
  * @author Filip Hanik
@@ -304,7 +303,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
         }
         serverChannel.close();
-        closeSelector();
+        if (selector != null)
+            selector.close();
     }
 
     
@@ -319,34 +319,13 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         if (selector != null) {
             try {
                 selector.wakeup();
-                closeSelector();
+                selector.close();
             } catch (Exception x) {
                 log.error("Unable to close cluster receiver selector.", x);
             } finally {
                 selector = null;
             }
         }
-    }
-
-    private void closeSelector() throws IOException {
-        Selector selector = this.selector;
-        this.selector = null;
-        if (selector==null) return;
-        try {
-            Iterator it = selector.keys().iterator();
-            // look at each key in the selected set
-            while (it.hasNext()) {
-                SelectionKey key = (SelectionKey)it.next();
-                key.channel().close();
-                key.attach(null);
-                key.cancel();
-            }
-        }catch ( IOException ignore ){
-            if (log.isWarnEnabled()) {
-                log.warn("Unable to cleanup on selector close.",ignore);
-            }
-        }catch ( ClosedSelectorException ignore){}
-        selector.close();
     }
 
     // ----------------------------------------------------------

@@ -34,7 +34,7 @@ public class ChannelStartStop extends TestCase {
         super.tearDown();
         try {channel.stop(channel.DEFAULT);}catch (Exception ignore){}
     }
-
+    
     public void testDoubleFullStart() throws Exception {
         int count = 0;
         try {
@@ -82,7 +82,7 @@ public class ChannelStartStop extends TestCase {
         } catch ( Exception x){/*expected*/}
         assertEquals(count,1);
         channel.stop(channel.DEFAULT);
-
+        
         count = 0;
         try {
             channel.start(channel.SND_RX_SEQ);
@@ -107,7 +107,7 @@ public class ChannelStartStop extends TestCase {
         assertEquals(count,1);
         channel.stop(channel.DEFAULT);
     }
-
+    
     public void testFalseOption() throws Exception {
         int flag = 0xFFF0;//should get ignored by the underlying components
         int count = 0;

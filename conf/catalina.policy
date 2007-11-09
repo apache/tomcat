@@ -1,5 +1,20 @@
+// Licensed to the Apache Software Foundation (ASF) under one or more
+// contributor license agreements.  See the NOTICE file distributed with
+// this work for additional information regarding copyright ownership.
+// The ASF licenses this file to You under the Apache License, Version 2.0
+// (the "License"); you may not use this file except in compliance with
+// the License.  You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // ============================================================================
-// catalina.corepolicy - Security Policy Permissions for Tomcat 5
+// catalina.corepolicy - Security Policy Permissions for Tomcat 6
 //
 // This file contains a default set of security policies to be enforced (by the
 // JVM) when Catalina is executed with the "-security" option.  In addition
@@ -89,27 +104,30 @@ grant {
     permission java.util.PropertyPermission "java.vendor", "read";
     permission java.util.PropertyPermission "java.vendor.url", "read";
     permission java.util.PropertyPermission "java.class.version", "read";
-	permission java.util.PropertyPermission "java.specification.version", "read";
-	permission java.util.PropertyPermission "java.specification.vendor", "read";
-	permission java.util.PropertyPermission "java.specification.name", "read";
+    permission java.util.PropertyPermission "java.specification.version", "read";
+    permission java.util.PropertyPermission "java.specification.vendor", "read";
+    permission java.util.PropertyPermission "java.specification.name", "read";
 
-	permission java.util.PropertyPermission "java.vm.specification.version", "read";
-	permission java.util.PropertyPermission "java.vm.specification.vendor", "read";
-	permission java.util.PropertyPermission "java.vm.specification.name", "read";
-	permission java.util.PropertyPermission "java.vm.version", "read";
-	permission java.util.PropertyPermission "java.vm.vendor", "read";
-	permission java.util.PropertyPermission "java.vm.name", "read";
+    permission java.util.PropertyPermission "java.vm.specification.version", "read";
+    permission java.util.PropertyPermission "java.vm.specification.vendor", "read";
+    permission java.util.PropertyPermission "java.vm.specification.name", "read";
+    permission java.util.PropertyPermission "java.vm.version", "read";
+    permission java.util.PropertyPermission "java.vm.vendor", "read";
+    permission java.util.PropertyPermission "java.vm.name", "read";
 
     // Required for OpenJMX
     permission java.lang.RuntimePermission "getAttribute";
 
-	// Allow read of JAXP compliant XML parser debug
-	permission java.util.PropertyPermission "jaxp.debug", "read";
+    // Allow read of JAXP compliant XML parser debug
+    permission java.util.PropertyPermission "jaxp.debug", "read";
 
     // Precompiled JSPs need access to this package.
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime.*";
     
+    // Precompiled JSPs need access to this system property.
+    permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
+
 };
 
 

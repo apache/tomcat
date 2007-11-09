@@ -1,4 +1,20 @@
 <?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
@@ -115,48 +131,6 @@
 
   </subsection>
 
-
-  <subsection name="Virtual Webapp Loader">
-
-    <p>An extension of the standard webapp loader.
-    This extension, allows you to specify a classpath inside of your &lt;Loader&gt; element,
-    or even read it from the webapps MANIFEST.MF file.</p>
-    <p>The virtual webapp loader extends the <code>org.apache.catalina.loader.WebappLoader</code>
-    so all attributes are supported from the inherited implementation.</p>
-    <attributes>
-
-      <attribute name="className" required="true">
-        <p>Java class name of the <code>VirtualWebappLoader</code>
-        The value that must be specified is
-        <code>org.apache.catalina.loader.VirtualWebappLoader</code>.</p>
-      </attribute>
-      <attribute name="virtualClasspath" required="false">
-        <p>Class-Path string, separated by semi colon by default.
-        Format is the same as a classpath for the JVM.<br/>
-        Example: /dir/classes:/somedir/somejar.jar<br/>
-        You can chose what separator should be used by using the <code>separator</code> attribute.</p>
-      </attribute>
-      <attribute name="separator" required="false">
-        <p>The separator of class path elements in the <code>virtualClasspath</code> element.
-        Default value is semi colon <code>;</code>.</p>
-      </attribute>
-      <attribute name="makeLocalCopy" required="false">
-        <p>If set to true, all repositories will be copied over to the java.io.tmpdir directory
-        and used only by this webapp during runtime. During shutdown, the local copy will be removed.
-        The default value is <code>true</code> and Tomcat will copy the libraries to the temp directory.</p>
-      </attribute>
-      <attribute name="separateJars" required="false">
-        <p>If set to true, the JAR files will be added as WebappClassLoader.addJar to prevent them from being locked 
-        during runtime. The default value is set to 
-        <code>true</code>.</p>
-      </attribute>
-      <attribute name="readManifestCP" required="false">
-        <p>If set to true, Tomcat will extract the Class-Path variable from the webapp's META-INF/MANIFEST.MF
-        file and use that in addition to the virtualClasspath. The separator here is hardcoded to a space.
-        Default value is <code>true</code>.</p>
-      </attribute>
-    </attributes>
-  </subsection>  
 
 </section>
 

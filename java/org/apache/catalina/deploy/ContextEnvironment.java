@@ -19,8 +19,6 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -31,7 +29,7 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 
-public class ContextEnvironment implements Serializable, Injectable {
+public class ContextEnvironment implements Serializable {
 
 
     // ------------------------------------------------------------- Properties
@@ -105,18 +103,6 @@ public class ContextEnvironment implements Serializable, Injectable {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-
-    private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
-
-    public void addInjectionTarget(String injectionTargetName, String jndiName) {
-        InjectionTarget target = new InjectionTarget(injectionTargetName, jndiName);
-        injectionTargets.add(target);
-    }
-
-    public List<InjectionTarget> getInjectionTargets() {
-        return injectionTargets;
     }
 
     // --------------------------------------------------------- Public Methods

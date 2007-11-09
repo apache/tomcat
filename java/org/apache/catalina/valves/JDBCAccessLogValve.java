@@ -45,11 +45,11 @@ import org.apache.catalina.util.StringManager;
  * To use, copy into the server/classes directory of the Tomcat installation
  * and configure in server.xml as:
  * <pre>
- * 		&lt;Valve className="org.apache.catalina.valves.JDBCAccessLogValve"
- *        	driverName="<i>your_jdbc_driver</i>"
- *        	connectionURL="<i>your_jdbc_url</i>"
- *        	pattern="combined" resolveHosts="false"
- * 		/&gt;
+ *      &lt;Valve className="org.apache.catalina.valves.JDBCAccessLogValve"
+ *          driverName="<i>your_jdbc_driver</i>"
+ *          connectionURL="<i>your_jdbc_url</i>"
+ *          pattern="combined" resolveHosts="false"
+ *      /&gt;
  * </pre>
  * </p>
  * <p>
@@ -93,6 +93,11 @@ import org.apache.catalina.util.StringManager;
  * INDEX (userAgent)
  * );
  * </pre>
+ * <p>Set JDBCAccessLogValve attribute useLongContentLength="true" as you have more then 4GB outputs. 
+ * Please, use long SQL datatype at access.bytes attribute.
+ * The datatype of bytes at oracle is <i>number</i> and other databases use <i>bytes BIGINT NOT NULL</i>.
+ * </p>
+ * 
  * <p>
  * If the table is created as above, its name and the field names don't need 
  * to be defined.
@@ -120,21 +125,21 @@ public final class JDBCAccessLogValve
      * Class constructor. Initializes the fields with the default values.
      * The defaults are:
      * <pre>
-     * 		driverName = null;
-     * 		connectionURL = null;
-     * 		tableName = "access";
-     * 		remoteHostField = "remoteHost";
-     * 		userField = "userName";
-     * 		timestampField = "timestamp";
-     * 		virtualHostField = "virtualHost";
-     * 		methodField = "method";
-     * 		queryField = "query";
-     * 		statusField = "status";
-     * 		bytesField = "bytes";
-     * 		refererField = "referer";
-     * 		userAgentField = "userAgent";
-     * 		pattern = "common";
-     * 		resolveHosts = false;
+     *      driverName = null;
+     *      connectionURL = null;
+     *      tableName = "access";
+     *      remoteHostField = "remoteHost";
+     *      userField = "userName";
+     *      timestampField = "timestamp";
+     *      virtualHostField = "virtualHost";
+     *      methodField = "method";
+     *      queryField = "query";
+     *      statusField = "status";
+     *      bytesField = "bytes";
+     *      refererField = "referer";
+     *      userAgentField = "userAgent";
+     *      pattern = "common";
+     *      resolveHosts = false;
      * </pre>
      */
     public JDBCAccessLogValve() {
@@ -162,7 +167,12 @@ public final class JDBCAccessLogValve
 
     // ----------------------------------------------------- Instance Variables
 
-
+   /**
+    * Use long contentLength as you have more 4 GB output.
+    * @since 6.0.15
+    */
+    protected boolean useLongContentLength = false ;
+    
    /**
      * The connection username to use when trying to connect to the database.
      */
@@ -419,6 +429,19 @@ public final class JDBCAccessLogValve
         this.resolveHosts = new Boolean(resolveHosts).booleanValue();
     }
 
+    /**
+     * get useLongContentLength
+     */
+    public  boolean getUseLongContentLength() {
+        return this.useLongContentLength ;
+    }
+    
+    /**
+     * @param useLongContentLength the useLongContentLength to set
+     */
+    public void setUseLongContentLength(boolean useLongContentLength) {
+        this.useLongContentLength = useLongContentLength;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -435,37 +458,35 @@ public final class JDBCAccessLogValve
      */    
     public void invoke(Request request, Response response) 
         throws IOException, ServletException {
-
+        final String EMPTY = "" ;
+        
         getNext().invoke(request, response);
 
-        String remoteHost = "";
+        String remoteHost = EMPTY;
         if(resolveHosts)
             remoteHost = request.getRemoteHost();
         else
             remoteHost = request.getRemoteAddr();
-        String user = "";
+        String user = EMPTY;
         if(request != null)
             user = request.getRemoteUser();
         String query="";
         if(request != null)
             query = request.getRequestURI();
-        int bytes = response.getContentCount();
+        
+        long bytes = response.getContentCountLong() ;
         if(bytes < 0)
             bytes = 0;
         int status = response.getStatus();
-        if (pattern.equals("combined")) {
-                String virtualHost = "";
-                if(request != null)
-                    virtualHost = request.getServerName();
-                String method = "";
-                if(request != null)
-                    method = request.getMethod();
-                String referer = "";
-                if(request != null)
-                    referer = request.getHeader("referer");
-                String userAgent = "";
-                if(request != null)
-                    userAgent = request.getHeader("user-agent");
+        String virtualHost = EMPTY;
+        String method = EMPTY;
+        String referer = EMPTY;
+        String userAgent = EMPTY;
+        if (pattern.equals("combined") && request != null) {
+            virtualHost = request.getServerName();
+            method = request.getMethod();
+            referer = request.getHeader("referer");
+            userAgent = request.getHeader("user-agent");
         }
         synchronized (this) {
           int numberOfTries = 2;
@@ -478,21 +499,15 @@ public final class JDBCAccessLogValve
                 ps.setTimestamp(3, new Timestamp(getCurrentTimeMillis()));
                 ps.setString(4, query);
                 ps.setInt(5, status);
-                ps.setInt(6, bytes);
+                
+                if(useLongContentLength) {
+                    ps.setLong(6, bytes);                
+                } else {
+                    if (bytes > Integer.MAX_VALUE)
+                        bytes = -1 ;
+                    ps.setInt(6, (int) bytes);
+                }               
                 if (pattern.equals("combined")) {
-     
-                      String virtualHost = "";
-                      if(request != null)
-                         virtualHost = request.getServerName();
-                      String method = "";
-                      if(request != null)
-                         method = request.getMethod();
-                      String referer = "";
-                      if(request != null)
-                         referer = request.getHeader("referer");
-                      String userAgent = "";
-                      if(request != null)
-                         userAgent = request.getHeader("user-agent");
                       ps.setString(7, virtualHost);
                       ps.setString(8, method);
                       ps.setString(9, referer);
@@ -508,11 +523,11 @@ public final class JDBCAccessLogValve
                 if (conn != null)
                     close();
               }
-    	      numberOfTries--;        
+              numberOfTries--;
            }
         }
 
-    }	
+    }
 
 
     /**
@@ -666,7 +681,7 @@ public final class JDBCAccessLogValve
         started = false;
         
         close() ;
-    	
+
     }
 
 

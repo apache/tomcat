@@ -205,7 +205,13 @@ public class SetPropertiesRule extends Rule {
                         "} Setting property '" + name + "' to '" +
                         value + "'");
             }
-            IntrospectionUtils.setProperty(top, name, value);
+            if (!digester.isFakeAttribute(top, name) 
+                    && !IntrospectionUtils.setProperty(top, name, value) 
+                    && digester.getRulesValidation()) {
+                digester.log.warn("[SetPropertiesRule]{" + digester.match +
+                        "} Setting property '" + name + "' to '" +
+                        value + "' did not find a matching property.");
+            }
         }
 
     }

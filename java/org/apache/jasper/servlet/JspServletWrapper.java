@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.tagext.TagInfo;
 
-import org.apache.InstanceManager;
+import org.apache.AnnotationProcessor;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
@@ -39,7 +39,6 @@ import org.apache.jasper.compiler.ErrorDispatcher;
 import org.apache.jasper.compiler.JavacErrorDetail;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.Localizer;
-import org.apache.jasper.runtime.InstanceManagerFactory;
 import org.apache.jasper.runtime.JspSourceDependent;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -69,6 +68,7 @@ public class JspServletWrapper {
 
     private Servlet theServlet;
     private String jspUri;
+    private Class servletClass;
     private Class tagHandlerClass;
     private JspCompilationContext ctxt;
     private long available = 0L;
@@ -139,10 +139,15 @@ public class JspServletWrapper {
                     destroy();
                     
                     Servlet servlet = null;
-
+                    
                     try {
-                        InstanceManager instanceManager = InstanceManagerFactory.getInstanceManager(config);
-                        servlet = (Servlet) instanceManager.newInstance(ctxt.getFQCN(), ctxt.getJspLoader());
+                        servletClass = ctxt.load();
+                        servlet = (Servlet) servletClass.newInstance();
+                        AnnotationProcessor annotationProcessor = (AnnotationProcessor) config.getServletContext().getAttribute(AnnotationProcessor.class.getName());
+                        if (annotationProcessor != null) {
+                           annotationProcessor.processAnnotations(servlet);
+                           annotationProcessor.postConstruct(servlet);
+                        }
                     } catch (IllegalAccessException e) {
                         throw new JasperException(e);
                     } catch (InstantiationException e) {
@@ -418,13 +423,15 @@ public class JspServletWrapper {
     public void destroy() {
         if (theServlet != null) {
             theServlet.destroy();
-            InstanceManager instanceManager = InstanceManagerFactory.getInstanceManager(config);
-            try {
-                instanceManager.destroyInstance(theServlet);
-            } catch (Exception e) {
-                // Log any exception, since it can't be passed along
-                log.error(Localizer.getMessage("jsp.error.file.not.found",
-                        e.getMessage()), e);
+            AnnotationProcessor annotationProcessor = (AnnotationProcessor) config.getServletContext().getAttribute(AnnotationProcessor.class.getName());
+            if (annotationProcessor != null) {
+                try {
+                    annotationProcessor.preDestroy(theServlet);
+                } catch (Exception e) {
+                    // Log any exception, since it can't be passed along
+                    log.error(Localizer.getMessage("jsp.error.file.not.found",
+                           e.getMessage()), e);
+                }
             }
         }
     }

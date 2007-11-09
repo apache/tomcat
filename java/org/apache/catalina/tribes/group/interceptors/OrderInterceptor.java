@@ -61,8 +61,8 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
     
-    ReentrantReadWriteLock inLock = new ReentrantReadWriteLock(false);
-    ReentrantReadWriteLock outLock= new ReentrantReadWriteLock(false);
+    ReentrantReadWriteLock inLock = new ReentrantReadWriteLock(true);
+    ReentrantReadWriteLock outLock= new ReentrantReadWriteLock(true);
 
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         if ( !okToProcess(msg.getOptions()) ) {
