@@ -43,6 +43,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
+import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -79,6 +80,7 @@ import org.apache.juli.logging.LogFactory;
  * <li><b>%v</b> - Local server name
  * <li><b>%D</b> - Time taken to process the request, in millis
  * <li><b>%T</b> - Time taken to process the request, in seconds
+ * <li><b>%I</b> - current Request thread name (can compare later with stacktraces)
  * </ul>
  * <p>In addition, the caller can specify one of the following aliases for
  * commonly utilized patterns:</p>
@@ -94,6 +96,7 @@ import org.apache.juli.logging.LogFactory;
  * It is modeled after the apache syntax:
  * <ul>
  * <li><code>%{xxx}i</code> for incoming headers
+ * <li><code>%{xxx}o</code> for outgoing response headers
  * <li><code>%{xxx}c</code> for a specific cookie
  * <li><code>%{xxx}r</code> xxx is an attribute in the ServletRequest
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
@@ -111,7 +114,9 @@ import org.apache.juli.logging.LogFactory;
  * @author Jason Brittain
  * @author Remy Maucherat
  * @author Takayuki Kaneko
- * @version $Revision$ $Date: 2007-01-04 12:17:11 +0900
+ * @author Peter Rossbach
+ * 
+ * @version $Revision$ $Date$
  */
 
 public class AccessLogValve
@@ -140,7 +145,7 @@ public class AccessLogValve
      * The descriptive information about this implementation.
      */
     protected static final String info =
-        "org.apache.catalina.valves.AccessLogValve/2.0";
+        "org.apache.catalina.valves.AccessLogValve/2.1";
 
 
     /**
@@ -890,6 +895,7 @@ public class AccessLogValve
                     .getString("accessLogValve.notStarted"));
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         started = false;
+        
         close();
     }
     
@@ -900,6 +906,21 @@ public class AccessLogValve
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time);
 
+    }
+    
+    /**
+     * write thread name - %I
+     */
+    protected class ThreadNameElement implements AccessLogElement {
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+            RequestInfo info = request.getCoyoteRequest().getRequestProcessor();
+            if(info != null) {
+                buf.append(info.getWorkerThreadName());
+            } else {
+                buf.append("-");
+            }
+        }
     }
     
     /**
@@ -1078,7 +1099,7 @@ public class AccessLogValve
 
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            int length = response.getContentCount();
+            long length = response.getContentCountLong() ;
             if (length <= 0 && conversion) {
                 buf.append('-');
             } else {
@@ -1248,6 +1269,34 @@ public class AccessLogValve
     }
 
     /**
+     * write a specific response header - %{xxx}o
+     */
+    protected class ResponseHeaderElement implements AccessLogElement {
+        private String header;
+
+        public ResponseHeaderElement(String header) {
+            this.header = header;
+        }
+        
+        public void addElement(StringBuffer buf, Date date, Request request,
+                Response response, long time) {
+           if (null != response) {
+                String[] values = response.getHeaderValues(header);
+                if(values.length > 0) {
+                    for (int i = 0; i < values.length; i++) {
+                        String string = values[i];
+                        buf.append(string) ;
+                        if(i+1<values.length)
+                            buf.append(",");
+                    }
+                    return ;
+                }
+            }
+            buf.append("-");
+        }
+    }
+    
+    /**
      * write an attribute in the ServletRequest - %{xxx}r
      */
     protected class RequestAttributeElement implements AccessLogElement {
@@ -1370,10 +1419,12 @@ public class AccessLogValve
             return new HeaderElement(header);
         case 'c':
             return new CookieElement(header);
+        case 'o':
+            return new ResponseHeaderElement(header);
         case 'r':
             return new RequestAttributeElement(header);
         case 's':
-            return new SessionAttributeElement(header);
+            return new SessionAttributeElement(header);            
         default:
             return new StringElement("???");
         }
@@ -1422,6 +1473,8 @@ public class AccessLogValve
             return new RequestURIElement();
         case 'v':
             return new LocalServerNameElement();
+        case 'I':
+            return new ThreadNameElement();
         default:
             return new StringElement("???" + pattern + "???");
         }

@@ -20,12 +20,15 @@
 package org.apache.catalina.startup;
 
 
-import org.apache.catalina.Executor;
-import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
-import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Rule;
 import org.xml.sax.Attributes;
+import org.apache.catalina.Service;
+import org.apache.catalina.Executor;
+import org.apache.tomcat.util.IntrospectionUtils;
+import java.lang.reflect.Method;
+import org.apache.juli.logging.LogFactory;
+import org.apache.juli.logging.Log;
 
 
 /**
@@ -34,7 +37,7 @@ import org.xml.sax.Attributes;
 
 public class ConnectorCreateRule extends Rule {
 
-
+    protected static Log log = LogFactory.getLog(ConnectorCreateRule.class);
     // --------------------------------------------------------- Public Methods
 
 
@@ -50,14 +53,18 @@ public class ConnectorCreateRule extends Rule {
             ex = svc.getExecutor(attributes.getValue("executor"));
         }
         Connector con = new Connector(attributes.getValue("protocol"));
-        if ( ex != null )  setExecutor(con,ex);
+        if ( ex != null )  _setExecutor(con,ex);
         
         digester.push(con);
     }
     
-    public void setExecutor(Connector con, Executor ex) throws Exception {
-    	IntrospectionUtils.callMethod1(con.getProtocolHandler(), "setExecutor", 
-    			ex, java.util.concurrent.Executor.class.getName(), getClass().getClassLoader());
+    public void _setExecutor(Connector con, Executor ex) throws Exception {
+        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setExecutor",new Class[] {java.util.concurrent.Executor.class});
+        if (m!=null) {
+            m.invoke(con.getProtocolHandler(), new Object[] {ex});
+        }else {
+            log.warn("Connector ["+con+"] does not support external executors. Method setExecutor(java.util.concurrent.Executor) not found.");
+        }
     }
 
 
@@ -65,7 +72,7 @@ public class ConnectorCreateRule extends Rule {
      * Process the end of this element.
      */
     public void end() throws Exception {
-        digester.pop();
+        Object top = digester.pop();
     }
 
 

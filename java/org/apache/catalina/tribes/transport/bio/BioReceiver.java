@@ -28,14 +28,9 @@ import org.apache.catalina.tribes.transport.RxTaskPool;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 
 /**
- * <p>Title: </p>
  *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
+ * @author Filip Hanik
+ * @version $Revision:$ $Date:$
  */
 public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 
@@ -145,7 +140,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             }
             if ( socket == null ) continue;
             socket.setReceiveBufferSize(getRxBufSize());
-            socket.setSendBufferSize(getRxBufSize());
+            socket.setSendBufferSize(getTxBufSize());
             socket.setTcpNoDelay(getTcpNoDelay());
             socket.setKeepAlive(getSoKeepAlive());
             socket.setOOBInline(getOoBInline());

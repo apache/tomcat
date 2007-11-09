@@ -19,37 +19,38 @@
 <body bgcolor="white">
 <h1> Request Information </h1>
 <font size="4">
-JSP Request Method: <% out.print(util.HTMLFilter.filter(request.getMethod())); %>
+JSP Request Method: <%= util.HTMLFilter.filter(request.getMethod()) %>
 <br>
-Request URI: <%= request.getRequestURI() %>
+Request URI: <%= util.HTMLFilter.filter(request.getRequestURI()) %>
 <br>
-Request Protocol: <%= request.getProtocol() %>
+Request Protocol: <%= util.HTMLFilter.filter(request.getProtocol()) %>
 <br>
-Servlet path: <%= request.getServletPath() %>
+Servlet path: <%= util.HTMLFilter.filter(request.getServletPath()) %>
 <br>
-Path info: <% out.print(util.HTMLFilter.filter(request.getPathInfo())); %>
+Path info: <%= util.HTMLFilter.filter(request.getPathInfo()) %>
 <br>
-Query string: <% out.print(util.HTMLFilter.filter(request.getQueryString())); %>
+Query string: <%= util.HTMLFilter.filter(request.getQueryString()) %>
 <br>
 Content length: <%= request.getContentLength() %>
 <br>
-Content type: <% out.print(util.HTMLFilter.filter(request.getContentType())); %>
+Content type: <%= util.HTMLFilter.filter(request.getContentType()) %>
 <br>
-Server name: <%= request.getServerName() %>
+Server name: <%= util.HTMLFilter.filter(request.getServerName()) %>
 <br>
 Server port: <%= request.getServerPort() %>
 <br>
-Remote user: <%= request.getRemoteUser() %>
+Remote user: <%= util.HTMLFilter.filter(request.getRemoteUser()) %>
 <br>
-Remote address: <%= request.getRemoteAddr() %>
+Remote address: <%= util.HTMLFilter.filter(request.getRemoteAddr()) %>
 <br>
-Remote host: <%= request.getRemoteHost() %>
+Remote host: <%= util.HTMLFilter.filter(request.getRemoteHost()) %>
 <br>
-Authorization scheme: <%= request.getAuthType() %> 
+Authorization scheme: <%= util.HTMLFilter.filter(request.getAuthType()) %> 
 <br>
 Locale: <%= request.getLocale() %>
 <hr>
-The browser you are using is <% out.print(util.HTMLFilter.filter(request.getHeader("User-Agent"))); %>
+The browser you are using is
+<%= util.HTMLFilter.filter(request.getHeader("User-Agent")) %>
 <hr>
 </font>
 </body>

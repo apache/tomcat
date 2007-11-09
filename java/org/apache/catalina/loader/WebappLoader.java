@@ -62,7 +62,6 @@ import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.catalina.Host;
 
 
 /**
@@ -661,8 +660,7 @@ public class WebappLoader
                 ((ClassLoader) classLoader, this.container.getResources());
 
             StandardContext ctx=(StandardContext)container;
-            Host host = (Host)ctx.getParent();
-            Engine eng=(Engine)host.getParent();
+            Engine eng=(Engine)ctx.getParent().getParent();
             String path = ctx.getPath();
             if (path.equals("")) {
                 path = "/";
@@ -672,16 +670,13 @@ public class WebappLoader
                  + path + ",host=" + ctx.getParent().getName());
             Registry.getRegistry(null, null)
                 .registerComponent(classLoader, cloname, null);
-            
-            //set the name of the webapp classloader
-            String clName = eng.getName()+"#"+host.getName()+"#"+ctx.getName();
-            classLoader.setName(clName);
+
         } catch (Throwable t) {
             log.error( "LifecycleException ", t );
             throw new LifecycleException("start: ", t);
         }
+
     }
-    
 
 
     /**

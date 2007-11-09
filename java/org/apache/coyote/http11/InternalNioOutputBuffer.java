@@ -34,8 +34,6 @@ import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.res.StringManager;
-import java.io.EOFException;
-import org.apache.tomcat.util.MutableInteger;
 
 /**
  * Output buffer.
@@ -58,14 +56,14 @@ public class InternalNioOutputBuffer
      * Default constructor.
      */
     public InternalNioOutputBuffer(Response response) {
-        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE);
+        this(response, Constants.DEFAULT_HTTP_HEADER_BUFFER_SIZE, 10000);
     }
 
 
     /**
      * Alternate constructor.
      */
-    public InternalNioOutputBuffer(Response response, int headerBufferSize) {
+    public InternalNioOutputBuffer(Response response, int headerBufferSize, long writeTimeout) {
 
         this.response = response;
         headers = response.getMimeHeaders();
@@ -88,6 +86,8 @@ public class InternalNioOutputBuffer
         committed = false;
         finished = false;
         
+        this.writeTimeout = writeTimeout;
+
         // Cause loading of HttpMessages
         HttpMessages.getMessage(200);
 
@@ -142,10 +142,6 @@ public class InternalNioOutputBuffer
      */
     protected int pos;
 
-    /**
-     * Number of bytes last written
-     */
-    protected MutableInteger lastWrite = new MutableInteger(1);
 
     /**
      * Underlying socket.
@@ -183,6 +179,12 @@ public class InternalNioOutputBuffer
      */
     protected int lastActiveFilter;
     
+    /**
+     * Write time out in milliseconds
+     */
+    protected long writeTimeout = -1;
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -193,11 +195,19 @@ public class InternalNioOutputBuffer
         this.socket = socket;
     }
 
+    public void setWriteTimeout(long writeTimeout) {
+        this.writeTimeout = writeTimeout;
+    }
+
     /**
      * Get the underlying socket input stream.
      */
     public NioChannel getSocket() {
         return socket;
+    }
+
+    public long getWriteTimeout() {
+        return writeTimeout;
     }
 
     public void setSelectorPool(NioSelectorPool pool) { 
@@ -314,6 +324,7 @@ public class InternalNioOutputBuffer
 
         // Recycle Request object
         response.recycle();
+
     }
 
 
@@ -336,7 +347,6 @@ public class InternalNioOutputBuffer
         lastActiveFilter = -1;
         committed = false;
         finished = false;
-        lastWrite.set(1);
 
     }
 
@@ -395,9 +405,7 @@ public class InternalNioOutputBuffer
 
     }
 
-    public boolean isWritable() {
-        return lastWrite.get()>0;
-    }
+
     // ------------------------------------------------ HTTP/1.1 Output Methods
 
 
@@ -409,30 +417,16 @@ public class InternalNioOutputBuffer
 
         if (!committed) {
             //Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0
-            ByteBuffer buf = ByteBuffer.wrap(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
-            writeToSocket(buf,true);
+            socket.getBufHandler() .getWriteBuffer().put(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
+            writeToSocket(socket.getBufHandler() .getWriteBuffer(),true);
         }
 
     }
 
-    /**
-     * 
-     * @param bytebuffer ByteBuffer
-     * @param flip boolean
-     * @return int
-     * @throws IOException
-     * @todo Fix non blocking write properly
-     */
-    private synchronized int writeToSocket(ByteBuffer bytebuffer, boolean block) throws IOException {
-        if (socket.getBufHandler().getWriteBuffer() != bytebuffer) {
-            socket.getBufHandler().getWriteBuffer().put(bytebuffer);
-            bytebuffer = socket.getBufHandler().getWriteBuffer();
-        }
-
+    private synchronized void writeToSocket(ByteBuffer bytebuffer, boolean flip) throws IOException {
+        //int limit = bytebuffer.position();
+        if ( flip ) bytebuffer.flip();
         int written = 0;
-        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
-        if ( att == null ) throw new IOException("Key must be cancelled");
-        long writeTimeout = att.getTimeout();
         Selector selector = null;
         try {
             selector = getSelectorPool().get();
@@ -440,17 +434,16 @@ public class InternalNioOutputBuffer
             //ignore
         }
         try {
-            written = getSelectorPool().write(bytebuffer, socket, selector, writeTimeout, block,lastWrite);
+            written = getSelectorPool().write(bytebuffer, socket, selector, writeTimeout);
             //make sure we are flushed 
             do {
-                if (socket.flush(true,selector,writeTimeout,lastWrite)) break;
+                if (socket.flush(true,selector,writeTimeout)) break;
             }while ( true );
         }finally { 
             if ( selector != null ) getSelectorPool().put(selector);
         }
-        if ( block ) bytebuffer.clear(); //only clear
+        socket.getBufHandler().getWriteBuffer().clear();
         this.total = 0;
-        return written;
     } 
 
 
@@ -769,7 +762,6 @@ public class InternalNioOutputBuffer
 
         //write to the socket, if there is anything to write
         if (socket.getBufHandler().getWriteBuffer().position() > 0) {
-            socket.getBufHandler().getWriteBuffer().flip();
             writeToSocket(socket.getBufHandler().getWriteBuffer(),true);
         }
     }

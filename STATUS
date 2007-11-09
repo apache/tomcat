@@ -1,0 +1,55 @@
+================================================================================
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+================================================================================
+
+$Revision$ $Date$
+
+                         =================================
+                         Apache Tomcat 6.0 Patch Proposals
+                         =================================
+
+
+PATCHES PROPOSED TO BACKPORT:
+  [ New proposals should be added at the end of the list ]
+
+
+* Fix BZ 43588 - hard coded 127.0.0.1 for localhost
+  http://issues.apache.org/bugzilla/attachment.cgi?id=21039&action=view
+  +1: 
+  -1: funkman InetAddress.getLocalHost() != localhost - it should be
+            InetAddress.getByName("localhost").getHostAddress()
+
+* Fix bug in CGI servlet that causes it to fail when included
+  http://people.apache.org/~markt/patches/2007-10-28-cgi-include.patch
+  +1: markt
+  -1:
+
+* Fix BZ 43702 - Inner class files have unnecessarily long names
+  http://people.apache.org/~markt/patches/2007-10-30-Bug43702.patch
+  +1: markt
+  -1:
+
+* Fix BZ 43675 - Possible logging related classloader leak
+  http://people.apache.org/~markt/patches/2007-10-30-Bug43675.patch
+  +1: markt
+  -1:
+
+* Fix double quoting of quoted-string. http://people.apache.org/~jfclere/patches/cookies.tck.patch
+  and $Version parsing
+  +1: jfclere, pero
+  -1: markt - only the double quoting part - see http://marc.info/?l=tomcat-dev&m=119454915422424&w=2 for reasons
+  -1: fhanik - I still think it needs some work, will discuss on dev list
+

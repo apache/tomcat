@@ -312,6 +312,19 @@ public class Digester extends DefaultHandler {
     protected boolean validating = false;
 
 
+    
+    /**
+     * Warn on missing attributes and elements.
+     */
+    protected boolean rulesValidation = false;
+
+    
+    /**
+     * Fake attributes map (attributes are often used for object creation).
+     */
+    protected Map<Class, List<String>> fakeAttributes = null;
+
+
     /**
      * The Log to which most logging calls will be made.
      */
@@ -889,6 +902,72 @@ public class Digester extends DefaultHandler {
 
 
     /**
+     * Return the rules validation flag.
+     */
+    public boolean getRulesValidation() {
+
+        return (this.rulesValidation);
+
+    }
+
+
+    /**
+     * Set the rules validation flag.  This must be called before
+     * <code>parse()</code> is called the first time.
+     *
+     * @param rulesValidation The new rules validation flag.
+     */
+    public void setRulesValidation(boolean rulesValidation) {
+
+        this.rulesValidation = rulesValidation;
+
+    }
+
+
+    /**
+     * Return the fake attributes list.
+     */
+    public Map<Class, List<String>> getFakeAttributes() {
+
+        return (this.fakeAttributes);
+
+    }
+
+
+    /**
+     * Determine if an attribute is a fake attribute.
+     */
+    public boolean isFakeAttribute(Object object, String name) {
+
+        if (fakeAttributes == null) {
+            return false;
+        }
+        List<String> result = fakeAttributes.get(object.getClass());
+        if (result == null) {
+            result = fakeAttributes.get(Object.class);
+        }
+        if (result == null) {
+            return false;
+        } else {
+            return result.contains(name);
+        }
+
+    }
+
+
+    /**
+     * Set the fake attributes.
+     *
+     * @param fakeAttributes The new fake attributes.
+     */
+    public void setFakeAttributes(Map<Class, List<String>> fakeAttributes) {
+
+        this.fakeAttributes = fakeAttributes;
+
+    }
+
+
+    /**
      * Return the XMLReader to be used for parsing the input document.
      *
      * FIX ME: there is a bug in JAXP/XERCES that prevent the use of a 
@@ -1037,6 +1116,9 @@ public class Digester extends DefaultHandler {
         } else {
             if (debug) {
                 log.debug("  No rules found matching '" + match + "'.");
+            }
+            if (rulesValidation) {
+                log.warn("  No rules found matching '" + match + "'.");
             }
         }
 

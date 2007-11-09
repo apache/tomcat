@@ -103,8 +103,7 @@ public class NioEndpoint {
      */
     public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
 
-    public static final int OP_REGISTER = 0x100; //register interest op
-    public static final int OP_CALLBACK = 0x200; //callback interest op
+    public static final int OP_REGISTER = -1; //register interest op
     
     // ----------------------------------------------------------------- Fields
 
@@ -479,10 +478,23 @@ public class NioEndpoint {
     /**
      * The socket poller.
      */
-    protected Poller poller = null;
+    protected Poller[] pollers = null;
+    protected int pollerRoundRobin = 0;
     public Poller getPoller0() {
+        pollerRoundRobin = (pollerRoundRobin + 1) % pollers.length;
+        Poller poller = pollers[pollerRoundRobin];
         return poller;
     }
+
+
+    /**
+     * The socket poller used for Comet support.
+     */
+    public Poller getCometPoller0() {
+        Poller poller = getPoller0();
+        return poller;
+    }
+
 
     /**
      * Dummy maxSpareThreads property.
@@ -498,37 +510,68 @@ public class NioEndpoint {
     /**
      * Generic properties, introspected
      */
-    public void setProperty(String name, String value) {
+    public boolean setProperty(String name, String value) {
         final String selectorPoolName = "selectorPool.";
         final String socketName = "socket.";
         try {
             if (name.startsWith(selectorPoolName)) {
-                IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
+                return IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
             } else if (name.startsWith(socketName)) {
-                IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
+                return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
             } else {
-                IntrospectionUtils.setProperty(this,name,value);
+                return IntrospectionUtils.setProperty(this,name,value);
             }
         }catch ( Exception x ) {
             log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
+            return false;
         }
     }
 
 
+    public String adjustRelativePath(String path, String relativeTo) {
+        File f = new File(path);
+        if ( !f.isAbsolute()) {
+            path = relativeTo + File.separator + path;
+            f = new File(path);
+        }
+        if (!f.exists()) {
+            log.warn("configured file:["+path+"] does not exist.");
+        }
+        return path;
+    }
+    
+    public String defaultIfNull(String val, String defaultValue) {
+        if (val==null) return defaultValue;
+        else return val;
+    }
     // --------------------  SSL related properties --------------------
+    protected String truststoreFile = System.getProperty("javax.net.ssl.trustStore");
+    public void setTruststoreFile(String s) {
+        s = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.truststoreFile = s;
+    }
+    public String getTruststoreFile() {return truststoreFile;}
+    protected String truststorePass = System.getProperty("javax.net.ssl.trustStorePassword");
+    public void setTruststorePass(String truststorePass) {this.truststorePass = truststorePass;}
+    public String getTruststorePass() {return truststorePass;}
+    protected String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+    public void setTruststoreType(String truststoreType) {this.truststoreType = truststoreType;}
+    public String getTruststoreType() {return truststoreType;}
+    
     protected String keystoreFile = System.getProperty("user.home")+"/.keystore";
     public String getKeystoreFile() { return keystoreFile;}
-    public void setKeystoreFile(String s ) { this.keystoreFile = s; }
-    public void setKeystore(String s ) { setKeystoreFile(s);}
-    public String getKeystore() { return getKeystoreFile();}
+    public void setKeystoreFile(String s ) { 
+        s = adjustRelativePath(s,System.getProperty("catalina.base"));
+        this.keystoreFile = s; 
+    }
     
     protected String algorithm = "SunX509";
     public String getAlgorithm() { return algorithm;}
     public void setAlgorithm(String s ) { this.algorithm = s;}
 
-    protected boolean clientAuth = false;
-    public boolean getClientAuth() { return clientAuth;}
-    public void setClientAuth(boolean b ) { this.clientAuth = b;}
+    protected String clientAuth = "false";
+    public String getClientAuth() { return clientAuth;}
+    public void setClientAuth(String s ) { this.clientAuth = s;}
     
     protected String keystorePass = "changeit";
     public String getKeystorePass() { return keystorePass;}
@@ -636,10 +679,14 @@ public class NioEndpoint {
      * Number of keepalive sockets.
      */
     public int getKeepAliveCount() {
-        if (poller == null) {
+        if (pollers == null) {
             return 0;
         } else {
-                return poller.selector.keys().size();
+            int keepAliveCount = 0;
+            for (int i = 0; i < pollers.length; i++) {
+                keepAliveCount += pollers[i].getKeepAliveCount();
+            }
+            return keepAliveCount;
         }
     }
 
@@ -722,11 +769,21 @@ public class NioEndpoint {
 
             KeyStore ks = KeyStore.getInstance(getKeystoreType());
             ks.load(new FileInputStream(getKeystoreFile()), passphrase);
-            KeyStore ts = KeyStore.getInstance(getKeystoreType());
-            ts.load(new FileInputStream(getKeystoreFile()), passphrase);
 
             KeyManagerFactory kmf = KeyManagerFactory.getInstance(getAlgorithm());
             kmf.init(ks, passphrase);
+
+            char[] tpassphrase = (getTruststorePass()!=null)?getTruststorePass().toCharArray():passphrase;
+            String ttype = (getTruststoreType()!=null)?getTruststoreType():getKeystoreType();
+
+            KeyStore ts = null;
+            if (getTruststoreFile()==null) {
+                ts = KeyStore.getInstance(getKeystoreType());
+                ts.load(new FileInputStream(getKeystoreFile()), passphrase);
+            }else {
+                ts = KeyStore.getInstance(ttype);
+                ts.load(new FileInputStream(getTruststoreFile()), tpassphrase);
+            }
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(getAlgorithm());
             tmf.init(ts);
@@ -737,7 +794,7 @@ public class NioEndpoint {
         }
         
         if (oomParachute>0) reclaimParachute(true);
-        selectorPool.open();
+
         initialized = true;
 
     }
@@ -776,12 +833,16 @@ public class NioEndpoint {
                 acceptorThread.start();
             }
 
-            // Start poller thread
-            poller = new Poller();
-            Thread pollerThread = new Thread(poller, getName() + "-ClientPoller");
-            pollerThread.setPriority(threadPriority);
-            pollerThread.setDaemon(true);
-            pollerThread.start();
+            // Start poller threads
+            pollers = new Poller[pollerThreadCount];
+            for (int i = 0; i < pollerThreadCount; i++) {
+                pollers[i] = new Poller();
+                pollers[i].init();
+                Thread pollerThread = new Thread(pollers[i], getName() + "-Poller-" + i);
+                pollerThread.setPriority(threadPriority);
+                pollerThread.setDaemon(true);
+                pollerThread.start();
+            }
         }
     }
 
@@ -815,8 +876,10 @@ public class NioEndpoint {
         if (running) {
             running = false;
             unlockAccept();
-                poller.destroy();
-            poller = null;
+            for (int i = 0; i < pollers.length; i++) {
+                pollers[i].destroy();
+            }
+            pollers = null;
         }
         eventCache.clear();
         keyCache.clear();
@@ -832,7 +895,6 @@ public class NioEndpoint {
             }
             executor = null;
         }
-        
     }
 
 
@@ -850,7 +912,6 @@ public class NioEndpoint {
         sslContext = null;
         initialized = false;
         releaseCaches();
-        selectorPool.close();
     }
 
 
@@ -975,7 +1036,14 @@ public class NioEndpoint {
 
     protected SSLEngine createSSLEngine() {
         SSLEngine engine = sslContext.createSSLEngine();
-        engine.setNeedClientAuth(getClientAuth());
+        if ("false".equals(getClientAuth())) {
+            engine.setNeedClientAuth(false);
+            engine.setWantClientAuth(false);
+        } else if ("true".equals(getClientAuth()) || "yes".equals(getClientAuth())){
+            engine.setNeedClientAuth(true);
+        } else if ("want".equals(getClientAuth())) {
+            engine.setWantClientAuth(true);
+        }        
         engine.setUseClientMode(false);
         if ( ciphersarr.length > 0 ) engine.setEnabledCipherSuites(ciphersarr);
         if ( sslEnabledProtocolsarr.length > 0 ) engine.setEnabledProtocols(sslEnabledProtocolsarr);
@@ -1097,8 +1165,6 @@ public class NioEndpoint {
     
     protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
-            KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
-            attachment.setCometNotify(false); //will get reset upon next reg
             if (executor == null) {
                 getWorkerThread().assign(socket, status);
             } else {
@@ -1220,18 +1286,11 @@ public class NioEndpoint {
                     if (key != null) {
                         final KeyAttachment att = (KeyAttachment) key.attachment();
                         if ( att!=null ) {
-                            //handle callback flag
-                            if (att.getComet() && (interestOps & OP_CALLBACK) == OP_CALLBACK ) {
-                                att.setCometNotify(true);
-                            } else {
-                                att.setCometNotify(false);
-                            }
-                            interestOps = (interestOps & (~OP_CALLBACK));//remove the callback flag
                             att.access();//to prevent timeout
                             //we are registering the key to start with, reset the fairness counter.
-                            int ops = key.interestOps() | interestOps;
-                            att.interestOps(ops);
-                            key.interestOps(ops);
+                            att.setFairness(0);
+                            att.interestOps(interestOps);
+                            key.interestOps(interestOps);
                         } else {
                             cancel = true;
                         }
@@ -1251,7 +1310,6 @@ public class NioEndpoint {
             return super.toString()+"[intOps="+this.interestOps+"]";
         }
     }
-    
     /**
      * Poller class.
      */
@@ -1262,6 +1320,9 @@ public class NioEndpoint {
         
         protected boolean close = false;
         protected long nextExpiration = 0;//optimize expiration handling
+
+        protected int keepAliveCount = 0;
+        public int getKeepAliveCount() { return keepAliveCount; }
         
         protected AtomicLong wakeupCounter = new AtomicLong(0l);
         
@@ -1274,6 +1335,14 @@ public class NioEndpoint {
         }
         
         public Selector getSelector() { return selector;}
+
+        /**
+         * Create the poller. With some versions of APR, the maximum poller size will
+         * be 62 (reocmpiling APR is necessary to remove this limitation).
+         */
+        protected void init() {
+            keepAliveCount = 0;
+        }
 
         /**
          * Destroy the poller.
@@ -1291,19 +1360,6 @@ public class NioEndpoint {
         public void addEvent(Runnable event) {
             events.offer(event);
             if ( wakeupCounter.incrementAndGet() < 3 ) selector.wakeup();
-        }
-        
-        public void cometInterest(NioChannel socket) {
-            KeyAttachment att = (KeyAttachment)socket.getAttachment(false);
-            add(socket,att.getCometOps());
-            if ( (att.getCometOps()&OP_CALLBACK) == OP_CALLBACK ) {
-                nextExpiration = 0; //force the check for faster callback
-                selector.wakeup();
-            }
-        }
-        
-        public void wakeup() {
-            selector.wakeup();
         }
 
         /**
@@ -1351,7 +1407,7 @@ public class NioEndpoint {
             socket.setPoller(this);
             KeyAttachment key = keyCache.poll();
             final KeyAttachment ka = key!=null?key:new KeyAttachment();
-            ka.reset(this,socket,getSocketProperties().getSoTimeout());
+            ka.reset(this,socket);
             PollerEvent r = eventCache.poll();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
@@ -1369,7 +1425,6 @@ public class NioEndpoint {
                     processSocket(ka.getChannel(), status, false);//don't dispatch if the lines below are cancelling the key
                     if (status == SocketStatus.TIMEOUT ) return; // don't close on comet timeout
                 }
-                handler.release(ka.getChannel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {ka.channel.close(true);}catch (Exception ignore){}
@@ -1418,12 +1473,10 @@ public class NioEndpoint {
                         }
                     } catch ( NullPointerException x ) {
                         //sun bug 5076772 on windows JDK 1.5
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
                         if ( wakeupCounter == null || selector == null ) throw x;
                         continue;
                     } catch ( CancelledKeyException x ) {
                         //sun bug 5076772 on windows JDK 1.5
-                        if ( log.isDebugEnabled() ) log.debug("Possibly encountered sun bug 5076772 on windows JDK 1.5",x);
                         if ( wakeupCounter == null || selector == null ) throw x;
                         continue;
                     } catch (Throwable x) {
@@ -1439,7 +1492,6 @@ public class NioEndpoint {
                     while (iterator != null && iterator.hasNext()) {
                         SelectionKey sk = (SelectionKey) iterator.next();
                         KeyAttachment attachment = (KeyAttachment)sk.attachment();
-                        attachment.access();
                         iterator.remove();
                         processKey(sk, attachment);
                     }//while
@@ -1477,23 +1529,24 @@ public class NioEndpoint {
                     sk.attach(attachment);//cant remember why this is here
                     NioChannel channel = attachment.getChannel();
                     if (sk.isReadable() || sk.isWritable() ) {
-                        if ( attachment.getSendfileData() != null ) {
+                        if ( sk.isReadable() && attachment.getReadLatch() != null ) {
+                            unreg(sk, attachment,SelectionKey.OP_READ);
+                            attachment.getReadLatch().countDown();
+                        } else if ( sk.isWritable() && attachment.getWriteLatch() != null ) {
+                            unreg(sk, attachment,SelectionKey.OP_WRITE);
+                            attachment.getWriteLatch().countDown();
+                        } else if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment,true);
                         } else if ( attachment.getComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
-                                //set interest ops to 0 so we don't get multiple
-                                //invokations for both read and write on separate threads
-                                reg(sk, attachment, 0);
-                                //read goes before write
-                                if (sk.isReadable()) {
-                                    if (!processSocket(channel, SocketStatus.OPEN_READ))
-                                        processSocket(channel, SocketStatus.DISCONNECT);
-                                } else {
-                                    if (!processSocket(channel, SocketStatus.OPEN_WRITE))
-                                        processSocket(channel, SocketStatus.DISCONNECT);
-                                }
+                                unreg(sk, attachment, sk.readyOps());
+                                if (!processSocket(channel, SocketStatus.OPEN))
+                                    processSocket(channel, SocketStatus.DISCONNECT);
+                                attachment.setFairness(0);
                             } else {
+                                //increase the fairness counter
+                                attachment.incFairness();
                                 result = false;
                             }
                         } else {
@@ -1504,7 +1557,10 @@ public class NioEndpoint {
                                 if (close) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT,false);
                                 }
+                                attachment.setFairness(0);
                             } else {
+                                //increase the fairness counter
+                                attachment.incFairness();
                                 result = false;
                             }
                         }
@@ -1577,7 +1633,7 @@ public class NioEndpoint {
             if ( ((keyCount>0 || hasEvents) ||(now < nextExpiration)) && (!close) ) {
                 return;
             }
-            long prevExp = nextExpiration; //for logging purposes only
+            long prevExp = nextExpiration;
             nextExpiration = now + socketProperties.getTimeoutInterval();
             //timeout
             Set<SelectionKey> keys = selector.keys();
@@ -1591,9 +1647,6 @@ public class NioEndpoint {
                         cancelledKey(key, SocketStatus.ERROR,false); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
                         cancelledKey(key, SocketStatus.ERROR,true);
-                    } else if (ka.getComet() && ka.getCometNotify() ) {
-                        reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
-                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
@@ -1616,7 +1669,7 @@ public class NioEndpoint {
                     cancelledKey(key, SocketStatus.ERROR,false);
                 }
             }//for
-            if ( log.isDebugEnabled() ) log.debug("timeout completed: keys processed="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
+           if ( log.isDebugEnabled() ) log.debug("timeout completed: keycount="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
                                                   "keyCount="+keyCount+"; hasEvents="+hasEvents +"; eval="+( (now < prevExp) && (keyCount>0 || hasEvents) && (!close) ));
 
         }
@@ -1628,27 +1681,25 @@ public class NioEndpoint {
         public KeyAttachment() {
             
         }
-        public void reset(Poller poller, NioChannel channel, long soTimeout) {
+        public void reset(Poller poller, NioChannel channel) {
             this.channel = channel;
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
             currentAccess = false;
             comet = false;
-            timeout = soTimeout;
+            timeout = -1;
             error = false;
+            fairness = 0;
             lastRegistered = 0;
             sendfileData = null;
             if ( readLatch!=null ) try {for (int i=0; i<(int)readLatch.getCount();i++) readLatch.countDown();}catch (Exception ignore){}
             readLatch = null;
             if ( writeLatch!=null ) try {for (int i=0; i<(int)writeLatch.getCount();i++) writeLatch.countDown();}catch (Exception ignore){}
             writeLatch = null;
-            cometNotify = false;
-            cometOps = 0;
-            sendfileData = null;
         }
         
         public void reset() {
-            reset(null,null,-1);
+            reset(null,null);
         }
         
         public Poller getPoller() { return poller;}
@@ -1658,12 +1709,9 @@ public class NioEndpoint {
         public void access(long access) { lastAccess = access; }
         public void setComet(boolean comet) { this.comet = comet; }
         public boolean getComet() { return comet; }
-        public void setCometNotify(boolean notify) { this.cometNotify = notify; }
-        public boolean getCometNotify() { return cometNotify; }
-        public void setCometOps(int ops) { this.cometOps = ops; }
-        public int getCometOps() { return cometOps; }
         public boolean getCurrentAccess() { return currentAccess; }
         public void setCurrentAccess(boolean access) { currentAccess = access; }
+        public Object getMutex() {return mutex;}
         public void setTimeout(long timeout) {this.timeout = timeout;}
         public long getTimeout() {return this.timeout;}
         public boolean getError() { return error; }
@@ -1677,7 +1725,7 @@ public class NioEndpoint {
         public CountDownLatch getReadLatch() { return readLatch; }
         public CountDownLatch getWriteLatch() { return writeLatch; }
         protected CountDownLatch resetLatch(CountDownLatch latch) {
-            if ( latch==null || latch.getCount() == 0 ) return null;
+            if ( latch.getCount() == 0 ) return null;
             else throw new IllegalStateException("Latch must be at count 0");
         }
         public void resetReadLatch() { readLatch = resetLatch(readLatch); }
@@ -1700,22 +1748,25 @@ public class NioEndpoint {
         public void awaitReadLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(readLatch,timeout,unit);}
         public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch,timeout,unit);}
         
+        public int getFairness() { return fairness; }
+        public void setFairness(int f) { fairness = f;}
+        public void incFairness() { fairness++; }
         public long getLastRegistered() { return lastRegistered; };
         public void setLastRegistered(long reg) { lastRegistered = reg; }
         
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
         
+        protected Object mutex = new Object();
         protected long lastAccess = -1;
         protected boolean currentAccess = false;
         protected boolean comet = false;
-        protected int cometOps = 0;
-        protected boolean cometNotify = false;
         protected long timeout = -1;
         protected boolean error = false;
         protected NioChannel channel = null;
         protected CountDownLatch readLatch = null;
         protected CountDownLatch writeLatch = null;
+        protected int fairness = 0;
         protected long lastRegistered = 0;
         protected SendfileData sendfileData = null;
     }
@@ -1912,7 +1963,6 @@ public class NioEndpoint {
         public SocketState process(NioChannel socket);
         public SocketState event(NioChannel socket, SocketStatus status);
         public void releaseCaches();
-        public void release(NioChannel socket);
     }
 
 

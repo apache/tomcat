@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -14,7 +15,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<?xml version="1.0" encoding="UTF-8"?>
 <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
 	    targetNamespace="http://java.sun.com/xml/ns/j2ee"
 	    xmlns:j2ee="http://java.sun.com/xml/ns/j2ee"
@@ -25,41 +25,6 @@
   <xsd:annotation>
     <xsd:documentation>
       %W% %E%
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
-
-      Copyright 2002 Sun Microsystems, Inc., 901 San Antonio
-      Road, Palo Alto, California 94303, U.S.A. All rights
-      reserved.
-
-      Sun Microsystems, Inc. has intellectual property rights
-      relating to technology described in this document. In
-      particular, and without limitation, these intellectual
-      property rights may include one or more of the U.S. patents
-      listed at http://www.sun.com/patents and one or more
-      additional patents or pending patent applications in the
-      U.S. and other countries.
-
-      This document and the technology which it describes are
-      distributed under licenses restricting their use, copying,
-      distribution, and decompilation. No part of this document
-      may be reproduced in any form by any means without prior
-      written authorization of Sun and its licensors, if any.
-
-      Third-party software, including font technology, is
-      copyrighted and licensed from Sun suppliers.
-
-      Sun, Sun Microsystems, the Sun logo, Solaris, Java, J2EE,
-      JavaServer Pages, Enterprise JavaBeans and the Java Coffee
-      Cup logo are trademarks or registered trademarks of Sun
-      Microsystems, Inc. in the U.S. and other countries.
-
-      Federal Acquisitions: Commercial Software - Government Users
-      Subject to Standard License Terms and Conditions.
-
     </xsd:documentation>
   </xsd:annotation>
 
@@ -805,7 +770,7 @@
 
     <xsd:simpleContent>
       <xsd:restriction base="j2ee:string">
-	<xsd:pattern value="[\p{L}\-\p{Nd}]+/[\p{L}\-\p{Nd}\.]+"/>
+          <xsd:pattern value="[^\p{Cc}^\s]+/[^\p{Cc}^\s]+"/>
       </xsd:restriction>
     </xsd:simpleContent>
   </xsd:complexType>

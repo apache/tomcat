@@ -1014,7 +1014,7 @@ public class DefaultServlet
 
         // Vector which will contain all the ranges which are successfully
         // parsed.
-        ArrayList result = new ArrayList();
+        ArrayList<Range> result = new ArrayList<Range>();
         StringTokenizer commaTokenizer = new StringTokenizer(rangeHeader, ",");
 
         // Parsing the range list
@@ -1571,6 +1571,8 @@ public class DefaultServlet
                     // The entity has not been modified since the date
                     // specified by the client. This is not an error case.
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    response.setHeader("ETag", getETag(resourceAttributes));
+
                     return false;
                 }
             }
@@ -1627,6 +1629,8 @@ public class DefaultServlet
                 if ( ("GET".equals(request.getMethod()))
                      || ("HEAD".equals(request.getMethod())) ) {
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    response.setHeader("ETag", getETag(resourceAttributes));
+
                     return false;
                 } else {
                     response.sendError
