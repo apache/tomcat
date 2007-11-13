@@ -191,9 +191,6 @@ public class ParserUtils {
 
 class MyEntityResolver implements EntityResolver {
 
-    // Logger
-    private Log log = LogFactory.getLog(MyEntityResolver.class);
-
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException {
         for (int i = 0; i < Constants.CACHED_DTD_PUBLIC_IDS.length; i++) {
@@ -210,6 +207,7 @@ class MyEntityResolver implements EntityResolver {
                 return isrc;
             }
         }
+        Log log = LogFactory.getLog(MyEntityResolver.class);
         if (log.isDebugEnabled())
             log.debug("Resolve entity failed" + publicId + " " + systemId);
         log.error(Localizer.getMessage("jsp.error.parse.xml.invalidPublicId",
@@ -220,10 +218,8 @@ class MyEntityResolver implements EntityResolver {
 
 class MyErrorHandler implements ErrorHandler {
 
-    // Logger
-    private Log log = LogFactory.getLog(MyErrorHandler.class);
-
     public void warning(SAXParseException ex) throws SAXException {
+        Log log = LogFactory.getLog(MyErrorHandler.class);
         if (log.isDebugEnabled())
             log.debug("ParserUtils: warning ", ex);
         // We ignore warnings
