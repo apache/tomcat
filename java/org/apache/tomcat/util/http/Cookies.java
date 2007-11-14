@@ -487,7 +487,7 @@ public final class Cookies { // extends MultiMap {
                 if (equals( "Version", bytes, nameStart, nameEnd) && 
                     sc == null) {
                     // Set version
-                    if( bytes[valueStart] =='1' && valueEnd == valueStart) {
+                    if( bytes[valueStart] =='1' && valueEnd == (valueStart+1)) {
                         version=1;
                     } else {
                         // unknown version (Versioning is not very strict)
