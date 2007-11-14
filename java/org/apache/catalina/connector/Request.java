@@ -2350,6 +2350,22 @@ public class Request
             cookie.setSecure(true);
         }
     }
+    
+    protected String unescape(String s) {
+        if (s==null) return null;
+        if (s.indexOf('\\') == -1) return s;
+        StringBuffer buf = new StringBuffer();
+        for (int i=0; i<s.length(); i++) {
+            char c = s.charAt(i);
+            if (c!='\\') buf.append(c);
+            else {
+                if (++i >= s.length()) throw new IllegalArgumentException();//invalid escape, hence invalid cookie
+                c = s.charAt(i);
+                buf.append(c);
+            }
+        }
+        return buf.toString();
+    }
 
     /**
      * Parse cookies.
@@ -2369,14 +2385,18 @@ public class Request
         for (int i = 0; i < count; i++) {
             ServerCookie scookie = serverCookies.getCookie(i);
             try {
-                Cookie cookie = new Cookie(scookie.getName().toString(),
-                                           scookie.getValue().toString());
-                cookie.setPath(scookie.getPath().toString());
-                cookie.setVersion(scookie.getVersion());
+                /*
+                we must unescape the '\\' escape character
+                */
+                Cookie cookie = new Cookie(scookie.getName().toString(),null);
+                int version = scookie.getVersion();
+                cookie.setVersion(version);
+                cookie.setValue(unescape(scookie.getValue().toString()));
+                cookie.setPath(unescape(scookie.getPath().toString()));
                 String domain = scookie.getDomain().toString();
-                if (domain != null) {
-                    cookie.setDomain(scookie.getDomain().toString());
-                }
+                if (domain!=null) cookie.setDomain(unescape(domain));//avoid NPE
+                String comment = scookie.getComment().toString();
+                cookie.setComment(version==1?unescape(comment):null);
                 cookies[idx++] = cookie;
             } catch(IllegalArgumentException e) {
                 // Ignore bad cookie
