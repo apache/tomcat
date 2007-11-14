@@ -145,11 +145,26 @@ public class ServerCookie implements Serializable {
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
 
-            if (c < 0x20 || c >= 0x7f || tspecials.indexOf(c) != -1)
+            if (tspecials.indexOf(c) != -1)
                 return false;
         }
         return true;
     }
+
+    public static boolean containsCTL(String value, int version) {
+        if( value==null) return false;
+        int len = value.length();
+        for (int i = 0; i < len; i++) {
+            char c = value.charAt(i);
+            if (c < 0x20 || c >= 0x7f) {
+                if (c == 0x09)
+                    continue; //allow horizontal tabs
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public static boolean isToken2(String value) {
         if( value==null) return true;
@@ -157,8 +172,7 @@ public class ServerCookie implements Serializable {
 
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
-
-            if (c < 0x20 || c >= 0x7f || tspecials2.indexOf(c) != -1)
+            if (tspecials2.indexOf(c) != -1)
                 return false;
         }
         return true;
@@ -218,7 +232,7 @@ public class ServerCookie implements Serializable {
         DateTool.formatOldCookie(new Date(10000));
 
     // TODO RFC2965 fields also need to be passed
-    public static void appendCookieValue( StringBuffer buf,
+    public static void appendCookieValue( StringBuffer headerBuf,
                                           int version,
                                           String name,
                                           String value,
@@ -228,6 +242,7 @@ public class ServerCookie implements Serializable {
                                           int maxAge,
                                           boolean isSecure )
     {
+        StringBuffer buf = new StringBuffer();
         // Servlet implementation checks name
         buf.append( name );
         buf.append("=");
@@ -285,22 +300,27 @@ public class ServerCookie implements Serializable {
           buf.append ("; Secure");
         }
         
-        
+        headerBuf.append(buf);
     }
 
     /**
      * @deprecated - Not used
      */
-    public static void maybeQuote (int version, StringBuffer buf,
-            String value) {
+    @Deprecated
+    public static void maybeQuote (int version, StringBuffer buf,String value) {
         // special case - a \n or \r  shouldn't happen in any case
         if (isToken(value)) {
             buf.append(value);
         } else {
             buf.append('"');
-            buf.append(escapeDoubleQuotes(value));
+            buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
         }
+    }
+    
+    public static boolean alreadyQuoted (String value) {
+        if (value==null || value.length()==0) return false;
+        return (value.charAt(0)=='\"' && value.charAt(value.length()-1)=='\"');
     }
     
     /**
@@ -309,15 +329,25 @@ public class ServerCookie implements Serializable {
      * @param buf
      * @param value
      */
-    public static void maybeQuote2 (int version, StringBuffer buf,
-            String value) {
-        // special case - a \n or \r  shouldn't happen in any case
-        if (version == 0 && isToken(value) || version == 1 && isToken2(value)) {
+    public static void maybeQuote2 (int version, StringBuffer buf, String value) {
+        if (value==null || value.length()==0) {
+            buf.append("\"\"");
+        }else if (containsCTL(value,version)) 
+            throw new IllegalArgumentException("Control character in cookie value, consider BASE64 encoding your value");
+        else if (alreadyQuoted(value)) {
+            buf.append('"');
+            buf.append(escapeDoubleQuotes(value,1,value.length()-1));
+            buf.append('"');
+        } else if (version==0 && !isToken(value)) {
+            buf.append('"');
+            buf.append(escapeDoubleQuotes(value,0,value.length()));
+            buf.append('"');
+        } else if (version==1 && !isToken2(value)) {
+            buf.append('"');
+            buf.append(escapeDoubleQuotes(value,0,value.length()));
+            buf.append('"');
+        }else {
             buf.append(value);
-        } else {
-            buf.append('"');
-            buf.append(escapeDoubleQuotes(value));
-            buf.append('"');
         }
     }
 
@@ -326,19 +356,25 @@ public class ServerCookie implements Serializable {
      * Escapes any double quotes in the given string.
      *
      * @param s the input string
-     *
+     * @param beginIndex start index inclusive
+     * @param endIndex exclusive
      * @return The (possibly) escaped string
      */
-    private static String escapeDoubleQuotes(String s) {
+    private static String escapeDoubleQuotes(String s, int beginIndex, int endIndex) {
 
         if (s == null || s.length() == 0 || s.indexOf('"') == -1) {
             return s;
         }
 
         StringBuffer b = new StringBuffer();
-        for (int i = 0; i < s.length(); i++) {
+        for (int i = beginIndex; i < endIndex; i++) {
             char c = s.charAt(i);
-            if (c == '"')
+            if (c == '\\' ) {
+                b.append(c);
+                //ignore the character after an escape, just append it
+                if (++i>=endIndex) throw new IllegalArgumentException("Invalid escape character in cookie value.");
+                b.append(s.charAt(i));
+            } else if (c == '"')
                 b.append('\\').append('"');
             else
                 b.append(c);
