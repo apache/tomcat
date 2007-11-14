@@ -955,9 +955,9 @@ public class Response
         if (isCommitted())
             return;
 
-        cookies.add(cookie);
-
         final StringBuffer sb = new StringBuffer();
+        //web application code can receive a IllegalArgumentException 
+        //from the appendCookieValue invokation
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction() {
                 public Object run(){
@@ -975,12 +975,13 @@ public class Response
                      cookie.getPath(), cookie.getDomain(), cookie.getComment(), 
                      cookie.getMaxAge(), cookie.getSecure());
         }
-
+        //if we reached here, no exception, cookie is valid
         // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
         // RFC2965 is not supported by browsers and the Servlet spec
         // asks for 2109.
         addHeader("Set-Cookie", sb.toString());
 
+        cookies.add(cookie);
     }
 
 
