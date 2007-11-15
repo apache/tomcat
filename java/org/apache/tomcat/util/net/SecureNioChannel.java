@@ -25,6 +25,7 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLEngineResult.HandshakeStatus;
 import javax.net.ssl.SSLEngineResult.Status;
 import java.nio.channels.Selector;
+import org.apache.tomcat.util.MutableInteger;
 
 /**
  * 
@@ -102,11 +103,11 @@ public class SecureNioChannel extends NioChannel  {
      * been flushed out and is empty
      * @return boolean
      */
-    public boolean flush(boolean block, Selector s, long timeout) throws IOException {
+    public boolean flush(boolean block, Selector s, long timeout,MutableInteger lastWrite) throws IOException {
         if (!block) {
             flush(netOutBuffer);
         } else {
-            pool.write(netOutBuffer, this, s, timeout);
+            pool.write(netOutBuffer, this, s, timeout,block,lastWrite);
         }
         return !netOutBuffer.hasRemaining();
     }
@@ -402,32 +403,33 @@ public class SecureNioChannel extends NioChannel  {
             if ( src != bufHandler.getWriteBuffer() ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
             //are we closing or closed?
             if ( closing || closed) throw new IOException("Channel is in closing state.");
-    
+
             //the number of bytes written
             int written = 0;
-    
+
             if (!flush(netOutBuffer)) {
                 //we haven't emptied out the buffer yet
                 return written;
             }
-    
+
             /*
              * The data buffer is empty, we can reuse the entire buffer.
              */
             netOutBuffer.clear();
-    
+
             SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
             written = result.bytesConsumed();
             netOutBuffer.flip();
-    
+
             if (result.getStatus() == Status.OK) {
                 if (result.getHandshakeStatus() == HandshakeStatus.NEED_TASK) tasks();
             } else {
                 throw new IOException("Unable to wrap data, invalid engine state: " +result.getStatus());
             }        
-    
+
             //force a flush
             flush(netOutBuffer);
+
             return written;
         }
     }
