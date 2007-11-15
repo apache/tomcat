@@ -30,6 +30,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.net.NioEndpoint;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -51,8 +52,7 @@ public class InternalNioInputBuffer implements InputBuffer {
     /**
      * Alternate constructor.
      */
-    public InternalNioInputBuffer(Request request, int headerBufferSize, 
-                                  long readTimeout) {
+    public InternalNioInputBuffer(Request request, int headerBufferSize) {
 
         this.request = request;
         headers = request.getMimeHeaders();
@@ -72,15 +72,13 @@ public class InternalNioInputBuffer implements InputBuffer {
 
         parsingHeader = true;
         parsingRequestLine = true;
+        parsingRequestLinePhase = 0;
+        parsingRequestLineEol = false;
+        parsingRequestLineStart = 0;
+        parsingRequestLineQPos = -1;
         headerParsePos = HeaderParsePosition.HEADER_START;
         headerData.recycle();
         swallowInput = true;
-
-        if (readTimeout < 0) {
-            this.readTimeout = -1;
-        } else {
-            this.readTimeout = readTimeout;
-        }
 
     }
 
@@ -111,10 +109,15 @@ public class InternalNioInputBuffer implements InputBuffer {
 
 
     /**
-     * State.
+     * Parsing state - used for non blocking parsing so that
+     * when more data arrives, we can pick up where we left off.
      */
     protected boolean parsingHeader;
     protected boolean parsingRequestLine;
+    protected int parsingRequestLinePhase = 0;
+    protected boolean parsingRequestLineEol = false;
+    protected int parsingRequestLineStart = 0;
+    protected int parsingRequestLineQPos = -1;
     protected HeaderParsePosition headerParsePos;
 
 
@@ -185,12 +188,6 @@ public class InternalNioInputBuffer implements InputBuffer {
      */
     protected int lastActiveFilter;
 
-
-    /**
-     * The socket timeout used when reading the first block of the request
-     * header.
-     */
-    protected long readTimeout;
 
     // ------------------------------------------------------------- Properties
 
@@ -287,7 +284,23 @@ public class InternalNioInputBuffer implements InputBuffer {
     }
 
     // --------------------------------------------------------- Public Methods
-
+    /**
+     * Returns true if there are bytes available from the socket layer
+     * @return boolean
+     * @throws IOException
+     */
+    public boolean isReadable() throws IOException {
+        return (pos < lastValid) || (nbRead()>0);
+    }
+    
+    /**
+     * Issues a non blocking read
+     * @return int
+     * @throws IOException
+     */
+    public int nbRead() throws IOException {
+        return readSocket(true,false);
+    }
 
     /**
      * Recycle the input buffer. This should be called when closing the 
@@ -309,6 +322,10 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
+        parsingRequestLinePhase = 0;
+        parsingRequestLineEol = false;
+        parsingRequestLineStart = 0;
+        parsingRequestLineQPos = -1;
         headerData.recycle();
         swallowInput = true;
 
@@ -350,6 +367,10 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
+        parsingRequestLinePhase = 0;
+        parsingRequestLineEol = false;
+        parsingRequestLineStart = 0;
+        parsingRequestLineQPos = -1;
         headerData.recycle();
         swallowInput = true;
 
@@ -388,160 +409,137 @@ public class InternalNioInputBuffer implements InputBuffer {
 
         //check state
         if ( !parsingRequestLine ) return true;
-        
-        int start = 0;
-
         //
         // Skipping blank lines
         //
-
-        byte chr = 0;
-        do {
-
-            // Read new bytes if needed
+        if ( parsingRequestLinePhase == 0 ) {
+            byte chr = 0;
+            do {
+                
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (useAvailableData) {
+                        return false;
+                    }
+                    // Do a simple read with a short timeout
+                    if ( readSocket(true, false)==0 ) return false;
+                }
+                chr = buf[pos++];
+            } while ((chr == Constants.CR) || (chr == Constants.LF));
+            pos--;
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 1;
+        } 
+        if ( parsingRequestLinePhase == 1 ) {
+            // Mark the current buffer position
+            
             if (pos >= lastValid) {
                 if (useAvailableData) {
                     return false;
                 }
-                if (readTimeout == -1) {
-                    if (!fill(false,true)) //request line parsing
-                        throw new EOFException(sm.getString("iib.eof.error"));
-                } else {
-                    // Do a simple read with a short timeout
-                    if ( !readSocket(true, false) ) return false;
-                }
-            }
-
-            chr = buf[pos++];
-
-        } while ((chr == Constants.CR) || (chr == Constants.LF));
-
-        pos--;
-
-        // Mark the current buffer position
-        start = pos;
-
-        if (pos >= lastValid) {
-            if (useAvailableData) {
-                return false;
-            }
-            if (readTimeout == -1) {
-                if (!fill(false,true)) //request line parsing
-                    return false;
-            } else {
                 // Do a simple read with a short timeout
-                if ( !readSocket(true, true) ) return false;
+                if ( readSocket(true, false)==0 ) return false;
             }
+            parsingRequestLinePhase = 2;
         }
-
-        //
-        // Reading the method name
-        // Method name is always US-ASCII
-        //
-
-        boolean space = false;
-
-        while (!space) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true,true)) //request line parsing
-                    return false;
+        if ( parsingRequestLinePhase == 2 ) {
+            //
+            // Reading the method name
+            // Method name is always US-ASCII
+            //
+            boolean space = false;
+            while (!space) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true, false)) //request line parsing
+                        return false;
+                }
+                if (buf[pos] == Constants.SP) {
+                    space = true;
+                    request.method().setBytes(buf, parsingRequestLineStart, pos - parsingRequestLineStart);
+                }
+                pos++;
             }
-
-            if (buf[pos] == Constants.SP) {
-                space = true;
-                request.method().setBytes(buf, start, pos - start);
-            }
-
-            pos++;
-
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 3;
         }
-
-        // Mark the current buffer position
-        start = pos;
-        int end = 0;
-        int questionPos = -1;
-
-        //
-        // Reading the URI
-        //
-
-        space = false;
-        boolean eol = false;
-
-        while (!space) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true,true)) //request line parsing
-                    return false;
-            }
-
-            if (buf[pos] == Constants.SP) {
-                space = true;
-                end = pos;
-            } else if ((buf[pos] == Constants.CR) 
-                       || (buf[pos] == Constants.LF)) {
-                // HTTP/0.9 style request
-                eol = true;
-                space = true;
-                end = pos;
-            } else if ((buf[pos] == Constants.QUESTION) 
-                       && (questionPos == -1)) {
-                questionPos = pos;
-            }
-
-            pos++;
-
-        }
-
-        request.unparsedURI().setBytes(buf, start, end - start);
-        if (questionPos >= 0) {
-            request.queryString().setBytes(buf, questionPos + 1, 
-                                           end - questionPos - 1);
-            request.requestURI().setBytes(buf, start, questionPos - start);
-        } else {
-            request.requestURI().setBytes(buf, start, end - start);
-        }
-
-        // Mark the current buffer position
-        start = pos;
-        end = 0;
-
-        //
-        // Reading the protocol
-        // Protocol is always US-ASCII
-        //
-
-        while (!eol) {
-
-            // Read new bytes if needed
-            if (pos >= lastValid) {
-                if (!fill(true,true)) //reques line parsing
-                    return false;
-            }
-
-            if (buf[pos] == Constants.CR) {
-                end = pos;
-            } else if (buf[pos] == Constants.LF) {
-                if (end == 0)
+        if ( parsingRequestLinePhase == 3 ) {
+            // Mark the current buffer position
+            
+            int end = 0;
+            //
+            // Reading the URI
+            //
+            boolean space = false;
+            while (!space) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true,false)) //request line parsing
+                        return false;
+                }
+                if (buf[pos] == Constants.SP) {
+                    space = true;
                     end = pos;
-                eol = true;
+                } else if ((buf[pos] == Constants.CR) 
+                           || (buf[pos] == Constants.LF)) {
+                    // HTTP/0.9 style request
+                    parsingRequestLineEol = true;
+                    space = true;
+                    end = pos;
+                } else if ((buf[pos] == Constants.QUESTION) 
+                           && (parsingRequestLineQPos == -1)) {
+                    parsingRequestLineQPos = pos;
+                }
+                pos++;
             }
-
-            pos++;
-
+            request.unparsedURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
+            if (parsingRequestLineQPos >= 0) {
+                request.queryString().setBytes(buf, parsingRequestLineQPos + 1, 
+                                               end - parsingRequestLineQPos - 1);
+                request.requestURI().setBytes(buf, parsingRequestLineStart, parsingRequestLineQPos - parsingRequestLineStart);
+            } else {
+                request.requestURI().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
+            }
+            parsingRequestLineStart = pos;
+            parsingRequestLinePhase = 4;
         }
-
-        if ((end - start) > 0) {
-            request.protocol().setBytes(buf, start, end - start);
-        } else {
-            request.protocol().setString("");
+        if ( parsingRequestLinePhase == 4 ) {
+            // Mark the current buffer position
+            
+            end = 0;
+            //
+            // Reading the protocol
+            // Protocol is always US-ASCII
+            //
+            while (!parsingRequestLineEol) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true, false)) //reques line parsing
+                        return false;
+                }
+        
+                if (buf[pos] == Constants.CR) {
+                    end = pos;
+                } else if (buf[pos] == Constants.LF) {
+                    if (end == 0)
+                        end = pos;
+                    parsingRequestLineEol = true;
+                }
+                pos++;
+            }
+        
+            if ( (end - parsingRequestLineStart) > 0) {
+                request.protocol().setBytes(buf, parsingRequestLineStart, end - parsingRequestLineStart);
+            } else {
+                request.protocol().setString("");
+            }
+            parsingRequestLine = false;
+            parsingRequestLinePhase = 0;
+            parsingRequestLineEol = false;
+            parsingRequestLineStart = 0;
+            return true;
         }
-        parsingRequestLine = false;
-        return true;
-
+        throw new IllegalStateException("Invalid request line parse phase:"+parsingRequestLinePhase);
     }
     
     private void expand(int newsize) {
@@ -552,6 +550,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             tmp = null;
         }
     }
+    
     /**
      * Perform blocking read with a timeout if desired
      * @param timeout boolean - if we want to use the timeout data
@@ -560,15 +559,16 @@ public class InternalNioInputBuffer implements InputBuffer {
      * @throws IOException if a socket exception occurs
      * @throws EOFException if end of stream is reached
      */
-    private boolean readSocket(boolean timeout, boolean block) throws IOException {
+    private int readSocket(boolean timeout, boolean block) throws IOException {
         int nRead = 0;
-        long rto = timeout?this.readTimeout:-1;
         socket.getBufHandler().getReadBuffer().clear();
         if ( block ) {
             Selector selector = null;
             try { selector = getSelectorPool().get(); }catch ( IOException x ) {}
             try {
-                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket,selector,rto);
+                NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                if ( att == null ) throw new IOException("Key must be cancelled.");
+                nRead = getSelectorPool().read(socket.getBufHandler().getReadBuffer(),socket,selector,att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
             } finally { 
@@ -583,12 +583,12 @@ public class InternalNioInputBuffer implements InputBuffer {
             expand(nRead + pos);
             socket.getBufHandler().getReadBuffer().get(buf, pos, nRead);
             lastValid = pos + nRead;
-            return true;
+            return nRead;
         } else if (nRead == -1) {
             //return false;
             throw new EOFException(sm.getString("iib.eof.error"));
         } else {
-            return false;
+            return 0;
         }
     }
 
@@ -630,7 +630,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,true)) {//parse header 
+                if (!fill(true,false)) {//parse header 
                     headerParsePos = HeaderParsePosition.HEADER_START;
                     return HeaderParseStatus.NEED_MORE_DATA;
                 }
@@ -668,7 +668,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,true)) { //parse header 
+                if (!fill(true,false)) { //parse header 
                     return HeaderParseStatus.NEED_MORE_DATA;
                 }
             }
@@ -708,7 +708,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
                     // Read new bytes if needed
                     if (pos >= lastValid) {
-                        if (!fill(true,true)) {//parse header 
+                        if (!fill(true,false)) {//parse header 
                             //HEADER_VALUE, should already be set
                             return HeaderParseStatus.NEED_MORE_DATA;
                         }
@@ -729,7 +729,7 @@ public class InternalNioInputBuffer implements InputBuffer {
 
                     // Read new bytes if needed
                     if (pos >= lastValid) {
-                        if (!fill(true,true)) {//parse header 
+                        if (!fill(true,false)) {//parse header 
                             //HEADER_VALUE
                             return HeaderParseStatus.NEED_MORE_DATA;
                         }
@@ -760,7 +760,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             }
             // Read new bytes if needed
             if (pos >= lastValid) {
-                if (!fill(true,true)) {//parse header
+                if (!fill(true,false)) {//parse header
                     
                     //HEADER_MULTI_LINE
                     return HeaderParseStatus.NEED_MORE_DATA;
@@ -852,7 +852,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             }
 
             // Do a simple read with a short timeout
-            read = readSocket(timeout,block);
+            read = readSocket(timeout,block)>0;
         } else {
 
             if (buf.length - end < 4500) {
@@ -865,7 +865,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             pos = end;
             lastValid = pos;
             // Do a simple read with a short timeout
-            read = readSocket(timeout, block);
+            read = readSocket(timeout, block)>0;
         }
         return read;
     }
