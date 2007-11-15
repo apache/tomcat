@@ -227,8 +227,8 @@ final class StandardWrapperValve
                     }
                 } else {
                     if (comet) {
-                        filterChain.doFilterEvent(request.getEvent());
                         request.setComet(true);
+                        filterChain.doFilterEvent(request.getEvent());
                     } else {
                         filterChain.doFilter
                             (request.getRequest(), response.getResponse());
