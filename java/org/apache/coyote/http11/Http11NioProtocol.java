@@ -95,12 +95,13 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
      * Set a property.
      */
     public boolean setProperty(String name, String value) {
-        setAttribute(name, value);
+        setAttribute(name, value); //store all settings
         if ( name!=null && (name.startsWith("socket.") ||name.startsWith("selectorPool.")) ){
             return ep.setProperty(name, value);
         } else {
             return ep.setProperty(name,value); //make sure we at least try to set all properties
         }
+        
     }
 
     /**
@@ -632,6 +633,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public void releaseCaches() {
             recycledProcessors.clear();
         }
+        
+        public void release(NioChannel socket) {
+            Http11NioProcessor result = connections.remove(socket);
+            if ( result != null ) {
+                result.recycle();
+                recycledProcessors.offer(result);
+            }
+        }
 
         public SocketState event(NioChannel socket, SocketStatus status) {
             Http11NioProcessor result = connections.get(socket);
@@ -671,7 +680,9 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                         }
                     } else {
                         if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
-                        socket.getPoller().add(socket);
+                        //add correct poller events here based on Comet stuff
+                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                        socket.getPoller().add(socket,att.getCometOps());
                     }
                 }
             }
@@ -681,6 +692,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         public SocketState process(NioChannel socket) {
             Http11NioProcessor processor = null;
             try {
+                processor = connections.remove(socket);
+                
                 if (processor == null) {
                     processor = recycledProcessors.poll();
                 }
@@ -708,9 +721,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     // Associate the connection with the processor. The next request 
                     // processed by this thread will use either a new or a recycled
                     // processor.
-                    if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
+                    //if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
                     connections.put(socket, processor);
-                    socket.getPoller().add(socket);
+                    if (processor.comet) {
+                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                        socket.getPoller().add(socket,att.getCometOps());
+                    } else {
+                        socket.getPoller().add(socket);
+                    }
                 } else {
                     recycledProcessors.offer(processor);
                 }
