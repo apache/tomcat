@@ -784,16 +784,31 @@ public final class CGIServlet extends HttpServlet {
          */
         protected void setupFromRequest(HttpServletRequest req)
                 throws UnsupportedEncodingException {
-            
-            this.contextPath = req.getContextPath();
-            this.servletPath = req.getServletPath();
-            this.pathInfo = req.getPathInfo();
+
+            boolean isIncluded = false;
+
+            // Look to see if this request is an include
+            if (req.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
+                isIncluded = true;
+            }
+            if (isIncluded) {
+                this.contextPath = (String) req.getAttribute(
+                        Globals.INCLUDE_CONTEXT_PATH_ATTR);
+                this.servletPath = (String) req.getAttribute(
+                        Globals.INCLUDE_SERVLET_PATH_ATTR);
+                this.pathInfo = (String) req.getAttribute(
+                        Globals.INCLUDE_PATH_INFO_ATTR);
+            } else {
+                this.contextPath = req.getContextPath();
+                this.servletPath = req.getServletPath();
+                this.pathInfo = req.getPathInfo();
+            }
             // If getPathInfo() returns null, must be using extension mapping
             // In this case, pathInfo should be same as servletPath
             if (this.pathInfo == null) {
                 this.pathInfo = this.servletPath;
             }
-            
+
             // If the request method is GET, POST or HEAD and the query string
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
@@ -801,7 +816,13 @@ public final class CGIServlet extends HttpServlet {
             if (req.getMethod().equals("GET")
                 || req.getMethod().equals("POST")
                 || req.getMethod().equals("HEAD")) {
-                String qs = req.getQueryString();
+                String qs;
+                if (isIncluded) {
+                    qs = (String) req.getAttribute(
+                            Globals.INCLUDE_QUERY_STRING_ATTR);
+                } else {
+                    qs = req.getQueryString();
+                }
                 if (qs != null && qs.indexOf("=") == -1) {
                     StringTokenizer qsTokens = new StringTokenizer(qs, "+");
                     while ( qsTokens.hasMoreTokens() ) {
