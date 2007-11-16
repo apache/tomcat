@@ -3309,9 +3309,7 @@ class Generator {
         charArrayBuffer = null;
         err = compiler.getErrorDispatcher();
         ctxt = compiler.getCompilationContext();
-        fragmentHelperClass = new FragmentHelperClass(ctxt
-                .getServletClassName()
-                + "Helper");
+        fragmentHelperClass = new FragmentHelperClass("Helper");
         pageInfo = compiler.getPageInfo();
 
         /*
