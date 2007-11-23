@@ -67,7 +67,49 @@ import org.xml.sax.SAXException;
 
 /**
  * Servlet which adds support for WebDAV level 2. All the basic HTTP requests
- * are handled by the DefaultServlet.
+ * are handled by the DefaultServlet. The WebDAVServlet must not be used as the
+ * default servlet (ie mapped to '/') as it will not work in this configuration.
+ * To enable WebDAV for a context add the following to web.xml:<br/><code>
+ * &lt;servlet&gt;<br/>
+ *  &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;<br/>
+ *  &lt;servlet-class&gt;org.apache.catalina.servlets.WebdavServlet&lt;/servlet-class&gt;<br/>
+ *    &lt;init-param&gt;<br/>
+ *      &lt;param-name&gt;debug&lt;/param-name&gt;<br/>
+ *      &lt;param-value&gt;0&lt;/param-value&gt;<br/>
+ *    &lt;/init-param&gt;<br/>
+ *    &lt;init-param&gt;<br/>
+ *      &lt;param-name&gt;listings&lt;/param-name&gt;<br/>
+ *      &lt;param-value&gt;true&lt;/param-value&gt;<br/>
+ *    &lt;/init-param&gt;<br/>
+ *  &lt;/servlet&gt;<br/>
+ *  &lt;servlet-mapping&gt;<br/>
+ *    &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;<br/>
+ *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;<br/>
+ *  &lt;/servlet-mapping&gt;
+ * </code>
+ * <p/>
+ * This will enable read only access. To enable read-write access add:<br/>
+ * <code>
+ *    &lt;init-param&gt;<br/>
+ *      &lt;param-name&gt;readonly&lt;/param-name&gt;<br/>
+ *      &lt;param-value&gt;false&lt;/param-value&gt;<br/>
+ *    &lt;/init-param&gt;<br/>
+ * </code>
+ * <p/>
+ * To make the content editable via a different URL, using the following
+ * mapping:<br/>
+ * <code>
+ *  &lt;servlet-mapping&gt;<br/>
+ *    &lt;servlet-name&gt;webdav&lt;/servlet-name&gt;<br/>
+ *    &lt;url-pattern&gt;/webdavedit/*&lt;/url-pattern&gt;<br/>
+ *  &lt;/servlet-mapping&gt;
+ * </code>
+ * <p/>
+ * Don't forget to secure access appropriately to the editing URLs. With this
+ * configuration the context will be accessible to normal users as before. Those
+ * users with the necessary access will be able to edit content available via
+ * http://host:port/context/content using
+ * http://host:port/context/webdavedit/content
  *
  * @author Remy Maucherat
  * @version $Revision$ $Date$
@@ -326,7 +368,6 @@ public class WebdavServlet
      * @param request The servlet request we are processing
      */
     protected String getRelativePath(HttpServletRequest request) {
-
         // Are we being processed by a RequestDispatcher.include()?
         if (request.getAttribute(Globals.INCLUDE_REQUEST_URI_ATTR) != null) {
             String result = (String) request.getAttribute(
