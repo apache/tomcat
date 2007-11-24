@@ -402,12 +402,20 @@ public class FormAuthenticator
 
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
+        boolean cachable = "GET".equalsIgnoreCase(saved.getMethod()) ||
+                           "HEAD".equalsIgnoreCase(saved.getMethod());
         Iterator names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = (String) names.next();
-            Iterator values = saved.getHeaderValues(name);
-            while (values.hasNext()) {
-                rmh.addValue(name).setString( (String)values.next() );
+            // The browser isn't expecting this conditional reposponse now.
+            // Assuming that it can quietly recover from an unexpected 412.
+            // BZ 43687
+            if(!("If-Modified-Since".equalsIgnoreCase(name) ||
+                 (cachable && "If-None-Match".equalsIgnoreCase(name)))) {
+                Iterator values = saved.getHeaderValues(name);
+                while (values.hasNext()) {
+                    rmh.addValue(name).setString( (String)values.next() );
+                }
             }
         }
         
