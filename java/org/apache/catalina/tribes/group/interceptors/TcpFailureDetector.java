@@ -15,6 +15,7 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -34,7 +35,6 @@ import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import org.apache.catalina.tribes.membership.Membership;
-import java.net.ConnectException;
 
 /**
  * <p>Title: A perfect failure detector </p>
@@ -317,7 +317,44 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         return false;
     }
 
+    public boolean getPerformConnectTest() {
+        return performConnectTest;
+    }
 
+    public long getReadTestTimeout() {
+        return readTestTimeout;
+    }
 
-    
+    public boolean getPerformSendTest() {
+        return performSendTest;
+    }
+
+    public boolean getPerformReadTest() {
+        return performReadTest;
+    }
+
+    public long getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setPerformConnectTest(boolean performConnectTest) {
+        this.performConnectTest = performConnectTest;
+    }
+
+    public void setPerformReadTest(boolean performReadTest) {
+        this.performReadTest = performReadTest;
+    }
+
+    public void setPerformSendTest(boolean performSendTest) {
+        this.performSendTest = performSendTest;
+    }
+
+    public void setReadTestTimeout(long readTestTimeout) {
+        this.readTestTimeout = readTestTimeout;
+    }
+
+    public void setConnectTimeout(long connectTimeout) {
+        this.connectTimeout = connectTimeout;
+    }
+
 }
