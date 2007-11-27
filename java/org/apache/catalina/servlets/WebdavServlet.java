@@ -1729,6 +1729,9 @@ public class WebdavServlet
 
         }
 
+        // Copy was successful
+        resp.setStatus(WebdavStatus.SC_CREATED);
+
         // Removing any lock-null resource which would be present at
         // the destination path
         lockNullResources.remove(destinationPath);
