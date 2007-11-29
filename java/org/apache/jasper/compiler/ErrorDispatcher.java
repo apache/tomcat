@@ -527,13 +527,26 @@ public class ErrorDispatcher {
         page.visit(errVisitor);
         Node errNode = errVisitor.getJspSourceNode();
         if ((errNode != null) && (errNode.getStart() != null)) {
-            javacError = new JavacErrorDetail(
-                    fname,
-                    lineNum,
-                    errNode.getStart().getFile(),
-                    errNode.getStart().getLineNumber(),
-                    errMsgBuf,
-                    ctxt);
+            // If this is a scriplet node then there is a one to one mapping
+            // between JSP lines and Java lines
+            if (errVisitor.getJspSourceNode() instanceof Node.Scriptlet) {
+                javacError = new JavacErrorDetail(
+                        fname,
+                        lineNum,
+                        errNode.getStart().getFile(),
+                        errNode.getStart().getLineNumber() + lineNum -
+                            errVisitor.getJspSourceNode().getBeginJavaLine(),
+                        errMsgBuf,
+                        ctxt);
+            } else {
+                javacError = new JavacErrorDetail(
+                        fname,
+                        lineNum,
+                        errNode.getStart().getFile(),
+                        errNode.getStart().getLineNumber(),
+                        errMsgBuf,
+                        ctxt);
+            }
         } else {
             /*
              * javac error line number cannot be mapped to JSP page
