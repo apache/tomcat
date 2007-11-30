@@ -623,8 +623,8 @@ public class Http11Protocol
             processor.setKeepAliveTimeout(proto.keepAliveTimeout);
             processor.setTimeout(proto.timeout);
             processor.setDisableUploadTimeout(proto.disableUploadTimeout);
-            processor.setCompression(proto.compression);
             processor.setCompressionMinSize(proto.compressionMinSize);
+            processor.setCompression(proto.compression);
             processor.setNoCompressionUserAgents(proto.noCompressionUserAgents);
             processor.setCompressableMimeTypes(proto.compressableMimeTypes);
             processor.setRestrictedUserAgents(proto.restrictedUserAgents);
