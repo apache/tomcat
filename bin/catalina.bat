@@ -83,7 +83,12 @@ goto end
 :okHome
 
 rem Get standard environment variables
+if "%CATALINA_BASE%" == "" goto gotSetenvHome
+if exist "%CATALINA_BASE%\bin\setenv.bat" call "%CATALINA_BASE%\bin\setenv.bat"
+goto gotSetenvBase
+:gotSetenvHome
 if exist "%CATALINA_HOME%\bin\setenv.bat" call "%CATALINA_HOME%\bin\setenv.bat"
+:gotSetenvBase
 
 rem Get standard Java environment variables
 if exist "%CATALINA_HOME%\bin\setclasspath.bat" goto okSetclasspath
