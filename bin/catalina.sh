@@ -99,7 +99,9 @@ PRGDIR=`dirname "$PRG"`
 # Only set CATALINA_HOME if not already set
 [ -z "$CATALINA_HOME" ] && CATALINA_HOME=`cd "$PRGDIR/.." ; pwd`
 
-if [ -r "$CATALINA_HOME"/bin/setenv.sh ]; then
+if [ -r "$CATALINA_BASE"/bin/setenv.sh ]; then
+  . "$CATALINA_BASE"/bin/setenv.sh
+elif [ -r "$CATALINA_HOME"/bin/setenv.sh ]; then
   . "$CATALINA_HOME"/bin/setenv.sh
 fi
 
