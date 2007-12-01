@@ -228,6 +228,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     path = "/" + basename;
                 }
 
+                if ((host.findChild(path) != null) && !isDeployed(path)) {
+                    message = sm.getString
+                        ("htmlManagerServlet.deployUploadInServerXml", war);
+                    break;
+                }
+
                 if (!isServiced(path)) {
                     addServiced(path);
                     try {
