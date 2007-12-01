@@ -106,6 +106,8 @@ When you use this "-Dcatalina.base=$CATALINA_BASE" argument, Tomcat will
 calculate all relative references for files in the following directories based
 on the value of $CATALINA_BASE instead of $CATALINA_HOME:
 
+* bin  - Only setenv.sh (*nix) and setenv.bat (windows)
+
 * conf - Server configuration files (including server.xml)
 
 * logs - Log and output files
