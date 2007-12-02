@@ -347,7 +347,7 @@
     <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
               file="webapps/docs/appdev/build.xml.txt"/>
   	
-  	<mkdir dir="${tomcat.build}/webapps/docs/funcspec" />
+  	<mkdir dir="${tomcat.build}/webapps/docs/funcspecs" />
   	
   	<!-- XSL processing -->
     <style basedir="webapps/docs"
@@ -372,7 +372,7 @@
              style="webapps/docs/tomcat-docs.xsl"
           excludes="project.xml"
           includes="*.xml">
-      <param name="relative-path" expression="../.."/>
+      <param name="relative-path" expression=".."/>
     </style>
     <style basedir="webapps/docs/config"
            destdir="${tomcat.build}/webapps/docs/config"
