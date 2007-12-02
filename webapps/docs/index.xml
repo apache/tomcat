@@ -177,7 +177,7 @@ the development of the <em>Apache Tomcat</em> project.</p>
 <li><a href="developers.html"><strong>Developers</strong></a> - List of active
     Apache Tomcat contributors.
     </li>
-<li><a href="catalina/funcspecs/index.html"><strong>Functional Specifications</strong></a>
+<li><a href="funcspecs/index.html"><strong>Functional Specifications</strong></a>
     - Requirements specifications for features of the <em>Catalina</em> servlet
     container portion of Apache Tomcat 6.</li>
 <li><a href="api/index.html"><strong>Javadocs</strong></a>
