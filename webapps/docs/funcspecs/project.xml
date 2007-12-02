@@ -27,7 +27,7 @@
     <body>
 
     <menu name="Links">
-        <item name="Docs Home"             href="../../index.html"/>
+        <item name="Docs Home"             href="../index.html"/>
         <item name="Functional Specs"      href="index.html"/>
     </menu>
 
