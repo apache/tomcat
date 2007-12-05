@@ -90,7 +90,7 @@
     <delete dir="${tomcat.build}/temp" />
     <delete dir="${tomcat.build}/work" />
 
-  	<mkdir dir="${tomcat.build}"/>
+    <mkdir dir="${tomcat.build}"/>
     <mkdir dir="${tomcat.build}/bin"/>
     <mkdir dir="${tomcat.build}/conf"/>
     <mkdir dir="${tomcat.build}/lib"/>
@@ -115,8 +115,8 @@
     </javac>
     <tstamp>
       <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
-      <format property="TSTAMP" pattern="hh:mm:ss"/>        
-    </tstamp>    
+      <format property="TSTAMP" pattern="hh:mm:ss"/>
+    </tstamp>
     <!-- Copy static resource files -->
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_NUMBER" value="${version.number}"/>
@@ -184,7 +184,7 @@
     </jar>
 
     <!-- Bootstrap JAR File -->
-    <jar jarfile="${bootstrap.jar}" 
+    <jar jarfile="${bootstrap.jar}"
         manifest="res/bootstrap.jar.manifest">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/startup/Bootstrap.class" />
@@ -233,7 +233,7 @@
         <exclude name="org/apache/naming/factory/webservices/**" />
       </fileset>
     </jar>
-    
+
     <!-- Catalina GroupCom/Tribes JAR File -->
     <jar jarfile="${catalina-tribes.jar}">
       <fileset dir="${tomcat.classes}">
@@ -341,15 +341,15 @@
       </fileset>
     </copy>
     <filter token="VERSION" value="${version}"/>
-    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES" 
+    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES"
           filtering="true" />
 
     <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
               file="webapps/docs/appdev/build.xml.txt"/>
-  	
-  	<mkdir dir="${tomcat.build}/webapps/docs/funcspecs" />
-  	
-  	<!-- XSL processing -->
+
+    <mkdir dir="${tomcat.build}/webapps/docs/funcspecs" />
+
+    <!-- XSL processing -->
     <style basedir="webapps/docs"
            destdir="${tomcat.build}/webapps/docs"
          extension=".html"
@@ -390,7 +390,7 @@
           includes="*.xml">
       <param name="relative-path" expression=".."/>
     </style>
-    
+
     <style basedir="webapps/docs/tribes"
                destdir="${tomcat.build}/webapps/docs/tribes"
              extension=".html"
@@ -399,72 +399,6 @@
               includes="*.xml">
           <param name="relative-path" expression=".."/>
     </style>
-
-  	<!-- Print friendly version -->
-  	<mkdir dir="${tomcat.build}/webapps/docs/printer" />
-    <copy todir="${tomcat.build}/webapps/docs/printer">
-      <fileset dir=".">
-        <include name="BUILDING.txt"/>
-        <include name="NOTICE"/>
-        <include name="RUNNING.txt"/>
-      </fileset>
-    </copy>
-  	<mkdir dir="${tomcat.build}/webapps/docs/appdev/printer" />
-    <copy todir="${tomcat.build}/webapps/docs/appdev/printer">
-        <fileset dir="webapps">
-          <include name="docs/appdev/*.txt"/>
-        </fileset>
-    </copy>
-  	<mkdir dir="${tomcat.build}/webapps/docs/funcspecs/printer" />
-    <mkdir dir="${tomcat.build}/webapps/docs/architecture/printer"/>
-    <mkdir dir="${tomcat.build}/webapps/docs/config/printer"/>
-
-  	<style basedir="webapps/docs"
-           destdir="${tomcat.build}/webapps/docs/printer"
-         extension=".html"
-             style="webapps/docs/tomcat-docs.xsl"
-          excludes="build.xml project.xml"
-          includes="*.xml">
-      <param name="relative-path" expression="./.."/>
-      <param name="project-menu" expression="nomenu"/>
-    </style>
-    <style basedir="webapps/docs/appdev"
-           destdir="${tomcat.build}/webapps/docs/appdev/printer"
-         extension=".html"
-             style="webapps/docs/tomcat-docs.xsl"
-          excludes="project.xml"
-          includes="*.xml">
-      <param name="relative-path" expression="../.."/>
-      <param name="project-menu" expression="nomenu"/>
-    </style>
-    <style basedir="webapps/docs/funcspecs"
-           destdir="${tomcat.build}/webapps/docs/funcspecs/printer"
-         extension=".html"
-             style="webapps/docs/tomcat-docs.xsl"
-          excludes="project.xml"
-          includes="*.xml">
-      <param name="relative-path" expression="../../.."/>
-      <param name="project-menu" expression="nomenu"/>
-    </style>
-    <style basedir="webapps/docs/config"
-           destdir="${tomcat.build}/webapps/docs/config/printer"
-         extension=".html"
-             style="webapps/docs/tomcat-docs.xsl"
-          excludes="project.xml"
-          includes="*.xml">
-      <param name="relative-path" expression="../.."/>
-      <param name="project-menu" expression="nomenu"/>
-    </style>
-    <style basedir="webapps/docs/architecture"
-           destdir="${tomcat.build}/webapps/docs/architecture/printer"
-         extension=".html"
-             style="webapps/docs/tomcat-docs.xsl"
-          excludes="project.xml"
-          includes="*.xml">
-      <param name="relative-path" expression="../.."/>
-      <param name="project-menu" expression="nomenu"/>
-    </style>
-
   </target>
 
   <target name="deploy" depends="build-only,build-docs">
@@ -475,14 +409,14 @@
     <copy todir="${tomcat.build}/bin" file="${commons-daemon.jar}" />
     <copy todir="${tomcat.build}/bin" file="${commons-daemon.jsvc.tar.gz}" />
 
-  	<!-- Copy scripts -->
+    <!-- Copy scripts -->
     <copy todir="${tomcat.build}/bin">
       <fileset dir="bin">
          <exclude name="**/*.launch"/>
       </fileset>
     </copy>
 
-  	<!-- Copy static resource files -->
+    <!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
       <fileset dir="conf">
         <include name="**/*.policy"/>
@@ -502,29 +436,29 @@
     </copy>
 
     <filter token="VERSION" value="${version}"/>
-    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES" 
+    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES"
           filtering="true" />
 
     <!-- Build classes for examples webapp -->
-    <javac   srcdir="webapps/examples/WEB-INF/classes" 
+    <javac   srcdir="webapps/examples/WEB-INF/classes"
              destdir="${tomcat.build}/webapps/examples/WEB-INF/classes"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
              optimize="${compile.optimize}"
-    	     classpath="${tomcat.classes}"
-             excludes="**/CVS/**,**/.svn/**">
-    </javac>
-  	
-    <javac   srcdir="webapps/examples/jsp/plugin/applet" 
-             destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
-             debug="${compile.debug}" deprecation="${compile.deprecation}"
-             optimize="${compile.optimize}"
-    	     classpath="$tomcat.lcasses}"
+             classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**">
     </javac>
 
-  	<!-- Add sources for examples -->
-	<taskdef    name="txt2html"
-		   classname="org.apache.tomcat.buildutil.Txt2Html"
+    <javac   srcdir="webapps/examples/jsp/plugin/applet"
+             destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
+             debug="${compile.debug}" deprecation="${compile.deprecation}"
+             optimize="${compile.optimize}"
+             classpath="$tomcat.lcasses}"
+             excludes="**/CVS/**,**/.svn/**">
+    </javac>
+
+    <!-- Add sources for examples -->
+    <taskdef    name="txt2html"
+           classname="org.apache.tomcat.buildutil.Txt2Html"
            classpath="${tomcat.classes}" />
     <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsp2/simpletag">
       <fileset dir="webapps/examples/WEB-INF/classes/jsp2/examples">
@@ -600,17 +534,17 @@
       </fileset>
     </txt2html>
 
-  	<copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
 
   </target>
-	
+
   <target name="clean-depend"
-	     description="Clean depend src components">
-	 <delete dir="${tomcat-dbcp.home}"/>    
-	 <delete dir="${jasper-jdt.home}"/>
+         description="Clean depend src components">
+     <delete dir="${tomcat-dbcp.home}"/>
+     <delete dir="${jasper-jdt.home}"/>
   </target>
-	
+
   <target name="clean">
     <delete dir="${tomcat.classes}" />
     <delete dir="${tomcat.build}" />
@@ -707,7 +641,7 @@
 
   <target name="build-tomcat-dbcp">
     <copy todir="${tomcat-dbcp.home}">
-    <!-- 
+    <!--
       <fileset dir="${commons-collections.home}" >
         <include name="**/collections/CursorableLinkedList.java" />
         <include name="**/collections/KeyValue.java" />
@@ -724,7 +658,7 @@
         <exclude name="**/test/**" />
       </fileset>
     </copy>
-  	<!--
+    <!--
     <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons">
       <replacefilter token="return UnmodifiableList.decorate(l);"
             value="return l;" />
