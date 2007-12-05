@@ -1143,6 +1143,10 @@
         <mime-type>x-world/x-vrml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>wspolicy</extension>
+        <mime-type>application/wspolicy+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>Z</extension>
         <mime-type>application/x-compress</mime-type>
     </mime-mapping>
