@@ -71,6 +71,10 @@
       <meta name="author" value="{$name}"/>
       <meta name="email" value="{$email}"/>
     </xsl:for-each>
+		<style type="text/css" media="print">
+			.noPrint {display: none;}
+			td#mainBody {width: 100%;}
+		</style>
     </head>
 
     <body bgcolor="{$body-bg}" text="{$body-fg}" link="{$body-link}"
@@ -126,47 +130,15 @@
 
       <tr>
 
-        <!-- Don't generate a menu if styling printer friendly docs -->
-        <xsl:if test="$project-menu = 'menu'">
-          <xsl:comment>LEFT SIDE NAVIGATION</xsl:comment>
-          <td width="20%" valign="top" nowrap="true">
-            <xsl:apply-templates select="project/body/menu"/>
-          </td>
-        </xsl:if>
+        <xsl:comment>LEFT SIDE NAVIGATION</xsl:comment>
+        <td width="20%" valign="top" nowrap="true" class="noPrint">
+          <xsl:apply-templates select="project/body/menu"/>
+        </td>
 
         <xsl:comment>RIGHT SIDE MAIN BODY</xsl:comment>
-        <td width="80%" valign="top" align="left">
-          <table border="0" width="100%" cellspacing="4">
-            <tr>
-              <td align="left" valign="top">
-                <h1><xsl:value-of select="project/title"/></h1>
-                <h2><xsl:value-of select="properties/title"/></h2>
-              </td>
-              <td align="right" valign="top" nowrap="true">
-                <!-- Add the printer friendly link for docs with a menu -->
-                <xsl:if test="$project-menu = 'menu'">
-                  <xsl:variable name="src">
-                    <xsl:value-of select="$relative-path"/><xsl:value-of select="$printer-logo"/>
-                  </xsl:variable>
-                  <xsl:variable name="url">
-                    <xsl:value-of select="/document/@url"/>
-                  </xsl:variable>
-                  <small>
-                    <a href="printer/{$url}">
-                      <img src="{$src}" border="0" alt="Printer Friendly Version"/>
-                      <br />print-friendly<br />version
-                    </a>
-                  </small>
-                </xsl:if>
-                <xsl:if test="$project-menu != 'menu'">
-                  <xsl:variable name="void">
-                    <xsl:value-of select="$relative-path"/><xsl:value-of select="$void-image"/>
-                    </xsl:variable>
-                  <img src="{$void}" width="1" height="1" vspace="0" hspace="0" border="0"/>
-                </xsl:if>
-              </td>
-            </tr>
-          </table>
+        <td width="80%" valign="top" align="left" id="mainBody">
+          <h1><xsl:value-of select="project/title"/></h1>
+          <h2><xsl:value-of select="properties/title"/></h2>
           <xsl:apply-templates select="body/section"/>
         </td>
 
