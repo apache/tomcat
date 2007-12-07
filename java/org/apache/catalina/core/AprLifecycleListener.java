@@ -205,17 +205,18 @@ public class AprLifecycleListener
              //only once per VM
             return;
         }
-        String methodName = "initialize";
+        String methodName = "randSet";
         Class paramTypes[] = new Class[1];
         paramTypes[0] = String.class;
         Object paramValues[] = new Object[1];
-        paramValues[0] = "on".equalsIgnoreCase(SSLEngine)?null:SSLEngine;
+        paramValues[0] = SSLRandomSeed;
         Class clazz = Class.forName("org.apache.tomcat.jni.SSL");
         Method method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
+        
 
-        methodName = "randLoad";
-        paramValues[0] = SSLRandomSeed;
+        methodName = "initialize";
+        paramValues[0] = "on".equalsIgnoreCase(SSLEngine)?null:SSLEngine;
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
  
