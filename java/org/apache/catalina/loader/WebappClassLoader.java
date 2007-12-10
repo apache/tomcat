@@ -167,6 +167,11 @@ public class WebappClassLoader
      */
     boolean antiJARLocking = false; 
     
+    /**
+     * Lock to prevent attempts to load duplicate classes from external
+     * repositories.
+     */
+    private Object lock = new Object();
 
     // ----------------------------------------------------------- Constructors
 
@@ -883,7 +888,9 @@ public class WebappClassLoader
             }
             if ((clazz == null) && hasExternalRepositories) {
                 try {
-                    clazz = super.findClass(name);
+                    synchronized (lock) {
+                        clazz = super.findClass(name);
+                    }
                 } catch(AccessControlException ace) {
                     throw new ClassNotFoundException(name, ace);
                 } catch (RuntimeException e) {
