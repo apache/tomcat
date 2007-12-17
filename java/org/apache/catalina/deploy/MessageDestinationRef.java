@@ -19,6 +19,8 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -31,7 +33,7 @@ import java.io.Serializable;
  * @since Tomcat 5.0
  */
 
-public class MessageDestinationRef implements Serializable {
+public class MessageDestinationRef implements Serializable, Injectable {
 
 
     // ------------------------------------------------------------- Properties
@@ -106,6 +108,16 @@ public class MessageDestinationRef implements Serializable {
         this.usage = usage;
     }
 
+    private List<InjectionTarget> injectionTargets = new ArrayList<InjectionTarget>();
+
+    public void addInjectionTarget(String injectionTargetName, String jndiName) {
+        InjectionTarget target = new InjectionTarget(injectionTargetName, jndiName);
+        injectionTargets.add(target);
+    }
+
+    public List<InjectionTarget> getInjectionTargets() {
+        return injectionTargets;
+    }
 
     // --------------------------------------------------------- Public Methods
 
