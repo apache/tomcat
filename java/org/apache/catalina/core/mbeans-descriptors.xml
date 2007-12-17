@@ -41,9 +41,9 @@
                is="true"
                type="boolean"/>
       
-     <attribute name="annotationProcessor"
-                description="Object that processes things like injection annotations"
-                type="org.apache.AnnotationProcessor" />
+    <attribute name="instanceManager"
+                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
+                type="org.apache.catalina.instanceManagement.InstanceManager" />
 
     <attribute name="antiJARLocking"
                description="Take care to not lock jar files"

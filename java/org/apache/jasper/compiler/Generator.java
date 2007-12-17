@@ -48,20 +48,20 @@ import org.xml.sax.Attributes;
 
 /**
  * Generate Java source from Nodes
- * 
+ *
  * @author Anil K. Vijendran
  * @author Danno Ferrin
  * @author Mandar Raje
  * @author Rajiv Mordani
  * @author Pierre Delisle
- * 
+ *
  * Tomcat 4.1.x and Tomcat 5:
  * @author Kin-man Chung
  * @author Jan Luehe
  * @author Shawn Bayern
  * @author Mark Roth
  * @author Denis Benoit
- * 
+ *
  * Tomcat 6.x
  * @author Jacob Hookom
  * @author Remy Maucherat
@@ -71,10 +71,10 @@ class Generator {
 
     private static final Class[] OBJECT_CLASS = { Object.class };
 
-    private static final String VAR_EXPRESSIONFACTORY = 
+    private static final String VAR_EXPRESSIONFACTORY =
         System.getProperty("org.apache.jasper.compiler.Generator.VAR_EXPRESSIONFACTORY", "_el_expressionfactory");
-    private static final String VAR_ANNOTATIONPROCESSOR = 
-        System.getProperty("org.apache.jasper.compiler.Generator.VAR_ANNOTATIONPROCESSOR", "_jsp_annotationprocessor");
+    private static final String VAR_INSTANCEMANAGER =
+        System.getProperty("org.apache.jasper.compiler.Generator.VAR_INSTANCEMANAGER", "_jsp_instancemanager");
 
     private ServletWriter out;
 
@@ -186,7 +186,7 @@ class Generator {
             /*
              * Generates getServletInfo() method that returns the value of the
              * page directive's 'info' attribute, if present.
-             * 
+             *
              * The Validator has already ensured that if the translation unit
              * contains more than one page directive with an 'info' attribute,
              * their values match.
@@ -251,7 +251,7 @@ class Generator {
 
             /*
              * Constructor
-             * 
+             *
              * @param v Vector of tag handler pool names to populate
              */
             TagHandlerPoolVisitor(Vector v) {
@@ -280,7 +280,7 @@ class Generator {
             /*
              * Creates the name of the tag handler pool whose tag handlers may
              * be (re)used to service this action.
-             * 
+             *
              * @return The name of the tag handler pool
              */
             private String createTagHandlerPoolName(String prefix,
@@ -376,7 +376,7 @@ class Generator {
      * Generates the _jspInit() method for instantiating the tag handler pools.
      * For tag file, _jspInit has to be invoked manually, and the ServletConfig
      * object explicitly passed.
-     * 
+     *
      * In JSP 2.1, we also instantiate an ExpressionFactory
      */
     private void generateInit() {
@@ -400,7 +400,7 @@ class Generator {
                 out.println(");");
             }
         }
-        
+
         out.printin(VAR_EXPRESSIONFACTORY);
         out.print(" = _jspxFactory.getJspApplicationContext(");
         if (ctxt.isTagFile()) {
@@ -410,14 +410,14 @@ class Generator {
         }
         out.println(".getServletContext()).getExpressionFactory();");
 
-        out.printin(VAR_ANNOTATIONPROCESSOR);
-        out.print(" = (org.apache.AnnotationProcessor) ");
+        out.printin(VAR_INSTANCEMANAGER);
+        out.print(" = org.apache.jasper.runtime.InstanceManagerFactory.getInstanceManager(");
         if (ctxt.isTagFile()) {
             out.print("config");
         } else {
             out.print("getServletConfig()");
         }
-        out.println(".getServletContext().getAttribute(org.apache.AnnotationProcessor.class.getName());");
+        out.println(");");
 
         out.popIndent();
         out.printil("}");
@@ -432,14 +432,14 @@ class Generator {
 
         out.printil("public void _jspDestroy() {");
         out.pushIndent();
-        
+
         if (isPoolingEnabled) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
                                 out.printin((String) tagHandlerPoolNames.elementAt(i));
                                 out.println(".release();");
             }
         }
-        
+
         out.popIndent();
         out.printil("}");
         out.println();
@@ -506,7 +506,7 @@ class Generator {
      * Declare tag handler pools (tags of the same type and with the same
      * attribute set share the same tag handler pool) (shared by servlet and tag
      * handler preamble generation)
-     * 
+     *
      * In JSP 2.1, we also scope an instance of ExpressionFactory
      */
     private void genPreambleClassVariableDeclarations(String className)
@@ -521,8 +521,8 @@ class Generator {
         out.printin("private javax.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
         out.println(";");
-        out.printin("private org.apache.AnnotationProcessor ");
-        out.print(VAR_ANNOTATIONPROCESSOR);
+        out.printin("private org.apache.InstanceManager ");
+        out.print(VAR_INSTANCEMANAGER);
         out.println(";");
         out.println();
     }
@@ -539,7 +539,7 @@ class Generator {
         out.popIndent();
         out.printil("}");
         out.println();
-        
+
         generateInit();
         generateDestroy();
     }
@@ -781,7 +781,7 @@ class Generator {
          * interpreter. If the result is a Named Attribute we insert the
          * generated variable name. Otherwise the result is a string literal,
          * quoted and escaped.
-         * 
+         *
          * @param attr
          *            An JspAttribute object
          * @param encode
@@ -829,7 +829,7 @@ class Generator {
         /**
          * Prints the attribute value specified in the param action, in the form
          * of name=value string.
-         * 
+         *
          * @param n
          *            the parent node for the param action nodes.
          */
@@ -2142,11 +2142,11 @@ class Generator {
 
             String tagHandlerClassName = JspUtil
                     .getCanonicalName(tagHandlerClass);
-            out.printin(tagHandlerClassName);
-            out.print(" ");
-            out.print(tagHandlerVar);
-            out.print(" = ");
             if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
+                out.printin(tagHandlerClassName);
+                out.print(" ");
+                out.print(tagHandlerVar);
+                out.print(" = ");
                 out.print("(");
                 out.print(tagHandlerClassName);
                 out.print(") ");
@@ -2155,14 +2155,7 @@ class Generator {
                 out.print(tagHandlerClassName);
                 out.println(".class);");
             } else {
-                out.print("new ");
-                out.print(tagHandlerClassName);
-                out.println("();");
-                out.printin("org.apache.jasper.runtime.AnnotationHelper.postConstruct(");
-                out.print(VAR_ANNOTATIONPROCESSOR);
-                out.print(", ");
-                out.print(tagHandlerVar);
-                out.println(");");
+                writeNewInstance(tagHandlerVar, tagHandlerClassName);
             }
 
             // includes setting the context
@@ -2220,8 +2213,7 @@ class Generator {
                         out.println("[0]++;");
                     }
                     out.printin(tagHandlerVar);
-                    out
-                            .println(".setBodyContent((javax.servlet.jsp.tagext.BodyContent) out);");
+                    out.println(".setBodyContent((javax.servlet.jsp.tagext.BodyContent) out);");
                     out.printin(tagHandlerVar);
                     out.println(".doInitBody();");
 
@@ -2245,6 +2237,40 @@ class Generator {
             // Map the Java lines that handles start of custom tags to the
             // JSP line for this tag
             n.setEndJavaLine(out.getJavaLine());
+        }
+
+        private void writeNewInstance(String tagHandlerVar, String tagHandlerClassName) {
+        	if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
+        		out.printin(tagHandlerClassName);
+        		out.print(" ");
+        		out.print(tagHandlerVar);
+        		out.print(" = (");
+        		out.print(tagHandlerClassName);
+        		out.print(")");
+        		out.print(VAR_INSTANCEMANAGER);
+        		out.print(".newInstance(\"");
+        		out.print(tagHandlerClassName);
+        		out.println("\", this.getClass().getClassLoader());");
+        	} else {
+        		out.printin(tagHandlerClassName);
+        		out.print(" ");
+        		out.print(tagHandlerVar);
+        		out.print(" = (");
+        		out.print("new ");
+        		out.print(tagHandlerClassName);
+        		out.println("());");
+        		out.printin(VAR_INSTANCEMANAGER);
+        		out.print(".newInstance(");
+        		out.print(tagHandlerVar);
+        		out.println(");");
+        	}
+        }
+
+        private void writeDestroyInstance(String tagHandlerVar) {
+            out.printin(VAR_INSTANCEMANAGER);
+            out.print(".destroyInstance(");
+            out.print(tagHandlerVar);
+            out.println(");");
         }
 
         private void generateCustomEnd(Node.CustomTag n, String tagHandlerVar,
@@ -2308,11 +2334,7 @@ class Generator {
                 } else {
                     out.printin(tagHandlerVar);
                     out.println(".release();");
-                    out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
-                    out.print(VAR_ANNOTATIONPROCESSOR);
-                    out.print(", ");
-                    out.print(tagHandlerVar);
-                    out.println(");");
+                    writeDestroyInstance(tagHandlerVar);
                 }
             }
             if (isTagFile || isFragment) {
@@ -2355,11 +2377,7 @@ class Generator {
             } else {
                 out.printin(tagHandlerVar);
                 out.println(".release();");
-                out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
-                out.print(VAR_ANNOTATIONPROCESSOR);
-                out.print(", ");
-                out.print(tagHandlerVar);
-                out.println(");");
+                writeDestroyInstance(tagHandlerVar);
             }
 
             if (n.implementsTryCatchFinally()) {
@@ -2391,21 +2409,8 @@ class Generator {
 
             String tagHandlerClassName = JspUtil
                     .getCanonicalName(tagHandlerClass);
-            out.printin(tagHandlerClassName);
-            out.print(" ");
-            out.print(tagHandlerVar);
-            out.print(" = ");
-            out.print("new ");
-            out.print(tagHandlerClassName);
-            out.println("();");
+            writeNewInstance(tagHandlerVar, tagHandlerClassName);
 
-            // Resource injection
-            out.printin("org.apache.jasper.runtime.AnnotationHelper.postConstruct(");
-            out.print(VAR_ANNOTATIONPROCESSOR);
-            out.print(", ");
-            out.print(tagHandlerVar);
-            out.println(");");
-            
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
             // JspIdConsumer (after context has been set)
@@ -2458,11 +2463,7 @@ class Generator {
             syncScriptingVars(n, VariableInfo.AT_END);
 
             // Resource injection
-            out.printin("org.apache.jasper.runtime.AnnotationHelper.preDestroy(");
-            out.print(VAR_ANNOTATIONPROCESSOR);
-            out.print(", ");
-            out.print(tagHandlerVar);
-            out.println(");");
+            writeDestroyInstance(tagHandlerVar);
 
             n.setEndJavaLine(out.getJavaLine());
         }
@@ -2504,7 +2505,7 @@ class Generator {
 
         /*
          * This method is called as part of the custom tag's start element.
-         * 
+         *
          * If the given custom tag has a custom nesting level greater than 0,
          * save the current values of its scripting variables to temporary
          * variables, so those values may be restored in the tag's end element.
@@ -2566,7 +2567,7 @@ class Generator {
 
         /*
          * This method is called as part of the custom tag's end element.
-         * 
+         *
          * If the given custom tag has a custom nesting level greater than 0,
          * restore its scripting variables to their original values that were
          * saved in the tag's start element.
@@ -2771,14 +2772,14 @@ class Generator {
 
                 // reset buffer
                 sb.setLength(0);
-                
+
                 // create our mark
                 sb.append(n.getStart().toString());
                 sb.append(" '");
                 sb.append(attrValue);
-                sb.append('\'');                
+                sb.append('\'');
                 String mark = sb.toString();
-                
+
                 // reset buffer
                 sb.setLength(0);
 
@@ -2865,7 +2866,7 @@ class Generator {
 
         /**
          * Generate code to create a map for the alias variables
-         * 
+         *
          * @return the name of the map
          */
         private String generateAliasMap(Node.CustomTag n, String tagHandlerVar)
@@ -2964,7 +2965,7 @@ class Generator {
             for (int i = 0; attrs != null && i < attrs.length; i++) {
                 String attrValue = evaluateAttribute(handlerInfo, attrs[i], n,
                         tagHandlerVar);
-                
+
                 Mark m = n.getStart();
                 out.printil("// "+m.getFile()+"("+m.getLineNumber()+","+m.getColumnNumber()+") "+ attrs[i].getTagAttributeInfo());
                 if (attrs[i].isDynamic()) {
@@ -3129,7 +3130,7 @@ class Generator {
         /**
          * Generate the code required to obtain the runtime value of the given
          * named attribute.
-         * 
+         *
          * @return The name of the temporary variable the result is stored in.
          */
         public String generateNamedAttributeValue(Node.NamedAttribute n)
@@ -3180,7 +3181,7 @@ class Generator {
         /**
          * Similar to generateNamedAttributeValue, but create a JspFragment
          * instead.
-         * 
+         *
          * @param n
          *            The parent node of the named attribute
          * @param tagHandlerVar
@@ -3335,7 +3336,7 @@ class Generator {
 
     /**
      * The main entry for Generator.
-     * 
+     *
      * @param out
      *            The servlet output writer
      * @param compiler
@@ -3452,7 +3453,7 @@ class Generator {
          * share the code generator with JSPs.
          */
         out.printil("PageContext _jspx_page_context = (PageContext)jspContext;");
-        
+
         // Declare implicit objects.
         out.printil("HttpServletRequest request = "
                 + "(HttpServletRequest) _jspx_page_context.getRequest();");
@@ -3463,10 +3464,10 @@ class Generator {
         out.printil("ServletConfig config = _jspx_page_context.getServletConfig();");
         out.printil("JspWriter out = jspContext.getOut();");
         out.printil("_jspInit(config);");
-        
+
         // set current JspContext on ELContext
         out.printil("jspContext.getELContext().putContext(JspContext.class,jspContext);");
-        
+
         generatePageScopedVariables(tagInfo);
 
         declareTemporaryScriptingVars(tag);
@@ -3495,7 +3496,7 @@ class Generator {
         out.popIndent();
         out.printil("} finally {");
         out.pushIndent();
-        
+
         // handle restoring VariableMapper
         TagAttributeInfo[] attrInfos = tagInfo.getAttributes();
         for (int i = 0; i < attrInfos.length; i++) {
@@ -3507,10 +3508,10 @@ class Generator {
                 out.println(");");
             }
         }
-        
+
         // restore nested JspContext on ELContext
         out.printil("jspContext.getELContext().putContext(JspContext.class,super.getJspContext());");
-        
+
         out.printil("((org.apache.jasper.runtime.JspContextWrapper) jspContext).syncEndTagFile();");
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
             out.printil("_jspDestroy();");
@@ -3725,17 +3726,17 @@ class Generator {
         boolean variableMapperVar = false;
         for (int i = 0; i < attrInfos.length; i++) {
             String attrName = attrInfos[i].getName();
-            
+
             // handle assigning deferred vars to VariableMapper, storing
             // previous values under '_el_ve[i]' for later re-assignment
             if (attrInfos[i].isDeferredValue() || attrInfos[i].isDeferredMethod()) {
-                
+
                 // we need to scope the modified VariableMapper for consistency and performance
                 if (!variableMapperVar) {
                     out.printil("javax.el.VariableMapper _el_variablemapper = jspContext.getELContext().getVariableMapper();");
                     variableMapperVar = true;
                 }
-                
+
                 out.printin("javax.el.ValueExpression _el_ve");
                 out.print(i);
                 out.print(" = _el_variablemapper.setVariable(");
@@ -3801,7 +3802,7 @@ class Generator {
 
         /**
          * Constructor.
-         * 
+         *
          * @param n
          *            The custom tag whose tag handler class is to be
          *            introspected
