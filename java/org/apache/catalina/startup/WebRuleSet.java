@@ -27,7 +27,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ContextHandler;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.SecurityConstraint;
-import org.apache.catalina.deploy.SecurityRoleRef;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.CallMethodRule;
 import org.apache.tomcat.util.digester.CallParamRule;
@@ -139,58 +138,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addRule(prefix + "web-app/distributable",
                          new SetDistributableRule());
 
-        digester.addObjectCreate(prefix + "web-app/ejb-local-ref",
-                                 "org.apache.catalina.deploy.ContextLocalEjb");
-        digester.addRule(prefix + "web-app/ejb-local-ref",
-                new SetNextNamingRule("addLocalEjb",
-                            "org.apache.catalina.deploy.ContextLocalEjb"));
-
-        digester.addCallMethod(prefix + "web-app/ejb-local-ref/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-link",
-                               "setLink", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-ref-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-ref-type",
-                               "setType", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-local-ref/local",
-                               "setLocal", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-local-ref/local-home",
-                               "setHome", 0);
-
-        digester.addObjectCreate(prefix + "web-app/ejb-ref",
-                                 "org.apache.catalina.deploy.ContextEjb");
-        digester.addRule(prefix + "web-app/ejb-ref",
-                new SetNextNamingRule("addEjb",
-                            "org.apache.catalina.deploy.ContextEjb"));
-
-        digester.addCallMethod(prefix + "web-app/ejb-ref/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-link",
-                               "setLink", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-ref-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-ref-type",
-                               "setType", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-ref/home",
-                               "setHome", 0);
-        digester.addCallMethod(prefix + "web-app/ejb-ref/remote",
-                               "setRemote", 0);
-
-        digester.addObjectCreate(prefix + "web-app/env-entry",
-                                 "org.apache.catalina.deploy.ContextEnvironment");
-        digester.addRule(prefix + "web-app/env-entry",
-                new SetNextNamingRule("addEnvironment",
-                            "org.apache.catalina.deploy.ContextEnvironment"));
-
-        digester.addCallMethod(prefix + "web-app/env-entry/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/env-entry/env-entry-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/env-entry/env-entry-type",
-                               "setType", 0);
-        digester.addCallMethod(prefix + "web-app/env-entry/env-entry-value",
-                               "setValue", 0);
+        configureNamingRules(digester);
 
         digester.addObjectCreate(prefix + "web-app/error-page",
                                  "org.apache.catalina.deploy.ErrorPage");
@@ -282,67 +230,6 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallParam(prefix + "web-app/mime-mapping/extension", 0);
         digester.addCallParam(prefix + "web-app/mime-mapping/mime-type", 1);
 
-        digester.addObjectCreate(prefix + "web-app/resource-env-ref",
-            "org.apache.catalina.deploy.ContextResourceEnvRef");
-        digester.addRule(prefix + "web-app/resource-env-ref",
-                    new SetNextNamingRule("addResourceEnvRef",
-                        "org.apache.catalina.deploy.ContextResourceEnvRef"));
-
-        digester.addCallMethod(prefix + "web-app/resource-env-ref/resource-env-ref-name",
-                "setName", 0);
-        digester.addCallMethod(prefix + "web-app/resource-env-ref/resource-env-ref-type",
-                "setType", 0);
-
-        digester.addObjectCreate(prefix + "web-app/message-destination",
-                                 "org.apache.catalina.deploy.MessageDestination");
-        digester.addSetNext(prefix + "web-app/message-destination",
-                            "addMessageDestination",
-                            "org.apache.catalina.deploy.MessageDestination");
-
-        digester.addCallMethod(prefix + "web-app/message-destination/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination/display-name",
-                               "setDisplayName", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination/icon/large-icon",
-                               "setLargeIcon", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination/icon/small-icon",
-                               "setSmallIcon", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination/message-destination-name",
-                               "setName", 0);
-
-        digester.addObjectCreate(prefix + "web-app/message-destination-ref",
-                                 "org.apache.catalina.deploy.MessageDestinationRef");
-        digester.addSetNext(prefix + "web-app/message-destination-ref",
-                            "addMessageDestinationRef",
-                            "org.apache.catalina.deploy.MessageDestinationRef");
-
-        digester.addCallMethod(prefix + "web-app/message-destination-ref/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-link",
-                               "setLink", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-ref-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-type",
-                               "setType", 0);
-        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-usage",
-                               "setUsage", 0);
-
-        digester.addObjectCreate(prefix + "web-app/resource-ref",
-                                 "org.apache.catalina.deploy.ContextResource");
-        digester.addRule(prefix + "web-app/resource-ref",
-                new SetNextNamingRule("addResource",
-                            "org.apache.catalina.deploy.ContextResource"));
-
-        digester.addCallMethod(prefix + "web-app/resource-ref/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/resource-ref/res-auth",
-                               "setAuth", 0);
-        digester.addCallMethod(prefix + "web-app/resource-ref/res-ref-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/resource-ref/res-sharing-scope",
-                               "setScope", 0);
-        digester.addCallMethod(prefix + "web-app/resource-ref/res-type",
-                               "setType", 0);
 
         digester.addObjectCreate(prefix + "web-app/security-constraint",
                                  "org.apache.catalina.deploy.SecurityConstraint");
@@ -374,58 +261,6 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "web-app/security-role/role-name",
                                "addSecurityRole", 0);
 
-        digester.addObjectCreate(prefix + "web-app/service-ref",
-                                 "org.apache.catalina.deploy.ContextService");
-        digester.addRule(prefix + "web-app/service-ref",
-                         new SetNextNamingRule("addService",
-                         "org.apache.catalina.deploy.ContextService"));
-
-        digester.addCallMethod(prefix + "web-app/service-ref/description",
-                               "setDescription", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/display-name",
-                               "setDisplayname", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/icon",
-                               "setIcon", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/service-ref-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/service-interface",
-                               "setType", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/wsdl-file",
-                               "setWsdlfile", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/jaxrpc-mapping-file",
-                               "setJaxrpcmappingfile", 0);
-        digester.addRule(prefix + "web-app/service-ref/service-qname", new ServiceQnameRule());
-
-        digester.addRule(prefix + "web-app/service-ref/port-component-ref",
-                               new CallMethodMultiRule("addPortcomponent", 2, 1));
-        digester.addCallParam(prefix + "web-app/service-ref/port-component-ref/service-endpoint-interface", 0);
-        digester.addRule(prefix + "web-app/service-ref/port-component-ref/port-component-link", new CallParamMultiRule(1));
-
-        digester.addObjectCreate(prefix + "web-app/service-ref/handler",
-                                 "org.apache.catalina.deploy.ContextHandler");
-        digester.addRule(prefix + "web-app/service-ref/handler",
-                         new SetNextRule("addHandler",
-                         "org.apache.catalina.deploy.ContextHandler"));
-        
-        digester.addCallMethod(prefix + "web-app/service-ref/handler/handler-name",
-                               "setName", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/handler/handler-class",
-                               "setHandlerclass", 0);
-
-        digester.addCallMethod(prefix + "web-app/service-ref/handler/init-param",
-                               "setProperty", 2);
-        digester.addCallParam(prefix + "web-app/service-ref/handler/init-param/param-name",
-                              0);
-        digester.addCallParam(prefix + "web-app/service-ref/handler/init-param/param-value",
-                              1);
-
-        digester.addRule(prefix + "web-app/service-ref/handler/soap-header", new SoapHeaderRule());
-
-        digester.addCallMethod(prefix + "web-app/service-ref/handler/soap-role",
-                               "addSoapRole", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/handler/port-name",
-                               "addPortName", 0);
-        
         digester.addRule(prefix + "web-app/servlet",
                          new WrapperCreateRule());
         digester.addSetNext(prefix + "web-app/servlet",
@@ -446,14 +281,10 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "web-app/servlet/run-as/role-name",
                                "setRunAs", 0);
 
-        digester.addRule(prefix + "web-app/servlet/security-role-ref",
-                new SecurityRoleRefCreateRule());
-        digester.addCallMethod(
-                prefix + "web-app/servlet/security-role-ref/role-link",
-                "setLink", 0);
-        digester.addCallMethod(
-                prefix + "web-app/servlet/security-role-ref/role-name",
-                "setName", 0);
+        digester.addCallMethod(prefix + "web-app/servlet/security-role-ref",
+                               "addSecurityReference", 2);
+        digester.addCallParam(prefix + "web-app/servlet/security-role-ref/role-link", 1);
+        digester.addCallParam(prefix + "web-app/servlet/security-role-ref/role-name", 0);
 
         digester.addCallMethod(prefix + "web-app/servlet/servlet-class",
                               "setServletClass", 0);
@@ -487,6 +318,202 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallParam(prefix + "web-app/locale-encoding-mapping-list/locale-encoding-mapping/encoding", 1);
 
     }
+
+    protected void configureNamingRules(Digester digester) {
+        //ejb-local-ref
+        digester.addObjectCreate(prefix + "web-app/ejb-local-ref",
+                                 "org.apache.catalina.deploy.ContextLocalEjb");
+        digester.addRule(prefix + "web-app/ejb-local-ref",
+                new SetNextNamingRule("addLocalEjb",
+                            "org.apache.catalina.deploy.ContextLocalEjb"));
+
+        digester.addCallMethod(prefix + "web-app/ejb-local-ref/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-link",
+                               "setLink", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-ref-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-ref-type",
+                               "setType", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-local-ref/local",
+                               "setLocal", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-local-ref/local-home",
+                               "setHome", 0);
+        configureInjectionRules(digester, "web-app/ejb-local-ref/");
+
+        //ejb-ref
+        digester.addObjectCreate(prefix + "web-app/ejb-ref",
+                                 "org.apache.catalina.deploy.ContextEjb");
+        digester.addRule(prefix + "web-app/ejb-ref",
+                new SetNextNamingRule("addEjb",
+                            "org.apache.catalina.deploy.ContextEjb"));
+
+        digester.addCallMethod(prefix + "web-app/ejb-ref/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-link",
+                               "setLink", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-ref-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-ref-type",
+                               "setType", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-ref/home",
+                               "setHome", 0);
+        digester.addCallMethod(prefix + "web-app/ejb-ref/remote",
+                               "setRemote", 0);
+        configureInjectionRules(digester, "web-app/ejb-ref/");
+
+        //env-entry
+        digester.addObjectCreate(prefix + "web-app/env-entry",
+                                 "org.apache.catalina.deploy.ContextEnvironment");
+        digester.addRule(prefix + "web-app/env-entry",
+                new SetNextNamingRule("addEnvironment",
+                            "org.apache.catalina.deploy.ContextEnvironment"));
+
+        digester.addCallMethod(prefix + "web-app/env-entry/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/env-entry/env-entry-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/env-entry/env-entry-type",
+                               "setType", 0);
+        digester.addCallMethod(prefix + "web-app/env-entry/env-entry-value",
+                               "setValue", 0);
+        configureInjectionRules(digester, "web-app/env-entry/");
+
+        //resource-env-ref
+        digester.addObjectCreate(prefix + "web-app/resource-env-ref",
+            "org.apache.catalina.deploy.ContextResourceEnvRef");
+        digester.addRule(prefix + "web-app/resource-env-ref",
+                    new SetNextNamingRule("addResourceEnvRef",
+                        "org.apache.catalina.deploy.ContextResourceEnvRef"));
+
+        digester.addCallMethod(prefix + "web-app/resource-env-ref/resource-env-ref-name",
+                "setName", 0);
+        digester.addCallMethod(prefix + "web-app/resource-env-ref/resource-env-ref-type",
+                "setType", 0);
+        configureInjectionRules(digester, "web-app/ejb-local-ref/");
+
+        //message-destination
+        digester.addObjectCreate(prefix + "web-app/message-destination",
+                                 "org.apache.catalina.deploy.MessageDestination");
+        digester.addSetNext(prefix + "web-app/message-destination",
+                            "addMessageDestination",
+                            "org.apache.catalina.deploy.MessageDestination");
+
+        digester.addCallMethod(prefix + "web-app/message-destination/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination/display-name",
+                               "setDisplayName", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination/icon/large-icon",
+                               "setLargeIcon", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination/icon/small-icon",
+                               "setSmallIcon", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination/message-destination-name",
+                               "setName", 0);
+
+        //message-destination-ref
+        digester.addObjectCreate(prefix + "web-app/message-destination-ref",
+                                 "org.apache.catalina.deploy.MessageDestinationRef");
+        digester.addSetNext(prefix + "web-app/message-destination-ref",
+                            "addMessageDestinationRef",
+                            "org.apache.catalina.deploy.MessageDestinationRef");
+
+        digester.addCallMethod(prefix + "web-app/message-destination-ref/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-link",
+                               "setLink", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-ref-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-type",
+                               "setType", 0);
+        digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-usage",
+                               "setUsage", 0);
+
+        configureInjectionRules(digester, "web-app/message-destination-ref/");
+
+        //resource-ref
+        digester.addObjectCreate(prefix + "web-app/resource-ref",
+                                 "org.apache.catalina.deploy.ContextResource");
+        digester.addRule(prefix + "web-app/resource-ref",
+                new SetNextNamingRule("addResource",
+                            "org.apache.catalina.deploy.ContextResource"));
+
+        digester.addCallMethod(prefix + "web-app/resource-ref/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/resource-ref/res-auth",
+                               "setAuth", 0);
+        digester.addCallMethod(prefix + "web-app/resource-ref/res-ref-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/resource-ref/res-sharing-scope",
+                               "setScope", 0);
+        digester.addCallMethod(prefix + "web-app/resource-ref/res-type",
+                               "setType", 0);
+        configureInjectionRules(digester, "web-app/resource-ref/");
+
+        //service-ref
+        digester.addObjectCreate(prefix + "web-app/service-ref",
+                                 "org.apache.catalina.deploy.ContextService");
+        digester.addRule(prefix + "web-app/service-ref",
+                         new SetNextNamingRule("addService",
+                         "org.apache.catalina.deploy.ContextService"));
+
+        digester.addCallMethod(prefix + "web-app/service-ref/description",
+                               "setDescription", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/display-name",
+                               "setDisplayname", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/icon",
+                               "setIcon", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-ref-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/service-interface",
+                               "setType", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/wsdl-file",
+                               "setWsdlfile", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/jaxrpc-mapping-file",
+                               "setJaxrpcmappingfile", 0);
+        digester.addRule(prefix + "web-app/service-ref/service-qname", new ServiceQnameRule());
+
+        digester.addRule(prefix + "web-app/service-ref/port-component-ref",
+                               new CallMethodMultiRule("addPortcomponent", 2, 1));
+        digester.addCallParam(prefix + "web-app/service-ref/port-component-ref/service-endpoint-interface", 0);
+        digester.addRule(prefix + "web-app/service-ref/port-component-ref/port-component-link", new CallParamMultiRule(1));
+
+        digester.addObjectCreate(prefix + "web-app/service-ref/handler",
+                                 "org.apache.catalina.deploy.ContextHandler");
+        digester.addRule(prefix + "web-app/service-ref/handler",
+                         new SetNextRule("addHandler",
+                         "org.apache.catalina.deploy.ContextHandler"));
+
+        digester.addCallMethod(prefix + "web-app/service-ref/handler/handler-name",
+                               "setName", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/handler/handler-class",
+                               "setHandlerclass", 0);
+
+        digester.addCallMethod(prefix + "web-app/service-ref/handler/init-param",
+                               "setProperty", 2);
+        digester.addCallParam(prefix + "web-app/service-ref/handler/init-param/param-name",
+                              0);
+        digester.addCallParam(prefix + "web-app/service-ref/handler/init-param/param-value",
+                              1);
+
+        digester.addRule(prefix + "web-app/service-ref/handler/soap-header", new SoapHeaderRule());
+
+        digester.addCallMethod(prefix + "web-app/service-ref/handler/soap-role",
+                               "addSoapRole", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/handler/port-name",
+                               "addPortName", 0);
+        configureInjectionRules(digester, "web-app/service-ref/");
+
+
+    }
+
+    protected void configureInjectionRules(Digester digester, String base) {
+
+        digester.addCallMethod(prefix + base + "injection-target", "addInjectionTarget", 2);
+        digester.addCallParam(prefix + base + "injection-target/injection-target-class", 0);
+        digester.addCallParam(prefix + base + "injection-target/injection-target-name", 1);
+
+    }
+
 
     /**
      * Reset counter used for validating the web.xml file.
@@ -628,6 +655,7 @@ final class SetPublicIdRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
+        Context context = (Context) digester.peek(digester.getCount() - 1);
         Object top = digester.peek();
         Class paramClasses[] = new Class[1];
         paramClasses[0] = "String".getClass();
@@ -874,32 +902,3 @@ final class ServiceQnameRule extends Rule {
     }
 }
 
-/**
- * A Rule that adds a security-role-ref to a servlet, allowing for the fact that
- * role-link is an optional element.
- */
-final class SecurityRoleRefCreateRule extends Rule {
-    
-    public SecurityRoleRefCreateRule() {
-    }
-    
-    public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
-        SecurityRoleRef securityRoleRef = new SecurityRoleRef();
-        digester.push(securityRoleRef);
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("new SecurityRoleRef");
-    }
-
-    public void end(String namespace, String name)
-            throws Exception {
-        SecurityRoleRef securityRoleRef = (SecurityRoleRef) digester.pop();
-        Wrapper wrapper = (Wrapper) digester.peek();
-        
-        wrapper.addSecurityReference(securityRoleRef.getName(),
-                securityRoleRef.getLink());
-
-        if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("pop SecurityRoleRef");
-    }
-}
