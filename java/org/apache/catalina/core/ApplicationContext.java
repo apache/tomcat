@@ -507,7 +507,7 @@ public class ApplicationContext
     public InputStream getResourceAsStream(String path) {
 
         path = normalize(path);
-        if (path == null)
+        if (path == null || !path.startsWith("/"))
             return (null);
 
         DirContext resources = context.getResources();
@@ -865,7 +865,7 @@ public class ApplicationContext
 
         String normalized = path;
 
-        // Normalize the slashes and add leading slash if necessary
+        // Normalize the slashes
         if (normalized.indexOf('\\') >= 0)
             normalized = normalized.replace('\\', '/');
 
