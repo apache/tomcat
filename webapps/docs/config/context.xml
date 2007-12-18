@@ -181,7 +181,12 @@
 
       <attribute name="privileged" required="false">
         <p>Set to <code>true</code> to allow this context to use container
-        servlets, like the manager servlet.</p>
+        servlets, like the manager servlet. Use of the <code>privileged</code>
+        attribute will change the context's parent class loader to be the
+        <em>Server</em> class loader rather than the <em>Shared</em> class
+        loader. Note that in a default installation, the <em>Common</em> class
+        loader is used for both the <em>Server</em> and the <em>Shared</em>
+        class loaders.</p>
       </attribute>
 
       <attribute name="path" required="false">
