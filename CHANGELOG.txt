@@ -1,0 +1,7 @@
+Improvement: Add support of J9VM based JVM. (jfclere)
+Improvement: Arrange licence in source files. (markt).
+Improvement: Add two new 'immediate' methods for sending the data.
+             It is the responsibility of the Java callee to deal with
+             the returned values and retry if the error was non-fatal. (mturk)
+Fix: Arrange the check of openssl version. It was failing on Linux. (jfclere)
+Fix: Prevent returning APR_SUCCESS when there is something wrong in ssl layer.  Fix for PR: 44087 (jfclere)
