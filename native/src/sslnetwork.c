@@ -333,7 +333,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
                     if (!APR_STATUS_IS_EAGAIN(os) &&
                         !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return os;
+                        return os == APR_SUCCESS ? APR_EGENERAL : os;
                     }
                 break;
                 default:
@@ -407,7 +407,7 @@ ssl_socket_recv(apr_socket_t *sock, char *buf, apr_size_t *len)
                     if (!APR_STATUS_IS_EAGAIN(os) &&
                         !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return os;
+                        return os == APR_SUCCESS ? APR_EGENERAL : os;
                     }
                 break;
                 default:
@@ -458,7 +458,7 @@ ssl_socket_send(apr_socket_t *sock, const char *buf,
                     if (!APR_STATUS_IS_EAGAIN(os) &&
                         !APR_STATUS_IS_EINTR(os)) {
                         con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-                        return os;
+                        return os == APR_SUCCESS ? APR_EGENERAL : os;
                     }
                 break;
                 default:
