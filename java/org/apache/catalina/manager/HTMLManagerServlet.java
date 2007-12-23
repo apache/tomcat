@@ -981,7 +981,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"expire\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
         " </td>\n" +
@@ -1000,7 +1000,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
-        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"expire\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
+        "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
         " </td>\n" +
