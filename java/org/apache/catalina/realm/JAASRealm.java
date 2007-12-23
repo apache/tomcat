@@ -241,21 +241,19 @@ public class JAASRealm
      }
      
      /**
-      * Sets the list of comma-delimited classes that represent 
-      * roles. The classes in the list must implement <code>java.security.Principal</code>.
-      * When this accessor is called (for example, by a <code>Digester</code>
-      * instance parsing the
-      * configuration file), it will parse the class names and store the resulting
-      * string(s) into the <code>ArrayList</code> field </code>roleClasses</code>.
+      * Sets the list of comma-delimited classes that represent roles. The
+      * classes in the list must implement <code>java.security.Principal</code>.
+      * The supplied list of classes will be parsed when {@link #start()} is
+      * called.
       */
      public void setRoleClassNames(String roleClassNames) {
          this.roleClassNames = roleClassNames;
-         parseClassNames(roleClassNames, roleClasses);
      }
      
      /**
       * Parses a comma-delimited list of class names, and store the class names
-      * in the provided List. Each class must implement <codejava.security.Principal</code>.
+      * in the provided List. Each class must implement
+      * <code>java.security.Principal</code>.
       * 
       * @param classNamesString a comma-delimited list of fully qualified class names.
       * @param classNamesList the list in which the class names will be stored.
@@ -264,12 +262,17 @@ public class JAASRealm
      protected void parseClassNames(String classNamesString, List<String> classNamesList) {
          classNamesList.clear();
          if (classNamesString == null) return;
-         
+
+         ClassLoader loader = this.getClass().getClassLoader();
+         if (isUseContextClassLoader())
+             loader = Thread.currentThread().getContextClassLoader();
+
          String[] classNames = classNamesString.split("[ ]*,[ ]*");
          for (int i=0; i<classNames.length; i++) {
              if (classNames[i].length()==0) continue;        
              try {
-                 Class principalClass = Class.forName(classNames[i]);
+                 Class principalClass = Class.forName(classNames[i], false,
+                         loader);
                  if (Principal.class.isAssignableFrom(principalClass)) {
                      classNamesList.add(classNames[i]);
                  } else {
@@ -293,16 +296,13 @@ public class JAASRealm
      }
      
      /**
-     * Sets the list of comma-delimited classes that represent individual
-     * users. The classes in the list must implement <code>java.security.Principal</code>.
-     * When this accessor is called (for example, by a <code>Digester</code>
-     * instance parsing the
-     * configuration file), it will parse the class names and store the resulting
-     * string(s) into the <code>ArrayList</code> field </code>userClasses</code>.
-     */
+      * Sets the list of comma-delimited classes that represent individual
+      * users. The classes in the list must implement
+      * <code>java.security.Principal</code>. The supplied list of classes will
+      * be parsed when {@link #start()} is called.
+      */
     public void setUserClassNames(String userClassNames) {
         this.userClassNames = userClassNames;
-        parseClassNames(userClassNames, userClasses);
     }
 
 
@@ -335,9 +335,10 @@ public class JAASRealm
         // What if the LoginModule is in the container class loader ?
         ClassLoader ocl = null;
 
-        if (isUseContextClassLoader()) {
-          ocl=Thread.currentThread().getContextClassLoader();
-          Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+        if (!isUseContextClassLoader()) {
+          ocl = Thread.currentThread().getContextClassLoader();
+          Thread.currentThread().setContextClassLoader(
+                  this.getClass().getClassLoader());
         }
 
         try {
@@ -348,7 +349,7 @@ public class JAASRealm
             log.error(sm.getString("jaasRealm.unexpectedError"), e);
             return (null);
         } finally {
-            if( isUseContextClassLoader()) {
+            if(!isUseContextClassLoader()) {
               Thread.currentThread().setContextClassLoader(ocl);
             }
         }
@@ -462,9 +463,9 @@ public class JAASRealm
         Principal userPrincipal = null;
 
         // Scan the Principals for this Subject
-        Iterator principals = subject.getPrincipals().iterator();
+        Iterator<Principal> principals = subject.getPrincipals().iterator();
         while (principals.hasNext()) {
-            Principal principal = (Principal) principals.next();
+            Principal principal = principals.next();
 
             String principalClass = principal.getClass().getName();
 
@@ -547,6 +548,10 @@ public class JAASRealm
         // Perform normal superclass initialization
         super.start();
 
+        // These need to be called after loading configuration, in case
+        // useContextClassLoader appears after them in xml config
+        parseClassNames(userClassNames, userClasses);
+        parseClassNames(roleClassNames, roleClasses);
     }
 
 
