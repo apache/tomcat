@@ -364,8 +364,8 @@ public abstract class ELArithmetic {
             return coerce(new Short((short) ((Character) obj).charValue()));
         }
 
-        throw new IllegalArgumentException(MessageFactory.get("el.convert", obj,
-                objType));
+        throw new IllegalArgumentException(MessageFactory.get("error.convert",
+                obj, objType, "Number"));
     }
 
     protected abstract Number coerce(final String str);
