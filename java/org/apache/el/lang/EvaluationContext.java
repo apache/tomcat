@@ -17,6 +17,8 @@
 
 package org.apache.el.lang;
 
+import java.util.Locale;
+
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.FunctionMapper;
@@ -67,5 +69,13 @@ public final class EvaluationContext extends ELContext {
 
     public void setPropertyResolved(boolean resolved) {
         this.elContext.setPropertyResolved(resolved);
+    }
+    
+    public Locale getLocale() { 
+        return this.elContext.getLocale();
+        }
+
+    public void setLocale(Locale locale) { 
+        this.elContext.setLocale(locale);
     }
 }
