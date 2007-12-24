@@ -43,13 +43,13 @@ public class JasperLoader extends URLClassLoader {
     private SecurityManager securityManager;
 
     public JasperLoader(URL[] urls, ClassLoader parent,
-			PermissionCollection permissionCollection,
-			CodeSource codeSource) {
-	super(urls, parent);
-	this.permissionCollection = permissionCollection;
-	this.codeSource = codeSource;
-	this.parent = parent;
-	this.securityManager = System.getSecurityManager();
+                        PermissionCollection permissionCollection,
+                        CodeSource codeSource) {
+        super(urls, parent);
+        this.permissionCollection = permissionCollection;
+        this.codeSource = codeSource;
+        this.parent = parent;
+        this.securityManager = System.getSecurityManager();
     }
 
     /**
@@ -122,16 +122,16 @@ public class JasperLoader extends URLClassLoader {
             }                              
         }
 
-	if( !name.startsWith(Constants.JSP_PACKAGE_NAME) ) {
+        if( !name.startsWith(Constants.JSP_PACKAGE_NAME) ) {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = parent.loadClass(name);            
-	    if( resolve )
-		resolveClass(clazz);
-	    return clazz;
-	}
+            if( resolve )
+                resolveClass(clazz);
+            return clazz;
+        }
 
-	return findClass(name);
+        return findClass(name);
     }
 
     
