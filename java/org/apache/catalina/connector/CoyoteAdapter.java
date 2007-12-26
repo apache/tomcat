@@ -25,6 +25,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.util.StringManager;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.juli.logging.Log;
@@ -99,6 +100,28 @@ public class CoyoteAdapter
      */
     protected StringManager sm =
         StringManager.getManager(Constants.Package);
+
+
+    /**
+     * Encoder for the Location URL in HTTP redirects.
+     */
+    protected static URLEncoder urlEncoder;
+
+
+    // ----------------------------------------------------- Static Initializer
+
+
+    /**
+     * The safe character set.
+     */
+    static {
+        urlEncoder = new URLEncoder();
+        urlEncoder.addSafeCharacter('-');
+        urlEncoder.addSafeCharacter('_');
+        urlEncoder.addSafeCharacter('.');
+        urlEncoder.addSafeCharacter('*');
+        urlEncoder.addSafeCharacter('/');
+    }
 
 
     // -------------------------------------------------------- Adapter Methods
@@ -452,7 +475,7 @@ public class CoyoteAdapter
         // Possible redirect
         MessageBytes redirectPathMB = request.getMappingData().redirectPath;
         if (!redirectPathMB.isNull()) {
-            String redirectPath = redirectPathMB.toString();
+            String redirectPath = urlEncoder.encode(redirectPathMB.toString());
             String query = request.getQueryString();
             if (request.isRequestedSessionIdFromURL()) {
                 // This is not optimal, but as this is not very common, it
