@@ -986,6 +986,8 @@ public class FileDirContext extends BaseDirContext {
 
         public FileResourceAttributes(File file) {
             this.file = file;
+            getCreation();
+            getLastModified();
         }
 
         // --------------------------------------------------- Member Variables
@@ -1036,7 +1038,7 @@ public class FileDirContext extends BaseDirContext {
         public long getCreation() {
             if (creation != -1L)
                 return creation;
-            creation = file.lastModified();
+            creation = getLastModified();
             return creation;
         }
 
@@ -1048,7 +1050,7 @@ public class FileDirContext extends BaseDirContext {
          */
         public Date getCreationDate() {
             if (creation == -1L) {
-                creation = file.lastModified();
+                creation = getCreation();
             }
             return super.getCreationDate();
         }
@@ -1074,7 +1076,7 @@ public class FileDirContext extends BaseDirContext {
          */
         public Date getLastModifiedDate() {
             if (lastModified == -1L) {
-                lastModified = file.lastModified();
+                lastModified = getLastModified();
             }
             return super.getLastModifiedDate();
         }
