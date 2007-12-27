@@ -693,7 +693,7 @@ List of Cluster Mbeans<br/>
 </section>
 
 <section name="FAQ">
-<p>Please see <a href="http://tomcat.apache.org/faq/cluster.html">the clustering section of the FAQ</a>.</p>
+<p>Please see <a href="http://wiki.apache.org/tomcat/FAQ/Clustering">the clustering section of the FAQ</a>.</p>
 </section>
 
 </body>
