@@ -26,6 +26,7 @@ import javax.el.ELResolver;
 import javax.el.MethodInfo;
 import javax.el.PropertyNotFoundException;
 
+import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
@@ -127,7 +128,11 @@ public final class AstValue extends SimpleNode {
             throws ELException {
         Target t = getTarget(ctx);
         ctx.setPropertyResolved(false);
-        ctx.getELResolver().setValue(ctx, t.base, t.property, value);
+        ELResolver resolver = ctx.getELResolver();
+        resolver.setValue(ctx, t.base, t.property, 
+        		// coerce to the expected type
+        		ELSupport.coerceToType(value, 
+        				resolver.getType(ctx, t.base, t.property)));
     }
 
     public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes)
