@@ -350,55 +350,55 @@
     <mkdir dir="${tomcat.build}/webapps/docs/funcspecs" />
 
     <!-- XSL processing -->
-    <style basedir="webapps/docs"
+    <xslt basedir="webapps/docs"
            destdir="${tomcat.build}/webapps/docs"
          extension=".html"
              style="webapps/docs/tomcat-docs.xsl"
           excludes="build.xml project.xml"
           includes="*.xml">
       <param name="relative-path" expression="."/>
-    </style>
-    <style basedir="webapps/docs/appdev"
+    </xslt>
+    <xslt basedir="webapps/docs/appdev"
            destdir="${tomcat.build}/webapps/docs/appdev"
          extension=".html"
              style="webapps/docs/tomcat-docs.xsl"
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
-    </style>
-    <style basedir="webapps/docs/funcspecs"
+    </xslt>
+    <xslt basedir="webapps/docs/funcspecs"
            destdir="${tomcat.build}/webapps/docs/funcspecs"
          extension=".html"
              style="webapps/docs/tomcat-docs.xsl"
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
-    </style>
-    <style basedir="webapps/docs/config"
+    </xslt>
+    <xslt basedir="webapps/docs/config"
            destdir="${tomcat.build}/webapps/docs/config"
          extension=".html"
              style="webapps/docs/tomcat-docs.xsl"
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
-    </style>
-    <style basedir="webapps/docs/architecture"
+    </xslt>
+    <xslt basedir="webapps/docs/architecture"
            destdir="${tomcat.build}/webapps/docs/architecture"
          extension=".html"
              style="webapps/docs/tomcat-docs.xsl"
           excludes="project.xml"
           includes="*.xml">
       <param name="relative-path" expression=".."/>
-    </style>
+    </xslt>
 
-    <style basedir="webapps/docs/tribes"
+    <xslt basedir="webapps/docs/tribes"
                destdir="${tomcat.build}/webapps/docs/tribes"
              extension=".html"
                  style="webapps/docs/tomcat-docs.xsl"
               excludes="project.xml"
               includes="*.xml">
           <param name="relative-path" expression=".."/>
-    </style>
+    </xslt>
   </target>
 
   <target name="deploy" depends="build-only,build-docs">
