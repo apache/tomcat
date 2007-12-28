@@ -117,21 +117,21 @@ public final class JspRuntimeContext {
                 (URLClassLoader)this.getClass().getClassLoader();
         }
 
-	if (log.isDebugEnabled()) {
-	    if (parentClassLoader != null) {
-		log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
-					       parentClassLoader.toString()));
-	    } else {
-		log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
-					       "<none>"));
-	    }
+        if (log.isDebugEnabled()) {
+            if (parentClassLoader != null) {
+                log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
+                                               parentClassLoader.toString()));
+            } else {
+                log.debug(Localizer.getMessage("jsp.message.parent_class_loader_is",
+                                               "<none>"));
+            }
         }
 
         initClassPath();
 
-	if (context instanceof org.apache.jasper.servlet.JspCServletContext) {
-	    return;
-	}
+        if (context instanceof org.apache.jasper.servlet.JspCServletContext) {
+            return;
+        }
 
         if (Constants.IS_SECURITY_ENABLED) {
             initSecurity();
@@ -302,7 +302,7 @@ public final class JspRuntimeContext {
                     ctxt.incrementRemoved();
                 } catch (Throwable t) {
                     jsw.getServletContext().log("Background compile failed",
-						t);
+                                                t);
                 }
             }
         }
@@ -340,7 +340,7 @@ public final class JspRuntimeContext {
             }
         }    
 
-	cpath.append(options.getScratchDir() + sep);
+        cpath.append(options.getScratchDir() + sep);
 
         String cp = (String) context.getAttribute(Constants.SERVLET_CLASSPATH);
         if (cp == null || cp.equals("")) {
