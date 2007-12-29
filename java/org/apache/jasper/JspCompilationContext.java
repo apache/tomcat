@@ -34,7 +34,6 @@ import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.ServletWriter;
-import org.apache.jasper.servlet.JasperLoader;
 import org.apache.jasper.servlet.JspServletWrapper;
 
 /**
@@ -176,11 +175,7 @@ public class JspCompilationContext {
 
     public ClassLoader getJspLoader() {
         if( jspLoader == null ) {
-            jspLoader = new JasperLoader
-            (new URL[] {baseUrl},
-                    getClassLoader(),
-                    rctxt.getPermissionCollection(),
-                    rctxt.getCodeSource());
+            jspLoader = rctxt.getJspLoader(baseUrl, getClassLoader());
         }
         return jspLoader;
     }
