@@ -542,7 +542,7 @@ public class ManagedBean implements java.io.Serializable
             Object object = null;
             NoSuchMethodException exception = null;
             try {
-                object = this;
+                object = bean;
                 m = object.getClass().getMethod(setMethod, signature);
             } catch (NoSuchMethodException e) {
                 exception = e;;
@@ -601,7 +601,7 @@ public class ManagedBean implements java.io.Serializable
             Object object = null;
             Exception exception = null;
             try {
-                object = this;
+                object = bean;
                 method = object.getClass().getMethod(aname, types);
             } catch (NoSuchMethodException e) {
                 exception = e;
