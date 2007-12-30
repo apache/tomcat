@@ -105,8 +105,9 @@ public class SerializablePrincipal  implements java.io.Serializable {
             if (this.roles.length > 0)
                 Arrays.sort(this.roles);
         }
-        this.userPrincipal = userPrincipal;
-
+        if (userPrincipal instanceof Serializable) {
+            this.userPrincipal = userPrincipal;
+        }
     }
 
 
