@@ -15,7 +15,7 @@
   limitations under the License.
 ================================================================================
 
-$Revision: 593356 $ $Date: 2007-11-08 23:32:52 +0000 (Thu, 08 Nov 2007) $
+$Revision$ $Date$
 
                          =================================
                            Apache Tomcat Trunk Proposals
