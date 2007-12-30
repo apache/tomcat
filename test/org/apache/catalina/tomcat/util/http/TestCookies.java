@@ -15,6 +15,8 @@
  *  limitations under the License.
  */
 
+package org.apache.catalina.tomcat.util.http;
+
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.ServerCookie;
 
