@@ -15,7 +15,7 @@
   limitations under the License.
 ================================================================================
 
-$Id: RUNNING.txt 354430 2005-12-06 13:44:26Z yoavs $
+$Id$
 
             ===================================================
             Running The Apache Tomcat 6.0 Servlet/JSP Container
