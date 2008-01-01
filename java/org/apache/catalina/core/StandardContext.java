@@ -4601,6 +4601,9 @@ public class StandardContext
             log.error( "Error reseting context " + this + " " + ex, ex );
         }
         
+        //reset the instance manager
+        instanceManager = null;
+
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
 
