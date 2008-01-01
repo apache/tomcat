@@ -95,7 +95,7 @@ ${StrRep}
     LangString DESC_SecTomcat ${LANG_ENGLISH} "Install the Tomcat Servlet container."
     LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core."
     LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start Tomcat when the computer is started. This requires Windows NT 4.0, Windows 2000 or Windows XP."
-    LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Downloads and installs Tomcat native .dll for better performance and scalability in production environments."
+    LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Downloads and installs APR based Tomcat native .dll for better performance and scalability in production environments."
 ;    LangString DESC_SecTomcatSource ${LANG_ENGLISH} "Install the Tomcat source code."
     LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
     LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This include documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
