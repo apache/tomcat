@@ -59,7 +59,7 @@
         <item name="21) Monitoring and Management"         
               href="monitoring.html"/>
         <item name="22) Logging"            href="logging.html"/>
-        <item name="23) APR"                href="apr.html"/>
+        <item name="23) APR/Native"         href="apr.html"/>
         <item name="24) Virtual Hosting"    href="virtual-hosting-howto.html"/>
         <item name="25) Advanced IO"        href="aio.html"/>
         <item name="26) Additional Components" href="extras.html"/>

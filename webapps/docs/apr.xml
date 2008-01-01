@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>Apache Portable Runtime and Tomcat</title>
+    <title>Apache Portable Runtime (APR) based Native library for Tomcat</title>
     <author>Remy Maucherat</author>
   </properties>
 
