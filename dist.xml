@@ -711,7 +711,8 @@
   <!-- Packages the source code distribution in tar.gz format -->
   <target name="package-src-tgz">
   	<fixcrlf srcdir="${tomcat.dist}/src"
-     excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war" eol="lf"/>
+     excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war,**/*.exe.**/*.pdf,**/*.bin,**/*.dia"
+          eol="lf"/>
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
