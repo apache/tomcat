@@ -414,11 +414,6 @@ public class JspC implements Options {
         return null;
     }
 
-    public boolean getSendErrorToClient() {
-        // implied send to System.err
-        return true;
-    }
-
     public void setClassDebugInfo( boolean b ) {
         classDebugInfo=b;
     }
