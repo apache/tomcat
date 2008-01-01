@@ -85,15 +85,10 @@ for use on a production Tomcat server.</p>
 in your global <code>$CATALINA_BASE/conf/web.xml</code>.
 
 <ul>
-<li><strong>checkInterval</strong> - If development is false and reloading is
-true, background compiles are enabled. checkInterval is the time in seconds
-between checks to see if a JSP page needs to be recompiled. Default
-<code>300</code> seconds.</li>
-
-<li><strong>compiler</strong> - Which compiler Ant should use to compile JSP
-pages.  See the Ant documentation for more information. If the value is not set,
-then the default Eclipse JDT Java compiler will be used instead of using Ant. 
-No default value.</li>
+<li><strong>checkInterval</strong> - If development is false and checkInterval
+is greater than zero, background compiles are enabled. checkInterval is the time
+in seconds between checks to see if a JSP page (and its dependent files) needs
+to be recompiled. Default <code>0</code> seconds.</li>
 
 <li><strong>classdebuginfo</strong> - Should the class file be compiled with
 debugging information?  <code>true</code> or <code>false</code>, default
@@ -106,13 +101,29 @@ attribute org.apache.jasper.Constants.SERVLET_CLASSPATH is not set. This
 attribute is always set when Jasper is used within Tomcat. By default the
 classpath is created dynamically based on the current web application.</li>
 
-<li><strong>compilerSourceVM</strong> - What JDK version are the source files compatible with? (Default JDK 1.4)</li>
+<li><strong>compiler</strong> - Which compiler Ant should use to compile JSP
+pages.  See the Ant documentation for more information. If the value is not set,
+then the default Eclipse JDT Java compiler will be used instead of using Ant. 
+No default value.</li>
 
-<li><strong>compilerTargetVM</strong> - What JDK version are the generated files compatible with? (Default JDK 1.4)</li>
+<li><strong>compilerSourceVM</strong> - What JDK version are the source files
+compatible with? (Default JDK 1.4)</li>
 
-<li><strong>development</strong> - Is Jasper used in development mode (will
-check for JSP modification on every access)? <code>true</code> or
-<code>false</code>, default <code>true</code>.</li>
+<li><strong>compilerTargetVM</strong> - What JDK version are the generated files
+compatible with? (Default JDK 1.4)</li>
+
+<li><strong>development</strong> - Is Jasper used in development mode? If true,
+the frequency at which JSPs are checked for modification may be specified via
+the modificationTestInterval parameter.<code>true</code> or <code>false</code>,
+default <code>true</code>.</li>
+
+<li><strong>displaySourceFragment</strong> - Should a source fragment be
+included in exception messages? <code>true</code> or <code>false</code>,
+default <code>true</code>.</li>
+
+<li><strong>dumpSmap</strong> - Should the SMAP info for JSR45 debugging be
+dumped to a file? <code>true</code> or <code>false</code>, default
+<code>false</code>. <code>false</code> if suppressSmap is true.</li>
 
 <li><strong>enablePooling</strong> - Determines whether tag handler pooling is
 enabled. <code>true</code> or <code>false</code>, default <code>true</code>.
@@ -123,19 +134,24 @@ used to configure Jasper. If not present, the default EmbeddedServletOptions
 will be used.
 </li>
 
-<li><strong>ieClassId</strong> - The class-id value to be sent to Internet
-Explorer when using &lt;jsp:plugin&gt; tags.   Default
-<code>clsid:8AD9C840-044E-11D1-B3E9-00805F499D93</code>.</li>
+<li><strong>errorOnUseBeanInvalidClassAttribute</strong> - Should Jasper issue
+an error when the value of the class attribute in an useBean action is not a
+valid bean class? <code>true</code> or <code>false</code>, default
+<code>true</code>.</li>
 
 <li><strong>fork</strong> - Have Ant fork JSP page compiles so they are
 performed in a seperate JVM from Tomcat? <code>true</code> or
 <code>false</code>, default <code>true</code>.</li>
 
-<li><strong>javaEncoding</strong> - Java file encoding to use for generating
-java source files. Default <code>UTF8</code>.</li>
-
 <li><strong>genStringAsCharArray</strong> - Should text strings be generated as char
 arrays, to improve performance in some cases? Default <code>false</code>.</li>
+
+<li><strong>ieClassId</strong> - The class-id value to be sent to Internet
+Explorer when using &lt;jsp:plugin&gt; tags.   Default
+<code>clsid:8AD9C840-044E-11D1-B3E9-00805F499D93</code>.</li>
+
+<li><strong>javaEncoding</strong> - Java file encoding to use for generating
+java source files. Default <code>UTF8</code>.</li>
 
 <li><strong>keepgenerated</strong> - Should we keep the generated Java source
 code for each page instead of deleting it? <code>true</code> or
@@ -145,45 +161,52 @@ code for each page instead of deleting it? <code>true</code> or
 print statement per input line, to ease debugging?
 <code>true</code> or <code>false</code>, default <code>true</code>.</li>
 
-<li><strong>modificationTestInterval</strong> - Checks for modification for a given
-JSP file (and all its dependent files) will be performed only once every specified amount
-of seconds. Setting this to 0 will cause the JSP to be checked on every access.
-Default is <code>4</code> seconds.</li>
-
-<li><strong>reloading</strong> - Should Jasper check for modified JSPs?
-<code>true</code> or <code>false</code>, default <code>false</code>.</li>
+<li><strong>modificationTestInterval</strong> - Causes a JSP (and its dependent
+files) to not be checked for modification during the specified time interval
+(in seconds) from the last time the JSP was checked for modification. A value of
+0 will cause the JSP to be checked on every access. Used in development mode
+only. Default is <code>4</code> seconds.</li>
 
 <li><strong>scratchdir</strong> - What scratch directory should we use when
 compiling JSP pages? Default is the work directory for the current web
 application.</li>
 
+<li><strong>suppressSmap</strong> - Should the generation of SMAP info for JSR45
+debugging be suppressed? <code>true</code> or <code>false</code>, default
+<code>false</code>.</li>
+ 
 <li><strong>trimSpaces</strong> - Should white spaces in template text between
 actions or directives be trimmed ?, default <code>false</code>.</li>
+
+<li><strong>xpoweredBy</strong> - Determines whether X-Powered-By response
+header is added by generated servlet. <code>true</code> or <code>false</code>,
+default <code>false</code>.</li>
 </ul>
 </p>
 
-<p>The Java compiler from Eclipse JDT in included as the default compiler. It is an
-advanced Java compiler which will load all dependencies from the Tomcat class loader, 
-which will help tremendously when compiling on large installations with tens of JARs.
-On fast servers, this will allow sub-second recompilation cycles for even large JSP 
-pages.</p>
+<p>The Java compiler from Eclipse JDT in included as the default compiler. It is
+an advanced Java compiler which will load all dependencies from the Tomcat class
+loader, which will help tremendously when compiling on large installations with
+tens of JARs. On fast servers, this will allow sub-second recompilation cycles
+for even large JSP  pages.</p>
 
-<p>Apache Ant, which was used in previous Tomcat releases, can be used instead instead of 
-the new compiler by simply removing the <code>lib/jasper-jdt.jar</code> file, 
-and placing the <code>ant.jar</code> file from the latest Ant distribution in the 
-<code>lib</code> folder.  If you do this, you also need to use the "javac"
+<p>Apache Ant, which was used in previous Tomcat releases, can be used instead
+of the new compiler by simply removing the <code>lib/jasper-jdt.jar</code> file, 
+and placing the <code>ant.jar</code> file from the latest Ant distribution in
+the <code>lib</code> folder.  If you do this, you also need to use the "javac"
 argument to catalina.sh.</p>
 
 </section>
 
 <section name="Production Configuration">
 
-<p>The main JSP optimization which can be done is precompilation of JSPs. However,
-this might not be possible (for example, when using the jsp-property-group feature)
-or practical, in which case the configuration of the Jasper servlet becomes critical.</p>
+<p>The main JSP optimization which can be done is precompilation of JSPs.
+However, this might not be possible (for example, when using the
+jsp-property-group feature) or practical, in which case the configuration of the
+Jasper servlet becomes critical.</p>
 
-<p>When using Jasper 2 in a production Tomcat server you should consider
-making the following changes from the default configuration.
+<p>When using Jasper 2 in a production Tomcat server you should consider making
+the following changes from the default configuration.
 <ul>
 <li><strong>development</strong> - To disable on access checks for JSP
 pages compilation set this to <code>false</code>.</li>
@@ -290,28 +313,34 @@ are automatically compiled as part of the build process.
 <p>
 At the jasper2 task you can use the option <code>addWebXmlMappings</code> for 
 automatic merge the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
-with the current web application deployment descriptor at <code>${webapp.path}/WEB-INF/web.xml</code>.
-When you want to use Java 5 feature inside your jsp's, add the following javac compiler task
-attributes: <code>source=&quot;1.5&quot; target=&quot;1.5&quot;</code>. For live application
-you can also compile with <code>optimize=&quot;on&quot;</code> and without debug info
-<code>debug=&quot;off&quot;</code>.
+with the current web application deployment descriptor at
+<code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 5
+features inside your jsp's, add the following javac compiler task attributes:
+<code>source=&quot;1.5&quot; target=&quot;1.5&quot;</code>. For live
+applications you can also compile with <code>optimize=&quot;on&quot;</code> and
+without debug info <code>debug=&quot;off&quot;</code>.
 </p>
 
 <p>
 When you don't want to stop the jsp generation at first jsp syntax error, use   
-<code>failOnError=&quot;false&quot;</code>and with <code>showSuccess=&quot;true&quot;</code>
-all successfull <i>jsp to java</i> generation are printed out. Sometimes it is
-very helpfull, when you cleanup the generate java source files at <code>${webapp.path}/WEB-INF/src</code>
-and the compile jsp servlet classes at <code>${webapp.path}/WEB-INF/classes/org/apache/jsp</code>.
+<code>failOnError=&quot;false&quot;</code>and with
+<code>showSuccess=&quot;true&quot;</code> all successfull <i>jsp to java</i>
+generation are printed out. Sometimes it is very helpfull, when you cleanup the
+generate java source files at <code>${webapp.path}/WEB-INF/src</code>
+and the compile jsp servlet classes at
+<code>${webapp.path}/WEB-INF/classes/org/apache/jsp</code>.
 </p>
 
 <p><strong>Hints:</strong>
 <ul>
-<li> When you switch to another tomcat release, then regenerate and recompile
-your jsp's with this version again!</li>
-<li>Use java system property at server runtime to disable tag pooling <code>org.apache.jasper.runtime.JspFactoryImpl.USE_POOL=false</code>.
-and limit the buffering with <code>org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER=true</code>. Note that changing
-from the defaults may affect performance, but depending on the application.</li>
+<li> When you switch to another Tomcat release, then regenerate and recompile
+your jsp's with the new Tomcat version.</li>
+<li>Use java system property at server runtime to disable tag pooling
+<code>org.apache.jasper.runtime.JspFactoryImpl.USE_POOL=false</code>.
+and limit the buffering with
+<code>org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER=true</code>. Note
+that changing from the defaults may affect performance, but it will vary
+depending on the application.</li>
 </ul>
 </p>
 </section>
