@@ -136,21 +136,8 @@
   <!--   checkInterval       If development is false and checkInterval is   -->
   <!--                       greater than zero, background compilations are -->
   <!--                       enabled. checkInterval is the time in seconds  -->
-  <!--                       between checks to see if a JSP page needs to   -->
-  <!--                       be recompiled. [0]                             -->
-  <!--                                                                      -->
-  <!--   modificationTestInterval                                           -->
-  <!--                       Causes a JSP (and its dependent files) to not  -->
-  <!--                       be checked for modification during the         -->
-  <!--                       specified time interval (in seconds) from the  -->
-  <!--                       last time the JSP was checked for              -->
-  <!--                       modification. A value of 0 will cause the JSP  -->
-  <!--                       to be checked on every access.                 -->
-  <!--                       Used in development mode only. [4]             -->
-  <!--                                                                      -->
-  <!--   compiler            Which compiler Ant should use to compile JSP   -->
-  <!--                       pages.  See the jasper documentation for more  -->
-  <!--                       information.                                   -->
+  <!--                       between checks to see if a JSP page (and its   -->
+  <!--                       dependent files) needs to  be recompiled. [0]  -->
   <!--                                                                      -->
   <!--   classdebuginfo      Should the class file be compiled with         -->
   <!--                       debugging information?  [true]                 -->
@@ -159,17 +146,52 @@
   <!--                       generated servlets?  [Created dynamically      -->
   <!--                       based on the current web application]          -->
   <!--                                                                      -->
+  <!--   compiler            Which compiler Ant should use to compile JSP   -->
+  <!--                       pages.  See the jasper documentation for more  -->
+  <!--                       information.                                   -->
+  <!--                                                                      -->
+  <!--   compilerSourceVM    Compiler source VM                             -->
+  <!--                       default is System.properties                   -->
+  <!--                        java.specification.version > 1.4              -->
+  <!--                        [1.5] else [1.4]                              -->
+  <!--                                                                      -->
+  <!--   compilerTargetVM    Compiler target VM                             -->  
+  <!--                       default is System.properties                   -->
+  <!--                        java.specification.version > 1.4              -->
+  <!--                        [1.5] else [1.4]                              -->
+  <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->
   <!--                       modification may be specified via the          -->
   <!--                       modificationTestInterval parameter. [true]     -->
   <!--                                                                      -->
+  <!--   displaySourceFragment                                              -->
+  <!--                       Should a source fragment be included in        -->
+  <!--                       exception messages? [true]                     -->
+  <!--                                                                      -->
+  <!--   dumpSmap            Should the SMAP info for JSR45 debugging be    -->
+  <!--                       dumped to a file? [false]                      -->
+  <!--                       False if suppressSmap is true                  -->
+  <!--                                                                      -->
   <!--   enablePooling       Determines whether tag handler pooling is      -->
   <!--                       enabled  [true]                                -->
+  <!--                                                                      -->
+  <!--   engineOptionsClass  Allows specifying the Options class used to    -->
+  <!--                       configure Jasper. If not present, the default  -->
+  <!--                       EmbeddedServletOptions will be used.           -->
+  <!--                                                                      -->
+  <!--   errorOnUseBeanInvalidClassAttribute                                -->
+  <!--                       Should Jasper issue an error when the value of -->
+  <!--                       the class attribute in an useBean action is    -->
+  <!--                       not a valid bean class?  [true]                -->
   <!--                                                                      -->
   <!--   fork                Tell Ant to fork compiles of JSP pages so that -->
   <!--                       a separate JVM is used for JSP page compiles   -->
   <!--                       from the one Tomcat is running in. [true]      -->
+  <!--                                                                      -->
+  <!--   genStrAsCharArray   Should text strings be generated as char       -->
+  <!--                       arrays, to improve performance in some cases?  -->
+  <!--                       [false]                                        -->
   <!--                                                                      -->
   <!--   ieClassId           The class-id value to be sent to Internet      -->
   <!--                       Explorer when using <jsp:plugin> tags.         -->
@@ -185,41 +207,27 @@
   <!--                       print statement per input line, to ease        -->
   <!--                       debugging?  [true]                             -->
   <!--                                                                      -->
-  <!--   trimSpaces          Should white spaces in template text between   -->
-  <!--                       actions or directives be trimmed?  [false]     -->
-  <!--                                                                      -->
-  <!--   suppressSmap        Should the generation of SMAP info for JSR45   -->
-  <!--                       debugging be suppressed?  [false]              -->
-  <!--                                                                      -->
-  <!--   dumpSmap            Should the SMAP info for JSR45 debugging be    -->
-  <!--                       dumped to a file? [false]                      -->
-  <!--                       False if suppressSmap is true                  -->
-  <!--                                                                      -->
-  <!--   genStrAsCharArray   Should text strings be generated as char       -->
-  <!--                       arrays, to improve performance in some cases?  -->
-  <!--                       [false]                                        -->
-  <!--                                                                      -->
-  <!--   errorOnUseBeanInvalidClassAttribute                                -->
-  <!--                       Should Jasper issue an error when the value of -->
-  <!--                       the class attribute in an useBean action is    -->
-  <!--                       not a valid bean class?  [true]                -->
+  <!--   modificationTestInterval                                           -->
+  <!--                       Causes a JSP (and its dependent files) to not  -->
+  <!--                       be checked for modification during the         -->
+  <!--                       specified time interval (in seconds) from the  -->
+  <!--                       last time the JSP was checked for              -->
+  <!--                       modification. A value of 0 will cause the JSP  -->
+  <!--                       to be checked on every access.                 -->
+  <!--                       Used in development mode only. [4]             -->
   <!--                                                                      -->
   <!--   scratchdir          What scratch directory should we use when      -->
   <!--                       compiling JSP pages?  [default work directory  -->
   <!--                       for the current web application]               -->
   <!--                                                                      -->
+  <!--   suppressSmap        Should the generation of SMAP info for JSR45   -->
+  <!--                       debugging be suppressed?  [false]              -->
+  <!--                                                                      -->
+  <!--   trimSpaces          Should white spaces in template text between   -->
+  <!--                       actions or directives be trimmed?  [false]     -->
+  <!--                                                                      -->
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet  [false]  -->
-  <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM                             -->  
-  <!--                       default is System.properties                   -->
-  <!--                        java.specification.version > 1.4              -->
-  <!--                        [1.5] else [1.4]                              -->
-  <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM                             -->
-  <!--                       default is System.properties                   -->
-  <!--                        java.specification.version > 1.4              -->
-  <!--                        [1.5] else [1.4]                              -->
   <!--                                                                      -->
   <!-- If you wish to use Jikes to compile JSP pages:                       -->
   <!--   Please see the "Using Jikes" section of the Jasper-HowTo           -->
