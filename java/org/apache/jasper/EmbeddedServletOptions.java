@@ -78,13 +78,6 @@ public final class EmbeddedServletOptions implements Options {
     private boolean mappedFile = true;
     
     /**
-     * Do you want stack traces and such displayed in the client's
-     * browser? If this is false, such messages go to the standard
-     * error or a log file if the standard error is redirected. 
-     */
-    private boolean sendErrorToClient = false;
-    
-    /**
      * Do we want to include debugging information in the class file?
      */
     private boolean classDebugInfo = true;
@@ -220,13 +213,6 @@ public final class EmbeddedServletOptions implements Options {
      */
     public boolean getMappedFile() {
         return mappedFile;
-    }
-    
-    /**
-     * Should errors be sent to client or thrown into stderr?
-     */
-    public boolean getSendErrorToClient() {
-        return sendErrorToClient;
     }
     
     /**
@@ -462,19 +448,6 @@ public final class EmbeddedServletOptions implements Options {
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.mappedFile"));
-                }
-            }
-        }
-        
-        String senderr = config.getInitParameter("sendErrToClient");
-        if (senderr != null) {
-            if (senderr.equalsIgnoreCase("true")) {
-                this.sendErrorToClient = true;
-            } else if (senderr.equalsIgnoreCase("false")) {
-                this.sendErrorToClient = false;
-            } else {
-                if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage("jsp.warning.sendErrToClient"));
                 }
             }
         }
