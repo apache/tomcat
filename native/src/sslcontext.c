@@ -534,7 +534,7 @@ TCN_IMPLEMENT_CALL(jboolean, SSLContext, setCertificate)(TCN_STDARGS, jlong ctx,
     if (!key_file)
         key_file = cert_file;
     if (!key_file) {
-        tcn_Throw(e, "No Certificate file specified");
+        tcn_Throw(e, "No Certificate file specified or invalid file format");
         rv = JNI_FALSE;
         goto cleanup;
     }
