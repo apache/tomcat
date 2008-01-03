@@ -19,6 +19,7 @@
 package org.apache.catalina.ha.session;
 
 
+import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.util.StringManager;
 
 
 /**
@@ -42,6 +44,14 @@ import org.apache.catalina.realm.GenericPrincipal;
  */
 public class SerializablePrincipal  implements java.io.Serializable {
 
+    protected static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(SerializablePrincipal.class);
+    
+    /**
+     * The string manager for this package.
+     */
+    protected static StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------------- Constructors
 
@@ -201,7 +211,8 @@ public class SerializablePrincipal  implements java.io.Serializable {
                 userPrincipal);
     }
     
-    public static GenericPrincipal readPrincipal(ObjectInput in, Realm realm) throws java.io.IOException{
+    public static GenericPrincipal readPrincipal(ObjectInput in, Realm realm)
+            throws IOException, ClassNotFoundException {
         String name = in.readUTF();
         boolean hasPwd = in.readBoolean();
         String pwd = null;
@@ -209,21 +220,23 @@ public class SerializablePrincipal  implements java.io.Serializable {
         int size = in.readInt();
         String[] roles = new String[size];
         for ( int i=0; i<size; i++ ) roles[i] = in.readUTF();
-        Principal innerPrincipal = null;
-        boolean hasInnerPrincipal = in.readBoolean();
-        if (hasInnerPrincipal) {
+        Principal userPrincipal = null;
+        boolean hasUserPrincipal = in.readBoolean();
+        if (hasUserPrincipal) {
             try {
-                innerPrincipal = (Principal) in.readObject();
+                userPrincipal = (Principal) in.readObject();
             } catch (ClassNotFoundException e) {
-                // Failed to read inner Principal
-                e.printStackTrace();
+                log.error(sm.getString(
+                        "serializablePrincipal.readPrincipal.cnfe"), e);
+                throw e;
             }
         }
         return new GenericPrincipal(realm,name,pwd,Arrays.asList(roles),
-                innerPrincipal);
+                userPrincipal);
     }
     
-    public static void writePrincipal(GenericPrincipal p, ObjectOutput out) throws java.io.IOException {
+    public static void writePrincipal(GenericPrincipal p, ObjectOutput out)
+            throws IOException {
         out.writeUTF(p.getName());
         out.writeBoolean(p.getPassword()!=null);
         if ( p.getPassword()!= null ) out.writeUTF(p.getPassword());
@@ -231,10 +244,10 @@ public class SerializablePrincipal  implements java.io.Serializable {
         if ( roles == null ) roles = new String[0];
         out.writeInt(roles.length);
         for ( int i=0; i<roles.length; i++ ) out.writeUTF(roles[i]);
-        boolean hasInnerPrincipal = (p != p.getUserPrincipal() &&
+        boolean hasUserPrincipal = (p != p.getUserPrincipal() &&
                 p.getUserPrincipal() instanceof Serializable);
-        out.writeBoolean(hasInnerPrincipal);
-        if (hasInnerPrincipal) out.writeObject(p.getUserPrincipal());
+        out.writeBoolean(hasUserPrincipal);
+        if (hasUserPrincipal) out.writeObject(p.getUserPrincipal());
     }
 
 
