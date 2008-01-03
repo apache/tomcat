@@ -82,6 +82,9 @@ public class TestSerializablePrincipal extends TestCase {
         } catch (IOException e) {
             e.printStackTrace();
             fail("ioe de-serializing principal");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            fail("cnfe de-serializing principal");
         }
         
         // Now test how similar original and de-serialized versions are
