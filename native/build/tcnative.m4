@@ -31,7 +31,7 @@ AC_DEFUN(TCN_FIND_APR,[
     AC_MSG_ERROR(APR config could not be located. Please use the --with-apr option.)
   fi
   sapr_version="`echo $sapr_pversion|sed -e 's/\([a-z]*\)$/.\1/'`"
-  IFS=.; set $sapr_version; IFS=' '
+  tc_save_IFS=$IFS; IFS=.; set $sapr_version; IFS=$tc_save_IFS
   if test "${1}" -lt "1"; then
     AC_MSG_ERROR(You need APR version 1.2.1 or newer installed.)
   else
