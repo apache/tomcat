@@ -261,7 +261,7 @@ download) to precompile a webapp:
           &lt;include name="*.jar"/&gt;
         &lt;/fileset&gt;
         &lt;pathelement location="${tomcat.home}/lib"/&gt;
-        &lt;fileset dir="${tomcat.home}/common/lib"&gt;
+        &lt;fileset dir="${tomcat.home}/lib"&gt;
           &lt;include name="*.jar"/&gt;
         &lt;/fileset&gt;
         &lt;fileset dir="${tomcat.home}/bin"&gt; 
