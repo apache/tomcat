@@ -51,8 +51,6 @@ class Parser implements TagConstants {
 
     private JspReader reader;
 
-    private String currentFile;
-
     private Mark start;
 
     private ErrorDispatcher err;
@@ -69,11 +67,14 @@ class Parser implements TagConstants {
 
     // Virtual body content types, to make parsing a little easier.
     // These are not accessible from outside the parser.
-    private static final String JAVAX_BODY_CONTENT_PARAM = "JAVAX_BODY_CONTENT_PARAM";
+    private static final String JAVAX_BODY_CONTENT_PARAM =
+        "JAVAX_BODY_CONTENT_PARAM";
 
-    private static final String JAVAX_BODY_CONTENT_PLUGIN = "JAVAX_BODY_CONTENT_PLUGIN";
+    private static final String JAVAX_BODY_CONTENT_PLUGIN =
+        "JAVAX_BODY_CONTENT_PLUGIN";
 
-    private static final String JAVAX_BODY_CONTENT_TEMPLATE_TEXT = "JAVAX_BODY_CONTENT_TEMPLATE_TEXT";
+    private static final String JAVAX_BODY_CONTENT_TEMPLATE_TEXT =
+        "JAVAX_BODY_CONTENT_TEMPLATE_TEXT";
 
     /**
      * The constructor
@@ -85,7 +86,6 @@ class Parser implements TagConstants {
         this.pageInfo = pc.getCompiler().getPageInfo();
         this.err = pc.getCompiler().getErrorDispatcher();
         this.reader = reader;
-        this.currentFile = reader.mark().getFile();
         this.scriptlessCount = 0;
         this.isTagFile = isTagFile;
         this.directivesOnly = directivesOnly;
@@ -108,7 +108,8 @@ class Parser implements TagConstants {
     public static Node.Nodes parse(ParserController pc, JspReader reader,
             Node parent, boolean isTagFile, boolean directivesOnly,
             URL jarFileUrl, String pageEnc, String jspConfigPageEnc,
-            boolean isDefaultPageEncoding, boolean isBomPresent) throws JasperException {
+            boolean isDefaultPageEncoding, boolean isBomPresent)
+            throws JasperException {
 
         Parser parser = new Parser(pc, reader, isTagFile, directivesOnly,
                 jarFileUrl);
@@ -169,7 +170,8 @@ class Parser implements TagConstants {
      * around Eq. It is added to be backward compatible with Tomcat, and with
      * other xml parsers.
      */
-    private boolean parseAttribute(AttributesImpl attrs) throws JasperException {
+    private boolean parseAttribute(AttributesImpl attrs)
+            throws JasperException {
 
         // Get the qualified name
         String qName = parseName();
@@ -417,8 +419,8 @@ class Parser implements TagConstants {
                     }
                     if (impl == null) {
                         String[] location = ctxt.getTldLocation(uri);
-                        impl = new TagLibraryInfoImpl(ctxt, parserController, pageInfo,
-                                prefix, uri, location, err);
+                        impl = new TagLibraryInfoImpl(ctxt, parserController,
+                                pageInfo, prefix, uri, location, err);
                         if (ctxt.getOptions().isCaching()) {
                             ctxt.getOptions().getCache().put(uri, impl);
                         }
@@ -433,7 +435,8 @@ class Parser implements TagConstants {
                     if (pageInfo.getTaglib(urnTagdir) == null) {
                         pageInfo.addTaglib(urnTagdir,
                                 new ImplicitTagLibraryInfo(ctxt,
-                                        parserController, pageInfo, prefix, tagdir, err));
+                                        parserController, pageInfo, prefix,
+                                        tagdir, err));
                     }
                     pageInfo.addPrefixMapping(prefix, urnTagdir);
                 }
@@ -599,8 +602,8 @@ class Parser implements TagConstants {
     }
 
     /*
-     * Parses a variable directive with the following syntax: PageDirective ::= (
-     * S Attribute)*
+     * Parses a variable directive with the following syntax:
+     * PageDirective ::= ( S Attribute)*
      */
     private void parseVariableDirective(Node parent) throws JasperException {
         Attributes attrs = parseAttributes();
@@ -738,7 +741,8 @@ class Parser implements TagConstants {
      * ELExpressionBody (following "${" to first unquoted "}") // XXX add formal
      * production and confirm implementation against it, // once it's decided
      */
-    private void parseELExpression(Node parent, char type) throws JasperException {
+    private void parseELExpression(Node parent, char type)
+            throws JasperException {
         start = reader.mark();
         Mark last = null;
         boolean singleQuoted = false, doubleQuoted = false;
