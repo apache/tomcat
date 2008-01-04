@@ -1,3 +1,6 @@
+Fix: IFS problem in native/build/tcnative.m4 (rjung)
+Fix: Wrong gcc link flag in native/build/tcnative.m4 (rjung)
+Tag: 1_1.12
 Improvement: Add support of J9VM based JVM. (jfclere)
 Improvement: Arrange licence in source files. (markt).
 Improvement: Add two new 'immediate' methods for sending the data.
