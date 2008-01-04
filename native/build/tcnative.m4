@@ -336,7 +336,7 @@ case "$use_openssl" in
                 TCN_OPENSSL_LIBS="-L$use_openssl/lib -Wl,+b: -lssl -lcrypto"
                 ;;
             *linux*)
-                TCN_OPENSSL_LIBS="-L$use_openssl/lib --Wl,-rpath,$use_openssl/lib -lssl -lcrypto"
+                TCN_OPENSSL_LIBS="-L$use_openssl/lib -Wl,-rpath,$use_openssl/lib -lssl -lcrypto"
                 ;;
             *)
                 TCN_OPENSSL_LIBS="-L$use_openssl/lib -lssl -lcrypto"
