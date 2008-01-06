@@ -89,34 +89,34 @@ public class JspServletWrapper {
                       boolean isErrorPage, JspRuntimeContext rctxt)
             throws JasperException {
 
-	this.isTagFile = false;
+        this.isTagFile = false;
         this.config = config;
         this.options = options;
         this.jspUri = jspUri;
         ctxt = new JspCompilationContext(jspUri, isErrorPage, options,
-					 config.getServletContext(),
-					 this, rctxt);
+                                         config.getServletContext(),
+                                         this, rctxt);
     }
 
     /*
      * JspServletWrapper for tag files.
      */
     public JspServletWrapper(ServletContext servletContext,
-			     Options options,
-			     String tagFilePath,
-			     TagInfo tagInfo,
-			     JspRuntimeContext rctxt,
-			     URL tagFileJarUrl)
-	    throws JasperException {
+                             Options options,
+                             String tagFilePath,
+                             TagInfo tagInfo,
+                             JspRuntimeContext rctxt,
+                             URL tagFileJarUrl)
+            throws JasperException {
 
-	this.isTagFile = true;
-        this.config = null;	// not used
+        this.isTagFile = true;
+        this.config = null;        // not used
         this.options = options;
-	this.jspUri = tagFilePath;
-	this.tripCount = 0;
+        this.jspUri = tagFilePath;
+        this.tripCount = 0;
         ctxt = new JspCompilationContext(jspUri, tagInfo, options,
-					 servletContext, this, rctxt,
-					 tagFileJarUrl);
+                                         servletContext, this, rctxt,
+                                         tagFileJarUrl);
     }
 
     public JspCompilationContext getJspEngineContext() {
@@ -221,9 +221,9 @@ public class JspServletWrapper {
             }
         } catch (FileNotFoundException ex) {
             throw new JasperException(ex);
-	}
+        }
 
-	return tagHandlerClass;
+        return tagHandlerClass;
     }
 
     /**
@@ -234,12 +234,12 @@ public class JspServletWrapper {
      */
     public Class loadTagFilePrototype() throws JasperException {
 
-	ctxt.setPrototypeMode(true);
-	try {
-	    return loadTagFile();
-	} finally {
-	    ctxt.setPrototypeMode(false);
-	}
+        ctxt.setPrototypeMode(true);
+        try {
+            return loadTagFile();
+        } finally {
+            ctxt.setPrototypeMode(false);
+        }
     }
 
     /**
@@ -266,21 +266,21 @@ public class JspServletWrapper {
     }
 
     public boolean isTagFile() {
-	return this.isTagFile;
+        return this.isTagFile;
     }
 
     public int incTripCount() {
-	return tripCount++;
+        return tripCount++;
     }
 
     public int decTripCount() {
-	return tripCount--;
+        return tripCount--;
     }
 
     public void service(HttpServletRequest request, 
                         HttpServletResponse response,
                         boolean precompile)
-	    throws ServletException, IOException, FileNotFoundException {
+            throws ServletException, IOException, FileNotFoundException {
         
         try {
 
