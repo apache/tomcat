@@ -16,6 +16,10 @@
 
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.text.DecimalFormat;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
@@ -23,10 +27,6 @@ import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
-import java.text.DecimalFormat;
-import org.apache.catalina.tribes.membership.MemberImpl;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 
@@ -61,7 +61,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
             super.sendMessage(destination, msg, payload);
         }catch ( ChannelException x ) {
             msgTxErr.addAndGet(1);
-            access.addAndGet(-1);
+            if ( access.get() == 1 ) access.addAndGet(-1);
             throw x;
         } 
         mbTx += ((double)(bytes*destination.length))/(1024d*1024d);
@@ -115,6 +115,46 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
 
     public int getInterval() {
         return interval;
+    }
+
+    public double getLastCnt() {
+        return lastCnt;
+    }
+
+    public double getMbAppTx() {
+        return mbAppTx;
+    }
+
+    public double getMbRx() {
+        return mbRx;
+    }
+
+    public double getMbTx() {
+        return mbTx;
+    }
+
+    public AtomicLong getMsgRxCnt() {
+        return msgRxCnt;
+    }
+
+    public AtomicLong getMsgTxCnt() {
+        return msgTxCnt;
+    }
+
+    public AtomicLong getMsgTxErr() {
+        return msgTxErr;
+    }
+
+    public long getRxStart() {
+        return rxStart;
+    }
+
+    public double getTimeTx() {
+        return timeTx;
+    }
+
+    public long getTxStart() {
+        return txStart;
     }
 
 }
