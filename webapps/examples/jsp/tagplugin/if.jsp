@@ -25,7 +25,7 @@
     </br>
     <a href="notes.html">Plugin Introductory Notes<font <font color="#0000FF"></a>
     <br/>
-    <a href="howto.html">Brief Instructions for Wrieting Plugins<font color="#0000FF"></a>
+    <a href="howto.html">Brief Instructions for Writing Plugins<font color="#0000FF"></a>
     <br/> <br/>
     <hr>
 
