@@ -47,7 +47,8 @@ base-jakarta.loc=http://archive.apache.org/dist/jakarta
 base-tomcat.loc=http://archive.apache.org/dist/tomcat
 
 # ----- Commons Logging, version 1.1 or later -----
-commons-logging-src.loc=${base-jakarta.loc}/commons/logging/source/commons-logging-1.1-src.tar.gz
+commons-logging-version=1.1.1
+commons-logging-src.loc=${base-jakarta.loc}/commons/logging/source/commons-logging-${commons-logging-version}-src.tar.gz
 
 # ----- Webservices -----
 jaxrpc-src.loc=http://repo1.maven.org/maven2/geronimo-spec/geronimo-spec-jaxrpc/1.1-rc4/geronimo-spec-jaxrpc-1.1-rc4.jar
@@ -81,12 +82,12 @@ commons-collections.loc=${base-jakarta.loc}/commons/collections/binaries/commons
 commons-collections-src.loc=${base-jakarta.loc}/commons/collections/source/commons-collections-3.2-src.tar.gz
 
 # ----- NSIS, version 2.0 or later -----
-nsis.home=${base.path}/nsis-2.22
+nsis.home=${base.path}/nsis-2.34
 nsis.exe=${nsis.home}/makensis.exe
 nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
 nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
 nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
-nsis.loc=${base-sf.loc}/nsis/nsis-2.22-setup.exe
+nsis.loc=${base-sf.loc}/nsis/nsis-2.34-setup.exe
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
 commons-daemon.home=${base.path}/commons-daemon-1.0.1
