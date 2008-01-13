@@ -102,36 +102,36 @@
     <untar src="${tomcat.extras}/logging/commons-logging-src.tar" 
     	dest="${tomcat.extras}/logging/"/>
   	
-    <replace dir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/commons" >
+    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/commons" >
       <replacefilter token="org.apache.commons"
             value="org.apache.juli" />
     </replace>
-    <mkdir dir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/juli" />
-    <move todir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/juli">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/src/java/org/apache/commons" />
+    <mkdir dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/juli" />
+    <move todir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/juli">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/src/java/org/apache/commons" />
     </move>
 
-    <replace dir="${tomcat.extras}/logging/commons-logging-1.1-src" >
+    <replace dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src" >
       <replacefilter token="org.apache.commons"
             value="org.apache.juli" />
         <replacefilter token="org/apache/commons/"
               value="org/apache/juli/" />
     </replace>
-    <copy tofile="${tomcat.extras}/logging/commons-logging-1.1-src/build2.xml" 
-    	file="${tomcat.extras}/logging/commons-logging-1.1-src/build.xml" />
+    <copy tofile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml" 
+    	file="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build.xml" />
 
-  	<ant antfile="${tomcat.extras}/logging/commons-logging-1.1-src/build2.xml"
-  	     dir="${tomcat.extras}/logging/commons-logging-1.1-src" 
+  	<ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
+  	     dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src" 
   	     target="getlibs" />
-    <copy todir="${tomcat.extras}/logging/commons-logging-1.1-src">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/lib" />
+    <copy todir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/lib" />
     </copy>
-  	<ant antfile="${tomcat.extras}/logging/commons-logging-1.1-src/build2.xml"
-  	     dir="${tomcat.extras}/logging/commons-logging-1.1-src"
+  	<ant antfile="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/build2.xml"
+  	     dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
   	     target="compile" />
   
     <jar jarfile="${tomcat-juli.jar}">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/target/classes">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
         <include name="org/apache/juli/logging/*.class" /> 
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" /> 
         <include name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
@@ -155,7 +155,7 @@
               forceOverwrite="yes" fileext=".md5" />
 
     <jar jarfile="${tomcat-juli-adapters.jar}">
-      <fileset dir="${tomcat.extras}/logging/commons-logging-1.1-src/target/classes">
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
         <include name="org/apache/juli/logging/impl/**.class" /> 
         <exclude name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
         <exclude name="org/apache/juli/logging/impl/LogFactoryImpl.class" /> 
