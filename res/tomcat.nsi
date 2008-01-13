@@ -136,20 +136,26 @@ Section "Core" SecTomcatCore
   SetOutPath $INSTDIR
   File tomcat.ico
   File LICENSE
-  File /r lib
-  File /nonfatal /r logs
-  File /nonfatal /r work
-  File /nonfatal /r temp
+  SetOutPath $INSTDIR\lib
+  File /r lib\*.*
+  SetOutPath $INSTDIR\logs
+  File /nonfatal /r logs\*.*
+  SetOutPath $INSTDIR\work
+  File /nonfatal /r work\*.*
+  SetOutPath $INSTDIR\temp
+  File /nonfatal /r temp\*.*
   SetOutPath $INSTDIR\bin
   File bin\bootstrap.jar
   File bin\tomcat-juli.jar
   File bin\*.exe
   SetOutPath $INSTDIR\conf
   File conf\*.*
-  SetOutPath $INSTDIR\webapps
-  File /r webapps\ROOT
-  File /r webapps\host-manager
-  File /r webapps\manager
+  SetOutPath $INSTDIR\webapps\ROOT
+  File /r webapps\ROOT\*.*
+  SetOutPath $INSTDIR\webapps\host-manager
+  File /r webapps\host-manager\*.*
+  SetOutPath $INSTDIR\webapps\manager
+  File /r webapps\manager\*.*
 
   Call configure
   Call findJavaPath
@@ -285,8 +291,8 @@ SectionEnd
 Section "Documentation" SecDocs
 
   SectionIn 1 3
-  SetOutPath $INSTDIR\webapps
-  File /r webapps\docs
+  SetOutPath $INSTDIR\webapps\docs
+  File /r webapps\docs\*.*
 
 SectionEnd
 
@@ -295,8 +301,8 @@ Section "Examples" SecExamples
   SectionIn 3
 
   SetOverwrite on
-  SetOutPath $INSTDIR\webapps
-  File /r webapps\examples
+  SetOutPath $INSTDIR\webapps\examples
+  File /r webapps\examples\*.*
 
 SectionEnd
 
