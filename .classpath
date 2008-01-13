@@ -17,9 +17,11 @@
 -->
 <classpath>
 	<classpathentry excluding="**/.svn/**|org/apache/tomcat/util/net/puretls/" kind="src" path="java"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/apache-ant-1.6.5/lib/ant.jar"/>
-	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/eclipse/plugins/org.eclipse.jdt.core_3.1.2.jar"/>
+	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/eclipse/plugins/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
 	<classpathentry kind="output" path=".settings/output"/>
 </classpath>
