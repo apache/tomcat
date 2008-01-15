@@ -46,6 +46,7 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <update>Add -Dorg.apache.catalina.tribes.dns_lookups=false as default. The ability to turn off reverse DNS lookups for membership.(fhanik)</update>
       <update>Guess java location from the PATH environment and improve fix for 37284</update>
       <update>Add NIO connector to server.xml parsing warning, remove Connector as exception case</update>
       <fix><bug>43653</bug>: Fix SSL buffer mixup when response is unable to write more than socket buffer can handle</fix>
