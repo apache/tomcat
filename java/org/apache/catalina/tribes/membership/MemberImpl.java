@@ -37,6 +37,11 @@ import org.apache.catalina.tribes.transport.SenderState;
 public class MemberImpl implements Member, java.io.Externalizable {
 
     /**
+     * Should a call to getName or getHostName try to do a DNS lookup?
+     * default is false
+     */
+    public static final boolean DO_DNS_LOOKUPS = Boolean.parseBoolean(System.getProperty("org.apache.catalina.tribes.dns_lookups","false"));
+    /**
      * Public properties specific to this implementation
      */
     public static final transient String TCP_LISTEN_PORT = "tcpListenPort";
@@ -430,7 +435,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
         if ( this.hostname != null ) return hostname;
         else {
             try {
-                this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
+                if (DO_DNS_LOOKUPS)
+                    this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
+                else 
+                    this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host);
                 return this.hostname;
             }catch ( IOException x ) {
                 throw new RuntimeException("Unable to parse hostname.",x);
