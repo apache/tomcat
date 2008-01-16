@@ -395,9 +395,10 @@ public class StandardManager
                     session.setManager(this);
                     sessions.put(session.getIdInternal(), session);
                     session.activate();
+                    sessionCounter++;
                 }
             } catch (ClassNotFoundException e) {
-              log.error(sm.getString("standardManager.loading.cnfe", e), e);
+                log.error(sm.getString("standardManager.loading.cnfe", e), e);
                 if (ois != null) {
                     try {
                         ois.close();
@@ -408,7 +409,7 @@ public class StandardManager
                 }
                 throw e;
             } catch (IOException e) {
-              log.error(sm.getString("standardManager.loading.ioe", e), e);
+                log.error(sm.getString("standardManager.loading.ioe", e), e);
                 if (ois != null) {
                     try {
                         ois.close();
