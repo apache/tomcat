@@ -382,7 +382,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
             Map.Entry entry = (Map.Entry) iterator.next();
             String displayPath = (String) entry.getKey();
-            String contextPath = (String) entry.getKey();
+            String contextPath = (String) entry.getValue();
             Context context = (Context) host.findChild(contextPath);
             if (displayPath.equals("")) {
                 displayPath = "/";
