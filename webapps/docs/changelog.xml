@@ -46,6 +46,9 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        Set correct StandardManager.sessionCounter after reload/restart. (pero)
+      </fix
       <update>Add -Dorg.apache.catalina.tribes.dns_lookups=false as default. The ability to turn off reverse DNS lookups for membership.(fhanik)</update>
       <update>Guess java location from the PATH environment and improve fix for 37284</update>
       <update>Add NIO connector to server.xml parsing warning, remove Connector as exception case</update>
