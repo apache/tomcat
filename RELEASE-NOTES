@@ -42,8 +42,7 @@ KNOWN ISSUES IN THIS RELEASE:
 ===================
 Dependency Changes:
 ===================
-Tomcat 6.0 is designed to run on JSE 5.0 and later, and requires
-configuration to run on JSE 5.0.
+Tomcat 6.0 is designed to run on JSE 5.0 and later.
 
 In addition, Tomcat 6.0 uses the Eclipse JDT Java compiler for compiling
 JSP pages.  This means you no longer need to have the complete
