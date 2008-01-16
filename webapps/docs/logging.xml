@@ -214,7 +214,7 @@
     </ul>
   </p>
   <p>
-    Example logging.properties file to be placed in common/classes:
+    Example logging.properties file to be placed in $CATALINA_HOME/conf:
     <source>
 handlers = 1catalina.org.apache.juli.FileHandler, 2localhost.org.apache.juli.FileHandler, \
            3manager.org.apache.juli.FileHandler, 4admin.org.apache.juli.FileHandler, \
