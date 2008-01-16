@@ -38,6 +38,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.manager.util.BaseSessionComparator;
 import org.apache.catalina.manager.util.ReverseComparator;
@@ -440,7 +441,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
                      "/html/expire?path=" + displayPath);
                 args[9] = appsExpire;
                 args[10] = sm.getString("htmlManagerServlet.expire.explain");
-                args[11] = new Integer(context.getManager().getMaxInactiveInterval()/60);
+                Manager manager = context.getManager();
+                if (manager == null) {
+                    args[11] = sm.getString("htmlManagerServlet.noManager");
+                } else {
+                    args[11] = new Integer(
+                            context.getManager().getMaxInactiveInterval()/60);
+                }
                 args[12] = sm.getString("htmlManagerServlet.expire.unit");
                 
                 args[13] = highlightColor;
