@@ -88,7 +88,7 @@ public class DefaultInstanceManager implements InstanceManager {
                     this.getClass().getClassLoader().getResourceAsStream
                             ("org/apache/catalina/core/RestrictedListeners.properties");
             if (is != null) {
-                restrictedFilters.load(is);
+                restrictedListeners.load(is);
             } else {
                 catalinaContext.getLogger().error(sm.getString("defaultInstanceManager.restrictedListenersResources"));
             }
