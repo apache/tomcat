@@ -1203,7 +1203,13 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         s.expire();
     }
 
-
+    public long getLastAccessedTimestamp( String sessionId ) {
+        Session s=(Session)sessions.get(sessionId);
+        if(s== null)
+            return -1 ;
+        return s.getLastAccessedTime();
+    }
+  
     public String getLastAccessedTime( String sessionId ) {
         Session s=(Session)sessions.get(sessionId);
         if( s==null ) {
@@ -1222,6 +1228,13 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
             return "";
         }
         return new Date(s.getCreationTime()).toString();
+    }
+
+    public long getCreationTimestamp( String sessionId ) {
+        Session s=(Session)sessions.get(sessionId);
+        if(s== null)
+            return -1 ;
+        return s.getCreationTime();
     }
 
     // -------------------- JMX and Registration  --------------------
