@@ -46,6 +46,9 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        Fix ManagerServlet.exipreSession throws Exceptions as iterate longer session lists at production servers (pero)
+      </fix>
       <add>
         Add ManagerBase session getLastAccessedTimestamp and getCreationTimestamp for better
         remote JMX access. (pero)

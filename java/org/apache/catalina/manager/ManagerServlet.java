@@ -47,6 +47,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
+import org.apache.catalina.Manager;
 import org.apache.catalina.Role;
 import org.apache.catalina.Server;
 import org.apache.catalina.ServerFactory;
@@ -1115,8 +1116,14 @@ public class ManagerServlet
                                             RequestUtil.filter(displayPath)));
                 return;
             }
+            Manager manager = context.getManager() ;
+            if(manager == null) {
+                writer.println(sm.getString("managerServlet.noManager",
+                        RequestUtil.filter(displayPath)));
+                return;               
+            }
             int maxCount = 60;
-            int maxInactiveInterval = context.getManager().getMaxInactiveInterval()/60;
+            int maxInactiveInterval = manager.getMaxInactiveInterval()/60;
             int histoInterval = maxInactiveInterval / maxCount;
             if ( histoInterval * maxCount < maxInactiveInterval ) 
                 histoInterval++;
@@ -1127,13 +1134,13 @@ public class ManagerServlet
             writer.println(sm.getString("managerServlet.sessions", displayPath));
             writer.println(sm.getString("managerServlet.sessiondefaultmax",
                                 "" + maxInactiveInterval));
-            Session [] sessions = context.getManager().findSessions();
+            Session [] sessions = manager.findSessions();
             int [] timeout = new int[maxCount];
             int notimeout = 0;
             int expired = 0;
             long now = System.currentTimeMillis();
             for (int i = 0; i < sessions.length; i++) {
-                int time = (int)((now-sessions[i].getLastAccessedTime())/1000);
+                int time = (int)((now-sessions[i].getLastAccessedTimeInternal())/1000);
                 if (idle >= 0 && time >= idle*60) {
                     sessions[i].expire();
                     idle++;
