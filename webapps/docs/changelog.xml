@@ -46,6 +46,9 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <fix><bug>44261</bug>: Fix "Restricted listeners property file not found" message fix.  Patch provided by
+        David Jencks. (pero)
+      </fix>  
       <fix>
         Fix ManagerServlet.exipreSession throws Exceptions as iterate longer session lists at production servers (pero)
       </fix>
