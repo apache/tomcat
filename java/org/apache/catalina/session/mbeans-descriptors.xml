@@ -160,6 +160,24 @@
                  type="java.lang.String"/>
     </operation>
 
+   <operation   name="getLastAccessedTimestamp"
+          description="Get the last access timestamp"
+               impact="ACTION"
+           returnType="long">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getCreationTimestamp"
+          description="Get the creation timestamp"
+               impact="ACTION"
+           returnType="long">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+
   </mbean>
 
   <mbean         name="PersistentManager"
@@ -316,6 +334,24 @@
           description="Get the creation time"
                impact="ACTION"
            returnType="java.lang.String">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getLastAccessedTimestamp"
+          description="Get the last access timestamp"
+               impact="ACTION"
+           returnType="long">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getCreationTimestamp"
+          description="Get the creation timestamp"
+               impact="ACTION"
+           returnType="long">
       <parameter name="sessionId"
           description="Id of the session"
                  type="java.lang.String"/>

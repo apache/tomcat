@@ -46,6 +46,10 @@
   </subsection>
   <subsection name="Catalina">
     <changelog>
+      <add>
+        Add ManagerBase session getLastAccessedTimestamp and getCreationTimestamp for better
+        remote JMX access. (pero)
+      </add>
       <fix>
         Set correct StandardManager.sessionCounter after reload/restart. (pero)
       </fix>
