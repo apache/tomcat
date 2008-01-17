@@ -342,6 +342,22 @@ created by this Manager"
         description="Id of the session"
         type="java.lang.String"/>
     </operation>
+    <operation   name="getLastAccessedTimestamp"
+          description="Get the last access timestamp"
+               impact="ACTION"
+           returnType="long">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
+    <operation   name="getCreationTimestamp"
+          description="Get the creation timestamp"
+               impact="ACTION"
+           returnType="long">
+      <parameter name="sessionId"
+          description="Id of the session"
+                 type="java.lang.String"/>
+    </operation>
     <operation
       name="expireAllLocalSessions"
       description="Exipre all active local sessions and replicate the invalid sessions"
