@@ -171,7 +171,7 @@ public class JSSESocketFactory
         String[] enabledCiphers = null;
 
         if (requestedCiphers != null) {
-            Vector vec = null;
+            Vector<String> vec = null;
             String cipher = requestedCiphers;
             int index = requestedCiphers.indexOf(',');
             if (index != -1) {
@@ -187,7 +187,7 @@ public class JSSESocketFactory
                                      && i<supportedCiphers.length; i++) {
                             if (supportedCiphers[i].equals(cipher)) {
                                 if (vec == null) {
-                                    vec = new Vector();
+                                    vec = new Vector<String>();
                                 }
                                 vec.addElement(cipher);
                                 break;
@@ -211,7 +211,7 @@ public class JSSESocketFactory
                                  && i<supportedCiphers.length; i++) {
                         if (supportedCiphers[i].equals(cipher)) {
                             if (vec == null) {
-                                vec = new Vector();
+                                vec = new Vector<String>();
                             }
                             vec.addElement(cipher);
                             break;
@@ -476,7 +476,7 @@ public class JSSESocketFactory
         if("PKIX".equalsIgnoreCase(algorithm)) {
             PKIXBuilderParameters xparams = new PKIXBuilderParameters(trustStore, 
                                                                      new X509CertSelector());
-            Collection crls = getCRLs(crlf);
+            Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
             xparams.addCertStore(store);
@@ -560,7 +560,7 @@ public class JSSESocketFactory
         String[] enabledProtocols = null;
 
         if (requestedProtocols != null) {
-            Vector vec = null;
+            Vector<String> vec = null;
             String protocol = requestedProtocols;
             int index = requestedProtocols.indexOf(',');
             if (index != -1) {
@@ -576,7 +576,7 @@ public class JSSESocketFactory
                                      && i<supportedProtocols.length; i++) {
                             if (supportedProtocols[i].equals(protocol)) {
                                 if (vec == null) {
-                                    vec = new Vector();
+                                    vec = new Vector<String>();
                                 }
                                 vec.addElement(protocol);
                                 break;
@@ -600,7 +600,7 @@ public class JSSESocketFactory
                                  && i<supportedProtocols.length; i++) {
                         if (supportedProtocols[i].equals(protocol)) {
                             if (vec == null) {
-                                vec = new Vector();
+                                vec = new Vector<String>();
                             }
                             vec.addElement(protocol);
                             break;
