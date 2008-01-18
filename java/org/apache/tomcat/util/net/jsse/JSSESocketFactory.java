@@ -283,6 +283,9 @@ public class JSSESocketFactory
             log.debug("TrustPass = " + trustStorePassword);
         }
         String truststoreType = (String)attributes.get("truststoreType");
+        if( truststoreType == null) {
+            truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+        }
         if(truststoreType == null) {
             truststoreType = keystoreType;
         }
