@@ -636,11 +636,15 @@ public class HostConfig
                     name = path;
                 }
             }
-            File expandedDocBase = new File(name);
-            File warDocBase = new File(name + ".war");
-            if (!expandedDocBase.isAbsolute()) {
-                expandedDocBase = new File(appBase(), name);
-                warDocBase = new File(appBase(), name + ".war");
+            // default to appBase dir + name
+            File expandedDocBase = new File(appBase(), name);
+            if (context.getDocBase() != null) {
+                // first assume docBase is absolute
+                expandedDocBase = new File(context.getDocBase());
+                if (!expandedDocBase.isAbsolute()) {
+                    // if docBase specified and relative, it must be relative to appBase
+                    expandedDocBase = new File(appBase(), context.getDocBase());
+                }
             }
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
@@ -652,6 +656,7 @@ public class HostConfig
                 addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
             } else {
                 // Find an existing matching war and expanded folder
+                File warDocBase = new File(expandedDocBase.getAbsolutePath() + ".war");
                 if (warDocBase.exists()) {
                     deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
                             new Long(warDocBase.lastModified()));
@@ -966,9 +971,13 @@ public class HostConfig
                 if (docBase != null) {
                     resource = new File(docBaseFile, watchedResources[i]);
                 } else {
+                    if(log.isDebugEnabled())
+                        log.debug("Ignoring non-existent WatchedResource '" + resource.getAbsolutePath() + "'");
                     continue;
                 }
             }
+            if(log.isDebugEnabled())
+                log.debug("Watching WatchedResource '" + resource.getAbsolutePath() + "'");
             app.reloadResources.put(resource.getAbsolutePath(), 
                     new Long(resource.lastModified()));
         }
