@@ -41,14 +41,16 @@ server.
 
 The J2EE standard provides a standard set of elements in 
 the <code>/WEB-INF/web.xml</code> file to reference resources; resources 
-referenced in these elements must be defined in an application-server-specific configuration. 
+referenced in these elements must be defined in an application-server-specific
+configuration. 
 </p>
 
 <p>For Tomcat 6, these entries in per-web-application 
 <code>InitialContext</code> are configured in the 
-<code><strong>&lt;Context&gt;</strong></code> elements that can be specified 
-in either <code>$CATALINA_HOME/conf/server.xml</code> or, preferably, 
-the per-web-application context XML file (either <code>META-INF/context.xml</code>).
+<a href="config/context.html"><code>&lt;Context&gt;</code></a> elements that
+can be specified in either <code>$CATALINA_HOME/conf/server.xml</code> or,
+preferably, the per-web-application context XML file (
+<code>META-INF/context.xml</code>).
 </p>
 
 <p>Tomcat 6 maintains a separate namespace of global resources for the 
@@ -103,9 +105,8 @@ conn.close();
 for JNDI, and for the features supported by Java2 Enterprise Edition (J2EE)
 servers, which Tomcat emulates for the services that it provides:</p>
 <ul>
-<li><a href="http://java.sun.com/products/jndi/#download">Java Naming and
-    Directory Interface</a> (included in JDK 1.4, available separately for
-    prior JDK versions)</li>
+<li><a href="http://java.sun.com/products/jndi">Java Naming and Directory
+    Interface</a> (included in JDK 1.4 onwards)</li>
 <li><a href="http://java.sun.com/j2ee/download.html">J2EE Platform
     Specification</a> (in particular, see Chapter 5 on <em>Naming</em>)</li>
 </ul>
@@ -116,8 +117,8 @@ servers, which Tomcat emulates for the services that it provides:</p>
 <section name="Configuring JNDI Resources">
 
 <p>Each available JNDI Resource is configured based on inclusion of the
-following elements in the <code><strong>&lt;Context&gt;</strong></code> or 
-<code><strong>&lt;DefaultContext&gt;</strong></code> elements:</p>
+following elements in the
+<a href="config/context.html"><code>&lt;Context&gt;</code></a> element:</p>
 
 <ul>
 <li><a href="config/context.html#Environment Entries">&lt;Environment&gt;</a> -
@@ -144,16 +145,17 @@ following elements in the <code><strong>&lt;Context&gt;</strong></code> or
 </ul>
 
 <p>Any number of these elements may be nested inside a
-<a href="config/context.html">&lt;Context&gt;</a> element (to be associated
-only with that particular web application).</p>
+<a href="config/context.html"><code>&lt;Context&gt;</code></a> element (to be
+associated only with that particular web application).</p>
 
 <p>In addition, the names and values of all <code>&lt;env-entry&gt;</code>
 elements included in the web application deployment descriptor
 (<code>/WEB-INF/web.xml</code>) are configured into the initial context as
-well, overriding corresponding values from <code>conf/server.xml</code>
+well, overriding corresponding values from the
+<a href="config/context.html"><code>&lt;Context&gt;</code></a> element
 <strong>only</strong> if allowed by the corresponding
-<code>&lt;Environment&gt;</code> element (by setting the
-<code>override</code> attribute to "true").</p>
+<code>&lt;Environment&gt;</code> element (by setting the <code>override</code>
+attribute to "true").</p>
 
 <p>Global resources can be defined in the server-wide JNDI context, by adding
 the resource elements described above to the
@@ -170,10 +172,11 @@ include it in the per-web-application context.</p>
 
   <p>Tomcat 6 includes a series of standard resource factories that can
   provide services to your web applications, but give you configuration
-  flexibility (in <code>$CATALINA_HOME/conf/server.xml</code>) without
-  modifying the web application or the deployment descriptor.  Each
-  subsection below details the configuration and usage of the standard
-  resource factories.</p>
+  flexibility (via the
+  <a href="config/context.html"><code>&lt;Context&gt;</code></a> element)
+  without modifying the web application or the deployment descriptor. Each
+  subsection below details the configuration and usage of the standard resource
+  factories.</p>
 
   <p>See <a href="#Adding Custom Resource Factories">Adding Custom
   Resource Factories</a> for information about how to create, install,
@@ -280,9 +283,10 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <h3>4.  Configure Tomcat's Resource Factory</h3>
 
-    <p>To configure Tomcat's resource factory, add an elements like this to the
-    <code>$CATALINA_HOME/conf/server.xml</code> file, nested inside the
-    <code>Context</code> element for this web application.</p>
+    <p>To configure Tomcat's resource factory, add an element like this to the
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+    this web application.</p>
+
 <source>
 &lt;Context ...&gt;
   ...
@@ -318,7 +322,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <p>Tomcat 6 includes a standard resource factory that will create
     <code>javax.mail.Session</code> session instances for you, already
-    connected to the SMTP server that is configured in <code>server.xml</code>.
+    configured to connect to an SMTP server.
     In this way, the application is totally insulated from changes in the
     email server configuration environment - it simply asks for, and receives,
     a preconfigured session whenever needed.</p>
@@ -380,14 +384,16 @@ Transport.send(message);
 
     <p>Note that the application uses the same resource reference name
     that was declared in the web application deployment descriptor.  This
-    is matched up against the resource factory that is configured in
-    <code>$CATALINA_HOME/conf/server.xml</code>, as described below.</p>
+    is matched up against the resource factory that is configured in the
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element
+    for the web application as described below.</p>
 
     <h3>3.  Configure Tomcat's Resource Factory</h3>
 
     <p>To configure Tomcat's resource factory, add an elements like this to the
-    <code>$CATALINA_HOME/conf/server.xml</code> file, nested inside the
-    <code>Context</code> element for this web application.</p>
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+    this web application.</p>
+
 <source>
 &lt;Context ...&gt;
   ...
@@ -415,7 +421,7 @@ Transport.send(message);
     activation.jar and mail.jar. Unpackage both distributions and place 
     them into $CATALINA_HOME/lib so that they are available to
     Tomcat during the initialization of the mail Session Resource.
-    <strong>Note:</strong> placing these jars in both common/lib and a 
+    <strong>Note:</strong> placing these jars in both $CATALINA_HOME/lib and a 
     web application's lib folder will cause an error, so ensure you have
     them in the $CATALINA_HOME/lib location only.
     </p>
@@ -428,12 +434,13 @@ Transport.send(message);
     sends the mail message is in
     <code>/WEB-INF/classes/SendMailServlet.java</code>.</p>
 
-    <p><strong>WARNING</strong> - The default configuration assumes that
-    there is an SMTP server listing on port 25 on <code>localhost</code>.
-    If this is not the case, edit the
-    <code>$CATALINA_HOME/conf/server.xml</code> file, and modify the
-    parameter value for the <code>mail.smtp.host</code> parameter to be
-    the host name of an SMTP server on your network.</p>
+    <p><strong>WARNING</strong> - The default configuration assumes that there
+    is an SMTP server listing on port 25 on <code>localhost</code>. If this is
+    not the case, edit the
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+    this web application and modify the parameter value for the
+    <code>mail.smtp.host</code> parameter to be the host name of an SMTP server
+    on your network.</p>
 
   </subsection>
 
@@ -466,8 +473,8 @@ Transport.send(message);
 
     <p><strong>NOTE</strong> - The default data source support in Tomcat
     is based on the <strong>DBCP</strong> connection pool from the
-    <a href="http://jakarta.apache.org/commons">Jakarta Commons</a>
-    subproject.  However, it is possible to use any other connection pool
+    <a href="http://commons.apache.org/">Commons</a>
+    project.  However, it is possible to use any other connection pool
     that implements <code>javax.sql.DataSource</code>, by writing your
     own custom resource factory, as described
     <a href="#Adding Custom Resource Factories">below</a>.</p>
@@ -495,7 +502,8 @@ Transport.send(message);
   &lt;description&gt;
     Resource reference to a factory for java.sql.Connection
     instances that may be used for talking to a particular
-    database that is configured in the server.xml file.
+    database that is configured in the &lt;Context&gt;
+    configurartion for the web application.
   &lt;/description&gt;
   &lt;res-ref-name&gt;
     jdbc/EmployeeDB
@@ -529,22 +537,30 @@ Connection conn = ds.getConnection();
 conn.close();
 </source>
 
-    <p>Note that the application uses the same resource reference name
-    that was declared in the web application deployment descriptor.  This
-    is matched up against the resource factory that is configured in
-    <code>$CATALINA_HOME/conf/server.xml</code>, as described below.</p>
+    <p>Note that the application uses the same resource reference name that was
+    declared in the web application deployment descriptor. This is matched up
+    against the resource factory that is configured in the
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+    the web application as described below.</p>
 
     <h3>4.  Configure Tomcat's Resource Factory</h3>
 
     <p>To configure Tomcat's resource factory, add an element like this to the
-    <code>/META-INF/context.xml</code> file in the web application.</p>
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+    the web application.</p>
+
 <source>
 &lt;Context ...&gt;
   ...
-  &lt;Resource name="jdbc/EmployeeDB" auth="Container"
-            type="javax.sql.DataSource" username="dbusername" password="dbpassword"
-            driverClassName="org.hsql.jdbcDriver" url="jdbc:HypersonicSQL:database"
-            maxActive="8" maxIdle="4"/&gt;
+  &lt;Resource name="jdbc/EmployeeDB"
+            auth="Container"
+            type="javax.sql.DataSource"
+            username="dbusername"
+            password="dbpassword"
+            driverClassName="org.hsql.jdbcDriver"
+            url="jdbc:HypersonicSQL:database"
+            maxActive="8"
+            maxIdle="4"/&gt;
   ...
 &lt;/Context&gt;
 </source>
@@ -592,13 +608,14 @@ conn.close();
 
 <section name="Adding Custom Resource Factories">
 
-  <p>If none of the standard resource factories meet your needs, you can
-  write your own factory and integrate it into Tomcat 6, and then configure
-  the use of this factory in the <code>conf/server.xml</code> configuration
-  file.  In the example below, we will create a factory that only knows how
-  to create <code>com.mycompany.MyBean</code> beans, from the
-  <a href="#Generic JavaBean Resources">Generic JavaBean Resources</a>
-  example, above.</p>
+  <p>If none of the standard resource factories meet your needs, you can write
+  your own factory and integrate it into Tomcat 6, and then configure the use
+  of this factory in the
+  <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+  the web application. In the example below, we will create a factory that only
+  knows how to create <code>com.mycompany.MyBean</code> beans from the
+  <a href="#Generic JavaBean Resources">Generic JavaBean Resources</a> example
+  above.</p>
 
   <h3>1.  Write A Resource Factory Class</h3>
 
@@ -609,12 +626,12 @@ conn.close();
   called, with the following arguments:</p>
   <ul>
   <li><strong>Object obj</strong> - The (possibly null) object containing
-      location or reference information that can be used in creating an
-      object.  For Tomcat, this will always be an object of type
-      <code>javax.naming.Reference</code>, which contains the class name
-      of this factory class, as well as the configuration properties
-      (from <code>conf/server.xml</code>) to use in creating objects
-      to be returned.</li>
+      location or reference information that can be used in creating an object.
+      For Tomcat, this will always be an object of type
+      <code>javax.naming.Reference</code>, which contains the class name of
+      this factory class, as well as the configuration properties (from the
+      <a href="config/context.html"><code>&lt;Context&gt;</code></a> for the
+      web application) to use in creating objects to be returned.</li>
   <li><strong>Name name</strong> - The name to which this factory is bound
       relative to <code>nameCtx</code>, or <code>null</code> if no name
       is specified.</li>
@@ -741,8 +758,9 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <h3>4.  Configure Tomcat's Resource Factory</h3>
 
     <p>To configure Tomcat's resource factory, add an elements like this to the
-    <code>$CATALINA_HOME/conf/server.xml</code> file, nested inside the
-    <code>Context</code> element for this web application.</p>
+    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
+    this web application.</p>
+
 <source>
 &lt;Context ...&gt;
   ...
@@ -772,8 +790,6 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     compatible APIs.</p>
 
 </section>
-
-
 
 </body>
 
