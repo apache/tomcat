@@ -47,7 +47,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix><bug>38131</bug>: WatchedResource does not work if app is outside host appbase webapps. 
-        Patch provided by Gernot Pfingstl (pero)
+        Patch provided by Peter Lynch (pero)
       </fix>
       <fix><bug>44261</bug>: Fix "Restricted listeners property file not found" message fix.  Patch provided by
         David Jencks. (pero)
