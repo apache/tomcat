@@ -70,6 +70,10 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Manager</servlet-name>
+      <url-pattern>/expire</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Manager</servlet-name>
       <url-pattern>/sessions</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
@@ -150,6 +154,7 @@
       <url-pattern>/jmxproxy/*</url-pattern>
       <url-pattern>/html/*</url-pattern>
       <url-pattern>/list</url-pattern>
+      <url-pattern>/expire</url-pattern>
       <url-pattern>/sessions</url-pattern>
       <url-pattern>/start</url-pattern>
       <url-pattern>/stop</url-pattern>
