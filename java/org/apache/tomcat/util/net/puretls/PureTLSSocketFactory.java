@@ -44,7 +44,7 @@ public class PureTLSSocketFactory
     extends org.apache.tomcat.util.net.ServerSocketFactory
 {
     static org.apache.commons.logging.Log logger =
-	org.apache.commons.logging.LogFactory.getLog(PureTLSSocketFactory.class);
+        org.apache.commons.logging.LogFactory.getLog(PureTLSSocketFactory.class);
     static String defaultProtocol = "TLS";
     static boolean defaultClientAuth = false;
     static String defaultKeyStoreFile = "server.pem";
@@ -58,71 +58,71 @@ public class PureTLSSocketFactory
     }
 
     public ServerSocket createSocket(int port)
-	throws IOException
+        throws IOException
     {
-	init();
-	return new SSLServerSocket(context,port);
+        init();
+        return new SSLServerSocket(context,port);
     }
 
     public ServerSocket createSocket(int port, int backlog)
-	throws IOException
+        throws IOException
     {
-	init();
-	ServerSocket tmp;
-	
-	try {
-	    tmp=new SSLServerSocket(context,port,backlog);
-	}
-	catch (IOException e){
-	    throw e;
-	}
-	return tmp;
+        init();
+        ServerSocket tmp;
+        
+        try {
+            tmp=new SSLServerSocket(context,port,backlog);
+        }
+        catch (IOException e){
+            throw e;
+        }
+        return tmp;
     }
 
     public ServerSocket createSocket(int port, int backlog,
-				     InetAddress ifAddress)
-	throws IOException
+                                     InetAddress ifAddress)
+        throws IOException
     {
-	init();
-	return new SSLServerSocket(context,port,backlog,ifAddress);
+        init();
+        return new SSLServerSocket(context,port,backlog,ifAddress);
     }
 
     private void init()
-	throws IOException
+        throws IOException
     {
-	if(context!=null)
-	    return;
-	
-	boolean clientAuth=defaultClientAuth;
+        if(context!=null)
+            return;
+        
+        boolean clientAuth=defaultClientAuth;
 
-	try {
-	    String keyStoreFile=(String)attributes.get("keystore");
-	    if(keyStoreFile==null) keyStoreFile=defaultKeyStoreFile;
-	    
-	    String keyPass=(String)attributes.get("keypass");
-	    if(keyPass==null) keyPass=defaultKeyPass;
-	    
-	    String rootFile=(String)attributes.get("rootfile");
-	    if(rootFile==null) rootFile=defaultRootFile;
+        try {
+            String keyStoreFile=(String)attributes.get("keystore");
+            if(keyStoreFile==null) keyStoreFile=defaultKeyStoreFile;
+            
+            String keyPass=(String)attributes.get("keypass");
+            if(keyPass==null) keyPass=defaultKeyPass;
+            
+            String rootFile=(String)attributes.get("rootfile");
+            if(rootFile==null) rootFile=defaultRootFile;
 
-	    String randomFile=(String)attributes.get("randomfile");
-	    if(randomFile==null) randomFile=defaultRandomFile;
-	    
-	    String protocol=(String)attributes.get("protocol");
-	    if(protocol==null) protocol=defaultProtocol;
+            String randomFile=(String)attributes.get("randomfile");
+            if(randomFile==null) randomFile=defaultRandomFile;
+            
+            String protocol=(String)attributes.get("protocol");
+            if(protocol==null) protocol=defaultProtocol;
 
-	    String clientAuthStr=(String)attributes.get("clientauth");
-	    if(clientAuthStr != null){
-		if(clientAuthStr.equals("true")){
-		    clientAuth=true;
-		} else if(clientAuthStr.equals("false")) {
-		    clientAuth=false;
-		} else {
-		    throw new IOException("Invalid value '" +
-					  clientAuthStr + 
-					  "' for 'clientauth' parameter:");
-		}
-	    }
+            String clientAuthStr=(String)attributes.get("clientauth");
+            if(clientAuthStr != null){
+                if(clientAuthStr.equals("true")){
+                    clientAuth=true;
+                } else if(clientAuthStr.equals("false")) {
+                    clientAuth=false;
+                } else {
+                    throw new IOException("Invalid value '" +
+                                          clientAuthStr + 
+                                          "' for 'clientauth' parameter:");
+                }
+            }
 
             SSLContext tmpContext=new SSLContext();
             try {
@@ -133,10 +133,10 @@ public class PureTLSSocketFactory
                                  rootFile,iex);
             }
             tmpContext.loadEAYKeyFile(keyStoreFile,keyPass);
-	    tmpContext.useRandomnessFile(randomFile,keyPass);
-	    
-	    SSLPolicyInt policy=new SSLPolicyInt();
-	    policy.requireClientAuth(clientAuth);
+            tmpContext.useRandomnessFile(randomFile,keyPass);
+            
+            SSLPolicyInt policy=new SSLPolicyInt();
+            policy.requireClientAuth(clientAuth);
             policy.handshakeOnConnect(false);
             policy.waitOnClose(false);
             short [] enabledCiphers = getEnabledCiphers(policy.getCipherSuites());
@@ -144,11 +144,11 @@ public class PureTLSSocketFactory
                 policy.setCipherSuites(enabledCiphers);
             }
             tmpContext.setPolicy(policy);
-	    context=tmpContext;
-	} catch (Exception e){
-	    logger.info("Error initializing SocketFactory",e);
-	    throw new IOException(e.getMessage());
-	}
+            context=tmpContext;
+        } catch (Exception e){
+            logger.info("Error initializing SocketFactory",e);
+            throw new IOException(e.getMessage());
+        }
     }
 
     /*
@@ -206,21 +206,21 @@ public class PureTLSSocketFactory
     }
 
     public Socket acceptSocket(ServerSocket socket)
-	throws IOException
+        throws IOException
     {
-	try {
-	    Socket sock=socket.accept();
-	    return sock;
-	} catch (SSLException e){
+        try {
+            Socket sock=socket.accept();
+            return sock;
+        } catch (SSLException e){
             logger.debug("SSL handshake error",e);
             throw new SocketException("SSL handshake error" + e.toString());
-	}
+        }
     }
 
     public void handshake(Socket sock)
-	 throws IOException
+         throws IOException
     {
-	((SSLSocket)sock).handshake();
+        ((SSLSocket)sock).handshake();
     }
 }
 
