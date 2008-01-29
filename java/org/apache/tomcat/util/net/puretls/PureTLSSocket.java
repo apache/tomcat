@@ -37,7 +37,7 @@ public class PureTLSSocket extends COM.claymoresystems.ptls.SSLSocket
     // constructor since this class is only used with
     // implAccept
     public PureTLSSocket() throws IOException {
-	super();
+        super();
     }
 }
  

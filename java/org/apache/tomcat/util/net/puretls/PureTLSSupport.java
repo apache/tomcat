@@ -44,7 +44,7 @@ import COM.claymoresystems.sslg.SSLPolicyInt;
 
 class PureTLSSupport implements SSLSupport {
     static org.apache.commons.logging.Log logger =
-	org.apache.commons.logging.LogFactory.getLog(PureTLSSupport.class);
+        org.apache.commons.logging.LogFactory.getLog(PureTLSSupport.class);
 
     private COM.claymoresystems.ptls.SSLSocket ssl;
 
@@ -59,21 +59,21 @@ class PureTLSSupport implements SSLSupport {
 
     public Object[] getPeerCertificateChain()
         throws IOException {
-	return getPeerCertificateChain(false);
+        return getPeerCertificateChain(false);
     }
 
     public Object[] getPeerCertificateChain(boolean force)
         throws IOException {
         Vector v=ssl.getCertificateChain();
 
-	if(v == null && force) {
-	    SSLPolicyInt policy=new SSLPolicyInt();
-	    policy.requireClientAuth(true);
-	    policy.handshakeOnConnect(false);
-	    policy.waitOnClose(false);
-	    ssl.renegotiate(policy);
-	    v = ssl.getCertificateChain();
-	}
+        if(v == null && force) {
+            SSLPolicyInt policy=new SSLPolicyInt();
+            policy.requireClientAuth(true);
+            policy.handshakeOnConnect(false);
+            policy.waitOnClose(false);
+            ssl.renegotiate(policy);
+            v = ssl.getCertificateChain();
+        }
 
         if(v==null)
             return null;
@@ -97,11 +97,11 @@ class PureTLSSupport implements SSLSupport {
             X509Certificate xCert = (X509Certificate)cf.generateCertificate(stream);
             chain[i-1]= xCert;
             if(logger.isTraceEnabled()) {
-		logger.trace("Cert # " + i + " = " + xCert);
-	    }
+                logger.trace("Cert # " + i + " = " + xCert);
+            }
           }
         } catch (java.security.cert.CertificateException e) {
-	    logger.info("JDK's broken cert handling can't parse this certificate (which PureTLS likes)",e);
+            logger.info("JDK's broken cert handling can't parse this certificate (which PureTLS likes)",e);
             throw new IOException("JDK's broken cert handling can't parse this certificate (which PureTLS likes)");
         }
         return chain;
