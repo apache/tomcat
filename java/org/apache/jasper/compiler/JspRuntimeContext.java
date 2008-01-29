@@ -38,6 +38,7 @@ import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.Options;
 import org.apache.jasper.runtime.JspFactoryImpl;
 import org.apache.jasper.security.SecurityClassLoad;
+import org.apache.jasper.servlet.JasperLoader;
 import org.apache.jasper.servlet.JspServletWrapper;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -155,6 +156,7 @@ public final class JspRuntimeContext {
     private ServletContext context;
     private Options options;
     private URLClassLoader parentClassLoader;
+    private JasperLoader jspLoader;
     private PermissionCollection permissionCollection;
     private CodeSource codeSource;                    
     private String classpath;
@@ -314,6 +316,26 @@ public final class JspRuntimeContext {
      */
     public String getClassPath() {
         return classpath;
+    }
+
+
+    /**
+     * Obtain the classloader to use when loading JSP resources. In development
+     * mode or when running background compilations, each JSP has a separate
+     * classloader to enable easy re-loading of modified JSPs. If not in
+     * development mode, a single loader is used to reduce perm gen usage when
+     * many JSPs all use the same handful of tags.
+     */
+    public URLClassLoader getJspLoader(URL baseUrl, ClassLoader parent) {
+        if (options.getDevelopment() || lastCheck > -1) {
+            return new JasperLoader(new URL[] {baseUrl}, parent,
+                    permissionCollection, codeSource);
+        }
+        if (jspLoader == null) {
+            jspLoader = new JasperLoader(new URL[] {baseUrl}, parent,
+                    permissionCollection, codeSource);
+        }
+        return jspLoader;
     }
 
 
