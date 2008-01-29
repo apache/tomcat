@@ -35,8 +35,8 @@ import COM.claymoresystems.ptls.SSLSocket;
 public class PureTLSImplementation extends SSLImplementation
 {
     public PureTLSImplementation() throws ClassNotFoundException {
-	// Check to see if PureTLS is floating around somewhere
-	Class.forName("COM.claymoresystems.ptls.SSLContext");
+        // Check to see if PureTLS is floating around somewhere
+        Class.forName("COM.claymoresystems.ptls.SSLContext");
     }
 
     public String getImplementationName(){
@@ -45,12 +45,12 @@ public class PureTLSImplementation extends SSLImplementation
       
     public ServerSocketFactory getServerSocketFactory()
     {
-	return new PureTLSSocketFactory();
+        return new PureTLSSocketFactory();
     } 
 
     public SSLSupport getSSLSupport(Socket s)
     {
-	return new PureTLSSupport((SSLSocket)s);
+        return new PureTLSSupport((SSLSocket)s);
     }
 
 
