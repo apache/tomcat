@@ -109,7 +109,6 @@
            excludes="**/CVS/**,**/.svn/**">
 <!-- Comment this in to show unchecked warnings:     <compilerarg value="-Xlint:unchecked"/> -->
       <classpath refid="tomcat.classpath" />
-      <exclude name="org/apache/tomcat/util/net/puretls/**" />
       <exclude name="org/apache/naming/factory/webservices/**" />
     </javac>
     <tstamp>
