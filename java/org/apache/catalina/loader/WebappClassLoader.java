@@ -55,6 +55,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -128,6 +129,23 @@ public class WebappClassLoader
         }
 
     }
+
+    
+    protected final class PrivilegedGetClassLoader
+        implements PrivilegedAction<ClassLoader> {
+
+        public Class<?> clazz;
+
+        public PrivilegedGetClassLoader(Class<?> clazz){
+            this.clazz = clazz;
+        }
+
+        public ClassLoader run() {       
+            return clazz.getClassLoader();
+        }           
+    }
+
+    
 
 
     // ------------------------------------------------------- Static Variables
@@ -907,8 +925,17 @@ public class WebappClassLoader
         // Return the class we have located
         if (log.isTraceEnabled())
             log.debug("      Returning class " + clazz);
-        if ((log.isTraceEnabled()) && (clazz != null))
-            log.debug("      Loaded by " + clazz.getClassLoader());
+        
+        if ((log.isTraceEnabled()) && (clazz != null)) {
+            ClassLoader cl;
+            if (Globals.IS_SECURITY_ENABLED){
+                cl = AccessController.doPrivileged(
+                    new PrivilegedGetClassLoader(clazz));
+            } else {
+                cl = clazz.getClassLoader();
+            }
+            log.debug("      Loaded by " + cl.toString());
+        }
         return (clazz);
 
     }
