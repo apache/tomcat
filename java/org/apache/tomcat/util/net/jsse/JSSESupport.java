@@ -125,19 +125,19 @@ class JSSESupport implements SSLSupport {
             return null;
 
         // Convert JSSE's certificate format to the ones we need
-	X509Certificate [] jsseCerts = null;
-	try {
-	    jsseCerts = session.getPeerCertificateChain();
-	} catch(Exception bex) {
-	    // ignore.
-	}
-	if (jsseCerts == null)
-	    jsseCerts = new X509Certificate[0];
-	if(jsseCerts.length <= 0 && force) {
-	    session.invalidate();
-	    handShake();
-	    session = ssl.getSession();
-	}
+        X509Certificate [] jsseCerts = null;
+        try {
+            jsseCerts = session.getPeerCertificateChain();
+        } catch(Exception bex) {
+            // ignore.
+        }
+        if (jsseCerts == null)
+            jsseCerts = new X509Certificate[0];
+        if(jsseCerts.length <= 0 && force) {
+            session.invalidate();
+            handShake();
+            session = ssl.getSession();
+        }
         return getX509Certificates(session);
     }
 
