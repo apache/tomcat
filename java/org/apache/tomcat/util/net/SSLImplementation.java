@@ -31,14 +31,11 @@ abstract public class SSLImplementation {
         org.apache.juli.logging.LogFactory.getLog(SSLImplementation.class);
 
     // The default implementations in our search path
-    private static final String PureTLSImplementationClass=
-	"org.apache.tomcat.util.net.puretls.PureTLSImplementation";
     private static final String JSSEImplementationClass=
 	"org.apache.tomcat.util.net.jsse.JSSEImplementation";
     
     private static final String[] implementations=
     {
-        PureTLSImplementationClass,
         JSSEImplementationClass
     };
 
