@@ -39,7 +39,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioEndpoint.Handler;
-import org.apache.tomcat.util.net.SSLImplementation;
+import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 import org.apache.tomcat.util.net.SecureNioChannel;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.res.StringManager;
@@ -56,7 +56,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 {
-    protected SSLImplementation sslImplementation = null;
+    protected JSSEImplementation sslImplementation = null;
     
     public Http11NioProtocol() {
         cHandler = new Http11ConnectionHandler( this );
@@ -134,7 +134,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         
         try {
             ep.init();
-            sslImplementation = SSLImplementation.getInstance("org.apache.tomcat.util.net.jsse.JSSEImplementation");
+            sslImplementation = new JSSEImplementation();
         } catch (Exception ex) {
             log.error(sm.getString("http11protocol.endpoint.initerror"), ex);
             throw ex;
