@@ -554,15 +554,7 @@ public class JspCompilationContext {
     
     public void compile() throws JasperException, FileNotFoundException {
         createCompiler();
-        boolean outDated;
-        if (isPackagedTagFile) {
-            // Tags in JARs only need to be compiled once
-            // If the JAR changes, the app needs to be re-loaded
-            outDated = !(new File(getClassFileName()).exists());
-        } else {
-            outDated = jspCompiler.isOutDated();
-        }
-        if (outDated) {
+        if (isPackagedTagFile || jspCompiler.isOutDated()) {
             try {
                 jspCompiler.removeGeneratedFiles();
                 jspLoader = null;
