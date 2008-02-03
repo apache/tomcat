@@ -35,7 +35,7 @@
 <section name="Tomcat 6.0.15 (remm)">
   <subsection name="General">
     <changelog>
-      <fix><bug>43701</bug>: Start acceptor thread before poller thread
+      <fix><bug>43701</bug>: Start poller thread before acceptor thread
       </fix>
       <update>Fix the MD5 file contents in distribution</update>
       <update>
