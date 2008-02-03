@@ -76,24 +76,24 @@ public class TagInfo {
      *
      */
     public TagInfo(String tagName,
-	    String tagClassName,
-	    String bodycontent,
-	    String infoString,
-	    TagLibraryInfo taglib,
-	    TagExtraInfo tagExtraInfo,
-	    TagAttributeInfo[] attributeInfo) {
-	this.tagName       = tagName;
-	this.tagClassName  = tagClassName;
-	this.bodyContent   = bodycontent;
-	this.infoString    = infoString;
-	this.tagLibrary    = taglib;
-	this.tagExtraInfo  = tagExtraInfo;
-	this.attributeInfo = attributeInfo;
+            String tagClassName,
+            String bodycontent,
+            String infoString,
+            TagLibraryInfo taglib,
+            TagExtraInfo tagExtraInfo,
+            TagAttributeInfo[] attributeInfo) {
+        this.tagName       = tagName;
+        this.tagClassName  = tagClassName;
+        this.bodyContent   = bodycontent;
+        this.infoString    = infoString;
+        this.tagLibrary    = taglib;
+        this.tagExtraInfo  = tagExtraInfo;
+        this.attributeInfo = attributeInfo;
 
-	if (tagExtraInfo != null)
+        if (tagExtraInfo != null)
             tagExtraInfo.setTagInfo(this);
     }
-			 
+                         
     /**
      * Constructor for TagInfo from data in the JSP 1.2 format for TLD.
      * This class is to be instantiated only from the TagLibrary code
@@ -119,32 +119,32 @@ public class TagInfo {
      * @param tvi An array of a TagVariableInfo (or null)
      */
     public TagInfo(String tagName,
-	    String tagClassName,
-	    String bodycontent,
-	    String infoString,
-	    TagLibraryInfo taglib,
-	    TagExtraInfo tagExtraInfo,
-	    TagAttributeInfo[] attributeInfo,
-	    String displayName,
-	    String smallIcon,
-	    String largeIcon,
-	    TagVariableInfo[] tvi) {
-	this.tagName       = tagName;
-	this.tagClassName  = tagClassName;
-	this.bodyContent   = bodycontent;
-	this.infoString    = infoString;
-	this.tagLibrary    = taglib;
-	this.tagExtraInfo  = tagExtraInfo;
-	this.attributeInfo = attributeInfo;
-	this.displayName = displayName;
-	this.smallIcon = smallIcon;
-	this.largeIcon = largeIcon;
-	this.tagVariableInfo = tvi;
+            String tagClassName,
+            String bodycontent,
+            String infoString,
+            TagLibraryInfo taglib,
+            TagExtraInfo tagExtraInfo,
+            TagAttributeInfo[] attributeInfo,
+            String displayName,
+            String smallIcon,
+            String largeIcon,
+            TagVariableInfo[] tvi) {
+        this.tagName       = tagName;
+        this.tagClassName  = tagClassName;
+        this.bodyContent   = bodycontent;
+        this.infoString    = infoString;
+        this.tagLibrary    = taglib;
+        this.tagExtraInfo  = tagExtraInfo;
+        this.attributeInfo = attributeInfo;
+        this.displayName = displayName;
+        this.smallIcon = smallIcon;
+        this.largeIcon = largeIcon;
+        this.tagVariableInfo = tvi;
 
-	if (tagExtraInfo != null)
+        if (tagExtraInfo != null)
             tagExtraInfo.setTagInfo(this);
     }
-			 
+                         
     /**
      * Constructor for TagInfo from data in the JSP 2.0 format for TLD.
      * This class is to be instantiated only from the TagLibrary code
@@ -208,7 +208,7 @@ public class TagInfo {
      */
 
     public String getTagName() {
-	return tagName;
+        return tagName;
     }
 
     /**
@@ -237,7 +237,7 @@ public class TagInfo {
        VariableInfo[] result = null;
        TagExtraInfo tei = getTagExtraInfo();
        if (tei != null) {
-	   result = tei.getVariableInfo( data );
+           result = tei.getVariableInfo( data );
        }
        return result;
    }
@@ -252,7 +252,7 @@ public class TagInfo {
     public boolean isValid(TagData data) {
         TagExtraInfo tei = getTagExtraInfo();
         if (tei == null) {
-	    return true;
+            return true;
         }
         return tei.isValid(data);
     }
@@ -267,11 +267,11 @@ public class TagInfo {
      * @since 2.0
      */
     public ValidationMessage[] validate( TagData data ) {
-	TagExtraInfo tei = getTagExtraInfo();
-	if( tei == null ) {
-	    return null;
-	}
-	return tei.validate( data );
+        TagExtraInfo tei = getTagExtraInfo();
+        if( tei == null ) {
+            return null;
+        }
+        return tei.validate( data );
     }
 
     /**
@@ -280,7 +280,7 @@ public class TagInfo {
      * @param tei the TagExtraInfo instance
      */
     public void setTagExtraInfo(TagExtraInfo tei) {
-	tagExtraInfo = tei;
+        tagExtraInfo = tei;
     }
 
 
@@ -290,7 +290,7 @@ public class TagInfo {
      * @return The TagExtraInfo instance, if any.
      */
     public TagExtraInfo getTagExtraInfo() {
-	return tagExtraInfo;
+        return tagExtraInfo;
     }
 
 
@@ -301,7 +301,7 @@ public class TagInfo {
      */
     
     public String getTagClassName() {
-	return tagClassName;
+        return tagClassName;
     }
 
 
@@ -314,7 +314,7 @@ public class TagInfo {
      */
 
     public String getBodyContent() {
-	return bodyContent;
+        return bodyContent;
     }
 
 
@@ -326,7 +326,7 @@ public class TagInfo {
      */
 
     public String getInfoString() {
-	return infoString;
+        return infoString;
     }
 
 
@@ -346,7 +346,7 @@ public class TagInfo {
      */
 
     public void setTagLibrary(TagLibraryInfo tl) {
-	tagLibrary = tl;
+        tagLibrary = tl;
     }
 
     /**
@@ -356,7 +356,7 @@ public class TagInfo {
      */
 
     public TagLibraryInfo getTagLibrary() {
-	return tagLibrary;
+        return tagLibrary;
     }
 
 
@@ -371,7 +371,7 @@ public class TagInfo {
      */
 
     public String getDisplayName() {
-	return displayName;
+        return displayName;
     }
 
     /**
@@ -382,7 +382,7 @@ public class TagInfo {
      */
 
     public String getSmallIcon() {
-	return smallIcon;
+        return smallIcon;
     }
 
     /**
@@ -393,7 +393,7 @@ public class TagInfo {
      */
 
     public String getLargeIcon() {
-	return largeIcon;
+        return largeIcon;
     }
 
     /**
@@ -405,7 +405,7 @@ public class TagInfo {
      */
 
     public TagVariableInfo[] getTagVariableInfos() {
-	return tagVariableInfo;
+        return tagVariableInfo;
     }
 
 
