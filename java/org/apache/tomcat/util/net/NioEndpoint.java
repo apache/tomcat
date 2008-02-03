@@ -813,6 +813,13 @@ public class NioEndpoint {
                 workers = new WorkerStack(maxThreads);
             }
 
+            // Start poller thread
+            poller = new Poller();
+            Thread pollerThread = new Thread(poller, getName() + "-ClientPoller");
+            pollerThread.setPriority(threadPriority);
+            pollerThread.setDaemon(true);
+            pollerThread.start();
+
             // Start acceptor threads
             for (int i = 0; i < acceptorThreadCount; i++) {
                 Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
@@ -820,13 +827,6 @@ public class NioEndpoint {
                 acceptorThread.setDaemon(daemon);
                 acceptorThread.start();
             }
-
-            // Start poller thread
-            poller = new Poller();
-            Thread pollerThread = new Thread(poller, getName() + "-ClientPoller");
-            pollerThread.setPriority(threadPriority);
-            pollerThread.setDaemon(true);
-            pollerThread.start();
         }
     }
 
