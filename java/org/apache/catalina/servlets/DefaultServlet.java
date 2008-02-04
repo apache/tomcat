@@ -1415,7 +1415,10 @@ public class DefaultServlet
                     return buffer.toString();
                 }
             } catch (NamingException e) {
-                throw new ServletException("Error opening readme resource", e);
+                if (debug > 10)
+                    log("readme '" + readmeFile + "' not found", e);
+
+                return null;
             }
         }
 
@@ -1438,7 +1441,10 @@ public class DefaultServlet
                         return is;
                 }
             } catch (NamingException e) {
-                throw new ServletException("Error opening XSLT resource", e);
+                if (debug > 10)
+                    log("localXsltFile '" + localXsltFile + "' not found", e);
+
+                return null;
             }
         }
 
