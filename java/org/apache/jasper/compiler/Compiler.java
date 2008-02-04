@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Iterator;
@@ -384,7 +385,12 @@ public abstract class Compiler {
                 return false;
             }
             URLConnection uc = jspUrl.openConnection();
-            jspRealLastModified = uc.getLastModified();
+            if (uc instanceof JarURLConnection) {
+                jspRealLastModified =
+                    ((JarURLConnection) uc).getJarEntry().getTime();
+            } else {
+                jspRealLastModified = uc.getLastModified();
+            }
             uc.getInputStream().close();
         } catch (Exception e) {
             return true;
@@ -435,9 +441,15 @@ public abstract class Compiler {
                     return true;
                 }
 
-                URLConnection includeUconn = includeUrl.openConnection();
-                long includeLastModified = includeUconn.getLastModified();
-                includeUconn.getInputStream().close();
+                URLConnection iuc = includeUrl.openConnection();
+                long includeLastModified = 0;
+                if (iuc instanceof JarURLConnection) {
+                    includeLastModified =
+                        ((JarURLConnection) iuc).getJarEntry().getTime();
+                } else {
+                    includeLastModified = iuc.getLastModified();
+                }
+                iuc.getInputStream().close();
 
                 if (includeLastModified > targetLastModified) {
                     return true;

@@ -279,8 +279,28 @@ public class JspCompilationContext {
 
 
     public URL getResource(String res) throws MalformedURLException {
-        return context.getResource(canonicalURI(res));
+        URL result = null;
+
+        if (res.startsWith("/META-INF/")) {
+            // This is a tag file packaged in a jar that is being compiled
+            URL jarUrl = tagFileJarUrls.get(res);
+            if (jarUrl == null) {
+                jarUrl = tagFileJarUrl;
+            }
+            if (jarUrl != null) {
+                result = new URL(jarUrl.toExternalForm() + res.substring(1));
+            }
+        } else if (res.startsWith("jar:file:")) {
+                // This is a tag file packaged in a jar that is being checked
+                // for a dependency
+                result = new URL(res);
+
+        } else {
+            result = context.getResource(canonicalURI(res));
+        }
+        return result;
     }
+
 
     public Set getResourcePaths(String path) {
         return context.getResourcePaths(canonicalURI(path));
@@ -554,7 +574,7 @@ public class JspCompilationContext {
     
     public void compile() throws JasperException, FileNotFoundException {
         createCompiler();
-        if (isPackagedTagFile || jspCompiler.isOutDated()) {
+        if (jspCompiler.isOutDated()) {
             try {
                 jspCompiler.removeGeneratedFiles();
                 jspLoader = null;
