@@ -794,7 +794,7 @@ public class InternalNioOutputBuffer
             byte[] b = chunk.getBuffer();
             while (len > 0) {
                 int thisTime = len;
-                if (socket.getBufHandler().getWriteBuffer().position() == socket.getBufHandler().getWriteBuffer().capacity()) {
+                if (socket.getBufHandler().getWriteBuffer().position() == socket.getBufHandler().getWriteBuffer().capacity() ||socket.getBufHandler().getWriteBuffer().remaining()==0) {
                     flushBuffer();
                 }
                 if (thisTime > socket.getBufHandler().getWriteBuffer().remaining()) {
