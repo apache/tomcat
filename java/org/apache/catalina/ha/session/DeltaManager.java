@@ -615,10 +615,15 @@ public class DeltaManager extends ClusterManagerBase{
      * @throws IOException
      */
     protected DeltaRequest deserializeDeltaRequest(DeltaSession session, byte[] data) throws ClassNotFoundException, IOException {
-        ReplicationStream ois = getReplicationStream(data);
-        session.getDeltaRequest().readExternal(ois);
-        ois.close();
-        return session.getDeltaRequest();
+        try {
+            session.lock();
+            ReplicationStream ois = getReplicationStream(data);
+            session.getDeltaRequest().readExternal(ois);
+            ois.close();
+            return session.getDeltaRequest();
+        }finally {
+            session.unlock();
+        }
     }
 
     /**
@@ -629,8 +634,13 @@ public class DeltaManager extends ClusterManagerBase{
      * @return serialized delta request
      * @throws IOException
      */
-    protected byte[] serializeDeltaRequest(DeltaRequest deltaRequest) throws IOException {
-        return deltaRequest.serialize();
+    protected byte[] serializeDeltaRequest(DeltaSession session, DeltaRequest deltaRequest) throws IOException {
+        try {
+            session.lock();
+            return deltaRequest.serialize();
+        }finally {
+            session.unlock();
+        }
     }
 
     /**
@@ -1096,16 +1106,18 @@ public class DeltaManager extends ClusterManagerBase{
      * @return a SessionMessage to be sent,
      */
     public ClusterMessage requestCompleted(String sessionId) {
+        DeltaSession session = null;
         try {
-            DeltaSession session = (DeltaSession) findSession(sessionId);
+            session = (DeltaSession) findSession(sessionId);
             DeltaRequest deltaRequest = session.getDeltaRequest();
+            session.lock();
             SessionMessage msg = null;
             boolean isDeltaRequest = false ;
             synchronized(deltaRequest) {
                 isDeltaRequest = deltaRequest.getSize() > 0 ;
                 if (isDeltaRequest) {    
                     counterSend_EVT_SESSION_DELTA++;
-                    byte[] data = serializeDeltaRequest(deltaRequest);
+                    byte[] data = serializeDeltaRequest(session,deltaRequest);
                     msg = new SessionMessageImpl(getName(),
                                                  SessionMessage.EVT_SESSION_DELTA, 
                                                  data, 
@@ -1155,6 +1167,8 @@ public class DeltaManager extends ClusterManagerBase{
         } catch (IOException x) {
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",sessionId), x);
             return null;
+        }finally {
+            if (session!=null) session.unlock();
         }
 
     }
@@ -1360,9 +1374,14 @@ public class DeltaManager extends ClusterManagerBase{
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
         if (session != null) {
             if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.receiveMessage.delta",getName(), msg.getSessionID()));
-            DeltaRequest dreq = deserializeDeltaRequest(session, delta);
-            dreq.execute(session, notifyListenersOnReplication);
-            session.setPrimarySession(false);
+            try {
+                session.lock();
+                DeltaRequest dreq = deserializeDeltaRequest(session, delta);
+                dreq.execute(session, notifyListenersOnReplication);
+                session.setPrimarySession(false);
+            }finally {
+                session.unlock();
+            }
         }
     }
 
