@@ -118,7 +118,7 @@ public class DeltaRequest implements Externalizable {
         addAction(TYPE_ISNEW,action,NAME_ISNEW,new Boolean(n));
     }
 
-    protected synchronized void addAction(int type,
+    protected void addAction(int type,
                              int action,
                              String name,
                              Object value) {
@@ -151,7 +151,7 @@ public class DeltaRequest implements Externalizable {
         execute(session,true);
     }
 
-    public synchronized void execute(DeltaSession session, boolean notifyListeners) {
+    public void execute(DeltaSession session, boolean notifyListeners) {
         if ( !this.sessionId.equals( session.getId() ) )
             throw new java.lang.IllegalArgumentException("Session id mismatch, not executing the delta request");
         session.access();
@@ -195,7 +195,7 @@ public class DeltaRequest implements Externalizable {
         reset();
     }
 
-    public synchronized void reset() {
+    public void reset() {
         while ( actions.size() > 0 ) {
             try {
                 AttributeInfo info = (AttributeInfo) actions.removeFirst();
@@ -221,12 +221,12 @@ public class DeltaRequest implements Externalizable {
         return actions.size();
     }
     
-    public synchronized void clear() {
+    public void clear() {
         actions.clear();
         actionPool.clear();
     }
     
-    public synchronized void readExternal(java.io.ObjectInput in) throws IOException,ClassNotFoundException {
+    public void readExternal(java.io.ObjectInput in) throws IOException,ClassNotFoundException {
         //sessionId - String
         //recordAll - boolean
         //size - int
@@ -259,7 +259,7 @@ public class DeltaRequest implements Externalizable {
         
 
 
-    public synchronized void writeExternal(java.io.ObjectOutput out ) throws java.io.IOException {
+    public void writeExternal(java.io.ObjectOutput out ) throws java.io.IOException {
         //sessionId - String
         //recordAll - boolean
         //size - int
@@ -348,7 +348,7 @@ public class DeltaRequest implements Externalizable {
             return other.getName().equals(this.getName());
         }
         
-        public synchronized void readExternal(java.io.ObjectInput in ) throws IOException,ClassNotFoundException {
+        public void readExternal(java.io.ObjectInput in ) throws IOException,ClassNotFoundException {
             //type - int
             //action - int
             //name - String
@@ -361,7 +361,7 @@ public class DeltaRequest implements Externalizable {
             if ( hasValue ) value = in.readObject();
         }
 
-        public synchronized void writeExternal(java.io.ObjectOutput out) throws IOException {
+        public void writeExternal(java.io.ObjectOutput out) throws IOException {
             //type - int
             //action - int
             //name - String
