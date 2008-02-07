@@ -60,7 +60,7 @@
     </copy>
 
     <mkdir     dir="${build.dir}/${dist.name}/printer"/>
-    <style basedir="."
+    <xslt basedir="."
            destdir="${build.dir}/${dist.name}/printer"
          extension=".html"
              style="style.xsl"
@@ -68,19 +68,19 @@
           includes="*.xml">
       <param name="relative-path" expression="./.."/>
       <param name="project-menu" expression="nomenu"/>
-    </style>
+    </xslt>
 
     <!-- Miscellaneous Documentation -->
-    <style basedir="miscellaneous"
+    <xslt basedir="miscellaneous"
            destdir="${build.dir}/${dist.name}/miscellaneous"
            extension=".html"
            style="style.xsl"
            excludes="project.xml"
            includes="*.xml">
       <param name="relative-path" expression=".."/>
-    </style>
+    </xslt>
     <mkdir     dir="${build.dir}/${dist.name}/miscellaneous/printer"/>
-    <style basedir="miscellaneous"
+    <xslt basedir="miscellaneous"
            destdir="${build.dir}/${dist.name}/miscellaneous/printer"
            extension=".html"
            style="style.xsl"
@@ -88,19 +88,19 @@
            includes="*.xml">
       <param name="relative-path" expression="../.."/>
       <param name="project-menu" expression="nomenu"/>
-    </style>
+    </xslt>
 
     <!-- News -->
-    <style basedir="news"
+    <xslt basedir="news"
            destdir="${build.dir}/${dist.name}/news"
            extension=".html"
            style="style.xsl"
            excludes="project.xml"
            includes="*.xml">
       <param name="relative-path" expression=".."/>
-    </style>
+    </xslt>
     <mkdir     dir="${build.dir}/${dist.name}/news/printer"/>
-    <style basedir="news"
+    <xslt basedir="news"
            destdir="${build.dir}/${dist.name}/news/printer"
            extension=".html"
            style="style.xsl"
@@ -108,7 +108,7 @@
            includes="*.xml">
       <param name="relative-path" expression="../.."/>
       <param name="project-menu" expression="nomenu"/>
-    </style>
+    </xslt>
  
   </target>
 
@@ -117,14 +117,14 @@
   <target name="build-main" depends="build-static">
 
     <!-- Top Level Directory -->
-    <style basedir="."
+    <xslt basedir="."
            destdir="${build.dir}/${dist.name}"
          extension=".html"
              style="style.xsl"
           excludes="build.xml project.xml empty.xml"
           includes="*.xml">
       <param name="relative-path" expression="."/>
-    </style>
+    </xslt>
 
   </target>
 
