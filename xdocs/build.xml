@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<project name="tomcat-docs" default="build-main" basedir=".">
+
+
+  <!-- ===================== Initialize Property Values =================== -->
+
+  <!-- See "build.properties.sample" in the top level directory for all     -->
+  <!-- property values you must customize for successful building!!!        -->
+  <property file="build.properties"/>
+  <property file="../build.properties"/>
+  <property file="../../build.properties"/>
+  <property file="${user.home}/build.properties"/>
+
+  <property name="build.compiler"  value="modern"/>
+  <property name="build.dir"   value="../build"/>
+  <property name="dist.dir"    value="../dist"/>
+  <property name="dist.name"     value="docs"/>
+
+
+  <!-- =================== BUILD: Create Directories ====================== -->
+  <target name="build-prepare">
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.dir}/${dist.name}"/>
+  </target>
+
+
+  <!-- ================ BUILD: Copy Static Files ========================== -->
+  <target name="build-static" depends="build-prepare">
+
+    <!-- Top Level Static Files -->
+    <copy    todir="${build.dir}/${dist.name}">
+      <fileset dir=".">
+        <include name="style.css"/>
+      </fileset>
+    </copy>
+    <copy    todir="${build.dir}/${dist.name}">
+      <fileset dir="." includes="**/*.html"/>
+    </copy>
+
+    <!-- Images Subdirectory -->
+    <mkdir     dir="${build.dir}/${dist.name}/images"/>
+    <copy    todir="${build.dir}/${dist.name}/images">
+      <fileset dir="images"/>
+    </copy>
+
+    <mkdir     dir="${build.dir}/${dist.name}/printer"/>
+    <style basedir="."
+           destdir="${build.dir}/${dist.name}/printer"
+         extension=".html"
+             style="style.xsl"
+          excludes="build.xml project.xml empty.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="./.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+    <!-- Miscellaneous Documentation -->
+    <style basedir="miscellaneous"
+           destdir="${build.dir}/${dist.name}/miscellaneous"
+           extension=".html"
+           style="style.xsl"
+           excludes="project.xml"
+           includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <mkdir     dir="${build.dir}/${dist.name}/miscellaneous/printer"/>
+    <style basedir="miscellaneous"
+           destdir="${build.dir}/${dist.name}/miscellaneous/printer"
+           extension=".html"
+           style="style.xsl"
+           excludes="project.xml"
+           includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+
+    <!-- News -->
+    <style basedir="news"
+           destdir="${build.dir}/${dist.name}/news"
+           extension=".html"
+           style="style.xsl"
+           excludes="project.xml"
+           includes="*.xml">
+      <param name="relative-path" expression=".."/>
+    </style>
+    <mkdir     dir="${build.dir}/${dist.name}/news/printer"/>
+    <style basedir="news"
+           destdir="${build.dir}/${dist.name}/news/printer"
+           extension=".html"
+           style="style.xsl"
+           excludes="project.xml"
+           includes="*.xml">
+      <param name="relative-path" expression="../.."/>
+      <param name="project-menu" expression="nomenu"/>
+    </style>
+ 
+  </target>
+
+
+  <!-- ================= BUILD: XML-HTML Generation ======================= -->
+  <target name="build-main" depends="build-static">
+
+    <!-- Top Level Directory -->
+    <style basedir="."
+           destdir="${build.dir}/${dist.name}"
+         extension=".html"
+             style="style.xsl"
+          excludes="build.xml project.xml empty.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="."/>
+    </style>
+
+  </target>
+
+
+  <!-- ==================== BUILD: Rebuild Everything ===================== -->
+  <target name="all" depends="build-clean,build-main"
+   description="Clean and build documentation"/>
+
+
+  <!-- ======================= BUILD: Clean Directory ===================== -->
+  <target name="build-clean">
+    <delete dir="${build.dir}/${dist.name}"/>
+  </target>
+
+
+  <!-- ======================= DIST: Create Directories =================== -->
+  <target name="dist-prepare">
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+
+  <!-- ======================= DIST: Create Distribution Files ============ -->
+  <target name="dist" depends="build-main,dist-prepare"
+   description="Create documentation binary distribution">
+      <jar   jarfile="${dist.dir}/${dist.name}.war"
+             basedir="${build.dir}/${dist.name}" includes="**"/>
+  </target>
+
+
+  <!-- ======================= DIST: Clean Directory ====================== -->
+  <target name="dist-clean">
+    <delete dir="${dist.dir}/${dist.name}"/>
+  </target>
+
+
+  <!-- ====================== Convenient Synonyms ========================= -->
+  <target name="clean" depends="build-clean,dist-clean"
+   description="Clean build and dist directories"/>
+
+
+</project>

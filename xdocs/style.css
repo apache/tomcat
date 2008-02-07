@@ -1,0 +1,73 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+div.screen {
+    margin: 10px 0px 10px 20px;
+    font-size: smaller;
+    color: #ffffff; 
+}
+div.example {
+    background-color: #e5ecf3;
+    color: #000;
+    padding: 0.5em;
+    margin: 1em 2em 1em 1em;
+}
+pre {
+    font-family: "Courier New", Courier, monospace;
+    font-weight: normal;
+    font-style: normal;
+    font-size: smaller;
+}
+em.screen {
+    font-weight: normal;
+    font-style: normal;
+    color: #c0c0c0;
+}
+p.screen {
+    background-color: #000000;
+    border-style: none;
+    color: #c0c0c0;
+    margin-left: 10px;
+    margin-right: 0px;
+    text-align: left;         
+}
+b.screen {
+    font-weight: normal;
+    font-style: normal;
+    color: #c0c0c0;
+}   
+code.screen {
+    background-color: #000000;
+    border-style: none;
+    color: #c0c0c0;
+    margin-left: 10px;
+    margin-right: 0px;
+    text-align: left; 
+}
+b.code {
+    font-weight: normal;
+    font-style: normal;
+    color: #023264;
+}
+p.todo {
+    background-color: #ffffff;
+    border-style: none;
+    color: #000000;
+    margin-left: 20px;
+    margin-right: 10px;
+    text-align: justify;
+    font-size: smaller;
+}                                  

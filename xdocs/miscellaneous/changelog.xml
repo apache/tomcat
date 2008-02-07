@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="changelog.html">
+
+  &project;
+
+  <properties>
+    <author email="jfclere@apache.org">Jean-Frederic Clere</author>
+    </properties>
+
+<body>
+
+<section name="Preface">
+  <p>
+  This is the Changelog for Tomcat Native. This changelog
+  does not contain all updates and fixes to the Tomcat Native (yet).
+  It should contain fixes made only after December 19th 2007, when the
+  new documentation project for  Tomcat Native was started.
+  </p>
+</section>
+<section name="Changes between 1.1.12 and 1.1.13">
+  <changelog>
+    <fix>
+      IFS problem in native/build/tcnative.m4 (rjung)
+    </fix>
+    <fix>
+      Wrong gcc link flag in native/build/tcnative.m4 (rjung)
+    </fix>
+  </changelog>
+</section>
+<section name="Changes between 1.1.11 and 1.1.12">
+  <changelog>
+    <update>
+      Add support of J9VM based JVM. (jfclere)
+    </update>
+    <update>
+      Arrange licence in source files. (markt)
+    </update>
+    <update>
+      Add two new 'immediate' methods for sending the data.
+      It is the responsibility of the Java callee to deal with
+      the returned values and retry if the error was non-fatal. (mturk)
+    </update>
+    <fix>
+      Arrange the check of openssl version. It was failing on Linux. (jfclere)
+    </fix>
+    <fix>
+      Prevent returning APR_SUCCESS when there is something wrong in ssl layer. (jfclere)
+    </fix>
+    <fix>
+      <bug>44087</bug>: Fix it. (jfclere)
+    </fix>
+  </changelog>
+</section>
+</body>
+</document>
