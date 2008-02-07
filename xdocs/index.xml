@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="index.html">
+
+  &project;
+
+  <properties>
+    <author email="jfclere@apache.org">Jean-Frederic Clere</author>
+    <title>Documentation Index</title>
+  </properties>
+
+<body>
+
+<section name="Introduction">
+
+<p>This is the top-level entry point of the documentation bundle for the
+<strong>Apache Tomcat Native</strong>
+
+</p>
+<p>Select one of the links from the navigation menu (to the left) to drill
+down to the more detailed documentation that is available. Each available
+manual is described in more detail below.</p>
+
+</section>
+
+<section name="Headlines">
+<br />
+<ul>
+<li><a href="news/2008.html#20080215.1">15 February 2008 - <b>TC-Native-1.1.13 released</b></a>
+<p>The Apache Tomcat team is proud to announce the immediate availability
+of Tomcat Native 1.1.13 Stable.
+</p>
+<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/tomcat-native-1.1.13-src.tar.gz">TC-native 1.1.13 release sources</a>
+ | <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/tomcat-native-1.1.13-src.tar.gz.asc">PGP signature</a>
+</p>
+<p>Download the <a href="http://tomcat.heanet.ie/native/">binaries</a> for selected platforms.
+</p>
+</li>
+</ul>
+</section>
+
+<section name="Building">
+<subsection name="Requirements">
+    <p>
+      Build tc-native requires three components to be installed:
+      <ul>
+        <li>APR library</li>
+        <li>OpenSSL libraries</li>
+        <li>Java SE Development Kit (JDK)</li>
+      </ul>
+    </p>
+</subsection>
+
+<subsection name="UNIX">
+  <p>
+    On all the POSIX systems (Linux, Solaris, HP-UX, AIX etc...) a well-known
+    configure and make is used to build tc-native.<br/>
+    In the jni/native runs:<br/>
+    <pre>
+    ./configure --help
+    </pre>
+    to read the description of all the parameters.<br/>
+    <pre>
+    ./configure --with-apr=$HOME/APR \
+                --with-java-home=$JAVA_HOME \
+                --with-ssl=$HOME/OPENSSL \
+                --prefix=$HOME/TCNATIVE
+    </pre>
+    to create the includes and makefiles to be able to build tc-native.<br/>
+    Where:<br/>
+    $HOME/APR is something like /usr/bin/apr-1-config or the path where apr is
+    installed.<br/>
+    $JAVA_HOME is something /home/jfclere/JAVA/jdk1.5.0_09 path to a JDK
+    installation. Any JDK should work but it is advisable to use the same
+    JVM version the JVM you use with Tomcat.<br/>
+    $HOME/OPENSSL is the path where openssl is installed.<br/>
+    $HOME/TCNATIVE is the path where the produced libraries will be installed.<br/>
+    <br/>
+    The configure is able to guess most of OpenSSL standard installations.
+    So most of the time the following will be enough:
+    <pre>
+    ./configure --with-apr=/usr/bin/apr-1-config \
+                --with-java-home=/home/jfclere/JAVA/jdk1.5.0_09/ \
+                --with-ssl=yes \
+                --prefix=/home/jfclere/TCNATIVE
+    </pre>
+    <br/>
+    To build the libraries and install them:<br/>
+    <pre>
+    make &amp;&amp; make install
+    </pre>
+    The libraries will be found in /home/jfclere/TCNATIVE/lib 
+  </p>
+</subsection>
+
+<subsection name="Windows">
+</subsection>
+
+</section>
+</body>
+</document> 
