@@ -134,5 +134,36 @@ of Tomcat Native 1.1.13 Stable.
 </subsection>
    
 </section>
+
+<section name="Install and tests">
+<subsection name="UNIX">
+  <p>
+   Edit the $CATALINA_BASE/bin/setenv.sh and add the path to the tc-native libraries to LD_LIBRARY_PATH.
+   Something like:
+   <pre>
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/jfclere/TCNATIVE/lib
+    export LD_LIBRARY_PATH
+   /home/jfclere/TCNATIVE/lib
+   </pre>
+   Start tomcat and check for the messages like is ones:
+   <pre>
+    Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
+    INFO: Loaded APR based Apache Tomcat Native library 1.1.12.
+    Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
+    INFO: APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
+    Feb 8, 2008 12:27:41 PM org.apache.coyote.http11.Http11AprProtocol init
+    INFO: Initializing Coyote HTTP/1.1 on http-8080
+   </pre>
+    Refer to the tomcat documentation to configure the connectors
+    (See <a href="http://tomcat.apache.org/tomcat-6.0-doc/apr.html">Tomcat6.0.x</a>
+    and  <a href="http://tomcat.apache.org/tomcat-5.5-doc/apr.html">Tomcat5.5.x</a>)
+  </p>
+</subsection>
+
+<subsection name="Windows">
+</subsection>
+
+</section>
+
 </body>
 </document> 
