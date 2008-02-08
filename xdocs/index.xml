@@ -91,7 +91,7 @@ of Tomcat Native 1.1.13 Stable.
     $JAVA_HOME is something /home/jfclere/JAVA/jdk1.5.0_09 path to a JDK
     installation. Any JDK should work but it is advisable to use the same
     JVM version the JVM you use with Tomcat.<br/>
-    $HOME/OPENSSL is the path where openssl is installed.<br/>
+    $HOME/OPENSSL is the path where OpenSSL is installed.<br/>
     $HOME/TCNATIVE is the path where the produced libraries will be installed.<br/>
     <br/>
     The configure is able to guess most of OpenSSL standard installations.
@@ -127,7 +127,7 @@ of Tomcat Native 1.1.13 Stable.
     Use MS Visual Studio to open the workspace of the APR sources and build the library (libapr).
   </p>
   <p>
-    Use MS Visual Studio to open the workspace of the tc-native sources, adjust the openssl includes and libraries location
+    Use MS Visual Studio to open the workspace of the tc-native sources, adjust the OpenSSL includes and libraries location
     change the name of the libraries libeay32 and libssleay to libeay32MT and libssleayMT and build the tcn-native library.
     That should create a tcnative-1.dll.
   </p>
@@ -143,9 +143,8 @@ of Tomcat Native 1.1.13 Stable.
    <pre>
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/jfclere/TCNATIVE/lib
     export LD_LIBRARY_PATH
-   /home/jfclere/TCNATIVE/lib
    </pre>
-   Start tomcat and check for the messages like is ones:
+   Start tomcat and check for the messages like this ones:
    <pre>
     Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
     INFO: Loaded APR based Apache Tomcat Native library 1.1.12.
@@ -161,6 +160,22 @@ of Tomcat Native 1.1.13 Stable.
 </subsection>
 
 <subsection name="Windows">
+  <p>
+    Edit the $CATALINA_BASE\bin\setenv.bat and add the path to the tc-native libraries, apr and OpenSSL to PATH.
+    For example:
+  <pre>
+    set PATH=%PATH;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\native\Debug;C:\cygwin\home\support\tomcat-native-current-win32-src\jni\apr\Debug;C:\OpenSSL\lib\VC
+  </pre>
+    Start tomcat and check for the messages like this ones:
+  <pre>
+    Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
+    INFO: Loaded APR based Apache Tomcat Native library 1.1.12.
+    Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
+    INFO: APR capabilities: IPv6 [false], sendfile [true], accept filters [false], random [true].
+    Feb 8, 2008 2:48:18 PM org.apache.coyote.http11.Http11AprProtocol init
+    INFO: Initializing Coyote HTTP/1.1 on http-8080
+  </pre>
+  </p>
 </subsection>
 
 </section>
