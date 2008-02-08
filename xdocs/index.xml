@@ -112,8 +112,27 @@ of Tomcat Native 1.1.13 Stable.
 </subsection>
 
 <subsection name="Windows">
+  <p>
+   Download the windows sources of tc-native and extract them.
+  </p>
+  <p>
+    Download OpenSSL sources (See <a href="http://www.openssl.org/related/binaries.html"><b>Binary Distributions</b></a>)
+    OpenSSL is a crypto software so check if you are allowed to download it. If not you can still use tc-native without SSL.
+  </p>
+  <p>
+    Download APR sources for Windows. (See <a href="http://apr.apache.org/download.cgi"><b>Download</b></a>)
+    Extract them in jni and rename the apr-1.x.y directory to apr.
+  </p>
+  <p>
+    Use MS Visual Studio to open the workspace of the APR sources and build the library (libapr).
+  </p>
+  <p>
+    Use MS Visual Studio to open the workspace of the tc-native sources, adjust the openssl includes and libraries location
+    change the name of the libraries libeay32 and libssleay to libeay32MT and libssleayMT and build the tcn-native library.
+    That should create a tcnative-1.dll.
+  </p>
 </subsection>
-
+   
 </section>
 </body>
 </document> 
