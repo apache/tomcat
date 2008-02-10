@@ -74,6 +74,10 @@
         <item name="Deployer"              href="cluster-deployer.html"/>
         <item name="ClusterListener"       href="cluster-listener.html"/>
     </menu>
+
+    <menu name="Global Settings">
+        <item name="System properties"     href="systemprops.html"/>
+    </menu>
   </body>
 
 </project>
