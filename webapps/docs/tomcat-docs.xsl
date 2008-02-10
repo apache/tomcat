@@ -154,7 +154,7 @@
       <xsl:comment>PAGE FOOTER</xsl:comment>
       <tr><td colspan="2">
         <div align="center"><font color="{$body-link}" size="-1"><em>
-        Copyright &#169; 1999-2006, Apache Software Foundation
+        Copyright &#169; 1999-2008, Apache Software Foundation
         </em></font></div>
       </td></tr>
 
@@ -288,6 +288,30 @@
             <xsl:if test="@required != 'true'">
               <code><xsl:value-of select="@name"/></code>
             </xsl:if>
+          </td>
+          <td align="left" valign="center">
+            <xsl:apply-templates/>
+          </td>
+        </tr>
+      </xsl:for-each>
+    </table>
+  </xsl:template>
+
+  <!-- Process a properties list with nested property elements -->
+  <xsl:template match="properties">
+    <table border="1" cellpadding="5">
+      <tr>
+        <th width="15%" bgcolor="{$attributes-color}">
+          <font color="#ffffff">Property</font>
+        </th>
+        <th width="85%" bgcolor="{$attributes-color}">
+          <font color="#ffffff">Description</font>
+        </th>
+      </tr>
+      <xsl:for-each select="property">
+        <tr>
+          <td align="left" valign="center">
+            <code><xsl:value-of select="@name"/></code>
           </td>
           <td align="left" valign="center">
             <xsl:apply-templates/>
