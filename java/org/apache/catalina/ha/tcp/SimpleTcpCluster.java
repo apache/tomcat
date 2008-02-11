@@ -824,8 +824,9 @@ public class SimpleTcpCluster
                 } else
                     log.error("Unable to send message to local member " + msg);
             } else {
-                if (channel.getMembers().length>0)
-                    channel.send(channel.getMembers(),msg,channelSendOptions);
+                Member[] destmembers = channel.getMembers();
+                if (destmembers.length>0)
+                    channel.send(destmembers,msg,channelSendOptions);
                 else if (log.isDebugEnabled()) 
                     log.debug("No members in cluster, ignoring message:"+msg);
             }

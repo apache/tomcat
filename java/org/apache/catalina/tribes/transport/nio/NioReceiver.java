@@ -202,10 +202,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                     if ( ka != null ) {
                         long delta = now - ka.getLastAccess();
                         if (delta > (long) getTimeout() && (!ka.isAccessed())) {
-                            log.warn("Channel key is registered, but has had no interest ops for the last "+getTimeout()+" ms. (cancelled:"+ka.isCancelled()+"):"+key+" last access:"+new java.sql.Timestamp(ka.getLastAccess()));
-//                            System.out.println("Interest:"+key.interestOps());
-//                            System.out.println("Ready Ops:"+key.readyOps());
-//                            System.out.println("Valid:"+key.isValid());
+                            if (log.isWarnEnabled()) 
+                                log.warn("Channel key is registered, but has had no interest ops for the last "+getTimeout()+" ms. (cancelled:"+ka.isCancelled()+"):"+key+" last access:"+new java.sql.Timestamp(ka.getLastAccess())+" Possible cause: all threads used, perform thread dump");
                             ka.setLastAccess(now);
                             //key.interestOps(SelectionKey.OP_READ);
                         }//end if
