@@ -319,7 +319,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         int pos = offset;
         
         if (XByteBuffer.firstIndexOf(data,offset,TRIBES_MBR_BEGIN)!=pos) {
-            throw new IllegalArgumentException("Invalid package, should start with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN));
+            throw new IllegalArgumentException("Invalid package, should start with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN)+" Possibly an incompatible client broadcasting on the same multicast address.");
         }
 
         if ( length < (TRIBES_MBR_BEGIN.length+4) ) {
