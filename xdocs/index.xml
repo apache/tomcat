@@ -147,7 +147,7 @@ of Tomcat Native 1.1.13 Stable.
    Start tomcat and check for the messages like this ones:
    <pre>
     Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
-    INFO: Loaded APR based Apache Tomcat Native library 1.1.12.
+    INFO: Loaded APR based Apache Tomcat Native library 1.x.y.
     Feb 8, 2008 12:27:41 PM org.apache.catalina.core.AprLifecycleListener init
     INFO: APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true].
     Feb 8, 2008 12:27:41 PM org.apache.coyote.http11.Http11AprProtocol init
@@ -169,7 +169,7 @@ of Tomcat Native 1.1.13 Stable.
     Start tomcat and check for the messages like this ones:
   <pre>
     Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
-    INFO: Loaded APR based Apache Tomcat Native library 1.1.12.
+    INFO: Loaded APR based Apache Tomcat Native library 1.x.y.
     Feb 8, 2008 2:48:17 PM org.apache.catalina.core.AprLifecycleListener init
     INFO: APR capabilities: IPv6 [false], sendfile [true], accept filters [false], random [true].
     Feb 8, 2008 2:48:18 PM org.apache.coyote.http11.Http11AprProtocol init
