@@ -25,6 +25,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The XByteBuffer provides a dual functionality.
@@ -562,10 +563,10 @@ public class XByteBuffer
         throws IOException, ClassNotFoundException, ClassCastException {
         return deserialize(data,offset,length,null);     
     }
-    public static int invokecount = 0;
+    public static AtomicInteger invokecount = new AtomicInteger(0);
     public static Serializable deserialize(byte[] data, int offset, int length, ClassLoader[] cls) 
         throws IOException, ClassNotFoundException, ClassCastException {
-        synchronized (XByteBuffer.class) { invokecount++;}
+        invokecount.addAndGet(1);
         Object message = null;
         if ( cls == null ) cls = new ClassLoader[0];
         if (data != null) {
