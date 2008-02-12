@@ -67,6 +67,16 @@ of Tomcat Native 1.1.13 Stable.
         <li>Java SE Development Kit (JDK)</li>
       </ul>
     </p>
+    <p>
+     In debian based Linux those dependencies could be installed by something like:
+      <pre>
+        apt-get install libapr1.0-dev libssl-dev
+      </pre>
+     In rpm based Linux those dependencies could be installed by something like:
+      <pre>
+        yum install apr-devel openssl-devel
+      </pre>
+    </p>
 </subsection>
 
 <subsection name="UNIX">
@@ -82,7 +92,7 @@ of Tomcat Native 1.1.13 Stable.
     ./configure --with-apr=$HOME/APR \
                 --with-java-home=$JAVA_HOME \
                 --with-ssl=$HOME/OPENSSL \
-                --prefix=$HOME/TCNATIVE
+                --prefix=$CATALINA_HOME
     </pre>
     to create the includes and makefiles to be able to build tc-native.<br/>
     Where:<br/>
@@ -92,7 +102,7 @@ of Tomcat Native 1.1.13 Stable.
     installation. Any JDK should work but it is advisable to use the same
     JVM version the JVM you use with Tomcat.<br/>
     $HOME/OPENSSL is the path where OpenSSL is installed.<br/>
-    $HOME/TCNATIVE is the path where the produced libraries will be installed.<br/>
+    $CATALINA_HOME is the path where the produced libraries will be installed. Something like $HOME/apache-tomcat-6.0.16/<br/>
     <br/>
     The configure is able to guess most of OpenSSL standard installations.
     So most of the time the following will be enough:
@@ -100,14 +110,14 @@ of Tomcat Native 1.1.13 Stable.
     ./configure --with-apr=/usr/bin/apr-1-config \
                 --with-java-home=/home/jfclere/JAVA/jdk1.5.0_09/ \
                 --with-ssl=yes \
-                --prefix=/home/jfclere/TCNATIVE
+                --prefix=$CATALINA_HOME
     </pre>
     <br/>
     To build the libraries and install them:<br/>
     <pre>
     make &amp;&amp; make install
     </pre>
-    The libraries will be found in /home/jfclere/TCNATIVE/lib 
+    The libraries will be found in $CATALINA_HOME/lib
   </p>
 </subsection>
 
@@ -138,10 +148,10 @@ of Tomcat Native 1.1.13 Stable.
 <section name="Install and tests">
 <subsection name="UNIX">
   <p>
-   Edit the $CATALINA_BASE/bin/setenv.sh and add the path to the tc-native libraries to LD_LIBRARY_PATH.
+   Edit the $CATALINA_HOME/bin/setenv.sh and add the path to the tc-native libraries to LD_LIBRARY_PATH.
    Something like:
    <pre>
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/jfclere/TCNATIVE/lib
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CATALINA_HOME/lib
     export LD_LIBRARY_PATH
    </pre>
    Start tomcat and check for the messages like this ones:
@@ -181,4 +191,4 @@ of Tomcat Native 1.1.13 Stable.
 </section>
 
 </body>
-</document> 
+</document>
