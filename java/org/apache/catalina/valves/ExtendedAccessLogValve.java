@@ -663,7 +663,7 @@ public class ExtendedAccessLogValve
                         public void addElement(StringBuffer buf, Date date,
                                 Request request, Response response, long time) {
                             String query = request.getQueryString();
-                            if (query != null) {
+                            if (query == null) {
                                 buf.append(request.getRequestURI());
                             } else {
                                 buf.append(request.getRequestURI());
