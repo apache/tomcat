@@ -32,3 +32,36 @@ PATCHES PROPOSED FOR INCLUSION in 6.1.x:
   svn revision or other reference
   +1: 
   -1:
+
+
+* catalina-tribes.jar improvements
+Messaging
+=========
+Add in support for UDP messages
+ - fire and forget
+ - ack on message
+ - ack on batch of messages
+ - periodic ack, time or message count
+ - support multicast fire and forget
+ - autoswitch TCP/UDP based on size, number of recipients, or on message flag
+
+Priority Messaging
+ - Being able to send through high priority messages through a channel
+   pause existing messages
+
+Failure Detection
+=================
+Improvements to the current failure detector
+ - NIO based
+ - avoid multiple member failed messages, keep a lock on a recipient basis
+ - different levels of failure check (accept, send/receive ack)
+Networking
+==========
+Add in support to leverage multiple network cards in parallel (research 
+if any OS features are available to leverage this)
+
+Performance/Concurrency
+=======================
+ - Remove usage of "synchronized" (previously used for JDK 1.4 compatibility)
+ - make JDK 1.5 minimum version
+ - take advantage of java.util.concurrent
