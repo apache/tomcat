@@ -44,6 +44,7 @@ Add in support for UDP messages
  - periodic ack, time or message count
  - support multicast fire and forget
  - autoswitch TCP/UDP based on size, number of recipients, or on message flag
+ - add in versioning to the message structure
 
 Priority Messaging
  - Being able to send through high priority messages through a channel
@@ -65,3 +66,8 @@ Performance/Concurrency
  - Remove usage of "synchronized" (previously used for JDK 1.4 compatibility)
  - make JDK 1.5 minimum version
  - take advantage of java.util.concurrent
+ 
+Membership
+==========
+ - implement payloadChange(...) event on membership listener
+ 
