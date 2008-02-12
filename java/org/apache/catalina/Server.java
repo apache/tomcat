@@ -89,6 +89,20 @@ public interface Server {
 
 
     /**
+     * Return the address on which we listen to for shutdown commands.
+     */
+    public String getAddress();
+
+
+    /**
+     * Set the address on which we listen to for shutdown commands.
+     *
+     * @param address The new address
+     */
+    public void setAddress(String address);
+
+
+    /**
      * Return the shutdown command string we are waiting for.
      */
     public String getShutdown();
