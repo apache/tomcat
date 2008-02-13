@@ -112,9 +112,6 @@ on the value of $CATALINA_BASE instead of $CATALINA_HOME:
 
 * logs - Log and output files
 
-* lib - For classes and resources that must be shared across all web
-           applications
-
 * webapps - Automatically loaded web applications
 
 * work - Temporary working directories for web applications
