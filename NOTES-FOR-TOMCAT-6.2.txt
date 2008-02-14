@@ -15,13 +15,10 @@
   limitations under the License.
 ================================================================================
 
-$Id$
+$Id: NOTES-FOR-TOMCAT-7.txt 607604 2007-12-30 22:41:20Z markt $
 
-            ===================================================
-            Things to refer to when planning / writing Tomcat 7
-            ===================================================
+            ==================================================
+             Things to consider for inclusion in Tomcat 6.2.0
+            ==================================================
 
-1. Anything in NOTES-FOR-TOMCAT-6.2.txt that didn't make it into 6.2.x
-
-2. Support for standalone EL
-   http://issues.apache.org/bugzilla/show_bug.cgi?id=43819
+1. AnnotationProcessor -> InstanceManager replacement (used by Geronimo)
