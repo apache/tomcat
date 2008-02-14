@@ -52,6 +52,7 @@ import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.mapper.MappingData;
+import org.apache.catalina.Globals;
 
 
 /**
@@ -453,9 +454,12 @@ public class ApplicationContext
     public URL getResource(String path)
         throws MalformedURLException {
 
-        if (path == null || !path.startsWith("/")) {
+        if (path == null)
             throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
-        }
+
+        if (!path.startsWith("/") && Globals.STRICT_SERVLET_COMPLIANCE)
+            throw new MalformedURLException(sm.getString("applicationContext.requestDispatcher.iae", path));
+
         
         path = normalize(path);
         if (path == null)
@@ -507,9 +511,12 @@ public class ApplicationContext
     public InputStream getResourceAsStream(String path) {
 
         path = normalize(path);
-        if (path == null || !path.startsWith("/"))
+        if (path == null)
             return (null);
 
+        if (!path.startsWith("/") && Globals.STRICT_SERVLET_COMPLIANCE)
+            return null;
+        
         DirContext resources = context.getResources();
         if (resources != null) {
             try {
