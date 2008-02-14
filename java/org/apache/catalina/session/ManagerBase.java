@@ -679,7 +679,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         if(log.isDebugEnabled())
             log.debug("Start expire sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         for (int i = 0; i < sessions.length; i++) {
-            if (!sessions[i].isValid()) {
+            if (sessions[i]!=null && !sessions[i].isValid()) {
                 expireHere++;
             }
         }
