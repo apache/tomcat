@@ -34,6 +34,7 @@
 </section>
 
 
+
 <section name="Clustering">
   <properties>
 
@@ -194,6 +195,15 @@
       <li>every request that is associated with a session will cause the
       session's last accessed time to be updated regardless of whether or not
       the request explicity accesses the session. (SRV.7.6)  
+      </li>
+      <li>
+        cookies will be parsed strictly, by default v0 cookies will not work with any invalid characters.
+        <br/>If set to false, any v0 cookie with invalid character will be switched to a v1 cookie and 
+        the value will be quoted.
+      </li>
+      <li>
+        <code>ServletContext.getResource/getResourceAsStream</code> must start with "/"<br/>
+        if set to false, code like <code>getResource("myfolder/myresource.txt")</code> will work
       </li>
       </ul>
       </p>
