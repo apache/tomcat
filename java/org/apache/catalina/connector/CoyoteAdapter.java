@@ -682,6 +682,10 @@ public class CoyoteAdapter
         int start = uriBC.getStart();
         int end = uriBC.getEnd();
 
+        // An empty URL is not acceptable
+        if (start == end)
+            return false;
+
         // URL * is acceptable
         if ((end - start == 1) && b[start] == (byte) '*')
           return true;
