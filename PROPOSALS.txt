@@ -45,7 +45,7 @@ Add in support for UDP messages
  - support multicast fire and forget
  - autoswitch TCP/UDP based on size, number of recipients, or on message flag
  - add in versioning to the message structure
-
+ - Add in a delay between bind failures, to give the JVM a chance to recover
 Priority Messaging
  - Being able to send through high priority messages through a channel
    pause existing messages
