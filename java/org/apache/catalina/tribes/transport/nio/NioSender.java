@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ package org.apache.catalina.tribes.transport.nio;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -34,7 +35,7 @@ import java.net.*;
 
 /**
  * This class is NOT thread safe and should never be used with more than one thread at a time
- * 
+ *
  * This is a state machine, handled by the process method
  * States are:
  * - NOT_CONNECTED -> connect() -> CONNECTED
@@ -42,7 +43,7 @@ import java.net.*;
  * - READY_TO_WRITE -> write() -> READY TO WRITE | READY TO READ
  * - READY_TO_READ -> read() -> READY_TO_READ | TRANSFER_COMPLETE
  * - TRANSFER_COMPLETE -> CONNECTED
- * 
+ *
  * @author Filip Hanik
  * @version 1.0
  */
@@ -50,10 +51,11 @@ public class NioSender extends AbstractSender implements DataSender{
 
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(NioSender.class);
 
-    
-    
-    protected Selector selector;    
-    protected SocketChannel socketChannel;
+
+
+    protected Selector selector;
+    protected SocketChannel socketChannel = null;
+    protected DatagramChannel dataChannel = null;
 
     /*
      * STATE VARIABLES *
@@ -64,14 +66,14 @@ public class NioSender extends AbstractSender implements DataSender{
     protected XByteBuffer ackbuf = new XByteBuffer(128,true);
     protected int remaining = 0;
     protected boolean complete;
-    
+
     protected boolean connecting = false;
-    
+
     public NioSender() {
         super();
-        
+
     }
-    
+
     /**
      * State machine to send data
      * @param key SelectionKey
@@ -89,7 +91,7 @@ public class NioSender extends AbstractSender implements DataSender{
                 completeConnect();
                 if ( current != null ) key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                 return false;
-            } else  { 
+            } else  {
                 //wait for the connection to finish
                 key.interestOps(key.interestOps() | SelectionKey.OP_CONNECT);
                 return false;
@@ -146,8 +148,8 @@ public class NioSender extends AbstractSender implements DataSender{
         socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerTime());
         socketChannel.socket().setTrafficClass(getSoTrafficClass());
     }
-    
-    
+
+
 
     protected boolean read(SelectionKey key) throws IOException {
         //if there is no message here, we are done
@@ -171,7 +173,7 @@ public class NioSender extends AbstractSender implements DataSender{
         }
     }
 
-    
+
     protected boolean write(SelectionKey key) throws IOException {
         if ( (!isConnected()) || (this.socketChannel==null)) {
             throw new IOException("NioSender is not connected, this should not occur.");
@@ -215,7 +217,7 @@ public class NioSender extends AbstractSender implements DataSender{
         } else {
             writebuf.clear();
         }
-        
+
         InetSocketAddress addr = new InetSocketAddress(getAddress(),getPort());
         if ( socketChannel != null ) throw new IOException("Socket channel has already been established. Connection might be in progress.");
         socketChannel = SocketChannel.open();
@@ -227,7 +229,7 @@ public class NioSender extends AbstractSender implements DataSender{
             socketChannel.register(getSelector(), SelectionKey.OP_CONNECT, this);
         }
     }
-    
+
 
     /**
      * disconnect
@@ -257,7 +259,7 @@ public class NioSender extends AbstractSender implements DataSender{
         }
 
     }
-    
+
     public void reset() {
         if ( isConnected() && readbuf == null) {
             readbuf = getReadBuffer();
@@ -273,10 +275,10 @@ public class NioSender extends AbstractSender implements DataSender{
         setConnectTime(-1);
     }
 
-    private ByteBuffer getReadBuffer() { 
+    private ByteBuffer getReadBuffer() {
         return getBuffer(getRxBufSize());
     }
-    
+
     private ByteBuffer getWriteBuffer() {
         return getBuffer(getTxBufSize());
     }
@@ -284,7 +286,7 @@ public class NioSender extends AbstractSender implements DataSender{
     private ByteBuffer getBuffer(int size) {
         return (getDirectBuffer()?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
     }
-    
+
     /**
     * sendMessage
     *
@@ -312,9 +314,9 @@ public class NioSender extends AbstractSender implements DataSender{
            if (isConnected()) {
                socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
            }
-       } 
+       }
    }
-   
+
    public byte[] getMessage() {
        return current;
    }
