@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,12 +40,15 @@ public class ObjectReader {
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ObjectReader.class);
 
     private XByteBuffer buffer;
-    
+
     protected long lastAccess = System.currentTimeMillis();
-    
+
     protected boolean accessed = false;
     private boolean cancelled;
 
+    public ObjectReader(int packetSize) {
+        this.buffer = new XByteBuffer(packetSize, true);
+    }
     /**
      * Creates an <code>ObjectReader</code> for a TCP NIO socket channel
      * @param channel - the channel to be read.
@@ -53,7 +56,7 @@ public class ObjectReader {
     public ObjectReader(SocketChannel channel) {
         this(channel.socket());
     }
-    
+
     /**
      * Creates an <code>ObjectReader</code> for a TCP socket
      * @param socket Socket
@@ -67,23 +70,23 @@ public class ObjectReader {
             this.buffer = new XByteBuffer(43800,true);
         }
     }
-    
+
     public synchronized void access() {
         this.accessed = true;
         this.lastAccess = System.currentTimeMillis();
     }
-    
+
     public synchronized void finish() {
         this.accessed = false;
         this.lastAccess = System.currentTimeMillis();
     }
-    
+
     public boolean isAccessed() {
         return this.accessed;
     }
 
     /**
-     * Append new bytes to buffer. 
+     * Append new bytes to buffer.
      * @see XByteBuffer#countPackages()
      * @param data new transfer buffer
      * @param off offset
@@ -125,11 +128,11 @@ public class ObjectReader {
         }
         return result;
     }
-    
+
     public int bufferSize() {
         return buffer.getLength();
     }
-    
+
 
     public boolean hasPackage() {
         return buffer.countPackages(true)>0;
@@ -141,7 +144,7 @@ public class ObjectReader {
     public int count() {
         return buffer.countPackages();
     }
-    
+
     public void close() {
         this.buffer = null;
     }

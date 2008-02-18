@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,6 +15,7 @@
  */
 package org.apache.catalina.tribes.test.channel;
 
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.group.GroupChannel;
 import junit.framework.TestCase;
 import org.apache.catalina.tribes.transport.ReceiverBase;
@@ -25,6 +26,7 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
  */
 public class ChannelStartStop extends TestCase {
     GroupChannel channel = null;
+    int udpPort = 45543;
     protected void setUp() throws Exception {
         super.setUp();
         channel = new GroupChannel();
@@ -34,7 +36,7 @@ public class ChannelStartStop extends TestCase {
         super.tearDown();
         try {channel.stop(channel.DEFAULT);}catch (Exception ignore){}
     }
-    
+
     public void testDoubleFullStart() throws Exception {
         int count = 0;
         try {
@@ -52,11 +54,11 @@ public class ChannelStartStop extends TestCase {
     public void testScrap() throws Exception {
         System.out.println(channel.getChannelReceiver().getClass());
         ((ReceiverBase)channel.getChannelReceiver()).setMaxThreads(1);
-    } 
+    }
 
 
     public void testDoublePartialStart() throws Exception {
-        //try to double start the RX 
+        //try to double start the RX
         int count = 0;
         try {
             channel.start(channel.SND_RX_SEQ);
@@ -82,7 +84,7 @@ public class ChannelStartStop extends TestCase {
         } catch ( Exception x){/*expected*/}
         assertEquals(count,1);
         channel.stop(channel.DEFAULT);
-        
+
         count = 0;
         try {
             channel.start(channel.SND_RX_SEQ);
@@ -107,7 +109,7 @@ public class ChannelStartStop extends TestCase {
         assertEquals(count,1);
         channel.stop(channel.DEFAULT);
     }
-    
+
     public void testFalseOption() throws Exception {
         int flag = 0xFFF0;//should get ignored by the underlying components
         int count = 0;
@@ -121,6 +123,14 @@ public class ChannelStartStop extends TestCase {
         } catch ( Exception x){/*expected*/}
         assertEquals(count,2);
         channel.stop(channel.DEFAULT);
+    }
+
+    public void testUdpReceiverStart() throws Exception {
+        ReceiverBase rb = (ReceiverBase)channel.getChannelReceiver();
+        rb.setUdpPort(udpPort);
+        channel.start(Channel.DEFAULT);
+        Thread.sleep(1000);
+        channel.stop(Channel.DEFAULT);
     }
 
 }

@@ -34,7 +34,7 @@ import org.apache.catalina.tribes.Member;
  * @version 1.0
  */
 public abstract class AbstractSender implements DataSender {
-    
+
     private boolean connected = false;
     private int rxBufSize = 25188;
     private int txBufSize = 43800;
@@ -57,7 +57,9 @@ public abstract class AbstractSender implements DataSender {
     private int soLingerTime = 3;
     private int soTrafficClass = 0x04 | 0x08 | 0x010;
     private boolean throwOnFailedAck = true;
-    
+    private boolean udpBased = false;
+    private int udpPort = -1;
+
     /**
      * transfers sender properties from one sender to another
      * @param from AbstractSender
@@ -82,13 +84,15 @@ public abstract class AbstractSender implements DataSender {
         to.soLingerTime = from.soLingerTime;
         to.soTrafficClass = from.soTrafficClass;
         to.throwOnFailedAck = from.throwOnFailedAck;
-    }   
-
-    
-    public AbstractSender() {
-        
+        to.udpBased = from.udpBased;
+        to.udpPort = from.udpPort;
     }
-    
+
+
+    public AbstractSender() {
+
+    }
+
     /**
      * connect
      *
@@ -117,11 +121,11 @@ public abstract class AbstractSender implements DataSender {
         if ( disconnect ) disconnect();
         return disconnect;
     }
-    
+
     protected void setConnected(boolean connected){
         this.connected = connected;
     }
-    
+
     public boolean isConnected() {
         return connected;
     }
@@ -170,7 +174,7 @@ public abstract class AbstractSender implements DataSender {
     public int getMaxRetryAttempts() {
         return maxRetryAttempts;
     }
-    
+
     public void setDirect(boolean direct) {
         setDirectBuffer(direct);
     }
@@ -182,7 +186,7 @@ public abstract class AbstractSender implements DataSender {
     public boolean getDirect() {
         return getDirectBuffer();
     }
-    
+
     public boolean getDirectBuffer() {
         return this.directBuffer;
     }
@@ -304,6 +308,26 @@ public abstract class AbstractSender implements DataSender {
 
     public void setAddress(InetAddress address) {
         this.address = address;
+    }
+
+
+    public boolean isUdpBased() {
+        return udpBased;
+    }
+
+
+    public void setUdpBased(boolean udpBased) {
+        this.udpBased = udpBased;
+    }
+
+
+    public int getUdpPort() {
+        return udpPort;
+    }
+
+
+    public void setUdpPort(int udpPort) {
+        this.udpPort = udpPort;
     }
 
 }
