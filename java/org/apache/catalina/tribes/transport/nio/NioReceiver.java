@@ -18,7 +18,9 @@
 package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectableChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -59,6 +61,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
     private Selector selector = null;
     private ServerSocketChannel serverChannel = null;
+    private DatagramChannel datagramChannel = null;
 
     protected LinkedList events = new LinkedList();
 //    private Object interestOpsMutex = new Object();
@@ -110,7 +113,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             else throw new IOException(x.getMessage());
         }
     }
-    
+
     public AbstractRxTask createRxTask() {
         NioReplicationTask thread = new NioReplicationTask(this,this);
         thread.setUseBufferPool(this.getUseBufferPool());
@@ -118,9 +121,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         thread.setOptions(getWorkerThreadOptions());
         return thread;
     }
-    
-    
-    
+
+
+
     protected void bind() throws IOException {
         // allocate an unbound server socket channel
         serverChannel = ServerSocketChannel.open();
@@ -135,9 +138,22 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         serverChannel.configureBlocking(false);
         // register the ServerSocketChannel with the Selector
         serverChannel.register(selector, SelectionKey.OP_ACCEPT);
-        
+
+        //set up the datagram channel
+        if (this.getUdpPort()>0) {
+            datagramChannel = DatagramChannel.open();
+            datagramChannel.configureBlocking(false);
+            //bind to the address to avoid security checks
+            InetSocketAddress daddr = new InetSocketAddress(getBind(),getUdpPort());
+            //TODO should we auto increment the UDP port to avoid collisions?
+            //we could auto increment with the offset from the tcp listen port
+            datagramChannel.connect(daddr);
+        }
+
+
+
     }
-    
+
     public void addEvent(Runnable event) {
         if ( selector != null ) {
             synchronized (events) {
@@ -163,18 +179,18 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             events.clear();
         }
     }
-    
+
     public static void cancelledKey(SelectionKey key) {
         ObjectReader reader = (ObjectReader)key.attachment();
         if ( reader != null ) {
             reader.setCancelled(true);
             reader.finish();
         }
-        key.cancel(); 
+        key.cancel();
         key.attach(null);
         try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
         try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
-        
+
     }
     protected long lastCheck = System.currentTimeMillis();
     protected void socketTimeouts() {
@@ -202,7 +218,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                     if ( ka != null ) {
                         long delta = now - ka.getLastAccess();
                         if (delta > (long) getTimeout() && (!ka.isAccessed())) {
-                            if (log.isWarnEnabled()) 
+                            if (log.isWarnEnabled())
                                 log.warn("Channel key is registered, but has had no interest ops for the last "+getTimeout()+" ms. (cancelled:"+ka.isCancelled()+"):"+key+" last access:"+new java.sql.Timestamp(ka.getLastAccess())+" Possible cause: all threads used, perform thread dump");
                             ka.setLastAccess(now);
                             //key.interestOps(SelectionKey.OP_READ);
@@ -230,8 +246,12 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             log.warn("ServerSocketChannel already started");
             return;
         }
-        
+
         setListen(true);
+        if (selector!=null && datagramChannel!=null) {
+            ObjectReader oreader = new ObjectReader(1024*65);
+            registerChannel(selector,datagramChannel,SelectionKey.OP_READ,oreader);
+        }
 
         while (doListen() && selector != null) {
             // this may block for a long time, upon return the
@@ -302,10 +322,18 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
         }
         serverChannel.close();
+        if (datagramChannel!=null) {
+            try {
+                datagramChannel.close();
+            }catch (Exception iox) {
+                if (log.isDebugEnabled()) log.debug("Unable to close datagram channel.",iox);
+            }
+            datagramChannel=null;
+        }
         closeSelector();
     }
 
-    
+
 
     /**
      * Close Selector.
