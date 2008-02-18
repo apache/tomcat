@@ -90,6 +90,10 @@
       The secure listen port. This port is SSL enabled. If this attribute is omitted no SSL port is opened up.
       There default value is unset, meaning there is no SSL socket available.
     </attribute>
+    <attribute name="udpPort" required="false">
+      The UDP listen port. If this attribute is omitted no UDP port is opened up.
+      There default value is unset, meaning there is no UDP listener available.
+    </attribute>
     <attribute name="selectorTimeout" required="false">
       The value in milliseconds for the polling timeout in the <code>NioReceiver</code>. On older versions of the JDK
       there have been bugs, that should all now be cleared out where the selector never woke up.

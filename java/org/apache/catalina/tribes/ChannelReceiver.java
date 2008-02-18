@@ -59,6 +59,12 @@ public interface ChannelReceiver extends Heartbeat {
     public int getSecurePort();
     
     /**
+     * Returns the UDP port
+     * @return port, -1 if the UDP port is not activated.
+     */
+    public int getUdpPort();
+    
+    /**
      * Sets the message listener to receive notification of incoming
      * @param listener MessageListener
      * @see MessageListener
