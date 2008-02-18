@@ -141,7 +141,10 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 clusterReceiver.setMessageListener(this);
                 clusterReceiver.start();
                 //synchronize, big time FIXME
-                membershipService.setLocalMemberProperties(getClusterReceiver().getHost(), getClusterReceiver().getPort());
+                membershipService.setLocalMemberProperties(getClusterReceiver().getHost(), 
+                                                           getClusterReceiver().getPort(),
+                                                           getClusterReceiver().getSecurePort(),
+                                                           getClusterReceiver().getUdpPort());
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {

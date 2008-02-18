@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -47,10 +47,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public static final transient String TCP_LISTEN_PORT = "tcpListenPort";
     public static final transient String TCP_LISTEN_HOST = "tcpListenHost";
     public static final transient String MEMBER_NAME = "memberName";
-    
+
     public static final transient byte[] TRIBES_MBR_BEGIN = new byte[] {84, 82, 73, 66, 69, 83, 45, 66, 1, 0};
     public static final transient byte[] TRIBES_MBR_END   = new byte[] {84, 82, 73, 66, 69, 83, 45, 69, 1, 0};
-    
+
     /**
      * The listen host for this member
      */
@@ -64,7 +64,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * The udp listen port for this member
      */
     protected int udpPort = -1;
-    
+
     /**
      * The tcp/SSL listen port for this member
      */
@@ -79,12 +79,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * created, is kept track of using the start time
      */
     protected long memberAliveTime = 0;
-    
+
     /**
      * For the local member only
      */
     protected transient long serviceStartTime;
-    
+
     /**
      * To avoid serialization over and over again, once the local dataPkg
      * has been set, we use that to transmit data
@@ -95,13 +95,13 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Unique session Id for this member
      */
     protected byte[] uniqueId = new byte[16];
-    
+
     /**
      * Custom payload that an app framework can broadcast
      * Also used to transport stop command.
      */
     protected byte[] payload = new byte[0];
-    
+
     /**
      * Command, so that the custom payload doesn't have to be used
      * This is for internal tribes use, such as SHUTDOWN_COMMAND
@@ -112,12 +112,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * Domain if we want to filter based on domain.
      */
     protected byte[] domain = new byte[0];
-    
+
     /**
      * Empty constructor for serialization
      */
     public MemberImpl() {
-        
+
     }
 
     /**
@@ -134,7 +134,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         this.port = port;
         this.memberAliveTime=aliveTime;
     }
-    
+
     public MemberImpl(String host,
                       int port,
                       long aliveTime,
@@ -142,7 +142,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         this(host,port,aliveTime);
         setPayload(payload);
     }
-    
+
     public boolean isReady() {
         return SenderState.getSenderState(this).isReady();
     }
@@ -178,8 +178,8 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public byte[] getData(boolean getalive)  {
         return getData(getalive,false);
     }
-    
-    
+
+
     public int getDataLength() {
         return TRIBES_MBR_BEGIN.length+ //start pkg
                4+ //data length
@@ -198,9 +198,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
                payload.length+ //payload
                TRIBES_MBR_END.length; //end pkg
     }
-    
+
     /**
-     * 
+     *
      * @param getalive boolean - calculate memberAlive time
      * @param reset boolean - reset the cached data package, and create a new one
      * @return byte[]
@@ -217,7 +217,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
             }
             return dataPkg;
         }
-        
+
         //package looks like
         //start package TRIBES_MBR_BEGIN.length
         //package length - 4 bytes
@@ -239,19 +239,19 @@ public class MemberImpl implements Member, java.io.Externalizable {
         long alive=System.currentTimeMillis()-getServiceStartTime();
         byte hl = (byte)addr.length;
         byte[] data = new byte[getDataLength()];
-        
+
         int bodylength = (getDataLength() - TRIBES_MBR_BEGIN.length - TRIBES_MBR_END.length - 4);
-        
+
         int pos = 0;
-        
+
         //TRIBES_MBR_BEGIN
         System.arraycopy(TRIBES_MBR_BEGIN,0,data,pos,TRIBES_MBR_BEGIN.length);
         pos += TRIBES_MBR_BEGIN.length;
-        
+
         //body length
         XByteBuffer.toBytes(bodylength,data,pos);
         pos += 4;
-        
+
         //alive data
         XByteBuffer.toBytes((long)alive,data,pos);
         pos += 8;
@@ -289,7 +289,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         pos+=4;
         System.arraycopy(payload,0,data,pos,payload.length);
         pos+=payload.length;
-        
+
         //TRIBES_MBR_END
         System.arraycopy(TRIBES_MBR_END,0,data,pos,TRIBES_MBR_END.length);
         pos += TRIBES_MBR_END.length;
@@ -314,7 +314,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         //alive - 8 bytes
         //port - 4 bytes
         //secure port - 4 bytes
-    	//udp port - 4 bytes
+        //udp port - 4 bytes
         //host length - 1 byte
         //host - hl bytes
         //clen - 4 bytes
@@ -327,7 +327,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         //end package TRIBES_MBR_END.length
 
         int pos = offset;
-        
+
         if (XByteBuffer.firstIndexOf(data,offset,TRIBES_MBR_BEGIN)!=pos) {
             throw new IllegalArgumentException("Invalid package, should start with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN));
         }
@@ -335,16 +335,16 @@ public class MemberImpl implements Member, java.io.Externalizable {
         if ( length < (TRIBES_MBR_BEGIN.length+4) ) {
             throw new ArrayIndexOutOfBoundsException("Member package to small to validate.");
         }
-        
+
         pos += TRIBES_MBR_BEGIN.length;
-        
+
         int bodylength = XByteBuffer.toInt(data,pos);
         pos += 4;
-        
+
         if ( length < (bodylength+4+TRIBES_MBR_BEGIN.length+TRIBES_MBR_END.length) ) {
             throw new ArrayIndexOutOfBoundsException("Not enough bytes in member package.");
         }
-        
+
         int endpos = pos+bodylength;
         if (XByteBuffer.firstIndexOf(data,endpos,TRIBES_MBR_END)!=endpos) {
             throw new IllegalArgumentException("Invalid package, should end with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_END));
@@ -357,7 +357,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         byte[] portd = new byte[4];
         System.arraycopy(data, pos, portd, 0, 4);
         pos += 4;
-        
+
         byte[] sportd = new byte[4];
         System.arraycopy(data, pos, sportd, 0, 4);
         pos += 4;
@@ -366,37 +366,37 @@ public class MemberImpl implements Member, java.io.Externalizable {
         System.arraycopy(data, pos, uportd, 0, 4);
         pos += 4;
 
-    
+
         byte hl = data[pos++];
         byte[] addr = new byte[hl];
         System.arraycopy(data, pos, addr, 0, hl);
         pos += hl;
-    
+
         int cl = XByteBuffer.toInt(data, pos);
         pos += 4;
-    
+
         byte[] command = new byte[cl];
         System.arraycopy(data, pos, command, 0, command.length);
         pos += command.length;
-    
+
         int dl = XByteBuffer.toInt(data, pos);
         pos += 4;
-    
+
         byte[] domain = new byte[dl];
         System.arraycopy(data, pos, domain, 0, domain.length);
         pos += domain.length;
-    
+
         byte[] uniqueId = new byte[16];
         System.arraycopy(data, pos, uniqueId, 0, 16);
         pos += 16;
-    
+
         int pl = XByteBuffer.toInt(data, pos);
         pos += 4;
-    
+
         byte[] payload = new byte[pl];
         System.arraycopy(data, pos, payload, 0, payload.length);
         pos += payload.length;
-    
+
         member.setHost(addr);
         member.setPort(XByteBuffer.toInt(portd, 0));
         member.setSecurePort(XByteBuffer.toInt(sportd, 0));
@@ -406,10 +406,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
         member.payload = payload;
         member.domain = domain;
         member.command = command;
-    
+
         member.dataPkg = new byte[length];
         System.arraycopy(data, offset, member.dataPkg, 0, length);
-    
+
         return member;
     }
 
@@ -428,7 +428,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public String getName() {
         return "tcp://"+getHostname()+":"+getPort();
     }
-    
+
     /**
      * Return the listen port of this member
      * @return - tcp listen port
@@ -444,14 +444,14 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public byte[] getHost()  {
         return host;
     }
-    
+
     public String getHostname() {
         if ( this.hostname != null ) return hostname;
         else {
             try {
                 if (DO_DNS_LOOKUPS)
                     this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
-                else 
+                else
                     this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host);
                 return this.hostname;
             }catch ( IOException x ) {
@@ -493,9 +493,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public int getSecurePort() {
         return securePort;
     }
-    
+
     public int getUdpPort() {
-    	return udpPort;
+        return udpPort;
     }
 
     public void setMemberAliveTime(long time) {
@@ -512,7 +512,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
         buf.append(getName()).append(",");
         buf.append(getHostname()).append(",");
         buf.append(port).append(", alive=");
-        buf.append(memberAliveTime).append(",");
+        buf.append(memberAliveTime).append(", ");
+        buf.append("securePort=").append(securePort).append(", ");
+        buf.append("UDP Port=").append(udpPort).append(", ");
         buf.append("id=").append(bToS(this.uniqueId)).append(", ");
         buf.append("payload=").append(bToS(this.payload,8)).append(", ");
         buf.append("command=").append(bToS(this.command,8)).append(", ");
@@ -558,16 +560,16 @@ public class MemberImpl implements Member, java.io.Externalizable {
         else
             return false;
     }
-    
+
     public void setHost(byte[] host) {
         this.host = host;
     }
-    
+
     public void setHostname(String host) throws IOException {
         hostname = host;
         this.host = java.net.InetAddress.getByName(host).getAddress();
     }
-    
+
     public void setMsgCount(int msgCount) {
         this.msgCount = msgCount;
     }
@@ -593,7 +595,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
             this.payload = oldpayload;
             throw new IllegalArgumentException("Payload is to large for tribes to handle.");
         }
-        
+
     }
 
     public void setCommand(byte[] command) {
@@ -610,10 +612,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
         this.securePort = securePort;
         this.dataPkg = null;
     }
-    
+
     public void setUdpPort(int port) {
-    	this.udpPort = port;
-    	this.dataPkg = null;
+        this.udpPort = port;
+        this.dataPkg = null;
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
@@ -621,7 +623,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         byte[] message = new byte[length];
         in.read(message);
         getMember(message,this);
-        
+
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
@@ -629,5 +631,5 @@ public class MemberImpl implements Member, java.io.Externalizable {
         out.writeInt(data.length);
         out.write(data);
     }
-    
+
 }
