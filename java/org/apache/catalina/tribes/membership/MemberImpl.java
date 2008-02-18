@@ -48,8 +48,8 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public static final transient String TCP_LISTEN_HOST = "tcpListenHost";
     public static final transient String MEMBER_NAME = "memberName";
     
-    public static final transient byte[] TRIBES_MBR_BEGIN = new byte[] {84, 82, 73, 66, 69, 83, 45, 66};
-    public static final transient byte[] TRIBES_MBR_END   = new byte[] {84, 82, 73, 66, 69, 83, 45, 69};
+    public static final transient byte[] TRIBES_MBR_BEGIN = new byte[] {84, 82, 73, 66, 69, 83, 45, 66, 1, 0};
+    public static final transient byte[] TRIBES_MBR_END   = new byte[] {84, 82, 73, 66, 69, 83, 45, 69, 1, 0};
     
     /**
      * The listen host for this member
@@ -60,6 +60,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * The tcp listen port for this member
      */
     protected int port;
+    /**
+     * The udp listen port for this member
+     */
+    protected int udpPort = -1;
     
     /**
      * The tcp/SSL listen port for this member
@@ -182,6 +186,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
                8+ //alive time
                4+ //port
                4+ //secure port
+               4+ //udp port
                1+ //host length
                host.length+ //host
                4+ //command length
@@ -219,6 +224,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         //alive - 8 bytes
         //port - 4 bytes
         //secure port - 4 bytes
+        //udp port - 4 bytes
         //host length - 1 byte
         //host - hl bytes
         //clen - 4 bytes
@@ -254,6 +260,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
         pos += 4;
         //secure port
         XByteBuffer.toBytes(securePort,data,pos);
+        pos += 4;
+        //udp port
+        XByteBuffer.toBytes(udpPort,data,pos);
         pos += 4;
         //host length
         data[pos++] = hl;
@@ -305,6 +314,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         //alive - 8 bytes
         //port - 4 bytes
         //secure port - 4 bytes
+    	//udp port - 4 bytes
         //host length - 1 byte
         //host - hl bytes
         //clen - 4 bytes
@@ -319,7 +329,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         int pos = offset;
         
         if (XByteBuffer.firstIndexOf(data,offset,TRIBES_MBR_BEGIN)!=pos) {
-            throw new IllegalArgumentException("Invalid package, should start with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN)+" Possibly an incompatible client broadcasting on the same multicast address.");
+            throw new IllegalArgumentException("Invalid package, should start with:"+org.apache.catalina.tribes.util.Arrays.toString(TRIBES_MBR_BEGIN));
         }
 
         if ( length < (TRIBES_MBR_BEGIN.length+4) ) {
@@ -352,6 +362,9 @@ public class MemberImpl implements Member, java.io.Externalizable {
         System.arraycopy(data, pos, sportd, 0, 4);
         pos += 4;
 
+        byte[] uportd = new byte[4];
+        System.arraycopy(data, pos, uportd, 0, 4);
+        pos += 4;
 
     
         byte hl = data[pos++];
@@ -387,6 +400,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         member.setHost(addr);
         member.setPort(XByteBuffer.toInt(portd, 0));
         member.setSecurePort(XByteBuffer.toInt(sportd, 0));
+        member.setUdpPort(XByteBuffer.toInt(uportd, 0));
         member.setMemberAliveTime(XByteBuffer.toLong(alived, 0));
         member.setUniqueId(uniqueId);
         member.payload = payload;
@@ -478,6 +492,10 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     public int getSecurePort() {
         return securePort;
+    }
+    
+    public int getUdpPort() {
+    	return udpPort;
     }
 
     public void setMemberAliveTime(long time) {
@@ -590,6 +608,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
 
     public void setSecurePort(int securePort) {
         this.securePort = securePort;
+        this.dataPkg = null;
+    }
+    
+    public void setUdpPort(int port) {
+    	this.udpPort = port;
+    	this.dataPkg = null;
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
