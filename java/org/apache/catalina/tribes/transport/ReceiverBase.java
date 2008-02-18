@@ -47,11 +47,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
 
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReceiverBase.class);
-    
+
     private MessageListener listener;
     private String host = "auto";
     private InetAddress bind;
     private int port  = 4000;
+    private int udpPort = -1;
     private int securePort = -1;
     private int rxBufSize = 43800;
     private int txBufSize = 25188;
@@ -74,24 +75,24 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int soTrafficClass = 0x04 | 0x08 | 0x010;
     private int timeout = 3000; //3 seconds
     private boolean useBufferPool = true;
-    
+
     private ExecutorService executor;
 
 
     public ReceiverBase() {
     }
-    
+
     public void start() throws IOException {
         if ( executor == null ) {
             executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
         }
     }
-    
+
     public void stop() {
         if ( executor != null ) executor.shutdownNow();//ignore left overs
         executor = null;
     }
-    
+
     /**
      * getMessageListener
      *
@@ -118,7 +119,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public int getTxBufSize() {
         return txBufSize;
     }
-    
+
     /**
      * @deprecated use getMinThreads()/getMaxThreads()
      * @return int
@@ -188,7 +189,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
         return bind;
     }
-    
+
     /**
      * recursive bind to find the next available port
      * @param socket ServerSocket
@@ -219,13 +220,13 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
         return retries;
     }
-    
+
     public void messageDataReceived(ChannelMessage data) {
         if ( this.listener != null ) {
             if ( listener.accept(data) ) listener.messageReceived(data);
         }
     }
-    
+
     public int getWorkerThreadOptions() {
         int options = 0;
         if ( getDirect() ) options = options | OPTION_DIRECT_BUFFER;
@@ -248,7 +249,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return getPort();
     }
 
-    
+
     public boolean getDirect() {
         return direct;
     }
@@ -264,7 +265,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         getBind();
         return this.host;
     }
-    
+
     public String getHost() {
         return getAddress();
     }
@@ -291,7 +292,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public RxTaskPool getTaskPool() {
         return pool;
     }
-    
+
     /**
      * @deprecated use getAddress
      * @return String
@@ -376,7 +377,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public void setTcpSelectorTimeout(long selTimeout) {
         setSelectorTimeout(selTimeout);
     }
-    
+
     public void setSelectorTimeout(long selTimeout) {
         tcpSelectorTimeout = selTimeout;
     }
@@ -385,7 +386,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         this.listen = doListen;
     }
 
-    
+
     public void setAddress(String host) {
         this.host = host;
     }
@@ -478,5 +479,13 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public void heartbeat() {
         //empty operation
     }
-    
+
+    public int getUdpPort() {
+        return udpPort;
+    }
+
+    public void setUdpPort(int udpPort) {
+        this.udpPort = udpPort;
+    }
+
 }
