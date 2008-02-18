@@ -32,6 +32,7 @@ import java.util.Arrays;
 public class MemberSerialization extends TestCase {
     MemberImpl m1, m2, p1,p2;
     byte[] payload = null;
+    int udpPort = 3445;
     protected void setUp() throws Exception {
         super.setUp();
         payload = new byte[333];
@@ -46,6 +47,8 @@ public class MemberSerialization extends TestCase {
         m2.setDomain(new byte[] {1,2,3,4,5,6,7,8,9});
         m1.setCommand(new byte[] {1,2,4,5,6,7,8,9});
         m2.setCommand(new byte[] {1,2,4,5,6,7,8,9});
+        m1.setUdpPort(udpPort);
+        m2.setUdpPort(m1.getUdpPort());
     }
     
     public void testCompare() throws Exception {
@@ -56,6 +59,19 @@ public class MemberSerialization extends TestCase {
         assertFalse(m1.equals(p2));
         assertFalse(m2.equals(p2));
         assertFalse(p1.equals(p2));
+    }
+    
+    public void testUdpPort() throws Exception {
+    	byte[] md1 = m1.getData();
+    	byte[] md2 = m2.getData();
+
+        MemberImpl a1 = MemberImpl.getMember(md1);
+        MemberImpl a2 = MemberImpl.getMember(md2);
+        
+        assertEquals(true, a1.getUdpPort()==a2.getUdpPort());
+        assertEquals(true,a1.getUdpPort()==udpPort);
+
+    	
     }
     
     public void testSerializationOne() throws Exception {
