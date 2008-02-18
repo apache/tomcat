@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -70,9 +70,9 @@ public class McastService implements MembershipService,MembershipListener {
     protected MemberImpl localMember ;
     private int mcastSoTimeout;
     private int mcastTTL;
-    
+
     protected byte[] payload;
-    
+
     protected byte[] domain;
 
     /**
@@ -95,7 +95,7 @@ public class McastService implements MembershipService,MembershipListener {
     public String getInfo() {
         return (info);
     }
-    
+
     /**
      *
      * @param properties
@@ -132,7 +132,7 @@ public class McastService implements MembershipService,MembershipListener {
     public String getLocalMemberName() {
         return localMember.toString() ;
     }
- 
+
     /**
      * Return the local member
      */
@@ -140,13 +140,15 @@ public class McastService implements MembershipService,MembershipListener {
         if ( alive && localMember != null && impl != null) localMember.setMemberAliveTime(System.currentTimeMillis()-impl.getServiceStartTime());
         return localMember;
     }
-    
+
     /**
      * Sets the local member properties for broadcasting
      */
-    public void setLocalMemberProperties(String listenHost, int listenPort) {
+    public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort) {
         properties.setProperty("tcpListenHost",listenHost);
         properties.setProperty("tcpListenPort",String.valueOf(listenPort));
+        properties.setProperty("udpListenPort",String.valueOf(udpPort));
+        properties.setProperty("tcpSecurePort",String.valueOf(securePort));
         try {
             if (localMember != null) {
                 localMember.setHostname(listenHost);
@@ -157,16 +159,18 @@ public class McastService implements MembershipService,MembershipListener {
                 localMember.setPayload(getPayload());
                 localMember.setDomain(getDomain());
             }
+            localMember.setSecurePort(securePort);
+            localMember.setUdpPort(udpPort);
             localMember.getData(true, true);
         }catch ( IOException x ) {
             throw new IllegalArgumentException(x);
         }
     }
-    
+
     public void setAddress(String addr) {
         properties.setProperty("mcastAddress", addr);
     }
-    
+
     /**
      * @deprecated use setAddress
      * @param addr String
@@ -174,11 +178,11 @@ public class McastService implements MembershipService,MembershipListener {
     public void setMcastAddr(String addr) {
         setAddress(addr);
     }
-    
+
     public String getAddress() {
         return properties.getProperty("mcastAddress");
     }
-    
+
     /**
      * @deprecated use getAddress
      * @return String
@@ -190,7 +194,7 @@ public class McastService implements MembershipService,MembershipListener {
     public void setMcastBindAddress(String bindaddr) {
         setBind(bindaddr);
     }
-    
+
     public void setBind(String bindaddr) {
         properties.setProperty("mcastBindAddress", bindaddr);
     }
@@ -217,7 +221,7 @@ public class McastService implements MembershipService,MembershipListener {
     public void setPort(int port) {
         properties.setProperty("mcastPort", String.valueOf(port));
     }
-    
+
     public void setRecoveryCounter(int recoveryCounter) {
         properties.setProperty("recoveryCounter", String.valueOf(recoveryCounter));
     }
@@ -242,7 +246,7 @@ public class McastService implements MembershipService,MembershipListener {
         String p = properties.getProperty("mcastPort");
         return new Integer(p).intValue();
     }
-    
+
     /**
      * @deprecated use setFrequency
      * @param time long
@@ -250,7 +254,7 @@ public class McastService implements MembershipService,MembershipListener {
     public void setMcastFrequency(long time) {
         setFrequency(time);
     }
-    
+
     public void setFrequency(long time) {
         properties.setProperty("mcastFrequency", String.valueOf(time));
     }
@@ -274,7 +278,7 @@ public class McastService implements MembershipService,MembershipListener {
     public void setDropTime(long time) {
         properties.setProperty("memberDropTime", String.valueOf(time));
     }
-    
+
     /**
      * @deprecated use getDropTime
      * @return long
@@ -305,7 +309,7 @@ public class McastService implements MembershipService,MembershipListener {
         start(MembershipService.MBR_RX);
         start(MembershipService.MBR_TX);
     }
-    
+
     public void start(int level) throws java.lang.Exception {
         hasProperty(properties,"mcastPort");
         hasProperty(properties,"mcastAddress");
@@ -313,6 +317,9 @@ public class McastService implements MembershipService,MembershipListener {
         hasProperty(properties,"mcastFrequency");
         hasProperty(properties,"tcpListenPort");
         hasProperty(properties,"tcpListenHost");
+        hasProperty(properties,"tcpSecurePort");
+        hasProperty(properties,"udpListenPort");
+
 
         if ( impl != null ) {
             impl.start(level);
@@ -320,7 +327,9 @@ public class McastService implements MembershipService,MembershipListener {
         }
         String host = getProperties().getProperty("tcpListenHost");
         int port = Integer.parseInt(getProperties().getProperty("tcpListenPort"));
-        
+        int securePort = Integer.parseInt(getProperties().getProperty("tcpSecurePort"));
+        int udpPort = Integer.parseInt(getProperties().getProperty("udpListenPort"));
+
         if ( localMember == null ) {
             localMember = new MemberImpl(host, port, 100);
             localMember.setUniqueId(UUIDGenerator.randomUUID(true));
@@ -329,6 +338,8 @@ public class McastService implements MembershipService,MembershipListener {
             localMember.setPort(port);
             localMember.setMemberAliveTime(100);
         }
+        localMember.setSecurePort(securePort);
+        localMember.setUdpPort(udpPort);
         if ( this.payload != null ) localMember.setPayload(payload);
         if ( this.domain != null ) localMember.setDomain(domain);
         localMember.setServiceStartTime(System.currentTimeMillis());
@@ -363,19 +374,19 @@ public class McastService implements MembershipService,MembershipListener {
                                     this);
         String value = properties.getProperty("recoveryEnabled","true");
         boolean recEnabled = Boolean.valueOf(value).booleanValue() ;
-        impl.setRecoveryEnabled(recEnabled);        
+        impl.setRecoveryEnabled(recEnabled);
         int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter","10"));
         impl.setRecoveryCounter(recCnt);
         long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime","5000"));
         impl.setRecoverySleepTime(recSlpTime);
-        
-        
+
+
         impl.start(level);
-		
+
 
     }
 
- 
+
     /**
      * Stop broadcasting and listening to membership pings
      */
@@ -403,7 +414,7 @@ public class McastService implements MembershipService,MembershipListener {
             membernames = new String[0] ;
         return membernames ;
     }
- 
+
     /**
      * Return the member by name
      */
@@ -423,7 +434,7 @@ public class McastService implements MembershipService,MembershipListener {
        if ( impl == null || impl.membership == null ) return false;
        return impl.membership.hasMembers();
     }
-    
+
     public Member getMember(Member mbr) {
         if ( impl == null || impl.membership == null ) return null;
         return impl.membership.getMember(mbr);
@@ -472,11 +483,11 @@ public class McastService implements MembershipService,MembershipListener {
     public int getMcastSoTimeout() {
         return getSoTimeout();
     }
-    
+
     public int getSoTimeout() {
         return mcastSoTimeout;
     }
-    
+
     /**
      * @deprecated use setSoTimeout
      * @param mcastSoTimeout int
@@ -484,12 +495,12 @@ public class McastService implements MembershipService,MembershipListener {
     public void setMcastSoTimeout(int mcastSoTimeout) {
         setSoTimeout(mcastSoTimeout);
     }
-    
+
     public void setSoTimeout(int mcastSoTimeout) {
         this.mcastSoTimeout = mcastSoTimeout;
         properties.setProperty("mcastSoTimeout", String.valueOf(mcastSoTimeout));
     }
-    
+
     /**
      * @deprecated use getTtl
      * @return int
@@ -497,7 +508,7 @@ public class McastService implements MembershipService,MembershipListener {
     public int getMcastTTL() {
         return getTtl();
     }
-    
+
     public int getTtl() {
         return mcastTTL;
     }
@@ -505,11 +516,11 @@ public class McastService implements MembershipService,MembershipListener {
     public byte[] getPayload() {
         return payload;
     }
-    
+
     public byte[] getDomain() {
         return domain;
     }
-    
+
     /**
      * @deprecated use setTtl
      * @param mcastTTL int
@@ -535,7 +546,7 @@ public class McastService implements MembershipService,MembershipListener {
             }
         }
     }
-    
+
     public void setDomain(byte[] domain) {
         this.domain = domain;
         if ( localMember != null ) {
@@ -555,7 +566,7 @@ public class McastService implements MembershipService,MembershipListener {
      * @throws Exception If an error occurs
      */
     public static void main(String args[]) throws Exception {
-		if(log.isInfoEnabled())
+        if(log.isInfoEnabled())
             log.info("Usage McastService hostname tcpport");
         McastService service = new McastService();
         java.util.Properties p = new java.util.Properties();

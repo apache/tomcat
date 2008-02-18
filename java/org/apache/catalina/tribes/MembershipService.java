@@ -109,7 +109,7 @@ public interface MembershipService {
     /**
      * Sets the local member properties for broadcasting
      */
-    public void setLocalMemberProperties(String listenHost, int listenPort);
+    public void setLocalMemberProperties(String listenHost, int listenPort, int securePort, int udpPort);
     
     /**
      * Sets the membership listener, only one listener can be added.
