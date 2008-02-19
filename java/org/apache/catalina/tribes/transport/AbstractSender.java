@@ -116,7 +116,8 @@ public abstract class AbstractSender implements DataSender {
      */
     public boolean keepalive() {
         boolean disconnect = false;
-        if ( keepAliveCount >= 0 && requestCount>keepAliveCount ) disconnect = true;
+        if (isUdpBased()) disconnect = true; //always disconnect UDP, TODO optimize the keepalive handling
+        else if ( keepAliveCount >= 0 && requestCount>keepAliveCount ) disconnect = true;
         else if ( keepAliveTime >= 0 && (System.currentTimeMillis()-connectTime)>keepAliveTime ) disconnect = true;
         if ( disconnect ) disconnect();
         return disconnect;
@@ -299,6 +300,7 @@ public abstract class AbstractSender implements DataSender {
         this.destination = destination;
         this.address = InetAddress.getByAddress(destination.getHost());
         this.port = destination.getPort();
+        this.udpPort = destination.getUdpPort();
 
     }
 

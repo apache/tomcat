@@ -154,7 +154,7 @@ public class NioSender extends AbstractSender implements DataSender{
     protected boolean read(SelectionKey key) throws IOException {
         //if there is no message here, we are done
         if ( current == null ) return true;
-        int read = socketChannel.read(readbuf);
+        int read = isUdpBased()?dataChannel.read(readbuf) : socketChannel.read(readbuf);
         //end of stream
         if ( read == -1 ) throw new IOException("Unable to receive an ack message. EOF on socket channel has been reached.");
         //no data read
@@ -175,14 +175,14 @@ public class NioSender extends AbstractSender implements DataSender{
 
 
     protected boolean write(SelectionKey key) throws IOException {
-        if ( (!isConnected()) || (this.socketChannel==null)) {
+        if ( (!isConnected()) || (this.socketChannel==null && this.dataChannel==null)) {
             throw new IOException("NioSender is not connected, this should not occur.");
         }
         if ( current != null ) {
             if ( remaining > 0 ) {
                 //weve written everything, or we are starting a new package
                 //protect against buffer overwrite
-                int byteswritten = socketChannel.write(writebuf);
+                int byteswritten = isUdpBased()?dataChannel.write(writebuf) : socketChannel.write(writebuf);
                 if (byteswritten == -1 ) throw new EOFException();
                 remaining -= byteswritten;
                 //if the entire message was written from the buffer
@@ -204,7 +204,7 @@ public class NioSender extends AbstractSender implements DataSender{
      * @todo Implement this org.apache.catalina.tribes.transport.IDataSender method
      */
     public synchronized void connect() throws IOException {
-        if ( connecting ) return;
+        if ( connecting || isConnected()) return;
         connecting = true;
         if ( isConnected() ) throw new IOException("NioSender is already in connected state.");
         if ( readbuf == null ) {
@@ -218,15 +218,23 @@ public class NioSender extends AbstractSender implements DataSender{
             writebuf.clear();
         }
 
-        InetSocketAddress addr = new InetSocketAddress(getAddress(),getPort());
-        if ( socketChannel != null ) throw new IOException("Socket channel has already been established. Connection might be in progress.");
-        socketChannel = SocketChannel.open();
-        socketChannel.configureBlocking(false);
-        if ( socketChannel.connect(addr) ) {
-            completeConnect();
-            socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
+        if (isUdpBased()) {
+            InetSocketAddress daddr = new InetSocketAddress(getAddress(),getUdpPort());
+            if ( dataChannel != null ) throw new IOException("Datagram channel has already been established. Connection might be in progress.");
+            dataChannel = DatagramChannel.open();
+            dataChannel.configureBlocking(false);
+            dataChannel.connect(daddr);
         } else {
-            socketChannel.register(getSelector(), SelectionKey.OP_CONNECT, this);
+            InetSocketAddress addr = new InetSocketAddress(getAddress(),getPort());
+            if ( socketChannel != null ) throw new IOException("Socket channel has already been established. Connection might be in progress.");
+            socketChannel = SocketChannel.open();
+            socketChannel.configureBlocking(false);
+            if ( socketChannel.connect(addr) ) {
+                completeConnect();
+                socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
+            } else {
+                socketChannel.register(getSelector(), SelectionKey.OP_CONNECT, this);
+            }
         }
     }
 
@@ -252,6 +260,18 @@ public class NioSender extends AbstractSender implements DataSender{
                     socketChannel = null;
                 }
             }
+            if ( dataChannel != null ) {
+                try {
+                    try {dataChannel.socket().close();}catch ( Exception x){}
+                    //error free close, all the way
+                    //try {socket.shutdownOutput();}catch ( Exception x){}
+                    //try {socket.shutdownInput();}catch ( Exception x){}
+                    //try {socket.close();}catch ( Exception x){}
+                    try {dataChannel.close();}catch ( Exception x){}
+                }finally {
+                    dataChannel = null;
+                }
+            }
         } catch ( Exception x ) {
             log.error("Unable to disconnect NioSender. msg="+x.getMessage());
             if ( log.isDebugEnabled() ) log.debug("Unable to disconnect NioSender. msg="+x.getMessage(),x);
@@ -273,6 +293,7 @@ public class NioSender extends AbstractSender implements DataSender{
         setAttempt(0);
         setRequestCount(0);
         setConnectTime(-1);
+        setUdpBased(false);
     }
 
     private ByteBuffer getReadBuffer() {
@@ -312,7 +333,10 @@ public class NioSender extends AbstractSender implements DataSender{
            //writebuf.limit(length);
            writebuf.flip();
            if (isConnected()) {
-               socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
+               if (isUdpBased())
+                   dataChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
+               else
+                   socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
            }
        }
    }
