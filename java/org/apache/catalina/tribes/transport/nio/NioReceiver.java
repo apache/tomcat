@@ -144,10 +144,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             datagramChannel = DatagramChannel.open();
             datagramChannel.configureBlocking(false);
             //bind to the address to avoid security checks
-            InetSocketAddress daddr = new InetSocketAddress(getBind(),getUdpPort());
-            //TODO should we auto increment the UDP port to avoid collisions?
-            //we could auto increment with the offset from the tcp listen port
-            datagramChannel.connect(daddr);
+            bindUdp(datagramChannel.socket(),getUdpPort(),getAutoBind());
         }
 
 
@@ -188,7 +185,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         }
         key.cancel();
         key.attach(null);
-        try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
+        if (key.channel() instanceof SocketChannel)
+            try { ((SocketChannel)key.channel()).socket().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
+        if (key.channel() instanceof DatagramChannel)
+            try { ((DatagramChannel)key.channel()).socket().close(); } catch (Exception e) { if (log.isDebugEnabled()) log.debug("", e); }
         try { key.channel().close(); } catch (IOException e) { if (log.isDebugEnabled()) log.debug("", e); }
 
     }
@@ -249,7 +249,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
         setListen(true);
         if (selector!=null && datagramChannel!=null) {
-            ObjectReader oreader = new ObjectReader(1024*65);
+            ObjectReader oreader = new ObjectReader(65535); //max size for a datagram packet
             registerChannel(selector,datagramChannel,SelectionKey.OP_READ,oreader);
         }
 
