@@ -249,7 +249,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
 
         setListen(true);
         if (selector!=null && datagramChannel!=null) {
-            ObjectReader oreader = new ObjectReader(65535); //max size for a datagram packet
+            ObjectReader oreader = new ObjectReader(MAX_UDP_SIZE); //max size for a datagram packet
             registerChannel(selector,datagramChannel,SelectionKey.OP_READ,oreader);
         }
 

@@ -137,16 +137,24 @@ public class NioSender extends AbstractSender implements DataSender{
         connecting = false;
         setRequestCount(0);
         setConnectTime(System.currentTimeMillis());
-        socketChannel.socket().setSendBufferSize(getTxBufSize());
-        socketChannel.socket().setReceiveBufferSize(getRxBufSize());
-        socketChannel.socket().setSoTimeout((int)getTimeout());
-        socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerOn()?getSoLingerTime():0);
-        socketChannel.socket().setTcpNoDelay(getTcpNoDelay());
-        socketChannel.socket().setKeepAlive(getSoKeepAlive());
-        socketChannel.socket().setReuseAddress(getSoReuseAddress());
-        socketChannel.socket().setOOBInline(getOoBInline());
-        socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerTime());
-        socketChannel.socket().setTrafficClass(getSoTrafficClass());
+        if (socketChannel!=null) {
+            socketChannel.socket().setSendBufferSize(getTxBufSize());
+            socketChannel.socket().setReceiveBufferSize(getRxBufSize());
+            socketChannel.socket().setSoTimeout((int)getTimeout());
+            socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerOn()?getSoLingerTime():0);
+            socketChannel.socket().setTcpNoDelay(getTcpNoDelay());
+            socketChannel.socket().setKeepAlive(getSoKeepAlive());
+            socketChannel.socket().setReuseAddress(getSoReuseAddress());
+            socketChannel.socket().setOOBInline(getOoBInline());
+            socketChannel.socket().setSoLinger(getSoLingerOn(),getSoLingerTime());
+            socketChannel.socket().setTrafficClass(getSoTrafficClass());
+        } else if (dataChannel!=null) {
+            dataChannel.socket().setSendBufferSize(getTxBufSize());
+            dataChannel.socket().setReceiveBufferSize(getRxBufSize());
+            dataChannel.socket().setSoTimeout((int)getTimeout());
+            dataChannel.socket().setReuseAddress(getSoReuseAddress());
+            dataChannel.socket().setTrafficClass(getSoTrafficClass());
+        }
     }
 
 
@@ -224,6 +232,9 @@ public class NioSender extends AbstractSender implements DataSender{
             dataChannel = DatagramChannel.open();
             dataChannel.configureBlocking(false);
             dataChannel.connect(daddr);
+            completeConnect();
+            dataChannel.register(getSelector(),SelectionKey.OP_WRITE, this);
+            
         } else {
             InetSocketAddress addr = new InetSocketAddress(getAddress(),getPort());
             if ( socketChannel != null ) throw new IOException("Socket channel has already been established. Connection might be in progress.");
