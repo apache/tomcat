@@ -27,6 +27,8 @@ package org.apache.catalina.tribes;
  * @version $Revision$, $Date$
  */
 public interface ChannelReceiver extends Heartbeat {
+    public static final int MAX_UDP_SIZE = 65535;
+    
     /**
      * Start listening for incoming messages on the host/port
      * @throws java.io.IOException
