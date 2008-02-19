@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.transport;
 
 import java.io.IOException;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -220,6 +221,38 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         }
         return retries;
     }
+
+    /**
+     * Same as bind() except it does it for the UDP port
+     * @param socket
+     * @param portstart
+     * @param retries
+     * @return
+     * @throws IOException
+     */
+    protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {
+        InetSocketAddress addr = null;
+        while ( retries > 0 ) {
+            try {
+                addr = new InetSocketAddress(getBind(), portstart);
+                socket.bind(addr);
+                setUdpPort(portstart);
+                log.info("UDP Receiver Server Socket bound to:"+addr);
+                return 0;
+            }catch ( IOException x) {
+                retries--;
+                if ( retries <= 0 ) {
+                    log.info("Unable to bind UDP socket to:"+addr+" throwing error.");
+                    throw x;
+                }
+                portstart++;
+                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.currentThread().interrupted();}
+                retries = bindUdp(socket,portstart,retries);
+            }
+        }
+        return retries;
+    }
+
 
     public void messageDataReceived(ChannelMessage data) {
         if ( this.listener != null ) {
