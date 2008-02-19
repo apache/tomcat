@@ -17,6 +17,7 @@
 
 package org.apache.catalina.tribes.transport.nio;
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -147,19 +148,33 @@ public class NioReplicationTask extends AbstractRxTask {
         reader.setLastAccess(System.currentTimeMillis());
         reader.access();
         ReadableByteChannel channel = (ReadableByteChannel) key.channel();
-        int count;
+        int count=-1;
         buffer.clear();			// make buffer empty
+        SocketAddress saddr = null;
 
-        // loop while data available, channel is non-blocking
-        while ((count = channel.read (buffer)) > 0) {
-            buffer.flip();		// make buffer readable
+        if (channel instanceof SocketChannel) {
+            // loop while data available, channel is non-blocking
+            while ((count = channel.read (buffer)) > 0) {
+                buffer.flip();		// make buffer readable
+                if ( buffer.hasArray() )
+                    reader.append(buffer.array(),0,count,false);
+                else
+                    reader.append(buffer,count,false);
+                buffer.clear();		// make buffer empty
+                //do we have at least one package?
+                if ( reader.hasPackage() ) break;
+            }
+        } else if (channel instanceof DatagramChannel) {
+            DatagramChannel dchannel = (DatagramChannel)channel;
+            saddr = dchannel.receive(buffer);
+            buffer.flip();      // make buffer readable
             if ( buffer.hasArray() )
-                reader.append(buffer.array(),0,count,false);
+                reader.append(buffer.array(),0,buffer.limit()-buffer.position(),false);
             else
-                reader.append(buffer,count,false);
-            buffer.clear();		// make buffer empty
-            //do we have at least one package?
-            if ( reader.hasPackage() ) break;
+                reader.append(buffer,buffer.limit()-buffer.position(),false);
+            buffer.clear();     // make buffer empty
+            //did we get a package
+            count = reader.hasPackage()?1:-1;
         }
 
         int pkgcnt = reader.count();
@@ -180,7 +195,7 @@ public class NioReplicationTask extends AbstractRxTask {
              * server before completing the request
              * This is considered an asynchronized request
              */
-            if (ChannelData.sendAckAsync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND);
+            if (ChannelData.sendAckAsync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
             try {
                 if ( Logs.MESSAGES.isTraceEnabled() ) {
                     try {
@@ -194,13 +209,13 @@ public class NioReplicationTask extends AbstractRxTask {
                  * server before sending the ack to the remote server
                  * This is considered a synchronized request
                  */
-                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND);
+                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
             }catch ( RemoteProcessException e ) {
                 if ( log.isDebugEnabled() ) log.error("Processing of cluster message failed.",e);
-                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND);
+                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
             }catch ( Exception e ) {
                 log.error("Processing of cluster message failed.",e);
-                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND);
+                if (ChannelData.sendAckSync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.FAIL_ACK_COMMAND,saddr);
             }
             if ( getUseBufferPool() ) {
                 BufferPool.getBufferPool().returnBuffer(msgs[i].getMessage());
@@ -275,17 +290,25 @@ public class NioReplicationTask extends AbstractRxTask {
 
 
     /**
-     * send a reply-acknowledgement (6,2,3)
+     * send a reply-acknowledgement (6,2,3), sends it doing a busy write, the ACK is so small
+     * that it should always go to the buffer
      * @param key
      * @param channel
      */
-    protected void sendAck(SelectionKey key, WritableByteChannel channel, byte[] command) {
-
+    protected void sendAck(SelectionKey key, WritableByteChannel channel, byte[] command, SocketAddress udpaddr) {
         try {
+
             ByteBuffer buf = ByteBuffer.wrap(command);
             int total = 0;
-            while ( total < command.length ) {
-                total += channel.write(buf);
+            if (channel instanceof DatagramChannel) {
+                DatagramChannel dchannel = (DatagramChannel)channel;
+                while ( total < command.length ) {
+                    total += dchannel.send(buf, udpaddr);
+                }
+            } else {
+                while ( total < command.length ) {
+                    total += channel.write(buf);
+                }
             }
             if (log.isTraceEnabled()) {
                 log.trace("ACK sent to " +
