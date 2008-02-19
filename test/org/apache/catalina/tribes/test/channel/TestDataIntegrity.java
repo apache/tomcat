@@ -28,12 +28,12 @@ import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 
 /**
- * <p>Title: </p> 
- * 
- * <p>Description: </p> 
- * 
+ * <p>Title: </p>
+ *
+ * <p>Description: </p>
+ *
  * <p>Company: </p>
- * 
+ *
  * @author not attributable
  * @version 1.0
  */
@@ -61,7 +61,7 @@ public class TestDataIntegrity extends TestCase {
         channel1.stop(GroupChannel.DEFAULT);
         channel2.stop(GroupChannel.DEFAULT);
     }
-    
+
     public void testDataSendNO_ACK() throws Exception {
         System.err.println("Starting NO_ACK");
         Thread[] threads = new Thread[threadCount];
@@ -89,7 +89,7 @@ public class TestDataIntegrity extends TestCase {
         System.err.println("Finished NO_ACK ["+listener1.count+"]");
         assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
-    
+
     public void testDataSendASYNCM() throws Exception {
             System.err.println("Starting ASYNC MULTI THREAD");
             Thread[] threads = new Thread[threadCount];
@@ -113,7 +113,7 @@ public class TestDataIntegrity extends TestCase {
             for (int x=0; x<threads.length; x++ ) { threads[x].join();}
             //sleep for 50 sec, let the other messages in
             long start = System.currentTimeMillis();
-            while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+            while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
             System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
             assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
@@ -148,7 +148,7 @@ public class TestDataIntegrity extends TestCase {
         public boolean accept(Serializable s, Member m) {
             return (s instanceof Data);
         }
-        
+
         public void messageReceived(Serializable s, Member m) {
             Data d = (Data)s;
             if ( !Data.verify(d) ) {
@@ -161,7 +161,7 @@ public class TestDataIntegrity extends TestCase {
             }
         }
     }
-    
+
     public static class Data implements Serializable {
         public int length;
         public byte[] data;
@@ -178,14 +178,14 @@ public class TestDataIntegrity extends TestCase {
             Arrays.fill(d.data,d.key);
             return d;
         }
-        
+
         public static boolean verify(Data d) {
             boolean result = (d.length == d.data.length);
             for ( int i=0; result && (i<d.data.length); i++ ) result = result && d.data[i] == d.key;
             return result;
         }
     }
-    
-    
+
+
 
 }
