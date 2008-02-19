@@ -33,6 +33,8 @@ import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.BufferPool;
 import java.nio.channels.CancelledKeyException;
+
+import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.util.Logs;
@@ -68,10 +70,14 @@ public class NioReplicationTask extends AbstractRxTask {
     // loop forever waiting for work to do
     public synchronized void run() {
         if ( buffer == null ) {
+            int size = getRxBufSize();
+            if (key.channel() instanceof DatagramChannel) {
+                size = ChannelReceiver.MAX_UDP_SIZE;
+            }
             if ( (getOptions() & OPTION_DIRECT_BUFFER) == OPTION_DIRECT_BUFFER) {
-                buffer = ByteBuffer.allocateDirect(getRxBufSize());
+                buffer = ByteBuffer.allocateDirect(size);
             } else {
-                buffer = ByteBuffer.allocate(getRxBufSize());
+                buffer = ByteBuffer.allocate(size);
             }
         } else {
             buffer.clear();

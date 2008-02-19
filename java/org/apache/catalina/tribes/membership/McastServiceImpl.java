@@ -335,7 +335,10 @@ public class McastServiceImpl
                         }
                     };
                 } //end if
-                if ( t != null ) t.start();
+                if ( t != null ) {
+                    t.setDaemon(true);
+                    t.start();
+                }
             }
         } catch (SocketTimeoutException x ) { 
             //do nothing, this is normal, we don't want to block forever
