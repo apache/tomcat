@@ -46,7 +46,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public static final int OPTION_DIRECT_BUFFER = 0x0004;
 
-
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ReceiverBase.class);
 
     private MessageListener listener;
