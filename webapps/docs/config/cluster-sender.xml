@@ -90,6 +90,14 @@
        The send buffer size on the socket.
        Default value is <code>43800</code> bytes.
       </attribute>
+      <attribute name="udpRxBufSize" required="false">
+        The receive buffer size on the datagram socket.
+        Default value is <code>25188</code> bytes.
+      </attribute>
+      <attribute name="udpTxBufSize" required="false">
+       The send buffer size on the datagram socket.
+       Default value is <code>43800</code> bytes.
+      </attribute>
       <attribute name="direct" required="false">
        Possible values are <code>true</code> or <code>false</code>. 
        Set to true if you want the receiver to use direct bytebuffers when reading data
