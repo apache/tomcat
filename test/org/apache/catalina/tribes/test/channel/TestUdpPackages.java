@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
@@ -33,6 +35,7 @@ import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 import org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor;
+import org.apache.catalina.tribes.io.XByteBuffer;
 
 /**
  */
@@ -81,11 +84,18 @@ public class TestUdpPackages extends TestCase {
         channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024),Channel.SEND_OPTIONS_UDP);
         Thread.sleep(500);
         System.err.println("Finished Single package NO_ACK ["+listener1.count+"]");
-        assertEquals("Checking success messages.",1,listener1.count);
+        assertEquals("Checking success messages.",1,listener1.count.get());
     }
 
     
     public void testDataSendNO_ACK() throws Exception {
+        final AtomicInteger counter = new AtomicInteger(0);
+        ReceiverBase rb1 = (ReceiverBase)channel1.getChannelReceiver();
+        ReceiverBase rb2 = (ReceiverBase)channel2.getChannelReceiver();
+        rb1.setUdpRxBufSize(1024*1024*10);
+        rb2.setUdpRxBufSize(1024*1024*10);
+        rb1.setUdpTxBufSize(1024*1024*10);
+        rb2.setUdpTxBufSize(1024*1024*10);
         System.err.println("Starting NO_ACK");
         Thread[] threads = new Thread[threadCount];
         for (int x=0; x<threads.length; x++ ) {
@@ -93,7 +103,11 @@ public class TestUdpPackages extends TestCase {
                 public void run() {
                     try {
                         long start = System.currentTimeMillis();
-                        for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024),Channel.SEND_OPTIONS_UDP);
+                        for (int i = 0; i < msgCount; i++) {
+                            int cnt = counter.addAndGet(1);
+                            channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024,cnt),Channel.SEND_OPTIONS_UDP);
+                            Thread.currentThread().sleep(10);
+                        }
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
@@ -108,9 +122,19 @@ public class TestUdpPackages extends TestCase {
         for (int x=0; x<threads.length; x++ ) { threads[x].join();}
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) Thread.sleep(500);
         System.err.println("Finished NO_ACK ["+listener1.count+"]");
-        assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
+        System.out.println("Sent "+counter.get()+ " messages. Received "+listener1.count+" Highest msg received:"+listener1.maxIdx);
+        System.out.print("Missing messages:");
+        printMissingMsgs(listener1.nrs,counter.get());
+        assertEquals("Checking success messages.",msgCount*threadCount,listener1.count.get());
+    }
+    
+    public static void printMissingMsgs(int[] msgs, int maxIdx) {
+        for (int i=0; i<maxIdx && i<msgs.length; i++) {
+            if (msgs[i]==0) System.out.print(i+", ");
+        }
+        System.out.println();
     }
 
     public void testDataSendASYNCM() throws Exception {
@@ -136,18 +160,18 @@ public class TestUdpPackages extends TestCase {
             for (int x=0; x<threads.length; x++ ) { threads[x].join();}
             //sleep for 50 sec, let the other messages in
             long start = System.currentTimeMillis();
-            while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+            while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) Thread.sleep(500);
             System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
-            assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
+            assertEquals("Checking success messages.",msgCount*threadCount,listener1.count.get());
     }
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_UDP);
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count.get()) Thread.sleep(500);
         System.err.println("Finished ASYNC");
-        assertEquals("Checking success messages.",msgCount,listener1.count);
+        assertEquals("Checking success messages.",msgCount,listener1.count.get());
     }
 
     public void testDataSendACK() throws Exception {
@@ -155,7 +179,7 @@ public class TestUdpPackages extends TestCase {
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_UDP);
         Thread.sleep(250);
         System.err.println("Finished ACK");
-        assertEquals("Checking success messages.",msgCount,listener1.count);
+        assertEquals("Checking success messages.",msgCount,listener1.count.get());
     }
 
     public void testDataSendSYNCACK() throws Exception {
@@ -163,24 +187,38 @@ public class TestUdpPackages extends TestCase {
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_SYNCHRONIZED_ACK|GroupChannel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_UDP);
         Thread.sleep(250);
         System.err.println("Finished SYNC_ACK");
-        assertEquals("Checking success messages.",msgCount,listener1.count);
+        assertEquals("Checking success messages.",msgCount,listener1.count.get());
     }
 
     public static class Listener implements ChannelListener {
-        long count = 0;
+        AtomicLong count = new AtomicLong(0);
+        int maxIdx = -1;
+        int[] nrs = new int[1000000];
+        public Listener() {
+            Arrays.fill(nrs, 0);
+        }
         public boolean accept(Serializable s, Member m) {
             return (s instanceof Data);
         }
 
         public void messageReceived(Serializable s, Member m) {
-            Data d = (Data)s;
-            if ( !Data.verify(d) ) {
-                System.err.println("ERROR");
-            } else {
-                count++;
-                if ((count %1000) ==0 ) {
-                    System.err.println("SUCCESS:"+count);
+            try {
+                Data d = (Data)s;
+                if ( !Data.verify(d) ) {
+                    System.err.println("ERROR - Unable to verify data package");
+                } else {
+                    long c = count.addAndGet(1);
+                    if ((c%1000) ==0 ) {
+                        System.err.println("SUCCESS:"+c);
+                    }
+                    int nr = d.getNumber();
+                    if (nr>=0 && nr<nrs.length) {
+                        maxIdx = Math.max(maxIdx, nr);
+                        nrs[nr] = 1;
+                    }
                 }
+            }catch (Exception x ) {
+                x.printStackTrace();
             }
         }
     }
@@ -189,25 +227,41 @@ public class TestUdpPackages extends TestCase {
         public int length;
         public byte[] data;
         public byte key;
+        public boolean hasNr = false;
         public static Random r = new Random(System.currentTimeMillis());
         public static Data createRandomData() {
             return createRandomData(ChannelReceiver.MAX_UDP_SIZE);
         }
         public static Data createRandomData(int size) {
+            return createRandomData(size,-1);
+        }
+        
+        public static Data createRandomData(int size, int number) {
             int i = r.nextInt();
             i = ( i % 127 );
             int length = Math.abs(r.nextInt() % size);
+            if (length<100) length += 100;
             Data d = new Data();
             d.length = length;
             d.key = (byte)i;
             d.data = new byte[length];
             Arrays.fill(d.data,d.key);
+            if (number>0 && d.data.length>=4) {
+                //populate number
+                d.hasNr = true;
+                XByteBuffer.toBytes(number,d.data, 0);
+            }
             return d;
+        }
+        
+        public int getNumber() {
+            if (!hasNr) return -1;
+            return XByteBuffer.toInt(this.data, 0);
         }
 
         public static boolean verify(Data d) {
             boolean result = (d.length == d.data.length);
-            for ( int i=0; result && (i<d.data.length); i++ ) result = result && d.data[i] == d.key;
+            for ( int i=(d.hasNr?4:0); result && (i<d.data.length); i++ ) result = result && d.data[i] == d.key;
             return result;
         }
     }
