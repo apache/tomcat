@@ -421,12 +421,15 @@ public class McastServiceImpl
                     if ( log.isDebugEnabled() )
                         log.debug("Invalid member mcast package.",ax);
                 } catch ( Exception x ) {
-                    if (errorCounter==0) log.warn("Error receiving mcast package. Sleeping 500ms",x);
-                    else log.debug("Error receiving mcast package. Sleeping 500ms",x);
-                    try { Thread.sleep(500); } catch ( Exception ignore ){}
-                    if ( (++errorCounter)>=recoveryCounter ) {
-                        errorCounter=0;
-                        new RecoveryThread(McastServiceImpl.this);
+                    if (x instanceof InterruptedException) interrupted();
+                    else {
+                        if (errorCounter==0) log.warn("Error receiving mcast package. Sleeping 500ms",x);
+                        else log.debug("Error receiving mcast package. Sleeping 500ms",x);
+                        try { Thread.sleep(500); } catch ( Exception ignore ){}
+                        if ( (++errorCounter)>=recoveryCounter ) {
+                            errorCounter=0;
+                            new RecoveryThread(McastServiceImpl.this);
+                        }
                     }
                 }
             }
