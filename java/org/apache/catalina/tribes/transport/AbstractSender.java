@@ -38,6 +38,8 @@ public abstract class AbstractSender implements DataSender {
     private boolean connected = false;
     private int rxBufSize = 25188;
     private int txBufSize = 43800;
+    private int udpRxBufSize = 25188;
+    private int udpTxBufSize = 43800;
     private boolean directBuffer = false;
     private int keepAliveCount = -1;
     private int requestCount = 0;
@@ -330,6 +332,26 @@ public abstract class AbstractSender implements DataSender {
 
     public void setUdpPort(int udpPort) {
         this.udpPort = udpPort;
+    }
+
+
+    public int getUdpRxBufSize() {
+        return udpRxBufSize;
+    }
+
+
+    public void setUdpRxBufSize(int udpRxBufSize) {
+        this.udpRxBufSize = udpRxBufSize;
+    }
+
+
+    public int getUdpTxBufSize() {
+        return udpTxBufSize;
+    }
+
+
+    public void setUdpTxBufSize(int udpTxBufSize) {
+        this.udpTxBufSize = udpTxBufSize;
     }
 
 }

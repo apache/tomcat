@@ -56,6 +56,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private int securePort = -1;
     private int rxBufSize = 43800;
     private int txBufSize = 25188;
+    private int udpRxBufSize = 43800;
+    private int udpTxBufSize = 25188;
+
     private boolean listen = false;
     private RxTaskPool pool;
     private boolean direct = true;
@@ -518,6 +521,22 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setUdpPort(int udpPort) {
         this.udpPort = udpPort;
+    }
+
+    public int getUdpRxBufSize() {
+        return udpRxBufSize;
+    }
+
+    public void setUdpRxBufSize(int udpRxBufSize) {
+        this.udpRxBufSize = udpRxBufSize;
+    }
+
+    public int getUdpTxBufSize() {
+        return udpTxBufSize;
+    }
+
+    public void setUdpTxBufSize(int udpTxBufSize) {
+        this.udpTxBufSize = udpTxBufSize;
     }
 
 }
