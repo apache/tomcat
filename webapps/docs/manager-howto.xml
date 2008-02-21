@@ -101,7 +101,7 @@ the following functions:</p>
 <p>A default Tomcat installation includes the manager. To add an instance of the
 Manager web application <code>Context</code> to a new host install the
 <code>manager.xml</code> context configuration file in the
-<code>$CATALINA_HOME/conf/[enginename]/[hostname]</code> folder. Here is an
+<code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
 example:
 <pre>
 &lt;Context path="/manager" debug="0" privileged="true"
@@ -135,13 +135,11 @@ With Ant</a> for more information.</li>
 <section name="Configuring Manager Application Access">
 
     <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 6,
-    and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 6 for multiple
-    instances by setting a CATALINA_BASE directory, you should use
-    $CATALINA_BASE instead of $CATALINA_HOME for each of these
-    references.</p>
+    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    base directory against which most relative paths are resolved. If you have
+    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
+    the directory into which you have installed Tomcat 6.</p>
     </em></blockquote>
 
 <p>It would be quite unsafe to ship Tomcat with default settings that allowed
@@ -150,7 +148,7 @@ Therefore, the Manager application is shipped with the requirement that anyone
 who attempts to use it must authenticate themselves, using a username and
 password that have the role <strong>manager</strong> associated with them.
 Further, there is no username in the default users file
-(<conf>$CATALINA_HOME/conf/tomcat-users.xml</conf>) that is assigned this
+(<conf>$CATALINA_BASE/conf/tomcat-users.xml</conf>) that is assigned this
 role.  Therefore, access to the Manager application is completely disabled
 by default.</p>
 
@@ -161,9 +159,9 @@ to some existing username/password combination.  Exactly where this is done
 depends on which <code>Realm</code> implementation you are using:</p>
 <ul>
 <li><em>MemoryRealm</em> - If you have not customized your
-    <code>$CATALINA_HOME/conf/server.xml</code> to select a different one,
+    <code>$CATALINA_BASE/conf/server.xml</code> to select a different one,
     Tomcat 6 defaults to an XML-format file stored at
-    <code>$CATALINA_HOME/conf/tomcat-users.xml</code>, which can be
+    <code>$CATALINA_BASE/conf/tomcat-users.xml</code>, which can be
     edited with any text editor.  This file contains an XML
     <code>&lt;user&gt;</code> for each individual user, which might
     look something like this:
@@ -857,7 +855,7 @@ application artifacts that exist within <code>appBase</code> directory
 This will delete the the application .WAR, if present, 
 the application directory resulting either from a deploy in unpacked form 
 or from .WAR expansion as well as the XML Context definition from
-<code>$CATALINA_HOME/conf/[enginename]/[hostname]/</code> directory. 
+<code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory. 
 If you simply want to take an application
 out of service, you should use the <code>/stop</code> command instead.</p>
 

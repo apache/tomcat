@@ -438,10 +438,8 @@ create table tomcat_sessions (
   <p>In order for the JDBC Based Store to successfully connect to your
   database, the JDBC driver you configure must be visible to Tomcat's
   internal class loader.  Generally, that means you must place the JAR
-  file containing this driver into the <code>$CATALINA_HOME/server/lib</code>
-  directory (if your applications do not also need it) or into the
-  <code>$CATALINA_HOME/common/lib</code> directory (if you wish to share
-  this driver with your web applications.</p>
+  file containing this driver into the <code>$CATALINA_HOME/lib</code>
+  directory.</p>
 
 </section>
 

@@ -58,7 +58,9 @@ Tomcat 6 are available <a href="../setup.html">here</a>.</p>
 
 <p>In the remainder of this manual, example shell scripts assume that you have
 set an environment variable <code>CATALINA_HOME</code> that contains the
-pathname to the directory in which Tomcat 6 has been installed.</p>
+pathname to the directory in which Tomcat 6 has been installed. Optionally, if
+Tomcat has been configured for multiple instances, each instance will have its
+own <code>CATALINA_BASE</code> configured.</p>
 
 </subsection>
 

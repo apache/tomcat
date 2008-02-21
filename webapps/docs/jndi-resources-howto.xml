@@ -48,7 +48,7 @@ configuration.
 <p>For Tomcat 6, these entries in per-web-application 
 <code>InitialContext</code> are configured in the 
 <a href="config/context.html"><code>&lt;Context&gt;</code></a> elements that
-can be specified in either <code>$CATALINA_HOME/conf/server.xml</code> or,
+can be specified in either <code>$CATALINA_BASE/conf/server.xml</code> or,
 preferably, the per-web-application context XML file (
 <code>META-INF/context.xml</code>).
 </p>
@@ -57,7 +57,7 @@ preferably, the per-web-application context XML file (
 entire server.  These are configured in the 
 <a href="config/globalresources.html">
 <code><strong>&lt;GlobalNameingResources&gt;</strong></code></a> element of 
-<code>$CATALINA_HOME/conf/server.xml</code>. You may expose these resources to 
+<code>$CATALINA_BASE/conf/server.xml</code>. You may expose these resources to 
 web applications by using 
 <code><strong>&lt;ResourceLink&gt;</strong></code> elements.
 </p>
