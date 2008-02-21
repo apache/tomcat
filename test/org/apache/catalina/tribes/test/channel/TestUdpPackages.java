@@ -104,9 +104,9 @@ public class TestUdpPackages extends TestCase {
                     try {
                         long start = System.currentTimeMillis();
                         for (int i = 0; i < msgCount; i++) {
-                            int cnt = counter.addAndGet(1);
+                            int cnt = counter.getAndAdd(1);
                             channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024,cnt),Channel.SEND_OPTIONS_UDP);
-                            Thread.currentThread().sleep(10);
+                            //Thread.currentThread().sleep(10);
                         }
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
