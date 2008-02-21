@@ -29,7 +29,7 @@
 
     <menu name="Links">
         <item name="Docs Home"             href="index.html"/>
-        <item name="FAQ"                   href="http://tomcat.apache.org/faq" />
+        <item name="FAQ"                   href="http://wiki.apache.org/tomcat/FAQ" />
     </menu>
 
     <menu name="User Guide">
@@ -77,7 +77,7 @@
     <menu name="Apache Tomcat Development">
         <item name="Building"              href="building.html"/>
         <item name="Changelog"             href="changelog.html"/>
-        <item name="Status"                href="status.html"/>
+        <item name="Status"                href="http://wiki.apache.org/tomcat/TomcatVersions"/>
         <item name="Developers"            href="developers.html"/>
         <item name="Architecture"          href="architecture/index.html" />
         <item name="Functional Specs."     href="funcspecs/index.html"/>
