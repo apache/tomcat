@@ -81,16 +81,16 @@ LoadModule proxy_module  {path-to-modules}/mod_proxy.so
 AddModule  mod_proxy.c
 </source></li>
 <li>Include two directives in your <code>httpd.conf</code> file for
-    each web application that you wish to forward to Tomcat 5.  For
+    each web application that you wish to forward to Tomcat 6.  For
     example, to forward an application at context path <code>/myapp</code>:
 <source>
 ProxyPass         /myapp  http://localhost:8081/myapp
 ProxyPassReverse  /myapp  http://localhost:8081/myapp
 </source>
     which tells Apache to forward URLs of the form
-    <code>http://localhost/myapp/*</code> to the Tomcat 5 connector
+    <code>http://localhost/myapp/*</code> to the Tomcat 6 connector
     listening on port 8081.</li>
-<li>Configure your copy of Tomcat 5 to include a special
+<li>Configure your copy of Tomcat 6 to include a special
     <code>&lt;Connector&gt;</code> element, with appropriate
     proxy settings, for example:
 <source>

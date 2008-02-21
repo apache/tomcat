@@ -52,7 +52,7 @@ as serves the directory listings (if directory listings are enabled).
 
 <section name="Where is it declared?">
 <a name="where"></a>
-It is declared globally in <i>$CATALINA_HOME/conf/web.xml</i>.
+It is declared globally in <i>$CATALINA_BASE/conf/web.xml</i>.
 By default here is it's declaration:
 <source>
     &lt;servlet&gt;

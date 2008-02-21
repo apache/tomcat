@@ -33,13 +33,11 @@
 <section name="Directory Structure">
 
     <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 5,
-    and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 5 for multiple
-    instances by setting a CATALINA_BASE directory, you should use
-    $CATALINA_BASE instead of $CATALINA_HOME for each of these
-    references.</p>
+    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    base directory against which most relative paths are resolved. If you have
+    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
+    the directory into which you have installed Tomcat 6.</p>
     </em></blockquote>
 
 <p>A key recommendation of this manual is to separate the directory
@@ -104,9 +102,9 @@ created on a temporary basis:</p>
 <li><strong>build/</strong> - When you execute a default build
     (<code>ant</code>), this directory will contain an exact image
     of the files in the web application archive for this application.
-    Tomcat 5 allows you to deploy an application in an unpacked
+    Tomcat 6 allows you to deploy an application in an unpacked
     directory like this, either by copying it to the
-    <code>$CATALINA_HOME/webapps</code> directory, or by <em>installing</em>
+    <code>$CATALINA_BASE/webapps</code> directory, or by <em>installing</em>
     it via the "Manager" web application.  The latter approach is very
     useful during development, and will be illustrated below.
     <br/><br/></li>
@@ -154,8 +152,8 @@ build is performed.</p>
   "standard" build properties stored in the developer's home directory.</p>
 
   <p>In many cases, your development system administrator will have already
-  installed the required JAR files into Tomcat 5's <code>common/lib</code>
-  or <code>shared/lib</code> directories.  If this has been done, you need
+  installed the required JAR files into Tomcat 6's <code>lib</code> directory.
+  If this has been done, you need
   to take no actions at all - the example <code>build.xml</code> file
   automatically constructs a compile classpath that includes these files.</p>
 
@@ -292,22 +290,22 @@ provided:</p>
 </ul>
 
 <p>For interactive development and testing of your web application using
-Tomcat 5, the following additional targets are defined:</p>
+Tomcat 6, the following additional targets are defined:</p>
 <ul>
-<li><strong>install</strong> - Tell the currently running Tomcat 5 to make
+<li><strong>install</strong> - Tell the currently running Tomcat 6 to make
     the application you are developing immediately available for execution
-    and testing.  This action does not require Tomcat 5 to be restarted, but
+    and testing.  This action does not require Tomcat 6 to be restarted, but
     it is also not remembered after Tomcat is restarted the next time.
     <br/><br/></li>
 <li><strong>reload</strong> - Once the application is installed, you can
     continue to make changes and recompile using the <code>compile</code>
-    target.  Tomcat 5 will automatically recognize changes made to JSP pages,
+    target.  Tomcat 6 will automatically recognize changes made to JSP pages,
     but not to servlet or JavaBean classes - this command will tell Tomcat
     to restart the currently installed application so that such changes are
     recognized.
     <br/><br/></li>
 <li><strong>remove</strong> - When you have completed your development and
-    testing activities, you can optionally tell Tomcat 5 to remove this
+    testing activities, you can optionally tell Tomcat 6 to remove this
     application from service.
     </li>
 </ul>

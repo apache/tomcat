@@ -87,7 +87,7 @@ Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
     - Configuring a JNDI DataSoure with a DB connection pool.
     Examples for many popular databases.</li>
 <li><a href="class-loader-howto.html"><strong>Classloading</strong></a>
-    - Information about class loading in Apache Tomcat 5, including where to place
+    - Information about class loading in Apache Tomcat 6, including where to place
     your application classes so that they are visible.</li>
 <li><a href="jasper-howto.html"><strong>JSPs</strong></a>
     - Information about Jasper configuration, as well as the JSP compiler
@@ -101,7 +101,7 @@ Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
 <li><a href="cgi-howto.html"><strong>CGI</strong></a> -
     Using CGIs with Apache Tomcat.</li>
 <li><a href="proxy-howto.html"><strong>Proxy Support</strong></a> -
-    Configuring Apache Tomcat 5 to run behind a proxy server (or a web server
+    Configuring Apache Tomcat 6 to run behind a proxy server (or a web server
     functioning as a proxy server).</li>
 <li><a href="mbeans-descriptor-howto.html"><strong>MBean Descriptor</strong></a> -
     Configuring MBean descriptors files for custom components.</li>

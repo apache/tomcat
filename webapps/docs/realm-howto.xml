@@ -129,7 +129,7 @@ sources of authentication information:</p>
 and integrate it with Tomcat 6.  To do so, you need to:
 <ul>
   <li>Implement <code>org.apache.catalina.Realm</code>,</li>
-  <li>Place your compiled realm in $CATALINA_HOME/server/lib,</li>
+  <li>Place your compiled realm in $CATALINA_HOME/lib,</li>
   <li>Declare your realm as described in the "Configuring a Realm" section below,</li>
   <li>Declare your realm to the <a href="mbeans-descriptor-howto.html">MBeans Descriptor</a>.</li>
 </ul>
@@ -342,14 +342,14 @@ database structure conforms to the following requirements:</p>
     <code>$CATALINA_HOME/lib</code> directory.
     Note that <strong>only</strong> JAR files are recognized!</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
-    <code>$CATALINA_HOME/conf/server.xml</code> file.</li>
+    <code>$CATALINA_BASE/conf/server.xml</code> file.</li>
 <li>Restart Tomcat 6 if it is already running.</li>
 </ol>
 
 <h3>Realm Element Attributes</h3>
 
 <p>To configure JDBCRealm, you will create a <code>&lt;Realm&gt;</code>
-element and nest it in your <code>$CATALINA_HOME/conf/server.xml</code> file,
+element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
 as described <a href="#Configuring a Realm">above</a>.  The following
 attributes are supported by this implementation:</p>
 
@@ -437,7 +437,7 @@ create table user_roles (
 </source>
 
 <p>Example <code>Realm</code> elements are included (commented out) in the
-default <code>$CATALINA_HOME/conf/server.xml</code> file.  Here's an example
+default <code>$CATALINA_BASE/conf/server.xml</code> file.  Here's an example
 for using a MySQL database called "authority", configured with the tables
 described above, and accessed with username "dbuser" and password "dbpass":</p>
 <source>
@@ -520,14 +520,14 @@ as your database structure conforms to the following requirements:</p>
     <a href="jndi-datasource-examples-howto.html">JNDI DataSource Example HOW-TO</a>
     for information on how to configure a JNDI named JDBC DataSource.</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
-    <code>$CATALINA_HOME/conf/server.xml</code> file.</li>
+    <code>$CATALINA_BASE/conf/server.xml</code> file.</li>
 <li>Restart Tomcat 6 if it is already running.</li>
 </ol>
 
 <h3>Realm Element Attributes</h3>
 
 <p>To configure DataSourceRealm, you will create a <code>&lt;Realm&gt;</code>
-element and nest it in your <code>$CATALINA_HOME/conf/server.xml</code> file,
+element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
 as described <a href="#Configuring a Realm">above</a>.  The following
 attributes are supported by this implementation:</p>
 
@@ -829,14 +829,14 @@ the name of this attribute.</p>
     <code>ldap.jar</code> available with JNDI) inside the
     <code>$CATALINA_HOME/lib</code> directory.</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
-    <code>$CATALINA_HOME/conf/server.xml</code> file.</li>
+    <code>$CATALINA_BASE/conf/server.xml</code> file.</li>
 <li>Restart Tomcat 6 if it is already running.</li>
 </ol>
 
 <h3>Realm Element Attributes</h3>
 
 <p>To configure JNDIRealm, you will create a <code>&lt;Realm&gt;</code>
-element and nest it in your <code>$CATALINA_HOME/conf/server.xml</code> file,
+element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
 as described <a href="#Configuring a Realm">above</a>.  The following
 attributes are supported by this implementation:</p>
 
@@ -1186,13 +1186,13 @@ authentication is usually to be preferred.</p>
 <p><strong>MemoryRealm</strong> is a simple demonstration implementation of the
 Tomcat 6 <code>Realm</code> interface.  It is not designed for production use.
 At startup time, MemoryRealm loads information about all users, and their
-corresponding roles, from an XML document (by default, this document is loaded from <code>$CATALINA_HOME/conf/tomcat-users.xml</code>).  Changes to the data
+corresponding roles, from an XML document (by default, this document is loaded from <code>$CATALINA_BASE/conf/tomcat-users.xml</code>).  Changes to the data
 in this file are not recognized until Tomcat is restarted.</p>
 
 <h3>Realm Element Attributes</h3>
 
 <p>To configure MemoryRealm, you will create a <code>&lt;Realm&gt;</code>
-element and nest it in your <code>$CATALINA_HOME/conf/server.xml</code> file,
+element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
 as described <a href="#Configuring a Realm">above</a>.  The following
 attributes are supported by this implementation:</p>
 
@@ -1213,7 +1213,7 @@ attributes are supported by this implementation:</p>
   </attribute>
 
   <attribute name="pathname" required="false">
-    <p>Absolute or relative (to $CATALINA_HOME) pathname of the XML document
+    <p>Absolute or relative (to $CATALINA_BASE) pathname of the XML document
     containing our valid usernames, passwords, and roles.  See below for more
     information on the format of this file.  If not specified, the value
     <code>conf/tomcat-users.xml</code> is used.</p>
@@ -1327,7 +1327,7 @@ Regardless, the first Principal returned is <em>always</em> treated as the user 
  href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS
 LoginConfig file</a>) and tell Tomcat where to find it by specifying
 its location to the JVM, for instance by setting the environment
-variable: <code>JAVA_OPTS=-DJAVA_OPTS=-Djava.security.auth.login.config==$CATALINA_HOME/conf/jaas.config</code></li>
+variable: <code>JAVA_OPTS=-DJAVA_OPTS=-Djava.security.auth.login.config==$CATALINA_BASE/conf/jaas.config</code></li>
 
           <li>Configure your security-constraints in your web.xml for
 the resources you want to protect</li>
@@ -1337,7 +1337,7 @@ the resources you want to protect</li>
         <h3>Realm Element Attributes</h3>
         <p>To configure JAASRealm as for step 6 above, you create
 a <code>&lt;Realm&gt;</code> element and nest it in your 
-<code>$CATALINA_HOME/conf/server.xml</code>
+<code>$CATALINA_BASE/conf/server.xml</code>
 file within your <code>&lt;Engine&gt;</code> node. The following attributes 
 are supported by this implementation:</p>
 

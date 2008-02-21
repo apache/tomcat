@@ -38,13 +38,11 @@
     use OpenSSL, which uses a different configuration.</b></p>
 
     <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 6,
-    and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 6 for multiple
-    instances by setting a CATALINA_BASE directory, you should use
-    $CATALINA_BASE instead of $CATALINA_HOME for each of these
-    references.</p>
+    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    base directory against which most relative paths are resolved. If you have
+    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
+    the directory into which you have installed Tomcat 6.</p>
     </em></blockquote>
 
 <p>To install and configure SSL support on Tomcat 6, you need to follow
@@ -62,7 +60,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA
 <p></p>
     and specify a password value of "changeit".</li><br/><br/>
 <li>Uncomment the "SSL HTTP/1.1 Connector" entry in
-    <code>$CATALINA_HOME/conf/server.xml</code> and tweak as necessary.</li>
+    <code>$CATALINA_BASE/conf/server.xml</code> and tweak as necessary.</li>
     <br/><br/>
 </ol>
 
@@ -301,9 +299,9 @@ If you haven't compiled in SSL support into your Tomcat Native library, then you
 </p>
 
 <p>The final step is to configure your secure socket in the
-<code>$CATALINA_HOME/conf/server.xml</code> file, where
-<code>$CATALINA_HOME</code> represents the directory into which you
-installed Tomcat 6.  An example <code>&lt;Connector&gt;</code> element
+<code>$CATALINA_BASE/conf/server.xml</code> file, where
+<code>$CATALINA_BASE</code> represents the base directory for the
+Tomcat 6 instance.  An example <code>&lt;Connector&gt;</code> element
 for an SSL connector is included in the default <code>server.xml</code>
 file installed with Tomcat.  It will look something like this:</p>
 <source>

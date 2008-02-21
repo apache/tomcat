@@ -113,7 +113,7 @@ controlRole tomcat
 
   <section name="Manage Tomcat with JMX remote Ant Tasks">
    <p>For simple tomcat ant task usage with ant 1.6.x we have integrate import and antlib support.</p>   
-   <p><b>antlib</b>Copy your catalina-ant.jar from $CATALINA_HOME/server/lib to $ANT_HOME/lib.</p>
+   <p><b>antlib</b>Copy your catalina-ant.jar from $CATALINA_HOME/lib to $ANT_HOME/lib.</p>
    <p>Following example show the JMX Accessor usage:</p>
    <table border="1">
    <tr><td><p><pre>
