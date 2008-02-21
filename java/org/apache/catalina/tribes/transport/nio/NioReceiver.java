@@ -281,7 +281,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                 // get an iterator over the set of selected keys
                 Iterator it = selector.selectedKeys().iterator();
                 // look at each key in the selected set
-                while (it.hasNext()) {
+                while (it.hasNext() && selector!=null) {
                     SelectionKey key = (SelectionKey) it.next();
                     // Is a new connection coming in?
                     if (key.isAcceptable()) {
@@ -310,7 +310,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                     }
 
                     // remove key from selected set, it's been handled
-                    it.remove();
+                    if (selector!=null) it.remove();
                 }
             } catch (java.nio.channels.ClosedSelectorException cse) {
                 // ignore is normal at shutdown or stop listen socket
