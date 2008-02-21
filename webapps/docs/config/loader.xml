@@ -54,13 +54,11 @@
   that is implemented by Catalina, see <a href="../class-loader-howto.html">the ClassLoader HowTo</a>.</p>
 
     <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 6,
-    and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 6 for multiple
-    instances by setting a CATALINA_BASE directory, you should use
-    $CATALINA_BASE instead of $CATALINA_HOME for each of these
-    references.</p>
+    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    base directory against which most relative paths are resolved. If you have
+    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
+    the directory into which you have installed Tomcat 6.</p>
     </em></blockquote>
 
 </section>

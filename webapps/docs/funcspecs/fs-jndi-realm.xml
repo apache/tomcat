@@ -37,7 +37,7 @@
   <subsection name="Introduction">
 
     <p>The purpose of the <strong>JNDIRealm</strong> implementation is to
-    provide a mechanism by which Tomcat 5 can acquire information needed
+    provide a mechanism by which Tomcat 6 can acquire information needed
     to authenticate web application users, and define their security roles,
     from a directory server or other service accessed via JNDI APIs.  For
     integration with Catalina, this class must implement the
@@ -111,7 +111,7 @@
     JNDIRealm to operate correctly:</p>
     <ul>
     <li>The desire to utilize JNDIRealm must be registered in
-        <code>$CATALINA_HOME/conf/server.xml</code>, in a
+        <code>$CATALINA_BASE/conf/server.xml</code>, in a
         <code>&lt;Realm&gt;</code> element that is nested inside a
         corresponding <code>&lt;Engine&gt;</code>, <code>&lt;Host&gt;</code>,
         or <code>&lt;Context&gt;</code> element.</li>

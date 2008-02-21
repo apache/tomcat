@@ -37,7 +37,7 @@
   <subsection name="Introduction">
 
     <p>The purpose of the <strong>JDBCRealm</strong> implementation is to
-    provide a mechanism by which Tomcat 5 can acquire information needed
+    provide a mechanism by which Tomcat 6 can acquire information needed
     to authenticate web application users, and define their security roles,
     from a relational database accessed via JDBC APIs.  For integration
     with Catalina, the resulting class(es) must implement the
@@ -104,7 +104,7 @@
     JDBCRealm to operate correctly:</p>
     <ul>
     <li>The desire to utilize JDBCRealm must be registered in
-        <code>$CATALINA_HOME/conf/server.xml</code>, in a
+        <code>$CATALINA_BASE/conf/server.xml</code>, in a
         <code>&lt;Realm&gt;</code> element that is nested inside a
         corresponding <code>&lt;Engine&gt;</code>, <code>&lt;Host&gt;</code>,
         or <code>&lt;Context&gt;</code> element.</li>
