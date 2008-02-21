@@ -89,7 +89,7 @@
     <ul>
     <li>The invoker servlet must be registered in the application deployment
         descriptor (or the default deployment descriptor in file
-        <code>$CATALINA_HOME/conf/web.xml</code>) using a "path mapped"
+        <code>$CATALINA_BASE/conf/web.xml</code>) using a "path mapped"
         servlet mapping.  The historical default mapping is to URL pattern
         "<code>/servlet/*</code>", although the invoker servlet must operate
         correctly with an arbitrary mapping.</li>

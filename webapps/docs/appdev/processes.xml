@@ -55,7 +55,7 @@ once (no matter how many web applications you plan to develop).</p>
 <ul>
 <li><em>Configure the Ant custom tasks</em>.  The implementation code for the
     Ant custom tasks is in a JAR file named
-    <code>$CATALINA_HOME/server/lib/catalina-ant.jar</code>, which must be
+    <code>$CATALINA_HOME/lib/catalina-ant.jar</code>, which must be
     copied in to the <code>lib</code> directory of your Ant installation.
     <br/><br/></li>
 <li><em>Define one or more Tomcat users</em>.  The <em>Manager</em> web
@@ -127,13 +127,13 @@ file named <code>build.properties</code> in your project's top-level
 directory.  The supported properties are listed in the comments inside
 the sample <code>build.xml</code> script.  At a minimum, you will generally
 need to define the <code>catalina.home</code> property defining where
-Tomcat 5 is installed, and the manager application username and password.
+Tomcat 6 is installed, and the manager application username and password.
 You might end up with something like this:</p>
 <source>
 # Context path to install this application on
 app.path=/hello
 
-# Tomcat 5 installation directory
+# Tomcat 6 installation directory
 catalina.home=/usr/local/apache-tomcat-6.0
 
 # Manager webapp username and password
@@ -245,7 +245,7 @@ quickest way to do that is to use the custom Ant tasks that are included in
 the sample <code>build.xml</code> script.  Using these commands might follow
 a pattern like this:</p>
 <ul>
-<li><em>Start Tomcat 5 if needed</em>.  If Tomcat 5 is not already running,
+<li><em>Start Tomcat 6 if needed</em>.  If Tomcat 6 is not already running,
     you will need to start it in the usual way.
     <br/><br/></li>
 <li><em>Compile your application</em>.  Use the <code>ant compile</code>

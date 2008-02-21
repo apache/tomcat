@@ -38,7 +38,7 @@
 
     <p>The purpose of this specification is to define high level requirements
     for administrative applications that can be used to manage the operation
-    of a running Tomcat 5 container.  A variety of <em>Access Methods</em>
+    of a running Tomcat 6 container.  A variety of <em>Access Methods</em>
     to the supported administrative functionality shall be supported, to
     meet varying requirements:</p>
     <ul>
@@ -102,7 +102,7 @@
     <ul>
     <li>To the maximum extent feasible, all administrative functions,
         and the access methods that support them, shall run portably
-        on all platforms where Tomcat 5 itself runs.</li>
+        on all platforms where Tomcat 6 itself runs.</li>
     <li>In a default Tomcat distribution, all administrative capabilities
         shall be disabled.  It shall be necessary for a system
         administrator to specifically enable the desired access methods
@@ -176,9 +176,9 @@
     <li><a href="http://java.sun.com/j2se/">Java 2 Standard Edition</a>
         (Version 1.2 or later)</li>
     <li><a href="http://www.jcp.org/jsr/detail/154.jsp">Servlet 2.4</a>
-        (supported natively by Tomcat 5)</li>
+        (supported natively by Tomcat 6)</li>
     <li><a href="http://www.jcp.org/jsr/detail/152.jsp">JavaServer Pages 2.0</a>
-        (supported natively by Tomcat 5)</li>
+        (supported natively by Tomcat 6)</li>
     <li><a href="http://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">JavaServer Pages Standard Tag Library 1.0 (Jakarta Taglibs-Standard 1.0.3)</a></li>
     <li><a href="http://jakarta.apache.org/struts/">Struts Framework</a>
         (Version 1.0) - MVC Framework for Web Applications</li>

@@ -353,7 +353,7 @@ Jikes</a> to compile JSP pages:
 <ul>
 <li>From your <a href="ant.apache.org">Ant</a> installation, copy ant.jar
 and (if it's available: Ant 1.5 and later) ant-launcher.jar to 
-<code>$CATALINA_BASE/lib</code>.</li>
+<code>$CATALINA_HOME/lib</code>.</li>
 <li>Download and install jikes. jikes must support the -encoding option.
 Execute <code>jikes -help</code> to verify that it was built with support
 for <code>-encoding</code>.</li>

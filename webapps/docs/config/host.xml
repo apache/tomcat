@@ -56,13 +56,11 @@
   <code>defaultHost</code> attribute of that Engine.</p>
 
     <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 6,
-    and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 6 for multiple
-    instances by setting a CATALINA_BASE directory, you should use
-    $CATALINA_BASE instead of $CATALINA_HOME for each of these
-    references.</p>
+    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    base directory against which most relative paths are resolved. If you have
+    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
+    the directory into which you have installed Tomcat 6.</p>
     </em></blockquote>
 
 </section>
@@ -157,7 +155,7 @@
         applications from interacting with the container's configuration. The 
         administrator will then be responsible for providing an external context 
         configuration file, and put it in 
-        <code>$CATALINA_HOME/conf/[enginename]/[hostname]/</code>.
+        <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>.
         The flag's value defaults to <code>true</code>.</p>
       </attribute>
 
@@ -191,7 +189,7 @@
         attribute (of type <code>java.io.File</code>) named
         <code>javax.servlet.context.tempdir</code> as described in the
         Servlet Specification.  If not specified, a suitable directory
-        underneath <code>$CATALINA_HOME/work</code> will be provided.</p>
+        underneath <code>$CATALINA_BASE/work</code> will be provided.</p>
       </attribute>
 
     </attributes>
@@ -275,7 +273,7 @@
     <code>true</code> (which is the default value):</p>
     <ul>
     <li>Any XML file in the 
-        <code>$CATALINA_HOME/conf/[engine_name]/[host_name]</code> directory is
+        <code>$CATALINA_BASE/conf/[engine_name]/[host_name]</code> directory is
         assumed to contain a
         <a href="context.html">Context</a> element (and its associated
         subelements) for a single web application.  The <code>docBase</code>
@@ -308,7 +306,7 @@
     <p>In addition to the automatic deployment that occurs at startup time,
     you can also request that new XML configuration files, WAR files, or
     subdirectories that are dropped in to the <code>appBase</code> (or 
-    <code>$CATALINA_HOME/conf/[engine_name]/[host_name]</code> in the case of
+    <code>$CATALINA_BASE/conf/[engine_name]/[host_name]</code> in the case of
     an XML configuration file) directory while Tomcat is running will be
     automatically deployed, according to the rules described above. The 
     auto deployer will also track web applications for the following changes:

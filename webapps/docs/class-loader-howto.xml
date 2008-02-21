@@ -82,7 +82,7 @@ loaders as it is initialized:</p>
 <li><strong>System</strong> - This class loader is normally initialized from
     the contents of the <code>CLASSPATH</code> environment variable.  All such
     classes are visible to both Tomcat internal classes, and to web
-    applications.  However, the standard Tomcat 5 startup scripts
+    applications.  However, the standard Tomcat 6 startup scripts
     (<code>$CATALINA_HOME/bin/catalina.sh</code> or
     <code>%CATALINA_HOME%\bin\catalina.bat</code>) totally ignore the contents
     of the <code>CLASSPATH</code> environment variable itself, and instead
@@ -180,7 +180,7 @@ implementation.  For more information, see:
 http://java.sun.com/j2se/1.5/docs/guide/standards/index.html</a>.</p>
 
 <p>Tomcat utilizes this mechanism by including the system property setting
-<code>-Djava.endorsed.dirs=$CATALINA_HOME/endorsed</code> in the
+<code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the
 command line that starts the container.</p>
 
 </section>

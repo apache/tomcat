@@ -64,10 +64,12 @@ terms; some specific to Tomcat, and others defined by the
 <strong>$CATALINA_HOME</strong>. This represents the root of your Tomcat
 installation. When we say, "This information can be found in your
 $CATALINA_HOME/README.txt file" we mean to look at the README.txt file at the
-root of your Tomcat install.</p>
+root of your Tomcat install. Optionally, Tomcat may be configured for multiple
+instances by defining <strong>$CATALINA_BASE</strong> for each instance. If
+multiple instances are not configured, <strong>$CATALINA_BASE</strong> is the
+same as <strong>$CATALINA_HOME</strong>.</p>
 
-<p>These are some of the key tomcat directories, all relative
-to <strong>$CATALINA_HOME</strong>:</p>
+<p>These are some of the key tomcat directories:</p>
 
 <ul>
 <li><strong>/bin</strong> - Startup, shutdown, and other scripts. The
