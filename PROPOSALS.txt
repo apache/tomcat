@@ -74,3 +74,5 @@ Membership
 * Make OSGi Bundles of each jar
 
 * Include tomcat-juli and tomcat-juli-adapters as an add on package when doing a release
+
+* Generate source jars for each maven jar posted
