@@ -53,7 +53,7 @@
   system administrator can use to keep the server secure and reliable.</p>
 
   <p><strong>WARNING</strong> - A security audit
-  have been conducted using the Tomcat 5 codebase. Most of the critical
+  have been conducted using the Tomcat 6 codebase. Most of the critical
   package have been protected and a new security package protection mechanism 
   has been implemented. Still, make sure that you are satisfied with your SecurityManager 
   configuration before allowing untrusted users to publish web applications, 
@@ -139,7 +139,7 @@ permission java.io.FilePermission "** your application context**", "read";
   <h3>Policy File Format</h3>
 
   <p>The security policies implemented by the Java SecurityManager are
-  configured in the <code>$CATALINA_HOME/conf/catalina.policy</code> file.
+  configured in the <code>$CATALINA_BASE/conf/catalina.policy</code> file.
   This file completely replaces the <code>java.policy</code> file present
   in your JDK system directories.  The <code>catalina.policy</code> file
   can be edited by hand, or you can use the
@@ -161,12 +161,13 @@ grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
   end at the end of the current line.  The <code>codeBase</code> is in the
   form of a URL, and for a file URL can use the <code>${java.home}</code>
   and <code>${catalina.home}</code> properties (which are expanded out to
-  the directory paths defined for them by the <code>JAVA_HOME</code> and
-  <code>CATALINA_HOME</code> environment variables).</p>
+  the directory paths defined for them by the <code>JAVA_HOME</code>,
+  <code>CATALINA_HOME</code> and <code>CATALINA_BASE</code> environment
+  variables).</p>
 
   <h3>The Default Policy File</h3>
 
-  <p>The default <code>$CATALINA_HOME/conf/catalina.policy</code> file
+  <p>The default <code>$CATALINA_BASE/conf/catalina.policy</code> file
   looks like this:</p>
 <source>
 // ============================================================================
@@ -341,7 +342,7 @@ $CATALINA_HOME/bin/catalina.sh start -security    (Unix)
 
   <h3>The Default Properties File</h3>
 
-  <p>The default <code>$CATALINA_HOME/conf/catalina.properties</code> file
+  <p>The default <code>$CATALINA_BASE/conf/catalina.properties</code> file
   looks like this:</p>
 <source>  
 #

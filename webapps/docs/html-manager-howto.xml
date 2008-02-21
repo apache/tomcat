@@ -133,7 +133,7 @@ error message.  Possible causes for problems include:
 <li><em>Encountered exception</em>
     <blockquote>             
     <p>An exception was encountered trying to start the web application.
-    Check the Tomcat 5 logs for the details.</p>
+    Check the Tomcat 6 logs for the details.</p>
     </blockquote></li>       
 <li><em>Invalid context path was specified</em>
     <blockquote>             
@@ -173,7 +173,7 @@ error message.  Possible causes for problems include:
 <li><em>Encountered exception</em>
     <blockquote>             
     <p>An exception was encountered trying to stop the web application.
-    Check the Tomcat 5 logs for the details.</p>
+    Check the Tomcat 6 logs for the details.</p>
     </blockquote></li>       
 <li><em>Invalid context path was specified</em>
     <blockquote>             
@@ -221,7 +221,7 @@ error message.  Possible causes for problems include:
 <li><em>Encountered exception</em>
     <blockquote>             
     <p>An exception was encountered trying to restart the web application.
-    Check the Tomcat 5 logs for the details.</p>
+    Check the Tomcat 6 logs for the details.</p>
     </blockquote></li>       
 <li><em>Invalid context path was specified</em>
     <blockquote>             
@@ -510,7 +510,7 @@ error message.  Possible causes for problems include:</p>
 <li><em>Encountered exception</em>
     <blockquote>
     <p>An exception was encountered trying to start the new web application.
-    Check the Tomcat 5 logs for the details, but likely explanations include
+    Check the Tomcat 6 logs for the details, but likely explanations include
     problems parsing your <code>/WEB-INF/web.xml</code> file, or missing
     classes encountered when initializing application event listeners and
     filters.</p>

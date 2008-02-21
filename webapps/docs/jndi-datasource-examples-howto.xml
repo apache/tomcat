@@ -306,7 +306,7 @@ select id, foo, bar from testdata
 
 </p>
 
-<p>Finally deploy your web app into <code>$CATALINA_HOME/webapps</code> either
+<p>Finally deploy your web app into <code>$CATALINA_BASE/webapps</code> either
 as a warfile called <code>DBTest.war</code> or into a sub-directory called
 <code>DBTest</code></p>
 <p>Once deployed, point a browser at

@@ -32,6 +32,14 @@
 
 <section name="Introduction">
 
+    <blockquote><em>
+    <p>The description below uses the variable name $CATALINA_BASE to refer the
+    base directory against which most relative paths are resolved. If you have
+    not configured Tomcat 6 for multiple instances by setting a CATALINA_BASE
+    directory, then $CATALINA_BASE will be set to the value of $CATALINA_HOME,
+    the directory into which you have installed Tomcat 6.</p>
+    </em></blockquote>
+
   <p>The <strong>Context</strong> element represents a <em>web
   application</em>, which is run within a particular virtual host.
   Each web application is based on a <em>Web Application Archive</em>
@@ -67,14 +75,14 @@
 
   <p><strong>Context</strong> elements may be explicitly defined:
   <ul>
-  <li>in the <code>$CATALINA_HOME/conf/context.xml</code> file: 
+  <li>in the <code>$CATALINA_BASE/conf/context.xml</code> file: 
   the Context element information will be loaded by all webapps</li>
   <li>in the 
-  <code>$CATALINA_HOME/conf/[enginename]/[hostname]/context.xml.default</code>
+  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml.default</code>
   file: the Context element information will be loaded by all webapps of that
   host</li>
   <li>in individual files (with a ".xml" extension) in the
-  <code>$CATALINA_HOME/conf/[enginename]/[hostname]/</code> directory.
+  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
   The name of the file (less the .xml extension) will be used as the
   context path. Multi-level context paths may be defined using #, e.g.
   <code>context#path.xml</code>. The default web application may be defined
@@ -92,16 +100,6 @@
   Automatic Application Deployment</a> and
   <a href="host.html#User Web Applications">User Web Applications</a>
   for more information.</p>
-
-    <blockquote><em>
-    <p>The description below uses the variable name $CATALINA_HOME
-    to refer to the directory into which you have installed Tomcat 6,
-    and is the base directory against which most relative paths are
-    resolved.  However, if you have configured Tomcat 6 for multiple
-    instances by setting a CATALINA_BASE directory, you should use
-    $CATALINA_BASE instead of $CATALINA_HOME for each of these
-    references.</p>
-    </em></blockquote>
 
 </section>
 
@@ -360,7 +358,7 @@
         <code>java.io.File</code>) named
         <code>javax.servlet.context.tempdir</code> as described in the
         Servlet Specification.  If not specified, a suitable directory
-        underneath <code>$CATALINA_HOME/work</code> will be provided.</p>
+        underneath <code>$CATALINA_BASE/work</code> will be provided.</p>
       </attribute>
 
     </attributes>

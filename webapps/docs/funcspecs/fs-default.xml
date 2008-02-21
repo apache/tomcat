@@ -90,7 +90,7 @@
     <ul>
     <li>The default servlet must be registered in the application deployment
         descriptor (or the default deployment descriptor in file
-        <code>$CATALINA_HOME/conf/web.xml</code>) using a "default servlet"
+        <code>$CATALINA_BASE/conf/web.xml</code>) using a "default servlet"
         servlet mapping, signified by URL pattern "/".</li>
     </ul>
 

@@ -37,10 +37,10 @@
   <subsection name="Introduction">
 
     <p>The purpose of the <strong>MemoryRealm</strong> implementation is to
-    provide a mechanism by which Tomcat 5 can acquire information needed
+    provide a mechanism by which Tomcat 6 can acquire information needed
     to authenticate web application users, and define their security roles,
     from a simple text-based configuration file in XML format.  This is
-    intended to simplify the initial installation and operation of Tomcat 5,
+    intended to simplify the initial installation and operation of Tomcat 6,
     without the complexity of configuring a database or directory server
     based Realm.  It is not intended for production use.</p>
 
@@ -102,7 +102,7 @@
     MemoryRealm to operate correctly:</p>
     <ul>
     <li>The desire to utilize MemoryRealm must be registered in
-        <code>$CATALINA_HOME/conf/server.xml</code>, in a
+        <code>$CATALINA_BASE/conf/server.xml</code>, in a
         <code>&lt;Realm&gt;</code> element that is nested inside a
         corresponding <code>&lt;Engine&gt;</code>, <code>&lt;Host&gt;</code>,
         or <code>&lt;Context&gt;</code> element.  (This is already
@@ -123,11 +123,7 @@
     <li><code>MemoryRealm</code> must have an XML parser compatible with
         the JAXP/1.1 APIs available to it.  This is normally accomplished
         by placing the corresponding JAR files in directory
-        <code>$CATALINA_HOME/server/lib</code> (to make them visible only
-        to internal Catalina classes) or in directory
-        <code>$CATALINA_HOME/common/lib</code> (to make them visible to
-        Catalina internal classes <strong>and</strong> installed web
-        applications).</li>
+        <code>$CATALINA_HOME/lib</code>.</li>
     </ul>
 
   </subsection>
@@ -174,7 +170,7 @@
     <ul>
     <li>Configurable debugging detail level.</li>
     <li>Configurable file pathname (absolute or relative to
-        <code>$CATALINA_HOME</code> of the XML file containing our
+        <code>$CATALINA_BASE</code> of the XML file containing our
         defined users.  [<code>conf/tomcat-users.xml</code>].</li>
     </ul>
 

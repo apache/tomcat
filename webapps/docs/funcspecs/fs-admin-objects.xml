@@ -75,7 +75,7 @@ Operations</a> that can be performed when the administrative application is
   following configurable properties:</p>
   <ul>
   <li><code>debug</code> - Debugging detail level.  [0]</li>
-  <li><code>directory</code> - Absolute or relative (to $CATALINA_HOME) path
+  <li><code>directory</code> - Absolute or relative (to $CATALINA_BASE) path
       of the directory into which access log files are created.
       [logs].</li>
   <li><code>pattern</code> - Pattern string defining the fields to be
@@ -168,7 +168,7 @@ Operations</a> that can be performed when the administrative application is
       requirements of the Java2 Enterprise Edition specification?  [true]</li>
   <li><code>workDir</code> - Absolute pathname of a scratch directory that is
       provided to this web application.  [Automatically assigned relative to
-      $CATALINA_HOME/work]</li>
+      $CATALINA_BASE/work]</li>
   </ul>
 
   <p>Each <em>Context</em> is owned by a parent <em>Host</em>, and is
@@ -235,7 +235,7 @@ Operations</a> that can be performed when the administrative application is
 <section name="Default Deployment Descriptor">
 
   <p>Default web application characteristics are configured in a special
-  deployment descriptor named <code>$CATALINA_HOME/conf/web.xml</code>.  This
+  deployment descriptor named <code>$CATALINA_BASE/conf/web.xml</code>.  This
   section describes the configurable components that may be stored there.</p>
 
   <p><strong>FIXME</strong> - Complete the description of default servlets,
@@ -315,7 +315,7 @@ Operations</a> that can be performed when the administrative application is
       with this host (for example, a particular host might be named
       <code>www.mycompany.com</code> with an alias <code>company.com</code>).
       </li>
-  <li><code>appBase</code> - Absolute or relative (to $CATALINA_HOME) path
+  <li><code>appBase</code> - Absolute or relative (to $CATALINA_BASE) path
       to a directory from which web applications will be automatically
       deployed.</li>
   <li><code>debug</code> - Debugging detail level.  [0]</li>
@@ -423,7 +423,7 @@ Operations</a> that can be performed when the administrative application is
   following configurable properties:</p>
   <ul>
   <li><code>debug</code> - Debugging detail level.  [0]</li>
-  <li><code>pathname</code> - Absolute or relative (to $CATALINA_HOME) path to
+  <li><code>pathname</code> - Absolute or relative (to $CATALINA_BASE) path to
       the XML file containing our user information.  [conf/tomcat-users.xml]
       </li>
   </ul>

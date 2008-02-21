@@ -35,7 +35,7 @@
 
 <p>This document defines the <em>Supported Operations</em> that may
 be performed against the <a href="fs-admin-objects.html">Administered
-Objects</a> that are supported by Tomcat 5 administrative applications.
+Objects</a> that are supported by Tomcat 6 administrative applications.
 Not all operations are required to be available through every administrative
 application that is implemented.  However, if a given operation is available,
 it should operate consistently with the descriptions found here.</p>
