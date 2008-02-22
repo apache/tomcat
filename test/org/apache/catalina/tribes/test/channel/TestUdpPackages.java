@@ -56,7 +56,7 @@ public class TestUdpPackages extends TestCase {
         tint.setInterval(500);
         ThroughputInterceptor tint2 = new ThroughputInterceptor();
         tint2.setInterval(500);
-        channel1.addInterceptor(tint);
+        //channel1.addInterceptor(tint);
         channel2.addInterceptor(tint2);
         listener1 = new Listener();
         ReceiverBase rb1 = (ReceiverBase)channel1.getChannelReceiver();
@@ -138,31 +138,45 @@ public class TestUdpPackages extends TestCase {
     }
 
     public void testDataSendASYNCM() throws Exception {
-            System.err.println("Starting ASYNC MULTI THREAD");
-            Thread[] threads = new Thread[threadCount];
-            for (int x=0; x<threads.length; x++ ) {
-                threads[x] = new Thread() {
-                    public void run() {
-                        try {
-                            long start = System.currentTimeMillis();
-                            for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_UDP);
-                            System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
-                        }catch ( Exception x ) {
-                            x.printStackTrace();
-                            return;
-                        } finally {
-                            threadCounter++;
+        final AtomicInteger counter = new AtomicInteger(0);
+        ReceiverBase rb1 = (ReceiverBase)channel1.getChannelReceiver();
+        ReceiverBase rb2 = (ReceiverBase)channel2.getChannelReceiver();
+        rb1.setUdpRxBufSize(1024*1024*10);
+        rb2.setUdpRxBufSize(1024*1024*10);
+        rb1.setUdpTxBufSize(1024*1024*10);
+        rb2.setUdpTxBufSize(1024*1024*10);
+        System.err.println("Starting NO_ACK");
+        Thread[] threads = new Thread[threadCount];
+        for (int x=0; x<threads.length; x++ ) {
+            threads[x] = new Thread() {
+                public void run() {
+                    try {
+                        long start = System.currentTimeMillis();
+                        for (int i = 0; i < msgCount; i++) {
+                            int cnt = counter.getAndAdd(1);
+                            channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(1024,cnt),Channel.SEND_OPTIONS_UDP|Channel.SEND_OPTIONS_ASYNCHRONOUS);
+                            //Thread.currentThread().sleep(10);
                         }
+                        System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
+                    }catch ( Exception x ) {
+                        x.printStackTrace();
+                        return;
+                    } finally {
+                        threadCounter++;
                     }
-                };
-            }
-            for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-            for (int x=0; x<threads.length; x++ ) { threads[x].join();}
-            //sleep for 50 sec, let the other messages in
-            long start = System.currentTimeMillis();
-            while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) Thread.sleep(500);
-            System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
-            assertEquals("Checking success messages.",msgCount*threadCount,listener1.count.get());
+                }
+            };
+        } 
+        for (int x=0; x<threads.length; x++ ) { threads[x].start();}
+        for (int x=0; x<threads.length; x++ ) { threads[x].join();}
+        //sleep for 50 sec, let the other messages in
+        long start = System.currentTimeMillis();
+        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) Thread.sleep(500);
+        System.err.println("Finished NO_ACK ["+listener1.count+"]");
+        System.out.println("Sent "+counter.get()+ " messages. Received "+listener1.count+" Highest msg received:"+listener1.maxIdx);
+        System.out.print("Missing messages:");
+        printMissingMsgs(listener1.nrs,counter.get());
+        assertEquals("Checking success messages.",msgCount*threadCount,listener1.count.get());
     }
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
