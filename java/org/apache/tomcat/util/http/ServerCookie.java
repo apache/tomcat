@@ -51,7 +51,12 @@ public class ServerCookie implements Serializable {
     private int maxAge = -1;
     private int version = 0;
 
-    protected static boolean switchToV1Cookies = !Boolean.valueOf(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false")).booleanValue();
+    /**
+     * If set to true, we parse cookies according to the servlet spec,
+     */
+    public static final boolean STRICT_SERVLET_COMPLIANCE =
+        Boolean.valueOf(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false")).booleanValue();
+
 
     // Note: Servlet Spec =< 2.5 only refers to Netscape and RFC2109,
     // not RFC2965
@@ -340,7 +345,7 @@ public class ServerCookie implements Serializable {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,1,value.length()-1));
             buf.append('"');
-        } else if (switchToV1Cookies && version==0 && !isToken2(value)) {
+        } else if ((!STRICT_SERVLET_COMPLIANCE) && version==0 && !isToken2(value)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
