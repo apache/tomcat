@@ -1106,7 +1106,6 @@ TCN_IMPLEMENT_CALL(jint, Socket, optSet)(TCN_STDARGS, jlong sock,
 
     UNREFERENCED(o);
     if (!s->sock) {
-        tcn_ThrowAPRException(e, APR_ENOTSOCK);
         return APR_ENOTSOCK;
     }
     else
