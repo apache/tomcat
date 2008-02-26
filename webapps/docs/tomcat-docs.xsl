@@ -40,6 +40,7 @@
   <xsl:param    name="project-menu"     select="'menu'"/>
   <xsl:param    name="standalone"       select="''"/>
   <xsl:param    name="buglink"          select="'http://issues.apache.org/bugzilla/show_bug.cgi?id='"/>
+  <xsl:param    name="revlink"          select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
 
   <!-- Defined variables (non-overrideable) -->
   <xsl:variable name="body-bg"          select="'#ffffff'"/>
@@ -435,6 +436,12 @@
   <!-- Link to a bug report -->
   <xsl:template match="bug">
       <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
+      <a href="{$link}"><xsl:apply-templates/></a>
+  </xsl:template>
+  
+  <!-- Link to a SVN revision report -->
+  <xsl:template match="rev">
+      <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
       <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 

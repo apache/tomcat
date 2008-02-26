@@ -32,11 +32,16 @@
   </properties>
 
 <body>
-<section name="Tomcat 6.0.17 (remm)">
+<section name="Tomcat Trunk ">
   <subsection name="Catalina">
      <changelog>
       <fix>ExtendedAccessLogValve cs-uri not print empty querystring (pero)
       </fix>
+     </changelog>
+  </subsection>
+  <subsection name="Documentation">
+     <changelog>
+      <update>Update changelog to support the &lt;rev&gt; element (fhanik)</update>
      </changelog>
   </subsection>
 </section>
