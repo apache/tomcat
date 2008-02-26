@@ -41,7 +41,7 @@
   </subsection>
   <subsection name="Documentation">
      <changelog>
-      <update>Update changelog to support the &lt;rev&gt; element (fhanik)</update>
+      <update><rev>631321</rev>Update changelog to support the &lt;rev&gt; element (fhanik)</update>
      </changelog>
   </subsection>
 </section>
