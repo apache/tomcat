@@ -1120,7 +1120,7 @@ TCN_IMPLEMENT_CALL(jint, Socket, optGet)(TCN_STDARGS, jlong sock,
     apr_int32_t on = 0;
 
     UNREFERENCED(o);
-    if (s->sock)
+    if (!s->sock)
         tcn_ThrowAPRException(e, APR_ENOTSOCK);
     else {
         TCN_THROW_IF_ERR((*s->net->opt_get)(s->opaque, (apr_int32_t)opt,
