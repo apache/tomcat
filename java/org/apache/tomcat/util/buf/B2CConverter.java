@@ -68,31 +68,22 @@ public class B2CConverter {
     char result[]=new char[BUFFER_SIZE];
 
     /** Convert a buffer of bytes into a chars
-     * @deprecated
      */
     public  void convert( ByteChunk bb, CharChunk cb )
 	throws IOException
     {
 	// Set the ByteChunk as input to the Intermediate reader
-	convert(bb, cb, cb.getBuffer().length - cb.getEnd());
+	iis.setByteChunk( bb );
+	convert(cb);
     }
 
-    public void convert( ByteChunk bb, CharChunk cb, int limit) 
-        throws IOException
-    {
-        iis.setByteChunk( bb );
-        convert(cb, limit);
-    }
-
-    private void convert(CharChunk cb, int limit)
+    private void convert(CharChunk cb)
 	throws IOException
     {
 	try {
 	    // read from the reader
-            int count = 0;
-	    while( limit > 0 ) { // conv.ready() ) {
-                int size = limit < BUFFER_SIZE ? limit : BUFFER_SIZE;
-		int cnt=conv.read( result, 0, size );
+	    while( iis.available()>0 ) { // conv.ready() ) {
+		int cnt=conv.read( result, 0, BUFFER_SIZE );
 		if( cnt <= 0 ) {
 		    // End of stream ! - we may be in a bad state
 		    if( debug>0)
@@ -105,7 +96,6 @@ public class B2CConverter {
 
 		// XXX go directly
 		cb.append( result, 0, cnt );
-                limit -= cnt;
 	    }
 	} catch( IOException ex) {
 	    if( debug>0)
@@ -221,6 +211,10 @@ final class  ReadConvertor extends InputStreamReader {
 	return super.read( cbuf, off, len );
     }
     
+    public final int read() throws IOException {
+        return super.read();
+    }
+    
     /** Reset the buffer
      */
     public  final void recycle() {
@@ -235,7 +229,10 @@ final class  ReadConvertor extends InputStreamReader {
     not be called if recycling the converter and if data was not flushed.
 */
 final class IntermediateInputStream extends InputStream {
-    ByteChunk bc = null;
+    byte buf[];
+    int pos;
+    int len;
+    int end;
     
     public IntermediateInputStream() {
     }
@@ -246,18 +243,64 @@ final class IntermediateInputStream extends InputStream {
     }
     
     public  final  int read(byte cbuf[], int off, int len) throws IOException {
-	return bc.substract(cbuf, off, len);
+	if( pos >= end ) return -1;
+	if (pos + len > end) {
+	    len = end - pos;
+	}
+	if (len <= 0) {
+	    return 0;
+	}
+	System.arraycopy(buf, pos, cbuf, off, len);
+	pos += len;
+	return len;
     }
     
     public  final int read() throws IOException {
-	return bc.substract();
+	return (pos < end ) ? (buf[pos++] & 0xff) : -1;
     }
-
+    
     // -------------------- Internal methods --------------------
 
+    void setBuffer( byte b[], int p, int l ) {
+	buf=b;
+	pos=p;
+	len=l;
+	end=pos+len;
+    }
 
     void setByteChunk( ByteChunk mb ) {
-        bc = mb;
+	buf=mb.getBytes();
+	pos=mb.getStart();
+	len=mb.getLength();
+	end=pos+len;
+    }
+
+    public int available() throws IOException {
+        return end-pos;
+    }
+
+    public boolean markSupported() {
+        return false;
+    }
+
+    public int read(byte[] b) throws IOException {
+        return read(b,0,b.length);
+    }
+
+    /**
+     * Repositions this stream to the position at the time the <code>mark</code> method was last called on this input
+     * stream.
+     *
+     * @throws IOException if this stream has not been marked or if the mark has been invalidated.
+     * @todo Implement this java.io.InputStream method
+     */
+    public synchronized void reset() throws IOException {
+        //not implemented
+    }
+
+    public long skip(long n) throws IOException {
+        //not implemented
+        return 0L;
     }
 
 }
