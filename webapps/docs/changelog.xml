@@ -35,6 +35,15 @@
 <section name="Tomcat Trunk ">
   <subsection name="Catalina">
      <changelog>
+     <update><rev>631700</rev>
+       Revert back to original patch proposed for UTF8 parsing.
+       This also fixes the regression for 6.0.16 and 5.5.26 (and possibly 4.1.37) mentioned in
+       http://issues.apache.org/bugzilla/show_bug.cgi?id=44494
+
+       The original patch can be viewed
+       http://svn.apache.org/viewvc?rev=568307&amp;view=rev
+       http://svn.apache.org/viewvc?rev=568605&amp;view=rev
+      </update> 
       <fix>ExtendedAccessLogValve cs-uri not print empty querystring (pero)
       </fix>
      </changelog>
