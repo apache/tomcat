@@ -260,7 +260,7 @@ limitations under the License.--&gt;">
         </copy>
         <javac srcdir="${build.src}/test"
             destdir="${build.dest}/test"
-            debug="${debug}"
+            debug="on"
             deprecation="${deprecation}"
             optimize="${optimize}">
 
@@ -271,11 +271,21 @@ limitations under the License.--&gt;">
     <!-- =================================================================== -->
     <!-- Junit tests                                                         -->
     <!-- =================================================================== -->
-    <target name="test.file" depends="compile-tests">
+    <target name="test" depends="compile-tests">
         <echo message="Running Tomcat Native package tests ..."/>
         <java dir="${test.dir}" classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
             <arg value="org.apache.tomcat.jni.FileTestSuite"/>
             <classpath refid="test.classpath"/>
+            <env key="PATH" path="${tc.library.path}:${java.library.path}"/>
+            <env key="Path" path="${tc.library.path}:${java.library.path}"/>
+            <jvmarg value="-Djava.library.path=${tc.library.path}"/>
+        </java>
+        <java dir="${test.dir}" classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
+            <arg value="org.apache.tomcat.jni.SocketServerTestSuite"/>
+            <classpath refid="test.classpath"/>
+            <env key="PATH" path="${tc.library.path}:${java.library.path}"/>
+            <env key="Path" path="${tc.library.path}:${java.library.path}"/>
+            <jvmarg value="-Djava.library.path=${tc.library.path}"/>
         </java>
     </target>
 
