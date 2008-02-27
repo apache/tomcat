@@ -354,9 +354,9 @@ public class InputBuffer extends Reader
             cb.setEnd(0);
         }
 
-        state = CHAR_STATE;
-        conv.convert(bb, cb, len);
+        conv.convert(bb, cb);
         bb.setOffset(bb.getEnd());
+        state = CHAR_STATE;
 
         return cb.getLength();
 
