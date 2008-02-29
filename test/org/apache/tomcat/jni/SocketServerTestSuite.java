@@ -34,6 +34,9 @@ import java.io.OutputStream;
 public class SocketServerTestSuite extends TestCase {
 
     private long serverSock = 0;
+    private int port=6666;
+    private String host="localhost";
+
     public static long serverPool = 0;
 
     public void testSocketServerTestSuite() throws Exception {
@@ -43,8 +46,8 @@ public class SocketServerTestSuite extends TestCase {
 
         /* Create the server socket and listen on it */
         serverPool = Pool.create(0);
-        long inetAddress = Address.info("127.0.0.1", Socket.APR_INET,
-                                        6666, 0, serverPool);
+        long inetAddress = Address.info(host, Socket.APR_INET,
+                                        port, 0, serverPool);
         serverSock = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM,
                                    Socket.APR_PROTO_TCP, serverPool);
         int rc = Socket.bind(serverSock, inetAddress);
@@ -139,7 +142,7 @@ public class SocketServerTestSuite extends TestCase {
     private class Client extends java.lang.Thread {
         java.net.Socket sock;
         public Client() throws Exception {
-            sock = new java.net.Socket("localhost", 6666);
+            sock = new java.net.Socket(host, port);
         }
         public void run() {
             try {
