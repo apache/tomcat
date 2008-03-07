@@ -35,6 +35,13 @@
 <section name="Tomcat Trunk ">
   <subsection name="Catalina">
      <changelog>
+     <update><rev>634513</rev><br/>
+       <rev>630533</rev>
+       Cookies are parsed according to both servlet spec and cookie spec if STRICT_SERVLET_COMPLIANCE is set to 
+       true.<br/>
+       If false, the default, then values will be quoted for v0 cookies if they contain invalid characters
+      </update> 
+
      <update><rev>631700</rev>
        Revert back to original patch proposed for UTF8 parsing.
        This also fixes the regression for 6.0.16 and 5.5.26 (and possibly 4.1.37) mentioned in
