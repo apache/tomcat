@@ -299,7 +299,10 @@ public class ServerCookie implements Serializable {
         // Path=path
         if (path!=null) {
             buf.append ("; Path=");
-            maybeQuote2(version, buf, path);
+            if (version>0)
+                maybeQuote2(version, buf, path); //don't quote the path for v0 cookies
+            else
+                buf.append(path);
         }
 
         // Secure
