@@ -804,7 +804,7 @@ class NoBodyOutputStream extends ServletOutputStream {
             // isn't this really an IllegalArgumentException?
             
             String msg = lStrings.getString("err.io.negativelength");
-            throw new IOException("negative length");
+            throw new IOException(msg);
         }
     }
 }
