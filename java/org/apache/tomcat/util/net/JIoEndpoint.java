@@ -498,7 +498,11 @@ public class JIoEndpoint {
                     serverSocket = serverSocketFactory.createSocket(port, backlog, address);
                 }
             } catch (BindException be) {
-                throw new BindException(be.getMessage() + ":" + port);
+                if (address == null)
+                    throw new BindException(be.getMessage() + "<null>:" + port);
+                else
+                    throw new BindException(be.getMessage() + " " +
+                            address.toString() + ":" + port);
             }
         }
         //if( serverTimeout >= 0 )
