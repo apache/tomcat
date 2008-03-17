@@ -297,7 +297,7 @@ If you haven't compiled in SSL support into your Tomcat Native library, then you
 </source>
 SSLRandomSeed allows to specify a source of entropy. Productive system needs a reliable source of entropy
 but entropy may need a lot of time to be collected therefore test systems could use no blocking entropy
-sources like "/dev/urandom" that will allow quickier starts of Tomcat.
+sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 
 </p>
 
