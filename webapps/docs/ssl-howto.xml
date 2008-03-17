@@ -282,11 +282,11 @@ which contains further references for this issue.</p>
 <subsection name="Edit the Tomcat Configuration File">
 <p>If you are using APR, you have the option of configuring an alternative engine to openSSL.
 <source>
-&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="someengine" /&gt;
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="someengine" SSLRandomSeed="somedevice" /&gt;
 </source>
 The default value is
 <source>
-&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" /&gt;
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" SSLRandomSeed="builtin" /&gt;
 </source>
 So to use SSL under APR, make sure the SSLEngine attribute is set to something other than <code>off</code>.
 The default value is <code>on</code> and if you specify another value, it has to be a valid engine name.
@@ -295,6 +295,9 @@ If you haven't compiled in SSL support into your Tomcat Native library, then you
 <source>
 &lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="off" /&gt;
 </source>
+SSLRandomSeed allows to specify a source of entropy. Productive system needs a reliable source of entropy
+but entropy may need a lot of time to be collected therefore test systems could use no blocking entropy
+sources like "/dev/urandom" that will allow quickier starts of Tomcat.
 
 </p>
 
