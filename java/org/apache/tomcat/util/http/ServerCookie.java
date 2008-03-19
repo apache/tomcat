@@ -255,7 +255,7 @@ public class ServerCookie implements Serializable {
         buf.append("=");
         // Servlet implementation does not check anything else
         
-        version = maybeQuote2(version, buf, value);
+        version = maybeQuote2(version, buf, value,true);
 
         // Add version 1 specific information
         if (version == 1) {
@@ -299,10 +299,7 @@ public class ServerCookie implements Serializable {
         // Path=path
         if (path!=null) {
             buf.append ("; Path=");
-            if (version>0)
-                maybeQuote2(version, buf, path); //don't quote the path for v0 cookies
-            else
-                buf.append(path);
+            maybeQuote2(version, buf, path);
         }
 
         // Secure
@@ -340,6 +337,10 @@ public class ServerCookie implements Serializable {
      * @param value
      */
     public static int maybeQuote2 (int version, StringBuffer buf, String value) {
+        return maybeQuote2(version,buf,value,false);
+    }
+
+    public static int maybeQuote2 (int version, StringBuffer buf, String value, boolean allowVersionSwitch) {
         if (value==null || value.length()==0) {
             buf.append("\"\"");
         }else if (containsCTL(value,version)) 
@@ -348,7 +349,7 @@ public class ServerCookie implements Serializable {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,1,value.length()-1));
             buf.append('"');
-        } else if ((!STRICT_SERVLET_COMPLIANCE) && version==0 && !isToken2(value)) {
+        } else if (allowVersionSwitch && (!STRICT_SERVLET_COMPLIANCE) && version==0 && !isToken2(value)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
