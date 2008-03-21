@@ -219,7 +219,7 @@ resource to your <a href="config/context.html">Context</a>.</p>
 
     &lt;!-- maxActive: Maximum number of dB connections in pool. Make sure you
          configure your mysqld max_connections large enough to handle
-         all of your db connections. Set to 0 for no limit.
+         all of your db connections. Set to -1 for no limit.
          --&gt;
 
     &lt;!-- maxIdle: Maximum number of idle dB connections to retain in pool.
