@@ -20,8 +20,10 @@ package org.apache.catalina.valves;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.CometEvent;
+import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -86,11 +89,18 @@ public class CometConnectionManagerValve
 
     
     /**
-     * Connection list.
+     * List of current Coment connections.
      */
-    protected ConcurrentHashMap<String, ConnectionInfo[]> connections
-        = new ConcurrentHashMap<String, ConnectionInfo[]>();
+    protected List<Request> cometRequests =
+        Collections.synchronizedList(new ArrayList<Request>());
     
+
+    /**
+     * Name of session attribute used to store list of comet connections.
+     */
+    protected String cometRequestsAttribute =
+        "org.apache.tomcat.comet.connectionList";
+
 
     // ------------------------------------------------------------- Properties
 
@@ -178,54 +188,36 @@ public class CometConnectionManagerValve
             ((Lifecycle) container).removeLifecycleListener(this);
         }
 
-        // The webapp is getting stopped, so all current connections 
-        // should be closed
-        // Close all Comet connections associated with this session
-        // Note: this will only be done if the container was not a Context
-        // (otherwise, this needs to be done before stop, as the servlet would
-        // be deallocated already)
-        Iterator<ConnectionInfo[]> iterator = connections.values().iterator();
-        while (iterator.hasNext()) {
-            ConnectionInfo[] connectionInfos = iterator.next();
-            if (connectionInfos != null) {
-                for (int i = 0; i < connectionInfos.length; i++) {
-                    ConnectionInfo connectionInfo = connectionInfos[i];
-                    try {
-                        connectionInfo.event.close();
-                    } catch (Exception e) {
-                        container.getLogger().warn(sm.getString("cometConnectionManagerValve.event"), e);
-                    }
-                }
-            }
-        }
-        connections.clear();
-
     }
 
     
     public void lifecycleEvent(LifecycleEvent event) {
         if (event.getType() == Lifecycle.BEFORE_STOP_EVENT) {
-            // The webapp is getting stopped, so all current connections 
-            // should be closed
-            // Close all Comet connections associated with this session
-            Iterator<ConnectionInfo[]> iterator = connections.values().iterator();
+            // The container is getting stopped, close all current connections 
+            Iterator<Request> iterator = cometRequests.iterator();
             while (iterator.hasNext()) {
-                ConnectionInfo[] connectionInfos = iterator.next();
-                if (connectionInfos != null) {
-                    for (int i = 0; i < connectionInfos.length; i++) {
-                        ConnectionInfo connectionInfo = connectionInfos[i];
-                        try {
-                            ((CometEventImpl) connectionInfo.event).setEventType(CometEvent.EventType.END);
-                            ((CometEventImpl) connectionInfo.event).setEventSubType(CometEvent.EventSubType.WEBAPP_RELOAD);
-                            getNext().event(connectionInfo.request, connectionInfo.response, connectionInfo.event);
-                            connectionInfo.event.close();
-                        } catch (Exception e) {
-                            container.getLogger().warn(sm.getString("cometConnectionManagerValve.event"), e);
-                        }
-                    }
+                Request request = iterator.next();
+                // Remove the session tracking attribute as it isn't
+                // serializable or required.
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    session.removeAttribute(cometRequestsAttribute);
+                }
+                // Close the comet connection
+                try {
+                    CometEventImpl cometEvent = request.getEvent();
+                    cometEvent.setEventType(CometEvent.EventType.END);
+                    cometEvent.setEventSubType(
+                            CometEvent.EventSubType.WEBAPP_RELOAD);
+                    getNext().event(request, request.getResponse(), cometEvent);
+                    cometEvent.close();
+                } catch (Exception e) {
+                    container.getLogger().warn(
+                            sm.getString("cometConnectionManagerValve.event"),
+                            e);
                 }
             }
-            connections.clear();
+            cometRequests.clear();
         }
     }
 
@@ -259,25 +251,27 @@ public class CometConnectionManagerValve
             // Start tracking this connection, since this is a 
             // begin event, and Comet mode is on
             HttpSession session = request.getSession(true);
-            ConnectionInfo newConnectionInfo = new ConnectionInfo();
-            newConnectionInfo.request = request;
-            newConnectionInfo.response = response;
-            newConnectionInfo.event = request.getEvent();
+            
+            // Track the conection for webapp reload
+            cometRequests.add(request);
+            
+            // Track the connection for session expiration
             synchronized (session) {
-                String id = session.getId();
-                ConnectionInfo[] connectionInfos = connections.get(id);
-                if (connectionInfos == null) {
-                    connectionInfos = new ConnectionInfo[1];
-                    connectionInfos[0] = newConnectionInfo;
-                    connections.put(id, connectionInfos);
+                Request[] requests = (Request[])
+                        session.getAttribute(cometRequestsAttribute);
+                if (requests == null) {
+                    requests = new Request[1];
+                    requests[0] = request;
+                    session.setAttribute(cometRequestsAttribute,
+                            requests);
                 } else {
-                    ConnectionInfo[] newConnectionInfos = 
-                        new ConnectionInfo[connectionInfos.length + 1];
-                    for (int i = 0; i < connectionInfos.length; i++) {
-                        newConnectionInfos[i] = connectionInfos[i];
+                    Request[] newRequests = 
+                        new Request[requests.length + 1];
+                    for (int i = 0; i < requests.length; i++) {
+                        newRequests[i] = requests[i];
                     }
-                    newConnectionInfos[connectionInfos.length] = newConnectionInfo;
-                    connections.put(id, newConnectionInfos);
+                    newRequests[requests.length] = request;
+                    session.setAttribute(cometRequestsAttribute, newRequests);
                 }
             }
         }
@@ -306,32 +300,48 @@ public class CometConnectionManagerValve
             if (!ok || response.isClosed() 
                     || (event.getEventType() == CometEvent.EventType.END)
                     || (event.getEventType() == CometEvent.EventType.ERROR
-                            && !(event.getEventSubType() == CometEvent.EventSubType.TIMEOUT))) {
-                // Remove from tracked list, the connection is done
-                HttpSession session = request.getSession(true);
-                synchronized (session) {
-                    ConnectionInfo[] connectionInfos = connections.get(session.getId());
-                    if (connectionInfos != null) {
-                        boolean found = false;
-                        for (int i = 0; !found && (i < connectionInfos.length); i++) {
-                            found = (connectionInfos[i].request == request);
-                        }
-                        if (found) {
-                            ConnectionInfo[] newConnectionInfos = 
-                                new ConnectionInfo[connectionInfos.length - 1];
-                            int pos = 0;
-                            for (int i = 0; i < connectionInfos.length; i++) {
-                                if (connectionInfos[i].request != request) {
-                                    newConnectionInfos[pos++] = connectionInfos[i];
+                            && !(event.getEventSubType() ==
+                                CometEvent.EventSubType.TIMEOUT))) {
+                
+                // Remove the connection from webapp reload tracking
+                cometRequests.remove(request);
+                
+                // Remove connection from session expiration tracking
+                // Note: can't get the session if it has been invalidated but
+                // OK since session listener will have done clean-up
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    synchronized (session) {
+                        Request[] reqs = (Request[])
+                            session.getAttribute(cometRequestsAttribute);
+                        if (reqs != null) {
+                            boolean found = false;
+                            for (int i = 0; !found && (i < reqs.length); i++) {
+                                found = (reqs[i] == request);
+                            }
+                            if (found) {
+                                if (reqs.length > 1) {
+                                    Request[] newConnectionInfos = 
+                                        new Request[reqs.length - 1];
+                                    int pos = 0;
+                                    for (int i = 0; i < reqs.length; i++) {
+                                        if (reqs[i] != request) {
+                                            newConnectionInfos[pos++] = reqs[i];
+                                        }
+                                    }
+                                    session.setAttribute(cometRequestsAttribute,
+                                            newConnectionInfos);
+                                } else {
+                                    session.removeAttribute(
+                                            cometRequestsAttribute);
                                 }
                             }
-                            connections.put(session.getId(), newConnectionInfos);
                         }
                     }
-                }                
+                }
             }
         }
-        
+
     }
 
 
@@ -341,31 +351,24 @@ public class CometConnectionManagerValve
 
     public void sessionDestroyed(HttpSessionEvent se) {
         // Close all Comet connections associated with this session
-        ConnectionInfo[] connectionInfos = connections.remove(se.getSession().getId());
-        if (connectionInfos != null) {
-            for (int i = 0; i < connectionInfos.length; i++) {
-                ConnectionInfo connectionInfo = connectionInfos[i];
+        Request[] reqs = (Request[])
+            se.getSession().getAttribute(cometRequestsAttribute);
+        if (reqs != null) {
+            for (int i = 0; i < reqs.length; i++) {
+                Request req = reqs[i];
                 try {
-                    ((CometEventImpl) connectionInfo.event).setEventType(CometEvent.EventType.END);
-                    ((CometEventImpl) connectionInfo.event).setEventSubType(CometEvent.EventSubType.SESSION_END);
-                    getNext().event(connectionInfo.request, connectionInfo.response, connectionInfo.event);
-                    connectionInfo.event.close();
+                    CometEventImpl event = req.getEvent();
+                    event.setEventType(CometEvent.EventType.END);
+                    event.setEventSubType(CometEvent.EventSubType.SESSION_END);
+                    ((CometProcessor)
+                            req.getWrapper().getServlet()).event(event);
+                    event.close();
                 } catch (Exception e) {
-                    container.getLogger().warn(sm.getString("cometConnectionManagerValve.event"), e);
+                    req.getWrapper().getParent().getLogger().warn(sm.getString(
+                            "cometConnectionManagerValve.listenerEvent"), e);
                 }
             }
         }
     }
-
-
-    // --------------------------------------------- ConnectionInfo Inner Class
-
-    
-    protected class ConnectionInfo {
-        public CometEvent event;
-        public Request request;
-        public Response response;
-    }
-
 
 }
