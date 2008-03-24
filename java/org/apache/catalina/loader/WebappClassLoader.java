@@ -1842,9 +1842,14 @@ public class WebappClassLoader
             }
 
             if (entry.loadedClass == null) {
-                clazz = defineClass(name, entry.binaryContent, 0,
-                        entry.binaryContent.length, 
-                        new CodeSource(entry.codeBase, entry.certificates));
+                try {
+                    clazz = defineClass(name, entry.binaryContent, 0,
+                            entry.binaryContent.length, 
+                            new CodeSource(entry.codeBase, entry.certificates));
+                } catch (UnsupportedClassVersionError ucve) {
+                    throw new UnsupportedClassVersionError(
+                            sm.getString("webappClassLoader.wrongVersion", name));
+                }
                 entry.loadedClass = clazz;
                 entry.binaryContent = null;
                 entry.source = null;
