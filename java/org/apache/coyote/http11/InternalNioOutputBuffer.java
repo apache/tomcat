@@ -614,11 +614,21 @@ public class InternalNioOutputBuffer
 
     int total = 0;
     private synchronized void addToBB(byte[] buf, int offset, int length) throws IOException {
-        while (socket.getBufHandler().getWriteBuffer().remaining() < length) {
-            flushBuffer();
+        while (length > 0) {
+            int thisTime = length;
+            if (socket.getBufHandler().getWriteBuffer().position() ==
+                    socket.getBufHandler().getWriteBuffer().capacity()
+                    || socket.getBufHandler().getWriteBuffer().remaining()==0) {
+                flushBuffer();
+            }
+            if (thisTime > socket.getBufHandler().getWriteBuffer().remaining()) {
+                thisTime = socket.getBufHandler().getWriteBuffer().remaining();
+            }
+            socket.getBufHandler().getWriteBuffer().put(buf, offset, thisTime);
+            length = length - thisTime;
+            offset = offset + thisTime;
+            total += thisTime;
         }
-        socket.getBufHandler().getWriteBuffer().put(buf, offset, length);
-        total += length;
         NioEndpoint.KeyAttachment ka = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         if ( ka!= null ) ka.access();//prevent timeouts for just doing client writes
     }
@@ -794,18 +804,7 @@ public class InternalNioOutputBuffer
             int len = chunk.getLength();
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
-            while (len > 0) {
-                int thisTime = len;
-                if (socket.getBufHandler().getWriteBuffer().position() == socket.getBufHandler().getWriteBuffer().capacity() ||socket.getBufHandler().getWriteBuffer().remaining()==0) {
-                    flushBuffer();
-                }
-                if (thisTime > socket.getBufHandler().getWriteBuffer().remaining()) {
-                    thisTime = socket.getBufHandler().getWriteBuffer().remaining();
-                }
-                addToBB(b,start,thisTime);
-                len = len - thisTime;
-                start = start + thisTime;
-            }
+            addToBB(b, start, len);
             return chunk.getLength();
 
         }
