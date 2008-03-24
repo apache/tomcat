@@ -23,8 +23,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileNotFoundException;
 import java.security.Permission;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import javax.naming.NamingException;
 import javax.naming.NamingEnumeration;
@@ -217,6 +221,46 @@ public class DirContextURLConnection
         return 0;
     }
     
+
+    /**
+     * Returns an unmodifiable Map of the header fields.
+     */
+    public Map getHeaderFields() {
+
+      if (!connected) {
+          // Try to connect (silently)
+          try {
+              connect();
+          } catch (IOException e) {
+          }
+      }
+
+      if (attributes == null)
+          return (Collections.EMPTY_MAP);
+
+      HashMap headerFields = new HashMap(attributes.size());
+      NamingEnumeration attributeEnum = attributes.getIDs();
+      try {
+          while (attributeEnum.hasMore()) {
+              String attributeID = (String)attributeEnum.next();
+              Attribute attribute = attributes.get(attributeID);
+              if (attribute == null) continue;
+              ArrayList attributeValueList = new ArrayList(attribute.size());
+              NamingEnumeration attributeValues = attribute.getAll();
+              while (attributeValues.hasMore()) {
+                  attributeValueList.add(attributeValues.next().toString());
+              }
+              attributeValueList.trimToSize(); // should be a no-op if attribute.size() didn't lie
+              headerFields.put(attributeID, Collections.unmodifiableList(attributeValueList));
+          }
+      } catch (NamingException ne) {
+            // Shouldn't happen
+      }
+
+      return Collections.unmodifiableMap(headerFields);
+
+    }
+    
     
     /**
      * Returns the name of the specified header field.
@@ -234,11 +278,18 @@ public class DirContextURLConnection
         if (attributes == null)
             return (null);
 
-        Attribute attribute = attributes.get(name);
+        NamingEnumeration attributeEnum = attributes.getIDs();
         try {
-            return attribute.get().toString();
-        } catch (Exception e) {
-            // Shouldn't happen, unless the attribute has no value
+            while (attributeEnum.hasMore()) {
+                String attributeID = (String)attributeEnum.next();
+                if (attributeID.equalsIgnoreCase(name)) {
+                    Attribute attribute = attributes.get(attributeID);
+                    if (attribute == null) return null;
+                    return attribute.get(attribute.size()-1).toString();
+                }
+            }
+        } catch (NamingException ne) {
+            // Shouldn't happen
         }
 
         return (null);

@@ -263,7 +263,7 @@ public class ResourceAttributes implements Attributes {
      */
     public boolean isCollection() {
         if (attributes != null) {
-            return (getResourceType().equals(COLLECTION_TYPE));
+            return (COLLECTION_TYPE.equals(getResourceType()));
         } else {
             return (collection);
         }
@@ -683,7 +683,7 @@ public class ResourceAttributes implements Attributes {
             if (collection)
                 result = COLLECTION_TYPE;
             else
-                result = "";
+                result = null;
         }
         return result;
     }
@@ -775,28 +775,41 @@ public class ResourceAttributes implements Attributes {
     public Attribute get(String attrID) {
         if (attributes == null) {
             if (attrID.equals(CREATION_DATE)) {
-                return new BasicAttribute(CREATION_DATE, getCreationDate());
+                Date creationDate = getCreationDate();
+                if (creationDate == null) return null;
+                return new BasicAttribute(CREATION_DATE, creationDate);
             } else if (attrID.equals(ALTERNATE_CREATION_DATE)) {
-                return new BasicAttribute(ALTERNATE_CREATION_DATE, 
-                                          getCreationDate());
+                Date creationDate = getCreationDate();
+                if (creationDate == null) return null;
+                return new BasicAttribute(ALTERNATE_CREATION_DATE, creationDate);
             } else if (attrID.equals(LAST_MODIFIED)) {
-                return new BasicAttribute(LAST_MODIFIED, 
-                                          getLastModifiedDate());
+                Date lastModifiedDate = getLastModifiedDate();
+                if (lastModifiedDate == null) return null;
+                return new BasicAttribute(LAST_MODIFIED, lastModifiedDate);
             } else if (attrID.equals(ALTERNATE_LAST_MODIFIED)) {
-                return new BasicAttribute(ALTERNATE_LAST_MODIFIED,
-                                          getLastModifiedDate());
+                Date lastModifiedDate = getLastModifiedDate();
+                if (lastModifiedDate == null) return null;
+                return new BasicAttribute(ALTERNATE_LAST_MODIFIED, lastModifiedDate);
             } else if (attrID.equals(NAME)) {
-                return new BasicAttribute(NAME, getName());
+                String name = getName();
+                if (name == null) return null;
+                return new BasicAttribute(NAME, name);
             } else if (attrID.equals(TYPE)) {
-                return new BasicAttribute(TYPE, getResourceType());
+                String resourceType = getResourceType();
+                if (resourceType == null) return null;
+                return new BasicAttribute(TYPE, resourceType);
             } else if (attrID.equals(ALTERNATE_TYPE)) {
-                return new BasicAttribute(ALTERNATE_TYPE, getResourceType());
+                String resourceType = getResourceType();
+                if (resourceType == null) return null;
+                return new BasicAttribute(ALTERNATE_TYPE, resourceType);
             } else if (attrID.equals(CONTENT_LENGTH)) {
-                return new BasicAttribute(CONTENT_LENGTH, 
-                                          new Long(getContentLength()));
+                long contentLength = getContentLength();
+                if (contentLength < 0) return null;
+                return new BasicAttribute(CONTENT_LENGTH, new Long(contentLength));
             } else if (attrID.equals(ALTERNATE_CONTENT_LENGTH)) {
-                return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, 
-                                          new Long(getContentLength()));
+              long contentLength = getContentLength();
+              if (contentLength < 0) return null;
+              return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, new Long(contentLength));
             }
         } else {
             return attributes.get(attrID);
@@ -851,15 +864,35 @@ public class ResourceAttributes implements Attributes {
     public NamingEnumeration getAll() {
         if (attributes == null) {
             Vector attributes = new Vector();
-            attributes.addElement(new BasicAttribute
-                                  (CREATION_DATE, getCreationDate()));
-            attributes.addElement(new BasicAttribute
-                                  (LAST_MODIFIED, getLastModifiedDate()));
-            attributes.addElement(new BasicAttribute(NAME, getName()));
-            attributes.addElement(new BasicAttribute(TYPE, getResourceType()));
-            attributes.addElement
-                (new BasicAttribute(CONTENT_LENGTH, 
-                                    new Long(getContentLength())));
+            Date creationDate = getCreationDate();
+            if (creationDate != null) {
+                attributes.addElement(new BasicAttribute
+                                      (CREATION_DATE, creationDate));
+                attributes.addElement(new BasicAttribute
+                                      (ALTERNATE_CREATION_DATE, creationDate));
+            }
+            Date lastModifiedDate = getLastModifiedDate();
+            if (lastModifiedDate != null) {
+                attributes.addElement(new BasicAttribute
+                                      (LAST_MODIFIED, lastModifiedDate));
+                attributes.addElement(new BasicAttribute
+                                      (ALTERNATE_LAST_MODIFIED, lastModifiedDate));
+            }
+            String name = getName();
+            if (name != null) {
+                attributes.addElement(new BasicAttribute(NAME, name));
+            }
+            String resourceType = getResourceType();
+            if (resourceType != null) {
+                attributes.addElement(new BasicAttribute(TYPE, resourceType));
+                attributes.addElement(new BasicAttribute(ALTERNATE_TYPE, resourceType));
+            }
+            long contentLength = getContentLength();
+            if (contentLength >= 0) {
+                Long contentLengthLong = new Long(contentLength);
+                attributes.addElement(new BasicAttribute(CONTENT_LENGTH, contentLengthLong));
+                attributes.addElement(new BasicAttribute(ALTERNATE_CONTENT_LENGTH, contentLengthLong));
+            }
             return new RecyclableNamingEnumeration(attributes);
         } else {
             return attributes.getAll();
@@ -873,11 +906,29 @@ public class ResourceAttributes implements Attributes {
     public NamingEnumeration getIDs() {
         if (attributes == null) {
             Vector attributeIDs = new Vector();
-            attributeIDs.addElement(CREATION_DATE);
-            attributeIDs.addElement(LAST_MODIFIED);
-            attributeIDs.addElement(NAME);
-            attributeIDs.addElement(TYPE);
-            attributeIDs.addElement(CONTENT_LENGTH);
+            Date creationDate = getCreationDate();
+            if (creationDate != null) {
+                attributeIDs.addElement(CREATION_DATE);
+                attributeIDs.addElement(ALTERNATE_CREATION_DATE);
+            }
+            Date lastModifiedDate = getLastModifiedDate();
+            if (lastModifiedDate != null) {
+                attributeIDs.addElement(LAST_MODIFIED);
+                attributeIDs.addElement(ALTERNATE_LAST_MODIFIED);
+            }
+            if (getName() != null) {
+                attributeIDs.addElement(NAME);
+            }
+            String resourceType = getResourceType();
+            if (resourceType != null) {
+                attributeIDs.addElement(TYPE);
+                attributeIDs.addElement(ALTERNATE_TYPE);
+            }
+            long contentLength = getContentLength();
+            if (contentLength >= 0) {
+                attributeIDs.addElement(CONTENT_LENGTH);
+                attributeIDs.addElement(ALTERNATE_CONTENT_LENGTH);
+            }
             return new RecyclableNamingEnumeration(attributeIDs);
         } else {
             return attributes.getIDs();
@@ -890,7 +941,13 @@ public class ResourceAttributes implements Attributes {
      */
     public int size() {
         if (attributes == null) {
-            return 5;
+            int size = 0;
+            if (getCreationDate() != null) size += 2;
+            if (getLastModifiedDate() != null) size += 2;
+            if (getName() != null) size++;
+            if (getResourceType() != null) size += 2;
+            if (getContentLength() >= 0) size += 2;
+            return size;
         } else {
             return attributes.size();
         }
