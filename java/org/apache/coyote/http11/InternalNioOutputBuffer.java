@@ -34,7 +34,6 @@ import org.apache.tomcat.util.net.NioChannel;
 import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.NioSelectorPool;
 import org.apache.tomcat.util.res.StringManager;
-import java.io.EOFException;
 import org.apache.tomcat.util.MutableInteger;
 
 /**
@@ -479,11 +478,14 @@ public class InternalNioOutputBuffer
         buf[pos++] = Constants.SP;
 
         // Write message
-        String message = response.getMessage();
-        if (message == null) {
+        String message = null;
+        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER) {
+            message = response.getMessage();
+        }
+        if (message == null){
             write(HttpMessages.getMessage(status));
         } else {
-            write(message);
+            write(message.replace('\n', ' ').replace('\r', ' '));
         }
 
         // End the response status line
