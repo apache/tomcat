@@ -1848,7 +1848,9 @@ public class WebappClassLoader
                             new CodeSource(entry.codeBase, entry.certificates));
                 } catch (UnsupportedClassVersionError ucve) {
                     throw new UnsupportedClassVersionError(
-                            sm.getString("webappClassLoader.wrongVersion", name));
+                            ucve.getLocalizedMessage() + " " +
+                            sm.getString("webappClassLoader.wrongVersion",
+                                    name));
                 }
                 entry.loadedClass = clazz;
                 entry.binaryContent = null;
