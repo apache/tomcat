@@ -364,7 +364,7 @@ class NamesEnumerator implements Enumeration {
     String next;
     MimeHeaders headers;
 
-    NamesEnumerator(MimeHeaders headers) {
+    public NamesEnumerator(MimeHeaders headers) {
         this.headers=headers;
         pos=0;
         size = headers.size();
