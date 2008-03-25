@@ -81,27 +81,9 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Number of bytes read.
-     */
-    private int bytesRead = 0;
-
-
-    /**
-     * Number of chars read.
-     */
-    private int charsRead = 0;
-
-
-    /**
      * Flag which indicates if the input buffer is closed.
      */
     private boolean closed = false;
-
-
-    /**
-     * Byte chunk used to input bytes.
-     */
-    private ByteChunk inputChunk = new ByteChunk();
 
 
     /**
@@ -119,7 +101,8 @@ public class InputBuffer extends Reader
     /**
      * List of encoders.
      */
-    protected HashMap encoders = new HashMap();
+    protected HashMap<String,B2CConverter> encoders =
+        new HashMap<String,B2CConverter>();
 
 
     /**
@@ -211,8 +194,6 @@ public class InputBuffer extends Reader
     public void recycle() {
         
         state = INITIAL_STATE;
-        bytesRead = 0;
-        charsRead = 0;
         
         // If usage of mark made the buffer too big, reallocate it
         if (cb.getChars().length > size) {
@@ -481,14 +462,14 @@ public class InputBuffer extends Reader
         gotEnc = true;
         if (enc == null)
             enc = DEFAULT_ENCODING;
-        conv = (B2CConverter) encoders.get(enc);
+        conv = encoders.get(enc);
         if (conv == null) {
             if (SecurityUtil.isPackageProtectionEnabled()){
                 try{
-                    conv = (B2CConverter)AccessController.doPrivileged(
-                            new PrivilegedExceptionAction(){
+                    conv = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<B2CConverter>(){
 
-                                public Object run() throws IOException{
+                                public B2CConverter run() throws IOException {
                                     return new B2CConverter(enc);
                                 }
 
