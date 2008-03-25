@@ -25,6 +25,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.catalina.util.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -44,6 +45,12 @@ public class InputBuffer extends Reader
     implements ByteChunk.ByteInputChannel, CharChunk.CharInputChannel,
                CharChunk.CharOutputChannel {
 
+    /**
+     * The string manager for this package.
+     */
+    protected static StringManager sm =
+        StringManager.getManager(Constants.Package);
+
 
     // -------------------------------------------------------------- Constants
 
@@ -57,7 +64,6 @@ public class InputBuffer extends Reader
     public final int INITIAL_STATE = 0;
     public final int CHAR_STATE = 1;
     public final int BYTE_STATE = 2;
-
 
     // ----------------------------------------------------- Instance Variables
 
@@ -285,12 +291,20 @@ public class InputBuffer extends Reader
 
     public int readByte()
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         return bb.substract();
     }
 
 
     public int read(byte[] b, int off, int len)
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         return bb.substract(b, off, len);
     }
 
@@ -346,24 +360,40 @@ public class InputBuffer extends Reader
 
     public int read()
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         return cb.substract();
     }
 
 
     public int read(char[] cbuf)
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         return read(cbuf, 0, cbuf.length);
     }
 
 
     public int read(char[] cbuf, int off, int len)
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         return cb.substract(cbuf, off, len);
     }
 
 
     public long skip(long n)
         throws IOException {
+
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
 
         if (n < 0) {
             throw new IllegalArgumentException();
@@ -396,6 +426,10 @@ public class InputBuffer extends Reader
 
     public boolean ready()
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         return (available() > 0);
     }
 
@@ -407,6 +441,10 @@ public class InputBuffer extends Reader
 
     public void mark(int readAheadLimit)
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         if (cb.getLength() <= 0) {
             cb.setOffset(0);
             cb.setEnd(0);
@@ -430,6 +468,10 @@ public class InputBuffer extends Reader
 
     public void reset()
         throws IOException {
+
+        if (closed)
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+
         if (state == CHAR_STATE) {
             if (markPos < 0) {
                 cb.recycle();
