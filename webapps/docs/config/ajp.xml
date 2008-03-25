@@ -258,6 +258,15 @@
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
 
+    <attribute name="packetSize" required="false">
+      <p>This attribute sets the maximum AJP packet size in Bytes. The maximum
+      value is 65536. It should be the same as the <code>max_packet_size</code>
+      directive configured for mod_jk. Normally it is not necessary to change
+      the maximum packet size. Problems with the default value have been
+      reported when sending certificates or certificate chains. The default
+      value is 8192.</p>
+    </attribute>
+
     <attribute name="port" required="true">
       <p>The TCP port number on which this <strong>Connector</strong>
       will create a server socket and await incoming connections.  Your
