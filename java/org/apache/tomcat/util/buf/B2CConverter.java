@@ -89,7 +89,6 @@ public class B2CConverter {
     {
         try {
             // read from the reader
-            int count = 0;
             while( limit > 0 ) { // conv.ready() ) {
                 int size = limit < BUFFER_SIZE ? limit : BUFFER_SIZE;
                 int cnt=conv.read( result, 0, size );
@@ -193,10 +192,6 @@ public class B2CConverter {
  * 
  */
 final class  ReadConvertor extends InputStreamReader {
-    // stream with flush() and close(). overriden.
-    private IntermediateInputStream iis;
-    
-    // Has a private, internal byte[8192]
     
     /** Create a converter.
      */
@@ -204,7 +199,6 @@ final class  ReadConvertor extends InputStreamReader {
         throws UnsupportedEncodingException
     {
         super( in, enc );
-        iis=in;
     }
     
     /** Overriden - will do nothing but reset internal state.
