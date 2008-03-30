@@ -77,34 +77,28 @@ public class B2CConverter {
         convert(bb, cb, cb.getBuffer().length - cb.getEnd());
     }
 
+
     public void convert( ByteChunk bb, CharChunk cb, int limit) 
         throws IOException
     {
         iis.setByteChunk( bb );
-        convert(cb, limit);
-    }
-
-    private void convert(CharChunk cb, int limit)
-        throws IOException
-    {
         try {
             // read from the reader
+            int bbLengthBeforeRead = 0;
             while( limit > 0 ) { // conv.ready() ) {
                 int size = limit < BUFFER_SIZE ? limit : BUFFER_SIZE;
+                bbLengthBeforeRead = bb.getLength();
                 int cnt=conv.read( result, 0, size );
                 if( cnt <= 0 ) {
                     // End of stream ! - we may be in a bad state
                     if( debug>0)
                         log( "EOF" );
-                    //                    reset();
                     return;
                 }
                 if( debug > 1 )
                     log("Converted: " + new String( result, 0, cnt ));
-
-                // XXX go directly
                 cb.append( result, 0, cnt );
-                limit -= cnt;
+                limit = limit - (bbLengthBeforeRead - bb.getLength());
             }
         } catch( IOException ex) {
             if( debug>0)
@@ -113,6 +107,7 @@ public class B2CConverter {
             throw ex;
         }
     }
+
 
     public void reset()
         throws IOException
