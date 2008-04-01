@@ -274,18 +274,6 @@
       to a particular port number on a particular IP address.</p>
     </attribute>
 
-    <attribute name="request.secret" required="false">
-      <p>Only requests from workers with this secret keyword will be accepted.
-      This attribute only has an effect if <code>request.useSecret</code> is
-      <code>true</code>.</p>
-    </attribute>
-
-    <attribute name="request.useSecret" required="false">
-      <p>If set to <code>true</code>, then only requests from workers with the
-      same secret keyword will be accepted. This is set to <code>false</code>
-      by default.</p>
-    </attribute>
-
     <attribute name="tcpNoDelay" required="false">
       <p>If set to <code>true</code>, the TCP_NO_DELAY option will be
       set on the server socket, which improves performance under most
