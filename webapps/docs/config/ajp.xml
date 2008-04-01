@@ -274,6 +274,25 @@
       to a particular port number on a particular IP address.</p>
     </attribute>
 
+    <attribute name="request.secret" required="false">
+      <p>Only requests from workers with this secret keyword will be accepted.
+      </p>
+    </attribute>
+
+    <attribute name="request.shutdownEnabled" required="false">
+      <p>If true and a secret has been configured, a correctly fomatted AJP
+      request (that includes the secret) will shutdown the Tomcat instance
+      associated with this connector. This is set to <code>false</code> by
+      default.</p>
+    </attribute>
+
+    <attribute name="request.useSecret" required="false">
+      <p>If set to <code>true</code>, then a random value for
+      <code>request.secret</code> will be generated. It is for use with
+      <code>request.shutdownEnabled</code>. This is set to <code>false</code>
+      by default.</p>
+    </attribute>
+
     <attribute name="tcpNoDelay" required="false">
       <p>If set to <code>true</code>, the TCP_NO_DELAY option will be
       set on the server socket, which improves performance under most
