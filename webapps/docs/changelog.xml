@@ -33,6 +33,14 @@
 
 <body>
 <section name="Tomcat Trunk ">
+  <subsection name="Coyote">
+    <changelog>
+     <update><rev>644858</rev><br/>
+       Inproper curly brackets cause NIO/SendFile to fail. Workaround prior to this version, set
+       useSendFile=&quot;false&quot; in the Connector element.
+      </update> 
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
      <changelog>
      <update><rev>634513</rev><br/>
