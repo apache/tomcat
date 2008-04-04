@@ -1607,10 +1607,11 @@ public class NioEndpoint {
                 }
                 if ( sd.length <= 0 ) {
                     attachment.setSendfileData(null);
-                    if ( sd.keepAlive ) 
+                    if ( sd.keepAlive ) {
                         if (reg) reg(sk,attachment,SelectionKey.OP_READ);
-                    else 
+                    } else {
                         cancelledKey(sk,SocketStatus.STOP,false);
+                    }
                 } else if ( attachment.interestOps() == 0 && reg ) {
                     reg(sk,attachment,SelectionKey.OP_WRITE);
                 }
