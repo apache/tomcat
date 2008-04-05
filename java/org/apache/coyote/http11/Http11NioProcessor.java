@@ -777,7 +777,8 @@ public class Http11NioProcessor implements ActionHook {
             return SocketState.CLOSED;
         } else if (!comet) {
             recycle();
-            return SocketState.OPEN;
+            //pay attention to the keep alive flag set in process()
+            return (keepAlive)?SocketState.OPEN:SocketState.CLOSED;
         } else {
             return SocketState.LONG;
         }
@@ -1219,6 +1220,21 @@ public class Http11NioProcessor implements ActionHook {
             comet = true;
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
+        }  else if (actionCode == ActionCode.ACTION_COMET_CLOSE) {
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            attach.setCometOps(NioEndpoint.OP_CALLBACK);
+            //notify poller if not on a tomcat thread
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
+                socket.getPoller().cometInterest(socket);
+        } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
+            if (param==null) return;
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            long timeout = ((Long)param).longValue();
+            //if we are not piggy backing on a worker thread, set the timeout
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
+                attach.setTimeout(timeout);
         }
 
     }
