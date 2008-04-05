@@ -356,14 +356,15 @@
 
   </target>
 
-  <target name="dist-javadoc" description="Create the Tomcat javadoc" >
+  <target name="dist-javadoc" depends="dist-source"
+    description="Create the Tomcat javadoc" >
     <javadoc packagenames="org.apache.*"
       sourcepath="${tomcat.dist}/src/java"
       destdir="${tomcat.dist}/webapps/docs/api"
       author="true" version="true"
       windowtitle="Tomcat API Documentation"
       doctitle="Tomcat API"
-      bottom="Copyright &#169; 2000-2007 Apache Software Foundation.  All Rights Reserved."
+      bottom="Copyright &#169; 2000-2008 Apache Software Foundation.  All Rights Reserved."
       additionalparam="-breakiterator"
       maxmemory="256m" >
     </javadoc>
