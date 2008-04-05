@@ -1205,6 +1205,10 @@ public class Http11AprProcessor implements ActionHook {
             comet = true;
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
+        } else if (actionCode == ActionCode.ACTION_COMET_CLOSE) {
+            //no op
+        } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
+            //no op
         }
 
     }
