@@ -141,7 +141,7 @@ public final class ActionCode {
 
 
     /**
-     * Callback for begin Comet processing
+     * Callback for end Comet processing
      */
     public static final ActionCode ACTION_COMET_END = new ActionCode(22);
 
@@ -151,7 +151,16 @@ public final class ActionCode {
      */
     public static final ActionCode ACTION_AVAILABLE = new ActionCode(23);
 
+    /**
+     * Callback for an asynchronous close of the Comet event
+     */
+    public static final ActionCode ACTION_COMET_CLOSE = new ActionCode(24);
 
+    /**
+     * Callback for setting the timeout asynchronously
+     */
+    public static final ActionCode ACTION_COMET_SETTIMEOUT = new ActionCode(25);
+    
     // ----------------------------------------------------------- Constructors
     int code;
 
