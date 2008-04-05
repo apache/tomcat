@@ -1635,6 +1635,7 @@ public class NioEndpoint {
         protected void reg(SelectionKey sk, KeyAttachment attachment, int intops) {
             sk.interestOps(intops); 
             attachment.interestOps(intops);
+            attachment.setCometOps(intops);
         }
 
         protected void timeout(int keyCount, boolean hasEvents) {
@@ -1659,6 +1660,7 @@ public class NioEndpoint {
                     } else if ( ka.getError() ) {
                         cancelledKey(key, SocketStatus.ERROR,true);
                     } else if (ka.getComet() && ka.getCometNotify() ) {
+                        ka.setCometNotify(false);
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);

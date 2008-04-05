@@ -21,6 +21,7 @@ package org.apache.catalina;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.Servlet;
 
 /**
  * This interface should be implemented by servlets which would like to handle
@@ -29,7 +30,7 @@ import javax.servlet.ServletException;
  * Note: When this interface is implemented, the service method of the servlet will
  * never be called, and will be replaced with a begin event.
  */
-public interface CometProcessor {
+public interface CometProcessor extends Servlet{
 
     /**
      * Process the given Comet event.
