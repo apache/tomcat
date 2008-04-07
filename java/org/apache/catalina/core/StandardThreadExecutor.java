@@ -193,6 +193,10 @@ public class StandardThreadExecutor implements Executor {
         return (executor != null) ? executor.getPoolSize() : 0;
     }
 
+    public int getQueueSize() {
+        return (executor != null) ? executor.getQueue().size() : -1;
+    }
+
     // ---------------------------------------------- TaskQueue Inner Class
     class TaskQueue extends LinkedBlockingQueue<Runnable> {
         ThreadPoolExecutor parent = null;
