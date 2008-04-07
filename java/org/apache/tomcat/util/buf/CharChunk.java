@@ -480,7 +480,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 	    tmp=new char[newSize];
 	}
 	
-	System.arraycopy(buff, start, tmp, start, end-start);
+	System.arraycopy(buff, 0, tmp, 0, end);
 	buff = tmp;
 	tmp = null;
     }
