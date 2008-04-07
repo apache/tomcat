@@ -457,11 +457,7 @@ public class InputBuffer extends Reader
                 cb.setOffset(0);
             }
         }
-        int offset = readAheadLimit;
-        if (offset < size) {
-            offset = size;
-        }
-        cb.setLimit(cb.getStart() + offset);
+        cb.setLimit(cb.getStart() + readAheadLimit + size);
         markPos = cb.getStart();
     }
 
