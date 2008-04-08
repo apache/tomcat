@@ -326,8 +326,11 @@ public abstract class ELArithmetic {
         return (obj != null && isNumberType(obj.getClass()));
     }
 
-    public final static boolean isNumberType(final Class type) {
-        return type == (java.lang.Long.class) || type == Long.TYPE || type == (java.lang.Double.class) || type == Double.TYPE || type == (java.lang.Byte.class) || type == Byte.TYPE || type == (java.lang.Short.class) || type == Short.TYPE || type == (java.lang.Integer.class) || type == Integer.TYPE || type == (java.lang.Float.class) || type == Float.TYPE || type == (java.math.BigInteger.class) || type == (java.math.BigDecimal.class);
+    public final static boolean isNumberType(final Class<?> type) {
+        return type == Long.TYPE || type == Double.TYPE ||
+            type == Byte.TYPE || type == Short.TYPE ||
+            type == Integer.TYPE || type == Float.TYPE ||
+            Number.class.isAssignableFrom(type);
     }
 
     /**
