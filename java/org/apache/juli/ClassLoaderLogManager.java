@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
+import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Collections;
@@ -296,9 +297,14 @@ public class ClassLoaderLogManager extends LogManager {
         InputStream is = null;
         // Special case for URL classloaders which are used in containers: 
         // only look in the local repositories to avoid redefining loggers 20 times
-        if ((classLoader instanceof URLClassLoader) 
-                && (((URLClassLoader) classLoader).findResource("logging.properties") != null)) {
-            is = classLoader.getResourceAsStream("logging.properties");
+        try {
+            if ((classLoader instanceof URLClassLoader) 
+                    && (((URLClassLoader) classLoader).findResource("logging.properties") != null)) {
+                is = classLoader.getResourceAsStream("logging.properties");
+            }
+        } catch (AccessControlException ace) {
+            // No permission to configure logging in context
+            // Ignore and carry on
         }
         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
             String configFileStr = System.getProperty("java.util.logging.config.file");
