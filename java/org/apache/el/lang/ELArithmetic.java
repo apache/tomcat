@@ -164,8 +164,6 @@ public abstract class ELArithmetic {
                     || obj1 instanceof Double
                     || obj0 instanceof Float
                     || obj1 instanceof Float
-                    || (obj0 != null && (Double.TYPE == obj0.getClass() || Float.TYPE == obj0.getClass()))
-                    || (obj1 != null && (Double.TYPE == obj1.getClass() || Float.TYPE == obj1.getClass()))
                     || (obj0 instanceof String && ELSupport
                             .isStringFloat((String) obj0)) || (obj1 instanceof String && ELSupport
                     .isStringFloat((String) obj1)));
@@ -362,13 +360,12 @@ public abstract class ELArithmetic {
             return coerce(ZERO);
         }
 
-        Class objType = obj.getClass();
-        if (Character.class.equals(objType) || Character.TYPE == objType) {
+        if (obj instanceof Character) {
             return coerce(new Short((short) ((Character) obj).charValue()));
         }
 
         throw new IllegalArgumentException(MessageFactory.get("error.convert",
-                obj, objType, "Number"));
+                obj, obj.getClass(), "Number"));
     }
 
     protected abstract Number coerce(final String str);

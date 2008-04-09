@@ -59,23 +59,22 @@ public final class AstNegative extends SimpleNode {
             }
             return new Long(-Long.parseLong((String) obj));
         }
-        Class type = obj.getClass();
-        if (obj instanceof Long || Long.TYPE == type) {
+        if (obj instanceof Long) {
             return new Long(-((Long) obj).longValue());
         }
-        if (obj instanceof Double || Double.TYPE == type) {
+        if (obj instanceof Double) {
             return new Double(-((Double) obj).doubleValue());
         }
-        if (obj instanceof Integer || Integer.TYPE == type) {
+        if (obj instanceof Integer) {
             return new Integer(-((Integer) obj).intValue());
         }
-        if (obj instanceof Float || Float.TYPE == type) {
+        if (obj instanceof Float) {
             return new Float(-((Float) obj).floatValue());
         }
-        if (obj instanceof Short || Short.TYPE == type) {
+        if (obj instanceof Short) {
             return new Short((short) -((Short) obj).shortValue());
         }
-        if (obj instanceof Byte || Byte.TYPE == type) {
+        if (obj instanceof Byte) {
             return new Byte((byte) -((Byte) obj).byteValue());
         }
         Long num = (Long) coerceToNumber(obj, Long.class);
