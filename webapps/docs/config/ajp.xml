@@ -253,7 +253,7 @@
       <p>The maximum number of request processing threads to be created
       by this <strong>Connector</strong>, which therefore determines the
       maximum number of simultaneous requests that can be handled.  If
-      not specified, this attribute is set to 40. If an executor is associated
+      not specified, this attribute is set to 200. If an executor is associated
       with this connector, this attribute is ignored as the connector will 
       execute tasks using the executor rather than an internal thread pool.</p>
     </attribute>
