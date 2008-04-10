@@ -70,6 +70,8 @@ import org.apache.jasper.util.Enumerator;
  */
 public class PageContextImpl extends PageContext {
 
+	private static final JspFactory jspf = JspFactory.getDefaultFactory(); 
+
 	private BodyContentImpl[] outs;
 
 	private int depth;
@@ -895,7 +897,7 @@ public class PageContextImpl extends PageContext {
 			final ProtectedFunctionMapper functionMap, final boolean escape)
 			throws ELException {
 		Object retValue;
-        final ExpressionFactory exprFactory = JspFactory.getDefaultFactory().getJspApplicationContext(pageContext.getServletContext()).getExpressionFactory();
+        final ExpressionFactory exprFactory = jspf.getJspApplicationContext(pageContext.getServletContext()).getExpressionFactory();
 		if (SecurityUtil.isPackageProtectionEnabled()) {
 			try {
 				retValue = AccessController
