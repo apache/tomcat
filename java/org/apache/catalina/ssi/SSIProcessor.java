@@ -40,7 +40,8 @@ public class SSIProcessor {
     protected final static String COMMAND_END = "-->";
     protected final static int BUFFER_SIZE = 4096;
     protected SSIExternalResolver ssiExternalResolver;
-    protected HashMap commands = new HashMap();
+    protected HashMap<String,SSICommand> commands =
+        new HashMap<String,SSICommand>();
     protected int debug;
 
 
@@ -132,8 +133,8 @@ public class SSIProcessor {
                         // change
                         // during the loop
                         String configErrMsg = ssiMediator.getConfigErrMsg();
-                        SSICommand ssiCommand = (SSICommand)commands
-                                .get(strCmd.toLowerCase());
+                        SSICommand ssiCommand =
+                            commands.get(strCmd.toLowerCase());
                         String errorMessage = null;
                         if (ssiCommand == null) {
                             errorMessage = "Unknown command: " + strCmd;

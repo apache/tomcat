@@ -34,7 +34,7 @@ public interface SSIExternalResolver {
      * @param variableNames
      *            the collection to add to
      */
-    public void addVariableNames(Collection variableNames);
+    public void addVariableNames(Collection<String> variableNames);
 
 
     public String getVariableValue(String name);
