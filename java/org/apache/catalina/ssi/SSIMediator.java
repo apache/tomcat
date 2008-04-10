@@ -125,8 +125,8 @@ public class SSIMediator {
     }
 
 
-    public Collection getVariableNames() {
-        Set variableNames = new HashSet();
+    public Collection<String> getVariableNames() {
+        Set<String> variableNames = new HashSet<String>();
         //These built-in variables are supplied by the mediator ( if not
         // over-written by
         // the user ) and always exist
@@ -135,9 +135,9 @@ public class SSIMediator {
         variableNames.add("LAST_MODIFIED");
         ssiExternalResolver.addVariableNames(variableNames);
         //Remove any variables that are reserved by this class
-        Iterator iter = variableNames.iterator();
+        Iterator<String> iter = variableNames.iterator();
         while (iter.hasNext()) {
-            String name = (String)iter.next();
+            String name = iter.next();
             if (isNameReserved(name)) {
                 iter.remove();
             }

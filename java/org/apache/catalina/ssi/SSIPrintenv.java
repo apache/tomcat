@@ -39,10 +39,10 @@ public class SSIPrintenv implements SSICommand {
             String errorMessage = ssiMediator.getConfigErrMsg();
             writer.write(errorMessage);
         } else {
-            Collection variableNames = ssiMediator.getVariableNames();
-            Iterator iter = variableNames.iterator();
+            Collection<String> variableNames = ssiMediator.getVariableNames();
+            Iterator<String> iter = variableNames.iterator();
             while (iter.hasNext()) {
-                String variableName = (String)iter.next();
+                String variableName = iter.next();
                 String variableValue = ssiMediator
                         .getVariableValue(variableName);
                 //This shouldn't happen, since all the variable names must
