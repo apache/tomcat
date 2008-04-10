@@ -82,7 +82,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
-    public void addVariableNames(Collection variableNames) {
+    public void addVariableNames(Collection<String> variableNames) {
         for (int i = 0; i < VARIABLE_NAMES.length; i++) {
             String variableName = VARIABLE_NAMES[i];
             String variableValue = getVariableValue(variableName);
