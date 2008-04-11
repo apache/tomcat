@@ -679,11 +679,17 @@ public final class TldConfig  {
             if (loader instanceof URLClassLoader) {
                 URL[] urls = ((URLClassLoader) loader).getURLs();
                 for (int i=0; i<urls.length; i++) {
-                    // Expect file URLs, these are %xx encoded or not depending on
-                    // the class loader
+                    // Expect file URLs, these are %xx encoded or not depending
+                    // on the class loader
                     // This is definitely not as clean as using JAR URLs either
                     // over file or the custom jndi handler, but a lot less
                     // buggy overall
+                    
+                    // Check that the URL is using file protocol, else ignore it
+                    if (!"file".equals(urls[i].getProtocol())) {
+                        continue;
+                    }
+                    
                     File file = null;
                     try {
                         file = new File(urls[i].toURI());
