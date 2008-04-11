@@ -47,7 +47,6 @@ import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Globals;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.digester.Digester;
@@ -253,12 +252,6 @@ public final class TldConfig  {
 
         File tldCache=null;
 
-        if (context instanceof StandardContext) {
-            File workDir= (File)
-                ((StandardContext)context).getServletContext().getAttribute(Globals.WORK_DIR_ATTR);
-            //tldCache=new File( workDir, "tldCache.ser");
-        }
-
         // Option to not rescan
         if( ! rescan ) {
             // find the cache
@@ -273,8 +266,8 @@ public final class TldConfig  {
          * Acquire the list of TLD resource paths, possibly embedded in JAR
          * files, to be processed
          */
-        Set resourcePaths = tldScanResourcePaths();
-        Map jarPaths = getJarPaths();
+        Set<String> resourcePaths = tldScanResourcePaths();
+        Map<String, File> jarPaths = getJarPaths();
 
         // Check to see if we can use cached listeners
         if (tldCache != null && tldCache.exists()) {
@@ -286,19 +279,20 @@ public final class TldConfig  {
         }
 
         // Scan each accumulated resource path for TLDs to be processed
-        Iterator paths = resourcePaths.iterator();
+        Iterator<String> paths = resourcePaths.iterator();
         while (paths.hasNext()) {
-            String path = (String) paths.next();
+            String path = paths.next();
             if (path.endsWith(".jar")) {
                 tldScanJar(path);
             } else {
                 tldScanTld(path);
             }
         }
+        
         if (jarPaths != null) {
-            paths = jarPaths.values().iterator();
-            while (paths.hasNext()) {
-                tldScanJar((File) paths.next());
+            Iterator<File> files  = jarPaths.values().iterator();
+            while (files.hasNext()) {
+                tldScanJar(files.next());
             }
         }
 
@@ -339,12 +333,12 @@ public final class TldConfig  {
      *
      * @return Last modification date
      */
-    private long getLastModified(Set resourcePaths, Map jarPaths)
-            throws Exception {
+    private long getLastModified(Set<String> resourcePaths,
+            Map<String, File> jarPaths) throws Exception {
 
         long lastModified = 0;
 
-        Iterator paths = resourcePaths.iterator();
+        Iterator<String> paths = resourcePaths.iterator();
         while (paths.hasNext()) {
             String path = (String) paths.next();
             URL url = context.getServletContext().getResource(path);
@@ -360,9 +354,9 @@ public final class TldConfig  {
         }
 
         if (jarPaths != null) {
-            paths = jarPaths.values().iterator();
-            while (paths.hasNext()) {
-                File jarFile = (File) paths.next();
+            Iterator<File> files = jarPaths.values().iterator();
+            while (files.hasNext()) {
+                File jarFile = files.next();
                 long lastM = jarFile.lastModified();
                 if (lastM > lastModified) lastModified = lastM;
                 if (log.isDebugEnabled()) {
@@ -459,9 +453,9 @@ public final class TldConfig  {
 
         try {
             jarFile = new JarFile(file);
-            Enumeration entries = jarFile.entries();
+            Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
-                JarEntry entry = (JarEntry) entries.nextElement();
+                JarEntry entry = entries.nextElement();
                 name = entry.getName();
                 if (!name.startsWith("META-INF/")) {
                     continue;
@@ -572,11 +566,11 @@ public final class TldConfig  {
      * @exception IOException if an input/output error occurs while
      *  accumulating the list of resource paths
      */
-    private Set tldScanResourcePaths() throws IOException {
+    private Set<String> tldScanResourcePaths() throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(" Accumulating TLD resource paths");
         }
-        Set resourcePaths = new HashSet();
+        Set<String> resourcePaths = new HashSet<String>();
 
         // Accumulate resource paths explicitly listed in the web application
         // deployment descriptor
@@ -623,7 +617,7 @@ public final class TldConfig  {
      */
     private void tldScanResourcePathsWebInf(DirContext resources,
                                             String rootPath,
-                                            Set tldPaths) 
+                                            Set<String> tldPaths) 
             throws IOException {
 
         if (log.isTraceEnabled()) {
@@ -631,9 +625,9 @@ public final class TldConfig  {
         }
 
         try {
-            NamingEnumeration items = resources.list(rootPath);
+            NamingEnumeration<NameClassPair> items = resources.list(rootPath);
             while (items.hasMoreElements()) {
-                NameClassPair item = (NameClassPair) items.nextElement();
+                NameClassPair item = items.nextElement();
                 String resourcePath = rootPath + "/" + item.getName();
                 if (!resourcePath.endsWith(".tld")
                         && (resourcePath.startsWith("/WEB-INF/classes")
@@ -675,9 +669,9 @@ public final class TldConfig  {
      *
      * @return Map of JAR file paths
      */
-    private Map getJarPaths() {
+    private Map<String, File> getJarPaths() {
 
-        HashMap jarPathMap = null;
+        HashMap<String, File> jarPathMap = null;
 
         ClassLoader webappLoader = Thread.currentThread().getContextClassLoader();
         ClassLoader loader = webappLoader;
@@ -717,7 +711,7 @@ public final class TldConfig  {
                             || noTldJars == null
                             || !noTldJars.contains(file.getName())) {
                         if (jarPathMap == null) {
-                            jarPathMap = new HashMap();
+                            jarPathMap = new HashMap<String, File>();
                             jarPathMap.put(path, file);
                         } else if (!jarPathMap.containsKey(path)) {
                             jarPathMap.put(path, file);
