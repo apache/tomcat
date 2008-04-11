@@ -213,6 +213,14 @@ final class  ReadConvertor extends InputStreamReader {
     /** Reset the buffer
      */
     public  final void recycle() {
+        try {
+            // Must clear super's buffer.
+            while (ready()) {
+                // InputStreamReader#skip(long) will allocate buffer to skip.
+                read();
+            }
+        } catch(IOException ioe){
+        }
     }
 }
 
