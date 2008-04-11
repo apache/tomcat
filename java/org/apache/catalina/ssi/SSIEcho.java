@@ -37,20 +37,14 @@ public class SSIEcho implements SSICommand {
      */
     public long process(SSIMediator ssiMediator, String commandName,
             String[] paramNames, String[] paramValues, PrintWriter writer) {
-    	long lastModified = 0;
         String encoding = DEFAULT_ENCODING;
+        String originalValue = null;
         String errorMessage = ssiMediator.getConfigErrMsg();
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
             if (paramName.equalsIgnoreCase("var")) {
-                String variableValue = ssiMediator.getVariableValue(
-                        paramValue, encoding);
-                if (variableValue == null) {
-                    variableValue = MISSING_VARIABLE_VALUE;
-                }
-                writer.write(variableValue);
-                lastModified = System.currentTimeMillis();
+                originalValue = paramValue;
             } else if (paramName.equalsIgnoreCase("encoding")) {
                 if (isValidEncoding(paramValue)) {
                     encoding = paramValue;
@@ -63,7 +57,13 @@ public class SSIEcho implements SSICommand {
                 writer.write(errorMessage);
             }
         }
-        return lastModified;
+        String variableValue = ssiMediator.getVariableValue(
+                originalValue, encoding);
+        if (variableValue == null) {
+            variableValue = MISSING_VARIABLE_VALUE;
+        }
+        writer.write(variableValue);
+        return System.currentTimeMillis();
     }
 
 
