@@ -348,7 +348,9 @@ public class InputBuffer extends Reader
             cb.setOffset(0);
             cb.setEnd(0);
         }
-
+        int limit = bb.getLength()+cb.getStart();
+        if ( cb.getLimit() < limit )
+            cb.setLimit(limit);
         state = CHAR_STATE;
         conv.convert(bb, cb, bb.getLength());
         bb.setOffset(bb.getEnd());
