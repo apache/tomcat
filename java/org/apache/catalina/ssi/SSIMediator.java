@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import org.apache.catalina.util.DateTool;
 import org.apache.catalina.util.Strftime;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.http.HttpMessages;
 /**
  * Allows the different SSICommand implementations to share data/talk to each
  * other
@@ -205,10 +206,31 @@ public class SSIMediator {
      * new resolved string.
      */
     public String substituteVariables(String val) {
-        // If it has no variable references then no work
+        // If it has no references or HTML entities then no work
         // need to be done
-        if (val.indexOf('$') < 0) return val;
+        if (val.indexOf('$') < 0 && val.indexOf('&') < 0) return val;
+        
+        // HTML decoding
+        val.replace("&lt;", "<");
+        val.replace("&gt;", ">");
+        val.replace("&quot;", "\"");
+        val.replace("&amp;", "&");
+
         StringBuffer sb = new StringBuffer(val);
+        int charStart = sb.indexOf("&#");
+        while (charStart > -1) {
+            int charEnd = sb.indexOf(";", charStart);
+            if (charEnd > -1) {
+                char c = (char) Integer.parseInt(
+                        sb.substring(charStart + 2, charEnd));
+                sb.delete(charStart, charEnd + 1);
+                sb.insert(charStart, c);
+                charStart = sb.indexOf("&#");
+            } else {
+                break;
+            }
+        }
+
         for (int i = 0; i < sb.length();) {
             // Find the next $
             for (; i < sb.length(); i++) {
@@ -279,8 +301,7 @@ public class SSIMediator {
         } else if (encoding.equalsIgnoreCase("none")) {
             retVal = value;
         } else if (encoding.equalsIgnoreCase("entity")) {
-            //Not sure how this is really different than none
-            retVal = value;
+            retVal = HttpMessages.filter(value);
         } else {
             //This shouldn't be possible
             throw new IllegalArgumentException("Unknown encoding: " + encoding);
