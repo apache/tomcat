@@ -209,6 +209,13 @@
         user passwords are assumed to be stored in clear-text.</p>
       </attribute>
 
+      <attribute name="localDataSource" required="false">
+        <p>When the realm is nested inside a Context element, this allows the 
+        realm to use a DataSource defined for the Context rather than a global
+        DataSource.  If not specified, the default is <code>false</code>: use a 
+        global DataSource.</p>
+      </attribute>
+    
       <attribute name="roleNameCol" required="true">
         <p>Name of the column, in the "user roles" table, which contains
         a role name assigned to the corresponding user.</p>
@@ -328,6 +335,15 @@
         <p>A string specifying how aliases are to be dereferenced during
         search operations. The allowed values are "always", "never",
         "finding" and "searching". If not specified, "always" is used.</p>
+      </attribute>
+
+      <attribute name="digest" required="false">
+        <p>The digest algorithm to apply to the plaintext password offered
+        by the user before comparing it with the value retrieved from the
+        directory.  Valid values are those accepted for the algorithm name
+        by the <code>java.security.MessageDigest</code> class. If not
+        specified the plaintext password is assumed to be retrieved. Not
+        required unless <code>userPassword</code> is specified</p>
       </attribute>
 
       <attribute name="protocol" required="false">
@@ -451,6 +467,13 @@
 
     <attributes>
 
+      <attribute name="digest" required="false">
+        <p>The digest algorithm used to store passwords in non-plaintext
+        formats. Valid values are those accepted for the algorithm name by the
+        <code>java.security.MessageDigest</code> class. If not specified,
+        passwords are stored in clear text.</p>
+      </attribute>
+
       <attribute name="pathname" required="false">
         <p>Absolute or relative (to $CATALINA_BASE) pathname to the XML file
         containing our user information.  See below for details on the
@@ -483,6 +506,64 @@
     information on setting up container managed security using the
     Memory Based Realm component.</p>
 
+    <h3>JAAS Realm (org.apache.catalina.realm.JAASRealm)</h3>
+
+    <p><strong>JAASRealm</strong> is an implementation of the Tomcat 6
+    <code>Realm</code> interface that authenticates users through the Java
+    Authentication &amp; Authorization Service (JAAS) framework which is now
+    provided as part of the standard J2SE API.</p>
+
+    <p>Using JAASRealm gives the developer the ability to combine practically
+    any conceivable security realm with Tomcat's CMA.</p>
+
+    <p>JAASRealm is prototype for Tomcat of the JAAS-based J2EE authentication
+    framework for J2EE v1.4, based on the <a
+    href="http://www.jcp.org/en/jsr/detail?id=196">JCP Specification Request
+    196</a> to enhance container-managed security and promote 'pluggable'
+    authentication mechanisms whose implementations would be
+    container-independent.</p>
+
+    <p>Based on the JAAS login module and principal
+    (see <code>javax.security.auth.spi.LoginModule</code> and
+    <code>javax.security.Principal</code>), you can develop your own security
+    mechanism or wrap another third-party mechanism for integration with the CMA
+    as implemented by Tomcat.</p>
+
+    <p>The JAAS Realm implementation supports the following additional
+    attributes:</p>
+
+    <attributes>
+
+      <attribute name="appName" required="true">
+       <p>The name of the application as configured in your login configuration
+       file 
+       (<a href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS LoginConfig</a>).</p>
+      </attribute>
+
+      <attribute name="userClassNames" required="true">
+        <p>A comma-seperated list of the names of the classes that you have made 
+        for your user <code>Principals</code>.</p>
+      </attribute>
+
+      <attribute name="roleClassNames" required="false">
+        <p>A comma-seperated list of the names of the classes that you have made 
+        for your role <code>Principals</code>.</p>
+      </attribute>
+
+      <attribute name="useContextClassLoader" required="false">
+        <p>Instructs JAASRealm to use the context class loader for loading the
+        user-specified <code>LoginModule</code> class and associated
+        <code>Principal</code> classes. The default value is <code>true</code>,
+        which is backwards-compatible with the way Tomcat 5 works. To load
+        classes using the container's classloader, specify
+        <code>false</code>.</p>
+      </attribute>
+
+    </attributes>
+
+    <p>See the <a href="../realm-howto.html">Container-Managed Security
+    Guide</a> for more information on setting up container managed security
+    using the JAAS Realm component.</p>
 
   </subsection>
 
