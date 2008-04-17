@@ -33,6 +33,14 @@
 
 <body>
 <section name="Tomcat Trunk ">
+
+  <subsection name="ha">
+    <changelog>
+     <fix><rev>649238</rev><br/><bug>44833</bug><br/>
+       Properly override methods from DeltaSession -> StandardSession
+      </fix> 
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
      <update><rev>644858</rev><br/>
@@ -43,6 +51,9 @@
   </subsection>
   <subsection name="Catalina">
      <changelog>
+     <update><rev>645184</rev><br/>
+       Properly deserialize Proxy classes
+     </update>  
      <update><rev>634513</rev><br/>
        <rev>630533</rev>
        Cookies are parsed according to both servlet spec and cookie spec if STRICT_SERVLET_COMPLIANCE is set to 
