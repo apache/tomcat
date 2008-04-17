@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.NotSerializableException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -446,6 +448,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @exception IOException
      *                if an input/output error occurs
      */
+    @Override
+    public void readObjectData(ObjectInputStream stream) throws ClassNotFoundException, IOException {
+        readObject((ObjectInput)stream);
+    }
     public void readObjectData(ObjectInput stream) throws ClassNotFoundException, IOException {
         readObject(stream);
     }
@@ -461,6 +467,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @exception IOException
      *                if an input/output error occurs
      */
+    @Override
+    public void writeObjectData(ObjectOutputStream stream) throws IOException {
+        writeObjectData((ObjectOutput)stream);
+    }
     public void writeObjectData(ObjectOutput stream) throws IOException {
         writeObject(stream);
     }
@@ -578,6 +588,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @exception IOException
      *                if an input/output error occurs
      */
+    @Override
+    protected void readObject(ObjectInputStream stream) throws ClassNotFoundException, IOException {
+        readObject((ObjectInput)stream);
+    }
+
     private void readObject(ObjectInput stream) throws ClassNotFoundException, IOException {
 
         // Deserialize the scalar instance variables (except Manager)
@@ -654,6 +669,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
      * @exception IOException
      *                if an input/output error occurs
      */
+    protected void writeObject(ObjectOutputStream stream) throws IOException {
+        writeObject((ObjectOutput)stream);
+    }
+    
     private void writeObject(ObjectOutput stream) throws IOException {
         // Write the scalar instance variables (except Manager)
         stream.writeObject(new Long(creationTime));
