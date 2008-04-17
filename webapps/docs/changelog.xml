@@ -36,6 +36,9 @@
 
   <subsection name="ha">
     <changelog>
+      <update><rev>649252</rev><br/>
+       Expose the alwaysSend flag to be able to configure send behavior when reaching the limit
+      </update> 
      <fix><rev>649238</rev><br/><bug>44833</bug><br/>
        Properly override methods from DeltaSession -> StandardSession
       </fix> 
