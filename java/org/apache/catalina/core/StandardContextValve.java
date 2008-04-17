@@ -136,6 +136,13 @@ final class StandardContextValve
 
         // Select the Wrapper to be used for this Request
         Wrapper wrapper = request.getWrapper();
+
+        if (wrapper.isUnavailable()) {
+            // May be as a result of a reload
+            // Try and find the new wrapper
+            wrapper = (Wrapper) container.findChild(wrapper.getName());
+        }
+
         if (wrapper == null) {
             String requestURI = request.getDecodedRequestURI();
             notFound(requestURI, response);
