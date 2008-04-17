@@ -198,5 +198,13 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         return link;
     }
 
+    public boolean isAlwaysSend() {
+        return alwaysSend;
+    }
+
+    public void setAlwaysSend(boolean alwaysSend) {
+        this.alwaysSend = alwaysSend;
+    }
+
 
 }
