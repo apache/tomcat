@@ -36,8 +36,6 @@ import org.apache.el.util.MessageFactory;
  */
 public class ELSupport {
 
-    private final static ELSupport REF = new ELSupport();
-
     private final static Long ZERO = new Long(0L);
 
     public final static void throwUnhandled(Object base, Object property)
@@ -426,9 +424,8 @@ public class ELSupport {
     public final static boolean isStringFloat(final String str) {
         int len = str.length();
         if (len > 1) {
-            char c = 0;
             for (int i = 0; i < len; i++) {
-                switch (c = str.charAt(i)) {
+                switch (str.charAt(i)) {
                 case 'E':
                     return true;
                 case 'e':
