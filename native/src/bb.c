@@ -47,6 +47,7 @@ TCN_IMPLEMENT_CALL(jobject, Buffer, malloc)(TCN_STDARGS, jint size)
 TCN_IMPLEMENT_CALL(jobject, Buffer, calloc)(TCN_STDARGS, jint num, jint size)
 {
     size_t sz = (size_t)APR_ALIGN_DEFAULT((size * num));
+    void *mem;
 
     UNREFERENCED(o);
 
