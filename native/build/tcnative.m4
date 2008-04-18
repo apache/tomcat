@@ -362,12 +362,12 @@ yes|'')
 int main() {
         if ((OPENSSL_VERSION_NUMBER >= 0x0090701fL &&
          OPENSSL_VERSION_NUMBER < 0x00908000L) ||
-         OPENSSL_VERSION_NUMBER >= 0x0090802fL)
+         OPENSSL_VERSION_NUMBER >= 0x0090801fL)
             return (0);
     printf("\n\nFound   OPENSSL_VERSION_NUMBER %#010x\n",
         OPENSSL_VERSION_NUMBER);
     printf("Require OPENSSL_VERSION_NUMBER 0x0090701f or greater (0.9.7a)\n"
-           "Require OPENSSL_VERSION_NUMBER 0x0090802f or greater (0.9.8a)\n\n");
+           "Require OPENSSL_VERSION_NUMBER 0x0090801f or greater (0.9.8a)\n\n");
         return (1);
 }
         ],
