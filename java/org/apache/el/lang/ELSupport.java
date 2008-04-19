@@ -223,9 +223,15 @@ public class ELSupport {
             if (number instanceof BigDecimal) {
                 return ((BigDecimal) number).toBigInteger();
             }
+            if (number instanceof BigInteger) {
+                return new BigInteger(number.toString());
+            }
             return BigInteger.valueOf(number.longValue());
         }
         if (BigDecimal.class.equals(type)) {
+            if (number instanceof BigDecimal) {
+                return new BigDecimal(number.toString());
+            }
             if (number instanceof BigInteger) {
                 return new BigDecimal((BigInteger) number);
             }
