@@ -339,10 +339,6 @@ public class ContextConfig
         
         long t1=System.currentTimeMillis();
 
-        if (webDigester == null){
-            webDigester = createWebDigester();
-        }
-        
         URL url=null;
         // Process the application web.xml file
         synchronized (webDigester) {
@@ -624,10 +620,6 @@ public class ContextConfig
                       + " " + defaultWebXml + " " + file , e);
         }
 
-        if (webDigester == null){
-            webDigester = createWebDigester();
-        }
-        
         if (stream != null) {
             processDefaultWebConfig(webDigester, stream, source);
             webRuleSet.recycle();
@@ -786,9 +778,6 @@ public class ContextConfig
         
         if (source == null)
             return;
-        if (contextDigester == null){
-            contextDigester = createContextDigester();
-        }
         synchronized (contextDigester) {
             try {
                 source.setByteStream(stream);
@@ -996,6 +985,16 @@ public class ContextConfig
      */
     protected void init() {
         // Called from StandardContext.init()
+
+        if (webDigester == null){
+            webDigester = createWebDigester();
+            webDigester.getParser();
+        }
+        
+        if (contextDigester == null){
+            contextDigester = createContextDigester();
+            contextDigester.getParser();
+        }
 
         if (log.isDebugEnabled())
             log.debug(sm.getString("contextConfig.init"));
