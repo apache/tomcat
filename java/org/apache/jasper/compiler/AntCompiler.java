@@ -175,8 +175,10 @@ public class AntCompiler extends Compiler {
             if(endorsed != null) {
                 Javac.ImplementationSpecificArgument endorsedArg = 
                     javac.createCompilerArg();
-                endorsedArg.setLine("-J-Djava.endorsed.dirs="+endorsed);
-                info.append("    endorsed dir=" + endorsed + "\n");
+                endorsedArg.setLine("-J-Djava.endorsed.dirs=" +
+                        quotePathList(endorsed));
+                info.append("    endorsed dir=" + quotePathList(endorsed) +
+                        "\n");
             } else {
                 info.append("    no endorsed dirs specified\n");
             }
@@ -275,7 +277,26 @@ public class AntCompiler extends Compiler {
         }
     }
 
-    
+    private String quotePathList(String list) {
+        StringBuffer result = new StringBuffer(list.length() + 10);
+        StringTokenizer st = new StringTokenizer(list, File.pathSeparator);
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (token.indexOf(' ') == -1) {
+                result.append(token);
+            } else {
+                result.append('\"');
+                result.append(token);
+                result.append('\"');
+            }
+            if (st.hasMoreTokens()) {
+                result.append(File.pathSeparatorChar);
+            }
+        }
+        return result.toString();
+    }
+
+
     protected static class SystemLogHandler extends PrintStream {
 
 
