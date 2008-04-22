@@ -140,6 +140,14 @@ final class StandardContextValve
             String requestURI = request.getDecodedRequestURI();
             notFound(requestURI, response);
             return;
+        } else if (wrapper.isUnavailable()) {
+            // May be as a result of a reload, try and find the new wrapper
+            wrapper = (Wrapper) container.findChild(wrapper.getName());
+            if (wrapper == null) {
+                String requestURI = request.getDecodedRequestURI();
+                notFound(requestURI, response);
+                return;
+            }
         }
 
         // Normal request processing
