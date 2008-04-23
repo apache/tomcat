@@ -1755,6 +1755,7 @@ class Generator {
                 String value = attrs.getValue(i);
                 if (value.indexOf('"') != -1) {
                     quote = SINGLE_QUOTE;
+                    value = value.replace("\"", DOUBLE_QUOTE);
                 }
                 out.print(quote);
                 out.print(value);
@@ -1777,6 +1778,7 @@ class Generator {
                     String value = attrs.getValue(i);
                     if (value.indexOf('"') != -1) {
                         quote = SINGLE_QUOTE;
+                        value = value.replace("\"", DOUBLE_QUOTE);
                     }
                     out.print(quote);
                     out.print(value);
