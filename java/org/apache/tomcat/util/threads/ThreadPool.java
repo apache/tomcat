@@ -96,9 +96,11 @@ public class ThreadPool  {
     /** The threads that are part of the pool.
      * Key is Thread, value is the ControlRunnable
      */
-    protected Hashtable threads=new Hashtable();
+    protected Hashtable<Thread, ControlRunnable> threads =
+        new Hashtable<Thread, ControlRunnable>();
 
-    protected Vector listeners=new Vector();
+    protected Vector<ThreadPoolListener> listeners =
+        new Vector<ThreadPoolListener>();
 
     /** Name of the threadpool
      */
@@ -180,10 +182,10 @@ public class ThreadPool  {
       // Set for future threads
       this.threadPriority = threadPriority;
 
-      Enumeration currentThreads = getThreads();
+      Enumeration<Thread> currentThreads = getThreads();
       Thread t = null;
       while(currentThreads.hasMoreElements()) {
-        t = (Thread) currentThreads.nextElement();
+        t = currentThreads.nextElement();
         t.setPriority(threadPriority);
       } 
     }
@@ -270,7 +272,7 @@ public class ThreadPool  {
     public void addThread( Thread t, ControlRunnable cr ) {
         threads.put( t, cr );
         for( int i=0; i<listeners.size(); i++ ) {
-            ThreadPoolListener tpl=(ThreadPoolListener)listeners.elementAt(i);
+            ThreadPoolListener tpl = listeners.elementAt(i);
             tpl.threadStart(this, t);
         }
     }
@@ -278,7 +280,7 @@ public class ThreadPool  {
     public void removeThread( Thread t ) {
         threads.remove(t);
         for( int i=0; i<listeners.size(); i++ ) {
-            ThreadPoolListener tpl=(ThreadPoolListener)listeners.elementAt(i);
+            ThreadPoolListener tpl = listeners.elementAt(i);
             tpl.threadEnd(this, t);
         }
     }
@@ -287,7 +289,7 @@ public class ThreadPool  {
         listeners.addElement( tpl );
     }
 
-    public Enumeration getThreads(){
+    public Enumeration<Thread> getThreads(){
         return threads.keys();
     }
 
@@ -784,7 +786,7 @@ public class ThreadPool  {
      */
     public String threadStatusString() {
         StringBuffer sb=new StringBuffer();
-        Iterator it=threads.keySet().iterator();
+        Iterator<Thread> it=threads.keySet().iterator();
         sb.append("<ul>");
         while( it.hasNext()) {
             sb.append("<li>");
@@ -807,7 +809,7 @@ public class ThreadPool  {
      */
     public String[] getThreadStatus() {
         String status[]=new String[ threads.size()];
-        Iterator it=threads.keySet().iterator();
+        Iterator<Thread> it=threads.keySet().iterator();
         for( int i=0; ( i<status.length && it.hasNext()); i++ ) {
             ThreadWithAttributes twa=(ThreadWithAttributes)
                     it.next();
@@ -823,7 +825,7 @@ public class ThreadPool  {
      */
     public String[] getThreadParam() {
         String status[]=new String[ threads.size()];
-        Iterator it=threads.keySet().iterator();
+        Iterator<Thread> it=threads.keySet().iterator();
         for( int i=0; ( i<status.length && it.hasNext()); i++ ) {
             ThreadWithAttributes twa=(ThreadWithAttributes)
                     it.next();
