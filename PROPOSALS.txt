@@ -76,3 +76,10 @@ Membership
 * Include tomcat-juli and tomcat-juli-adapters as an add on package when doing a release
 
 * Generate source jars for each maven jar posted
+
+Session Replication
+===================
+- New feature - only replicate upon demand
+  Runtime tomcat doesn't do live session replication
+  but you can move the sessions upon demand before shutting down a tomcat instance
+  and draining sessions
