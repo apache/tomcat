@@ -230,7 +230,12 @@ public class McastServiceImpl
         boolean valid = false;
         if ( (level & Channel.MBR_RX_SEQ)==Channel.MBR_RX_SEQ ) {
             if ( receiver != null ) throw new IllegalStateException("McastService.receive already running.");
-            if ( sender == null ) socket.joinGroup(address);
+            try {
+                if ( sender == null ) socket.joinGroup(address);
+            }catch (IOException iox) {
+                log.error("Unable to join multicast group, make sure your system has multicasting enabled.");
+                throw iox;
+            }
             doRunReceiver = true;
             receiver = new ReceiverThread();
             receiver.setDaemon(true);

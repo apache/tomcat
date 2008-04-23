@@ -338,6 +338,8 @@ public class NioSender extends AbstractSender implements DataSender{
            if ( writebuf != null ) writebuf.clear();
            else writebuf = getBuffer(length);
            if ( writebuf.capacity() < length ) writebuf = getBuffer(length);
+           
+           //TODO use ByteBuffer.wrap to avoid copying the data.
            writebuf.put(data,offset,length);
            //writebuf.rewind();
            //set the limit so that we don't write non wanted data
