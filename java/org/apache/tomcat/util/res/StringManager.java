@@ -236,7 +236,8 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static Hashtable managers = new Hashtable();
+    private static Hashtable<String, StringManager> managers =
+        new Hashtable<String, StringManager>();
 
     /**
      * Get the StringManager for a particular package. If a manager for
@@ -246,7 +247,7 @@ public class StringManager {
      * @param packageName The package name
      */
     public synchronized static StringManager getManager(String packageName) {
-      StringManager mgr = (StringManager)managers.get(packageName);
+      StringManager mgr = managers.get(packageName);
       if (mgr == null) {
           mgr = new StringManager(packageName);
           managers.put(packageName, mgr);
@@ -275,7 +276,7 @@ public class StringManager {
      */
 
    public synchronized static StringManager getManager(String packageName,Locale loc) {
-      StringManager mgr = (StringManager)managers.get(packageName+"_"+loc.toString());
+      StringManager mgr = managers.get(packageName+"_"+loc.toString());
       if (mgr == null) {
           mgr = new StringManager(packageName,loc);
           managers.put(packageName+"_"+loc.toString(), mgr);
