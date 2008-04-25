@@ -320,7 +320,7 @@ public class NamingResources implements Serializable {
             entries.put(resource.getName(), resource.getType());
         }
 
-        synchronized (localEjbs) {
+        synchronized (resourceEnvRefs) {
             resource.setNamingResources(this);
             resourceEnvRefs.put(resource.getName(), resource);
         }
@@ -681,7 +681,7 @@ public class NamingResources implements Serializable {
 
         ContextLocalEjb localEjb = null;
         synchronized (localEjbs) {
-            localEjb = (ContextLocalEjb) ejbs.remove(name);
+            localEjb = (ContextLocalEjb) localEjbs.remove(name);
         }
         if (localEjb != null) {
             support.firePropertyChange("localEjb", localEjb, null);
@@ -755,13 +755,14 @@ public class NamingResources implements Serializable {
 
         entries.remove(name);
 
-        String type = null;
+        ContextResourceEnvRef resourceEnvRef = null;
         synchronized (resourceEnvRefs) {
-            type = (String) resourceEnvRefs.remove(name);
+            resourceEnvRef =
+                (ContextResourceEnvRef) resourceEnvRefs.remove(name);
         }
-        if (type != null) {
-            support.firePropertyChange("resourceEnvRef",
-                                       name + ":" + type, null);
+        if (resourceEnvRef != null) {
+            support.firePropertyChange("resourceEnvRef", resourceEnvRef, null);
+            resourceEnvRef.setNamingResources(null);
         }
 
     }
