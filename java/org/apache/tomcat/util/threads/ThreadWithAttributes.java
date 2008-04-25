@@ -96,6 +96,7 @@ public class ThreadWithAttributes extends Thread {
      * you can use notes for array access.
      */
     public final Hashtable getAttributes(Object control) {
+        if( this.control != control ) return null;
         return attributes;
     }
 }
