@@ -1751,14 +1751,9 @@ class Generator {
                 out.print(" ");
                 out.print(attrs.getQName(i));
                 out.print("=");
-                String quote = DOUBLE_QUOTE;
-                String value = attrs.getValue(i);
-                if (value.indexOf('"') != -1) {
-                    quote = SINGLE_QUOTE;
-                }
-                out.print(quote);
-                out.print(value);
-                out.print(quote);
+                out.print(DOUBLE_QUOTE);
+                out.print(attrs.getValue(i).replace("\"", "&quot;"));
+                out.print(DOUBLE_QUOTE);
             }
 
             attrs = n.getAttributes();
@@ -1773,14 +1768,9 @@ class Generator {
                     out.print(attributeValue(jspAttrs[i], false, String.class));
                     out.print(" + \"\\\"");
                 } else {
-                    String quote = DOUBLE_QUOTE;
-                    String value = attrs.getValue(i);
-                    if (value.indexOf('"') != -1) {
-                        quote = SINGLE_QUOTE;
-                    }
-                    out.print(quote);
-                    out.print(value);
-                    out.print(quote);
+                    out.print(DOUBLE_QUOTE);
+                    out.print(attrs.getValue(i).replace("\"", "&quot;"));
+                    out.print(DOUBLE_QUOTE);
                 }
             }
 
