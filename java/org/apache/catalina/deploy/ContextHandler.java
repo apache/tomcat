@@ -59,14 +59,14 @@ public class ContextHandler extends ResourceBase implements Serializable {
      * soapHeader[0] : namespaceURI
      * soapHeader[1] : localpart
      */
-    private HashMap soapHeaders = new HashMap();
+    private HashMap<String, String> soapHeaders = new HashMap<String, String>();
 
-    public Iterator getLocalparts() {
+    public Iterator<String> getLocalparts() {
         return soapHeaders.keySet().iterator();
     }
 
     public String getNamespaceuri(String localpart) {
-        return (String) soapHeaders.get(localpart);
+        return soapHeaders.get(localpart);
     }
 
     public void addSoapHeaders(String localpart, String namespaceuri) {
@@ -83,7 +83,7 @@ public class ContextHandler extends ResourceBase implements Serializable {
     /**
      * The soapRole.
      */
-    private ArrayList<String> soapRoles = new ArrayList();
+    private ArrayList<String> soapRoles = new ArrayList<String>();
 
     public String getSoapRole(int i) {
         return this.soapRoles.get(i);
@@ -100,7 +100,7 @@ public class ContextHandler extends ResourceBase implements Serializable {
     /**
      * The portName.
      */
-    private ArrayList<String> portNames = new ArrayList();
+    private ArrayList<String> portNames = new ArrayList<String>();
 
     public String getPortName(int i) {
         return this.portNames.get(i);
