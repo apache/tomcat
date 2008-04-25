@@ -19,7 +19,6 @@
 package org.apache.catalina.deploy;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
 
@@ -143,7 +142,7 @@ public class ContextService extends ResourceBase implements Serializable {
      * particular port-component.
      *
      */
-    public Iterator getServiceendpoints() {
+    public Iterator<String> getServiceendpoints() {
         return this.listProperties();
     }
 
@@ -162,14 +161,15 @@ public class ContextService extends ResourceBase implements Serializable {
      *
      * The instanciation of the handler have to be done.
      */
-    private HashMap handlers = new HashMap();
+    private HashMap<String, ContextHandler> handlers =
+        new HashMap<String, ContextHandler>();
 
-    public Iterator getHandlers() {
+    public Iterator<String> getHandlers() {
         return handlers.keySet().iterator();
     }
 
     public ContextHandler getHandler(String handlername) {
-        return (ContextHandler) handlers.get(handlername);
+        return handlers.get(handlername);
     }
 
     public void addHandler(ContextHandler handler) {
