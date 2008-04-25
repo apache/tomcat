@@ -113,9 +113,9 @@ public class FilterDef implements Serializable {
      * The set of initialization parameters for this filter, keyed by
      * parameter name.
      */
-    private Map parameters = new HashMap();
+    private Map<String, String> parameters = new HashMap<String, String>();
 
-    public Map getParameterMap() {
+    public Map<String, String> getParameterMap() {
 
         return (this.parameters);
 
