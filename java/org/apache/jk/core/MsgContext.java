@@ -303,7 +303,7 @@ public class MsgContext implements ActionHook {
             try {            
                 jkIS.endMessage();
             } catch(IOException iex) {
-                log.warn("Error sending end packet",iex);
+                log.debug("Error sending end packet",iex);
                 setStatus(JK_STATUS_ERROR);
             }
             if(getStatus() != JK_STATUS_ERROR) {
