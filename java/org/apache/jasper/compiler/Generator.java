@@ -294,6 +294,9 @@ class Generator {
                         attrNames[i] = attrs.getQName(i);
                     }
                     Arrays.sort(attrNames, Collections.reverseOrder());
+                    if (attrNames.length > 0) {
+                        poolName = poolName + "&";
+                    }
                     for (int i = 0; i < attrNames.length; i++) {
                         poolName = poolName + "_" + attrNames[i];
                     }
