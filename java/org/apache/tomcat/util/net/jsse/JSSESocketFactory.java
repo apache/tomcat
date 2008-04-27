@@ -364,7 +364,7 @@ public class JSSESocketFactory
             // Certificate encoding algorithm (e.g., SunX509)
             String algorithm = (String) attributes.get("algorithm");
             if (algorithm == null) {
-                algorithm = KeyManagerFactory.getDefaultAlgorithm();;
+                algorithm = KeyManagerFactory.getDefaultAlgorithm();
             }
 
             String keystoreType = (String) attributes.get("keystoreType");
