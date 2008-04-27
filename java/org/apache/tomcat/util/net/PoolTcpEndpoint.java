@@ -103,11 +103,13 @@ public class PoolTcpEndpoint implements Runnable { // implements Endpoint {
     /* The background thread. */
     private Thread thread = null;
     /* Available processors. */
-    private Stack workerThreads = new Stack();
+    private Stack<MasterSlaveWorkerThread> workerThreads =
+        new Stack<MasterSlaveWorkerThread>();
     private int curThreads = 0;
     private int maxThreads = 20;
     /* All processors which have been created. */
-    private Vector created = new Vector();
+    private Vector<MasterSlaveWorkerThread> created =
+        new Vector<MasterSlaveWorkerThread>();
 
     
     public PoolTcpEndpoint() {
@@ -569,7 +571,7 @@ public class PoolTcpEndpoint implements Runnable { // implements Endpoint {
 
         synchronized (workerThreads) {
             if (workerThreads.size() > 0) {
-                return ((MasterSlaveWorkerThread) workerThreads.pop());
+                return (workerThreads.pop());
             }
             if ((maxThreads > 0) && (curThreads < maxThreads)) {
                 return (newWorkerThread());
