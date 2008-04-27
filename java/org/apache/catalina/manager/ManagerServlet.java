@@ -101,6 +101,7 @@ import org.apache.tomcat.util.modeler.Registry;
  *     descriptions from the user database connected to the <code>users</code>
  *     resource reference.
  * <li><b>/serverinfo</b> - Display system OS and JVM properties.
+ * <li><b>/sessions</b> - Deprecated. Use expire.
  * <li><b>/expire?path=/xxx</b> - List session idle timeinformation about the
  *     web application attached to context path <code>/xxx</code> for this
  *     virtual host.</li>
@@ -368,6 +369,8 @@ public class ManagerServlet
             save(writer, path);
         } else if (command.equals("/serverinfo")) {
             serverinfo(writer);
+        } else if (command.equals("/sessions")) {
+            expireSessions(writer, path, request);
         } else if (command.equals("/expire")) {
             expireSessions(writer, path, request);
         } else if (command.equals("/start")) {
