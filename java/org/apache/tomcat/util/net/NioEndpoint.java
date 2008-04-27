@@ -1383,7 +1383,7 @@ public class NioEndpoint {
             //synchronized (events) {
                 Runnable r = null;
                 result = (events.size() > 0);
-                while ( (r = (Runnable)events.poll()) != null ) {
+                while ( (r = events.poll()) != null ) {
                     try {
                         r.run();
                         if ( r instanceof PollerEvent ) {
@@ -1497,11 +1497,12 @@ public class NioEndpoint {
                     //either we timed out or we woke up, process events first
                     if ( keyCount == 0 ) hasEvents = (hasEvents | events());
 
-                    Iterator iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
+                    Iterator<SelectionKey> iterator =
+                        keyCount > 0 ? selector.selectedKeys().iterator() : null;
                     // Walk through the collection of ready keys and dispatch
                     // any active event.
                     while (iterator != null && iterator.hasNext()) {
-                        SelectionKey sk = (SelectionKey) iterator.next();
+                        SelectionKey sk = iterator.next();
                         KeyAttachment attachment = (KeyAttachment)sk.attachment();
                         attachment.access();
                         iterator.remove();
