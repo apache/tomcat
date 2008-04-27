@@ -159,7 +159,7 @@ class JSSESupport implements SSLSupport {
         if(log.isTraceEnabled())
             log.trace("Reading for try #" +i);
             try {
-                int x = in.read(b);
+                in.read(b);
             } catch(SSLException sslex) {
                 log.info("SSL Error getting client Certs",sslex);
                 throw sslex;
@@ -213,7 +213,7 @@ class JSSESupport implements SSLSupport {
             return null;
         StringBuffer buf=new StringBuffer("");
         for(int x=0; x<ssl_session.length; x++) {
-            String digit=Integer.toHexString((int)ssl_session[x]);
+            String digit=Integer.toHexString(ssl_session[x]);
             if (digit.length()<2) buf.append('0');
             if (digit.length()>2) digit=digit.substring(digit.length()-2);
             buf.append(digit);

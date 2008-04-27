@@ -60,7 +60,8 @@ public class NioSelectorPool {
     protected boolean enabled = true;
     protected AtomicInteger active = new AtomicInteger(0);
     protected AtomicInteger spare = new AtomicInteger(0);
-    protected ConcurrentLinkedQueue<Selector> selectors = new ConcurrentLinkedQueue<Selector>();
+    protected ConcurrentLinkedQueue<Selector> selectors =
+        new ConcurrentLinkedQueue<Selector>();
 
     protected Selector getSharedSelector() throws IOException {
         if (SHARED && SHARED_SELECTOR == null) {
@@ -293,7 +294,7 @@ public class NioSelectorPool {
         return sharedSelectorTimeout;
     }
 
-    public ConcurrentLinkedQueue getSelectors() {
+    public ConcurrentLinkedQueue<Selector> getSelectors() {
         return selectors;
     }
 
