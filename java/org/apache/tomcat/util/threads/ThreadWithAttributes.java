@@ -47,10 +47,12 @@ public class ThreadWithAttributes extends Thread {
     }
     
     public final Object[] getThreadData(Object control ) {
+        if( this.control != control ) return null;
         return thData;
     }
     
     public final void setThreadData(Object control, Object thData[] ) {
+        if( this.control != control ) return;
         this.thData=thData;
     }
 
