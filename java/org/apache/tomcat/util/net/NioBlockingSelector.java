@@ -193,7 +193,8 @@ public class NioBlockingSelector {
     protected class BlockPoller extends Thread {
         protected boolean run = true;
         protected Selector selector = null;
-        protected ConcurrentLinkedQueue events = new ConcurrentLinkedQueue();
+        protected ConcurrentLinkedQueue<Runnable> events =
+            new ConcurrentLinkedQueue<Runnable>();
         public void disable() { run = false; selector.wakeup();}
         protected AtomicInteger wakeupCounter = new AtomicInteger(0);
         public void cancelKey(final NioChannel socket, final SelectionKey key) {
@@ -284,7 +285,7 @@ public class NioBlockingSelector {
             boolean result = false;
             Runnable r = null;
             result = (events.size() > 0);
-            while ( (r = (Runnable)events.poll()) != null ) {
+            while ( (r = events.poll()) != null ) {
                 r.run();
                 result = true;
             }
@@ -320,12 +321,13 @@ public class NioBlockingSelector {
                         continue;
                     }
 
-                    Iterator iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
+                    Iterator<SelectionKey> iterator =
+                        keyCount > 0 ? selector.selectedKeys().iterator() : null;
 
                     // Walk through the collection of ready keys and dispatch
                     // any active event.
                     while (run && iterator != null && iterator.hasNext()) {
-                        SelectionKey sk = (SelectionKey) iterator.next();
+                        SelectionKey sk = iterator.next();
                         KeyAttachment attachment = (KeyAttachment)sk.attachment();
                         try {
                             attachment.access();
