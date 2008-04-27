@@ -335,7 +335,7 @@ public class ThreadPool  {
                     int toOpen = currentThreadCount + minSpareThreads;
                     openThreads(toOpen);
                 } else {
-                    logFull(log, currentThreadCount, maxThreads);
+                    logFull(currentThreadCount, maxThreads);
                     // Wait for a thread to become idel.
                     try {
                         this.wait();
@@ -373,8 +373,7 @@ public class ThreadPool  {
         return c;
     }
 
-    private static void logFull(Log loghelper, int currentThreadCount,
-                                int maxThreads) {
+    private static void logFull(int currentThreadCount, int maxThreads) {
 	if( logfull ) {
             log.error(sm.getString("threadpool.busy",
                                    new Integer(currentThreadCount),
