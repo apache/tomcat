@@ -656,19 +656,19 @@ public class JspCompilationContext {
     protected void createOutputDir() {
         String path = null;
         if (isTagFile()) {
-	    String tagName = tagInfo.getTagClassName();
-            path = tagName.replace('.', '/');
-	    path = path.substring(0, path.lastIndexOf('/'));
+            String tagName = tagInfo.getTagClassName();
+            path = tagName.replace('.', File.separatorChar);
+            path = path.substring(0, path.lastIndexOf(File.separatorChar));
         } else {
-            path = getServletPackageName().replace('.', '/');
-	}
+            path = getServletPackageName().replace('.',File.separatorChar);
+        }
 
             // Append servlet or tag handler path to scratch dir
             try {
-                baseUrl = options.getScratchDir().toURL();
-                String outUrlString = baseUrl.toString() + '/' + path;
-                URL outUrl = new URL(outUrlString);
-                outputDir = outUrl.getFile() + File.separator;
+                File base = options.getScratchDir();
+                baseUrl = base.toURI().toURL();
+                outputDir = base.getAbsolutePath() + File.separator + path + 
+                    File.separator;
                 if (!makeOutputDir()) {
                     throw new IllegalStateException(Localizer.getMessage("jsp.error.outputfolder"));
                 }
