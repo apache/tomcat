@@ -121,7 +121,7 @@ public final class ClassLoaderFactory {
                 if (!file.exists() || !file.canRead())
                     continue;
                 file = new File(file.getCanonicalPath() + File.separator);
-                URL url = file.toURL();
+                URL url = file.toURI().toURL();
                 if (log.isDebugEnabled())
                     log.debug("  Including directory " + url);
                 list.add(url);
@@ -143,7 +143,7 @@ public final class ClassLoaderFactory {
                     File file = new File(directory, filenames[j]);
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + file.getAbsolutePath());
-                    URL url = file.toURL();
+                    URL url = file.toURI().toURL();
                     list.add(url);
                 }
             }
@@ -201,7 +201,7 @@ public final class ClassLoaderFactory {
                     if (!directory.exists() || !directory.isDirectory() ||
                         !directory.canRead())
                          continue;
-                    URL url = directory.toURL();
+                    URL url = directory.toURI().toURL();
                     if (log.isDebugEnabled())
                         log.debug("  Including directory " + url);
                     list.add(url);
@@ -210,7 +210,7 @@ public final class ClassLoaderFactory {
                     file = new File(file.getCanonicalPath());
                     if (!file.exists() || !file.canRead())
                         continue;
-                    URL url = file.toURL();
+                    URL url = file.toURI().toURL();
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + url);
                     list.add(url);
@@ -234,7 +234,7 @@ public final class ClassLoaderFactory {
                         if (log.isDebugEnabled())
                             log.debug("    Including glob jar file "
                                 + file.getAbsolutePath());
-                        URL url = file.toURL();
+                        URL url = file.toURI().toURL();
                         list.add(url);
                     }
                 }
