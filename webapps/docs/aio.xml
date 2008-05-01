@@ -327,10 +327,11 @@ public class ChatServlet
   
   <p>
     Any servlet can instruct Tomcat to perform a sendfile call by setting the appropriate
-    response attributes. When using sendfile, it is best to ensure that neither the
+    request attributes. It is also necessary to correctly set the content length
+    for the response. When using sendfile, it is best to ensure that neither the
     request or response have been wrapped, since as the response body will be sent later
     by the connector itself, it cannot be filtered. Other than setting the 3 needed 
-    response attributes, the servlet should not send any response data, but it may use
+    request attributes, the servlet should not send any response data, but it may use
     any method which will result in modifying the response header (like setting cookies).
   </p>
   
@@ -338,7 +339,7 @@ public class ChatServlet
   <li>org.apache.tomcat.sendfile.filename: Canonical filename of the file which will be sent as
       a String</li>
   <li>org.apache.tomcat.sendfile.start: Start offset as a Long</li>
-  <li>org.apache.tomcat.sendfile.start: End offset as a Long</li>
+  <li>org.apache.tomcat.sendfile.end: End offset as a Long</li>
   </ul>
 
   </section>
