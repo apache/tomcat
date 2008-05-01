@@ -701,7 +701,7 @@ public class HostConfig
             if (files[i].equalsIgnoreCase("WEB-INF"))
                 continue;
             File dir = new File(appBase, files[i]);
-            if (files[i].toLowerCase().endsWith(".war")) {
+            if (files[i].toLowerCase().endsWith(".war") && dir.isFile()) {
                 
                 // Calculate the context path and make sure it is unique
                 String contextPath = "/" + files[i];
