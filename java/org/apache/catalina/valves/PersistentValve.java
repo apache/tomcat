@@ -30,16 +30,18 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Store;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.session.PersistentManager;
 import org.apache.catalina.util.StringManager;
 
 
 /**
- * Valve that implements the default basic behavior for the
- * <code>StandardHost</code> container implementation.
+ * Valve that implements per-request session persistence. It is intended to be
+ * used with non-sticky load-balancers.
  * <p>
  * <b>USAGE CONSTRAINT</b>: To work correctly it requires a  PersistentManager.
+ * <p>
+ * <b>USAGE CONSTRAINT</b>: To work correctly it assumes only one request exists
+ *                              per session at any one time.
  *
  * @author Jean-Frederic Clere
  * @version $Revision$ $Date$
@@ -97,7 +99,6 @@ public class PersistentValve
         throws IOException, ServletException {
 
         // Select the Context to be used for this Request
-        StandardHost host = (StandardHost) getContainer();
         Context context = request.getContext();
         if (context == null) {
             response.sendError
