@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <classpath>
-	<classpathentry excluding="**/.svn/**" kind="src" path="java"/>
+        <classpathentry excluding="**/.svn/**|org/apache/naming/factory/webservices/" kind="src" path="java"/>
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
