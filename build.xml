@@ -72,6 +72,8 @@
   <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+  <available property="tomcat-dbcp-present" file="${tomcat-dbcp.jar}" />
+  <available property="jdk16.present" classname="javax.sql.StatementEvent" />
 
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -398,8 +400,14 @@
           <param name="relative-path" expression=".."/>
     </xslt>
   </target>
-
-  <target name="deploy" depends="build-only,build-docs">
+ 
+  <target name="warn.dbcp" unless="tomcat-dbcp.present">
+    <echo>WARNING: tomcat-dbcp.jar not included, this build can't be used
+    in a release. Please run 'ant download' with JDK1.5 if you are 
+    building a tomcat release.</echo>
+  </target>
+  
+  <target name="deploy" depends="build-only,build-docs,warn.dbcp">
 
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
             file="${tomcat-native.tar.gz}" />
@@ -532,7 +540,8 @@
       </fileset>
     </txt2html>
 
-    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" />
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" 
+      failonerror="false"/>
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
 
   </target>
@@ -637,7 +646,7 @@
 
   </target>
 
-  <target name="build-tomcat-dbcp">
+  <target name="build-tomcat-dbcp" unless="jdk16.present">
     <copy todir="${tomcat-dbcp.home}">
     <!--
       <fileset dir="${commons-collections.home}" >
