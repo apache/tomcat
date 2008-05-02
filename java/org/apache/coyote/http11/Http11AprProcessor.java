@@ -470,7 +470,7 @@ public class Http11AprProcessor implements ActionHook {
      */
     protected void addFilter(String className) {
         try {
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             Object obj = clazz.newInstance();
             if (obj instanceof InputFilter) {
                 inputBuffer.addFilter((InputFilter) obj);
@@ -526,22 +526,6 @@ public class Http11AprProcessor implements ActionHook {
             result[rArray.length] = value;
         }
         return result;
-    }
-
-
-    /**
-     * General use method
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private boolean inStringArray(String sArray[], String value) {
-        for (int i = 0; i < sArray.length; i++) {
-            if (sArray[i].equals(value)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -1144,9 +1128,8 @@ public class Http11AprProcessor implements ActionHook {
                     }
                     // User key size
                     sslO = new Integer(SSLSocket.getInfoI(socket, SSL.SSL_INFO_CIPHER_USEKEYSIZE));
-                    if (sslO != null) {
-                        request.setAttribute(AprEndpoint.KEY_SIZE_KEY, sslO);
-                    }
+                    request.setAttribute(AprEndpoint.KEY_SIZE_KEY, sslO);
+
                     // SSL session ID
                     sslO = SSLSocket.getInfoS(socket, SSL.SSL_INFO_SESSION_ID);
                     if (sslO != null) {
@@ -1474,7 +1457,7 @@ public class Http11AprProcessor implements ActionHook {
             int port = 0;
             int mult = 1;
             for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.DEC[(int) valueB[i + valueS]];
+                int charValue = HexUtils.DEC[valueB[i + valueS]];
                 if (charValue == -1) {
                     // Invalid character
                     error = true;
