@@ -460,7 +460,7 @@ public class Http11Processor implements ActionHook {
      */
     protected void addFilter(String className) {
         try {
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             Object obj = clazz.newInstance();
             if (obj instanceof InputFilter) {
                 inputBuffer.addFilter((InputFilter) obj);
@@ -516,22 +516,6 @@ public class Http11Processor implements ActionHook {
             result[rArray.length] = value;
         }
         return result;
-    }
-
-
-    /**
-     * General use method
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private boolean inStringArray(String sArray[], String value) {
-        for (int i = 0; i < sArray.length; i++) {
-            if (sArray[i].equals(value)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -1386,7 +1370,7 @@ public class Http11Processor implements ActionHook {
             int port = 0;
             int mult = 1;
             for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.DEC[(int) valueB[i + valueS]];
+                int charValue = HexUtils.DEC[valueB[i + valueS]];
                 if (charValue == -1) {
                     // Invalid character
                     error = true;
@@ -1555,9 +1539,9 @@ public class Http11Processor implements ActionHook {
         // Add date header
         String date = null;
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
-            date = (String)AccessController.doPrivileged(
-                    new PrivilegedAction() {
-                        public Object run(){
+            date = AccessController.doPrivileged(
+                    new PrivilegedAction<String>() {
+                        public String run(){
                             return FastHttpDateFormat.getCurrentDate();
                         }
                     }

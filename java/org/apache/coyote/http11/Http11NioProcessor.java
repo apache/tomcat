@@ -89,7 +89,6 @@ public class Http11NioProcessor implements ActionHook {
         this.endpoint = endpoint;
 
         request = new Request();
-        int readTimeout = endpoint.getSoTimeout();
         inputBuffer = new InternalNioInputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(inputBuffer);
 
@@ -478,7 +477,7 @@ public class Http11NioProcessor implements ActionHook {
      */
     protected void addFilter(String className) {
         try {
-            Class clazz = Class.forName(className);
+            Class<?> clazz = Class.forName(className);
             Object obj = clazz.newInstance();
             if (obj instanceof InputFilter) {
                 inputBuffer.addFilter((InputFilter) obj);
@@ -534,22 +533,6 @@ public class Http11NioProcessor implements ActionHook {
             result[rArray.length] = value;
         }
         return result;
-    }
-
-
-    /**
-     * General use method
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private boolean inStringArray(String sArray[], String value) {
-        for (int i = 0; i < sArray.length; i++) {
-            if (sArray[i].equals(value)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 
@@ -811,8 +794,6 @@ public class Http11NioProcessor implements ActionHook {
         int keepAliveLeft = maxKeepAliveRequests;
         long soTimeout = endpoint.getSoTimeout();
 
-        int limit = 0;
-
         boolean keptAlive = false;
         boolean openSocket = false;
         boolean recycle = true;
@@ -840,7 +821,7 @@ public class Http11NioProcessor implements ActionHook {
                 }
                 request.setStartTime(System.currentTimeMillis());
                 if (!disableUploadTimeout) { //only for body, not for request headers
-                    socket.getIOChannel().socket().setSoTimeout((int)timeout);
+                    socket.getIOChannel().socket().setSoTimeout(timeout);
                 }
             } catch (IOException e) {
                 if (log.isDebugEnabled()) {
@@ -1507,7 +1488,7 @@ public class Http11NioProcessor implements ActionHook {
             int port = 0;
             int mult = 1;
             for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.DEC[(int) valueB[i + valueS]];
+                int charValue = HexUtils.DEC[valueB[i + valueS]];
                 if (charValue == -1) {
                     // Invalid character
                     error = true;
