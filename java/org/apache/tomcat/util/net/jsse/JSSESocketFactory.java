@@ -310,7 +310,7 @@ public class JSSESocketFactory
         InputStream istream = null;
         try {
             ks = KeyStore.getInstance(type);
-            if(! "PKCS11".equalsIgnoreCase(type) ) {
+            if(!("PKCS11".equalsIgnoreCase(type) || "".equalsIgnoreCase(path))) {
                 File keyStoreFile = new File(path);
                 if (!keyStoreFile.isAbsolute()) {
                     keyStoreFile = new File(System.getProperty("catalina.base"),
