@@ -4954,7 +4954,7 @@ public class StandardContext
 
         // Acquire (or calculate) the work directory path
         String workDir = getWorkDir();
-        if (workDir == null) {
+        if (workDir == null || workDir.length() == 0) {
 
             // Retrieve our parent (normally a host) name
             String hostName = null;
