@@ -5202,8 +5202,7 @@ public class StandardContext
             // Temporary - /admin uses the old names
             return name;
         }
-        ObjectName result=super.preRegister(server,name);
-        return name;
+        return super.preRegister(server,name);
     }
 
     public void preDeregister() throws Exception {
