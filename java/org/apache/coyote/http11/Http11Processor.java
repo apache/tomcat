@@ -432,6 +432,7 @@ public class Http11Processor implements ActionHook {
      */
     public void setCompressableMimeTypes(String compressableMimeTypes) {
         if (compressableMimeTypes != null) {
+            this.compressableMimeTypes = null;
             StringTokenizer st = new StringTokenizer(compressableMimeTypes, ",");
 
             while (st.hasMoreTokens()) {
