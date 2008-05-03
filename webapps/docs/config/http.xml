@@ -655,7 +655,9 @@
       <p>The pathname of the keystore file where you have stored the
       server certificate to be loaded.  By default, the pathname is
       the file "<code>.keystore</code>" in the operating system home
-      directory of the user that is running Tomcat.</p>
+      directory of the user that is running Tomcat. If your
+      <code>keystoreType</code> doesn't need a file use <code>""</code>
+      (empty string) for this parameter.</p>
     </attribute>
 
     <attribute name="keystorePass" required="false">
