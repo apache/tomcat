@@ -72,7 +72,7 @@
   <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
-  <available property="tomcat-dbcp-present" file="${tomcat-dbcp.jar}" />
+  <available property="tomcat-dbcp.present" file="${tomcat-dbcp.jar}" />
   <available property="jdk16.present" classname="javax.sql.StatementEvent" />
 
   <!-- Classpath -->
