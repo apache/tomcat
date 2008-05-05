@@ -873,9 +873,13 @@ public class ContextConfig
         String contextPath = context.getPath();
         if (contextPath.equals("")) {
             contextPath = "ROOT";
+        } else {
+            if (contextPath.lastIndexOf('/') > 0) {
+                contextPath = "/" + contextPath.substring(1).replace('/','#');
+            }
         }
         if (docBase.toLowerCase().endsWith(".war") && !file.isDirectory() && unpackWARs) {
-            URL war = new URL("jar:" + (new File(docBase)).toURL() + "!/");
+            URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
             docBase = ExpandWar.expand(host, war, contextPath);
             file = new File(docBase);
             docBase = file.getCanonicalPath();
@@ -888,7 +892,8 @@ public class ContextConfig
                 File warFile = new File(docBase + ".war");
                 if (warFile.exists()) {
                     if (unpackWARs) {
-                        URL war = new URL("jar:" + warFile.toURL() + "!/");
+                        URL war =
+                            new URL("jar:" + warFile.toURI().toURL() + "!/");
                         docBase = ExpandWar.expand(host, war, contextPath);
                         file = new File(docBase);
                         docBase = file.getCanonicalPath();
