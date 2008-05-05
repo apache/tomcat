@@ -122,14 +122,15 @@ public class HostConfig
     /**
      * Map of deployed applications.
      */
-    protected HashMap deployed = new HashMap();
+    protected HashMap<String, DeployedApplication> deployed =
+        new HashMap<String, DeployedApplication>();
 
     
     /**
      * List of applications which are being serviced, and shouldn't be 
      * deployed/undeployed/redeployed at the moment.
      */
-    protected ArrayList serviced = new ArrayList();
+    protected ArrayList<String> serviced = new ArrayList<String>();
     
 
     /**
@@ -346,7 +347,7 @@ public class HostConfig
      * on which the application was deployed
      */
     public long getDeploymentTime(String name) {
-    	DeployedApplication app = (DeployedApplication) deployed.get(name);
+    	DeployedApplication app = deployed.get(name);
     	if (app == null) {
     		return 0L;
     	} else {
@@ -363,7 +364,7 @@ public class HostConfig
      * exist
      */
     public boolean isDeployed(String name) {
-        DeployedApplication app = (DeployedApplication) deployed.get(name);
+        DeployedApplication app = deployed.get(name);
         if (app == null) {
             return false;
         } else {
@@ -591,7 +592,7 @@ public class HostConfig
                 }
             }
             if (context instanceof Lifecycle) {
-                Class clazz = Class.forName(host.getConfigClass());
+                Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
                     (LifecycleListener) clazz.newInstance();
                 ((Lifecycle) context).addLifecycleListener(listener);
@@ -777,7 +778,7 @@ public class HostConfig
                     try {
                         ostream.close();
                     } catch (Throwable t) {
-                        ;
+                        // Ignore
                     }
                     ostream = null;
                 }
@@ -785,7 +786,7 @@ public class HostConfig
                     try {
                         istream.close();
                     } catch (Throwable t) {
-                        ;
+                        // Ignore
                     }
                     istream = null;
                 }
@@ -795,7 +796,7 @@ public class HostConfig
                     try {
                         jar.close();
                     } catch (Throwable t) {
-                        ;
+                        // Ignore
                     }
                     jar = null;
                 }
@@ -815,7 +816,7 @@ public class HostConfig
         try {
             Context context = (Context) Class.forName(contextClass).newInstance();
             if (context instanceof Lifecycle) {
-                Class clazz = Class.forName(host.getConfigClass());
+                Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
                     (LifecycleListener) clazz.newInstance();
                 ((Lifecycle) context).addLifecycleListener(listener);
@@ -911,7 +912,7 @@ public class HostConfig
         try {
             Context context = (Context) Class.forName(contextClass).newInstance();
             if (context instanceof Lifecycle) {
-                Class clazz = Class.forName(host.getConfigClass());
+                Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
                     (LifecycleListener) clazz.newInstance();
                 ((Lifecycle) context).addLifecycleListener(listener);
@@ -988,13 +989,15 @@ public class HostConfig
      * Check resources for redeployment and reloading.
      */
     protected synchronized void checkResources(DeployedApplication app) {
-        String[] resources = (String[]) app.redeployResources.keySet().toArray(new String[0]);
+        String[] resources =
+            app.redeployResources.keySet().toArray(new String[0]);
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
             if (log.isDebugEnabled())
                 log.debug("Checking context[" + app.name + "] redeploy resource " + resource);
             if (resource.exists()) {
-                long lastModified = ((Long) app.redeployResources.get(resources[i])).longValue();
+                long lastModified =
+                    app.redeployResources.get(resources[i]).longValue();
                 if ((!resource.isDirectory()) && resource.lastModified() > lastModified) {
                     // Undeploy application
                     if (log.isInfoEnabled())
@@ -1032,7 +1035,8 @@ public class HostConfig
                     return;
                 }
             } else {
-                long lastModified = ((Long) app.redeployResources.get(resources[i])).longValue();
+                long lastModified =
+                    app.redeployResources.get(resources[i]).longValue();
                 if (lastModified == 0L) {
                     continue;
                 }
@@ -1069,7 +1073,8 @@ public class HostConfig
                     }
                 }
                 // Delete reload resources as well (to remove any remaining .xml descriptor)
-                String[] resources2 = (String[]) app.reloadResources.keySet().toArray(new String[0]);
+                String[] resources2 =
+                    app.reloadResources.keySet().toArray(new String[0]);
                 for (int j = 0; j < resources2.length; j++) {
                     try {
                         File current = new File(resources2[j]);
@@ -1090,12 +1095,12 @@ public class HostConfig
                 return;
             }
         }
-        resources = (String[]) app.reloadResources.keySet().toArray(new String[0]);
+        resources = app.reloadResources.keySet().toArray(new String[0]);
         for (int i = 0; i < resources.length; i++) {
             File resource = new File(resources[i]);
             if (log.isDebugEnabled())
                 log.debug("Checking context[" + app.name + "] reload resource " + resource);
-            long lastModified = ((Long) app.reloadResources.get(resources[i])).longValue();
+            long lastModified = app.reloadResources.get(resources[i]).longValue();
             if ((!resource.exists() && lastModified != 0L) 
                 || (resource.lastModified() != lastModified)) {
                 // Reload application
@@ -1182,8 +1187,8 @@ public class HostConfig
             log.debug(sm.getString("hostConfig.undeploying"));
 
         // Soft undeploy all contexts we have deployed
-        DeployedApplication[] apps = 
-            (DeployedApplication[]) deployed.values().toArray(new DeployedApplication[0]);
+        DeployedApplication[] apps =
+            deployed.values().toArray(new DeployedApplication[0]);
         for (int i = 0; i < apps.length; i++) {
             try {
                 host.removeChild(host.findChild(apps[i].name));
@@ -1206,7 +1211,7 @@ public class HostConfig
         if (host.getAutoDeploy()) {
             // Check for resources modification to trigger redeployment
             DeployedApplication[] apps = 
-                (DeployedApplication[]) deployed.values().toArray(new DeployedApplication[0]);
+                deployed.values().toArray(new DeployedApplication[0]);
             for (int i = 0; i < apps.length; i++) {
                 if (!isServiced(apps[i].name))
                     checkResources(apps[i]);
@@ -1222,7 +1227,7 @@ public class HostConfig
      * Check status of a specific webapp, for use with stuff like management webapps.
      */
     public void check(String name) {
-        DeployedApplication app = (DeployedApplication) deployed.get(name);
+        DeployedApplication app = deployed.get(name);
         if (app != null) {
             checkResources(app);
         } else {
@@ -1320,7 +1325,8 @@ public class HostConfig
     	 * contain resources like the context.xml file, a compressed WAR path.
          * The value is the last modification time.
     	 */
-    	public LinkedHashMap redeployResources = new LinkedHashMap();
+    	public LinkedHashMap<String, Long> redeployResources =
+    	    new LinkedHashMap<String, Long>();
 
     	/**
     	 * Any modification of the specified (static) resources will cause a 
@@ -1329,7 +1335,8 @@ public class HostConfig
     	 * additional descriptors.
          * The value is the last modification time.
     	 */
-    	public HashMap reloadResources = new HashMap();
+    	public HashMap<String, Long> reloadResources =
+    	    new HashMap<String, Long>();
 
     	/**
     	 * Instant where the application was last put in service.
