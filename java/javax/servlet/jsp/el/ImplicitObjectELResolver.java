@@ -320,8 +320,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                             while (e.hasMoreElements()) {
                                 list.add(e.nextElement().toString());
                             }
-                            return (String[]) list.toArray(new String[list
-                                    .size()]);
+                            return list.toArray(new String[list.size()]);
                         }
                         return null;
                     }
@@ -497,7 +496,7 @@ public class ImplicitObjectELResolver extends ELResolver {
             }
 
             public Object getKey() {
-                return (Object) this.key;
+                return this.key;
             }
 
             public Object getValue() {
