@@ -19,7 +19,6 @@ package javax.servlet.jsp.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -182,12 +181,6 @@ public class ScopedAttributeELResolver extends ELResolver {
 			list.add(descriptor);
 		}
 		return list.iterator();
-	}
-
-	private static void appendEnumeration(Collection c, Enumeration e) {
-		while (e.hasMoreElements()) {
-			c.add(e.nextElement());
-		}
 	}
 
 	public Class<String> getCommonPropertyType(ELContext context, Object base) {
