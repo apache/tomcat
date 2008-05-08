@@ -96,12 +96,10 @@ ${StrRep}
     LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core."
     LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start Tomcat when the computer is started. This requires Windows NT 4.0, Windows 2000 or Windows XP."
     LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Downloads and installs APR based Tomcat native .dll for better performance and scalability in production environments."
-;    LangString DESC_SecTomcatSource ${LANG_ENGLISH} "Install the Tomcat source code."
     LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
     LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This include documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
     LangString DESC_SecExamples ${LANG_ENGLISH} "Installs some examples web applications."
     LangString DESC_SecAdmin ${LANG_ENGLISH} "Installs the administration web application.";
-;    LangString DESC_SecWebapps ${LANG_ENGLISH} "Installs other utility web applications (WebDAV, balancer, etc)."
 
   ;Language
   !insertmacro MUI_LANGUAGE English
@@ -226,14 +224,6 @@ Section "Native" SecTomcatNative
 
 SectionEnd
 
-;Section "Source Code" SecTomcatSource
-;
-;  SectionIn 3
-;  SetOutPath $INSTDIR
-;  File /r src
-;
-;SectionEnd
-
 SubSectionEnd
 
 Section "Start Menu Items" SecMenu
@@ -249,12 +239,6 @@ Section "Start Menu Items" SecMenu
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Welcome.lnk" \
                  "http://127.0.0.1:$R0/"
-
-;  IfFileExists "$INSTDIR\webapps\admin" 0 NoAdminApp
-;
-;  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Tomcat Administration.lnk" \
-;                 "http://127.0.0.1:$R0/admin/"
-;NoAdminApp:
 
   IfFileExists "$INSTDIR\webapps\manager" 0 NoManagerApp
 
@@ -305,36 +289,6 @@ Section "Examples" SecExamples
   File /r webapps\examples\*.*
 
 SectionEnd
-
-;Section "Administration" SecAdmin
-;
-;  SectionIn 3
-;
-;  SetOutPath $INSTDIR\webapps
-;  File /r webapps\admin
-;  SetOutPath $INSTDIR\conf\Catalina\localhost
-;  File conf\Catalina\localhost\admin.xml
-;
-;SectionEnd
-
-;Section "Webapps" SecWebapps
-;
-;  SectionIn 3
-;
-;  SetOutPath $INSTDIR\webapps
-;  File /nonfatal /r webapps\balancer
-;  File /nonfatal /r webapps\webdav
-;
-;SectionEnd
-
-;Section "Compatibility" SecCompat
-;
-;  SetOutPath $INSTDIR
-;  File /oname=bin\jmx.jar ..\compat\bin\jmx.jar
-;  File /oname=common\endorsed\xercesImpl.jar ..\compat\common\endorsed\xercesImpl.jar
-;  File /oname=common\endorsed\xml-apis.jar  ..\compat\common\endorsed\xml-apis.jar
-;
-;SectionEnd
 
 Section -post
   nsExec::ExecToLog '"$INSTDIR\bin\tomcat6.exe" //US//Tomcat6 --Classpath "$INSTDIR\bin\bootstrap.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
@@ -434,19 +388,11 @@ FunctionEnd
 ;
 Function findJavaPath
 
-  ;ClearErrors
-
-  ;ReadEnvStr $1 JAVA_HOME
-
-  ;IfErrors 0 FoundJDK
-
   ClearErrors
 
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
   ReadRegStr $3 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "RuntimeLib"
-
-  ;FoundJDK:
 
   IfErrors 0 NoErrors
   StrCpy $1 ""
@@ -677,10 +623,8 @@ Section Uninstall
   RMDir /r "$INSTDIR\lib"
   Delete "$INSTDIR\conf\*.dtd"
   RMDir "$INSTDIR\logs"
-;  RMDir /r "$INSTDIR\webapps\balancer"
   RMDir /r "$INSTDIR\webapps\docs"
   RMDir /r "$INSTDIR\webapps\examples"
-;  RMDir /r "$INSTDIR\webapps\webdav"
   RMDir /r "$INSTDIR\work"
   RMDir /r "$INSTDIR\temp"
   RMDir "$INSTDIR"
