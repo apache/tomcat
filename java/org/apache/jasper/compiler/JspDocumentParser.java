@@ -278,8 +278,11 @@ class JspDocumentParser
             return;
         }
 
+        String currentPrefix = getPrefix(current.getQName());
+        
         // jsp:text must not have any subelements
-        if (JSP_URI.equals(uri) && TEXT_ACTION.equals(current.getLocalName())) {
+        if (JSP_URI.equals(uri) && TEXT_ACTION.equals(current.getLocalName())
+                && "jsp".equals(currentPrefix)) {
             throw new SAXParseException(
                 Localizer.getMessage("jsp.error.text.has_subelement"),
                 locator);
@@ -1175,11 +1178,7 @@ class JspDocumentParser
             }
         }
 
-        String prefix = "";
-        int colon = qName.indexOf(':');
-        if (colon != -1) {
-            prefix = qName.substring(0, colon);
-        }
+        String prefix = getPrefix(qName);
 
         Node.CustomTag ret = null;
         if (tagInfo != null) {
@@ -1366,14 +1365,21 @@ class JspDocumentParser
      */
     private void checkPrefix(String uri, String qName) {
 
-        int index = qName.indexOf(':');
-        if (index != -1) {
-            String prefix = qName.substring(0, index);
+        String prefix = getPrefix(qName);
+        if (prefix.length() > 0) {
             pageInfo.addPrefix(prefix);
             if ("jsp".equals(prefix) && !JSP_URI.equals(uri)) {
                 pageInfo.setIsJspPrefixHijacked(true);
             }
         }
+    }
+
+    private String getPrefix(String qName) {
+        int index = qName.indexOf(':');
+        if (index != -1) {
+            return qName.substring(0, index);
+        }
+        return "";
     }
 
     /*
