@@ -322,11 +322,12 @@ class Validator {
          * 
          * @throws JasperException in case of page encoding mismatch
          */
-        private String comparePageEncodings(String pageDirEnc,
+        private String comparePageEncodings(String thePageDirEnc,
                 Node.PageDirective pageDir) throws JasperException {
 
             Node.Root root = pageDir.getRoot();
-            String configEnc = root.getJspConfigPageEncoding();
+            String configEnc = root.getJspConfigPageEncoding().toUpperCase();
+            String pageDirEnc = thePageDirEnc.toUpperCase();
 
             /*
              * Compare the 'pageEncoding' attribute of the page directive with
@@ -354,7 +355,7 @@ class Validator {
              * identical.
              */
             if ((root.isXmlSyntax() && root.isEncodingSpecifiedInProlog()) || root.isBomPresent()) {
-                String pageEnc = root.getPageEncoding();
+                String pageEnc = root.getPageEncoding().toUpperCase();
                 if (!pageDirEnc.equals(pageEnc)
                         && (!pageDirEnc.startsWith("UTF-16") || !pageEnc
                                 .startsWith("UTF-16"))) {
