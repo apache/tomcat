@@ -193,8 +193,7 @@ public class NioBlockingSelector {
     protected class BlockPoller extends Thread {
         protected boolean run = true;
         protected Selector selector = null;
-        protected ConcurrentLinkedQueue<Runnable> events =
-            new ConcurrentLinkedQueue<Runnable>();
+        protected ConcurrentLinkedQueue<Runnable> events = new ConcurrentLinkedQueue<Runnable>();
         public void disable() { run = false; selector.wakeup();}
         protected AtomicInteger wakeupCounter = new AtomicInteger(0);
         public void cancelKey(final NioChannel socket, final SelectionKey key) {
@@ -232,6 +231,8 @@ public class NioBlockingSelector {
                     try {
                         if (sk == null) {
                             sk = ch.register(selector, ops, key);
+                        } else if (!sk.isValid()) {
+                        	cancel(sk,key,ops);
                         } else {
                             sk.interestOps(sk.interestOps() | ops);
                         }
@@ -260,12 +261,17 @@ public class NioBlockingSelector {
                             if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
                             if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
                         } else {
-                            sk.interestOps(sk.interestOps() & (~ops));
-                            if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
-                            if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
-                            if (sk.interestOps()==0) {
-                                sk.cancel();
-                                sk.attach(null);
+                            if (sk.isValid()) {
+                            	sk.interestOps(sk.interestOps() & (~ops));
+                            	if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
+                            	if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
+                            	if (sk.interestOps()==0) {
+                            		sk.cancel();
+                            		sk.attach(null);
+                            	}
+                            }else {
+                        		sk.cancel();
+                        		sk.attach(null);
                             }
                         }
                     }catch (CancelledKeyException cx) {
@@ -321,8 +327,7 @@ public class NioBlockingSelector {
                         continue;
                     }
 
-                    Iterator<SelectionKey> iterator =
-                        keyCount > 0 ? selector.selectedKeys().iterator() : null;
+                    Iterator<SelectionKey> iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
 
                     // Walk through the collection of ready keys and dispatch
                     // any active event.
