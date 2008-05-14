@@ -322,17 +322,17 @@ public class JSSESocketFactory
             ks.load(istream, pass.toCharArray());
         } catch (FileNotFoundException fnfe) {
             log.error(sm.getString("jsse.keystore_load_failed", type, path,
-                    fnfe.getMessage()));
+                    fnfe.getMessage()), fnfe);
             throw fnfe;
         } catch (IOException ioe) {
             log.error(sm.getString("jsse.keystore_load_failed", type, path,
-                    ioe.getMessage()));
+                    ioe.getMessage()), ioe);
             throw ioe;      
         } catch(Exception ex) {
             String msg = sm.getString("jsse.keystore_load_failed", type, path,
                     ex.getMessage());
-            log.error(msg);
-            throw new IOException(msg);
+            log.error(msg, ex);
+            throw new IOException(msg, ex);
         } finally {
             if (istream != null) {
                 try {
