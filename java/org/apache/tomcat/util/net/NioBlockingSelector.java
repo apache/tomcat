@@ -232,7 +232,7 @@ public class NioBlockingSelector {
                         if (sk == null) {
                             sk = ch.register(selector, ops, key);
                         } else if (!sk.isValid()) {
-                        	cancel(sk,key,ops);
+                            cancel(sk,key,ops);
                         } else {
                             sk.interestOps(sk.interestOps() | ops);
                         }
@@ -266,12 +266,12 @@ public class NioBlockingSelector {
                             	if (SelectionKey.OP_WRITE==(ops&SelectionKey.OP_WRITE)) countDown(key.getWriteLatch());
                             	if (SelectionKey.OP_READ==(ops&SelectionKey.OP_READ))countDown(key.getReadLatch());
                             	if (sk.interestOps()==0) {
-                            		sk.cancel();
-                            		sk.attach(null);
+                            	    sk.cancel();
+                            	    sk.attach(null);
                             	}
                             }else {
-                        		sk.cancel();
-                        		sk.attach(null);
+                                sk.cancel();
+                                sk.attach(null);
                             }
                         }
                     }catch (CancelledKeyException cx) {
