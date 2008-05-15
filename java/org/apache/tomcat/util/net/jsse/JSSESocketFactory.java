@@ -332,7 +332,7 @@ public class JSSESocketFactory
             String msg = sm.getString("jsse.keystore_load_failed", type, path,
                     ex.getMessage());
             log.error(msg, ex);
-            throw new IOException(msg, ex);
+            throw new IOException(msg);
         } finally {
             if (istream != null) {
                 try {
