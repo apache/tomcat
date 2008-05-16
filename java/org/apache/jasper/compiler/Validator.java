@@ -326,7 +326,7 @@ class Validator {
                 Node.PageDirective pageDir) throws JasperException {
 
             Node.Root root = pageDir.getRoot();
-            String configEnc = root.getJspConfigPageEncoding().toUpperCase();
+            String configEnc = root.getJspConfigPageEncoding();
             String pageDirEnc = thePageDirEnc.toUpperCase();
 
             /*
@@ -336,6 +336,7 @@ class Validator {
              * "UTF-16LE" as identical.
              */
             if (configEnc != null) {
+                configEnc = configEnc.toUpperCase();
                 if (!pageDirEnc.equals(configEnc)
                         && (!pageDirEnc.startsWith("UTF-16") || !configEnc
                                 .startsWith("UTF-16"))) {
