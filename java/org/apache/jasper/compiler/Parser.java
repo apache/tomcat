@@ -244,7 +244,8 @@ class Parser implements TagConstants {
             err.jspError(start, "jsp.error.attribute.unterminated", watch);
         }
 
-        String ret = parseQuoted(reader.getText(start, stop));
+        String ret = parseQuoted(start, reader.getText(start, stop),
+                watch.charAt(watch.length() - 1));
         if (watch.length() == 1) // quote
             return ret;
 
@@ -257,7 +258,8 @@ class Parser implements TagConstants {
      * QuotedChar ::= '&apos;' | '&quot;' | '\\' | '\"' | "\'" | '\>' | '\$' |
      * Char
      */
-    private String parseQuoted(String tx) {
+    private String parseQuoted(Mark start, String tx, char quote)
+            throws JasperException {
         StringBuffer buf = new StringBuffer();
         int size = tx.length();
         int i = 0;
@@ -291,6 +293,10 @@ class Parser implements TagConstants {
                     buf.append('\\');
                     ++i;
                 }
+            } else if (ch == quote) {
+                // Unescaped quote character
+                err.jspError(start, "jsp.error.attribute.noescape", tx,
+                        "" + quote);
             } else {
                 buf.append(ch);
                 ++i;
