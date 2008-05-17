@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.test;
 
-import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.util.Iterator;
 import java.nio.channels.Selector;
@@ -88,9 +87,9 @@ public class TestNioSender {
                 continue;
             }
 
-            Iterator it = selector.selectedKeys().iterator();
+            Iterator<SelectionKey> it = selector.selectedKeys().iterator();
             while (it.hasNext()) {
-                SelectionKey sk = (SelectionKey) it.next();
+                SelectionKey sk = it.next();
                 it.remove();
                 try {
                     int readyOps = sk.readyOps();
@@ -98,7 +97,7 @@ public class TestNioSender {
                     NioSender sender = (NioSender) sk.attachment();
                     if ( sender.process(sk, (testOptions&Channel.SEND_OPTIONS_USE_ACK)==Channel.SEND_OPTIONS_USE_ACK) ) {
                         System.out.println("Message completed for handler:"+sender);
-                        Thread.currentThread().sleep(2000);
+                        Thread.sleep(2000);
                         sender.reset();
                         sender.setMessage(XByteBuffer.createDataPackage(getMessage(mbr)));
                     }

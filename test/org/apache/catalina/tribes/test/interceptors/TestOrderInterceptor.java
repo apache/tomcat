@@ -19,8 +19,6 @@ package org.apache.catalina.tribes.test.interceptors;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator;
-import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import junit.framework.TestCase;
 import junit.framework.TestResult;
 import junit.framework.TestSuite;

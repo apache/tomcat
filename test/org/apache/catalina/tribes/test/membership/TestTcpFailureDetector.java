@@ -69,11 +69,11 @@ public class TestTcpFailureDetector extends TestCase {
     public void testTcpSendFailureMemberDrop() throws Exception {
         System.out.println("testTcpSendFailureMemberDrop()");
         clear();
-        channel1.start(channel1.DEFAULT);
-        channel2.start(channel2.DEFAULT);
+        channel1.start(Channel.DEFAULT);
+        channel2.start(Channel.DEFAULT);
         //Thread.sleep(1000);
         assertEquals("Expecting member count to be equal",mbrlist1.members.size(),mbrlist2.members.size());
-        channel2.stop(channel2.SND_RX_SEQ);
+        channel2.stop(Channel.SND_RX_SEQ);
         ByteMessage msg = new ByteMessage(new byte[1024]);
         try {
             channel1.send(channel1.getMembers(), msg, 0);
@@ -89,12 +89,12 @@ public class TestTcpFailureDetector extends TestCase {
     public void testTcpFailureMemberAdd() throws Exception {
         System.out.println("testTcpFailureMemberAdd()");
         clear();
-        channel1.start(channel1.DEFAULT);
-        channel2.start(channel2.SND_RX_SEQ);
-        channel2.start(channel2.SND_TX_SEQ);
-        channel2.start(channel2.MBR_RX_SEQ);
-        channel2.stop(channel2.SND_RX_SEQ);
-        channel2.start(channel2.MBR_TX_SEQ);
+        channel1.start(Channel.DEFAULT);
+        channel2.start(Channel.SND_RX_SEQ);
+        channel2.start(Channel.SND_TX_SEQ);
+        channel2.start(Channel.MBR_RX_SEQ);
+        channel2.stop(Channel.SND_RX_SEQ);
+        channel2.start(Channel.MBR_TX_SEQ);
         //Thread.sleep(1000);
         assertEquals("Expecting member count to not be equal",mbrlist1.members.size()+1,mbrlist2.members.size());
         channel1.stop(Channel.DEFAULT);
@@ -104,11 +104,11 @@ public class TestTcpFailureDetector extends TestCase {
     public void testTcpMcastFail() throws Exception {
         System.out.println("testTcpMcastFail()");
         clear();
-        channel1.start(channel1.DEFAULT);
-        channel2.start(channel2.DEFAULT);
+        channel1.start(Channel.DEFAULT);
+        channel2.start(Channel.DEFAULT);
         //Thread.sleep(1000);
         assertEquals("Expecting member count to be equal",mbrlist1.members.size(),mbrlist2.members.size());
-        channel2.stop(channel2.MBR_TX_SEQ);
+        channel2.stop(Channel.MBR_TX_SEQ);
         ByteMessage msg = new ByteMessage(new byte[1024]);
         try {
             Thread.sleep(5000);
@@ -137,7 +137,7 @@ public class TestTcpFailureDetector extends TestCase {
         public TestMbrListener(String name) {
             this.name = name;
         }
-        public ArrayList members = new ArrayList();
+        public ArrayList<Member> members = new ArrayList<Member>();
         public void memberAdded(Member member) {
             if ( !members.contains(member) ) {
                 members.add(member);

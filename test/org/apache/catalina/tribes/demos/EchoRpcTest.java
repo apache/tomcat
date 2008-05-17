@@ -91,7 +91,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
             try {
                 System.out.println("Sending ["+msg+"]");
                 long start = System.currentTimeMillis();
-                Response[] resp = rpc.send(channel.getMembers(),(Serializable)msg,options,Channel.SEND_OPTIONS_DEFAULT,timeout);
+                Response[] resp = rpc.send(channel.getMembers(),msg,options,Channel.SEND_OPTIONS_DEFAULT,timeout);
                 System.out.println("Send of ["+msg+"] completed. Nr of responses="+resp.length+" Time:"+(System.currentTimeMillis()-start)+" ms.");
                 for ( int i=0; i<resp.length; i++ ) {
                     System.out.println("Received a response message from ["+resp[i].getSource().getName()+"] with data ["+resp[i].getMessage()+"]");
@@ -124,14 +124,10 @@ public class EchoRpcTest implements RpcCallback, Runnable {
         }
     
         public static void main(String[] args) throws Exception {
-            boolean send = true;
-            boolean debug = false;
             long pause = 3000;
             int count = 1000000;
             int stats = 10000;
             String name = "EchoRpcId";
-            boolean breakOnEx = false;
-            int threads = 1;
             int options = RpcChannel.ALL_REPLY;
             long timeout = 15000;
             String message = "EchoRpcMessage";
@@ -140,14 +136,14 @@ public class EchoRpcTest implements RpcCallback, Runnable {
             }
             for (int i = 0; i < args.length; i++) {
                 if ("-threads".equals(args[i])) {
-                    threads = Integer.parseInt(args[++i]);
+                    // Not used
                 } else if ("-count".equals(args[i])) {
                     count = Integer.parseInt(args[++i]);
                     System.out.println("Sending "+count+" messages.");
                 } else if ("-pause".equals(args[i])) {
                     pause = Long.parseLong(args[++i])*1000;
                 } else if ("-break".equals(args[i])) {
-                    breakOnEx = true;
+                    // Not used
                 } else if ("-stats".equals(args[i])) {
                     stats = Integer.parseInt(args[++i]);
                     System.out.println("Stats every "+stats+" message");
@@ -162,7 +158,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                     else if ( "first".equals(args[i]) ) options = RpcChannel.FIRST_REPLY;
                     else if ( "majority".equals(args[i]) ) options = RpcChannel.MAJORITY_REPLY;
                 } else if ("-debug".equals(args[i])) {
-                    debug = true;
+                    // Not used
                 } else if ("-help".equals(args[i])) 
                 {
                     usage();
@@ -173,7 +169,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
     
             ManagedChannel channel = (ManagedChannel)ChannelCreator.createChannel(args);
             EchoRpcTest test = new EchoRpcTest(channel,name,count,message,pause,options,timeout);
-            channel.start(channel.DEFAULT);
+            channel.start(Channel.DEFAULT);
             Runtime.getRuntime().addShutdownHook(new Shutdown(channel));
             test.run();
     
@@ -193,7 +189,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                 exit.setDaemon(true);
                 exit.start();
                 try {
-                    channel.stop(channel.DEFAULT);
+                    channel.stop(Channel.DEFAULT);
     
                 }catch ( Exception x ) {
                     x.printStackTrace();
