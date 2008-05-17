@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
 import junit.framework.TestCase;
 import org.apache.catalina.tribes.ChannelListener;
@@ -95,12 +94,13 @@ public class TestSenderConnections extends TestCase {
     
     public static class TestMsg implements Serializable {
         static Random r = new Random(System.currentTimeMillis());
-        HashMap map = new HashMap();
+        HashMap<Integer, ArrayList<Object>> map =
+            new HashMap<Integer, ArrayList<Object>>();
         public TestMsg() {
             int size = Math.abs(r.nextInt() % 200);
             for (int i=0; i<size; i++ ) {
                 int length = Math.abs(r.nextInt() %65000);
-                ArrayList list = new ArrayList(length);
+                ArrayList<Object> list = new ArrayList<Object>(length);
                 map.put(new Integer(i),list);
             }
         }
