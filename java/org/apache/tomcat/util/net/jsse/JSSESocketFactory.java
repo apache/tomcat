@@ -177,7 +177,8 @@ public class JSSESocketFactory
             if (index != -1) {
                 int fromIndex = 0;
                 while (index != -1) {
-                    cipher = requestedCiphers.substring(fromIndex, index).trim();
+                    cipher =
+                        requestedCiphers.substring(fromIndex, index).trim();
                     if (cipher.length() > 0) {
                         /*
                          * Check to see if the requested cipher is among the
@@ -265,23 +266,26 @@ public class JSSESocketFactory
     protected KeyStore getTrustStore(String keystoreType) throws IOException {
         KeyStore trustStore = null;
 
-        String trustStoreFile = (String)attributes.get("truststoreFile");
-        if(trustStoreFile == null) {
-            trustStoreFile = System.getProperty("javax.net.ssl.trustStore");
+        String truststoreFile = (String)attributes.get("truststoreFile");
+        if(truststoreFile == null) {
+            truststoreFile = System.getProperty("javax.net.ssl.trustStore");
         }
         if(log.isDebugEnabled()) {
-            log.debug("Truststore = " + trustStoreFile);
+            log.debug("Truststore = " + truststoreFile);
         }
-        String trustStorePassword = (String)attributes.get("truststorePass");
-        if( trustStorePassword == null) {
-            trustStorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
+
+        String truststorePassword = (String)attributes.get("truststorePass");
+        if( truststorePassword == null) {
+            truststorePassword =
+                System.getProperty("javax.net.ssl.trustStorePassword");
         }
-        if( trustStorePassword == null ) {
-            trustStorePassword = getKeystorePassword();
+        if( truststorePassword == null ) {
+            truststorePassword = getKeystorePassword();
         }
         if(log.isDebugEnabled()) {
-            log.debug("TrustPass = " + trustStorePassword);
+            log.debug("TrustPass = " + truststorePassword);
         }
+
         String truststoreType = (String)attributes.get("truststoreType");
         if( truststoreType == null) {
             truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
@@ -292,9 +296,10 @@ public class JSSESocketFactory
         if(log.isDebugEnabled()) {
             log.debug("trustType = " + truststoreType);
         }
-        if (trustStoreFile != null && trustStorePassword != null){
-            trustStore = getStore(truststoreType, trustStoreFile,
-                                  trustStorePassword);
+
+        if (truststoreFile != null && truststorePassword != null){
+            trustStore = getStore(truststoreType, truststoreFile,
+                                  truststorePassword);
         }
 
         return trustStore;
@@ -310,7 +315,8 @@ public class JSSESocketFactory
         InputStream istream = null;
         try {
             ks = KeyStore.getInstance(type);
-            if(!("PKCS11".equalsIgnoreCase(type) || "".equalsIgnoreCase(path))) {
+            if(!("PKCS11".equalsIgnoreCase(type) ||
+                    "".equalsIgnoreCase(path))) {
                 File keyStoreFile = new File(path);
                 if (!keyStoreFile.isAbsolute()) {
                     keyStoreFile = new File(System.getProperty("catalina.base"),
@@ -377,10 +383,12 @@ public class JSSESocketFactory
                 keystoreType = defaultKeystoreType;
             }
 
-        String trustAlgorithm = (String)attributes.get("truststoreAlgorithm");
-        if( trustAlgorithm == null ) {
-            trustAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
-        }
+            String trustAlgorithm =
+                (String)attributes.get("truststoreAlgorithm");
+            if( trustAlgorithm == null ) {
+                trustAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+            }
+
             // Create and init SSLContext
             SSLContext context = SSLContext.getInstance(protocol); 
             context.init(getKeyManagers(keystoreType, algorithm,
@@ -393,8 +401,9 @@ public class JSSESocketFactory
 
             // Determine which cipher suites to enable
             String requestedCiphers = (String)attributes.get("ciphers");
-            enabledCiphers = getEnabledCiphers(requestedCiphers,
-                                               sslProxy.getSupportedCipherSuites());
+            enabledCiphers =
+                getEnabledCiphers(requestedCiphers,
+                        sslProxy.getSupportedCipherSuites());
 
         } catch(Exception e) {
             if( e instanceof IOException )
@@ -417,7 +426,8 @@ public class JSSESocketFactory
 
         KeyStore ks = getKeystore(keystoreType, keystorePass);
         if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
-            throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
+            throw new IOException(
+                    sm.getString("jsse.alias_no_key_entry", keyAlias));
         }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
@@ -439,8 +449,8 @@ public class JSSESocketFactory
     /**
      * Gets the intialized trust managers.
      */
-    protected TrustManager[] getTrustManagers(String keystoreType, String algorithm)
-        throws Exception {
+    protected TrustManager[] getTrustManagers(String keystoreType,
+            String algorithm) throws Exception {
         String crlf = (String) attributes.get("crlFile");
         
         TrustManager[] tms = null;
@@ -452,13 +462,17 @@ public class JSSESocketFactory
         KeyStore trustStore = getTrustStore(truststoreType);
         if (trustStore != null) {
             if (crlf == null) {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
+                TrustManagerFactory tmf =
+                    TrustManagerFactory.getInstance(algorithm);
                 tmf.init(trustStore);
                 tms = tmf.getTrustManagers();
             } else {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
-                CertPathParameters params = getParameters(algorithm, crlf, trustStore);
-                ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
+                TrustManagerFactory tmf =
+                    TrustManagerFactory.getInstance(algorithm);
+                CertPathParameters params =
+                    getParameters(algorithm, crlf, trustStore);
+                ManagerFactoryParameters mfp =
+                    new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
                 tms = tmf.getTrustManagers();
             }
@@ -482,8 +496,8 @@ public class JSSESocketFactory
         throws Exception {
         CertPathParameters params = null;
         if("PKIX".equalsIgnoreCase(algorithm)) {
-            PKIXBuilderParameters xparams = new PKIXBuilderParameters(trustStore, 
-                                                                     new X509CertSelector());
+            PKIXBuilderParameters xparams =
+                new PKIXBuilderParameters(trustStore, new X509CertSelector());
             Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
@@ -545,7 +559,8 @@ public class JSSESocketFactory
      * @param socket the SSLServerSocket.
      * @param protocols the protocols to use.
      */
-    protected void setEnabledProtocols(SSLServerSocket socket, String []protocols){
+    protected void setEnabledProtocols(SSLServerSocket socket,
+            String []protocols){
         if (protocols != null) {
             socket.setEnabledProtocols(protocols);
         }
@@ -574,7 +589,8 @@ public class JSSESocketFactory
             if (index != -1) {
                 int fromIndex = 0;
                 while (index != -1) {
-                    protocol = requestedProtocols.substring(fromIndex, index).trim();
+                    protocol =
+                        requestedProtocols.substring(fromIndex, index).trim();
                     if (protocol.length() > 0) {
                         /*
                          * Check to see if the requested protocol is among the
