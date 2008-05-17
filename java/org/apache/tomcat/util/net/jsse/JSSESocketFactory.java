@@ -250,20 +250,21 @@ public class JSSESocketFactory
     /*
      * Gets the SSL server's keystore.
      */
-    protected KeyStore getKeystore(String type, String pass)
+    protected KeyStore getKeystore(String type, String provider, String pass)
             throws IOException {
 
         String keystoreFile = (String)attributes.get("keystore");
         if (keystoreFile == null)
             keystoreFile = defaultKeystoreFile;
 
-        return getStore(type, keystoreFile, pass);
+        return getStore(type, provider, keystoreFile, pass);
     }
 
     /*
      * Gets the SSL server's truststore.
      */
-    protected KeyStore getTrustStore(String keystoreType) throws IOException {
+    protected KeyStore getTrustStore(String keystoreType,
+            String keystoreProvider) throws IOException {
         KeyStore trustStore = null;
 
         String truststoreFile = (String)attributes.get("truststoreFile");
@@ -297,9 +298,22 @@ public class JSSESocketFactory
             log.debug("trustType = " + truststoreType);
         }
 
+        String truststoreProvider =
+            (String)attributes.get("truststoreProvider");
+        if( truststoreProvider == null) {
+            truststoreProvider =
+                System.getProperty("javax.net.ssl.trustStoreProvider");
+        }
+        if (truststoreProvider == null) {
+            truststoreProvider = keystoreProvider;
+        }
+        if(log.isDebugEnabled()) {
+            log.debug("trustProvider = " + truststoreProvider);
+        }
+
         if (truststoreFile != null && truststorePassword != null){
-            trustStore = getStore(truststoreType, truststoreFile,
-                                  truststorePassword);
+            trustStore = getStore(truststoreType, truststoreProvider,
+                    truststoreFile, truststorePassword);
         }
 
         return trustStore;
@@ -308,13 +322,17 @@ public class JSSESocketFactory
     /*
      * Gets the key- or truststore with the specified type, path, and password.
      */
-    private KeyStore getStore(String type, String path, String pass)
-            throws IOException {
+    private KeyStore getStore(String type, String provider, String path,
+            String pass) throws IOException {
 
         KeyStore ks = null;
         InputStream istream = null;
         try {
-            ks = KeyStore.getInstance(type);
+            if (provider == null) {
+                ks = KeyStore.getInstance(type);
+            } else {
+                ks = KeyStore.getInstance(type, provider);
+            }
             if(!("PKCS11".equalsIgnoreCase(type) ||
                     "".equalsIgnoreCase(path))) {
                 File keyStoreFile = new File(path);
@@ -383,6 +401,9 @@ public class JSSESocketFactory
                 keystoreType = defaultKeystoreType;
             }
 
+            String keystoreProvider =
+                (String) attributes.get("keystoreProvider");
+
             String trustAlgorithm =
                 (String)attributes.get("truststoreAlgorithm");
             if( trustAlgorithm == null ) {
@@ -391,9 +412,11 @@ public class JSSESocketFactory
 
             // Create and init SSLContext
             SSLContext context = SSLContext.getInstance(protocol); 
-            context.init(getKeyManagers(keystoreType, algorithm,
-                                        (String) attributes.get("keyAlias")),
-                         getTrustManagers(keystoreType, trustAlgorithm),
+            context.init(getKeyManagers(keystoreType, keystoreProvider,
+                                 algorithm,
+                                 (String) attributes.get("keyAlias")),
+                         getTrustManagers(keystoreType, keystoreProvider,
+                                 trustAlgorithm),
                          new SecureRandom());
 
             // create proxy
@@ -416,6 +439,7 @@ public class JSSESocketFactory
      * Gets the initialized key managers.
      */
     protected KeyManager[] getKeyManagers(String keystoreType,
+                                          String keystoreProvider,
                                           String algorithm,
                                           String keyAlias)
                 throws Exception {
@@ -424,7 +448,7 @@ public class JSSESocketFactory
 
         String keystorePass = getKeystorePassword();
 
-        KeyStore ks = getKeystore(keystoreType, keystorePass);
+        KeyStore ks = getKeystore(keystoreType, keystoreProvider, keystorePass);
         if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
             throw new IOException(
                     sm.getString("jsse.alias_no_key_entry", keyAlias));
@@ -450,16 +474,13 @@ public class JSSESocketFactory
      * Gets the intialized trust managers.
      */
     protected TrustManager[] getTrustManagers(String keystoreType,
-            String algorithm) throws Exception {
+            String keystoreProvider, String algorithm)
+        throws Exception {
         String crlf = (String) attributes.get("crlFile");
         
         TrustManager[] tms = null;
         
-        String truststoreType = (String) attributes.get("truststoreType");
-        if (truststoreType == null) {
-            truststoreType = keystoreType;
-        }
-        KeyStore trustStore = getTrustStore(truststoreType);
+        KeyStore trustStore = getTrustStore(keystoreType, keystoreProvider);
         if (trustStore != null) {
             if (crlf == null) {
                 TrustManagerFactory tmf =
