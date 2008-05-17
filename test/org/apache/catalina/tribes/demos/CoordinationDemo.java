@@ -21,8 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.StringTokenizer;
 
-import org.apache.catalina.tribes.ChannelInterceptor;
-import org.apache.catalina.tribes.ChannelInterceptor.InterceptorEvent;
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
@@ -299,7 +298,7 @@ public class CoordinationDemo {
                 if ( channel == null ) {
                     channel = createChannel();
                     startstatus = "starting";
-                    channel.start(channel.DEFAULT);
+                    channel.start(Channel.DEFAULT);
                     startstatus = "running";
                 } else {
                     status = "Channel already started.";
@@ -322,7 +321,7 @@ public class CoordinationDemo {
         public void stop() {
             try {
                 if ( channel != null ) {
-                    channel.stop(channel.DEFAULT);
+                    channel.stop(Channel.DEFAULT);
                     status = "Channel Stopped";
                 } else {
                     status = "Channel Already Stopped";

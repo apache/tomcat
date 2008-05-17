@@ -25,9 +25,7 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.Channel;
-import java.io.Externalizable;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -86,9 +84,9 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     }    
     
     private static void printSendStats(long counter, int messageSize) {
-        float cnt = (float)counter;
-        float size = (float)messageSize;
-        float time = (float)(System.currentTimeMillis()-messageStartSendTime) / 1000f;
+        float cnt = counter;
+        float size = messageSize;
+        float time = (System.currentTimeMillis()-messageStartSendTime) / 1000f;
         log.info("****SEND STATS-"+Thread.currentThread().getName()+"*****"+
                  "\n\tMessage count:"+counter+
                  "\n\tTotal bytes  :"+(long)(size*cnt)+
@@ -122,7 +120,6 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         long counter = 0;
         long total = 0;
         LoadMessage msg = new LoadMessage();
-        int messageSize = LoadTest.messageSize;
         
         try {
             startTest();
@@ -222,11 +219,11 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         
         
         bytesReceived+=((LoadMessage)msg).getMessage().length;
-        mBytesReceived+=((float)((LoadMessage)msg).getMessage().length)/1024f/1024f;
+        mBytesReceived+=(((LoadMessage)msg).getMessage().length)/1024f/1024f;
         messagesReceived++;
         if ( (messagesReceived%statsInterval)==0 || (messagesReceived==msgCount)) {
-            float bytes = (float)(((LoadMessage)msg).getMessage().length*messagesReceived);
-            float seconds = ((float)(System.currentTimeMillis()-receiveStart)) / 1000f;
+            float bytes = (((LoadMessage)msg).getMessage().length*messagesReceived);
+            float seconds = (System.currentTimeMillis()-receiveStart) / 1000f;
             log.info("****RECEIVE STATS-"+Thread.currentThread().getName()+"*****"+
                      "\n\tMessage count :"+(long)messagesReceived+
                      "\n\tMessage/sec   :"+messagesReceived/seconds+
@@ -257,15 +254,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         public static byte[] outdata = new byte[size];
         public static Random r = new Random(System.currentTimeMillis());
         public static int getMessageSize (LoadMessage msg) {
-            int messageSize = msg.getMessage().length;
-            if ( ((Object)msg) instanceof ByteMessage ) return messageSize;
-            try {
-                messageSize  = XByteBuffer.serialize(new LoadMessage()).length;
-                log.info("Average message size:" + messageSize + " bytes");
-            } catch (Exception x) {
-                log.error("Unable to calculate test message size.", x);
-            }
-            return messageSize;
+            return msg.getMessage().length;
         }
         static {
             r.nextBytes(outdata);
@@ -382,7 +371,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             test.channelOptions = channelOptions;
         }
         test.run();
-        if ( shutdown && send ) channel.stop(channel.DEFAULT);
+        if ( shutdown && send ) channel.stop(Channel.DEFAULT);
         System.out.println("System test complete, sleeping to let threads finish.");
         Thread.sleep(60*1000*60);
     } 
@@ -399,7 +388,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
             exit.setDaemon(true);
             exit.start();
             try {
-                channel.stop(channel.DEFAULT);
+                channel.stop(Channel.DEFAULT);
                 
             }catch ( Exception x ) {
                 x.printStackTrace();

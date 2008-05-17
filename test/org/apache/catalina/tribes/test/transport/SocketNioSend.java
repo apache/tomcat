@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.tribes.test.transport;
 
-import java.io.OutputStream;
-import java.net.Socket;
 import java.text.DecimalFormat;
 import org.apache.catalina.tribes.transport.nio.NioSender;
 import org.apache.catalina.tribes.membership.MemberImpl;
@@ -75,9 +73,9 @@ public class SocketNioSend {
                 continue;
             }
 
-            Iterator it = selector.selectedKeys().iterator();
+            Iterator<SelectionKey> it = selector.selectedKeys().iterator();
             while (it.hasNext()) {
-                SelectionKey sk = (SelectionKey) it.next();
+                SelectionKey sk = it.next();
                 it.remove();
                 try {
                     int readyOps = sk.readyOps();
