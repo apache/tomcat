@@ -23,8 +23,6 @@ import java.util.Arrays;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.test.channel.TestDataIntegrity.Listener;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
 
 /**

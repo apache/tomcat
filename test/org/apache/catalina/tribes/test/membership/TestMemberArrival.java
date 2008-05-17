@@ -89,7 +89,7 @@ public class TestMemberArrival
             this.name = name;
         }
 
-        public ArrayList members = new ArrayList();
+        public ArrayList<Member> members = new ArrayList<Member>();
         public void memberAdded(Member member) {
             if (!members.contains(member)) {
                 members.add(member);

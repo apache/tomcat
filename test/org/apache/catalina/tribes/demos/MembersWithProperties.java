@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.tribes.demos;
 
-import java.io.Serializable;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.Channel;
@@ -91,13 +90,13 @@ public class MembersWithProperties implements MembershipListener{
         Properties props = new Properties();
         props.setProperty("mydomainkey","mydomainvalue");
         props.setProperty("someotherkey", Arrays.toString(UUIDGenerator.randomUUID(true)));
-        MembersWithProperties test = new MembersWithProperties(channel, props);
-        channel.start(channel.DEFAULT);
+        new MembersWithProperties(channel, props);
+        channel.start(Channel.DEFAULT);
         Runtime.getRuntime().addShutdownHook(new Shutdown(channel));
         try {
-            main.sleep(Long.MAX_VALUE);
+            Thread.sleep(Long.MAX_VALUE);
         }catch(InterruptedException ix) {
-            main.sleep(5000);//allow everything to shutdown
+            Thread.sleep(5000);//allow everything to shutdown
         }
     }
 
@@ -110,7 +109,7 @@ public class MembersWithProperties implements MembershipListener{
         public void run() {
             System.out.println("Shutting down...");
             try {
-                channel.stop(channel.DEFAULT);
+                channel.stop(Channel.DEFAULT);
             } catch (Exception x) {
                 x.printStackTrace();
             }

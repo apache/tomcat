@@ -17,7 +17,6 @@
 package org.apache.catalina.tribes.demos;
 
 import java.io.Serializable;
-import java.util.Map;
 
 import java.awt.ComponentOrientation;
 import java.awt.Dimension;
@@ -33,22 +32,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableModel;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
-import org.apache.catalina.tribes.tipis.AbstractReplicatedMap;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.Color;
 import java.awt.Component;
 import javax.swing.table.TableColumn;
-import org.apache.catalina.tribes.util.UUIDGenerator;
-import org.apache.catalina.tribes.util.Arrays;
-import java.util.Set;
 import java.util.Random;
 
 /**
@@ -107,9 +101,9 @@ public class MapDemo implements ChannelListener, MembershipListener{
         if ( args.length > 0 && (!args[args.length-1].startsWith("-"))) {
             mapName = args[args.length-1];
         }
-        channel.start(channel.DEFAULT);
+        channel.start(Channel.DEFAULT);
         Runtime.getRuntime().addShutdownHook(new Shutdown(channel));
-        MapDemo demo = new MapDemo(channel,mapName);
+        new MapDemo(channel,mapName);
         
         System.out.println("System test complete, time to start="+(System.currentTimeMillis()-start)+" ms. Sleeping to let threads finish.");
         Thread.sleep(60 * 1000 * 60);
@@ -128,7 +122,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             exit.setDaemon(true);
             exit.start();
             try {
-                channel.stop(channel.DEFAULT);
+                channel.stop(Channel.DEFAULT);
 
             } catch (Exception x) {
                 x.printStackTrace();
@@ -341,7 +335,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                             try {
                                 Thread.sleep(500);
                             } catch (InterruptedException x) {
-                                Thread.currentThread().interrupted();
+                                Thread.interrupted();
                             }
                         }
                     }

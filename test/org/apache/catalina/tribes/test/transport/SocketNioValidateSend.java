@@ -16,18 +16,13 @@
  */
 package org.apache.catalina.tribes.test.transport;
 
-import java.io.OutputStream;
-import java.net.Socket;
 import java.text.DecimalFormat;
 import org.apache.catalina.tribes.transport.nio.NioSender;
 import org.apache.catalina.tribes.membership.MemberImpl;
 import java.nio.channels.Selector;
-import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.Member;
 import java.nio.channels.SelectionKey;
 import java.util.Iterator;
-import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.tribes.io.ChannelData;
 import java.math.BigDecimal;
 import java.util.Arrays;
 
@@ -73,9 +68,9 @@ public class SocketNioValidateSend {
                 continue;
             }
 
-            Iterator it = selector.selectedKeys().iterator();
+            Iterator<SelectionKey> it = selector.selectedKeys().iterator();
             while (it.hasNext()) {
-                SelectionKey sk = (SelectionKey) it.next();
+                SelectionKey sk = it.next();
                 it.remove();
                 try {
                     int readyOps = sk.readyOps();

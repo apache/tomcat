@@ -100,7 +100,7 @@ public class ChannelCreator {
         boolean frag = false;
         int fragsize = 1024;
         int autoBind = 10;
-        ArrayList staticMembers = new ArrayList();
+        ArrayList<Member> staticMembers = new ArrayList<Member>();
         Properties transportProperties = new Properties();
         String transport = "org.apache.catalina.tribes.transport.nio.PooledParallelSender";
         String receiver = "org.apache.catalina.tribes.transport.nio.NioReceiver";
@@ -171,12 +171,14 @@ public class ChannelCreator {
         }
         
         System.out.println("Creating receiver class="+receiver);
-        Class cl = Class.forName(receiver,true,ChannelCreator.class.getClassLoader());
+        Class<?> cl = Class.forName(receiver, true,
+                ChannelCreator.class.getClassLoader());
         ReceiverBase rx = (ReceiverBase)cl.newInstance();
-        rx.setTcpListenAddress(bind);
-        rx.setTcpListenPort(port);
-        rx.setTcpSelectorTimeout(tcpseltimeout);
-        rx.setTcpThreadCount(tcpthreadcount);
+        rx.setAddress(bind);
+        rx.setPort(port);
+        rx.setSelectorTimeout(tcpseltimeout);
+        rx.setMaxThreads(tcpthreadcount);
+        rx.setMinThreads(tcpthreadcount);
         rx.getBind();
         rx.setRxBufSize(43800);
         rx.setTxBufSize(25188);
@@ -199,11 +201,11 @@ public class ChannelCreator {
         ps.setTransport(sender);
 
         McastService service = new McastService();
-        service.setMcastAddr(mcastaddr);
+        service.setAddress(mcastaddr);
         if (mbind != null) service.setMcastBindAddress(mbind);
-        service.setMcastFrequency(mcastfreq);
+        service.setFrequency(mcastfreq);
         service.setMcastDropTime(mcastdrop);
-        service.setMcastPort(mcastport);
+        service.setPort(mcastport);
 
         ManagedChannel channel = new GroupChannel();
         channel.setChannelReceiver(rx);
@@ -237,7 +239,7 @@ public class ChannelCreator {
         if ( staticMembers.size() > 0 ) {
             StaticMembershipInterceptor smi = new StaticMembershipInterceptor();
             for (int x=0; x<staticMembers.size(); x++ ) {
-                smi.addStaticMember((Member)staticMembers.get(x));
+                smi.addStaticMember(staticMembers.get(x));
             }
             channel.addInterceptor(smi);
         }
