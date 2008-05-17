@@ -27,15 +27,6 @@ public class ELParser/*@bgen(jjtree)*/implements ELParserTreeConstants, ELParser
                 throw new ELException(pe.getMessage());
         }
     }
-  
-  public static void main(String[] argv) throws Exception {
-	  String[] str = { "${foo()}", "${fn.fn:foo() ? a : b}", "${fn:foo() ? (fn_af.f:fd() ? a : b) : b}", "${a.b.c ? a : b}" };
-		for (int i = 0; i < str.length; i++) {
-			SimpleNode sn = (SimpleNode) ELParser.parse(str[i]);
-			System.out.println("====\n" + str[i]);
-			sn.dump("\t");
-		}
-  }
 
 /*
  * CompositeExpression
@@ -216,31 +207,31 @@ public class ELParser/*@bgen(jjtree)*/implements ELParserTreeConstants, ELParser
         break label_2;
       }
       jj_consume_token(QUESTIONMARK);
-      Or();
+      Choice();
       jj_consume_token(COLON);
-                                            AstChoice jjtn001 = new AstChoice(JJTCHOICE);
-                                            boolean jjtc001 = true;
-                                            jjtree.openNodeScope(jjtn001);
+                                                AstChoice jjtn001 = new AstChoice(JJTCHOICE);
+                                                boolean jjtc001 = true;
+                                                jjtree.openNodeScope(jjtn001);
       try {
         Choice();
       } catch (Throwable jjte001) {
-                                            if (jjtc001) {
-                                              jjtree.clearNodeScope(jjtn001);
-                                              jjtc001 = false;
-                                            } else {
-                                              jjtree.popNode();
-                                            }
-                                            if (jjte001 instanceof RuntimeException) {
-                                              {if (true) throw (RuntimeException)jjte001;}
-                                            }
-                                            if (jjte001 instanceof ParseException) {
-                                              {if (true) throw (ParseException)jjte001;}
-                                            }
-                                            {if (true) throw (Error)jjte001;}
+                                                if (jjtc001) {
+                                                  jjtree.clearNodeScope(jjtn001);
+                                                  jjtc001 = false;
+                                                } else {
+                                                  jjtree.popNode();
+                                                }
+                                                if (jjte001 instanceof RuntimeException) {
+                                                  {if (true) throw (RuntimeException)jjte001;}
+                                                }
+                                                if (jjte001 instanceof ParseException) {
+                                                  {if (true) throw (ParseException)jjte001;}
+                                                }
+                                                {if (true) throw (Error)jjte001;}
       } finally {
-                                            if (jjtc001) {
-                                              jjtree.closeNodeScope(jjtn001,  3);
-                                            }
+                                                if (jjtc001) {
+                                                  jjtree.closeNodeScope(jjtn001,  3);
+                                                }
       }
     }
   }
