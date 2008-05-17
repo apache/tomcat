@@ -19,131 +19,126 @@ package org.apache.el.parser;
 
 public interface ELParserConstants {
 
-	int EOF = 0;
+  int EOF = 0;
+  int LITERAL_EXPRESSION = 1;
+  int START_DYNAMIC_EXPRESSION = 2;
+  int START_DEFERRED_EXPRESSION = 3;
+  int INTEGER_LITERAL = 9;
+  int FLOATING_POINT_LITERAL = 10;
+  int EXPONENT = 11;
+  int STRING_LITERAL = 12;
+  int BADLY_ESCAPED_STRING_LITERAL = 13;
+  int TRUE = 14;
+  int FALSE = 15;
+  int NULL = 16;
+  int END_EXPRESSION = 17;
+  int DOT = 18;
+  int LPAREN = 19;
+  int RPAREN = 20;
+  int LBRACK = 21;
+  int RBRACK = 22;
+  int COLON = 23;
+  int COMMA = 24;
+  int GT0 = 25;
+  int GT1 = 26;
+  int LT0 = 27;
+  int LT1 = 28;
+  int GE0 = 29;
+  int GE1 = 30;
+  int LE0 = 31;
+  int LE1 = 32;
+  int EQ0 = 33;
+  int EQ1 = 34;
+  int NE0 = 35;
+  int NE1 = 36;
+  int NOT0 = 37;
+  int NOT1 = 38;
+  int AND0 = 39;
+  int AND1 = 40;
+  int OR0 = 41;
+  int OR1 = 42;
+  int EMPTY = 43;
+  int INSTANCEOF = 44;
+  int MULT = 45;
+  int PLUS = 46;
+  int MINUS = 47;
+  int QUESTIONMARK = 48;
+  int DIV0 = 49;
+  int DIV1 = 50;
+  int MOD0 = 51;
+  int MOD1 = 52;
+  int IDENTIFIER = 53;
+  int NAMESPACE = 54;
+  int FUNCTIONSUFFIX = 55;
+  int IMPL_OBJ_START = 56;
+  int LETTER = 57;
+  int DIGIT = 58;
+  int ILLEGAL_CHARACTER = 59;
 
-	int LITERAL_EXPRESSION = 1;
+  int DEFAULT = 0;
+  int IN_EXPRESSION = 1;
 
-	int START_DYNAMIC_EXPRESSION = 2;
-
-	int START_DEFERRED_EXPRESSION = 3;
-
-	int INTEGER_LITERAL = 9;
-
-	int FLOATING_POINT_LITERAL = 10;
-
-	int EXPONENT = 11;
-
-	int STRING_LITERAL = 12;
-
-	int BADLY_ESCAPED_STRING_LITERAL = 13;
-
-	int TRUE = 14;
-
-	int FALSE = 15;
-
-	int NULL = 16;
-
-	int END_EXPRESSION = 17;
-
-	int DOT = 18;
-
-	int LPAREN = 19;
-
-	int RPAREN = 20;
-
-	int LBRACK = 21;
-
-	int RBRACK = 22;
-
-	int COLON = 23;
-
-	int COMMA = 24;
-
-	int GT0 = 25;
-
-	int GT1 = 26;
-
-	int LT0 = 27;
-
-	int LT1 = 28;
-
-	int GE0 = 29;
-
-	int GE1 = 30;
-
-	int LE0 = 31;
-
-	int LE1 = 32;
-
-	int EQ0 = 33;
-
-	int EQ1 = 34;
-
-	int NE0 = 35;
-
-	int NE1 = 36;
-
-	int NOT0 = 37;
-
-	int NOT1 = 38;
-
-	int AND0 = 39;
-
-	int AND1 = 40;
-
-	int OR0 = 41;
-
-	int OR1 = 42;
-
-	int EMPTY = 43;
-
-	int INSTANCEOF = 44;
-
-	int MULT = 45;
-
-	int PLUS = 46;
-
-	int MINUS = 47;
-
-	int QUESTIONMARK = 48;
-
-	int DIV0 = 49;
-
-	int DIV1 = 50;
-
-	int MOD0 = 51;
-
-	int MOD1 = 52;
-
-	int IDENTIFIER = 53;
-
-	int NAMESPACE = 54;
-
-	int FUNCTIONSUFFIX = 55;
-
-	int IMPL_OBJ_START = 56;
-
-	int LETTER = 57;
-
-	int DIGIT = 58;
-
-	int ILLEGAL_CHARACTER = 59;
-
-	int DEFAULT = 0;
-
-	int IN_EXPRESSION = 1;
-
-	String[] tokenImage = { "<EOF>", "<LITERAL_EXPRESSION>", "\"${\"",
-			"\"#{\"", "\"\\\\\"", "\" \"", "\"\\t\"", "\"\\n\"", "\"\\r\"",
-			"<INTEGER_LITERAL>", "<FLOATING_POINT_LITERAL>", "<EXPONENT>",
-			"<STRING_LITERAL>", "<BADLY_ESCAPED_STRING_LITERAL>", "\"true\"",
-			"\"false\"", "\"null\"", "\"}\"", "\".\"", "\"(\"", "\")\"",
-			"\"[\"", "\"]\"", "\":\"", "\",\"", "\">\"", "\"gt\"", "\"<\"",
-			"\"lt\"", "\">=\"", "\"ge\"", "\"<=\"", "\"le\"", "\"==\"",
-			"\"eq\"", "\"!=\"", "\"ne\"", "\"!\"", "\"not\"", "\"&&\"",
-			"\"and\"", "\"||\"", "\"or\"", "\"empty\"", "\"instanceof\"",
-			"\"*\"", "\"+\"", "\"-\"", "\"?\"", "\"/\"", "\"div\"", "\"%\"",
-			"\"mod\"", "<IDENTIFIER>", "<NAMESPACE>", "<FUNCTIONSUFFIX>",
-			"\"#\"", "<LETTER>", "<DIGIT>", "<ILLEGAL_CHARACTER>", };
+  String[] tokenImage = {
+    "<EOF>",
+    "<LITERAL_EXPRESSION>",
+    "\"${\"",
+    "\"#{\"",
+    "\"\\\\\"",
+    "\" \"",
+    "\"\\t\"",
+    "\"\\n\"",
+    "\"\\r\"",
+    "<INTEGER_LITERAL>",
+    "<FLOATING_POINT_LITERAL>",
+    "<EXPONENT>",
+    "<STRING_LITERAL>",
+    "<BADLY_ESCAPED_STRING_LITERAL>",
+    "\"true\"",
+    "\"false\"",
+    "\"null\"",
+    "\"}\"",
+    "\".\"",
+    "\"(\"",
+    "\")\"",
+    "\"[\"",
+    "\"]\"",
+    "\":\"",
+    "\",\"",
+    "\">\"",
+    "\"gt\"",
+    "\"<\"",
+    "\"lt\"",
+    "\">=\"",
+    "\"ge\"",
+    "\"<=\"",
+    "\"le\"",
+    "\"==\"",
+    "\"eq\"",
+    "\"!=\"",
+    "\"ne\"",
+    "\"!\"",
+    "\"not\"",
+    "\"&&\"",
+    "\"and\"",
+    "\"||\"",
+    "\"or\"",
+    "\"empty\"",
+    "\"instanceof\"",
+    "\"*\"",
+    "\"+\"",
+    "\"-\"",
+    "\"?\"",
+    "\"/\"",
+    "\"div\"",
+    "\"%\"",
+    "\"mod\"",
+    "<IDENTIFIER>",
+    "<NAMESPACE>",
+    "<FUNCTIONSUFFIX>",
+    "\"#\"",
+    "<LETTER>",
+    "<DIGIT>",
+    "<ILLEGAL_CHARACTER>",
+  };
 
 }
