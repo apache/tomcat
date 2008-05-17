@@ -146,7 +146,7 @@ public class CompressionFilter implements Filter{
             }
 
             // Are we allowed to compress ?
-            String s = (String) ((HttpServletRequest)request).getParameter("gzip");
+            String s = ((HttpServletRequest)request).getParameter("gzip");
             if ("false".equals(s)) {
                 if (debug > 0) {
                     System.out.println("got parameter gzip=false --> don't compress, just chain filter");

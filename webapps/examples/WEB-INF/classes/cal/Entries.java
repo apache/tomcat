@@ -21,14 +21,14 @@ import javax.servlet.http.*;
 
 public class Entries {
 
-  private Hashtable entries;
+  private Hashtable<String, Entry> entries;
   private static final String[] time = {"8am", "9am", "10am", "11am", "12pm", 
 					"1pm", "2pm", "3pm", "4pm", "5pm", "6pm",
 					"7pm", "8pm" };
   public static final int rows = 12;
 
   public Entries () {   
-   entries = new Hashtable (rows);
+   entries = new Hashtable<String, Entry> (rows);
    for (int i=0; i < rows; i++) {
      entries.put (time[i], new Entry(time[i]));
    }
@@ -39,7 +39,7 @@ public class Entries {
   }
 
   public Entry getEntry (int index) {
-    return (Entry)this.entries.get(time[index]);
+    return this.entries.get(time[index]);
   }
 
   public int getIndex (String tm) {
@@ -52,7 +52,7 @@ public class Entries {
     int index = getIndex (tm);
     if (index >= 0) {
       String descr = request.getParameter ("description");
-      ((Entry)entries.get(time[index])).setDescription (descr);
+      entries.get(time[index]).setDescription (descr);
     }
   }
 

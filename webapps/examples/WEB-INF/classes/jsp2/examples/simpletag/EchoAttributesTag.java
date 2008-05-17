@@ -32,13 +32,13 @@ public class EchoAttributesTag
     extends SimpleTagSupport
     implements DynamicAttributes
 {
-    private ArrayList keys = new ArrayList();
-    private ArrayList values = new ArrayList();
+    private ArrayList<String> keys = new ArrayList<String>();
+    private ArrayList<Object> values = new ArrayList<Object>();
 
     public void doTag() throws JspException, IOException {
 	JspWriter out = getJspContext().getOut();
 	for( int i = 0; i < keys.size(); i++ ) {
-	    String key = (String)keys.get( i );
+	    String key = keys.get( i );
 	    Object value = values.get( i );
 	    out.println( "<li>" + key + " = " + value + "</li>" );
         }

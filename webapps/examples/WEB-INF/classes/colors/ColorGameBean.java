@@ -16,8 +16,6 @@
 */
 package colors;
 
-import javax.servlet.http.*;
-
 public class ColorGameBean {
 
     private String background = "yellow";
@@ -29,7 +27,7 @@ public class ColorGameBean {
 	private int intval = 0;
     private boolean tookHints = false;
 
-    public void processRequest(HttpServletRequest request) {
+    public void processRequest() {
 
 	// background = "yellow";
 	// foreground = "red";
