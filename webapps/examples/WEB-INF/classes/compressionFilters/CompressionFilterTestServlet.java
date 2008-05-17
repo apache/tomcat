@@ -36,7 +36,7 @@ public class CompressionFilterTestServlet extends HttpServlet {
         ServletOutputStream out = response.getOutputStream();
         response.setContentType("text/plain");
 
-        Enumeration e = ((HttpServletRequest)request).getHeaders("Accept-Encoding");
+        Enumeration e = request.getHeaders("Accept-Encoding");
         while (e.hasMoreElements()) {
             String name = (String)e.nextElement();
             out.println(name);
