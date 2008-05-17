@@ -20,7 +20,7 @@
 <jsp:setProperty name="cb" property="*" />
 
 <%
-	cb.processRequest(request);
+	cb.processRequest();
 %>
 
 <body bgcolor=<%= cb.getColor1() %>>

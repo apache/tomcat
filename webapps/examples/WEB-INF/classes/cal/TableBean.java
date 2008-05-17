@@ -21,7 +21,7 @@ import java.util.Hashtable;
 
 public class TableBean {
 
-  Hashtable table;
+  Hashtable<String, Entries> table;
   JspCalendar JspCal;
   Entries entries;
   String date;
@@ -30,7 +30,7 @@ public class TableBean {
   boolean processError = false;
 
   public TableBean () {
-    this.table = new Hashtable (10);
+    this.table = new Hashtable<String, Entries> (10);
     this.JspCal = new JspCalendar ();
     this.date = JspCal.getCurrentDate ();
   }
@@ -77,7 +77,7 @@ public class TableBean {
     else if (dateR.equalsIgnoreCase("next")) date = JspCal.getNextDate ();
     else if (dateR.equalsIgnoreCase("prev")) date = JspCal.getPrevDate ();
 
-    entries = (Entries) table.get (date);
+    entries = table.get (date);
     if (entries == null) {
       entries = new Entries ();
       table.put (date, entries);
