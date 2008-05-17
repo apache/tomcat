@@ -34,21 +34,21 @@ public class ChannelStartStop extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        try {channel.stop(channel.DEFAULT);}catch (Exception ignore){}
+        try {channel.stop(Channel.DEFAULT);}catch (Exception ignore){}
     }
 
     public void testDoubleFullStart() throws Exception {
         int count = 0;
         try {
-            channel.start(channel.DEFAULT);
+            channel.start(Channel.DEFAULT);
             count++;
         } catch ( Exception x){x.printStackTrace();}
         try {
-            channel.start(channel.DEFAULT);
+            channel.start(Channel.DEFAULT);
             count++;
         } catch ( Exception x){x.printStackTrace();}
         assertEquals(count,2);
-        channel.stop(channel.DEFAULT);
+        channel.stop(Channel.DEFAULT);
     }
 
     public void testScrap() throws Exception {
@@ -61,53 +61,53 @@ public class ChannelStartStop extends TestCase {
         //try to double start the RX
         int count = 0;
         try {
-            channel.start(channel.SND_RX_SEQ);
-            channel.start(channel.MBR_RX_SEQ);
+            channel.start(Channel.SND_RX_SEQ);
+            channel.start(Channel.MBR_RX_SEQ);
             count++;
         } catch ( Exception x){x.printStackTrace();}
         try {
-            channel.start(channel.MBR_RX_SEQ);
+            channel.start(Channel.MBR_RX_SEQ);
             count++;
         } catch ( Exception x){/*expected*/}
         assertEquals(count,1);
-        channel.stop(channel.DEFAULT);
+        channel.stop(Channel.DEFAULT);
         //double the membership sender
         count = 0;
         try {
-            channel.start(channel.SND_RX_SEQ);
-            channel.start(channel.MBR_TX_SEQ);
+            channel.start(Channel.SND_RX_SEQ);
+            channel.start(Channel.MBR_TX_SEQ);
             count++;
         } catch ( Exception x){x.printStackTrace();}
         try {
-            channel.start(channel.MBR_TX_SEQ);
+            channel.start(Channel.MBR_TX_SEQ);
             count++;
         } catch ( Exception x){/*expected*/}
         assertEquals(count,1);
-        channel.stop(channel.DEFAULT);
+        channel.stop(Channel.DEFAULT);
 
         count = 0;
         try {
-            channel.start(channel.SND_RX_SEQ);
+            channel.start(Channel.SND_RX_SEQ);
             count++;
         } catch ( Exception x){x.printStackTrace();}
         try {
-            channel.start(channel.SND_RX_SEQ);
+            channel.start(Channel.SND_RX_SEQ);
             count++;
         } catch ( Exception x){/*expected*/}
         assertEquals(count,1);
-        channel.stop(channel.DEFAULT);
+        channel.stop(Channel.DEFAULT);
 
         count = 0;
         try {
-            channel.start(channel.SND_TX_SEQ);
+            channel.start(Channel.SND_TX_SEQ);
             count++;
         } catch ( Exception x){x.printStackTrace();}
         try {
-            channel.start(channel.SND_TX_SEQ);
+            channel.start(Channel.SND_TX_SEQ);
             count++;
         } catch ( Exception x){/*expected*/}
         assertEquals(count,1);
-        channel.stop(channel.DEFAULT);
+        channel.stop(Channel.DEFAULT);
     }
 
     public void testFalseOption() throws Exception {
@@ -122,7 +122,7 @@ public class ChannelStartStop extends TestCase {
             count++;
         } catch ( Exception x){/*expected*/}
         assertEquals(count,2);
-        channel.stop(channel.DEFAULT);
+        channel.stop(Channel.DEFAULT);
     }
 
     public void testUdpReceiverStart() throws Exception {
