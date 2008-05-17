@@ -104,7 +104,7 @@ void Expression() : {}
  */
 void Choice() : {}
 {
-	Or() (<QUESTIONMARK> Or() <COLON> Choice() #Choice(3))*
+	Or() (<QUESTIONMARK> Choice() <COLON> Choice() #Choice(3))*
 }
 
 /*
