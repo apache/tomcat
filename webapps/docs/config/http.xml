@@ -671,6 +671,14 @@
       If not specified, the default value is "<code>JKS</code>".</p>
     </attribute>
 
+    <attribute name="keystoreProvider" required="false">
+      <p>The name of the keystore provider to be used for the server
+      certificate. If not specified, the list of registered providers is
+      traversed in preference order and the first provider that supports the
+      <code>keystoreType</code> is used.
+      </p>
+    </attribute>
+
     <attribute name="sslProtocol" required="false">
       <p>The version of the SSL protocol to use.  If not specified,
       the default is "<code>TLS</code>".</p>
@@ -699,6 +707,14 @@
       <p>Add this element if your are using a different format for the
       TrustStore then you are using for the KeyStore.</p>
      </attribute>
+
+    <attribute name="truststoreProvider" required="false">
+      <p>The name of the truststore provider to be used for the server
+      certificate. If not specified, the list of registered providers is
+      traversed in preference order and the first provider that supports the
+      <code>truststoreType</code> is used.
+      </p>
+    </attribute>
 
   </attributes>
 
