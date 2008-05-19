@@ -21,6 +21,7 @@ package org.apache.catalina.startup;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -814,7 +815,26 @@ public class HostConfig
             (dir.getAbsolutePath(), new Long(dir.lastModified()));
 
         try {
-            Context context = (Context) Class.forName(contextClass).newInstance();
+            Context context = null;
+            if (deployXML && xml.exists()) {
+                synchronized (digester) {
+                    try {
+                        context = (Context) digester.parse(xml);
+                        if (context == null) {
+                            log.error(sm.getString("hostConfig.deployDescriptor.error",
+                                    file));
+                            return;
+                        }
+                    } finally {
+                        digester.reset();
+                    }
+                }
+                context.setConfigFile(xml.getAbsolutePath());
+                deployedApp.redeployResources.put
+                    (xml.getAbsolutePath(), new Long(xml.lastModified()));
+            } else {
+                context = (Context) Class.forName(contextClass).newInstance();
+            }
             if (context instanceof Lifecycle) {
                 Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
@@ -823,11 +843,6 @@ public class HostConfig
             }
             context.setPath(contextPath);
             context.setDocBase(file);
-            if (xml.exists()) {
-                context.setConfigFile(xml.getAbsolutePath());
-                deployedApp.redeployResources.put
-                    (xml.getAbsolutePath(), new Long(xml.lastModified()));
-            }
             host.addChild(context);
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
@@ -911,7 +926,78 @@ public class HostConfig
         if( log.isDebugEnabled() ) 
             log.debug(sm.getString("hostConfig.deployDir", file));
         try {
-            Context context = (Context) Class.forName(contextClass).newInstance();
+            // Checking for a /META-INF/context.xml
+            InputStream istream = null;
+            BufferedOutputStream ostream = null;
+            File xml = new File
+                (configBase, file + ".xml");
+            if (deployXML && !xml.exists()) {
+                try {
+                    File applicationContextXml =
+                        new File(dir, Constants.ApplicationContextXml);
+                    if (applicationContextXml.exists()) {
+                        istream = new FileInputStream(applicationContextXml);
+                        
+                        configBase.mkdirs();
+                        
+                        ostream =
+                            new BufferedOutputStream
+                            (new FileOutputStream(xml), 1024);
+                        byte buffer[] = new byte[1024];
+                        while (true) {
+                            int n = istream.read(buffer);
+                            if (n < 0) {
+                                break;
+                            }
+                            ostream.write(buffer, 0, n);
+                        }
+                        ostream.flush();
+                        ostream.close();
+                        ostream = null;
+                        istream.close();
+                        istream = null;
+                    }
+                } catch (Exception e) {
+                    // Ignore and continue
+                    if (ostream != null) {
+                        try {
+                            ostream.close();
+                        } catch (Throwable t) {
+                            // Ignore
+                        }
+                        ostream = null;
+                    }
+                    if (istream != null) {
+                        try {
+                            istream.close();
+                        } catch (Throwable t) {
+                            // Ignore
+                        }
+                        istream = null;
+                    }
+                }
+            }
+            
+            Context context = null;
+            if (deployXML && xml.exists()) {
+                synchronized (digester) {
+                    try {
+                        context = (Context) digester.parse(xml);
+                        if (context == null) {
+                            log.error(sm.getString("hostConfig.deployDescriptor.error",
+                                    file));
+                            return;
+                        }
+                    } finally {
+                        digester.reset();
+                    }
+                }
+                context.setConfigFile(xml.getAbsolutePath());
+                deployedApp.redeployResources.put
+                    (xml.getAbsolutePath(), new Long(xml.lastModified()));
+            } else {
+                context = (Context) Class.forName(contextClass).newInstance();
+            }
             if (context instanceof Lifecycle) {
                 Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
@@ -920,17 +1006,9 @@ public class HostConfig
             }
             context.setPath(contextPath);
             context.setDocBase(file);
-            File configFile = new File(dir, Constants.ApplicationContextXml);
-            if (deployXML) {
-                context.setConfigFile(configFile.getAbsolutePath());
-            }
             host.addChild(context);
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     new Long(dir.lastModified()));
-            if (deployXML) {
-                deployedApp.redeployResources.put(configFile.getAbsolutePath(),
-                        new Long(configFile.lastModified()));
-            }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
         } catch (Throwable t) {
             log.error(sm.getString("hostConfig.deployDir.error", file), t);
