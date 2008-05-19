@@ -403,13 +403,28 @@ public class InternalAprInputBuffer implements InputBuffer {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
-            if (buf[pos] == Constants.SP) {
+            // Spec says single SP but it also says be tolerant of HT
+            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 request.method().setBytes(buf, start, pos - start);
             }
 
             pos++;
 
+        }
+
+        // Spec says single SP but also says be tolerant of multiple and/or HT
+        while (space) {
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (!fill())
+                    throw new EOFException(sm.getString("iib.eof.error"));
+            }
+            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
+                pos++;
+            } else {
+                space = false;
+            }
         }
 
         // Mark the current buffer position
@@ -421,7 +436,6 @@ public class InternalAprInputBuffer implements InputBuffer {
         // Reading the URI
         //
 
-        space = false;
         boolean eol = false;
 
         while (!space) {
@@ -432,7 +446,8 @@ public class InternalAprInputBuffer implements InputBuffer {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
-            if (buf[pos] == Constants.SP) {
+            // Spec says single SP but it also says be tolerant of HT
+            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 end = pos;
             } else if ((buf[pos] == Constants.CR) 
@@ -458,6 +473,21 @@ public class InternalAprInputBuffer implements InputBuffer {
         } else {
             request.requestURI().setBytes(buf, start, end - start);
         }
+
+        // Spec says single SP but also says be tolerant of multiple and/or HT
+        while (space) {
+            // Read new bytes if needed
+            if (pos >= lastValid) {
+                if (!fill())
+                    throw new EOFException(sm.getString("iib.eof.error"));
+            }
+            if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
+                pos++;
+            } else {
+                space = false;
+            }
+        }
+
 
         // Mark the current buffer position
         start = pos;
