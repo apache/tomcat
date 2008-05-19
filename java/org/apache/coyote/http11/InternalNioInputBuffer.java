@@ -454,7 +454,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                     if (!fill(true, false)) //request line parsing
                         return false;
                 }
-                if (buf[pos] == Constants.SP) {
+                if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                     space = true;
                     request.method().setBytes(buf, parsingRequestLineStart, pos - parsingRequestLineStart);
                 }
@@ -464,20 +464,34 @@ public class InternalNioInputBuffer implements InputBuffer {
             parsingRequestLinePhase = 3;
         }
         if ( parsingRequestLinePhase == 3 ) {
+            // Spec says single SP but also be tolerant of multiple and/or HT
+            boolean space = true;
+            while (space) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true, false)) //request line parsing
+                        return false;
+                }
+                if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
+                    pos++;
+                } else {
+                    space = false;
+                }
+            }
+
             // Mark the current buffer position
             
             int end = 0;
             //
             // Reading the URI
             //
-            boolean space = false;
             while (!space) {
                 // Read new bytes if needed
                 if (pos >= lastValid) {
                     if (!fill(true,false)) //request line parsing
                         return false;
                 }
-                if (buf[pos] == Constants.SP) {
+                if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                     space = true;
                     end = pos;
                 } else if ((buf[pos] == Constants.CR) 
@@ -504,6 +518,21 @@ public class InternalNioInputBuffer implements InputBuffer {
             parsingRequestLinePhase = 4;
         }
         if ( parsingRequestLinePhase == 4 ) {
+            // Spec says single SP but also be tolerant of multiple and/or HT
+            boolean space = true;
+            while (space) {
+                // Read new bytes if needed
+                if (pos >= lastValid) {
+                    if (!fill(true, false)) //request line parsing
+                        return false;
+                }
+                if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
+                    pos++;
+                } else {
+                    space = false;
+                }
+            }
+
             // Mark the current buffer position
             
             end = 0;
