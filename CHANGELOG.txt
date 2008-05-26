@@ -19,7 +19,7 @@ PLEASE DON'T WRITE IN THIS FILE BUT IN xdocs/miscellaneous/changelog.xml AND USE
 ./jnirelease.sh
 TO BUILD THE TEXT VERSION.
 
-
+Fix: BZ45071 by reseting ttl when Poll.pool remove is false(mturk)
 Fix: IFS problem in native/build/tcnative.m4 (rjung)
 Fix: Wrong gcc link flag in native/build/tcnative.m4 (rjung)
 Tag: 1_1.12

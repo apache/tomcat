@@ -224,6 +224,20 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
     return apr_pollset_remove(p->pollset, fd);
 }
 
+static void update_ttl(tcn_pollset_t *p, const apr_pollfd_t *fd, apr_time_t t)
+{
+    apr_int32_t i;
+
+    for (i = 0; i < p->nelts; i++) {
+        if (fd->desc.s == p->socket_set[i].desc.s) {
+            /* Found an instance of the fd: update ttl */
+            p->socket_ttl[i] = t;
+            break;
+        }
+    }
+}
+
+
 static void remove_all(tcn_pollset_t *p)
 {
     apr_int32_t i;
@@ -266,6 +280,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
     apr_int32_t  i, num = 0;
     apr_status_t rv = APR_SUCCESS;
+    apr_time_t now;
     apr_interval_time_t ptime = J2T(timeout);
     UNREFERENCED(o);
     TCN_ASSERT(pollset != 0);
@@ -275,7 +290,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
 #endif
 
     if (ptime > 0 && p->max_ttl >= 0) {
-        apr_time_t now = apr_time_now();
+        now = apr_time_now();
 
         /* Find the minimum timeout */
         for (i = 0; i < p->nelts; i++) {
@@ -316,11 +331,15 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
          p->sp_polled += num;
          p->sp_max_polled = TCN_MAX(p->sp_max_polled, num);
 #endif
+        if (!remove)
+            now = apr_time_now();
         for (i = 0; i < num; i++) {
             p->set[i*2+0] = (jlong)(fd->rtnevents);
             p->set[i*2+1] = P2J(fd->client_data);
             if (remove)
                 do_remove(p, fd);
+            else
+                update_ttl(p, fd, now);
             fd ++;
         }
         (*e)->SetLongArrayRegion(e, set, 0, num * 2, p->set);
