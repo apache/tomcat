@@ -126,12 +126,23 @@ final class StandardContextValve
         }
 
         // Wait if we are reloading
+        boolean reloaded = false;
         while (context.getPaused()) {
+            reloaded = true;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 ;
             }
+        }
+
+        // Reloading will have stopped the old webappclassloader and
+        // created a new one
+        if (reloaded &&
+                context.getLoader() != null &&
+                context.getLoader().getClassLoader() != null) {
+            Thread.currentThread().setContextClassLoader(
+                    context.getLoader().getClassLoader());
         }
 
         // Select the Wrapper to be used for this Request
