@@ -39,6 +39,7 @@ import javax.naming.directory.Attributes;
 import org.apache.naming.JndiPermission;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
  * Connection to a JNDI directory context.
@@ -222,6 +223,18 @@ public class DirContextURLConnection
     }
     
 
+    protected String getHeaderValueAsString(Object headerValue) {
+        if (headerValue == null) return null;
+        if (headerValue instanceof Date) {
+            // return date strings (ie Last-Modified) in HTTP format, rather
+            // than Java format
+            return FastHttpDateFormat.formatDate(
+                    ((Date)headerValue).getTime(), null);
+        }
+        return headerValue.toString();
+    }
+
+
     /**
      * Returns an unmodifiable Map of the header fields.
      */
@@ -248,7 +261,8 @@ public class DirContextURLConnection
               ArrayList attributeValueList = new ArrayList(attribute.size());
               NamingEnumeration attributeValues = attribute.getAll();
               while (attributeValues.hasMore()) {
-                  attributeValueList.add(attributeValues.next().toString());
+                  Object attrValue = attributeValues.next();
+                  attributeValueList.add(getHeaderValueAsString(attrValue));
               }
               attributeValueList.trimToSize(); // should be a no-op if attribute.size() didn't lie
               headerFields.put(attributeID, Collections.unmodifiableList(attributeValueList));
@@ -285,7 +299,8 @@ public class DirContextURLConnection
                 if (attributeID.equalsIgnoreCase(name)) {
                     Attribute attribute = attributes.get(attributeID);
                     if (attribute == null) return null;
-                    return attribute.get(attribute.size()-1).toString();
+                    Object attrValue = attribute.get(attribute.size()-1);
+                    return getHeaderValueAsString(attrValue);
                 }
             }
         } catch (NamingException ne) {
