@@ -215,6 +215,7 @@ static apr_status_t do_remove(tcn_pollset_t *p, const apr_pollfd_t *fd)
                 }
                 else {
                     p->socket_set[dst] = p->socket_set[i];
+                    p->socket_ttl[dst] = p->socket_ttl[i];
                     dst++;
                 }
             }
