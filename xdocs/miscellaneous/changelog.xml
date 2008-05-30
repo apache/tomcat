@@ -40,6 +40,10 @@
 <section name="Changes between 1.1.13 and 1.1.14">
   <changelog>
     <fix>
+      <bug>45071</bug>: Reset ttl when Poll.pool remove is false.
+      Additional patch was provided by Alex Barclay. (mturk)
+    </fix>
+    <fix>
       Fix optGet that was always throwing exceptions. (jfclere)
     </fix>
     <fix>
