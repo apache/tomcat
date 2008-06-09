@@ -38,6 +38,10 @@ import org.apache.el.util.ReflectionUtil;
  */
 public final class AstValue extends SimpleNode {
 
+    protected static final boolean COERCE_TO_ZERO =
+        Boolean.valueOf(System.getProperty(
+                "org.apache.el.parser.COERCE_TO_ZERO", "true")).booleanValue();
+    
     protected static class Target {
         protected Object base;
 
@@ -129,11 +133,27 @@ public final class AstValue extends SimpleNode {
         Target t = getTarget(ctx);
         ctx.setPropertyResolved(false);
         ELResolver resolver = ctx.getELResolver();
-        resolver.setValue(ctx, t.base, t.property, 
-        		// coerce to the expected type
-        		ELSupport.coerceToType(value, 
-        				resolver.getType(ctx, t.base, t.property)));
+
+        // coerce to the expected type
+        Class<?> targetClass = resolver.getType(ctx, t.base, t.property);
+        if (COERCE_TO_ZERO == true
+                || !isAssignable(value, targetClass)) {
+            value = ELSupport.coerceToType(value, targetClass);
+        }
+        resolver.setValue(ctx, t.base, t.property, value);
     }
+
+    private boolean isAssignable(Object value, Class<?> targetClass) {
+        if (targetClass == null) {
+            return false;
+        } else if (value != null && targetClass.isPrimitive()) {
+            return false;
+        } else if (value != null && !targetClass.isInstance(value)) {
+            return false;
+        }
+        return true;
+    }
+
 
     public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes)
             throws ELException {

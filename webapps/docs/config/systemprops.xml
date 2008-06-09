@@ -48,6 +48,18 @@
 
 </section>
 
+<section name="Expression Language">
+  <properties>
+
+    <property name="org.apache.el.parser.COERCE_TO_ZERO">
+      <p>If <code>true</code>, when coercing expressions to numbers
+      <code>""</code> and <code>null</code> will be coerced to zero as required
+      by the specification. If not specified, the default value of
+      <code>true</code> will be used.</p>
+    </property>
+
+  </properties>
+</section>
 
 <section name="Jasper">
   <properties>
