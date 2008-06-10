@@ -54,6 +54,9 @@
   </subsection>
   <subsection name="Catalina">
      <changelog>
+     <update><rev>666232</rev><br/>
+       Prevent NPE stacktrace, and lost log message when logger has been shutdown. Instead log the error, with the message (fhanik)
+     </update>  
      <update><rev>645184</rev><br/>
        Properly deserialize Proxy classes
      </update>  
