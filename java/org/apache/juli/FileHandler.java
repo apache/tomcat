@@ -133,8 +133,12 @@ public class FileHandler
         }
         
         try {
-            writer.write(result);
-            writer.flush();
+            if (writer!=null) {
+                writer.write(result);
+                writer.flush();
+            } else {
+                reportError("FileHandler is closed or not yet initialized, unable to log ["+result+"]", null, ErrorManager.WRITE_FAILURE);
+            }
         } catch (Exception e) {
             reportError(null, e, ErrorManager.WRITE_FAILURE);
             return;
