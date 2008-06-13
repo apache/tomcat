@@ -1032,6 +1032,8 @@ public class StandardSession
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttribute.ise"));
 
+        if (name == null) return null;
+
         return (attributes.get(name));
 
     }
