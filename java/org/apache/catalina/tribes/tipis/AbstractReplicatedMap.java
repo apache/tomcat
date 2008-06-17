@@ -1017,7 +1017,9 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 Map.Entry e = (Map.Entry)i.next();
                 Object key = e.getKey();
                 MapEntry entry = (MapEntry)super.get(key);
-                if ( entry != null && entry.isPrimary() ) set.add(entry.getValue());
+                if ( entry != null && entry.isPrimary() ) {
+                    set.add(new MapEntry(key, entry.getValue()));
+                }
             }
             return Collections.unmodifiableSet(set);
         }
