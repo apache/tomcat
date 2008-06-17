@@ -1636,6 +1636,9 @@ public class StandardSession
      */
     protected void removeAttributeInternal(String name, boolean notify) {
 
+        // Avoid NPE
+        if (name == null) return;
+
         // Remove this attribute from our collection
         Object value = attributes.remove(name);
 
