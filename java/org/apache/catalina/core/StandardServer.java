@@ -140,7 +140,7 @@ public final class StandardServer
     /**
      * The address on which we wait for shutdown commands.
      */
-    private String address = "127.0.0.1";
+    private String address = "localhost";
 
 
     /**
@@ -400,8 +400,8 @@ public final class StandardServer
                 new ServerSocket(port, 1,
                                  InetAddress.getByName(address));
         } catch (IOException e) {
-            log.error("StandardServer.await: create[" + port
-                               + ":" + address
+            log.error("StandardServer.await: create[" + address
+                               + ":" + port
                                + "]: ", e);
             System.exit(1);
         }
