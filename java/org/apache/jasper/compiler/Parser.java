@@ -76,6 +76,11 @@ class Parser implements TagConstants {
     private static final String JAVAX_BODY_CONTENT_TEMPLATE_TEXT =
         "JAVAX_BODY_CONTENT_TEMPLATE_TEXT";
 
+    private static final boolean STRICT_QUOTE_ESCAPING = Boolean.valueOf(
+            System.getProperty(
+                    "org.apache.jasper.compiler.Parser.STRICT_QUOTE_ESCAPING",
+                    "true")).booleanValue();
+
     /**
      * The constructor
      */
@@ -293,7 +298,7 @@ class Parser implements TagConstants {
                     buf.append('\\');
                     ++i;
                 }
-            } else if (ch == quote) {
+            } else if (ch == quote && STRICT_QUOTE_ESCAPING) {
                 // Unescaped quote character
                 err.jspError(start, "jsp.error.attribute.noescape", tx,
                         "" + quote);
