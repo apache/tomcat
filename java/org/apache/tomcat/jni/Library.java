@@ -33,6 +33,7 @@ public final class Library {
     static private Library _instance = null;
 
     private Library()
+        throws Exception
     {
         boolean loaded = false;
         String err = "";
@@ -42,6 +43,16 @@ public final class Library {
                 loaded = true;
             }
             catch (Throwable e) {
+                String name = System.mapLibraryName(NAMES[i]);
+                String path = System.getProperty("java.library.path");
+                String sep = System.getProperty("path.separator");
+                String [] paths = path.split(sep);
+                for (int j=0; j<paths.length; j++) {
+                    java.io.File fd = new java.io.File(paths[j] + System.getProperty("file.separator") + name);
+                    if (fd.exists()) {
+                        e.printStackTrace();
+                    }
+                }
                 if ( i > 0)
                     err += ", ";
                 err +=  e.getMessage();
