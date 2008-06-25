@@ -64,6 +64,10 @@ JKJNIDIST=tomcat-native-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
 svn export $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
+if [ $? -ne 0 ]; then
+  echo "svn export failed"
+  exit 1
+fi
 svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKJNIDIST}/KEYS
 svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKJNIDIST}/LICENSE
 svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKJNIDIST}/NOTICE
