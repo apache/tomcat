@@ -50,10 +50,15 @@ fi
 
 # Replace JKJNIEXT with branch/or tag
 # and JKJNIVER by the version like 1.1.0
+# DON't forget to update native/include/tcn_version.h
+# and native/os/win32/libtcnative.rc
+# #define TCN_VERISON "1.1.14"
+# FILEVERSION 1,1,14,0
+# PRODUCTVERSION 1,1,14,0
 #JKJNIEXT="trunk"
 #JKJNIVER="current"
-JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_13"
-JKJNIVER="1.1.13"
+JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_14"
+JKJNIVER="1.1.14"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 JKJNIDIST=tomcat-native-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
