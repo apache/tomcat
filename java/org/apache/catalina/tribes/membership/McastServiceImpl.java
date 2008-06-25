@@ -304,6 +304,7 @@ public class McastServiceImpl
             send(false);
             //leave mcast group
             try {socket.leaveGroup(address);}catch ( Exception ignore){}
+            try {socket.close();}catch ( Exception ignore){}
             serviceStartTime = Long.MAX_VALUE;
         }
         return (startLevel == 0);
