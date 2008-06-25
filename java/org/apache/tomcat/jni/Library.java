@@ -48,7 +48,7 @@ public final class Library {
                 String sep = System.getProperty("path.separator");
                 String [] paths = path.split(sep);
                 for (int j=0; j<paths.length; j++) {
-                    java.io.File fd = new java.io.File(paths[j] + System.getProperty("file.separator") + name);
+                    java.io.File fd = new java.io.File(paths[j] , name);
                     if (fd.exists()) {
                         e.printStackTrace();
                     }
