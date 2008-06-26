@@ -135,6 +135,7 @@ public class ServerCookie implements Serializable {
     
     private static final String tspecials = ",; ";
     private static final String tspecials2 = "()<>@,;:\\\"/[]?={} \t";
+    private static final String tspecials2NoSlash = "()<>@,;:\\\"[]?={} \t";
 
     /*
      * Tests a string and returns true if the string counts as a
@@ -146,6 +147,11 @@ public class ServerCookie implements Serializable {
      *              token; <code>false</code> if it is not
      */
     public static boolean isToken(String value) {
+        return isToken(value,null);
+    }
+    
+    public static boolean isToken(String value, String literals) {
+        String tspecials = (literals==null?ServerCookie.tspecials:literals);
         if( value==null) return true;
         int len = value.length();
 
@@ -172,8 +178,12 @@ public class ServerCookie implements Serializable {
         return false;
     }
 
-
     public static boolean isToken2(String value) {
+        return isToken2(value,null);
+    }
+
+    public static boolean isToken2(String value, String literals) {
+        String tspecials2 = (literals==null?ServerCookie.tspecials2:literals);
         if( value==null) return true;
         int len = value.length();
 
@@ -299,7 +309,11 @@ public class ServerCookie implements Serializable {
         // Path=path
         if (path!=null) {
             buf.append ("; Path=");
-            maybeQuote2(version, buf, path);
+            if (version==0) {
+                maybeQuote2(version, buf, path);
+            } else {
+                maybeQuote2(version, buf, path, ServerCookie.tspecials2NoSlash, false);
+            }
         }
 
         // Secure
@@ -341,6 +355,10 @@ public class ServerCookie implements Serializable {
     }
 
     public static int maybeQuote2 (int version, StringBuffer buf, String value, boolean allowVersionSwitch) {
+        return maybeQuote2(version,buf,value,null,allowVersionSwitch);
+    }
+
+    public static int maybeQuote2 (int version, StringBuffer buf, String value, String literals, boolean allowVersionSwitch) {
         if (value==null || value.length()==0) {
             buf.append("\"\"");
         }else if (containsCTL(value,version)) 
@@ -349,16 +367,16 @@ public class ServerCookie implements Serializable {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,1,value.length()-1));
             buf.append('"');
-        } else if (allowVersionSwitch && (!STRICT_SERVLET_COMPLIANCE) && version==0 && !isToken2(value)) {
+        } else if (allowVersionSwitch && (!STRICT_SERVLET_COMPLIANCE) && version==0 && !isToken2(value, literals)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
             version = 1;
-        } else if (version==0 && !isToken(value)) {
+        } else if (version==0 && !isToken(value,literals)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
-        } else if (version==1 && !isToken2(value)) {
+        } else if (version==1 && !isToken2(value,literals)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
