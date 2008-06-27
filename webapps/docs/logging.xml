@@ -210,7 +210,7 @@
       may be changed per logger using the <code>loggerName.useParentHandlers</code> property, which accepts 
       a boolean value.</li>
       <li>The root logger can define its set of handlers using a <code>.handlers</code> property.</li>
-      <li>System property replacement for property values which start with ${sytstemPropertyName}.</li>
+      <li>System property replacement for property values which start with ${systemPropertyName}.</li>
     </ul>
   </p>
   <p>
