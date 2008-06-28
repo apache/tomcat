@@ -330,6 +330,7 @@ public class AjpMessage {
             return;
         }
         mb.setBytes(buf, pos, length);
+        mb.getCharChunk().recycle(); // not valid anymore
         pos += length;
         pos++; // Skip the terminating \0
     }
