@@ -449,8 +449,8 @@ values, depending on how you configured your keystore earlier:</p>
   </tr>
   <tr>
     <td><code>keystoreType</code></td>
-    <td>Add this element if using a keystore type other than
-    <code>JKS</code>.</td>
+    <td>Add this element if using a keystore type other than <code>JKS</code>.
+    For example the *.p12 files from openssl can be used using <code>PKCS12</code>.</td>
   </tr>
   <tr>
     <td><code>sslProtocol</code></td>
