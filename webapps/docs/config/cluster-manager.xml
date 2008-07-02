@@ -97,6 +97,11 @@
        a shutdown occurs on one node, set this value to <code>true</code>.
        Default value is <code>false</code>.
      </attribute>
+     <attribute name="stateTransferTimeout" required="false">
+       The time in seconds to wait for a session state transfer to complete from another node
+       when a node is starting up.
+       Default value is <code>60</code> seconds.
+     </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.catalina.ha.session.BackupManager Attributes">
