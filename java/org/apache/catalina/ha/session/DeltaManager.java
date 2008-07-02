@@ -880,7 +880,7 @@ public class DeltaManager extends ClusterManagerBase{
                      receiverQueue = true ;
                 }
                 cluster.send(msg, mbr);
-                if (log.isWarnEnabled()) log.warn(sm.getString("deltaManager.waitForSessionState",getName(), mbr));
+                if (log.isWarnEnabled()) log.warn(sm.getString("deltaManager.waitForSessionState",getName(), mbr,getStateTransferTimeout()));
                 // FIXME At sender ack mode this method check only the state transfer and resend is a problem!
                 waitForSendAllSessions(beforeSendTime);
             } finally {
