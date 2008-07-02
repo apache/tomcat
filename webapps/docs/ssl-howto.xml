@@ -198,7 +198,7 @@ via (among other things) OpenSSL and Microsoft's Key-Manager.
 </p>
 
 <p>Each entry in a keystore is identified by an alias string. Whilst many
-keystore implmentations treat alaises in a case insensitive manner, case
+keystore implementations treat alaises in a case insensitive manner, case
 sensitive implementations are available. The <code>PKCS11</code> specification,
 for example, requires that aliases are case sensitive. To avoid issues related
 to the case sensitivity of aliaises, it is not recommended to use aliases that
