@@ -923,7 +923,10 @@ public class AjpProcessor implements ActionHook {
 
         // HTTP header contents
         responseHeaderMessage.appendInt(response.getStatus());
-        String message = response.getMessage();
+        String message = null;
+        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER) {
+            message = response.getMessage();
+        }
         if (message == null){
             message = HttpMessages.getMessage(response.getStatus());
         } else {

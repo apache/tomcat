@@ -421,11 +421,14 @@ public class InternalAprOutputBuffer
         buf[pos++] = Constants.SP;
 
         // Write message
-        String message = response.getMessage();
+        String message = null;
+        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER) {
+            message = response.getMessage();
+        }
         if (message == null) {
             write(HttpMessages.getMessage(status));
         } else {
-            write(message);
+            write(message.replace('\n', ' ').replace('\r', ' '));
         }
 
         // End the response status line
