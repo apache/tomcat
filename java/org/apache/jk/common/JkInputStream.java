@@ -272,7 +272,10 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
         outputMsg.appendByte(AjpConstants.JK_AJP13_SEND_HEADERS);
         outputMsg.appendInt( res.getStatus() );
         
-        String message=res.getMessage();
+        String message = null;
+        if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER) {
+            message = res.getMessage();
+        } 
         if( message==null ){
             message= HttpMessages.getMessage(res.getStatus());
         } else {
