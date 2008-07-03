@@ -369,9 +369,20 @@ public class ApplicationContext
             throw new IllegalArgumentException
                 (sm.getString
                  ("applicationContext.requestDispatcher.iae", path));
+
+        // Get query string
+        String queryString = null;
+        int pos = path.indexOf('?');
+        if (pos >= 0) {
+            queryString = path.substring(pos + 1);
+            path = path.substring(0, pos);
+        }
+
         path = normalize(path);
         if (path == null)
             return (null);
+
+        pos = path.length(); 
 
         // Use the thread local URI and mapping data
         DispatchData dd = dispatchData.get();
@@ -383,15 +394,6 @@ public class ApplicationContext
         MessageBytes uriMB = dd.uriMB;
         uriMB.recycle();
 
-        // Get query string
-        String queryString = null;
-        int pos = path.indexOf('?');
-        if (pos >= 0) {
-            queryString = path.substring(pos + 1);
-        } else {
-            pos = path.length();
-        }
- 
         // Use the thread local mapping data
         MappingData mappingData = dd.mappingData;
 
