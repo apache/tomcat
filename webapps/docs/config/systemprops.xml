@@ -189,6 +189,15 @@
       be used.</p>
     </property>
 
+    <property
+    name="org.apache.coyote. USE_CUSTOM_STATUS_MSG_IN_HEADER"><p>If this is
+      <code>true</code> custom HTTP status messages will be used within HTTP
+      headers. Users must ensure that any such message is ISO-8859-1 encoded,
+      particularly if user provided input is included in the message, to prevent
+      a possible XSS vulnerability. If not specified the default value of
+      <code>false</code> will be used.</p>
+    </property>
+
   </properties>
 
 </section>
