@@ -125,6 +125,28 @@
       If a value smaller or equal to 0 is presented, the code will default this value to frequency
       </p>
     </attribute>
+    <attribute name="recoveryEnabled" required="false">
+      <p>
+      In case of a network failure, Java multicast socket don't transparently fail over, instead the socket will continously
+      throw IOException upon each receive request. When recoveryEnabled is set to true, this will close the multicast socket
+      and open a new socket with the same properties as defined above.<br/>
+      The default is <code>true</code>. <br/>
+      </p>
+    </attribute>
+    <attribute name="recoveryCounter" required="false">
+      <p>
+      When <code>recoveryEnabled==true</code> this value indicates how many times we will try recovery.
+      The default is <code>10</code>. <br/>
+      </p>
+    </attribute>
+    <attribute name="recoverySleepTime" required="false">
+      <p>
+      When <code>recoveryEnabled==true</code> this value indicates how long time (in milliseconds)
+      the system will sleep in between recovery attempts, until we either recovered successfully or we have reached the
+      recoveryCounter limit.
+      The default is <code>5000</code> (5 seconds). <br/>
+      </p>
+    </attribute>
 
 
   </attributes>
