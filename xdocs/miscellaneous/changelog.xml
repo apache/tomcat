@@ -36,7 +36,6 @@
   new documentation project for  Tomcat Native was started.
   </p>
 </section>
-</section>
 <section name="Changes between 1.1.13 and 1.1.14">
   <changelog>
     <fix>
@@ -50,6 +49,7 @@
       Fix optSet don't throw exception as JAVA prototype doesn't. (jfclere)
     </fix>
   </changelog>
+</section>
 <section name="Changes between 1.1.12 and 1.1.13">
   <changelog>
     <fix>
