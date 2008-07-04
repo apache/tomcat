@@ -198,16 +198,18 @@ via (among other things) OpenSSL and Microsoft's Key-Manager.
 </p>
 
 <p>Each entry in a keystore is identified by an alias string. Whilst many
-keystore implementations treat alaises in a case insensitive manner, case
+keystore implementations treat aliases in a case insensitive manner, case
 sensitive implementations are available. The <code>PKCS11</code> specification,
 for example, requires that aliases are case sensitive. To avoid issues related
-to the case sensitivity of aliaises, it is not recommended to use aliases that
+to the case sensitivity of aliases, it is not recommended to use aliases that
 differ only in case.
 </p>
 
 <p>To import an existing certificate into a JKS keystore, please read the
 documentation (in your JDK documentation package) about <code>keytool</code>.
-Note that openssl often adds a readable comments before the key, <code>keytool</code>does not support that, so remove the openssl comments if they exist before importing the key using <code>keytool</code>.
+Note that OpenSSL often adds a readable comments before the key,
+<code>keytool</code>does not support that, so remove the OpenSSL comments if
+they exist before importing the key using <code>keytool</code>.
 </p>
 <p>To import an existing certificate signed by your own CA into a PKCS12 
 keystore using OpenSSL you would execute a command like:
@@ -216,7 +218,7 @@ keystore using OpenSSL you would execute a command like:
                         -caname root -chain
 </source>
 For more advanced cases, consult the <a href="http://www.openssl.org/">OpenSSL
-documententation</a>.
+documentation</a>.
 </p>
 <p>To create a new keystore from scratch, containing a single self-signed
 Certificate, execute the following from a terminal command line:</p>
@@ -280,7 +282,7 @@ which contains further references for this issue.</p>
 </subsection>
 
 <subsection name="Edit the Tomcat Configuration File">
-<p>If you are using APR, you have the option of configuring an alternative engine to openSSL.
+<p>If you are using APR, you have the option of configuring an alternative engine to OpenSSL.
 <source>
 &lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="someengine" SSLRandomSeed="somedevice" /&gt;
 </source>
@@ -450,7 +452,7 @@ values, depending on how you configured your keystore earlier:</p>
   <tr>
     <td><code>keystoreType</code></td>
     <td>Add this element if using a keystore type other than <code>JKS</code>.
-    For example the *.p12 files from openssl can be used using <code>PKCS12</code>.</td>
+    For example the *.p12 files from OpenSSL can be used using <code>PKCS12</code>.</td>
   </tr>
   <tr>
     <td><code>sslProtocol</code></td>
