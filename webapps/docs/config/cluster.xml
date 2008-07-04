@@ -124,6 +124,18 @@
       So to use ACK and ASYNC messaging, the flag would be <code>10 (8+2) or 0x000B</code><br/>
       </p>
     </attribute>
+    <attribute name="channelStartOptions" required="false">
+      <p>Sets the start and stop flags for the &lt;Channel&gt; object used by the cluster.
+         The default is <code>Channel.DEFAULT</code> which starts all the channel services, such as 
+         sender, receiver, multicast sender and multicast receiver.
+         The following flags are available today:
+         <source>
+           Channel.DEFAULT = Channel.SND_RX_SEQ (1)| Channel.SND_TX_SEQ (2)| Channel.MBR_RX_SEQ (4)| Channel.MBR_TX_SEQ (8);
+         </source>
+         To start a channel without multicasting, you would want to use the value <code>Channel.SND_RX_SEQ | Channel.SND_TX_SEQ</code>
+         that equals to <code>3</code>.
+      </p>
+    </attribute>
 
     <attribute name="heartbeatBackgroundEnabled" required="false">
       <p>Enable this flag don't forget to disable the channel heartbeat thread.
