@@ -437,7 +437,7 @@
 
   <!-- ================= DIST: Create Windows Installer =================== -->
   <target name="installer"
-   description="Create Windows installer" if="execute.installer">
+   description="Create Windows installer" unless="skip.installer">
     <echo message="Builds a Windows installer based on Nullsoft Installer"/>
     <copy todir="${tomcat.dist}">
       <fileset dir="res" />
@@ -454,7 +454,12 @@
     <filter token="VERSION_NUMBER" value="${version.number}"/>
 
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" filtering="true" overwrite="true"/>
-    <exec dir="${tomcat.dist}" executable="${nsis.exe}">
+    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="tomcat.nsi" />
+    </exec>
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.exe}" />
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="tomcat.nsi" />
     </exec>
