@@ -29,7 +29,7 @@
 
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2007" />
+  <property name="year"                  value="2008" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
@@ -644,6 +644,11 @@
       <param name="basedir" value="${jasper-jdt.home}" />
     </antcall>
 
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${nsis.loc}"/>
+      <param name="destfile" value="${nsis.exe}"/>
+  	  <param name="destdir" value="${nsis.home}/.."/>
+    </antcall>
   </target>
 
   <target name="build-tomcat-dbcp" unless="jdk16.present">
