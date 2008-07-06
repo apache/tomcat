@@ -45,6 +45,7 @@ compile.debug=true
 
 base-commons.loc=http://archive.apache.org/dist/commons
 base-tomcat.loc=http://archive.apache.org/dist/tomcat
+base-sf.loc=http://downloads.sourceforge.net
 
 # ----- Commons Logging, version 1.1 or later -----
 commons-logging-version=1.1.1
@@ -82,12 +83,12 @@ commons-collections.loc=${base-jakarta.loc}/commons/collections/binaries/commons
 commons-collections-src.loc=${base-commons.loc}/collections/source/commons-collections-3.2-src.tar.gz
 
 # ----- NSIS, version 2.0 or later -----
-nsis.home=${base.path}/nsis-2.34
+nsis.home=${base.path}/nsis-2.37
 nsis.exe=${nsis.home}/makensis.exe
 nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
 nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
 nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
-nsis.loc=${base-sf.loc}/nsis/nsis-2.34-setup.exe
+nsis.loc=${base-sf.loc}/nsis/nsis-2.37.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
 commons-daemon.home=${base.path}/commons-daemon-1.0.1
