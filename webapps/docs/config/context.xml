@@ -94,6 +94,10 @@
   </ul>
   </p>
 
+  <p>With the exception of server.xml, files that define <strong>Context
+  </strong> elements may only define a single <strong>Context</strong> element.
+  </p>
+
   <p>In addition to explicitly specified Context elements, there are
   several techniques by which Context elements can be created automatically
   for you.  See <a href="host.html#Automatic Application Deployment">
