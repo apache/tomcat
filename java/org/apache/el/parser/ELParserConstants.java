@@ -69,11 +69,13 @@ public interface ELParserConstants {
   int MOD1 = 52;
   int IDENTIFIER = 53;
   int NAMESPACE = 54;
-  int FUNCTIONSUFFIX = 55;
-  int IMPL_OBJ_START = 56;
-  int LETTER = 57;
-  int DIGIT = 58;
-  int ILLEGAL_CHARACTER = 59;
+  int NAMESPACE_NAME = 55;
+  int FUNCTION_CALL = 56;
+  int FUNCTIONSUFFIX = 57;
+  int IMPL_OBJ_START = 58;
+  int LETTER = 59;
+  int DIGIT = 60;
+  int ILLEGAL_CHARACTER = 61;
 
   int DEFAULT = 0;
   int IN_EXPRESSION = 1;
@@ -134,6 +136,8 @@ public interface ELParserConstants {
     "\"mod\"",
     "<IDENTIFIER>",
     "<NAMESPACE>",
+    "<NAMESPACE_NAME>",
+    "<FUNCTION_CALL>",
     "<FUNCTIONSUFFIX>",
     "\"#\"",
     "<LETTER>",
