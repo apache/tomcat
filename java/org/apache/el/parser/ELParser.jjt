@@ -31,7 +31,7 @@ options
 	NODE_DEFAULT_VOID=true;
 	JAVA_UNICODE_ESCAPE=false;
   	UNICODE_INPUT=true;
-	BUILD_NODE_FILES=true;
+	BUILD_NODE_FILES=false;
 }
 
 /* == Parser Declaration == */
@@ -274,20 +274,19 @@ void Identifier() #Identifier : { Token t = null; }
  */
 void Function() #Function :
 {
-	Token t0 = null;
-	Token t1 = null;
+	Token tx = null;
 }
 {
-	(t0=<NAMESPACE>)? t1=<IDENTIFIER>
+	(tx=<FUNCTION_CALL>) (Expression() (<COMMA> Expression())*)? <RPAREN>
 	{
-		if (t0 != null) {
-			jjtThis.setPrefix(t0.image.substring(0, t0.image.length() - 1));
-			jjtThis.setLocalName(t1.image);
+		int split = tx.image.indexOf(":");
+		if (split!=-1) {
+			jjtThis.setPrefix(tx.image.substring(0, split));
+			jjtThis.setLocalName(tx.image.substring(split + 1, tx.image.length() - 1));
 		} else {
-			jjtThis.setLocalName(t1.image);
+			jjtThis.setLocalName(tx.image.substring(0, tx.image.length() - 1));
 		}
 	}
-	<LPAREN> (Expression() (<COMMA> Expression())*)? <RPAREN>
 }
 
 /*
@@ -428,7 +427,9 @@ void Null() #Null : {}
 |	< MOD0 : "%" >
 |	< MOD1 : "mod" >
 |	< IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
-|   < NAMESPACE : (<IDENTIFIER> (<IDENTIFIER>|<MINUS>|<DOT>)* <COLON>) >
+|	< #NAMESPACE : ( <NAMESPACE_NAME> <COLON>) >
+|	< #NAMESPACE_NAME: (<IDENTIFIER> (<LETTER>|<DIGIT>|<MINUS>|<DOT>)*) >
+|	< FUNCTION_CALL: (<NAMESPACE>)? <IDENTIFIER> <LPAREN> >
 |	< FUNCTIONSUFFIX : (<IDENTIFIER>) >
 |	< #IMPL_OBJ_START: "#" >
 |	< #LETTER:
