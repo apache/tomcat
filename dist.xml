@@ -449,6 +449,8 @@
         tofile="${tomcat.dist}/bin/tomcat6.exe" />
     <copy file="res/procrun/tomcat6w.exe"
         tofile="${tomcat.dist}/bin/tomcat6w.exe" />
+    <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
+        tofile="${tomcat.dist}/bin/tcnative-1.dll" />
 
     <filter token="VERSION" value="${version}"/>
     <filter token="VERSION_NUMBER" value="${version.number}"/>
@@ -470,6 +472,7 @@
               forceOverwrite="yes" fileext=".md5" />
     <echo     file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" 
                       message="${md5sum.binary-prefix}${final.name}.exe${line.separator}" append="true" />
+    <delete file="${tomcat.dist}/bin/tcnative-1.dll"/>
   </target>
 
 
