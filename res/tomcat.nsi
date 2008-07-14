@@ -95,7 +95,7 @@ ${StrRep}
     LangString DESC_SecTomcat ${LANG_ENGLISH} "Install the Tomcat Servlet container."
     LangString DESC_SecTomcatCore ${LANG_ENGLISH} "Install the Tomcat Servlet container core."
     LangString DESC_SecTomcatService ${LANG_ENGLISH} "Automatically start Tomcat when the computer is started. This requires Windows NT 4.0, Windows 2000 or Windows XP."
-    LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Downloads and installs APR based Tomcat native .dll for better performance and scalability in production environments."
+    LangString DESC_SecTomcatNative ${LANG_ENGLISH} "Install APR based Tomcat native .dll for better performance and scalability in production environments."
     LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
     LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This include documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
     LangString DESC_SecExamples ${LANG_ENGLISH} "Installs some examples web applications."
@@ -209,16 +209,8 @@ Section "Native" SecTomcatNative
 
   SectionIn 3
 
-  ; tcnative-1.dll is a symlink to the tcnative-1-ipv4.dll
-  ; If IPV6 support is required, download the tcnative-1-ipv6.dll insted
-  ; The tcnative-1.dll from heanet.ie comes with APR 1.2.8 and OpenSSL 0.9.8e compiled in.
-  ; TODO: Depending on the JVM download the 32 or 64 bit version.
-  NSISdl::download /TIMEOUT=30000 http://tomcat.heanet.ie/native/1.1.10/binaries/win32/tcnative-1.dll $INSTDIR\bin\tcnative-1.dll
-  Pop $0
-  StrCmp $0 success success
-    SetDetailsView show
-    DetailPrint "download failed from http://tomcat.heanet.ie/native/1.1.10/binaries/win32/tcnative-1.dll: $0"
-  success:
+  SetOutPath $INSTDIR\bin
+  File bin\tcnative-1.dll
 
   ClearErrors
 
