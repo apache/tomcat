@@ -1728,16 +1728,20 @@ public final class CGIServlet extends HttpServlet {
                     }
                 } //replacement for Process.waitFor()
     
-                // Close the output stream if used
-                if (cgiOutput != null) {
-                    cgiOutput.close();
-                }
             }
             catch (IOException e){
                 log ("Caught exception " + e);
                 throw e;
             }
             finally{
+                // Close the output stream if used
+                if (cgiOutput != null) {
+                    try {
+                        cgiOutput.close();
+                    } catch (IOException ioe) {
+                        log ("Exception closing output stream " + ioe);
+                    }
+                }
                 if (debug > 4) {
                     log ("Running finally block");
                 }
