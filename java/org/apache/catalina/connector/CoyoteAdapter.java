@@ -206,6 +206,13 @@ public class CoyoteAdapter
                     connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
                 }
                 if (response.isClosed() || !request.isComet()) {
+                    if (status==SocketStatus.OPEN) {
+                        //CometEvent.close was called during an event.
+                        request.getEvent().setEventType(CometEvent.EventType.END);
+                        request.getEvent().setEventSubType(null);
+                        error = true;
+                        connector.getContainer().getPipeline().getFirst().event(request, response, request.getEvent());
+                    }
                     res.action(ActionCode.ACTION_COMET_END, null);
                 } else if (!error && read && request.getAvailable()) {
                     // If this was a read and not all bytes have been read, or if no data
@@ -287,7 +294,7 @@ public class CoyoteAdapter
 
                 if (request.isComet()) {
                     if (!response.isClosed() && !response.isError()) {
-                        if (request.getAvailable()) {
+                        if (request.getAvailable() || (request.getContentLength() > 0 && (!request.isParametersParsed()))) {
                             // Invoke a read event right away if there are available bytes
                             if (event(req, res, SocketStatus.OPEN)) {
                                 comet = true;
