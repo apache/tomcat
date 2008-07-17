@@ -2248,6 +2248,12 @@ public class Request
         this.comet = comet;
     }
 
+    /**
+     * return true if we have parsed parameters
+     */
+    public boolean isParametersParsed() {
+        return parametersParsed;
+    }    
     
     /**
      * Return true if bytes are available.
