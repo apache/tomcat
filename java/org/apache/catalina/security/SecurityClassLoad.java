@@ -64,9 +64,6 @@ public final class SecurityClassLoad {
              "core.ContainerBase$PrivilegedAddChild");
         loader.loadClass
             (basePackage +
-             "core.StandardWrapper$1");
-        loader.loadClass
-        	(basePackage +
              "core.ApplicationHttpRequest$AttributeNamesEnumerator");
     }
     
