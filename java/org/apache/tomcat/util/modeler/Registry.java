@@ -22,6 +22,7 @@ package org.apache.tomcat.util.modeler;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -593,7 +594,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                     log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1 ));
                 }
             } else {
-                server=MBeanServerFactory.createMBeanServer();
+                server = ManagementFactory.getPlatformMBeanServer();
                 if( log.isDebugEnabled() ) {
                     log.debug("Creating MBeanServer"+ (System.currentTimeMillis() - t1 ));
                 }
