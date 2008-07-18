@@ -207,7 +207,7 @@ differ only in case.
 
 <p>To import an existing certificate into a JKS keystore, please read the
 documentation (in your JDK documentation package) about <code>keytool</code>.
-Note that OpenSSL often adds a readable comments before the key,
+Note that OpenSSL often adds readable comments before the key,
 <code>keytool</code>does not support that, so remove the OpenSSL comments if
 they exist before importing the key using <code>keytool</code>.
 </p>
@@ -406,7 +406,7 @@ numbers lower than 1024 on many operating systems.</p>
   that SSL is required, as required by the Servlet 2.4 Specification.</p>
   </em></blockquote>
 
-<p>There are addional option used to configure the SSL protocol.
+<p>There are additional options used to configure the SSL protocol.
   You may need to add or change the following attribute
 values, depending on how you configured your keystore earlier:</p>
 
@@ -513,8 +513,8 @@ contains some troubleshooting tips.</p>
 </section>
 
 <section name="Installing a Certificate from a Certificate Authority">
-<p>To obstain and install a Certificate from a Certificate Authority (like verisign.com, thawte.com 
-or trustcenter.de) you should have read the previous section and then follow these instructions:</p>
+<p>To obtain and install a Certificate from a Certificate Authority (like verisign.com, thawte.com 
+or trustcenter.de), read the previous section and then follow these instructions:</p>
 
 <subsection name="Create a local Certificate Signing Request (CSR)">
 <p>In order to obtain a Certificate from the Certificate Authority of your choice 
@@ -540,20 +540,20 @@ documentation of the Certificate Authority website on how to do this). In return
 <subsection name="Importing the Certificate">
 <p>Now that you have your Certificate you can import it into you local keystore. 
 First of all you have to import a so called Chain Certificate or Root Certificate into your keystore. 
-After that you can procede with importing your Certificate.</p>
+After that you can proceed with importing your Certificate.</p>
 
 <ul>
 <li>Download a Chain Certificate from the Certificate Authority you obtained the Certificate from.<br/>
 	For Verisign.com commercial certificates go to:
             http://www.verisign.com/support/install/intermediate.html<br/>
         For Verisign.com trial certificates go to:
-            http://www.verisign.com/support/verisign-intermediate-ca/Trial_Secure_Server_Root/index.html
+            http://www.verisign.com/support/verisign-intermediate-ca/Trial_Secure_Server_Root/index.html<br/>
 	For Trustcenter.de go to:
             http://www.trustcenter.de/certservices/cacerts/en/en.htm#server<br/>
 	For Thawte.com go to:
             http://www.thawte.com/certs/trustmap.html<br/>
 </li>
-<li>Import the Chain Certificate into you keystore
+<li>Import the Chain Certificate into your keystore
     <source>keytool -import -alias root -keystore &lt;your_keystore_filename&gt; \
 	-trustcacerts -file &lt;filename_of_the_chain_certificate&gt;</source>
 </li>
