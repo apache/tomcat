@@ -20,6 +20,7 @@ package org.apache.catalina.startup;
 
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -179,7 +180,7 @@ public final class Bootstrap {
             mBeanServer =
                 (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
         } else {
-            mBeanServer = MBeanServerFactory.createMBeanServer();
+            mBeanServer = ManagementFactory.getPlatformMBeanServer();
         }
 
         // Register the server classloader
