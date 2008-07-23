@@ -302,6 +302,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
     tcn_socket_t *ss = J2P(sock, tcn_socket_t *);
     tcn_ssl_conn_t *con;
     int s, i;
+    long vr;
     apr_status_t rv;
     X509 *peer;
 
@@ -351,11 +352,17 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, handshake)(TCN_STDARGS, jlong sock)
         /*
         * Check for failed client authentication
         */
-        if (SSL_get_verify_result(con->ssl) != X509_V_OK) {
-            /* TODO: Log SSL client authentication failed */
-            con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
-            /* TODO: Figure out the correct return value */
-            return APR_EGENERAL;
+        if ((vr = SSL_get_verify_result(con->ssl)) != X509_V_OK) {
+            if (SSL_VERIFY_ERROR_IS_OPTIONAL(vr) &&
+                con->ctx->verify_mode == SSL_CVERIFY_OPTIONAL_NO_CA) {
+                /* TODO: Log optionalNoCA */
+            }
+            else {
+                /* TODO: Log SSL client authentication failed */
+                con->shutdown_type = SSL_SHUTDOWN_TYPE_UNCLEAN;
+                /* TODO: Figure out the correct return value */
+                return APR_EGENERAL;
+            }
         }
 
         /*

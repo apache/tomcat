@@ -36,6 +36,15 @@
   new documentation project for  Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.14 and 1.1.15">
+  <changelog>
+    <fix>
+      <bug>44864</bug>: Use additional check for SSL verify like
+      with mod_ssl for SSLVerifyClient=optionalNoCA. (mturk)
+    </fix>
+  </changelog>
+</section>
+
 <section name="Changes between 1.1.13 and 1.1.14">
   <changelog>
     <fix>
