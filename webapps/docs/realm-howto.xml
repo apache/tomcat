@@ -1342,7 +1342,7 @@ Regardless, the first Principal returned is <em>always</em> treated as the user 
  href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS
 LoginConfig file</a>) and tell Tomcat where to find it by specifying
 its location to the JVM, for instance by setting the environment
-variable: <code>JAVA_OPTS=-DJAVA_OPTS=-Djava.security.auth.login.config==$CATALINA_BASE/conf/jaas.config</code></li>
+variable: <code>JAVA_OPTS=$JAVA_OPTS -Djava.security.auth.login.config==$CATALINA_BASE/conf/jaas.config</code></li>
 
           <li>Configure your security-constraints in your web.xml for
 the resources you want to protect</li>
