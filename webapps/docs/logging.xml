@@ -104,7 +104,7 @@
             (v1.2 or later) and place the log4j jar in $CATALINA_HOME/lib.</li>
 
         <li>Build the commons-logging additional component using the extras.xml
-        Ant build script which is part of teh Tomcat source bundle.</li>
+        Ant build script which is part of the Tomcat source bundle.</li>
         
         <li>Replace <code>$CATALINA_HOME/bin/tomcat-juli.jar</code> with
         <code>output/extras/tomcat-juli.jar</code>.</li>
@@ -125,7 +125,7 @@
 	
     <p>
       You can (and should) be more picky about which packages to include 
-      in the logging. Tomcat 6 uses defines loggers by Engine and Host names.
+      in the logging. Tomcat 6 defines loggers by Engine and Host names.
       For example, for a default Catalina localhost log, add this to the
       end of the log4j.properties above. Note that there are known issues with 
       using this naming convention (with square brackets) in log4j XML based
