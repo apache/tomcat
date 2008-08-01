@@ -1413,6 +1413,7 @@ public class ELParser/*@bgen(jjtree)*/implements ELParserTreeConstants, ELParser
     xsp = jj_scanpos;
     if (jj_3R_11()) jj_scanpos = xsp;
     if (jj_scan_token(IDENTIFIER)) return true;
+    if (jj_scan_token(LPAREN)) return true;
     return false;
   }
 
