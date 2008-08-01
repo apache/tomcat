@@ -255,7 +255,7 @@ void BracketSuffix() #BracketSuffix : {}
 void NonLiteral() : {}
 {
  	<LPAREN> Expression() <RPAREN>
- 	| LOOKAHEAD(3) Function()
+ 	| LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER>) Function()
 	| Identifier()
 }
 
@@ -278,7 +278,7 @@ void Function() #Function :
 	Token t1 = null;
 }
 {
-	(t0=<NAMESPACE>)? t1=<IDENTIFIER>
+	(t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
 	{
 		if (t0 != null) {
 			jjtThis.setPrefix(t0.image.substring(0, t0.image.length() - 1));
@@ -428,7 +428,6 @@ void Null() #Null : {}
 |	< MOD0 : "%" >
 |	< MOD1 : "mod" >
 |	< IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
-|   < NAMESPACE : (<IDENTIFIER> (<IDENTIFIER>|<MINUS>|<DOT>)* <COLON>) >
 |	< FUNCTIONSUFFIX : (<IDENTIFIER>) >
 |	< #IMPL_OBJ_START: "#" >
 |	< #LETTER:
