@@ -255,7 +255,7 @@ void BracketSuffix() #BracketSuffix : {}
 void NonLiteral() : {}
 {
  	<LPAREN> Expression() <RPAREN>
- 	| LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER>) Function()
+ 	| LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
 	| Identifier()
 }
 
