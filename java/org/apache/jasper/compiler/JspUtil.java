@@ -27,14 +27,10 @@ import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
 import javax.el.FunctionMapper;
-import javax.servlet.jsp.el.ExpressionEvaluator;
 
-
-import org.apache.el.ExpressionFactoryImpl;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.jasper.el.ExpressionEvaluatorImpl;
 import org.xml.sax.Attributes;
 
 /** 
@@ -64,10 +60,6 @@ public class JspUtil {
     //private static ExpressionEvaluatorImpl expressionEvaluator
     //= new ExpressionEvaluatorImpl();
     
-    //tc6
-    private final static ExpressionEvaluator expressionEvaluator =
-        new ExpressionEvaluatorImpl(new ExpressionFactoryImpl());
-
     private static final String javaKeywords[] = {
         "abstract", "assert", "boolean", "break", "byte", "case",
         "catch", "char", "class", "const", "continue",
