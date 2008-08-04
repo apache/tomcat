@@ -73,7 +73,7 @@
 
     <p>
       If you need to setup cross-context detailed logging from within Tomcat's code, 
-      then you can use a simple log4j configuration. Note that this logging van be very 
+      then you can use a simple log4j configuration. Note that this logging can be very 
       verbose depending on the log level you chose to use.  Note also that a log4j logging 
       configuration is not going to produce stack trace type logging: those stack traces
       are output to <code>stdout</code> as discussed above.
