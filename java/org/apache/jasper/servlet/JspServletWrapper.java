@@ -334,6 +334,9 @@ public class JspServletWrapper {
             } else {
                 throw ex;
             }
+        } catch (FileNotFoundException fnfe) {
+            // File has been removed. Let caller handle this.
+            throw fnfe;
         } catch (IOException ex) {
             if (options.getDevelopment()) {
                 throw handleJspException(ex);
