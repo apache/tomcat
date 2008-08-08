@@ -569,7 +569,7 @@ public class JspCompilationContext {
     }
 
     public boolean isRemoved() {
-        if (removed > 1 ) {
+        if (removed > 0 ) {
             return true;
         }
         return false;
@@ -580,6 +580,9 @@ public class JspCompilationContext {
     public void compile() throws JasperException, FileNotFoundException {
         createCompiler();
         if (jspCompiler.isOutDated()) {
+            if (isRemoved()) {
+                throw new FileNotFoundException(jspUri);
+            }
             try {
                 jspCompiler.removeGeneratedFiles();
                 jspLoader = null;

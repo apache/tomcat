@@ -382,7 +382,7 @@ public abstract class Compiler {
             URL jspUrl = ctxt.getResource(jsp);
             if (jspUrl == null) {
                 ctxt.incrementRemoved();
-                return false;
+                return true;
             }
             URLConnection uc = jspUrl.openConnection();
             if (uc instanceof JarURLConnection) {
