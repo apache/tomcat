@@ -1328,7 +1328,7 @@ JAAS Authentication Tutorial</a> and
 Developer's Guide</a>) to be managed by the JAAS Login
 Context (<code>javax.security.auth.login.LoginContext</code>)
 When developing your LoginModule, note that JAASRealm's built-in <code>CallbackHandler</code>
-+only recognizes the <code>NameCallback</code> and <code>PasswordCallback</code> at present.
+only recognizes the <code>NameCallback</code> and <code>PasswordCallback</code> at present.
           </li>
           <li>Although not specified in JAAS, you should create
 seperate classes to distinguish between users and roles, extending <code>javax.security.Principal</code>,
