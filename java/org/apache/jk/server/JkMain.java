@@ -676,9 +676,12 @@ public class JkMain implements MBeanRegistration
     }
 
     public void pause() throws Exception {
-        for( int i=0; i<wEnv.getHandlerCount(); i++ ) {
-            if( wEnv.getHandler(i) != null ) {
-                wEnv.getHandler(i).pause();
+        // wEnv sometime null at shutdown - bug45591
+        if (wEnv != null) {
+            for( int i=0; i<wEnv.getHandlerCount(); i++ ) {
+                if( wEnv.getHandler(i) != null ) {
+                    wEnv.getHandler(i).pause();
+                }
             }
         }
     }
