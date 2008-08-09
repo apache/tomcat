@@ -39,6 +39,7 @@ import javax.security.auth.spi.LoginModule;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Realm;
+import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.util.RequestUtil;
@@ -310,7 +311,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
         // Set up our CallbackHandler requests
         if (callbackHandler == null)
             throw new LoginException("No CallbackHandler specified");
-        Callback callbacks[] = new Callback[8];
+        Callback callbacks[] = new Callback[9];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
         callbacks[2] = new TextInputCallback("nonce");
@@ -319,6 +320,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
         callbacks[5] = new TextInputCallback("qop");
         callbacks[6] = new TextInputCallback("realmName");
         callbacks[7] = new TextInputCallback("md5a2");
+        callbacks[8] = new TextInputCallback("authMethod");
 
         // Interact with the user to retrieve the username and password
         String username = null;
@@ -329,6 +331,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
         String qop = null;
         String realmName = null;
         String md5a2 = null;
+        String authMethod = null;
 
         try {
             callbackHandler.handle(callbacks);
@@ -341,6 +344,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
             qop = ((TextInputCallback) callbacks[5]).getText();
             realmName = ((TextInputCallback) callbacks[6]).getText();
             md5a2 = ((TextInputCallback) callbacks[7]).getText();
+            authMethod = ((TextInputCallback) callbacks[8]).getText();
         } catch (IOException e) {
             throw new LoginException(e.toString());
         } catch (UnsupportedCallbackException e) {
@@ -348,13 +352,16 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, R
         }
 
         // Validate the username and password we have received
-        if (md5a2 == null) {
-            // Not using DIGEST
+        if (authMethod == null) {
+            // BASIC or FORM
             principal = super.authenticate(username, password);
-        } else {
-            // Must be using DIGEST
+        } else if (authMethod.equals(Constants.DIGEST_METHOD)) {
             principal = super.authenticate(username, password, nonce, nc,
                     cnonce, qop, realmName, md5a2);
+        } else if (authMethod.equals(Constants.CERT_METHOD)) {
+            principal = super.getPrincipal(username);
+        } else {
+            throw new LoginException("Unknown authentication method");
         }
 
         log.debug("login " + username + " " + principal);
