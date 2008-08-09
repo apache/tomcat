@@ -34,6 +34,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -337,13 +338,15 @@ public class JAASRealm
      * @param realmName     Realm name
      * @param md5a2         Second MD5 digest used to calculate the digest
      *                          MD5(Method + ":" + uri)
+     * @param authMethod    The authentication scheme in use
      */
     public Principal authenticate(String username, String clientDigest,
             String nonce, String nc, String cnonce, String qop,
             String realmName, String md5a2) {
         return authenticate(username,
                 new JAASCallbackHandler(this, username, clientDigest, nonce,
-                        nc, cnonce, qop, realmName, md5a2));
+                        nc, cnonce, qop, realmName, md5a2,
+                        Constants.DIGEST_METHOD));
     }
 
 
@@ -467,7 +470,9 @@ public class JAASRealm
      */
     protected Principal getPrincipal(String username) {
 
-        return (null);
+        return authenticate(username,
+                new JAASCallbackHandler(this, username, null, null, null, null,
+                        null, null, null, Constants.CERT_METHOD));
 
     }
 
