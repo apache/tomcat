@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CRL;
@@ -692,7 +693,7 @@ public class JSSESocketFactory
      * Configures the given SSL server socket with the requested cipher suites,
      * protocol versions, and need for client authentication
      */
-    private void initServerSocket(ServerSocket ssocket) {
+    private void initServerSocket(ServerSocket ssocket) throws IOException {
 
         SSLServerSocket socket = (SSLServerSocket) ssocket;
 
@@ -704,9 +705,48 @@ public class JSSESocketFactory
         setEnabledProtocols(socket, getEnabledProtocols(socket, 
                                                          requestedProtocols));
 
+        // Check the SSL config is OK
+        checkSocket(ssocket);
+
         // we don't know if client auth is needed -
         // after parsing the request we may re-handshake
         configureClientAuth(socket);
     }
 
+    /**
+     * Checks that the cetificate is compatible with the enabled cipher suites.
+     * If we don't check now, the JIoEndpoint can enter a nasty logging loop.
+     * See bug 45528.
+     */
+    private void checkSocket(ServerSocket socket) throws IOException {
+        int timeout = socket.getSoTimeout();
+        
+        socket.setSoTimeout(1);
+        Socket s = null;
+        try {
+            s = socket.accept();
+            // No expecting to get here but if we do, at least we know things
+            // are working.
+        } catch (SSLException ssle) {
+            // Cert doesn't match ciphers
+            IOException ioe =
+                new IOException("Certificate / cipher mismatch");
+            ioe.initCause(ssle);
+            throw ioe;
+        } catch (SocketTimeoutException ste) {
+            // Expected - do nothing
+        } finally {
+            // In case we actually got a connection - close it.
+            if (s != null) {
+                try {
+                    s.close();
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
+            // Reset the timeout
+            socket.setSoTimeout(timeout);
+        }
+        
+    }
 }
