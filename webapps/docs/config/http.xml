@@ -685,8 +685,11 @@
     </attribute>
 
     <attribute name="ciphers" required="false">
-      <p>A comma seperated list of the encryption ciphers that may be used.
-      If not specified, then any available cipher may be used.</p>
+      <p>The comma separated list of encryption ciphers that this socket is 
+      allowed to use. By default, the default ciphers for the JVM will be used.
+      Note that this usually means that the weak export grade ciphers will be
+      included in the list of available ciphers. The ciphers are specified using
+      the JSSE cipher naming convention.</p>
     </attribute>
 
     <attribute name="keyAlias" required="false">
