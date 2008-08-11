@@ -465,7 +465,10 @@ values, depending on how you configured your keystore earlier:</p>
   <tr>
     <td><code>ciphers</code></td>
     <td>The comma separated list of encryption ciphers that this socket is 
-        allowed to use.  By default, any available cipher is allowed.</td>
+        allowed to use. By default, the default ciphers for the JVM will be
+        used. Note that this usually means that the weak export grade ciphers
+        will be included in the list of available ciphers. The ciphers are
+        specified using the JSSE cipher naming convention.</td>
   </tr>
   <tr>
     <td><code>algorithm</code></td>
