@@ -707,7 +707,7 @@ public class StandardHost
             } catch (Throwable t) {
                 log.error(sm.getString
                     ("standardHost.invalidErrorReportValveClass", 
-                     errorReportValveClass));
+                     errorReportValveClass), t);
             }
         }
         if(log.isDebugEnabled()) {
