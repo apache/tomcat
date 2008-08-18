@@ -200,12 +200,18 @@ static void fill_finfo(JNIEnv *e, jobject obj, apr_finfo_t *info)
 
 static void fill_ainfo(JNIEnv *e, jobject obj, apr_sockaddr_t *info)
 {
+    apr_int32_t f;
+    if (info->family == APR_UNSPEC) f = 0;
+    else if (info->family == APR_INET) f = 1;
+    else if (info->family == APR_INET6) f = 2;
+    else f = info->family;
 
     SET_AINFO_J(pool, P2J(info->pool));
     SET_AINFO_S(hostname, info->hostname);
     SET_AINFO_S(servname, info->servname);
     SET_AINFO_I(port, info->port);
     SET_AINFO_I(family, info->family);
+    SET_AINFO_I(family, f);
     SET_AINFO_J(next, P2J(info->next));
 
 }
