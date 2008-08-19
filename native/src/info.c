@@ -210,7 +210,6 @@ static void fill_ainfo(JNIEnv *e, jobject obj, apr_sockaddr_t *info)
     SET_AINFO_S(hostname, info->hostname);
     SET_AINFO_S(servname, info->servname);
     SET_AINFO_I(port, info->port);
-    SET_AINFO_I(family, info->family);
     SET_AINFO_I(family, f);
     SET_AINFO_J(next, P2J(info->next));
 
