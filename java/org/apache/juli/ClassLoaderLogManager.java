@@ -135,9 +135,9 @@ public class ClassLoaderLogManager extends LogManager {
                 Handler handler = null;
                 ClassLoader current = classLoader;
                 while (current != null) {
-                    info = (ClassLoaderLogInfo) classLoaderLoggers.get(current);
+                    info = classLoaderLoggers.get(current);
                     if (info != null) {
-                        handler = (Handler) info.handlers.get(handlerName);
+                        handler = info.handlers.get(handlerName);
                         if (handler != null) {
                             break;
                         }
@@ -174,7 +174,7 @@ public class ClassLoaderLogManager extends LogManager {
     public synchronized Logger getLogger(final String name) {
         ClassLoader classLoader = Thread.currentThread()
                 .getContextClassLoader();
-        return (Logger) getClassLoaderInfo(classLoader).loggers.get(name);
+        return getClassLoaderInfo(classLoader).loggers.get(name);
     }
     
     
@@ -198,7 +198,7 @@ public class ClassLoaderLogManager extends LogManager {
     public String getProperty(String name) {
         ClassLoader classLoader = Thread.currentThread()
             .getContextClassLoader();
-        String prefix = (String) this.prefix.get();
+        String prefix = this.prefix.get();
         if (prefix != null) {
             name = prefix + name;
         }
@@ -210,7 +210,7 @@ public class ClassLoaderLogManager extends LogManager {
         if ((result == null) && (info.props.isEmpty())) {
             ClassLoader current = classLoader.getParent();
             while (current != null) {
-                info = (ClassLoaderLogInfo) classLoaderLoggers.get(current);
+                info = classLoaderLoggers.get(current);
                 if (info != null) {
                     result = info.props.getProperty(name);
                     if ((result != null) || (!info.props.isEmpty())) {
@@ -265,8 +265,7 @@ public class ClassLoaderLogManager extends LogManager {
         if (classLoader == null) {
             classLoader = ClassLoader.getSystemClassLoader();
         }
-        ClassLoaderLogInfo info = (ClassLoaderLogInfo) classLoaderLoggers
-                .get(classLoader);
+        ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
         if (info == null) {
             final ClassLoader classLoaderParam = classLoader;
             AccessController.doPrivileged(new PrivilegedAction() {
@@ -279,7 +278,7 @@ public class ClassLoaderLogManager extends LogManager {
                     return null;
                 }
             });
-            info = (ClassLoaderLogInfo) classLoaderLoggers.get(classLoader);
+            info = classLoaderLoggers.get(classLoader);
         }
         return info;
     }
@@ -362,8 +361,7 @@ public class ClassLoaderLogManager extends LogManager {
     protected void readConfiguration(InputStream is, ClassLoader classLoader)
         throws IOException {
         
-        ClassLoaderLogInfo info = 
-            (ClassLoaderLogInfo) classLoaderLoggers.get(classLoader);
+        ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
         
         try {
             info.props.load(is);
@@ -503,8 +501,7 @@ public class ClassLoaderLogManager extends LogManager {
                     nextName = name.substring(0, dotIndex);
                     name = name.substring(dotIndex + 1);
                 }
-                LogNode childNode = (LogNode) currentNode.children
-                        .get(nextName);
+                LogNode childNode = currentNode.children.get(nextName);
                 if (childNode == null) {
                     childNode = new LogNode(currentNode);
                     currentNode.children.put(nextName, childNode);
