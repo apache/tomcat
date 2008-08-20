@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CRL;
@@ -428,6 +429,9 @@ public class JSSESocketFactory
                 getEnabledCiphers(requestedCiphers,
                         sslProxy.getSupportedCipherSuites());
 
+            // Check the SSL config is OK
+            checkConfig();
+
         } catch(Exception e) {
             if( e instanceof IOException )
                 throw (IOException)e;
@@ -692,7 +696,7 @@ public class JSSESocketFactory
      * Configures the given SSL server socket with the requested cipher suites,
      * protocol versions, and need for client authentication
      */
-    private void initServerSocket(ServerSocket ssocket) {
+    private void initServerSocket(ServerSocket ssocket) throws IOException {
 
         SSLServerSocket socket = (SSLServerSocket) ssocket;
 
@@ -709,4 +713,33 @@ public class JSSESocketFactory
         configureClientAuth(socket);
     }
 
+    /**
+     * Checks that the cetificate is compatible with the enabled cipher suites.
+     * If we don't check now, the JIoEndpoint can enter a nasty logging loop.
+     * See bug 45528.
+     */
+    private void checkConfig() throws IOException {
+        // Create an unbound server socket
+        ServerSocket socket = sslProxy.createServerSocket();
+        initServerSocket(socket);
+
+        // Set the timeout to 1ms as all we care about is if it throws an
+        // exception on accept. 
+        socket.setSoTimeout(1);
+        try {
+            socket.accept();
+            // Will never get here - no client can connect to an unbound port
+        } catch (SSLException ssle) {
+            // SSL configuration is invalid. Possibly cert doesn't match ciphers
+            IOException ioe = new IOException(sm.getString(
+                    "jsse.invalid_ssl_conf", ssle.getMessage()));
+            ioe.initCause(ssle);
+            throw ioe;
+        } catch (SocketTimeoutException ste) {
+            // Expected if all is well - do nothing
+        } finally {
+            socket.close();
+        }
+        
+    }
 }
