@@ -30,6 +30,7 @@ TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     TCN_ALLOC_CSTRING(hostname);
     apr_sockaddr_t *sa = NULL;
+    apr_sockaddr_t *sl = NULL;
     apr_int32_t f;
 
 
@@ -38,10 +39,26 @@ TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
     TCN_THROW_IF_ERR(apr_sockaddr_info_get(&sa,
             J2S(hostname), f, (apr_port_t)port,
             (apr_int32_t)flags, p), sa);
+    sl = sa;
+    /* 
+     * apr_sockaddr_info_get may return several address so this is not
+     * go to work in some cases (but as least it works for Linux)
+     * XXX: with AP_ENABLE_V4_MAPPED it is going to work otherwise it won't.
+     */
+#if APR_HAVE_IPV6
+    if (hostname == NULL) {
+        /* Try all address using IPV6 one */
+        while (sl) {
+            if (sl->family == APR_INET6)
+                break; /* Done */
+            sl = sl->next;
+        }
+    }
+#endif
 
 cleanup:
     TCN_FREE_CSTRING(hostname);
-    return P2J(sa);
+    return P2J(sl);
 }
 
 TCN_IMPLEMENT_CALL(jstring, Address, getnameinfo)(TCN_STDARGS,
