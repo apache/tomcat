@@ -111,6 +111,7 @@ public class SocketServerTestSuite extends TestCase {
         wait = System.currentTimeMillis() - start;
         if (wait > 1 && ! ok)
             throw new Exception("non_blocking accept Socket.APR_SO_NONBLOCK failed");
+        client.join();
 
         /* Try the same on client socket */
         client = new Client();
@@ -136,6 +137,9 @@ public class SocketServerTestSuite extends TestCase {
         wait = System.currentTimeMillis() - start;
         if (wait < 1)
             throw new Exception("non_blocking client Socket.APR_SO_NONBLOCK false failed");
+
+        client.join();
+        Library.terminate();
     }
 
     /* small client that connects and sends one byte */
@@ -165,6 +169,7 @@ public class SocketServerTestSuite extends TestCase {
     {
         TestSuite suite = new TestSuite( "Tomcat Native Server Socket" );
         suite.addTest(new TestSuite(SocketServerTestSuite.class));
+        suite.addTest(new TestSuite(SocketServerTestBind.class));
         return suite;
     }
 }
