@@ -119,15 +119,4 @@ public class SocketServerTestBind extends TestCase {
             }
         }
     }
-    
-    public static void main(String[] args) {
-        TestRunner.run(suite());
-    }
-    
-    public static Test suite()
-    {
-        TestSuite suite = new TestSuite( "Tomcat Native Server Socket" );
-        suite.addTest(new TestSuite(SocketServerTestSuite.class));
-        return suite;
-    }
 }
