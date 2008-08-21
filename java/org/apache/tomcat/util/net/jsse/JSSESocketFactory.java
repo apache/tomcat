@@ -26,7 +26,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CRL;
@@ -696,7 +695,7 @@ public class JSSESocketFactory
      * Configures the given SSL server socket with the requested cipher suites,
      * protocol versions, and need for client authentication
      */
-    private void initServerSocket(ServerSocket ssocket) throws IOException {
+    private void initServerSocket(ServerSocket ssocket) {
 
         SSLServerSocket socket = (SSLServerSocket) ssocket;
 
@@ -714,7 +713,7 @@ public class JSSESocketFactory
     }
 
     /**
-     * Checks that the cetificate is compatible with the enabled cipher suites.
+     * Checks that the certificate is compatible with the enabled cipher suites.
      * If we don't check now, the JIoEndpoint can enter a nasty logging loop.
      * See bug 45528.
      */
@@ -723,10 +722,11 @@ public class JSSESocketFactory
         ServerSocket socket = sslProxy.createServerSocket();
         initServerSocket(socket);
 
-        // Set the timeout to 1ms as all we care about is if it throws an
-        // exception on accept. 
-        socket.setSoTimeout(1);
         try {
+            // Set the timeout to 1ms as all we care about is if it throws an
+            // SSLException on accept. 
+            socket.setSoTimeout(1);
+
             socket.accept();
             // Will never get here - no client can connect to an unbound port
         } catch (SSLException ssle) {
@@ -735,10 +735,22 @@ public class JSSESocketFactory
                     "jsse.invalid_ssl_conf", ssle.getMessage()));
             ioe.initCause(ssle);
             throw ioe;
-        } catch (SocketTimeoutException ste) {
-            // Expected if all is well - do nothing
+        } catch (Exception e) {
+            /*
+             * Possible ways of getting here
+             * socket.accept() throws a SecurityException
+             * socket.setSoTimeout() throws a SocketException
+             * socket.accept() throws some other exception (after a JDK change)
+             *      In these cases the test won't work so carry on - essentially
+             *      the behaviour before this patch
+             * socket.accept() throws a SocketTimeoutException
+             *      In this case all is well so carry on
+             */
         } finally {
-            socket.close();
+            // Should be open here but just in case
+            if (!socket.isClosed()) {
+                socket.close();
+            }
         }
         
     }
