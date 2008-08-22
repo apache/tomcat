@@ -23,6 +23,7 @@ import junit.textui.TestRunner;
 import junit.framework.TestCase;
 
 import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.NetworkInterface;
 import java.net.InetAddress;
 import java.util.*;
@@ -70,11 +71,17 @@ public class SocketServerTestBind extends TestCase {
         while (running) { 
             /* Accept it */
             long clientSock = Socket.accept(serverSock);
+            Socket.timeoutSet(clientSock, 10000);
             byte [] buf = new byte[1];
             while (Socket.recv(clientSock, buf, 0, 1) == 1) {
+                if (buf[0] == 'A') {
+                    buf[0] = 'Z';
+                    Socket.send(clientSock, buf, 0, 1);
+                }
             }
-            if (buf[0] != 'A')
-                break;
+            Socket.close(clientSock);
+            if (buf[0] != 'Z')
+                running = false;
         }
         client.join();
         Library.terminate();
@@ -95,11 +102,15 @@ public class SocketServerTestBind extends TestCase {
                        InetAddress ia = (InetAddress)addrs.nextElement();
                        System.out.println("Trying: " + ia.getHostAddress());
                        java.net.Socket sock = new java.net.Socket(ia, port);
+                       sock.setSoTimeout(10000);
                        OutputStream ou = sock.getOutputStream();
+                       InputStream in =  sock.getInputStream();
                        ou.write('A');
                        ou.flush();
-                       java.lang.Thread.sleep(10000);
-                       ou.close();
+                       int rep = in.read();
+                       sock.close();
+                       if (rep != 'Z')
+                            throw new Exception("Read wrong data");
                   }
                }
             } catch(Exception ex ) {
@@ -112,8 +123,7 @@ public class SocketServerTestBind extends TestCase {
                OutputStream ou = sock.getOutputStream();
                ou.write('E');
                ou.flush();
-               java.lang.Thread.sleep(10000);
-               ou.close();
+               sock.close();
             } catch(Exception ex ) {
                 ex.printStackTrace();
             }
