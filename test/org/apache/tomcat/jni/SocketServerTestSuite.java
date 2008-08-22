@@ -52,6 +52,7 @@ public class SocketServerTestSuite extends TestCase {
                                    Socket.APR_PROTO_TCP, serverPool);
         int rc = Socket.bind(serverSock, inetAddress);
         if (rc != 0) {
+            Socket.close(serverSock);
             throw(new Exception("Can't bind: " + Error.strerror(rc)));
         }
         Socket.listen(serverSock, 5);
@@ -67,22 +68,30 @@ public class SocketServerTestSuite extends TestCase {
         /* Try 2 milliseconds timeout */
         Socket.timeoutSet(clientSock, 2000);
         long timeout = Socket.timeoutGet(clientSock);
-        if (timeout != 2000)
+        if (timeout != 2000) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("Socket.timeoutGet clientSock failed");
+        }
 
         long start = System.currentTimeMillis();
         byte [] buf = new byte[1];
         while (Socket.recv(clientSock, buf, 0, 1) == 1) {
         }
         long wait = System.currentTimeMillis() - start;
-        if (wait < 1 || wait >3)
+        if (wait < 1 || wait >3) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("2 milliseconds client Socket.timeoutSet failed");
+        }
 
         /* Try 2 milliseconds timeout on accept socket */
         Socket.timeoutSet(serverSock, 2000);
         timeout = Socket.timeoutGet(serverSock);
-        if (timeout != 2000)
+        if (timeout != 2000) {
+            Socket.close(serverSock);
             throw new Exception("Socket.timeoutGet serverSock failed");
+        }
 
         start = System.currentTimeMillis();
         boolean ok = false;
@@ -92,14 +101,19 @@ public class SocketServerTestSuite extends TestCase {
             ok = true;
         }
         wait = System.currentTimeMillis() - start;
-        if (wait < 1 || wait >3 && ! ok)
+        if (wait < 1 || wait >3 && ! ok) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("2 milliseconds accept Socket.timeoutSet failed");
+        }
 
         /* Try APR_SO_NONBLOCK */
         Socket.optSet(serverSock, Socket.APR_SO_NONBLOCK, 1);
         int val = Socket.optGet(serverSock, Socket.APR_SO_NONBLOCK);
-        if (val != 1)
+        if (val != 1) {
+            Socket.close(serverSock);
             throw new Exception("Socket.optGet serverSock failed");
+        }
 
         start = System.currentTimeMillis();
         ok = false;
@@ -109,9 +123,13 @@ public class SocketServerTestSuite extends TestCase {
             ok = true;
         }
         wait = System.currentTimeMillis() - start;
-        if (wait > 1 && ! ok)
+        if (wait > 1 && ! ok) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("non_blocking accept Socket.APR_SO_NONBLOCK failed");
+        }
         client.join();
+        Socket.close(clientSock);
 
         /* Try the same on client socket */
         client = new Client();
@@ -120,14 +138,20 @@ public class SocketServerTestSuite extends TestCase {
         clientSock = Socket.accept(serverSock);
         Socket.optSet(clientSock, Socket.APR_SO_NONBLOCK, 1);
         val = Socket.optGet(clientSock, Socket.APR_SO_NONBLOCK);
-        if (val != 1)
+        if (val != 1) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("Socket.optGet clientSock failed");
+        }
         start = System.currentTimeMillis();
         while (Socket.recv(clientSock, buf, 0, 1) == 1) {
         }
         wait = System.currentTimeMillis() - start;
-        if (wait > 1)
+        if (wait > 1) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("non_blocking client Socket.APR_SO_NONBLOCK failed");
+        }
 
         /* Now blocking */
         Socket.optSet(clientSock, Socket.APR_SO_NONBLOCK, 0);
@@ -135,10 +159,15 @@ public class SocketServerTestSuite extends TestCase {
         while (Socket.recv(clientSock, buf, 0, 1) == 1) {
         }
         wait = System.currentTimeMillis() - start;
-        if (wait < 1)
+        if (wait < 1) {
+            Socket.close(clientSock);
+            Socket.close(serverSock);
             throw new Exception("non_blocking client Socket.APR_SO_NONBLOCK false failed");
+        }
 
         client.join();
+        Socket.close(clientSock);
+        Socket.close(serverSock);
         Library.terminate();
     }
 
@@ -154,7 +183,7 @@ public class SocketServerTestSuite extends TestCase {
                 ou.write('A');
                 ou.flush();
                 java.lang.Thread.sleep(10000);
-                ou.close();
+                sock.close();
             } catch(Exception ex ) {
                 ex.printStackTrace();
             }
