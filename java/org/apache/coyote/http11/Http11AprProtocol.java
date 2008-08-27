@@ -242,8 +242,14 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
     public void setPollerSize(int pollerSize) { endpoint.setPollerSize(pollerSize); }
     public int getPollerSize() { return endpoint.getPollerSize(); }
 
+    public void setPollerThreadCount(int pollerThreadCount) { endpoint.setPollerThreadCount(pollerThreadCount); }
+    public int getPollerThreadCount() { return endpoint.getPollerThreadCount(); }
+    
     public int getSendfileSize() { return endpoint.getSendfileSize(); }
     public void setSendfileSize(int sendfileSize) { endpoint.setSendfileSize(sendfileSize); }
+    
+    public void setSendfileThreadCount(int sendfileThreadCount) { endpoint.setSendfileThreadCount(sendfileThreadCount); }
+    public int getSendfileThreadCount() { return endpoint.getSendfileThreadCount(); }
     
     protected int socketBuffer = 9000;
     public int getSocketBuffer() { return socketBuffer; }
