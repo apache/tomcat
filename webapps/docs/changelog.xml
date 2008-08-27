@@ -49,6 +49,7 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+     <fix><bug>45074</bug>Add configuration parameters in Http11AprProtocol</fix>
      <update><rev>644858</rev><br/>
        Inproper curly brackets cause NIO/SendFile to fail. Workaround prior to this version, set
        useSendFile=&quot;false&quot; in the Connector element.
