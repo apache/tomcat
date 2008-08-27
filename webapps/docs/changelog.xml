@@ -57,6 +57,7 @@
   </subsection>
   <subsection name="Catalina">
      <changelog>
+     <fix><bug>44809</bug>Improve AprLifecycleListener Error Messages</fix>
      <fix><rev>671973</rev><br/><bug>45272</bug><br/>
        Workaround for IE cookie behavior
       </fix> 

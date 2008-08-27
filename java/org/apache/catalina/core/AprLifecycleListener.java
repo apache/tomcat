@@ -86,7 +86,7 @@ public class AprLifecycleListener
                     if (!log.isDebugEnabled()) {
                         log.info(sm.getString("aprListener.sslInit"));
                     } else {
-                        log.debug(sm.getString("aprListener.sslInit"));
+                        log.debug(sm.getString("aprListener.sslInit"), t);
                     }
                 }
             }
