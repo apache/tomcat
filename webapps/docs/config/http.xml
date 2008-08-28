@@ -312,7 +312,7 @@
     <attribute name="maxHttpHeaderSize" required="false">
       <p>The maximum size of the request and response HTTP header, specified
       in bytes.
-      If not specified, this attribute is set to 4096 (4 KB).</p>
+      If not specified, this attribute is set to 8192 (8 KB).</p>
     </attribute>
 
     <attribute name="maxKeepAliveRequests" required="false">
