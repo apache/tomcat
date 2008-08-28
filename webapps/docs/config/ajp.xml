@@ -302,7 +302,7 @@
     <attribute name="tomcatAuthentication" required="false">
       <p>If set to <code>true</code>, the authetication will be done in Tomcat. 
       Otherwise, the authenticated principal will be propagated from the native
-      webaserver and used for authorization in Tomcat.  
+      webserver and used for authorization in Tomcat.  
       The default value is <code>true</code>.</p>
     </attribute>
 
