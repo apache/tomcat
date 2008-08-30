@@ -48,7 +48,7 @@ TCN_IMPLEMENT_CALL(jlong, Address, info)(TCN_STDARGS,
 #if APR_HAVE_IPV6
     if (hostname == NULL) {
         /* Try all address using IPV6 one */
-        while (sl) {
+        while (sl && sl->next) {
             if (sl->family == APR_INET6)
                 break; /* Done */
             sl = sl->next;
