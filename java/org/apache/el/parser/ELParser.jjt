@@ -281,7 +281,7 @@ void Function() #Function :
 	(t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
 	{
 		if (t0 != null) {
-			jjtThis.setPrefix(t0.image.substring(0, t0.image.length() - 1));
+			jjtThis.setPrefix(t0.image);
 			jjtThis.setLocalName(t1.image);
 		} else {
 			jjtThis.setLocalName(t1.image);
