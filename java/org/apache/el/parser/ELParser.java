@@ -1188,7 +1188,7 @@ public class ELParser/*@bgen(jjtree)*/implements ELParserTreeConstants, ELParser
       }
       t1 = jj_consume_token(IDENTIFIER);
                 if (t0 != null) {
-                        jjtn000.setPrefix(t0.image.substring(0, t0.image.length() - 1));
+                        jjtn000.setPrefix(t0.image);
                         jjtn000.setLocalName(t1.image);
                 } else {
                         jjtn000.setLocalName(t1.image);
