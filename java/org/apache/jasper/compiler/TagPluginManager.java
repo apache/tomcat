@@ -150,91 +150,91 @@ public class TagPluginManager {
 	    n.setAtSTag(curNodes);
 	    n.setUseTagPlugin(true);
 	    pluginAttributes = new HashMap();
-	}
+        }
 
-	public TagPluginContext getParentContext() {
-	    Node parent = node.getParent();
-	    if (! (parent instanceof Node.CustomTag)) {
-		return null;
-	    }
-	    return ((Node.CustomTag) parent).getTagPluginContext();
-	}
+        public TagPluginContext getParentContext() {
+            Node parent = node.getParent();
+            if (! (parent instanceof Node.CustomTag)) {
+                return null;
+            }
+            return ((Node.CustomTag) parent).getTagPluginContext();
+        }
 
-	public void setPluginAttribute(String key, Object value) {
-	    pluginAttributes.put(key, value);
-	}
+        public void setPluginAttribute(String key, Object value) {
+            pluginAttributes.put(key, value);
+        }
 
-	public Object getPluginAttribute(String key) {
-	    return pluginAttributes.get(key);
-	}
+        public Object getPluginAttribute(String key) {
+            return pluginAttributes.get(key);
+        }
 
-	public boolean isScriptless() {
-	    return node.getChildInfo().isScriptless();
-	}
+        public boolean isScriptless() {
+            return node.getChildInfo().isScriptless();
+        }
 
-	public boolean isConstantAttribute(String attribute) {
-	    Node.JspAttribute attr = getNodeAttribute(attribute);
-	    if (attr == null)
-		return false;
-	    return attr.isLiteral();
-	}
-
-	public String getConstantAttribute(String attribute) {
-	    Node.JspAttribute attr = getNodeAttribute(attribute);
+        public boolean isConstantAttribute(String attribute) {
+            Node.JspAttribute attr = getNodeAttribute(attribute);
             if (attr == null)
-		return null;
-	    return attr.getValue();
-	}
+                return false;
+            return attr.isLiteral();
+        }
 
-	public boolean isAttributeSpecified(String attribute) {
-	    return getNodeAttribute(attribute) != null;
-	}
+        public String getConstantAttribute(String attribute) {
+            Node.JspAttribute attr = getNodeAttribute(attribute);
+            if (attr == null)
+                return null;
+            return attr.getValue();
+        }
 
-	public String getTemporaryVariableName() {
-	    return JspUtil.nextTemporaryVariableName();
-	}
+        public boolean isAttributeSpecified(String attribute) {
+            return getNodeAttribute(attribute) != null;
+        }
 
-	public void generateImport(String imp) {
-	    pageInfo.addImport(imp);
-	}
+        public String getTemporaryVariableName() {
+            return JspUtil.nextTemporaryVariableName();
+        }
 
-	public void generateDeclaration(String id, String text) {
-	    if (pageInfo.isPluginDeclared(id)) {
-		return;
-	    }
-	    curNodes.add(new Node.Declaration(text, node.getStart(), null));
-	}
+        public void generateImport(String imp) {
+            pageInfo.addImport(imp);
+        }
 
-	public void generateJavaSource(String sourceCode) {
-	    curNodes.add(new Node.Scriptlet(sourceCode, node.getStart(),
-					    null));
-	}
+        public void generateDeclaration(String id, String text) {
+            if (pageInfo.isPluginDeclared(id)) {
+                return;
+            }
+            curNodes.add(new Node.Declaration(text, node.getStart(), null));
+        }
 
-	public void generateAttribute(String attributeName) {
-	    curNodes.add(new Node.AttributeGenerator(node.getStart(),
-						     attributeName,
-						     node));
-	}
+        public void generateJavaSource(String sourceCode) {
+            curNodes.add(new Node.Scriptlet(sourceCode, node.getStart(),
+                                            null));
+        }
 
-	public void dontUseTagPlugin() {
-	    node.setUseTagPlugin(false);
-	}
+        public void generateAttribute(String attributeName) {
+            curNodes.add(new Node.AttributeGenerator(node.getStart(),
+                                                     attributeName,
+                                                     node));
+        }
 
-	public void generateBody() {
-	    // Since we'll generate the body anyway, this is really a nop, 
-	    // except for the fact that it lets us put the Java sources the
-	    // plugins produce in the correct order (w.r.t the body).
-	    curNodes = node.getAtETag();
-	}
+        public void dontUseTagPlugin() {
+            node.setUseTagPlugin(false);
+        }
 
-	private Node.JspAttribute getNodeAttribute(String attribute) {
-	    Node.JspAttribute[] attrs = node.getJspAttributes();
-	    for (int i=0; attrs != null && i < attrs.length; i++) {
-		if (attrs[i].getName().equals(attribute)) {
-		    return attrs[i];
-		}
-	    }
-	    return null;
-	}
+        public void generateBody() {
+            // Since we'll generate the body anyway, this is really a nop, 
+            // except for the fact that it lets us put the Java sources the
+            // plugins produce in the correct order (w.r.t the body).
+            curNodes = node.getAtETag();
+        }
+
+        private Node.JspAttribute getNodeAttribute(String attribute) {
+            Node.JspAttribute[] attrs = node.getJspAttributes();
+            for (int i=0; attrs != null && i < attrs.length; i++) {
+                if (attrs[i].getName().equals(attribute)) {
+                    return attrs[i];
+                }
+            }
+            return null;
+        }
     }
 }
