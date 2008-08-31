@@ -55,8 +55,6 @@ public class JspUtil {
     private static final String OPEN_EXPR_XML  = "%=";
     private static final String CLOSE_EXPR_XML = "%";
 
-    private static int tempSequenceNumber = 0;
-    
     //private static ExpressionEvaluatorImpl expressionEvaluator
     //= new ExpressionEvaluatorImpl();
     
@@ -597,22 +595,6 @@ public class JspUtil {
 //            err.jspError(where, "jsp.error.invalid.expression", expressions,
 //                e.toString() );
 //        }
-    }
-
-    /**
-     * Resets the temporary variable name.
-     * (not thread-safe)
-     */
-    public static void resetTemporaryVariableName() {
-        tempSequenceNumber = 0;
-    }
-
-    /**
-     * Generates a new temporary variable name.
-     * (not thread-safe)
-     */
-    public static String nextTemporaryVariableName() {
-        return Constants.TEMP_VARIABLE_NAME_PREFIX + (tempSequenceNumber++);
     }
 
     public static String coerceToPrimitiveBoolean(String s,
