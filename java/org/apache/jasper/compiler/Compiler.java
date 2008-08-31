@@ -145,10 +145,6 @@ public abstract class Compiler {
 
         ServletWriter writer = null;
         try {
-
-            // Reset the temporary variable counter for the generator.
-            JspUtil.resetTemporaryVariableName();
-
             // Parse the file
             ParserController parserCtl = new ParserController(ctxt, this);
             pageNodes = parserCtl.parse(ctxt.getJspFile());
