@@ -191,7 +191,7 @@ public class TagPluginManager {
         }
 
         public String getTemporaryVariableName() {
-            return JspUtil.nextTemporaryVariableName();
+            return node.getRoot().nextTemporaryVariableName();
         }
 
         public void generateImport(String imp) {
