@@ -1,0 +1,26 @@
+<html>
+<head>
+    <title>Cometd chat</title>
+    <script type="text/javascript" src="../dojo/dojo/dojo.js"></script>
+    <script type="text/javascript" src="../dojo/dojox/cometd.js.uncompressed.js"></script>
+    <script type="text/javascript" src="chat.js"></script>
+    <link rel="stylesheet" type="text/css" href="chat.css">
+</head>
+<body>
+<h1>Cometd Chat</h1>
+
+<div id="chatroom">
+ <div id="chat"></div>
+ <div id="input">
+   <div id="join" >
+     Username:&nbsp;<input id="username" type="text"/><input id="joinB" class="button" type="submit" name="join" value="Join"/>
+   </div>
+   <div id="joined" class="hidden">
+     Chat:&nbsp;<input id="phrase" type="text"/>
+     <input id="sendB" class="button" type="submit" name="join" value="Send"/>
+     <input id="leaveB" class="button" type="submit" name="join" value="Leave"/>
+   </div>
+  </div>
+ </div>
+
+</body>
