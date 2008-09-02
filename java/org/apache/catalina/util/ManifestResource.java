@@ -117,7 +117,7 @@ public class ManifestResource {
      */
     public boolean isFulfilled() {
         if (requiredExtensions == null) {
-            return false;
+            return true;
         }
         Iterator it = requiredExtensions.iterator();
         while (it.hasNext()) {
