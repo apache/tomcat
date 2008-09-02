@@ -1,0 +1,74 @@
+
+body {
+  background-color : #ffffcc;
+  text-align: center;
+}
+a:link {
+  color : black;
+}
+a:visited {
+  color : black;
+}
+a:hover {
+  color : yellow;
+}
+p.instructions {
+  background-color : #ccffcc;
+  padding-left : 20%;
+  padding-right : 20%;
+}
+table {
+  border: none;
+  margin: 0 auto;
+}
+td#cell0 {
+  padding: 10px ;
+  border-bottom: thin solid black;
+  border-right: thin solid black;
+}
+td#cell1 {
+  padding: 10px ;
+  border-bottom: thin solid black;
+  border-right: thin solid black;
+  border-left: thin solid black;
+}
+td#cell2 {
+  padding: 10px ;
+  border-left: thin solid black;
+  border-bottom: thin solid black;
+}
+td#cell3 {
+  padding: 10px ;
+  border-top: thin solid black;
+  border-right: thin solid black;
+  border-bottom: thin solid black;
+}
+td#cell4 {
+  padding: 10px ;
+  border-top: thin solid black;
+  border-right: thin solid black;
+  border-left: thin solid black;
+  border-bottom: thin solid black;
+}
+td#cell5 {
+  padding: 10px ;
+  border-top: thin solid black;
+  border-left: thin solid black;
+  border-bottom: thin solid black;
+}
+td#cell6 {
+  padding: 10px ;
+  border-top: thin solid black;
+  border-right: thin solid black;
+}
+td#cell7 {
+  padding: 10px ;
+  border-top: thin solid black;
+  border-right: thin solid black;
+  border-left: thin solid black;
+}
+td#cell8 {
+  padding: 10px ;
+  border-top: thin solid black;
+  border-left: thin solid black;
+}

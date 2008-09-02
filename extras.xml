@@ -76,6 +76,11 @@
   <property name="tomcat-juli.jar" value="${tomcat.extras}/tomcat-juli.jar"/>
   <property name="tomcat-juli-adapters.jar" value="${tomcat.extras}/tomcat-juli-adapters.jar"/>
   <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
+
+  <property name="cometd-api.jar" value="${tomcat.extras}/cometd-api.jar"/>
+  <property name="tomcat-bayeux.jar" value="${tomcat.extras}/tomcat-bayeux.jar"/>
+  <property name="cometd.war" value="${tomcat.extras}/cometd.war"/>
+
 	
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -220,7 +225,62 @@
 	
   </target>
 
-  <target name="extras" depends="prepare,commons-logging,webservices">
+  <target name="bayeux">
+    <mkdir dir="${tomcat.extras}"/>
+
+    <copy todir="${tomcat.extras}" file="${json-lib.home}/${json-lib.jar}"/>
+    <!-- Classpath -->
+    <path id="tomcat.bayeux.classpath">
+      <pathelement path="${tomcat.classpath}"/>
+      <pathelement path="${json-lib.home}/${json-lib.jar}"/>
+    </path>
+
+    <!-- compile org.apache.tomcat.bayeux -->
+    <!-- compile org.apache.cometd -->
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}">
+      <classpath refid="tomcat.bayeux.classpath" />
+      <include name="org/apache/tomcat/bayeux/**" />
+      <include name="org/apache/cometd/**" />
+    </javac>
+    <!-- Cometd API JAR File -->
+    <jar jarfile="${cometd-api.jar}">
+      <fileset dir="${tomcat.classes}">
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+        <include name="org/apache/cometd/**" />
+      </fileset>
+    </jar>
+    <!-- Cometd API JAR File -->
+    <jar jarfile="${tomcat-bayeux.jar}">
+      <fileset dir="${tomcat.classes}">
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+        <include name="org/apache/tomcat/bayeux/**" />
+      </fileset>
+    </jar>
+
+    <zip zipfile="${cometd.war}">
+      <fileset dir="${basedir}/webapps/cometd">
+        <include name="**/**"/>
+      </fileset>
+    </zip>
+    <checksum file="${cometd-api.jar}" forceOverwrite="yes" fileext=".md5" />
+    <checksum file="${tomcat-bayeux.jar}" forceOverwrite="yes" fileext=".md5" />
+    <checksum file="${tomcat.extras}/${json-lib.jar}" forceOverwrite="yes" fileext=".md5" />
+    <echo>You've built the Tomcat Bayeux libraries, simply add the following libraries to your CATALINA_HOME/lib directory:
+          ${cometd-api.jar}
+          ${tomcat-bayeux.jar} 
+          ${tomcat.extras}/${json-lib.jar}
+To run the sample application, copy the following applications into your CATALINA_BASE/webapps directory
+          ${cometd.war}
+    </echo>
+  </target>
+
+  <target name="extras" depends="prepare,commons-logging,webservices,bayeux">
   </target>
 
   <!-- Download and dependency building -->
