@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app 
+   xmlns="http://java.sun.com/xml/ns/javaee" 
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+   version="2.5"> 
+  <display-name>Cometd Test WebApp</display-name>
+  
+  <servlet>
+    <servlet-name>cometd</servlet-name>
+    <servlet-class>org.apache.tomcat.bayeux.BayeuxServlet</servlet-class>
+    <init-param>
+      <param-name>timeout</param-name>
+      <param-value>120000000</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>cometd</servlet-name>
+    <url-pattern>/cometd/*</url-pattern>
+  </servlet-mapping>
+  
+</web-app>
+
+
