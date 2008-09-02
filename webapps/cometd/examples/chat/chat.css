@@ -1,0 +1,57 @@
+
+div 
+{ 
+  border: 0px solid black; 
+}
+
+div#chatroom
+{
+  background-color: #e0e0e0;
+  border: 1px solid black; 
+  width: 45em;
+}
+
+div#chat
+{
+  height: 20ex;
+  overflow: auto; 
+  background-color: #f0f0f0;
+  padding: 4px;
+  border: 0px solid black; 
+}
+
+div#input
+{
+  clear: both;
+  padding: 4px;
+  border: 0px solid black; 
+  border-top: 1px solid black; 
+}
+
+input#phrase
+{
+  width:28em;
+  background-color: #e0f0f0;
+}
+
+input#username
+{
+  width:14em;
+  background-color: #e0f0f0;
+}
+
+div.hidden
+{
+  display: none;
+}
+
+span.from
+{
+  font-weight: bold;
+}
+
+span.alert
+{
+  font-style: italic;
+}
+
