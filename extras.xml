@@ -80,6 +80,7 @@
   <property name="cometd-api.jar" value="${tomcat.extras}/cometd-api.jar"/>
   <property name="tomcat-bayeux.jar" value="${tomcat.extras}/tomcat-bayeux.jar"/>
   <property name="cometd.war" value="${tomcat.extras}/cometd.war"/>
+  <property name="tomcat-bayeux-samples.jar" value="${tomcat.extras}/tomcat-bayeux-samples.jar"/>
 
 	
   <!-- Classpath -->
@@ -246,6 +247,7 @@
       <include name="org/apache/tomcat/bayeux/**" />
       <include name="org/apache/cometd/**" />
     </javac>
+    
     <!-- Cometd API JAR File -->
     <jar jarfile="${cometd-api.jar}">
       <fileset dir="${tomcat.classes}">
@@ -263,6 +265,26 @@
       </fileset>
     </jar>
 
+    <!-- cometd samples application -->
+    <javac srcdir="test" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}">
+      <classpath refid="tomcat.bayeux.classpath" />
+      <include name="org/apache/tomcat/bayeux/**" />
+      <include name="org/apache/cometd/**" />
+    </javac>
+    
+    <!-- Cometd samples JAR File -->
+    <jar jarfile="${tomcat-bayeux-samples.jar}">
+      <fileset dir="${tomcat.classes}">
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+        <include name="org/apache/cometd/bayeux/samples/**" />
+      </fileset>
+    </jar>
+    
     <zip zipfile="${cometd.war}">
       <fileset dir="${basedir}/webapps/cometd">
         <include name="**/**"/>
@@ -270,10 +292,12 @@
     </zip>
     <checksum file="${cometd-api.jar}" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${tomcat-bayeux.jar}" forceOverwrite="yes" fileext=".md5" />
+    <checksum file="${tomcat-bayeux-samples.jar}" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${tomcat.extras}/${json-lib.jar}" forceOverwrite="yes" fileext=".md5" />
     <echo>You've built the Tomcat Bayeux libraries, simply add the following libraries to your CATALINA_HOME/lib directory:
           ${cometd-api.jar}
           ${tomcat-bayeux.jar} 
+          ${tomcat-bayeux-samples.jar} 
           ${tomcat.extras}/${json-lib.jar}
 To run the sample application, copy the following applications into your CATALINA_BASE/webapps directory
           ${cometd.war}
