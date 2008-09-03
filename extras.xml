@@ -299,11 +299,8 @@
   		<include name="**/**"/>
   	  </fileset>
       <fileset dir="${dojo-js.home}">
-      	<include name="dojo/dojo.js.uncompressed.js"/>
-        <include name="dojo/_base.js"/>
-        <include name="dojo/_base/json.js"/>
-      	<include name="dojox/cometd.js"/>
-      	<include name="dojox/cometd/*.*"/>
+      	<include name="dojo/**"/>
+      	<include name="dojox/**"/>
       </fileset>	
   	</copy>
     <mkdir dir="${cometd-app}/WEB-INF/lib"/>
