@@ -1214,7 +1214,7 @@ public abstract class RealmBase
 
 
     /**
-     * Digest password using the algorithm especificied and
+     * Digest password using the algorithm specified and
      * convert the result to a corresponding hex string.
      * If exception, the plain credentials string is returned
      *
@@ -1250,7 +1250,7 @@ public abstract class RealmBase
 
 
     /**
-     * Digest password using the algorithm especificied and
+     * Digest password using the algorithm specified and
      * convert the result to a corresponding hex string.
      * If exception, the plain credentials string is returned
      */
