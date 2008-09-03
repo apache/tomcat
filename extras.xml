@@ -229,6 +229,11 @@
   <target name="bayeux">
     <mkdir dir="${tomcat.extras}"/>
 
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${dojo-js.loc}"/>
+      <param name="destfile" value="${dojo-js.jar}"/>
+    </antcall>
+  	
     <copy todir="${tomcat.extras}" file="${json-lib.home}/${json-lib.jar}"/>
     <!-- Classpath -->
     <path id="tomcat.bayeux.classpath">
@@ -285,19 +290,43 @@
       </fileset>
     </jar>
     
+    <!-- build samples webapplication /cometd -->
+  	<property name="cometd-app" value="${base.path}/cometd"/>
+  	<mkdir dir="${cometd-app}"/>
+  	
+  	<copy todir="${cometd-app}">
+  	  <fileset dir="${basedir}/webapps/cometd">
+  		<include name="**/**"/>
+  	  </fileset>
+      <fileset dir="${dojo-js.home}">
+      	<include name="dojo/dojo.js.uncompressed.js"/>
+        <include name="dojo/_base.js"/>
+        <include name="dojo/_base/json.js"/>
+      	<include name="dojox/cometd.js"/>
+      	<include name="dojox/cometd/*.*"/>
+      </fileset>	
+  	</copy>
+    <mkdir dir="${cometd-app}/WEB-INF/lib"/>
+    <copy todir="${cometd-app}/WEB-INF/lib" file="${tomcat-bayeux-samples.jar}"/>
+  	
     <zip zipfile="${cometd.war}">
-      <fileset dir="${basedir}/webapps/cometd">
+      <fileset dir="${cometd-app}">
         <include name="**/**"/>
       </fileset>
     </zip>
+  	
+  	<delete dir="${cometd-app}"/>
+  	
+  	<!-- create checksums -->
     <checksum file="${cometd-api.jar}" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${tomcat-bayeux.jar}" forceOverwrite="yes" fileext=".md5" />
-    <checksum file="${tomcat-bayeux-samples.jar}" forceOverwrite="yes" fileext=".md5" />
+    <checksum file="${cometd.war}" forceOverwrite="yes" fileext=".md5" />
     <checksum file="${tomcat.extras}/${json-lib.jar}" forceOverwrite="yes" fileext=".md5" />
+  	
+  	<!-- print out how to --> 
     <echo>You've built the Tomcat Bayeux libraries, simply add the following libraries to your CATALINA_HOME/lib directory:
           ${cometd-api.jar}
           ${tomcat-bayeux.jar} 
-          ${tomcat-bayeux-samples.jar} 
           ${tomcat.extras}/${json-lib.jar}
 To run the sample application, copy the following applications into your CATALINA_BASE/webapps directory
           ${cometd.war}
@@ -333,5 +362,15 @@ To run the sample application, copy the following applications into your CATALIN
     <mkdir dir="${destdir}" />
     <get src="${sourcefile}" dest="${destfile}" />
   </target>
+	
+  <target name="downloadgz" unless="exist" depends="setproxy,testexist">
+    <!-- Download and extract the package -->
+    <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
+    <gunzip src="${base.path}/file.tar.gz" dest="${base.path}/file.tar"/>
+    <untar src="${base.path}/file.tar" dest="${base.path}"/>
+    <delete file="${base.path}/file.tar"/>
+    <delete file="${base.path}/file.tar.gz"/>
+  </target>
+
 
 </project>
