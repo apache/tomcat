@@ -21,7 +21,7 @@
 	<classpathentry kind="src" path="webapps/examples/WEB-INF/classes"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/eclipse/plugins/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar"/>
-        <classpathentry kind="var" path="TOMCAT_LIBS_BASE/json-20070829/json.jar"/>
+        <classpathentry kind="var" path="TOMCAT_LIBS_BASE/json-20080701/json.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="var" path="ANT_HOME/lib/ant.jar"/>
 	<classpathentry kind="output" path=".settings/output"/>
