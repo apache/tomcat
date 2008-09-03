@@ -93,6 +93,11 @@ public class MetaHandshakeRequest extends RequestBase implements BayeuxRequest {
             clientId = client.getId();
             client.setSupportedConnTypes(suppConnTypesFlag);
             client.setUseJsonFiltered(getExt().get(Bayeux.JSON_COMMENT_FILTERED_FIELD) != null);
+            if (client.useJsonFiltered()) {
+            	event.getHttpServletResponse().setContentType("text/json-comment-filtered");
+            }else {
+            	event.getHttpServletResponse().setContentType("text/json");
+            }
             response.put(Bayeux.CLIENT_FIELD, client.getId());
             ((HashMap) response.get(Bayeux.ADVICE_FIELD)).put(Bayeux.RECONNECT_FIELD, Bayeux.RETRY_RESPONSE);
             ((HashMap) response.get(Bayeux.ADVICE_FIELD)).put(Bayeux.INTERVAL_FIELD, getReconnectInterval());
