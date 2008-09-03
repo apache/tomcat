@@ -313,9 +313,6 @@ public class ClassLoaderLogManager extends LogManager {
                         log.warning("Original error was: " + ace.getMessage());
                }
             }
-         }
-         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
-             String configFileStr = System.getProperty("java.util.logging.config.file");
         }
         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
             String configFileStr = System.getProperty("java.util.logging.config.file");
