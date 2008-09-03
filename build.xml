@@ -663,6 +663,14 @@
       <param name="destfile" value="${nsis.exe}"/>
   	  <param name="destdir" value="${nsis.home}/.."/>
     </antcall>
+  	
+  	<!-- Download json libraries -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${json-lib.lib}"/>
+      <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
+      <param name="destdir" value="${json-lib.home}"/>
+    </antcall>
+
   </target>
 
   <target name="build-tomcat-dbcp" unless="jdk16.present">
