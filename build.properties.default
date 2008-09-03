@@ -103,3 +103,9 @@ commons-daemon.jsvc.tar.gz=${commons-daemon.lib}/bin/jsvc.tar.gz
 json-lib.home=${base.path}/json-20070829
 json-lib.lib=http://repo1.maven.org/maven2/org/json/json/20070829/json-20070829.jar
 json-lib.jar=json.jar
+
+# ----- Dojo Toolkit 
+dojo-js.home=${base.path}/dojo-release-1.1.1
+dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
+dojo-js.jar=${dojo-js.home}/dojo/dojo.js
+
