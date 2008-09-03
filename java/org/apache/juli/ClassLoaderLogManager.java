@@ -303,7 +303,19 @@ public class ClassLoaderLogManager extends LogManager {
             }
         } catch (AccessControlException ace) {
             // No permission to configure logging in context
-            // Ignore and carry on
+            // Log and carry on
+            ClassLoaderLogInfo info = classLoaderLoggers.get(ClassLoader.getSystemClassLoader());
+            if (info != null) {
+                Logger log = info.loggers.get("");
+                if (log != null) {
+                        log.warning("You need to permit read access to your context specific java.util.logging logging configuration to " + ClassLoaderLogManager.class);
+                        log.warning("See \"per context logging\" in the default catalina.policy file.");
+                        log.warning("Original error was: " + ace.getMessage());
+               }
+            }
+         }
+         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
+             String configFileStr = System.getProperty("java.util.logging.config.file");
         }
         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
             String configFileStr = System.getProperty("java.util.logging.config.file");
