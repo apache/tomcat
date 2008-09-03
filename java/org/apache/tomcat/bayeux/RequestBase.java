@@ -163,6 +163,14 @@ public abstract class RequestBase implements BayeuxRequest {
             log.debug("["+Thread.currentThread().getName()+"] Delivering message to[" + to + "] message:" + jsonstring);
         }
 
+        if (to!=null) {
+            if (to.useJsonFiltered()) {
+                if (!event.getHttpServletResponse().isCommitted()) event.getHttpServletResponse().setContentType("text/json-comment-filtered");
+            }else {	
+                if (!event.getHttpServletResponse().isCommitted()) event.getHttpServletResponse().setContentType("text/json");
+            }
+        }
+
         PrintWriter out = event.getHttpServletResponse().getWriter();
         if (to==null) {
             //do nothing
