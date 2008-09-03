@@ -1440,6 +1440,61 @@ and restarting the server, without any code changes to your application.</li>
 </subsection>
 
 
+<subsection name="CombinedRealm">
+
+    <h3>Introduction</h3>
+
+    <p><strong>CombinedRealm</strong> is an implementation of the Tomcat 6
+    <code>Realm</code> interface that authenticates users through one or more
+    sub-Realms.</p>
+
+    <p>Using CombinedRealm gives the developer the ability to combine multiple
+    Realms of the same or different types. This can be used to authenticate
+    against different sources, provide fall back in case one Realm fails or for
+    any other purpose that requires multiple Realms.</p>
+
+    <p>Sub-realms are defined by nesting <code>Realm</code> elements inside the
+    <code>Realm</code> element that defines the CombinedRealm. Authentication
+    will be attempted against each <code>Realm</code> in the order they are
+    listed. Authentication against any Realm will be sufficient to authenticate
+    the user.</p>
+
+    <h3>Realm Element Attributes</h3>
+    <p>To configure CombinedRealm, you create a <code>&lt;Realm&gt;</code>
+    element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code>
+    file within your <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.
+    You can also nest inside a <code>&lt;Context&gt;</code> node in a
+    <code>context.xml</code> file. The following attributes are supported by
+    this implementation:</p>
+
+<attributes>
+
+  <attribute name="className" required="true">
+    <p>The fully qualified Java class name of this Realm implementation.
+    You <strong>MUST</strong> specify the value
+    "<code>org.apache.catalina.realm.CombinedRealm</code>" here.</p>
+  </attribute>
+
+</attributes>
+
+<h3>Example</h3>
+
+<p>Here is an example of how your server.xml snippet should look to use a
+UserDatabase Realm and a DataSource Realm.</p>
+
+<source>
+&lt;Realm className="org.apache.catalina.realm.CombinedRealm" &gt;
+   &lt;Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+             resourceName="UserDatabase"/&gt;
+   &lt;Realm className="org.apache.catalina.realm.DataSourceRealm" debug="99"
+             dataSourceName="jdbc/authority"
+             userTable="users" userNameCol="user_name" userCredCol="user_pass"
+             userRoleTable="user_roles" roleNameCol="role_name"/&gt;
+&lt;Realm/&gt;
+</source>
+
+</subsection>
+
 </section>
 
 </body>

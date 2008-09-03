@@ -170,13 +170,7 @@ public class ContextRuleSet extends RuleSetBase {
                             "addApplicationParameter",
                             "org.apache.catalina.deploy.ApplicationParameter");
 
-        digester.addObjectCreate(prefix + "Context/Realm",
-                                 null, // MUST be specified in the element
-                                 "className");
-        digester.addSetProperties(prefix + "Context/Realm");
-        digester.addSetNext(prefix + "Context/Realm",
-                            "setRealm",
-                            "org.apache.catalina.Realm");
+        digester.addRuleSet(new RealmRuleSet(prefix + "Context/"));
 
         digester.addObjectCreate(prefix + "Context/Resources",
                                  "org.apache.naming.resources.FileDirContext",

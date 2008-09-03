@@ -121,13 +121,7 @@ public class EngineRuleSet extends RuleSetBase {
                             "org.apache.catalina.LifecycleListener");
 
 
-        digester.addObjectCreate(prefix + "Engine/Realm",
-                                 null, // MUST be specified in the element
-                                 "className");
-        digester.addSetProperties(prefix + "Engine/Realm");
-        digester.addSetNext(prefix + "Engine/Realm",
-                            "setRealm",
-                            "org.apache.catalina.Realm");
+        digester.addRuleSet(new RealmRuleSet(prefix + "Engine/"));
 
         digester.addObjectCreate(prefix + "Engine/Valve",
                                  null, // MUST be specified in the element
