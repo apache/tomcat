@@ -565,6 +565,30 @@
     Guide</a> for more information on setting up container managed security
     using the JAAS Realm component.</p>
 
+    <h3>Combined Realm (org.apache.catalina.realm.CombinedRealm)</h3>
+
+    <p><strong>CombinedRealm</strong> is an implementation of the Tomcat 6
+    <code>Realm</code> interface that authenticates users through one or more
+    sub-Realms.</p>
+
+    <p>Using CombinedRealm gives the developer the ability to combine multiple
+    Realms of the same or different types. This can be used to authenticate
+    against different sources, provide fall back in case one Realm fails or for
+    any other purpose that requires multiple Realms.</p>
+
+    <p>Sub-realms are defined by nesting <code>Realm</code> elements inside the
+    <code>Realm</code> element that defines the CombinedRealm. Authentication
+    will be attempted against each <code>Realm</code> in the order they are
+    listed. Authentication against any Realm will be sufficient to authenticate
+    the user.</p>
+
+    <p>The Combined Realm implementation does not support any additional
+    attributes.</p>
+
+    <p>See the <a href="../realm-howto.html">Container-Managed Security
+    Guide</a> for more information on setting up container managed security
+    using the Combined Realm component.</p>
+
   </subsection>
 
 
@@ -573,7 +597,14 @@
 
 <section name="Nested Components">
 
-  <p>No components may be nested inside a <strong>Realm</strong> element.</p>
+  <h3>Combined Realm Implementation</h3>
+
+  <p>If you are using the <em>Combined Realm Implementation</em>
+  <strong>&lt;Realm&gt;</strong> elements may be nested inside it.</p>
+
+  <h3>Other Realm Implementations</h3>
+  
+  <p>No other Realm implementation supports nested components.</p>
 
 </section>
 
