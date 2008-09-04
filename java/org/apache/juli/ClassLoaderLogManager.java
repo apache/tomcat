@@ -19,11 +19,13 @@ package org.apache.juli;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLClassLoader;
 import java.security.AccessControlException;
 import java.security.AccessController;
+import java.security.Permission;
 import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -308,10 +310,15 @@ public class ClassLoaderLogManager extends LogManager {
             if (info != null) {
                 Logger log = info.loggers.get("");
                 if (log != null) {
-                        log.warning("You need to permit read access to your context specific java.util.logging logging configuration to " + ClassLoaderLogManager.class);
-                        log.warning("See \"per context logging\" in the default catalina.policy file.");
+                    Permission perm = ace.getPermission();
+                    if (perm instanceof FilePermission && perm.getActions().equals("read")) {
+                        log.warning("Reading " + perm.getName() + " is not permitted. See \"per context logging\" in the default catalina.policy file.");
+                    }
+                    else {
+                        log.warning("Reading logging.properties is not permitted in some context. See \"per context logging\" in the default catalina.policy file.");
                         log.warning("Original error was: " + ace.getMessage());
-               }
+                    }
+                }
             }
         }
         if ((is == null) && (classLoader == ClassLoader.getSystemClassLoader())) {
