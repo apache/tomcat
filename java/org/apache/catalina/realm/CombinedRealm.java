@@ -34,11 +34,12 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Realm implementation that contains one or more realms. Authentication is
  * attempted for each realm in the order they were configured. If any realm
- * authenticates the user then the authentication succeeds.
+ * authenticates the user then the authentication succeeds. When combining
+ * realms usernames should be unique across all combined realms.
  */
 public class CombinedRealm extends RealmBase {
 
-    private static Log log = LogFactory.getLog(RealmBase.class);
+    private static Log log = LogFactory.getLog(CombinedRealm.class);
 
     /**
      * The string manager for this package.
