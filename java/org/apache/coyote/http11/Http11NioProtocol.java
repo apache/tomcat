@@ -81,6 +81,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         attributes.put(name, value);
     }
 
+    public NioEndpoint getEndpoint() {
+        return ep;
+    }
+    
     public Object getAttribute( String key ) {
         if( log.isTraceEnabled())
             log.trace(sm.getString("http11protocol.getattribute", key));
@@ -809,7 +813,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                         if (log.isDebugEnabled()) log.debug("Deregister ["+processor+"] count="+registerCount.get());
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
-                        ObjectName rpName = rp.getRpName();
+                        ObjectName rpName = (ObjectName) rp.getRpName();
                         Registry.getRegistry(null, null).unregisterComponent(rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {
