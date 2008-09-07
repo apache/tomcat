@@ -433,7 +433,7 @@ public class AjpProtocol
                     try {
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
-                        ObjectName rpName = rp.getRpName();
+                        ObjectName rpName = (ObjectName) rp.getRpName();
                         if (log.isDebugEnabled()) {
                             log.debug("Unregister " + rpName);
                         }
