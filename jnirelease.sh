@@ -57,8 +57,8 @@ fi
 # PRODUCTVERSION 1,1,14,0
 #JKJNIEXT="trunk"
 #JKJNIVER="current"
-JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_14"
-JKJNIVER="1.1.14"
+JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_15"
+JKJNIVER="1.1.15"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 JKJNIDIST=tomcat-native-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
