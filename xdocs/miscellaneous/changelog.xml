@@ -39,6 +39,9 @@
 <section name="Changes between 1.1.14 and 1.1.15">
   <changelog>
     <fix>
+      <bug>43327</bug>: Socket bind fail because mixing IPv4/IPv6 (markt, jfclere)
+    </fix>
+    <fix>
       <bug>44864</bug>: Use additional check for SSL verify like
       with mod_ssl for SSLVerifyClient=optionalNoCA. (mturk)
     </fix>
