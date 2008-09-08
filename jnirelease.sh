@@ -55,17 +55,42 @@ fi
 # #define TCN_VERISON "1.1.14"
 # FILEVERSION 1,1,14,0
 # PRODUCTVERSION 1,1,14,0
-#JKJNIEXT="trunk"
-#JKJNIVER="current"
 JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_15"
 JKJNIVER="1.1.15"
+#JKJNIEXT="trunk"
+#JKJNIVER="current"
 SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 JKJNIDIST=tomcat-native-${JKJNIVER}-src
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
 svn export $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
 if [ $? -ne 0 ]; then
-  echo "svn export failed"
+  echo "svn export native failed"
+  exit 1
+fi
+svn export $SVNBASE/${JKJNIEXT}/jni/java ${JKJNIDIST}/jni/java
+if [ $? -ne 0 ]; then
+  echo "svn export java failed"
+  exit 1
+fi
+svn export $SVNBASE/${JKJNIEXT}/jni/build.xml ${JKJNIDIST}/jni/build.xml
+if [ $? -ne 0 ]; then
+  echo "svn export build.xml failed"
+  exit 1
+fi
+svn export $SVNBASE/${JKJNIEXT}/jni/build.properties.sample ${JKJNIDIST}/jni/build.properties.sample
+if [ $? -ne 0 ]; then
+  echo "svn export build.xml failed"
+  exit 1
+fi
+svn export $SVNBASE/${JKJNIEXT}/jni/examples ${JKJNIDIST}/jni/examples
+if [ $? -ne 0 ]; then
+  echo "svn export examples failed"
+  exit 1
+fi
+svn export $SVNBASE/${JKJNIEXT}/jni/test ${JKJNIDIST}/jni/test
+if [ $? -ne 0 ]; then
+  echo "svn export test failed"
   exit 1
 fi
 svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKJNIDIST}/KEYS

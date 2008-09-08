@@ -15,6 +15,10 @@
   limitations under the License.
 ================================================================================
 
+  Building from source package:
+  configure --with-apr=apr_install_location --with-ssl=openssl_install_location
+  make
+
   Building from the cvs tree:
   sh buildconf --with-apr=apr_source_location.
   configure --with-apr=apr_install_location --with-ssl=openssl_install_location
@@ -22,11 +26,11 @@
 
   Testing the build:
   The make should produce a .so file named libtcnative-1.so.
-  Build the jar containing the example by
+  Build the jar containing the examples by
   cd ..
   ant jar
-  Run the example:
-  ant example-basic
+  Run one of the example (the echo one):
+  ant echo-example
  
   Using it in Tomcat:
   1 - In <Connector> use of conf/server.xml:
@@ -37,7 +41,7 @@
     /home/jfclere/tomcat-connectors/jni/native/.libs for tclib_location
 
 NOTES:
-  - configure --without-ssl : Configure without ssl support.
+  - configure --disable-openssl: Configure without ssl support.
   - To use it in Tomcat you may have to add in bin/setenv.sh:
     LD_LIBRARY_PATH=openssl_install_location/lib; export LD_LIBRARY_PATH
     (use ldd ./.libs/libtcnative-1.so to check it).
