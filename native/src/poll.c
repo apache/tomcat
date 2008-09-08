@@ -281,7 +281,7 @@ TCN_IMPLEMENT_CALL(jint, Poll, poll)(TCN_STDARGS, jlong pollset,
     tcn_pollset_t *p = J2P(pollset,  tcn_pollset_t *);
     apr_int32_t  i, num = 0;
     apr_status_t rv = APR_SUCCESS;
-    apr_time_t now;
+    apr_time_t now = 0;
     apr_interval_time_t ptime = J2T(timeout);
     UNREFERENCED(o);
     TCN_ASSERT(pollset != 0);
