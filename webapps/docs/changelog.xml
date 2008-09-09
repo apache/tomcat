@@ -40,6 +40,9 @@
   </subsection>
   <subsection name="ha">
     <changelog>
+      <fix>
+        Fix that JvmrouteBinderValve can rewrite session suffix with parallel requests from same client (pero)
+      </fix>
      <fix><rev>671650</rev><br/><bug>45279</bug><br/>
        Close multicast socket when calling close
       </fix> 
