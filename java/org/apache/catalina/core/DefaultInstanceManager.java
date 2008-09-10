@@ -350,11 +350,11 @@ public class DefaultInstanceManager implements InstanceManager {
         return classLoader.loadClass(className);
     }
 
-    private void checkAccess(Class clazz) {
+    private void checkAccess(Class<?> clazz) {
         if (privileged) return;
-        if (clazz.isAssignableFrom(Filter.class)) {
+        if (Filter.class.isAssignableFrom(clazz)) {
             checkAccess(clazz, restrictedFilters);
-        } else if (clazz.isAssignableFrom(Servlet.class)) {
+        } else if (Servlet.class.isAssignableFrom(clazz)) {
             checkAccess(clazz, restrictedServlets);
         } else {
             checkAccess(clazz, restrictedListeners);
