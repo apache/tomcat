@@ -45,6 +45,16 @@ manual is described in more detail below.</p>
 <br />
 <ul>
 
+<li><a href="news/2008.html#20080910.1">10 September 2008 - <b>TC-Native-1.1.15 released</b></a>
+<p>The Apache Tomcat team is proud to announce the immediate availability of Tomcat Native 1.1.15 Stable.
+</p>
+<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/tomcat-native-1.1.15-src.tar.gz">TC-native 1.1.15 release sources</a>
+ | <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/tomcat-native-1.1.15-src.tar.gz.asc">PGP signature</a>
+</p>
+<p>Download the <a href="http://www.apache.org/dist/tomcat/tomcat-connectors/native/1.1.15/binaries/">binaries</a> for selected platforms.
+</p>
+</li>
+
 <li><a href="news/2008.html#20080704.1">04 July 2008 - <b>TC-Native-1.1.14 released</b></a>
 <p>The Apache Tomcat team is proud to announce the immediate availability
 of Tomcat Native 1.1.14 Stable.
