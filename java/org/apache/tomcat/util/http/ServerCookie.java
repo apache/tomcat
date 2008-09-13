@@ -257,7 +257,8 @@ public class ServerCookie implements Serializable {
                                           String domain,
                                           String comment,
                                           int maxAge,
-                                          boolean isSecure )
+                                          boolean isSecure,
+                                          boolean isHttpOnly)
     {
         StringBuffer buf = new StringBuffer();
         // Servlet implementation checks name
@@ -321,6 +322,10 @@ public class ServerCookie implements Serializable {
           buf.append ("; Secure");
         }
         
+        // HttpOnly
+        if (isHttpOnly) {
+            buf.append("; HttpOnly");
+        }
         headerBuf.append(buf);
     }
 
