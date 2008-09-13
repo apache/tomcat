@@ -2331,7 +2331,7 @@ public class Request
             Cookie cookie = new Cookie(Globals.SESSION_COOKIE_NAME,
                                        session.getIdInternal());
             configureSessionCookie(cookie);
-            response.addCookieInternal(cookie);
+            response.addCookieInternal(cookie, manager.getUseHttpOnly());
         }
 
         if (session != null) {
