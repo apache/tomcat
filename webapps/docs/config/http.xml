@@ -410,6 +410,11 @@
         This value is ignored if the <code>executor</code> attribute is present and points to a valid shared thread pool.
         </p>
       </attribute>
+      <attribute name="executor" required="false">
+        <p>A reference to the name in an <a href="executor.html">Executor</a> element.
+           If this attribute is enabled, and the named executor exists, the connector will
+           use the executor, and all the other thread attributes will be ignored.</p>
+      </attribute>
       <attribute name="acceptorThreadCount" required="false">
         <p>(int)The number of threads to be used to accept connections. Increase this value on a multi CPU machine,
         although you would never really need more than <code>2</code>. Also, with a lot of non keep alive connections,
