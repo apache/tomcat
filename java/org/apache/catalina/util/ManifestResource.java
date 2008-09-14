@@ -39,8 +39,8 @@ public class ManifestResource {
     public static final int WAR = 2;
     public static final int APPLICATION = 3;
     
-    private ArrayList availableExtensions = null;
-    private ArrayList requiredExtensions = null;
+    private ArrayList<Extension> availableExtensions = null;
+    private ArrayList<Extension> requiredExtensions = null;
     
     private String resourceName = null;
     private int resourceType = -1;
@@ -66,7 +66,7 @@ public class ManifestResource {
      *
      * @return List of available extensions
      */
-    public ArrayList getAvailableExtensions() {
+    public ArrayList<Extension> getAvailableExtensions() {
         return availableExtensions;
     }
     
@@ -75,7 +75,7 @@ public class ManifestResource {
      *
      * @return List of required extensions
      */
-    public ArrayList getRequiredExtensions() {
+    public ArrayList<Extension> getRequiredExtensions() {
         return requiredExtensions;   
     }
     
@@ -119,9 +119,9 @@ public class ManifestResource {
         if (requiredExtensions == null) {
             return true;
         }
-        Iterator it = requiredExtensions.iterator();
+        Iterator<Extension> it = requiredExtensions.iterator();
         while (it.hasNext()) {
-            Extension ext = (Extension)it.next();
+            Extension ext = it.next();
             if (!ext.isFulfilled()) return false;            
         }
         return true;
@@ -165,14 +165,14 @@ public class ManifestResource {
      * @return List of required extensions, or null if the application
      * does not require any extensions
      */
-    private ArrayList getRequiredExtensions(Manifest manifest) {
+    private ArrayList<Extension> getRequiredExtensions(Manifest manifest) {
 
         Attributes attributes = manifest.getMainAttributes();
         String names = attributes.getValue("Extension-List");
         if (names == null)
             return null;
 
-        ArrayList extensionList = new ArrayList();
+        ArrayList<Extension> extensionList = new ArrayList<Extension>();
         names += " ";
 
         while (true) {
@@ -212,14 +212,14 @@ public class ManifestResource {
      * @return List of available extensions, or null if the web application
      * does not bundle any extensions
      */
-    private ArrayList getAvailableExtensions(Manifest manifest) {
+    private ArrayList<Extension> getAvailableExtensions(Manifest manifest) {
 
         Attributes attributes = manifest.getMainAttributes();
         String name = attributes.getValue("Extension-Name");
         if (name == null)
             return null;
 
-        ArrayList extensionList = new ArrayList();
+        ArrayList<Extension> extensionList = new ArrayList<Extension>();
 
         Extension extension = new Extension();
         extension.setExtensionName(name);

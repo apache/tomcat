@@ -61,8 +61,9 @@ public final class ExtensionValidator {
     private static StringManager sm =
         StringManager.getManager("org.apache.catalina.util");
     
-    private static ArrayList containerAvailableExtensions = null;
-    private static ArrayList containerManifestResources = new ArrayList();
+    private static ArrayList<Extension> containerAvailableExtensions = null;
+    private static ArrayList<ManifestResource> containerManifestResources =
+        new ArrayList<ManifestResource>();
 
 
     // ----------------------------------------------------- Static Initializer
@@ -133,15 +134,17 @@ public final class ExtensionValidator {
                     throws IOException {
 
         String appName = context.getPath();
-        ArrayList appManifestResources = new ArrayList();
+        ArrayList<ManifestResource> appManifestResources =
+            new ArrayList<ManifestResource>();
         // If the application context is null it does not exist and 
         // therefore is not valid
         if (dirContext == null) return false;
         // Find the Manifest for the Web Applicaiton
         InputStream inputStream = null;
         try {
-            NamingEnumeration wne = dirContext.listBindings("/META-INF/");
-            Binding binding = (Binding) wne.nextElement();
+            NamingEnumeration<Binding> wne =
+                dirContext.listBindings("/META-INF/");
+            Binding binding = wne.nextElement();
             if (binding.getName().toUpperCase().equals("MANIFEST.MF")) {
                 Resource resource = (Resource)dirContext.lookup
                                     ("/META-INF/" + binding.getName());
@@ -169,13 +172,11 @@ public final class ExtensionValidator {
         }
 
         // Locate the Manifests for all bundled JARs
-        NamingEnumeration ne = null;
+        NamingEnumeration<Binding> ne = null;
         try {
-            if (dirContext != null) {
-                ne = dirContext.listBindings("WEB-INF/lib/");
-            }
+            ne = dirContext.listBindings("WEB-INF/lib/");
             while ((ne != null) && ne.hasMoreElements()) {
-                Binding binding = (Binding)ne.nextElement();
+                Binding binding = ne.nextElement();
                 if (!binding.getName().toLowerCase().endsWith(".jar")) {
                     continue;
                 }
@@ -239,16 +240,16 @@ public final class ExtensionValidator {
      *
      * @return true if manifest resource file requirements are met
      */
-    private static boolean validateManifestResources(String appName, 
-                                                     ArrayList resources) {
+    private static boolean validateManifestResources(String appName,
+            ArrayList<ManifestResource> resources) {
         boolean passes = true;
         int failureCount = 0;        
-        ArrayList availableExtensions = null;
+        ArrayList<Extension> availableExtensions = null;
 
-        Iterator it = resources.iterator();
+        Iterator<ManifestResource> it = resources.iterator();
         while (it.hasNext()) {
-            ManifestResource mre = (ManifestResource)it.next();
-            ArrayList requiredList = mre.getRequiredExtensions();
+            ManifestResource mre = it.next();
+            ArrayList<Extension> requiredList = mre.getRequiredExtensions();
             if (requiredList == null) {
                 continue;
             }
@@ -266,15 +267,15 @@ public final class ExtensionValidator {
             }
 
             // iterate through the list of required extensions
-            Iterator rit = requiredList.iterator();
+            Iterator<Extension> rit = requiredList.iterator();
             while (rit.hasNext()) {
                 boolean found = false;
-                Extension requiredExt = (Extension)rit.next();
+                Extension requiredExt = rit.next();
                 // check the applicaion itself for the extension
                 if (availableExtensions != null) {
-                    Iterator ait = availableExtensions.iterator();
+                    Iterator<Extension> ait = availableExtensions.iterator();
                     while (ait.hasNext()) {
-                        Extension targetExt = (Extension) ait.next();
+                        Extension targetExt = ait.next();
                         if (targetExt.isCompatibleWith(requiredExt)) {
                             requiredExt.setFulfilled(true);
                             found = true;
@@ -284,9 +285,10 @@ public final class ExtensionValidator {
                 }
                 // check the container level list for the extension
                 if (!found && containerAvailableExtensions != null) {
-                    Iterator cit = containerAvailableExtensions.iterator();
+                    Iterator<Extension> cit =
+                        containerAvailableExtensions.iterator();
                     while (cit.hasNext()) {
-                        Extension targetExt = (Extension) cit.next();
+                        Extension targetExt = cit.next();
                         if (targetExt.isCompatibleWith(requiredExt)) {
                             requiredExt.setFulfilled(true);
                             found = true;
@@ -332,20 +334,21 @@ public final class ExtensionValidator {
     *
     * @return HashMap Map of available extensions
     */
-    private static ArrayList buildAvailableExtensionsList(ArrayList resources) {
+    private static ArrayList<Extension> buildAvailableExtensionsList(
+            ArrayList<ManifestResource> resources) {
 
-        ArrayList availableList = null;
+        ArrayList<Extension> availableList = null;
 
-        Iterator it = resources.iterator();
+        Iterator<ManifestResource> it = resources.iterator();
         while (it.hasNext()) {
-            ManifestResource mre = (ManifestResource)it.next();
-            ArrayList list = mre.getAvailableExtensions();
+            ManifestResource mre = it.next();
+            ArrayList<Extension> list = mre.getAvailableExtensions();
             if (list != null) {
-                Iterator values = list.iterator();
+                Iterator<Extension> values = list.iterator();
                 while (values.hasNext()) {
-                    Extension ext = (Extension) values.next();
+                    Extension ext = values.next();
                     if (availableList == null) {
-                        availableList = new ArrayList();
+                        availableList = new ArrayList<Extension>();
                         availableList.add(ext);
                     } else {
                         availableList.add(ext);

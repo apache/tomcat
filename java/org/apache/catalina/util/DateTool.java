@@ -33,9 +33,6 @@ import java.util.TimeZone;
  */
 public class DateTool {
 
-    private static StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
-
     /**
      * US locale - all HTTP dates are in english
      */
