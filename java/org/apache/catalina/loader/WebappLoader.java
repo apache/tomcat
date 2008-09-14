@@ -994,6 +994,10 @@ public class WebappLoader
                     // impossible to update it or remove it at runtime)
                     File destFile = new File(destDir, binding.getName());
 
+                    // Ignore directories named xxx.jar
+                    if (destFile.isDirectory())
+                        continue;
+
                     if( log.isDebugEnabled())
                     log.debug(sm.getString("webappLoader.jarDeploy", filename,
                                      destFile.getAbsolutePath()));
