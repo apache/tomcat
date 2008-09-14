@@ -332,18 +332,4 @@ public class DOMWriter {
 
    } // normalize(String):String
 
-   private static void printValidJavaEncoding() {
-      System.err.println( "    ENCODINGS:" );
-      System.err.print( "   " );
-      for( int i = 0;
-                     i < MIME2JAVA_ENCODINGS.length; i++) {
-         System.err.print( MIME2JAVA_ENCODINGS[i] + " " );
-      if( (i % 7 ) == 0 ){
-         System.err.println();
-         System.err.print( "   " );
-         }
-      }
-
-   } // printJavaEncoding()
-
 }

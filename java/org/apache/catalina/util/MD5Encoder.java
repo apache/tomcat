@@ -58,8 +58,8 @@ public final class MD5Encoder {
         char[] buffer = new char[32];
 
         for (int i=0; i<16; i++) {
-            int low = (int) (binaryData[i] & 0x0f);
-            int high = (int) ((binaryData[i] & 0xf0) >> 4);
+            int low = binaryData[i] & 0x0f;
+            int high = (binaryData[i] & 0xf0) >> 4;
             buffer[i*2] = hexadecimal[high];
             buffer[i*2 + 1] = hexadecimal[low];
         }
