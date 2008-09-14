@@ -64,7 +64,7 @@ public class ServerInfo {
             serverBuilt = props.getProperty("server.built");
             serverNumber = props.getProperty("server.number");
         } catch (Throwable t) {
-            ;
+            //Ignore
         }
         if (serverInfo == null)
             serverInfo = "Apache Tomcat";
