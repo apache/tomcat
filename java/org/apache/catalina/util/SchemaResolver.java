@@ -43,7 +43,8 @@ public class SchemaResolver implements EntityResolver {
      * The URLs of dtds and schemas that have been registered, keyed by the
      * public identifier that corresponds.
      */
-    protected HashMap entityValidator = new HashMap();
+    protected HashMap<String,String> entityValidator =
+        new HashMap<String,String>();
 
 
     /**
@@ -109,14 +110,14 @@ public class SchemaResolver implements EntityResolver {
         // Has this system identifier been registered?
         String entityURL = null;
         if (publicId != null) {
-            entityURL = (String) entityValidator.get(publicId);
+            entityURL = entityValidator.get(publicId);
         }
 
         // Redirect the schema location to a local destination
         String key = null;
         if (entityURL == null && systemId != null) {
             key = systemId.substring(systemId.lastIndexOf('/')+1);
-            entityURL = (String)entityValidator.get(key);
+            entityURL = entityValidator.get(key);
         }
 
         if (entityURL == null) {

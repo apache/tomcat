@@ -471,11 +471,11 @@ import java.util.*;
  */
 public class MIME2Java {
 
-    static private Hashtable s_enchash;
-    static private Hashtable s_revhash;
+    static private Hashtable<String,String> s_enchash;
+    static private Hashtable<String,String> s_revhash;
 
     static {
-        s_enchash = new Hashtable();
+        s_enchash = new Hashtable<String,String>();
         //    <preferred MIME name>, <Java encoding name>
         s_enchash.put("UTF-8", "UTF8");
         s_enchash.put("US-ASCII",        "8859_1");    // ?
@@ -519,7 +519,7 @@ public class MIME2Java {
                                                 // j:CNS11643 -> EUC-TW?
                                                 // ISO-2022-CN? ISO-2022-CN-EXT?
 
-        s_revhash = new Hashtable();
+        s_revhash = new Hashtable<String,String>();
         //    <Java encoding name>, <preferred MIME name>
         s_revhash.put("UTF8", "UTF-8");
         //s_revhash.put("8859_1", "US-ASCII");    // ?
@@ -580,7 +580,7 @@ public class MIME2Java {
      * @see #reverse
      */
     public static String convert(String mimeCharsetName) {
-        return (String)s_enchash.get(mimeCharsetName.toUpperCase());
+        return s_enchash.get(mimeCharsetName.toUpperCase());
     }
 
     /**
@@ -598,6 +598,6 @@ public class MIME2Java {
      * @see #convert
      */
     public static String reverse(String encoding) {
-        return (String)s_revhash.get(encoding.toUpperCase());
+        return s_revhash.get(encoding.toUpperCase());
     }
 }

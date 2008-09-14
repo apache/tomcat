@@ -59,7 +59,6 @@ public class URLEncoder {
 
     public String encode( String path ) {
         int maxBytesPerChar = 10;
-        int caseDiff = ('a' - 'A');
         StringBuffer rewrittenPath = new StringBuffer(path.length());
         ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
         OutputStreamWriter writer = null;
@@ -71,7 +70,7 @@ public class URLEncoder {
         }
 
         for (int i = 0; i < path.length(); i++) {
-            int c = (int) path.charAt(i);
+            int c = path.charAt(i);
             if (safeCharacters.get(c)) {
                 rewrittenPath.append((char)c);
             } else {
@@ -88,8 +87,8 @@ public class URLEncoder {
                     // Converting each byte in the buffer
                     byte toEncode = ba[j];
                     rewrittenPath.append('%');
-                    int low = (int) (toEncode & 0x0f);
-                    int high = (int) ((toEncode & 0xf0) >> 4);
+                    int low = toEncode & 0x0f;
+                    int high = (toEncode & 0xf0) >> 4;
                     rewrittenPath.append(hexadecimal[high]);
                     rewrittenPath.append(hexadecimal[low]);
                 }
