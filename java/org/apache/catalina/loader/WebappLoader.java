@@ -994,15 +994,17 @@ public class WebappLoader
                     // impossible to update it or remove it at runtime)
                     File destFile = new File(destDir, binding.getName());
 
-                    // Ignore directories named xxx.jar
-                    if (destFile.isDirectory())
-                        continue;
-
                     if( log.isDebugEnabled())
                     log.debug(sm.getString("webappLoader.jarDeploy", filename,
                                      destFile.getAbsolutePath()));
 
-                    Resource jarResource = (Resource) binding.getObject();
+                    Object obj = binding.getObject();
+                    
+                    if (!(obj instanceof Resource))
+                        continue;
+                    
+                    Resource jarResource = (Resource) obj;
+                    
                     if (copyJars) {
                         if (!copy(jarResource.streamContent(),
                                   new FileOutputStream(destFile)))
