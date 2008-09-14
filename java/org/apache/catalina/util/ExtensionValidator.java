@@ -180,8 +180,13 @@ public final class ExtensionValidator {
                 if (!binding.getName().toLowerCase().endsWith(".jar")) {
                     continue;
                 }
-                Resource resource = (Resource)dirContext.lookup
-                                        ("/WEB-INF/lib/" + binding.getName());
+                Object obj =
+                    dirContext.lookup("/WEB-INF/lib/" + binding.getName());
+                if (!(obj instanceof Resource)) {
+                    // Probably a directory named xxx.jar - ignore it
+                    continue;
+                }
+                Resource resource = (Resource) obj;
                 Manifest jmanifest = getManifest(resource.streamContent());
                 if (jmanifest != null) {
                     ManifestResource mre = new ManifestResource(
