@@ -26,17 +26,15 @@ import java.util.Vector;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
-import javax.el.FunctionMapper;
-
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.xml.sax.Attributes;
 
-/** 
- * This class has all the utility method(s).
- * Ideally should move all the bean containers here.
- *
+/**
+ * This class has all the utility method(s). Ideally should move all the bean
+ * containers here.
+ * 
  * @author Mandar Raje.
  * @author Rajiv Mordani.
  * @author Danno Ferrin
@@ -50,33 +48,31 @@ public class JspUtil {
     private static final String META_INF_TAGS = "/META-INF/tags/";
 
     // Delimiters for request-time expressions (JSP and XML syntax)
-    private static final String OPEN_EXPR  = "<%=";
+    private static final String OPEN_EXPR = "<%=";
     private static final String CLOSE_EXPR = "%>";
-    private static final String OPEN_EXPR_XML  = "%=";
+    private static final String OPEN_EXPR_XML = "%=";
     private static final String CLOSE_EXPR_XML = "%";
 
-    //private static ExpressionEvaluatorImpl expressionEvaluator
-    //= new ExpressionEvaluatorImpl();
-    
-    private static final String javaKeywords[] = {
-        "abstract", "assert", "boolean", "break", "byte", "case",
-        "catch", "char", "class", "const", "continue",
-        "default", "do", "double", "else", "enum", "extends",
-        "final", "finally", "float", "for", "goto",
-        "if", "implements", "import", "instanceof", "int",
-        "interface", "long", "native", "new", "package",
-        "private", "protected", "public", "return", "short",
-        "static", "strictfp", "super", "switch", "synchronized",
-        "this", "throws", "transient", "try", "void",
-        "volatile", "while" };
+    // private static ExpressionEvaluatorImpl expressionEvaluator
+    // = new ExpressionEvaluatorImpl();
+
+    private static final String javaKeywords[] = { "abstract", "assert",
+            "boolean", "break", "byte", "case", "catch", "char", "class",
+            "const", "continue", "default", "do", "double", "else", "enum",
+            "extends", "final", "finally", "float", "for", "goto", "if",
+            "implements", "import", "instanceof", "int", "interface", "long",
+            "native", "new", "package", "private", "protected", "public",
+            "return", "short", "static", "strictfp", "super", "switch",
+            "synchronized", "this", "throws", "transient", "try", "void",
+            "volatile", "while" };
 
     public static final int CHUNKSIZE = 1024;
-        
-    public static char[] removeQuotes(char []chars) {
+
+    public static char[] removeQuotes(char[] chars) {
         CharArrayWriter caw = new CharArrayWriter();
         for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '%' && chars[i+1] == '\\' &&
-                chars[i+2] == '>') {
+            if (chars[i] == '%' && chars[i + 1] == '\\' &&
+                    chars[i + 2] == '>') {
                 caw.write('%');
                 caw.write('>');
                 i = i + 2;
@@ -87,7 +83,7 @@ public class JspUtil {
         return caw.toCharArray();
     }
 
-    public static char[] escapeQuotes (char []chars) {
+    public static char[] escapeQuotes(char[] chars) {
         // Prescan to convert %\> to %>
         String s = new String(chars);
         while (true) {
@@ -102,7 +98,6 @@ public class JspUtil {
         chars = s.toCharArray();
         return (chars);
 
-
         // Escape all backslashes not inside a Java string literal
         /*
         CharArrayWriter caw = new CharArrayWriter();
@@ -114,59 +109,58 @@ public class JspUtil {
             caw.write(chars[i]);
         }
         return caw.toCharArray();
-        */
+         */
     }
 
     /**
-     * Checks if the token is a runtime expression.
-     * In standard JSP syntax, a runtime expression starts with '<%' and
-     * ends with '%>'. When the JSP document is in XML syntax, a runtime
-     * expression starts with '%=' and ends with '%'.
-     *
+     * Checks if the token is a runtime expression. In standard JSP syntax, a
+     * runtime expression starts with '<%' and ends with '%>'. When the JSP
+     * document is in XML syntax, a runtime expression starts with '%=' and ends
+     * with '%'.
+     * 
      * @param token The token to be checked
-     * return whether the token is a runtime expression or not.
+     * @return whether the token is a runtime expression or not.
      */
     public static boolean isExpression(String token, boolean isXml) {
-    String openExpr;
-    String closeExpr;
-    if (isXml) {
-        openExpr = OPEN_EXPR_XML;
-        closeExpr = CLOSE_EXPR_XML;
-    } else {
-        openExpr = OPEN_EXPR;
-        closeExpr = CLOSE_EXPR;
-    }
-    if (token.startsWith(openExpr) && token.endsWith(closeExpr)) {
-        return true;
-    } else {
-        return false;
-    }
+        String openExpr;
+        String closeExpr;
+        if (isXml) {
+            openExpr = OPEN_EXPR_XML;
+            closeExpr = CLOSE_EXPR_XML;
+        } else {
+            openExpr = OPEN_EXPR;
+            closeExpr = CLOSE_EXPR;
+        }
+        if (token.startsWith(openExpr) && token.endsWith(closeExpr)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
-     * @return the "expression" part of a runtime expression, 
-     * taking the delimiters out.
+     * @return the "expression" part of a runtime expression, taking the
+     *         delimiters out.
      */
-    public static String getExpr (String expression, boolean isXml) {
-    String returnString;
-    String openExpr;
-    String closeExpr;
-    if (isXml) {
-        openExpr = OPEN_EXPR_XML;
-        closeExpr = CLOSE_EXPR_XML;
-    } else {
-        openExpr = OPEN_EXPR;
-        closeExpr = CLOSE_EXPR;
-    }
-    int length = expression.length();
-    if (expression.startsWith(openExpr) && 
-                expression.endsWith(closeExpr)) {
-        returnString = expression.substring(
-                               openExpr.length(), length - closeExpr.length());
-    } else {
-        returnString = "";
-    }
-    return returnString;
+    public static String getExpr(String expression, boolean isXml) {
+        String returnString;
+        String openExpr;
+        String closeExpr;
+        if (isXml) {
+            openExpr = OPEN_EXPR_XML;
+            closeExpr = CLOSE_EXPR_XML;
+        } else {
+            openExpr = OPEN_EXPR;
+            closeExpr = CLOSE_EXPR;
+        }
+        int length = expression.length();
+        if (expression.startsWith(openExpr) && expression.endsWith(closeExpr)) {
+            returnString = expression.substring(openExpr.length(), length
+                    - closeExpr.length());
+        } else {
+            returnString = "";
+        }
+        return returnString;
     }
 
     /**
@@ -176,9 +170,9 @@ public class JspUtil {
         String returnString;
         int length = expression.length();
 
-        if (expression.startsWith(OPEN_EXPR) 
-                && expression.endsWith(CLOSE_EXPR)) {
-            returnString = expression.substring (1, length - 1);
+        if (expression.startsWith(OPEN_EXPR) &&
+                expression.endsWith(CLOSE_EXPR)) {
+            returnString = expression.substring(1, length - 1);
         } else {
             returnString = expression;
         }
@@ -188,42 +182,44 @@ public class JspUtil {
 
     /**
      * Checks to see if the given scope is valid.
-     *
-     * @param scope The scope to be checked
-     * @param n The Node containing the 'scope' attribute whose value is to be
-     * checked
-     * @param err error dispatcher
-     *
-     * @throws JasperException if scope is not null and different from
-     * &quot;page&quot;, &quot;request&quot;, &quot;session&quot;, and
-     * &quot;application&quot;
+     * 
+     * @param scope
+     *            The scope to be checked
+     * @param n
+     *            The Node containing the 'scope' attribute whose value is to be
+     *            checked
+     * @param err
+     *            error dispatcher
+     * 
+     * @throws JasperException
+     *             if scope is not null and different from &quot;page&quot;,
+     *             &quot;request&quot;, &quot;session&quot;, and
+     *             &quot;application&quot;
      */
     public static void checkScope(String scope, Node n, ErrorDispatcher err)
             throws JasperException {
-    if (scope != null && !scope.equals("page") && !scope.equals("request")
-        && !scope.equals("session") && !scope.equals("application")) {
-        err.jspError(n, "jsp.error.invalid.scope", scope);
-    }
+        if (scope != null && !scope.equals("page") && !scope.equals("request")
+                && !scope.equals("session") && !scope.equals("application")) {
+            err.jspError(n, "jsp.error.invalid.scope", scope);
+        }
     }
 
     /**
      * Checks if all mandatory attributes are present and if all attributes
-     * present have valid names.  Checks attributes specified as XML-style
+     * present have valid names. Checks attributes specified as XML-style
      * attributes as well as attributes specified using the jsp:attribute
-     * standard action. 
+     * standard action.
      */
-    public static void checkAttributes(String typeOfTag,
-                       Node n,
-                       ValidAttribute[] validAttributes,
-                       ErrorDispatcher err)
-                throws JasperException {
+    public static void checkAttributes(String typeOfTag, Node n,
+            ValidAttribute[] validAttributes, ErrorDispatcher err)
+            throws JasperException {
         Attributes attrs = n.getAttributes();
         Mark start = n.getStart();
-    boolean valid = true;
+        boolean valid = true;
 
         // AttributesImpl.removeAttribute is broken, so we do this...
         int tempLength = (attrs == null) ? 0 : attrs.getLength();
-    Vector temp = new Vector(tempLength, 1);
+        Vector<String> temp = new Vector<String>(tempLength, 1);
         for (int i = 0; i < tempLength; i++) {
             String qName = attrs.getQName(i);
             if ((!qName.equals("xmlns")) && (!qName.startsWith("xmlns:")))
@@ -232,20 +228,20 @@ public class JspUtil {
 
         // Add names of attributes specified using jsp:attribute
         Node.Nodes tagBody = n.getBody();
-        if( tagBody != null ) {
+        if (tagBody != null) {
             int numSubElements = tagBody.size();
-            for( int i = 0; i < numSubElements; i++ ) {
-                Node node = tagBody.getNode( i );
-                if( node instanceof Node.NamedAttribute ) {
-                    String attrName = node.getAttributeValue( "name" );
-                    temp.addElement( attrName );
-            // Check if this value appear in the attribute of the node
-            if (n.getAttributeValue(attrName) != null) {
-            err.jspError(n, "jsp.error.duplicate.name.jspattribute",
-                    attrName);
-            }
-                }
-                else {
+            for (int i = 0; i < numSubElements; i++) {
+                Node node = tagBody.getNode(i);
+                if (node instanceof Node.NamedAttribute) {
+                    String attrName = node.getAttributeValue("name");
+                    temp.addElement(attrName);
+                    // Check if this value appear in the attribute of the node
+                    if (n.getAttributeValue(attrName) != null) {
+                        err.jspError(n,
+                                "jsp.error.duplicate.name.jspattribute",
+                                attrName);
+                    }
+                } else {
                     // Nothing can come before jsp:attribute, and only
                     // jsp:body can come after it.
                     break;
@@ -253,82 +249,83 @@ public class JspUtil {
             }
         }
 
-    /*
-     * First check to see if all the mandatory attributes are present.
-     * If so only then proceed to see if the other attributes are valid
-     * for the particular tag.
-     */
-    String missingAttribute = null;
+        /*
+         * First check to see if all the mandatory attributes are present. If so
+         * only then proceed to see if the other attributes are valid for the
+         * particular tag.
+         */
+        String missingAttribute = null;
 
-    for (int i = 0; i < validAttributes.length; i++) {
-        int attrPos;    
-        if (validAttributes[i].mandatory) {
-                attrPos = temp.indexOf(validAttributes[i].name);
-        if (attrPos != -1) {
-            temp.remove(attrPos);
-            valid = true;
-        } else {
-            valid = false;
-            missingAttribute = validAttributes[i].name;
-            break;
-        }
-        }
-    }
-
-    // If mandatory attribute is missing then the exception is thrown
-    if (!valid)
-        err.jspError(start, "jsp.error.mandatory.attribute", typeOfTag,
-             missingAttribute);
-
-    // Check to see if there are any more attributes for the specified tag.
-        int attrLeftLength = temp.size();
-    if (attrLeftLength == 0)
-        return;
-
-    // Now check to see if the rest of the attributes are valid too.
-    String attribute = null;
-
-    for (int j = 0; j < attrLeftLength; j++) {
-        valid = false;
-        attribute = (String) temp.elementAt(j);
         for (int i = 0; i < validAttributes.length; i++) {
-        if (attribute.equals(validAttributes[i].name)) {
-            valid = true;
-            break;
+            int attrPos;
+            if (validAttributes[i].mandatory) {
+                attrPos = temp.indexOf(validAttributes[i].name);
+                if (attrPos != -1) {
+                    temp.remove(attrPos);
+                    valid = true;
+                } else {
+                    valid = false;
+                    missingAttribute = validAttributes[i].name;
+                    break;
+                }
+            }
         }
-        }
+
+        // If mandatory attribute is missing then the exception is thrown
         if (!valid)
-        err.jspError(start, "jsp.error.invalid.attribute", typeOfTag,
-                 attribute);
+            err.jspError(start, "jsp.error.mandatory.attribute", typeOfTag,
+                    missingAttribute);
+
+        // Check to see if there are any more attributes for the specified tag.
+        int attrLeftLength = temp.size();
+        if (attrLeftLength == 0)
+            return;
+
+        // Now check to see if the rest of the attributes are valid too.
+        String attribute = null;
+
+        for (int j = 0; j < attrLeftLength; j++) {
+            valid = false;
+            attribute = temp.elementAt(j);
+            for (int i = 0; i < validAttributes.length; i++) {
+                if (attribute.equals(validAttributes[i].name)) {
+                    valid = true;
+                    break;
+                }
+            }
+            if (!valid)
+                err.jspError(start, "jsp.error.invalid.attribute", typeOfTag,
+                        attribute);
+        }
+        // XXX *could* move EL-syntax validation here... (sb)
     }
-    // XXX *could* move EL-syntax validation here... (sb)
-    }
-    
+
     public static String escapeQueryString(String unescString) {
-    if ( unescString == null )
-        return null;
-    
-    String escString    = "";
-    String shellSpChars = "\\\"";
-    
-    for(int index=0; index<unescString.length(); index++) {
-        char nextChar = unescString.charAt(index);
-        
-        if( shellSpChars.indexOf(nextChar) != -1 )
-        escString += "\\";
-        
-        escString += nextChar;
+        if (unescString == null)
+            return null;
+
+        String escString = "";
+        String shellSpChars = "\\\"";
+
+        for (int index = 0; index < unescString.length(); index++) {
+            char nextChar = unescString.charAt(index);
+
+            if (shellSpChars.indexOf(nextChar) != -1)
+                escString += "\\";
+
+            escString += nextChar;
+        }
+        return escString;
     }
-    return escString;
-    }
- 
+
     /**
-     *  Escape the 5 entities defined by XML.
+     * Escape the 5 entities defined by XML.
      */
     public static String escapeXml(String s) {
-        if (s == null) return null;
+        if (s == null)
+            return null;
         StringBuffer sb = new StringBuffer();
-        for(int i=0; i<s.length(); i++) {
+        for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '<') {
                 sb.append("&lt;");
@@ -352,539 +349,527 @@ public class JspUtil {
      * string <tt>with</tt>.
      */
     public static String replace(String name, char replace, String with) {
-    StringBuffer buf = new StringBuffer();
-    int begin = 0;
-    int end;
-    int last = name.length();
+        StringBuffer buf = new StringBuffer();
+        int begin = 0;
+        int end;
+        int last = name.length();
 
-    while (true) {
-        end = name.indexOf(replace, begin);
-        if (end < 0) {
-        end = last;
+        while (true) {
+            end = name.indexOf(replace, begin);
+            if (end < 0) {
+                end = last;
+            }
+            buf.append(name.substring(begin, end));
+            if (end == last) {
+                break;
+            }
+            buf.append(with);
+            begin = end + 1;
         }
-        buf.append(name.substring(begin, end));
-        if (end == last) {
-        break;
-        }
-        buf.append(with);
-        begin = end + 1;
-    }
-    
-    return buf.toString();
+
+        return buf.toString();
     }
 
     public static class ValidAttribute {
-    String name;
-    boolean mandatory;
-    boolean rtexprvalue;    // not used now
+        String name;
 
-    public ValidAttribute (String name, boolean mandatory,
-            boolean rtexprvalue )
-        {
-        this.name = name;
-        this.mandatory = mandatory;
+        boolean mandatory;
+
+        boolean rtexprvalue; // not used now
+
+        public ValidAttribute(String name, boolean mandatory,
+                boolean rtexprvalue) {
+            this.name = name;
+            this.mandatory = mandatory;
             this.rtexprvalue = rtexprvalue;
         }
 
-       public ValidAttribute (String name, boolean mandatory) {
-            this( name, mandatory, false );
+        public ValidAttribute(String name, boolean mandatory) {
+            this(name, mandatory, false);
+        }
+
+        public ValidAttribute(String name) {
+            this(name, false);
+        }
     }
 
-    public ValidAttribute (String name) {
-        this (name, false);
-    }
-    }
-    
     /**
-     * Convert a String value to 'boolean'.
-     * Besides the standard conversions done by
-     * Boolean.valueOf(s).booleanValue(), the value "yes"
-     * (ignore case) is also converted to 'true'. 
-     * If 's' is null, then 'false' is returned.
-     *
-     * @param s the string to be converted
+     * Convert a String value to 'boolean'. Besides the standard conversions
+     * done by Boolean.valueOf(s).booleanValue(), the value "yes" (ignore case)
+     * is also converted to 'true'. If 's' is null, then 'false' is returned.
+     * 
+     * @param s
+     *            the string to be converted
      * @return the boolean value associated with the string s
      */
     public static boolean booleanValue(String s) {
-    boolean b = false;
-    if (s != null) {
-        if (s.equalsIgnoreCase("yes")) {
-        b = true;
-        } else {
-        b = Boolean.valueOf(s).booleanValue();
+        boolean b = false;
+        if (s != null) {
+            if (s.equalsIgnoreCase("yes")) {
+                b = true;
+            } else {
+                b = Boolean.valueOf(s).booleanValue();
+            }
         }
-    }
-    return b;
+        return b;
     }
 
     /**
      * Returns the <tt>Class</tt> object associated with the class or
      * interface with the given string name.
-     *
-     * <p> The <tt>Class</tt> object is determined by passing the given string
+     * 
+     * <p>
+     * The <tt>Class</tt> object is determined by passing the given string
      * name to the <tt>Class.forName()</tt> method, unless the given string
      * name represents a primitive type, in which case it is converted to a
      * <tt>Class</tt> object by appending ".class" to it (e.g., "int.class").
      */
-    public static Class toClass(String type, ClassLoader loader)
-        throws ClassNotFoundException {
+    public static Class<?> toClass(String type, ClassLoader loader)
+            throws ClassNotFoundException {
 
-    Class c = null;
-    int i0 = type.indexOf('[');
-    int dims = 0;
-    if (i0 > 0) {
-        // This is an array.  Count the dimensions
-        for (int i = 0; i < type.length(); i++) {
-        if (type.charAt(i) == '[')
-            dims++;
+        Class<?> c = null;
+        int i0 = type.indexOf('[');
+        int dims = 0;
+        if (i0 > 0) {
+            // This is an array. Count the dimensions
+            for (int i = 0; i < type.length(); i++) {
+                if (type.charAt(i) == '[')
+                    dims++;
+            }
+            type = type.substring(0, i0);
         }
-        type = type.substring(0, i0);
+
+        if ("boolean".equals(type))
+            c = boolean.class;
+        else if ("char".equals(type))
+            c = char.class;
+        else if ("byte".equals(type))
+            c = byte.class;
+        else if ("short".equals(type))
+            c = short.class;
+        else if ("int".equals(type))
+            c = int.class;
+        else if ("long".equals(type))
+            c = long.class;
+        else if ("float".equals(type))
+            c = float.class;
+        else if ("double".equals(type))
+            c = double.class;
+        else if (type.indexOf('[') < 0)
+            c = loader.loadClass(type);
+
+        if (dims == 0)
+            return c;
+
+        if (dims == 1)
+            return java.lang.reflect.Array.newInstance(c, 1).getClass();
+
+        // Array of more than i dimension
+        return java.lang.reflect.Array.newInstance(c, new int[dims]).getClass();
     }
 
-    if ("boolean".equals(type))
-        c = boolean.class;
-    else if ("char".equals(type))
-        c = char.class;
-    else if ("byte".equals(type))
-        c =  byte.class;
-    else if ("short".equals(type))
-        c = short.class;
-    else if ("int".equals(type))
-        c = int.class;
-    else if ("long".equals(type))
-        c = long.class;
-    else if ("float".equals(type))
-        c = float.class;
-    else if ("double".equals(type))
-        c = double.class;
-    else if (type.indexOf('[') < 0)
-        c = loader.loadClass(type);
-
-    if (dims == 0)
-        return c;
-
-    if (dims == 1)
-        return java.lang.reflect.Array.newInstance(c, 1).getClass();
-
-    // Array of more than i dimension
-    return java.lang.reflect.Array.newInstance(c, new int[dims]).getClass();
-    }
-    
     /**
      * Produces a String representing a call to the EL interpreter.
-     * @param expression a String containing zero or more "${}" expressions
-     * @param expectedType the expected type of the interpreted result
-     * @param fnmapvar Variable pointing to a function map.
-     * @param XmlEscape True if the result should do XML escaping
+     * 
+     * @param expression
+     *            a String containing zero or more "${}" expressions
+     * @param expectedType
+     *            the expected type of the interpreted result
+     * @param fnmapvar
+     *            Variable pointing to a function map.
+     * @param XmlEscape
+     *            True if the result should do XML escaping
      * @return a String representing a call to the EL interpreter.
      */
-    public static String interpreterCall(boolean isTagFile,
-                     String expression,
-                                         Class expectedType,
-                                         String fnmapvar,
-                                         boolean XmlEscape ) 
-    {
+    public static String interpreterCall(boolean isTagFile, String expression,
+            Class<?> expectedType, String fnmapvar, boolean XmlEscape) {
         /*
          * Determine which context object to use.
          */
-    String jspCtxt = null;
-    if (isTagFile)
-        jspCtxt = "this.getJspContext()";
-    else
-        jspCtxt = "_jspx_page_context";
+        String jspCtxt = null;
+        if (isTagFile)
+            jspCtxt = "this.getJspContext()";
+        else
+            jspCtxt = "_jspx_page_context";
 
-    /*
-         * Determine whether to use the expected type's textual name
-     * or, if it's a primitive, the name of its correspondent boxed
-     * type.
+        /*
+         * Determine whether to use the expected type's textual name or, if it's
+         * a primitive, the name of its correspondent boxed type.
          */
-    String targetType = expectedType.getName();
-    String primitiveConverterMethod = null;
-    if (expectedType.isPrimitive()) {
-        if (expectedType.equals(Boolean.TYPE)) {
-        targetType = Boolean.class.getName();
-        primitiveConverterMethod = "booleanValue";
-        } else if (expectedType.equals(Byte.TYPE)) {
-        targetType = Byte.class.getName();
-        primitiveConverterMethod = "byteValue";
-        } else if (expectedType.equals(Character.TYPE)) {
-        targetType = Character.class.getName();
-        primitiveConverterMethod = "charValue";
-        } else if (expectedType.equals(Short.TYPE)) {
-        targetType = Short.class.getName();
-        primitiveConverterMethod = "shortValue";
-        } else if (expectedType.equals(Integer.TYPE)) {
-        targetType = Integer.class.getName();
-        primitiveConverterMethod = "intValue";
-        } else if (expectedType.equals(Long.TYPE)) {
-        targetType = Long.class.getName();
-        primitiveConverterMethod = "longValue";
-        } else if (expectedType.equals(Float.TYPE)) {
-        targetType = Float.class.getName();
-        primitiveConverterMethod = "floatValue";
-        } else if (expectedType.equals(Double.TYPE)) { 
-        targetType = Double.class.getName();
-        primitiveConverterMethod = "doubleValue";
+        String targetType = expectedType.getName();
+        String primitiveConverterMethod = null;
+        if (expectedType.isPrimitive()) {
+            if (expectedType.equals(Boolean.TYPE)) {
+                targetType = Boolean.class.getName();
+                primitiveConverterMethod = "booleanValue";
+            } else if (expectedType.equals(Byte.TYPE)) {
+                targetType = Byte.class.getName();
+                primitiveConverterMethod = "byteValue";
+            } else if (expectedType.equals(Character.TYPE)) {
+                targetType = Character.class.getName();
+                primitiveConverterMethod = "charValue";
+            } else if (expectedType.equals(Short.TYPE)) {
+                targetType = Short.class.getName();
+                primitiveConverterMethod = "shortValue";
+            } else if (expectedType.equals(Integer.TYPE)) {
+                targetType = Integer.class.getName();
+                primitiveConverterMethod = "intValue";
+            } else if (expectedType.equals(Long.TYPE)) {
+                targetType = Long.class.getName();
+                primitiveConverterMethod = "longValue";
+            } else if (expectedType.equals(Float.TYPE)) {
+                targetType = Float.class.getName();
+                primitiveConverterMethod = "floatValue";
+            } else if (expectedType.equals(Double.TYPE)) {
+                targetType = Double.class.getName();
+                primitiveConverterMethod = "doubleValue";
+            }
         }
-    }
- 
-    if (primitiveConverterMethod != null) {
-        XmlEscape = false;
-    }
 
-    /*
+        if (primitiveConverterMethod != null) {
+            XmlEscape = false;
+        }
+
+        /*
          * Build up the base call to the interpreter.
          */
         // XXX - We use a proprietary call to the interpreter for now
         // as the current standard machinery is inefficient and requires
-        // lots of wrappers and adapters.  This should all clear up once
+        // lots of wrappers and adapters. This should all clear up once
         // the EL interpreter moves out of JSTL and into its own project.
         // In the future, this should be replaced by code that calls
         // ExpressionEvaluator.parseExpression() and then cache the resulting
-        // expression objects.  The interpreterCall would simply select
+        // expression objects. The interpreterCall would simply select
         // one of the pre-cached expressions and evaluate it.
         // Note that PageContextImpl implements VariableResolver and
         // the generated Servlet/SimpleTag implements FunctionMapper, so
         // that machinery is already in place (mroth).
-    targetType = toJavaSourceType(targetType);
-    StringBuffer call = new StringBuffer(
-             "(" + targetType + ") "
-               + "org.apache.jasper.runtime.PageContextImpl.proprietaryEvaluate"
-               + "(" + Generator.quote(expression) + ", "
-               +       targetType + ".class, "
-           +       "(PageContext)" + jspCtxt 
-               +       ", " + fnmapvar
-           + ", " + XmlEscape
-               + ")");
- 
-    /*
+        targetType = toJavaSourceType(targetType);
+        StringBuffer call = new StringBuffer(
+                "("
+                        + targetType
+                        + ") "
+                        + "org.apache.jasper.runtime.PageContextImpl.proprietaryEvaluate"
+                        + "(" + Generator.quote(expression) + ", " + targetType
+                        + ".class, " + "(PageContext)" + jspCtxt + ", "
+                        + fnmapvar + ", " + XmlEscape + ")");
+
+        /*
          * Add the primitive converter method if we need to.
          */
-    if (primitiveConverterMethod != null) {
-        call.insert(0, "(");
-        call.append(")." + primitiveConverterMethod + "()");
-    }
- 
-    return call.toString();
-    }
+        if (primitiveConverterMethod != null) {
+            call.insert(0, "(");
+            call.append(")." + primitiveConverterMethod + "()");
+        }
 
-    /**
-     * Validates the syntax of all ${} expressions within the given string.
-     * @param where the approximate location of the expressions in the JSP page
-     * @param expressions a string containing zero or more "${}" expressions
-     * @param err an error dispatcher to use
-     * @deprecated now delegated to the org.apache.el Package
-     */
-    public static void validateExpressions(Mark where,
-                                           String expressions,
-                                           Class expectedType,
-                                           FunctionMapper functionMapper,
-                                           ErrorDispatcher err)
-            throws JasperException {
-
-//        try {
-//            
-//            JspUtil.expressionEvaluator.parseExpression( expressions, 
-//                expectedType, functionMapper );
-//        }
-//        catch( ELParseException e ) {
-//            err.jspError(where, "jsp.error.invalid.expression", expressions,
-//                e.toString() );
-//        }
-//        catch( ELException e ) {
-//            err.jspError(where, "jsp.error.invalid.expression", expressions,
-//                e.toString() );
-//        }
+        return call.toString();
     }
 
     public static String coerceToPrimitiveBoolean(String s,
-                          boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToBoolean(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "false";
-        else
-        return Boolean.valueOf(s).toString();
-    }
+            boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToBoolean("
+                    + s + ")";
+        } else {
+            if (s == null || s.length() == 0)
+                return "false";
+            else
+                return Boolean.valueOf(s).toString();
+        }
     }
 
     public static String coerceToBoolean(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Boolean) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Boolean.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Boolean(false)";
+        if (isNamedAttribute) {
+            return "(Boolean) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Boolean.class)";
         } else {
-        // Detect format error at translation time
-        return "new Boolean(" + Boolean.valueOf(s).toString() + ")";
+            if (s == null || s.length() == 0) {
+                return "new Boolean(false)";
+            } else {
+                // Detect format error at translation time
+                return "new Boolean(" + Boolean.valueOf(s).toString() + ")";
+            }
         }
-    }
     }
 
     public static String coerceToPrimitiveByte(String s,
-                           boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToByte(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "(byte) 0";
-        else
-        return "((byte)" + Byte.valueOf(s).toString() + ")";
-    }
+            boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToByte("
+                    + s + ")";
+        } else {
+            if (s == null || s.length() == 0)
+                return "(byte) 0";
+            else
+                return "((byte)" + Byte.valueOf(s).toString() + ")";
+        }
     }
 
     public static String coerceToByte(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Byte) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Byte.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Byte((byte) 0)";
+        if (isNamedAttribute) {
+            return "(Byte) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Byte.class)";
         } else {
-        // Detect format error at translation time
-        return "new Byte((byte)" + Byte.valueOf(s).toString() + ")";
+            if (s == null || s.length() == 0) {
+                return "new Byte((byte) 0)";
+            } else {
+                // Detect format error at translation time
+                return "new Byte((byte)" + Byte.valueOf(s).toString() + ")";
+            }
         }
-    }
     }
 
     public static String coerceToChar(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToChar(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "(char) 0";
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToChar("
+                    + s + ")";
         } else {
-        char ch = s.charAt(0);
-        // this trick avoids escaping issues
-        return "((char) " + (int) ch + ")";
+            if (s == null || s.length() == 0) {
+                return "(char) 0";
+            } else {
+                char ch = s.charAt(0);
+                // this trick avoids escaping issues
+                return "((char) " + (int) ch + ")";
+            }
         }
-    }
     }
 
     public static String coerceToCharacter(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Character) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Character.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Character((char) 0)";
+        if (isNamedAttribute) {
+            return "(Character) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Character.class)";
         } else {
-        char ch = s.charAt(0);
-        // this trick avoids escaping issues
-        return "new Character((char) " + (int) ch + ")";
+            if (s == null || s.length() == 0) {
+                return "new Character((char) 0)";
+            } else {
+                char ch = s.charAt(0);
+                // this trick avoids escaping issues
+                return "new Character((char) " + (int) ch + ")";
+            }
         }
-    }
     }
 
     public static String coerceToPrimitiveDouble(String s,
-                         boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToDouble(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "(double) 0";
-        else
-        return Double.valueOf(s).toString();
-    }
+            boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToDouble("
+                    + s + ")";
+        } else {
+            if (s == null || s.length() == 0)
+                return "(double) 0";
+            else
+                return Double.valueOf(s).toString();
+        }
     }
 
     public static String coerceToDouble(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Double) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Double.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Double(0)";
+        if (isNamedAttribute) {
+            return "(Double) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Double.class)";
         } else {
-        // Detect format error at translation time
-        return "new Double(" + Double.valueOf(s).toString() + ")";
+            if (s == null || s.length() == 0) {
+                return "new Double(0)";
+            } else {
+                // Detect format error at translation time
+                return "new Double(" + Double.valueOf(s).toString() + ")";
+            }
         }
-    }
     }
 
     public static String coerceToPrimitiveFloat(String s,
-                        boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToFloat(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "(float) 0";
-        else
-        return Float.valueOf(s).toString() + "f";
-    }
+            boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToFloat("
+                    + s + ")";
+        } else {
+            if (s == null || s.length() == 0)
+                return "(float) 0";
+            else
+                return Float.valueOf(s).toString() + "f";
+        }
     }
 
     public static String coerceToFloat(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Float) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Float.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Float(0)";
+        if (isNamedAttribute) {
+            return "(Float) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Float.class)";
         } else {
-        // Detect format error at translation time
-        return "new Float(" + Float.valueOf(s).toString() + "f)";
+            if (s == null || s.length() == 0) {
+                return "new Float(0)";
+            } else {
+                // Detect format error at translation time
+                return "new Float(" + Float.valueOf(s).toString() + "f)";
+            }
         }
-    }
     }
 
     public static String coerceToInt(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToInt(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "0";
-        else
-        return Integer.valueOf(s).toString();
-    }
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToInt("
+                    + s + ")";
+        } else {
+            if (s == null || s.length() == 0)
+                return "0";
+            else
+                return Integer.valueOf(s).toString();
+        }
     }
 
     public static String coerceToInteger(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Integer) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Integer.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Integer(0)";
+        if (isNamedAttribute) {
+            return "(Integer) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Integer.class)";
         } else {
-        // Detect format error at translation time
-        return "new Integer(" + Integer.valueOf(s).toString() + ")";
+            if (s == null || s.length() == 0) {
+                return "new Integer(0)";
+            } else {
+                // Detect format error at translation time
+                return "new Integer(" + Integer.valueOf(s).toString() + ")";
+            }
         }
-    }
     }
 
     public static String coerceToPrimitiveShort(String s,
-                        boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToShort(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "(short) 0";
-        else
-        return "((short) " + Short.valueOf(s).toString() + ")";
-    }
-    }
-    
-    public static String coerceToShort(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Short) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Short.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Short((short) 0)";
+            boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToShort("
+                    + s + ")";
         } else {
-        // Detect format error at translation time
-        return "new Short(\"" + Short.valueOf(s).toString() + "\")";
+            if (s == null || s.length() == 0)
+                return "(short) 0";
+            else
+                return "((short) " + Short.valueOf(s).toString() + ")";
         }
     }
+
+    public static String coerceToShort(String s, boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "(Short) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Short.class)";
+        } else {
+            if (s == null || s.length() == 0) {
+                return "new Short((short) 0)";
+            } else {
+                // Detect format error at translation time
+                return "new Short(\"" + Short.valueOf(s).toString() + "\")";
+            }
+        }
     }
-    
+
     public static String coerceToPrimitiveLong(String s,
-                           boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToLong(" + s + ")";
-    } else {
-        if (s == null || s.length() == 0)
-        return "(long) 0";
-        else
-        return Long.valueOf(s).toString() + "l";
-    }
+            boolean isNamedAttribute) {
+        if (isNamedAttribute) {
+            return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToLong("
+                    + s + ")";
+        } else {
+            if (s == null || s.length() == 0)
+                return "(long) 0";
+            else
+                return Long.valueOf(s).toString() + "l";
+        }
     }
 
     public static String coerceToLong(String s, boolean isNamedAttribute) {
-    if (isNamedAttribute) {
-        return "(Long) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Long.class)";
-    } else {
-        if (s == null || s.length() == 0) {
-        return "new Long(0)";
+        if (isNamedAttribute) {
+            return "(Long) org.apache.jasper.runtime.JspRuntimeLibrary.coerce("
+                    + s + ", Long.class)";
         } else {
-        // Detect format error at translation time
-        return "new Long(" + Long.valueOf(s).toString() + "l)";
+            if (s == null || s.length() == 0) {
+                return "new Long(0)";
+            } else {
+                // Detect format error at translation time
+                return "new Long(" + Long.valueOf(s).toString() + "l)";
+            }
         }
-    }
     }
 
     public static InputStream getInputStream(String fname, JarFile jarFile,
-                         JspCompilationContext ctxt,
-                         ErrorDispatcher err)
-        throws JasperException, IOException {
+            JspCompilationContext ctxt, ErrorDispatcher err)
+            throws JasperException, IOException {
 
         InputStream in = null;
 
-    if (jarFile != null) {
-        String jarEntryName = fname.substring(1, fname.length());
-        ZipEntry jarEntry = jarFile.getEntry(jarEntryName);
-        if (jarEntry == null) {
-        err.jspError("jsp.error.file.not.found", fname);
+        if (jarFile != null) {
+            String jarEntryName = fname.substring(1, fname.length());
+            ZipEntry jarEntry = jarFile.getEntry(jarEntryName);
+            if (jarEntry == null) {
+                err.jspError("jsp.error.file.not.found", fname);
+            }
+            in = jarFile.getInputStream(jarEntry);
+        } else {
+            in = ctxt.getResourceAsStream(fname);
         }
-        in = jarFile.getInputStream(jarEntry);
-    } else {
-        in = ctxt.getResourceAsStream(fname);
-    }
 
-    if (in == null) {
-        err.jspError("jsp.error.file.not.found", fname);
-    }
+        if (in == null) {
+            err.jspError("jsp.error.file.not.found", fname);
+        }
 
-    return in;
+        return in;
     }
 
     /**
      * Gets the fully-qualified class name of the tag handler corresponding to
      * the given tag file path.
-     *
-     * @param path Tag file path
-     * @param err Error dispatcher
-     *
-     * @return Fully-qualified class name of the tag handler corresponding to 
-     * the given tag file path
+     * 
+     * @param path
+     *            Tag file path
+     * @param err
+     *            Error dispatcher
+     * 
+     * @return Fully-qualified class name of the tag handler corresponding to
+     *         the given tag file path
      */
-    public static String getTagHandlerClassName(String path,
-                        ErrorDispatcher err)
-                throws JasperException {
+    public static String getTagHandlerClassName(String path, ErrorDispatcher err)
+            throws JasperException {
 
         String className = null;
         int begin = 0;
         int index;
-        
+
         index = path.lastIndexOf(".tag");
         if (index == -1) {
             err.jspError("jsp.error.tagfile.badSuffix", path);
         }
 
-        //It's tempting to remove the ".tag" suffix here, but we can't.
-        //If we remove it, the fully-qualified class name of this tag
-        //could conflict with the package name of other tags.
-        //For instance, the tag file
-        //    /WEB-INF/tags/foo.tag
-        //would have fully-qualified class name
-        //    org.apache.jsp.tag.web.foo
-        //which would conflict with the package name of the tag file
-        //    /WEB-INF/tags/foo/bar.tag
+        // It's tempting to remove the ".tag" suffix here, but we can't.
+        // If we remove it, the fully-qualified class name of this tag
+        // could conflict with the package name of other tags.
+        // For instance, the tag file
+        // /WEB-INF/tags/foo.tag
+        // would have fully-qualified class name
+        // org.apache.jsp.tag.web.foo
+        // which would conflict with the package name of the tag file
+        // /WEB-INF/tags/foo/bar.tag
 
         index = path.indexOf(WEB_INF_TAGS);
         if (index != -1) {
             className = "org.apache.jsp.tag.web.";
             begin = index + WEB_INF_TAGS.length();
         } else {
-        index = path.indexOf(META_INF_TAGS);
-        if (index != -1) {
-        className = "org.apache.jsp.tag.meta.";
-        begin = index + META_INF_TAGS.length();
-        } else {
-        err.jspError("jsp.error.tagfile.illegalPath", path);
+            index = path.indexOf(META_INF_TAGS);
+            if (index != -1) {
+                className = "org.apache.jsp.tag.meta.";
+                begin = index + META_INF_TAGS.length();
+            } else {
+                err.jspError("jsp.error.tagfile.illegalPath", path);
+            }
         }
-    }
 
         className += makeJavaPackage(path.substring(begin));
-  
-       return className;
+
+        return className;
     }
 
     /**
      * Converts the given path to a Java package or fully-qualified class name
-     *
-     * @param path Path to convert
-     *
+     * 
+     * @param path
+     *            Path to convert
+     * 
      * @return Java package corresponding to the given path
      */
     public static final String makeJavaPackage(String path) {
-        String classNameComponents[] = split(path,"/");
+        String classNameComponents[] = split(path, "/");
         StringBuffer legalClassNames = new StringBuffer();
         for (int i = 0; i < classNameComponents.length; i++) {
             legalClassNames.append(makeJavaIdentifier(classNameComponents[i]));
@@ -897,42 +882,45 @@ public class JspUtil {
 
     /**
      * Splits a string into it's components.
-     * @param path String to split
-     * @param pat Pattern to split at
+     * 
+     * @param path
+     *            String to split
+     * @param pat
+     *            Pattern to split at
      * @return the components of the path
      */
-    private static final String [] split(String path, String pat) {
-        Vector comps = new Vector();
+    private static final String[] split(String path, String pat) {
+        Vector<String> comps = new Vector<String>();
         int pos = path.indexOf(pat);
         int start = 0;
-        while( pos >= 0 ) {
-            if(pos > start ) {
-                String comp = path.substring(start,pos);
+        while (pos >= 0) {
+            if (pos > start) {
+                String comp = path.substring(start, pos);
                 comps.add(comp);
             }
             start = pos + pat.length();
-            pos = path.indexOf(pat,start);
+            pos = path.indexOf(pat, start);
         }
-        if( start < path.length()) {
+        if (start < path.length()) {
             comps.add(path.substring(start));
         }
-        String [] result = new String[comps.size()];
-        for(int i=0; i < comps.size(); i++) {
-            result[i] = (String)comps.elementAt(i);
+        String[] result = new String[comps.size()];
+        for (int i = 0; i < comps.size(); i++) {
+            result[i] = comps.elementAt(i);
         }
         return result;
     }
-            
+
     /**
      * Converts the given identifier to a legal Java identifier
-     *
-     * @param identifier Identifier to convert
-     *
+     * 
+     * @param identifier
+     *            Identifier to convert
+     * 
      * @return Legal Java identifier corresponding to the given identifier
      */
     public static final String makeJavaIdentifier(String identifier) {
-        StringBuffer modifiedIdentifier = 
-            new StringBuffer(identifier.length());
+        StringBuffer modifiedIdentifier = new StringBuffer(identifier.length());
         if (!Character.isJavaIdentifierStart(identifier.charAt(0))) {
             modifiedIdentifier.append('_');
         }
@@ -951,7 +939,7 @@ public class JspUtil {
         }
         return modifiedIdentifier.toString();
     }
-    
+
     /**
      * Mangle the specified character to create a legal Java class name.
      */
@@ -972,13 +960,13 @@ public class JspUtil {
         int i = 0;
         int j = javaKeywords.length;
         while (i < j) {
-            int k = (i+j)/2;
+            int k = (i + j) / 2;
             int result = javaKeywords[k].compareTo(key);
             if (result == 0) {
                 return true;
             }
             if (result < 0) {
-                i = k+1;
+                i = k + 1;
             } else {
                 j = k;
             }
@@ -987,14 +975,15 @@ public class JspUtil {
     }
 
     /**
-     * Converts the given Xml name to a legal Java identifier.  This is
-     * slightly more efficient than makeJavaIdentifier in that we only need
-     * to worry about '.', '-', and ':' in the string.  We also assume that
-     * the resultant string is further concatenated with some prefix string
-     * so that we don't have to worry about it being a Java key word.
-     *
-     * @param name Identifier to convert
-     *
+     * Converts the given Xml name to a legal Java identifier. This is slightly
+     * more efficient than makeJavaIdentifier in that we only need to worry
+     * about '.', '-', and ':' in the string. We also assume that the resultant
+     * string is further concatenated with some prefix string so that we don't
+     * have to worry about it being a Java key word.
+     * 
+     * @param name
+     *            Identifier to convert
+     * 
      * @return Legal Java identifier corresponding to the given identifier
      */
     public static final String makeXmlJavaIdentifier(String name) {
@@ -1008,19 +997,15 @@ public class JspUtil {
     }
 
     static InputStreamReader getReader(String fname, String encoding,
-            JarFile jarFile,
-            JspCompilationContext ctxt,
-            ErrorDispatcher err)
-    throws JasperException, IOException {
+            JarFile jarFile, JspCompilationContext ctxt, ErrorDispatcher err)
+            throws JasperException, IOException {
 
         return getReader(fname, encoding, jarFile, ctxt, err, 0);
     }
 
     static InputStreamReader getReader(String fname, String encoding,
-            JarFile jarFile,
-            JspCompilationContext ctxt,
-            ErrorDispatcher err, int skip)
-    throws JasperException, IOException {
+            JarFile jarFile, JspCompilationContext ctxt, ErrorDispatcher err,
+            int skip) throws JasperException, IOException {
 
         InputStreamReader reader = null;
         InputStream in = getInputStream(fname, jarFile, ctxt, err);
@@ -1035,12 +1020,10 @@ public class JspUtil {
 
         return reader;
     }
-    
+
     /**
-     * Handles taking input from TLDs
-     * 'java.lang.Object' -> 'java.lang.Object.class'
-     * 'int' -> 'int.class'
-     * 'void' -> 'Void.TYPE'
+     * Handles taking input from TLDs 'java.lang.Object' ->
+     * 'java.lang.Object.class' 'int' -> 'int.class' 'void' -> 'Void.TYPE'
      * 'int[]' -> 'int[].class'
      * 
      * @param type
@@ -1054,51 +1037,53 @@ public class JspUtil {
     }
 
     /**
-     * Class.getName() return arrays in the form "[[[<et>", where et,
-     * the element type can be one of ZBCDFIJS or L<classname>;
-     * It is converted into forms that can be understood by javac.
+     * Class.getName() return arrays in the form "[[[<et>", where et, the
+     * element type can be one of ZBCDFIJS or L<classname>; It is converted
+     * into forms that can be understood by javac.
      */
     public static String toJavaSourceType(String type) {
 
-    if (type.charAt(0) != '[') {
-        return type;
-    }
+        if (type.charAt(0) != '[') {
+            return type;
+        }
 
-    int dims = 1;
-    String t = null;
-    for (int i = 1; i < type.length(); i++) {
-        if (type.charAt(i) == '[') {
-        dims++;
-        } else {
-        switch (type.charAt(i)) {
-        case 'Z': t = "boolean"; break;
-        case 'B': t = "byte"; break;
-        case 'C': t = "char"; break;
-        case 'D': t = "double"; break;
-        case 'F': t = "float"; break;
-        case 'I': t = "int"; break;
-        case 'J': t = "long"; break;
-        case 'S': t = "short"; break;
-        case 'L': t = type.substring(i+1, type.indexOf(';')); break;
+        int dims = 1;
+        String t = null;
+        for (int i = 1; i < type.length(); i++) {
+            if (type.charAt(i) == '[') {
+                dims++;
+            } else {
+                switch (type.charAt(i)) {
+                case 'Z': t = "boolean"; break;
+                case 'B': t = "byte"; break;
+                case 'C': t = "char"; break;
+                case 'D': t = "double"; break;
+                case 'F': t = "float"; break;
+                case 'I': t = "int"; break;
+                case 'J': t = "long"; break;
+                case 'S': t = "short"; break;
+                case 'L': t = type.substring(i+1, type.indexOf(';')); break;
+                }
+                break;
+            }
         }
-        break;
+        StringBuffer resultType = new StringBuffer(t);
+        for (; dims > 0; dims--) {
+            resultType.append("[]");
         }
-    }
-    StringBuffer resultType = new StringBuffer(t);
-    for (; dims > 0; dims--) {
-        resultType.append("[]");
-    }
-    return resultType.toString();
+        return resultType.toString();
     }
 
     /**
-     * Compute the canonical name from a Class instance.  Note that a
-     * simple replacment of '$' with '.' of a binary name would not work,
-     * as '$' is a legal Java Identifier character.
-     * @param c A instance of java.lang.Class
-     * @return  The canonical name of c.
+     * Compute the canonical name from a Class instance. Note that a simple
+     * replacment of '$' with '.' of a binary name would not work, as '$' is a
+     * legal Java Identifier character.
+     * 
+     * @param c
+     *            A instance of java.lang.Class
+     * @return The canonical name of c.
      */
-    public static String getCanonicalName(Class c) {
+    public static String getCanonicalName(Class<?> c) {
 
         String binaryName = c.getName();
         c = c.getDeclaringClass();
@@ -1111,7 +1096,7 @@ public class JspUtil {
         do {
             buf.setCharAt(c.getName().length(), '.');
             c = c.getDeclaringClass();
-        } while ( c != null);
+        } while (c != null);
 
         return buf.toString();
     }
