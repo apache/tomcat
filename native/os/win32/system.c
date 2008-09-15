@@ -26,6 +26,8 @@
 #include <winsock2.h>
 #include <mswsock.h>
 #include <ws2tcpip.h>
+#include <tlhelp32.h>
+
 #include "apr.h"
 #include "apr_pools.h"
 #include "apr_poll.h"
