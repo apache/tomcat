@@ -806,13 +806,8 @@ class Generator {
                 }
                 return v;
             } else if (attr.isELInterpreterInput()) {
-                boolean replaceESC = v.indexOf(Constants.ESC) > 0;
                 v = JspUtil.interpreterCall(this.isTagFile, v, expectedType,
                         attr.getEL().getMapName(), false);
-                // XXX ESC replacement hack
-                if (replaceESC) {
-                    v = "(" + v + ").replace(" + Constants.ESCStr + ", '$')";
-                }
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
                             + v + ", request.getCharacterEncoding())";
@@ -2839,16 +2834,10 @@ class Generator {
                     attrValue = sb.toString();
                 } else {
                     // run attrValue through the expression interpreter
-                    boolean replaceESC = attrValue.indexOf(Constants.ESC) > 0;
                     String mapName = (attr.getEL() != null) ? attr.getEL()
                             .getMapName() : null;
                     attrValue = JspUtil.interpreterCall(this.isTagFile,
                             attrValue, c[0], mapName, false);
-                    // XXX hack: Replace ESC with '$'
-                    if (replaceESC) {
-                        attrValue = "(" + attrValue + ").replace("
-                                + Constants.ESCStr + ", '$')";
-                    }
                 }
             } else {
                 attrValue = convertString(c[0], attrValue, localName,

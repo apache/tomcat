@@ -145,8 +145,28 @@ public abstract class Compiler {
 
         ServletWriter writer = null;
         try {
+            /*
+             * The setting of isELIgnored changes the behaviour of the parser
+             * in subtle ways. To add to the 'fun', isELIgnored can be set in
+             * any file that forms part of the translation unit so setting it
+             * in a file included towards the end of the translation unit can
+             * change how the parser should have behaved when parsing content
+             * up to the point where isELIgnored was set. Arghh!
+             * Previous attempts to hack around this have only provided partial
+             * solutions. We now use two passes to parse the translation unit.
+             * The first just parses the directives and the second parses the
+             * whole translation unit once we know how isELIgnored has been set.
+             * TODO There are some possible optimisations of this process.  
+             */ 
             // Parse the file
             ParserController parserCtl = new ParserController(ctxt, this);
+            
+            // Pass 1 - the directives
+            Node.Nodes directives =
+                parserCtl.parseDirectives(ctxt.getJspFile());
+            Validator.validateDirectives(this, directives);
+            
+            // Pass 2 - the whole translation unit
             pageNodes = parserCtl.parse(ctxt.getJspFile());
 
             if (ctxt.isPrototypeMode()) {
@@ -158,8 +178,9 @@ public abstract class Compiler {
                 return null;
             }
 
-            // Validate and process attributes
-            Validator.validate(this, pageNodes);
+            // Validate and process attributes - don't re-validate the
+            // directives we validated in pass 1
+            Validator.validateExDirectives(this, pageNodes);
 
             if (log.isDebugEnabled()) {
                 t2 = System.currentTimeMillis();

@@ -104,6 +104,24 @@ class ParserController implements TagConstants {
     }
 
     /**
+     * Parses the directives of a JSP page or tag file. This is invoked by the
+     * compiler.
+     *
+     * @param inFileName The path to the JSP page or tag file to be parsed.
+     */
+    public Node.Nodes parseDirectives(String inFileName)
+    throws FileNotFoundException, JasperException, IOException {
+        // If we're parsing a packaged tag file or a resource included by it
+        // (using an include directive), ctxt.getTagFileJar() returns the 
+        // JAR file from which to read the tag file or included resource,
+        // respectively.
+        isTagFile = ctxt.isTagFile();
+        directiveOnly = true;
+        return doParse(inFileName, null, ctxt.getTagFileJarUrl());
+    }
+
+
+    /**
      * Processes an include directive with the given path.
      *
      * @param inFileName The path to the resource to be included.
