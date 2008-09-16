@@ -580,6 +580,9 @@ class JspDocumentParser
                         lastCh = ch;
                     }
                 } else if (lastCh == '\\' && (ch == '$' || ch == '#')) {
+                    if (pageInfo.isELIgnored()) {
+                        ttext.write('\\');
+                    }
                     ttext.write(ch);
                     ch = 0;  // Not start of EL anymore
                 } else {
