@@ -266,6 +266,7 @@ class Parser implements TagConstants {
     private String parseQuoted(Mark start, String tx, char quote)
             throws JasperException {
         StringBuffer buf = new StringBuffer();
+        boolean possibleEL = tx.contains("${");
         int size = tx.length();
         int i = 0;
         while (i < size) {
@@ -287,12 +288,21 @@ class Parser implements TagConstants {
                 }
             } else if (ch == '\\' && i + 1 < size) {
                 ch = tx.charAt(i + 1);
-                if (ch == '\\' || ch == '\"' || ch == '\'' || ch == '>') {
+                if (ch == '\\' || ch == '\"' || ch == '\'') {
+                    if (pageInfo.isELIgnored() || !possibleEL) {
+                        // EL is not enabled or no chance of EL
+                        // Unescape these now
+                        buf.append(ch);
+                        i += 2;
+                    } else {
+                        // EL is enabled and ${ appears in value
+                        // EL processing will escape these
+                        buf.append('\\');
+                        buf.append(ch);
+                        i += 2;
+                    }
+                } else if (ch == '>') {
                     buf.append(ch);
-                    i += 2;
-                } else if (ch == '$') {
-                    // Replace "\$" with some special char. XXX hack!
-                    buf.append(Constants.ESC);
                     i += 2;
                 } else {
                     buf.append('\\');
@@ -1339,11 +1349,8 @@ class Parser implements TagConstants {
                 }
                 char next = (char) reader.peekChar();
                 // Looking for \% or \$ or \#
-                // TODO: only recognize \$ or \# if isELIgnored is false, but since
-                // it can be set in a page directive, it cannot be determined
-                // here. Argh! (which is the way it should be since we shouldn't
-                // convolude multiple steps at once and create confusing parsers...)
-                if (next == '%' || next == '$' || next == '#') {
+                if (next == '%' || ((next == '$' || next == '#') &&
+                        !pageInfo.isELIgnored())) {
                     ch = reader.nextChar();
                 }
             }
