@@ -1238,7 +1238,12 @@ public class AccessLogValve
 
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(request.getHeader(header));
+            String value = request.getHeader(header);
+            if (value == null) {
+                buf.append('-');
+            } else {
+                buf.append(value);
+            }
         }
     }
 
