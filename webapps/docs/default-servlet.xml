@@ -179,6 +179,13 @@ The DefaultServlet allows the following initParamters:
         to always disable sendfile. [48]
     </td>
   </tr>
+  <tr>
+    <th valign='top'>useAcceptRanges</th>
+    <td valign='top'>
+        If true, the Accept-Ranges header will be set when appropriate for the
+        response. [true]
+    </td>
+  </tr>
 
 </table>
 </section>

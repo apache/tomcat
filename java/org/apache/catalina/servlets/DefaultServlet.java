@@ -154,7 +154,11 @@ public class DefaultServlet
      */
     protected int sendfileSize = 48 * 1024;
     
-    
+    /**
+     * Should the Accept-Ranges: bytes header be send with static resources?
+     */
+    protected boolean useAcceptRanges = true;
+
     /**
      * Full range marker.
      */
@@ -240,6 +244,9 @@ public class DefaultServlet
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         localXsltFile = getServletConfig().getInitParameter("localXsltFile");
         readmeFile = getServletConfig().getInitParameter("readmeFile");
+
+        if (getServletConfig().getInitParameter("useAcceptRanges") != null)
+            useAcceptRanges = Boolean.parseBoolean(getServletConfig().getInitParameter("useAcceptRanges"));
 
         // Sanity check on the specified buffer sizes
         if (input < 256)
@@ -717,9 +724,12 @@ public class DefaultServlet
             contentType = "text/html;charset=UTF-8";
 
         } else {
+            if (useAcceptRanges) {
+                // Accept ranges header
+                response.setHeader("Accept-Ranges", "bytes");
+            }
 
             // Parse range specifier
-
             ranges = parseRange(request, response, cacheEntry.attributes);
 
             // ETag header
