@@ -27,7 +27,6 @@ import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.xml.sax.Attributes;
@@ -786,9 +785,9 @@ class Parser implements TagConstants {
             }
             if (currentChar == -1)
                 err.jspError(start, "jsp.error.unterminated", type + "{");
-            if (currentChar == '"')
+            if (currentChar == '"' && !singleQuoted)
                 doubleQuoted = !doubleQuoted;
-            if (currentChar == '\'')
+            if (currentChar == '\'' && !doubleQuoted)
                 singleQuoted = !singleQuoted;
         } while (currentChar != '}' || (singleQuoted || doubleQuoted));
 
