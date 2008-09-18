@@ -44,7 +44,7 @@ public final class ValueExpressionLiteral extends ValueExpression implements
     public ValueExpressionLiteral() {
         super();
     }
-    
+
     public ValueExpressionLiteral(Object value, Class expectedType) {
         this.value = value;
         this.expectedType = expectedType;

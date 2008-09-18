@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,22 +16,22 @@
  */
 
 /*
-	Author:	Jacob Hookom
-	Email:	jacob at hookom.net
+    Author:    Jacob Hookom
+    Email:    jacob at hookom.net
 */
 
 /* == Option Declaration == */
 options
 {
-	STATIC=false;
-	NODE_PREFIX="Ast";
-	VISITOR_EXCEPTION="javax.el.ELException";
-	VISITOR=false;
-	MULTI=true;
-	NODE_DEFAULT_VOID=true;
-	JAVA_UNICODE_ESCAPE=false;
-  	UNICODE_INPUT=true;
-	BUILD_NODE_FILES=true;
+    STATIC=false;
+    NODE_PREFIX="Ast";
+    VISITOR_EXCEPTION="javax.el.ELException";
+    VISITOR=false;
+    MULTI=true;
+    NODE_DEFAULT_VOID=true;
+    JAVA_UNICODE_ESCAPE=false;
+    UNICODE_INPUT=true;
+    BUILD_NODE_FILES=true;
 }
 
 /* == Parser Declaration == */
@@ -44,9 +44,9 @@ public class ELParser
     public static Node parse(String ref) throws ELException
     {
         try {
-        	return (new ELParser(new StringReader(ref))).CompositeExpression();
+            return (new ELParser(new StringReader(ref))).CompositeExpression();
         } catch (ParseException pe) {
-           	throw new ELException(pe.getMessage());
+            throw new ELException(pe.getMessage());
         }
     }
 }
@@ -59,7 +59,7 @@ PARSER_END( ELParser )
  */
 AstCompositeExpression CompositeExpression() #CompositeExpression : {}
 {
-	(DeferredExpression() | DynamicExpression() | LiteralExpression())* <EOF> { return jjtThis; }
+    (DeferredExpression() | DynamicExpression() | LiteralExpression())* <EOF> { return jjtThis; }
 }
 
 /*
@@ -68,7 +68,7 @@ AstCompositeExpression CompositeExpression() #CompositeExpression : {}
  */
 void LiteralExpression() #LiteralExpression : { Token t = null; }
 {
-	t=<LITERAL_EXPRESSION> { jjtThis.setImage(t.image); }
+    t=<LITERAL_EXPRESSION> { jjtThis.setImage(t.image); }
 }
 
 /*
@@ -77,7 +77,7 @@ void LiteralExpression() #LiteralExpression : { Token t = null; }
  */
 void DeferredExpression() #DeferredExpression : {}
 {
-	<START_DEFERRED_EXPRESSION> Expression() <END_EXPRESSION> 
+    <START_DEFERRED_EXPRESSION> Expression() <END_EXPRESSION>
 }
 
 /*
@@ -86,7 +86,7 @@ void DeferredExpression() #DeferredExpression : {}
  */
 void DynamicExpression() #DynamicExpression : {}
 {
-	<START_DYNAMIC_EXPRESSION> Expression() <END_EXPRESSION> 
+    <START_DYNAMIC_EXPRESSION> Expression() <END_EXPRESSION>
 }
 
 /*
@@ -95,7 +95,7 @@ void DynamicExpression() #DynamicExpression : {}
  */
 void Expression() : {}
 {
-	Choice()
+    Choice()
 }
 
 /*
@@ -104,7 +104,7 @@ void Expression() : {}
  */
 void Choice() : {}
 {
-	Or() (<QUESTIONMARK> Choice() <COLON> Choice() #Choice(3))*
+    Or() (<QUESTIONMARK> Choice() <COLON> Choice() #Choice(3))*
 }
 
 /*
@@ -113,7 +113,7 @@ void Choice() : {}
  */
 void Or() : {}
 {
-	And() ((<OR0>|<OR1>) And() #Or(2))*
+    And() ((<OR0>|<OR1>) And() #Or(2))*
 }
 
 /*
@@ -122,7 +122,7 @@ void Or() : {}
  */
 void And() : {}
 {
-	Equality() ((<AND0>|<AND1>) Equality() #And(2))*
+    Equality() ((<AND0>|<AND1>) Equality() #And(2))*
 }
 
 /*
@@ -131,12 +131,12 @@ void And() : {}
  */
 void Equality() : {}
 {
-	Compare()
-	(
-		((<EQ0>|<EQ1>) Compare() #Equal(2))
-	|
-		((<NE0>|<NE1>) Compare() #NotEqual(2))
-	)*
+    Compare()
+    (
+        ((<EQ0>|<EQ1>) Compare() #Equal(2))
+    |
+        ((<NE0>|<NE1>) Compare() #NotEqual(2))
+    )*
 }
 
 /*
@@ -145,16 +145,16 @@ void Equality() : {}
  */
 void Compare() : {}
 {
-	Math()
-	(
-		((<LT0>|<LT1>) Math() #LessThan(2))
-	|
-		((<GT0>|<GT1>) Math() #GreaterThan(2))
-	|
-		((<LE0>|<LE1>) Math() #LessThanEqual(2))
-	|
-		((<GE0>|<GE1>) Math() #GreaterThanEqual(2))
-	)*
+    Math()
+    (
+        ((<LT0>|<LT1>) Math() #LessThan(2))
+    |
+        ((<GT0>|<GT1>) Math() #GreaterThan(2))
+    |
+        ((<LE0>|<LE1>) Math() #LessThanEqual(2))
+    |
+        ((<GE0>|<GE1>) Math() #GreaterThanEqual(2))
+    )*
 }
 
 /*
@@ -163,12 +163,12 @@ void Compare() : {}
  */
 void Math() : {}
 {
-	Multiplication()
-	(
-		(<PLUS> Multiplication() #Plus(2))
-	|
-		(<MINUS> Multiplication() #Minus(2))
-	)*
+    Multiplication()
+    (
+        (<PLUS> Multiplication() #Plus(2))
+    |
+        (<MINUS> Multiplication() #Minus(2))
+    )*
 }
 
 /*
@@ -177,14 +177,14 @@ void Math() : {}
  */
 void Multiplication() : {}
 {
-	Unary()
-	(
-		(<MULT> Unary() #Mult(2))
-	|
-		((<DIV0>|<DIV1>) Unary() #Div(2))
-	|
-		((<MOD0>|<MOD1>) Unary() #Mod(2))	
-	)*	
+    Unary()
+    (
+        (<MULT> Unary() #Mult(2))
+    |
+        ((<DIV0>|<DIV1>) Unary() #Div(2))
+    |
+        ((<MOD0>|<MOD1>) Unary() #Mod(2))
+    )*
 }
 
 /*
@@ -193,13 +193,13 @@ void Multiplication() : {}
  */
 void Unary() : {}
 {
-		<MINUS> Unary() #Negative 
-	|
-		(<NOT0>|<NOT1>) Unary() #Not 
-	|
-		<EMPTY> Unary() #Empty
-	|	
-		Value()
+        <MINUS> Unary() #Negative
+    |
+        (<NOT0>|<NOT1>) Unary() #Not
+    |
+        <EMPTY> Unary() #Empty
+    |
+        Value()
 }
 
 /*
@@ -208,7 +208,7 @@ void Unary() : {}
  */
 void Value() : {}
 {
-	(ValuePrefix() (ValueSuffix())*) #Value(>1)
+    (ValuePrefix() (ValueSuffix())*) #Value(>1)
 }
 
 /*
@@ -217,8 +217,8 @@ void Value() : {}
  */
 void ValuePrefix() : {}
 {
-	Literal()
-	| NonLiteral()
+    Literal()
+    | NonLiteral()
 }
 
 /*
@@ -227,7 +227,7 @@ void ValuePrefix() : {}
  */
 void ValueSuffix() : {}
 {
-	DotSuffix() | BracketSuffix()
+    DotSuffix() | BracketSuffix()
 }
 
 /*
@@ -236,7 +236,7 @@ void ValueSuffix() : {}
  */
 void DotSuffix() #DotSuffix : { Token t = null; }
 {
-	<DOT> t=<IDENTIFIER> { jjtThis.setImage(t.image); }
+    <DOT> t=<IDENTIFIER> { jjtThis.setImage(t.image); }
 }
 
 /*
@@ -245,7 +245,7 @@ void DotSuffix() #DotSuffix : { Token t = null; }
  */
 void BracketSuffix() #BracketSuffix : {}
 {
-	<LBRACK> Expression() <RBRACK>
+    <LBRACK> Expression() <RBRACK>
 }
 
 /*
@@ -254,9 +254,9 @@ void BracketSuffix() #BracketSuffix : {}
  */
 void NonLiteral() : {}
 {
- 	<LPAREN> Expression() <RPAREN>
- 	| LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
-	| Identifier()
+    <LPAREN> Expression() <RPAREN>
+    | LOOKAHEAD((<IDENTIFIER> <COLON>)? <IDENTIFIER> <LPAREN>) Function()
+    | Identifier()
 }
 
 /*
@@ -265,7 +265,7 @@ void NonLiteral() : {}
  */
 void Identifier() #Identifier : { Token t = null; }
 {
-	t=<IDENTIFIER> { jjtThis.setImage(t.image); }
+    t=<IDENTIFIER> { jjtThis.setImage(t.image); }
 }
 
 /*
@@ -274,20 +274,20 @@ void Identifier() #Identifier : { Token t = null; }
  */
 void Function() #Function :
 {
-	Token t0 = null;
-	Token t1 = null;
+    Token t0 = null;
+    Token t1 = null;
 }
 {
-	(t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
-	{
-		if (t0 != null) {
-			jjtThis.setPrefix(t0.image);
-			jjtThis.setLocalName(t1.image);
-		} else {
-			jjtThis.setLocalName(t1.image);
-		}
-	}
-	<LPAREN> (Expression() (<COMMA> Expression())*)? <RPAREN>
+    (t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
+    {
+        if (t0 != null) {
+            jjtThis.setPrefix(t0.image);
+            jjtThis.setLocalName(t1.image);
+        } else {
+            jjtThis.setLocalName(t1.image);
+        }
+    }
+    <LPAREN> (Expression() (<COMMA> Expression())*)? <RPAREN>
 }
 
 /*
@@ -296,11 +296,11 @@ void Function() #Function :
  */
 void Literal() : {}
 {
-	Boolean()
-	| FloatingPoint()
-	| Integer()
-	| String()
-	| Null()
+    Boolean()
+    | FloatingPoint()
+    | Integer()
+    | String()
+    | Null()
 }
 
 /*
@@ -309,8 +309,8 @@ void Literal() : {}
  */
 void Boolean() : {}
 {
-	<TRUE> #True
-	| <FALSE> #False
+    <TRUE> #True
+    | <FALSE> #False
 }
 
 /*
@@ -319,7 +319,7 @@ void Boolean() : {}
  */
 void FloatingPoint() #FloatingPoint : { Token t = null; }
 {
-	t=<FLOATING_POINT_LITERAL> { jjtThis.setImage(t.image); }
+    t=<FLOATING_POINT_LITERAL> { jjtThis.setImage(t.image); }
 }
 
 /*
@@ -328,7 +328,7 @@ void FloatingPoint() #FloatingPoint : { Token t = null; }
  */
 void Integer() #Integer : { Token t = null; }
 {
-	t=<INTEGER_LITERAL> { jjtThis.setImage(t.image); }
+    t=<INTEGER_LITERAL> { jjtThis.setImage(t.image); }
 }
 
 /*
@@ -337,7 +337,7 @@ void Integer() #Integer : { Token t = null; }
  */
 void String() #String : { Token t = null; }
 {
-	t=<STRING_LITERAL> { jjtThis.setImage(t.image); }
+    t=<STRING_LITERAL> { jjtThis.setImage(t.image); }
 }
 
 /*
@@ -346,7 +346,7 @@ void String() #String : { Token t = null; }
  */
 void Null() #Null : {}
 {
-	<NULL>
+    <NULL>
 }
 
 
@@ -374,97 +374,97 @@ void Null() #Null : {}
 
 <IN_EXPRESSION> TOKEN :
 {
-	< INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
-|	< FLOATING_POINT_LITERAL: (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? 
-		| "." (["0"-"9"])+ (<EXPONENT>)?
-		| (["0"-"9"])+ <EXPONENT>
-	>
-|	< #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
-|	< STRING_LITERAL: ("\"" ((~["\"","\\"])
-		| ("\\" ( ["\\","\""] )))* "\"")
-		| ("\'" ((~["\'","\\"])
-		| ("\\" ( ["\\","\'"] )))* "\'")
-	>
-|	< BADLY_ESCAPED_STRING_LITERAL: ("\"" (~["\"","\\"])* ("\\" ( ~["\\","\""] )))
-		| ("\'" (~["\'","\\"])* ("\\" ( ~["\\","\'"] )))
-	>
-|	< TRUE : "true" >
-|	< FALSE : "false" >
-|	< NULL : "null" >
-|	< END_EXPRESSION : "}" > : DEFAULT
-|	< DOT : "." >
-|	< LPAREN : "(" >
-|	< RPAREN : ")" >
-|	< LBRACK : "[" >
-|	< RBRACK : "]" >
-|	< COLON : ":" >
-|	< COMMA : "," >
-|	< GT0 : ">" >
-|	< GT1 : "gt" >
-|	< LT0 : "<" >
-|	< LT1 : "lt" >
-|	< GE0 : ">=" >
-|	< GE1 : "ge" >
-|	< LE0 : "<=" >
-|	< LE1 : "le" >
-|	< EQ0 : "==" >
-|	< EQ1 : "eq" >
-|	< NE0 : "!=" >
-|	< NE1 : "ne" >
-|	< NOT0 : "!" >
-|	< NOT1 : "not" >
-|	< AND0 : "&&" >
-|	< AND1 : "and" >
-|	< OR0 : "||" >
-|	< OR1 : "or" >
-|	< EMPTY : "empty" >
-|	< INSTANCEOF : "instanceof" >
-|	< MULT : "*" >
-|	< PLUS : "+" >
-|	< MINUS : "-" >
-|	< QUESTIONMARK : "?" >
-|	< DIV0 : "/" >
-|	< DIV1 : "div" >
-|	< MOD0 : "%" >
-|	< MOD1 : "mod" >
-|	< IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
-|	< FUNCTIONSUFFIX : (<IDENTIFIER>) >
-|	< #IMPL_OBJ_START: "#" >
-|	< #LETTER:
-		[
-		"\u0024",
-		"\u0041"-"\u005a",
-		"\u005f",
-		"\u0061"-"\u007a",
-		"\u00c0"-"\u00d6",
-		"\u00d8"-"\u00f6",
-		"\u00f8"-"\u00ff",
-		"\u0100"-"\u1fff",
-		"\u3040"-"\u318f",
-		"\u3300"-"\u337f",
-		"\u3400"-"\u3d2d",
-		"\u4e00"-"\u9fff",
-		"\uf900"-"\ufaff"
-		]
-	>
-|	< #DIGIT:
-		[
-		"\u0030"-"\u0039",
-		"\u0660"-"\u0669",
-		"\u06f0"-"\u06f9",
-		"\u0966"-"\u096f",
-		"\u09e6"-"\u09ef",
-		"\u0a66"-"\u0a6f",
-		"\u0ae6"-"\u0aef",
-		"\u0b66"-"\u0b6f",
-		"\u0be7"-"\u0bef",
-		"\u0c66"-"\u0c6f",
-		"\u0ce6"-"\u0cef",
-		"\u0d66"-"\u0d6f",
-		"\u0e50"-"\u0e59",
-		"\u0ed0"-"\u0ed9",
-		"\u1040"-"\u1049"
-		]
-	>
-|	< ILLEGAL_CHARACTER: (~[]) >
+    < INTEGER_LITERAL: ["0"-"9"] (["0"-"9"])* >
+|    < FLOATING_POINT_LITERAL: (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)?
+        | "." (["0"-"9"])+ (<EXPONENT>)?
+        | (["0"-"9"])+ <EXPONENT>
+    >
+|    < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+|    < STRING_LITERAL: ("\"" ((~["\"","\\"])
+        | ("\\" ( ["\\","\""] )))* "\"")
+        | ("\'" ((~["\'","\\"])
+        | ("\\" ( ["\\","\'"] )))* "\'")
+    >
+|    < BADLY_ESCAPED_STRING_LITERAL: ("\"" (~["\"","\\"])* ("\\" ( ~["\\","\""] )))
+        | ("\'" (~["\'","\\"])* ("\\" ( ~["\\","\'"] )))
+    >
+|    < TRUE : "true" >
+|    < FALSE : "false" >
+|    < NULL : "null" >
+|    < END_EXPRESSION : "}" > : DEFAULT
+|    < DOT : "." >
+|    < LPAREN : "(" >
+|    < RPAREN : ")" >
+|    < LBRACK : "[" >
+|    < RBRACK : "]" >
+|    < COLON : ":" >
+|    < COMMA : "," >
+|    < GT0 : ">" >
+|    < GT1 : "gt" >
+|    < LT0 : "<" >
+|    < LT1 : "lt" >
+|    < GE0 : ">=" >
+|    < GE1 : "ge" >
+|    < LE0 : "<=" >
+|    < LE1 : "le" >
+|    < EQ0 : "==" >
+|    < EQ1 : "eq" >
+|    < NE0 : "!=" >
+|    < NE1 : "ne" >
+|    < NOT0 : "!" >
+|    < NOT1 : "not" >
+|    < AND0 : "&&" >
+|    < AND1 : "and" >
+|    < OR0 : "||" >
+|    < OR1 : "or" >
+|    < EMPTY : "empty" >
+|    < INSTANCEOF : "instanceof" >
+|    < MULT : "*" >
+|    < PLUS : "+" >
+|    < MINUS : "-" >
+|    < QUESTIONMARK : "?" >
+|    < DIV0 : "/" >
+|    < DIV1 : "div" >
+|    < MOD0 : "%" >
+|    < MOD1 : "mod" >
+|    < IDENTIFIER : (<LETTER>|<IMPL_OBJ_START>) (<LETTER>|<DIGIT>)* >
+|    < FUNCTIONSUFFIX : (<IDENTIFIER>) >
+|    < #IMPL_OBJ_START: "#" >
+|    < #LETTER:
+        [
+        "\u0024",
+        "\u0041"-"\u005a",
+        "\u005f",
+        "\u0061"-"\u007a",
+        "\u00c0"-"\u00d6",
+        "\u00d8"-"\u00f6",
+        "\u00f8"-"\u00ff",
+        "\u0100"-"\u1fff",
+        "\u3040"-"\u318f",
+        "\u3300"-"\u337f",
+        "\u3400"-"\u3d2d",
+        "\u4e00"-"\u9fff",
+        "\uf900"-"\ufaff"
+        ]
+    >
+|    < #DIGIT:
+        [
+        "\u0030"-"\u0039",
+        "\u0660"-"\u0669",
+        "\u06f0"-"\u06f9",
+        "\u0966"-"\u096f",
+        "\u09e6"-"\u09ef",
+        "\u0a66"-"\u0a6f",
+        "\u0ae6"-"\u0aef",
+        "\u0b66"-"\u0b6f",
+        "\u0be7"-"\u0bef",
+        "\u0c66"-"\u0c6f",
+        "\u0ce6"-"\u0cef",
+        "\u0d66"-"\u0d6f",
+        "\u0e50"-"\u0e59",
+        "\u0ed0"-"\u0ed9",
+        "\u1040"-"\u1049"
+        ]
+    >
+|    < ILLEGAL_CHARACTER: (~[]) >
 }
