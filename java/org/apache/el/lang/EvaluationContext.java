@@ -70,12 +70,12 @@ public final class EvaluationContext extends ELContext {
     public void setPropertyResolved(boolean resolved) {
         this.elContext.setPropertyResolved(resolved);
     }
-    
-    public Locale getLocale() { 
+
+    public Locale getLocale() {
         return this.elContext.getLocale();
         }
 
-    public void setLocale(Locale locale) { 
+    public void setLocale(Locale locale) {
         this.elContext.setLocale(locale);
     }
 }

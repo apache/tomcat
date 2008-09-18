@@ -38,7 +38,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
         Externalizable {
 
     private static final long serialVersionUID = 1L;
-    
+
     protected Map functions = null;
 
     /*
@@ -83,16 +83,16 @@ public class FunctionMapperImpl extends FunctionMapper implements
             ClassNotFoundException {
         this.functions = (Map) in.readObject();
     }
-    
+
     public static class Function implements Externalizable {
-    
+
         protected transient Method m;
         protected String owner;
         protected String name;
         protected String[] types;
         protected String prefix;
         protected String localName;
-    
+
         /**
          * 
          */
@@ -107,11 +107,11 @@ public class FunctionMapperImpl extends FunctionMapper implements
             this.localName = localName;
             this.m = m;
         }
-        
+
         public Function() {
             // for serialization
         }
-    
+
         /*
          * (non-Javadoc)
          * 
@@ -122,18 +122,18 @@ public class FunctionMapperImpl extends FunctionMapper implements
             out.writeUTF(this.localName);
             // make sure m isn't null
             getMethod();
-            out.writeUTF((this.owner != null) ? 
-                     this.owner : 
+            out.writeUTF((this.owner != null) ?
+                     this.owner :
                      this.m.getDeclaringClass().getName());
-            out.writeUTF((this.name != null) ? 
-                     this.name : 
+            out.writeUTF((this.name != null) ?
+                     this.name :
                      this.m.getName());
-            out.writeObject((this.types != null) ? 
-                     this.types : 
+            out.writeObject((this.types != null) ?
+                     this.types :
                      ReflectionUtil.toTypeNameArray(this.m.getParameterTypes()));
 
         }
-    
+
         /*
          * (non-Javadoc)
          * 
@@ -141,7 +141,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
          */
         public void readExternal(ObjectInput in) throws IOException,
                 ClassNotFoundException {
-            
+
             this.prefix = in.readUTF();
             if ("".equals(this.prefix)) this.prefix = null;
             this.localName = in.readUTF();
@@ -149,7 +149,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
             this.name = in.readUTF();
             this.types = (String[]) in.readObject();
         }
-    
+
         public Method getMethod() {
             if (this.m == null) {
                 try {
@@ -162,7 +162,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
             }
             return this.m;
         }
-        
+
         public boolean matches(String prefix, String localName) {
             if (this.prefix != null) {
                 if (prefix == null) return false;
@@ -170,7 +170,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
             }
             return this.localName.equals(localName);
         }
-    
+
         /* (non-Javadoc)
          * @see java.lang.Object#equals(java.lang.Object)
          */
@@ -180,7 +180,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
             }
             return false;
         }
-        
+
         /* (non-Javadoc)
          * @see java.lang.Object#hashCode()
          */
