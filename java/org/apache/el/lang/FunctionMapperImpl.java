@@ -39,7 +39,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
 
     private static final long serialVersionUID = 1L;
 
-    protected Map functions = null;
+    protected Map<String, Function> functions = null;
 
     /*
      * (non-Javadoc)
@@ -49,7 +49,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
      */
     public Method resolveFunction(String prefix, String localName) {
         if (this.functions != null) {
-            Function f = (Function) this.functions.get(prefix + ":" + localName);
+            Function f = this.functions.get(prefix + ":" + localName);
             return f.getMethod();
         }
         return null;
@@ -57,7 +57,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
 
     public void addFunction(String prefix, String localName, Method m) {
         if (this.functions == null) {
-            this.functions = new HashMap();
+            this.functions = new HashMap<String, Function>();
         }
         Function f = new Function(prefix, localName, m);
         synchronized (this) {
@@ -81,7 +81,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
      */
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
-        this.functions = (Map) in.readObject();
+        this.functions = (Map<String, Function>) in.readObject();
     }
 
     public static class Function implements Externalizable {

@@ -50,7 +50,7 @@ import org.apache.el.util.MessageFactory;
  */
 public final class ExpressionBuilder implements NodeVisitor {
 
-    private static final ConcurrentCache cache = new ConcurrentCache(5000);
+    private static final ConcurrentCache<String, Node> cache = new ConcurrentCache<String, Node>(5000);
 
     private FunctionMapper fnMapper;
 
@@ -87,7 +87,7 @@ public final class ExpressionBuilder implements NodeVisitor {
             throw new ELException(MessageFactory.get("error.null"));
         }
 
-        Node n = (Node) cache.get(expr);
+        Node n = cache.get(expr);
         if (n == null) {
             try {
                 n = (new ELParser(new StringReader(expr)))
