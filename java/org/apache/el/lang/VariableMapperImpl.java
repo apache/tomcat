@@ -31,23 +31,23 @@ public class VariableMapperImpl extends VariableMapper implements Externalizable
 
     private static final long serialVersionUID = 1L;
 
-    private Map vars = new HashMap();
+    private Map<String, ValueExpression> vars = new HashMap<String, ValueExpression>();
 
     public VariableMapperImpl() {
         super();
     }
 
     public ValueExpression resolveVariable(String variable) {
-        return (ValueExpression) this.vars.get(variable);
+        return this.vars.get(variable);
     }
 
     public ValueExpression setVariable(String variable,
             ValueExpression expression) {
-        return (ValueExpression) this.vars.put(variable, expression);
+        return this.vars.put(variable, expression);
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        this.vars = (Map) in.readObject();
+        this.vars = (Map<String, ValueExpression>) in.readObject();
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
