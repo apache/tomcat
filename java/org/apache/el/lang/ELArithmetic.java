@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -110,12 +110,12 @@ public abstract class ELArithmetic {
     public final static class DoubleDelegate extends ELArithmetic {
 
         protected Number add(Number num0, Number num1) {
-        	// could only be one of these
-        	if (num0 instanceof BigDecimal) {
-        		return ((BigDecimal) num0).add(new BigDecimal(num1.doubleValue()));
-        	} else if (num1 instanceof BigDecimal) {
-        		return ((new BigDecimal(num0.doubleValue()).add((BigDecimal) num1)));
-        	}
+            // could only be one of these
+            if (num0 instanceof BigDecimal) {
+                return ((BigDecimal) num0).add(new BigDecimal(num1.doubleValue()));
+            } else if (num1 instanceof BigDecimal) {
+                return ((new BigDecimal(num0.doubleValue()).add((BigDecimal) num1)));
+            }
             return new Double(num0.doubleValue() + num1.doubleValue());
         }
 
@@ -123,7 +123,7 @@ public abstract class ELArithmetic {
             if (num instanceof Double)
                 return num;
             if (num instanceof BigInteger)
-            	return new BigDecimal((BigInteger) num);
+                return new BigDecimal((BigInteger) num);
             return new Double(num.doubleValue());
         }
 
@@ -140,22 +140,22 @@ public abstract class ELArithmetic {
         }
 
         protected Number subtract(Number num0, Number num1) {
-        	// could only be one of these
-        	if (num0 instanceof BigDecimal) {
-        		return ((BigDecimal) num0).subtract(new BigDecimal(num1.doubleValue()));
-        	} else if (num1 instanceof BigDecimal) {
-        		return ((new BigDecimal(num0.doubleValue()).subtract((BigDecimal) num1)));
-        	}
+            // could only be one of these
+            if (num0 instanceof BigDecimal) {
+                return ((BigDecimal) num0).subtract(new BigDecimal(num1.doubleValue()));
+            } else if (num1 instanceof BigDecimal) {
+                return ((new BigDecimal(num0.doubleValue()).subtract((BigDecimal) num1)));
+            }
             return new Double(num0.doubleValue() - num1.doubleValue());
         }
 
         protected Number multiply(Number num0, Number num1) {
-        	// could only be one of these
-        	if (num0 instanceof BigDecimal) {
-        		return ((BigDecimal) num0).multiply(new BigDecimal(num1.doubleValue()));
-        	} else if (num1 instanceof BigDecimal) {
-        		return ((new BigDecimal(num0.doubleValue()).multiply((BigDecimal) num1)));
-        	}
+            // could only be one of these
+            if (num0 instanceof BigDecimal) {
+                return ((BigDecimal) num0).multiply(new BigDecimal(num1.doubleValue()));
+            } else if (num1 instanceof BigDecimal) {
+                return ((new BigDecimal(num0.doubleValue()).multiply((BigDecimal) num1)));
+            }
             return new Double(num0.doubleValue() * num1.doubleValue());
         }
 
@@ -270,7 +270,7 @@ public abstract class ELArithmetic {
         else if (DOUBLE.matches(obj0, obj1))
             delegate = DOUBLE;
         else if (BIGINTEGER.matches(obj0, obj1))
-            delegate = BIGINTEGER;   
+            delegate = BIGINTEGER;
         else
             delegate = LONG;
 
@@ -332,7 +332,7 @@ public abstract class ELArithmetic {
     }
 
     /**
-     * 
+     *
      */
     protected ELArithmetic() {
         super();
@@ -349,7 +349,7 @@ public abstract class ELArithmetic {
     protected abstract Number coerce(final Number num);
 
     protected final Number coerce(final Object obj) {
-        
+
         if (isNumber(obj)) {
             return coerce((Number) obj);
         }
