@@ -104,7 +104,7 @@ void Expression() : {}
  */
 void Choice() : {}
 {
-    Or() (<QUESTIONMARK> Choice() <COLON> Choice() #Choice(3))*
+    Or() (LOOKAHEAD(3) <QUESTIONMARK> Choice() <COLON> Choice() #Choice(3))*
 }
 
 /*
@@ -278,7 +278,7 @@ void Function() #Function :
     Token t1 = null;
 }
 {
-    (t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
+    (LOOKAHEAD(2) t0=<IDENTIFIER> <COLON>)? t1=<IDENTIFIER>
     {
         if (t0 != null) {
             jjtThis.setPrefix(t0.image);
