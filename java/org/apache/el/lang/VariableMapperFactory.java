@@ -24,14 +24,14 @@ public class VariableMapperFactory extends VariableMapper {
 
     private final VariableMapper target;
     private VariableMapper momento;
-    
+
     public VariableMapperFactory(VariableMapper target) {
         if (target == null) {
             throw new NullPointerException("Target VariableMapper cannot be null");
         }
         this.target = target;
     }
-    
+
     public VariableMapper create() {
         return this.momento;
     }

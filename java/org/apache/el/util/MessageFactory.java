@@ -33,7 +33,7 @@ public final class MessageFactory {
     public MessageFactory() {
         super();
     }
-    
+
     public static String get(final String key) {
         return bundle.getString(key);
     }
