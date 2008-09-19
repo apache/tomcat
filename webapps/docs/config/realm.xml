@@ -292,17 +292,27 @@
     information from the directory:</p>
 
     <attributes>
-       <attribute name="alternateURL" required="false">
-         <p>If a socket connection can not be made to the provider at
-         the <code>connectionURL</code> an attempt will be made to use the
-         <code>alternateURL</code>.</p>
-       </attribute>
 
-       <attribute name="authentication" required="false">
-         <p>A string specifying the type of authentication to use.
-         "none", "simple", "strong" or a provider specific definition
-         can be used. If no value is given the providers default is used.</p>
-       </attribute>
+      <attribute name="adCompat" required="false">
+        <p>Microsoft Active Directory often returns referrals.
+        When iterating over NamingEnumerations these lead to
+        PartialResultExceptions. If you want us to ignore those exceptions,
+        set this attribute to "true". Unfortunately there's no stable way
+        to detect, if the Exceptions really come from an AD referral.
+        The default value is "false".</p>
+      </attribute>
+
+      <attribute name="alternateURL" required="false">
+        <p>If a socket connection can not be made to the provider at
+        the <code>connectionURL</code> an attempt will be made to use the
+        <code>alternateURL</code>.</p>
+      </attribute>
+
+      <attribute name="authentication" required="false">
+        <p>A string specifying the type of authentication to use.
+        "none", "simple", "strong" or a provider specific definition
+        can be used. If no value is given the providers default is used.</p>
+      </attribute>
 
       <attribute name="commonRole" required="false">
         <p>A role name assigned to each successfully authenticated user in
@@ -336,7 +346,7 @@
         to acquire our JNDI <code>InitialContext</code>.  By default,
         assumes that the standard JNDI LDAP provider will be utilized.</p>
       </attribute>
-      
+
       <attribute name="derefAliases" required="false">
         <p>A string specifying how aliases are to be dereferenced during
         search operations. The allowed values are "always", "never",
@@ -355,6 +365,16 @@
       <attribute name="protocol" required="false">
          <p>A string specifying the security protocol to use. If not given
          the providers default is used.</p>
+      </attribute>
+
+      <attribute name="referrals" required="false">
+        <p>How do we handle JNDI referrals? Allowed values are
+        "ignore", "follow", or "throw"  (see javax.naming.Context.REFERRAL
+        for more information).
+        Microsoft Active Directory often returns referrals.
+        If you need to follow them set referrals to "follow".
+        Caution: if your DNS is not part of AD, the LDAP client lib might try
+        to resolve your domain name in DNS to find another LDAP server.</p>
       </attribute>
 
       <attribute name="roleBase" required="false">

@@ -847,6 +847,15 @@ attributes are supported by this implementation:</p>
     "<code>org.apache.catalina.realm.JNDIRealm</code>" here.</p>
   </attribute>
 
+      <attribute name="adCompat" required="false">
+        <p>Microsoft Active Directory often returns referrals.
+        When iterating over NamingEnumerations these lead to
+        PartialResultExceptions. If you want us to ignore those exceptions,
+        set this attribute to "true". Unfortunately there's no stable way
+        to detect, if the Exceptions really come from an AD referral.
+        The default value is "false".</p>
+      </attribute>
+
       <attribute name="alternateURL" required="false">
         <p>If a socket connection can not be made to the provider at
         the <code>connectionURL</code> an attempt will be made to use the
@@ -902,6 +911,16 @@ attributes are supported by this implementation:</p>
         information. If not specified the plaintext password is assumed to
         be retrieved. Not required unless <code>userPassword</code> is
         specified</p>
+      </attribute>
+
+      <attribute name="referrals" required="false">
+        <p>How do we handle JNDI referrals? Allowed values are
+        "ignore", "follow", or "throw"  (see javax.naming.Context.REFERRAL
+        for more information).
+        Microsoft Active Directory often returns referrals.
+        If you need to follow them set referrals to "follow".
+        Caution: if your DNS is not part of AD, the LDAP client lib might try
+        to resolve your domain name in DNS to find another LDAP server.</p>
       </attribute>
 
       <attribute name="protocol" required="false">
