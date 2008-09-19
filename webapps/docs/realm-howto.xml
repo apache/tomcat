@@ -859,6 +859,12 @@ attributes are supported by this implementation:</p>
         can be used. If no value is given the providers default is used.</p>
       </attribute>
 
+      <attribute name="commonRole" required="false">
+        <p>A role name assigned to each successfully authenticated user in
+        addition to the roles retrieved from LDAP. If not specified, only
+        the roles retrieved via LDAP are used.</p>
+      </attribute>
+
       <attribute name="connectionName" required="false">
         <p>The directory username to use when establishing a
         connection to the directory for LDAP search operations. If not
