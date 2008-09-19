@@ -787,9 +787,12 @@ public abstract class RealmBase
                     log.debug("  No user authenticated, cannot grant access");
             } else {
                 for (int j = 0; j < roles.length; j++) {
-                    if (hasRole(principal, roles[j]))
+                    if (hasRole(principal, roles[j])) {
                         status = true;
-                    if( log.isDebugEnabled() )
+                        if( log.isDebugEnabled() )
+                            log.debug( "Role found:  " + roles[j]);
+                    }
+                    else if( log.isDebugEnabled() )
                         log.debug( "No role found:  " + roles[j]);
                 }
             }
