@@ -52,6 +52,7 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
     private boolean isFirst = true;
     private boolean isReplay = false;
     private boolean isReadRequired = false;
+    private int packetSize = AjpConstants.MAX_PACKET_SIZE;
 
     static {
         // Make certain HttpMessages is loaded for SecurityManager
@@ -64,14 +65,19 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
 
     public JkInputStream(MsgContext context, int bsize) {
         mc = context;
-        bodyMsg = new MsgAjp(bsize);
-        outputMsg = new MsgAjp(bsize);
+        // Never use less than the default maximum packet size.
+        if (bsize < AjpConstants.MAX_PACKET_SIZE)
+            this.packetSize = AjpConstants.MAX_PACKET_SIZE;
+        else
+            this.packetSize = bsize;
+        bodyMsg = new MsgAjp(this.packetSize);
+        outputMsg = new MsgAjp(this.packetSize);
     }
     /**
      * @deprecated
      */
     public JkInputStream(MsgContext context) {
-        this(context, 8*1024);
+        this(context, AjpConstants.MAX_PACKET_SIZE);
     }
 
     // -------------------- Jk specific methods --------------------
@@ -244,7 +250,8 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
         // Why not use outBuf??
         bodyMsg.reset();
         bodyMsg.appendByte(AjpConstants.JK_AJP13_GET_BODY_CHUNK);
-        bodyMsg.appendInt(AjpConstants.MAX_READ_SIZE);
+        // Adjust allowed size if packetSize != default (AjpConstants.MAX_PACKET_SIZE)
+        bodyMsg.appendInt(AjpConstants.MAX_READ_SIZE + packetSize - AjpConstants.MAX_PACKET_SIZE);
         
         if( log.isDebugEnabled() )
             log.debug("refillReadBuffer " + Thread.currentThread());
