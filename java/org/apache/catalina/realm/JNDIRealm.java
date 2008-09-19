@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.Context;
@@ -35,6 +36,7 @@ import javax.naming.NamingException;
 import javax.naming.NameParser;
 import javax.naming.Name;
 import javax.naming.AuthenticationException;
+import javax.naming.PartialResultException;
 import javax.naming.ServiceUnavailableException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -228,9 +230,20 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * How should we handle referrals?  Microsoft Active Directory can't handle
-     * the default case, so an application authenticating against AD must
-     * set referrals to "follow".
+     * Should we ignore PartialResultExceptions when iterating over NamingEnumerations?
+     * Microsoft Active Directory often returns referrals, which lead
+     * to PartialResultExceptions. Unfortunately there's no stable way to detect,
+     * if the Exceptions really come from an AD referral.
+     * Set to true to ignore PartialResultExceptions.
+     */
+    protected boolean adCompat = false;
+
+
+    /**
+     * How should we handle referrals?  Microsoft Active Directory often returns
+     * referrals. If you need to follow them set referrals to "follow".
+     * Caution: if your DNS is not part of AD, the LDAP client lib might try
+     * to resolve your domain name in DNS to find another LDAP server.
      */
     protected String referrals = null;
 
@@ -496,6 +509,23 @@ public class JNDIRealm extends RealmBase {
 
         this.protocol = protocol;
 
+    }
+
+
+    /**
+     * Returns the current settings for handling PartialResultExceptions
+     */
+    public boolean getAdCompat () {
+        return adCompat;
+    }
+
+
+    /**
+     * How do we handle PartialResultExceptions?
+     * True: ignore all PartialResultExceptions.
+     */
+    public void setAdCompat (boolean adCompat) {
+        this.adCompat = adCompat;
     }
 
 
@@ -948,6 +978,12 @@ public class JNDIRealm extends RealmBase {
                         if (checkCredentials(context, user, credentials)) {
                             // Search for additional roles
                             List<String> roles = getRoles(context, user);
+                            if (containerLog.isDebugEnabled()) {
+                                Iterator it = roles.iterator();
+                                while (it.hasNext()) {
+                                    containerLog.debug("Found role: " + it.next());
+                                }
+                            }
                             return (new GenericPrincipal(this,
                                                          username,
                                                          credentials,
@@ -976,6 +1012,12 @@ public class JNDIRealm extends RealmBase {
 
             // Search for additional roles
             List<String> roles = getRoles(context, user);
+            if (containerLog.isDebugEnabled()) {
+                Iterator it = roles.iterator();
+                while (it.hasNext()) {
+                    containerLog.debug("Found role: " + it.next());
+                }
+            }
 
             // Create and return a suitable Principal for this user
             return (new GenericPrincipal(this, username, credentials, roles));
@@ -1114,18 +1156,30 @@ public class JNDIRealm extends RealmBase {
 
 
         // Fail if no entries found
-        if (results == null || !results.hasMore()) {
-            return (null);
+        try {
+            if (results == null || !results.hasMore()) {
+                return (null);
+            }
+        } catch (PartialResultException ex) {
+            if (!adCompat)
+                throw ex;
+            else
+                return (null);
         }
 
         // Get result for the first entry found
         SearchResult result = (SearchResult)results.next();
 
         // Check no further entries were found
-        if (results.hasMore()) {
-            if(containerLog.isInfoEnabled())
-                containerLog.info("username " + username + " has multiple entries");
-            return (null);
+        try {
+            if (results.hasMore()) {
+                if(containerLog.isInfoEnabled())
+                    containerLog.info("username " + username + " has multiple entries");
+                return (null);
+            }
+        } catch (PartialResultException ex) {
+            if (!adCompat)
+                throw ex;
         }
 
         // Get the entry's distinguished name
@@ -1412,12 +1466,17 @@ public class JNDIRealm extends RealmBase {
             context.search(roleBase, filter, controls);
         if (results == null)
             return (list);  // Should never happen, but just in case ...
-        while (results.hasMore()) {
-            SearchResult result = (SearchResult) results.next();
-            Attributes attrs = result.getAttributes();
-            if (attrs == null)
-                continue;
-            list = addAttributeValues(roleName, attrs, list);
+        try {
+            while (results.hasMore()) {
+                SearchResult result = (SearchResult) results.next();
+                Attributes attrs = result.getAttributes();
+                if (attrs == null)
+                    continue;
+                list = addAttributeValues(roleName, attrs, list);
+            }
+        } catch (PartialResultException ex) {
+            if (!adCompat)
+                throw ex;
         }
 
 
@@ -1493,9 +1552,14 @@ public class JNDIRealm extends RealmBase {
         if (attr == null)
             return (values);
         NamingEnumeration e = attr.getAll();
-        while(e.hasMore()) {
-            String value = (String)e.next();
-            values.add(value);
+        try {
+            while(e.hasMore()) {
+                String value = (String)e.next();
+                values.add(value);
+            }
+        } catch (PartialResultException ex) {
+            if (!adCompat)
+                throw ex;
         }
         return values;
     }
