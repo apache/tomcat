@@ -281,6 +281,10 @@ public class JkInputStream implements InputBuffer, OutputBuffer {
         } else {
             message = message.replace('\n', ' ').replace('\r', ' ');
         }
+        if (message == null) {
+            // mod_jk + httpd 2.x fails with a null status message - bug 45026
+            message = Integer.toString(res.getStatus());
+        }
         tempMB.setString( message );
         c2b.convert( tempMB );
         outputMsg.appendBytes(tempMB);
