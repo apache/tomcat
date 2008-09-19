@@ -347,6 +347,12 @@ public class JNDIRealm extends RealmBase {
      */
     protected int curUserPattern = 0;
 
+    /**
+     *  Add this role to every authenticated user
+     */
+    protected String commonRole = null;
+
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -772,6 +778,28 @@ public class JNDIRealm extends RealmBase {
     public void setAlternateURL(String alternateURL) {
 
         this.alternateURL = alternateURL;
+
+    }
+
+
+    /**
+     * Return the common role
+     */
+    public String getCommonRole() {
+
+        return commonRole;
+
+    }
+
+
+    /**
+     * Set the common role
+     *
+     * @param commonRole The common role
+     */
+    public void setCommonRole(String commonRole) {
+
+        this.commonRole = commonRole;
 
     }
 
@@ -1363,6 +1391,8 @@ public class JNDIRealm extends RealmBase {
         if (list == null) {
             list = new ArrayList<String>();
         }
+        if (commonRole != null)
+            list.add(commonRole);
 
         // Are we configured to do role searches?
         if ((roleFormat == null) || (roleName == null))
