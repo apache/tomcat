@@ -34,8 +34,7 @@
                  type="java.lang.String"/>
 
     <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a
-                        non-plaintext format"
+          description="Digest algorithm used in storing passwords in a non-plaintext format"
                  type="java.lang.String"/>
 
     <attribute   name="localDataSource"
@@ -47,18 +46,15 @@
                  type="java.lang.String"/>
 
     <attribute   name="userCredCol"
-          description="The column in the user table that holds the user's
-                        credentials"
+          description="The column in the user table that holds the user's credentials"
                  type="java.lang.String"/>
 
     <attribute   name="userNameCol"
-          description="The column in the user table that holds the user's
-                        username"
+          description="The column in the user table that holds the user's username"
                  type="java.lang.String"/>
 
     <attribute   name="userRoleTable"
-          description="The table that holds the relation between user's and
-                        roles"
+          description="The table that holds the relation between user's and roles"
                  type="java.lang.String"/>
 
     <attribute   name="userTable"
@@ -74,16 +70,13 @@
   </mbean>
 
   <mbean         name="JAASRealm"
-          description="Implmentation of Realm that authenticates users via the
-                       Java Authentication and Authorization Service (JAAS)"
+          description="Implmentation of Realm that authenticates users via the Java Authentication and Authorization Service (JAAS)"
                domain="Catalina"
                 group="Realm"
                  type="org.apache.catalina.realm.JAASRealm">
 
     <attribute   name="appName"
-          description="The application name passed to the JAAS LoginContext,
-                       which uses it to select the set of relevant
-                       LoginModules"
+          description="The application name passed to the JAAS LoginContext, which uses it to select the set of relevant LoginModules"
                  type="java.lang.String"/>
 
     <attribute   name="className"
@@ -92,23 +85,19 @@
             writeable="false"/>
 
     <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a
-                       non-plaintext format"
+          description="Digest algorithm used in storing passwords in a non-plaintext format"
                  type="java.lang.String"/>
 
     <attribute   name="roleClassNames"
-          description="Comma-delimited list of javax.security.Principal classes
-                       that represent security roles"
+          description="Comma-delimited list of javax.security.Principal classes that represent security roles"
                  type="java.lang.String"/>
 
     <attribute   name="userClassNames"
-          description="Comma-delimited list of javax.security.Principal classes
-                       that represent individual users"
+          description="Comma-delimited list of javax.security.Principal classes that represent individual users"
                  type="java.lang.String"/>
 
     <attribute   name="validate"
-          description="Should we validate client certificate chains when they
-                       are presented?"
+          description="Should we validate client certificate chains when they are presented?"
                  type="java.lang.String"/>
 
 
@@ -120,8 +109,7 @@
 
 
   <mbean         name="JDBCRealm"
-          description="Implementation of Realm that works with any JDBC
-                       supported database"
+          description="Implementation of Realm that works with any JDBC supported database"
                domain="Catalina"
                 group="Realm"
                  type="org.apache.catalina.realm.JDBCRealm">
@@ -132,23 +120,19 @@
             writeable="false"/>
 
     <attribute   name="connectionName"
-          description="The connection username to use when trying to connect to
-                       the database"
+          description="The connection username to use when trying to connect to the database"
                  type="java.lang.String"/>
 
     <attribute   name="connectionPassword"
-          description="The connection URL to use when trying to connect to the
-                       database"
+          description="The connection URL to use when trying to connect to the database"
                  type="java.lang.String"/>
 
     <attribute   name="connectionURL"
-          description="The connection URL to use when trying to connect to the
-                       database"
+          description="The connection URL to use when trying to connect to the database"
                  type="java.lang.String"/>
 
     <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a
-                       non-plaintext format"
+          description="Digest algorithm used in storing passwords in a non-plaintext format"
                  type="java.lang.String"/>
 
     <attribute   name="driverName"
@@ -160,18 +144,15 @@
                  type="java.lang.String"/>
 
     <attribute   name="userCredCol"
-          description="The column in the user table that holds the user's
-                       credentials"
+          description="The column in the user table that holds the user's credentials"
                  type="java.lang.String"/>
 
     <attribute   name="userNameCol"
-          description="The column in the user table that holds the user's
-                       username"
+          description="The column in the user table that holds the user's username"
                  type="java.lang.String"/>
 
     <attribute   name="userRoleTable"
-          description="The table that holds the relation between user's and
-                       roles"
+          description="The table that holds the relation between user's and roles"
                  type="java.lang.String"/>
 
     <attribute   name="userTable"
@@ -186,9 +167,7 @@
   </mbean>
 
   <mbean         name="JNDIRealm"
-          description="Implementation of Realm that works with a directory
-                       server accessed via the Java Naming and Directory
-                       Interface (JNDI) APIs"
+          description="Implementation of Realm that works with a directory server accessed via the Java Naming and Directory Interface (JNDI) APIs"
                domain="Catalina"
                 group="Realm"
                  type="org.apache.catalina.realm.JNDIRealm">
@@ -215,8 +194,7 @@
                  type="java.lang.String"/>
 
     <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a
-                       non-plaintext format"
+          description="Digest algorithm used in storing passwords in a non-plaintext format"
                  type="java.lang.String"/>
 
     <attribute   name="roleBase"
@@ -232,8 +210,7 @@
                  type="java.lang.String"/>
 
     <attribute   name="roleSubtree"
-          description="Should we search the entire subtree for matching
-                       memberships?"
+          description="Should we search the entire subtree for matching memberships?"
                  type="boolean"/>
 
     <attribute   name="userBase"
@@ -249,8 +226,7 @@
                  type="java.lang.String"/>
 
      <attribute   name="userRoleName"
-          description="The name of the attribute in the user's entry containing
-                       roles for that user"
+          description="The name of the attribute in the user's entry containing roles for that user"
                  type="java.lang.String"/>
 
    <attribute   name="userSearch"
@@ -258,8 +234,7 @@
                 type="java.lang.String"/>
 
     <attribute   name="userSubtree"
-          description="Should we search the entire subtree for matching
-                       users?"
+          description="Should we search the entire subtree for matching users?"
                  type="boolean"/>
 
 
@@ -270,8 +245,7 @@
   </mbean>
 
   <mbean         name="MemoryRealm"
-          description="Simple implementation of Realm that reads an XML file to
-                       configure the valid users, passwords, and roles"
+          description="Simple implementation of Realm that reads an XML file to configure the valid users, passwords, and roles"
                domain="Catalina"
                 group="Realm"
                  type="org.apache.catalina.realm.MemoryRealm">
@@ -282,8 +256,7 @@
             writeable="false"/>
 
     <attribute   name="pathname"
-          description="The pathname of the XML file containing our database
-                       information"
+          description="The pathname of the XML file containing our database information"
                  type="java.lang.String"/>
 
     <operation name="start" description="Start" impact="ACTION" returnType="void" />
@@ -294,8 +267,7 @@
   </mbean>
 
   <mbean         name="UserDatabaseRealm"
-          description="Realm connected to a UserDatabase as a global JNDI
-                       resource"
+          description="Realm connected to a UserDatabase as a global JNDI resource"
                domain="Catalina"
                 group="Realm"
                  type="org.apache.catalina.realm.UserDatabaseRealm">
@@ -308,6 +280,105 @@
     <attribute   name="resourceName"
           description="The global JNDI name of the UserDatabase resource to use"
                  type="java.lang.String"/>
+
+  </mbean>
+
+  <mbean         name="CombinedRealm"
+          description="Realm implementation that can be used to chain multiple realms"
+               domain="Catalina"
+                group="Realm"
+                 type="org.apache.catalina.realm.CombinedRealm">
+
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="realms"
+          description="The set of realms that the combined realm is wrapping"
+                 type="[Ljavax.management.ObjectName;"
+            writeable="false"/>
+
+    <operation   name="addRealm"
+          description="Add a new Realm to the set of Realms wrapped by this realm"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="theRealm"
+                 description="New Realm to add"
+                 type="org.apache.catalina.Realm"/>
+    </operation>
+
+    <operation   name="start"
+          description="Start"
+               impact="ACTION"
+           returnType="void" />
+
+    <operation   name="stop"
+          description="Stop"
+               impact="ACTION"
+           returnType="void" />
+
+  </mbean>
+
+  <mbean         name="LockOutRealm"
+          description="Realm implementation that can be used to wrap existing realms to provide a user lock-out capability"
+               domain="Catalina"
+                group="Realm"
+                 type="org.apache.catalina.realm.LockOutRealm">
+
+    <attribute   name="className"
+          description="Fully qualified class name of the managed object"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="realms"
+          description="The set of realms that the lockout realm is wrapping"
+                 type="[Ljavax.management.ObjectName;"
+            writeable="false"/>
+
+    <attribute   name="cacheRemovalWarningTime"
+          description="If a failed user is removed from the cache because the cache is too big before it has been in the cache for at least this period of time (in seconds) a warning message will be logged. Defaults to 3600 (1 hour)."
+                 type="int" />
+
+    <attribute   name="cacheSize"
+          description="Number of users that have failed authentication to keep in cache. Over time the cache will grow to this size and may not shrink. Defaults to 1000."
+                 type="int" />
+
+    <attribute   name="failureCount"
+          description="The number of times in a row a user has to fail authentication to be locked out. Defaults to 5."
+                 type="int" />
+
+    <attribute   name="lockOutTime"
+          description="The time (in seconds) a user is locked out for after too many authentication failures. Defaults to 300 (5 minutes)."
+                 type="int" />
+
+    <operation   name="addRealm"
+          description="Add a new Realm to the set of Realms wrapped by this realm"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="theRealm"
+                 description="New Realm to add"
+                 type="org.apache.catalina.Realm"/>
+    </operation>
+
+    <operation   name="unlock"
+          description="Unlock the specified user"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+                 description="User to unlock"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="start"
+          description="Start"
+               impact="ACTION"
+           returnType="void" />
+
+    <operation   name="stop"
+          description="Stop"
+               impact="ACTION"
+           returnType="void" />
 
   </mbean>
 
