@@ -23,6 +23,8 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.management.ObjectName;
+
 import org.apache.catalina.Container;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -64,6 +66,21 @@ public class CombinedRealm extends RealmBase {
 	        sm.getString("combinedRealm.addRealm", theRealm.getInfo(), 
 	                Integer.toString(realms.size()));
 	    }
+	}
+
+
+	/**
+	 * Return the set of Realms that this Realm is wrapping
+	 */
+	public ObjectName[] getRealms() {
+	    ObjectName[] result = new ObjectName[realms.size()];
+	    for (Realm realm : realms) {
+	        if (realm instanceof RealmBase) {
+	            result[realms.indexOf(realm)] =
+	                ((RealmBase) realm).getObjectName();
+	        }
+	    }
+	    return result;
 	}
 
 
@@ -180,8 +197,14 @@ public class CombinedRealm extends RealmBase {
      * @param container The associated Container
      */
     public void setContainer(Container container) {
-        // Set the container for sub-realms. Mainly so logging works.
         for(Realm realm : realms) {
+            // Set the realmPath for JMX naming
+            if (realm instanceof RealmBase) {
+                ((RealmBase) realm).setRealmPath(
+                        getRealmPath() + "/realm" + realms.indexOf(realm));
+            }
+            
+            // Set the container for sub-realms. Mainly so logging works.
             realm.setContainer(container);
         }
         super.setContainer(container);
