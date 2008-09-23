@@ -1285,6 +1285,7 @@ public abstract class RealmBase
     protected String domain;
     protected String host;
     protected String path;
+    protected String realmPath = "/realm0";
     protected ObjectName oname;
     protected ObjectName controller;
     protected MBeanServer mserver;
@@ -1307,6 +1308,14 @@ public abstract class RealmBase
 
     public String getType() {
         return type;
+    }
+
+    public String getRealmPath() {
+        return realmPath;
+    }
+    
+    public void setRealmPath(String theRealmPath) {
+        realmPath = theRealmPath;
     }
 
     public ObjectName preRegister(MBeanServer server,
@@ -1370,7 +1379,8 @@ public abstract class RealmBase
             // register
             try {
                 ContainerBase cb=(ContainerBase)container;
-                oname=new ObjectName(cb.getDomain()+":type=Realm" + cb.getContainerSuffix());
+                oname=new ObjectName(cb.getDomain()+":type=Realm" +
+                        getRealmSuffix() + cb.getContainerSuffix());
                 Registry.getRegistry(null, null).registerComponent(this, oname, null );
                 if(log.isDebugEnabled())
                     log.debug("Register Realm "+oname);
@@ -1379,6 +1389,11 @@ public abstract class RealmBase
             }
         }
 
+    }
+
+
+    protected String getRealmSuffix() {
+        return ",realmPath=" + getRealmPath();
     }
 
 
