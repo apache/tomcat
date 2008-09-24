@@ -134,6 +134,7 @@ Section "Core" SecTomcatCore
   SetOutPath $INSTDIR
   File tomcat.ico
   File LICENSE
+  File NOTICE
   SetOutPath $INSTDIR\lib
   File /r lib\*.*
   SetOutPath $INSTDIR\logs
