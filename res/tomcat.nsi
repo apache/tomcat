@@ -535,8 +535,11 @@ Silent:
   FileOpen $R9 "$INSTDIR\conf\tomcat-users.xml" w
   ; File will be written using current windows codepage
   System::Call 'Kernel32::GetACP() i .r18'
-  FileWrite $R9 "<?xml version='1.0' encoding='cp$R8'?>$\r$\n"
-
+  StrCmp $R8 "932" 0 +3
+    ; Special case where Java uses non-standard name for character set
+    FileWrite $R9 "<?xml version='1.0' encoding='ms$R8'?>$\r$\n"
+    Goto +2
+    FileWrite $R9 "<?xml version='1.0' encoding='cp$R8'?>$\r$\n"
   Push "$TEMP\confinstall\tomcat-users_1.xml"
   Call copyFile
   FileWrite $R9 $R5
