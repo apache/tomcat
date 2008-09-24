@@ -338,7 +338,6 @@
     <copy todir="${tomcat.build}/webapps/docs">
       <fileset dir=".">
         <include name="BUILDING.txt"/>
-        <include name="NOTICE"/>
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>
