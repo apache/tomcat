@@ -50,6 +50,12 @@
 
   <!-- Can't be lower - jsp uses templates -->
   <property name="compile.source" value="1.5"/>
+  <!-- Can't be higher - must run on 1.5 -->
+  <property name="compile.target" value="1.5"/>
+
+  <!-- Exact spec versions (for the manifests) -->
+  <property name="servlet.revision" value="MR2" />
+  <property name="jsp.revision" value="FR" />
 
   <!-- JAR artifacts -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
@@ -107,6 +113,7 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
+           target="${compile.target}"
            optimize="${compile.optimize}"
            excludes="**/CVS/**,**/.svn/**">
 <!-- Comment this in to show unchecked warnings:     <compilerarg value="-Xlint:unchecked"/> -->
@@ -138,6 +145,9 @@
   <target name="build-only" depends="build-prepare,compile,package" />
 
   <target name="package" >
+    <!-- Common filtering tokens for JAR manifests-->
+    <filter token="source.jdk" value="${compile.source}"/>
+    <filter token="target.jdk" value="${compile.target}"/>
 
     <!-- Common Annotations 1.0 JAR File -->
     <jar  jarfile="${annotations-api.jar}">
@@ -154,7 +164,17 @@
     </jar>
 
     <!-- Servlet 2.5 Implementation JAR File -->
-    <jar  jarfile="${servlet-api.jar}">
+    <filter token="implementation.revision"
+            value="${servlet.revision}"/>
+    <copy tofile="res/manifest.tmp"
+          file="res/servlet-api.jar.manifest"
+          overwrite="yes"
+          filtering="true" />
+    <jar jarfile="${servlet-api.jar}"
+         manifest="res/manifest.tmp">
+      <fileset dir="res">
+        <include name="META-INF/**" />
+      </fileset>
       <fileset dir="${tomcat.classes}">
         <include name="javax/servlet/*" />
         <include name="javax/servlet/http/*" />
@@ -166,7 +186,17 @@
     </jar>
 
     <!-- JSP 2.1 Implementation JAR File -->
-    <jar  jarfile="${jsp-api.jar}">
+    <filter token="implementation.revision"
+            value="${jsp.revision}"/>
+    <copy tofile="res/manifest.tmp"
+          file="res/jsp-api.jar.manifest"
+          overwrite="yes"
+          filtering="true" />
+    <jar  jarfile="${jsp-api.jar}"
+          manifest="res/manifest.tmp">
+      <fileset dir="res">
+        <include name="META-INF/**" />
+      </fileset>
       <fileset dir="${tomcat.classes}">
         <include name="javax/servlet/jsp/**" />
         <!-- Javadoc and i18n exclusions -->
@@ -450,6 +480,8 @@
     <javac   srcdir="webapps/examples/WEB-INF/classes"
              destdir="${tomcat.build}/webapps/examples/WEB-INF/classes"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
+             source="${compile.source}"
+             target="${compile.target}"
              optimize="${compile.optimize}"
              classpath="${tomcat.classes}"
              excludes="**/CVS/**,**/.svn/**">
@@ -458,6 +490,8 @@
     <javac   srcdir="webapps/examples/jsp/plugin/applet"
              destdir="${tomcat.build}/webapps/examples/jsp/plugin/applet"
              debug="${compile.debug}" deprecation="${compile.deprecation}"
+             source="${compile.source}"
+             target="${compile.target}"
              optimize="${compile.optimize}"
              classpath="$tomcat.lcasses}"
              excludes="**/CVS/**,**/.svn/**">
@@ -718,6 +752,7 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
+           target="${compile.target}"
            sourcepath="${tomcat-dbcp.home}/src/java"
            srcdir="${tomcat-dbcp.home}/src/java" >
       <include name="**" />
