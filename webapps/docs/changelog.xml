@@ -40,6 +40,9 @@
   </subsection>
   <subsection name="ha">
     <changelog>
+      <update>
+        Update tc-native to 1.1.15 in build.properties.default (jfclere)
+      </update>
       <fix>
         Fix that JvmrouteBinderValve can rewrite session suffix with parallel requests from same client (pero)
       </fix>
