@@ -618,6 +618,7 @@ Section Uninstall
   RMDir /r "$SMPROGRAMS\Apache Tomcat 6.0"
   Delete "$INSTDIR\tomcat.ico"
   Delete "$INSTDIR\LICENSE"
+  Delete "$INSTDIR\NOTICE"
   RMDir /r "$INSTDIR\bin"
   RMDir /r "$INSTDIR\lib"
   Delete "$INSTDIR\conf\*.dtd"
