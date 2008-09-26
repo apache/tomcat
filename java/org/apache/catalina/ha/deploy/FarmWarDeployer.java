@@ -70,7 +70,8 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
     protected boolean started = false; //default 5 seconds
 
-    protected HashMap fileFactories = new HashMap();
+    protected HashMap<String, FileMessageFactory> fileFactories =
+        new HashMap<String, FileMessageFactory>();
 
     protected String deployDir;
 
@@ -212,7 +213,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     public void messageReceived(ClusterMessage msg) {
         try {
-            if (msg instanceof FileMessage && msg != null) {
+            if (msg instanceof FileMessage) {
                 FileMessage fmsg = (FileMessage) msg;
                 if (log.isDebugEnabled())
                     log.debug("receive cluster deployment [ path: "
@@ -250,7 +251,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
                         removeFactory(fmsg);
                     }
                 }
-            } else if (msg instanceof UndeployMessage && msg != null) {
+            } else if (msg instanceof UndeployMessage) {
                 try {
                     UndeployMessage umsg = (UndeployMessage) msg;
                     String path = umsg.getContextPath();
@@ -291,8 +292,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             throws java.io.FileNotFoundException, java.io.IOException {
         File tmpFile = new File(msg.getFileName());
         File writeToFile = new File(getTempDir(), tmpFile.getName());
-        FileMessageFactory factory = (FileMessageFactory) fileFactories.get(msg
-                .getFileName());
+        FileMessageFactory factory = fileFactories.get(msg.getFileName());
         if (factory == null) {
             factory = FileMessageFactory.getInstance(writeToFile, true);
             fileFactories.put(msg.getFileName(), factory);
@@ -450,7 +450,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             } catch (Exception x) {
                 log.error("No removal", x);
             }
-            install(contextName, deployWar.toURL());
+            install(contextName, deployWar.toURI().toURL());
         } catch (Exception x) {
             log.error("Unable to install WAR file", x);
         }
