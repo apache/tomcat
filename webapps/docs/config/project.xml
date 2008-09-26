@@ -54,6 +54,7 @@
     </menu>
 
     <menu name="Nested Components">
+        <item name="Listeners"             href="listeners.html"/>
         <item name="Global Resources"      href="globalresources.html"/>
         <item name="Loader"                href="loader.html"/>
         <item name="Manager"               href="manager.html"/> 

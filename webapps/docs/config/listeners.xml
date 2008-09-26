@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="listeners.html">
+
+  &project;
+
+  <properties>
+    <title>The LifeCycle Listener Component</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  <p>A <strong>Listener</strong> element defines a component that performs
+  actions when specific events occur, usually Tomcat starting or Tomcat
+  stopping.</p>
+
+  <p>Listeners may be nested inside a <a href="server.html">Server</a>, 
+  <a href="engine.html">Engine</a>, <a href="host.html">Host</a> or
+  <a href="context.html">Context</a>. Some Listeners are only intended to be
+  nested inside specific elements. These constraints are noted in the
+  documentation below.</p>
+
+</section>
+
+<section name="Attributes">
+
+  <subsection name="Common Attributes">
+
+    <p>All implementations of <strong>Listener</strong>
+    support the following attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use. This class must
+        implement the <code>org.apache.catalina.LifecycleListener</code>
+        interface.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Standard Implementation">
+
+    <p>Unlike most Catalina components, there are several standard
+    <strong>Listener</strong> implementations available.  As a result,
+    the <code>className</code> attribute MUST be used to select the
+    implementation you wish to use.</p>
+
+    <h3>APR Lifecycle Listener (org.apache.catalina.core.AprLifecycleListener)</h3>
+
+    <p>The <strong>APR Lifecycle Listener</strong> checks for the presence of
+    the APR/native library and loads the library if it is present. For more
+    information see the <a href="../apr.html">APR/native guide</a>.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>The following additional attributes are support by the <strong>APR
+    Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="SSLEngine" required="false">
+        <p>Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no
+        specific ENGINE. The default value is <b>on</b>. This initializes the
+        native SSL engine, which must be enabled in the APR/native connector by
+        the use of the <code>SSLEnabled</code> attribute.</p>
+        <p>See the <a href="http://www.openssl.org">Official OpenSSL website</a>
+        for more details on supported SSL hardware engines and manufacturers.
+        </p>
+      </attribute>
+
+    </attributes>
+
+    <h3>Jasper Listener (org.apache.catalina.core.JasperListener)</h3>
+
+    <p>The <strong>Jasper Listener</strong> initialises the Jasper 2 JSP engine
+    before any web applications that may use it are loaded. For more
+    information on the Jasper 2 JSP engine see the
+    <a href="../jasper-howto.html">Jasper How To</a>.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>No additional attributes are support by the <strong>Jasper Listener
+    </strong>.</p>
+
+    <h3>Server Lifecycle Listener
+    (org.apache.catalina.mbeans.ServerLifecycleListener)</h3>
+
+    <p>The <strong>Server Lifecycle Listener</strong> initialises the
+    MBeanServer for the MBeans that may be used to manager Tomcat via JMX.
+    Without this listener, none of the Tomcat MBeans will be available.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>No additional attributes are support by the <strong>Server Lifecycle
+    Listener</strong>.</p>
+
+    <h3>Global Resources Lifecycle Listener
+    (org.apache.catalina.mbeans.GlobalResourcesLifecycleListener)</h3>
+
+    <p>The <strong>Global Resources Lifecycle Listener</strong> initialises the
+    Global JNDI resources defined in server.xml as part of the <a
+    href="globalresources.html">Global Resources</a> element. Without this
+    listener, none of the Global Resources will be available.</p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>No additional attributes are support by the <strong>Global Resources
+    Lifecycle Listener</strong>.</p>
+
+    <h3>JMX Remote Lifecycle Listener
+    (org.apache.catalina.mbeans.JmxRemoteLifecycleListener)</h3>
+
+    <p>The <strong>JMX Remote Lifecycle Listener</strong> fixes the port used by
+    the JMX/RMI Server making things much simpler if you need to connect
+    jconsole or a similar tool to a remote Tomcat instance that is running
+    behind a firewall. Only this port is configured via the listener. The
+    remainder of the configuration is via the standard system properties for
+    configuring JMX. For further information on configuring JMX see
+    <a href="http://java.sun.com/j2se/1.5.0/docs/guide/management/agent.html">
+    Monitoring and Management Using JMX</a> included with the Java SDK
+    documentation.</p>
+
+    <p>If this listener was configured in server.xml as:
+<source>
+&lt;Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
+          rmiRegistryPort="10001" rmiServerPort="10002" /&gt;
+</source>
+    with the following system properties set (eg in setenv.sh):
+<source>
+-Dcom.sun.management.jmxremote.password.file=${catalina.base}/conf/jmxremote.password
+-Dcom.sun.management.jmxremote.access.file=${catalina.base}/conf/jmxremote.access
+</source>
+    then opening ports 10001 (RMI Registry) and 10002 (JMX/RMI Server) in your
+    firewall would enable jconsole to connect to a Tomcat instance running
+    behind a firewall.
+    </p>
+    
+    <p><strong>JMX access should be considered equivalent to administartive
+    access and secured accordingly.</strong></p>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>The following additional attributes are support by the <strong>JMX Remote
+    Lifecycle Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="rmiRegsitryPort" required="true">
+        <p>The port to be used by the JMX/RMI registry. The replaces the use of
+        the <code>com.sun.management.jmxremote.port</code> system propoerty that
+        should not be set when using this valve.</p>
+      </attribute>
+
+      <attribute name="rmiServerPort" required="true">
+        <p>The port to be used by the JMX/RMI server.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+<section name="Nested Components">
+
+  <p>No element may be nested inside a <strong>Listener</strong>.</p>
+
+</section>
+
+</body>
+
+</document>
