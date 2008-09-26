@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This factory is used to read files and write files by splitting them up into
@@ -74,7 +77,7 @@ public class FileMessageFactory {
     protected FileOutputStream out;
 
     /**
-     * The number of messages we have read or written
+     * The number of messages we have written
      */
     protected int nrOfMessagesProcessed = 0;
 
@@ -87,11 +90,30 @@ public class FileMessageFactory {
      * The total number of packets that we split this file into
      */
     protected long totalNrOfMessages = 0;
+    
+    /**
+     * The number of the last message procssed. Message IDs are 1 based.
+     */
+    protected AtomicLong lastMessageProcessed = new AtomicLong(0);
+    
+    /**
+     * Messages received out of order are held in the buffer until required. If
+     * everything is worked as expected, messages will spend very little time in
+     * the buffer.
+     */
+    protected Map<Long, FileMessage> msgBuffer =
+        new ConcurrentHashMap<Long, FileMessage>();
 
     /**
      * The bytes that we hold the data in, not thread safe.
      */
     protected byte[] data = new byte[READ_SIZE];
+
+    /**
+     * Flag that indicates if a thread is writing messages to disk. Access to
+     * this flag must be synchronised.
+     */
+    protected boolean isWriting = false;
 
     /**
      * Private constructor, either instantiates a factory to read or write. <BR>
@@ -205,25 +227,65 @@ public class FileMessageFactory {
         if (log.isDebugEnabled())
             log.debug("Message " + msg + " data " + msg.getData()
                     + " data length " + msg.getDataLength() + " out " + out);
-        if (out != null) {
-            out.write(msg.getData(), 0, msg.getDataLength());
-            nrOfMessagesProcessed++;
+        
+        if (msg.getMessageNumber() <= lastMessageProcessed.get()) {
+            // Duplicate of message already processed
+            log.warn("Receive Message again -- Sender ActTimeout too short [ path: "
+                    + msg.getContextPath()
+                    + " war: "
+                    + msg.getFileName()
+                    + " data: "
+                    + msg.getData()
+                    + " data length: " + msg.getDataLength() + " ]");
+            return false;
+        }
+        
+        FileMessage previous =
+            msgBuffer.put(new Long(msg.getMessageNumber()), msg);
+        if (previous !=null) {
+            // Duplicate of message not yet processed
+            log.warn("Receive Message again -- Sender ActTimeout too short [ path: "
+                    + msg.getContextPath()
+                    + " war: "
+                    + msg.getFileName()
+                    + " data: "
+                    + msg.getData()
+                    + " data length: " + msg.getDataLength() + " ]");
+            return false;
+        }
+        
+        FileMessage next = null;
+        synchronized (this) {
+            if (!isWriting) {
+                next = msgBuffer.get(new Long(lastMessageProcessed.get() + 1));
+                if (next != null) {
+                    isWriting = true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        
+        while (next != null) {
+            out.write(next.getData(), 0, next.getDataLength());
+            lastMessageProcessed.incrementAndGet();
             out.flush();
-            if (msg.getMessageNumber() == msg.getTotalNrOfMsgs()) {
+            if (next.getMessageNumber() == next.getTotalNrOfMsgs()) {
                 out.close();
                 cleanup();
                 return true;
-            }//end if
-        } else {
-            if (log.isWarnEnabled())
-                log.warn("Receive Message again -- Sender ActTimeout to short [ path: "
-                                + msg.getContextPath()
-                                + " war: "
-                                + msg.getFileName()
-                                + " data: "
-                                + msg.getData()
-                                + " data length: " + msg.getDataLength() + " ]");
+            }
+            synchronized(this) {
+                next =
+                    msgBuffer.get(new Long(lastMessageProcessed.get() + 1));
+                if (next == null) {
+                    isWriting = false;
+                }
+            }
         }
+        
         return false;
     }//writeMessage
 
@@ -248,6 +310,8 @@ public class FileMessageFactory {
         data = null;
         nrOfMessagesProcessed = 0;
         totalNrOfMessages = 0;
+        msgBuffer.clear();
+        lastMessageProcessed = null;
     }
 
     /**

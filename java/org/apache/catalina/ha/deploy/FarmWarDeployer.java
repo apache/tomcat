@@ -158,6 +158,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         }else {
             engine = (Engine)parent;
             hostname = engine.getDefaultHost();
+            host = (Host) engine.findChild(hostname);
         }
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host="
