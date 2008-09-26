@@ -78,7 +78,12 @@ public class ProxyDirContext implements DirContext {
                 }
                 cache.setCacheMaxSize(baseDirContext.getCacheMaxSize());
                 cacheTTL = baseDirContext.getCacheTTL();
-                cacheObjectMaxSize = baseDirContext.getCacheMaxSize() / 20;
+                cacheObjectMaxSize = baseDirContext.getCacheObjectMaxSize();
+                // cacheObjectMaxSize must be less than cacheMaxSize
+                // Set a sensible limit
+                if (cacheObjectMaxSize > baseDirContext.getCacheMaxSize()/20) {
+                    cacheObjectMaxSize = baseDirContext.getCacheMaxSize()/20;
+                }
             }
         }
         hostName = (String) env.get(HOST);

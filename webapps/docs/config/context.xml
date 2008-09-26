@@ -284,6 +284,14 @@
         (10 megabytes).</p>
       </attribute>
 
+      <attribute name="cacheObjectMaxSize" required="false">
+        <p>Maximum size of the static resource that will be placed in the cache.
+        If not specified, the default value is <code>512</code>
+        (512 kilobytes). If this value is greater than
+        <code>cacheMaxSize/20</code> it will be reduced to
+        <code>cacheMaxSize/20</code>.</p>
+      </attribute>
+
       <attribute name="cacheTTL" required="false">
         <p>Amount of time in milliseconds between cache entries revalidation.
         If not specified, the default value is <code>5000</code> 
