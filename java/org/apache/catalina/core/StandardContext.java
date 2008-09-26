@@ -626,6 +626,12 @@ public class StandardContext
 
 
     /**
+     * Cache object max size in KB.
+     */
+    protected int cacheObjectMaxSize = 512; // 512K
+
+
+    /**
      * Cache TTL in ms.
      */
     protected int cacheTTL = 5000;
@@ -785,6 +791,22 @@ public class StandardContext
      */
     public void setCacheMaxSize(int cacheMaxSize) {
         this.cacheMaxSize = cacheMaxSize;
+    }
+
+
+    /**
+     * Return the maximum size of objects to be cached in KB.
+     */
+    public int getCacheObjectMaxSize() {
+        return cacheObjectMaxSize;
+    }
+
+
+    /**
+     * Set the maximum size of objects to be placed the cache in KB.
+     */
+    public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
+        this.cacheObjectMaxSize = cacheObjectMaxSize;
     }
 
 
@@ -1830,6 +1852,8 @@ public class StandardContext
             ((BaseDirContext) resources).setCached(isCachingAllowed());
             ((BaseDirContext) resources).setCacheTTL(getCacheTTL());
             ((BaseDirContext) resources).setCacheMaxSize(getCacheMaxSize());
+            ((BaseDirContext) resources).setCacheObjectMaxSize(
+                    getCacheObjectMaxSize());
         }
         if (resources instanceof FileDirContext) {
             filesystemBased = true;

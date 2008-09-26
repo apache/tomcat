@@ -105,9 +105,15 @@ public abstract class BaseDirContext implements DirContext {
 
 
     /**
-     * Max size of resources which will have their content cached.
+     * Max size of cache for resources.
      */
     protected int cacheMaxSize = 10240; // 10 MB
+
+
+    /**
+     * Max size of resources that will be content cached.
+     */
+    protected int cacheObjectMaxSize = 512; // 512 K
 
 
     // ------------------------------------------------------------- Properties
@@ -189,6 +195,22 @@ public abstract class BaseDirContext implements DirContext {
      */
     public void setCacheMaxSize(int cacheMaxSize) {
         this.cacheMaxSize = cacheMaxSize;
+    }
+
+
+    /**
+     * Return the maximum size of objects to be cached in KB.
+     */
+    public int getCacheObjectMaxSize() {
+        return cacheObjectMaxSize;
+    }
+
+
+    /**
+     * Set the maximum size of objects to be placed the cache in KB.
+     */
+    public void setCacheObjectMaxSize(int cacheObjectMaxSize) {
+        this.cacheObjectMaxSize = cacheObjectMaxSize;
     }
 
 
