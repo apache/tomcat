@@ -54,7 +54,8 @@ public class WarWatcher {
     /**
      * Currently deployed files
      */
-    protected Map currentStatus = new HashMap();
+    protected Map<String, WarInfo> currentStatus =
+        new HashMap<String, WarInfo>();
 
     /*--Constructor---------------------------------------------*/
 
@@ -83,9 +84,10 @@ public class WarWatcher {
         }
 
         //check all the status codes and update the FarmDeployer
-        for (Iterator i = currentStatus.entrySet().iterator(); i.hasNext();) {
-            Map.Entry entry = (Map.Entry) i.next();
-            WarInfo info = (WarInfo) entry.getValue();
+        for (Iterator<Map.Entry<String,WarInfo>> i =
+                currentStatus.entrySet().iterator(); i.hasNext();) {
+            Map.Entry<String,WarInfo> entry = i.next();
+            WarInfo info = entry.getValue();
             int check = info.check();
             if (check == 1) {
                 listener.fileModified(info.getWar());
@@ -103,7 +105,7 @@ public class WarWatcher {
      * @param warfile
      */
     protected void addWarInfo(File warfile) {
-        WarInfo info = (WarInfo) currentStatus.get(warfile.getAbsolutePath());
+        WarInfo info = currentStatus.get(warfile.getAbsolutePath());
         if (info == null) {
             info = new WarInfo(warfile);
             info.setLastState(-1); //assume file is non existent
