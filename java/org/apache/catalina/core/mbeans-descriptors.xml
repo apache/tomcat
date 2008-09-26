@@ -57,6 +57,10 @@
                description="Maximum cache size in KB"
                type="int"/>
       
+    <attribute name="cacheObjectMaxSize"
+               description="Maximum cached object size in KB"
+               type="int"/>
+      
     <attribute name="cacheTTL"
                description="Time interval in ms between cache refeshes"
                type="int"/>
