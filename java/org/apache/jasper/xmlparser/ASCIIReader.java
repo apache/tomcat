@@ -112,7 +112,7 @@ public class ASCIIReader
         }
         int count = fInputStream.read(fBuffer, 0, length);
         for (int i = 0; i < count; i++) {
-            int b0 = fBuffer[i];
+            int b0 = (0xff & fBuffer[i]); // Convert to unsigned
             if (b0 > 0x80) {
                 throw new IOException(Localizer.getMessage("jsp.error.xml.invalidASCII",
 							   Integer.toString(b0)));
