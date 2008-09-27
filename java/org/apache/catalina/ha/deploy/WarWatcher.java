@@ -94,7 +94,7 @@ public class WarWatcher {
             } else if (check == -1) {
                 listener.fileRemoved(info.getWar());
                 //no need to keep in memory
-                currentStatus.remove(info.getWar());
+                currentStatus.remove(info.getWar().getAbsolutePath());
             }
         }
 
