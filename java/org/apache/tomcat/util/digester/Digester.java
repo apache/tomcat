@@ -2866,7 +2866,7 @@ public class Digester extends DefaultHandler {
             try {
                 String newValue = 
                     IntrospectionUtils.replaceProperties(value, null, source);
-                if (value != newValue) {
+                if (!value.equals(newValue)) {
                     newAttrs.setValue(i, newValue);
                 }
             }
@@ -2894,7 +2894,7 @@ public class Digester extends DefaultHandler {
             return bodyText; // return unchanged data
         }
 
-        if (out == in)  {
+        if (out.equals(in))  {
             // No substitutions required. Don't waste memory creating
             // a new buffer
             return bodyText;
