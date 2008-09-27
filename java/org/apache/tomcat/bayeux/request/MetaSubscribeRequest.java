@@ -82,7 +82,7 @@ public class MetaSubscribeRequest extends RequestBase implements BayeuxRequest {
      * channels and inverse client to channel reference.
      */
     public int process(int prevops) throws BayeuxException {
-        prevops = super.process(prevops);
+        super.process(prevops);
         response = (HashMap<String, Object>)this.responseTemplate.clone();
         ClientImpl client = (ClientImpl)getTomcatBayeux().getClient(clientId);
         HttpError error = validate();
