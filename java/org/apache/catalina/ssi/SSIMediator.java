@@ -211,10 +211,10 @@ public class SSIMediator {
         if (val.indexOf('$') < 0 && val.indexOf('&') < 0) return val;
         
         // HTML decoding
-        val.replace("&lt;", "<");
-        val.replace("&gt;", ">");
-        val.replace("&quot;", "\"");
-        val.replace("&amp;", "&");
+        val = val.replace("&lt;", "<");
+        val = val.replace("&gt;", ">");
+        val = val.replace("&quot;", "\"");
+        val = val.replace("&amp;", "&");
 
         StringBuffer sb = new StringBuffer(val);
         int charStart = sb.indexOf("&#");
