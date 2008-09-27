@@ -82,7 +82,7 @@ public class MetaUnsubscribeRequest extends RequestBase implements BayeuxRequest
      * Bayeux spec, a pattern may be specified.  Sever relationships.
      */
     public int process(int prevops) throws BayeuxException {
-        prevops = super.process(prevops);
+        super.process(prevops);
         response = (HashMap<String, Object>)responseTemplate.clone();
         ClientImpl client = (ClientImpl)getTomcatBayeux().getClient(clientId);
         HttpError error = validate();
