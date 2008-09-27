@@ -199,7 +199,8 @@ public /* abstract */ class LogFactory {
      * length array is returned.
      */
     public String[] getAttributeNames() {
-        return (String[])logConfig.keySet().toArray();
+        String result[] = new String[logConfig.size()];
+        return logConfig.keySet().toArray(result);
     }
 
     /**
