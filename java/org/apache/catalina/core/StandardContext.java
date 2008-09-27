@@ -233,7 +233,7 @@ public class StandardContext
     /**
      * The broadcaster that sends j2ee notifications. 
      */
-    private NotificationBroadcasterSupport broadcaster = null;
+    private transient NotificationBroadcasterSupport broadcaster = null;
     
     /**
      * The Locale to character set mapper for this application.
@@ -387,7 +387,7 @@ public class StandardContext
     /**
      * The mapper associated with this context.
      */
-    private org.apache.tomcat.util.http.mapper.Mapper mapper = 
+    private transient org.apache.tomcat.util.http.mapper.Mapper mapper = 
         new org.apache.tomcat.util.http.mapper.Mapper();
 
 
