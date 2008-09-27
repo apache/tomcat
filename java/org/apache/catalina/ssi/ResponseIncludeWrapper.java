@@ -20,6 +20,8 @@ package org.apache.catalina.ssi;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
@@ -42,6 +44,8 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      */
     private static final String CONTENT_TYPE = "content-type";
     private static final String LAST_MODIFIED = "last-modified";
+    private static final DateFormat format =
+        new SimpleDateFormat(DateTool.RFC1123_PATTERN, DateTool.LOCALE_US);
     protected long lastModified = -1;
     private String contentType = null;
 
@@ -208,7 +212,9 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
         String lname = name.toLowerCase();
         if (lname.equals(LAST_MODIFIED)) {
             try {
-                lastModified = DateTool.rfc1123Format.parse(value).getTime();
+                synchronized(format) {
+                    lastModified = format.parse(value).getTime();
+                }
             } catch (Throwable ignore) { }
         } else if (lname.equals(CONTENT_TYPE)) {
             contentType = value;
@@ -228,7 +234,9 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
         String lname = name.toLowerCase();
         if (lname.equals(LAST_MODIFIED)) {
             try {
-                lastModified = DateTool.rfc1123Format.parse(value).getTime();
+                synchronized(format) {
+                    lastModified = format.parse(value).getTime();
+                }
             } catch (Throwable ignore) { }
         }
         else if (lname.equals(CONTENT_TYPE))
