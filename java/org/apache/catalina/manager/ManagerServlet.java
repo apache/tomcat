@@ -692,8 +692,6 @@ public class ManagerServlet
 
         // Find the local WAR file
         File localWar = new File(deployedPath, getDocBase(path) + ".war");
-        // Find the local context deployment file (if any)
-        File localXml = new File(configBase, getConfigFile(path) + ".xml");
 
         // Check if app already exists, or undeploy it if updating
         Context context = (Context) host.findChild(path);
@@ -1334,18 +1332,6 @@ public class ManagerServlet
                 writer.println(sm.getString("managerServlet.noContext",
                                             RequestUtil.filter(displayPath)));
                 return;
-            }
-
-            // Identify the appBase of the owning Host of this Context (if any)
-            String appBase = null;
-            File appBaseDir = null;
-            if (context.getParent() instanceof Host) {
-                appBase = ((Host) context.getParent()).getAppBase();
-                appBaseDir = new File(appBase);
-                if (!appBaseDir.isAbsolute()) {
-                    appBaseDir = new File(System.getProperty("catalina.base"),
-                                          appBase);
-                }
             }
 
             if (!isDeployed(path)) {

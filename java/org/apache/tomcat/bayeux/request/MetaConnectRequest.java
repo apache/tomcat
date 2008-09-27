@@ -82,7 +82,7 @@ public class MetaConnectRequest extends RequestBase implements BayeuxRequest {
      * event to be delivered to this client (Section 4.2.2 of spec).
      */
     public int process(int prevops) throws BayeuxException {
-        prevops = super.process(prevops);
+        super.process(prevops);
         response = (HashMap<String, Object>)responseTemplate.clone();
         ClientImpl client = (ClientImpl)getTomcatBayeux().getClient(clientId);
         boolean success = false;

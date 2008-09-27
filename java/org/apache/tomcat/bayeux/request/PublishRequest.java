@@ -88,7 +88,7 @@ public class PublishRequest extends RequestBase implements BayeuxRequest {
      *  Send the event message to all registered subscribers.
      */
     public int process(int prevops) throws BayeuxException {
-        prevops = super.process(prevops);
+        super.process(prevops);
         response = (HashMap<String, Object>)responseTemplate.clone();
         ClientImpl client = clientId!=null?(ClientImpl)getTomcatBayeux().getClient(clientId):
                                            (ClientImpl)event.getHttpServletRequest().getAttribute("client");
