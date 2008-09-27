@@ -84,7 +84,7 @@ public class MetaHandshakeRequest extends RequestBase implements BayeuxRequest {
      * the Bayuex specification.
      */
     public int process(int prevops) throws BayeuxException {
-        prevops = super.process(prevops);
+        super.process(prevops);
         response = (HashMap<String, Object>)responseTemplate.clone();
         ClientImpl client = null;
         HttpError error = validate();

@@ -285,7 +285,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                  "Method name is null");
 
         if( log.isDebugEnabled()) log.debug("Invoke " + name);
-	MethodKey mkey = new MethodKey(name, signature);
+
         Method method= managedBean.getInvoke(name, params, signature, this, resource);
         
         // Invoke the selected method on the appropriate object
