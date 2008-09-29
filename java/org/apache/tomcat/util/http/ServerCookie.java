@@ -18,11 +18,14 @@
 package org.apache.tomcat.util.http;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.DateTool;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 
@@ -50,6 +53,19 @@ public class ServerCookie implements Serializable {
     private MessageBytes comment=MessageBytes.newInstance();
     private int maxAge = -1;
     private int version = 0;
+
+    // Other fields
+    private static final String OLD_COOKIE_PATTERN =
+        "EEE, dd-MMM-yyyy HH:mm:ss z";
+    private static final DateFormat OLD_COOKIE_FORMAT;
+    private static final String ancientDate;
+
+
+    static {
+        OLD_COOKIE_FORMAT = new SimpleDateFormat(OLD_COOKIE_PATTERN, Locale.US);
+        OLD_COOKIE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+        ancientDate = OLD_COOKIE_FORMAT.format(new Date(10000));
+    }
 
     /**
      * If set to true, we parse cookies according to the servlet spec,
@@ -245,9 +261,6 @@ public class ServerCookie implements Serializable {
         }
     }
 
-    private static final String ancientDate =
-        DateTool.formatOldCookie(new Date(10000));
-
     // TODO RFC2965 fields also need to be passed
     public static void appendCookieValue( StringBuffer headerBuf,
                                           int version,
@@ -296,10 +309,12 @@ public class ServerCookie implements Serializable {
                 if (maxAge == 0)
                     buf.append( ancientDate );
                 else
-                    DateTool.formatOldCookie
-                        (new Date( System.currentTimeMillis() +
-                                   maxAge *1000L), buf,
-                         new FieldPosition(0));
+                    synchronized (OLD_COOKIE_FORMAT) {
+                        OLD_COOKIE_FORMAT.format(
+                                new Date(System.currentTimeMillis() +
+                                        maxAge*1000L),
+                                buf, new FieldPosition(0));
+                    }
 
             } else {
                 buf.append ("; Max-Age=");
