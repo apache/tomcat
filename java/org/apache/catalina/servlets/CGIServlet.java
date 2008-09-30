@@ -1143,7 +1143,11 @@ public final class CGIServlet extends HttpServlet {
             String dirPath = destPath.toString().substring(
                     0,destPath.toString().lastIndexOf("/"));
             File dir = new File(dirPath);
-            dir.mkdirs();
+            if (!dir.mkdirs() && debug >= 2) {
+                log("expandCGIScript: failed to create directories for '" +
+                        dir.getAbsolutePath() + "'");
+                return;
+            }
 
             try {
                 synchronized (expandFileLock) {
@@ -1169,7 +1173,10 @@ public final class CGIServlet extends HttpServlet {
             } catch (IOException ioe) {
                 // delete in case file is corrupted 
                 if (f.exists()) {
-                    f.delete();
+                    if (!f.delete() && debug >= 2) {
+                        log("expandCGIScript: failed to delete '" +
+                                f.getAbsolutePath() + "'");
+                    }
                 }
             }
         }
@@ -1591,6 +1598,7 @@ public final class CGIServlet extends HttpServlet {
              * with major modifications by Martin Dengler
              */
             Runtime rt = null;
+            BufferedReader cgiHeaderReader = null;
             InputStream cgiOutput = null;
             BufferedReader commandsStdErr = null;
             BufferedOutputStream commandsStdIn = null;
@@ -1658,7 +1666,7 @@ public final class CGIServlet extends HttpServlet {
 
                 InputStream cgiHeaderStream =
                     new HTTPHeaderInputStream(proc.getInputStream());
-                BufferedReader cgiHeaderReader =
+                cgiHeaderReader =
                     new BufferedReader(new InputStreamReader(cgiHeaderStream));
             
                 while (isRunning) {
@@ -1728,6 +1736,14 @@ public final class CGIServlet extends HttpServlet {
                 throw e;
             }
             finally{
+                // Close the header reader
+                if (cgiHeaderReader != null) {
+                    try {
+                        cgiHeaderReader.close();
+                    } catch (IOException ioe) {
+                        log ("Exception closing header reader " + ioe);
+                    }
+                }
                 // Close the output stream if used
                 if (cgiOutput != null) {
                     try {
@@ -1833,7 +1849,7 @@ public final class CGIServlet extends HttpServlet {
      * upto and including the two blank lines terminating the headers. It
      * allows the content to be read using bytes or characters as appropriate.
      */
-    protected class HTTPHeaderInputStream extends InputStream {
+    protected static class HTTPHeaderInputStream extends InputStream {
         private static final int STATE_CHARACTER = 0;
         private static final int STATE_FIRST_CR = 1;
         private static final int STATE_FIRST_LF = 2;
