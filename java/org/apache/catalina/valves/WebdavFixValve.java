@@ -35,7 +35,7 @@ import org.apache.catalina.connector.Response;
  *       reconnect.</li>
  * </ul>
  * To use this valve add the following <code>&lt;Valve
- * className="org.apache.catalina.valves.MicrosoftWebdavFixValve" /&gt;</code>
+ * className="org.apache.catalina.valves.WebdavFixValve" /&gt;</code>
  * to your <code>Engine</code>, <code>Host</code> or <code>Context</code> as
  * required. Normally, this valve would be used at the <code>Context</code>
  * level.
