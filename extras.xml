@@ -82,6 +82,7 @@
   <property name="cometd.war" value="${tomcat.extras}/cometd.war"/>
   <property name="tomcat-bayeux-samples.jar" value="${tomcat.extras}/tomcat-bayeux-samples.jar"/>
 
+  <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
 	
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -330,7 +331,20 @@ To run the sample application, copy the following applications into your CATALIN
     </echo>
   </target>
 
-  <target name="extras" depends="prepare,commons-logging,webservices,bayeux">
+  <target name="jmx-remote" >
+    <!-- Create the JAR file -->
+    <jar jarfile="${catalina-jmx-remote.jar}">
+	    <fileset dir="${tomcat.classes}">
+        <include name="org/apache/catalina/mbeans/JmxRemote*" />
+     </fileset>
+   </jar>
+
+   <checksum file="${catalina-jmx-remote.jar}"
+             forceOverwrite="yes" fileext=".md5" />
+	  
+  </target>
+  
+  <target name="extras" depends="prepare,commons-logging,webservices,bayeux,jmx-remote">
   </target>
 
   <!-- Download and dependency building -->
