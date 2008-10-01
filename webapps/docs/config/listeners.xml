@@ -174,14 +174,32 @@
 
     <attributes>
 
-      <attribute name="rmiRegsitryPort" required="true">
-        <p>The port to be used by the JMX/RMI registry. The replaces the use of
-        the <code>com.sun.management.jmxremote.port</code> system propoerty that
+      <attribute name="rmiRegsitryPortPlatform" required="true">
+        <p>The port to be used by the JMX/RMI registry for the Platform MBeans.
+        The replaces the use of the
+        <code>com.sun.management.jmxremote.port</code> system property that
         should not be set when using this valve.</p>
       </attribute>
 
-      <attribute name="rmiServerPort" required="true">
-        <p>The port to be used by the JMX/RMI server.</p>
+      <attribute name="rmiServerPortPlatform" required="true">
+        <p>The port to be used by the Platform JMX/RMI server.</p>
+      </attribute>
+
+      <attribute name="rmiRegsitryPortCatalina" required="true">
+        <p>The port to be used by the JMX/RMI registry for the Catalina MBeans.
+        The replaces the use of the
+        <code>com.sun.management.jmxremote.port</code> system property that
+        should not be set when using this valve.</p>
+      </attribute>
+
+      <attribute name="rmiServerPortCatalina" required="true">
+        <p>The port to be used by the Catalina JMX/RMI server.</p>
+      </attribute>
+
+      <attribute name="useLocalPorts" required="false">
+        <p>Should any clients using these ports be forced to use local ports to
+        connect to the the JMX/RMI server. This is useful when tunnelling
+        connections over SSH or similar. Defaults to <code>false</code>.</p>
       </attribute>
 
     </attributes>
