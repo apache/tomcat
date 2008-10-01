@@ -18,10 +18,14 @@
 package org.apache.catalina.mbeans;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.server.RMIClientSocketFactory;
+import java.rmi.server.RMIServerSocketFactory;
 import java.util.HashMap;
 
 import javax.management.MBeanServer;
@@ -44,7 +48,8 @@ import org.apache.juli.logging.LogFactory;
  * simpler if you need to connect jconsole or similar to a remote Tomcat
  * instance that is running behind a firewall. Only this port is configured via
  * the listener. The remainder of the configuration is via the standard system
- * properties for configuring JMX.
+ * properties for configuring JMX. Because Tomcat uses a separate MBean server
+ * to the platform MBean server, both servers must be configured separately.
  */
 public class JmxRemoteLifecycleListener implements LifecycleListener {
     
@@ -57,8 +62,10 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    protected int rmiRegistryPort = -1;
-    protected int rmiServerPort = -1;
+    protected int rmiRegistryPortPlatform = -1;
+    protected int rmiServerPortPlatform = -1;
+    protected int rmiRegistryPortCatalina = -1;
+    protected int rmiServerPortCatalina = -1;
     protected boolean rmiSSL = true;
     protected String ciphers[] = null;
     protected String protocols[] = null;
@@ -66,39 +73,95 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     protected boolean authenticate = true;
     protected String passwordFile = null;
     protected String accessFile = null;
+    protected boolean useLocalPorts = false;
 
     /**
-     * Get the port on which the RMI server is exported. This is the port that
-     * is normally chosen by the RMI stack.
+     * Get the port on which the Platform RMI server is exported. This is the
+     * port that is normally chosen by the RMI stack.
      * @returns The port number
      */
-    public int getRmiServerPort() {
-        return rmiServerPort;
+    public int getRmiServerPortPlatform() {
+        return rmiServerPortPlatform;
     }
     
     /**
-     * Set the port on which the RMI server is exported. This is the port that
-     * is normally chosen by the RMI stack.
-     * @param theRmiServerPort The port number
+     * Set the port on which the Platform RMI server is exported. This is the
+     * port that is normally chosen by the RMI stack.
+     * @param theRmiServerPortPlatform The port number
      */
-    public void setRmiServerPort(int theRmiServerPort) {
-        rmiServerPort = theRmiServerPort;
+    public void setRmiServerPortPlatform(int theRmiServerPortPlatform) {
+        rmiServerPortPlatform = theRmiServerPortPlatform;
     }
     
     /**
-     * Get the port on which the RMI registry is exported.
+     * Get the port on which the Platform RMI registry is exported.
      * @returns The port number
      */
-    public int getRmiRegistryPort() {
-        return rmiRegistryPort;
+    public int getRmiRegistryPortPlatform() {
+        return rmiRegistryPortPlatform;
     }
     
     /**
-     * Set the port on which the RMI registryis exported.
-     * @param theRmiServerPort The port number
+     * Set the port on which the Platform RMI registry is exported.
+     * @param theRmiRegistryPortPlatform The port number
      */
-    public void setRmiRegistryPort(int theRmiRegistryPort) {
-        rmiRegistryPort = theRmiRegistryPort;
+    public void setRmiRegistryPortPlatform(int theRmiRegistryPortPlatform) {
+        rmiRegistryPortPlatform = theRmiRegistryPortPlatform;
+    }
+    
+    /**
+     * Get the port on which the Catalina RMI server is exported. This is the
+     * port that is normally chosen by the RMI stack.
+     * @returns The port number
+     */
+    public int getRmiServerPortCatalina() {
+        return rmiServerPortCatalina;
+    }
+    
+    /**
+     * Set the port on which the Catalina RMI server is exported. This is the
+     * port that is normally chosen by the RMI stack.
+     * @param theRmiServerPortCatalina The port number
+     */
+    public void setRmiServerPortCatalina(int theRmiServerPortCatalina) {
+        rmiServerPortCatalina = theRmiServerPortCatalina;
+    }
+    
+    /**
+     * Get the port on which the Catalina RMI registry is exported.
+     * @returns The port number
+     */
+    public int getRmiRegistryPortCatalina() {
+        return rmiRegistryPortCatalina;
+    }
+    
+    /**
+     * Set the port on which the Catalina RMI registry is exported.
+     * @param theRmiRegistryPortCatalina The port number
+     */
+    public void setRmiRegistryPortCatalina(int theRmiRegistryPortCatalina) {
+        rmiRegistryPortCatalina = theRmiRegistryPortCatalina;
+    }
+    
+    /**
+     * Get the flag that indicates that local ports should be used for all
+     * connections. If using SSH tunnels, or similar, this should be set to
+     * true to ensure the RMI client uses the tunnel.
+     * @returns <code>true</code> if local ports should be used
+     */
+    public boolean getUseLocalPorts() {
+        return useLocalPorts;
+    }
+    
+    /**
+     * Set the flag that indicates that local ports should be used for all
+     * connections. If using SSH tunnels, or similar, this should be set to
+     * true to ensure the RMI client uses the tunnel.
+     * @param useLocalPorts Set to <code>true</code> if local ports should be
+     *                      used
+     */
+    public void setUseLocalPorts(boolean useLocalPorts) {
+        this.useLocalPorts = useLocalPorts;
     }
     
     private void init() {
@@ -148,60 +211,113 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             // Prevent an attacker guessing the RMI object ID
             System.setProperty("java.rmi.server.randomIDs", "true");
 
-            try {
-                LocateRegistry.createRegistry(rmiRegistryPort);
-            } catch (RemoteException e) {
-                log.error(sm.getString(
-                        "jmxRemoteLifecycleListener.createRegistryFailed",
-                        Integer.toString(rmiRegistryPort)), e);
-                return;
-            }
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            // Create the environment
             HashMap<String,Object> env = new HashMap<String,Object>();
-            
+
+            RMIClientSocketFactory csf = null;
+            RMIServerSocketFactory ssf = null;
+
+            // Configure SSL for RMI connection if required
             if (rmiSSL) {
-                // Use SSL for RMI connection
-                SslRMIClientSocketFactory csf =
-                    new SslRMIClientSocketFactory();
-                SslRMIServerSocketFactory ssf =
-                    new SslRMIServerSocketFactory(ciphers, protocols,
+                csf = new SslRMIClientSocketFactory();
+                ssf = new SslRMIServerSocketFactory(ciphers, protocols,
                             clientAuth);
+            }
+            
+            // Force the use of local ports if required
+            if (useLocalPorts) {
+                csf = new RmiClientLocalhostSocketFactory(csf);
+            }
+
+            // Populate the env properties used to create the server
+            if (csf != null) {
                 env.put(RMIConnectorServer.RMI_CLIENT_SOCKET_FACTORY_ATTRIBUTE,
                         csf);
+            }
+            if (ssf != null) {
                 env.put(RMIConnectorServer.RMI_SERVER_SOCKET_FACTORY_ATTRIBUTE,
                         ssf);
             }
+
+            // Configure authentication
             if (authenticate) {
                 env.put("jmx.remote.x.password.file", passwordFile);
                 env.put("jmx.remote.x.access.file", accessFile);
             }
-            StringBuffer url = new StringBuffer();
-            url.append("service:jmx:rmi://localhost:");
-            url.append(rmiServerPort);
-            url.append("/jndi/rmi://localhost:");
-            url.append(rmiRegistryPort);
-            url.append("/jmxrmi");
-            JMXServiceURL serviceUrl;
-            try {
-                serviceUrl = new JMXServiceURL(url.toString());
-            } catch (MalformedURLException e) {
-                log.error(sm.getString(
-                        "jmxRemoteLifecycleListener.invalidURL",
-                        url.toString()), e);
-                return;
-            }
-            JMXConnectorServer cs;
-            try {
-                cs = JMXConnectorServerFactory.newJMXConnectorServer(
-                        serviceUrl, env, mbs);
-                cs.start();
-                log.info(sm.getString("jmxRemoteLifecycleListener.start",
-                        new Integer(rmiRegistryPort),
-                        new Integer(rmiServerPort)));
-            } catch (IOException e) {
-                log.error(sm.getString(""), e);
-            }
+
+
+            // Create the Platform server
+            createServer(rmiRegistryPortPlatform, rmiServerPortPlatform, env,
+                    ManagementFactory.getPlatformMBeanServer());
+            
+            // Create the catalina server
+            createServer(rmiRegistryPortCatalina, rmiServerPortCatalina, env,
+                    MBeanUtils.createServer());
         }
     }
 
+    private void createServer(int theRmiRegistryPort, int theRmiServerPort,
+            HashMap<String,Object> theEnv, MBeanServer theMBeanServer) {
+        
+        // Create the RMI registry
+        try {
+            LocateRegistry.createRegistry(theRmiRegistryPort);
+        } catch (RemoteException e) {
+            log.error(sm.getString(
+                    "jmxRemoteLifecycleListener.createRegistryFailed",
+                    Integer.toString(theRmiRegistryPort)), e);
+            return;
+        }
+
+        // Build the connection string with fixed ports
+        StringBuffer url = new StringBuffer();
+        url.append("service:jmx:rmi://localhost:");
+        url.append(theRmiServerPort);
+        url.append("/jndi/rmi://localhost:");
+        url.append(theRmiRegistryPort);
+        url.append("/jmxrmi");
+        JMXServiceURL serviceUrl;
+        try {
+            serviceUrl = new JMXServiceURL(url.toString());
+        } catch (MalformedURLException e) {
+            log.error(sm.getString(
+                    "jmxRemoteLifecycleListener.invalidURL",
+                    url.toString()), e);
+            return;
+        }
+        
+        // Start the JMX server with the connection string
+        JMXConnectorServer cs;
+        try {
+            cs = JMXConnectorServerFactory.newJMXConnectorServer(
+                    serviceUrl, theEnv, theMBeanServer);
+            cs.start();
+            log.info(sm.getString("jmxRemoteLifecycleListener.start",
+                    Integer.valueOf(theRmiRegistryPort),
+                    Integer.valueOf(theRmiServerPort)));
+        } catch (IOException e) {
+            log.error(sm.getString(""), e);
+        }
+    }
+
+    public static class RmiClientLocalhostSocketFactory
+    implements RMIClientSocketFactory, Serializable {
+        private static final String FORCED_HOST = "localhost";
+
+        private RMIClientSocketFactory factory = null;
+        
+        public RmiClientLocalhostSocketFactory(RMIClientSocketFactory theFactory) {
+            factory = theFactory;
+        }
+
+        public Socket createSocket(String host, int port) throws IOException {
+            if (factory == null) {
+                return new Socket(FORCED_HOST, port);
+            } else {
+                return factory.createSocket(FORCED_HOST, port);
+            }
+        }
+
+        
+    }
 }
