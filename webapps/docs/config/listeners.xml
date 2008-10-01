@@ -138,6 +138,10 @@
     <h3>JMX Remote Lifecycle Listener
     (org.apache.catalina.mbeans.JmxRemoteLifecycleListener)</h3>
 
+    <p>This listener requires <code>catalina-jmx-remote.jar</code> to be placed
+    in <code>$CATALINA_HOME/lib</code>. This jar may be found in the extras
+    directory of the binary download area.</p>
+
     <p>The <strong>JMX Remote Lifecycle Listener</strong> fixes the port used by
     the JMX/RMI Server making things much simpler if you need to connect
     jconsole or a similar tool to a remote Tomcat instance that is running
@@ -151,7 +155,8 @@
     <p>If this listener was configured in server.xml as:
 <source>
 &lt;Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
-          rmiRegistryPort="10001" rmiServerPort="10002" /&gt;
+          rmiRegistryPortPlatform="10001" rmiServerPortPlatform="10002"
+          rmiRegistryPortCatalina="10003" rmiServerPortCatalina="10004" /&gt;
 </source>
     with the following system properties set (eg in setenv.sh):
 <source>
