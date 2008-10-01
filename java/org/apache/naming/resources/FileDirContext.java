@@ -896,7 +896,9 @@ public class FileDirContext extends BaseDirContext {
 
         for (int i = 0; i < names.length; i++) {
 
-            File currentFile = new File(file, names[i]);
+            File currentFile = file(file.getName() + "/" + names[i]);
+            if (currentFile == null) continue;
+
             Object object = null;
             if (currentFile.isDirectory()) {
                 FileDirContext tempContext = new FileDirContext(env);
