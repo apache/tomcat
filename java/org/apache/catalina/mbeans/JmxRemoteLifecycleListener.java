@@ -46,10 +46,13 @@ import org.apache.juli.logging.LogFactory;
 /**
  * This listener fixes the port used by JMX/RMI Server making things much
  * simpler if you need to connect jconsole or similar to a remote Tomcat
- * instance that is running behind a firewall. Only this port is configured via
+ * instance that is running behind a firewall. Only the ports are configured via
  * the listener. The remainder of the configuration is via the standard system
  * properties for configuring JMX. Because Tomcat uses a separate MBean server
- * to the platform MBean server, both servers must be configured separately.
+ * to the platform MBean server, ports for both servers must be configured.
+ * TODO: Is there a way to reduce the number of ports and access both servers
+ *       (and any other MBean servers via a single registry and single
+ *       connection?
  */
 public class JmxRemoteLifecycleListener implements LifecycleListener {
     
