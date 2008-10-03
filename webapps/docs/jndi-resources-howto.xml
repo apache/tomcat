@@ -592,7 +592,7 @@ conn.close();
     <li><strong>url</strong> - Connection URL to be passed to our JDBC driver.
         (For backwards compatibility, the property <code>driverName</code>
         is also recognized.)</li>
-    <li><strong>user</strong> - Database username to be passed to our
+    <li><strong>username</strong> - Database username to be passed to our
         JDBC driver.</li>
     <li><strong>validationQuery</strong> - SQL query that can be used by the
         pool to validate connections before they are returned to the
