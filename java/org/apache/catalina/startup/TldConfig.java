@@ -47,20 +47,24 @@ import javax.naming.directory.DirContext;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.InputSource;
 
 /**
- * Startup event listener for a <b>Context</b> that configures the properties
- * of that Context, and the associated defined servlets.
+ * Startup event listener for a <b>Context</b> that configures application
+ * listeners configured in any TLD files.
  *
  * @author Craig R. McClanahan
  * @author Jean-Francois Arcand
  * @author Costin Manolache
  */
-public final class TldConfig  {
+public final class TldConfig  implements LifecycleListener {
 
     // Names of JARs that are known not to contain any TLDs
     private static HashSet<String> noTldJars;
@@ -387,20 +391,6 @@ public final class TldConfig  {
     }
 
     /**
-     * Create (if necessary) and return a Digester configured to process a tag
-     * library descriptor, looking for additional listener classes to be
-     * registered.
-     */
-    private static Digester createTldDigester() {
-
-        return DigesterFactory.newDigester(tldValidation, 
-                                           tldNamespaceAware, 
-                                           new TldRuleSet());
-
-    }
-
-
-    /**
      * Scan the JAR file at the specified resource path for TLDs in the
      * <code>META-INF</code> subdirectory, and scan each TLD for application
      * event listeners that need to be registered.
@@ -502,10 +492,6 @@ public final class TldConfig  {
     private void tldScanStream(InputSource resourceStream)
         throws Exception {
 
-        if (tldDigester == null){
-            tldDigester = createTldDigester();
-        }
-        
         synchronized (tldDigester) {
             try {
                 tldDigester.push(this);
@@ -729,5 +715,52 @@ public final class TldConfig  {
         }
 
         return jarPathMap;
+    }
+
+    public void lifecycleEvent(LifecycleEvent event) {
+        // Identify the context we are associated with
+        try {
+            context = (Context) event.getLifecycle();
+        } catch (ClassCastException e) {
+            log.error(sm.getString("tldConfig.cce", event.getLifecycle()), e);
+            return;
+        }
+        
+        if (event.getType().equals(Lifecycle.INIT_EVENT)) {
+            init();
+        } else if (event.getType().equals(Lifecycle.START_EVENT)) {
+            try {
+                execute();
+            } catch (Exception e) {
+                log.error(sm.getString(
+                        "tldConfig.execute", context.getPath()), e);
+            }
+        } // Ignore the other event types - nothing to do 
+    }
+    
+    private void init() {
+        if (tldDigester == null){
+            // (1)  check if the attribute has been defined
+            //      on the context element.
+            setTldValidation(context.getTldValidation());
+            setTldNamespaceAware(context.getTldNamespaceAware());
+    
+            // (2) if the attribute wasn't defined on the context
+            //     try the host.
+            if (!tldValidation) {
+              setTldValidation(
+                      ((StandardHost) context.getParent()).getXmlValidation());
+            }
+    
+            if (!tldNamespaceAware) {
+              setTldNamespaceAware(
+                      ((StandardHost) context.getParent()).getXmlNamespaceAware());
+            }
+
+            tldDigester = DigesterFactory.newDigester(tldValidation, 
+                    tldNamespaceAware, 
+                    new TldRuleSet());
+            tldDigester.getParser();
+        }
     }
 }
