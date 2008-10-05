@@ -542,19 +542,28 @@ public class AjpAprProcessor implements ActionHook {
                     new ByteArrayInputStream(certData.getBytes(),
                             certData.getStart(),
                             certData.getLength());
-                // Fill the first element.
+                // Fill the  elements.
                 try {
                     CertificateFactory cf =
                         CertificateFactory.getInstance("X.509");
-                    X509Certificate cert = (X509Certificate)
-                    cf.generateCertificate(bais);
-                    jsseCerts = new X509Certificate[1];
-                    jsseCerts[0] = cert;
-                    request.setAttribute(AprEndpoint.CERTIFICATE_KEY, jsseCerts);
+                    while(bais.available() > 0) {
+                        X509Certificate cert = (X509Certificate)
+                            cf.generateCertificate(bais);
+                        if(jsseCerts == null) {
+                            jsseCerts = new X509Certificate[1];
+                            jsseCerts[0] = cert;
+                        } else {
+                            X509Certificate [] temp = new X509Certificate[jsseCerts.length+1];
+                            System.arraycopy(jsseCerts,0,temp,0,jsseCerts.length);
+                            temp[jsseCerts.length] = cert;
+                            jsseCerts = temp;
+                        }
+                    }
                 } catch (java.security.cert.CertificateException e) {
                     log.error(sm.getString("ajpprocessor.certs.fail"), e);
                     return;
                 }
+                request.setAttribute(AprEndpoint.CERTIFICATE_KEY, jsseCerts);
             }
 
         } else if (actionCode == ActionCode.ACTION_REQ_HOST_ATTRIBUTE) {
