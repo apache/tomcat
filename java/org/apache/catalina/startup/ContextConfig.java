@@ -854,9 +854,9 @@ public class ContextConfig
                 docBase = "ROOT";
             } else {
                 if (path.startsWith("/")) {
-                    docBase = path.substring(1);
+                    docBase = path.substring(1).replace('/', '#');
                 } else {
-                    docBase = path;
+                    docBase = path.replace('/', '#');
                 }
             }
         }
