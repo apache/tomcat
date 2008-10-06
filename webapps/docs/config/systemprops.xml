@@ -252,6 +252,34 @@
 </section>
 
 
+<section name="Sessions">
+
+  <properties>
+
+    <property name="org.apache.catalina.SESSION_COOKIE_NAME">
+      <p>An alternative name for the session cookie. Defaults to
+      <code>JSESSIONID</code>. Note that the Servlet specification requires
+      this to be <code>JSESSIONID</code>. You should not rely on being able to
+      change this.</p>
+    </property>
+
+    <property name="org.apache.catalina.SESSION_PARAMETER_NAME">
+      <p>An alternative name for the session path parameter. Defaults to
+      <code>jsessionid</code>. Note that the Servlet specification requires
+      this to be <code>jsessionid</code>. You should not rely on being able to
+      change this.</p>
+    </property>
+
+    <property name="org.apache.catalina.SSO_SESSION_COOKIE_NAME">
+      <p>An alternative name for the single sign on session cookie. Defaults to
+      <code>JSESSIONIDSSO</code>.</p>
+    </property>
+    
+  </properties>
+
+</section>
+
+
 <section name="Other">
 
   <properties>
