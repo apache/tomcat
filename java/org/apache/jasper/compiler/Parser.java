@@ -288,8 +288,8 @@ class Parser implements TagConstants {
                 ch = tx.charAt(i + 1);
                 if (ch == '\\' || ch == '\"' || ch == '\'' || (ch == '>')) {
                     // \ " and ' are always unescaped regardless of if they are
-                    // or outside of an EL expression. JSP.1.6 takes precedence
-                    // over JSP.1.3.10 (confirmed with EG)
+                    // inside or outside of an EL expression. JSP.1.6 takes
+                    // precedence over JSP.1.3.10 (confirmed with EG).
                     buf.append(ch);
                     i += 2;
                 } else {
