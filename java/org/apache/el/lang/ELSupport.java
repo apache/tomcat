@@ -224,13 +224,13 @@ public class ELSupport {
                 return ((BigDecimal) number).toBigInteger();
             }
             if (number instanceof BigInteger) {
-                return new BigInteger(number.toString());
+                return number;
             }
             return BigInteger.valueOf(number.longValue());
         }
         if (BigDecimal.class.equals(type)) {
             if (number instanceof BigDecimal) {
-                return new BigDecimal(number.toString());
+                return number;
             }
             if (number instanceof BigInteger) {
                 return new BigDecimal((BigInteger) number);
@@ -341,7 +341,7 @@ public class ELSupport {
     public final static Object coerceToType(final Object obj, final Class type)
             throws IllegalArgumentException {
         if (type == null || Object.class.equals(type) ||
-                (obj != null && type.equals(obj.getClass()))) {
+                (obj != null && type.isAssignableFrom(obj.getClass()))) {
             return obj;
         }
         if (String.class.equals(type)) {
@@ -355,9 +355,6 @@ public class ELSupport {
         }
         if (Boolean.class.equals(type) || Boolean.TYPE == type) {
             return coerceToBoolean(obj);
-        }
-        if (obj != null && type.isAssignableFrom(obj.getClass())) {
-            return obj;
         }
         if (type.isEnum()) {
             return coerceToEnum(obj, type);
