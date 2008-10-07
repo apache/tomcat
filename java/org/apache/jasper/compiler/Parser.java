@@ -265,7 +265,6 @@ class Parser implements TagConstants {
     private String parseQuoted(Mark start, String tx, char quote)
             throws JasperException {
         StringBuffer buf = new StringBuffer();
-        boolean possibleEL = tx.contains("${");
         int size = tx.length();
         int i = 0;
         while (i < size) {
@@ -287,20 +286,10 @@ class Parser implements TagConstants {
                 }
             } else if (ch == '\\' && i + 1 < size) {
                 ch = tx.charAt(i + 1);
-                if (ch == '\\' || ch == '\"' || ch == '\'') {
-                    if (pageInfo.isELIgnored() || !possibleEL) {
-                        // EL is not enabled or no chance of EL
-                        // Unescape these now
-                        buf.append(ch);
-                        i += 2;
-                    } else {
-                        // EL is enabled and ${ appears in value
-                        // EL processing will escape these
-                        buf.append('\\');
-                        buf.append(ch);
-                        i += 2;
-                    }
-                } else if (ch == '>') {
+                if (ch == '\\' || ch == '\"' || ch == '\'' || (ch == '>')) {
+                    // \ " and ' are always unescaped regardless of if they are
+                    // or outside of an EL expression. JSP.1.6 takes precedence
+                    // over JSP.1.3.10 (confirmed with EG)
                     buf.append(ch);
                     i += 2;
                 } else {
