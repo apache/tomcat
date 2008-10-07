@@ -56,6 +56,12 @@ public class TestELSupport extends TestCase {
         testIsSame(Float.valueOf(0.123456F));
     }
 
+    public void testCoerceIntegerToNumber() {
+        Integer input = 4390241;
+        Object output = ELSupport.coerceToType(input, Number.class);
+        assertEquals(input, output);
+    }
+
     private static void testIsSame(Object value) {
         assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
     }
