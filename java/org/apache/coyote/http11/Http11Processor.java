@@ -892,7 +892,7 @@ public class Http11Processor implements ActionHook {
         // Recycle
         inputBuffer.recycle();
         outputBuffer.recycle();
-
+        this.socket = null;
         // Recycle ssl info
         sslSupport = null;
     }
