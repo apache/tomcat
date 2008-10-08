@@ -59,6 +59,9 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+     <update><rev>703017</rev>Make Java socket options consistent between NIO and JIO connector.
+       Expose all the socket options available on java.net.Socket
+     </update>
      <fix><bug>45074</bug>Add configuration parameters in Http11AprProtocol</fix>
      <update><rev>644858</rev><br/>
        Inproper curly brackets cause NIO/SendFile to fail. Workaround prior to this version, set
