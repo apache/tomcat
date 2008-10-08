@@ -123,8 +123,12 @@ public class Http11Protocol
     /**
      * Set a property.
      */
-    public void setProperty(String name, String value) {
+    public boolean setProperty(String name, String value) {
         setAttribute(name, value);
+        if (name.startsWith("socket.")) {
+            return endpoint.setProperty(name, value);
+        }
+        return true;
     }
 
     /**

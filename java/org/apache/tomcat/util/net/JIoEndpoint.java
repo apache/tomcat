@@ -26,6 +26,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -127,11 +128,32 @@ public class JIoEndpoint {
      * Associated server socket.
      */
     protected ServerSocket serverSocket = null;
+    
+    /**
+     * Holds all the socket properties
+     */
+    protected SocketProperties socketProperties = new SocketProperties();
 
 
     // ------------------------------------------------------------- Properties
 
-
+    /**
+     * Generic properties - currently only socket.XXX properties
+     */
+    public boolean setProperty(String name, String value) {
+        final String socketName = "socket.";
+        try {
+            if (name.startsWith(socketName)) {
+                return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
+            } else {
+                return IntrospectionUtils.setProperty(this,name,value);
+            }
+        }catch ( Exception x ) {
+            log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
+            return false;
+        }
+    }
+    
     /**
      * Acceptor thread count.
      */
@@ -201,25 +223,30 @@ public class JIoEndpoint {
     /**
      * Socket TCP no delay.
      */
-    protected boolean tcpNoDelay = false;
-    public boolean getTcpNoDelay() { return tcpNoDelay; }
-    public void setTcpNoDelay(boolean tcpNoDelay) { this.tcpNoDelay = tcpNoDelay; }
+    public boolean getTcpNoDelay() { return socketProperties.getTcpNoDelay(); }
+    public void setTcpNoDelay(boolean tcpNoDelay) { socketProperties.setTcpNoDelay(tcpNoDelay); }
 
 
     /**
      * Socket linger.
      */
-    protected int soLinger = 100;
-    public int getSoLinger() { return soLinger; }
-    public void setSoLinger(int soLinger) { this.soLinger = soLinger; }
+    public int getSoLinger() {return socketProperties.getSoLingerTime();}
+    public void setSoLinger(int soLinger) { 
+        if (soLinger>=0) {
+            socketProperties.setSoLingerOn(true);
+            socketProperties.setSoLingerTime(soLinger);
+        } else {
+            socketProperties.setSoLingerOn(false);
+            socketProperties.setSoLingerTime(-1);
+        }
+    }
 
 
     /**
      * Socket timeout.
      */
-    protected int soTimeout = -1;
-    public int getSoTimeout() { return soTimeout; }
-    public void setSoTimeout(int soTimeout) { this.soTimeout = soTimeout; }
+    public int getSoTimeout() { return socketProperties.getSoTimeout(); }
+    public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
 
 
     /**
@@ -617,16 +644,7 @@ public class JIoEndpoint {
         try {
 
             // 1: Set socket options: timeout, linger, etc
-            if (soLinger >= 0) { 
-                socket.setSoLinger(true, soLinger);
-            }
-            if (tcpNoDelay) {
-                socket.setTcpNoDelay(tcpNoDelay);
-            }
-            if (soTimeout > 0) {
-                socket.setSoTimeout(soTimeout);
-            }
-
+            socketProperties.setProperties(socket);
             // 2: SSL handshake
             step = 2;
             serverSocketFactory.handshake(socket);
