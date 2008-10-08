@@ -383,6 +383,52 @@
     </attribute>
 
   </attributes>
+  <subsection name="Java TCP socket attributes">
+  
+      <attribute name="socket.rxBufSize" required="false">
+        <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. Default value is <code>25188</code></p>
+      </attribute>
+      <attribute name="socket.txBufSize" required="false">
+        <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. Default value is <code>43800</code></p>
+      </attribute>
+      <attribute name="socket.tcpNoDelay" required="false">
+        <p>(bool)same as the standard setting <code>tcpNoDelay</code>. Default value is <code>false</code></p>
+      </attribute>
+      <attribute name="socket.soKeepAlive" required="false">
+        <p>(bool)Boolean value for the socket's keep alive setting (SO_KEEPALIVE). Default is <code>false</code>. </p>
+      </attribute>
+      <attribute name="socket.ooBInline" required="false">
+        <p>(bool)Boolean value for the socket OOBINLINE setting. Default value is <code>true</code></p>
+      </attribute>
+      <attribute name="socket.soReuseAddress" required="false">
+        <p>(bool)Boolean value for the sockets reuse address option (SO_REUSEADDR). Default value is <code>true</code></p>
+      </attribute>
+      <attribute name="socket.soLingerOn" required="false">
+        <p>(bool)Boolean value for the sockets so linger option (SO_LINGER). Default value is <code>true</code>.
+           This option is paired with the <code>soLingerTime</code> value.</p>
+      </attribute>
+      <attribute name="socket.soLingerTime" required="false">
+        <p>(bool)Value in seconds for the sockets so linger option (SO_LINGER). Default value is <code>25</code> seconds.
+           This option is paired with the soLinger value.</p>
+      </attribute>
+      <attribute name="socket.soTimeout" required="false">
+        <p>(int)Value in milliseconds for the sockets read timeout (SO_TIMEOUT). Default value is <code>5000</code> milliseconds.</p>
+      </attribute>      
+      <attribute name="socket.soTrafficClass" required="false">
+        <p>(byte)Value between <code>0</code> and <code>255</code> for the traffic class on the socket, <code>0x04 | 0x08 | 0x010</code></p>
+      </attribute>      
+      <attribute name="socket.performanceConnectionTime" required="false">
+        <p>(int)The first value for the performance settings. Default is <code>1</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+      </attribute>      
+      <attribute name="socket.performanceLatency" required="false">
+        <p>(int)The second value for the performance settings. Default is <code>0</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+      </attribute>      
+      <attribute name="socket.performanceBandwidth" required="false">
+        <p>(int)The third value for the performance settings. Default is <code>1</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
+      </attribute>      
+  
+
+  </subsection>
 
   </subsection>
   
@@ -458,12 +504,6 @@
            <br/>When you are using direct buffers, make sure you allocate the appropriate amount of memory for the 
                 direct memory space. On Sun's JDK that would be something like <code>-XX:MaxDirectMemorySize=256m</code></p>
       </attribute>
-      <attribute name="socket.rxBufSize" required="false">
-        <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. Default value is <code>25188</code></p>
-      </attribute>
-      <attribute name="socket.txBufSize" required="false">
-        <p>(int)The socket send buffer (SO_SNDBUF) size in bytes. Default value is <code>43800</code></p>
-      </attribute>
       <attribute name="socket.appReadBufSize" required="false">
         <p>(int)Each connection that is opened up in Tomcat get associated with a read and a write ByteBuffer
            This attribute controls the size of these buffers. By default this read buffer is sized at <code>8192</code> bytes.
@@ -511,41 +551,6 @@
            The default is <code>500</code>.
            Other values are <code>-1</code>. unlimited cache, and <code>0</code>, no cache.</p>
       </attribute>
-      <attribute name="socket.tcpNoDelay" required="false">
-        <p>(bool)same as the standard setting <code>tcpNoDelay</code>. Default value is <code>false</code></p>
-      </attribute>
-      <attribute name="socket.soKeepAlive" required="false">
-        <p>(bool)Boolean value for the socket's keep alive setting (SO_KEEPALIVE). Default is <code>false</code>. </p>
-      </attribute>
-      <attribute name="socket.ooBInline" required="false">
-        <p>(bool)Boolean value for the socket OOBINLINE setting. Default value is <code>true</code></p>
-      </attribute>
-      <attribute name="socket.soReuseAddress" required="false">
-        <p>(bool)Boolean value for the sockets reuse address option (SO_REUSEADDR). Default value is <code>true</code></p>
-      </attribute>
-      <attribute name="socket.soLingerOn" required="false">
-        <p>(bool)Boolean value for the sockets so linger option (SO_LINGER). Default value is <code>true</code>.
-           This option is paired with the <code>soLingerTime</code> value.</p>
-      </attribute>
-      <attribute name="socket.soLingerTime" required="false">
-        <p>(bool)Value in seconds for the sockets so linger option (SO_LINGER). Default value is <code>25</code> seconds.
-           This option is paired with the soLinger value.</p>
-      </attribute>
-      <attribute name="socket.soTimeout" required="false">
-        <p>(int)Value in milliseconds for the sockets read timeout (SO_TIMEOUT). Default value is <code>5000</code> milliseconds.</p>
-      </attribute>      
-      <attribute name="socket.soTrafficClass" required="false">
-        <p>(byte)Value between <code>0</code> and <code>255</code> for the traffic class on the socket, <code>0x04 | 0x08 | 0x010</code></p>
-      </attribute>      
-      <attribute name="socket.performanceConnectionTime" required="false">
-        <p>(int)The first value for the performance settings. Default is <code>1</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
-      </attribute>      
-      <attribute name="socket.performanceLatency" required="false">
-        <p>(int)The second value for the performance settings. Default is <code>0</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
-      </attribute>      
-      <attribute name="socket.performanceBandwidth" required="false">
-        <p>(int)The third value for the performance settings. Default is <code>1</code>, see <a href="http://java.sun.com/j2se/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)">Socket Performance Options</a></p>
-      </attribute>      
       <attribute name="selectorPool.maxSelectors" required="false">
         <p>(int)The max selectors to be used in the pool, to reduce selector contention.
         Use this option when the command line <code>org.apache.tomcat.util.net.NioSelectorShared</code> value is set to false.
@@ -738,10 +743,10 @@
     Classname         Http11Protocol                  Http11NioProtocol         Http11AprProtocol
     Tomcat Version   3.x 4.x 5.x 6.x                       6.x                     5.5.x 6.x
     Support Polling         NO                             YES                        YES
-    Polling Size           N/A                   Unlimited - Restricted by mem        Unlimited
-    Read HTTP Request     Blocking                     Blocking                       Blocking
-    Read HTTP Body        Blocking                     Blocking                       Blocking
-    Write HTTP Response   Blocking                     Blocking                       Blocking
+    Polling Size           N/A                   Unlimited - Restricted by mem        Unlimited - Configurable
+    Read HTTP Request     Blocking                     Non Blocking                   Blocking
+    Read HTTP Body        Blocking                     Sim Blocking                   Blocking
+    Write HTTP Response   Blocking                     Sim Blocking                   Blocking
     SSL Support           Java SSL                     Java SSL                       OpenSSL
     SSL Handshake         Blocking                     Non blocking                   Blocking
     Max Connections       maxThreads                   See polling size               See polling size
