@@ -351,8 +351,6 @@ public class CoyoteAdapter
                                        Response response)
             throws Exception {
 
-        // XXX the processor needs to set a correct scheme and port prior to this point, 
-        // in ajp13 protocols dont make sense to get the port from the connector..
         // XXX the processor may have set a correct scheme and port prior to this point, 
         // in ajp13 protocols dont make sense to get the port from the connector...
         // otherwise, use connector configuration
