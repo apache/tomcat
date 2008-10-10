@@ -75,22 +75,30 @@
 
   <p><strong>Context</strong> elements may be explicitly defined:
   <ul>
-  <li>in the <code>$CATALINA_BASE/conf/context.xml</code> file: 
-  the Context element information will be loaded by all webapps</li>
-  <li>in the 
+  <li>In the <code>$CATALINA_BASE/conf/context.xml</code> file: 
+  the Context element information will be loaded by all webapps.</li>
+  <li>In the 
   <code>$CATALINA_BASE/conf/[enginename]/[hostname]/context.xml.default</code>
   file: the Context element information will be loaded by all webapps of that
-  host</li>
-  <li>in individual files (with a ".xml" extension) in the
+  host.</li>
+  <li>In individual files (with a ".xml" extension) in the
   <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> directory.
   The name of the file (less the .xml extension) will be used as the
   context path. Multi-level context paths may be defined using #, e.g.
-  <code>context#path.xml</code>. The default web application may be defined
-  by using a file called <code>ROOT.xml</code>.</li>
-  <li>if the previous file was not found for this application, in an individual
-  file at <code>/META-INF/context.xml</code> inside the application files</li>
-  <li>inside a <a href="host.html">Host</a> element in the main
-  <code>conf/server.xml</code></li>
+  <code>foo#bar.xml</code> for a context path of <code>/foo/bar</code>. The
+  default web application may be defined by using a file called
+  <code>ROOT.xml</code>.</li>
+  <li>Only if a context file does not exist for the application in the 
+  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>, in an individual
+  file at <code>/META-INF/context.xml</code> inside the application files. If
+  the web application is packaged as a WAR then
+  <code>/META-INF/context.xml</code> will be copied to
+  <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> and renamed to
+  match the application's context path. Once this file exists, it will not be
+  replaced if a new WAR with a newer <code>/META-INF/context.xml</code> is
+  placed in the host's appBase.</li>
+  <li>Inside a <a href="host.html">Host</a> element in the main
+  <code>conf/server.xml</code>.</li>
   </ul>
   </p>
 
