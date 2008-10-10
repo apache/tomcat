@@ -290,17 +290,18 @@
         be sure to delete the expanded directory when restarting Tomcat, so
         that the updated WAR file will be re-expanded (note that the auto
         deployer, if enabled, will automatically expand the updated WAR file
-        once the previously expanded directory is removed).</li>
+        once the previously expanded directory is removed). Multi-level contexts
+        may be defined by using #, eg use a WAR named <code>foo#bar.war</code>
+        for a context path of <code>/foo/bar</code>.</li>
     <li>Any subdirectory within the <em>application base directory</em>
         will receive an automatically generated <a href="context.html">
         Context</a> element, even if this directory is not mentioned in the
-        <code>conf/server.xml</code> file.
-        This generated Context entry will be configured according to the
-        properties set in any <a href="defaultcontext.html">DefaultContext</a>
-        element nested in this Host element.  The context path for this
+        <code>conf/server.xml</code> file. The context path for this
         deployed Context will be a slash character ("/") followed by the
         directory name, unless the directory name is ROOT, in which case
-        the context path will be an empty string ("").</li>
+        the context path will be an empty string (""). Multi-level contexts
+        may be defined by using #, eg use a directory named <code>foo#bar</code>
+        for a context path of <code>/foo/bar</code>.</li>
     </ul>
 
     <p>In addition to the automatic deployment that occurs at startup time,
