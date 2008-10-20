@@ -112,12 +112,12 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     public Object newInstance(String className) throws IllegalAccessException, InvocationTargetException, NamingException, InstantiationException, ClassNotFoundException {
-        Class clazz = loadClassMaybePrivileged(className, classLoader);
+        Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
         return newInstance(clazz.newInstance(), clazz);
     }
 
     public Object newInstance(final String className, final ClassLoader classLoader) throws IllegalAccessException, NamingException, InvocationTargetException, InstantiationException, ClassNotFoundException {
-        Class clazz = classLoader.loadClass(className);
+        Class<?> clazz = classLoader.loadClass(className);
         return newInstance(clazz.newInstance(), clazz);
     }
 
@@ -126,7 +126,7 @@ public class DefaultInstanceManager implements InstanceManager {
     	newInstance(o, o.getClass());
     }
 
-    private Object newInstance(Object instance, Class clazz) throws IllegalAccessException, InvocationTargetException, NamingException {
+    private Object newInstance(Object instance, Class<?> clazz) throws IllegalAccessException, InvocationTargetException, NamingException {
         if (!ignoreAnnotations) {
             Map<String, String> injections = injectionMap.get(clazz.getName());
             processAnnotations(instance, injections);
@@ -150,9 +150,9 @@ public class DefaultInstanceManager implements InstanceManager {
      * @throws java.lang.reflect.InvocationTargetException
      *                                if call fails
      */
-    protected void postConstruct(Object instance, Class clazz)
+    protected void postConstruct(Object instance, Class<?> clazz)
             throws IllegalAccessException, InvocationTargetException {
-        Class superClass = clazz.getSuperclass();
+        Class<?> superClass = clazz.getSuperclass();
         if (superClass != Object.class) {
             postConstruct(instance, superClass);
         }
@@ -193,9 +193,9 @@ public class DefaultInstanceManager implements InstanceManager {
      * @throws java.lang.reflect.InvocationTargetException
      *                                if call fails
      */
-    protected void preDestroy(Object instance, Class clazz)
+    protected void preDestroy(Object instance, Class<?> clazz)
             throws IllegalAccessException, InvocationTargetException {
-        Class superClass = clazz.getSuperclass();
+        Class<?> superClass = clazz.getSuperclass();
         if (superClass != Object.class) {
             preDestroy(instance, superClass);
         }
@@ -311,13 +311,13 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
-    protected Class loadClassMaybePrivileged(final String className, final ClassLoader classLoader) throws ClassNotFoundException {
-        Class clazz;
+    protected Class<?> loadClassMaybePrivileged(final String className, final ClassLoader classLoader) throws ClassNotFoundException {
+        Class<?> clazz;
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
-                clazz = AccessController.doPrivileged(new PrivilegedExceptionAction<Class>() {
+                clazz = AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
 
-                    public Class run() throws Exception {
+                    public Class<?> run() throws Exception {
                         return loadClass(className, classLoader);
                     }
                 });
@@ -335,12 +335,12 @@ public class DefaultInstanceManager implements InstanceManager {
         return clazz;
     }
 
-    protected Class loadClass(String className, ClassLoader classLoader) throws ClassNotFoundException {
+    protected Class<?> loadClass(String className, ClassLoader classLoader) throws ClassNotFoundException {
         if (className.startsWith("org.apache.catalina")) {
             return containerClassLoader.loadClass(className);
         }
         try {
-            Class clazz = containerClassLoader.loadClass(className);
+            Class<?> clazz = containerClassLoader.loadClass(className);
             if (ContainerServlet.class.isAssignableFrom(clazz)) {
                 return clazz;
             }
@@ -361,7 +361,7 @@ public class DefaultInstanceManager implements InstanceManager {
         }
     }
 
-    private void checkAccess(Class clazz, Properties restricted) {
+    private void checkAccess(Class<?> clazz, Properties restricted) {
         while (clazz != null) {
             if ("restricted".equals(restricted.getProperty(clazz.getName()))) {
                 throw new SecurityException("Restricted class" + clazz);
