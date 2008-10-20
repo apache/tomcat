@@ -54,6 +54,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
             startComplete = true;
     }
 
+    @Override
     public synchronized void start() throws LifecycleException {
         if ( this.started ) return;
         super.addLifecycleListener(this);            
@@ -74,13 +75,14 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
         }
     }
     
+    @Override
     public synchronized void stop() throws LifecycleException
     {
-        ReplicatedMap map = (ReplicatedMap)((ReplApplContext)this.context).getAttributeMap();
-        if ( map!=null ) {
-            map.breakdown();
-        }
         if ( !this.started ) return;
+        AbstractMap map = (AbstractMap)((ReplApplContext)this.context).getAttributeMap();
+        if ( map!=null && map instanceof ReplicatedMap) {
+            ((ReplicatedMap)map).breakdown();
+        }
         try {
             super.lifecycle.removeLifecycleListener(this);
         } catch ( Exception x ){
