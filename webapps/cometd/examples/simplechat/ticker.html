@@ -3,10 +3,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" >
 <title>Bayeux Stock Ticker</title>
-<style>
- .red{background-color: red;}
- .white{background-color: white;}
-</style>
 <script type="text/javascript" src="../../dojo/dojo.js.uncompressed.js"></script>
 <script type="text/javascript" src="../../dojox/cometd.js"></script>
 <script type="text/javascript" src="../../dojox/cometd/_base.js"></script>
@@ -37,8 +33,12 @@ dojo.addOnLoad(function() {
 function subscribe(box, symbol) {
 	if (box.checked) {
 		dojox.cometd.subscribe("/stock/"+symbol, onMsgEvent);
+		var rowCurrent = dojo.byId("row."+symbol);
+		rowCurrent.bgColor="white";
 	} else {
 		dojox.cometd.unsubscribe("/stock/"+symbol, onMsgEvent);
+		var rowCurrent = dojo.byId("row."+symbol);
+		rowCurrent.bgColor="gray";
 	}
 }
 
@@ -78,7 +78,9 @@ function onMsgEvent(event) {
    var table = dojo.byId("stocktable");  
    var rows = table.getElementsByTagName("tr");  
    for(i = 0; i < rows.length; i++){
-	   rows[i].bgColor = "white"; 
+	   if (rows[i].bgColor != "gray") {
+	       rows[i].bgColor = "white"; 
+	   }
    }          
    //manipulate rows 
    var rowCurrent = dojo.byId("row."+symbol);
