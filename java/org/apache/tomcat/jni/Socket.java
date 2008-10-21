@@ -418,7 +418,7 @@ public class Socket {
      * @param nbytes The number of bytes to read (-1) for full array.
      * @return the number of bytes received.
      */
-    public static native int recvFrom(long from, long sock, int flags,
+    public static native int recvfrom(long from, long sock, int flags,
                                       byte[] buf, int offset, int nbytes);
 
     /**
