@@ -19,33 +19,23 @@ public class EchoChatClient implements ServletContextListener, ServletContextAtt
     protected Client c;
     protected boolean alive = true;
     protected TimestampThread tt = new TimestampThread();
+
     public EchoChatClient() {
         id = counter.incrementAndGet();
         System.out.println("new listener created with id:"+id);
     }
 
-    /**
-     * contextDestroyed
-     *
-     * @param servletContextEvent ServletContextEvent
-     * @todo Implement this javax.servlet.ServletContextListener method
-     */
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         alive = false;
         tt.interrupt();
     }
 
-    /**
-     * contextInitialized
-     *
-     * @param servletContextEvent ServletContextEvent
-     * @todo Implement this javax.servlet.ServletContextListener method
-     */
     public void contextInitialized(ServletContextEvent servletContextEvent) {
     }
 
     public void attributeAdded(ServletContextAttributeEvent scae) {
         if (scae.getName().equals(Bayeux.DOJOX_COMETD_BAYEUX)) {
+            System.out.println("Starting echo chat client!");
             b = (Bayeux)scae.getValue();
             c = b.newClient("echochat-",this);
             Channel ch = b.getChannel("/chat/demo",true);
@@ -101,7 +91,7 @@ public class EchoChatClient implements ServletContextListener, ServletContextAtt
                     m.put("join",false);
                     ch.publish(m);
                 }catch (InterruptedException ignore) {
-                    
+                    Thread.currentThread().interrupted();
                 }catch (Exception x) {
                     x.printStackTrace();
                 }
