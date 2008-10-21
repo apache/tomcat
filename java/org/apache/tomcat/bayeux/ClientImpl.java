@@ -115,9 +115,10 @@ public class ClientImpl implements Client {
             //local clients must have a listener
             ArrayList<Message> list = new ArrayList<Message>();
             for (int i=0; msgs!=null && i<msgs.length; i++) {
+                //dont deliver to ourselves
                 if (this!=msgs[i].getClient()) list.add(msgs[i]);
             }
-            if (getListener() != null) {
+            if (getListener() != null && list.size()>0) {
                 getListener().deliver(list.toArray(new Message[0]));
             }
         } else {

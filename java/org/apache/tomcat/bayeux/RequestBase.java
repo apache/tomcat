@@ -76,7 +76,7 @@ public abstract class RequestBase implements BayeuxRequest {
     
     protected static Log log = LogFactory.getLog(RequestBase.class);
     
-    protected int reconnectInterval;
+    protected int reconnectInterval = 1000;
     
     protected RequestBase(TomcatBayeux tb, CometEvent event, JSONObject jsReq) throws JSONException {
         this.tomcatBayeux = tb;
