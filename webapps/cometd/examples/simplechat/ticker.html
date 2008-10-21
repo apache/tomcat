@@ -3,6 +3,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1" >
 <title>Bayeux Stock Ticker</title>
+<style>
+ .red{background-color: red;}
+ .white{background-color: white;}
+</style>
 <script type="text/javascript" src="../../dojo/dojo.js.uncompressed.js"></script>
 <script type="text/javascript" src="../../dojox/cometd.js"></script>
 <script type="text/javascript" src="../../dojox/cometd/_base.js"></script>
@@ -29,26 +33,6 @@ dojo.addOnLoad(function() {
   dojox.cometd.endBatch();
 });
 
-
-function trim(str) {
-    return str.replace(/(^\s+|\s+$)/g,'');
-}
-
-
-function clear() {
-  dojo.byId("msgtext").value = "";
-  dojo.byId("msgtext").focus();
-}
-
-
-function enterKeyHandler(e) {
-if (!e) e = window.event;
-   if (e.keyCode == 13) {
-      send(trim(dojo.byId("msgtext").value));
-      clear();
-   }
-
-}
 
 function subscribe(box, symbol) {
 	if (box.checked) {
@@ -90,6 +74,19 @@ function onMsgEvent(event) {
    changelabel.value = pricechange;
    pricenode.appendChild(pricelabel);
    changenode.appendChild(changelabel);
+
+   var table = dojo.byId("stocktable");  
+   var rows = table.getElementsByTagName("tr");  
+   for(i = 0; i < rows.length; i++){
+	   rows[i].bgColor = "white"; 
+   }          
+   //manipulate rows 
+   var rowCurrent = dojo.byId("row."+symbol);
+   if (pricechange<=0) {
+       rowCurrent.bgColor = "red";
+   } else {
+	   rowCurrent.bgColor = "cyan";
+   }
 }
 
 
@@ -99,29 +96,29 @@ function onMsgEvent(event) {
 <h1 align="center">Bayeux Stock Ticker</h1>
 <h2 align="left"> &nbsp;</h2>
 <p>
-<table cellspacing="0" cellpadding="3" width="100%" align="center" border="0">
-  <tr>
+<table id="stocktable" cellspacing="0" cellpadding="3" width="100%" align="center" border="0">
+  <tr id="row.HEADER">
     <td>SYMBOL</td>
     <td>PRICE</td>
     <td>LAST CHANGE</td>
     <td>SUBSCRIBE</td></tr>
-  <tr>
+  <tr id="row.SPRG">
     <td>SPRG</td>
     <td id="price.SPRG"></td>
     <td id="change.SPRG"></td>
-    <td id="check.SPRG"><input type="checkbox" id="check.SPRG" checked></td>
+    <td id="check.SPRG"><input type="checkbox" id="check.SPRG" checked onClick="subscribe(this,'SPRG')"></td>
   </tr>
-  <tr>
+  <tr id="row.GOOG">
     <td>GOOG</td>
     <td id="price.GOOG"></td>
     <td id="change.GOOG"></td>
-    <td id="check.GOOG"><input type="checkbox" id="check.GOOG" checked></td>
+    <td id="check.GOOG"><input type="checkbox" id="check.GOOG" checked  onClick="subscribe(this,'GOOG')"></td>
   </tr>
-  <tr>
+  <tr id="row.YHOO">
     <td>YHOO</td>
     <td id="price.YHOO"></td>
     <td id="change.YHOO"></td>
-    <td id="check.YHOO"><input type="checkbox" id="check.GOOG" checked></td>
+    <td id="check.YHOO"><input type="checkbox" id="check.GOOG" checked  onClick="subscribe(this,'YHOO')"></td>
   </tr>
 </table>
 </p>
