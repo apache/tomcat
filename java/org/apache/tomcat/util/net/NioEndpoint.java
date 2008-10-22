@@ -349,7 +349,7 @@ public class NioEndpoint {
     /**
      * Maximum amount of worker threads.
      */
-    protected int maxThreads = 400;
+    protected int maxThreads = 40;
     public void setMaxThreads(int maxThreads) { this.maxThreads = maxThreads; }
     public int getMaxThreads() { return maxThreads; }
 
