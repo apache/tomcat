@@ -121,6 +121,7 @@
       <exclude name="org/apache/naming/factory/webservices/**" />
       <exclude name="org/apache/tomcat/bayeux/**" />
       <exclude name="org/apache/cometd/**" />
+      <exclude name="org/apache/tomcat/jdbc/**" />
     </javac>
     <tstamp>
       <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
