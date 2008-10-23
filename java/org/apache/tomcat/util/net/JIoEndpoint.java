@@ -173,7 +173,7 @@ public class JIoEndpoint {
     /**
      * Maximum amount of worker threads.
      */
-    protected int maxThreads = 40;
+    protected int maxThreads = 200;
     public void setMaxThreads(int maxThreads) { this.maxThreads = maxThreads; }
     public int getMaxThreads() { return maxThreads; }
 
