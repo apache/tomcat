@@ -1,0 +1,171 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.tomcat.jdbc.pool.jmx;
+/**
+ * @author Filip Hanik
+ */
+import java.util.Properties;
+
+import javax.management.DynamicMBean;
+
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+
+public class ConnectionPool implements ConnectionPoolMBean  {
+    protected org.apache.tomcat.jdbc.pool.ConnectionPool pool = null;
+
+    public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
+        this.pool = pool;
+    }
+
+    public org.apache.tomcat.jdbc.pool.ConnectionPool getPool() {
+        return pool;
+    }
+
+    //=================================================================
+    //       POOL STATS
+    //=================================================================
+
+    public int getSize() {
+        return pool.getSize();
+    }
+
+    public int getIdle() {
+        return pool.getIdle();
+    }
+
+    public int getActive() {
+        return pool.getActive();
+    }
+    
+    public boolean isPoolSweeperEnabled() {
+        return pool.getPoolProperties().isPoolSweeperEnabled();
+    }
+
+    //=================================================================
+    //       POOL OPERATIONS
+    //=================================================================
+    public void checkIdle() {
+        pool.checkIdle();
+    }
+
+    public void checkAbandoned() {
+        pool.checkAbandoned();
+    }
+
+    public void testIdle() {
+        pool.testAllIdle();
+    }
+    //=================================================================
+    //       POOL PROPERTIES
+    //=================================================================
+    public Properties getDbProperties() {
+        return pool.getPoolProperties().getDbProperties();
+    }
+    public String getUrl() {
+        return pool.getPoolProperties().getUrl();
+    }
+    public String getDriverClassName() {
+        return pool.getPoolProperties().getDriverClassName();
+    }
+    public boolean isDefaultAutoCommit() {
+        return pool.getPoolProperties().isDefaultAutoCommit();
+    }
+    public boolean isDefaultReadOnly() {
+        return pool.getPoolProperties().isDefaultReadOnly();
+    }
+    public int getDefaultTransactionIsolation() {
+        return pool.getPoolProperties().getDefaultTransactionIsolation();
+    }
+    public String getConnectionProperties() {
+        return pool.getPoolProperties().getConnectionProperties();
+    }
+    public String getDefaultCatalog() {
+        return pool.getPoolProperties().getDefaultCatalog();
+    }
+    public int getInitialSize() {
+        return pool.getPoolProperties().getInitialSize();
+    }
+    public int getMaxActive() {
+        return pool.getPoolProperties().getMaxActive();
+    }
+    public int getMaxIdle() {
+        return pool.getPoolProperties().getMaxIdle();
+    }
+    public int getMinIdle() {
+        return pool.getPoolProperties().getMinIdle();
+    }
+    public int getMaxWait() {
+        return pool.getPoolProperties().getMaxWait();
+    }
+    public String getValidationQuery() {
+        return pool.getPoolProperties().getValidationQuery();
+    }
+    public boolean isTestOnBorrow() {
+        return pool.getPoolProperties().isTestOnBorrow();
+    }
+    public boolean isTestOnReturn() {
+        return pool.getPoolProperties().isTestOnReturn();
+    }
+    public boolean isTestWhileIdle() {
+        return pool.getPoolProperties().isTestWhileIdle();
+    }
+    public int getTimeBetweenEvictionRunsMillis() {
+        return pool.getPoolProperties().getTimeBetweenEvictionRunsMillis();
+    }
+    public int getNumTestsPerEvictionRun() {
+        return pool.getPoolProperties().getNumTestsPerEvictionRun();
+    }
+    public int getMinEvictableIdleTimeMillis() {
+        return pool.getPoolProperties().getMinEvictableIdleTimeMillis();
+    }
+    public boolean isAccessToUnderlyingConnectionAllowed() {
+        return pool.getPoolProperties().isAccessToUnderlyingConnectionAllowed();
+    }
+    public boolean isRemoveAbandoned() {
+        return pool.getPoolProperties().isRemoveAbandoned();
+    }
+    public int getRemoveAbandonedTimeout() {
+        return pool.getPoolProperties().getRemoveAbandonedTimeout();
+    }
+    public boolean isLogAbandoned() {
+        return pool.getPoolProperties().isLogAbandoned();
+    }
+    public int getLoginTimeout() {
+        return pool.getPoolProperties().getLoginTimeout();
+    }
+    public String getName() {
+        return pool.getPoolProperties().getName();
+    }
+    public String getPassword() {
+        return pool.getPoolProperties().getPassword();
+    }
+    public String getUsername() {
+        return pool.getPoolProperties().getUsername();
+    }
+    public long getValidationInterval() {
+        return pool.getPoolProperties().getValidationInterval();
+    }
+    public String getInitSQL() {
+        return pool.getPoolProperties().getInitSQL();
+    }
+    public boolean isTestOnConnect() {
+        return pool.getPoolProperties().isTestOnConnect();
+    }
+    public String getJdbcInterceptors() {
+        return pool.getPoolProperties().getJdbcInterceptors();
+    }
+
+}
