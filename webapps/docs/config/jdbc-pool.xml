@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="http.html">
+
+  &project;
+
+  <properties>
+    <author email="fhanik@apache.org">Filip Hanik</author>
+    <title>The Tomcat JDBC Connection Pool</title>
+  </properties>
+
+<body>
+
+
+<section name="Introduction">
+
+  <p>The <strong>JDBC Connection Pool <code>org.apache.tomcat.jdbc.pool</code></strong> 
+  is a replacement or an alternative to the <a href="http://commons.apache.org/dbcp/">commons-dbcp</a>
+  connection pool.</p>
+
+  <p>So why do we need a new connection pool?</p>
+
+  <p>Here are a few of the reasons:
+    <ol>
+      <li>commons-dbcp is single threaded, in order to be thread safe commons-dbcp looks the entire pool, even during query validation</li>
+      <li>commons-dbcp is slow - as the number of logical CPUs grow, the performance suffers, the above point shows that there is not support for high concurrency</li>
+      <li>commons-dbcp is complex, over 60 classes. tomcat-jdbc-pool, is 8 classes, hence modifications for future requirement will require
+          much less changes.</li>
+      <li>commons-dbcp uses static interfaces. This means you can't compile it with JDK 1.6, or if you run on JDK 1.6/1.7 you will get 
+          NoSuchMethodException for all the methods not implemented, even if the driver supports.  </li>
+      <li>The commons-dbcp has become fairly stagnant. Sparse updates, releases, and new feature support.</li>
+      <li>It's not worth rewriting over 60 classes, when something as a connection pool can be accomplished with as a much simpler implementation.</li> 
+      <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a greatly simplified logging framework used in Tomcat</li>
+    </ol>
+  </p>
+
+  <p>Features added over other connection pool implementations
+    <ol>
+      <li>Support for highly concurrent environments and multi core/cpu systems</li>
+      <li>Dynamic implementation of interface, will support java.sql and javax.sql interfaces for 
+          your runtime environment (as long as your JDBC driver does the same), even when compiled with a lower JDK</li>
+      <li>Validation intervals - we don't have to validate every single time we use the connection, we can do this 
+          when we borrow or return the connection, just not more frequent than an interval we can configure.</li>
+      <li>Run-Once query, a configurable query that will be run only once, when the connection to the database is established.
+          Very useful to setup session settings, that you want to exist during the entire time the connection is established.</li>
+      <li>Ability to configure custom interceptors.
+          This allows you to write custom interceptors to enhance the functionality. You can use interceptors to gather query stats,
+          cache session states, reconnect the connection upon failures, retry queries, cache query results, and so on. 
+          Your options are endless and the interceptors are dynamic, not tied to a JDK version of a java.sql/javax.sql interface.</li>
+      <li>High performance - we will show some differences in performance later on</li>
+      <li>Extremely simple, due to the very simplified implementation, the line count and source file count are very low, compare with c3p0 
+          that has over 200 source files(last time we checked), Tomcat jdbc has a core of 8 files, the connection pool itself is about half 
+          that.</li>
+    </ol>
+  </p>
+
+
+</section>
+
+
+<section name="Attributes">
+  <p>To provide a very simple switch to and from commons-dbcp and tomcat-jdbc-pool,
+     Most attributes are the same and have the same meaning.</p>
+
+
+  <subsection name="JNDI Factory and Type">
+    <attributes>
+      <attribute name="factory" required="true">
+        <p>factory is required, and the value should be <code>org.apache.tomcat.jdbc.poo.DataSourceFactory</code></p>
+      </attribute>
+      <attribute name="type" required="true">
+        <p>Type should always be <code>javax.sql.DataSource</code></p>
+      </attribute>
+    </attributes>
+  </subsection>
+
+  <subsection name="Common Attributes">
+  <p>These attributes are shared between commons-dbcp and tomcat-jdbc-pool, in some cases default values are different.</p>
+  <attributes>
+ 
+    <attribute name="defaultAutoCommit" required="false">
+      <p>(boolean) The default auto-commit state of connections created by this pool. If not set, default is JDBC driver default (If not set then the setAutoCommit method will not be called.)</p>
+    </attribute>
+
+    <attribute name="defaultReadOnly" required="false">
+      <p>(boolean) The default read-only state of connections created by this pool. If not set then the setReadOnly method will not be called. (Some drivers don't support read only mode, ex: Informix)</p>
+    </attribute>
+
+    <attribute name="defaultTransactionIsolation" required="false">
+      <p>(String) The default TransactionIsolation state of connections created by this pool. One of the following: (see javadoc )<br/>
+         * NONE<br/>
+         * READ_COMMITTED<br/>
+         * READ_UNCOMMITTED<br/>
+         * REPEATABLE_READ<br/>
+         * SERIALIZABLE<br/>
+         If not set, the method will not be called and it defaults to the JDBC driver.
+      </p>
+    </attribute>
+
+    <attribute name="defaultCatalog" required="false">
+      <p>(String) The default catalog of connections created by this pool.</p>
+    </attribute>
+
+    <attribute name="driverClassName" required="true">
+      <p>(String) The fully qualified Java class name of the JDBC driver to be used. The driver has to be accessible
+         from the same classloader as tomcat-jdbc.jar 
+      </p>
+    </attribute>
+
+    <attribute name="username" required="true">
+      <p>(String) The connection username to be passed to our JDBC driver to establish a connection.
+         Note, at this point, <code>DataSource.getConnection(username,password)</code> is not using the credentials passed into the method.
+      </p>
+    </attribute>
+
+    <attribute name="password" required="true">
+      <p>(String) The connection password to be passed to our JDBC driver to establish a connection.
+         Note, at this point, <code>DataSource.getConnection(username,password)</code> is not using the credentials passed into the method.
+      </p>
+    </attribute>
+
+    <attribute name="maxActive" required="false">
+      <p>(int) The maximum number of active connections that can be allocated from this pool at the same time.
+         The default value is <code>100</code></p>
+    </attribute>
+
+    <attribute name="maxIdle" required="false">
+      <p>(int) The maximum number of connections that should be kept in the pool at all times. 
+         Default value is  <code>maxActive</code>:<code>100</code>
+         Idle connections are checked periodically (if enabled) and 
+         connections that been idle for longer than <code>minEvictableIdleTimeMillis</code> 
+         will be released. (also see <code>testWhileIdle</code>)</p>
+    </attribute>
+
+    <attribute name="minIdle" required="false">
+      <p>
+        (int) The minimum number of established connections that should be kept in the pool at all times.
+        The connection pool can shrink below this number if validation queries fail.
+        Default value is derived from <code>initialSize</code>:<code>10</code> (also see <code>testWhileIdle</code>)
+      </p>
+    </attribute>
+
+    <attribute name="initialSize" required="false">
+      <p>(int)The initial number of connections that are created when the pool is started.
+         Default value is <code>10</code></p>
+    </attribute>
+
+    <attribute name="maxWait" required="false">
+      <p>(long) The maximum number of milliseconds that the pool will wait (when there are no available connections) 
+         for a connection to be returned before throwing an exception. 
+         Default value is <code>30000</code> (30 seconds)</p>
+    </attribute>
+
+    <attribute name="testOnBorrow" required="false">
+      <p>(boolean) The indication of whether objects will be validated before being borrowed from the pool. 
+         If the object fails to validate, it will be dropped from the pool, and we will attempt to borrow another.
+         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
+         Default value is <code>false</code>
+      </p>
+    </attribute>
+
+    <attribute name="testOnReturn" required="false">
+      <p>(boolean) The indication of whether objects will be validated before being returned to the pool.
+         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
+         The default value is <code>false</code>.
+      </p>
+    </attribute>
+
+    <attribute name="testWhileIdle" required="false">
+      <p>(boolean) The indication of whether objects will be validated by the idle object evictor (if any). 
+         If an object fails to validate, it will be dropped from the pool.
+         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
+         The default value is <code>false</code> and this property has to be set in order for the 
+         pool cleaner/test thread is to run (also see <code>timeBetweenEvictionRunsMillis</code>)
+      </p>
+    </attribute>
+
+    <attribute name="validationQuery" required="false">
+      <p>(String) The SQL query that will be used to validate connections from this pool before returning them to the caller. 
+         If specified, this query does not have to return any data, it just can't throw a SQLException.  
+         The default value is <code>null</code>.
+         Example values are <code>SELECT 1</code>(mysql), <code>select 1 from dual</code>(oracle), <code>SELECT 1</code>(MS Sql Server)
+      </p>
+    </attribute>
+    
+    <attribute name="timeBetweenEvictionRunsMillis" required="false">
+      <p>(long) The number of milliseconds to sleep between runs of the idle connection validation/cleaner thread. 
+         This value should not be set under 1 second. It dictates how often we check for idle, abandoned connections, and how often 
+         we validate idle connections.
+         The default value is <code>5000</code> (5 seconds).</p>
+    </attribute>
+
+    <attribute name="numTestsPerEvictionRun" required="false">
+      <p>(int) Property not used in tomcat-jdbc-pool.</p>
+    </attribute>
+
+    <attribute name="minEvictableIdleTimeMillis" required="false">
+      <p>(long) The minimum amount of time an object may sit idle in the pool before it is eligable for eviction. 
+         The default value is <code>60000</code> (60 seconds).</p>
+    </attribute>
+
+    <attribute name="accessToUnderlyingConnectionAllowed" required="false">
+      <p>(boolean) Property not used. Access can be achieved by calling <code>unwrap</code> on the pooled connection.
+         see <code>javax.sql.DataSource</code> interface, or call <code>getConnection</code> through reflection.</p>
+    </attribute>
+
+    <attribute name="removeAbandoned" required="false">
+      <p>(boolean) Flag to remove abandoned connections if they exceed the <code>removeAbandonedTimout</code>.
+         If set to true a connection is considered abandoned and eligible for removal if it has been in use 
+         longer than the <code>removeAbandonedTimeout</code> Setting this to true can recover db connections from 
+         applications that fail to close a connection. See also <code>logAbandoned</code>
+         The default value is <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="removeAbandonedTimeout" required="false">
+      <p>(long) Timeout in seconds before an abandoned(in use) connection can be removed. 
+         The default value is <code>60</code> (60 seconds). The value should be set to the longest running query your applications 
+         might have.</p>
+    </attribute>
+
+    <attribute name="logAbandoned" required="false">
+      <p>(boolean) Flag to log stack traces for application code which abandoned a Connection.
+         Logging of abandoned Connections adds overhead for every Connection borrow because a stack trace has to be generated.
+         The default value is <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="connectionProperties" required="false">
+      <p>(String) The connection properties that will be sent to our JDBC driver when establishing new connections.
+         Format of the string must be [propertyName=property;]*
+         NOTE - The "user" and "password" properties will be passed explicitly, so they do not need to be included here. 
+         The default value is <code>null</code>.</p>
+    </attribute>
+
+    <attribute name="poolPreparedStatements" required="false">
+      <p>(boolean) Property not used. The default value is <code>false</code>.</p>
+    </attribute>
+
+    <attribute name="maxOpenPreparedStatements" required="false">
+      <p>(int) Property not used. The default value is <code>false</code>.</p>
+    </attribute>
+   
+
+
+  </attributes>
+
+  </subsection>
+
+  <subsection name="Tomcat JDBC Enhanced Attributes">
+
+  <attributes>
+
+    <attribute name="initSQL" required="false">
+      <p>(String) A custom query to be run when a connection is first created. 
+         The default value is <code>null</code>.</p>
+    </attribute>
+
+    <attribute name="jdbcInterceptors" required="false">
+      <p>(String) A semicolon separated list of classnames extending <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class.
+         These interceptors will be inserted as an interceptor into the chain of operations on a <code>java.sql.Connection</code> object.
+         The default value is <code>null</code>.</p>
+    </attribute>
+
+    <attribute name="validationInterval" required="false">
+      <p>(long) avoid excess validation, only run validation at most at this frequency - time in milliseconds.
+         If a connection is due for validation, but has been validated previously within this interval, it will not be validated again. 
+         The default value is <code>30000</code> (30 seconds).</p>
+    </attribute>
+
+    <attribute name="jmxEnabled" required="false">
+      <p>(boolean) Register the pool with JMX or not. 
+         The default value is <code>true</code>.</p>
+    </attribute>
+  </attributes>  
+  </subsection>
+</section>
+
+
+</body>
+
+</document>

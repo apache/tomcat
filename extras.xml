@@ -82,6 +82,8 @@
   <property name="cometd.war" value="${tomcat.extras}/cometd.war"/>
   <property name="tomcat-bayeux-samples.jar" value="${tomcat.extras}/tomcat-bayeux-samples.jar"/>
 
+  <property name="tomcat-jdbc.jar" value="${tomcat.extras}/tomcat-jdbc.jar"/>
+
   <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
 	
   <!-- Classpath -->
@@ -330,6 +332,33 @@ To run the sample application, copy the following applications into your CATALIN
           ${cometd.war}
     </echo>
   </target>
+
+  <target name="conpool">
+    <mkdir dir="${tomcat.extras}"/>
+    <path id="tomcat.jdbc.classpath">
+      <pathelement path="${tomcat.classpath}"/>
+    </path>
+
+    <!-- compile org.apache.tomcat.jdbc-->
+    <javac srcdir="java" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}">
+      <classpath refid="tomcat.jdbc.classpath"/>
+      <include name="org/apache/tomcat/jdbc/**" />
+    </javac>
+    
+    <!-- Cometd API JAR File -->
+    <jar jarfile="${tomcat-jdbc.jar}">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/tomcat/jdbc/**" />
+      </fileset>
+    </jar>
+    <!-- create checksums -->
+    <checksum file="${tomcat-jdbc.jar}" forceOverwrite="yes" fileext=".md5" />
+  </target>
+
 
   <target name="jmx-remote" >
     <!-- Create the JAR file -->
