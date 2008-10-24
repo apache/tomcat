@@ -710,38 +710,43 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get ETag.
      * 
-     * @return strong ETag if available, else weak ETag.
+     * @return Weak ETag
      */
     public String getETag() {
-        String result = null;
-        if (attributes != null) {
-            Attribute attribute = attributes.get(ETAG);
-            if (attribute != null) {
-                try {
-                    result = attribute.get().toString();
-                } catch (NamingException e) {
-                    ; // No value for the attribute
-                }
-            }
-        }
-        if (result == null) {
-            if (strongETag != null) {
-                // The strong ETag must always be calculated by the resources
-                result = strongETag;
-            } else {
-                // The weakETag is contentLength + lastModified
-                if (weakETag == null) {
-                    long contentLength = getContentLength();
-                    long lastModified = getLastModified();
-                    if ((contentLength >= 0) || (lastModified >= 0)) {
-                        weakETag = "W/\"" + contentLength + "-" 
-                        + lastModified + "\"";
+        return getETag(false);
+    }
+
+
+    /**
+     * Get ETag.
+     * 
+     * @param strong If true, the strong ETag will be returned
+     * @return ETag
+     */
+    public String getETag(boolean strong) {
+        if (strong) {
+            // The strong ETag must always be calculated by the resources
+            if (strongETag != null)
+                return strongETag;
+            if (attributes != null) {
+                Attribute attribute = attributes.get(ETAG);
+                if (attribute != null) {
+                    try {
+                        strongETag = attribute.get().toString();
+                    } catch (NamingException e) {
+                        ; // No value for the attribute
                     }
                 }
-                result = weakETag;
             }
+            return strongETag;
+        } else {
+            // The weakETag is contentLenght + lastModified
+            if (weakETag == null) {
+                weakETag = "W/\"" + getContentLength() + "-" 
+                    + getLastModified() + "\"";
+            }
+            return weakETag;
         }
-        return result;
     }
 
 
