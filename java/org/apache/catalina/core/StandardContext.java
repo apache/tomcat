@@ -3810,11 +3810,6 @@ public class StandardContext
                     listeners[i] + "'");
             try {
                 results[i] = instanceManager.newInstance(listeners[i]);
-            } catch (IllegalAccessException iae) {
-                getLogger().error
-                (sm.getString("standardContext.applicationListenerIAE",
-                              listeners[i]), iae);
-            ok = false;
             } catch (Throwable t) {
                 getLogger().error
                     (sm.getString("standardContext.applicationListener",
