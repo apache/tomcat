@@ -236,6 +236,13 @@
       presented.  The default value is infinite (i.e. no timeout).</p>
     </attribute>
     
+    <attribute name="deferAccept" required="false">
+      <p>Sets the <code>TCP_DEFER_ACCEPT</code> flag on the listening socket for
+      this connector. The default value is <code>true</code> where
+      <code>TCP_DEFER_ACCEPT</code> is supported by the operating system,
+      otherwise it is <code>false</code>.</p>
+    </attribute>
+    
     <attribute name="executor" required="false">
       <p>A reference to the name in an <a href="executor.html">Executor</a> element.
          If this attribute is enabled, and the named executor exists, the connector will
