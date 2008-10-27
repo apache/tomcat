@@ -710,43 +710,38 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get ETag.
      * 
-     * @return Weak ETag
+     * @return strong ETag if available, else weak ETag. 
      */
     public String getETag() {
-        return getETag(false);
-    }
-
-
-    /**
-     * Get ETag.
-     * 
-     * @param strong If true, the strong ETag will be returned
-     * @return ETag
-     */
-    public String getETag(boolean strong) {
-        if (strong) {
-            // The strong ETag must always be calculated by the resources
-            if (strongETag != null)
-                return strongETag;
-            if (attributes != null) {
-                Attribute attribute = attributes.get(ETAG);
-                if (attribute != null) {
-                    try {
-                        strongETag = attribute.get().toString();
-                    } catch (NamingException e) {
-                        ; // No value for the attribute
-                    }
+        String result = null;
+        if (attributes != null) {
+            Attribute attribute = attributes.get(ETAG);
+            if (attribute != null) {
+                try {
+                    result = attribute.get().toString();
+                } catch (NamingException e) {
+                    ; // No value for the attribute
                 }
             }
-            return strongETag;
-        } else {
-            // The weakETag is contentLenght + lastModified
-            if (weakETag == null) {
-                weakETag = "W/\"" + getContentLength() + "-" 
-                    + getLastModified() + "\"";
-            }
-            return weakETag;
         }
+        if (result == null) {
+            if (strongETag != null) {
+                // The strong ETag must always be calculated by the resources
+                result = strongETag;
+            } else {
+                // The weakETag is contentLength + lastModified
+                if (weakETag == null) {
+                    long contentLength = getContentLength();
+                    long lastModified = getLastModified();
+                    if ((contentLength >= 0) || (lastModified >= 0)) {
+                        weakETag = "W/\"" + contentLength + "-" +
+                                   lastModified + "\"";
+                    }
+                }
+                result = weakETag;
+            }
+        } 
+        return result;
     }
 
 
@@ -813,17 +808,17 @@ public class ResourceAttributes implements Attributes {
                 if (contentLength < 0) return null;
                 return new BasicAttribute(CONTENT_LENGTH, new Long(contentLength));
             } else if (attrID.equals(ALTERNATE_CONTENT_LENGTH)) {
-              long contentLength = getContentLength();
-              if (contentLength < 0) return null;
-              return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, new Long(contentLength));
+                long contentLength = getContentLength();
+                if (contentLength < 0) return null;
+                return new BasicAttribute(ALTERNATE_CONTENT_LENGTH, new Long(contentLength));
             } else if (attrID.equals(ETAG)) {
-              String etag = getETag();
-              if (etag == null) return null;
-              return new BasicAttribute(ETAG, etag);
+                String etag = getETag();
+                if (etag == null) return null;
+                return new BasicAttribute(ETAG, etag);
             } else if (attrID.equals(ALTERNATE_ETAG)) {
-              String etag = getETag();
-              if (etag == null) return null;
-              return new BasicAttribute(ALTERNATE_ETAG, etag);
+                String etag = getETag();
+                if (etag == null) return null;
+                return new BasicAttribute(ALTERNATE_ETAG, etag);
             }
         } else {
             return attributes.get(attrID);
