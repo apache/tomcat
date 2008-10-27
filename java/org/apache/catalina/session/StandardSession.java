@@ -204,7 +204,7 @@ public class StandardSession
     /**
      * The last accessed time for this Session.
      */
-    protected long lastAccessedTime = creationTime;
+    protected volatile long lastAccessedTime = creationTime;
 
 
     /**
@@ -279,7 +279,7 @@ public class StandardSession
     /**
      * The current accessed time for this session.
      */
-    protected long thisAccessedTime = creationTime;
+    protected volatile long thisAccessedTime = creationTime;
 
 
     /**
