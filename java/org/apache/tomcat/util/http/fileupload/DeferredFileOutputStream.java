@@ -84,7 +84,14 @@ public class DeferredFileOutputStream
         super(threshold);
         this.outputFile = outputFile;
 
-        memoryOutputStream = new ByteArrayOutputStream(threshold);
+        if (threshold < DefaultFileItemFactory.DEFAULT_SIZE_THRESHOLD) {
+            // Small threshold, use it
+            memoryOutputStream = new ByteArrayOutputStream(threshold);
+        } else {
+            // Large threshold. Use default and array will expand if required
+            memoryOutputStream = new ByteArrayOutputStream(
+                    DefaultFileItemFactory.DEFAULT_SIZE_THRESHOLD);
+        }
         currentOutputStream = memoryOutputStream;
     }
 
