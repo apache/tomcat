@@ -409,13 +409,15 @@ public class ConnectionPool {
     protected PooledConnection createConnection(long now, PooledConnection con) {
         //no connections where available we'll create one
         boolean error = false;
+        boolean inbusy = true;
         try {
             //connect and validate the connection
             con = create();
             con.lock();
             if (!busy.offer(con)) {
+                inbusy = false;
                 log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
-            }
+            } 
             con.connect();
             if (con.validate(PooledConnection.VALIDATE_INIT)) {
                 //no need to lock a new one, its not contented
@@ -424,6 +426,10 @@ public class ConnectionPool {
                     con.setStackTrace(getThreadDump());
                 }
                 return con;
+            } else {
+                //validation failed, make sure we disconnect
+                //and clean up
+                error =true;
             } //end if
         } catch (Exception e) {
             error = true;
@@ -431,7 +437,7 @@ public class ConnectionPool {
         } finally {
             if (error ) {
                 release(con);
-                busy.remove(con);
+                if (inbusy) busy.remove(con);
             }
             con.unlock();
         }//catch
