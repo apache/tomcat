@@ -156,14 +156,16 @@ public class AprEndpoint {
     protected long sslContext = 0;
 
     
+    // ------------------------------------------------------------- Properties
+
+
     /**
      * Defer accept.
      */
     protected boolean deferAccept = true;
+    public void setDeferAccept(boolean deferAccept) { this.deferAccept = deferAccept; }
+    public boolean getDeferAccept() { return deferAccept; }
     
-
-    // ------------------------------------------------------------- Properties
-
 
     /**
      * External Executor based thread pool.
@@ -659,8 +661,10 @@ public class AprEndpoint {
         // Delay accepting of new connections until data is available
         // Only Linux kernels 2.4 + have that implemented
         // on other platforms this call is noop and will return APR_ENOTIMPL.
-        if (Socket.optSet(serverSock, Socket.APR_TCP_DEFER_ACCEPT, 1) == Status.APR_ENOTIMPL) {
-            deferAccept = false;
+        if (deferAccept) {
+            if (Socket.optSet(serverSock, Socket.APR_TCP_DEFER_ACCEPT, 1) == Status.APR_ENOTIMPL) {
+                deferAccept = false;
+            }
         }
 
         // Initialize SSL if needed
