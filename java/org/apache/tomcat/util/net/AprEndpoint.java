@@ -941,7 +941,7 @@ public class AprEndpoint {
             if ((maxThreads > 0) && (curThreads < maxThreads)) {
                 curThreadsBusy++;
                 if (curThreadsBusy == maxThreads) {
-                    log.warn(sm.getString("endpoint.warn.maxThreads",
+                    log.info(sm.getString("endpoint.info.maxThreads",
                             Integer.toString(maxThreads), address,
                             Integer.toString(port)));
                 }
