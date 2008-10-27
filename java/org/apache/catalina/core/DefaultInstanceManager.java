@@ -26,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Properties;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.security.PrivilegedActionException;
 import java.io.InputStream;
@@ -46,6 +47,7 @@ import javax.servlet.Servlet;
 import org.apache.InstanceManager;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.ContainerServlet;
+import org.apache.catalina.Globals;
 import org.apache.catalina.core.Constants;
 import org.apache.catalina.util.StringManager;
 
@@ -150,14 +152,24 @@ public class DefaultInstanceManager implements InstanceManager {
      * @throws java.lang.reflect.InvocationTargetException
      *                                if call fails
      */
-    protected void postConstruct(Object instance, Class<?> clazz)
+    protected void postConstruct(Object instance, final Class<?> clazz)
             throws IllegalAccessException, InvocationTargetException {
         Class<?> superClass = clazz.getSuperclass();
         if (superClass != Object.class) {
             postConstruct(instance, superClass);
         }
 
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods = null;
+        if (Globals.IS_SECURITY_ENABLED) {
+            methods = AccessController.doPrivileged(
+                    new PrivilegedAction<Method[]>(){
+                public Method[] run(){
+                    return clazz.getDeclaredMethods();
+                }
+            });
+        } else {
+            methods = clazz.getDeclaredMethods();
+        }
         Method postConstruct = null;
         for (Method method : methods) {
             if (method.isAnnotationPresent(PostConstruct.class)) {
@@ -249,7 +261,18 @@ public class DefaultInstanceManager implements InstanceManager {
         
         while (clazz != null) {
             // Initialize fields annotations
-            Field[] fields = clazz.getDeclaredFields();
+            Field[] fields = null;
+            if (Globals.IS_SECURITY_ENABLED) {
+                final Class<?> clazz2 = clazz;
+                fields = AccessController.doPrivileged(
+                        new PrivilegedAction<Field[]>(){
+                    public Field[] run(){
+                        return clazz2.getDeclaredFields();
+                    }
+                });
+            } else {
+                fields = clazz.getDeclaredFields();
+            }
             for (Field field : fields) {
                 if (injections != null && injections.containsKey(field.getName())) {
                     lookupFieldResource(context, instance, field,
@@ -281,7 +304,18 @@ public class DefaultInstanceManager implements InstanceManager {
             }
     
             // Initialize methods annotations
-            Method[] methods = clazz.getDeclaredMethods();
+            Method[] methods = null;
+            if (Globals.IS_SECURITY_ENABLED) {
+                final Class<?> clazz2 = clazz;
+                methods = AccessController.doPrivileged(
+                        new PrivilegedAction<Method[]>(){
+                    public Method[] run(){
+                        return clazz2.getDeclaredMethods();
+                    }
+                });
+            } else {
+                methods = clazz.getDeclaredMethods();
+            }
             for (Method method : methods) {
                 String methodName = method.getName();
                 if (injections != null && methodName.startsWith("set") && methodName.length() > 3) {
