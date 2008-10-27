@@ -489,6 +489,9 @@ public final class IntrospectionUtils {
      */
     public static String replaceProperties(String value, Hashtable staticProp,
             PropertySource dynamicProp[]) {
+        if (value.indexOf("$") < 0) {
+            return value;
+        }
         StringBuffer sb = new StringBuffer();
         int prev = 0;
         // assert value!=nil
