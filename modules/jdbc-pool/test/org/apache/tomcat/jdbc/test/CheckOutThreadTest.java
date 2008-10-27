@@ -206,11 +206,100 @@ public class CheckOutThreadTest extends DefaultTestCase {
         System.out.println("[testPoolThreads20Connections10Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
+    
+    public void testDBCPThreads10Connections10WithQuery() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setTestOnBorrow(false);
+        this.threadcount = 10;
+        this.transferProperties();
+        this.tDatasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-dbcp-"+i);
+            t.d = this.tDatasource;
+            t.query = "select * from user";
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testDBCPThreads10Connections10WithQuery]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
 
+    public void testPoolThreads10Connections10WithQuery() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setTestOnBorrow(false);
+        this.threadcount = 10;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-"+i);
+            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.query = "select * from user";
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testPoolThreads10Connections10WithQuery]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+    
+    public void testDBCPThreads10Connections10WithValidateWithQuery() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
+        this.threadcount = 10;
+        this.transferProperties();
+        this.tDatasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-dbcp-"+i);
+            t.d = this.tDatasource;
+            t.query = "select * from user";
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testDBCPThreads10Connections10WithValidateWithQuery]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+
+    public void testPoolThreads10Connections10WithValidateWithQuery() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
+        this.threadcount = 10;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-"+i);
+            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.query = "select * from user";
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testPoolThreads10Connections10WithValidateWithQuery]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
     
     public class TestThread extends Thread {
         protected DataSource d;
-        
+        protected String query = null;
         public void run() {
             long max = -1, totalmax=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
             try {
@@ -223,6 +312,14 @@ public class CheckOutThreadTest extends DefaultTestCase {
                         totalmax += delta;
                         max = Math.max(delta, max);
                         nroffetch++;
+                        if (query!=null) {
+                            Statement st = con.createStatement();
+                            ResultSet rs = st.executeQuery(query);
+                            while (rs.next()) {
+                            }
+                            rs.close();
+                            st.close();
+                        }
                     } finally {
                         long cstart = System.nanoTime();
                         if (con!=null) try {con.close();}catch(Exception x) {x.printStackTrace();}
