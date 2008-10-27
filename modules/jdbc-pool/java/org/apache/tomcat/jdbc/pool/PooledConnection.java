@@ -61,7 +61,7 @@ public class PooledConnection {
     protected void connect() throws SQLException {
         if (connection != null) {
             try {
-                this.disconnect();
+                this.disconnect(false);
             } catch (Exception x) {
                 log.error("Unable to disconnect previous connection.", x);
             } //catch
@@ -90,11 +90,11 @@ public class PooledConnection {
     }
 
     protected void reconnect() throws SQLException {
-        this.disconnect();
+        this.disconnect(false);
         this.connect();
     } //reconnect
 
-    protected synchronized void disconnect() throws SQLException {
+    protected synchronized void disconnect(boolean finalize) throws SQLException {
         if (isDiscarded()) {
             return;
         }
@@ -103,7 +103,7 @@ public class PooledConnection {
             connection.close();
         }
         connection = null;
-        parent.finalize(this);
+        if (finalize) parent.finalize(this);
     }
 
 
@@ -121,7 +121,7 @@ public class PooledConnection {
 
     public boolean abandon() {
         try {
-            disconnect();
+            disconnect(true);
         } catch (SQLException x) {
             log.error("", x);
         } //catch
@@ -157,6 +157,10 @@ public class PooledConnection {
     }
 
     public boolean validate(int validateAction,String sql) {
+        if (this.isDiscarded()) {
+            return false;
+        }
+        
         if (!doValidate(validateAction)) {
             //no validation required, no init sql and props not set
             return true;
@@ -202,9 +206,15 @@ public class PooledConnection {
      */
     public void release() {
         try {
-            disconnect();
+            disconnect(true);
         } catch (SQLException x) {
-            //TODO
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to close SQL connection",x);
+            }
+        } catch (Exception x) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to close SQL connection",x);
+            }
         }
 
     }
