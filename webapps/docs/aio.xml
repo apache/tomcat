@@ -48,7 +48,7 @@
   <section name="Comet support">
 
   <p>
-    Comet support allows a servlet to process IO aynchronously, recieving
+    Comet support allows a servlet to process IO aynchronously, receiving
     events when data is available for reading on the connection (rather than
     always using a blocking read), and writing data back on connections
     asychnonously (most likely responding to some event raised from some
@@ -155,7 +155,7 @@
   <subsection name="Example code">
   
   <p>
-    The following pseudo code servlet implments asynchronous chat functionality using the API
+    The following pseudo code servlet implements asynchronous chat functionality using the API
     described above:
   </p>
   
@@ -299,7 +299,7 @@ public class ChatServlet
   </subsection>
   <subsection name="Comet timeouts">
     <p>If you are using the NIO connector, you can set individual timeouts for your different comet connections.
-       To set a timeout, simple set a request attribute like the following code shows:
+       To set a timeout, simply set a request attribute like the following code shows:
        <source>CometEvent event.... event.setTimeout(30*1000);</source> or
        <source>event.getHttpServletRequest().setAttribute("org.apache.tomcat.comet.timeout", new Integer(30 * 1000));</source>
        This sets the timeout to 30 seconds.
