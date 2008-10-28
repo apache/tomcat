@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat Trunk" default="conpool" basedir="../..">
+<project name="Tomcat Trunk" default="build" basedir="../..">
 
 
   <!-- ===================== Initialize Property Values =================== -->
@@ -90,12 +90,23 @@
   <path id="tomcat.classpath">
     <pathelement location="${tomcat.classes}"/>
   </path>
+	
+  <path id="test.classpath">
+  	<pathelement location="${tomcat-jdbc.jar}"/>
+  	<pathelement location="${tomcat.classes}"/>
+    <fileset dir="${base.path}">
+      <include name="**/tomcat-dbcp.jar"/>
+      <include name="**/junit.jar"/>
+      <include name="**/mysql-connector-java-5.0.7-bin.jar"/>
+    </fileset>
+  </path>
+
 
   <target name="prepare">
     <mkdir dir="${tomcat.extras}"/>
   </target>
 
-  <target name="conpool">
+  <target name="build">
     <mkdir dir="${tomcat.extras}"/>
     <path id="tomcat.jdbc.classpath">
       <pathelement path="${tomcat.classpath}"/>
@@ -119,6 +130,8 @@
     </jar>
     <!-- create checksums -->
     <checksum file="${tomcat-jdbc.jar}" forceOverwrite="yes" fileext=".md5" />
+
+  
   </target>
 
   <target name="clean"> 
@@ -130,6 +143,23 @@
           </fileset>
       </delete>
   </target>
+	
+  <target name="test" depends="clean,build">
+
+    <!-- compile org.apache.tomcat.jdbc-->
+    <javac srcdir="${basedir}/modules/jdbc-pool/test" destdir="${tomcat.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}">
+      <classpath refid="test.classpath"/>
+      <include name="org/apache/tomcat/jdbc/**" />
+    </javac>
+  	
+  	<java classname="org.junit.runner.JUnitCore" classpathref="test.classpath" fork="false">
+      <arg line="org.apache.tomcat.jdbc.test.CheckOutThreadTest" />
+    </java>
+  </target>	
 	
   <!-- Download and dependency building -->
   <target name="proxyflags">
