@@ -441,7 +441,7 @@ public class ConnectionPool {
         return null;
     }
 
-    protected PooledConnection borrowConnection(long now, PooledConnection con) {
+    protected PooledConnection borrowConnection(long now, PooledConnection con) throws SQLException {
         //we have a connection, lets set it up
         boolean setToNull = false;
         try {
@@ -483,6 +483,11 @@ public class ConnectionPool {
             } catch (Exception x) {
                 release(con);                
                 setToNull = true;
+                if (x instanceof SQLException) {
+                    throw (SQLException)x;
+                } else {
+                    throw new SQLException(x);
+                }
             }
         } finally {
             con.unlock();
