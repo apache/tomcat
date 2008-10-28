@@ -265,7 +265,7 @@ public class ConnectionPool {
         //make space for 10 extra in case we flow over a bit
         busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
         //make space for 10 extra in case we flow over a bit
-        idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
+        idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
 
         //if the evictor thread is supposed to run, start it now
         if (properties.isPoolSweeperEnabled()) {
