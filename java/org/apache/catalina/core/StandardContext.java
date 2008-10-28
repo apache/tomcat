@@ -457,7 +457,7 @@ public class StandardContext
 
 
     /**
-     * The DefaultContext override flag for this web application.
+     * The default context override flag for this web application.
      */
     private boolean override = false;
 
@@ -1537,7 +1537,7 @@ public class StandardContext
 
 
     /**
-     * Return the DefaultContext override flag for this web application.
+     * Return the default context override flag for this web application.
      */
     public boolean getOverride() {
 
@@ -1629,7 +1629,7 @@ public class StandardContext
 
 
     /**
-     * Set the DefaultContext override flag for this web application.
+     * Set the default context override flag for this web application.
      *
      * @param override The new override flag
      */

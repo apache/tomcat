@@ -158,7 +158,7 @@
                type="java.lang.String"/>
       
     <attribute name="override"
-               description="The DefaultContext override flag for this web application"
+               description="The default context.xml override flag for this web application"
                type="boolean"/>
       
     <attribute name="parentClassLoader"

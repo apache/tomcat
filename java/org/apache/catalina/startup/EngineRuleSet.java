@@ -26,9 +26,8 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 /**
  * <p><strong>RuleSet</strong> for processing the contents of a
  * Engine definition element.  This <code>RuleSet</code> does NOT include
- * any rules for nested Host or DefaultContext elements, which should
- * be added via instances of <code>HostRuleSet</code> or
- * <code>ContextRuleSet</code>, respectively.</p>
+ * any rules for nested Host elements, which should be added via instances of
+ * <code>HostRuleSet</code>.</p>
  *
  * @author Craig R. McClanahan
  * @version $Revision$ $Date$
