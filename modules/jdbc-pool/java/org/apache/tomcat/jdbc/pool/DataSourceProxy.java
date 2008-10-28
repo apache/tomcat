@@ -284,6 +284,10 @@ public class DataSourceProxy  {
         this.getPoolProperties().setJmxEnabled(enabled);
     }
     
+    public void setFairQueue(boolean fairQueue) {
+        this.getPoolProperties().setFairQueue(fairQueue);
+    }
+    
     public void setConnectionProperties(String properties) {
         try {
             java.util.Properties prop = DataSourceFactory.getProperties(properties);
