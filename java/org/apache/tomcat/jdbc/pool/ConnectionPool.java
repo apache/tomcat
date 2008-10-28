@@ -330,7 +330,7 @@ public class ConnectionPool {
         try {
             con.lock();
             if (getPoolProperties().isLogAbandoned()) {
-                log.warn("Connection has been abandoned" + con + ":" +con.getStackTrace());
+                log.warn("Connection has been abandoned " + con + ":" +con.getStackTrace());
             }
             con.abandon();
         } finally {
@@ -409,21 +409,19 @@ public class ConnectionPool {
     protected PooledConnection createConnection(long now, PooledConnection con) {
         //no connections where available we'll create one
         boolean error = false;
-        boolean inbusy = true;
         try {
             //connect and validate the connection
             con = create();
             con.lock();
-            if (!busy.offer(con)) {
-                inbusy = false;
-                log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
-            } 
             con.connect();
             if (con.validate(PooledConnection.VALIDATE_INIT)) {
                 //no need to lock a new one, its not contented
                 con.setTimestamp(now);
                 if (getPoolProperties().isLogAbandoned()) {
                     con.setStackTrace(getThreadDump());
+                }
+                if (!busy.offer(con)) {
+                    log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
                 }
                 return con;
             } else {
@@ -437,7 +435,6 @@ public class ConnectionPool {
         } finally {
             if (error ) {
                 release(con);
-                if (inbusy) busy.remove(con);
             }
             con.unlock();
         }//catch
@@ -449,10 +446,7 @@ public class ConnectionPool {
         boolean setToNull = false;
         try {
             con.lock();
-            if (con.isDiscarded()) {
-                //connection has already been disconnected
-                setToNull = true;
-            } else if (con.validate(PooledConnection.VALIDATE_BORROW)) {
+            if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
                 //set the timestamp
                 con.setTimestamp(now);
                 if (getPoolProperties().isLogAbandoned()) {
@@ -463,11 +457,33 @@ public class ConnectionPool {
                     log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
                 }
                 return con;
-            } else {
-                /*if the object wasn't validated, we may as well remove it*/
-                release(con);
+            }
+            //if we reached here, that means the connection
+            //is either discarded or validation failed.
+            //we will make one more attempt
+            //in order to guarantee that the thread that just acquired
+            //the connection shouldn't have to poll again.
+            try {
+                con.reconnect();
+                if (con.validate(PooledConnection.VALIDATE_INIT)) {
+                    //set the timestamp
+                    con.setTimestamp(now);
+                    if (getPoolProperties().isLogAbandoned()) {
+                        //set the stack trace for this pool
+                        con.setStackTrace(getThreadDump());
+                    }
+                    if (!busy.offer(con)) {
+                        log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
+                    }
+                    return con;
+                } else {
+                    release(con);
+                    setToNull = true;
+                }
+            } catch (Exception x) {
+                release(con);                
                 setToNull = true;
-            } //end if
+            }
         } finally {
             con.unlock();
             if (setToNull) {
