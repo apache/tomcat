@@ -219,21 +219,20 @@
     <p>Use <a href="context.html#Resource Links">&lt;ResourceLink&gt;</a> 
     elements to link resources from the global context into 
     per-web-application contexts. Here is an example of making a custom 
-    factory available to all applications in the server, based on the example 
-    definition in the 
+    factory available to an application, based on the example definition in the 
     <a href="../jndi-resources-howto.html#Generic JavaBean Resources">
     JNDI Resource HOW-TO</a>:
     </p>
 
     <source>
       <![CDATA[
-        <DefaultContext>
+        <Context>
           <ResourceLink 
             name="bean/MyBeanFactory"
             global="bean/MyBeanFactory"
             type="com.mycompany.MyBean"
           />
-        </DefaultContext>
+        </Context>
       ]]>
     </source>
 
