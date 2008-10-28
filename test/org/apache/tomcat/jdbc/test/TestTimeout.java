@@ -39,7 +39,7 @@ public class TestTimeout extends DefaultTestCase {
             this.datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(1000);
             this.datasource.getPoolProperties().setMaxActive(20);
             this.datasource.getPoolProperties().setMaxWait(3000);
-            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5000);
+            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5);
             this.datasource.getPoolProperties().setMinEvictableIdleTimeMillis(5000);
             this.datasource.getPoolProperties().setMinIdle(5);
             this.datasource.getPoolProperties().setLogAbandoned(true);
@@ -69,7 +69,7 @@ public class TestTimeout extends DefaultTestCase {
             this.datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(1000);
             this.datasource.getPoolProperties().setMaxActive(20);
             this.datasource.getPoolProperties().setMaxWait(3000);
-            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5000);
+            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5);
             this.datasource.getPoolProperties().setMinEvictableIdleTimeMillis(5000);
             this.datasource.getPoolProperties().setMinIdle(5);
             this.datasource.getPoolProperties().setLogAbandoned(true);
@@ -99,7 +99,7 @@ public class TestTimeout extends DefaultTestCase {
             this.datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(1000);
             this.datasource.getPoolProperties().setMaxActive(20);
             this.datasource.getPoolProperties().setMaxWait(3000);
-            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5000);
+            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5);
             this.datasource.getPoolProperties().setMinEvictableIdleTimeMillis(5000);
             this.datasource.getPoolProperties().setMinIdle(5);
             this.datasource.getPoolProperties().setRemoveAbandoned(true);
@@ -130,7 +130,7 @@ public class TestTimeout extends DefaultTestCase {
             this.datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(1000);
             this.datasource.getPoolProperties().setMaxActive(20);
             this.datasource.getPoolProperties().setMaxWait(3000);
-            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5000);
+            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5);
             this.datasource.getPoolProperties().setMinEvictableIdleTimeMillis(5000);
             this.datasource.getPoolProperties().setMinIdle(5);
             this.datasource.getPoolProperties().setRemoveAbandoned(true);
