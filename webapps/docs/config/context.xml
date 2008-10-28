@@ -179,10 +179,9 @@
 
       <attribute name="override" required="false">
         <p>Set to <code>true</code> to have explicit settings in this
-        Context element override any corresponding settings in the
-        <a href="defaultcontext.html">DefaultContext</a> element associated
-        with our owning <a href="host.html">Host</a>.  By default, settings
-        in the DefaultContext element will be used.</p>
+        Context element override any corresponding settings in either the global
+        or <a href="host.html">Host</a> default contexts.  By default, settings
+        from a default context will be used.</p>
         <p>If a symbolic link is used for docBase then changes to the
         symbolic link will only be effective after a Tomcat restart or
         by undeploying and redeploying the conext. A context reload is not
