@@ -489,12 +489,12 @@ public class ConnectionPool {
                     throw new SQLException("Failed to validate a newly established connection.");
                 }
             } catch (Exception x) {
-                release(con);                
+                release(con);
                 setToNull = true;
                 if (x instanceof SQLException) {
                     throw (SQLException)x;
                 } else {
-                    throw new SQLException(x);
+                    throw new SQLException(getStackTrace(x));
                 }
             }
         } finally {
@@ -514,7 +514,7 @@ public class ConnectionPool {
             //if the connection pool is closed
             //close the connection instead of returning it
             release(con);
-            return; 
+            return;
         } //end if
 
         if (con != null) {
