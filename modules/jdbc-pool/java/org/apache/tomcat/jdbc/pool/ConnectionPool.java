@@ -64,6 +64,7 @@ public class ConnectionPool {
 
     /**
      * Contains all the connections that are in use
+     * TODO - this shouldn't be a blocking queue, simply a list to hold our objects
      */
     protected BlockingQueue<PooledConnection> busy;
 
@@ -264,8 +265,13 @@ public class ConnectionPool {
         poolProperties = properties;
         //make space for 10 extra in case we flow over a bit
         busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
+        //busy = new FairBlockingQueue<PooledConnection>();
         //make space for 10 extra in case we flow over a bit
-        idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
+        if (properties.isFairQueue()) {
+            idle = new FairBlockingQueue<PooledConnection>();
+        } else {
+            idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
+        }
 
         //if the evictor thread is supposed to run, start it now
         if (properties.isPoolSweeperEnabled()) {
