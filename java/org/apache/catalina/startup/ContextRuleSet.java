@@ -25,8 +25,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 
 /**
  * <p><strong>RuleSet</strong> for processing the contents of a
- * Context or DefaultContext definition element.  To enable parsing of a
- * DefaultContext, be sure to specify a prefix that ends with "/Default".</p>
+ * Context definition element.</p>
  *
  * @author Craig R. McClanahan
  * @version $Revision$ $Date$
