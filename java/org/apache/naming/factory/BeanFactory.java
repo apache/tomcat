@@ -36,8 +36,8 @@ import java.lang.reflect.Method;
 /**
  * Object factory for any Resource conforming to the JavaBean spec.
  * 
- * <p>This factory can be configured in a <code>&lt;DefaultContext&gt;</code>
- * or <code>&lt;Context&gt;</code> element in your <code>conf/server.xml</code>
+ * <p>This factory can be configured in a <code>&lt;Context&gt;</code> element
+ * in your <code>conf/server.xml</code>
  * configuration file.  An example of factory configuration is:</p>
  * <pre>
  * &lt;Resource name="jdbc/myDataSource" auth="SERVLET"

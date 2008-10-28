@@ -37,7 +37,7 @@ import javax.naming.spi.ObjectFactory;
  * Factory class that creates a JNDI named javamail MimePartDataSource
  * object which can be used for sending email using SMTP.
  * <p>
- * Can be configured in the DefaultContext or Context scope
+ * Can be configured in the Context scope
  * of your server.xml configuration file.
  * <p>
  * Example:
