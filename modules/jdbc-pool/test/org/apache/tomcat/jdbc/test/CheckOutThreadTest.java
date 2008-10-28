@@ -117,6 +117,26 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    public void testPoolThreads20Connections10Fair() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setFairQueue(true);
+        this.threadcount = 20;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-"+i);
+            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testPoolThreads20Connections10Fair]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
 
     
     public void testDBCPThreads10Connections10Validate() throws Exception {

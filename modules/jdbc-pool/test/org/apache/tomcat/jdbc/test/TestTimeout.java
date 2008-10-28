@@ -58,9 +58,71 @@ public class TestTimeout extends DefaultTestCase {
         }
     }
 
+    public void testCheckoutTimeoutFair() throws Exception {
+        try {
+            init();
+            this.datasource.getPoolProperties().setFairQueue(true);
+            this.datasource.getPoolProperties().setTestWhileIdle(true);
+            this.datasource.getPoolProperties().setTestOnBorrow(false);
+            this.datasource.getPoolProperties().setTestOnReturn(false);
+            this.datasource.getPoolProperties().setValidationInterval(30000);
+            this.datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(1000);
+            this.datasource.getPoolProperties().setMaxActive(20);
+            this.datasource.getPoolProperties().setMaxWait(3000);
+            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5000);
+            this.datasource.getPoolProperties().setMinEvictableIdleTimeMillis(5000);
+            this.datasource.getPoolProperties().setMinIdle(5);
+            this.datasource.getPoolProperties().setLogAbandoned(true);
+            System.out.println("About to test connection pool:"+datasource);
+            for (int i = 0; i < 21; i++) {
+                long now = System.currentTimeMillis();
+                this.datasource.getConnection();
+                long delta = System.currentTimeMillis()-now;
+                System.out.println("Got connection #"+i+" in "+delta+" ms.");
+            }
+        } catch ( Exception x ) {
+            x.printStackTrace();
+        }finally {
+            Thread.sleep(20000);
+            tearDown();
+        }
+    }
+    
+
     public void testRemoveAbandoned() throws Exception {
         try {
             init();
+            this.datasource.getPoolProperties().setTestWhileIdle(true);
+            this.datasource.getPoolProperties().setTestOnBorrow(false);
+            this.datasource.getPoolProperties().setTestOnReturn(false);
+            this.datasource.getPoolProperties().setValidationInterval(30000);
+            this.datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(1000);
+            this.datasource.getPoolProperties().setMaxActive(20);
+            this.datasource.getPoolProperties().setMaxWait(3000);
+            this.datasource.getPoolProperties().setRemoveAbandonedTimeout(5000);
+            this.datasource.getPoolProperties().setMinEvictableIdleTimeMillis(5000);
+            this.datasource.getPoolProperties().setMinIdle(5);
+            this.datasource.getPoolProperties().setRemoveAbandoned(true);
+            this.datasource.getPoolProperties().setLogAbandoned(true);
+            System.out.println("About to test connection pool:"+datasource);
+            for (int i = 0; i < threadcount; i++) {
+                long now = System.currentTimeMillis();
+                this.datasource.getConnection();
+                long delta = System.currentTimeMillis()-now;
+                System.out.println("Got connection #"+i+" in "+delta+" ms.");
+            }
+        } catch ( Exception x ) {
+            x.printStackTrace();
+        }finally {
+            Thread.sleep(20000);
+            tearDown();
+        }
+    }
+    
+    public void testRemoveAbandonedFair() throws Exception {
+        try {
+            init();
+            this.datasource.getPoolProperties().setFairQueue(true);
             this.datasource.getPoolProperties().setTestWhileIdle(true);
             this.datasource.getPoolProperties().setTestOnBorrow(false);
             this.datasource.getPoolProperties().setTestOnReturn(false);
