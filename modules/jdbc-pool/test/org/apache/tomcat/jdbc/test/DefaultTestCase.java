@@ -50,7 +50,7 @@ public class DefaultTestCase extends TestCase {
         p.setMaxActive(threadcount);
         p.setInitialSize(threadcount);
         p.setMaxWait(10000);
-        p.setRemoveAbandonedTimeout(10000);
+        p.setRemoveAbandonedTimeout(10);
         p.setMinEvictableIdleTimeMillis(10000);
         p.setMinIdle(threadcount);
         p.setLogAbandoned(false);

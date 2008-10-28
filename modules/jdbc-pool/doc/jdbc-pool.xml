@@ -257,6 +257,12 @@
       <p>(int) Property not used. The default value is <code>false</code>.</p>
     </attribute>
    
+    <attribute name="fairQueue" required="false">
+      <p>(boolean) Set to true if you wish that calls to getConnection should be treated
+         fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code> 
+         implementation for the list of the idle connections. The default value is <code>false</code>.
+      </p>
+    </attribute>
 
 
   </attributes>
