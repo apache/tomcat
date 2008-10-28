@@ -528,8 +528,7 @@ http://www.mycompany.com:8080/~craigmcc
     considerations:</p>
     <ul>
     <li>Each user web application will be deployed with characteristics
-        established by any <a href="defaultcontext.html">DefaultContext</a>
-        element you have configured for this Host.</li>
+        established by the global and host level default context settings.</li>
     <li>It is legal to include more than one instance of this Listener
         element.  This would only be useful, however, in circumstances
         where you wanted to configure more than one "homeBase" directory.</li>

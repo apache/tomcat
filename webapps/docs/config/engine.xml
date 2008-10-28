@@ -130,10 +130,6 @@
   have a name that matches the name specified for the
   <code>defaultHost</code> attribute, listed above.</p>
 
-  <p>You can optional nest a <a href="defaultcontext.html">DefaultContext</a>
-  element inside this <strong>Engine</strong> element, to define the default
-  characteristics of web applications that are automatically deployed.</p>
-
   <p>You can nest at most one instance of the following utility components
   by nesting a corresponding element inside your <strong>Engine</strong>
   element:</p>
