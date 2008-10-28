@@ -514,7 +514,7 @@ public class ConnectionPool {
             //if the connection pool is closed
             //close the connection instead of returning it
             release(con);
-            return;
+            return; 
         } //end if
 
         if (con != null) {
@@ -552,7 +552,7 @@ public class ConnectionPool {
 
     public void checkAbandoned() {
         try {
-            long now = System.currentTimeMillis();
+            if (busy.size()==0) return;
             Iterator<PooledConnection> locked = busy.iterator();
             while (locked.hasNext()) {
                 PooledConnection con = locked.next();
@@ -564,6 +564,7 @@ public class ConnectionPool {
                     if (idle.contains(con))
                         continue;
                     long time = con.getTimestamp();
+                    long now = System.currentTimeMillis();
                     if ((now - time) > con.getAbandonTimeout()) {
                         busy.remove(con);
                         abandon(con);
@@ -587,6 +588,7 @@ public class ConnectionPool {
 
     public void checkIdle() {
         try {
+            if (idle.size()==0) return;
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
             while ( (idle.size()>=getPoolProperties().getMinIdle()) && unlocked.hasNext()) {
@@ -621,6 +623,7 @@ public class ConnectionPool {
 
     public void testAllIdle() {
         try {
+            if (idle.size()==0) return;
             Iterator<PooledConnection> unlocked = idle.iterator();
             while (unlocked.hasNext()) {
                 PooledConnection con = unlocked.next();
