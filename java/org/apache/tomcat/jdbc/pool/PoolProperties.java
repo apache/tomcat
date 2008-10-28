@@ -58,6 +58,15 @@ public class PoolProperties {
     protected String initSQL;
     protected boolean testOnConnect =false;
     private String jdbcInterceptors=null;
+    private boolean fairQueue = false;
+
+    public boolean isFairQueue() {
+        return fairQueue;
+    }
+
+    public void setFairQueue(boolean fairQueue) {
+        this.fairQueue = fairQueue;
+    }
 
     public boolean isAccessToUnderlyingConnectionAllowed() {
         return accessToUnderlyingConnectionAllowed;
