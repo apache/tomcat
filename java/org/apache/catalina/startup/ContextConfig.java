@@ -1040,7 +1040,7 @@ public class ContextConfig
         if (log.isDebugEnabled())
             log.debug(sm.getString("contextConfig.start"));
 
-        // Set properties based on DefaultContext
+        // Set properties based on default context
         Container container = context.getParent();
         if( !context.getOverride() ) {
             if( container instanceof Host ) {

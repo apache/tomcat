@@ -220,17 +220,7 @@ public class ServerLifecycleListener
             } catch (Exception e) {
                 log.error("Exception handling Container property change", e);
             }
-        }/* else if (event.getSource() instanceof DefaultContext) {
-            try {
-                processDefaultContextPropertyChange
-                    ((DefaultContext) event.getSource(),
-                     event.getPropertyName(),
-                     event.getOldValue(),
-                     event.getNewValue());
-            } catch (Exception e) {
-                log.error("Exception handling DefaultContext property change", e);
-            }
-        }*/ else if (event.getSource() instanceof NamingResources) {
+        } else if (event.getSource() instanceof NamingResources) {
             try {
                 processNamingResourcesPropertyChange
                     ((NamingResources) event.getSource(),
@@ -423,46 +413,6 @@ public class ServerLifecycleListener
         MBeanUtils.createMBean(resourceLink);
 
     }
-
-
-    /**
-     * Create the MBeans for the specified DefaultContext and its nested components.
-     *
-     * @param dcontext DefaultContext for which to create MBeans
-     *
-     * @exception Exception if an exception is thrown during MBean creation
-     */
-    /*
-    protected void createMBeans(DefaultContext dcontext) throws Exception {
-
-        // Create the MBean for the DefaultContext itself
-        if (log.isDebugEnabled())
-            log.debug("Creating MBean for DefaultContext " + dcontext);
-        MBeanUtils.createMBean(dcontext);
-
-        dcontext.addPropertyChangeListener(this);
-
-        // Create the MBeans for the associated nested components
-        Loader dLoader = dcontext.getLoader();
-        if (dLoader != null) {
-            if (log.isDebugEnabled())
-                log.debug("Creating MBean for Loader " + dLoader);
-            //MBeanUtils.createMBean(dLoader);
-        }
-
-        Manager dManager = dcontext.getManager();
-        if (dManager != null) {
-            if (log.isDebugEnabled())
-                log.debug("Creating MBean for Manager " + dManager);
-            //MBeanUtils.createMBean(dManager);
-        }
-
-        // Create the MBeans for the NamingResources (if any)
-        NamingResources resources = dcontext.getNamingResources();
-        createMBeans(resources);
-
-    }
-    */
 
 
     /**
@@ -794,47 +744,6 @@ public class ServerLifecycleListener
 
 
     /**
-     * Deregister the MBeans for the specified DefaultContext and its nested
-     * components.
-     *
-     * @param dcontext DefaultContext for which to deregister MBeans
-     *
-     * @exception Exception if an exception is thrown during MBean destruction
-     */
-    /*
-    protected void destroyMBeans(DefaultContext dcontext) throws Exception {
-
-        Manager dManager = dcontext.getManager();
-        if (dManager != null) {
-            if (log.isDebugEnabled())
-                log.debug("Destroying MBean for Manager " + dManager);
-            //MBeanUtils.destroyMBean(dManager);
-        }
-
-        Loader dLoader = dcontext.getLoader();
-        if (dLoader != null) {
-            if (log.isDebugEnabled())
-                log.debug("Destroying MBean for Loader " + dLoader);
-            //MBeanUtils.destroyMBean(dLoader);
-        }
-
-        // Destroy the MBeans for the NamingResources (if any)
-        NamingResources resources = dcontext.getNamingResources();
-        if (resources != null) {
-            destroyMBeans(resources);
-        }
-
-        // deregister the MBean for the DefaultContext itself
-        if (log.isDebugEnabled())
-            log.debug("Destroying MBean for Context " + dcontext);
-        MBeanUtils.destroyMBean(dcontext);
-        dcontext.removePropertyChangeListener(this);
-
-    }
-    */
-
-
-    /**
      * Deregister the MBeans for the specified Engine and its nested
      * components.
      *
@@ -1139,93 +1048,6 @@ public class ServerLifecycleListener
         }
 
     }
-
-
-    /**
-     * Process a property change event on a DefaultContext.
-     *
-     * @param defaultContext The DefaultContext on which this event occurred
-     * @param propertyName The name of the property that changed
-     * @param oldValue The previous value (may be <code>null</code>)
-     * @param newValue The new value (may be <code>null</code>)
-     *
-     * @exception Exception if an exception is thrown
-     */
-    /*
-    protected void processDefaultContextPropertyChange(DefaultContext defaultContext,
-                                                  String propertyName,
-                                                  Object oldValue,
-                                                  Object newValue)
-        throws Exception {
-
-        if (log.isTraceEnabled()) {
-            log.trace("propertyChange[defaultContext=" + defaultContext +
-                ",propertyName=" + propertyName +
-                ",oldValue=" + oldValue +
-                ",newValue=" + newValue + "]");
-        }
-        if ("loader".equals(propertyName)) {
-            if (oldValue != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing MBean for Loader " + oldValue);
-                }
-                MBeanUtils.destroyMBean((Loader) oldValue);
-            }
-            if (newValue != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating MBean for Loader " + newValue);
-                }
-                MBeanUtils.createMBean((Loader) newValue);
-            }
-        } else if ("logger".equals(propertyName)) {
-            if (oldValue != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing MBean for Logger " + oldValue);
-                }
-                //MBeanUtils.destroyMBean((Logger) oldValue);
-            }
-            if (newValue != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating MBean for Logger " + newValue);
-                }
-                //MBeanUtils.createMBean((Logger) newValue);
-            }
-        } else if ("manager".equals(propertyName)) {
-            if (oldValue != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Removing MBean for Manager " + oldValue);
-                }
-                MBeanUtils.destroyMBean((Manager) oldValue);
-            }
-            if (newValue != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating MBean for Manager " + newValue);
-                }
-                MBeanUtils.createMBean((Manager) newValue);
-            }
-        } else if ("realm".equals(propertyName)) {
-            if (oldValue != null) {
-//                if (log.isDebugEnabled()) {
-//                    log.debug("Removing MBean for Realm " + oldValue);
-//                }
-//                //MBeanUtils.destroyMBean((Realm) oldValue);
-            }
-            if (newValue != null) {
-//                if (log.isDebugEnabled()) {
-//                    log.debug("Creating MBean for Realm " + newValue);
-//                }
-//                //MBeanUtils.createMBean((Realm) newValue);
-            }
-        } else if ("service".equals(propertyName)) {
-            if (oldValue != null) {
-                destroyMBeans((Service) oldValue);
-            }
-            if (newValue != null) {
-                createMBeans((Service) newValue);
-            }
-        }
-
-    }*/
 
 
     /**
