@@ -99,6 +99,7 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_INTERCEPTORS = "jdbcInterceptors";
     protected final static String PROP_VALIDATIONINTERVAL = "validationInterval";
     protected final static String PROP_JMX_ENABLED = "jmxEnabled";
+    protected final static String PROP_FAIR_QUEUE = "fairQueue";
     
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
 
@@ -135,7 +136,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_CONNECTIONPROPERTIES,
         PROP_INITSQL,
         PROP_INTERCEPTORS,
-        PROP_JMX_ENABLED
+        PROP_JMX_ENABLED,
+        PROP_FAIR_QUEUE
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -380,6 +382,12 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             dataSource.getPoolProperties().setJmxEnabled(Boolean.parseBoolean(value));
         }
+        
+        value = properties.getProperty(PROP_FAIR_QUEUE);
+        if (value != null) {
+            dataSource.getPoolProperties().setFairQueue(Boolean.parseBoolean(value));
+        }
+        
 
         // Return the configured DataSource instance
         DataSource ds = getDataSource(dataSource);
