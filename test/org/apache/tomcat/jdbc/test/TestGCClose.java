@@ -30,6 +30,6 @@ public class TestGCClose extends DefaultTestCase {
         datasource.getConnection();
         System.out.println("Got a connection, but didn't return it");
         tearDown();
-        Thread.sleep(10000);
+        Thread.sleep(20000);
     }
 }
