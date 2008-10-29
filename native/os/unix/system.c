@@ -99,6 +99,10 @@ TCN_IMPLEMENT_CALL(jboolean, OS, is)(TCN_STDARGS, jint type)
     else if (type == 7)
         return JNI_TRUE;
 #endif
+#if defined(__APPLE__) || defined(DARWIN)
+    else if (type == 8)
+        return JNI_TRUE;
+#endif
     else
         return JNI_FALSE;
 }
