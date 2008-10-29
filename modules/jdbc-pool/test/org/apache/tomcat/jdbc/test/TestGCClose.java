@@ -32,4 +32,12 @@ public class TestGCClose extends DefaultTestCase {
         tearDown();
         Thread.sleep(20000);
     }
+    
+    public void testClose() throws Exception {
+        init();
+        datasource.getConnection();
+        System.out.println("Got a connection, but didn't return it");
+        datasource.close(true);
+        Thread.sleep(20000);
+    }
 }
