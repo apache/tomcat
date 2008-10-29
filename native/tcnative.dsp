@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib shlwapi.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /opt:ref
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib shlwapi.lib libeay32.lib ssleay32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"LibR/tcnative-1.dll" /libpath:"../openssl/out32" /libpath:"../openssl/out32dll" /opt:ref
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib shlwapi.lib rpcrt4.lib libeay32.lib ssleay32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /debug /machine:I386 /out:"LibR/tcnative-1.dll" /libpath:"../openssl/out32" /libpath:"../openssl/out32dll" /opt:ref
 
 !ELSEIF  "$(CFG)" == "tcnative - Win32 Debug"
 
@@ -79,7 +79,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib shlwapi.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386
-# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib shlwapi.lib libeay32.lib ssleay32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"LibD/tcnative-1.dll" /libpath:"../openssl/out32" /libpath:"../openssl/out32dll" 
+# ADD LINK32 kernel32.lib advapi32.lib ws2_32.lib mswsock.lib wldap32.lib psapi.lib ole32.lib shlwapi.lib rpcrt4.lib libeay32.lib ssleay32.lib /nologo /base:"0x6EE00000" /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"LibD/tcnative-1.dll" /libpath:"../openssl/out32" /libpath:"../openssl/out32dll" 
 
 !ENDIF 
 
