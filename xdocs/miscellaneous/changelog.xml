@@ -36,6 +36,17 @@
   new documentation project for  Tomcat Native was started.
   </p>
 </section>
+<section name="Changes between 1.1.15 and 1.1.16">
+  <changelog>
+    <fix>
+      Fix API name for recvfrom (mturk)
+    </fix>
+    <fix>
+      Allow building against APR 1.3 (mturk)
+    </fix>
+  </changelog>
+</section>
+
 <section name="Changes between 1.1.14 and 1.1.15">
   <changelog>
     <fix>
