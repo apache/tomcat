@@ -33,7 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 
 public class FairBlockingQueue<E> implements BlockingQueue<E> {
-    ReentrantLock lock = new ReentrantLock();
+    ReentrantLock lock = new ReentrantLock(false);
 
     LinkedList<E> items = null;
 
