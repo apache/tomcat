@@ -640,22 +640,21 @@ public class JIoEndpoint {
      */
     protected boolean setSocketOptions(Socket socket) {
         // Process the connection
-        int step = 1;
+        
         try {
-
             // 1: Set socket options: timeout, linger, etc
             socketProperties.setProperties(socket);
+        } catch (Throwable t) {
+            log.error(sm.getString("endpoint.err.unexpected"), t);
+            // Close the socket
+            return false;
+        }
+        try {
             // 2: SSL handshake
-            step = 2;
             serverSocketFactory.handshake(socket);
-
         } catch (Throwable t) {
             if (log.isDebugEnabled()) {
-                if (step == 2) {
-                    log.debug(sm.getString("endpoint.err.handshake"), t);
-                } else {
-                    log.debug(sm.getString("endpoint.err.unexpected"), t);
-                }
+                log.debug(sm.getString("endpoint.err.handshake"), t);
             }
             // Tell to close the socket
             return false;
