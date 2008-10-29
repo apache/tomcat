@@ -50,17 +50,18 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     public boolean offer(E e) {
         final ReentrantLock lock = this.lock;
         lock.lock();
+        ExchangeCountDownLatch<E> c = null;
         try {
             if (waiters.size() > 0) {
-                ExchangeCountDownLatch<E> c = waiters.poll();
+                c = waiters.poll();
                 c.setItem(e);
-                c.countDown();
             } else {
                 items.add(e);
             }
         } finally {
             lock.unlock();
         }
+        if (c!=null) c.countDown();
         return true;
     }
 
