@@ -51,6 +51,7 @@ import org.apache.juli.logging.LogFactory;
  *  <li>validationInterval - avoid excess validation, only run validation at most at this frequency - time in milliseconds.</li>
  *  <li>jdbcInterceptors - a semicolon separated list of classnames extending {@link JdbcInterceptor} class.</li>
  *  <li>jmxEnabled - true of false, whether to register the pool with JMX.</li>
+ *  <li>fairQueue - true of false, whether the pool should sacrifice a little bit of performance for true fairness.</li>
  *</ol>
  * @author Craig R. McClanahan
  * @author Dirk Verbeeck
