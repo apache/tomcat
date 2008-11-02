@@ -723,7 +723,7 @@ public class InternalInputBuffer implements InputBuffer {
         if (parsingHeader) {
 
             if (lastValid == buf.length) {
-                throw new IOException
+                throw new IllegalArgumentException
                     (sm.getString("iib.requestheadertoolarge.error"));
             }
 
