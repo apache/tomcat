@@ -670,16 +670,38 @@ public class Response
      *  been committed
      */
     public void resetBuffer() {
+        resetBuffer(false);
+    }
+
+    
+    /**
+     * Reset the data buffer and the using Writer/Stream flags but not any
+     * status or header information.
+     *
+     * @param resetWriterStreamFlags <code>true</code> if the internal
+     *        <code>usingWriter</code>, <code>usingOutputStream</code>,
+     *        <code>isCharacterEncodingSet</code> flags should also be reset
+     * 
+     * @exception IllegalStateException if the response has already
+     *  been committed
+     */
+    public void resetBuffer(boolean resetWriterStreamFlags) {
 
         if (isCommitted())
             throw new IllegalStateException
                 (sm.getString("coyoteResponse.resetBuffer.ise"));
 
         outputBuffer.reset();
+        
+        if(resetWriterStreamFlags) {
+            usingOutputStream = false;
+            usingWriter = false;
+            isCharacterEncodingSet = false;
+        }
 
     }
 
-
+    
     /**
      * Set the buffer size to be used for this Response.
      *

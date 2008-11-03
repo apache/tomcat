@@ -406,7 +406,7 @@ final class StandardHostValve
 
         try {
             // Reset the response (keeping the real error code and message)
-            response.resetBuffer();
+            response.resetBuffer(true);
 
             // Forward control to the specified location
             ServletContext servletContext =
