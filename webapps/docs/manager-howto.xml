@@ -976,6 +976,11 @@ file might look something like this:</p>
 </pre></td></tr>
 </table>
 
+<p>Note: The definition of the resources task above will override the resources
+datatype added in Ant 1.7. If you wish to use the resources datatype you will
+need to use Ant's namespace support to assign the Tomcat tasks to their own
+namespace.</p>
+
 <p>Now, you can execute commands like <code>ant deploy</code> to deploy the
 application to a running instance of Tomcat, or <code>ant reload</code> to
 tell Tomcat to reload it.  Note also that most of the interesting values in
