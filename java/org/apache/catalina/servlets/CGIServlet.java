@@ -288,14 +288,6 @@ public final class CGIServlet extends HttpServlet {
 
         super.init(config);
 
-        // Verify that we were not accessed using the invoker servlet
-        String servletName = getServletConfig().getServletName();
-        if (servletName == null)
-            servletName = "";
-        if (servletName.startsWith("org.apache.catalina.INVOKER."))
-            throw new UnavailableException
-                ("Cannot invoke CGIServlet through the invoker");
-        
         // Set our properties from the initialization parameters
         if (getServletConfig().getInitParameter("debug") != null)
             debug = Integer.parseInt(getServletConfig().getInitParameter("debug"));
@@ -559,11 +551,6 @@ public final class CGIServlet extends HttpServlet {
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
         throws ServletException, IOException {
-
-        // Verify that we were not accessed using the invoker servlet
-        if (req.getAttribute(Globals.INVOKED_ATTR) != null)
-            throw new UnavailableException
-                ("Cannot invoke CGIServlet through the invoker");
 
         CGIEnvironment cgiEnv = new CGIEnvironment(req, getServletContext());
 
