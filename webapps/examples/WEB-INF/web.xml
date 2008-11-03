@@ -27,23 +27,16 @@
     <display-name>Servlet and JSP Examples</display-name>
 
 
-    <!-- Define servlet-mapped and path-mapped example filters -->
+    <!-- Define example filters -->
     <filter>
-        <filter-name>Servlet Mapped Filter</filter-name>
+        <filter-name>Timing filter</filter-name>
         <filter-class>filters.ExampleFilter</filter-class>
 	<init-param>
 	    <param-name>attribute</param-name>
-	    <param-value>filters.ExampleFilter.SERVLET_MAPPED</param-value>
+	    <param-value>filters.ExampleFilter</param-value>
 	</init-param>
     </filter>
-    <filter>
-        <filter-name>Path Mapped Filter</filter-name>
-        <filter-class>filters.ExampleFilter</filter-class>
-	<init-param>
-	    <param-name>attribute</param-name>
-	    <param-value>filters.ExampleFilter.PATH_MAPPED</param-value>
-	</init-param>
-    </filter>
+
     <filter>
         <filter-name>Request Dumper Filter</filter-name>
         <filter-class>filters.RequestDumperFilter</filter-class>
@@ -73,15 +66,13 @@
         </init-param>
     </filter>
 
-    <!-- Define filter mappings for the defined filters -->
+    <!-- Define filter mappings for the timing filters -->
+    <!--
     <filter-mapping>
-        <filter-name>Servlet Mapped Filter</filter-name>
-	<servlet-name>invoker</servlet-name>
+        <filter-name>Timing Filter</filter-name>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
-    <filter-mapping>
-        <filter-name>Path Mapped Filter</filter-name>
-	<url-pattern>/servlet/*</url-pattern>
-    </filter-mapping>
+    -->
 
 <!-- Example filter mapping to apply the "Set Character Encoding" filter
      to *all* requests processed by this web application -->

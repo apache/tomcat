@@ -126,8 +126,8 @@ public final class ExampleFilter implements Filter {
     public String toString() {
 
 	if (filterConfig == null)
-	    return ("InvokerFilter()");
-	StringBuffer sb = new StringBuffer("InvokerFilter(");
+	    return ("TimingFilter()");
+	StringBuffer sb = new StringBuffer("TimingFilter(");
 	sb.append(filterConfig);
 	sb.append(")");
 	return (sb.toString());

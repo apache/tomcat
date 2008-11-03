@@ -823,9 +823,6 @@ final class ApplicationDispatcher
         while (current != null) {
             if(state.hrequest == null && (current instanceof HttpServletRequest))
                 state.hrequest = (HttpServletRequest)current;
-            if ("org.apache.catalina.servlets.InvokerHttpRequest".
-                equals(current.getClass().getName()))
-                break; // KLUDGE - Make nested RD.forward() using invoker work
             if (!(current instanceof ServletRequestWrapper))
                 break;
             if (current instanceof ApplicationHttpRequest)

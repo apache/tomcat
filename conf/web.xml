@@ -102,34 +102,6 @@
     </servlet>
 
 
-  <!-- The "invoker" servlet, which executes anonymous servlet classes      -->
-  <!-- that have not been defined in a web.xml file.  Traditionally, this   -->
-  <!-- servlet is mapped to the URL pattern "/servlet/*", but you can map   -->
-  <!-- it to other patterns as well.  The extra path info portion of such a -->
-  <!-- request must be the fully qualified class name of a Java class that  -->
-  <!-- implements Servlet (or extends HttpServlet), or the servlet name     -->
-  <!-- of an existing servlet definition.     This servlet supports the     -->
-  <!-- following initialization parameters (default values are in square    -->
-  <!-- brackets):                                                           -->
-  <!--                                                                      -->
-  <!--   debug               Debugging detail level for messages logged     -->
-  <!--                       by this servlet.  [0]                          -->
-
-<!--
-    <servlet>
-        <servlet-name>invoker</servlet-name>
-        <servlet-class>
-          org.apache.catalina.servlets.InvokerServlet
-        </servlet-class>
-        <init-param>
-            <param-name>debug</param-name>
-            <param-value>0</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
--->
-
-
   <!-- The JSP page compiler and execution servlet, which is the mechanism  -->
   <!-- used by Tomcat to support JSP pages.  Traditionally, this servlet    -->
   <!-- is mapped to the URL pattern "*.jsp".  This servlet supports the     -->
@@ -363,14 +335,6 @@
         <servlet-name>default</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-
-    <!-- The mapping for the invoker servlet -->
-<!--
-    <servlet-mapping>
-        <servlet-name>invoker</servlet-name>
-        <url-pattern>/servlet/*</url-pattern>
-    </servlet-mapping>
--->
 
     <!-- The mapping for the JSP servlet -->
     <servlet-mapping>
