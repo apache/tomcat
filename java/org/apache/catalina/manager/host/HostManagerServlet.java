@@ -81,11 +81,6 @@ import org.apache.catalina.core.ContainerBase;
  * this servlet itself will not succeed.  Therefore, this servlet should
  * generally be deployed in a separate virtual host.
  * <p>
- * <b>NOTE</b> - For security reasons, this application will not operate
- * when accessed via the invoker servlet.  You must explicitly map this servlet
- * with a servlet mapping, and you will always want to protect it with
- * appropriate security constraints as well.
- * <p>
  * The following servlet initialization parameters are recognized:
  * <ul>
  * <li><b>debug</b> - The debugging detail level that controls the amount
@@ -216,11 +211,6 @@ public class HostManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        // Verify that we were not accessed using the invoker servlet
-        if (request.getAttribute(Globals.INVOKED_ATTR) != null)
-            throw new UnavailableException
-                (sm.getString("hostManagerServlet.cannotInvoke"));
-
         // Identify the request parameters that we need
         String command = request.getPathInfo();
         if (command == null)
@@ -323,14 +313,6 @@ public class HostManagerServlet
         if ((wrapper == null) || (context == null))
             throw new UnavailableException
                 (sm.getString("hostManagerServlet.noWrapper"));
-
-        // Verify that we were not accessed using the invoker servlet
-        String servletName = getServletConfig().getServletName();
-        if (servletName == null)
-            servletName = "";
-        if (servletName.startsWith("org.apache.catalina.INVOKER."))
-            throw new UnavailableException
-                (sm.getString("hostManagerServlet.cannotInvoke"));
 
         // Set our properties from the initialization parameters
         String value = null;

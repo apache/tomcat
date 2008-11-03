@@ -144,11 +144,6 @@ import org.apache.tomcat.util.modeler.Registry;
  * generally be deployed as a separate web application within the virtual host
  * to be managed.
  * <p>
- * <b>NOTE</b> - For security reasons, this application will not operate
- * when accessed via the invoker servlet.  You must explicitly map this servlet
- * with a servlet mapping, and you will always want to protect it with
- * appropriate security constraints as well.
- * <p>
  * The following servlet initialization parameters are recognized:
  * <ul>
  * <li><b>debug</b> - The debugging detail level that controls the amount
@@ -318,11 +313,6 @@ public class ManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        // Verify that we were not accessed using the invoker servlet
-        if (request.getAttribute(Globals.INVOKED_ATTR) != null)
-            throw new UnavailableException
-                (sm.getString("managerServlet.cannotInvoke"));
-
         // Identify the request parameters that we need
         String command = request.getPathInfo();
         if (command == null)
@@ -404,11 +394,6 @@ public class ManagerServlet
                       HttpServletResponse response)
         throws IOException, ServletException {
 
-        // Verify that we were not accessed using the invoker servlet
-        if (request.getAttribute(Globals.INVOKED_ATTR) != null)
-            throw new UnavailableException
-                (sm.getString("managerServlet.cannotInvoke"));
-
         // Identify the request parameters that we need
         String command = request.getPathInfo();
         if (command == null)
@@ -451,14 +436,6 @@ public class ManagerServlet
         if ((wrapper == null) || (context == null))
             throw new UnavailableException
                 (sm.getString("managerServlet.noWrapper"));
-
-        // Verify that we were not accessed using the invoker servlet
-        String servletName = getServletConfig().getServletName();
-        if (servletName == null)
-            servletName = "";
-        if (servletName.startsWith("org.apache.catalina.INVOKER."))
-            throw new UnavailableException
-                (sm.getString("managerServlet.cannotInvoke"));
 
         // Set our properties from the initialization parameters
         String value = null;

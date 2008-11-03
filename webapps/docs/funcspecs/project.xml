@@ -40,7 +40,6 @@
 
     <menu name="Internal Servlets">
         <item name="Default Servlet"       href="fs-default.html"/>
-        <item name="Invoker Servlet"       href="fs-invoker.html"/>
     </menu>
 
     <menu name="Realm Implementations">

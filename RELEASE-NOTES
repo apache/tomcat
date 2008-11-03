@@ -34,7 +34,6 @@ KNOWN ISSUES IN THIS RELEASE:
 * Enabling SSI and CGI Support
 * Security manager URLs
 * Symlinking static resources
-* Enabling invoker servlet
 * Viewing the Tomcat Change Log
 * When all else fails
 
@@ -163,19 +162,6 @@ resources located outside the web application root directory.
 
 This behavior is optional, and the "allowLinking" flag may be used to disable
 the check.
-
-
-=========================
-Enabling invoker servlet:
-=========================
-Starting with Tomcat 4.1.12, the invoker servlet is no longer available by
-default in all webapps. Enabling it for all webapps is possible by editing
-$CATALINA_HOME/conf/web.xml to uncomment the "/servlet/*" servlet-mapping
-definition.
-
-Using the invoker servlet in a production environment is not recommended and
-is unsupported.  More details are available on the Tomcat FAQ at
-http://tomcat.apache.org/faq/misc.html#invoker.
 
 
 ==============================
