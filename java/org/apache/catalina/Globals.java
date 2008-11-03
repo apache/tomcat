@@ -121,15 +121,6 @@ public final class Globals {
 
 
     /**
-     * The request attribute under which the Invoker servlet will store
-     * the invoking servlet path, if it was used to execute a servlet
-     * indirectly instead of through a servlet mapping.
-     */
-    public static final String INVOKED_ATTR =
-        "org.apache.catalina.INVOKED";
-
-
-    /**
      * The request attribute under which we expose the value of the
      * <code>&lt;jsp-file&gt;</code> value associated with this servlet,
      * if any.

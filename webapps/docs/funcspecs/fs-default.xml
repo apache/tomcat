@@ -123,7 +123,7 @@
   <subsection name="Initialization Functionality">
 
     <p>The following processing must be performed when the <code>init()</code>
-    method of the invoker servlet is called:</p>
+    method of the default servlet is called:</p>
     <ul>
     <li>Process and sanity check configuration parameters.</li>
     </ul>
@@ -248,7 +248,7 @@
 
   <p>In addition the the assertions implied by the functionality requirements
   listed above, the following additional assertions shall be tested to
-  validate the behavior of the invoker servlet:</p>
+  validate the behavior of the default servlet:</p>
   <ul>
   <li>Requests for resources that do not exist in the web application must
       return HTTP status 404 (not found).</li>
