@@ -192,7 +192,12 @@ class ParserController implements TagConstants {
 
         if (parent != null) {
             // Included resource, add to dependent list
-            compiler.getPageInfo().addDependant(absFileName);
+            if (jarFile == null) {
+                compiler.getPageInfo().addDependant(absFileName);
+            } else {
+                compiler.getPageInfo().addDependant(
+                        jarFileUrl.toExternalForm() + absFileName.substring(1));
+            }
         }
 
         if ((isXml && isEncodingSpecifiedInProlog) || isBomPresent) {
