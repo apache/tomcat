@@ -979,7 +979,7 @@ public class JNDIRealm extends RealmBase {
                             // Search for additional roles
                             List<String> roles = getRoles(context, user);
                             if (containerLog.isDebugEnabled()) {
-                                Iterator it = roles.iterator();
+                                Iterator<String> it = roles.iterator();
                                 while (it.hasNext()) {
                                     containerLog.debug("Found role: " + it.next());
                                 }
@@ -1013,7 +1013,7 @@ public class JNDIRealm extends RealmBase {
             // Search for additional roles
             List<String> roles = getRoles(context, user);
             if (containerLog.isDebugEnabled()) {
-                Iterator it = roles.iterator();
+                Iterator<String> it = roles.iterator();
                 while (it.hasNext()) {
                     containerLog.debug("Found role: " + it.next());
                 }
@@ -1182,17 +1182,7 @@ public class JNDIRealm extends RealmBase {
                 throw ex;
         }
 
-        // Get the entry's distinguished name
-        NameParser parser = context.getNameParser("");
-        Name contextName = parser.parse(context.getNameInNamespace());
-        Name baseName = parser.parse(userBase);
-
-        // Bugzilla 32269
-        Name entryName = parser.parse(new CompositeName(result.getName()).get(0));
-
-        Name name = contextName.addAll(baseName);
-        name = name.addAll(entryName);
-        String dn = name.toString();
+        String dn = getDistinguishedName(context, userBase, result);
 
         if (containerLog.isTraceEnabled())
             containerLog.trace("  entry found for " + username + " with dn " + dn);
@@ -1448,6 +1438,16 @@ public class JNDIRealm extends RealmBase {
         if (commonRole != null)
             list.add(commonRole);
 
+        if (containerLog.isTraceEnabled()) {
+            if (list != null) {
+                containerLog.trace("  Found " + list.size() + " user internal roles");
+                for (int i=0; i<list.size(); i++)
+                    containerLog.trace(  "  Found user internal role " + list.get(i));
+            } else {
+                containerLog.trace("  Found no user internal roles");
+            }
+        }
+
         // Are we configured to do role searches?
         if ((roleFormat == null) || (roleName == null))
             return (list);
@@ -1483,8 +1483,10 @@ public class JNDIRealm extends RealmBase {
         if (containerLog.isTraceEnabled()) {
             if (list != null) {
                 containerLog.trace("  Returning " + list.size() + " roles");
-                for (int i=0; i<list.size(); i++)
-                    containerLog.trace(  "  Found role " + list.get(i));
+                Iterator<String> it = list.iterator();
+                while (it.hasNext()) {
+                    containerLog.trace(  "  Found role " + it.next());
+                }
             } else {
                 containerLog.trace("  getRoles about to return null ");
             }
@@ -1912,6 +1914,30 @@ public class JNDIRealm extends RealmBase {
             }
         }
         return buf.toString();
+    }
+
+
+    /**
+     * Returns the distinguished name of a search result.
+     *
+     * @param context Our DirContext
+     * @param base The base DN
+     * @param result The search result
+     * @return String containing the distinguished name
+     */
+    protected String getDistinguishedName(DirContext context, String base, SearchResult result)
+        throws NamingException {
+        // Get the entry's distinguished name
+        NameParser parser = context.getNameParser("");
+        Name contextName = parser.parse(context.getNameInNamespace());
+        Name baseName = parser.parse(base);
+
+        // Bugzilla 32269
+        Name entryName = parser.parse(new CompositeName(result.getName()).get(0));
+
+        Name name = contextName.addAll(baseName);
+        name = name.addAll(entryName);
+        return name.toString();
     }
 
 
