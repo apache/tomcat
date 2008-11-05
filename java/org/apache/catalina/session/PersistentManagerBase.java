@@ -1048,7 +1048,7 @@ public abstract class PersistentManagerBase
                     if (!session.isValid())
                         continue;
                     int timeIdle = // Truncate, do not round up
-                        (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
+                        (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
                     if (timeIdle > maxIdleSwap && timeIdle > minIdleSwap) {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
@@ -1092,7 +1092,7 @@ public abstract class PersistentManagerBase
         for (int i = 0; i < sessions.length && toswap > 0; i++) {
             synchronized (sessions[i]) {
                 int timeIdle = // Truncate, do not round up
-                    (int) ((timeNow - sessions[i].getLastAccessedTime()) / 1000L);
+                    (int) ((timeNow - sessions[i].getThisAccessedTime()) / 1000L);
                 if (timeIdle > minIdleSwap) {
                     if(log.isDebugEnabled())
                         log.debug(sm.getString
@@ -1130,7 +1130,7 @@ public abstract class PersistentManagerBase
                     if (!session.isValid())
                         continue;
                     int timeIdle = // Truncate, do not round up
-                        (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
+                        (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
                     if (timeIdle > maxIdleBackup) {
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
