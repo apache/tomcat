@@ -432,6 +432,32 @@ public class StandardSession
      * session, as the number of milliseconds since midnight, January 1, 1970
      * GMT.  Actions that your application takes, such as getting or setting
      * a value associated with the session, do not affect the access time.
+     * This one gets updated whenever a request starts.
+     */
+    public long getThisAccessedTime() {
+
+        if (!isValidInternal()) {
+            throw new IllegalStateException
+                (sm.getString("standardSession.getThisAccessedTime.ise"));
+        }
+
+        return (this.thisAccessedTime);
+    }
+
+    /**
+     * Return the last client access time without invalidation check
+     * @see #getThisAccessedTime().
+     */
+    public long getThisAccessedTimeInternal() {
+        return (this.thisAccessedTime);
+    }
+
+    /**
+     * Return the last time the client sent a request associated with this
+     * session, as the number of milliseconds since midnight, January 1, 1970
+     * GMT.  Actions that your application takes, such as getting or setting
+     * a value associated with the session, do not affect the access time.
+     * This one gets updated whenever a request finishes.
      */
     public long getLastAccessedTime() {
 

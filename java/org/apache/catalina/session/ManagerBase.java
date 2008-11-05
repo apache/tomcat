@@ -1228,13 +1228,30 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         s.expire();
     }
 
+    public long getThisAccessedTimestamp( String sessionId ) {
+        Session s=(Session)sessions.get(sessionId);
+        if(s== null)
+            return -1 ;
+        return s.getThisAccessedTime();
+    }
+
+    public String getThisAccessedTime( String sessionId ) {
+        Session s=(Session)sessions.get(sessionId);
+        if( s==null ) {
+            if(log.isInfoEnabled())
+                log.info("Session not found " + sessionId);
+            return "";
+        }
+        return new Date(s.getThisAccessedTime()).toString();
+    }
+
     public long getLastAccessedTimestamp( String sessionId ) {
         Session s=(Session)sessions.get(sessionId);
         if(s== null)
             return -1 ;
         return s.getLastAccessedTime();
     }
-  
+
     public String getLastAccessedTime( String sessionId ) {
         Session s=(Session)sessions.get(sessionId);
         if( s==null ) {
