@@ -1064,7 +1064,7 @@ public class ManagerServlet
 
     /**
      * Session information for the web application at the specified context path.
-     * Displays a profile of session lastAccessedTime listing number
+     * Displays a profile of session thisAccessedTime listing number
      * of sessions for each 10 minute interval up to 10 hours.
      *
      * @param writer Writer to render to
@@ -1118,7 +1118,7 @@ public class ManagerServlet
             int expired = 0;
             long now = System.currentTimeMillis();
             for (int i = 0; i < sessions.length; i++) {
-                int time = (int)((now-sessions[i].getLastAccessedTimeInternal())/1000);
+                int time = (int)((now-sessions[i].getThisAccessedTimeInternal())/1000);
                 if (idle >= 0 && time >= idle*60) {
                     sessions[i].expire();
                     idle++;
@@ -1161,7 +1161,7 @@ public class ManagerServlet
 
     /**
      * Session information for the web application at the specified context path.
-     * Displays a profile of session lastAccessedTime listing number
+     * Displays a profile of session thisAccessedTime listing number
      * of sessions for each 10 minute interval up to 10 hours.
      *
      * @param writer Writer to render to

@@ -237,7 +237,7 @@ public class SessionUtils {
 
     public static long getUsedTimeForSession(Session in_session) {
         try {
-            long diffMilliSeconds = in_session.getLastAccessedTime() - in_session.getCreationTime();
+            long diffMilliSeconds = in_session.getThisAccessedTime() - in_session.getCreationTime();
             return diffMilliSeconds;
         } catch (IllegalStateException ise) {
             //ignore: invalidated session
@@ -247,7 +247,7 @@ public class SessionUtils {
 
     public static long getTTLForSession(Session in_session) {
         try {
-            long diffMilliSeconds = (1000*in_session.getMaxInactiveInterval()) - (System.currentTimeMillis() - in_session.getLastAccessedTime());
+            long diffMilliSeconds = (1000*in_session.getMaxInactiveInterval()) - (System.currentTimeMillis() - in_session.getThisAccessedTime());
             return diffMilliSeconds;
         } catch (IllegalStateException ise) {
             //ignore: invalidated session
@@ -257,7 +257,7 @@ public class SessionUtils {
 
     public static long getInactiveTimeForSession(Session in_session) {
         try {
-            long diffMilliSeconds =  System.currentTimeMillis() - in_session.getLastAccessedTime();
+            long diffMilliSeconds =  System.currentTimeMillis() - in_session.getThisAccessedTime();
             return diffMilliSeconds;
         } catch (IllegalStateException ise) {
             //ignore: invalidated session
