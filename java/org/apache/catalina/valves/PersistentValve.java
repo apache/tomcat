@@ -200,7 +200,7 @@ public class PersistentValve
         int maxInactiveInterval = session.getMaxInactiveInterval();
         if (maxInactiveInterval >= 0) {
             int timeIdle = // Truncate, do not round up
-                (int) ((timeNow - session.getLastAccessedTime()) / 1000L);
+                (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
             if (timeIdle >= maxInactiveInterval)
                 return true;
         }
