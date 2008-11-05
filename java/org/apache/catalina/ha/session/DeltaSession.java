@@ -257,21 +257,12 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         resetDeltaRequest();
     }
 
-   
 
-    /**
-     * Return the last client access time without invalidation check
-     * @see #getLastAccessedTime().
-     */
-    public long getLastAccessedTimeInternal() {
-        return (this.lastAccessedTime);
-    }
-
-
-   
     public void setMaxInactiveInterval(int interval) {
         this.setMaxInactiveInterval(interval,true);
     }
+
+
     public void setMaxInactiveInterval(int interval, boolean addDeltaRequest) {
         super.maxInactiveInterval = interval;
         if (isValid && interval == 0) {
@@ -285,7 +276,6 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                     unlock();
                 }
             }
-                
         }
     }
 
