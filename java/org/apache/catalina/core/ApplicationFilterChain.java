@@ -228,7 +228,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
                     Object[] args = new Object[]{req, res, this};
                     SecurityUtil.doAsPrivilege
-                        ("doFilter", filter, classType, args);
+                        ("doFilter", filter, classType, args, principal);
                     
                     args = null;
                 } else {  
