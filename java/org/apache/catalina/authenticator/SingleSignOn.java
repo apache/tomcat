@@ -323,7 +323,7 @@ public class SingleSignOn
         // SSO.  If the session was logged out, we'll log out
         // of all session associated with the SSO.
         if (((session.getMaxInactiveInterval() > 0)
-            && (System.currentTimeMillis() - session.getLastAccessedTimeInternal() >=
+            && (System.currentTimeMillis() - session.getThisAccessedTimeInternal() >=
                 session.getMaxInactiveInterval() * 1000)) 
             || (Session.SESSION_PASSIVATED_EVENT.equals(event.getType()))) {
             removeSession(ssoId, session);
