@@ -617,9 +617,8 @@ public class StandardSession
      */
     public void access() {
 
-        this.lastAccessedTime = this.thisAccessedTime;
         this.thisAccessedTime = System.currentTimeMillis();
-        
+
         if (ACTIVITY_CHECK) {
             accessCount.incrementAndGet();
         }
@@ -633,6 +632,8 @@ public class StandardSession
     public void endAccess() {
 
         isNew = false;
+        this.thisAccessedTime = System.currentTimeMillis();
+        this.lastAccessedTime = this.thisAccessedTime;
 
         if (ACTIVITY_CHECK) {
             accessCount.decrementAndGet();
