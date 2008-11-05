@@ -180,7 +180,7 @@ public final class SecurityUtil{
  
     
     /**
-     * Perform work as a particular </code>Subject</code>. Here the work
+     * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject. 
      *
      * @param methodName the method to apply the security restriction
@@ -195,6 +195,31 @@ public final class SecurityUtil{
                                      final Filter targetObject, 
                                      final Class[] targetType,
                                      final Object[] targetArguments) 
+        throws java.lang.Exception{
+
+        doAsPrivilege(
+                methodName, targetObject, targetType, targetArguments, null);
+    }
+    
+    /**
+     * Perform work as a particular <code>Subject</code>. Here the work
+     * will be granted to a <code>null</code> subject. 
+     *
+     * @param methodName the method to apply the security restriction
+     * @param targetObject the <code>Filter</code> on which the method will 
+     * be called.
+     * @param targetType <code>Class</code> array used to instanciate a
+     * <code>Method</code> object.
+     * @param targetArguments <code>Object</code> array contains the 
+     * runtime parameters instance.
+     * @param principal the <code>Principal</code> to which the security 
+     * privilege apply
+     */    
+    public static void doAsPrivilege(final String methodName, 
+                                     final Filter targetObject, 
+                                     final Class[] targetType,
+                                     final Object[] targetArguments,
+                                     Principal principal) 
         throws java.lang.Exception{
         Method method = null;
 
@@ -215,7 +240,7 @@ public final class SecurityUtil{
                                             targetType);                     
         }
 
-        execute(method, targetObject, targetArguments, null);
+        execute(method, targetObject, targetArguments, principal);
     }
     
     
