@@ -23,6 +23,7 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
+  <property file="${basedir}/modules/jdbc-pool/build.properties"/>
   <property file="${basedir}/build.properties"/>
 
   <property file="${basedir}/build.properties.default"/>
@@ -30,18 +31,19 @@
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat" />
   <property name="year"                  value="2007" />
-  <property name="version.major"         value="6" />
+  <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="0" />
+  <property name="version.build"         value="1" />
   <property name="version.patch"         value="0" />
-  <property name="version"               value="6.0.0-dev" />
+  <property name="version"               value="1.0.1-beta" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
 
-  <property name="project"               value="apache-tomcat" />
+  <property name="project"               value="apache-tomcat-jdbc-pool" />
   <property name="final.name"            value="${project}-${version}" />
   <property name="final-src.name"        value="${project}-${version}-src" />
 
   <!-- Build Defaults -->
+  <property name="tomcat.pool" value="${basedir}/modules/jdbc-pool/output"/>
   <property name="tomcat.build"      value="${basedir}/output/build"/>
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
   <property name="tomcat.dist"       value="${basedir}/output/dist"/>
@@ -55,37 +57,11 @@
   <property name="compile.source" value="1.5"/>
 
   <!-- JAR artifacts -->
-  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
-
-  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
-  <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
-  <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
-  <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
-  <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
-  <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
-  <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
-
-  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
-  <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
-
   <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
-  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
-  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+  <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
+  <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
 
-  <property name="tomcat-juli.jar" value="${tomcat.extras}/tomcat-juli.jar"/>
-  <property name="tomcat-juli-adapters.jar" value="${tomcat.extras}/tomcat-juli-adapters.jar"/>
-  <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
-
-  <property name="cometd-api.jar" value="${tomcat.extras}/cometd-api.jar"/>
-  <property name="tomcat-bayeux.jar" value="${tomcat.extras}/tomcat-bayeux.jar"/>
-  <property name="cometd.war" value="${tomcat.extras}/cometd.war"/>
-  <property name="tomcat-bayeux-samples.jar" value="${tomcat.extras}/tomcat-bayeux-samples.jar"/>
-
-  <property name="tomcat-jdbc.jar" value="${tomcat.extras}/tomcat-jdbc.jar"/>
-
-  <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
-	
   <!-- Classpath -->
   <path id="tomcat.classpath">
     <pathelement location="${tomcat.classes}"/>
@@ -101,13 +77,12 @@
     </fileset>
   </path>
 
-
   <target name="prepare">
-    <mkdir dir="${tomcat.extras}"/>
+    <mkdir dir="${tomcat.pool}"/>
   </target>
 
   <target name="build">
-    <mkdir dir="${tomcat.extras}"/>
+    <mkdir dir="${tomcat.pool}"/>
     <path id="tomcat.jdbc.classpath">
       <pathelement path="${tomcat.classpath}"/>
     </path>
@@ -128,15 +103,22 @@
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
     </jar>
+  	<!-- connection pool source file-->
+    <jar jarfile="${tomcat-jdbc-src.jar}">
+      <fileset dir="${basedir}/modules/jdbc-pool/java">
+        <include name="org/apache/tomcat/jdbc/**" />
+      </fileset>
+    </jar>
     <!-- create checksums -->
     <checksum file="${tomcat-jdbc.jar}" forceOverwrite="yes" fileext=".md5" />
-
-  
+    <checksum file="${tomcat-jdbc-src.jar}" forceOverwrite="yes" fileext=".md5" />
   </target>
 
   <target name="clean"> 
       <delete file="${tomcat-jdbc.jar}"/>
       <delete file="${tomcat-jdbc.jar}.md5"/>
+      <delete file="${tomcat-jdbc-src.jar}"/>
+      <delete file="${tomcat-jdbc-src.jar}.md5"/>
       <delete includeemptydirs="true">
           <fileset dir="${tomcat.classes}">
             <include name="org/apache/tomcat/jdbc/**"/>
@@ -145,7 +127,6 @@
   </target>
 	
   <target name="test" depends="clean,build">
-
     <!-- compile org.apache.tomcat.jdbc-->
     <javac srcdir="${basedir}/modules/jdbc-pool/test" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -163,7 +144,7 @@
 	
   <target name="docs"> 
   	<xslt basedir="${basedir}/modules/jdbc-pool/doc"
-          destdir="${tomcat.extras}/"
+          destdir="${tomcat.pool}/"
   	      extension=".html"
   	      style="webapps/docs/tomcat-docs.xsl"
   	      excludes="build.xml project.xml"
@@ -172,6 +153,38 @@
   	</xslt>	
   </target>
 	
+  <target name="dist" depends="clean, build, docs">
+	<property name="destdir" value="${tomcat.pool}/release/v${version}"/>
+  	<mkdir dir="${destdir}"/>
+  	<zip destfile="${destdir}/apache-tomcat-jdbc-${version}.zip">
+  	  <fileset dir="${tomcat.pool}">
+  	  	<include name="jdbc-pool.html"/>
+  	  	<include name="tomcat-jdbc.jar"/>
+        <include name="tomcat-jdbc-src.jar"/>
+        <include name="tomcat-jdbc.jar.md5"/>
+        <include name="tomcat-jdbc-src.jar.md5"/>
+  	  </fileset>
+      <fileset dir="${basedir}/output/build/bin">
+      	<include name="tomcat-juli.jar"/>
+      </fileset>	
+  	</zip>
+    <tar destfile="${destdir}/apache-tomcat-jdbc-${version}.tar">
+      <fileset dir="${tomcat.pool}">
+        <include name="jdbc-pool.html"/>
+        <include name="tomcat-jdbc.jar"/>
+        <include name="tomcat-jdbc-src.jar"/>
+        <include name="tomcat-jdbc.jar.md5"/>
+        <include name="tomcat-jdbc-src.jar.md5"/>
+      </fileset>
+      <fileset dir="${basedir}/output/build/bin">
+        <include name="tomcat-juli.jar"/>
+      </fileset>    
+    </tar>
+    <gzip src="${destdir}/apache-tomcat-jdbc-${version}.tar"
+  	      destfile="${destdir}/apache-tomcat-jdbc-${version}.tar.gz"/>
+  	<delete file="${destdir}/apache-tomcat-jdbc-${version}.tar"/>
+  </target>
+  	
   <!-- Download and dependency building -->
   <target name="proxyflags">
     <!-- check proxy parameters. -->
@@ -207,5 +220,4 @@
     <delete file="${base.path}/file.tar"/>
     <delete file="${base.path}/file.tar.gz"/>
   </target>
-
 </project>
