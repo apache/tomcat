@@ -126,7 +126,7 @@ public class ConnectionPool {
             for (int i=proxies.length-1; i>=0; i--) {
                 try {
                     JdbcInterceptor interceptor =
-                        (JdbcInterceptor) Class.forName(proxies[i], true,
+                        (JdbcInterceptor) Class.forName(proxies[i], true, //should this be the class loader?
                                 Thread.currentThread().getContextClassLoader()).newInstance();
                     interceptor.setNext(handler);
                     handler = interceptor;
