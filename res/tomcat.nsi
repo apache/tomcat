@@ -48,8 +48,8 @@ ${StrRep}
   !define MUI_HEADERIMAGE_BITMAP header.bmp
   !define MUI_WELCOMEFINISHPAGE_BITMAP side_left.bmp 
   !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\webapps\ROOT\RELEASE-NOTES.txt"
-  !define MUI_FINISHPAGE_RUN $INSTDIR\bin\tomcat6w.exe
-  !define MUI_FINISHPAGE_RUN_PARAMETERS //MR//Tomcat6
+  !define MUI_FINISHPAGE_RUN $INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe
+  !define MUI_FINISHPAGE_RUN_PARAMETERS //MR//Tomcat@VERSION_MAJOR@
   !define MUI_FINISHPAGE_NOREBOOTSUPPORT
 
   !define MUI_ABORTWARNING
@@ -105,7 +105,7 @@ ${StrRep}
   !insertmacro MUI_LANGUAGE English
 
   ;Folder-select dialog
-  InstallDir "$PROGRAMFILES\Apache Software Foundation\Tomcat 6.0"
+  InstallDir "$PROGRAMFILES\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
 
   ;Install types
   InstType Normal
@@ -113,7 +113,7 @@ ${StrRep}
   InstType Full
 
   ; Main registry key
-  InstallDirRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\6.0" ""
+  InstallDirRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@" ""
 
   !insertmacro MUI_RESERVEFILE_INSTALLOPTIONS
   ReserveFile "jvm.ini"
@@ -171,11 +171,11 @@ Section "Core" SecTomcatCore
 
   InstallRetry:
   ClearErrors
-  nsExec::ExecToLog '"$INSTDIR\bin\tomcat6.exe" //IS//Tomcat6 --DisplayName "Apache Tomcat 6" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat6.exe" --Jvm "$2" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
+  nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //IS//Tomcat@VERSION_MAJOR@ --DisplayName "Apache Tomcat @VERSION_MAJOR@" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" --Jvm "$2" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   Pop $0
   StrCmp $0 "0" InstallOk
     MessageBox MB_ABORTRETRYIGNORE|MB_ICONSTOP \
-      "Failed to install Tomcat6 service.$\r$\nCheck your settings and permissions$\r$\nIgnore and continue anyway (not recommended)?" \
+      "Failed to install Tomcat@VERSION_MAJOR@ service.$\r$\nCheck your settings and permissions$\r$\nIgnore and continue anyway (not recommended)?" \
        /SD IDIGNORE IDIGNORE InstallOk IDRETRY InstallRetry
   Quit
   InstallOk:
@@ -198,9 +198,9 @@ Section "Service" SecTomcatService
   Call findJVMPath
   Pop $2
 
-  nsExec::ExecToLog '"$INSTDIR\bin\tomcat6.exe" //US//Tomcat6 --Startup auto'
+  nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Startup auto'
   ; Bahave like Apache Httpd (put the icon in try on login)
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor" '"$INSTDIR\bin\tomcat6w.exe" //MS//Tomcat6'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor" '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MS//Tomcat@VERSION_MAJOR@'
 
   ClearErrors
 
@@ -225,42 +225,42 @@ Section "Start Menu Items" SecMenu
 
   !insertmacro MUI_INSTALLOPTIONS_READ $2 "jvm.ini" "Field 2" "State"
 
-  SetOutPath "$SMPROGRAMS\Apache Tomcat 6.0"
+  SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Tomcat Home Page.lnk" \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Home Page.lnk" \
                  "http://tomcat.apache.org/"
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Welcome.lnk" \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Welcome.lnk" \
                  "http://127.0.0.1:$R0/"
 
   IfFileExists "$INSTDIR\webapps\manager" 0 NoManagerApp
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Tomcat Manager.lnk" \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Manager.lnk" \
                  "http://127.0.0.1:$R0/manager/html"
 
 NoManagerApp:
 
   IfFileExists "$INSTDIR\webapps\webapps\tomcat-docs" 0 NoDocumentaion
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Tomcat Documentation.lnk" \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat Documentation.lnk" \
                  "$INSTDIR\webapps\tomcat-docs\index.html"
 
 NoDocumentaion:
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Uninstall Tomcat 6.0.lnk" \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Uninstall Tomcat @VERSION_MAJOR_MINOR@.lnk" \
                  "$INSTDIR\Uninstall.exe"
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Tomcat 6.0 Program Directory.lnk" \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Tomcat @VERSION_MAJOR_MINOR@ Program Directory.lnk" \
                  "$INSTDIR"
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Monitor Tomcat.lnk" \
-                 "$INSTDIR\bin\tomcat6w.exe" \
-                 '//MS//Tomcat6' \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Monitor Tomcat.lnk" \
+                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
+                 '//MS//Tomcat@VERSION_MAJOR@' \
                  "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
 
-  CreateShortCut "$SMPROGRAMS\Apache Tomcat 6.0\Configure Tomcat.lnk" \
-                 "$INSTDIR\bin\tomcat6w.exe" \
-                 '//ES//Tomcat6' \
+  CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@\Configure Tomcat.lnk" \
+                 "$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" \
+                 '//ES//Tomcat@VERSION_MAJOR@' \
                  "$INSTDIR\tomcat.ico" 0 SW_SHOWNORMAL
 
 SectionEnd
@@ -284,16 +284,16 @@ Section "Examples" SecExamples
 SectionEnd
 
 Section -post
-  nsExec::ExecToLog '"$INSTDIR\bin\tomcat6.exe" //US//Tomcat6 --Classpath "$INSTDIR\bin\bootstrap.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
-  nsExec::ExecToLog '"$INSTDIR\bin\tomcat6.exe" //US//Tomcat6 --JvmOptions "-Dcatalina.home=$INSTDIR#-Dcatalina.base=$INSTDIR#-Djava.endorsed.dirs=$INSTDIR\endorsed#-Djava.io.tmpdir=$INSTDIR\temp#-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager#-Djava.util.logging.config.file=$INSTDIR\conf\logging.properties" --StdOutput auto --StdError auto'
+  nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --Classpath "$INSTDIR\bin\bootstrap.jar" --StartClass org.apache.catalina.startup.Bootstrap --StopClass org.apache.catalina.startup.Bootstrap --StartParams start --StopParams stop  --StartMode jvm --StopMode jvm'
+  nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //US//Tomcat@VERSION_MAJOR@ --JvmOptions "-Dcatalina.home=$INSTDIR#-Dcatalina.base=$INSTDIR#-Djava.endorsed.dirs=$INSTDIR\endorsed#-Djava.io.tmpdir=$INSTDIR\temp#-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager#-Djava.util.logging.config.file=$INSTDIR\conf\logging.properties" --StdOutput auto --StdError auto'
 
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-  WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\6.0" "InstallPath" $INSTDIR
-  WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\6.0" "Version" @VERSION@
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat 6.0" \
-                   "DisplayName" "Apache Tomcat 6.0 (remove only)"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat 6.0" \
+  WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@" "InstallPath" $INSTDIR
+  WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@" "Version" @VERSION@
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@" \
+                   "DisplayName" "Apache Tomcat @VERSION_MAJOR_MINOR@ (remove only)"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@" \
                    "UninstallString" '"$INSTDIR\Uninstall.exe"'
 
 SectionEnd
@@ -606,16 +606,16 @@ Section Uninstall
   Delete "$INSTDIR\Uninstall.exe"
 
   ; Stop Tomcat service monitor if running
-  nsExec::ExecToLog '"$INSTDIR\bin\tomcat6w.exe" //MQ//Tomcat6'
+  nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@w.exe" //MQ//Tomcat@VERSION_MAJOR@'
   ; Delete Tomcat service
-  nsExec::ExecToLog '"$INSTDIR\bin\tomcat6.exe" //DS//Tomcat6'
+  nsExec::ExecToLog '"$INSTDIR\bin\tomcat@VERSION_MAJOR@.exe" //DS//Tomcat@VERSION_MAJOR@'
   ClearErrors
 
   DeleteRegKey HKCR "JSPFile"
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat 6.0"
-  DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\6.0"
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@"
+  DeleteRegKey HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@"
   DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "ApacheTomcatMonitor"
-  RMDir /r "$SMPROGRAMS\Apache Tomcat 6.0"
+  RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@"
   Delete "$INSTDIR\tomcat.ico"
   Delete "$INSTDIR\LICENSE"
   Delete "$INSTDIR\NOTICE"
@@ -634,7 +634,7 @@ Section Uninstall
   ; if $INSTDIR was removed, skip these next ones
   IfFileExists "$INSTDIR" 0 Removed 
     MessageBox MB_YESNO|MB_ICONQUESTION \
-      "Remove all files in your Tomcat 6.0 directory? (If you have anything  \
+      "Remove all files in your Tomcat @VERSION_MAJOR_MINOR@ directory? (If you have anything  \
  you created that you want to keep, click No)" IDNO Removed
     RMDir /r "$INSTDIR\webapps\ROOT" ; this would be skipped if the user hits no
     RMDir "$INSTDIR\webapps"

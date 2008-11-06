@@ -28,16 +28,19 @@
   <property file="build.properties.default"/>
 
   <!-- Project Properties -->
+  <property name="project"               value="apache-tomcat" />
   <property name="name"                  value="Apache Tomcat" />
   <property name="year"                  value="2008" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
   <property name="version.patch"         value="0" />
-  <property name="version"               value="6.0.0-dev" />
-  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.suffix"        value="-dev" />
 
-  <property name="project"               value="apache-tomcat" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
+  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.major.minor"   value="${version.major}.${version.minor}" />
+
   <property name="final.name"            value="${project}-${version}" />
   <property name="final-src.name"        value="${project}-${version}-src" />
 
@@ -71,10 +74,18 @@
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
 
-  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
-  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat${version.major}-deps/dbcp" />
+  <property name="jasper-jdt.home" value="${base.path}/tomcat${version.major}-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+
+  <!-- Version info filter set -->
+  <filterset id="version.filters">
+    <filter token="VERSION" value="${version}"/>
+    <filter token="VERSION_NUMBER" value="${version.number}"/>
+    <filter token="VERSION_MAJOR" value="${version.major}"/>
+    <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
+  </filterset>
 
   <target name="build-webapps-precompile" description="Precompile webapps" >
 
@@ -208,19 +219,19 @@
   <target name="fix-webapps">
     <!-- Extra build steps for webapps -->
 
-    <filter token="VERSION" value="${version}"/>
-
     <!-- Add release notes to the root webapp -->
     <copy file="${basedir}/RELEASE-NOTES"
-        tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt"
-        filtering="true" />
+        tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt">
+      <filterset refid="version.filters"/>
+    </copy>
 
     <!-- Add documents to the tomcat-docs webapp -->
     <copy file="${basedir}/resources/build.xml"
         todir="${tomcat.build}/webapps/tomcat-docs" />
     <copy file="./RELEASE-NOTES"
-        tofile="${tomcat.build}/webapps/tomcat-docs/RELEASE-NOTES.txt"
-        filtering="true" />
+        tofile="${tomcat.build}/webapps/tomcat-docs/RELEASE-NOTES.txt">
+      <filterset refid="version.filters"/>
+    </copy>
 
     <!-- Build JARs for webapps classes -->
     <mkdir dir="${tomcat.build}/server/webapps/admin/WEB-INF/lib" />
@@ -306,8 +317,8 @@
     <mkdir dir="${tomcat.dist}/temp"/>
     <mkdir dir="${tomcat.dist}/webapps"/>
     <mkdir dir="${tomcat.dist}/work"/>
-  	<mkdir dir="${tomcat.release}/v${version}/bin" />
-  	<mkdir dir="${tomcat.release}/v${version}/src" />
+    <mkdir dir="${tomcat.release}/v${version}/bin" />
+    <mkdir dir="${tomcat.release}/v${version}/src" />
   </target>
 
 
@@ -315,8 +326,8 @@
   <target name="dist-static" depends="dist-prepare">
 
     <!-- Copy the top-level documentation files -->
-    <filter token="VERSION" value="${version}"/>
-    <copy todir="${tomcat.dist}" filtering="true">
+    <copy todir="${tomcat.dist}">
+      <filterset refid="version.filters"/>
       <fileset dir=".">
         <include name="INSTALLING.txt"/>
         <include name="LICENSE"/>
@@ -339,7 +350,7 @@
       </fileset>
     </copy>
 
-  	<copy todir="${tomcat.dist}/webapps">
+    <copy todir="${tomcat.dist}/webapps">
       <fileset dir="${tomcat.build}/webapps">
         <exclude name="**/balancer/WEB-INF/classes/**" />
         <exclude name="**/ROOT/WEB-INF/classes/**" />
@@ -445,17 +456,16 @@
     <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
     <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-    <copy file="res/procrun/tomcat6.exe"
-        tofile="${tomcat.dist}/bin/tomcat6.exe" />
-    <copy file="res/procrun/tomcat6w.exe"
-        tofile="${tomcat.dist}/bin/tomcat6w.exe" />
+    <copy file="res/procrun/tomcat${version.major}.exe"
+        tofile="${tomcat.dist}/bin/tomcat${version.major}.exe" />
+    <copy file="res/procrun/tomcat${version.major}w.exe"
+        tofile="${tomcat.dist}/bin/tomcat${version.major}w.exe" />
     <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
         tofile="${tomcat.dist}/bin/tcnative-1.dll" />
 
-    <filter token="VERSION" value="${version}"/>
-    <filter token="VERSION_NUMBER" value="${version.number}"/>
-
-    <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" filtering="true" overwrite="true"/>
+    <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true">
+      <filterset refid="version.filters"/>
+    </copy>
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="tomcat.nsi" />
@@ -480,18 +490,20 @@
   <target name="release" depends="clean,dist-static,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,dist-source,dist-javadoc,package-docs-tgz,package-src-zip,package-src-tgz"
    description="Create a Tomcat 6 packaged distribution">
 
-    <filter token="VERSION" value="${version}"/>
     <copy file="KEYS"
          todir="${tomcat.release}/v${version}"/>
     <copy file="RELEASE-NOTES"
-         todir="${tomcat.release}/v${version}"
-     filtering="true"/>
+         todir="${tomcat.release}/v${version}">
+      <filterset refid="version.filters"/>
+    </copy>
     <copy file="res/welcome.main.html"
-        tofile="${tomcat.release}/v${version}/README.html"
-     filtering="true"/>
+        tofile="${tomcat.release}/v${version}/README.html">
+      <filterset refid="version.filters"/>
+    </copy>
     <copy file="res/welcome.bin.html"
-        tofile="${tomcat.release}/v${version}/bin/README.html"
-     filtering="true"/>
+        tofile="${tomcat.release}/v${version}/bin/README.html">
+      <filterset refid="version.filters"/>
+    </copy>
 
     <mkdir dir="${tomcat.release}/v${version}/bin/extras" />
     <copy todir="${tomcat.release}/v${version}/bin/extras">
@@ -499,7 +511,7 @@
         <include name="*.*"/>
       </fileset>
     </copy>
-  	
+
   </target>
 
   <!-- Packages the core zip distro -->
@@ -559,7 +571,7 @@
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="README.txt" />
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="RELEASE-NOTES" />
     </zip>
-   
+
     <checksum file="${tomcat.release}/v${version}/bin/${final.name}-admin.zip"
               forceOverwrite="yes" fileext=".md5" />
     <echo     file="${tomcat.release}/v${version}/bin/${final.name}-admin.zip.md5"
@@ -687,13 +699,13 @@
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz">
-      <tarfileset dir="${tomcat.dist}" prefix="tomcat-6.0-doc">
+      <tarfileset dir="${tomcat.dist}" prefix="tomcat-${version.major.minor}-doc">
         <include name="LICENSE" />
         <include name="NOTICE" />
         <include name="README.txt" />
         <include name="RUNNING.txt" />
       </tarfileset>
-      <tarfileset dir="${tomcat.dist}/webapps/docs" prefix="tomcat-6.0-doc">
+      <tarfileset dir="${tomcat.dist}/webapps/docs" prefix="tomcat-${version.major.minor}-doc">
         <include name="**" />
       </tarfileset>
     </tar>
@@ -718,7 +730,7 @@
 
   <!-- Packages the source code distribution in tar.gz format -->
   <target name="package-src-tgz">
-  	<fixcrlf srcdir="${tomcat.dist}/src"
+    <fixcrlf srcdir="${tomcat.dist}/src"
      excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war,**/*.exe.**/*.pdf,**/*.bin,**/*.dia"
           eol="lf"/>
     <tar longfile="gnu" compression="gzip"

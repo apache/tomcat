@@ -18,10 +18,10 @@
 $Id$
 
             ===================================================
-            Running The Apache Tomcat 6.0 Servlet/JSP Container
+            Running The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ===================================================
 
-Apache Tomcat 6.0 requires the Java 2 Standard Edition Runtime
+Apache Tomcat @VERSION_MAJOR_MINOR@ requires the Java 2 Standard Edition Runtime
 Environment (JRE) version 5.0 or later.
 
 =============================

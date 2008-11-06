@@ -18,10 +18,10 @@
 $Id$
 
             ====================================================
-            Building The Apache Tomcat 6.0 Servlet/JSP Container
+            Building The Apache Tomcat @VERSION_MAJOR_MINOR@ Servlet/JSP Container
             ====================================================
 
-This subproject contains the source code for Tomcat 6.0, a container that
+This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
 implements the Servlet 2.5 and JSP 2.1 specifications from the Java
 Community Process <http://www.jcp.org/>.  In order to build a binary
 distribution version of the container from a source distribution, 
@@ -64,19 +64,19 @@ do the following:
   available, which will be used to actually perform the build.
 
 
-(2) Building Tomcat 6.0
+(2) Building Tomcat @VERSION_MAJOR_MINOR@
 
-(2.1) Checkout or obtain the source code for Tomcat 6.0
+(2.1) Checkout or obtain the source code for Tomcat @VERSION_MAJOR_MINOR@
 
 * Tomcat SVN repository URL:
-  http://svn.apache.org/repos/asf/tomcat/tc6.0.x/
+  http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/
 
 * Download a source package from:
   http://tomcat.apache.org/download-60.cgi
 
 * Checkout the source using SVN, selecting the desired version or
   branch (current development source is at 
-  http://svn.apache.org/repos/asf/tomcat/tc6.0.x/trunk/), or 
+  http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/), or 
   unpack the source package. The location where the source has been
   placed will be referred as ${tomcat.source}.
 
