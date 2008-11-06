@@ -161,6 +161,17 @@
     </java>
   </target>	
 	
+  <target name="docs"> 
+  	<xslt basedir="${basedir}/modules/jdbc-pool/doc"
+          destdir="${tomcat.extras}/"
+  	      extension=".html"
+  	      style="webapps/docs/tomcat-docs.xsl"
+  	      excludes="build.xml project.xml"
+  	      includes="*.xml">
+  	  <param name="relative-path" expression="."/>
+  	</xslt>	
+  </target>
+	
   <!-- Download and dependency building -->
   <target name="proxyflags">
     <!-- check proxy parameters. -->
