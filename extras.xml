@@ -28,16 +28,19 @@
   <property file="build.properties.default"/>
 
   <!-- Project Properties -->
+  <property name="project"               value="apache-tomcat" />
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2007" />
+  <property name="year"                  value="2008" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
   <property name="version.patch"         value="0" />
-  <property name="version"               value="6.0.0-dev" />
-  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.suffix"        value="-dev" />
 
-  <property name="project"               value="apache-tomcat" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
+  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.major.minor"   value="${version.major}.${version.minor}" />
+
   <property name="final.name"            value="${project}-${version}" />
   <property name="final-src.name"        value="${project}-${version}-src" />
 
@@ -68,8 +71,8 @@
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
 
-  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
-  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat${version.major}-deps/dbcp" />
+  <property name="jasper-jdt.home" value="${base.path}/tomcat${version.major}-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
 
