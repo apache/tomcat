@@ -276,11 +276,7 @@ TCN_IMPLEMENT_CALL(jint, Library, version)(TCN_STDARGS, jint what)
             return TCN_PATCH_VERSION;
         break;
         case 0x04:
-#ifdef TCN_IS_DEV_VERSION
-            return 1;
-#else
-            return 0;
-#endif
+            return TCN_IS_DEV_VERSION;
         break;
         case 0x11:
             return apv.major;
