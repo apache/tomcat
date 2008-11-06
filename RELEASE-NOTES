@@ -41,9 +41,9 @@ KNOWN ISSUES IN THIS RELEASE:
 ===================
 Dependency Changes:
 ===================
-Tomcat 6.0 is designed to run on JSE 5.0 and later.
+Tomcat @VERSION_MAJOR_MINOR@ is designed to run on JSE 5.0 and later.
 
-In addition, Tomcat 6.0 uses the Eclipse JDT Java compiler for compiling
+In addition, Tomcat @VERSION_MAJOR_MINOR@ uses the Eclipse JDT Java compiler for compiling
 JSP pages.  This means you no longer need to have the complete
 Java Development Kit (JDK) to run Tomcat, but a Java Runtime Environment
 (JRE) is sufficient.  The Eclipse JDT Java compiler is bundled with the 
@@ -76,7 +76,7 @@ during the lifetime of a particular JVM.
 =============
 Bundled APIs:
 =============
-A standard installation of Tomcat 6.0 makes all of the following APIs available
+A standard installation of Tomcat @VERSION_MAJOR_MINOR@ makes all of the following APIs available
 for use by web applications (by placing them in "lib"):
 * annotations-api.jar (Annotations package)
 * catalina.jar (Tomcat Catalina implementation)

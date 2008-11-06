@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // ============================================================================
-// catalina.corepolicy - Security Policy Permissions for Tomcat 6
+// catalina.corepolicy - Security Policy Permissions for Tomcat @VERSION_MAJOR@
 //
 // This file contains a default set of security policies to be enforced (by the
 // JVM) when Catalina is executed with the "-security" option.  In addition
