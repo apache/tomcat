@@ -16,13 +16,13 @@
   limitations under the License.
 -->
 <!DOCTYPE document [
-  <!ENTITY project SYSTEM "project.xml">
+  <!ENTITY project SYSTEM "../../../webapps/docs/project.xml">
 ]>
 <document url="http.html">
 
   &project;
 
-  <properties>
+ <properties>
     <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The Tomcat JDBC Connection Pool</title>
   </properties>
@@ -40,23 +40,24 @@
 
   <p>Here are a few of the reasons:
     <ol>
-      <li>commons-dbcp is single threaded, in order to be thread safe commons-dbcp looks the entire pool, even during query validation</li>
-      <li>commons-dbcp is slow - as the number of logical CPUs grow, the performance suffers, the above point shows that there is not support for high concurrency</li>
+      <li>commons-dbcp is single threaded, in order to be thread safe commons-dbcp locks the entire pool, even during query validation.</li>
+      <li>commons-dbcp is slow - as the number of logical CPUs grow, the performance suffers, the above point shows that there is not support for high concurrency
+          Even with the enormous optimizations of the <code>synchronized</code> statement in Java 6, commons-dbcp still suffers in speed and concurrency.</li>
       <li>commons-dbcp is complex, over 60 classes. tomcat-jdbc-pool, is 8 classes, hence modifications for future requirement will require
           much less changes.</li>
       <li>commons-dbcp uses static interfaces. This means you can't compile it with JDK 1.6, or if you run on JDK 1.6/1.7 you will get 
-          NoSuchMethodException for all the methods not implemented, even if the driver supports.  </li>
+          NoSuchMethodException for all the methods not implemented, even if the driver supports it.  </li>
       <li>The commons-dbcp has become fairly stagnant. Sparse updates, releases, and new feature support.</li>
       <li>It's not worth rewriting over 60 classes, when something as a connection pool can be accomplished with as a much simpler implementation.</li> 
-      <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a greatly simplified logging framework used in Tomcat</li>
+      <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a simplified logging framework used in Tomcat.</li>
     </ol>
   </p>
 
   <p>Features added over other connection pool implementations
     <ol>
-      <li>Support for highly concurrent environments and multi core/cpu systems</li>
+      <li>Support for highly concurrent environments and multi core/cpu systems.</li>
       <li>Dynamic implementation of interface, will support java.sql and javax.sql interfaces for 
-          your runtime environment (as long as your JDBC driver does the same), even when compiled with a lower JDK</li>
+          your runtime environment (as long as your JDBC driver does the same), even when compiled with a lower version of the JDK.</li>
       <li>Validation intervals - we don't have to validate every single time we use the connection, we can do this 
           when we borrow or return the connection, just not more frequent than an interval we can configure.</li>
       <li>Run-Once query, a configurable query that will be run only once, when the connection to the database is established.
@@ -68,23 +69,49 @@
       <li>High performance - we will show some differences in performance later on</li>
       <li>Extremely simple, due to the very simplified implementation, the line count and source file count are very low, compare with c3p0 
           that has over 200 source files(last time we checked), Tomcat jdbc has a core of 8 files, the connection pool itself is about half 
-          that.</li>
+          that. As bugs may occur, they will be faster to track down, and easier to fix. Complexity reduction has been a focus from inception.</li>
     </ol>
   </p>
 
 
 </section>
-
-
+<section name="How to use">
+  <p>
+    Usage of the Tomcat connection pool has been made to be as simple as possible, for those of you that are familiar with commons-dbcp, the 
+    transition will be very simple. Moving from other connection pools is also fairly straight forward. 
+  </p>
+  <subsection name="Additional features">
+    <p>The Tomcat connection pool offers a few additional features over what most other pools let you do:</p>
+    <ul>
+      <li><code>initSQL</code> - the ability to run a SQL statement exactly once, when the connection is created</li>
+      <li><code>validationInterval</code> - in addition to running validations on connections, avoid running them too frequently.</li>
+      <li><code>jdbcInterceptors</code> - flexible and pluggable interceptors to create any customizations around the pool, 
+          the query execution and the result set handling. More on this in the advanced section.</li>
+    </ul>    
+  </subsection>
+  <subsection name="Inside the Apache Tomcat Container">
+    <p>
+      The Tomcat Connection pool is configured as a resource described in <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html" target="_blank">The Tomcat JDBC documentation</a>
+      With the only difference being that you have to specify the <code>factory</code> attribute and set the value to 
+      <code>org.apache.tomcat.jdbc.pool.DataSourceFactory</code>
+    </p>
+  </subsection>
+  <subsection name="Standalone">
+    <p>
+      The connection pool only has another dependency, and that is on tomcat-juli.jar. 
+      To configure the pool in a stand alone project using bean instantiation, the bean to instantiate is 
+      <code>org.apache.tomcat.jdbc.pool.DataSource</code>. The same attributes (documented below) as you use to configure a connection
+      pool as a JNDI resource, are used to configure a data source as a bean.
+    </p>
+  </subsection>
+</section>
 <section name="Attributes">
   <p>To provide a very simple switch to and from commons-dbcp and tomcat-jdbc-pool,
      Most attributes are the same and have the same meaning.</p>
-
-
   <subsection name="JNDI Factory and Type">
     <attributes>
       <attribute name="factory" required="true">
-        <p>factory is required, and the value should be <code>org.apache.tomcat.jdbc.poo.DataSourceFactory</code></p>
+        <p>factory is required, and the value should be <code>org.apache.tomcat.jdbc.pool.DataSourceFactory</code></p>
       </attribute>
       <attribute name="type" required="true">
         <p>Type should always be <code>javax.sql.DataSource</code></p>
@@ -257,14 +284,6 @@
       <p>(int) Property not used. The default value is <code>false</code>.</p>
     </attribute>
    
-    <attribute name="fairQueue" required="false">
-      <p>(boolean) Set to true if you wish that calls to getConnection should be treated
-         fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code> 
-         implementation for the list of the idle connections. The default value is <code>false</code>.
-      </p>
-    </attribute>
-
-
   </attributes>
 
   </subsection>
@@ -294,10 +313,30 @@
       <p>(boolean) Register the pool with JMX or not. 
          The default value is <code>true</code>.</p>
     </attribute>
+
+    <attribute name="fairQueue" required="false">
+      <p>(boolean) Set to true if you wish that calls to getConnection should be treated
+         fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code> 
+         implementation for the list of the idle connections. The default value is <code>false</code>.
+      </p>
+    </attribute>
+
   </attributes>  
   </subsection>
 </section>
-
+<section name="Advanced usage">
+  <subsection name="JDBC interceptors">
+    <p>To see an example of how to use an interceptor, take a look at
+    <code>org.apache.tomcat.jdbc.pool.interceptor.ConnectionState</code>.
+    This simple interceptor is a cache of three attributes, transaction isolation level, auto commit and read only state,
+    in order for the system to avoid not needed roundtrips to the database.
+    </p>
+    <p>Further interceptors will be added to the core of the pool as the need arises. Contributions are always welcome!</p>
+    <p>Interceptors are of course not limited to just <code>java.sql.Connection</code> but can be used to wrap any 
+    of the results from a method invokation as well. You could build query performance analyzer that provides JMX notifications when a 
+    query is running longer than the expected time.</p>
+  </subsection>
+</section>
 
 </body>
 
