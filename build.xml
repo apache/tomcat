@@ -28,16 +28,19 @@
   <property file="build.properties.default"/>
 
   <!-- Project Properties -->
+  <property name="project"               value="apache-tomcat" />
   <property name="name"                  value="Apache Tomcat" />
   <property name="year"                  value="2008" />
   <property name="version.major"         value="6" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
   <property name="version.patch"         value="0" />
-  <property name="version"               value="6.0.0-dev" />
-  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.suffix"        value="-dev" />
 
-  <property name="project"               value="apache-tomcat" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
+  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+  <property name="version.major.minor"   value="${version.major}.${version.minor}" />
+
   <property name="final.name"            value="${project}-${version}" />
   <property name="final-src.name"        value="${project}-${version}-src" />
 
@@ -74,8 +77,8 @@
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
 
-  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
-  <property name="jasper-jdt.home" value="${base.path}/tomcat6-deps/jdt" />
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat${version.major}-deps/dbcp" />
+  <property name="jasper-jdt.home" value="${base.path}/tomcat${version.major}-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
   <available property="tomcat-dbcp.present" file="${tomcat-dbcp.jar}" />
@@ -86,6 +89,19 @@
     <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
   </path>
+
+  <!-- Version info filter set -->
+  <tstamp>
+    <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
+    <format property="TSTAMP" pattern="hh:mm:ss"/>
+  </tstamp>
+  <filterset id="version.filters">
+    <filter token="VERSION" value="${version}"/>
+    <filter token="VERSION_NUMBER" value="${version.number}"/>
+    <filter token="VERSION_MAJOR" value="${version.major}"/>
+    <filter token="VERSION_MAJOR_MINOR" value="${version.major.minor}"/>
+    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
+  </filterset>
 
   <!-- Just build Tomcat -->
   <target name="build-prepare">
@@ -116,22 +132,18 @@
            target="${compile.target}"
            optimize="${compile.optimize}"
            excludes="**/CVS/**,**/.svn/**">
-<!-- Comment this in to show unchecked warnings:     <compilerarg value="-Xlint:unchecked"/> -->
+<!-- Comment this in to show unchecked warnings:     
+      <compilerarg value="-Xlint:unchecked"/>
+ -->
       <classpath refid="tomcat.classpath" />
       <exclude name="org/apache/naming/factory/webservices/**" />
       <exclude name="org/apache/tomcat/bayeux/**" />
       <exclude name="org/apache/cometd/**" />
       <exclude name="org/apache/tomcat/jdbc/**" />
     </javac>
-    <tstamp>
-      <format property="TODAY" pattern="MMM d yyyy" locale="en"/>
-      <format property="TSTAMP" pattern="hh:mm:ss"/>
-    </tstamp>
     <!-- Copy static resource files -->
-    <filter token="VERSION" value="${version}"/>
-    <filter token="VERSION_NUMBER" value="${version.number}"/>
-    <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
-    <copy todir="${tomcat.classes}" filtering="true">
+    <copy todir="${tomcat.classes}">
+      <filterset refid="version.filters"/>
       <fileset dir="java">
         <include name="**/*.properties"/>
         <include name="**/*.dtd"/>
@@ -217,8 +229,13 @@
     </jar>
 
     <!-- Bootstrap JAR File -->
+    <copy tofile="res/manifest.tmp"
+          file="res/bootstrap.jar.manifest"
+          overwrite="yes">
+      <filterset refid="version.filters"/>
+    </copy>
     <jar jarfile="${bootstrap.jar}"
-        manifest="res/bootstrap.jar.manifest">
+        manifest="res/manifest.tmp">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/startup/Bootstrap.class" />
         <include name="org/apache/catalina/startup/catalina.properties" />
@@ -368,14 +385,15 @@
         </fileset>
     </copy>
     <copy todir="${tomcat.build}/webapps/docs">
+      <filterset refid="version.filters"/>
       <fileset dir=".">
         <include name="BUILDING.txt"/>
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>
-    <filter token="VERSION" value="${version}"/>
-    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES"
-          filtering="true" />
+    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES">
+      <filterset refid="version.filters"/>
+    </copy>
 
     <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
               file="webapps/docs/appdev/build.xml.txt"/>
@@ -452,11 +470,21 @@
     <copy todir="${tomcat.build}/bin">
       <fileset dir="bin">
          <exclude name="**/*.launch"/>
+         <exclude name="**/*.sh"/>
+         <exclude name="**/*.bat"/>
+      </fileset>
+    </copy>
+    <copy todir="${tomcat.build}/bin">
+      <filterset refid="version.filters"/>
+      <fileset dir="bin">
+         <include name="**/*.sh"/>
+         <include name="**/*.bat"/>
       </fileset>
     </copy>
 
     <!-- Copy static resource files -->
     <copy todir="${tomcat.build}/conf">
+      <filterset refid="version.filters"/>
       <fileset dir="conf">
         <include name="**/*.policy"/>
         <include name="**/*.xml"/>
@@ -474,9 +502,9 @@
       </fileset>
     </copy>
 
-    <filter token="VERSION" value="${version}"/>
-    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES"
-          filtering="true" />
+    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES">
+      <filterset refid="version.filters"/>
+    </copy>
 
     <!-- Build classes for examples webapp -->
     <javac   srcdir="webapps/examples/WEB-INF/classes"
@@ -698,8 +726,8 @@
       <param name="destfile" value="${nsis.exe}"/>
   	  <param name="destdir" value="${nsis.home}/.."/>
     </antcall>
-  	
-  	<!-- Download json libraries -->
+
+       <!-- Download json libraries -->
     <antcall target="downloadfile">
       <param name="sourcefile" value="${json-lib.lib}"/>
       <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
