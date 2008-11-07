@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -209,14 +209,14 @@ public class JNDIRealm extends RealmBase {
      */
     protected String contextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
 
-    
+
     /**
      * How aliases should be dereferenced during search operations.
      */
     protected String derefAliases = null;
 
     /**
-     * Constant that holds the name of the environment property for specifying 
+     * Constant that holds the name of the environment property for specifying
      * the manner in which aliases should be dereferenced.
      */
     public final static String DEREF_ALIASES = "java.naming.ldap.derefAliases";
@@ -499,11 +499,11 @@ public class JNDIRealm extends RealmBase {
      */
     public java.lang.String getDerefAliases() {
         return derefAliases;
-    }  
-    
+    }
+
     /**
      * Set the value for derefAliases to be used when searching the directory.
-     * 
+     *
      * @param derefAliases New value of property derefAliases.
      */
     public void setDerefAliases(java.lang.String derefAliases) {
@@ -974,6 +974,8 @@ public class JNDIRealm extends RealmBase {
                 close(context);
 
             // Return "not authenticated" for this request
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("Returning null principal.");
             return (null);
 
         }
@@ -1004,8 +1006,11 @@ public class JNDIRealm extends RealmBase {
         throws NamingException {
 
         if (username == null || username.equals("")
-            || credentials == null || credentials.equals(""))
+            || credentials == null || credentials.equals("")) {
+            if (containerLog.isDebugEnabled())
+                containerLog.debug("uername null or empty: returning null principal.");
             return (null);
+        }
 
         if (userPatternArray != null) {
             for (curUserPattern = 0;
@@ -1816,9 +1821,9 @@ public class JNDIRealm extends RealmBase {
     protected synchronized Principal getPrincipal(DirContext context,
                                                   String username)
         throws NamingException {
-        
+
         User user = getUser(context, username);
-        
+
         return new GenericPrincipal(this, user.username, user.password ,
                 getRoles(context, user));
     }
