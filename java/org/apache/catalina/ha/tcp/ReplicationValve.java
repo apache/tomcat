@@ -345,24 +345,26 @@ public class ReplicationValve
                 crossContextSessions.set(new ArrayList());
             }
             getNext().invoke(request, response);
-            Manager manager = request.getContext().getManager();
-            if (manager != null && manager instanceof ClusterManager) {
-                ClusterManager clusterManager = (ClusterManager) manager;
-                CatalinaCluster containerCluster = (CatalinaCluster) getContainer().getCluster();
-                if (containerCluster == null) {
-                    if (log.isWarnEnabled())
-                        log.warn(sm.getString("ReplicationValve.nocluster"));
-                    return;
+            if(context != null) {
+                Manager manager = context.getManager();            
+                if (manager != null && manager instanceof ClusterManager) {
+                    ClusterManager clusterManager = (ClusterManager) manager;
+                    CatalinaCluster containerCluster = (CatalinaCluster) getContainer().getCluster();
+                    if (containerCluster == null) {
+                        if (log.isWarnEnabled())
+                            log.warn(sm.getString("ReplicationValve.nocluster"));
+                        return;
+                    }
+                    // valve cluster can access manager - other cluster handle replication 
+                    // at host level - hopefully!
+                    if(containerCluster.getManager(clusterManager.getName()) == null)
+                        return ;
+                    if(containerCluster.hasMembers()) {
+                        sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, containerCluster);
+                    } else {
+                        resetReplicationRequest(request,isCrossContext);
+                    }        
                 }
-                // valve cluster can access manager - other cluster handle replication 
-                // at host level - hopefully!
-                if(containerCluster.getManager(clusterManager.getName()) == null)
-                    return ;
-                if(containerCluster.hasMembers()) {
-                    sendReplicationMessage(request, totalstart, isCrossContext, clusterManager, containerCluster);
-                } else {
-                    resetReplicationRequest(request,isCrossContext);
-                }        
             }
         } finally {
             // Array must be remove: Current master request send endAccess at recycle. 
