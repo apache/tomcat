@@ -1012,7 +1012,7 @@ public class JNDIRealm extends RealmBase {
                  curUserPattern < userPatternFormatArray.length;
                  curUserPattern++) {
                 // Retrieve user information
-                User user = getUser(context, username, curUserPattern);
+                User user = getUser(context, username, credentials, curUserPattern);
                 if (user != null) {
                     try {
                         // Check the user's credentials
@@ -1043,7 +1043,7 @@ public class JNDIRealm extends RealmBase {
             return null;
         } else {
             // Retrieve user information
-            User user = getUser(context, username);
+            User user = getUser(context, username, credentials);
             if (user == null)
                 return (null);
 
@@ -1076,12 +1076,32 @@ public class JNDIRealm extends RealmBase {
      *
      * @exception NamingException if a directory server error occurs
      *
-     * @see #getUser(DirContext, String, int)
+     * @see #getUser(DirContext, String, String, int)
      */
     protected User getUser(DirContext context, String username)
         throws NamingException {
 
-        return getUser(context, username, -1);
+        return getUser(context, username, null, -1);
+    }
+
+
+    /**
+     * Return a User object containing information about the user
+     * with the specified username, if found in the directory;
+     * otherwise return <code>null</code>.
+     *
+     * @param context The directory context
+     * @param username Username to be looked up
+     * @param credentials User credentials (optional)
+     *
+     * @exception NamingException if a directory server error occurs
+     *
+     * @see #getUser(DirContext, String, int)
+     */
+    protected User getUser(DirContext context, String username, String credentials)
+        throws NamingException {
+
+        return getUser(context, username, credentials, -1);
     }
 
 
@@ -1098,11 +1118,13 @@ public class JNDIRealm extends RealmBase {
      *
      * @param context The directory context
      * @param username Username to be looked up
+     * @param credentials User credentials (optional)
      * @param curUserPattern Index into userPatternFormatArray
      *
      * @exception NamingException if a directory server error occurs
      */
-    protected User getUser(DirContext context, String username, int curUserPattern)
+    protected User getUser(DirContext context, String username,
+                           String credentials, int curUserPattern)
         throws NamingException {
 
         User user = null;
@@ -1118,7 +1140,7 @@ public class JNDIRealm extends RealmBase {
 
         // Use pattern or search for user entry
         if (userPatternFormatArray != null && curUserPattern >= 0) {
-            user = getUserByPattern(context, username, attrIds, curUserPattern);
+            user = getUserByPattern(context, username, credentials, attrIds, curUserPattern);
         } else {
             user = getUserBySearch(context, username, attrIds);
         }
@@ -1128,29 +1150,23 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Use the <code>UserPattern</code> configuration attribute to
-     * locate the directory entry for the user with the specified
-     * username and return a User object; otherwise return
-     * <code>null</code>.
+     * Use the distinguished name to locate the directory
+     * entry for the user with the specified username and
+     * return a User object; otherwise return <code>null</code>.
      *
      * @param context The directory context
      * @param username The username
      * @param attrIds String[]containing names of attributes to
+     * @param dn Distinguished name of the user
      * retrieve.
      *
      * @exception NamingException if a directory server error occurs
      */
     protected User getUserByPattern(DirContext context,
-                                               String username,
-                                               String[] attrIds,
-                                               int curUserPattern)
+                                    String username,
+                                    String[] attrIds,
+                                    String dn)
         throws NamingException {
-
-        if (username == null || userPatternFormatArray[curUserPattern] == null)
-            return (null);
-
-        // Form the dn from the user pattern
-        String dn = userPatternFormatArray[curUserPattern].format(new String[] { username });
 
         // Get required attributes from user entry
         Attributes attrs = null;
@@ -1177,6 +1193,71 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
+     * Use the <code>UserPattern</code> configuration attribute to
+     * locate the directory entry for the user with the specified
+     * username and return a User object; otherwise return
+     * <code>null</code>.
+     *
+     * @param context The directory context
+     * @param username The username
+     * @param credentials User credentials (optional)
+     * @param attrIds String[]containing names of attributes to
+     * @param curUserPattern Index into userPatternFormatArray
+     *
+     * @exception NamingException if a directory server error occurs
+     * @see #getUserByPattern(DirContext, String, String[], String)
+     */
+    protected User getUserByPattern(DirContext context,
+                                    String username,
+                                    String credentials,
+                                    String[] attrIds,
+                                    int curUserPattern)
+        throws NamingException {
+
+        User user = null;
+
+        if (username == null || userPatternFormatArray[curUserPattern] == null)
+            return (null);
+
+        // Form the dn from the user pattern
+        String dn = userPatternFormatArray[curUserPattern].format(new String[] { username });
+
+        try {
+            user = getUserByPattern(context, username, attrIds, dn);
+        } catch (NameNotFoundException e) {
+            return (null);
+        } catch (NamingException e) {
+            // If the getUserByPattern() call fails, try it again with the
+            // credentials of the user that we're searching for
+            try {
+                // Set up security environment to bind as the user
+                context.addToEnvironment(Context.SECURITY_PRINCIPAL, dn);
+                context.addToEnvironment(Context.SECURITY_CREDENTIALS, credentials);
+
+                user = getUserByPattern(context, username, attrIds, dn);
+            } finally {
+                // Restore the original security environment
+                if (connectionName != null) {
+                    context.addToEnvironment(Context.SECURITY_PRINCIPAL,
+                                             connectionName);
+                } else {
+                    context.removeFromEnvironment(Context.SECURITY_PRINCIPAL);
+                }
+
+                if (connectionPassword != null) {
+                    context.addToEnvironment(Context.SECURITY_CREDENTIALS,
+                                             connectionPassword);
+                }
+                else {
+                    context.removeFromEnvironment(Context.SECURITY_CREDENTIALS);
+                }
+            }
+        }
+        return user;
+    }
+
+
+    /**
      * Search the directory to return a User object containing
      * information about the user with the specified username, if
      * found in the directory; otherwise return <code>null</code>.
@@ -1188,8 +1269,8 @@ public class JNDIRealm extends RealmBase {
      * @exception NamingException if a directory server error occurs
      */
     protected User getUserBySearch(DirContext context,
-                                           String username,
-                                           String[] attrIds)
+                                   String username,
+                                   String[] attrIds)
         throws NamingException {
 
         if (username == null || userSearchFormat == null)
