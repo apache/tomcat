@@ -375,11 +375,6 @@ public class JNDIRealm extends RealmBase {
     protected int connectionAttempt = 0;
 
     /**
-     * The current user pattern to be used for lookup and binding of a user.
-     */
-    protected int curUserPattern = 0;
-
-    /**
      *  Add this role to every authenticated user
      */
     protected String commonRole = null;
@@ -1008,16 +1003,16 @@ public class JNDIRealm extends RealmBase {
         if (username == null || username.equals("")
             || credentials == null || credentials.equals("")) {
             if (containerLog.isDebugEnabled())
-                containerLog.debug("uername null or empty: returning null principal.");
+                containerLog.debug("username null or empty: returning null principal.");
             return (null);
         }
 
         if (userPatternArray != null) {
-            for (curUserPattern = 0;
+            for (int curUserPattern = 0;
                  curUserPattern < userPatternFormatArray.length;
                  curUserPattern++) {
                 // Retrieve user information
-                User user = getUser(context, username);
+                User user = getUser(context, username, curUserPattern);
                 if (user != null) {
                     try {
                         // Check the user's credentials
@@ -1076,6 +1071,25 @@ public class JNDIRealm extends RealmBase {
      * with the specified username, if found in the directory;
      * otherwise return <code>null</code>.
      *
+     * @param context The directory context
+     * @param username Username to be looked up
+     *
+     * @exception NamingException if a directory server error occurs
+     *
+     * @see #getUser(DirContext, String, int)
+     */
+    protected User getUser(DirContext context, String username)
+        throws NamingException {
+
+        return getUser(context, username, -1);
+    }
+
+
+    /**
+     * Return a User object containing information about the user
+     * with the specified username, if found in the directory;
+     * otherwise return <code>null</code>.
+     *
      * If the <code>userPassword</code> configuration attribute is
      * specified, the value of that attribute is retrieved from the
      * user's directory entry. If the <code>userRoleName</code>
@@ -1084,10 +1098,11 @@ public class JNDIRealm extends RealmBase {
      *
      * @param context The directory context
      * @param username Username to be looked up
+     * @param curUserPattern Index into userPatternFormatArray
      *
      * @exception NamingException if a directory server error occurs
      */
-    protected User getUser(DirContext context, String username)
+    protected User getUser(DirContext context, String username, int curUserPattern)
         throws NamingException {
 
         User user = null;
@@ -1102,8 +1117,8 @@ public class JNDIRealm extends RealmBase {
         list.toArray(attrIds);
 
         // Use pattern or search for user entry
-        if (userPatternFormatArray != null) {
-            user = getUserByPattern(context, username, attrIds);
+        if (userPatternFormatArray != null && curUserPattern >= 0) {
+            user = getUserByPattern(context, username, attrIds, curUserPattern);
         } else {
             user = getUserBySearch(context, username, attrIds);
         }
@@ -1126,8 +1141,9 @@ public class JNDIRealm extends RealmBase {
      * @exception NamingException if a directory server error occurs
      */
     protected User getUserByPattern(DirContext context,
-                                              String username,
-                                              String[] attrIds)
+                                               String username,
+                                               String[] attrIds,
+                                               int curUserPattern)
         throws NamingException {
 
         if (username == null || userPatternFormatArray[curUserPattern] == null)
