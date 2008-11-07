@@ -735,7 +735,12 @@ public class NioEndpoint {
             return;
 
         serverSock = ServerSocketChannel.open();
-        serverSock.socket().setPerformancePreferences(socketProperties.getPerformanceConnectionTime(),
+        int performanceConnectionTime = socketProperties.getPerformanceConnectionTime();
+        int performanceLatency= socketProperties.getPerformanceLatency();
+        int performanceBandwidth = socketProperties.getPerformanceBandwidth();
+        if (performanceConnectionTime != -1 && performanceLatency != -1 &&
+                performanceBandwidth != -1)
+            serverSock.socket().setPerformancePreferences(socketProperties.getPerformanceConnectionTime(),
                                                       socketProperties.getPerformanceLatency(),
                                                       socketProperties.getPerformanceBandwidth());
         InetSocketAddress addr = (address!=null?new InetSocketAddress(address,port):new InetSocketAddress(port));

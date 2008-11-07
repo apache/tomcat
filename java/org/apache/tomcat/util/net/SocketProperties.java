@@ -210,55 +210,82 @@ public class SocketProperties {
     }
 
     public boolean getOoBInline() {
-        return ooBInline.booleanValue();
+        if(ooBInline != null)
+            return ooBInline.booleanValue();
+        return false;
     }
 
     public int getPerformanceBandwidth() {
-        return performanceBandwidth.intValue();
+        if(performanceBandwidth != null)
+            return performanceBandwidth.intValue();
+        return -1;
     }
 
     public int getPerformanceConnectionTime() {
-        return performanceConnectionTime.intValue();
+        if(performanceConnectionTime!= null)
+            return performanceConnectionTime.intValue();
+        return -1;
+          
     }
 
     public int getPerformanceLatency() {
-        return performanceLatency.intValue();
+        if(performanceLatency != null)
+            return performanceLatency.intValue();
+        return -1 ;
     }
 
     public int getRxBufSize() {
-        return rxBufSize.intValue();
+        if(rxBufSize != null)
+            return rxBufSize.intValue();
+        return -1;
     }
 
     public boolean getSoKeepAlive() {
-        return soKeepAlive.booleanValue();
+        if(soKeepAlive != null)
+            return soKeepAlive.booleanValue();
+        return false;
     }
 
     public boolean getSoLingerOn() {
-        return soLingerOn.booleanValue();
+        if(soLingerOn != null)
+            return soLingerOn.booleanValue();
+        return false;
     }
 
     public int getSoLingerTime() {
-        return soLingerTime.intValue();
+        if(soLingerTime != null)
+            return soLingerTime.intValue();
+        return -1;
     }
 
     public boolean getSoReuseAddress() {
-        return soReuseAddress.booleanValue();
+        if(soReuseAddress != null)
+            return soReuseAddress.booleanValue();
+        return false;
     }
 
     public int getSoTimeout() {
-        return soTimeout.intValue();
+        if(soTimeout != null)
+            return soTimeout.intValue();
+        return -1;
     }
 
     public int getSoTrafficClass() {
-        return soTrafficClass.intValue();
+        if(soTrafficClass != null)
+            return soTrafficClass.intValue();
+        return -1;
     }
 
     public boolean getTcpNoDelay() {
-        return tcpNoDelay.booleanValue();
+        if(tcpNoDelay != null)
+            return tcpNoDelay.booleanValue();
+        return false;
     }
 
     public int getTxBufSize() {
-        return txBufSize.intValue();
+        if(txBufSize != null)
+            return txBufSize.intValue();
+        return -1;
     }
 
     public int getBufferPool() {
