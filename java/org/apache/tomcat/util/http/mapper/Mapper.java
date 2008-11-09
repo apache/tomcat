@@ -136,6 +136,47 @@ public final class Mapper {
         }
     }
 
+    /**
+     * Add an alias to an existing host.
+     * @param name  The name of the host
+     * @param alias The alias to add
+     */
+    public synchronized void addHostAlias(String name, String alias) {
+        int pos = find(hosts, name);
+        if (pos < 0) {
+            // Should not be adding an alias for a host that doesn't exist but
+            // just in case...
+            return;
+        }
+        Host realHost = hosts[pos];
+        
+        Host[] newHosts = new Host[hosts.length + 1];
+        Host newHost = new Host();
+        newHost.name = alias;
+        newHost.contextList = realHost.contextList;
+        newHost.object = realHost;
+        if (insertMap(hosts, newHosts, newHost)) {
+            hosts = newHosts;
+        }
+    }
+
+    /**
+     * Remove a host alias
+     * @param alias The alias to remove
+     */
+    public synchronized void removeHostAlias(String alias) {
+        // Find and remove the alias
+        int pos = find(hosts, alias);
+        if (pos < 0) {
+            return;
+        }
+        Host[] newHosts = new Host[hosts.length - 1];
+        if (removeMap(hosts, newHosts, alias)) {
+            hosts = newHosts;
+        }
+
+    }
+
     public String[] getHosts() {
         String hostN[] = new String[hosts.length];
         for( int i = 0; i < hosts.length; i++ ) {
@@ -1025,7 +1066,7 @@ public final class Mapper {
 
 
     /**
-     * Find a map elemnt given its name in a sorted array of map elements.
+     * Find a map element given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
      */
