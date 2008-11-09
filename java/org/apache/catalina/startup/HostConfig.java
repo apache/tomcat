@@ -21,9 +21,11 @@ package org.apache.catalina.startup;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -41,6 +43,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.Registry;
@@ -600,7 +603,7 @@ public class HostConfig
             context.setConfigFile(contextXml.getAbsolutePath());
             context.setPath(contextPath);
             // Add the associated docBase to the redeployed list if it's a WAR
-            boolean isWar = false;
+            boolean isExternalWar = false;
             boolean isExternal = false;
             if (context.getDocBase() != null) {
                 File docBase = new File(context.getDocBase());
@@ -616,7 +619,7 @@ public class HostConfig
                     deployedApp.redeployResources.put(docBase.getAbsolutePath(),
                         new Long(docBase.lastModified()));
                     if (docBase.getAbsolutePath().toLowerCase().endsWith(".war")) {
-                        isWar = true;
+                        isExternalWar = true;
                     }
                 } else {
                     log.warn(sm.getString("hostConfig.deployDescriptor.localDocBaseSpecified",
@@ -650,7 +653,7 @@ public class HostConfig
             }
             // Add the eventual unpacked WAR and all the resources which will be
             // watched inside it
-            if (isWar && unpackWARs) {
+            if (isExternalWar && unpackWARs) {
                 deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
                         new Long(expandedDocBase.lastModified()));
                 deployedApp.redeployResources.put
@@ -658,10 +661,12 @@ public class HostConfig
                 addWatchedResources(deployedApp, expandedDocBase.getAbsolutePath(), context);
             } else {
                 // Find an existing matching war and expanded folder
-                File warDocBase = new File(expandedDocBase.getAbsolutePath() + ".war");
-                if (warDocBase.exists()) {
-                    deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
-                            new Long(warDocBase.lastModified()));
+                if (!isExternal) {
+                    File warDocBase = new File(expandedDocBase.getAbsolutePath() + ".war");
+                    if (warDocBase.exists()) {
+                        deployedApp.redeployResources.put(warDocBase.getAbsolutePath(),
+                                new Long(warDocBase.lastModified()));
+                    }
                 }
                 if (expandedDocBase.exists()) {
                     deployedApp.redeployResources.put(expandedDocBase.getAbsolutePath(),
@@ -729,10 +734,10 @@ public class HostConfig
 
     /**
      * @param contextPath
-     * @param dir
+     * @param war
      * @param file
      */
-    protected void deployWAR(String contextPath, File dir, String file) {
+    protected void deployWAR(String contextPath, File war, String file) {
         
         if (deploymentExists(contextPath))
             return;
@@ -746,7 +751,7 @@ public class HostConfig
             (configBase, file.substring(0, file.lastIndexOf(".")) + ".xml");
         if (deployXML && !xml.exists()) {
             try {
-                jar = new JarFile(dir);
+                jar = new JarFile(war);
                 entry = jar.getJarEntry(Constants.ApplicationContextXml);
                 if (entry != null) {
                     istream = jar.getInputStream(entry);
@@ -810,12 +815,32 @@ public class HostConfig
         if(log.isInfoEnabled()) 
             log.info(sm.getString("hostConfig.deployJar", file));
 
-        // Populate redeploy resources with the WAR file
-        deployedApp.redeployResources.put
-            (dir.getAbsolutePath(), new Long(dir.lastModified()));
-
         try {
-            Context context = (Context) Class.forName(contextClass).newInstance();
+            Context context = null;
+            if (deployXML && xml.exists()) {
+                synchronized (digester) {
+                    try {
+                        context = (Context) digester.parse(xml);
+                        if (context == null) {
+                            log.error(sm.getString("hostConfig.deployDescriptor.error",
+                                    file));
+                            return;
+                        }
+                    } finally {
+                        digester.reset();
+                    }
+                }
+                context.setConfigFile(xml.getAbsolutePath());
+                deployedApp.redeployResources.put
+                    (xml.getAbsolutePath(), new Long(xml.lastModified()));
+            } else {
+                context = (Context) Class.forName(contextClass).newInstance();
+            }
+
+            // Populate redeploy resources with the WAR file
+            deployedApp.redeployResources.put
+                (war.getAbsolutePath(), new Long(war.lastModified()));
+
             if (context instanceof Lifecycle) {
                 Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
@@ -824,11 +849,6 @@ public class HostConfig
             }
             context.setPath(contextPath);
             context.setDocBase(file);
-            if (xml.exists()) {
-                context.setConfigFile(xml.getAbsolutePath());
-                deployedApp.redeployResources.put
-                    (xml.getAbsolutePath(), new Long(xml.lastModified()));
-            }
             host.addChild(context);
             // If we're unpacking WARs, the docBase will be mutated after
             // starting the context
@@ -912,7 +932,51 @@ public class HostConfig
         if( log.isDebugEnabled() ) 
             log.debug(sm.getString("hostConfig.deployDir", file));
         try {
-            Context context = (Context) Class.forName(contextClass).newInstance();
+            Context context = null;
+            File xml = new File(dir, Constants.ApplicationContextXml);
+            if (deployXML && xml.exists()) {
+                // Will only do this on initial deployment. On subsequent
+                // deployments the copied xml file means we'll use
+                // deployDescriptor() instead
+                synchronized (digester) {
+                    try {
+                        context = (Context) digester.parse(xml);
+                        if (context == null) {
+                            log.error(sm.getString("hostConfig.deployDescriptor.error",
+                                    xml));
+                            return;
+                        }
+                    } finally {
+                        digester.reset();
+                    }
+                }
+                File xmlCopy = new File(configBase, file + ".xml");
+                InputStream is = null;
+                OutputStream os = null;
+                try {
+                    is = new FileInputStream(xml);
+                    os = new FileOutputStream(xmlCopy);
+                    IOTools.flow(is, os);
+                    // Don't catch IOE - let the outer try/catch handle it
+                } finally {
+                    try {
+                        if (is != null) is.close();
+                    } catch (IOException e){
+                        // Ignore
+                    }
+                    try {
+                        if (os != null) os.close();
+                    } catch (IOException e){
+                        // Ignore
+                    }
+                }
+                context.setConfigFile(xmlCopy.getAbsolutePath());
+                deployedApp.redeployResources.put
+                    (xmlCopy.getAbsolutePath(), new Long(xmlCopy.lastModified()));
+            } else {
+                context = (Context) Class.forName(contextClass).newInstance();
+            }
+
             if (context instanceof Lifecycle) {
                 Class<?> clazz = Class.forName(host.getConfigClass());
                 LifecycleListener listener =
@@ -921,17 +985,9 @@ public class HostConfig
             }
             context.setPath(contextPath);
             context.setDocBase(file);
-            File configFile = new File(dir, Constants.ApplicationContextXml);
-            if (deployXML) {
-                context.setConfigFile(configFile.getAbsolutePath());
-            }
             host.addChild(context);
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     new Long(dir.lastModified()));
-            if (deployXML) {
-                deployedApp.redeployResources.put(configFile.getAbsolutePath(),
-                        new Long(configFile.lastModified()));
-            }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
         } catch (Throwable t) {
             log.error(sm.getString("hostConfig.deployDir.error", file), t);
