@@ -353,14 +353,12 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
 
-    protected String getPathWithoutContext(String servletPath) {
-        String retVal = null;
-        int secondSlash = servletPath.indexOf('/', 1);
-        if (secondSlash >= 0) {
-            //cut off context
-            retVal = servletPath.substring(secondSlash);
+    protected String getPathWithoutContext(final String contextPath,
+            final String servletPath) {
+        if (servletPath.startsWith(contextPath)) {
+            return servletPath.substring(contextPath.length());
         }
-        return retVal;
+        return servletPath;
     }
 
 
@@ -419,7 +417,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 // ie:
                 // '/file1.shtml' vs '/appName1/file1.shtml'
                 if (!isRootContext(normContext)) {
-                    String noContext = getPathWithoutContext(normalized);
+                    String noContext = getPathWithoutContext(
+                            normContext.getContextPath(), normalized);
                     if (noContext == null) {
                         throw new IOException(
                                 "Couldn't remove context from path: "
