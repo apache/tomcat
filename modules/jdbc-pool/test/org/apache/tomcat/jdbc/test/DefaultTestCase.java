@@ -39,7 +39,8 @@ public class DefaultTestCase extends TestCase {
         super(name);
     }
 
-    protected void init() throws Exception {
+    public DataSourceProxy createDefaultDataSource() {
+        DataSourceProxy datasource = null;
         PoolProperties p = new DefaultProperties();
         p.setJmxEnabled(false);
         p.setTestWhileIdle(false);
@@ -57,6 +58,11 @@ public class DefaultTestCase extends TestCase {
         p.setRemoveAbandoned(false);
         datasource = new org.apache.tomcat.jdbc.pool.DataSourceProxy();
         datasource.setPoolProperties(p);
+        return datasource;
+    }
+    
+    protected void init() throws Exception {
+        this.datasource = createDefaultDataSource();
     }
 
     protected void transferProperties() {
@@ -92,6 +98,7 @@ public class DefaultTestCase extends TestCase {
 
 
     protected void tearDown() throws Exception {
+        try {datasource.close();}catch(Exception ignore){}
         datasource = null;
         tDatasource = null;
         System.gc();
