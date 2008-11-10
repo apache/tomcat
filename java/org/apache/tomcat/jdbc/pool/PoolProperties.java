@@ -50,7 +50,7 @@ public class PoolProperties {
     protected int removeAbandonedTimeout = 60;
     protected boolean logAbandoned = false;
     protected int loginTimeout = 10000;
-    protected String name = "Filip Connection Pool["+(poolCounter++)+"]";
+    protected String name = "Tomcat Connection Pool["+(poolCounter++)+"]";
     protected String password;
     protected String username;
     protected long validationInterval = 30000;
