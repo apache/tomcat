@@ -391,7 +391,7 @@ public class PoolProperties {
     public boolean isPoolSweeperEnabled() {
         boolean result = getTimeBetweenEvictionRunsMillis()>0;
         result = result && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
-        result = result && (isTestWhileIdle() && getValidationQuery()!=null);
+        result = result || (isTestWhileIdle() && getValidationQuery()!=null);
         return result;
     }
 }
