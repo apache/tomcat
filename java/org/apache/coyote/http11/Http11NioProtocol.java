@@ -132,10 +132,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         ep.setName(getName());
         ep.setHandler(cHandler);
         
-        //todo, determine if we even need these
-        ep.getSocketProperties().setRxBufSize(Math.max(ep.getSocketProperties().getRxBufSize(),getMaxHttpHeaderSize()));
-        ep.getSocketProperties().setTxBufSize(Math.max(ep.getSocketProperties().getTxBufSize(),getMaxHttpHeaderSize()));
-        
         try {
             ep.init();
             sslImplementation = new JSSEImplementation();
