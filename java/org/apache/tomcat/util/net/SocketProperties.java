@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -205,87 +206,76 @@ public class SocketProperties {
             socket.setTrafficClass(soTrafficClass.intValue());
     }
 
+    public void setProperties(ServerSocket socket) throws SocketException{
+        if (rxBufSize != null)
+            socket.setReceiveBufferSize(rxBufSize.intValue());
+        if (performanceConnectionTime != null && performanceLatency != null &&
+                performanceBandwidth != null)
+            socket.setPerformancePreferences(
+                    performanceConnectionTime.intValue(),
+                    performanceLatency.intValue(),
+                    performanceBandwidth.intValue());
+        if (soReuseAddress != null)
+            socket.setReuseAddress(soReuseAddress.booleanValue());
+        if (soTimeout != null)
+            socket.setSoTimeout(soTimeout.intValue());
+    }
+
+    
     public boolean getDirectBuffer() {
         return directBuffer;
     }
 
     public boolean getOoBInline() {
-        if(ooBInline != null)
-            return ooBInline.booleanValue();
-        return false;
+        return ooBInline.booleanValue();
     }
 
     public int getPerformanceBandwidth() {
-        if(performanceBandwidth != null)
-            return performanceBandwidth.intValue();
-        return -1;
+        return performanceBandwidth.intValue();
     }
 
     public int getPerformanceConnectionTime() {
-        if(performanceConnectionTime!= null)
-            return performanceConnectionTime.intValue();
-        return -1;
-          
+        return performanceConnectionTime.intValue();
     }
 
     public int getPerformanceLatency() {
-        if(performanceLatency != null)
-            return performanceLatency.intValue();
-        return -1 ;
+        return performanceLatency.intValue();
     }
 
     public int getRxBufSize() {
-        if(rxBufSize != null)
-            return rxBufSize.intValue();
-        return -1;
+        return rxBufSize.intValue();
     }
 
     public boolean getSoKeepAlive() {
-        if(soKeepAlive != null)
-            return soKeepAlive.booleanValue();
-        return false;
+        return soKeepAlive.booleanValue();
     }
 
     public boolean getSoLingerOn() {
-        if(soLingerOn != null)
-            return soLingerOn.booleanValue();
-        return false;
+        return soLingerOn.booleanValue();
     }
 
     public int getSoLingerTime() {
-        if(soLingerTime != null)
-            return soLingerTime.intValue();
-        return -1;
+        return soLingerTime.intValue();
     }
 
     public boolean getSoReuseAddress() {
-        if(soReuseAddress != null)
-            return soReuseAddress.booleanValue();
-        return false;
+        return soReuseAddress.booleanValue();
     }
 
     public int getSoTimeout() {
-        if(soTimeout != null)
-            return soTimeout.intValue();
-        return -1;
+        return soTimeout.intValue();
     }
 
     public int getSoTrafficClass() {
-        if(soTrafficClass != null)
-            return soTrafficClass.intValue();
-        return -1;
+        return soTrafficClass.intValue();
     }
 
     public boolean getTcpNoDelay() {
-        if(tcpNoDelay != null)
-            return tcpNoDelay.booleanValue();
-        return false;
+        return tcpNoDelay.booleanValue();
     }
 
     public int getTxBufSize() {
-        if(txBufSize != null)
-            return txBufSize.intValue();
-        return -1;
+        return txBufSize.intValue();
     }
 
     public int getBufferPool() {
