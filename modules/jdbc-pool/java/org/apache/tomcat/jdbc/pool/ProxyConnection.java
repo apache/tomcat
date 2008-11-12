@@ -74,6 +74,8 @@ public class ProxyConnection extends JdbcInterceptor {
             this.connection = null;
             pool.returnConnection(poolc);
             return null;
+        } else if (TOSTRING_VAL==method.getName()) {
+            return this.toString();
         }
         return method.invoke(connection.getConnection(),args);
     }
@@ -88,6 +90,10 @@ public class ProxyConnection extends JdbcInterceptor {
 
     public ConnectionPool getParentPool() {
         return pool;
+    }
+    
+    public String toString() {
+        return "ProxyConnection["+(connection!=null?connection.toString():"null")+"]";
     }
 
 }
