@@ -338,6 +338,98 @@
   </subsection>
 </section>
 
+<section name="Code Example">
+  <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
+  <subsection name="Plain Ol' Java">
+    <p>Here is a simple example of how to create and use a data source.</p> 
+    <source>
+        import java.sql.Connection;
+        import java.sql.ResultSet;
+        import java.sql.Statement;
+        
+        import org.apache.tomcat.jdbc.pool.DataSource;
+        import org.apache.tomcat.jdbc.pool.PoolProperties;
+        
+        public class SimplePOJOExample {
+        
+            public static void main(String[] args) throws Exception {
+                PoolProperties p = new PoolProperties();
+                p.setUrl("jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
+                p.setDriverClassName("com.mysql.jdbc.Driver");
+                p.setUsername("root");
+                p.setPassword("password");
+                p.setJmxEnabled(true);
+                p.setTestWhileIdle(false);
+                p.setTestOnBorrow(true);
+                p.setValidationQuery("SELECT 1");
+                p.setTestOnReturn(false);
+                p.setValidationInterval(30000);
+                p.setTimeBetweenEvictionRunsMillis(30000);
+                p.setMaxActive(100);
+                p.setInitialSize(10);
+                p.setMaxWait(10000);
+                p.setRemoveAbandonedTimeout(60);
+                p.setMinEvictableIdleTimeMillis(30000);
+                p.setMinIdle(10);
+                p.setLogAbandoned(true);
+                p.setRemoveAbandoned(true);
+                DataSource datasource = new DataSource();
+                datasource.setPoolProperties(p); 
+                
+                Connection con = null;
+                try {            
+                  con = datasource.getConnection();
+                  Statement st = con.createStatement();
+                  ResultSet rs = st.executeQuery("select * from user");
+                  int cnt = 1;
+                  while (rs.next()) {
+                      System.out.println((cnt++)+". Host:" +rs.getString("Host")+" User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
+                  }
+                  rs.close();
+                  st.close();
+                } finally {
+                  if (con!=null) try {con.close();}catch (Exception ignore) {}
+                }  
+            }
+        
+        }
+    </source>
+  </subsection>
+  <subsection name="As a Resource">
+    <p>And here is an example on how to configure a resource for JNDI lookups</p>
+    <source>
+    &lt;Resource name=&quot;jdbc/TestDB&quot; 
+              auth=&quot;Container&quot; 
+              type=&quot;javax.sql.DataSource&quot; 
+              factory=&quot;org.apache.tomcat.jdbc.pool.DataSourceFactory&quot;
+              testWhileIdle=&quot;true&quot;
+              testOnBorrow=&quot;true&quot;
+              testOnReturn=&quot;false&quot;
+              validationQuery=&quot;SELECT 1&quot;
+              validationInterval=&quot;30000&quot;
+              timeBetweenEvictionRunsMillis=&quot;30000&quot;
+              maxActive=&quot;100&quot; 
+              minIdle=&quot;10&quot; 
+              maxWait=&quot;10000&quot; 
+              initialSize=&quot;10&quot;
+              removeAbandonedTimeout=&quot;60&quot;
+              removeAbandoned=&quot;true&quot;
+              logAbandoned=&quot;true&quot;
+              minEvictableIdleTimeMillis=&quot;30000&quot; 
+              jmxEnabled=&quot;true&quot;
+              username=&quot;root&quot; 
+              password=&quot;password&quot; 
+              driverClassName=&quot;com.mysql.jdbc.Driver&quot;
+              url=&quot;jdbc:mysql://localhost:3306/mysql?autoReconnect=true&quot;/&gt;
+
+    
+    </source>
+  
+  </subsection>
+  
+</section>
+
+
 </body>
 
 </document>

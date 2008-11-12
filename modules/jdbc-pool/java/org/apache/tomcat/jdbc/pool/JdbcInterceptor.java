@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
  */
 public abstract class JdbcInterceptor implements InvocationHandler {
     public  static final String CLOSE_VAL = "close";
+    public  static final String TOSTRING_VAL = "toString";
 
     private JdbcInterceptor next = null;
 
