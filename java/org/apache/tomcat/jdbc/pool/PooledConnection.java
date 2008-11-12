@@ -300,5 +300,9 @@ public class PooledConnection {
             this.handler = new WeakReference<JdbcInterceptor>(handler);
         }
     }
+    
+    public String toString() {
+        return "PooledConnection["+(connection!=null?connection.toString():"null")+"]";
+    }
 
 }
