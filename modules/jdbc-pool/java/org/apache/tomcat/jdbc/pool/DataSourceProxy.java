@@ -172,13 +172,16 @@ public class DataSourceProxy  {
         return driver.getPool(getPoolProperties().getPoolName()).getSize();
     }
 
-   public String toString() {
+    public String toString() {
         return super.toString()+"{"+getPoolProperties()+"}";
     }
 
 /*-----------------------------------------------------------------------*/
 //      PROPERTIES WHEN NOT USED WITH FACTORY
 /*------------------------------------------------------------------------*/
+   
+   
+   
     public void setPoolProperties(PoolProperties poolProperties) {
         this.poolProperties = poolProperties;
     }
@@ -200,7 +203,7 @@ public class DataSourceProxy  {
     }
 
     public void setMaxActive(int maxActive) {
-        this.poolProperties.setMaxIdle(maxActive);
+        this.poolProperties.setMaxActive(maxActive);
     }
 
     public void setMaxIdle(int maxIdle) {
@@ -212,12 +215,11 @@ public class DataSourceProxy  {
     }
 
     public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
-        this.poolProperties.setMinEvictableIdleTimeMillis(
-            minEvictableIdleTimeMillis);
+        this.poolProperties.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
     }
 
     public void setMinIdle(int minIdle) {
-        this.setMinIdle(minIdle);
+        this.poolProperties.setMinIdle(minIdle);
     }
 
     public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
@@ -253,10 +255,8 @@ public class DataSourceProxy  {
         this.poolProperties.setTestWhileIdle(testWhileIdle);
     }
 
-    public void setTimeBetweenEvictionRunsMillis(int
-                                                 timeBetweenEvictionRunsMillis) {
-        this.poolProperties.setTimeBetweenEvictionRunsMillis(
-            timeBetweenEvictionRunsMillis);
+    public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
+        this.poolProperties.setTimeBetweenEvictionRunsMillis(timeBetweenEvictionRunsMillis);
     }
 
     public void setUrl(String url) {
@@ -283,26 +283,38 @@ public class DataSourceProxy  {
     public void setJmxEnabled(boolean enabled) {
         this.getPoolProperties().setJmxEnabled(enabled);
     }
-    
+
     public void setFairQueue(boolean fairQueue) {
         this.getPoolProperties().setFairQueue(fairQueue);
     }
     
+    public void setDefaultCatalog(String catalog) {
+        this.getPoolProperties().setDefaultCatalog(catalog);
+    }
+    
+    public void setDefaultAutoCommit(Boolean autocommit) {
+        this.getPoolProperties().setDefaultAutoCommit(autocommit);
+    }
+    
+    public void setDefaultTransactionIsolation(int defaultTransactionIsolation) {
+        this.getPoolProperties().setDefaultTransactionIsolation(defaultTransactionIsolation);
+    }
+
     public void setConnectionProperties(String properties) {
         try {
-            java.util.Properties prop = DataSourceFactory.getProperties(properties);
+            java.util.Properties prop = DataSourceFactory
+                    .getProperties(properties);
             Iterator i = prop.keySet().iterator();
             while (i.hasNext()) {
-                String key = (String)i.next();
+                String key = (String) i.next();
                 String value = prop.getProperty(key);
                 getPoolProperties().getDbProperties().setProperty(key, value);
             }
-            
-        }catch (Exception x) {
+
+        } catch (Exception x) {
             log.error("Unable to parse connection properties.", x);
             throw new RuntimeException(x);
         }
     }
-
 
 }
