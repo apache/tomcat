@@ -18,7 +18,7 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "../../../webapps/docs/project.xml">
 ]>
-<document url="http.html">
+<document url="jdbc-pool.html">
 
   &project;
 
