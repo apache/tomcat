@@ -68,6 +68,9 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if (ISCLOSED_VAL==method.getName()) {
+            return isClosed();
+        }
         if (isClosed()) throw new SQLException("Connection has already been closed.");
         if (CLOSE_VAL==method.getName()) {
             PooledConnection poolc = this.connection;
