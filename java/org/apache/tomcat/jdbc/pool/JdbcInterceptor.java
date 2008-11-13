@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 public abstract class JdbcInterceptor implements InvocationHandler {
     public  static final String CLOSE_VAL = "close";
     public  static final String TOSTRING_VAL = "toString";
+    public  static final String ISCLOSED_VAL = "isClosed"; 
 
     private JdbcInterceptor next = null;
 
@@ -47,6 +48,11 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     public void setNext(JdbcInterceptor next) {
         this.next = next;
     }
-
+    
+    /**
+     * Gets called each time the connection is borrowed from the pool
+     * @param parent - the connection pool owning the connection
+     * @param con - the pooled connection
+     */
     public abstract void reset(ConnectionPool parent, PooledConnection con);
 }

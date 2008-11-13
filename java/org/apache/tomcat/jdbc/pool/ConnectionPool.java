@@ -129,6 +129,7 @@ public class ConnectionPool {
                         (JdbcInterceptor) Class.forName(proxies[i], true, //should this be the class loader?
                                 Thread.currentThread().getContextClassLoader()).newInstance();
                     interceptor.setNext(handler);
+                    interceptor.reset(this, con); //initialize
                     handler = interceptor;
                 }catch(Exception x) {
                     SQLException sx = new SQLException("Unable to instantiate interceptor chain.");
