@@ -33,9 +33,9 @@
   <property name="year"                  value="2007" />
   <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="1" />
+  <property name="version.build"         value="2" />
   <property name="version.patch"         value="0" />
-  <property name="version"               value="1.0.1-beta" />
+  <property name="version"               value="1.0.2-beta" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
 
   <property name="project"               value="apache-tomcat-jdbc-pool" />
@@ -159,6 +159,7 @@
   	<zip destfile="${destdir}/apache-tomcat-jdbc-${version}.zip">
   	  <fileset dir="${tomcat.pool}">
   	  	<include name="jdbc-pool.html"/>
+  	  	<include name="changelog.html"/>
   	  	<include name="tomcat-jdbc.jar"/>
         <include name="tomcat-jdbc-src.jar"/>
         <include name="tomcat-jdbc.jar.md5"/>
