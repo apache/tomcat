@@ -17,10 +17,14 @@
 package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
@@ -30,18 +34,63 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  */
 
 public class ConnectionState extends JdbcInterceptor  {
-
-    protected final String[] readState = {"getAutoCommit","getTransactionIsolation","isReadOnly"};
-    protected final String[] writeState = {"setAutoCommit","setTransactionIsolation","setReadOnly"};
+    protected static Log log = LogFactory.getLog(ConnectionState.class);
+    
+    protected final String[] readState = {"getAutoCommit","getTransactionIsolation","isReadOnly","getCatalog"};
+    protected final String[] writeState = {"setAutoCommit","setTransactionIsolation","setReadOnly","setCatalog"};
 
     protected Boolean autoCommit = null;
     protected Integer transactionIsolation = null;
     protected Boolean readOnly = null;
-
+    protected String catalog = null;
+    
+    
     public void reset(ConnectionPool parent, PooledConnection con) {
-        autoCommit = null;
-        transactionIsolation = null;
-        readOnly = null;
+        PoolProperties poolProperties = parent.getPoolProperties();
+        if (poolProperties.getDefaultReadOnly()!=null) {
+            try {
+                if (readOnly==null || readOnly.booleanValue()!=poolProperties.getDefaultReadOnly().booleanValue()) {
+                    con.getConnection().setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
+                    readOnly = poolProperties.getDefaultReadOnly();
+                }
+            }catch (SQLException x) {
+                readOnly = null;
+                log.error("Unable to reset readonly state to connection.",x);
+            }
+        }
+        if (poolProperties.getDefaultAutoCommit()!=null) {
+            try {
+                if (autoCommit==null || autoCommit.booleanValue()!=poolProperties.getDefaultAutoCommit().booleanValue()) {
+                    con.getConnection().setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
+                    autoCommit = poolProperties.getDefaultAutoCommit();
+                }
+            }catch (SQLException x) {
+                autoCommit = null;
+                log.error("Unable to reset autocommit state to connection.",x);
+            }
+        }
+        if (poolProperties.getDefaultCatalog()!=null) {
+            try {
+                if (catalog==null || (!catalog.equals(poolProperties.getDefaultCatalog()))) {
+                    con.getConnection().setCatalog(poolProperties.getDefaultCatalog());
+                    catalog = poolProperties.getDefaultCatalog();
+                }
+            }catch (SQLException x) {
+                catalog = null;
+                log.error("Unable to reset default catalog state to connection.",x);
+            }
+        }
+        if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
+            try {
+                if (transactionIsolation==null || transactionIsolation.intValue()!=poolProperties.getDefaultTransactionIsolation()) {
+                    con.getConnection().setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+                    transactionIsolation = poolProperties.getDefaultTransactionIsolation();
+                }
+            }catch (SQLException x) {
+                transactionIsolation = null;
+                log.error("Unable to reset transaction isolation state to connection.",x);
+            }
+        }
     }
 
     @Override
@@ -64,6 +113,7 @@ public class ConnectionState extends JdbcInterceptor  {
                 case 0:{result = autoCommit; break;}
                 case 1:{result = transactionIsolation; break;}
                 case 2:{result = readOnly; break;}
+                case 3:{result = catalog; break;}
                 default: result = null;
             }
             //return cached result, if we have it
@@ -76,6 +126,7 @@ public class ConnectionState extends JdbcInterceptor  {
                 case 0:{autoCommit = (Boolean) (read?result:args[0]); break;}
                 case 1:{transactionIsolation = (Integer)(read?result:args[0]); break;}
                 case 2:{readOnly = (Boolean)(read?result:args[0]); break;}
+                case 3:{catalog = (String)(read?result:args[0]); break;}
             }
         }
         return result;
