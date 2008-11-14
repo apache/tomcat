@@ -370,7 +370,7 @@ public class PoolProperties {
     }
 
     public static int getPoolCounter() {
-        return poolCounter;
+        return poolCounter.get();
     }
 
     public boolean isJmxEnabled() {
