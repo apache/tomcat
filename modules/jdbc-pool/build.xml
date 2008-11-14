@@ -25,7 +25,7 @@
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="3" />
   <property name="version.patch"         value="-beta" />
-  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build} ${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
   <property file="${basedir}/modules/jdbc-pool/build.properties"/>
@@ -182,7 +182,8 @@
     </tar>
     <gzip src="${destdir}/apache-tomcat-jdbc-${version}.tar"
   	      destfile="${destdir}/apache-tomcat-jdbc-${version}.tar.gz"/>
-  	<delete file="${destdir}/apache-tomcat-jdbc-${version}.tar"/>
+    <delete file="${destdir}/apache-tomcat-jdbc-${version}.tar"/>
+    <echo message="Options +Indexes" file="${destdir}/.htaccess"/>
   </target>
   	
   <!-- Download and dependency building -->
