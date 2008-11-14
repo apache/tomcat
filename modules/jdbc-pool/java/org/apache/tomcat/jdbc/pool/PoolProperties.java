@@ -19,12 +19,13 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.Method;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Filip Hanik
  *
  */
 public class PoolProperties {
-    protected static volatile int poolCounter = 1;
+    protected static AtomicInteger poolCounter = new AtomicInteger(0);
     protected Properties dbProperties = new Properties();
     protected String url = null;
     protected String driverClassName = null;
@@ -50,7 +51,7 @@ public class PoolProperties {
     protected int removeAbandonedTimeout = 60;
     protected boolean logAbandoned = false;
     protected int loginTimeout = 10000;
-    protected String name = "Tomcat Connection Pool["+(poolCounter++)+"]";
+    protected String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+"]";
     protected String password;
     protected String username;
     protected long validationInterval = 30000;
