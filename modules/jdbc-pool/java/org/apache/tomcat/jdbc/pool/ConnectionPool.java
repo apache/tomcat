@@ -160,7 +160,9 @@ public class ConnectionPool {
             //return the connection
             return connection;
         }catch (Exception x) {
-            throw new SQLException();
+            SQLException s = new SQLException();
+            s.initCause(x);
+            throw s;
         }
     }
 
