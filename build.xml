@@ -21,6 +21,11 @@
   <!-- ===================== Initialize Property Values =================== -->
 
   <!-- See "build.properties.sample" in the top level directory for all     -->
+  <property name="version.major"         value="1" />
+  <property name="version.minor"         value="0" />
+  <property name="version.build"         value="3" />
+  <property name="version.patch"         value="-beta" />
+  <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
   <property file="${basedir}/modules/jdbc-pool/build.properties"/>
@@ -31,12 +36,6 @@
   <!-- Project Properties -->
   <property name="name"                  value="Apache Tomcat" />
   <property name="year"                  value="2007" />
-  <property name="version.major"         value="1" />
-  <property name="version.minor"         value="0" />
-  <property name="version.build"         value="2" />
-  <property name="version.patch"         value="0" />
-  <property name="version"               value="1.0.2-beta" />
-  <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
 
   <property name="project"               value="apache-tomcat-jdbc-pool" />
   <property name="final.name"            value="${project}-${version}" />
