@@ -1320,8 +1320,8 @@ public class StandardSession
         if ((manager != null) && manager.getDistributable() &&
           !(value instanceof Serializable))
             throw new IllegalArgumentException
-                (sm.getString("standardSession.setAttribute.iae"));
-
+                (sm.getString("standardSession.setAttribute.iae",
+                              name, value));
         // Construct an event with the new value
         HttpSessionBindingEvent event = null;
 
