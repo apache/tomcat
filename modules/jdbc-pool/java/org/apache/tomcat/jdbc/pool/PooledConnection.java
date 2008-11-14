@@ -94,13 +94,19 @@ public class PooledConnection {
         this.connect();
     } //reconnect
 
-    protected synchronized void disconnect(boolean finalize) throws SQLException {
+    protected synchronized void disconnect(boolean finalize) {
         if (isDiscarded()) {
             return;
         }
         setDiscarded(true);
         if (connection != null) {
-            connection.close();
+            try {
+                connection.close();
+            }catch (Exception ignore) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to close underlying SQL connection",ignore);
+                }
+            }
         }
         connection = null;
         if (finalize) parent.finalize(this);
@@ -122,7 +128,7 @@ public class PooledConnection {
     public boolean abandon() {
         try {
             disconnect(true);
-        } catch (SQLException x) {
+        } catch (Exception x) {
             log.error("", x);
         } //catch
         return false;
@@ -207,10 +213,6 @@ public class PooledConnection {
     public void release() {
         try {
             disconnect(true);
-        } catch (SQLException x) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to close SQL connection",x);
-            }
         } catch (Exception x) {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to close SQL connection",x);
