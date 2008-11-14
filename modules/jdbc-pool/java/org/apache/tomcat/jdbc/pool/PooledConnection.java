@@ -38,7 +38,7 @@ public class PooledConnection {
     public static final int VALIDATE_INIT = 4;
 
     protected static Log log = LogFactory.getLog(PooledConnection.class);
-    protected static volatile int counter = 1;
+    protected static AtomicInteger counter = new AtomicInteger(01);
 
     protected PoolProperties poolProperties;
     protected java.sql.Connection connection;
@@ -53,7 +53,7 @@ public class PooledConnection {
     protected WeakReference<JdbcInterceptor> handler = null;
 
     public PooledConnection(PoolProperties prop, ConnectionPool parent) throws SQLException {
-        instanceCount = counter++;
+        instanceCount = counter.addAndGet(1);
         poolProperties = prop;
         this.parent = parent;
     }
