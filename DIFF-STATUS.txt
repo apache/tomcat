@@ -15,7 +15,6 @@
 TODO
 ====
 /java
-/test
 /webapps
 
 Note that larger directory structures, like java, will be broken down into
@@ -23,7 +22,7 @@ smaller, more manageable chunks.
 
 In progress
 ===========
-/res - markt
+/test - markt
 
 
 Complete
@@ -32,6 +31,7 @@ Complete
 /bin
 /conf
 /native
+/res
 
 
 Issues
