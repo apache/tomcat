@@ -15,7 +15,6 @@
 TODO
 ====
 /java
-/native
 /res
 /test
 /webapps
@@ -25,13 +24,14 @@ smaller, more manageable chunks.
 
 In progress
 ===========
-/conf  - markt
+/native - markt
 
 
 Complete
 ========
 /
 /bin
+/conf
 
 
 Issues
