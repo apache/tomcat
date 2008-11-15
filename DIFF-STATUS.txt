@@ -14,7 +14,6 @@
 
 TODO
 ====
-/conf
 /java
 /native
 /res
@@ -26,12 +25,13 @@ smaller, more manageable chunks.
 
 In progress
 ===========
-/bin    - markt
+/conf  - markt
 
 
 Complete
 ========
 /
+/bin
 
 
 Issues
