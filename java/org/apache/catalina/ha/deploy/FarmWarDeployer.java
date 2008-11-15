@@ -24,6 +24,7 @@ import java.util.HashMap;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -139,38 +140,43 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     public void start() throws Exception {
         if (started)
             return;
-        getCluster().addClusterListener(this);
-        if (watchEnabled) {
-            watcher = new WarWatcher(this, new File(getWatchDir()));
-            if (log.isInfoEnabled())
-                log.info("Cluster deployment is watching " + getWatchDir()
-                         + " for changes.");
+        Container hcontainer = getCluster().getContainer();
+        if(!(hcontainer instanceof Host)) {
+            log.error("FarmWarDeployer can only work as host cluster subelement!");
+            return ;
         }
+        host = (Host) hcontainer;
     
         // Check to correct engine and host setup
-        Object parent = getCluster().getContainer();
-        Engine engine = null;
-        String hostname = null;
-        if ( parent instanceof Host ) {
-            host = (Host) parent;
-            engine = (Engine) host.getParent();
-            hostname = host.getName();
-        }else {
-            engine = (Engine)parent;
-            hostname = engine.getDefaultHost();
-            host = (Host) engine.findChild(hostname);
+        Container econtainer = host.getParent();
+        if(econtainer == null && econtainer instanceof Engine) {
+            log.error("FarmWarDeployer can only work if parent of " + host.getName()+ " is an engine!"); 
+            return ;
         }
+        Engine engine = (Engine) econtainer;
+        String hostname = null;
+        hostname = host.getName();
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host="
                     + hostname);
         } catch (Exception e) {
             log.error("Can't construct MBean object name" + e);
+            return;
         }
+        if (watchEnabled) {
+            watcher = new WarWatcher(this, new File(getWatchDir()));
+            if (log.isInfoEnabled()) {
+                log.info("Cluster deployment is watching " + getWatchDir()
+                          + " for changes.");
+            }
+        }
+         
         configBase = new File(System.getProperty("catalina.base"), "conf");
         if (engine != null) {
             configBase = new File(configBase, engine.getName());
-        } else if (host != null) {
-            configBase = new File(configBase, host.getName());
+        } 
+        if (host != null) {
+            configBase = new File(configBase, hostname);
         }
 
         // Retrieve the MBean server
@@ -178,6 +184,9 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
         started = true;
         count = 0;
+
+        getCluster().addClusterListener(this);
+
         if (log.isInfoEnabled())
             log.info("Cluster FarmWarDeployer started.");
     }
