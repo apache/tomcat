@@ -850,6 +850,11 @@ public class Http11Processor implements ActionHook {
             // Finish the handling of the request
             try {
                 rp.setStage(org.apache.coyote.Constants.STAGE_ENDINPUT);
+                // If we know we are closing the connection, don't drain input.
+                // This way uploading a 100GB file doesn't tie up the thread 
+                // if the servlet has rejected it.
+                if(error)
+                    inputBuffer.setSwallowInput(false);
                 inputBuffer.endRequest();
             } catch (IOException e) {
                 error = true;

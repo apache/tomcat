@@ -893,6 +893,11 @@ public class Http11NioProcessor implements ActionHook {
 
             // Finish the handling of the request
             if (!comet) {
+                // If we know we are closing the connection, don't drain input.
+                // This way uploading a 100GB file doesn't tie up the thread 
+                // if the servlet has rejected it.
+                if(error)
+                    inputBuffer.setSwallowInput(false);
                 endRequest();
             }
 
