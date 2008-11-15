@@ -1,0 +1,40 @@
+================================================================================
+ This file records the status of the ongoing diff of 6.0.x against trunk. The
+ purpose of the diff is to ensure that:
+  - all the changes to 6.0.x have also been made to trunk
+  - all appropriate changes from trunk are ported to 6.0.x
+  - the trunk change log is complete
+
+ As the diff progresses, all of the differences between 6.0.x and trunk will be
+ one of the following:
+  - merged into trunk/6.0.x as appropriate to eliminate the difference
+  - proposed for merge into 6.0.x
+  - added to the trunk change log
+================================================================================
+
+TODO
+====
+/bin
+/conf
+/java
+/native
+/res
+/test
+/webapps
+
+Note that larger directory structures, like java, will be broken down into
+smaller, more manageable chunks.
+
+In progress
+===========
+/        - markt
+
+
+Complete
+========
+None
+
+
+Issues
+======
+None
