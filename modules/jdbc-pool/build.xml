@@ -221,4 +221,7 @@
     <delete file="${base.path}/file.tar"/>
     <delete file="${base.path}/file.tar.gz"/>
   </target>
+  <target name="f">
+    <echoproperties/>
+  </target>
 </project>
