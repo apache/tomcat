@@ -14,7 +14,6 @@
 
 TODO
 ====
-/java/org/apache/jasper
 /java/org/apache/jk
 /java/org/apache/juli
 /java/org/apache/naming
@@ -25,7 +24,7 @@ manageable chunks.
 
 In progress
 ===========
-/java/org/apache/el - markt
+/java/org/apache/jasper - markt
 
 
 Complete
@@ -37,6 +36,7 @@ Complete
 /java/org/apache
 /java/org/apache/catalina
 /java/org/apache/coyote
+/java/org/apache/el
 /native
 /res
 /test
