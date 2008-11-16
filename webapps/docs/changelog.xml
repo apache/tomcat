@@ -24,10 +24,8 @@
 
   <properties>
     <author email="remm@apache.org">Remy Maucherat</author>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
     <author email="fhanik@apache.org">Filip Hanik</author>
     <author email="rjung@apache.org">Rainer Jung</author>
-    <author email="pero@apache.org">Peter Rossbach</author>
     <title>Changelog</title>
   </properties>
 
@@ -51,8 +49,9 @@
         <rev>656084</rev> Small performance improvement for NIO. (fhanik) 
       </fix>
       <fix>
-        <rev>666232</rev> Prevent NPE during shutdown when logger has been
-        shutdown but a component continues to try to log. (fhanik)
+        <rev>666232</rev> Prevent NPE stacktrace and lost log message when
+        logger has been shutdown. Instead log the error, with the message.
+        (fhanik)
       </fix>
       <add>
         <rev>677640</rev> Add a startup class that does not require any
@@ -109,6 +108,9 @@
         <rev>701902</rev> Add support for full client-cert chains to AJP.
         (billbarker)
       </add>
+      <update>
+        Use tc-native 1.2.x which is based on APR 1.3.3+ (mturk)
+      </update>
     </changelog>
   </subsection>
   <subsection name="High Availability">
@@ -173,65 +175,6 @@
         Parameterize version number throughout build scripts and source. (rjung)
       </update>
     </changelog>
-  </subsection>
-
-<!-- Below this line has not been reviewed as part of the 6.0.x/trunk diff.  -->
-  <subsection name="ha">
-    <changelog>
-      <update>
-        Update tc-native to 1.1.15 in build.properties.default (jfclere)
-      </update>
-     <fix><rev>671650</rev><br/><bug>45279</bug><br/>
-       Close multicast socket when calling close
-      </fix> 
-      <update><rev>649252</rev><br/>
-       Expose the alwaysSend flag to be able to configure send behavior when reaching the limit
-      </update> 
-     <fix><rev>649238</rev><br/><bug>44833</bug><br/>
-       Properly override methods from DeltaSession -> StandardSession
-      </fix> 
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-     <fix><bug>45074</bug>Add configuration parameters in Http11AprProtocol</fix>
-     <update><rev>644858</rev><br/>
-       Inproper curly brackets cause NIO/SendFile to fail. Workaround prior to this version, set
-       useSendFile=&quot;false&quot; in the Connector element.
-      </update> 
-    </changelog>
-  </subsection>
-  <subsection name="Catalina">
-     <changelog>
-     <fix><bug>44809</bug>Improve AprLifecycleListener Error Messages</fix>
-     <fix><rev>671973</rev><br/><bug>45272</bug><br/>
-       Workaround for IE cookie behavior
-      </fix> 
-     <update><rev>666232</rev><br/>
-       Prevent NPE stacktrace, and lost log message when logger has been shutdown. Instead log the error, with the message (fhanik)
-     </update>  
-     <update><rev>645184</rev><br/>
-       Properly deserialize Proxy classes
-     </update>  
-     <update><rev>634513</rev><br/>
-       <rev>630533</rev>
-       Cookies are parsed according to both servlet spec and cookie spec if STRICT_SERVLET_COMPLIANCE is set to 
-       true.<br/>
-       If false, the default, then values will be quoted for v0 cookies if they contain invalid characters
-      </update> 
-
-     <update><rev>631700</rev>
-       Revert back to original patch proposed for UTF8 parsing.
-       This also fixes the regression for 6.0.16 and 5.5.26 (and possibly 4.1.37) mentioned in
-       http://issues.apache.org/bugzilla/show_bug.cgi?id=44494
-
-       The original patch can be viewed
-       http://svn.apache.org/viewvc?rev=568307&amp;view=rev
-       http://svn.apache.org/viewvc?rev=568605&amp;view=rev
-      </update> 
-      <fix>ExtendedAccessLogValve cs-uri not print empty querystring (pero)
-      </fix>
-     </changelog>
   </subsection>
 </section>
 </body>
