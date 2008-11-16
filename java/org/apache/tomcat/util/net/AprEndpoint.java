@@ -1797,11 +1797,9 @@ public class AprEndpoint {
                                     // Destroy file descriptor pool, which should close the file
                                     Pool.destroy(state.fdpool);
                                     Socket.timeoutSet(state.socket, soTimeout * 1000);
-                                    // If all done hand this socket off to a worker for
+                                    // If all done put the socket back in the poller for
                                     // processing of further requests
-                                    if (!processSocket(state.socket)) {
-                                        Socket.destroy(state.socket);
-                                    }
+                                    getPoller().add(state.socket);
                                 } else {
                                     // Close the socket since this is
                                     // the end of not keep-alive request.
