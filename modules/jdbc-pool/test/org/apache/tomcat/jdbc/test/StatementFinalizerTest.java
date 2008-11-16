@@ -13,9 +13,9 @@ public class StatementFinalizerTest extends DefaultTestCase {
     }
     
     public void testStatementFinalization() throws Exception {
-        DataSourceProxy d1 = this.createDefaultDataSource();
-        d1.setJdbcInterceptors(StatementFinalizer.class.getName());
-        Connection con = d1.getConnection();
+        this.init();
+        datasource.setJdbcInterceptors(StatementFinalizer.class.getName());
+        Connection con = datasource.getConnection();
         Statement st = con.createStatement();
         assertFalse("Statement should not be closed.",st.isClosed());
         con.close();
