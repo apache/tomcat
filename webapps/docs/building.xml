@@ -179,17 +179,13 @@ Variables to add two new Classpath variables:
 </p>
 
 <p>
-Use File-&gt;New Project to create a new Java project 
-for each of the binaries repository (e.g., /usr/share/java), 
-container, connectors, jasper, servletapi. 
-Unless you thought ahead to make the ${tomcat.source} directory be under
-your Workspace folder, tell Eclipse the external location using &quot;Import/Export...&quot;,
-General-&gt;Existing Project into Workspace.
+Use File-&gt;Import and chose &quot;Existing Projects into Workspace&quot;.
+From there import the root directory where you have checked out tomcat.
 </p>
 
 <p>
-Eclipse .project and .classpath files are provided in each of these
-directories so Eclipse should find all source trees and jars, and
+Eclipse .project and .classpath files are provided in to root directory of tomcat repository
+should allow Eclipse to find all source trees and jars, and
 hopefully compile without problems. <b>Note</b> that these
 files assume you are using Eclipse with a 5.0 or later JDK; also, the
 connectors module must be built with a compiler compliance level of 5.0.
