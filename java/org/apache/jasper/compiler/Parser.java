@@ -286,7 +286,7 @@ class Parser implements TagConstants {
                 }
             } else if (ch == '\\' && i + 1 < size) {
                 ch = tx.charAt(i + 1);
-                if (ch == '\\' || ch == '\"' || ch == '\'' || (ch == '>')) {
+                if (ch == '\\' || ch == '\"' || ch == '\'' || ch == '>') {
                     // \ " and ' are always unescaped regardless of if they are
                     // inside or outside of an EL expression. JSP.1.6 takes
                     // precedence over JSP.1.3.10 (confirmed with EG).
