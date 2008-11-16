@@ -56,10 +56,14 @@
       be used.</p>
     </attribute>
 
+    <attribute name="address" required="false">
+      <p>The TCP/IP address on which this server waits for a shutdown
+      command. If no address is specified, <code>localhost</code> is used.</p>
+    </attribute>
+
     <attribute name="port" required="true">
       <p>The TCP/IP port number on which this server waits for a shutdown
-      command.  This connection must be initiated from the same server
-      computer that is running this instance of Tomcat.</p>
+      command. Set to <code>-1</code> to disable the shutdown port.</p>
     </attribute>
 
     <attribute name="shutdown" required="true">
