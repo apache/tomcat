@@ -51,9 +51,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             Statement st = ws.get();
             if (st!=null) {
                 try {
-                    if (!st.isClosed()) {
-                        st.close();
-                    }
+                    st.close();
                 } catch (Exception ignore) {
                     if (log.isDebugEnabled()) {
                         log.debug("Unable to closed statement upon connection close.",ignore);
@@ -62,5 +60,4 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             }
         }
     }
-
 }
