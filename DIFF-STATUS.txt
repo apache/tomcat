@@ -14,15 +14,13 @@
 
 TODO
 ====
-/java
-/webapps
+/java/org
 
-Note that larger directory structures, like java, will be broken down into
+Note that larger directory structures, like /java/org, will be broken down into
 smaller, more manageable chunks.
 
 In progress
 ===========
-/test - markt
 
 
 Complete
@@ -30,11 +28,16 @@ Complete
 /
 /bin
 /conf
+/java/javax
 /native
 /res
+/test
+/webapps
 
 
 Issues
 ======
 rjung  - will version changes be ported to 6.0.x?
-native - Remove the external from 6.0.x and trunk?
+all    - Remove the native external from 6.0.x and trunk?
+fhanik - Is the UDP support in tribes complete?
+rjung  - Status of AD changes to JNDI Realm?
