@@ -32,20 +32,155 @@
   </properties>
 
 <body>
-<section name="Tomcat Trunk ">
-  <subsection name="bayeux">
+<section name="Tomcat Trunk">
+  <subsection name="Catalina">
     <changelog>
-      <update><rev>691359</rev>Added in a Bayeux protocol implementation built on top of the Tomcat CometProcessor interface</update>
+      <update>
+        Switch from AnnotationProcessor to InstanceManager. Patch provided by
+        David Jecks with modifications by Remy. (remm/fhanik)
+      </update>
+      <update>
+        <rev>620845</rev> and <rev>669119</rev>. Make shutdwn address
+        configurable. (jfclere)
+      </update>
+      <fix>
+        <rev>651977</rev> Add some missing control checks to
+        <code>ThreadWithAttributes</code>. (markt) 
+      </fix>
+      <fix>
+        <rev>656084</rev> Small performance improvement for NIO. (fhanik) 
+      </fix>
+      <fix>
+        <rev>666232</rev> Prevent NPE during shutdown when logger has been
+        shutdown but a component continues to try to log. (fhanik)
+      </fix>
+      <add>
+        <rev>677640</rev> Add a startup class that does not require any
+        configuration files. (costin)
+      </add>
+      <fix>
+        <rev>677910</rev> Use platform mbean server by default. (costin)
+      </fix>
+      <fix>
+        <rev>700532</rev> Log if temporary file operations within the CGI
+        servlet fail. Make sure header Reader is closed on failure. (markt)
+      </fix>
+      <fix>
+        <rev>707670</rev> Correctly handle timeouts with Comet so events do not
+        stop. (fhanik)
+      </fix>
+      <fix>
+        <rev>708541</rev> Delete references to DefaultContext which was removed
+        in 6.0.x. (markt)
+      </fix>
+      <add>
+        <rev>709018</rev> Initial implementation of an asynchronous file handler
+        for JULI. (fhanik)
+      </add>
+      <fix>
+        <rev>713953</rev> Include name of attribute when logging failure of
+        session attribute serializatyion. (mturk)
+      </fix>
+      <update>
+        Improve JNDI realm compatability with Active Directory. (rjung)
+      </update>
+      <fix>
+        Give session thisAccessedTime and lastAccessedTime clear semantics.
+        (rjung)
+      </fix>
+      <add>
+        Expose thisAccessedTime via Session interface. (rjung)
+      </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update><rev>703017</rev> Make Java socket options consistent between NIO
+        and JIO connector. Expose all the socket options available on
+        <code>java.net.Socket</code> (fhanik)
+      </update>
+      <fix>
+        <bug>46051</bug>: The writer returned by <code>getWriter()</code> now
+        conforms to the <code>PrintWriter</code> specification and uses platform
+        dependent line endings rather than always using <code>\r\n</code>.
+        (markt)
+      </fix>
+      <add>
+        <rev>701902</rev> Add support for full client-cert chains to AJP.
+        (billbarker)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="High Availability">
+    <changelog>
+      <add>
+        Add support for UDP and secure communication to tribes. (fhanik)
+      </add>
+      <add>
+        Add versioning to the tribes communication protocol to support future
+        developments. (fhanik)
+      </add>
+      <add>
+        Add a demo on how to use the payload. (fhanik)
+      </add>
+      <add>
+        Started to add JMX support to the cluster implementation. (markt)
+      </add>
+      <fix>
+        <rev>609778</rev> Minor fixes to the throughput interceptor and the
+        NIO receiver. (fhanik)
+      </fix>
+      <fix>
+        <rev>630234</rev> Additional checks for the NIO receiver. (fhanik)
+      </fix>
+      <update>
+        <rev>671650</rev> Improve error message when multicast is not enabled.
+        (fhanik)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Documentation">
+     <changelog>
+      <update>
+        <rev>631321</rev> Update changelog to support the &lt;rev&gt; element.
+        (fhanik)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Extras">
+    <changelog>
+      <add>
+        A new JmxRemoteLifecycleListener that can be used to fix the ports used
+        for remote JMX connections, eg when using JConsole. (markt)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Modules">
+    <changelog>
+      <add>
+        <rev>691359</rev> Added in a Bayeux protocol implementation built on top
+        of the Tomcat CometProcessor interface. (fhanik)
+      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Numerous code clean-up changes including the use of generics and
+        removing unused imports, fields, parameters and methods.
+      </fix>
+      <update>
+        Parameterize version number throughout build scripts and source. (rjung)
+      </update>
+    </changelog>
+  </subsection>
+
+<!-- Below this line has not been reviewed as part of the 6.0.x/trunk diff.  -->
   <subsection name="ha">
     <changelog>
       <update>
         Update tc-native to 1.1.15 in build.properties.default (jfclere)
       </update>
-      <fix>
-        Fix that JvmrouteBinderValve can rewrite session suffix with parallel requests from same client (pero)
-      </fix>
      <fix><rev>671650</rev><br/><bug>45279</bug><br/>
        Close multicast socket when calling close
       </fix> 
@@ -59,9 +194,6 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
-     <update><rev>703017</rev>Make Java socket options consistent between NIO and JIO connector.
-       Expose all the socket options available on java.net.Socket
-     </update>
      <fix><bug>45074</bug>Add configuration parameters in Http11AprProtocol</fix>
      <update><rev>644858</rev><br/>
        Inproper curly brackets cause NIO/SendFile to fail. Workaround prior to this version, set
@@ -99,11 +231,6 @@
       </update> 
       <fix>ExtendedAccessLogValve cs-uri not print empty querystring (pero)
       </fix>
-     </changelog>
-  </subsection>
-  <subsection name="Documentation">
-     <changelog>
-      <update><rev>631321</rev>Update changelog to support the &lt;rev&gt; element (fhanik)</update>
      </changelog>
   </subsection>
 </section>
