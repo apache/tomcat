@@ -15,7 +15,7 @@
  *  limitations under the License.
  */
 
-package org.apache.catalina.tomcat.util.http;
+package org.apache.catalina.tomcat.util.http; 
 
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.ServerCookie;
@@ -71,8 +71,8 @@ public class TestCookies extends TestCase {
         test("$Version=1;foo=\"bar\";$Domain=apache.org;$Port=8080;a=b", "foo", "bar", "a", "b");
 
         // make sure these never split into two cookies - JVK
-        test("$Version=1;foo=\"b\"ar\";$Domain=apache.org;$Port=8080;a=b",  "foo", "b", "a", "b");
-        test("$Version=1;foo=\"b\\\"ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b\\\"ar", "a", "b");
+        test("$Version=1;foo=\"b\"ar\";$Domain=apache.org;$Port=8080;a=b",  "foo", "b", "a", "b"); // Incorrectly escaped.
+        test("$Version=1;foo=\"b\\\"ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b\"ar", "a", "b"); // correctly escaped.
         test("$Version=1;foo=\"b'ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b'ar", "a", "b");
         // JFC: sure it is "b" and not b'ar ?
         test("$Version=1;foo=b'ar;$Domain=apache.org;$Port=8080;a=b", "foo", "b", "a", "b");
@@ -115,8 +115,28 @@ public class TestCookies extends TestCase {
 
         
         test("foo;a=b;;\\;bar=rab", "foo", "", "a", "b", "bar", "rab");
+
+        // Try all the separators of version1 in version0 cookie.
+        // Won't work we only parse version1 cookie result 1 cookie.
+        test("a=()<>@:\\\"/[]?={}\t; foo=bar", "foo", "bar");
+
+        // Test the version.
+        test("$Version=1;foo=bar", 1);
+        test("$Version=0;foo=bar", 0);
     }
 
+    public static void test( String s, int val ) throws Exception {
+        System.out.println("Processing [" + s + "]");
+        Cookies cs=new Cookies(null);
+        cs.processCookieHeader( s.getBytes(), 0, s.length());
+        int num = cs.getCookieCount();
+        if (num != 1)
+          throw new Exception("wrong number of cookies " + num);
+        ServerCookie co = cs.getCookie(0);
+        System.out.println("One Cookie: " + co);
+        if (co.getVersion() != val)
+          throw new Exception("wrong version " + co.getVersion() + " != " + val);
+    }
     public static void test( String s ) throws Exception {
         System.out.println("Processing [" + s + "]");
         Cookies cs=new Cookies(null);
