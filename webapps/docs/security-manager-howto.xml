@@ -180,7 +180,6 @@ grant [signedBy &lt;signer&gt;,] [codeBase &lt;code source&gt;] {
 //
 // * Read access to the document root directory
 //
-// $Id$
 // ============================================================================
 
 

@@ -59,10 +59,11 @@ will bypass your security policy configuration in <code>catalina.policy.</code><
 
 <p>Remove the XML comments from around the CGI servlet and servlet-mapping
 configuration in <code>$CATALINA_BASE/conf/web.xml</code>.</p>
-</section>
 
 <p>Only Contexts which are marked as privileged may use the CGI servlet (see the
 privileged property of the Context element).</p>
+
+</section>
 
 <section name="Configuration">
 
