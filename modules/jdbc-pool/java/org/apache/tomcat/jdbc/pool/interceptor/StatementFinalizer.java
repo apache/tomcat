@@ -23,6 +23,8 @@ import java.util.ArrayList;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
  * Keeps track of statements associated with a connection and invokes close upon connection.close()
  * @author fhanik
@@ -60,4 +62,12 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             }
         }
     }
+
+    @Override
+    public void reset(ConnectionPool parent, PooledConnection con) {
+        statements.clear();
+        super.reset(parent, con);
+    }
+    
+    
 }
