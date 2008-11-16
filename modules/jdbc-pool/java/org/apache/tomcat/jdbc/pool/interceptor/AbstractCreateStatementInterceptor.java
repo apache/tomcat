@@ -37,15 +37,21 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     public  AbstractCreateStatementInterceptor() {
         super();
     }
-
+    
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        boolean process = false;
-        process = process(statements, method, process);
-        if (process) {
-            Object statement = super.invoke(proxy,method,args);
-            return createStatement(proxy,method,args,statement);
+        if (CLOSE_VAL==method.getName()) {
+            closeInvoked();
+            return super.invoke(proxy, method, args);
         } else {
-            return super.invoke(proxy,method,args);
+            boolean process = false;
+            process = process(statements, method, process);
+            if (process) {
+                Object statement = super.invoke(proxy,method,args);
+                return createStatement(proxy,method,args,statement);
+            } else {
+                return super.invoke(proxy,method,args);
+            }
         }
     }
     
@@ -59,6 +65,8 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      * @return
      */
     public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement);
+    
+    public abstract void closeInvoked();
 
     protected boolean process(String[] names, Method method, boolean process) {
         for (int i=0; (!process) && i<names.length; i++) {
