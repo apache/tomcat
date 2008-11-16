@@ -28,6 +28,7 @@
   <property name="tomcat.build" value="${basedir}/../output/build"/>
 
   <property name="compile.source" value="1.5"/>
+  <property name="compile.debug" value="true"/>
 
   <property name="junit.jar" value="${junit.home}/junit.jar"/>
   <property name="test.runner" value="junit.textui.TestRunner"/>
@@ -61,7 +62,7 @@
 
   <target name="all" depends="compile">
      <java dir="${test.classes}" classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
-            <arg value="TestCookies"/>
+            <arg value="org.apache.catalina.tomcat.util.http.TestCookies"/>
             <classpath refid="tomcat.test.classpath"/>
         </java>
 
