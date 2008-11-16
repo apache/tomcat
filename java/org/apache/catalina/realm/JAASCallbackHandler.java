@@ -90,7 +90,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @param realmName     Realm name
      * @param md5a2         Second MD5 digest used to calculate the digest
      *                      MD5(Method + ":" + uri)
-     * @param authMethod    The authentication mehtod in use 
+     * @param authMethod    The authentication method in use 
      */
     public JAASCallbackHandler(JAASRealm realm, String username,
                                String password, String nonce, String nc,
@@ -161,7 +161,7 @@ public class JAASCallbackHandler implements CallbackHandler {
     protected String md5a2;
 
     /**
-     * The authentication methdod to be used. If null, assume BASIC/FORM.
+     * The authentication method to be used. If null, assume BASIC/FORM.
      */
     protected String authMethod;
 
