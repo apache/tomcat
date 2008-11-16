@@ -14,8 +14,6 @@
 
 TODO
 ====
-/java/org/apache/coyote
-/java/org/apache/el
 /java/org/apache/jasper
 /java/org/apache/jk
 /java/org/apache/juli
@@ -27,6 +25,7 @@ manageable chunks.
 
 In progress
 ===========
+/java/org/apache/el - markt
 
 
 Complete
@@ -37,6 +36,7 @@ Complete
 /java/javax
 /java/org/apache
 /java/org/apache/catalina
+/java/org/apache/coyote
 /native
 /res
 /test
@@ -52,4 +52,7 @@ rjung  - Status of AD changes to JNDI Realm?
 rjung  - Will ession access time changes beported to 6.0.x?
 fhanik - Should http://svn.apache.org/viewvc?view=rev&revision=645175 be ported
          to 6.0.x?
-================================================================================
+fhanik - Should http://svn.apache.org/viewvc?view=rev&revision=609778 be ported
+         to 6.0.x?
+fhanik - Should http://svn.apache.org/viewvc?view=rev&revision=630234 be ported
+         to 6.0.x?
