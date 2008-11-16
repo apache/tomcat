@@ -14,10 +14,16 @@
 
 TODO
 ====
-/java/org
+/java/org/apache/coyote
+/java/org/apache/el
+/java/org/apache/jasper
+/java/org/apache/jk
+/java/org/apache/juli
+/java/org/apache/naming
+/java/org/apache/tomcat
 
-Note that larger directory structures, like /java/org, will be broken down into
-smaller, more manageable chunks.
+Note that larger directory structures will be broken down into smaller, more
+manageable chunks.
 
 In progress
 ===========
@@ -29,6 +35,8 @@ Complete
 /bin
 /conf
 /java/javax
+/java/org/apache
+/java/org/apache/catalina
 /native
 /res
 /test
@@ -37,7 +45,11 @@ Complete
 
 Issues
 ======
-rjung  - will version changes be ported to 6.0.x?
+rjung  - Will version changes be ported to 6.0.x?
 all    - Remove the native external from 6.0.x and trunk?
 fhanik - Is the UDP support in tribes complete?
 rjung  - Status of AD changes to JNDI Realm?
+rjung  - Will ession access time changes beported to 6.0.x?
+fhanik - Should http://svn.apache.org/viewvc?view=rev&revision=645175 be ported
+         to 6.0.x?
+================================================================================
