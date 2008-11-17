@@ -122,12 +122,12 @@ public class ConnectionPool {
             //build the proxy handler
             handler = new ProxyConnection(this,con);
             //set up the interceptor chain
-            String[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+            PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
             for (int i=proxies.length-1; i>=0; i--) {
                 try {
                     JdbcInterceptor interceptor =
-                        (JdbcInterceptor) Class.forName(proxies[i], true, //should this be the class loader?
-                                Thread.currentThread().getContextClassLoader()).newInstance();
+                        (JdbcInterceptor) Class.forName(proxies[i].getClassName(), true, Thread.currentThread().getContextClassLoader()).newInstance(); //should this be the class loader?
+                    interceptor.setProperties(proxies[i].getProperties());
                     interceptor.setNext(handler);
                     interceptor.reset(this, con); //initialize
                     handler = interceptor;
