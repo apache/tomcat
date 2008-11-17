@@ -18,6 +18,10 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 /**
  * @author Filip Hanik
@@ -27,7 +31,9 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     public  static final String CLOSE_VAL = "close";
     public  static final String TOSTRING_VAL = "toString";
     public  static final String ISCLOSED_VAL = "isClosed"; 
-
+    
+    protected List<InterceptorProperty> properties = null; 
+    
     private JdbcInterceptor next = null;
 
     public JdbcInterceptor() {
@@ -55,4 +61,13 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * @param con - the pooled connection
      */
     public abstract void reset(ConnectionPool parent, PooledConnection con);
+
+    public List<InterceptorProperty> getProperties() {
+        return properties;
+    }
+
+    public void setProperties(List<InterceptorProperty> properties) {
+        this.properties = properties;
+    }
+    
 }
