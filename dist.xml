@@ -90,11 +90,9 @@
   <target name="build-webapps-precompile" description="Precompile webapps" >
 
     <!-- JSPC -->
-    <property name="admin.base" location="${tomcat.build}/server/webapps/admin" />
     <property name="ROOT.base" location="${tomcat.build}/webapps/ROOT" />
     <property name="jsp-examples.base" location="${tomcat.build}/webapps/jsp-examples" />
 
-    <mkdir dir="${admin.base}/WEB-INF/src/admin" />
     <mkdir dir="${ROOT.base}/WEB-INF/src" />
     <mkdir dir="${ROOT.base}/WEB-INF/classes" />
     <mkdir dir="${jsp-examples.base}/WEB-INF/src" />
@@ -127,15 +125,6 @@
          webXmlFragment="${jsp-examples.base}/WEB-INF/generated_web.xml"
              addWebXmlMappings="true"
              outputDir="${jsp-examples.base}/WEB-INF/src" />
-
-    <jasper2
-             package="admin"
-             compile="false"
-             validateXml="false"
-             uriroot="${admin.base}"
-             webXmlFragment="${admin.base}/WEB-INF/generated_web.xml"
-             addWebXmlMappings="true"
-             outputDir="${admin.base}/WEB-INF/src/admin" />
 
     <javac destdir="${ROOT.base}/WEB-INF/classes"
            optimize="off"
@@ -190,98 +179,6 @@
       <include name="**" />
       <exclude name="tags/**" />
     </javac>
-
-    <javac destdir="${admin.base}/WEB-INF/classes"
-           optimize="off"
-           debug="${compile.debug}"
-           deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           failonerror="false"
-           srcdir="${admin.base}/WEB-INF/src"
-       excludes="**/*.smap">
-      <classpath>
-        <pathelement location="${java.home}/../lib/tools.jar"/>
-        <fileset dir="${tomcat.build}/server/lib">
-          <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${admin.base}/WEB-INF/lib">
-          <include name="*.jar"/>
-        </fileset>
-        <fileset dir="${tomcat.build}/common/lib">
-          <include name="*.jar"/>
-        </fileset>
-        <pathelement location="${tomcat.build}/classes"/>
-      </classpath>
-      <include name="admin/**" />
-    </javac>
-  </target>
-
-  <target name="fix-webapps">
-    <!-- Extra build steps for webapps -->
-
-    <!-- Add release notes to the root webapp -->
-    <copy file="${basedir}/RELEASE-NOTES"
-        tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt">
-      <filterset refid="version.filters"/>
-    </copy>
-
-    <!-- Add documents to the tomcat-docs webapp -->
-    <copy file="${basedir}/resources/build.xml"
-        todir="${tomcat.build}/webapps/tomcat-docs" />
-    <copy file="./RELEASE-NOTES"
-        tofile="${tomcat.build}/webapps/tomcat-docs/RELEASE-NOTES.txt">
-      <filterset refid="version.filters"/>
-    </copy>
-
-    <!-- Build JARs for webapps classes -->
-    <mkdir dir="${tomcat.build}/server/webapps/admin/WEB-INF/lib" />
-    <jar jarfile="${tomcat.build}/server/webapps/admin/WEB-INF/lib/catalina-admin.jar"
-         index="true">
-       <fileset dir="${tomcat.build}/server/webapps/admin/WEB-INF/classes">
-          <include name="**/*.class" />
-          <include name="**/*.properties" />
-       </fileset>
-    </jar>
-    <mkdir dir="${tomcat.build}/server/webapps/manager/WEB-INF/lib" />
-    <jar jarfile="${tomcat.build}/server/webapps/manager/WEB-INF/lib/catalina-manager.jar"
-         index="true">
-       <fileset dir="${tomcat.build}/server/webapps/manager/WEB-INF/classes">
-          <include name="**/*.class" />
-          <include name="**/*.properties" />
-       </fileset>
-    </jar>
-    <mkdir dir="${tomcat.build}/server/webapps/host-manager/WEB-INF/lib" />
-    <jar jarfile="${tomcat.build}/server/webapps/host-manager/WEB-INF/lib/catalina-host-manager.jar"
-         index="true">
-       <fileset dir="${tomcat.build}/server/webapps/host-manager/WEB-INF/classes">
-          <include name="**/*.class" />
-          <include name="**/*.properties" />
-       </fileset>
-    </jar>
-    <mkdir dir="${tomcat.build}/webapps/balancer/WEB-INF/lib" />
-    <jar jarfile="${tomcat.build}/webapps/balancer/WEB-INF/lib/catalina-balancer.jar"
-         index="true">
-       <fileset dir="${tomcat.build}/webapps/balancer/WEB-INF/classes">
-          <include name="**/*.class" />
-          <include name="**/*.properties" />
-       </fileset>
-    </jar>
-    <mkdir dir="${tomcat.build}/webapps/ROOT/WEB-INF/lib" />
-    <jar jarfile="${tomcat.build}/webapps/ROOT/WEB-INF/lib/catalina-root.jar"
-         index="true">
-       <fileset dir="${tomcat.build}/webapps/ROOT/WEB-INF/classes">
-          <include name="**/*.class" />
-          <include name="**/*.properties" />
-       </fileset>
-    </jar>
-
-    <!-- Add XML declarations for admin, manager and balancer -->
-    <copy file="${tomcat.build}/server/webapps/manager/manager.xml"
-         todir="${tomcat.build}/conf/Catalina/localhost" />
-    <copy file="${tomcat.build}/server/webapps/host-manager/host-manager.xml"
-         todir="${tomcat.build}/conf/Catalina/localhost" />
-    <copy file="${tomcat.build}/server/webapps/admin/admin.xml"
-         todir="${tomcat.build}/conf/Catalina/localhost" />
 
   </target>
 
@@ -352,7 +249,6 @@
 
     <copy todir="${tomcat.dist}/webapps">
       <fileset dir="${tomcat.build}/webapps">
-        <exclude name="**/balancer/WEB-INF/classes/**" />
         <exclude name="**/ROOT/WEB-INF/classes/**" />
         <exclude name="**/WEB-INF/src/**" />
       </fileset>
@@ -531,8 +427,6 @@
         <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
-        <exclude name="webapps/admin/**"/>
-        <exclude name="conf/Catalina/localhost/admin.xml"/>
       </zipfileset>
     </zip>
 
@@ -558,26 +452,6 @@
                       message="${md5sum.binary-prefix}${final.name}-deployer.zip${line.separator}" append="true" />
   </target>
 
-  <!-- Packages the admin webapp distro in zip format -->
-  <target name="package-admin-zip">
-    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-admin.zip">
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="webapps/admin/**"/>
-        <include name="conf/Catalina/localhost/admin.xml"/>
-        <exclude name="*.jsp" />
-      </zipfileset>
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="LICENSE" />
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="NOTICE" />
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="README.txt" />
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}" includes="RELEASE-NOTES" />
-    </zip>
-
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-admin.zip"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-admin.zip.md5"
-                      message="${md5sum.binary-prefix}${final.name}-admin.zip${line.separator}" append="true" />
-  </target>
-
   <!-- Packages the core tar.gz distro -->
   <target name="package-tgz">
     <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf"/>
@@ -600,7 +474,6 @@
       </tarfileset>
       <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
         <include name="conf/**" />
-        <exclude name="conf/Catalina/localhost/admin.xml" />
       </tarfileset>
       <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
         <include name="bin/**" />
@@ -629,7 +502,6 @@
         <exclude name="bin/version.sh" />
         <exclude name="conf/**" />
         <exclude name="src/**" />
-        <exclude name="webapps/admin/**" />
       </tarfileset>
     </tar>
 
@@ -662,33 +534,6 @@
               forceOverwrite="yes" fileext=".md5" />
     <echo     file="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz.md5"
                       message="${md5sum.binary-prefix}${final.name}-deployer.tar.gz${line.separator}" append="true" />
-  </target>
-
-  <!-- Packages the admin webapp distro in tar.gz format -->
-  <target name="package-admin-tgz">
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf"/>
-
-    <tar longfile="gnu" compression="gzip"
-         tarfile="${tomcat.release}/v${version}/bin/${final.name}-admin.tar.gz">
-      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="LICENSE" />
-        <include name="NOTICE" />
-        <include name="README.txt" />
-        <include name="RELEASE-NOTES" />
-      </tarfileset>
-      <tarfileset dir="${tomcat.dist}" prefix="${final.name}">
-        <include name="server/webapps/admin/**" />
-        <exclude name="*.jsp" />
-      </tarfileset>
-      <tarfileset dir="${tomcat.dist}" mode="600" prefix="${final.name}">
-        <include name="conf/Catalina/localhost/admin.xml" />
-      </tarfileset>
-    </tar>
-
-    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-admin.tar.gz"
-              forceOverwrite="yes" fileext=".md5" />
-    <echo     file="${tomcat.release}/v${version}/bin/${final.name}-admin.tar.gz.md5"
-                      message="${md5sum.binary-prefix}${final.name}-admin.tar.gz${line.separator}" append="true" />
   </target>
 
   <!-- Packages the documentation distro in tar.gz format -->
