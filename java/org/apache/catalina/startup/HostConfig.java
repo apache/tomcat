@@ -950,6 +950,7 @@ public class HostConfig
                         digester.reset();
                     }
                 }
+                configBase.mkdirs();
                 File xmlCopy = new File(configBase, file + ".xml");
                 InputStream is = null;
                 OutputStream os = null;
