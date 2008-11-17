@@ -134,9 +134,9 @@ public class SocketProperties {
     protected Integer soLingerTime = null;
 
     /**
-     * SO_TIMEOUT option. JVM default used if not set.
+     * SO_TIMEOUT option. default is 20000.
      */
-    protected Integer soTimeout = null;
+    protected Integer soTimeout = new Integer(20000);
 
     /**
      * Traffic class option, value between 0 and 255
