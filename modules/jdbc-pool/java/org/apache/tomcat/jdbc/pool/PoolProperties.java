@@ -18,8 +18,11 @@ package org.apache.tomcat.jdbc.pool;
 
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author Filip Hanik
  *
@@ -61,6 +64,8 @@ public class PoolProperties {
     private String jdbcInterceptors=null;
     private boolean fairQueue = false;
 
+    private InterceptorDefinition[] interceptors = null;
+    
     public boolean isFairQueue() {
         return fairQueue;
     }
@@ -201,11 +206,34 @@ public class PoolProperties {
         return jdbcInterceptors;
     }
 
-    public String[] getJdbcInterceptorsAsArray() {
-        if (jdbcInterceptors==null) return new String[0];
-        else {
-            return jdbcInterceptors.split(";");
+    public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
+        if (interceptors == null) {
+            if (jdbcInterceptors==null) {
+                interceptors = new InterceptorDefinition[0];
+            } else {
+                String[] interceptorValues = jdbcInterceptors.split(";");
+                InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length];
+                for (int i=0; i<interceptorValues.length; i++) {
+                    int propIndex = interceptorValues[i].indexOf("(");
+                    if (propIndex<0) {
+                        definitions[i] = new InterceptorDefinition(interceptorValues[i]);
+                    } else {
+                        String name = interceptorValues[i].substring(0,propIndex);
+                        definitions[i] = new InterceptorDefinition(name);
+                        String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length());
+                        String[] props = propsAsString.split(",");
+                        for (int j=0; j<props.length; j++) {
+                            int pidx = props[j].indexOf("=");
+                            String propName = props[j].substring(0,pidx);
+                            String propValue = props[j].substring(pidx+1);
+                            definitions[i].addProperty(new InterceptorProperty(propName,propValue));
+                        }
+                    }
+                }
+                interceptors = definitions;
+            }
         }
+        return interceptors;
     }
 
     public void setAccessToUnderlyingConnectionAllowed(boolean
@@ -337,6 +365,7 @@ public class PoolProperties {
 
     public void setJdbcInterceptors(String jdbcInterceptors) {
         this.jdbcInterceptors = jdbcInterceptors;
+        this.interceptors = null;
     }
 
     public String toString() {
@@ -395,4 +424,45 @@ public class PoolProperties {
         result = result || (isTestWhileIdle() && getValidationQuery()!=null);
         return result;
     }
+    
+    public static class InterceptorDefinition {
+        protected String className;
+        protected List<InterceptorProperty> properties = new ArrayList<InterceptorProperty>();
+
+        public InterceptorDefinition(String className) {
+            this.className = className;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+        public void addProperty(String name, String value) {
+            InterceptorProperty p = new InterceptorProperty(name,value);
+            addProperty(p);
+        }
+        
+        public void addProperty(InterceptorProperty p) {
+            properties.add(p);
+        }
+        
+        public List<InterceptorProperty> getProperties() {
+            return properties;
+        }
+    } 
+    
+    public static class InterceptorProperty {
+        String name;
+        String value;
+        public InterceptorProperty(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+        public String getName() {
+            return name;
+        }
+        public String getValue() {
+            return value;
+        }
+    }
+
 }
