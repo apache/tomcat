@@ -1690,7 +1690,7 @@ public class NioEndpoint {
                     cancelledKey(key, SocketStatus.ERROR,false);
                 }
             }//for
-            if ( log.isDebugEnabled() ) log.debug("timeout completed: keys processed="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
+            if ( log.isTraceEnabled() ) log.trace("timeout completed: keys processed="+keycount+"; now="+now+"; nextExpiration="+prevExp+"; "+
                                                   "keyCount="+keyCount+"; hasEvents="+hasEvents +"; eval="+( (now < prevExp) && (keyCount>0 || hasEvents) && (!close) ));
 
         }
