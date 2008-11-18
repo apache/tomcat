@@ -21,9 +21,13 @@ package org.apache.tomcat.util.modeler.modules;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.management.ObjectName;
+
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -37,7 +41,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
     String location;
     String type;
     Object source;
-    List mbeans=new ArrayList();
+    List<ObjectName> mbeans = new ArrayList<ObjectName>();
     protected static Digester digester = null;
     
     protected static Digester createDigester(Registry registry) {
@@ -200,10 +204,8 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         this.source=source;
     }
 
-    public List loadDescriptors( Registry registry, String location,
-                                 String type, Object source)
-            throws Exception
-    {
+    public List<ObjectName> loadDescriptors( Registry registry, String location,
+            String type, Object source) throws Exception {
         setRegistry(registry);
         setLocation(location);
         setType(type);
@@ -222,13 +224,14 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         if (digester == null) {
             digester = createDigester(registry);
         }
+        ArrayList<ManagedBean> loadedMbeans = new ArrayList<ManagedBean>();
         
         synchronized (digester) {
-
+            
             // Process the input file to configure our registry
             try {
                 // Push our registry object onto the stack
-                digester.push(mbeans);
+                digester.push(loadedMbeans);
                 digester.parse(stream);
             } catch (Exception e) {
                 log.error("Error digesting Registry data", e);
@@ -238,6 +241,9 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
             }
         
         }
-            
+        Iterator<ManagedBean> iter = loadedMbeans.iterator();
+        while (iter.hasNext()) {
+            registry.addManagedBean(iter.next());
+        }
     }
 }

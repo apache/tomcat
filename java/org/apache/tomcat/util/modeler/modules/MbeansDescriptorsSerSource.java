@@ -22,6 +22,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.management.ObjectName;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.ManagedBean;
@@ -35,7 +37,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
     String location;
     String type;
     Object source;
-    List mbeans=new ArrayList();
+    List<ObjectName> mbeans=new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -57,10 +59,8 @@ public class MbeansDescriptorsSerSource extends ModelerSource
         this.source=source;
     }
 
-    public List loadDescriptors( Registry registry, String location,
-                                 String type, Object source)
-            throws Exception
-    {
+    public List<ObjectName> loadDescriptors( Registry registry, String location,
+            String type, Object source) throws Exception {
         setRegistry(registry);
         setLocation(location);
         setType(type);
@@ -90,7 +90,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
             ManagedBean beans[]=(ManagedBean[])obj;
             // after all are read without error
             for( int i=0; i<beans.length; i++ ) {
-                mbeans.add(beans[i]);
+                registry.addManagedBean(beans[i]);
             }
 
         } catch( Exception ex ) {

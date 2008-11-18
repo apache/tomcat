@@ -143,8 +143,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 
     // --------------------------------------------------- DynamicMBean Methods
     // TODO: move to ManagedBean
-    static final Object[] NO_ARGS_PARAM=new Object[0];
-    static final Class[] NO_ARGS_PARAM_SIG=new Class[0];
+    static final Object[] NO_ARGS_PARAM = new Object[0];
+    static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
     
     protected String resourceType = null;
 
@@ -180,7 +180,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
         Method m=managedBean.getGetter(name, this, resource);
         Object result = null;
         try {
-            Class declaring=m.getDeclaringClass();
+            Class<?> declaring = m.getDeclaringClass();
             // workaround for catalina weird mbeans - the declaring class is BaseModelMBean.
             // but this is the catalina class.
             if( declaring.isAssignableFrom(this.getClass()) ) {
@@ -322,7 +322,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 
     }
 
-    static Class getAttributeClass(String signature)
+    static Class<?> getAttributeClass(String signature)
         throws ReflectionException
     {
         if (signature.equals(Boolean.TYPE.getName()))
@@ -467,7 +467,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
         // Prepare and return our response, eating all exceptions
         String names[] = new String[attributes.size()];
         int n = 0;
-        Iterator items = attributes.iterator();
+        Iterator<?> items = attributes.iterator();
         while (items.hasNext()) {
             Attribute item = (Attribute) items.next();
             names[n++] = item.getName();

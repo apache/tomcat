@@ -50,8 +50,8 @@ public class ManagedBean implements java.io.Serializable
 {
     private static final String BASE_MBEAN = "org.apache.tomcat.util.modeler.BaseModelMBean";
     // ----------------------------------------------------- Instance Variables
-    static final Object[] NO_ARGS_PARAM=new Object[0];
-    static final Class[] NO_ARGS_PARAM_SIG=new Class[0];
+    static final Object[] NO_ARGS_PARAM = new Object[0];
+    static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
 
 
     /**
@@ -59,10 +59,12 @@ public class ManagedBean implements java.io.Serializable
      * to this <code>ManagedBean</code> instance.
      */
     transient MBeanInfo info = null;
-    // Map<AttributeInfo>
-    private Map attributes = new HashMap();
-    //Map<OperationInfo>
-    private Map operations = new HashMap();
+
+    private Map<String,AttributeInfo> attributes =
+        new HashMap<String,AttributeInfo>();
+
+    private Map<String,OperationInfo> operations =
+        new HashMap<String,OperationInfo>();
     
     protected String className = BASE_MBEAN;
     //protected ConstructorInfo constructors[] = new ConstructorInfo[0];
@@ -347,7 +349,7 @@ public class ManagedBean implements java.io.Serializable
             // Skip introspection
             mbean = new BaseModelMBean();
         } else {
-            Class clazz = null;
+            Class<?> clazz = null;
             Exception ex = null;
             try {
                 clazz = Class.forName(getClassName());
@@ -484,7 +486,7 @@ public class ManagedBean implements java.io.Serializable
         Method m=null; // (Method)getAttMap.get( name );
 
         if( m==null ) {
-            AttributeInfo attrInfo = (AttributeInfo)attributes.get(aname);
+            AttributeInfo attrInfo = attributes.get(aname);
             // Look up the actual operation to be used
             if (attrInfo == null)
                 throw new AttributeNotFoundException(" Cannot find attribute " + aname + " for " + resource);
@@ -526,7 +528,7 @@ public class ManagedBean implements java.io.Serializable
         Method m=null;//(Method)setAttMap.get( name );
 
         if( m==null ) {
-            AttributeInfo attrInfo = (AttributeInfo)attributes.get(aname);
+            AttributeInfo attrInfo = attributes.get(aname);
             if (attrInfo == null)
                 throw new AttributeNotFoundException(" Cannot find attribute " + aname);
 
@@ -537,7 +539,8 @@ public class ManagedBean implements java.io.Serializable
 
             String argType=attrInfo.getType();
 
-            Class signature[] = new Class[] { BaseModelMBean.getAttributeClass( argType ) };
+            Class<?> signature[] =
+                new Class[] { BaseModelMBean.getAttributeClass( argType ) };
 
             Object object = null;
             NoSuchMethodException exception = null;
@@ -582,7 +585,7 @@ public class ManagedBean implements java.io.Serializable
 
             // Acquire the ModelMBeanOperationInfo information for
             // the requested operation
-            OperationInfo opInfo = (OperationInfo)operations.get(aname);
+            OperationInfo opInfo = operations.get(aname);
             if (opInfo == null)
                 throw new MBeanException(new ServiceNotFoundException(
                         "Cannot find operation " + aname),
@@ -590,7 +593,7 @@ public class ManagedBean implements java.io.Serializable
 
             // Prepare the signature required by Java reflection APIs
             // FIXME - should we use the signature from opInfo?
-            Class types[] = new Class[signature.length];
+            Class<?> types[] = new Class[signature.length];
             for (int i = 0; i < signature.length; i++) {
                 types[i] = BaseModelMBean.getAttributeClass(signature[i]);
             }
