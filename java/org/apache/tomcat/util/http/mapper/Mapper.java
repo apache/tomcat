@@ -289,7 +289,7 @@ public final class Mapper {
      * @return The context names
      */
     public String[] getContextNames() {
-        List list=new ArrayList();
+        List<String> list = new ArrayList<String>();
         for( int i=0; i<hosts.length; i++ ) {
             for( int j=0; j<hosts[i].contextList.contexts.length; j++ ) {
                 String cname=hosts[i].contextList.contexts[j].name;
@@ -298,7 +298,7 @@ public final class Mapper {
             }
         }
         String res[] = new String[list.size()];
-        return (String[])list.toArray(res);
+        return list.toArray(res);
     }
 
 
@@ -508,7 +508,7 @@ public final class Mapper {
     }
 
     public String[] getWrapperNames( String host, String context ) {
-        List list=new ArrayList();
+        List<String> list = new ArrayList<String>();
         if( host==null ) host="";
         if( context==null ) context="";
         for( int i=0; i<hosts.length; i++ ) {
@@ -532,7 +532,7 @@ public final class Mapper {
             }
         }
         String res[]=new String[list.size()];
-        return (String[])list.toArray(res);
+        return list.toArray(res);
     }
 
 
