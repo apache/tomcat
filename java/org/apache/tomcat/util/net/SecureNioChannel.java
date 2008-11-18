@@ -471,5 +471,25 @@ public class SecureNioChannel extends NioChannel  {
     public SocketChannel getIOChannel() {
         return sc;
     }
+    
+    public String toString() {
+        StringBuffer buf = new StringBuffer("[");
+        buf.append(super.toString());
+        buf.append("] ");
+        buf.append("Netout buffer: pos="+this.netOutBuffer.position());
+        buf.append(" limit="+this.netOutBuffer.limit());
+        buf.append(" Remaining:"+this.netOutBuffer.remaining());
+        buf.append("; Netin buffer: pos="+this.netInBuffer.position());
+        buf.append(" limit="+this.netInBuffer.limit());
+        buf.append(" Remaining:"+this.netInBuffer.remaining());
+        buf.append("; Appin buffer: pos="+this.bufHandler.getReadBuffer().position());
+        buf.append(" limit="+this.bufHandler.getReadBuffer().limit());
+        buf.append(" Remaining:"+this.bufHandler.getReadBuffer().remaining());
+        buf.append("; Appout buffer: pos="+this.bufHandler.getWriteBuffer().position());
+        buf.append(" limit="+this.bufHandler.getWriteBuffer().limit());
+        buf.append(" Remaining:"+this.bufHandler.getWriteBuffer().remaining());
+        return buf.toString();
+    }
+
 
 }
