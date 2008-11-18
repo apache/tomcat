@@ -54,7 +54,8 @@ public class RulesBase implements Rules {
      * Each value is a List containing the Rules for that pattern, in the
      * order that they were orginally registered.
      */
-    protected HashMap cache = new HashMap();
+    protected HashMap<String,List<Rule>> cache =
+        new HashMap<String,List<Rule>>();
 
 
     /**
@@ -75,7 +76,7 @@ public class RulesBase implements Rules {
      * The set of registered Rule instances, in the order that they were
      * originally registered.
      */
-    protected ArrayList rules = new ArrayList();
+    protected ArrayList<Rule> rules = new ArrayList<Rule>();
 
 
     // ------------------------------------------------------------- Properties
@@ -100,9 +101,9 @@ public class RulesBase implements Rules {
     public void setDigester(Digester digester) {
 
         this.digester = digester;
-        Iterator items = rules.iterator();
+        Iterator<Rule> items = rules.iterator();
         while (items.hasNext()) {
-            Rule item = (Rule) items.next();
+            Rule item = items.next();
             item.setDigester(digester);
         }
 
@@ -152,9 +153,9 @@ public class RulesBase implements Rules {
         }
         
         
-        List list = (List) cache.get(pattern);
+        List<Rule> list = cache.get(pattern);
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<Rule>();
             cache.put(pattern, list);
         }
         list.add(rule);
@@ -191,7 +192,7 @@ public class RulesBase implements Rules {
      *
      * @deprecated Call match(namespaceURI,pattern) instead.
      */
-    public List match(String pattern) {
+    public List<Rule> match(String pattern) {
 
         return (match(null, pattern));
 
@@ -209,16 +210,16 @@ public class RulesBase implements Rules {
      *  or <code>null</code> to match regardless of namespace URI
      * @param pattern Nesting pattern to be matched
      */
-    public List match(String namespaceURI, String pattern) {
+    public List<Rule> match(String namespaceURI, String pattern) {
 
         // List rulesList = (List) this.cache.get(pattern);
-        List rulesList = lookup(namespaceURI, pattern);
+        List<Rule> rulesList = lookup(namespaceURI, pattern);
         if ((rulesList == null) || (rulesList.size() < 1)) {
             // Find the longest key, ie more discriminant
             String longKey = "";
-            Iterator keys = this.cache.keySet().iterator();
+            Iterator<String> keys = this.cache.keySet().iterator();
             while (keys.hasNext()) {
-                String key = (String) keys.next();
+                String key = keys.next();
                 if (key.startsWith("*/")) {
                     if (pattern.equals(key.substring(2)) ||
                         pattern.endsWith(key.substring(1))) {
@@ -232,7 +233,7 @@ public class RulesBase implements Rules {
             }
         }
         if (rulesList == null) {
-            rulesList = new ArrayList();
+            rulesList = new ArrayList<Rule>();
         }
         return (rulesList);
 
@@ -246,7 +247,7 @@ public class RulesBase implements Rules {
      * in the order originally registered through the <code>add()</code>
      * method.
      */
-    public List rules() {
+    public List<Rule> rules() {
 
         return (this.rules);
 
@@ -265,10 +266,10 @@ public class RulesBase implements Rules {
      *  select matching rules regardless of namespace URI
      * @param pattern Pattern to be matched
      */
-    protected List lookup(String namespaceURI, String pattern) {
+    protected List<Rule> lookup(String namespaceURI, String pattern) {
 
         // Optimize when no namespace URI is specified
-        List list = (List) this.cache.get(pattern);
+        List<Rule> list = this.cache.get(pattern);
         if (list == null) {
             return (null);
         }
@@ -277,10 +278,10 @@ public class RulesBase implements Rules {
         }
 
         // Select only Rules that match on the specified namespace URI
-        ArrayList results = new ArrayList();
-        Iterator items = list.iterator();
+        ArrayList<Rule> results = new ArrayList<Rule>();
+        Iterator<Rule> items = list.iterator();
         while (items.hasNext()) {
-            Rule item = (Rule) items.next();
+            Rule item = items.next();
             if ((namespaceURI.equals(item.getNamespaceURI())) ||
                     (item.getNamespaceURI() == null)) {
                 results.add(item);

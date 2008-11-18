@@ -190,9 +190,9 @@ public class DiskFileUpload
      * @exception FileUploadException if there are problems reading/parsing
      *                                the request or storing files.
      */
-    public List /* FileItem */ parseRequest(HttpServletRequest req,
-                                            int sizeThreshold,
-                                            long sizeMax, String path)
+    public List<FileItem> parseRequest(HttpServletRequest req,
+                                       int sizeThreshold,
+                                       long sizeMax, String path)
         throws FileUploadException
     {
         setSizeThreshold(sizeThreshold);

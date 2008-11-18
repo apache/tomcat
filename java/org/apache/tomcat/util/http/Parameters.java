@@ -167,7 +167,7 @@ public final class Parameters extends MultiMap {
         if ( key==null ) return;
         String values[];
         if (paramHashStringArray.containsKey(key)) {
-            String oldValues[] = (String[])paramHashStringArray.get(key);
+            String oldValues[] = paramHashStringArray.get(key);
             values = new String[oldValues.length + newValues.length];
             for (int i = 0; i < oldValues.length; i++) {
                 values[i] = oldValues[i];
@@ -187,15 +187,15 @@ public final class Parameters extends MultiMap {
         // sub-request
         if( currentChild!=null ) {
             currentChild.merge();
-            return (String[])currentChild.paramHashStringArray.get(name);
+            return currentChild.paramHashStringArray.get(name);
         }
 
         // no "facade"
-        String values[]=(String[])paramHashStringArray.get(name);
+        String values[] = paramHashStringArray.get(name);
         return values;
     }
  
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
         handleQueryParameters();
         // Slow - the original code
         if( currentChild!=null ) {
@@ -276,10 +276,10 @@ public final class Parameters extends MultiMap {
      */
     private static void merge2(Hashtable<String,String[]> one,
             Hashtable<String,String[]> two ) {
-        Enumeration e = two.keys();
+        Enumeration<String> e = two.keys();
 
         while (e.hasMoreElements()) {
-            String name = (String) e.nextElement();
+            String name = e.nextElement();
             String[] oneValue = one.get(name);
             String[] twoValue = two.get(name);
             String[] combinedValue;
@@ -310,8 +310,7 @@ public final class Parameters extends MultiMap {
         if( key==null ) return;
         String values[];
         if (paramHashStringArray.containsKey(key)) {
-            String oldValues[] = (String[])paramHashStringArray.
-                get(key);
+            String oldValues[] = paramHashStringArray.get(key);
             values = new String[oldValues.length + 1];
             for (int i = 0; i < oldValues.length; i++) {
                 values[i] = oldValues[i];
@@ -517,11 +516,11 @@ public final class Parameters extends MultiMap {
      */
     public String paramsAsString() {
         StringBuffer sb=new StringBuffer();
-        Enumeration en= paramHashStringArray.keys();
+        Enumeration<String> en= paramHashStringArray.keys();
         while( en.hasMoreElements() ) {
-            String k=(String)en.nextElement();
+            String k = en.nextElement();
             sb.append( k ).append("=");
-            String v[]=(String[])paramHashStringArray.get( k );
+            String v[] = paramHashStringArray.get( k );
             for( int i=0; i<v.length; i++ )
                 sb.append( v[i] ).append(",");
             sb.append("\n");

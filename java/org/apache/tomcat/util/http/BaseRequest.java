@@ -285,7 +285,7 @@ public class BaseRequest {
      * Get iterator over attribute names
      * @return iterator over attribute names
      */
-    public Iterator getAttributeNames() {
+    public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
 

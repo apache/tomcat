@@ -59,13 +59,14 @@ public class SystemLogHandler extends PrintStream {
     /**
      * Thread <-> CaptureLog associations.
      */
-    protected static ThreadLocal logs = new ThreadLocal();
+    protected static ThreadLocal<Stack<CaptureLog>> logs =
+        new ThreadLocal<Stack<CaptureLog>>();
 
 
     /**
      * Spare CaptureLog ready for reuse.
      */
-    protected static Stack reuse = new Stack();
+    protected static Stack<CaptureLog> reuse = new Stack<CaptureLog>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -78,16 +79,16 @@ public class SystemLogHandler extends PrintStream {
         CaptureLog log = null;
         if (!reuse.isEmpty()) {
             try {
-                log = (CaptureLog)reuse.pop();
+                log = reuse.pop();
             } catch (EmptyStackException e) {
                 log = new CaptureLog();
             }
         } else {
             log = new CaptureLog();
         }
-        Stack stack = (Stack)logs.get();
+        Stack<CaptureLog> stack = logs.get();
         if (stack == null) {
-            stack = new Stack();
+            stack = new Stack<CaptureLog>();
             logs.set(stack);
         }
         stack.push(log);
@@ -98,11 +99,11 @@ public class SystemLogHandler extends PrintStream {
      * Stop capturing thread's output and return captured data as a String.
      */
     public static String stopCapture() {
-        Stack stack = (Stack)logs.get();
+        Stack<CaptureLog> stack = logs.get();
         if (stack == null || stack.isEmpty()) {
             return null;
         }
-        CaptureLog log = (CaptureLog)stack.pop();
+        CaptureLog log = stack.pop();
         if (log == null) {
             return null;
         }
@@ -120,9 +121,9 @@ public class SystemLogHandler extends PrintStream {
      * Find PrintStream to which the output must be written to.
      */
     protected PrintStream findStream() {
-        Stack stack = (Stack)logs.get();
+        Stack<CaptureLog> stack = logs.get();
         if (stack != null && !stack.isEmpty()) {
-            CaptureLog log = (CaptureLog)stack.peek();
+            CaptureLog log = stack.peek();
             if (log != null) {
                 PrintStream ps = log.getStream();
                 if (ps != null) {

@@ -239,7 +239,7 @@ public abstract class FileUploadBase
      * @exception FileUploadException if there are problems reading/parsing
      *                                the request or storing files.
      */
-    public List /* FileItem */ parseRequest(HttpServletRequest req)
+    public List<FileItem> parseRequest(HttpServletRequest req)
         throws FileUploadException
     {
         if (null == req)
@@ -247,7 +247,7 @@ public abstract class FileUploadBase
             throw new NullPointerException("req parameter");
         }
 
-        ArrayList items = new ArrayList();
+        ArrayList<FileItem> items = new ArrayList<FileItem>();
         String contentType = req.getHeader(CONTENT_TYPE);
 
         if ((null == contentType) || (!contentType.startsWith(MULTIPART)))
@@ -295,7 +295,7 @@ public abstract class FileUploadBase
             boolean nextPart = multi.skipPreamble();
             while (nextPart)
             {
-                Map headers = parseHeaders(multi.readHeaders());
+                Map<String,String> headers = parseHeaders(multi.readHeaders());
                 String fieldName = getFieldName(headers);
                 if (fieldName != null)
                 {
@@ -402,7 +402,7 @@ public abstract class FileUploadBase
      *
      * @return The file name for the current <code>encapsulation</code>.
      */
-    protected String getFileName(Map /* String, String */ headers)
+    protected String getFileName(Map<String,String> headers)
     {
         String fileName = null;
         String cd = getHeader(headers, CONTENT_DISPOSITION);
@@ -427,7 +427,7 @@ public abstract class FileUploadBase
      *
      * @return The field name for the current <code>encapsulation</code>.
      */
-    protected String getFieldName(Map /* String, String */ headers)
+    protected String getFieldName(Map<String,String> headers)
     {
         String fieldName = null;
         String cd = getHeader(headers, CONTENT_DISPOSITION);
@@ -456,7 +456,7 @@ public abstract class FileUploadBase
      *
      * @exception FileUploadException if an error occurs.
      */
-    protected FileItem createItem(Map /* String, String */ headers,
+    protected FileItem createItem(Map<String,String> headers,
                                   boolean isFormField)
         throws FileUploadException
     {
@@ -479,9 +479,9 @@ public abstract class FileUploadBase
      *
      * @return A <code>Map</code> containing the parsed HTTP request headers.
      */
-    protected Map /* String, String */ parseHeaders(String headerPart)
+    protected Map<String,String> parseHeaders(String headerPart)
     {
-        Map headers = new HashMap();
+        Map<String,String> headers = new HashMap<String,String>();
         char buffer[] = new char[MAX_HEADER_SIZE];
         boolean done = false;
         int j = 0;
@@ -548,10 +548,10 @@ public abstract class FileUploadBase
      * @return The value of specified header, or a comma-separated list if
      *         there were multiple headers of that name.
      */
-    protected final String getHeader(Map /* String, String */ headers,
+    protected final String getHeader(Map<String,String> headers,
                                      String name)
     {
-        return (String) headers.get(name.toLowerCase());
+        return headers.get(name.toLowerCase());
     }
 
 
