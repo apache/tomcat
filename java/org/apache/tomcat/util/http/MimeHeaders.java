@@ -139,9 +139,9 @@ public class MimeHeaders {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         pw.println("=== MimeHeaders ===");
-        Enumeration e = names();
+        Enumeration<String> e = names();
         while (e.hasMoreElements()) {
-            String n = (String)e.nextElement();
+            String n = e.nextElement();
             pw.println(n + " = " + getHeader(n));
         }
         return sw.toString();
@@ -197,11 +197,11 @@ public class MimeHeaders {
      * Field names may appear multiple times in this enumeration, indicating
      * that multiple fields with that name exist in this header.
      */
-    public Enumeration names() {
+    public Enumeration<String> names() {
         return new NamesEnumerator(this);
     }
 
-    public Enumeration values(String name) {
+    public Enumeration<String> values(String name) {
         return new ValuesEnumerator(this, name);
     }
 
@@ -358,7 +358,7 @@ public class MimeHeaders {
     This is less frequesnt than add() -
     we want to keep add O(1).
 */
-class NamesEnumerator implements Enumeration {
+class NamesEnumerator implements Enumeration<String> {
     int pos;
     int size;
     String next;
@@ -396,7 +396,7 @@ class NamesEnumerator implements Enumeration {
         return next!=null;
     }
 
-    public Object nextElement() {
+    public String nextElement() {
         String current=next;
         findNext();
         return current;
@@ -406,7 +406,7 @@ class NamesEnumerator implements Enumeration {
 /** Enumerate the values for a (possibly ) multiple
     value element.
 */
-class ValuesEnumerator implements Enumeration {
+class ValuesEnumerator implements Enumeration<String> {
     int pos;
     int size;
     MessageBytes next;
@@ -437,7 +437,7 @@ class ValuesEnumerator implements Enumeration {
         return next!=null;
     }
 
-    public Object nextElement() {
+    public String nextElement() {
         MessageBytes current=next;
         findNext();
         return current.toString();

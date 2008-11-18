@@ -54,9 +54,9 @@ public class WithDefaultsRulesWrapper implements Rules {
     /** The Rules implementation that this class wraps. */
     private Rules wrappedRules;
     /** Rules to be fired when the wrapped implementations returns none. */
-    private List defaultRules = new ArrayList();
+    private List<Rule> defaultRules = new ArrayList<Rule>();
     /** All rules (preserves order in which they were originally added) */
-    private List allRules = new ArrayList();
+    private List<Rule> allRules = new ArrayList<Rule>();
     
     // --------------------------------------------------------- Constructor
     
@@ -83,9 +83,9 @@ public class WithDefaultsRulesWrapper implements Rules {
     /** Sets digeseter using these Rules */
     public void setDigester(Digester digester) {
         wrappedRules.setDigester(digester);
-        Iterator it = defaultRules.iterator();
+        Iterator<Rule> it = defaultRules.iterator();
         while (it.hasNext()) {
-            Rule rule = (Rule) it.next();
+            Rule rule = it.next();
             rule.setDigester(digester);
         }
     }
@@ -101,13 +101,13 @@ public class WithDefaultsRulesWrapper implements Rules {
     }
     
     /** Gets Rule's which will be fired when the wrapped implementation returns no matches */
-    public List getDefaults() {
+    public List<Rule> getDefaults() {
         return defaultRules;
     }	
     
     // --------------------------------------------------------- Public Methods
     
-    public List match(String pattern) {
+    public List<Rule> match(String pattern) {
         return match("", pattern);
     }	
     
@@ -116,11 +116,11 @@ public class WithDefaultsRulesWrapper implements Rules {
      * If wrapped implementation returns any matches return those.
      * Otherwise, return default matches.
      */
-    public List match(String namespaceURI, String pattern) {
-        List matches = wrappedRules.match(namespaceURI, pattern);
+    public List<Rule> match(String namespaceURI, String pattern) {
+        List<Rule> matches = wrappedRules.match(namespaceURI, pattern);
         if (matches ==  null || matches.isEmpty()) {	
             // a little bit of defensive programming
-            return new ArrayList(defaultRules);
+            return new ArrayList<Rule>(defaultRules);
         }
         // otherwise
         return matches;
@@ -142,7 +142,7 @@ public class WithDefaultsRulesWrapper implements Rules {
     }
     
     /** Gets all rules */
-    public List rules() {
+    public List<Rule> rules() {
         return allRules;
     }
     

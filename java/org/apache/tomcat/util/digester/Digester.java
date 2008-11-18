@@ -149,7 +149,8 @@ public class Digester extends DefaultHandler {
     /**
      * The stack of body text string buffers for surrounding elements.
      */
-    protected ArrayStack bodyTexts = new ArrayStack();
+    protected ArrayStack<StringBuffer> bodyTexts =
+        new ArrayStack<StringBuffer>();
 
 
     /**
@@ -162,7 +163,7 @@ public class Digester extends DefaultHandler {
      *
      * @since 1.6
      */
-    protected ArrayStack matches = new ArrayStack(10);
+    protected ArrayStack<List<Rule>> matches = new ArrayStack<List<Rule>>(10);
     
     /**
      * The class loader to use for instantiating application objects.
@@ -188,7 +189,8 @@ public class Digester extends DefaultHandler {
      * The URLs of entityValidator that have been registered, keyed by the public
      * identifier that corresponds.
      */
-    protected HashMap entityValidator = new HashMap();
+    protected HashMap<String,String> entityValidator =
+        new HashMap<String,String>();
 
 
     /**
@@ -236,14 +238,15 @@ public class Digester extends DefaultHandler {
      * is required because documents can declare nested uses of the same
      * prefix for different Namespace URIs).
      */
-    protected HashMap namespaces = new HashMap();
+    protected HashMap<String,ArrayStack<String>> namespaces =
+        new HashMap<String,ArrayStack<String>>();
 
 
     /**
      * The parameters stack being utilized by CallMethodRule and
      * CallParamRule rules.
      */
-    protected ArrayStack params = new ArrayStack();
+    protected ArrayStack<Object> params = new ArrayStack<Object>();
 
 
     /**
@@ -296,7 +299,7 @@ public class Digester extends DefaultHandler {
     /**
      * The object stack being constructed.
      */
-    protected ArrayStack stack = new ArrayStack();
+    protected ArrayStack<Object> stack = new ArrayStack<Object>();
 
 
     /**
@@ -322,7 +325,7 @@ public class Digester extends DefaultHandler {
     /**
      * Fake attributes map (attributes are often used for object creation).
      */
-    protected Map<Class, List<String>> fakeAttributes = null;
+    protected Map<Class<?>, List<String>> fakeAttributes = null;
 
 
     /**
@@ -346,7 +349,8 @@ public class Digester extends DefaultHandler {
         "http://www.w3.org/2001/XMLSchema";
     
     /** Stacks used for interrule communication, indexed by name String */
-    private HashMap stacksByName = new HashMap();
+    private HashMap<String,ArrayStack<Object>> stacksByName =
+        new HashMap<String,ArrayStack<Object>>();
     
     // ------------------------------------------------------------- Properties
 
@@ -359,12 +363,12 @@ public class Digester extends DefaultHandler {
      */
     public String findNamespaceURI(String prefix) {
         
-        ArrayStack stack = (ArrayStack) namespaces.get(prefix);
+        ArrayStack<String> stack = namespaces.get(prefix);
         if (stack == null) {
             return (null);
         }
         try {
-            return ((String) stack.peek());
+            return stack.peek();
         } catch (EmptyStackException e) {
             return (null);
         }
@@ -927,7 +931,7 @@ public class Digester extends DefaultHandler {
     /**
      * Return the fake attributes list.
      */
-    public Map<Class, List<String>> getFakeAttributes() {
+    public Map<Class<?>, List<String>> getFakeAttributes() {
 
         return (this.fakeAttributes);
 
@@ -960,7 +964,7 @@ public class Digester extends DefaultHandler {
      *
      * @param fakeAttributes The new fake attributes.
      */
-    public void setFakeAttributes(Map<Class, List<String>> fakeAttributes) {
+    public void setFakeAttributes(Map<Class<?>, List<String>> fakeAttributes) {
 
         this.fakeAttributes = fakeAttributes;
 
@@ -1038,9 +1042,9 @@ public class Digester extends DefaultHandler {
         }
 
         // Fire "finish" events for all defined rules
-        Iterator rules = getRules().rules().iterator();
+        Iterator<Rule> rules = getRules().rules().iterator();
         while (rules.hasNext()) {
-            Rule rule = (Rule) rules.next();
+            Rule rule = rules.next();
             try {
                 rule.finish();
             } catch (Exception e) {
@@ -1095,12 +1099,12 @@ public class Digester extends DefaultHandler {
         }
 
         // Fire "body" events for all relevant rules
-        List rules = (List) matches.pop();
+        List<Rule> rules = matches.pop();
         if ((rules != null) && (rules.size() > 0)) {
             String bodyText = this.bodyText.toString();
             for (int i = 0; i < rules.size(); i++) {
                 try {
-                    Rule rule = (Rule) rules.get(i);
+                    Rule rule = rules.get(i);
                     if (debug) {
                         log.debug("  Fire body() for " + rule);
                     }
@@ -1123,7 +1127,7 @@ public class Digester extends DefaultHandler {
         }
 
         // Recover the body text from the surrounding element
-        bodyText = (StringBuffer) bodyTexts.pop();
+        bodyText = bodyTexts.pop();
         if (debug) {
             log.debug("  Popping body text '" + bodyText.toString() + "'");
         }
@@ -1133,7 +1137,7 @@ public class Digester extends DefaultHandler {
             for (int i = 0; i < rules.size(); i++) {
                 int j = (rules.size() - i) - 1;
                 try {
-                    Rule rule = (Rule) rules.get(j);
+                    Rule rule = rules.get(j);
                     if (debug) {
                         log.debug("  Fire end() for " + rule);
                     }
@@ -1173,7 +1177,7 @@ public class Digester extends DefaultHandler {
         }
 
         // Deregister this prefix mapping
-        ArrayStack stack = (ArrayStack) namespaces.get(prefix);
+        ArrayStack<String> stack = namespaces.get(prefix);
         if (stack == null) {
             return;
         }
@@ -1346,12 +1350,12 @@ public class Digester extends DefaultHandler {
         }
 
         // Fire "begin" events for all relevant rules
-        List rules = getRules().match(namespaceURI, match);
+        List<Rule> rules = getRules().match(namespaceURI, match);
         matches.push(rules);
         if ((rules != null) && (rules.size() > 0)) {
             for (int i = 0; i < rules.size(); i++) {
                 try {
-                    Rule rule = (Rule) rules.get(i);
+                    Rule rule = rules.get(i);
                     if (debug) {
                         log.debug("  Fire begin() for " + rule);
                     }
@@ -1389,9 +1393,9 @@ public class Digester extends DefaultHandler {
         }
 
         // Register this prefix mapping
-        ArrayStack stack = (ArrayStack) namespaces.get(prefix);
+        ArrayStack<String> stack = namespaces.get(prefix);
         if (stack == null) {
-            stack = new ArrayStack();
+            stack = new ArrayStack<String>();
             namespaces.put(prefix, stack);
         }
         stack.push(namespaceURI);
@@ -1481,12 +1485,12 @@ public class Digester extends DefaultHandler {
         // Has this system identifier been registered?
         String entityURL = null;
         if (publicId != null) {
-            entityURL = (String) entityValidator.get(publicId);
+            entityURL = entityValidator.get(publicId);
         }
          
         // Redirect the schema location to a local destination
         if (schemaLocation != null && entityURL == null && systemId != null){
-            entityURL = (String)entityValidator.get(systemId);
+            entityURL = entityValidator.get(systemId);
         } 
 
         if (entityURL == null) { 
@@ -1857,7 +1861,7 @@ public class Digester extends DefaultHandler {
      * @see CallMethodRule
      */
     public void addCallMethod(String pattern, String methodName,
-                              int paramCount, Class paramTypes[]) {
+                              int paramCount, Class<?> paramTypes[]) {
 
         addRule(pattern,
                 new CallMethodRule(
@@ -1999,7 +2003,7 @@ public class Digester extends DefaultHandler {
      * @param clazz Java class of the object creation factory class
      * @see FactoryCreateRule
      */
-    public void addFactoryCreate(String pattern, Class clazz) {
+    public void addFactoryCreate(String pattern, Class<?> clazz) {
 
         addFactoryCreate(pattern, clazz, false);
 
@@ -2034,7 +2038,7 @@ public class Digester extends DefaultHandler {
      *  value specified by <code>className</code>
      * @see FactoryCreateRule
      */
-    public void addFactoryCreate(String pattern, Class clazz,
+    public void addFactoryCreate(String pattern, Class<?> clazz,
                                  String attributeName) {
 
         addFactoryCreate(pattern, clazz, attributeName, false);
@@ -2090,7 +2094,7 @@ public class Digester extends DefaultHandler {
      */
     public void addFactoryCreate(
                                     String pattern, 
-                                    Class clazz,
+                                    Class<?> clazz,
                                     boolean ignoreCreateExceptions) {
 
         addRule(
@@ -2137,7 +2141,7 @@ public class Digester extends DefaultHandler {
      */
     public void addFactoryCreate(
                                     String pattern, 
-                                    Class clazz,
+                                    Class<?> clazz,
                                     String attributeName,
                                     boolean ignoreCreateExceptions) {
 
@@ -2190,7 +2194,7 @@ public class Digester extends DefaultHandler {
      * @param clazz Java class to be created
      * @see ObjectCreateRule
      */
-    public void addObjectCreate(String pattern, Class clazz) {
+    public void addObjectCreate(String pattern, Class<?> clazz) {
 
         addRule(pattern,
                 new ObjectCreateRule(clazz));
@@ -2227,7 +2231,7 @@ public class Digester extends DefaultHandler {
      */
     public void addObjectCreate(String pattern,
                                 String attributeName,
-                                Class clazz) {
+                                Class<?> clazz) {
 
         addRule(pattern,
                 new ObjectCreateRule(attributeName, clazz));
@@ -2511,9 +2515,9 @@ public class Digester extends DefaultHandler {
      * @since 1.6
      */
     public void push(String stackName, Object value) {
-        ArrayStack namedStack = (ArrayStack) stacksByName.get(stackName);
+        ArrayStack<Object> namedStack = stacksByName.get(stackName);
         if (namedStack == null) {
-            namedStack = new ArrayStack();
+            namedStack = new ArrayStack<Object>();
             stacksByName.put(stackName, namedStack);
         }
         namedStack.push(value);
@@ -2534,7 +2538,7 @@ public class Digester extends DefaultHandler {
      */
     public Object pop(String stackName) {
         Object result = null;
-        ArrayStack namedStack = (ArrayStack) stacksByName.get(stackName);
+        ArrayStack<Object> namedStack = stacksByName.get(stackName);
         if (namedStack == null) {
             if (log.isDebugEnabled()) {
                 log.debug("Stack '" + stackName + "' is empty");
@@ -2564,7 +2568,7 @@ public class Digester extends DefaultHandler {
      */
     public Object peek(String stackName) {
         Object result = null;
-        ArrayStack namedStack = (ArrayStack) stacksByName.get(stackName);
+        ArrayStack<Object> namedStack = stacksByName.get(stackName);
         if (namedStack == null ) {
             if (log.isDebugEnabled()) {
                 log.debug("Stack '" + stackName + "' is empty");
@@ -2590,7 +2594,7 @@ public class Digester extends DefaultHandler {
      */
     public boolean isEmpty(String stackName) {
         boolean result = true;
-        ArrayStack namedStack = (ArrayStack) stacksByName.get(stackName);
+        ArrayStack<Object> namedStack = stacksByName.get(stackName);
         if (namedStack != null ) {
             result = namedStack.isEmpty();
         }
@@ -2680,7 +2684,7 @@ public class Digester extends DefaultHandler {
     /**
      * Return the set of DTD URL registrations, keyed by public identifier.
      */
-    Map getRegistrations() {
+    Map<String,String> getRegistrations() {
 
         return (entityValidator);
 
@@ -2700,7 +2704,7 @@ public class Digester extends DefaultHandler {
      * @deprecated Call <code>match()</code> on the <code>Rules</code>
      *  implementation returned by <code>getRules()</code>
      */
-    List getRules(String match) {
+    List<Rule> getRules(String match) {
 
         return (getRules().match(match));
 

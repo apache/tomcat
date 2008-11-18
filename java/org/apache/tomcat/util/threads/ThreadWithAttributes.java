@@ -35,7 +35,7 @@ public class ThreadWithAttributes extends Thread {
     private Object control;
     public static int MAX_NOTES=16;
     private Object notes[]=new Object[MAX_NOTES];
-    private Hashtable attributes=new Hashtable();
+    private Hashtable<?,?> attributes=new Hashtable<Object,Object>();
     private String currentStage;
     private Object param;
     
@@ -97,7 +97,7 @@ public class ThreadWithAttributes extends Thread {
     /** Generic attributes. You'll need a hashtable lookup -
      * you can use notes for array access.
      */
-    public final Hashtable getAttributes(Object control) {
+    public final Hashtable<?,?> getAttributes(Object control) {
         if( this.control != control ) return null;
         return attributes;
     }
