@@ -42,10 +42,8 @@ public class ModelerSource {
      * @param source Introspected object or some other source
      * @throws Exception
      */ 
-    public List loadDescriptors( Registry registry, String location,
-                                 String type, Object source)
-            throws Exception
-    {
+    public List<ObjectName> loadDescriptors( Registry registry, String location,
+            String type, Object source) throws Exception {
         // TODO
         return null;
     }

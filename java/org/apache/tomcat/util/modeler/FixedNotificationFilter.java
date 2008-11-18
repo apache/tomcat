@@ -44,7 +44,7 @@ public class FixedNotificationFilter implements NotificationFilter {
      * The set of attribute names that are accepted by this filter.  If this
      * list is empty, all attribute names are accepted.
      */
-    private HashSet names = new HashSet();
+    private HashSet<String> names = new HashSet<String>();
     String namesA[]=null;
 
     /**
@@ -64,7 +64,7 @@ public class FixedNotificationFilter implements NotificationFilter {
      */
     public String[] getNames() {
         synchronized (names) {
-            return ((String[]) names.toArray(new String[names.size()]));
+            return names.toArray(new String[names.size()]);
         }
     }
 

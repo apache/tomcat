@@ -44,7 +44,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     String location;
     String type;
     Object source;
-    List mbeans=new ArrayList();
+    List<ObjectName> mbeans = new ArrayList<ObjectName>();
 
     public void setRegistry(Registry reg) {
         this.registry=reg;
@@ -66,10 +66,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         this.source=source;
     }
 
-    public List loadDescriptors( Registry registry, String location,
-                                 String type, Object source)
-            throws Exception
-    {
+    public List<ObjectName> loadDescriptors( Registry registry, String location,
+            String type, Object source) throws Exception {
         setRegistry(registry);
         setLocation(location);
         setType(type);
@@ -81,11 +79,12 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     public void execute() throws Exception {
         if( registry==null ) registry=Registry.getRegistry();
         try {
-            ManagedBean managed=createManagedBean(registry, null, (Class)source, type);
+            ManagedBean managed = createManagedBean(registry, null,
+                    (Class<?>)source, type);
             if( managed==null ) return;
             managed.setName( type );
 
-            mbeans.add(managed);
+            registry.addManagedBean(managed);
 
         } catch( Exception ex ) {
             log.error( "Error reading descriptors ", ex);
@@ -96,7 +95,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     // ------------ Implementation for non-declared introspection classes
 
-    static Hashtable specialMethods=new Hashtable();
+    static Hashtable<String,String> specialMethods =
+        new Hashtable<String,String>();
     static {
         specialMethods.put( "preDeregister", "");
         specialMethods.put( "postDeregister", "");
@@ -106,7 +106,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     private static ObjectName objNameArray[]=new ObjectName[0];
     // createMBean == registerClass + registerMBean
 
-    private static Class[] supportedTypes  = new Class[] {
+    private static Class<?>[] supportedTypes  = new Class[] {
         Boolean.class,
         Boolean.TYPE,
         Byte.class,
@@ -139,7 +139,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param ret The class to check
      * @return boolean True if class is supported
      */ 
-    private boolean supportedType(Class ret) {
+    private boolean supportedType(Class<?> ret) {
         for (int i = 0; i < supportedTypes.length; i++) {
             if (ret == supportedTypes[i]) {
                 return true;
@@ -158,7 +158,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param javaType The class to check
      * @return boolean True if the class is compatible.
      */
-    protected boolean isBeanCompatible(Class javaType) {
+    protected boolean isBeanCompatible(Class<?> javaType) {
         // Must be a non-primitive and non array
         if (javaType.isArray() || javaType.isPrimitive()) {
             return false;
@@ -178,7 +178,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         }
 
         // Make sure superclass is compatible
-        Class superClass = javaType.getSuperclass();
+        Class<?> superClass = javaType.getSuperclass();
         if (superClass != null && 
             superClass != java.lang.Object.class && 
             superClass != java.lang.Exception.class && 
@@ -200,10 +200,12 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @param setAttMap The settable attributes map
      * @param invokeAttMap The invokable attributes map
      */
-    private void initMethods(Class realClass,
+    private void initMethods(Class<?> realClass,
                              Method methods[],
-                             Hashtable attMap, Hashtable getAttMap,
-                             Hashtable setAttMap, Hashtable invokeAttMap)
+                             Hashtable<String,Method> attMap,
+                             Hashtable<String,Method> getAttMap,
+                             Hashtable<String,Method> setAttMap,
+                             Hashtable<String,Method> invokeAttMap)
     {
         for (int j = 0; j < methods.length; ++j) {
             String name=methods[j].getName();
@@ -217,10 +219,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             }
             if( methods[j].getDeclaringClass() == Object.class )
                 continue;
-            Class params[]=methods[j].getParameterTypes();
+            Class<?> params[] = methods[j].getParameterTypes();
 
             if( name.startsWith( "get" ) && params.length==0) {
-                Class ret=methods[j].getReturnType();
+                Class<?> ret = methods[j].getReturnType();
                 if( ! supportedType( ret ) ) {
                     if( log.isDebugEnabled() )
                         log.debug("Unsupported type " + methods[j]);
@@ -232,7 +234,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 // just a marker, we don't use the value
                 attMap.put( name, methods[j] );
             } else if( name.startsWith( "is" ) && params.length==0) {
-                Class ret=methods[j].getReturnType();
+                Class<?> ret = methods[j].getReturnType();
                 if( Boolean.TYPE != ret  ) {
                     if( log.isDebugEnabled() )
                         log.debug("Unsupported type " + methods[j] + " " + ret );
@@ -287,19 +289,19 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @return ManagedBean The create MBean
      */
     public ManagedBean createManagedBean(Registry registry, String domain,
-                                         Class realClass, String type)
+                                         Class<?> realClass, String type)
     {
         ManagedBean mbean= new ManagedBean();
 
         Method methods[]=null;
 
-        Hashtable attMap=new Hashtable();
+        Hashtable<String,Method> attMap = new Hashtable<String,Method>();
         // key: attribute val: getter method
-        Hashtable getAttMap=new Hashtable();
+        Hashtable<String,Method> getAttMap = new Hashtable<String,Method>();
         // key: attribute val: setter method
-        Hashtable setAttMap=new Hashtable();
+        Hashtable<String,Method> setAttMap = new Hashtable<String,Method>();
         // key: operation val: invoke method
-        Hashtable invokeAttMap=new Hashtable();
+        Hashtable<String,Method> invokeAttMap = new Hashtable<String,Method>();
 
         methods = realClass.getMethods();
 
@@ -307,23 +309,23 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         try {
 
-            Enumeration en=attMap.keys();
+            Enumeration<String> en = attMap.keys();
             while( en.hasMoreElements() ) {
-                String name=(String)en.nextElement();
+                String name = en.nextElement();
                 AttributeInfo ai=new AttributeInfo();
                 ai.setName( name );
-                Method gm=(Method)getAttMap.get(name);
+                Method gm = getAttMap.get(name);
                 if( gm!=null ) {
                     //ai.setGetMethodObj( gm );
                     ai.setGetMethod( gm.getName());
-                    Class t=gm.getReturnType();
+                    Class<?> t=gm.getReturnType();
                     if( t!=null )
                         ai.setType( t.getName() );
                 }
-                Method sm=(Method)setAttMap.get(name);
+                Method sm = setAttMap.get(name);
                 if( sm!=null ) {
                     //ai.setSetMethodObj(sm);
-                    Class t=sm.getParameterTypes()[0];
+                    Class<?> t = sm.getParameterTypes()[0];
                     if( t!=null )
                         ai.setType( t.getName());
                     ai.setSetMethod( sm.getName());
@@ -341,14 +343,14 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
             en=invokeAttMap.keys();
             while( en.hasMoreElements() ) {
-                String name=(String)en.nextElement();
-                Method m=(Method)invokeAttMap.get(name);
+                String name = en.nextElement();
+                Method m = invokeAttMap.get(name);
                 if( m!=null && name != null ) {
                     OperationInfo op=new OperationInfo();
                     op.setName(name);
                     op.setReturnType(m.getReturnType().getName());
                     op.setDescription("Introspected operation " + name);
-                    Class parms[]=m.getParameterTypes();
+                    Class<?> parms[] = m.getParameterTypes();
                     for(int i=0; i<parms.length; i++ ) {
                         ParameterInfo pi=new ParameterInfo();
                         pi.setType(parms[i].getName());
