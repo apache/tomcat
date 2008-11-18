@@ -53,7 +53,8 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * The set of registered <code>BaseNotificationBroadcasterEntry</code>
      * entries.
      */
-    protected ArrayList entries = new ArrayList();
+    protected ArrayList<BaseNotificationBroadcasterEntry> entries =
+        new ArrayList<BaseNotificationBroadcasterEntry>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -80,10 +81,10 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
             // Optimization to coalesce attribute name filters
             if (filter instanceof BaseAttributeFilter) {
                 BaseAttributeFilter newFilter = (BaseAttributeFilter) filter;
-                Iterator items = entries.iterator();
+                Iterator<BaseNotificationBroadcasterEntry> items =
+                    entries.iterator();
                 while (items.hasNext()) {
-                    BaseNotificationBroadcasterEntry item =
-                        (BaseNotificationBroadcasterEntry) items.next();
+                    BaseNotificationBroadcasterEntry item = items.next();
                     if ((item.listener == listener) &&
                         (item.filter != null) &&
                         (item.filter instanceof BaseAttributeFilter) &&
@@ -137,10 +138,10 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
         throws ListenerNotFoundException {
 
         synchronized (entries) {
-            Iterator items = entries.iterator();
+            Iterator<BaseNotificationBroadcasterEntry> items =
+                entries.iterator();
             while (items.hasNext()) {
-                BaseNotificationBroadcasterEntry item =
-                    (BaseNotificationBroadcasterEntry) items.next();
+                BaseNotificationBroadcasterEntry item = items.next();
                 if (item.listener == listener)
                     items.remove();
             }
@@ -200,10 +201,10 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
     public void sendNotification(Notification notification) {
 
         synchronized (entries) {
-            Iterator items = entries.iterator();
+            Iterator<BaseNotificationBroadcasterEntry> items =
+                entries.iterator();
             while (items.hasNext()) {
-                BaseNotificationBroadcasterEntry item =
-                    (BaseNotificationBroadcasterEntry) items.next();
+                BaseNotificationBroadcasterEntry item = items.next();
                 if ((item.filter != null) &&
                     (!item.filter.isNotificationEnabled(notification)))
                     continue;

@@ -21,6 +21,8 @@ package org.apache.tomcat.util.modeler;
 
 import java.util.List;
 
+import javax.management.ObjectName;
+
 /**
  * Interface for modeler MBeans.
  * 
@@ -53,7 +55,8 @@ public interface RegistryMBean {
      * 
      * @since 1.1
      */ 
-    public List loadMBeans( Object source, ClassLoader cl ) throws Exception;
+    public List<ObjectName> loadMBeans( Object source, ClassLoader cl )
+            throws Exception;
 
     /** Invoke an operation on a set of mbeans. 
      * 
@@ -63,7 +66,7 @@ public interface RegistryMBean {
      *      errors
      * @throws Exception
      */ 
-    public void invoke( List mbeans, String operation, boolean failFirst )
+    public void invoke( List<ObjectName> mbeans, String operation, boolean failFirst )
             throws Exception;
 
     /** Register a bean by creating a modeler mbean and adding it to the 
