@@ -115,7 +115,7 @@ public class StandardEngine
     
     /** Mbeans loaded by the engine.  
      */ 
-    private List mbeans;
+    private List<ObjectName> mbeans;
     
 
     /**
@@ -382,7 +382,7 @@ public class StandardEngine
             try {
                 for( int i=0; i<mbeans.size() ; i++ ) {
                     Registry.getRegistry(null, null)
-                        .unregisterComponent((ObjectName)mbeans.get(i));
+                            .unregisterComponent(mbeans.get(i));
                 }
             } catch (Exception e) {
                 log.error(sm.getString("standardEngine.unregister.mbeans.failed", mbeansFile), e);
