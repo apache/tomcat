@@ -45,8 +45,7 @@ public class ParserFeatureSetterFactory{
     static {
         try{
             // Use reflection to avoid a build dependency with Xerces.
-            Class versionClass = 
-                            Class.forName("org.apache.xerces.impl.Version");
+            Class.forName("org.apache.xerces.impl.Version");
             isXercesUsed = true;
         } catch (Exception ex){
             isXercesUsed = false;

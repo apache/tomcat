@@ -50,10 +50,10 @@ public class AcceptLanguage {
         Vector<Locale> l = new Vector<Locale>();
         extractLocales( languages,quality, l);
 
-        return (Locale)l.elementAt(0);
+        return l.elementAt(0);
     }
 
-    public static Enumeration getLocales(String acceptLanguage) {
+    public static Enumeration<Locale> getLocales(String acceptLanguage) {
             // Short circuit with an empty enumeration if null header
         if (acceptLanguage == null) {
             Vector<Locale> v = new Vector<Locale>();
@@ -125,17 +125,16 @@ public class AcceptLanguage {
         }
     }
 
-    private static void extractLocales(Hashtable languages, Vector q,
-            Vector<Locale> l)
-    {
+    private static void extractLocales(
+            Hashtable<String,Vector<String>> languages, Vector<Double> q,
+            Vector<Locale> l) {
         // XXX We will need to order by q value Vector in the Future ?
-        Enumeration e = q.elements();
+        Enumeration<Double> e = q.elements();
         while (e.hasMoreElements()) {
-            Vector v =
-                (Vector)languages.get(((Double)e.nextElement()).toString());
-            Enumeration le = v.elements();
+            Vector<String> v = languages.get((e.nextElement()).toString());
+            Enumeration<String> le = v.elements();
             while (le.hasMoreElements()) {
-                    String language = (String)le.nextElement();
+                    String language = le.nextElement();
                         String country = "";
                         int countryIndex = language.indexOf("-");
                 if (countryIndex > -1) {

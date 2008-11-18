@@ -140,13 +140,13 @@ public class MimeMap implements FileNameMap {
         map.put(extn, type.toLowerCase());
     }
 
-    public Enumeration getExtensions() {
+    public Enumeration<String> getExtensions() {
         return map.keys();
     }
 
     public String getContentType(String extn) {
-        String type = (String)map.get(extn.toLowerCase());
-        if( type == null ) type=(String)defaultMap.get( extn );
+        String type = map.get(extn.toLowerCase());
+        if(type == null) type = defaultMap.get(extn);
         return type;
     }
 

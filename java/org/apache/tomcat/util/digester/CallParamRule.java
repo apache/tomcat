@@ -167,7 +167,7 @@ public class CallParamRule extends Rule {
      * Stack is used to allow nested body text to be processed.
      * Lazy creation.
      */
-    protected ArrayStack bodyTextStack;
+    protected ArrayStack<String> bodyTextStack;
 
     // --------------------------------------------------------- Public Methods
 
@@ -224,7 +224,7 @@ public class CallParamRule extends Rule {
             // so that we can make sure that the right set of parameters
             // is at the top of the stack
             if (bodyTextStack == null) {
-                bodyTextStack = new ArrayStack();
+                bodyTextStack = new ArrayStack<String>();
             }
             bodyTextStack.push(bodyText.trim());
         }
