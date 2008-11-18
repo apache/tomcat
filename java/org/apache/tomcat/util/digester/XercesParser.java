@@ -99,7 +99,7 @@ public class XercesParser{
         String versionNumber = "1.0";
         try{
             // Use reflection to avoid a build dependency with Xerces.
-            Class versionClass = 
+            Class<?> versionClass = 
                             Class.forName("org.apache.xerces.impl.Version");
             // Will return Xerces-J 2.x.0
             Method method = 
