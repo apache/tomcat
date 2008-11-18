@@ -18,6 +18,8 @@ package org.apache.tomcat.util.modeler.modules;
 
 import java.util.List;
 
+import javax.management.ObjectName;
+
 
 /**
  * This mbean will load an extended mlet file ( similar in syntax with jboss ).
@@ -38,7 +40,7 @@ public interface MbeansSourceMBean
      * 
      * @return List of ObjectName
      */ 
-    public List getMBeans();
+    public List<ObjectName> getMBeans();
 
     /** Load the mbeans from the source. Called automatically on init() 
      * 
