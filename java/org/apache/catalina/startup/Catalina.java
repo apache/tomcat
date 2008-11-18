@@ -265,7 +265,8 @@ public class Catalina extends Embedded {
         Digester digester = new Digester();
         digester.setValidating(false);
         digester.setRulesValidation(true);
-        HashMap<Class, List<String>> fakeAttributes = new HashMap<Class, List<String>>();
+        HashMap<Class<?>, List<String>> fakeAttributes =
+            new HashMap<Class<?>, List<String>>();
         ArrayList<String> attrs = new ArrayList<String>();
         attrs.add("className");
         fakeAttributes.put(Object.class, attrs);
