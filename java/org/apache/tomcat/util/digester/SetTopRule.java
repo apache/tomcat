@@ -44,44 +44,6 @@ public class SetTopRule extends Rule {
      * "set parent" method's argument type is assumed to be the class of the
      * parent object.
      *
-     * @param digester The associated Digester
-     * @param methodName Method name of the "set parent" method to call
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #SetTopRule(String methodName)} instead.
-     */
-    public SetTopRule(Digester digester, String methodName) {
-
-        this(methodName);
-
-    }
-
-
-    /**
-     * Construct a "set parent" rule with the specified method name.
-     *
-     * @param digester The associated Digester
-     * @param methodName Method name of the "set parent" method to call
-     * @param paramType Java class of the "set parent" method's argument
-     *  (if you wish to use a primitive type, specify the corresonding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #SetTopRule(String methodName, String paramType)} instead.
-     */
-    public SetTopRule(Digester digester, String methodName,
-                      String paramType) {
-
-        this(methodName, paramType);
-
-    }
-
-    /**
-     * Construct a "set parent" rule with the specified method name.  The
-     * "set parent" method's argument type is assumed to be the class of the
-     * parent object.
-     *
      * @param methodName Method name of the "set parent" method to call
      */
     public SetTopRule(String methodName) {
