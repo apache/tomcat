@@ -24,6 +24,8 @@ package org.apache.tomcat.util.collections;
  *
  * @author Gal Shachor
  * @author Costin Manolache
+ * 
+ * @deprecated
  */
 public final class SimplePool  {
     
