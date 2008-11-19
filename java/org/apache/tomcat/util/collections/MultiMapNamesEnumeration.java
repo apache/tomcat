@@ -41,41 +41,41 @@ public final class MultiMapNamesEnumeration implements Enumeration {
      * @param  unique return only unique names
      */
     MultiMapNamesEnumeration(MultiMap headers, boolean toString,
-			     boolean unique) {
-	this.headers=headers;
-	pos=0;
-	size = headers.size();
-	findNext();
+                             boolean unique) {
+        this.headers=headers;
+        pos=0;
+        size = headers.size();
+        findNext();
     }
 
     private void findNext() {
-	next=null;
-	for(  ; pos< size; pos++ ) {
-	    next=headers.getName( pos ).toString();
-	    for( int j=0; j<pos ; j++ ) {
-		if( headers.getName( j ).equalsIgnoreCase( next )) {
-		    // duplicate.
-		    next=null;
-		    break;
-		}
-	    }
-	    if( next!=null ) {
-		// it's not a duplicate
-		break;
-	    }
-	}
-	// next time findNext is called it will try the
-	// next element
-	pos++;
+        next=null;
+        for(  ; pos< size; pos++ ) {
+            next=headers.getName( pos ).toString();
+            for( int j=0; j<pos ; j++ ) {
+                if( headers.getName( j ).equalsIgnoreCase( next )) {
+                    // duplicate.
+                    next=null;
+                    break;
+                }
+            }
+            if( next!=null ) {
+                // it's not a duplicate
+                break;
+            }
+        }
+        // next time findNext is called it will try the
+        // next element
+        pos++;
     }
     
     public boolean hasMoreElements() {
-	return next!=null;
+        return next!=null;
     }
 
     public Object nextElement() {
-	String current=next;
-	findNext();
-	return current;
+        String current=next;
+        findNext();
+        return current;
     }
 }
