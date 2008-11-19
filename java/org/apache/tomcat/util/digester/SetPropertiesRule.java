@@ -42,21 +42,6 @@ public class SetPropertiesRule extends Rule {
 
 
     /**
-     * Default constructor sets only the the associated Digester.
-     *
-     * @param digester The digester with which this rule is associated
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #SetPropertiesRule()} instead.
-     */
-    public SetPropertiesRule(Digester digester) {
-
-        this();
-
-    }
-    
-
-    /**
      * Base constructor.
      */
     public SetPropertiesRule() {
