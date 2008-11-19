@@ -32,33 +32,33 @@ class MultiMapValuesEnumeration implements Enumeration {
     String name;
 
     MultiMapValuesEnumeration(MultiMap headers, String name,
-			      boolean toString) {
+                              boolean toString) {
         this.name=name;
-	this.headers=headers;
-	pos=0;
-	size = headers.size();
-	findNext();
+        this.headers=headers;
+        pos=0;
+        size = headers.size();
+        findNext();
     }
 
     private void findNext() {
-	next=null;
-	for( ; pos< size; pos++ ) {
-	    MessageBytes n1=headers.getName( pos );
-	    if( n1.equalsIgnoreCase( name )) {
-		next=headers.getValue( pos );
-		break;
-	    }
-	}
-	pos++;
+        next=null;
+        for( ; pos< size; pos++ ) {
+            MessageBytes n1=headers.getName( pos );
+            if( n1.equalsIgnoreCase( name )) {
+                next=headers.getValue( pos );
+                break;
+            }
+        }
+        pos++;
     }
     
     public boolean hasMoreElements() {
-	return next!=null;
+        return next!=null;
     }
 
     public Object nextElement() {
-	MessageBytes current=next;
-	findNext();
-	return current.toString();
+        MessageBytes current=next;
+        findNext();
+        return current.toString();
     }
 }
