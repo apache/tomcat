@@ -55,6 +55,7 @@ import java.util.Enumeration;
  * it makes a significant difference when normalizing attributes,
  * which is done for each start-element construct.
  *
+ *@deprecated
  */
 public final class SimpleHashtable implements Enumeration
 {
