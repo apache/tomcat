@@ -20,6 +20,9 @@ package org.apache.tomcat.util.collections;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 
+/**
+ * @deprecated
+ */
 public class EmptyEnumeration implements Enumeration {
 
     static EmptyEnumeration staticInstance=new EmptyEnumeration();
