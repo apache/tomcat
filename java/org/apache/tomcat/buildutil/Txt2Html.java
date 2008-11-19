@@ -81,10 +81,10 @@ public class Txt2Html
         int count = 0;
         
         // Step through each file and convert.
-        Iterator iter = filesets.iterator();
+        Iterator<FileSet> iter = filesets.iterator();
         while( iter.hasNext() ) {
-            FileSet fs = (FileSet)iter.next();
-            DirectoryScanner ds = fs.getDirectoryScanner( project );
+            FileSet fs = iter.next();
+            DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             File basedir = ds.getBasedir();
             String[] files = ds.getIncludedFiles();
             for( int i = 0; i < files.length; i++ ) {
