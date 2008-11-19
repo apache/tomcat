@@ -25,6 +25,7 @@ import java.util.Hashtable;
  *
  * @author Ignacio J. Ortega
  *
+ * @deprecated
  */
 
 public class LRUCache
