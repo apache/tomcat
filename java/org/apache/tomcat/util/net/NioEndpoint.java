@@ -1429,7 +1429,8 @@ public class NioEndpoint {
                         processSocket(ka.getChannel(), status, false); //don't dispatch if the lines below are cancelling the key
                     }                    
                 }
-                handler.release(ka.getChannel());
+                
+                if (ka!=null) handler.release(ka.getChannel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {ka.channel.close(true);}catch (Exception ignore){}
@@ -1610,13 +1611,26 @@ public class NioEndpoint {
                     sd.length -= written;
                 }
                 if ( sd.length <= 0 ) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Send file complete for:"+sd.fileName);
+                    }
                     attachment.setSendfileData(null);
                     if ( sd.keepAlive ) {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Connection is keep alive, registering back for OP_READ");
+                        }
                         if (reg) reg(sk,attachment,SelectionKey.OP_READ);
                     } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Send file connection is being closed");
+                        }
                         cancelledKey(sk,SocketStatus.STOP,false);
                     }
                 } else if ( attachment.interestOps() == 0 && reg ) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("OP_WRITE for sendilfe:"+sd.fileName);
+                    }
+
                     reg(sk,attachment,SelectionKey.OP_WRITE);
                 }
             }catch ( IOException x ) {
