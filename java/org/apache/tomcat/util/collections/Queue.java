@@ -25,6 +25,8 @@ import java.util.Vector;
  * is not empty.
  *
  * @author Anil V (akv@eng.sun.com)
+ * 
+ * @deprecated
  */
 public class Queue {
     private Vector vector = new Vector();
