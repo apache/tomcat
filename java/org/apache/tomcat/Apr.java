@@ -21,6 +21,9 @@ package org.apache.tomcat;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * @deprecated
+ */
 public class Apr {
     private static String aprInfo = null;
 
