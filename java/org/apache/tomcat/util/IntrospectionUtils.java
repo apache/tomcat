@@ -46,8 +46,8 @@ public final class IntrospectionUtils {
      */
     public static void execute(Object proxy, String method) throws Exception {
         Method executeM = null;
-        Class c = proxy.getClass();
-        Class params[] = new Class[0];
+        Class<?> c = proxy.getClass();
+        Class<?> params[] = new Class[0];
         //	params[0]=args.getClass();
         executeM = findMethod(c, method, params);
         if (executeM == null) {
@@ -67,8 +67,8 @@ public final class IntrospectionUtils {
         }
 
         Method executeM = null;
-        Class c = proxy.getClass();
-        Class params[] = new Class[2];
+        Class<?> c = proxy.getClass();
+        Class<?> params[] = new Class[2];
         params[0] = String.class;
         params[1] = Object.class;
         executeM = findMethod(c, "setAttribute", params);
@@ -89,8 +89,8 @@ public final class IntrospectionUtils {
      */
     public static Object getAttribute(Object proxy, String n) throws Exception {
         Method executeM = null;
-        Class c = proxy.getClass();
-        Class params[] = new Class[1];
+        Class<?> c = proxy.getClass();
+        Class<?> params[] = new Class[1];
         params[0] = String.class;
         executeM = findMethod(c, "getAttribute", params);
         if (executeM == null) {
@@ -106,8 +106,8 @@ public final class IntrospectionUtils {
      */
     public static ClassLoader getURLClassLoader(URL urls[], ClassLoader parent) {
         try {
-            Class urlCL = Class.forName("java.net.URLClassLoader");
-            Class paramT[] = new Class[2];
+            Class<?> urlCL = Class.forName("java.net.URLClassLoader");
+            Class<?> paramT[] = new Class[2];
             paramT[0] = urls.getClass();
             paramT[1] = ClassLoader.class;
             Method m = findMethod(urlCL, "newInstance", paramT);
@@ -271,7 +271,7 @@ public final class IntrospectionUtils {
 
             // First, the ideal case - a setFoo( String ) method
             for (int i = 0; i < methods.length; i++) {
-                Class paramT[] = methods[i].getParameterTypes();
+                Class<?> paramT[] = methods[i].getParameterTypes();
                 if (setter.equals(methods[i].getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
 
@@ -287,7 +287,7 @@ public final class IntrospectionUtils {
                         && methods[i].getParameterTypes().length == 1) {
 
                     // match - find the type and invoke it
-                    Class paramType = methods[i].getParameterTypes()[0];
+                    Class<?> paramType = methods[i].getParameterTypes()[0];
                     Object params[] = new Object[1];
 
                     // Try a setFoo ( int )
@@ -402,7 +402,7 @@ public final class IntrospectionUtils {
 
             // First, the ideal case - a getFoo() method
             for (int i = 0; i < methods.length; i++) {
-                Class paramT[] = methods[i].getParameterTypes();
+                Class<?> paramT[] = methods[i].getParameterTypes();
                 if (getter.equals(methods[i].getName()) && paramT.length == 0) {
                     return methods[i].invoke(o, (Object[]) null);
                 }
@@ -454,7 +454,7 @@ public final class IntrospectionUtils {
             Method setPropertyMethod = null;
             // find setFoo() method
             for (int i = 0; i < methods.length; i++) {
-                Class paramT[] = methods[i].getParameterTypes();
+                Class<?> paramT[] = methods[i].getParameterTypes();
                 if (setter.equals(methods[i].getName()) && paramT.length == 0) {
                     methods[i].invoke(o, new Object[] {});
                     return;
@@ -471,8 +471,8 @@ public final class IntrospectionUtils {
     /**
      * Replace ${NAME} with the property value
      */
-    public static String replaceProperties(String value, Hashtable staticProp,
-            PropertySource dynamicProp[]) {
+    public static String replaceProperties(String value,
+            Hashtable<String,String> staticProp, PropertySource dynamicProp[]) {
         if (value.indexOf("$") < 0) {
             return value;
         }
@@ -500,7 +500,7 @@ public final class IntrospectionUtils {
                 String n = value.substring(pos + 2, endName);
                 String v = null;
                 if (staticProp != null) {
-                    v = (String) ((Hashtable) staticProp).get(n);
+                    v = staticProp.get(n);
                 }
                 if (v == null && dynamicProp != null) {
                     for (int i = 0; i < dynamicProp.length; i++) {
@@ -549,7 +549,7 @@ public final class IntrospectionUtils {
      * Add all the jar files in a dir to the classpath, represented as a Vector
      * of URLs.
      */
-    public static void addToClassPath(Vector cpV, String dir) {
+    public static void addToClassPath(Vector<URL> cpV, String dir) {
         try {
             String cpComp[] = getFilesByExt(dir, ".jar");
             if (cpComp != null) {
@@ -565,7 +565,7 @@ public final class IntrospectionUtils {
         }
     }
 
-    public static void addToolsJar(Vector v) {
+    public static void addToolsJar(Vector<URL> v) {
         try {
             // Add tools.jar in any case
             File f = new File(System.getProperty("java.home")
@@ -641,7 +641,7 @@ public final class IntrospectionUtils {
      * @throws IOException If an I/O error occurs
      * @throws MalformedURLException Doh ;)
      */
-    public static void addJarsFromClassPath(Vector jars, String cp)
+    public static void addJarsFromClassPath(Vector<URL> jars, String cp)
             throws IOException, MalformedURLException {
         String sep = System.getProperty("path.separator");
         String token;
@@ -665,10 +665,10 @@ public final class IntrospectionUtils {
     /**
      * Return a URL[] that can be used to construct a class loader
      */
-    public static URL[] getClassPath(Vector v) {
+    public static URL[] getClassPath(Vector<URL> v) {
         URL[] urls = new URL[v.size()];
         for (int i = 0; i < v.size(); i++) {
-            urls[i] = (URL) v.elementAt(i);
+            urls[i] = v.elementAt(i);
         }
         return urls;
     }
@@ -680,7 +680,7 @@ public final class IntrospectionUtils {
     public static URL[] getClassPath(String dir, String cpath,
             String cpathProp, boolean addTools) throws IOException,
             MalformedURLException {
-        Vector jarsV = new Vector();
+        Vector<URL> jarsV = new Vector<URL>();
         if (dir != null) {
             // Add dir/classes first, if it exists
             URL url = getURL(dir, "classes");
@@ -716,22 +716,24 @@ public final class IntrospectionUtils {
             //args0=findVoidSetters(proxy.getClass());
             args0 = findBooleanSetters(proxy.getClass());
         }
-        Hashtable h = null;
+        Hashtable<String,String> h = null;
         if (null != findMethod(proxy.getClass(), "getOptionAliases",
                 new Class[] {})) {
-            h = (Hashtable) callMethod0(proxy, "getOptionAliases");
+            h = (Hashtable<String,String>) callMethod0(proxy,
+                    "getOptionAliases");
         }
         return processArgs(proxy, args, args0, null, h);
     }
 
     public static boolean processArgs(Object proxy, String args[],
-            String args0[], String args1[], Hashtable aliases) throws Exception {
+            String args0[], String args1[],
+            Hashtable<String,String> aliases) throws Exception {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.startsWith("-"))
                 arg = arg.substring(1);
             if (aliases != null && aliases.get(arg) != null)
-                arg = (String) aliases.get(arg);
+                arg = aliases.get(arg);
 
             if (args0 != null) {
                 boolean set = false;
@@ -772,11 +774,11 @@ public final class IntrospectionUtils {
         objectMethods.clear();
     }
     
-    public static String[] findVoidSetters(Class c) {
+    public static String[] findVoidSetters(Class<?> c) {
         Method m[] = findMethods(c);
         if (m == null)
             return null;
-        Vector v = new Vector();
+        Vector<String> v = new Vector<String>();
         for (int i = 0; i < m.length; i++) {
             if (m[i].getName().startsWith("set")
                     && m[i].getParameterTypes().length == 0) {
@@ -786,16 +788,16 @@ public final class IntrospectionUtils {
         }
         String s[] = new String[v.size()];
         for (int i = 0; i < s.length; i++) {
-            s[i] = (String) v.elementAt(i);
+            s[i] = v.elementAt(i);
         }
         return s;
     }
 
-    public static String[] findBooleanSetters(Class c) {
+    public static String[] findBooleanSetters(Class<?> c) {
         Method m[] = findMethods(c);
         if (m == null)
             return null;
-        Vector v = new Vector();
+        Vector<String> v = new Vector<String>();
         for (int i = 0; i < m.length; i++) {
             if (m[i].getName().startsWith("set")
                     && m[i].getParameterTypes().length == 1
@@ -807,15 +809,16 @@ public final class IntrospectionUtils {
         }
         String s[] = new String[v.size()];
         for (int i = 0; i < s.length; i++) {
-            s[i] = (String) v.elementAt(i);
+            s[i] = v.elementAt(i);
         }
         return s;
     }
 
-    static Hashtable objectMethods = new Hashtable();
+    static Hashtable<Class<?>,Method[]> objectMethods =
+        new Hashtable<Class<?>,Method[]>();
 
-    public static Method[] findMethods(Class c) {
-        Method methods[] = (Method[]) objectMethods.get(c);
+    public static Method[] findMethods(Class<?> c) {
+        Method methods[] = objectMethods.get(c);
         if (methods != null)
             return methods;
 
@@ -824,13 +827,14 @@ public final class IntrospectionUtils {
         return methods;
     }
 
-    public static Method findMethod(Class c, String name, Class params[]) {
+    public static Method findMethod(Class<?> c, String name,
+            Class<?> params[]) {
         Method methods[] = findMethods(c);
         if (methods == null)
             return null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().equals(name)) {
-                Class methodParams[] = methods[i].getParameterTypes();
+                Class<?> methodParams[] = methods[i].getParameterTypes();
                 if (methodParams == null)
                     if (params == null || params.length == 0)
                         return methods[i];
@@ -862,8 +866,8 @@ public final class IntrospectionUtils {
             for (int i = 0; i < myMethods.length; i++) {
                 if (methodN.equals(myMethods[i].getName())) {
                     // check if it's overriden
-                    Class declaring = myMethods[i].getDeclaringClass();
-                    Class parentOfDeclaring = declaring.getSuperclass();
+                    Class<?> declaring = myMethods[i].getDeclaringClass();
+                    Class<?> parentOfDeclaring = declaring.getSuperclass();
                     // this works only if the base class doesn't extend
                     // another class.
 
@@ -881,8 +885,8 @@ public final class IntrospectionUtils {
         return false;
     }
 
-    public static void callMain(Class c, String args[]) throws Exception {
-        Class p[] = new Class[1];
+    public static void callMain(Class<?> c, String args[]) throws Exception {
+        Class<?> p[] = new Class[1];
         p[0] = args.getClass();
         Method m = c.getMethod("main", p);
         m.invoke(c, new Object[] { args });
@@ -897,7 +901,7 @@ public final class IntrospectionUtils {
             d("callMethod1 " + target.getClass().getName() + " "
                     + param1.getClass().getName() + " " + typeParam1);
 
-        Class params[] = new Class[1];
+        Class<?> params[] = new Class[1];
         if (typeParam1 == null)
             params[0] = param1.getClass();
         else
@@ -918,7 +922,7 @@ public final class IntrospectionUtils {
         if (dbg > 0)
             d("callMethod0 " + target.getClass().getName() + "." + methodN);
 
-        Class params[] = new Class[0];
+        Class<?> params[] = new Class[0];
         Method m = findMethod(target.getClass(), methodN, params);
         if (m == null)
             throw new NoSuchMethodException(target.getClass().getName() + " "
@@ -929,7 +933,7 @@ public final class IntrospectionUtils {
     static Object[] emptyArray = new Object[] {};
 
     public static Object callMethodN(Object target, String methodN,
-            Object params[], Class typeParams[]) throws Exception {
+            Object params[], Class<?> typeParams[]) throws Exception {
         Method m = null;
         m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
@@ -954,7 +958,7 @@ public final class IntrospectionUtils {
         return o;
     }
 
-    public static Object convert(String object, Class paramType) {
+    public static Object convert(String object, Class<?> paramType) {
         Object result = null;
         if ("java.lang.String".equals(paramType.getName())) {
             result = object;
