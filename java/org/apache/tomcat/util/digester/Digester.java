@@ -206,13 +206,6 @@ public class Digester extends DefaultHandler {
     protected SAXParserFactory factory = null;
 
     /**
-     * @deprecated This is now managed by {@link ParserFeatureSetterFactory}
-     */
-    protected String JAXP_SCHEMA_LANGUAGE =
-        "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-    
-    
-    /**
      * The Locator associated with our parser.
      */
     protected Locator locator = null;
@@ -438,37 +431,6 @@ public class Digester extends DefaultHandler {
             elementName = elementName.substring(lastSlash + 1);
         }
         return (elementName);
-
-    }
-
-
-    /**
-     * Return the debugging detail level of our currently enabled logger.
-     *
-     * @deprecated This method now always returns 0. Digester uses the apache
-     * jakarta commons-logging library; see the documentation for that library
-     * for more information.
-     */
-    public int getDebug() {
-
-        return (0);
-
-    }
-
-
-    /**
-     * Set the debugging detail level of our currently enabled logger.
-     *
-     * @param debug New debugging detail level (0=off, increasing integers
-     *  for more detail)
-     *
-     * @deprecated This method now has no effect at all. Digester uses
-     * the apache jakarta comons-logging library; see the documentation
-     * for that library for more information.
-     */
-    public void setDebug(int debug) {
-
-        ; // No action is taken
 
     }
 
@@ -759,25 +721,6 @@ public class Digester extends DefaultHandler {
         throws SAXNotRecognizedException, SAXNotSupportedException {
 
         getParser().setProperty(property, value);
-
-    }
-
-
-    /**
-     * By setting the reader in the constructor, you can bypass JAXP and
-     * be able to use digester in Weblogic 6.0.  
-     *
-     * @deprecated Use getXMLReader() instead, which can throw a
-     *  SAXException if the reader cannot be instantiated
-     */
-    public XMLReader getReader() {
-
-        try {
-            return (getXMLReader());
-        } catch (SAXException e) {
-            log.error("Cannot get XMLReader", e);
-            return (null);
-        }
 
     }
 
@@ -1587,32 +1530,6 @@ public class Digester extends DefaultHandler {
 
 
     // ------------------------------------------------------- Public Methods
-
-
-    /**
-     * Log a message to our associated logger.
-     *
-     * @param message The message to be logged
-     * @deprecated Call getLogger() and use it's logging methods
-     */
-    public void log(String message) {
-
-        log.info(message);
-
-    }
-
-
-    /**
-     * Log a message and exception to our associated logger.
-     *
-     * @param message The message to be logged
-     * @deprecated Call getLogger() and use it's logging methods
-     */
-    public void log(String message, Throwable exception) {
-
-        log.error(message, exception);
-
-    }
 
 
     /**
@@ -2687,26 +2604,6 @@ public class Digester extends DefaultHandler {
     Map<String,String> getRegistrations() {
 
         return (entityValidator);
-
-    }
-
-
-    /**
-     * Return the set of rules that apply to the specified match position.
-     * The selected rules are those that match exactly, or those rules
-     * that specify a suffix match and the tail of the rule matches the
-     * current match position.  Exact matches have precedence over
-     * suffix matches, then (among suffix matches) the longest match
-     * is preferred.
-     *
-     * @param match The current match position
-     *
-     * @deprecated Call <code>match()</code> on the <code>Rules</code>
-     *  implementation returned by <code>getRules()</code>
-     */
-    List<Rule> getRules(String match) {
-
-        return (getRules().match(match));
 
     }
 
