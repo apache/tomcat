@@ -24,7 +24,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 /** Enumerate the values for a (possibly ) multiple
  *    value element.
  */
-class MultiMapValuesEnumeration implements Enumeration {
+class MultiMapValuesEnumeration implements Enumeration<String> {
     int pos;
     int size;
     MessageBytes next;
@@ -56,7 +56,7 @@ class MultiMapValuesEnumeration implements Enumeration {
         return next!=null;
     }
 
-    public Object nextElement() {
+    public String nextElement() {
         MessageBytes current=next;
         findNext();
         return current.toString();
