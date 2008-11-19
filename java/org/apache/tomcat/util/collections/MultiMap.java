@@ -50,17 +50,17 @@ public class MultiMap {
      * 
      */
     public MultiMap(int initial_size) {
-	fields=new Field[initial_size];
+        fields=new Field[initial_size];
     }
 
     /**
      * Clears all header fields.
      */
     public void recycle() {
-	for (int i = 0; i < count; i++) {
-	    fields[i].recycle();
-	}
-	count = 0;
+        for (int i = 0; i < count; i++) {
+            fields[i].recycle();
+        }
+        count = 0;
     }
 
     // -------------------- Idx access to headers ----------
@@ -70,7 +70,7 @@ public class MultiMap {
      * Returns the current number of header fields.
      */
     public int size() {
-	return count;
+        return count;
     }
 
     /**
@@ -80,8 +80,8 @@ public class MultiMap {
      * An exception is thrown if the index is not valid ( <0 or >size )
      */
     public MessageBytes getName(int n) {
-	// n >= 0 && n < count ? headers[n].getName() : null
-	return fields[n].name;
+        // n >= 0 && n < count ? headers[n].getName() : null
+        return fields[n].name;
     }
 
     /**
@@ -89,21 +89,21 @@ public class MultiMap {
      * This may be used to iterate through all header fields.
      */
     public MessageBytes getValue(int n) {
-	return fields[n].value;
+        return fields[n].value;
     }
 
     /** Find the index of a field with the given name.
      */
     public int find( String name, int starting ) {
-	// We can use a hash - but it's not clear how much
-	// benefit you can get - there is an  overhead 
-	// and the number of headers is small (4-5 ?)
-	// Another problem is that we'll pay the overhead
-	// of constructing the hashtable
+        // We can use a hash - but it's not clear how much
+        // benefit you can get - there is an  overhead 
+        // and the number of headers is small (4-5 ?)
+        // Another problem is that we'll pay the overhead
+        // of constructing the hashtable
 
-	// A custom search tree may be better
+        // A custom search tree may be better
         for (int i = starting; i < count; i++) {
-	    if (fields[i].name.equals(name)) {
+            if (fields[i].name.equals(name)) {
                 return i;
             }
         }
@@ -113,15 +113,15 @@ public class MultiMap {
     /** Find the index of a field with the given name.
      */
     public int findIgnoreCase( String name, int starting ) {
-	// We can use a hash - but it's not clear how much
-	// benefit you can get - there is an  overhead 
-	// and the number of headers is small (4-5 ?)
-	// Another problem is that we'll pay the overhead
-	// of constructing the hashtable
+        // We can use a hash - but it's not clear how much
+        // benefit you can get - there is an  overhead 
+        // and the number of headers is small (4-5 ?)
+        // Another problem is that we'll pay the overhead
+        // of constructing the hashtable
 
-	// A custom search tree may be better
+        // A custom search tree may be better
         for (int i = starting; i < count; i++) {
-	    if (fields[i].name.equalsIgnoreCase(name)) {
+            if (fields[i].name.equalsIgnoreCase(name)) {
                 return i;
             }
         }
@@ -139,68 +139,68 @@ public class MultiMap {
      * there are better ways ( like adding a "isValid" field )
      */
     public void remove( int i ) {
-	// reset and swap with last header
-	Field mh = fields[i];
-	// reset the field
-	mh.recycle();
-	
-	fields[i] = fields[count - 1];
-	fields[count - 1] = mh;
-	count--;
+        // reset and swap with last header
+        Field mh = fields[i];
+        // reset the field
+        mh.recycle();
+        
+        fields[i] = fields[count - 1];
+        fields[count - 1] = mh;
+        count--;
     }
 
     /** Create a new, unitialized entry. 
      */
     public int addField() {
-	int len = fields.length;
-	int pos=count;
-	if (count >= len) {
-	    // expand header list array
-	    Field tmp[] = new Field[pos * 2];
-	    System.arraycopy(fields, 0, tmp, 0, len);
-	    fields = tmp;
-	}
-	if (fields[pos] == null) {
-	    fields[pos] = new Field();
-	}
-	count++;
-	return pos;
+        int len = fields.length;
+        int pos=count;
+        if (count >= len) {
+            // expand header list array
+            Field tmp[] = new Field[pos * 2];
+            System.arraycopy(fields, 0, tmp, 0, len);
+            fields = tmp;
+        }
+        if (fields[pos] == null) {
+            fields[pos] = new Field();
+        }
+        count++;
+        return pos;
     }
 
     public MessageBytes get( String name) {
         for (int i = 0; i < count; i++) {
-	    if (fields[i].name.equals(name)) {
-		return fields[i].value;
-	    }
-	}
+            if (fields[i].name.equals(name)) {
+                return fields[i].value;
+            }
+        }
         return null;
     }
 
     public int findFirst( String name ) {
         for (int i = 0; i < count; i++) {
-	    if (fields[i].name.equals(name)) {
-		return i;
-	    }
-	}
+            if (fields[i].name.equals(name)) {
+                return i;
+            }
+        }
         return -1;
     }
 
     public int findNext( int startPos ) {
-	int next= fields[startPos].nextPos;
-	if( next != MultiMap.NEED_NEXT ) {
-	    return next;
-	}
+        int next= fields[startPos].nextPos;
+        if( next != MultiMap.NEED_NEXT ) {
+            return next;
+        }
 
-	// next==NEED_NEXT, we never searched for this header
-	MessageBytes name=fields[startPos].name;
+        // next==NEED_NEXT, we never searched for this header
+        MessageBytes name=fields[startPos].name;
         for (int i = startPos; i < count; i++) {
-	    if (fields[i].name.equals(name)) {
-		// cache the search result
-		fields[startPos].nextPos=i;
-		return i;
-	    }
-	}
-	fields[startPos].nextPos= MultiMap.LAST;
+            if (fields[i].name.equals(name)) {
+                // cache the search result
+                fields[startPos].nextPos=i;
+                return i;
+            }
+        }
+        fields[startPos].nextPos= MultiMap.LAST;
         return -1;
     }
 
@@ -210,27 +210,27 @@ public class MultiMap {
 
     // -------------------- Internal representation --------------------
     final class Field {
-	MessageBytes name;
-	MessageBytes value;
+        MessageBytes name;
+        MessageBytes value;
 
-	// Extra info for speed
-	
-	//  multiple fields with same name - a linked list will
-	// speed up multiple name enumerations and search.
-	int nextPos;
+        // Extra info for speed
+        
+        //  multiple fields with same name - a linked list will
+        // speed up multiple name enumerations and search.
+        int nextPos;
 
-	// hashkey
-	int hash;
-	Field nextSameHash;
+        // hashkey
+        int hash;
+        Field nextSameHash;
 
-	Field() {
-	    nextPos=MultiMap.NEED_NEXT;
-	}
-	
-	void recycle() {
-	    name.recycle();
-	    value.recycle();
-	    nextPos=MultiMap.NEED_NEXT;
-	}
+        Field() {
+            nextPos=MultiMap.NEED_NEXT;
+        }
+        
+        void recycle() {
+            name.recycle();
+            value.recycle();
+            nextPos=MultiMap.NEED_NEXT;
+        }
     }
 }
