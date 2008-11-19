@@ -104,7 +104,7 @@ public class SocketProperties {
     /**
      * TCP_NO_DELAY option. JVM default used if not set.
      */
-    protected Boolean tcpNoDelay = null;
+    protected Boolean tcpNoDelay = Boolean.TRUE;
 
     /**
      * SO_KEEPALIVE option. JVM default used if not set.
