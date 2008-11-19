@@ -1547,7 +1547,7 @@ public class NioEndpoint {
                     NioChannel channel = attachment.getChannel();
                     if (sk.isReadable() || sk.isWritable() ) {
                         if ( attachment.getSendfileData() != null ) {
-                            processSendfile(sk,attachment,true);
+                            processSendfile(sk,attachment,true, false);
                         } else if ( attachment.getComet() ) {
                             //check if thread is available
                             if ( isWorkerAvailable() ) {
@@ -1592,7 +1592,7 @@ public class NioEndpoint {
             return result;
         }
         
-        public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg) {
+        public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg, boolean event) {
             try {
                 //unreg(sk,attachment);//only do this if we do process send file on a separate thread
                 SendfileData sd = attachment.getSendfileData();
@@ -1616,10 +1616,16 @@ public class NioEndpoint {
                     }
                     attachment.setSendfileData(null);
                     if ( sd.keepAlive ) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Connection is keep alive, registering back for OP_READ");
+                        if (reg) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connection is keep alive, registering back for OP_READ");
+                            }
+                            if (event) {
+                                this.add(attachment.getChannel(),SelectionKey.OP_READ);
+                            } else {
+                                reg(sk,attachment,SelectionKey.OP_READ);
+                            }
                         }
-                        if (reg) reg(sk,attachment,SelectionKey.OP_READ);
                     } else {
                         if (log.isDebugEnabled()) {
                             log.debug("Send file connection is being closed");
@@ -1630,11 +1636,14 @@ public class NioEndpoint {
                     if (log.isDebugEnabled()) {
                         log.debug("OP_WRITE for sendilfe:"+sd.fileName);
                     }
-
-                    reg(sk,attachment,SelectionKey.OP_WRITE);
+                    if (event) {
+                        add(attachment.getChannel(),SelectionKey.OP_WRITE);
+                    } else {
+                        reg(sk,attachment,SelectionKey.OP_WRITE);
+                    }
                 }
             }catch ( IOException x ) {
-                if ( log.isDebugEnabled() ) log.warn("Unable to complete sendfile request:", x);
+                if ( log.isDebugEnabled() ) log.debug("Unable to complete sendfile request:", x);
                 cancelledKey(sk,SocketStatus.ERROR,false);
                 return false;
             }catch ( Throwable t ) {
