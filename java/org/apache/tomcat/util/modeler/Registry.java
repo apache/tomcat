@@ -649,7 +649,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * @param param
      * @return List of descriptors
      * @throws Exception
-     * @deprecated bad interface, mixing of metadata and mbeans
      */
     public List<ObjectName> load( String sourceType, Object source,
             String param) throws Exception {
