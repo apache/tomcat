@@ -26,7 +26,7 @@ import java.util.Enumeration;
     This is less frequesnt than add() -
     we want to keep add O(1).
 */
-public final class MultiMapNamesEnumeration implements Enumeration {
+public final class MultiMapNamesEnumeration implements Enumeration<String> {
     int pos;
     int size;
     String next;
@@ -73,7 +73,7 @@ public final class MultiMapNamesEnumeration implements Enumeration {
         return next!=null;
     }
 
-    public Object nextElement() {
+    public String nextElement() {
         String current=next;
         findNext();
         return current;
