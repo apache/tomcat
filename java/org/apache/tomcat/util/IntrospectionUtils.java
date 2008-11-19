@@ -470,22 +470,6 @@ public final class IntrospectionUtils {
 
     /**
      * Replace ${NAME} with the property value
-     * 
-     * @deprecated Use the explicit method
-     */
-    public static String replaceProperties(String value, Object getter) {
-        if (getter instanceof Hashtable)
-            return replaceProperties(value, (Hashtable) getter, null);
-
-        if (getter instanceof PropertySource) {
-            PropertySource src[] = new PropertySource[] { (PropertySource) getter };
-            return replaceProperties(value, null, src);
-        }
-        return value;
-    }
-
-    /**
-     * Replace ${NAME} with the property value
      */
     public static String replaceProperties(String value, Hashtable staticProp,
             PropertySource dynamicProp[]) {

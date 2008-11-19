@@ -626,7 +626,7 @@ public class CoyoteAdapter
             }
             if (conv != null) {
                 try {
-                    conv.convert(bc, cc);
+                    conv.convert(bc, cc, cc.getBuffer().length - cc.getEnd());
                     uri.setChars(cc.getBuffer(), cc.getStart(), 
                                  cc.getLength());
                     return;
