@@ -60,7 +60,7 @@ public class EjbFactory
      * @param obj The reference object describing the DataSource
      */
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable environment)
+                                    Hashtable<?,?> environment)
         throws Exception {
         
         if (obj instanceof EjbRef) {
@@ -110,7 +110,7 @@ public class EjbFactory
                 // Loading factory
                 ClassLoader tcl = 
                     Thread.currentThread().getContextClassLoader();
-                Class factoryClass = null;
+                Class<?> factoryClass = null;
                 if (tcl != null) {
                     try {
                         factoryClass = tcl.loadClass(factoryClassName);

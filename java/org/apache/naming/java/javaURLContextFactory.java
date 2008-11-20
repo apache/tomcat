@@ -79,11 +79,11 @@ public class javaURLContextFactory
      * Crete a new Context's instance.
      */
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable environment)
+                                    Hashtable<?,?> environment)
         throws NamingException {
         if ((ContextBindings.isThreadBound()) || 
             (ContextBindings.isClassLoaderBound())) {
-            return new SelectorContext(environment);
+            return new SelectorContext((Hashtable<String,Object>)environment);
         } else {
             return null;
         }
@@ -93,16 +93,18 @@ public class javaURLContextFactory
     /**
      * Get a new (writable) initial context.
      */
-    public Context getInitialContext(Hashtable environment)
+    public Context getInitialContext(Hashtable<?,?> environment)
         throws NamingException {
         if (ContextBindings.isThreadBound() || 
             (ContextBindings.isClassLoaderBound())) {
             // Redirect the request to the bound initial context
-            return new SelectorContext(environment, true);
+            return new SelectorContext(
+                    (Hashtable<String,Object>)environment, true);
         } else {
             // If the thread is not bound, return a shared writable context
             if (initialContext == null)
-                initialContext = new NamingContext(environment, MAIN);
+                initialContext = new NamingContext(
+                        (Hashtable<String,Object>)environment, MAIN);
             return initialContext;
         }
     }

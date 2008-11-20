@@ -56,7 +56,8 @@ public class ResourceCache {
     /**
      * Not found cache.
      */
-    protected HashMap notFoundCache = new HashMap();
+    protected HashMap<String,CacheEntry> notFoundCache =
+        new HashMap<String,CacheEntry>();
 
 
     /**
@@ -298,7 +299,7 @@ public class ResourceCache {
         }
         if (cacheEntry == null) {
             try {
-                cacheEntry = (CacheEntry) notFoundCache.get(name);
+                cacheEntry = notFoundCache.get(name);
             } catch (Exception e) {
                 // Ignore: the reliability of this lookup is not critical
             }

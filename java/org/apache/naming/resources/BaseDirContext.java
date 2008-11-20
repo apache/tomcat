@@ -20,8 +20,10 @@ package org.apache.naming.resources;
 
 import java.util.Hashtable;
 
+import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.Name;
+import javax.naming.NameClassPair;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -29,6 +31,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.naming.NameParserImpl;
 import org.apache.naming.StringManager;
@@ -53,14 +56,14 @@ public abstract class BaseDirContext implements DirContext {
      * Builds a base directory context.
      */
     public BaseDirContext() {
-        this.env = new Hashtable();
+        this.env = new Hashtable<String,Object>();
     }
 
 
     /**
      * Builds a base directory context using the given environment.
      */
-    public BaseDirContext(Hashtable env) {
+    public BaseDirContext(Hashtable<String,Object> env) {
         this.env = env;
     }
 
@@ -77,7 +80,7 @@ public abstract class BaseDirContext implements DirContext {
     /**
      * Environment.
      */
-    protected Hashtable env;
+    protected Hashtable<String,Object> env;
 
 
     /**
@@ -221,7 +224,7 @@ public abstract class BaseDirContext implements DirContext {
      * Allocate resources for this directory context.
      */
     public void allocate() {
-        ; // No action taken by the default implementation
+        // No action taken by the default implementation
     }
 
 
@@ -229,7 +232,7 @@ public abstract class BaseDirContext implements DirContext {
      * Release any resources allocated for this directory context.
      */
     public void release() {
-        ; // No action taken by the default implementation
+        // No action taken by the default implementation
     }
 
 
@@ -408,7 +411,7 @@ public abstract class BaseDirContext implements DirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration list(Name name)
+    public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         return list(name.toString());
     }
@@ -423,7 +426,7 @@ public abstract class BaseDirContext implements DirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration list(String name)
+    public abstract NamingEnumeration<NameClassPair> list(String name)
         throws NamingException;
 
 
@@ -440,7 +443,7 @@ public abstract class BaseDirContext implements DirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration listBindings(Name name)
+    public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         return listBindings(name.toString());
     }
@@ -455,7 +458,7 @@ public abstract class BaseDirContext implements DirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration listBindings(String name)
+    public abstract NamingEnumeration<Binding> listBindings(String name)
         throws NamingException;
 
 
@@ -675,7 +678,7 @@ public abstract class BaseDirContext implements DirContext {
      * @return the environment of this context; never null
      * @exception NamingException if a naming exception is encountered
      */
-    public Hashtable getEnvironment()
+    public Hashtable<String,Object> getEnvironment()
         throws NamingException {
         return env;
     }
@@ -1045,8 +1048,8 @@ public abstract class BaseDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(Name name, Attributes matchingAttributes,
-                                    String[] attributesToReturn)
+    public NamingEnumeration<SearchResult> search(Name name,
+            Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
         return search(name.toString(), matchingAttributes, attributesToReturn);
     }
@@ -1068,7 +1071,7 @@ public abstract class BaseDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration search
+    public abstract NamingEnumeration<SearchResult> search
         (String name, Attributes matchingAttributes,
          String[] attributesToReturn)
         throws NamingException;
@@ -1089,8 +1092,8 @@ public abstract class BaseDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(Name name, Attributes matchingAttributes)
-        throws NamingException {
+    public NamingEnumeration<SearchResult> search(Name name,
+            Attributes matchingAttributes) throws NamingException {
         return search(name.toString(), matchingAttributes);
     }
 
@@ -1108,7 +1111,7 @@ public abstract class BaseDirContext implements DirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration search
+    public abstract NamingEnumeration<SearchResult> search
         (String name, Attributes matchingAttributes)
         throws NamingException;
 
@@ -1132,7 +1135,7 @@ public abstract class BaseDirContext implements DirContext {
      * contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search
+    public NamingEnumeration<SearchResult> search
         (Name name, String filter, SearchControls cons)
         throws NamingException {
         return search(name.toString(), filter, cons);
@@ -1158,8 +1161,8 @@ public abstract class BaseDirContext implements DirContext {
      * contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration search(String name, String filter, 
-                                             SearchControls cons)
+    public abstract NamingEnumeration<SearchResult> search(String name,
+            String filter, SearchControls cons)
         throws NamingException;
 
 
@@ -1187,7 +1190,7 @@ public abstract class BaseDirContext implements DirContext {
      * represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(Name name, String filterExpr, 
+    public NamingEnumeration<SearchResult> search(Name name, String filterExpr, 
                                     Object[] filterArgs, SearchControls cons)
         throws NamingException {
         return search(name.toString(), filterExpr, filterArgs, cons);
@@ -1218,7 +1221,7 @@ public abstract class BaseDirContext implements DirContext {
      * represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract NamingEnumeration search
+    public abstract NamingEnumeration<SearchResult> search
         (String name, String filterExpr, 
          Object[] filterArgs, SearchControls cons)
         throws NamingException;

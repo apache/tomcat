@@ -113,7 +113,7 @@ public class StringManager {
             Object nonNullArgs[] = args;
             for (int i=0; i<args.length; i++) {
 		if (args[i] == null) {
-		    if (nonNullArgs==args) nonNullArgs=(Object[])args.clone();
+		    if (nonNullArgs==args) nonNullArgs = args.clone();
 		    nonNullArgs[i] = "null";
 		}
 	    }
@@ -197,7 +197,8 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static Hashtable managers = new Hashtable();
+    private static Hashtable<String,StringManager> managers =
+        new Hashtable<String,StringManager>();
 
     /**
      * Get the StringManager for a particular package. If a manager for
@@ -208,7 +209,7 @@ public class StringManager {
      */
 
     public synchronized static StringManager getManager(String packageName) {
-	StringManager mgr = (StringManager)managers.get(packageName);
+	StringManager mgr = managers.get(packageName);
 	if (mgr == null) {
 	    mgr = new StringManager(packageName);
 	    managers.put(packageName, mgr);
