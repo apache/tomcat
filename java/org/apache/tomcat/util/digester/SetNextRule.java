@@ -44,6 +44,44 @@ public class SetNextRule extends Rule {
      * method's argument type is assumed to be the class of the
      * child object.
      *
+     * @param digester The associated Digester
+     * @param methodName Method name of the parent method to call
+     *
+     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
+     * Use {@link #SetNextRule(String methodName)} instead.
+     */
+    public SetNextRule(Digester digester, String methodName) {
+
+        this(methodName);
+
+    }
+
+
+    /**
+     * Construct a "set next" rule with the specified method name.
+     *
+     * @param digester The associated Digester
+     * @param methodName Method name of the parent method to call
+     * @param paramType Java class of the parent method's argument
+     *  (if you wish to use a primitive type, specify the corresonding
+     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
+     *  for a <code>boolean</code> parameter)
+     *
+     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
+     * Use {@link #SetNextRule(String methodName,String paramType)} instead.
+     */
+    public SetNextRule(Digester digester, String methodName,
+                       String paramType) {
+
+        this(methodName, paramType);
+
+    }
+
+    /**
+     * Construct a "set next" rule with the specified method name.  The
+     * method's argument type is assumed to be the class of the
+     * child object.
+     *
      * @param methodName Method name of the parent method to call
      */
     public SetNextRule(String methodName) {

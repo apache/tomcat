@@ -68,10 +68,10 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Creates a new, uninitialized MessageBytes object.
-     * Use static newInstance() in order to allow
+     * @deprecated Use static newInstance() in order to allow
      *   future hooks.
      */
-    private MessageBytes() {
+    public MessageBytes() {
     }
 
     /** Construct a new MessageBytes instance
