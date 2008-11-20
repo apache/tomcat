@@ -31,14 +31,14 @@ import javax.naming.NamingException;
  * @version $Revision$ $Date$
  */
 
-public class RecyclableNamingEnumeration 
-    implements NamingEnumeration {
+public class RecyclableNamingEnumeration<E> 
+    implements NamingEnumeration<E> {
 
 
     // ----------------------------------------------------------- Constructors
 
 
-    public RecyclableNamingEnumeration(Vector entries) {
+    public RecyclableNamingEnumeration(Vector<E> entries) {
         this.entries = entries;
         recycle();
     }
@@ -50,13 +50,13 @@ public class RecyclableNamingEnumeration
     /**
      * Entries.
      */
-    protected Vector entries;
+    protected Vector<E> entries;
 
 
     /**
      * Underlying enumeration.
      */
-    protected Enumeration enumeration;
+    protected Enumeration<E> enumeration;
 
 
     // --------------------------------------------------------- Public Methods
@@ -65,7 +65,7 @@ public class RecyclableNamingEnumeration
     /**
      * Retrieves the next element in the enumeration.
      */
-    public Object next()
+    public E next()
         throws NamingException {
         return nextElement();
     }
@@ -93,7 +93,7 @@ public class RecyclableNamingEnumeration
     }
 
 
-    public Object nextElement() {
+    public E nextElement() {
         return enumeration.nextElement();
     }
 

@@ -32,13 +32,13 @@ import javax.naming.NamingException;
  */
 
 public class NamingContextEnumeration 
-    implements NamingEnumeration {
+    implements NamingEnumeration<NameClassPair> {
 
 
     // ----------------------------------------------------------- Constructors
 
 
-    public NamingContextEnumeration(Iterator entries) {
+    public NamingContextEnumeration(Iterator<NamingEntry> entries) {
     	iterator = entries;
     }
 
@@ -49,7 +49,7 @@ public class NamingContextEnumeration
     /**
      * Underlying enumeration.
      */
-    protected Iterator iterator;
+    protected Iterator<NamingEntry> iterator;
 
 
     // --------------------------------------------------------- Public Methods
@@ -58,7 +58,7 @@ public class NamingContextEnumeration
     /**
      * Retrieves the next element in the enumeration.
      */
-    public Object next()
+    public NameClassPair next()
         throws NamingException {
         return nextElement();
     }
@@ -86,8 +86,8 @@ public class NamingContextEnumeration
     }
 
 
-    public Object nextElement() {
-        NamingEntry entry = (NamingEntry) iterator.next();
+    public NameClassPair nextElement() {
+        NamingEntry entry = iterator.next();
         return new NameClassPair(entry.name, entry.value.getClass().getName());
     }
 
