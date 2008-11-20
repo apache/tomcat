@@ -147,9 +147,9 @@ public class ResourceRef
         sb.append(getFactoryClassLocation());
         sb.append(",factoryClassName=");
         sb.append(getFactoryClassName());
-        Enumeration refAddrs = getAll();
+        Enumeration<RefAddr> refAddrs = getAll();
         while (refAddrs.hasMoreElements()) {
-            RefAddr refAddr = (RefAddr) refAddrs.nextElement();
+            RefAddr refAddr = refAddrs.nextElement();
             sb.append(",{type=");
             sb.append(refAddr.getType());
             sb.append(",content=");

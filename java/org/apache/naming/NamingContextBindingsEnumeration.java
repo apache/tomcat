@@ -34,13 +34,14 @@ import javax.naming.NamingException;
  */
 
 public class NamingContextBindingsEnumeration 
-    implements NamingEnumeration {
+    implements NamingEnumeration<Binding> {
 
 
     // ----------------------------------------------------------- Constructors
 
 
-    public NamingContextBindingsEnumeration(Iterator entries, Context ctx) {
+    public NamingContextBindingsEnumeration(Iterator<NamingEntry> entries,
+            Context ctx) {
     	iterator = entries;
         this.ctx = ctx;
     }
@@ -51,7 +52,7 @@ public class NamingContextBindingsEnumeration
     /**
      * Underlying enumeration.
      */
-    protected Iterator iterator;
+    protected Iterator<NamingEntry> iterator;
 
     
     /**
@@ -66,7 +67,7 @@ public class NamingContextBindingsEnumeration
     /**
      * Retrieves the next element in the enumeration.
      */
-    public Object next()
+    public Binding next()
         throws NamingException {
         return nextElementInternal();
     }
@@ -94,7 +95,7 @@ public class NamingContextBindingsEnumeration
     }
 
 
-    public Object nextElement() {
+    public Binding nextElement() {
         try {
             return nextElementInternal();
         } catch (NamingException e) {
@@ -102,8 +103,8 @@ public class NamingContextBindingsEnumeration
         }
     }
     
-    private Object nextElementInternal() throws NamingException {
-        NamingEntry entry = (NamingEntry) iterator.next();
+    private Binding nextElementInternal() throws NamingException {
+        NamingEntry entry = iterator.next();
         
         // If the entry is a reference, resolve it
         if (entry.type == NamingEntry.REFERENCE

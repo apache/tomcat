@@ -19,8 +19,11 @@
 package org.apache.naming;
 
 import java.util.Hashtable;
+
+import javax.naming.Binding;
 import javax.naming.Context;
 import javax.naming.Name;
+import javax.naming.NameClassPair;
 import javax.naming.NameParser;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -62,7 +65,7 @@ public class SelectorContext implements Context {
     /**
      * Builds a Catalina selector context using the given environment.
      */
-    public SelectorContext(Hashtable env) {
+    public SelectorContext(Hashtable<String,Object> env) {
         this.env = env;
     }
 
@@ -70,7 +73,8 @@ public class SelectorContext implements Context {
     /**
      * Builds a Catalina selector context using the given environment.
      */
-    public SelectorContext(Hashtable env, boolean initialContext) {
+    public SelectorContext(Hashtable<String,Object> env,
+            boolean initialContext) {
         this(env);
         this.initialContext = initialContext;
     }
@@ -82,7 +86,7 @@ public class SelectorContext implements Context {
     /**
      * Environment.
      */
-    protected Hashtable env;
+    protected Hashtable<String,Object> env;
 
 
     /**
@@ -287,7 +291,7 @@ public class SelectorContext implements Context {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration list(Name name)
+    public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         return getBoundContext().list(parseName(name));
     }
@@ -302,7 +306,7 @@ public class SelectorContext implements Context {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration list(String name)
+    public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
         return getBoundContext().list(parseName(name));
     }
@@ -321,7 +325,7 @@ public class SelectorContext implements Context {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration listBindings(Name name)
+    public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         return getBoundContext().listBindings(parseName(name));
     }
@@ -336,7 +340,7 @@ public class SelectorContext implements Context {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration listBindings(String name)
+    public NamingEnumeration<Binding> listBindings(String name)
         throws NamingException {
         return getBoundContext().listBindings(parseName(name));
     }
@@ -562,7 +566,7 @@ public class SelectorContext implements Context {
      * @return the environment of this context; never null
      * @exception NamingException if a naming exception is encountered
      */
-    public Hashtable getEnvironment()
+    public Hashtable<?,?> getEnvironment()
         throws NamingException {
         return getBoundContext().getEnvironment();
     }
