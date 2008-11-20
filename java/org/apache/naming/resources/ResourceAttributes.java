@@ -311,11 +311,11 @@ public class ResourceAttributes implements Attributes {
                         try {
                             contentLength = Long.parseLong(value.toString());
                         } catch (NumberFormatException e) {
-                            ; // Ignore
+                            // Ignore
                         }
                     }
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -364,7 +364,7 @@ public class ResourceAttributes implements Attributes {
                             try {
                                 result = formats[i].parse(creationDateValue);
                             } catch (ParseException e) {
-                                ;
+                                // Ignore
                             }
                         }
                         if (result != null) {
@@ -373,7 +373,7 @@ public class ResourceAttributes implements Attributes {
                         }
                     }
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -426,7 +426,7 @@ public class ResourceAttributes implements Attributes {
                             try {
                                 result = formats[i].parse(creationDateValue);
                             } catch (ParseException e) {
-                                ;
+                                // Ignore
                             }
                         }
                         if (result != null) {
@@ -435,7 +435,7 @@ public class ResourceAttributes implements Attributes {
                         }
                     }
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -486,7 +486,7 @@ public class ResourceAttributes implements Attributes {
                                 result = 
                                     formats[i].parse(lastModifiedDateValue);
                             } catch (ParseException e) {
-                                ;
+                                // Ignore
                             }
                         }
                         if (result != null) {
@@ -495,7 +495,7 @@ public class ResourceAttributes implements Attributes {
                         }
                     }
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -560,7 +560,7 @@ public class ResourceAttributes implements Attributes {
                                 result = 
                                     formats[i].parse(lastModifiedDateValue);
                             } catch (ParseException e) {
-                                ;
+                                // Ignore
                             }
                         }
                         if (result != null) {
@@ -569,7 +569,7 @@ public class ResourceAttributes implements Attributes {
                         }
                     }
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -648,7 +648,7 @@ public class ResourceAttributes implements Attributes {
                 try {
                     name = attribute.get().toString();
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -681,7 +681,7 @@ public class ResourceAttributes implements Attributes {
                 try {
                     result = attribute.get().toString();
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -720,7 +720,7 @@ public class ResourceAttributes implements Attributes {
                 try {
                     result = attribute.get().toString();
                 } catch (NamingException e) {
-                    ; // No value for the attribute
+                    // No value for the attribute
                 }
             }
         }
@@ -870,9 +870,9 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get all attributes.
      */
-    public NamingEnumeration getAll() {
+    public NamingEnumeration<? extends Attribute> getAll() {
         if (attributes == null) {
-            Vector attributes = new Vector();
+            Vector<BasicAttribute> attributes = new Vector<BasicAttribute>();
             Date creationDate = getCreationDate();
             if (creationDate != null) {
                 attributes.addElement(new BasicAttribute
@@ -907,7 +907,7 @@ public class ResourceAttributes implements Attributes {
                 attributes.addElement(new BasicAttribute(ETAG, etag));
                 attributes.addElement(new BasicAttribute(ALTERNATE_ETAG, etag));
             }
-            return new RecyclableNamingEnumeration(attributes);
+            return new RecyclableNamingEnumeration<BasicAttribute>(attributes);
         } else {
             return attributes.getAll();
         }
@@ -917,9 +917,9 @@ public class ResourceAttributes implements Attributes {
     /**
      * Get all attribute IDs.
      */
-    public NamingEnumeration getIDs() {
+    public NamingEnumeration<String> getIDs() {
         if (attributes == null) {
-            Vector attributeIDs = new Vector();
+            Vector<String> attributeIDs = new Vector<String>();
             Date creationDate = getCreationDate();
             if (creationDate != null) {
                 attributeIDs.addElement(CREATION_DATE);
@@ -948,7 +948,7 @@ public class ResourceAttributes implements Attributes {
                 attributeIDs.addElement(ETAG);
                 attributeIDs.addElement(ALTERNATE_ETAG);
             }
-            return new RecyclableNamingEnumeration(attributeIDs);
+            return new RecyclableNamingEnumeration<String>(attributeIDs);
         } else {
             return attributes.getIDs();
         }

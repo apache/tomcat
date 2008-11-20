@@ -30,8 +30,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
+import javax.naming.Binding;
 import javax.naming.CompositeName;
 import javax.naming.Name;
+import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
@@ -39,6 +41,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.naming.NamingContextBindingsEnumeration;
 import org.apache.naming.NamingContextEnumeration;
@@ -70,7 +73,7 @@ public class WARDirContext extends BaseDirContext {
     /**
      * Builds a WAR directory context using the given environment.
      */
-    public WARDirContext(Hashtable env) {
+    public WARDirContext(Hashtable<String,Object> env) {
         super(env);
     }
 
@@ -257,7 +260,7 @@ public class WARDirContext extends BaseDirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration list(String name)
+    public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
         return list(new CompositeName(name));
     }
@@ -276,7 +279,7 @@ public class WARDirContext extends BaseDirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration list(Name name)
+    public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         if (name.isEmpty())
             return new NamingContextEnumeration(list(entries).iterator());
@@ -301,7 +304,7 @@ public class WARDirContext extends BaseDirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration listBindings(String name)
+    public NamingEnumeration<Binding> listBindings(String name)
         throws NamingException {
         return listBindings(new CompositeName(name));
     }
@@ -320,7 +323,7 @@ public class WARDirContext extends BaseDirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration listBindings(Name name)
+    public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         if (name.isEmpty())
             return new NamingContextBindingsEnumeration(list(entries).iterator(),
@@ -622,8 +625,8 @@ public class WARDirContext extends BaseDirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, Attributes matchingAttributes,
-                                    String[] attributesToReturn)
+    public NamingEnumeration<SearchResult> search(String name,
+            Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
         throw new OperationNotSupportedException();
     }
@@ -644,8 +647,8 @@ public class WARDirContext extends BaseDirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, Attributes matchingAttributes)
-        throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name,
+            Attributes matchingAttributes) throws NamingException {
         throw new OperationNotSupportedException();
     }
 
@@ -669,7 +672,7 @@ public class WARDirContext extends BaseDirContext {
      * contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, String filter, 
+    public NamingEnumeration<SearchResult> search(String name, String filter, 
                                     SearchControls cons)
         throws NamingException {
         throw new OperationNotSupportedException();
@@ -700,7 +703,7 @@ public class WARDirContext extends BaseDirContext {
      * represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, String filterExpr, 
+    public NamingEnumeration<SearchResult> search(String name, String filterExpr, 
                                     Object[] filterArgs, SearchControls cons)
         throws NamingException {
         throw new OperationNotSupportedException();
@@ -731,12 +734,12 @@ public class WARDirContext extends BaseDirContext {
 
         try {
 
-            Enumeration entryList = base.entries();
+            Enumeration<? extends ZipEntry> entryList = base.entries();
             entries = new Entry("/", new ZipEntry("/"));
             
             while (entryList.hasMoreElements()) {
                 
-                ZipEntry entry = (ZipEntry) entryList.nextElement();
+                ZipEntry entry = entryList.nextElement();
                 String name = normalize(entry);
                 int pos = name.lastIndexOf('/');
                 // Check that parent entries exist and, if not, create them.
@@ -801,9 +804,9 @@ public class WARDirContext extends BaseDirContext {
     /**
      * List children as objects.
      */
-    protected ArrayList list(Entry entry) {
+    protected ArrayList<NamingEntry> list(Entry entry) {
         
-        ArrayList entries = new ArrayList();
+        ArrayList<NamingEntry> entries = new ArrayList<NamingEntry>();
         Entry[] children = entry.getChildren();
         Arrays.sort(children);
         NamingEntry namingEntry = null;
@@ -832,7 +835,7 @@ public class WARDirContext extends BaseDirContext {
     /**
      * Entries structure.
      */
-    protected class Entry implements Comparable {
+    protected class Entry implements Comparable<Object> {
 
 
         // -------------------------------------------------------- Constructor
