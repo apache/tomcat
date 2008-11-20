@@ -28,6 +28,22 @@ package org.apache.tomcat.util.net;
  */
 public interface TcpConnectionHandler {
     
+    /** Add informations about the a "controler" object
+     *  specific to the server. In tomcat it will be a
+     *  ContextManager.
+     *  @deprecated This has nothing to do with TcpHandling,
+     *  was used as a workaround
+     */
+    public void setServer(Object manager);
+
+    
+    /** Used to pass config informations to the handler.
+     *
+     *  @deprecated This has nothing to do with Tcp,
+     *    was used as a workaround.
+     */
+    public void setAttribute(String name, Object value );
+    
     /** Called before the call to processConnection.
      *  If the thread is reused, init() should be called once per thread.
      *

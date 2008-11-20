@@ -123,7 +123,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     
     public void init() throws Exception {
         if( mbeans==null) execute();
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( registry==null ) registry=Registry.getRegistry();
         
         registry.invoke(mbeans, "init", false);
     }
@@ -137,7 +137,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
     }
 
     public void execute() throws Exception {
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( registry==null ) registry=Registry.getRegistry();
         try {
             InputStream stream=getInputStream();
             long t1=System.currentTimeMillis();
@@ -160,8 +160,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
                 firstMbeanN=descriptorsN;
             }
 
-            MBeanServer server =
-                Registry.getRegistry(null, null).getMBeanServer();
+            MBeanServer server = Registry.getServer();
 
             // XXX Not very clean...  Just a workaround
             if( ! loaderLoaded ) {

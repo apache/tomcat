@@ -132,6 +132,22 @@ abstract public class AbstractRulesImpl implements Rules {
      * in the order originally registered through the <code>add()</code>
      * method.
      *
+     * @param pattern Nesting pattern to be matched
+     *
+     * @deprecated Call match(namespaceURI,pattern) instead.
+     */
+    public List<Rule> match(String pattern) {
+        return match(namespaceURI, pattern);
+    }
+
+
+    /**
+     * Return a List of all registered Rule instances that match the specified
+     * nesting pattern, or a zero-length List if there are no matches.  If more
+     * than one Rule instance matches, they <strong>must</strong> be returned
+     * in the order originally registered through the <code>add()</code>
+     * method.
+     *
      * @param namespaceURI Namespace URI for which to select matching rules,
      *  or <code>null</code> to match regardless of namespace URI
      * @param pattern Nesting pattern to be matched
