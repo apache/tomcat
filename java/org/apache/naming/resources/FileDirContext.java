@@ -28,7 +28,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Hashtable;
 
+import javax.naming.Binding;
 import javax.naming.NameAlreadyBoundException;
+import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.OperationNotSupportedException;
@@ -36,6 +38,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.naming.NamingContextBindingsEnumeration;
 import org.apache.naming.NamingContextEnumeration;
@@ -76,7 +79,7 @@ public class FileDirContext extends BaseDirContext {
     /**
      * Builds a file directory context using the given environment.
      */
-    public FileDirContext(Hashtable env) {
+    public FileDirContext(Hashtable<String,Object> env) {
         super(env);
     }
 
@@ -293,7 +296,7 @@ public class FileDirContext extends BaseDirContext {
      * this context. Each element of the enumeration is of type NameClassPair.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration list(String name)
+    public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
 
         File file = file(name);
@@ -320,7 +323,7 @@ public class FileDirContext extends BaseDirContext {
      * Each element of the enumeration is of type Binding.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration listBindings(String name)
+    public NamingEnumeration<Binding> listBindings(String name)
         throws NamingException {
 
         File file = file(name);
@@ -666,8 +669,8 @@ public class FileDirContext extends BaseDirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, Attributes matchingAttributes,
-                                    String[] attributesToReturn)
+    public NamingEnumeration<SearchResult> search(String name,
+            Attributes matchingAttributes, String[] attributesToReturn)
         throws NamingException {
         return null;
     }
@@ -688,8 +691,8 @@ public class FileDirContext extends BaseDirContext {
      * context named by name.
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, Attributes matchingAttributes)
-        throws NamingException {
+    public NamingEnumeration<SearchResult> search(String name,
+            Attributes matchingAttributes) throws NamingException {
         return null;
     }
 
@@ -713,7 +716,7 @@ public class FileDirContext extends BaseDirContext {
      * contain invalid settings
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, String filter,
+    public NamingEnumeration<SearchResult> search(String name, String filter,
                                     SearchControls cons)
         throws NamingException {
         return null;
@@ -744,8 +747,8 @@ public class FileDirContext extends BaseDirContext {
      * represents an invalid search filter
      * @exception NamingException if a naming exception is encountered
      */
-    public NamingEnumeration search(String name, String filterExpr,
-                                    Object[] filterArgs, SearchControls cons)
+    public NamingEnumeration<SearchResult> search(String name,
+            String filterExpr, Object[] filterArgs, SearchControls cons)
         throws NamingException {
         return null;
     }
@@ -884,9 +887,9 @@ public class FileDirContext extends BaseDirContext {
      * @param file Collection
      * @return Vector containg NamingEntry objects
      */
-    protected ArrayList list(File file) {
+    protected ArrayList<NamingEntry> list(File file) {
 
-        ArrayList entries = new ArrayList();
+        ArrayList<NamingEntry> entries = new ArrayList<NamingEntry>();
         if (!file.isDirectory())
             return entries;
         String[] names = file.list();

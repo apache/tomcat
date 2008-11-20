@@ -77,7 +77,7 @@ public class ResourceLinkFactory
      * @param obj The reference object describing the DataSource
      */
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable environment)
+                                    Hashtable<?,?> environment)
         throws NamingException {
         
         if (!(obj instanceof ResourceLinkRef))

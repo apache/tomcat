@@ -53,13 +53,15 @@ public class DirContextURLStreamHandler
     /**
      * Bindings class loader - directory context. Keyed by CL id.
      */
-    private static Hashtable clBindings = new Hashtable();
+    private static Hashtable<ClassLoader,DirContext> clBindings =
+        new Hashtable<ClassLoader,DirContext>();
     
     
     /**
      * Bindings thread - directory context. Keyed by thread id.
      */
-    private static Hashtable threadBindings = new Hashtable();
+    private static Hashtable<Thread,DirContext> threadBindings =
+        new Hashtable<Thread,DirContext>();
     
     
     // ----------------------------------------------------- Instance Variables
@@ -203,17 +205,17 @@ public class DirContextURLStreamHandler
         ClassLoader currentCL = currentThread.getContextClassLoader();
 
         // Checking CL binding
-        result = (DirContext) clBindings.get(currentCL);
+        result = clBindings.get(currentCL);
         if (result != null)
             return result;
 
         // Checking thread biding
-        result = (DirContext) threadBindings.get(currentThread);
+        result = threadBindings.get(currentThread);
 
         // Checking parent CL binding
         currentCL = currentCL.getParent();
         while (currentCL != null) {
-            result = (DirContext) clBindings.get(currentCL);
+            result = clBindings.get(currentCL);
             if (result != null)
                 return result;
             currentCL = currentCL.getParent();
@@ -247,7 +249,7 @@ public class DirContextURLStreamHandler
      * Get the bound context.
      */
     public static DirContext get(ClassLoader cl) {
-        return (DirContext) clBindings.get(cl);
+        return clBindings.get(cl);
     }
     
     
@@ -255,7 +257,7 @@ public class DirContextURLStreamHandler
      * Get the bound context.
      */
     public static DirContext get(Thread thread) {
-        return (DirContext) threadBindings.get(thread);
+        return threadBindings.get(thread);
     }
     
     
