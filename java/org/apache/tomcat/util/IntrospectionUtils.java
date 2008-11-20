@@ -472,7 +472,7 @@ public final class IntrospectionUtils {
      * Replace ${NAME} with the property value
      */
     public static String replaceProperties(String value,
-            Hashtable<String,String> staticProp, PropertySource dynamicProp[]) {
+            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[]) {
         if (value.indexOf("$") < 0) {
             return value;
         }
@@ -500,7 +500,7 @@ public final class IntrospectionUtils {
                 String n = value.substring(pos + 2, endName);
                 String v = null;
                 if (staticProp != null) {
-                    v = staticProp.get(n);
+                    v = (String) staticProp.get(n);
                 }
                 if (v == null && dynamicProp != null) {
                     for (int i = 0; i < dynamicProp.length; i++) {
@@ -716,10 +716,10 @@ public final class IntrospectionUtils {
             //args0=findVoidSetters(proxy.getClass());
             args0 = findBooleanSetters(proxy.getClass());
         }
-        Hashtable<String,String> h = null;
+        Hashtable<Object,Object> h = null;
         if (null != findMethod(proxy.getClass(), "getOptionAliases",
                 new Class[] {})) {
-            h = (Hashtable<String,String>) callMethod0(proxy,
+            h = (Hashtable<Object,Object>) callMethod0(proxy,
                     "getOptionAliases");
         }
         return processArgs(proxy, args, args0, null, h);
@@ -727,13 +727,13 @@ public final class IntrospectionUtils {
 
     public static boolean processArgs(Object proxy, String args[],
             String args0[], String args1[],
-            Hashtable<String,String> aliases) throws Exception {
+            Hashtable<Object,Object> aliases) throws Exception {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.startsWith("-"))
                 arg = arg.substring(1);
             if (aliases != null && aliases.get(arg) != null)
-                arg = aliases.get(arg);
+                arg = (String) aliases.get(arg);
 
             if (args0 != null) {
                 boolean set = false;
