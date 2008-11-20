@@ -70,7 +70,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
     }
 
     public void execute() throws Exception {
-        if( registry==null ) registry=Registry.getRegistry(null, null);
+        if( registry==null ) registry=Registry.getRegistry();
         long t1=System.currentTimeMillis();
         try {
             InputStream stream=null;

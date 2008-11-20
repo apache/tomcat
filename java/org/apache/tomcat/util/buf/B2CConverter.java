@@ -67,6 +67,16 @@ public class B2CConverter {
     static final int BUFFER_SIZE=8192;
     char result[]=new char[BUFFER_SIZE];
 
+    /** Convert a buffer of bytes into a chars
+     * @deprecated
+     */
+    public  void convert( ByteChunk bb, CharChunk cb )
+        throws IOException
+    {
+        // Set the ByteChunk as input to the Intermediate reader
+        convert(bb, cb, cb.getBuffer().length - cb.getEnd());
+    }
+
 
     public void convert( ByteChunk bb, CharChunk cb, int limit) 
         throws IOException

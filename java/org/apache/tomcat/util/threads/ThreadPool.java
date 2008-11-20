@@ -525,6 +525,12 @@ public class ThreadPool  {
         currentThreadCount = toOpen;
     }
 
+    /** @deprecated */
+    void log( String s ) {
+	log.info(s);
+	//loghelper.flush();
+    }
+    
     /** 
      * Periodically execute an action - cleanup in this case
      */
