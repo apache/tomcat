@@ -69,74 +69,6 @@ public class CallMethodRule extends Rule {
 
     // ----------------------------------------------------------- Constructors
 
-
-    /**
-     * Construct a "call method" rule with the specified method name.  The
-     * parameter types (if any) default to java.lang.String.
-     *
-     * @param digester The associated Digester
-     * @param methodName Method name of the parent method to call
-     * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of this element.
-     *
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #CallMethodRule(String methodName,int paramCount)} instead.
-     */
-    public CallMethodRule(Digester digester, String methodName,
-                          int paramCount) {
-
-        this(methodName, paramCount);
-
-    }
-
-
-    /**
-     * Construct a "call method" rule with the specified method name.
-     *
-     * @param digester The associated Digester
-     * @param methodName Method name of the parent method to call
-     * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of ths element
-     * @param paramTypes The Java class names of the arguments
-     *  (if you wish to use a primitive type, specify the corresonding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean</code>
-     *  for a <code>boolean</code> parameter)
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #CallMethodRule(String methodName,int paramCount, String [] paramTypes)} instead.
-     */
-    public CallMethodRule(Digester digester, String methodName,
-                          int paramCount, String paramTypes[]) {
-
-        this(methodName, paramCount, paramTypes);
-
-    }
-
-
-    /**
-     * Construct a "call method" rule with the specified method name.
-     *
-     * @param digester The associated Digester
-     * @param methodName Method name of the parent method to call
-     * @param paramCount The number of parameters to collect, or
-     *  zero for a single argument from the body of ths element
-     * @param paramTypes The Java classes that represent the
-     *  parameter types of the method arguments
-     *  (if you wish to use a primitive type, specify the corresonding
-     *  Java wrapper class instead, such as <code>java.lang.Boolean.TYPE</code>
-     *  for a <code>boolean</code> parameter)
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #CallMethodRule(String methodName,int paramCount, Class [] paramTypes)} instead.
-     */
-    public CallMethodRule(Digester digester, String methodName,
-                          int paramCount, Class<?> paramTypes[]) {
-
-        this(methodName, paramCount, paramTypes);
-    }
-
-
     /**
      * Construct a "call method" rule with the specified method name.  The
      * parameter types (if any) default to java.lang.String.
@@ -434,9 +366,15 @@ public class CallMethodRule extends Rule {
     /**
      * Process the start of this element.
      *
+     * @param namespace the namespace URI of the matching element, or an 
+     *   empty string if the parser is not namespace aware or the element has
+     *   no namespace
+     * @param name the local name if the parser is namespace aware, or just 
+     *   the element name otherwise
      * @param attributes The attribute list for this element
      */
-    public void begin(Attributes attributes) throws Exception {
+    public void begin(String namespace, String name, Attributes attributes)
+            throws Exception {
 
         // Push an array to capture the parameter values if necessary
         if (paramCount > 0) {
@@ -453,9 +391,15 @@ public class CallMethodRule extends Rule {
     /**
      * Process the body text of this element.
      *
+     * @param namespace the namespace URI of the matching element, or an 
+     *   empty string if the parser is not namespace aware or the element has
+     *   no namespace
+     * @param name the local name if the parser is namespace aware, or just 
+     *   the element name otherwise
      * @param bodyText The body text of this element
      */
-    public void body(String bodyText) throws Exception {
+    public void body(String namespace, String name, String bodyText)
+            throws Exception {
 
         if (paramCount == 0) {
             this.bodyText = bodyText.trim();
@@ -466,8 +410,14 @@ public class CallMethodRule extends Rule {
 
     /**
      * Process the end of this element.
+     * 
+     * @param namespace the namespace URI of the matching element, or an 
+     *   empty string if the parser is not namespace aware or the element has
+     *   no namespace
+     * @param name the local name if the parser is namespace aware, or just 
+     *   the element name otherwise
      */
-    public void end() throws Exception {
+    public void end(String namespace, String name) throws Exception {
 
         // Retrieve or construct the parameter values array
         Object parameters[] = null;
