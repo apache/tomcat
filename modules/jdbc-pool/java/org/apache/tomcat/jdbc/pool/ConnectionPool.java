@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
@@ -109,6 +111,11 @@ public class ConnectionPool {
         init(prop);
     }
 
+
+    public Future<Connection> getConnectionAsync() throws SQLException {
+        return null;
+    }
+    
     /**
      * Borrows a connection from the pool
      * @return Connection - a java.sql.Connection reflection proxy, wrapping the underlying object.
@@ -117,6 +124,10 @@ public class ConnectionPool {
     public Connection getConnection() throws SQLException {
         //check out a connection
         PooledConnection con = (PooledConnection)borrowConnection();
+        return setupConnection(con);
+    }
+
+    protected Connection setupConnection(PooledConnection con) throws SQLException {
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
             //build the proxy handler
@@ -164,8 +175,9 @@ public class ConnectionPool {
             s.initCause(x);
             throw s;
         }
-    }
 
+    }
+    
     /**
      * Returns the name of this pool
      * @return String
@@ -394,7 +406,7 @@ public class ConnectionPool {
 
             //calculate wait time for this iteration
             long maxWait = (getPoolProperties().getMaxWait()<=0)?Long.MAX_VALUE:getPoolProperties().getMaxWait();
-            long timetowait = Math.max(1, maxWait - (System.currentTimeMillis() - now));
+            long timetowait = Math.max(0, maxWait - (System.currentTimeMillis() - now));
             try {
                 //retrieve an existing connection
                 con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
