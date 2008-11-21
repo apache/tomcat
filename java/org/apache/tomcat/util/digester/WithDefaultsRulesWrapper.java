@@ -107,10 +107,6 @@ public class WithDefaultsRulesWrapper implements Rules {
     
     // --------------------------------------------------------- Public Methods
     
-    public List<Rule> match(String pattern) {
-        return match("", pattern);
-    }	
-    
     /**
      * Return list of rules matching given pattern.
      * If wrapped implementation returns any matches return those.
