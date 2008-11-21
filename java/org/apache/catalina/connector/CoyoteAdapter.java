@@ -258,9 +258,9 @@ public class CoyoteAdapter
         if (request == null) {
 
             // Create objects
-            request = (Request) connector.createRequest();
+            request = connector.createRequest();
             request.setCoyoteRequest(req);
-            response = (Response) connector.createResponse();
+            response = connector.createResponse();
             response.setCoyoteResponse(res);
 
             // Link objects
@@ -319,7 +319,7 @@ public class CoyoteAdapter
             }
 
         } catch (IOException e) {
-            ;
+            // Ignore
         } catch (Throwable t) {
             log.error(sm.getString("coyoteAdapter.service"), t);
         } finally {
@@ -626,7 +626,7 @@ public class CoyoteAdapter
             }
             if (conv != null) {
                 try {
-                    conv.convert(bc, cc);
+                    conv.convert(bc, cc, cc.getBuffer().length - cc.getEnd());
                     uri.setChars(cc.getBuffer(), cc.getStart(), 
                                  cc.getLength());
                     return;
