@@ -130,14 +130,23 @@ public class StandardThreadExecutor implements Executor {
 
     public void setMaxIdleTime(int maxIdleTime) {
         this.maxIdleTime = maxIdleTime;
+        if (executor != null) {
+            executor.setKeepAliveTime(maxIdleTime, TimeUnit.MILLISECONDS);
+        }
     }
 
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
+        if (executor != null) {
+            executor.setMaximumPoolSize(maxThreads);
+        }
     }
 
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
+        if (executor != null) {
+            executor.setCorePoolSize(minSpareThreads);
+        }
     }
 
     public void setName(String name) {
