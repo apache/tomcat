@@ -45,42 +45,6 @@ public class CallParamRule extends Rule {
 
     // ----------------------------------------------------------- Constructors
 
-
-    /**
-     * Construct a "call parameter" rule that will save the body text of this
-     * element as the parameter value.
-     *
-     * @param digester The associated Digester
-     * @param paramIndex The zero-relative parameter number
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #CallParamRule(int paramIndex)} instead.
-     */
-    public CallParamRule(Digester digester, int paramIndex) {
-
-        this(paramIndex);
-
-    }
-
-
-    /**
-     * Construct a "call parameter" rule that will save the value of the
-     * specified attribute as the parameter value.
-     *
-     * @param digester The associated Digester
-     * @param paramIndex The zero-relative parameter number
-     * @param attributeName The name of the attribute to save
-     *
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
-     * Use {@link #CallParamRule(int paramIndex, String attributeName)} instead.
-     */
-    public CallParamRule(Digester digester, int paramIndex,
-                         String attributeName) {
-
-        this(paramIndex, attributeName);
-
-    }
-
     /**
      * Construct a "call parameter" rule that will save the body text of this
      * element as the parameter value.
@@ -175,9 +139,15 @@ public class CallParamRule extends Rule {
     /**
      * Process the start of this element.
      *
+     * @param namespace the namespace URI of the matching element, or an 
+     *   empty string if the parser is not namespace aware or the element has
+     *   no namespace
+     * @param name the local name if the parser is namespace aware, or just 
+     *   the element name otherwise
      * @param attributes The attribute list for this element
      */
-    public void begin(Attributes attributes) throws Exception {
+    public void begin(String namespace, String name, Attributes attributes)
+            throws Exception {
 
         Object param = null;
         
@@ -215,9 +185,15 @@ public class CallParamRule extends Rule {
     /**
      * Process the body text of this element.
      *
+     * @param namespace the namespace URI of the matching element, or an 
+     *   empty string if the parser is not namespace aware or the element has
+     *   no namespace
+     * @param name the local name if the parser is namespace aware, or just 
+     *   the element name otherwise
      * @param bodyText The body text of this element
      */
-    public void body(String bodyText) throws Exception {
+    public void body(String namespace, String name, String bodyText)
+            throws Exception {
 
         if (attributeName == null && !fromStack) {
             // We must wait to set the parameter until end

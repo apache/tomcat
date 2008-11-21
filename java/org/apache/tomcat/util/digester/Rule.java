@@ -35,19 +35,6 @@ public abstract class Rule {
 
 
     /**
-     * Constructor sets the associated Digester.
-     *
-     * @param digester The digester with which this rule is associated
-     * @deprecated The digester instance is now set in the {@link Digester#addRule} method. Use {@link #Rule()} instead.
-     */
-    public Rule(Digester digester) {
-
-        super();
-        setDigester(digester);
-
-    }
-    
-    /**
      * <p>Base constructor.
      * Now the digester will be set when the rule is added.</p>
      */
