@@ -76,7 +76,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         lock.lock();
         try {
             result = items.poll();
-            if (result==null) {
+            if (result==null && timeout>0) {
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
                 waiters.addLast(c);
                 lock.unlock();
