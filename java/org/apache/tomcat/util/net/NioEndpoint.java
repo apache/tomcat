@@ -354,8 +354,14 @@ public class NioEndpoint {
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         if (running) {
-            synchronized(workers) {
-                workers.resize(maxThreads);
+            if (getUseExecutor() && executor!=null) {
+                if (executor instanceof ThreadPoolExecutor) {
+                    ((ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
+                }
+            }else if (workers!=null){            
+                synchronized(workers) {
+                    workers.resize(maxThreads);
+                }
             }
         }
     }
