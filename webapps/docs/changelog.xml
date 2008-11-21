@@ -169,7 +169,13 @@
     <changelog>
       <fix>
         Numerous code clean-up changes including the use of generics and
-        removing unused imports, fields, parameters and methods.
+        removing unused imports, fields, parameters and methods. (markt)
+      </fix>
+      <fix>
+        All deprecated internal code has been removed. <b>Warning:</b> If you
+        have custom components for a previous Tomcat version that extend
+        internal Tomcat classes and override deprecated methods it is highly
+        likely that they will no longer work. (markt)
       </fix>
       <update>
         Parameterize version number throughout build scripts and source. (rjung)
