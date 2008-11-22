@@ -453,57 +453,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         descriptorsByClass.remove( bean.getType());
     }
 
-    // -------------------- Deprecated 1.0 methods  --------------------
-    
-    /**
-     * Factory method to create (if necessary) and return our
-     * <code>MBeanServer</code> instance.
-     *
-     * @since 1.0
-     * @deprecated Use the instance method
-     */
-    public static MBeanServer getServer() {
-        return Registry.getRegistry().getMBeanServer();
-    }
-
-    /**
-     * Set the <code>MBeanServer</code> to be utilized for our
-     * registered management beans.
-     *
-     * @param mbeanServer The new <code>MBeanServer</code> instance
-     * @since 1.0
-     * @deprecated Use the instance method
-     */
-    public static void setServer(MBeanServer mbeanServer) {
-        Registry.getRegistry().setMBeanServer(mbeanServer);
-    }
-
-    /**
-     * Load the registry from the XML input found in the specified input
-     * stream.
-     *
-     * @param stream InputStream containing the registry configuration
-     *  information
-     *
-     * @exception Exception if any parsing or processing error occurs
-     * @deprecated use normal class method instead
-     * @since 1.0
-     */
-    public static void loadRegistry(InputStream stream) throws Exception {
-        Registry registry = getRegistry();
-        registry.loadMetadata(stream);
-    }
-
-    /** Get a "singelton" registry, or one per thread if setUseContextLoader 
-     * was called 
-     * 
-     * @deprecated Not enough info - use the method that takes CL and domain
-     * @since 1.0 
-     */ 
-    public synchronized static Registry getRegistry() {
-        return getRegistry(null, null);
-    }    
-
     // -------------------- Helpers  --------------------
 
     /** Get the type of an attribute of the object, from the metadata.
@@ -846,16 +795,15 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         return;
     }
 
-    /**Experimental. Will become private, some code may still use it
-     *
+    /**
      * @param sourceType
      * @param source
      * @param param
      * @throws Exception
-     * @deprecated
+
      */
-    public void loadDescriptors(String sourceType, Object source, String param)
-            throws Exception {
+    private void loadDescriptors(String sourceType, Object source,
+            String param) throws Exception {
         load(sourceType, source, param);
     }
 
@@ -974,21 +922,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         loadDescriptors("MbeansDescriptorsDigesterSource", source, null );
     }
 
-    /** @deprecated - may still be used in code using pre-1.1 builds
-     */
-    public void registerComponent(Object bean, String domain, String type,
-                                  String name)
-            throws Exception
-    {
-        StringBuffer sb=new StringBuffer();
-        sb.append( domain ).append(":");
-        sb.append( name );
-        String nameStr=sb.toString();
-        ObjectName oname=new ObjectName( nameStr );
-        registerComponent(bean, oname, type );
-    }
-
-    
 
     // should be removed
     public void unregisterComponent( String domain, String name ) {
@@ -1002,19 +935,4 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
     }
     
-
-    /**
-     * Load the registry from a cached .ser file. This is typically 2-3 times
-     * faster than parsing the XML.
-     *
-     * @param source Source to be used to load. Can be an InputStream or URL.
-     *
-     * @exception Exception if any parsing or processing error occurs
-     * @deprecated Loaded automatically or using a File or Url ending in .ser
-     */
-    public void loadCachedDescriptors( Object source )
-            throws Exception
-    {
-        loadDescriptors("MbeansDescriptorsSerSource", source, null );
-    }
 }
