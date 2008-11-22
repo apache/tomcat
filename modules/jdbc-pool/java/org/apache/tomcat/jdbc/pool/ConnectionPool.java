@@ -123,7 +123,7 @@ public class ConnectionPool {
      */
     public Connection getConnection() throws SQLException {
         //check out a connection
-        PooledConnection con = (PooledConnection)borrowConnection();
+        PooledConnection con = (PooledConnection)borrowConnection(-1);
         return setupConnection(con);
     }
 
@@ -316,7 +316,7 @@ public class ConnectionPool {
         PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
         try {
             for (int i = 0; i < initialPool.length; i++) {
-                initialPool[i] = this.borrowConnection();
+                initialPool[i] = this.borrowConnection(0); //don't wait, should be no contention
             } //for
 
         } catch (SQLException x) {
@@ -376,10 +376,12 @@ public class ConnectionPool {
 
     /**
      * Thread safe way to retrieve a connection from the pool
+     * @param wait - time to wait, overrides the maxWait from the properties, 
+     * set to -1 if you wish to use maxWait, 0 if you wish no wait time. 
      * @return PooledConnection
      * @throws SQLException
      */
-    protected PooledConnection borrowConnection() throws SQLException {
+    protected PooledConnection borrowConnection(int wait) throws SQLException {
 
         if (isClosed()) {
             throw new SQLException("Connection pool closed.");
@@ -405,13 +407,19 @@ public class ConnectionPool {
             } //end if
 
             //calculate wait time for this iteration
-            long maxWait = (getPoolProperties().getMaxWait()<=0)?Long.MAX_VALUE:getPoolProperties().getMaxWait();
+            long maxWait = wait;
+            if (wait==-1) {
+                maxWait = (getPoolProperties().getMaxWait()<=0)?Long.MAX_VALUE:getPoolProperties().getMaxWait();
+            }
             long timetowait = Math.max(0, maxWait - (System.currentTimeMillis() - now));
             try {
                 //retrieve an existing connection
                 con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupted();
+            }
+            if (maxWait==0) { //no wait, return one if we have one
+                return con;
             }
             //we didn't get a connection, lets see if we timed out
             if (con == null) {
