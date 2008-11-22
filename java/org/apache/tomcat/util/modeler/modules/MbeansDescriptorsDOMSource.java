@@ -80,7 +80,7 @@ public class MbeansDescriptorsDOMSource extends ModelerSource
     }
 
     public void execute() throws Exception {
-        if( registry==null ) registry=Registry.getRegistry();
+        if( registry==null ) registry=Registry.getRegistry(null, null);
 
         try {
             InputStream stream=(InputStream)source;

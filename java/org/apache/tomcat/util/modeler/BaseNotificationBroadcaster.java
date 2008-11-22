@@ -224,7 +224,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
     private synchronized void registerNotifications( FixedNotificationFilter filter ) {
         String names[]=filter.getNames();
-        Registry reg=Registry.getRegistry();
+        Registry reg=Registry.getRegistry(null, null);
         for( int i=0; i<names.length; i++ ) {
             int code=reg.getId(null, names[i]);
             if( hooks.length < code ) {
