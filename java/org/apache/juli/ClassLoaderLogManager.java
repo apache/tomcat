@@ -90,7 +90,7 @@ public class ClassLoaderLogManager extends LogManager {
         final String levelString = getProperty(loggerName + ".level");
         if (levelString != null) {
             try {
-                AccessController.doPrivileged(new PrivilegedAction() {
+                AccessController.doPrivileged(new PrivilegedAction<Object>() {
                     public Object run() {
                         logger.setLevel(Level.parse(levelString.trim()));
                         return null;
@@ -270,7 +270,7 @@ public class ClassLoaderLogManager extends LogManager {
         ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
         if (info == null) {
             final ClassLoader classLoaderParam = classLoader;
-            AccessController.doPrivileged(new PrivilegedAction() {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
                 public Object run() {
                     try {
                         readConfiguration(classLoaderParam);
@@ -445,7 +445,7 @@ public class ClassLoaderLogManager extends LogManager {
      */
     protected static void doSetParentLogger(final Logger logger,
             final Logger parent) {
-        AccessController.doPrivileged(new PrivilegedAction() {
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 logger.setParent(parent);
                 return null;
@@ -538,9 +538,9 @@ public class ClassLoaderLogManager extends LogManager {
         }
 
         void setParentLogger(final Logger parent) {
-            for (final Iterator iter = children.values().iterator(); iter
-                    .hasNext();) {
-                final LogNode childNode = (LogNode) iter.next();
+            for (final Iterator<LogNode> iter =
+                children.values().iterator(); iter.hasNext();) {
+                final LogNode childNode = iter.next();
                 if (childNode.logger == null) {
                     childNode.setParentLogger(parent);
                 } else {
