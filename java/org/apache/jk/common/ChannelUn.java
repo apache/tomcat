@@ -310,7 +310,7 @@ public class ChannelUn extends JniHandler implements JkChannel {
             if( log.isDebugEnabled() )
                 log.debug( "Closing un channel");
             try{
-                Request req = (Request)ep.getRequest();
+                Request req = ep.getRequest();
                 if( req != null ) {
                     ObjectName roname = (ObjectName)ep.getNote(JMXRequestNote);
                     if( roname != null ) {

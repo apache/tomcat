@@ -722,7 +722,7 @@ public class ChannelSocket extends JkHandler
                 log.error( "Error, closing connection", e);
             }
             try{
-                Request req = (Request)ep.getRequest();
+                Request req = ep.getRequest();
                 if( req != null ) {
                     ObjectName roname = (ObjectName)ep.getNote(JMXRequestNote);
                     if( roname != null ) {
