@@ -38,7 +38,7 @@ public class TagPluginManager {
     private static final String TAG_PLUGINS_ROOT_ELEM = "tag-plugins";
 
     private boolean initialized = false;
-    private HashMap tagPlugins = null;
+    private HashMap<String, TagPlugin> tagPlugins = null;
     private ServletContext ctxt;
     private PageInfo pageInfo;
 
@@ -85,10 +85,10 @@ public class TagPluginManager {
 			 TAG_PLUGINS_ROOT_ELEM);
 	}
 
-	tagPlugins = new HashMap();
-	Iterator pluginList = root.findChildren("tag-plugin");
+	tagPlugins = new HashMap<String, TagPlugin>();
+	Iterator<TreeNode> pluginList = root.findChildren("tag-plugin");
 	while (pluginList.hasNext()) {
-	    TreeNode pluginNode = (TreeNode) pluginList.next();
+	    TreeNode pluginNode = pluginList.next();
             TreeNode tagClassNode = pluginNode.findChild("tag-class");
 	    if (tagClassNode == null) {
 		// Error
@@ -104,7 +104,7 @@ public class TagPluginManager {
 	    String pluginClassStr = pluginClassNode.getBody();
 	    TagPlugin tagPlugin = null;
 	    try {
-		Class pluginClass = Class.forName(pluginClassStr);
+		Class<?> pluginClass = Class.forName(pluginClassStr);
 		tagPlugin = (TagPlugin) pluginClass.newInstance();
 	    } catch (Exception e) {
 		throw new JasperException(e);
@@ -124,8 +124,7 @@ public class TagPluginManager {
      * The given custom tag node will be manipulated by the plugin.
      */
     private void invokePlugin(Node.CustomTag n) {
-	TagPlugin tagPlugin = (TagPlugin)
-		tagPlugins.get(n.getTagHandlerClass().getName());
+	TagPlugin tagPlugin = tagPlugins.get(n.getTagHandlerClass().getName());
 	if (tagPlugin == null) {
 	    return;
 	}
@@ -139,7 +138,7 @@ public class TagPluginManager {
 	private Node.CustomTag node;
 	private Node.Nodes curNodes;
 	private PageInfo pageInfo;
-	private HashMap pluginAttributes;
+	private HashMap<String, Object> pluginAttributes;
 
 	TagPluginContextImpl(Node.CustomTag n, PageInfo pageInfo) {
 	    this.node = n;
@@ -149,7 +148,7 @@ public class TagPluginManager {
 	    curNodes = new Node.Nodes();
 	    n.setAtSTag(curNodes);
 	    n.setUseTagPlugin(true);
-	    pluginAttributes = new HashMap();
+	    pluginAttributes = new HashMap<String, Object>();
         }
 
         public TagPluginContext getParentContext() {

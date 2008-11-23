@@ -324,13 +324,15 @@ public class AntCompiler extends Compiler {
         /**
          * Thread <-> PrintStream associations.
          */
-        protected static ThreadLocal streams = new ThreadLocal();
+        protected static ThreadLocal<PrintStream> streams =
+            new ThreadLocal<PrintStream>();
 
 
         /**
          * Thread <-> ByteArrayOutputStream associations.
          */
-        protected static ThreadLocal data = new ThreadLocal();
+        protected static ThreadLocal<ByteArrayOutputStream> data =
+            new ThreadLocal<ByteArrayOutputStream>();
 
 
         // --------------------------------------------------------- Public Methods
@@ -354,8 +356,7 @@ public class AntCompiler extends Compiler {
          * Stop capturing thread's output and return captured data as a String.
          */
         public static String unsetThread() {
-            ByteArrayOutputStream baos = 
-                (ByteArrayOutputStream) data.get();
+            ByteArrayOutputStream baos = data.get();
             if (baos == null) {
                 return null;
             }
@@ -372,7 +373,7 @@ public class AntCompiler extends Compiler {
          * Find PrintStream to which the output must be written to.
          */
         protected PrintStream findStream() {
-            PrintStream ps = (PrintStream) streams.get();
+            PrintStream ps = streams.get();
             if (ps == null) {
                 ps = wrapped;
             }

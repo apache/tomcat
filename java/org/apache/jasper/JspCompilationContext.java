@@ -85,7 +85,7 @@ public class JspCompilationContext {
 
     protected URLClassLoader jspLoader;
     protected URL baseUrl;
-    protected Class servletClass;
+    protected Class<?> servletClass;
 
     protected boolean isTagFile;
     protected boolean protoTypeMode;
@@ -307,7 +307,7 @@ public class JspCompilationContext {
     }
 
 
-    public Set getResourcePaths(String path) {
+    public Set<String> getResourcePaths(String path) {
         return context.getResourcePaths(canonicalURI(path));
     }
 
@@ -606,7 +606,7 @@ public class JspCompilationContext {
 
     // ==================== Manipulating the class ====================
 
-    public Class load() 
+    public Class<?> load() 
         throws JasperException, FileNotFoundException
     {
         try {

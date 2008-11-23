@@ -40,6 +40,8 @@ import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import javax.servlet.jsp.tagext.TagLibraryInfo;
+
 import org.apache.jasper.compiler.Compiler;
 import org.apache.jasper.compiler.JspConfig;
 import org.apache.jasper.compiler.JspRuntimeContext;
@@ -157,7 +159,8 @@ public class JspC implements Options {
     protected boolean smapSuppressed = true;
     protected boolean smapDumped = false;
     protected boolean caching = true;
-    protected Map cache = new HashMap();
+    protected Map<String, TagLibraryInfo> cache =
+        new HashMap<String, TagLibraryInfo>();
 
     protected String compiler = null;
 
@@ -176,12 +179,12 @@ public class JspC implements Options {
      * The file extensions to be handled as JSP files.
      * Default list is .jsp and .jspx.
      */
-    protected List extensions;
+    protected List<String> extensions;
 
     /**
      * The pages.
      */
-    protected List pages = new Vector();
+    protected List<String> pages = new Vector<String>();
 
     /**
      * Needs better documentation, this data member does.
@@ -440,7 +443,7 @@ public class JspC implements Options {
     /**
      * @see Options#getCache()
      */
-    public Map getCache() {
+    public Map<String, TagLibraryInfo> getCache() {
         return cache;
     }
 
@@ -540,13 +543,13 @@ public class JspC implements Options {
         return scratchDir;
     }
 
-    public Class getJspCompilerPlugin() {
-       // we don't compile, so this is meanlingless
+    public Class<?> getJspCompilerPlugin() {
+       // we don't compile, so this is meaningless
         return null;
     }
 
     public String getJspCompilerPath() {
-       // we don't compile, so this is meanlingless
+       // we don't compile, so this is meaningless
         return null;
     }
 
@@ -637,7 +640,7 @@ public class JspC implements Options {
      *
      * @return The list of extensions
      */
-    public List getExtensions() {
+    public List<String> getExtensions() {
         return extensions;
     }
 
@@ -650,7 +653,7 @@ public class JspC implements Options {
     protected void addExtension(final String extension) {
         if(extension != null) {
             if(extensions == null) {
-                extensions = new Vector();
+                extensions = new Vector<String>();
             }
 
             extensions.add(extension);
@@ -1094,7 +1097,7 @@ public class JspC implements Options {
                     throw new JasperException(
                         Localizer.getMessage("jsp.error.jspc.missingTarget"));
                 }
-                String firstJsp = (String) pages.get( 0 );
+                String firstJsp = pages.get( 0 );
                 File firstJspF = new File( firstJsp );
                 if (!firstJspF.exists()) {
                     throw new JasperException(
@@ -1126,7 +1129,7 @@ public class JspC implements Options {
 
             initWebXml();
 
-            Iterator iter = pages.iterator();
+            Iterator<String> iter = pages.iterator();
             while (iter.hasNext()) {
                 String nextjsp = iter.next().toString();
                 File fjsp = new File(nextjsp);

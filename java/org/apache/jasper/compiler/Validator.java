@@ -1736,8 +1736,8 @@ class Validator {
         StringBuffer errMsg = null;
         ErrorDispatcher errDisp = compiler.getErrorDispatcher();
 
-        for (Iterator iter = compiler.getPageInfo().getTaglibs().iterator(); iter
-                .hasNext();) {
+        for (Iterator<TagLibraryInfo> iter =
+            compiler.getPageInfo().getTaglibs().iterator(); iter.hasNext();) {
 
             Object o = iter.next();
             if (!(o instanceof TagLibraryInfoImpl))

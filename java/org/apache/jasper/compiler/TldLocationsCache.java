@@ -101,7 +101,7 @@ public class TldLocationsCache {
      *    [0] The location
      *    [1] If the location is a jar file, this is the location of the tld.
      */
-    private Hashtable mappings;
+    private Hashtable<String, String[]> mappings;
 
     private boolean initialized;
     private ServletContext ctxt;
@@ -178,7 +178,7 @@ public class TldLocationsCache {
     public TldLocationsCache(ServletContext ctxt, boolean redeployMode) {
         this.ctxt = ctxt;
         this.redeployMode = redeployMode;
-        mappings = new Hashtable();
+        mappings = new Hashtable<String, String[]>();
         initialized = false;
     }
 
@@ -218,7 +218,7 @@ public class TldLocationsCache {
         if (!initialized) {
             init();
         }
-        return (String[]) mappings.get(uri);
+        return mappings.get(uri);
     }
 
     /** 
@@ -302,11 +302,11 @@ public class TldLocationsCache {
             if (jspConfig != null) {
                 webtld = jspConfig;
             }
-            Iterator taglibs = webtld.findChildren("taglib");
+            Iterator<TreeNode> taglibs = webtld.findChildren("taglib");
             while (taglibs.hasNext()) {
 
                 // Parse the next <taglib> element
-                TreeNode taglib = (TreeNode) taglibs.next();
+                TreeNode taglib = taglibs.next();
                 String tagUri = null;
                 String tagLoc = null;
                 TreeNode child = taglib.findChild("taglib-uri");
@@ -356,9 +356,9 @@ public class TldLocationsCache {
                 conn.setUseCaches(false);
             }
             jarFile = conn.getJarFile();
-            Enumeration entries = jarFile.entries();
+            Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
-                JarEntry entry = (JarEntry) entries.nextElement();
+                JarEntry entry = entries.nextElement();
                 String name = entry.getName();
                 if (!name.startsWith("META-INF/")) continue;
                 if (!name.endsWith(".tld")) continue;
@@ -416,11 +416,11 @@ public class TldLocationsCache {
     private void processTldsInFileSystem(String startPath)
             throws Exception {
 
-        Set dirList = ctxt.getResourcePaths(startPath);
+        Set<String> dirList = ctxt.getResourcePaths(startPath);
         if (dirList != null) {
-            Iterator it = dirList.iterator();
+            Iterator<String> it = dirList.iterator();
             while (it.hasNext()) {
-                String path = (String) it.next();
+                String path = it.next();
                 if (path.endsWith("/")) {
                     processTldsInFileSystem(path);
                 }

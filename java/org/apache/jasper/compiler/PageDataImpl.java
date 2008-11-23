@@ -518,7 +518,7 @@ class PageDataImpl extends PageData implements TagConstants {
 	    if (n.getImports().size() > 0) {
 		// Concatenate names of imported classes/packages
 		boolean first = true;
-		ListIterator iter = n.getImports().listIterator();
+		ListIterator<String> iter = n.getImports().listIterator();
 		while (iter.hasNext()) {
 		    if (first) {
 			first = false;
@@ -526,7 +526,7 @@ class PageDataImpl extends PageData implements TagConstants {
 		    } else {
 			buf.append(",");
 		    }
-		    buf.append(JspUtil.getExprInXml((String) iter.next()));
+		    buf.append(JspUtil.getExprInXml(iter.next()));
 		}
 		buf.append("\"\n");
 	    }

@@ -68,7 +68,7 @@ class JspReader {
     /**
      * The list of source files.
      */
-    private List sourceFiles;
+    private List<String> sourceFiles;
 
     /**
      * The current file ID (-1 indicates an error or no file).
@@ -134,7 +134,7 @@ class JspReader {
 
         this.context = ctxt;
         this.err = err;
-        sourceFiles = new Vector();
+        sourceFiles = new Vector<String>();
         currFileId = 0;
         size = 0;
         singleFile = false;
@@ -156,7 +156,7 @@ class JspReader {
      * @return The file at that position, if found, null otherwise
      */
     String getFile(final int fileid) {
-        return (String) sourceFiles.get(fileid);
+        return sourceFiles.get(fileid);
     }
        
     /**
