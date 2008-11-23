@@ -115,9 +115,9 @@ public class SmapStratum {
     // Private state
 
     private String stratumName;
-    private List fileNameList;
-    private List filePathList;
-    private List lineData;
+    private List<String> fileNameList;
+    private List<String> filePathList;
+    private List<LineInfo> lineData;
     private int lastFileID;
 
     //*********************************************************************
@@ -131,9 +131,9 @@ public class SmapStratum {
      */
     public SmapStratum(String stratumName) {
         this.stratumName = stratumName;
-        fileNameList = new ArrayList();
-        filePathList = new ArrayList();
-        lineData = new ArrayList();
+        fileNameList = new ArrayList<String>();
+        filePathList = new ArrayList<String>();
+        lineData = new ArrayList<LineInfo>();
         lastFileID = 0;
     }
 
@@ -180,8 +180,8 @@ public class SmapStratum {
         //outputLineIncrement, if possible
         int i = 0;
         while (i < lineData.size() - 1) {
-            LineInfo li = (LineInfo)lineData.get(i);
-            LineInfo liNext = (LineInfo)lineData.get(i + 1);
+            LineInfo li = lineData.get(i);
+            LineInfo liNext = lineData.get(i + 1);
             if (!liNext.lineFileIDSet
                 && liNext.inputStartLine == li.inputStartLine
                 && liNext.inputLineCount == 1
@@ -203,8 +203,8 @@ public class SmapStratum {
         //inputLineCount, if possible
         i = 0;
         while (i < lineData.size() - 1) {
-            LineInfo li = (LineInfo)lineData.get(i);
-            LineInfo liNext = (LineInfo)lineData.get(i + 1);
+            LineInfo li = lineData.get(i);
+            LineInfo liNext = lineData.get(i + 1);
             if (!liNext.lineFileIDSet
                 && liNext.inputStartLine == li.inputStartLine + li.inputLineCount
                 && liNext.outputLineIncrement == li.outputLineIncrement
@@ -308,7 +308,7 @@ public class SmapStratum {
                 out.append("+ " + i + " " + fileNameList.get(i) + "\n");
                 // Source paths must be relative, not absolute, so we
                 // remove the leading "/", if one exists.
-                String filePath = (String)filePathList.get(i);
+                String filePath = filePathList.get(i);
                 if (filePath.startsWith("/")) {
                     filePath = filePath.substring(1);
                 }
@@ -322,7 +322,7 @@ public class SmapStratum {
         out.append("*L\n");
         bound = lineData.size();
         for (int i = 0; i < bound; i++) {
-            LineInfo li = (LineInfo)lineData.get(i);
+            LineInfo li = lineData.get(i);
             out.append(li.getString());
         }
 

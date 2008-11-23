@@ -52,11 +52,11 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private static final String IMPLICIT_TLD = "implicit.tld";
 
     // Maps tag names to tag file paths
-    private Hashtable tagFileMap;
+    private Hashtable<String,String> tagFileMap;
 
     private ParserController pc;
     private PageInfo pi;
-    private Vector vec;
+    private Vector<TagFileInfo> vec;
 
     /**
      * Constructor.
@@ -70,8 +70,8 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
         super(prefix, null);
         this.pc = pc;
         this.pi = pi;
-        this.tagFileMap = new Hashtable();
-        this.vec = new Vector();
+        this.tagFileMap = new Hashtable<String,String>();
+        this.vec = new Vector<TagFileInfo>();
 
         // Implicit tag libraries have no functions:
         this.functions = new FunctionInfo[0];
@@ -94,11 +94,11 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
         }
 
         // Populate mapping of tag names to tag file paths
-        Set dirList = ctxt.getResourcePaths(tagdir);
+        Set<String> dirList = ctxt.getResourcePaths(tagdir);
         if (dirList != null) {
-            Iterator it = dirList.iterator();
+            Iterator<String> it = dirList.iterator();
             while (it.hasNext()) {
-                String path = (String) it.next();
+                String path = it.next();
                 if (path.endsWith(TAG_FILE_SUFFIX)
                         || path.endsWith(TAGX_FILE_SUFFIX)) {
                     /*
@@ -131,10 +131,10 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
                             }
 
                             // Process each child element of our <taglib> element
-                            Iterator list = tld.findChildren();
+                            Iterator<TreeNode> list = tld.findChildren();
 
                             while (list.hasNext()) {
-                                TreeNode element = (TreeNode) list.next();
+                                TreeNode element = list.next();
                                 String tname = element.getName();
 
                                 if ("tlibversion".equals(tname) // JSP 1.1
@@ -184,7 +184,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
 
         TagFileInfo tagFile = super.getTagFile(shortName);
         if (tagFile == null) {
-            String path = (String) tagFileMap.get(shortName);
+            String path = tagFileMap.get(shortName);
             if (path == null) {
                 return null;
             }
@@ -210,8 +210,8 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     }
 
     public TagLibraryInfo[] getTagLibraryInfos() {
-        Collection coll = pi.getTaglibs();
-        return (TagLibraryInfo[]) coll.toArray(new TagLibraryInfo[0]);
+        Collection<TagLibraryInfo> coll = pi.getTaglibs();
+        return coll.toArray(new TagLibraryInfo[0]);
     }
 
 }

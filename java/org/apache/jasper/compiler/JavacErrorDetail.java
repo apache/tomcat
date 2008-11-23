@@ -220,13 +220,13 @@ public class JavacErrorDetail {
      */
     private String[] readFile(InputStream s) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(s));
-        List lines = new ArrayList();
+        List<String> lines = new ArrayList<String>();
         String line;
 
         while ( (line = reader.readLine()) != null ) {
             lines.add(line);
         }
 
-        return (String[]) lines.toArray( new String[lines.size()] );
+        return lines.toArray( new String[lines.size()] );
     }
 }

@@ -245,7 +245,7 @@ public class JspServletWrapper {
     /**
      * Get a list of files that the current page has source dependency on.
      */
-    public java.util.List getDependants() {
+    public java.util.List<String> getDependants() {
         try {
             Object target;
             if (isTagFile) {

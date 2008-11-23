@@ -240,9 +240,9 @@ public final class JspRuntimeContext {
      * Process a "destory" event for this web application context.
      */                                                        
     public void destroy() {
-        Iterator servlets = jsps.values().iterator();
+        Iterator<JspServletWrapper> servlets = jsps.values().iterator();
         while (servlets.hasNext()) {
-            ((JspServletWrapper) servlets.next()).destroy();
+            servlets.next().destroy();
         }
     }
 
@@ -336,7 +336,7 @@ public final class JspRuntimeContext {
             // protocol URL's to the classpath.
             
             if( urls[i].getProtocol().equals("file") ) {
-                cpath.append((String)urls[i].getFile()+sep);
+                cpath.append(urls[i].getFile()+sep);
             }
         }    
 
