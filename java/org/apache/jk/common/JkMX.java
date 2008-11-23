@@ -380,7 +380,7 @@ public class JkMX extends JkHandler
 
     private ObjectName registerObject(String className, String oName) 
         throws Exception {
-        Class c = Class.forName(className);
+        Class<?> c = Class.forName(className);
         Object o = c.newInstance();
         ObjectName objN = new ObjectName(oName);
         mserver.registerMBean(o, objN);
