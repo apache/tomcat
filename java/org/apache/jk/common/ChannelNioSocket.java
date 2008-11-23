@@ -917,7 +917,7 @@ public class ChannelNioSocket extends JkHandler
                 log.error("Error closing connection", e);
             }
             try{
-                Request req = (Request)ep.getRequest();
+                Request req = ep.getRequest();
                 if( req != null ) {
                     ObjectName roname = (ObjectName)ep.getNote(JMXRequestNote);
                     if( roname != null ) {
@@ -958,10 +958,10 @@ public class ChannelNioSocket extends JkHandler
                     if(log.isDebugEnabled())
                         log.debug("Selecting "+ns+" channels");
                     if(ns > 0) {
-                        Set sels = selector.selectedKeys();
-                        Iterator it = sels.iterator();
+                        Set<SelectionKey> sels = selector.selectedKeys();
+                        Iterator<SelectionKey> it = sels.iterator();
                         while(it.hasNext()) {
-                            SelectionKey sk = (SelectionKey)it.next();
+                            SelectionKey sk = it.next();
                             if(sk.isAcceptable()) {
                                 acceptConnections();
                             } else {

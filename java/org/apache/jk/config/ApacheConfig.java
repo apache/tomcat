@@ -153,7 +153,7 @@ public class ApacheConfig  extends BaseJkConfig {
     private String sslCipherIndicator="SSL_CIPHER";
     private String sslCertsIndicator="SSL_CLIENT_CERT";
 
-    Hashtable NamedVirtualHosts=null;
+    Hashtable<String, String> NamedVirtualHosts=null;
     
     public ApacheConfig() {
     }

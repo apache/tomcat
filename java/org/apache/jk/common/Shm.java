@@ -51,7 +51,7 @@ public class Shm extends JniHandler {
     boolean reset=false;
     String dumpFile=null;
 
-    Vector groups=new Vector();
+    Vector<String> groups = new Vector<String>();
     
     // Will be dynamic ( getMethodId() ) after things are stable 
     static final int SHM_WRITE_SLOT=2;
@@ -149,7 +149,7 @@ public class Shm extends JniHandler {
     public void resetScoreboard() throws IOException {
         if( apr==null ) return;
         MsgContext mCtx=createMsgContext();
-        Msg msg=(Msg)mCtx.getMsg(0);
+        Msg msg=mCtx.getMsg(0);
         msg.reset();
 
         msg.appendByte( SHM_RESET );
@@ -160,7 +160,7 @@ public class Shm extends JniHandler {
     public void dumpScoreboard(String fname) throws IOException {
         if( apr==null ) return;
         MsgContext mCtx=createMsgContext();
-        Msg msg=(Msg)mCtx.getMsg(0);
+        Msg msg=mCtx.getMsg(0);
         C2BConverter c2b=mCtx.getConverter();
         msg.reset();
 
@@ -181,7 +181,7 @@ public class Shm extends JniHandler {
 
         String slotName="TOMCAT:" + instanceId;
         MsgContext mCtx=createMsgContext();
-        Msg msg=(Msg)mCtx.getMsg(0);
+        Msg msg=mCtx.getMsg(0);
         msg.reset();
         C2BConverter c2b=mCtx.getConverter();
         
@@ -194,7 +194,7 @@ public class Shm extends JniHandler {
         // number of groups. 0 means the default lb.
         msg.appendInt( groups.size() );
         for( int i=0; i<groups.size(); i++ ) {
-            appendString( msg, (String)groups.elementAt( i ), c2b);
+            appendString( msg, groups.elementAt( i ), c2b);
             appendString( msg, instanceId, c2b);
         }
         
@@ -224,7 +224,7 @@ public class Shm extends JniHandler {
     {
         String slotName="TOMCAT:" + host + ":" + port;
         MsgContext mCtx=createMsgContext();
-        Msg msg=(Msg)mCtx.getMsg(0);
+        Msg msg=mCtx.getMsg(0);
         msg.reset();
         C2BConverter c2b=mCtx.getConverter();
         
