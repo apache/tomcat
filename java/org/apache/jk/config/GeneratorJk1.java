@@ -98,14 +98,15 @@ public class GeneratorJk1 implements WebXml2Jk.MappingGenerator {
 
     }
     
-    public void generateWelcomeFiles( Vector wf ) {
+    public void generateWelcomeFiles( Vector<String> wf ) {
 
     }
                                             
     
-    public void generateConstraints( Vector urls, Vector methods, Vector roles, boolean isSSL ) {
+    public void generateConstraints( Vector<String> urls, Vector<String> methods,
+            Vector<String> roles, boolean isSSL ) {
         for( int i=0; i<urls.size(); i++ ) {
-            String url=(String)urls.elementAt(i);
+            String url = urls.elementAt(i);
 
             out.println( "JkMount " + cpath + url + " " + worker);
         }

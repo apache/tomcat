@@ -98,10 +98,10 @@ public class GeneratorApache2 implements WebXml2Jk.MappingGenerator {
     }
 
     private void generateWelcomeFiles( PrintWriter out ) {
-        Vector wf= wxml.getWellcomeFiles();
+        Vector<String> wf= wxml.getWellcomeFiles();
         out.print("  DirectoryIndex ");
         for( int i=0; i<wf.size(); i++ ) {
-            out.print( " " + (String)wf.elementAt(i));
+            out.print( " " + wf.elementAt(i));
         }
         out.println();
     }
@@ -161,16 +161,17 @@ public class GeneratorApache2 implements WebXml2Jk.MappingGenerator {
     }
 
     // XXX Only if BASIC/DIGEST and 'integrated auth'
-    public void generateConstraints( Vector urls, Vector methods, Vector roles, boolean isSSL ) {
+    public void generateConstraints( Vector<String> urls, Vector<String> methods,
+            Vector<String> roles, boolean isSSL ) {
         for( int i=0; i<urls.size(); i++ ) {
-            String url=(String)urls.elementAt(i);
+            String url = urls.elementAt(i);
 
             out.println( "<Location \"" + cpath + url + "\" >");
 
             if( methods.size() > 0 ) {
                 out.print("  <Limit ");
                 for( int j=0; j<methods.size(); j++ ) {
-                    String m=(String)methods.elementAt(j);
+                    String m = methods.elementAt(j);
                     out.print( " " +  m);
                 }
                 out.println(  " >" );
@@ -179,7 +180,7 @@ public class GeneratorApache2 implements WebXml2Jk.MappingGenerator {
             out.println( "    AuthType basic" );
             out.print( "    Require group " );
             for( int j=0; j<roles.size(); j++ ) {
-                String role=(String)roles.elementAt(j);
+                String role = roles.elementAt(j);
                 out.print( " " +  role);
             }
             out.println();

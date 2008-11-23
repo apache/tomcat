@@ -147,7 +147,8 @@ public class WebXml2Jk {
 
         void generateErrorPage( int err, String location ) throws IOException ;
             
-        void generateConstraints( Vector urls, Vector methods, Vector roles, boolean isSSL ) throws IOException ;
+        void generateConstraints( Vector<String> urls, Vector<String> methods,
+                Vector<String> roles, boolean isSSL ) throws IOException ;
     }    
     
     // -------------------- Implementation --------------------
@@ -164,11 +165,11 @@ public class WebXml2Jk {
         return jkDir;
     }
     
-    /** Extract the wellcome files from the web.xml
+    /** Extract the welcome files from the web.xml
      */
-    public Vector getWellcomeFiles() {
+    public Vector<String> getWellcomeFiles() {
         Node n0=getChild( webN, "welcome-file-list" );
-        Vector wF=new Vector();
+        Vector<String> wF = new Vector<String>();
         if( n0!=null ) {
             for( Node mapN=getChild( webN, "welcome-file" );
                  mapN != null; mapN = getNext( mapN ) ) {
@@ -240,9 +241,9 @@ public class WebXml2Jk {
         for( Node mapN=getChild( webN, "security-constraint" );
              mapN != null; mapN = getNext( mapN )) {
 
-            Vector methods=new Vector();
-            Vector urls=new Vector();
-            Vector roles=new Vector();
+            Vector<String> methods = new Vector<String>();
+            Vector<String> urls= new Vector<String>();
+            Vector<String> roles= new Vector<String>();
             boolean isSSL=false;
             
             Node wrcN=getChild( mapN, "web-resource-collection");
@@ -340,7 +341,7 @@ public class WebXml2Jk {
 
             /* do ant-style property setting */
             IntrospectionUtils.processArgs( w2jk, args, new String[] {},
-                                            null, new Hashtable());
+                                            null, new Hashtable<Object, Object>());
             w2jk.execute();
         } catch( Exception ex ) {
             ex.printStackTrace();

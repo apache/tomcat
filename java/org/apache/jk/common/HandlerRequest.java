@@ -261,8 +261,7 @@ public class HandlerRequest extends JkHandler
                 decodeRequest( msg, ep, tmpMB );
                 if (twa != null) {
                     twa.setCurrentStage(control, "JkService");
-                    twa.setParam(control,
-                                 ((Request)ep.getRequest()).unparsedURI());
+                    twa.setParam(control, ep.getRequest().unparsedURI());
                 }
             } catch( Exception ex ) {
                 log.error( "Error decoding request ", ex );
@@ -377,7 +376,7 @@ public class HandlerRequest extends JkHandler
         // Translate the HTTP method code to a String.
         byte methodCode = msg.getByte();
         if (methodCode != AjpConstants.SC_M_JK_STORED) {
-            String mName=AjpConstants.methodTransArray[(int)methodCode - 1];
+            String mName=AjpConstants.methodTransArray[methodCode - 1];
             req.method().setString(mName);
         }
 
@@ -652,7 +651,7 @@ public class HandlerRequest extends JkHandler
             int port = 0;
             int mult = 1;
             for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.DEC[(int) valueB[i + valueS]];
+                int charValue = HexUtils.DEC[valueB[i + valueS]];
                 if (charValue == -1) {
                     // Invalid character
                     throw new CharConversionException("Invalid char in port: " + valueB[i + valueS]); 
