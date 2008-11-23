@@ -334,7 +334,7 @@ public abstract class Compiler {
                 generateClass(smap);
             }
         } finally {
-            if (tfp != null) {
+            if (tfp != null && ctxt.isPrototypeMode()) {
                 tfp.removeProtoTypeFiles(null);
             }
             // Make sure these object which are only used during the
