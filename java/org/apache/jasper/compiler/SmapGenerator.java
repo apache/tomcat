@@ -47,8 +47,8 @@ public class SmapGenerator {
 
     private String outputFileName;
     private String defaultStratum = "Java";
-    private List strata = new ArrayList();
-    private List embedded = new ArrayList();
+    private List<SmapStratum> strata = new ArrayList<SmapStratum>();
+    private List<String> embedded = new ArrayList<String>();
     private boolean doEmbedded = true;
 
     //*********************************************************************
@@ -129,7 +129,7 @@ public class SmapGenerator {
 	// print our StratumSections, FileSections, and LineSections
 	int nStrata = strata.size();
 	for (int i = 0; i < nStrata; i++) {
-	    SmapStratum s = (SmapStratum) strata.get(i);
+	    SmapStratum s = strata.get(i);
 	    out.append(s.getString());
 	}
 

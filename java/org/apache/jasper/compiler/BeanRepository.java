@@ -53,9 +53,9 @@ public class BeanRepository {
         beanTypes.put(s, type);
     }
             
-    public Class getBeanType(String bean)
+    public Class<?> getBeanType(String bean)
         throws JasperException {
-        Class clazz = null;
+        Class<?> clazz = null;
         try {
             clazz = loader.loadClass(beanTypes.get(bean));
         } catch (ClassNotFoundException ex) {

@@ -22,6 +22,7 @@ import java.util.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.jsp.tagext.TagLibraryInfo;
 
 import org.apache.jasper.compiler.TldLocationsCache;
 import org.apache.jasper.compiler.JspConfig;
@@ -357,7 +358,7 @@ public final class EmbeddedServletOptions implements Options {
         return false;
     }
     
-    public Map getCache() {
+    public Map<String, TagLibraryInfo> getCache() {
         return null;
     }
 
@@ -387,9 +388,9 @@ public final class EmbeddedServletOptions implements Options {
             // Ignore
         }
         
-        Enumeration enumeration=config.getInitParameterNames();
+        Enumeration<String> enumeration=config.getInitParameterNames();
         while( enumeration.hasMoreElements() ) {
-            String k=(String)enumeration.nextElement();
+            String k=enumeration.nextElement();
             String v=config.getInitParameter( k );
             setProperty( k, v);
         }

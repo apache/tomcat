@@ -444,14 +444,14 @@ public abstract class Compiler {
             return false;
         }
 
-        List depends = jsw.getDependants();
+        List<String> depends = jsw.getDependants();
         if (depends == null) {
             return false;
         }
 
-        Iterator it = depends.iterator();
+        Iterator<String> it = depends.iterator();
         while (it.hasNext()) {
-            String include = (String) it.next();
+            String include = it.next();
             try {
                 URL includeUrl = ctxt.getResource(include);
                 if (includeUrl == null) {
