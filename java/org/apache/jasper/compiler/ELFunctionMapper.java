@@ -167,7 +167,7 @@ public class ELFunctionMapper {
             // First locate all unique functions in this EL
             Fvisitor fv = new Fvisitor();
             el.visit(fv);
-            ArrayList functions = fv.funcs;
+            ArrayList<ELNode.Function> functions = fv.funcs;
 
             if (functions.size() == 0) {
                 return;
@@ -198,7 +198,7 @@ public class ELFunctionMapper {
 
             // Setup arguments for either getMapForFunction or mapFunction
             for (int i = 0; i < functions.size(); i++) {
-                ELNode.Function f = (ELNode.Function)functions.get(i);
+                ELNode.Function f = functions.get(i);
                 FunctionInfo funcInfo = f.getFunctionInfo();
                 String key = f.getPrefix()+ ":" + f.getName();
                 ds.append(funcMethod + "(\"" + key + "\", " +
@@ -250,13 +250,13 @@ public class ELFunctionMapper {
          * @return A previous generated function mapper name that can be used
          *         by this EL; null if none found.
          */
-        private String matchMap(ArrayList functions) {
+        private String matchMap(ArrayList<ELNode.Function> functions) {
 
             String mapName = null;
             for (int i = 0; i < functions.size(); i++) {
-                ELNode.Function f = (ELNode.Function)functions.get(i);
-                String temName = (String) gMap.get(f.getPrefix() + ':' +
-                                        f.getName() + ':' + f.getUri());
+                ELNode.Function f = functions.get(i);
+                String temName = gMap.get(f.getPrefix() + ':' + f.getName() +
+                        ':' + f.getUri());
                 if (temName == null) {
                     return null;
                 }

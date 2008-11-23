@@ -382,11 +382,11 @@ class Parser implements TagConstants {
      * Add a list of files. This is used for implementing include-prelude and
      * include-coda of jsp-config element in web.xml
      */
-    private void addInclude(Node parent, List files) throws JasperException {
+    private void addInclude(Node parent, List<String> files) throws JasperException {
         if (files != null) {
-            Iterator iter = files.iterator();
+            Iterator<String> iter = files.iterator();
             while (iter.hasNext()) {
-                String file = (String) iter.next();
+                String file = iter.next();
                 AttributesImpl attrs = new AttributesImpl();
                 attrs.addAttribute("", "file", "file", "CDATA", file);
 
@@ -1230,7 +1230,7 @@ class Parser implements TagConstants {
         if (tagInfo == null && tagFileInfo == null) {
             err.jspError(start, "jsp.error.bad_tag", shortTagName, prefix);
         }
-        Class tagHandlerClass = null;
+        Class<?> tagHandlerClass = null;
         if (tagInfo != null) {
             // Must be a classic tag, load it here.
             // tag files will be loaded later, in TagFileProcessor

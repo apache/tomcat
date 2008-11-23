@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarFile;
 
+import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
@@ -228,11 +229,11 @@ class JspDocumentParser
      * This is used to implement the include-prelude and include-coda
      * subelements of the jsp-config element in web.xml
      */
-    private void addInclude(Node parent, List files) throws SAXException {
+    private void addInclude(Node parent, List<String> files) throws SAXException {
         if (files != null) {
-            Iterator iter = files.iterator();
+            Iterator<String> iter = files.iterator();
             while (iter.hasNext()) {
-                String file = (String)iter.next();
+                String file = iter.next();
                 AttributesImpl attrs = new AttributesImpl();
                 attrs.addAttribute("", "file", "file", "CDATA", file);
 
@@ -1166,7 +1167,7 @@ class JspDocumentParser
             throw new SAXException(
                 Localizer.getMessage("jsp.error.xml.bad_tag", localName, uri));
         }
-        Class tagHandlerClass = null;
+        Class<?> tagHandlerClass = null;
         if (tagInfo != null) {
             String handlerClassName = tagInfo.getTagClassName();
             try {
@@ -1254,7 +1255,7 @@ class JspDocumentParser
             String[] location = ctxt.getTldLocation(uri);
             if (location != null || !isPlainUri) {
                 if (ctxt.getOptions().isCaching()) {
-                    result = (TagLibraryInfoImpl) ctxt.getOptions().getCache().get(uri);
+                    result = ctxt.getOptions().getCache().get(uri);
                 }
                 if (result == null) {
                     /*

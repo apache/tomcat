@@ -201,8 +201,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     }
 
     public TagLibraryInfo[] getTagLibraryInfos() {
-        Collection coll = pi.getTaglibs();
-        return (TagLibraryInfo[]) coll.toArray(new TagLibraryInfo[0]);
+        Collection<TagLibraryInfo> coll = pi.getTaglibs();
+        return coll.toArray(new TagLibraryInfo[0]);
     }
     
     /*
@@ -212,9 +212,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      */
     private void parseTLD(JspCompilationContext ctxt, String uri,
             InputStream in, URL jarFileUrl) throws JasperException {
-        Vector tagVector = new Vector();
-        Vector tagFileVector = new Vector();
-        Hashtable functionTable = new Hashtable();
+        Vector<TagInfo> tagVector = new Vector<TagInfo>();
+        Vector<TagFileInfo> tagFileVector = new Vector<TagFileInfo>();
+        Hashtable<String, FunctionInfo> functionTable = new Hashtable<String, FunctionInfo>();
 
         // Create an iterator over the child elements of our <taglib> element
         ParserUtils pu = new ParserUtils();
@@ -226,10 +226,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         this.jspversion = tld.findAttribute("version");
 
         // Process each child element of our <taglib> element
-        Iterator list = tld.findChildren();
+        Iterator<TreeNode> list = tld.findChildren();
 
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
 
             if ("tlibversion".equals(tname) // JSP 1.1
@@ -293,9 +293,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         this.functions = new FunctionInfo[functionTable.size()];
         int i = 0;
-        Enumeration enumeration = functionTable.elements();
+        Enumeration<FunctionInfo> enumeration = functionTable.elements();
         while (enumeration.hasMoreElements()) {
-            this.functions[i++] = (FunctionInfo) enumeration.nextElement();
+            this.functions[i++] = enumeration.nextElement();
         }
     }
 
@@ -358,11 +358,11 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         String largeIcon = null;
         boolean dynamicAttributes = false;
 
-        Vector attributeVector = new Vector();
-        Vector variableVector = new Vector();
-        Iterator list = elem.findChildren();
+        Vector<TagAttributeInfo> attributeVector = new Vector<TagAttributeInfo>();
+        Vector<TagVariableInfo> variableVector = new Vector<TagVariableInfo>();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
 
             if ("name".equals(tname)) {
@@ -413,7 +413,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         TagExtraInfo tei = null;
         if (teiClassName != null && !teiClassName.equals("")) {
             try {
-                Class teiClass = ctxt.getClassLoader().loadClass(teiClassName);
+                Class<?> teiClass =
+                    ctxt.getClassLoader().loadClass(teiClassName);
                 tei = (TagExtraInfo) teiClass.newInstance();
             } catch (Exception e) {
                 err.jspError("jsp.error.teiclass.instantiation", teiClassName,
@@ -451,9 +452,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         String name = null;
         String path = null;
 
-        Iterator list = elem.findChildren();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode child = (TreeNode) list.next();
+            TreeNode child = list.next();
             String tname = child.getName();
             if ("name".equals(tname)) {
                 name = child.getBody();
@@ -494,9 +495,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         String methodSignature = null;
         boolean required = false, rtexprvalue = false, reqTime = false, isFragment = false, deferredValue = false, deferredMethod = false;
 
-        Iterator list = elem.findChildren();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
 
             if ("name".equals(tname)) {
@@ -593,9 +594,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         boolean declare = true;
         int scope = VariableInfo.NESTED;
 
-        Iterator list = elem.findChildren();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
             if ("name-given".equals(tname))
                 nameGiven = element.getBody();
@@ -635,11 +636,11 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             throws JasperException {
 
         String validatorClass = null;
-        Map initParams = new Hashtable();
+        Map<String,Object> initParams = new Hashtable<String,Object>();
 
-        Iterator list = elem.findChildren();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
             if ("validator-class".equals(tname))
                 validatorClass = element.getBody();
@@ -659,7 +660,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         TagLibraryValidator tlv = null;
         if (validatorClass != null && !validatorClass.equals("")) {
             try {
-                Class tlvClass = ctxt.getClassLoader()
+                Class<?> tlvClass = ctxt.getClassLoader()
                         .loadClass(validatorClass);
                 tlv = (TagLibraryValidator) tlvClass.newInstance();
             } catch (Exception e) {
@@ -676,9 +677,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     String[] createInitParam(TreeNode elem) {
         String[] initParam = new String[2];
 
-        Iterator list = elem.findChildren();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
             if ("param-name".equals(tname)) {
                 initParam[0] = element.getBody();
@@ -702,9 +703,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         String klass = null;
         String signature = null;
 
-        Iterator list = elem.findChildren();
+        Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
-            TreeNode element = (TreeNode) list.next();
+            TreeNode element = list.next();
             String tname = element.getName();
 
             if ("name".equals(tname)) {

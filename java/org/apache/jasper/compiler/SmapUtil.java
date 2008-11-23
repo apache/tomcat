@@ -74,7 +74,7 @@ public class SmapUtil {
             pageNodes.visit(psVisitor);
         } catch (JasperException ex) {
         }
-        HashMap map = psVisitor.getMap();
+        HashMap<String, SmapStratum> map = psVisitor.getMap();
 
         // set up our SMAP generator
         SmapGenerator g = new SmapGenerator();
@@ -123,11 +123,11 @@ public class SmapUtil {
         smapInfo[1] = g.getString();
 
         int count = 2;
-        Iterator iter = map.entrySet().iterator();
+        Iterator<Map.Entry<String,SmapStratum>> iter = map.entrySet().iterator();
         while (iter.hasNext()) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            String innerClass = (String) entry.getKey();
-            s = (SmapStratum) entry.getValue();
+            Map.Entry<String,SmapStratum> entry = iter.next();
+            String innerClass = entry.getKey();
+            s = entry.getValue();
             s.optimizeLineSection();
             g = new SmapGenerator();
             g.setOutputFileName(unqualify(ctxt.getServletJavaFileName()));
@@ -385,7 +385,7 @@ public class SmapUtil {
         }
 
         int readU1() {
-            return ((int)orig[origPos++]) & 0xFF;
+            return orig[origPos++] & 0xFF;
         }
 
         int readU2() {
@@ -495,7 +495,7 @@ public class SmapUtil {
     public static void evaluateNodes(
         Node.Nodes nodes,
         SmapStratum s,
-        HashMap innerClassMap,
+        HashMap<String, SmapStratum> innerClassMap,
         boolean breakAtLF) {
         try {
             nodes.visit(new SmapGenVisitor(s, breakAtLF, innerClassMap));
@@ -507,9 +507,9 @@ public class SmapUtil {
 
         private SmapStratum smap;
         private boolean breakAtLF;
-        private HashMap innerClassMap;
+        private HashMap<String, SmapStratum> innerClassMap;
 
-        SmapGenVisitor(SmapStratum s, boolean breakAtLF, HashMap map) {
+        SmapGenVisitor(SmapStratum s, boolean breakAtLF, HashMap<String, SmapStratum> map) {
             this.smap = s;
             this.breakAtLF = breakAtLF;
             this.innerClassMap = map;
@@ -519,7 +519,7 @@ public class SmapUtil {
             SmapStratum smapSave = smap;
             String innerClass = n.getInnerClassName();
             if (innerClass != null) {
-                this.smap = (SmapStratum) innerClassMap.get(innerClass);
+                this.smap = innerClassMap.get(innerClass);
             }
             super.visitBody(n);
             smap = smapSave;
@@ -628,13 +628,13 @@ public class SmapUtil {
                              iOutputLineIncrement);
 
             // Output additional mappings in the text
-            java.util.ArrayList extraSmap = n.getExtraSmap();
+            java.util.ArrayList<Integer> extraSmap = n.getExtraSmap();
 
             if (extraSmap != null) {
                 for (int i = 0; i < extraSmap.size(); i++) {
                     iOutputStartLine += iOutputLineIncrement;
                     smap.addLineData(
-                        iInputStartLine+((Integer)extraSmap.get(i)).intValue(),
+                        iInputStartLine+extraSmap.get(i).intValue(),
                         fileName,
                         1,
                         iOutputStartLine,
@@ -712,7 +712,7 @@ public class SmapUtil {
 
     private static class PreScanVisitor extends Node.Visitor {
 
-        HashMap map = new HashMap();
+        HashMap<String, SmapStratum> map = new HashMap<String, SmapStratum>();
 
         public void doVisit(Node n) {
             String inner = n.getInnerClassName();
@@ -721,7 +721,7 @@ public class SmapUtil {
             }
         }
 
-        HashMap getMap() {
+        HashMap<String, SmapStratum> getMap() {
             return map;
         }
     }

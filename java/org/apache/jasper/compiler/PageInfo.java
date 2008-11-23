@@ -38,14 +38,14 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 
 class PageInfo {
 
-    private Vector imports;
-    private Vector dependants;
+    private Vector<String> imports;
+    private Vector<String> dependants;
 
     private BeanRepository beanRepository;
-    private HashMap taglibsMap;
-    private HashMap jspPrefixMapper;
-    private HashMap xmlPrefixMapper;
-    private HashMap nonCustomTagPrefixMap;
+    private HashMap<String,TagLibraryInfo> taglibsMap;
+    private HashMap<String, String> jspPrefixMapper;
+    private HashMap<String, LinkedList<String>> xmlPrefixMapper;
+    private HashMap<String, Mark> nonCustomTagPrefixMap;
     private String jspFile;
     private String defaultLanguage = "java";
     private String language;
@@ -86,28 +86,28 @@ class PageInfo {
     private boolean isJspPrefixHijacked;
 
     // Set of all element and attribute prefixes used in this translation unit
-    private HashSet prefixes;
+    private HashSet<String> prefixes;
 
     private boolean hasJspRoot = false;
-    private Vector includePrelude;
-    private Vector includeCoda;
-    private Vector pluginDcls;      // Id's for tagplugin declarations
+    private Vector<String> includePrelude;
+    private Vector<String> includeCoda;
+    private Vector<String> pluginDcls;      // Id's for tagplugin declarations
 
 
     PageInfo(BeanRepository beanRepository, String jspFile) {
 
         this.jspFile = jspFile;
         this.beanRepository = beanRepository;
-        this.taglibsMap = new HashMap();
-        this.jspPrefixMapper = new HashMap();
-        this.xmlPrefixMapper = new HashMap();
-        this.nonCustomTagPrefixMap = new HashMap();
-        this.imports = new Vector();
-        this.dependants = new Vector();
-        this.includePrelude = new Vector();
-        this.includeCoda = new Vector();
-        this.pluginDcls = new Vector();
-        this.prefixes = new HashSet();
+        this.taglibsMap = new HashMap<String, TagLibraryInfo>();
+        this.jspPrefixMapper = new HashMap<String, String>();
+        this.xmlPrefixMapper = new HashMap<String, LinkedList<String>>();
+        this.nonCustomTagPrefixMap = new HashMap<String, Mark>();
+        this.imports = new Vector<String>();
+        this.dependants = new Vector<String>();
+        this.includePrelude = new Vector<String>();
+        this.includeCoda = new Vector<String>();
+        this.pluginDcls = new Vector<String>();
+        this.prefixes = new HashSet<String>();
 
         // Enter standard imports
         for(int i = 0; i < Constants.STANDARD_IMPORTS.length; i++)
@@ -126,7 +126,7 @@ class PageInfo {
         return false;
     }
 
-    public void addImports(List imports) {
+    public void addImports(List<String> imports) {
         this.imports.addAll(imports);
     }
 
@@ -134,7 +134,7 @@ class PageInfo {
         this.imports.add(imp);
     }
 
-    public List getImports() {
+    public List<String> getImports() {
         return imports;
     }
 
@@ -147,7 +147,7 @@ class PageInfo {
                 dependants.add(d);
     }
 
-    public List getDependants() {
+    public List<String> getDependants() {
         return dependants;
     }
 
@@ -171,19 +171,19 @@ class PageInfo {
         return scriptingInvalid;
     }
 
-    public List getIncludePrelude() {
+    public List<String> getIncludePrelude() {
         return includePrelude;
     }
 
-    public void setIncludePrelude(Vector prelude) {
+    public void setIncludePrelude(Vector<String> prelude) {
         includePrelude = prelude;
     }
 
-    public List getIncludeCoda() {
+    public List<String> getIncludeCoda() {
         return includeCoda;
     }
 
-    public void setIncludeCoda(Vector coda) {
+    public void setIncludeCoda(Vector<String> coda) {
         includeCoda = coda;
     }
 
@@ -274,7 +274,7 @@ class PageInfo {
      * @return Tag library corresponding to the given URI
      */
     public TagLibraryInfo getTaglib(String uri) {
-        return (TagLibraryInfo) taglibsMap.get(uri);
+        return taglibsMap.get(uri);
     }
 
     /*
@@ -282,7 +282,7 @@ class PageInfo {
      *
      * @return Collection of tag libraries that are associated with a URI
      */
-    public Collection getTaglibs() {
+    public Collection<TagLibraryInfo> getTaglibs() {
         return taglibsMap.values();
     }
 
@@ -316,9 +316,9 @@ class PageInfo {
      * @param uri The URI to be pushed onto the stack
      */
     public void pushPrefixMapping(String prefix, String uri) {
-        LinkedList stack = (LinkedList) xmlPrefixMapper.get(prefix);
+        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null) {
-            stack = new LinkedList();
+            stack = new LinkedList<String>();
             xmlPrefixMapper.put(prefix, stack);
         }
         stack.addFirst(uri);
@@ -331,7 +331,7 @@ class PageInfo {
      * @param prefix The prefix whose stack of URIs is to be popped
      */
     public void popPrefixMapping(String prefix) {
-        LinkedList stack = (LinkedList) xmlPrefixMapper.get(prefix);
+        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null || stack.size() == 0) {
             // XXX throw new Exception("XXX");
         }
@@ -349,11 +349,11 @@ class PageInfo {
 
         String uri = null;
 
-        LinkedList stack = (LinkedList) xmlPrefixMapper.get(prefix);
+        LinkedList<String> stack = xmlPrefixMapper.get(prefix);
         if (stack == null || stack.size() == 0) {
-            uri = (String) jspPrefixMapper.get(prefix);
+            uri = jspPrefixMapper.get(prefix);
         } else {
-            uri = (String) stack.getFirst();
+            uri = stack.getFirst();
         }
 
         return uri;
@@ -678,7 +678,7 @@ class PageInfo {
     }
 
     public Mark getNonCustomTagPrefix(String prefix) {
-        return (Mark) nonCustomTagPrefixMap.get(prefix);
+        return nonCustomTagPrefixMap.get(prefix);
     }
     
     public String getDeferredSyntaxAllowedAsLiteral() {

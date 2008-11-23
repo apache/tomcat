@@ -47,7 +47,7 @@ final class Mark {
      * stack of stream and stream state of streams that have included
      * current stream
      */
-    private Stack includeStack = null;
+    private Stack<IncludeState> includeStack = null;
 
     // encoding of current file
     private String encoding = null;
@@ -80,7 +80,7 @@ final class Mark {
         this.fileName = name;
         this.baseDir = inBaseDir;
         this.encoding = inEncoding;
-        this.includeStack = new Stack();
+        this.includeStack = new Stack<IncludeState>();
     }
 
 
@@ -101,7 +101,7 @@ final class Mark {
         this.encoding = other.encoding;
 
         // clone includeStack without cloning contents
-        includeStack = new Stack();
+        includeStack = new Stack<IncludeState>();
         for ( int i=0; i < other.includeStack.size(); i++ ) {
             includeStack.addElement( other.includeStack.elementAt(i) );
         }
@@ -168,7 +168,7 @@ final class Mark {
         }
 
         // get previous state in stack
-        IncludeState state = (IncludeState) includeStack.pop( );
+        IncludeState state = includeStack.pop( );
 
         // set new variables
         cursor = state.cursor;
