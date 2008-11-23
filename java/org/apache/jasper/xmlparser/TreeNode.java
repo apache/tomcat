@@ -91,7 +91,7 @@ public class TreeNode {
     /**
      * The children of this node, instantiated only if required.
      */
-    protected ArrayList children = null;
+    protected ArrayList<TreeNode> children = null;
 
 
     /**
@@ -133,7 +133,7 @@ public class TreeNode {
     public void addChild(TreeNode node) {
 
         if (children == null)
-            children = new ArrayList();
+            children = new ArrayList<TreeNode>();
         children.add(node);
 
     }
@@ -194,7 +194,7 @@ public class TreeNode {
      * Return an Iterator of all children of this node.  If there are no
      * children, an empty Iterator is returned.
      */
-    public Iterator findChildren() {
+    public Iterator<TreeNode> findChildren() {
 
         if (children == null)
             return (Collections.EMPTY_LIST.iterator());
@@ -211,15 +211,15 @@ public class TreeNode {
      *
      * @param name Name used to select children
      */
-    public Iterator findChildren(String name) {
+    public Iterator<TreeNode> findChildren(String name) {
 
         if (children == null)
             return (Collections.EMPTY_LIST.iterator());
 
-        ArrayList results = new ArrayList();
-        Iterator items = children.iterator();
+        ArrayList<TreeNode> results = new ArrayList<TreeNode>();
+        Iterator<TreeNode> items = children.iterator();
         while (items.hasNext()) {
-            TreeNode item = (TreeNode) items.next();
+            TreeNode item = items.next();
             if (name.equals(item.getName()))
                 results.add(item);
         }

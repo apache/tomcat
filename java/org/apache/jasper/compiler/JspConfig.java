@@ -46,7 +46,7 @@ public class JspConfig {
     // Logger
     private Log log = LogFactory.getLog(JspConfig.class);
 
-    private Vector jspProperties = null;
+    private Vector<JspPropertyGroup> jspProperties = null;
     private ServletContext ctxt;
     private boolean initialized = false;
 
@@ -100,26 +100,27 @@ public class JspConfig {
                 return;
             }
 
-            jspProperties = new Vector();
-            Iterator jspPropertyList = jspConfig.findChildren("jsp-property-group");
+            jspProperties = new Vector<JspPropertyGroup>();
+            Iterator<TreeNode> jspPropertyList =
+                jspConfig.findChildren("jsp-property-group");
             while (jspPropertyList.hasNext()) {
 
-                TreeNode element = (TreeNode) jspPropertyList.next();
-                Iterator list = element.findChildren();
+                TreeNode element = jspPropertyList.next();
+                Iterator<TreeNode> list = element.findChildren();
 
-                Vector urlPatterns = new Vector();
+                Vector<String> urlPatterns = new Vector<String>();
                 String pageEncoding = null;
                 String scriptingInvalid = null;
                 String elIgnored = null;
                 String isXml = null;
-                Vector includePrelude = new Vector();
-                Vector includeCoda = new Vector();
+                Vector<String> includePrelude = new Vector<String>();
+                Vector<String> includeCoda = new Vector<String>();
                 String deferredSyntaxAllowedAsLiteral = null;
                 String trimDirectiveWhitespaces = null;
 
                 while (list.hasNext()) {
 
-                    element = (TreeNode) list.next();
+                    element = list.next();
                     String tname = element.getName();
 
                     if ("url-pattern".equals(tname))
@@ -149,7 +150,7 @@ public class JspConfig {
                 // Add one JspPropertyGroup for each URL Pattern.  This makes
                 // the matching logic easier.
                 for( int p = 0; p < urlPatterns.size(); p++ ) {
-                    String urlPattern = (String)urlPatterns.elementAt( p );
+                    String urlPattern = urlPatterns.elementAt( p );
                     String path = null;
                     String extension = null;
 
@@ -289,8 +290,8 @@ public class JspConfig {
             uriExtension = uri.substring(index+1);
         }
 
-        Vector includePreludes = new Vector();
-        Vector includeCodas = new Vector();
+        Vector<String> includePreludes = new Vector<String>();
+        Vector<String> includeCodas = new Vector<String>();
 
         JspPropertyGroup isXmlMatch = null;
         JspPropertyGroup elIgnoredMatch = null;
@@ -299,10 +300,10 @@ public class JspConfig {
         JspPropertyGroup deferedSyntaxAllowedAsLiteralMatch = null;
         JspPropertyGroup trimDirectiveWhitespacesMatch = null;
 
-        Iterator iter = jspProperties.iterator();
+        Iterator<JspPropertyGroup> iter = jspProperties.iterator();
         while (iter.hasNext()) {
 
-            JspPropertyGroup jpg = (JspPropertyGroup) iter.next();
+            JspPropertyGroup jpg = iter.next();
             JspProperty jp = jpg.getJspProperty();
 
             // (arrays will be the same length)
@@ -419,10 +420,10 @@ public class JspConfig {
             uriExtension = uri.substring(index+1);
         }
 
-        Iterator iter = jspProperties.iterator();
+        Iterator<JspPropertyGroup> iter = jspProperties.iterator();
         while (iter.hasNext()) {
 
-            JspPropertyGroup jpg = (JspPropertyGroup) iter.next();
+            JspPropertyGroup jpg = iter.next();
             JspProperty jp = jpg.getJspProperty();
 
             String extension = jpg.getExtension();
@@ -475,14 +476,14 @@ public class JspConfig {
         private String elIgnored;
         private String scriptingInvalid;
         private String pageEncoding;
-        private Vector includePrelude;
-        private Vector includeCoda;
+        private Vector<String> includePrelude;
+        private Vector<String> includeCoda;
         private String deferedSyntaxAllowedAsLiteral;
         private String trimDirectiveWhitespaces;
 
         public JspProperty(String isXml, String elIgnored,
                 String scriptingInvalid, String pageEncoding,
-                Vector includePrelude, Vector includeCoda,
+                Vector<String> includePrelude, Vector<String> includeCoda,
                 String deferedSyntaxAllowedAsLiteral, 
                 String trimDirectiveWhitespaces) {
 
@@ -512,11 +513,11 @@ public class JspConfig {
             return pageEncoding;
         }
 
-        public Vector getIncludePrelude() {
+        public Vector<String> getIncludePrelude() {
             return includePrelude;
         }
 
-        public Vector getIncludeCoda() {
+        public Vector<String> getIncludeCoda() {
             return includeCoda;
         }
         

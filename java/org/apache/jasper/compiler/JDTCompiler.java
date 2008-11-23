@@ -81,7 +81,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         final ClassLoader classLoader = ctxt.getJspLoader();
         String[] fileNames = new String[] {sourceFile};
         String[] classNames = new String[] {targetClassName};
-        final ArrayList problemList = new ArrayList();
+        final ArrayList<JavacErrorDetail> problemList =
+            new ArrayList<JavacErrorDetail>();
         
         class CompilationUnit implements ICompilationUnit {
 
@@ -266,7 +267,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
         final IErrorHandlingPolicy policy = 
             DefaultErrorHandlingPolicies.proceedWithAllProblems();
 
-        final Map settings = new HashMap();
+        final Map<String,String> settings = new HashMap<String,String>();
         settings.put(CompilerOptions.OPTION_LineNumberAttribute,
                      CompilerOptions.GENERATE);
         settings.put(CompilerOptions.OPTION_SourceFileAttribute,
@@ -419,7 +420,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
     
         if (!problemList.isEmpty()) {
             JavacErrorDetail[] jeds = 
-                (JavacErrorDetail[]) problemList.toArray(new JavacErrorDetail[0]);
+                problemList.toArray(new JavacErrorDetail[0]);
             errDispatcher.javacError(jeds);
         }
         
