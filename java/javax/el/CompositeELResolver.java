@@ -19,6 +19,7 @@ package javax.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class CompositeELResolver extends ELResolver {
 
@@ -127,9 +128,11 @@ public class CompositeELResolver extends ELResolver {
 
         private final int size;
 
-        private Iterator itr;
+        private Iterator<FeatureDescriptor> itr;
 
         private int idx;
+
+        private FeatureDescriptor next;
 
         public FeatureIterator(ELContext context, Object base,
                 ELResolver[] resolvers, int size) {
@@ -150,22 +153,30 @@ public class CompositeELResolver extends ELResolver {
             }
         }
 
-        public boolean hasNext() {
-            return this.itr != null;
+        public boolean hasNext() {          
+            if (this.next != null)
+                return true;
+            if (this.itr != null){
+                while (this.next == null && itr.hasNext()) {
+                    this.next = itr.next();
+                }
+            } else {
+                return false;
+            }
+            if (this.next == null) {
+                this.itr = null;
+                this.guaranteeIterator();
+            }
+            return hasNext();
         }
 
         public FeatureDescriptor next() {
-            Object result = null;
-            if (this.itr != null) {
-                if (this.itr.hasNext()) {
-                    result = this.itr.next();
-                    if (!this.itr.hasNext()) {
-                        this.itr = null;
-                        this.guaranteeIterator();
-                    }
-                }
-            }
-            return (FeatureDescriptor) result;
+            if (!hasNext())
+                throw new NoSuchElementException();
+            FeatureDescriptor next = this.next;
+            this.next = null;
+            return next;
+
         }
 
         public void remove() {
