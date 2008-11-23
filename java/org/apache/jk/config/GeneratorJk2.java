@@ -116,25 +116,26 @@ public class GeneratorJk2 implements WebXml2Jk.MappingGenerator {
 
     }
     
-    public void generateWelcomeFiles( Vector wf ) {
+    public void generateWelcomeFiles( Vector<String> wf ) {
 
     }
                                             
     
-    public void generateConstraints( Vector urls, Vector methods, Vector roles, boolean isSSL ) {
+    public void generateConstraints(Vector<String> urls, Vector<String> methods,
+            Vector<String> roles, boolean isSSL ) {
         for( int i=0; i<urls.size(); i++ ) {
-            String url=(String)urls.elementAt(i);
+            String url=urls.elementAt(i);
 
             out.println("[url:" + vhost + cpath + url + "]");
             out.println( "group=" + worker );
             out.println( "host=" +  vhost); 
             out.println( "context=" +  cpath);
             for( int j=0; j<roles.size(); j++ ) {
-                String role=(String)roles.elementAt(j);
+                String role=roles.elementAt(j);
                 out.println( "role=" +  role);
             }
             for( int j=0; j<methods.size(); j++ ) {
-                String m=(String)methods.elementAt(j);
+                String m=methods.elementAt(j);
                 out.println( "method=" +  m);
             }
             if( isSSL )

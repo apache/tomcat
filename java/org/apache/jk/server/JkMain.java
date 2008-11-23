@@ -159,7 +159,7 @@ public class JkMain implements MBeanRegistration
      * Retrieve a property.
      */
     public Object getProperty(String name) {
-        String alias = (String)replacements.get(name);
+        String alias = replacements.get(name);
         Object result = null;
         if(alias != null) {
             result = props.get(alias);
@@ -419,7 +419,7 @@ public class JkMain implements MBeanRegistration
             jkMain=new JkMain();
 
             IntrospectionUtils.processArgs( jkMain, args, new String[] {},
-                                            null, new Hashtable());
+                                            null, new Hashtable<Object,Object>());
 
             jkMain.init();
             jkMain.start();
@@ -476,7 +476,8 @@ public class JkMain implements MBeanRegistration
     }
 
     // translate top-level keys ( from coyote or generic ) into component keys
-    static Hashtable replacements=new Hashtable();
+    static Hashtable<String,String> replacements =
+        new Hashtable<String,String>();
     static {
         replacements.put("port","channelSocket.port");
         replacements.put("maxThreads", "channelSocket.maxThreads");   
@@ -493,11 +494,12 @@ public class JkMain implements MBeanRegistration
     }
 
     private void preProcessProperties() {
-        Enumeration keys=props.keys();
-        Vector v=new Vector();
+        // TODO This can be fixed in Java 6
+        Enumeration<String> keys = (Enumeration) props.keys();
+        Vector<String> v=new Vector<String>();
         
         while( keys.hasMoreElements() ) {
-            String key=(String)keys.nextElement();          
+            String key=keys.nextElement();          
             Object newName=replacements.get(key);
             if( newName !=null ) {
                 v.addElement(key);
@@ -505,9 +507,9 @@ public class JkMain implements MBeanRegistration
         }
         keys=v.elements();
         while( keys.hasMoreElements() ) {
-            String key=(String)keys.nextElement();
-            Object propValue=props.getProperty( key );
-            String replacement=(String)replacements.get(key);
+            String key = keys.nextElement();
+            Object propValue = props.getProperty( key );
+            String replacement = replacements.get(key);
             props.put(replacement, propValue);
             if( log.isDebugEnabled()) 
                 log.debug("Substituting " + key + " " + replacement + " " + 
@@ -517,10 +519,10 @@ public class JkMain implements MBeanRegistration
     
     private void processProperties() {
         preProcessProperties();
-        Enumeration keys=props.keys();
+        Enumeration<String> keys = (Enumeration) props.keys();
 
         while( keys.hasMoreElements() ) {
-            String name=(String)keys.nextElement();
+            String name= keys.nextElement();
             String propValue=props.getProperty( name );
 
             processProperty( name, propValue );
@@ -577,7 +579,7 @@ public class JkMain implements MBeanRegistration
             return null;
         }
         try {
-            Class channelclass = Class.forName(classN);
+            Class<?> channelclass = Class.forName(classN);
             handler=(JkHandler)channelclass.newInstance();
         } catch (Throwable ex) {
             handler=null;
@@ -599,11 +601,11 @@ public class JkMain implements MBeanRegistration
     }
 
     private void processModules() {
-        Enumeration keys=props.keys();
+        Enumeration<String> keys = (Enumeration)props.keys();
         int plen=6;
         
         while( keys.hasMoreElements() ) {
-            String k=(String)keys.nextElement();
+            String k=keys.nextElement();
             if( ! k.startsWith( "class." ) )
                 continue;
 
@@ -616,14 +618,14 @@ public class JkMain implements MBeanRegistration
     }
 
     private String[] split(String s, String delim ) {
-         Vector v=new Vector();
+        Vector<String> v = new Vector<String>();
         StringTokenizer st=new StringTokenizer(s, delim );
         while( st.hasMoreTokens() ) {
             v.addElement( st.nextToken());
         }
         String res[]=new String[ v.size() ];
         for( int i=0; i<res.length; i++ ) {
-            res[i]=(String)v.elementAt(i);
+            res[i]=v.elementAt(i);
         }
         return res;
     }

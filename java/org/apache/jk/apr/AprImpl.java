@@ -40,7 +40,7 @@ public class AprImpl extends JkHandler { // This will be o.a.t.util.handler.TcHa
     static boolean ok=true;
     boolean initialized=false;
     // Handlers for native callbacks
-    Hashtable jkHandlers=new Hashtable();
+    Hashtable<String, JkHandler> jkHandlers= new Hashtable<String, JkHandler>();
 
     // Name of the so used in inprocess mode 
     String jniModeSo="inprocess";

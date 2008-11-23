@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  * 
  */
 public class TomcatStarter implements Runnable {
-    Class c;
+    Class<?> c;
     String args[];
     AprImpl apr = new AprImpl();
     
@@ -45,7 +45,7 @@ public class TomcatStarter implements Runnable {
         try {
             AprImpl.jniMode();            
             // Find the class
-            Class c=null;
+            Class<?> c=null;
             for( int i=0; i<mainClasses.length; i++ ) {
                 try {
                     System.err.println("Try  " + mainClasses[i]);
@@ -69,7 +69,7 @@ public class TomcatStarter implements Runnable {
         }
     }
 
-    public TomcatStarter( Class c, String args[] ) {
+    public TomcatStarter( Class<?> c, String args[] ) {
         this.c=c;
         this.args=args;
     }
@@ -77,7 +77,7 @@ public class TomcatStarter implements Runnable {
     public void run() {
         System.err.println("Starting " + c.getName());
         try {
-            Class argClass=args.getClass();
+            Class<?> argClass=args.getClass();
             Method m=c.getMethod( "main", new Class[] {argClass} );
             m.invoke( c, new Object[] { args } );
             System.out.println("TomcatStarter: Done");

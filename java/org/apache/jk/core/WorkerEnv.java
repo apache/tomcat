@@ -33,7 +33,7 @@ import javax.management.ObjectName;
  */
 public class WorkerEnv {
 
-    Hashtable properties;
+    Hashtable<Object, Object> properties;
 
     public static final int ENDPOINT_NOTE=0;
     public static final int REQUEST_NOTE=1;
@@ -42,7 +42,8 @@ public class WorkerEnv {
     String noteName[][]=new String[4][];
     private Object notes[]=new Object[32];
 
-    Hashtable handlersMap=new Hashtable();
+    Hashtable<String, JkHandler> handlersMap =
+        new Hashtable<String, JkHandler>();
     JkHandler handlersTable[]=new JkHandler[20];
     int handlerCount=0;
     
@@ -122,7 +123,7 @@ public class WorkerEnv {
     }
 
     public final JkHandler getHandler( String name ) {
-        return (JkHandler)handlersMap.get(name);
+        return handlersMap.get(name);
     }
 
     public final JkHandler getHandler( int id ) {
