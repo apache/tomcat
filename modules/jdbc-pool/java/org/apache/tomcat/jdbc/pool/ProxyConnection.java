@@ -44,9 +44,10 @@ public class ProxyConnection extends JdbcInterceptor {
         this.pool = pool;
     }
 
-    protected ProxyConnection(ConnectionPool parent, PooledConnection con) throws SQLException {
+    protected ProxyConnection(ConnectionPool parent, PooledConnection con, boolean useEquals) throws SQLException {
         pool = parent;
         connection = con;
+        setUseEquals(useEquals);
     }
 
     public void reset(ConnectionPool parent, PooledConnection con) {
@@ -68,16 +69,16 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (ISCLOSED_VAL==method.getName()) {
+        if (compare(ISCLOSED_VAL,method)) {
             return isClosed();
         }
-        if (CLOSE_VAL==method.getName()) {
+        if (compare(CLOSE_VAL,method)) {
             if (isClosed()) return null; //noop for already closed.
             PooledConnection poolc = this.connection;
             this.connection = null;
             pool.returnConnection(poolc);
             return null;
-        } else if (TOSTRING_VAL==method.getName()) {
+        } else if (compare(TOSTRING_VAL,method)) {
             return this.toString();
         }
         if (isClosed()) throw new SQLException("Connection has already been closed.");
