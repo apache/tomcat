@@ -48,7 +48,7 @@ public class FairnessTest extends DefaultTestCase {
             totalfetch += t.nroffetch;
             minfetch = Math.min(minfetch, t.nroffetch);
             maxfetch = Math.max(maxfetch, t.nroffetch);
-            //System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+t.max+" :Max close time:"+t.cmax);
+            System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+t.max+" :Max close time:"+t.cmax);
         }
         System.out.println("["+name+"] Max fetch:"+maxfetch+" Min fetch:"+minfetch+" Average fetch:"+
                            (((float)totalfetch))/(float)threads.length);
@@ -73,7 +73,9 @@ public class FairnessTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
         }
-        latch.await(complete,TimeUnit.MILLISECONDS);
+        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
+            System.out.println("Latch timed out.");
+        }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testDBCPThreads20Connections10");
@@ -100,7 +102,9 @@ public class FairnessTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
         }
-        latch.await(complete,TimeUnit.MILLISECONDS);
+        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
+            System.out.println("Latch timed out.");
+        }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10");
@@ -129,7 +133,9 @@ public class FairnessTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             threads[i].start();
         }
-        latch.await(complete,TimeUnit.MILLISECONDS);
+        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
+            System.out.println("Latch timed out.");
+        }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10Fair");
@@ -145,7 +151,9 @@ public class FairnessTest extends DefaultTestCase {
         long max = -1, totalmax=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
         public void run() {
             try {
+                long now = System.currentTimeMillis();
                 while (FairnessTest.this.run) {
+                    if ((System.currentTimeMillis()-now)>=FairnessTest.this.complete) break;
                     long start = System.nanoTime();
                     Connection con = null;
                     try {
