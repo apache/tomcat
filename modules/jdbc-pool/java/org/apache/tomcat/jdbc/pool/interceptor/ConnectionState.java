@@ -99,12 +99,12 @@ public class ConnectionState extends JdbcInterceptor  {
         boolean read = false;
         int index = -1;
         for (int i=0; (!read) && i<readState.length; i++) {
-            read = name==readState[i];
+            read = compare(name,readState[i]);
             if (read) index = i;
         }
         boolean write = false;
         for (int i=0; (!write) && (!read) && i<writeState.length; i++) {
-            write = name==writeState[i];
+            write = compare(name,writeState[i]);
             if (write) index = i;
         }
         Object result = null;
