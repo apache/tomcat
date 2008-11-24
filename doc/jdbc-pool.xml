@@ -473,6 +473,16 @@
         <code>&quot;close&quot;.equals(method.getName())</code>.
         Above we see a direct reference comparison between the method name and <code>static final String</code> reference.
         According to the JVM spec, method names and static final String end up in a shared constant pool, so the reference comparison should work.
+        One could of course do this as well:
+       <source>
+       
+        if (compare(CLOSE_VAL,method.getName())) {
+            if (isClosed()) return null; //noop for already closed.
+        } 
+        return super.invoke(proxy,method,args);
+        </source>
+        The <code>compare(String,Method)</code> will use the <code>useEquals</code> flag on an interceptor and do either reference comparison or 
+        a string value comparison when the <code>useEquals=true</code> flag is set.
     </p>                   
     <p>Configuring interceptors<br/>
        Interceptors are configured using the <code>jdbcInterceptors</code> property or the <code>setJdbcInterceptors</code> method.
