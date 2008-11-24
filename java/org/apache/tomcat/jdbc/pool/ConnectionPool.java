@@ -517,7 +517,9 @@ public class ConnectionPool {
                 if (x instanceof SQLException) {
                     throw (SQLException)x;
                 } else {
-                    throw new SQLException(getStackTrace(x));
+                    SQLException ex  = new SQLException(x.getMessage());
+                    ex.initCause(x);
+                    throw ex;
                 }
             }
         } finally {
