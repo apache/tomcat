@@ -48,9 +48,9 @@ public class FairnessTest extends DefaultTestCase {
             totalfetch += t.nroffetch;
             minfetch = Math.min(minfetch, t.nroffetch);
             maxfetch = Math.max(maxfetch, t.nroffetch);
-            System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+t.max+" :Max close time:"+t.cmax);
+            System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+(((float)t.max)/1000000f)+"ms. :Max close time:"+(((float)t.cmax)/1000000f)+"ms.");
         }
-        System.out.println("["+name+"] Max fetch:"+maxfetch+" Min fetch:"+minfetch+" Average fetch:"+
+        System.out.println("["+name+"] Max fetch:"+(maxfetch)+" Min fetch:"+(minfetch)+" Average fetch:"+
                            (((float)totalfetch))/(float)threads.length);
     }
     
