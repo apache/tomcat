@@ -57,7 +57,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     }
     
     public boolean compare(String name1, String name2) {
-        if (useEquals()) {
+        if (isUseEquals()) {
             return name1.equals(name2);
         } else {
             return name1==name2;
@@ -83,11 +83,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
         this.properties = properties;
     }
     
-    public boolean getUseEquals() {
-        return useEquals();
-    }
-    
-    public boolean useEquals() {
+    public boolean isUseEquals() {
         return useEquals;
     }
     
