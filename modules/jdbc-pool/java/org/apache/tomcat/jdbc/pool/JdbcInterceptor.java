@@ -56,12 +56,16 @@ public abstract class JdbcInterceptor implements InvocationHandler {
         this.next = next;
     }
     
-    public boolean compare(String methodName, Method method) {
+    public boolean compare(String name1, String name2) {
         if (useEquals()) {
-            return methodName.equals(method.getName());
+            return name1.equals(name2);
         } else {
-            return methodName==method.getName();
+            return name1==name2;
         }
+    }
+    
+    public boolean compare(String methodName, Method method) {
+        return compare(methodName, method.getName());
     }
     
     /**
