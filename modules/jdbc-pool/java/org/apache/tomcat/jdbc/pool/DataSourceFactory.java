@@ -102,6 +102,8 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_JMX_ENABLED = "jmxEnabled";
     protected final static String PROP_FAIR_QUEUE = "fairQueue";
     
+    protected static final String PROP_USE_EQUALS = "useEquals";
+    
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
 
 
@@ -138,7 +140,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_INITSQL,
         PROP_INTERCEPTORS,
         PROP_JMX_ENABLED,
-        PROP_FAIR_QUEUE
+        PROP_FAIR_QUEUE,
+        PROP_USE_EQUALS
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -387,6 +390,11 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_FAIR_QUEUE);
         if (value != null) {
             dataSource.getPoolProperties().setFairQueue(Boolean.parseBoolean(value));
+        }
+        
+        value = properties.getProperty(PROP_USE_EQUALS);
+        if (value != null) {
+            dataSource.getPoolProperties().setUseEquals(Boolean.parseBoolean(value));
         }
         
 

@@ -131,7 +131,7 @@ public class ConnectionPool {
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
             //build the proxy handler
-            handler = new ProxyConnection(this,con);
+            handler = new ProxyConnection(this,con,getPoolProperties().isUseEquals());
             //set up the interceptor chain
             PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
             for (int i=proxies.length-1; i>=0; i--) {
