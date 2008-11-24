@@ -63,6 +63,7 @@ public class PoolProperties {
     protected boolean testOnConnect =false;
     private String jdbcInterceptors=null;
     private boolean fairQueue = false;
+    private boolean useEquals = false;
 
     private InterceptorDefinition[] interceptors = null;
     
@@ -425,6 +426,8 @@ public class PoolProperties {
         return result;
     }
     
+    
+    
     public static class InterceptorDefinition {
         protected String className;
         protected List<InterceptorProperty> properties = new ArrayList<InterceptorProperty>();
@@ -463,6 +466,14 @@ public class PoolProperties {
         public String getValue() {
             return value;
         }
+    }
+
+    public boolean isUseEquals() {
+        return useEquals;
+    }
+
+    public void setUseEquals(boolean useEquals) {
+        this.useEquals = useEquals;
     }
 
 }

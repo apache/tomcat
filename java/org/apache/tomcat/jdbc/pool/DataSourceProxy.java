@@ -316,5 +316,9 @@ public class DataSourceProxy  {
             throw new RuntimeException(x);
         }
     }
+    
+    public void setUseEquals(boolean useEquals) {
+        this.getPoolProperties().setUseEquals(useEquals);
+    }
 
 }
