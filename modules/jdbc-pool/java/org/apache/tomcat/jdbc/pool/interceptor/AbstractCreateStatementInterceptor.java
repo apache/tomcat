@@ -40,7 +40,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (CLOSE_VAL==method.getName()) {
+        if (compare(CLOSE_VAL,method)) {
             closeInvoked();
             return super.invoke(proxy, method, args);
         } else {
@@ -70,7 +70,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
 
     protected boolean process(String[] names, Method method, boolean process) {
         for (int i=0; (!process) && i<names.length; i++) {
-            process = (method.getName()==names[i]);
+            process = compare(names[i],method);
         }
         return process;
     }
