@@ -88,7 +88,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     }
     
     public boolean useEquals() {
-        return getUseEquals();
+        return useEquals();
     }
     
     public void setUseEquals(boolean useEquals) {
