@@ -55,6 +55,7 @@ public class FairnessTest extends DefaultTestCase {
     }
     
     public void testDBCPThreads20Connections10() throws Exception {
+        System.out.println("Starting fairness - DBCP");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.threadcount = 20;
@@ -76,10 +77,12 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testDBCPThreads20Connections10");
+        System.out.println("Completed fairness - DBCP");
         tearDown();
     }
 
     public void testPoolThreads20Connections10() throws Exception {
+        System.out.println("Starting fairness - Tomcat JDBC - Non Fair");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.threadcount = 20;
@@ -101,11 +104,13 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10");
+        System.out.println("Completed fairness - Tomcat JDBC - Non Fair");
         tearDown();
 
     }
 
     public void testPoolThreads20Connections10Fair() throws Exception {
+        System.out.println("Starting fairness - Tomcat JDBC - Fair");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(true);
@@ -128,6 +133,7 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10Fair");
+        System.out.println("Completed fairness - Tomcat JDBC - Fair");
         tearDown();
     }
 
