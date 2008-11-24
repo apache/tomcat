@@ -28,9 +28,10 @@
   </properties>
 
 <body>
-<section name="Tomcat JDBC Connection Pool v1.0.2-beta">
+<section name="Tomcat JDBC Connection Pool v1.0.4-beta">
   <subsection name="pool">
     <changelog>
+      <update><rev>720253</rev>Document how to use interceptors</update> 
       <update><rev>717972</rev>Added an interceptor that will clean up non closed statements when a connection is returned to the pool. (<code>org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer</code>)</update>
       <update><rev>713763</rev>Improve connection state handling</update>
       <fix><bug></bug> <rev>713763</rev>Improve connection state handling</fix>
