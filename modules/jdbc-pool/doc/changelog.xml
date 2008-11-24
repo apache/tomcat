@@ -28,7 +28,7 @@
   </properties>
 
 <body>
-<section name="Tomcat JDBC Connection Pool v1.0.4-beta">
+<section name="Tomcat JDBC Connection Pool v1.0.5-beta">
   <subsection name="pool">
     <changelog>
       <update><rev>720253</rev>Document how to use interceptors</update> 
