@@ -35,6 +35,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     protected List<InterceptorProperty> properties = null; 
     
     private JdbcInterceptor next = null;
+    private boolean useEquals = false;
 
     public JdbcInterceptor() {
     }
@@ -55,6 +56,14 @@ public abstract class JdbcInterceptor implements InvocationHandler {
         this.next = next;
     }
     
+    public boolean compare(String methodName, Method method) {
+        if (useEquals()) {
+            return methodName.equals(method.getName());
+        } else {
+            return methodName==method.getName();
+        }
+    }
+    
     /**
      * Gets called each time the connection is borrowed from the pool
      * @param parent - the connection pool owning the connection
@@ -70,4 +79,15 @@ public abstract class JdbcInterceptor implements InvocationHandler {
         this.properties = properties;
     }
     
+    public boolean getUseEquals() {
+        return useEquals();
+    }
+    
+    public boolean useEquals() {
+        return getUseEquals();
+    }
+    
+    public void setUseEquals(boolean useEquals) {
+        this.useEquals = useEquals;
+    }
 }
