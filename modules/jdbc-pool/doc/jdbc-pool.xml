@@ -481,7 +481,7 @@
         One could of course do this as well:
        <source>
        
-        if (compare(CLOSE_VAL,method.getName())) {
+        if (compare(CLOSE_VAL,method)) {
             if (isClosed()) return null; //noop for already closed.
         } 
         return super.invoke(proxy,method,args);
