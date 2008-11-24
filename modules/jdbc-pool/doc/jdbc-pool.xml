@@ -328,7 +328,8 @@
       <p>(boolean) Set to true if you wish the <code>ProxyConnection</code> class to use <code>String.equals</code> instead of 
          <code>==</code> when comparing method names. This property does not apply to added interceptors as those are configured individually.
          The default value is <code>false</code>.
-      </p>   
+      </p> 
+    </attribute>    
   </attributes>  
   </subsection>
 </section>
