@@ -300,7 +300,11 @@
     <attribute name="jdbcInterceptors" required="false">
       <p>(String) A semicolon separated list of classnames extending <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class.
          These interceptors will be inserted as an interceptor into the chain of operations on a <code>java.sql.Connection</code> object.
-         The default value is <code>null</code>.</p>
+         The default value is <code>null</code>.<br/>
+         Predefined interceptors:<br/>
+         org.apache.tomcat.jdbc.pool.interceptor.ConnectionState - keeps track of auto commit, read only, catalog and transaction isolation level.<br/>
+         org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer - keeps track of opened statements, and closes them when the connection is returned to the pool.<br/>
+      </p>
     </attribute>
 
     <attribute name="validationInterval" required="false">
@@ -373,6 +377,7 @@
                 p.setMinIdle(10);
                 p.setLogAbandoned(true);
                 p.setRemoveAbandoned(true);
+                p.setJdbcInterceptors(&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;);
                 DataSource datasource = new DataSource();
                 datasource.setPoolProperties(p); 
                 
@@ -417,6 +422,7 @@
               logAbandoned=&quot;true&quot;
               minEvictableIdleTimeMillis=&quot;30000&quot; 
               jmxEnabled=&quot;true&quot;
+              jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
               username=&quot;root&quot; 
               password=&quot;password&quot; 
               driverClassName=&quot;com.mysql.jdbc.Driver&quot;
@@ -425,6 +431,57 @@
     
     </source>
   
+  </subsection>
+  <subsection name="Interceptors">
+    <p>Interceptors are a powerful way to enable, disable or modify functionality on a specific connection or its sub components.
+       There are many different use cases for when interceptors are useful. By default, and for performance reasons, the connection pool is stateless.
+       The only state the pool itself inserts are <code>defaultAutoCommit, defaultReadOnly, defaultTransactionIsolation, defaultCatalog</code> if 
+       these are set. These 4 properties are only set upon connection creation. Should these properties be modified during the usage of the connection,
+       the pool itself will not reset them.</p>
+    <p>An interceptor has to extend the <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class. This class is fairly simple, 
+       You will need to have a no arg constructor</p>
+       <source>
+       
+         public JdbcInterceptor() {
+         }
+       </source>
+    <p>
+       When a connection is borrowed from the pool, the interceptor can initialize or in some other way react to the event by implementing the 
+       <source>
+       
+         public abstract void reset(ConnectionPool parent, PooledConnection con);
+       </source>
+       method. This method gets called with two parameters, a reference to the connection pool itself <code>ConnectionPool parent</code> 
+       and a reference to the underlying connection <code>PooledConnection con</code>.
+    </p>
+    <p>
+       When a method on the <code>java.sql.Connection</code> object is invoked, it will cause the 
+       <source>
+         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+       </source>
+       method to get invoked. The <code>Method method</code> is the actual method invoked, and <code>Object[] args</code> are the arguments.
+       To look at a very simple example, where we demonstrate how to make the invokation to <code>java.sql.Connection.close()</code> a noop 
+       if the connection has been closed
+       <source>
+       
+        if (CLOSE_VAL==method.getName()) {
+            if (isClosed()) return null; //noop for already closed.
+        } 
+        return super.invoke(proxy,method,args);
+        </source>
+        There is an observation being made. It is the comparison of the method name. One way to do this would be to do
+        <code>&quot;close&quot;.equals(method.getName())</code>.
+        Above we see a direct reference comparison between the method name and <code>static final String</code> reference.
+        According to the JVM spec, method names and static final String end up in a shared constant pool, so the reference comparison should work.
+    </p>                   
+    <p>Configuring interceptors<br/>
+       Interceptors are configured using the <code>jdbcInterceptors</code> property or the <code>setJdbcInterceptors</code> method.
+       An interceptor can have properties, and would be configured like this
+       <source>
+       
+       String jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState(useEquals=true,fast=yes)&quot;
+       </source> 
+    </p>   
   </subsection>
   
 </section>
