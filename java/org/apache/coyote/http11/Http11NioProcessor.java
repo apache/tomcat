@@ -1208,6 +1208,7 @@ public class Http11NioProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_COMET_END) {
             comet = false;
         }  else if (actionCode == ActionCode.ACTION_COMET_CLOSE) {
+            if (socket==null || socket.getAttachment(false)==null) return;
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             attach.setCometOps(NioEndpoint.OP_CALLBACK);
             //notify poller if not on a tomcat thread
@@ -1216,6 +1217,7 @@ public class Http11NioProcessor implements ActionHook {
                 socket.getPoller().cometInterest(socket);
         } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
             if (param==null) return;
+            if (socket==null || socket.getAttachment(false)==null) return;
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
