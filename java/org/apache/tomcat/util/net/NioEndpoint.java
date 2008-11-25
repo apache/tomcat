@@ -44,16 +44,20 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.JIoEndpoint.Worker;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
+import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -571,6 +575,11 @@ public class NioEndpoint {
     }
     public void setKeystore(String s ) { setKeystoreFile(s);}
     public String getKeystore() { return getKeystoreFile();}
+
+    String keyAlias = null;
+    public String getKeyAlias() { return keyAlias;}
+    public void setKeyAlias(String s ) { keyAlias = s;}
+    
     
     protected String algorithm = "SunX509";
     public String getAlgorithm() { return algorithm;}
@@ -776,8 +785,8 @@ public class NioEndpoint {
             ks.load(new FileInputStream(getKeystoreFile()), passphrase);
             KeyStore ts = null;
             if (getTruststoreFile()==null) {
-                ts = KeyStore.getInstance(getKeystoreType());
-                ts.load(new FileInputStream(getKeystoreFile()), passphrase);
+//                ts = KeyStore.getInstance(getKeystoreType());
+//                ts.load(new FileInputStream(getKeystoreFile()), passphrase);
             }else {
                 ts = KeyStore.getInstance(ttype);
                 ts.load(new FileInputStream(getTruststoreFile()), tpassphrase);
@@ -790,13 +799,27 @@ public class NioEndpoint {
             tmf.init(ts);
 
             sslContext = SSLContext.getInstance(getSslProtocol());
-            sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+            sslContext.init(wrap(kmf.getKeyManagers()), tmf.getTrustManagers(), null);
         }
         
         if (oomParachute>0) reclaimParachute(true);
         selectorPool.open();
         initialized = true;
 
+    }
+    
+    public KeyManager[] wrap(KeyManager[] managers) {
+        return managers;
+//        if (managers==null) return null;
+//        KeyManager[] result = new KeyManager[managers.length];
+//        for (int i=0; i<result.length; i++) {
+//            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
+//                result[i] = new JSSEKeyManager((X509KeyManager)managers[i],getKeyAlias());
+//            } else {
+//                result[i] = managers[i];
+//            }
+//        }
+//        return result;
     }
 
 
