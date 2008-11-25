@@ -195,7 +195,7 @@ public class DataSourceFactory implements ObjectFactory {
      * @throws Exception if an error occurs creating the data source
      */
     public static DataSource createDataSource(Properties properties) throws Exception {
-        org.apache.tomcat.jdbc.pool.DataSourceProxy dataSource = new org.apache.tomcat.jdbc.pool.DataSourceProxy();
+        org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
 
         String value = null;
 
@@ -399,8 +399,7 @@ public class DataSourceFactory implements ObjectFactory {
         
 
         // Return the configured DataSource instance
-        DataSource ds = getDataSource(dataSource);
-        return ds;
+        return dataSource;
     }
 
     public static DataSource getDataSource(org.apache.tomcat.jdbc.pool.DataSourceProxy dataSource) {
