@@ -55,9 +55,8 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
-import org.apache.tomcat.util.net.JIoEndpoint.Worker;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
-import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
+import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -785,8 +784,7 @@ public class NioEndpoint {
             ks.load(new FileInputStream(getKeystoreFile()), passphrase);
             KeyStore ts = null;
             if (getTruststoreFile()==null) {
-//                ts = KeyStore.getInstance(getKeystoreType());
-//                ts.load(new FileInputStream(getKeystoreFile()), passphrase);
+                //no op, same as for BIO connector
             }else {
                 ts = KeyStore.getInstance(ttype);
                 ts.load(new FileInputStream(getTruststoreFile()), tpassphrase);
@@ -809,17 +807,16 @@ public class NioEndpoint {
     }
     
     public KeyManager[] wrap(KeyManager[] managers) {
-        return managers;
-//        if (managers==null) return null;
-//        KeyManager[] result = new KeyManager[managers.length];
-//        for (int i=0; i<result.length; i++) {
-//            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
-//                result[i] = new JSSEKeyManager((X509KeyManager)managers[i],getKeyAlias());
-//            } else {
-//                result[i] = managers[i];
-//            }
-//        }
-//        return result;
+        if (managers==null) return null;
+        KeyManager[] result = new KeyManager[managers.length];
+        for (int i=0; i<result.length; i++) {
+            if (managers[i] instanceof X509KeyManager && getKeyAlias()!=null) {
+                result[i] = new NioX509KeyManager((X509KeyManager)managers[i],getKeyAlias());
+            } else {
+                result[i] = managers[i];
+            }
+        }
+        return result;
     }
 
 
