@@ -335,7 +335,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
 
 
     //------------------------------------------------------------------
-    // Future used to check and see if a connection has been made available
+    // Non cancellable Future used to check and see if a connection has been made available
     //------------------------------------------------------------------
     protected class ItemFuture<T> implements Future<T> {
         protected volatile T item = null;
