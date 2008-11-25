@@ -545,6 +545,10 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public void setKeystore(String s) { setKeystoreFile(s);}
     public String getKeystore(){ return getKeystoreFile();}
     
+    public String getKeyAlias() { return ep.getKeyAlias();}
+    public void setKeyAlias(String s ) { ep.setKeyAlias(s);}
+
+    
     public String getAlgorithm() { return ep.getAlgorithm();}
     public void setAlgorithm(String s ) { ep.setAlgorithm(s);}
     
