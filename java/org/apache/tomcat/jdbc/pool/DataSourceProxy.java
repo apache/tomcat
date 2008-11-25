@@ -41,7 +41,7 @@ import org.apache.juli.logging.LogFactory;
 public class DataSourceProxy  {
     protected static Log log = LogFactory.getLog(DataSourceProxy.class);
     
-    protected Driver driver;
+    protected volatile ConnectionPool pool = null;
     protected PoolProperties poolProperties = new PoolProperties();
 
     public DataSourceProxy() {
@@ -75,12 +75,12 @@ public class DataSourceProxy  {
      * @return Driver
      * @throws SQLException
      */
-    public synchronized Driver createDriver() throws SQLException {
-        if (driver != null) {
-            return driver;
+    public synchronized ConnectionPool createPool() throws SQLException {
+        if (pool != null) {
+            return pool;
         } else {
-            driver = new org.apache.tomcat.jdbc.pool.Driver(getPoolProperties());
-            return driver;
+            pool = new ConnectionPool(poolProperties);
+            return pool;
         }
     }
 
@@ -89,9 +89,9 @@ public class DataSourceProxy  {
      */
 
     public Connection getConnection() throws SQLException {
-        if (driver == null)
-            driver = createDriver();
-        return driver.connect(poolProperties.getPoolName(), null);
+        if (pool == null)
+            return createPool().getConnection();
+        return pool.getConnection();
     }
 
     /**
@@ -151,10 +151,10 @@ public class DataSourceProxy  {
     }
     public void close(boolean all) {
         try {
-            if (driver != null) {
-                Driver d = driver;
-                driver = null;
-                d.closePool(poolProperties.getPoolName(), all);
+            if (pool != null) {
+                final ConnectionPool p = pool;
+                pool = null;
+                if (p!=null) p.close(all);
             }
         }catch (Exception x) {
             x.printStackTrace();
@@ -167,9 +167,9 @@ public class DataSourceProxy  {
     }
 
     public int getPoolSize() throws SQLException{
-        if (driver == null)
-            driver = createDriver();
-        return driver.getPool(getPoolProperties().getPoolName()).getSize();
+        final ConnectionPool p = pool;
+        if (p == null) return 0;
+        else return p.getSize();
     }
 
     public String toString() {
