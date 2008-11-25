@@ -418,8 +418,9 @@ public class ConnectionPool {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupted();
             }
-            if (maxWait==0) { //no wait, return one if we have one
-                return con;
+            if (maxWait==0 && con == null) { //no wait, return one if we have one
+                throw new SQLException("[" + Thread.currentThread().getName()+"] " +
+                        "NoWait: Pool empty. Unable to fetch a connection, none available["+busy.size()+" in use].");
             }
             //we didn't get a connection, lets see if we timed out
             if (con == null) {
