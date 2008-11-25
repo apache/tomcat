@@ -21,7 +21,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -47,6 +50,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // USED BY CONPOOL IMPLEMENTATION
     //------------------------------------------------------------------
+    /**
+     * {@inheritDoc}
+     */
     public boolean offer(E e) {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -65,10 +71,16 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
         return offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         E result = null;
         final ReentrantLock lock = this.lock;
@@ -97,7 +109,39 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
         return result;
     }
-
+    
+    /**
+     * Request an item from the queue asynchronously
+     * @return - a future pending the result from the queue poll request
+     */
+    public Future<E> pollAsync() {
+        Future<E> result = null;
+        final ReentrantLock lock = this.lock;
+        boolean error = true;
+        lock.lock();
+        try {
+            E item = items.poll();
+            if (item==null) {
+                ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
+                waiters.addLast(c);
+                lock.unlock();
+                result = new ItemFuture(c);
+            } else {
+                lock.unlock();
+                result = new ItemFuture(item);
+            }
+            error = false;
+        } finally {
+            if (error && lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
     public boolean remove(Object e) {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -107,15 +151,24 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             lock.unlock();
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public int size() {
         return items.size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Iterator<E> iterator() {
         return new FairIterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E poll() {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -126,6 +179,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean contains(Object e) {
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -140,31 +196,53 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // NOT USED BY CONPOOL IMPLEMENTATION
     //------------------------------------------------------------------
-
+    /**
+     * {@inheritDoc}
+     */
     public boolean add(E e) {
         return offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public int drainTo(Collection<? super E> c, int maxElements) {
         throw new UnsupportedOperationException("int drainTo(Collection<? super E> c, int maxElements)");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public int drainTo(Collection<? super E> c) {
         return drainTo(c,Integer.MAX_VALUE);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void put(E e) throws InterruptedException {
         offer(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int remainingCapacity() {
         return Integer.MAX_VALUE - size();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public E take() throws InterruptedException {
         return this.poll(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean addAll(Collection<? extends E> c) {
         Iterator i = c.iterator();
         while (i.hasNext()) {
@@ -174,56 +252,146 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public void clear() {
         throw new UnsupportedOperationException("void clear()");
 
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public boolean containsAll(Collection<?> c) {
         throw new UnsupportedOperationException("boolean containsAll(Collection<?> c)");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean isEmpty() {
         return size() == 0;
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException("boolean removeAll(Collection<?> c)");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException("boolean retainAll(Collection<?> c)");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public Object[] toArray() {
         throw new UnsupportedOperationException("Object[] toArray()");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public <T> T[] toArray(T[] a) {
         throw new UnsupportedOperationException("<T> T[] toArray(T[] a)");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public E element() {
         throw new UnsupportedOperationException("E element()");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public E peek() {
         throw new UnsupportedOperationException("E peek()");
     }
 
+    /**
+     * {@inheritDoc}
+     * @throws UnsupportedOperation - this operation is not supported
+     */
     public E remove() {
         throw new UnsupportedOperationException("E remove()");
     }
 
 
 
+    //------------------------------------------------------------------
+    // Future used to check and see if a connection has been made available
+    //------------------------------------------------------------------
+    protected class ItemFuture<T> implements Future<T> {
+        protected volatile T item = null;
+        protected volatile ExchangeCountDownLatch<T> latch = null;
+        protected volatile boolean canceled = false;
+        
+        public ItemFuture(T item) {
+            this.item = item;
+        }
+        
+        public ItemFuture(ExchangeCountDownLatch<T> latch) {
+            this.latch = latch;
+        }
+        
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return false; //don't allow cancel for now
+        }
 
+        public T get() throws InterruptedException, ExecutionException {
+            if (item!=null) {
+                return item;
+            } else if (latch!=null) {
+                latch.await();
+                return latch.getItem();
+            } else {
+                throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());
+            }
+        }
+
+        public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            if (item!=null) {
+                return item;
+            } else if (latch!=null) {
+                boolean timedout = !latch.await(timeout, unit);
+                if (timedout) throw new TimeoutException();
+                else return latch.getItem();
+            } else {
+                throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());
+            }
+        }
+
+        public boolean isCancelled() {
+            return false;
+        }
+
+        public boolean isDone() {
+            return (item!=null || latch.getItem()!=null);
+        }
+        
+    }
 
     //------------------------------------------------------------------
     // Count down latch that can be used to exchange information
     //------------------------------------------------------------------
     protected class ExchangeCountDownLatch<T> extends CountDownLatch {
-        protected T item;
+        protected volatile T item;
         public ExchangeCountDownLatch(int i) {
             super(i);
         }
