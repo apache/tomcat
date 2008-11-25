@@ -127,6 +127,56 @@ public class ConnectionPool {
         return setupConnection(con);
     }
 
+    
+    /**
+     * Returns the name of this pool
+     * @return String
+     */
+    public String getName() {
+        return getPoolProperties().getPoolName();
+    }
+
+    /**
+     * Returns the pool properties associated with this connection pool
+     * @return PoolProperties
+     */
+    public PoolProperties getPoolProperties() {
+        return this.poolProperties;
+    }
+
+    /**
+     * Returns the total size of this pool, this includes both busy and idle connections
+     * @return int
+     */
+    public int getSize() {
+        return idle.size()+busy.size();
+    }
+
+    /**
+     * Returns the number of connections that are in use
+     * @return int
+     */
+    public int getActive() {
+        return busy.size();
+    }
+
+    public int getIdle() {
+        return idle.size();
+    }
+
+    /**
+     * Returns true if {@link #close close} has been called, and the connection pool is unusable
+     * @return boolean
+     */
+    public  boolean isClosed() {
+        return this.closed;
+    }
+
+    //===============================================================================
+    //         PROTECTED METHODS
+    //===============================================================================
+    
+    
     protected Connection setupConnection(PooledConnection con) throws SQLException {
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
@@ -178,49 +228,6 @@ public class ConnectionPool {
 
     }
     
-    /**
-     * Returns the name of this pool
-     * @return String
-     */
-    public String getName() {
-        return getPoolProperties().getPoolName();
-    }
-
-    /**
-     * Returns the pool properties associated with this connection pool
-     * @return PoolProperties
-     */
-    public PoolProperties getPoolProperties() {
-        return this.poolProperties;
-    }
-
-    /**
-     * Returns the total size of this pool, this includes both busy and idle connections
-     * @return int
-     */
-    public int getSize() {
-        return idle.size()+busy.size();
-    }
-
-    /**
-     * Returns the number of connections that are in use
-     * @return int
-     */
-    public int getActive() {
-        return busy.size();
-    }
-
-    public int getIdle() {
-        return idle.size();
-    }
-
-    /**
-     * Returns true if {@link #close close} has been called, and the connection pool is unusable
-     * @return boolean
-     */
-    public  boolean isClosed() {
-        return this.closed;
-    }
 
     @Override
     protected void finalize() throws Throwable {
@@ -268,9 +275,6 @@ public class ConnectionPool {
     } //closePool
 
 
-    //===============================================================================
-    //         PROTECTED METHODS
-    //===============================================================================
     /**
      * Initialize the connection pool - called from the constructor
      * @param properties PoolProperties - properties used to initialize the pool with
@@ -703,7 +707,7 @@ public class ConnectionPool {
         size.addAndGet(-1);
     }
 
-    public void startJmx() {
+    protected void startJmx() {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type=ConnectionPool,name="+getName());
@@ -713,7 +717,7 @@ public class ConnectionPool {
         }
     }
 
-    public void stopJmx() {
+    protected void stopJmx() {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type=ConnectionPool,name="+getName());
