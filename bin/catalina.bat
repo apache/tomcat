@@ -140,10 +140,10 @@ set JPDA=
 if not ""%1"" == ""jpda"" goto noJpda
 set JPDA=jpda
 if not "%JPDA_TRANSPORT%" == "" goto gotJpdaTransport
-set JPDA_TRANSPORT=dt_shmem
+set JPDA_TRANSPORT=dt_socket
 :gotJpdaTransport
 if not "%JPDA_ADDRESS%" == "" goto gotJpdaAddress
-set JPDA_ADDRESS=jdbconn
+set JPDA_ADDRESS=8000
 :gotJpdaAddress
 if not "%JPDA_SUSPEND%" == "" goto gotJpdaSuspend
 set JPDA_SUSPEND=n
