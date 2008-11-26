@@ -309,7 +309,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     public void setUseSendfile(boolean useSendfile) {
         ep.setUseSendfile(useSendfile);
     }
-
     
     // -------------------- Tcp setup --------------------
 
