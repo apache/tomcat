@@ -48,7 +48,9 @@
       <li>commons-dbcp uses static interfaces. This means you can't compile it with JDK 1.6, or if you run on JDK 1.6/1.7 you will get 
           NoSuchMethodException for all the methods not implemented, even if the driver supports it.  </li>
       <li>The commons-dbcp has become fairly stagnant. Sparse updates, releases, and new feature support.</li>
-      <li>It's not worth rewriting over 60 classes, when something as a connection pool can be accomplished with as a much simpler implementation.</li> 
+      <li>It's not worth rewriting over 60 classes, when something as a connection pool can be accomplished with as a much simpler implementation.</li>
+      <li>Tomcat jdbc pool implements a fairness option not available in commons-dbcp and still performs faster than commons-dbcp</li>
+      <li>Tomcat jdbc pool implements the ability retrieve a connection asynchronously, without adding additional threads to the library itself</li> 
       <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a simplified logging framework used in Tomcat.</li>
     </ol>
   </p>
@@ -70,6 +72,7 @@
       <li>Extremely simple, due to the very simplified implementation, the line count and source file count are very low, compare with c3p0 
           that has over 200 source files(last time we checked), Tomcat jdbc has a core of 8 files, the connection pool itself is about half 
           that. As bugs may occur, they will be faster to track down, and easier to fix. Complexity reduction has been a focus from inception.</li>
+      <li>Asynchronous connection retrieval - you can queue your request for a connection and receive a Future&lt;Connection&gt; back.</li>    
     </ol>
   </p>
 
@@ -87,6 +90,7 @@
       <li><code>validationInterval</code> - in addition to running validations on connections, avoid running them too frequently.</li>
       <li><code>jdbcInterceptors</code> - flexible and pluggable interceptors to create any customizations around the pool, 
           the query execution and the result set handling. More on this in the advanced section.</li>
+      <li><code>fairQueue</code> - Set the fair flag to true to achieve thread fairness or to use asynchronous connection retrieval</li>
     </ul>    
   </subsection>
   <subsection name="Inside the Apache Tomcat Container">
@@ -322,6 +326,7 @@
       <p>(boolean) Set to true if you wish that calls to getConnection should be treated
          fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code> 
          implementation for the list of the idle connections. The default value is <code>false</code>.
+         This flag is required when you want to use asynchronous connection retrieval.
       </p>
     </attribute>
     <attribute name="useEquals" required="false">
@@ -437,6 +442,32 @@
     </source>
   
   </subsection>
+  <subsection name="Asynchronous Connection Retrieval">
+    <p> The Tomcat JDBC connection pool supports asynchronous connection retrieval without adding additional threads to the 
+        pool library. It does this by adding a method to the data source called <code>Future&lt;Connection&gt; getConnectionAsync()</code>.
+        In order to use the async retrieval, two conditions must be met:<br/>
+        1. You must configure the <code>fairQueue</code> property to be <code>true</code>.<br/>
+        2. You will have to cast the data source to <code>org.apache.tomcat.jdbc.pool.DataSource</code><br/>
+        An example of using the async feature is show below.
+      <source>
+      
+        Connection con = null;
+        try {            
+          Future&lt;Connection&gt; future = datasource.getConnectionAsync();
+          while (!future.isDone()) {
+              System.out.println("Connection is not yet available. Do some background work");
+              try {
+                  Thread.sleep(100); //simulate work
+              }catch (InterruptedException x) {
+                  Thread.currentThread().interrupted();
+              }
+          }
+          con = future.get(); //should return instantly 
+          Statement st = con.createStatement();
+          ResultSet rs = st.executeQuery("select * from user");
+      </source>
+    </p>
+  </subsection>
   <subsection name="Interceptors">
     <p>Interceptors are a powerful way to enable, disable or modify functionality on a specific connection or its sub components.
        There are many different use cases for when interceptors are useful. By default, and for performance reasons, the connection pool is stateless.
@@ -498,6 +529,7 @@
        </source> 
     </p>   
   </subsection>
+  
   
 </section>
 

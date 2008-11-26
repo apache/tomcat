@@ -56,7 +56,7 @@ public class DefaultTestCase extends TestCase {
         p.setMinIdle(threadcount);
         p.setLogAbandoned(false);
         p.setRemoveAbandoned(false);
-        datasource = new org.apache.tomcat.jdbc.pool.DataSourceProxy();
+        datasource = new org.apache.tomcat.jdbc.pool.DataSource();
         datasource.setPoolProperties(p);
         return datasource;
     }
