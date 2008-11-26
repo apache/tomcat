@@ -28,14 +28,18 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -113,7 +117,12 @@ public class ConnectionPool {
 
 
     public Future<Connection> getConnectionAsync() throws SQLException {
-        return null;
+        if (idle instanceof FairBlockingQueue) {
+            Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
+            return new ConnectionFuture(pcf);
+        } else {
+            throw new SQLException("Connection pool is misconfigured, doesn't support async retrieval. Set the 'fair' property to 'true'");
+        }
     }
     
     /**
@@ -726,7 +735,71 @@ public class ConnectionPool {
             log.warn("Unable to stop JMX integration for connection pool. Instance["+getName()+"].",x);
         }
     }
+    
+    /**
+     * Tread safe wrapper around a future for the regular queue
+     * This one retrieves the pooled connection object
+     * and performs the initialization according to 
+     * interceptors and validation rules.
+     * This class is thread safe.
+     * @author fhanik
+     *
+     */
+    protected class ConnectionFuture implements Future<Connection> {
+        Future<PooledConnection> pcFuture = null;
+        AtomicBoolean configured = new AtomicBoolean(false);
+        CountDownLatch latch = new CountDownLatch(1);
+        Connection result = null;
+        SQLException cause = null;
+        public ConnectionFuture(Future<PooledConnection> pcf) {
+            this.pcFuture = pcf;
+        }
+        
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return pcFuture.cancel(mayInterruptIfRunning);
+        }
 
+        public Connection get() throws InterruptedException, ExecutionException {
+            try {
+                return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+            }catch (TimeoutException x) {
+                throw new ExecutionException(x);
+            }
+        }
+
+        public Connection get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+            PooledConnection pc = pcFuture.get(timeout,unit);
+            if (pc!=null) {
+                if (result!=null) return result;
+                if (configured.compareAndSet(false, true)) {
+                    try {
+                        pc = borrowConnection(System.currentTimeMillis(),pc);
+                        result = ConnectionPool.this.setupConnection(pc);
+                    } catch (SQLException x) {
+                        cause = x;
+                    } finally {
+                        latch.countDown();
+                    }
+                } else {
+                    //if we reach here, another thread is configuring the actual connection 
+                    latch.await(timeout,unit); //this shouldn't block for long
+                }
+                if (result==null) throw new ExecutionException(cause);
+                return result;
+            } else {
+                return null;
+            }
+        }
+
+        public boolean isCancelled() {
+            return pcFuture.isCancelled();
+        }
+
+        public boolean isDone() {
+            return pcFuture.isDone();
+        }
+        
+    }
 
     protected class PoolCleaner extends Thread {
         protected ConnectionPool pool;
