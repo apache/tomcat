@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.concurrent.Future;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -92,6 +93,17 @@ public class DataSourceProxy  {
         if (pool == null)
             return createPool().getConnection();
         return pool.getConnection();
+    }
+    
+    /**
+     * Invokes an sync operation to retrieve the connection.
+     * @return
+     * @throws SQLException
+     */
+    public Future<Connection> getConnectionAsync() throws SQLException {
+        if (pool == null)
+            return createPool().getConnectionAsync();
+        return pool.getConnectionAsync();
     }
 
     /**

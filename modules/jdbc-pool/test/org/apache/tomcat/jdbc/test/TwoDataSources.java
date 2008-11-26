@@ -34,14 +34,12 @@ public class TwoDataSources extends DefaultTestCase {
             this.assertTrue("Connection c2 should be working",false);
         }
         try {
-            c1.close();
-            this.assertTrue("Connection should have been closed.",false);
+            this.assertTrue("Connection should have been closed.",c1.isClosed());
         }catch (Exception x) {
             this.assertTrue("This is correct, c1 is closed",true);
         }
         try {
-            c2.close();
-            this.assertTrue("Connection c2 should not have been closed.",true);
+            this.assertFalse("Connection c2 should not have been closed.",c2.isClosed());
         }catch (Exception x) {
             this.assertTrue("Connection c2 should be working",false);
         }
