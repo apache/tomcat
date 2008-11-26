@@ -30,6 +30,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.WritableByteChannel;
 import java.security.KeyStore;
 import java.util.Collection;
 import java.util.Iterator;
@@ -644,7 +645,6 @@ public class NioEndpoint {
     }
 
     public void setUseSendfile(boolean useSendfile) {
-
         this.useSendfile = useSendfile;
     }
 
@@ -958,8 +958,7 @@ public class NioEndpoint {
     }
 
     public boolean getUseSendfile() {
-        //send file doesn't work with SSL
-        return useSendfile && (!isSSLEnabled());
+        return useSendfile;
     }
 
     public int getOomParachute() {
@@ -1328,10 +1327,10 @@ public class NioEndpoint {
                     } else {
                         cancel = true;
                     }
-                    if ( cancel ) getPoller0().cancelledKey(key,SocketStatus.ERROR,false);
+                    if ( cancel ) socket.getPoller().cancelledKey(key,SocketStatus.ERROR,false);
                 }catch (CancelledKeyException ckx) {
                     try {
-                        getPoller0().cancelledKey(key,SocketStatus.DISCONNECT,true);
+                        socket.getPoller().cancelledKey(key,SocketStatus.DISCONNECT,true);
                     }catch (Exception ignore) {}
                 }
             }//end if
@@ -1627,6 +1626,7 @@ public class NioEndpoint {
         }
         
         public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean reg, boolean event) {
+            NioChannel sc = null;
             try {
                 //unreg(sk,attachment);//only do this if we do process send file on a separate thread
                 SendfileData sd = attachment.getSendfileData();
@@ -1638,13 +1638,20 @@ public class NioEndpoint {
                     }
                     sd.fchannel = new FileInputStream(f).getChannel();
                 }
-                SocketChannel sc = attachment.getChannel().getIOChannel();
-                long written = sd.fchannel.transferTo(sd.pos,sd.length,sc);
-                if ( written > 0 ) {
-                    sd.pos += written;
-                    sd.length -= written;
+                sc = attachment.getChannel();
+                sc.setSendFile(true);
+                WritableByteChannel wc =(WritableByteChannel) ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
+                
+                if (sc.getOutboundRemaining()>0) {
+                    sc.flushOutbound();
+                } else {
+                    long written = sd.fchannel.transferTo(sd.pos,sd.length,wc);
+                    if ( written > 0 ) {
+                        sd.pos += written;
+                        sd.length -= written;
+                    }
                 }
-                if ( sd.length <= 0 ) {
+                if ( sd.length <= 0 && sc.getOutboundRemaining()<=0) {
                     if (log.isDebugEnabled()) {
                         log.debug("Send file complete for:"+sd.fileName);
                     }
@@ -1684,6 +1691,8 @@ public class NioEndpoint {
                 log.error("",t);
                 cancelledKey(sk, SocketStatus.ERROR, false);
                 return false;
+            }finally {
+                if (sc!=null) sc.setSendFile(false);
             }
             return true;
         }

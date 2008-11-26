@@ -400,7 +400,7 @@ public class SecureNioChannel extends NioChannel  {
             return written;
         } else {
             //make sure we can handle expand, and that we only use on buffer
-            if ( src != bufHandler.getWriteBuffer() ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
+            if ( (!this.isSendFile()) && (src != bufHandler.getWriteBuffer()) ) throw new IllegalArgumentException("You can only write using the application write buffer provided by the handler.");
             //are we closing or closed?
             if ( closing || closed) throw new IOException("Channel is in closing state.");
 
@@ -433,6 +433,17 @@ public class SecureNioChannel extends NioChannel  {
             return written;
         }
     }
+    
+    @Override
+    public int getOutboundRemaining() {
+        return netOutBuffer.remaining();
+    }
+    
+    @Override
+    public void flushOutbound() throws IOException {
+        flush(netOutBuffer);
+    }
+
     
     /**
      * Callback interface to be able to expand buffers
