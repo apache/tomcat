@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.sql.Connection;
@@ -26,6 +27,7 @@ import java.sql.ResultSet;
 import javax.sql.DataSource;
 
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
+import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 
 /**
  * @author Filip Hanik
@@ -143,11 +145,42 @@ public class FairnessTest extends DefaultTestCase {
         tearDown();
     }
 
+    public void testPoolThreads20Connections10FairAsync() throws Exception {
+        System.out.println("Starting fairness - Tomcat JDBC - Fair - Async");
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setFairQueue(true);
+        this.threadcount = 20;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        TestThread[] threads = new TestThread[threadcount];
+        for (int i=0; i<threadcount; i++) {
+            threads[i] = new TestThread();
+            threads[i].setName("tomcat-pool-"+i);
+            threads[i].async = true;
+            threads[i].d = DataSourceFactory.getDataSource(this.datasource);
+            
+        }
+        for (int i=0; i<threadcount; i++) {
+            threads[i].start();
+        }
+        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
+            System.out.println("Latch timed out.");
+        }
+        this.run = false;
+        long delta = System.currentTimeMillis() - start;
+        printThreadResults(threads,"testPoolThreads20Connections10FairAsync");
+        System.out.println("Completed fairness - Tomcat JDBC - Fair - Async");
+        tearDown();
+    }
     
     public class TestThread extends Thread {
         protected DataSource d;
         protected String query = null;
         protected long sleep = 10;
+        protected boolean async = false;
         long max = -1, totalmax=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
         public void run() {
             try {
@@ -157,7 +190,12 @@ public class FairnessTest extends DefaultTestCase {
                     long start = System.nanoTime();
                     Connection con = null;
                     try {
-                        con = d.getConnection();
+                        if (async) {
+                            Future<Connection> cf = ((DataSourceProxy)d).getConnectionAsync();
+                            con  = cf.get();
+                        } else {
+                            con = d.getConnection();
+                        }
                         long delta = System.nanoTime() - start;
                         totalmax += delta;
                         max = Math.max(delta, max);

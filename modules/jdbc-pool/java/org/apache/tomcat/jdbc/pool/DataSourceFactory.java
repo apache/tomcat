@@ -403,6 +403,8 @@ public class DataSourceFactory implements ObjectFactory {
     }
 
     public static DataSource getDataSource(org.apache.tomcat.jdbc.pool.DataSourceProxy dataSource) {
+        if (dataSource instanceof DataSource) return (DataSource)dataSource;
+        //only return a proxy if we didn't implement the DataSource interface
         DataSourceHandler handler = new DataSourceHandler(dataSource);
         DataSource ds = (DataSource)Proxy.newProxyInstance(DataSourceFactory.class.getClassLoader(), new Class[] {javax.sql.DataSource.class}, handler);
         return ds;
