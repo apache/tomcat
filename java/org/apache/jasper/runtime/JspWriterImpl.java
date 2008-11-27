@@ -128,8 +128,8 @@ public class JspWriterImpl extends JspWriter {
     
     private String getLocalizeMessage(final String message){
         if (SecurityUtil.isPackageProtectionEnabled()){
-            return (String)AccessController.doPrivileged(new PrivilegedAction(){
-                public Object run(){
+            return AccessController.doPrivileged(new PrivilegedAction<String>(){
+                public String run(){
                     return Localizer.getMessage(message); 
                 }
             });

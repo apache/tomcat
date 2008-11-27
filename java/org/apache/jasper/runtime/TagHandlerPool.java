@@ -50,7 +50,7 @@ public class TagHandlerPool {
         String tpClassName=getOption( config, OPTION_TAGPOOL, null);
         if( tpClassName != null ) {
             try {
-                Class c=Class.forName( tpClassName );
+                Class<?> c=Class.forName( tpClassName );
                 result=(TagHandlerPool)c.newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -110,7 +110,7 @@ public class TagHandlerPool {
      *
      * @throws JspException if a tag handler cannot be instantiated
      */
-    public Tag get(Class handlerClass) throws JspException {
+    public Tag get(Class<? extends Tag> handlerClass) throws JspException {
     	Tag handler;
         synchronized( this ) {
             if (current >= 0) {
@@ -125,7 +125,7 @@ public class TagHandlerPool {
         	if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
         		return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
         	} else {
-                Tag instance = (Tag) handlerClass.newInstance();
+                Tag instance = handlerClass.newInstance();
                 instanceManager.newInstance(instance);
                 return instance;
         	}
