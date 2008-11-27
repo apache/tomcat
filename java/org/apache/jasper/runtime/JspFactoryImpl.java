@@ -196,7 +196,17 @@ public class JspFactoryImpl extends JspFactory {
 
     }
 
-    public JspApplicationContext getJspApplicationContext(ServletContext context) {
-        return JspApplicationContextImpl.getInstance(context);
+    public JspApplicationContext getJspApplicationContext(
+            final ServletContext context) {
+        if (Constants.IS_SECURITY_ENABLED) {
+            return AccessController.doPrivileged(
+                    new PrivilegedAction<JspApplicationContext>() {
+                public JspApplicationContext run() {
+                    return JspApplicationContextImpl.getInstance(context);
+                }
+            });
+        } else {
+            return JspApplicationContextImpl.getInstance(context);
+        }
     }
 }
