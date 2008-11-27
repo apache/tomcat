@@ -69,7 +69,7 @@ public class JspServletWrapper {
 
     private Servlet theServlet;
     private String jspUri;
-    private Class tagHandlerClass;
+    private Class<?> tagHandlerClass;
     private JspCompilationContext ctxt;
     private long available = 0L;
     private ServletConfig config;
@@ -198,7 +198,7 @@ public class JspServletWrapper {
     /**
      * Compile (if needed) and load a tag file
      */
-    public Class loadTagFile() throws JasperException {
+    public Class<?> loadTagFile() throws JasperException {
 
         try {
             if (ctxt.isRemoved()) {
@@ -232,7 +232,7 @@ public class JspServletWrapper {
      * (skeleton) with no dependencies on other other tag files is
      * generated and compiled.
      */
-    public Class loadTagFilePrototype() throws JasperException {
+    public Class<?> loadTagFilePrototype() throws JasperException {
 
         ctxt.setPrototypeMode(true);
         try {
@@ -258,7 +258,7 @@ public class JspServletWrapper {
                 target = getServlet();
             }
             if (target != null && target instanceof JspSourceDependent) {
-                return ((java.util.List) ((JspSourceDependent) target).getDependants());
+                return ((JspSourceDependent) target).getDependants();
             }
         } catch (Throwable ex) {
         }

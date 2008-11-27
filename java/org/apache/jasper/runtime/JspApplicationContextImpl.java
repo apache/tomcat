@@ -106,8 +106,9 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 		if (this.resolver == null) {
 			CompositeELResolver r = new CompositeELResolver();
 			r.add(new ImplicitObjectELResolver());
-			for (Iterator itr = this.resolvers.iterator(); itr.hasNext();) {
-				r.add((ELResolver) itr.next());
+			for (Iterator<ELResolver> itr = this.resolvers.iterator();
+			        itr.hasNext();) {
+				r.add(itr.next());
 			}
 			r.add(new MapELResolver());
 			r.add(new ResourceBundleELResolver());
