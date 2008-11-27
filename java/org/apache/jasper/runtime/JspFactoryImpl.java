@@ -56,9 +56,9 @@ public class JspFactoryImpl extends JspFactory {
 
         if( Constants.IS_SECURITY_ENABLED ) {
             PrivilegedGetPageContext dp = new PrivilegedGetPageContext(
-                    (JspFactoryImpl)this, servlet, request, response, errorPageURL,
+                    this, servlet, request, response, errorPageURL,
                     needsSession, bufferSize, autoflush);
-            return (PageContext)AccessController.doPrivileged(dp);
+            return AccessController.doPrivileged(dp);
         } else {
             return internalGetPageContext(servlet, request, response,
                     errorPageURL, needsSession,
@@ -71,7 +71,7 @@ public class JspFactoryImpl extends JspFactory {
             return;
         if( Constants.IS_SECURITY_ENABLED ) {
             PrivilegedReleasePageContext dp = new PrivilegedReleasePageContext(
-                    (JspFactoryImpl)this,pc);
+                    this,pc);
             AccessController.doPrivileged(dp);
         } else {
             internalReleasePageContext(pc);
@@ -121,7 +121,8 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
 
-    private class PrivilegedGetPageContext implements PrivilegedAction {
+    private class PrivilegedGetPageContext
+            implements PrivilegedAction<PageContext> {
 
         private JspFactoryImpl factory;
         private Servlet servlet;
@@ -145,13 +146,14 @@ public class JspFactoryImpl extends JspFactory {
             this.autoflush = autoflush;
         }
 
-        public Object run() {
+        public PageContext run() {
             return factory.internalGetPageContext(servlet, request, response,
                     errorPageURL, needsSession, bufferSize, autoflush);
         }
     }
 
-    private class PrivilegedReleasePageContext implements PrivilegedAction {
+    private class PrivilegedReleasePageContext
+            implements PrivilegedAction<Void> {
 
         private JspFactoryImpl factory;
         private PageContext pageContext;
@@ -162,7 +164,7 @@ public class JspFactoryImpl extends JspFactory {
             this.pageContext = pageContext;
         }
 
-        public Object run() {
+        public Void run() {
             factory.internalReleasePageContext(pageContext);
             return null;
         }
