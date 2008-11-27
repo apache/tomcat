@@ -61,7 +61,7 @@ public class JasperLoader extends URLClassLoader {
      *
      * @exception ClassNotFoundException if the class was not found
      */
-    public Class loadClass(String name) throws ClassNotFoundException {
+    public Class<?> loadClass(String name) throws ClassNotFoundException {
 
         return (loadClass(name, false));
     }
@@ -91,10 +91,10 @@ public class JasperLoader extends URLClassLoader {
      *                                     
      * @exception ClassNotFoundException if the class was not found
      */                                    
-    public Class loadClass(final String name, boolean resolve)
+    public Class<?> loadClass(final String name, boolean resolve)
         throws ClassNotFoundException {
 
-        Class clazz = null;                
+        Class<?> clazz = null;                
                                            
         // (0) Check our previously loaded class cache
         clazz = findLoadedClass(name);     

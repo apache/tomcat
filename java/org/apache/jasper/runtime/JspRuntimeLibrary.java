@@ -61,7 +61,7 @@ public class JspRuntimeLibrary {
         = "javax.servlet.jsp.jspException";
 
     protected static class PrivilegedIntrospectHelper
-        implements PrivilegedExceptionAction {
+        implements PrivilegedExceptionAction<Void> {
 
         private Object bean;
         private String prop;
@@ -82,7 +82,7 @@ public class JspRuntimeLibrary {
             this.ignoreMethodNF = ignoreMethodNF;
         }
          
-        public Object run() throws JasperException {
+        public Void run() throws JasperException {
             internalIntrospecthelper(
                 bean,prop,value,request,param,ignoreMethodNF);
             return null;
@@ -175,7 +175,7 @@ public class JspRuntimeLibrary {
             return Long.valueOf(s).longValue();
     }
 
-    public static Object coerce(String s, Class target) {
+    public static Object coerce(String s, Class<?> target) {
 
         boolean isNullOrEmpty = (s == null || s.length() == 0);
 
@@ -225,8 +225,8 @@ public class JspRuntimeLibrary {
     }
 
    // __begin convertMethod
-    public static Object convert(String propertyName, String s, Class t,
-                                 Class propertyEditorClass) 
+    public static Object convert(String propertyName, String s, Class<?> t,
+            Class<?> propertyEditorClass) 
        throws JasperException 
     {
         try {
@@ -279,9 +279,9 @@ public class JspRuntimeLibrary {
     public static void introspect(Object bean, ServletRequest request)
                                   throws JasperException
     {
-        Enumeration e = request.getParameterNames();
+        Enumeration<String> e = request.getParameterNames();
         while ( e.hasMoreElements() ) {
-            String name  = (String) e.nextElement();
+            String name  = e.nextElement();
             String value = request.getParameter(name);
             introspecthelper(bean, name, value, request, name, true);
         }
@@ -316,8 +316,8 @@ public class JspRuntimeLibrary {
                                         throws JasperException
     {
         Method method = null;
-        Class type = null;
-        Class propertyEditorClass = null;
+        Class<?> type = null;
+        Class<?> propertyEditorClass = null;
         try {
             java.beans.BeanInfo info
                 = java.beans.Introspector.getBeanInfo(bean.getClass());
@@ -339,7 +339,7 @@ public class JspRuntimeLibrary {
                         throw new JasperException(
                             Localizer.getMessage("jsp.error.beans.setproperty.noindexset"));
                     }
-                    Class t = type.getComponentType();
+                    Class<?> t = type.getComponentType();
                     String[] values = request.getParameterValues(param);
                     //XXX Please check.
                     if(values == null) return;
@@ -428,8 +428,8 @@ public class JspRuntimeLibrary {
                                         Object bean,
                                         Method method,
                                         String[] values,
-                                        Class t,
-                                        Class propertyEditorClass)
+                                        Class<?> t,
+                                        Class<?> propertyEditorClass)
                 throws JasperException {
 
         try {
@@ -764,10 +764,10 @@ public class JspRuntimeLibrary {
         }        
     }
     
-    public static Method getWriteMethod(Class beanClass, String prop)
+    public static Method getWriteMethod(Class<?> beanClass, String prop)
     throws JasperException {
         Method method = null;        
-        Class type = null;
+        Class<?> type = null;
         try {
             java.beans.BeanInfo info
                 = java.beans.Introspector.getBeanInfo(beanClass);
@@ -807,11 +807,11 @@ public class JspRuntimeLibrary {
         return method;
     }
 
-    public static Method getReadMethod(Class beanClass, String prop)
+    public static Method getReadMethod(Class<?> beanClass, String prop)
             throws JasperException {
 
         Method method = null;        
-        Class type = null;
+        Class<?> type = null;
         try {
             java.beans.BeanInfo info
                 = java.beans.Introspector.getBeanInfo(beanClass);
@@ -853,12 +853,13 @@ public class JspRuntimeLibrary {
     // PropertyEditor Support
 
     public static Object getValueFromBeanInfoPropertyEditor(
-                           Class attrClass, String attrName, String attrValue,
-                           Class propertyEditorClass) 
+                           Class<?> attrClass, String attrName, String attrValue,
+                           Class<?> propertyEditorClass) 
         throws JasperException 
     {
         try {
-            PropertyEditor pe = (PropertyEditor)propertyEditorClass.newInstance();
+            PropertyEditor pe =
+                (PropertyEditor)propertyEditorClass.newInstance();
             pe.setAsText(attrValue);
             return pe.getValue();
         } catch (Exception ex) {
@@ -870,7 +871,7 @@ public class JspRuntimeLibrary {
     }
 
     public static Object getValueFromPropertyEditorManager(
-                     Class attrClass, String attrName, String attrValue) 
+                     Class<?> attrClass, String attrName, String attrValue) 
         throws JasperException 
     {
         try {

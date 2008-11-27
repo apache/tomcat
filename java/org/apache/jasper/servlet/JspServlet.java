@@ -85,9 +85,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             try {
                 ClassLoader loader = Thread.currentThread()
                         .getContextClassLoader();
-                Class engineOptionsClass = loader.loadClass(engineOptionsName);
-                Class[] ctorSig = { ServletConfig.class, ServletContext.class };
-                Constructor ctor = engineOptionsClass.getConstructor(ctorSig);
+                Class<?> engineOptionsClass =
+                    loader.loadClass(engineOptionsName);
+                Class<?>[] ctorSig =
+                    { ServletConfig.class, ServletContext.class };
+                Constructor<?> ctor =
+                    engineOptionsClass.getConstructor(ctorSig);
                 Object[] args = { config, context };
                 options = (Options) ctor.newInstance(args);
             } catch (Throwable e) {
@@ -255,9 +258,9 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             log.debug("\t      RequestURI: " + request.getRequestURI());
             log.debug("\t     QueryString: " + request.getQueryString());
             log.debug("\t  Request Params: ");
-            Enumeration e = request.getParameterNames();
+            Enumeration<String> e = request.getParameterNames();
             while (e.hasMoreElements()) {
-                String name = (String) e.nextElement();
+                String name = e.nextElement();
                 log.debug("\t\t " + name + " = " 
                           + request.getParameter(name));
             }
