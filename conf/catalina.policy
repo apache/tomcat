@@ -138,9 +138,9 @@ grant {
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime.*";
     
-    // Precompiled JSPs need access to this system property.
+    // Precompiled JSPs need access to these system properties.
     permission java.util.PropertyPermission "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
-
+    permission java.util.PropertyPermission "org.apache.el.parser.COERCE_TO_ZERO", "read";
 };
 
 
