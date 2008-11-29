@@ -64,6 +64,21 @@ public final class SecurityClassLoad {
              "core.ContainerBase$PrivilegedAddChild");
         loader.loadClass
             (basePackage +
+             "core.DefaultInstanceManager$1");
+        loader.loadClass
+            (basePackage +
+             "core.DefaultInstanceManager$2");
+        loader.loadClass
+            (basePackage +
+             "core.DefaultInstanceManager$3");
+        loader.loadClass
+            (basePackage +
+             "core.DefaultInstanceManager$4");
+        loader.loadClass
+            (basePackage +
+             "core.DefaultInstanceManager$5");
+        loader.loadClass
+            (basePackage +
              "core.ApplicationHttpRequest$AttributeNamesEnumerator");
     }
     
