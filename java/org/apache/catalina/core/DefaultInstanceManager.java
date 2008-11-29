@@ -205,14 +205,24 @@ public class DefaultInstanceManager implements InstanceManager {
      * @throws java.lang.reflect.InvocationTargetException
      *                                if call fails
      */
-    protected void preDestroy(Object instance, Class<?> clazz)
+    protected void preDestroy(Object instance, final Class<?> clazz)
             throws IllegalAccessException, InvocationTargetException {
         Class<?> superClass = clazz.getSuperclass();
         if (superClass != Object.class) {
             preDestroy(instance, superClass);
         }
 
-        Method[] methods = clazz.getDeclaredMethods();
+        Method[] methods;
+        if (Globals.IS_SECURITY_ENABLED) {
+            methods = AccessController.doPrivileged(
+                    new PrivilegedAction<Method[]>(){
+                public Method[] run(){
+                    return clazz.getDeclaredMethods();
+                }
+            });
+        } else {
+            methods = clazz.getDeclaredMethods();
+        }
         Method preDestroy = null;
         for (Method method : methods) {
             if (method.isAnnotationPresent(PreDestroy.class)) {
