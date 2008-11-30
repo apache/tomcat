@@ -33,17 +33,18 @@ import org.apache.el.util.ReflectionUtil;
 
 public class MethodExpressionLiteral extends MethodExpression implements Externalizable {
 
-    private Class expectedType;
+    private Class<?> expectedType;
 
     private String expr;
 
-    private Class[] paramTypes;
+    private Class<?>[] paramTypes;
 
     public MethodExpressionLiteral() {
         // do nothing
     }
 
-    public MethodExpressionLiteral(String expr, Class expectedType, Class[] paramTypes) {
+    public MethodExpressionLiteral(String expr, Class<?> expectedType,
+            Class<?>[] paramTypes) {
         this.expr = expr;
         this.expectedType = expectedType;
         this.paramTypes = paramTypes;

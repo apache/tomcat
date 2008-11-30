@@ -92,7 +92,7 @@ import org.apache.el.util.ReflectionUtil;
 public final class ValueExpressionImpl extends ValueExpression implements
         Externalizable {
 
-    private Class expectedType;
+    private Class<?> expectedType;
 
     private String expr;
 
@@ -110,7 +110,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      */
     public ValueExpressionImpl(String expr, Node node, FunctionMapper fnMapper,
-            VariableMapper varMapper, Class expectedType) {
+            VariableMapper varMapper, Class<?> expectedType) {
         this.expr = expr;
         this.node = node;
         this.fnMapper = fnMapper;
@@ -133,7 +133,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#getExpectedType()
      */
-    public Class getExpectedType() {
+    public Class<?> getExpectedType() {
         return this.expectedType;
     }
 
@@ -167,7 +167,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#getType(javax.el.ELContext)
      */
-    public Class getType(ELContext context) throws PropertyNotFoundException,
+    public Class<?> getType(ELContext context) throws PropertyNotFoundException,
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
                 this.varMapper);

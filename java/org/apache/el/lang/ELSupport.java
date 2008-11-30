@@ -184,7 +184,7 @@ public class ELSupport {
         if (ELArithmetic.isNumber(obj)) {
             return new Character((char) ((Number) obj).shortValue());
         }
-        Class objType = obj.getClass();
+        Class<?> objType = obj.getClass();
         if (obj instanceof Character) {
             return (Character) obj;
         }
@@ -209,7 +209,7 @@ public class ELSupport {
     }
 
     protected final static Number coerceToNumber(final Number number,
-            final Class type) throws IllegalArgumentException {
+            final Class<?> type) throws IllegalArgumentException {
         if (Long.TYPE == type || Long.class.equals(type)) {
             return new Long(number.longValue());
         }
@@ -251,8 +251,8 @@ public class ELSupport {
                 number, number.getClass(), type));
     }
 
-    public final static Number coerceToNumber(final Object obj, final Class type)
-            throws IllegalArgumentException {
+    public final static Number coerceToNumber(final Object obj,
+            final Class<?> type) throws IllegalArgumentException {
         if (obj == null || "".equals(obj)) {
             return coerceToNumber(ZERO, type);
         }
@@ -273,7 +273,7 @@ public class ELSupport {
     }
 
     protected final static Number coerceToNumber(final String val,
-            final Class type) throws IllegalArgumentException {
+            final Class<?> type) throws IllegalArgumentException {
         if (Long.TYPE == type || Long.class.equals(type)) {
             return Long.valueOf(val);
         }
@@ -319,7 +319,7 @@ public class ELSupport {
         }
     }
 
-    public final static void checkType(final Object obj, final Class type)
+    public final static void checkType(final Object obj, final Class<?> type)
         throws IllegalArgumentException {
         if (String.class.equals(type)) {
             coerceToString(obj);
@@ -338,8 +338,8 @@ public class ELSupport {
         }
     }
 
-    public final static Object coerceToType(final Object obj, final Class type)
-            throws IllegalArgumentException {
+    public final static Object coerceToType(final Object obj,
+            final Class<?> type) throws IllegalArgumentException {
         if (type == null || Object.class.equals(type) ||
                 (obj != null && type.isAssignableFrom(obj.getClass()))) {
             return obj;

@@ -52,7 +52,7 @@ public final class AstFloatingPoint extends SimpleNode {
         return this.getFloatingPoint();
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return this.getFloatingPoint().getClass();
     }
