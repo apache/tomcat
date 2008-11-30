@@ -91,7 +91,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         return attributes.get(key);
     }
 
-    public Iterator getAttributeNames() {
+    public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
 
@@ -209,7 +209,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     protected NioEndpoint ep=new NioEndpoint();
     protected boolean secure = false;
 
-    protected Hashtable attributes = new Hashtable();
+    protected Hashtable<String, Object> attributes =
+        new Hashtable<String, Object>();
 
     private int maxKeepAliveRequests=100; // as in Apache HTTPD server
     private int timeout = 300000;   // 5 minutes as in Apache HTTPD server
@@ -534,7 +535,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
     public void setOomParachute(int oomParachute) {
         ep.setOomParachute(oomParachute);
-        setAttribute("oomParachute",oomParachute);
+        setAttribute("oomParachute", Integer.valueOf(oomParachute));
     }
 
     // --------------------  SSL related properties --------------------
@@ -812,7 +813,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                         if (log.isDebugEnabled()) log.debug("Deregister ["+processor+"] count="+registerCount.get());
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
-                        ObjectName rpName = (ObjectName) rp.getRpName();
+                        ObjectName rpName = rp.getRpName();
                         Registry.getRegistry(null, null).unregisterComponent(rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {
