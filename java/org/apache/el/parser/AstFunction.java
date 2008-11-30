@@ -58,7 +58,7 @@ public final class AstFunction extends SimpleNode {
         return prefix;
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         
         FunctionMapper fnMapper = ctx.getFunctionMapper();
@@ -90,7 +90,7 @@ public final class AstFunction extends SimpleNode {
                     this.getOutputName()));
         }
 
-        Class[] paramTypes = m.getParameterTypes();
+        Class<?>[] paramTypes = m.getParameterTypes();
         Object[] params = null;
         Object result = null;
         int numParams = this.jjtGetNumChildren();

@@ -32,7 +32,7 @@ public final class AstLiteralExpression extends SimpleNode {
         super(id);
     }
 
-    public Class getType(EvaluationContext ctx) throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         return String.class;
     }
 

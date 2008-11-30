@@ -32,7 +32,7 @@ public final class AstChoice extends SimpleNode {
         super(id);
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         Object val = this.getValue(ctx);
         return (val != null) ? val.getClass() : null;
