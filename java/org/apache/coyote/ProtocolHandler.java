@@ -42,7 +42,7 @@ public interface ProtocolHandler {
 
 
     public Object getAttribute(String name);
-    public Iterator getAttributeNames();
+    public Iterator<String> getAttributeNames();
 
     /**
      * The adapter, used to call the connector.
