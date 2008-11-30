@@ -95,7 +95,8 @@ public class AjpProtocol
     /**
      * Configuration attributes.
      */
-    protected Hashtable attributes = new Hashtable();
+    protected Hashtable<String,Object> attributes =
+        new Hashtable<String,Object>();
 
 
     /**
@@ -131,7 +132,7 @@ public class AjpProtocol
     }
 
 
-    public Iterator getAttributeNames() {
+    public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
 
@@ -433,7 +434,7 @@ public class AjpProtocol
                     try {
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
-                        ObjectName rpName = (ObjectName) rp.getRpName();
+                        ObjectName rpName = rp.getRpName();
                         if (log.isDebugEnabled()) {
                             log.debug("Unregister " + rpName);
                         }
