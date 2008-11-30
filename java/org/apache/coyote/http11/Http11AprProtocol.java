@@ -85,7 +85,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         return attributes.get(key);
     }
 
-    public Iterator getAttributeNames() {
+    public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
 
@@ -518,7 +518,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         }
 
         public SocketState event(long socket, SocketStatus status) {
-            Http11AprProcessor result = connections.get(socket);
+            Http11AprProcessor result = connections.get(Long.valueOf(socket));
             
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
@@ -547,7 +547,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
                         (sm.getString("http11protocol.proto.error"), e);
                 } finally {
                     if (state != SocketState.LONG) {
-                        connections.remove(socket);
+                        connections.remove(Long.valueOf(socket));
                         recycledProcessors.offer(result);
                         if (state == SocketState.OPEN) {
                             proto.endpoint.getPoller().add(socket);
@@ -576,7 +576,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
                     // Associate the connection with the processor. The next request 
                     // processed by this thread will use either a new or a recycled
                     // processor.
-                    connections.put(socket, processor);
+                    connections.put(Long.valueOf(socket), processor);
                     proto.endpoint.getCometPoller().add(socket);
                 } else {
                     recycledProcessors.offer(processor);
@@ -655,7 +655,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
                     try {
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
-                        ObjectName rpName = (ObjectName) rp.getRpName();
+                        ObjectName rpName = rp.getRpName();
                         if (log.isDebugEnabled()) {
                             log.debug("Unregister " + rpName);
                         }

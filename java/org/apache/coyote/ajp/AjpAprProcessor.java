@@ -634,7 +634,7 @@ public class AjpAprProcessor implements ActionHook {
         // Translate the HTTP method code to a String.
         byte methodCode = requestHeaderMessage.getByte();
         if (methodCode != Constants.SC_M_JK_STORED) {
-            String methodName = Constants.methodTransArray[(int)methodCode - 1];
+            String methodName = Constants.methodTransArray[methodCode - 1];
             request.method().setString(methodName);
         }
 
@@ -894,7 +894,7 @@ public class AjpAprProcessor implements ActionHook {
             int port = 0;
             int mult = 1;
             for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.DEC[(int) valueB[i + valueS]];
+                int charValue = HexUtils.DEC[valueB[i + valueS]];
                 if (charValue == -1) {
                     // Invalid character
                     error = true;

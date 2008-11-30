@@ -135,7 +135,7 @@ public final class Request {
 
     private MessageBytes remoteUser=MessageBytes.newInstance();
     private MessageBytes authType=MessageBytes.newInstance();
-    private HashMap attributes=new HashMap();
+    private HashMap<String,Object> attributes=new HashMap<String,Object>();
 
     private Response response;
     private ActionHook hook;
@@ -377,7 +377,7 @@ public final class Request {
         attributes.put( name, o );
     }
 
-    public HashMap getAttributes() {
+    public HashMap<String,Object> getAttributes() {
         return attributes;
     }
 

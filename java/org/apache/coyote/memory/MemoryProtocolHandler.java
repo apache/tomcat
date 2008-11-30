@@ -53,7 +53,7 @@ public class MemoryProtocolHandler
         return null;
     }
 
-    public Iterator getAttributeNames() { return null ; }
+    public Iterator<String> getAttributeNames() { return null ; }
     /**
      * Associated adapter.
      */

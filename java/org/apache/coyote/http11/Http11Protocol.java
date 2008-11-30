@@ -116,7 +116,7 @@ public class Http11Protocol
         return attributes.get(key);
     }
 
-    public Iterator getAttributeNames() {
+    public Iterator<String> getAttributeNames() {
         return attributes.keySet().iterator();
     }
 
@@ -667,7 +667,7 @@ public class Http11Protocol
                     try {
                         RequestInfo rp = processor.getRequest().getRequestProcessor();
                         rp.setGlobalProcessor(null);
-                        ObjectName rpName = (ObjectName) rp.getRpName();
+                        ObjectName rpName = rp.getRpName();
                         if (log.isDebugEnabled()) {
                             log.debug("Unregister " + rpName);
                         }
