@@ -121,7 +121,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
         this.image = image;
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         throw new UnsupportedOperationException();
     }
@@ -150,11 +150,13 @@ public abstract class SimpleNode extends ELSupport implements Node {
         }
     }
 
-    public Object invoke(EvaluationContext ctx, Class[] paramTypes, Object[] paramValues) throws ELException {
+    public Object invoke(EvaluationContext ctx, Class[] paramTypes,
+            Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
-    public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes) throws ELException {
+    public MethodInfo getMethodInfo(EvaluationContext ctx,
+            Class[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
     }
 }

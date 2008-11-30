@@ -41,7 +41,7 @@ public final class AstString extends SimpleNode {
         return this.string;
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return String.class;
     }

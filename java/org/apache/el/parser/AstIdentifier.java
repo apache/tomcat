@@ -37,7 +37,7 @@ public final class AstIdentifier extends SimpleNode {
         super(id);
     }
 
-    public Class getType(EvaluationContext ctx) throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
         if (varMapper != null) {
             ValueExpression expr = varMapper.resolveVariable(this.image);
@@ -85,23 +85,6 @@ public final class AstIdentifier extends SimpleNode {
         }
         ctx.setPropertyResolved(false);
         ctx.getELResolver().setValue(ctx, null, this.image, value);
-    }
-
-    private final Object invokeTarget(EvaluationContext ctx, Object target,
-            Object[] paramValues) throws ELException {
-        if (target instanceof MethodExpression) {
-            MethodExpression me = (MethodExpression) target;
-            return me.invoke(ctx.getELContext(), paramValues);
-        } else if (target == null) {
-            throw new MethodNotFoundException("Identity '" + this.image
-                    + "' was null and was unable to invoke");
-        } else {
-            throw new ELException(
-                    "Identity '"
-                            + this.image
-                            + "' does not reference a MethodExpression instance, returned type: "
-                            + target.getClass().getName());
-        }
     }
 
     public Object invoke(EvaluationContext ctx, Class[] paramTypes,

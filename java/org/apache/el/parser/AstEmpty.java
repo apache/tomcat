@@ -35,7 +35,7 @@ public final class AstEmpty extends SimpleNode {
         super(id);
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return Boolean.class;
     }

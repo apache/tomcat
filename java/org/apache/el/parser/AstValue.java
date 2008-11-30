@@ -52,7 +52,7 @@ public final class AstValue extends SimpleNode {
         super(id);
     }
 
-    public Class getType(EvaluationContext ctx) throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         Target t = getTarget(ctx);
         ctx.setPropertyResolved(false);
         return ctx.getELResolver().getType(ctx, t.base, t.property);
@@ -169,7 +169,7 @@ public final class AstValue extends SimpleNode {
         Method m = ReflectionUtil.getMethod(t.base, t.property, paramTypes);
         Object result = null;
         try {
-            result = m.invoke(t.base, (Object[]) paramValues);
+            result = m.invoke(t.base, paramValues);
         } catch (IllegalAccessException iae) {
             throw new ELException(iae);
         } catch (InvocationTargetException ite) {

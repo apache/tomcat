@@ -39,13 +39,13 @@ public final class ValueExpressionLiteral extends ValueExpression implements
 
     private Object value;
 
-    private Class expectedType;
+    private Class<?> expectedType;
 
     public ValueExpressionLiteral() {
         super();
     }
 
-    public ValueExpressionLiteral(Object value, Class expectedType) {
+    public ValueExpressionLiteral(Object value, Class<?> expectedType) {
         this.value = value;
         this.expectedType = expectedType;
     }
@@ -66,11 +66,11 @@ public final class ValueExpressionLiteral extends ValueExpression implements
         return true;
     }
 
-    public Class getType(ELContext context) {
+    public Class<?> getType(ELContext context) {
         return (this.value != null) ? this.value.getClass() : null;
     }
 
-    public Class getExpectedType() {
+    public Class<?> getExpectedType() {
         return this.expectedType;
     }
 
