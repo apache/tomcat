@@ -43,7 +43,7 @@ public class ReflectionUtil {
     protected static final String[] PRIMITIVE_NAMES = new String[] { "boolean",
             "byte", "char", "double", "float", "int", "long", "short", "void" };
 
-    protected static final Class[] PRIMITIVES = new Class[] { boolean.class,
+    protected static final Class<?>[] PRIMITIVES = new Class[] { boolean.class,
             byte.class, char.class, double.class, float.class, int.class,
             long.class, short.class, Void.TYPE };
 
@@ -54,11 +54,11 @@ public class ReflectionUtil {
         super();
     }
 
-    public static Class forName(String name) throws ClassNotFoundException {
+    public static Class<?> forName(String name) throws ClassNotFoundException {
         if (null == name || "".equals(name)) {
             return null;
         }
-        Class c = forNamePrimitive(name);
+        Class<?> c = forNamePrimitive(name);
         if (c == null) {
             if (name.endsWith("[]")) {
                 String nc = name.substring(0, name.length() - 2);
@@ -71,7 +71,7 @@ public class ReflectionUtil {
         return c;
     }
 
-    protected static Class forNamePrimitive(String name) {
+    protected static Class<?> forNamePrimitive(String name) {
         if (name.length() <= 8) {
             int p = Arrays.binarySearch(PRIMITIVE_NAMES, name);
             if (p >= 0) {
@@ -87,10 +87,10 @@ public class ReflectionUtil {
      * @return
      * @throws ClassNotFoundException
      */
-    public static Class[] toTypeArray(String[] s) throws ClassNotFoundException {
+    public static Class<?>[] toTypeArray(String[] s) throws ClassNotFoundException {
         if (s == null)
             return null;
-        Class[] c = new Class[s.length];
+        Class<?>[] c = new Class[s.length];
         for (int i = 0; i < s.length; i++) {
             c[i] = forName(s[i]);
         }
@@ -102,7 +102,7 @@ public class ReflectionUtil {
      * @param c
      * @return
      */
-    public static String[] toTypeNameArray(Class[] c) {
+    public static String[] toTypeNameArray(Class<?>[] c) {
         if (c == null)
             return null;
         String[] s = new String[c.length];
@@ -121,7 +121,7 @@ public class ReflectionUtil {
      * @throws MethodNotFoundException
      */
     public static Method getMethod(Object base, Object property,
-            Class[] paramTypes) throws MethodNotFoundException {
+            Class<?>[] paramTypes) throws MethodNotFoundException {
         if (base == null || property == null) {
             throw new MethodNotFoundException(MessageFactory.get(
                     "error.method.notfound", base, property,
@@ -142,7 +142,7 @@ public class ReflectionUtil {
         return method;
     }
 
-    protected static final String paramString(Class[] types) {
+    protected static final String paramString(Class<?>[] types) {
         if (types != null) {
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < types.length; i++) {
@@ -166,7 +166,6 @@ public class ReflectionUtil {
     public static PropertyDescriptor getPropertyDescriptor(Object base,
             Object property) throws ELException, PropertyNotFoundException {
         String name = ELSupport.coerceToString(property);
-        PropertyDescriptor p = null;
         try {
             PropertyDescriptor[] desc = Introspector.getBeanInfo(
                     base.getClass()).getPropertyDescriptors();

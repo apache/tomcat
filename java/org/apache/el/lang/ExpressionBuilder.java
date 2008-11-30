@@ -99,7 +99,7 @@ public final class ExpressionBuilder implements NodeVisitor {
                     if (numChildren == 1) {
                         n = n.jjtGetChild(0);
                     } else {
-                        Class type = null;
+                        Class<?> type = null;
                         Node child = null;
                         for (int i = 0; i < numChildren; i++) {
                             child = n.jjtGetChild(i);
@@ -189,15 +189,15 @@ public final class ExpressionBuilder implements NodeVisitor {
         }
     }
 
-    public ValueExpression createValueExpression(Class expectedType)
+    public ValueExpression createValueExpression(Class<?> expectedType)
             throws ELException {
         Node n = this.build();
         return new ValueExpressionImpl(this.expression, n, this.fnMapper,
                 this.varMapper, expectedType);
     }
 
-    public MethodExpression createMethodExpression(Class expectedReturnType,
-            Class[] expectedParamTypes) throws ELException {
+    public MethodExpression createMethodExpression(Class<?> expectedReturnType,
+            Class<?>[] expectedParamTypes) throws ELException {
         Node n = this.build();
         if (n instanceof AstValue || n instanceof AstIdentifier) {
             return new MethodExpressionImpl(expression, n, this.fnMapper,

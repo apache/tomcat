@@ -80,7 +80,7 @@ import org.apache.el.util.ReflectionUtil;
 public final class MethodExpressionImpl extends MethodExpression implements
         Externalizable {
 
-    private Class expectedType;
+    private Class<?> expectedType;
 
     private String expr;
 
@@ -90,7 +90,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
 
     private transient Node node;
 
-    private Class[] paramTypes;
+    private Class<?>[] paramTypes;
 
     /**
      * 
@@ -108,7 +108,7 @@ public final class MethodExpressionImpl extends MethodExpression implements
      */
     public MethodExpressionImpl(String expr, Node node,
             FunctionMapper fnMapper, VariableMapper varMapper,
-            Class expectedType, Class[] paramTypes) {
+            Class<?> expectedType, Class<?>[] paramTypes) {
         super();
         this.expr = expr;
         this.node = node;
