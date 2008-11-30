@@ -32,7 +32,7 @@ public final class AstNull extends SimpleNode {
         super(id);
     }
 
-    public Class getType(EvaluationContext ctx)
+    public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return null;
     }
