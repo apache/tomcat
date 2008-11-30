@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // ============================================================================
-// catalina.corepolicy - Security Policy Permissions for Tomcat @VERSION_MAJOR@
+// catalina.corepolicy - Security Policy Permissions for Tomcat 6
 //
 // This file contains a default set of security policies to be enforced (by the
 // JVM) when Catalina is executed with the "-security" option.  In addition
@@ -134,7 +134,8 @@ grant {
     // Allow read of JAXP compliant XML parser debug
     permission java.util.PropertyPermission "jaxp.debug", "read";
 
-    // Precompiled JSPs need access to this package.
+    // Precompiled JSPs need access to these packages.
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.el";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.jasper.runtime.*";
     
