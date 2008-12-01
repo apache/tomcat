@@ -38,7 +38,7 @@
         David Jecks with modifications by Remy. (remm/fhanik)
       </update>
       <update>
-        <rev>620845</rev> and <rev>669119</rev>. Make shutdwn address
+        <rev>620845</rev> and <rev>669119</rev>. Make shutdown address
         configurable. (jfclere)
       </update>
       <fix>
@@ -89,6 +89,10 @@
       </fix>
       <add>
         Expose thisAccessedTime via Session interface. (rjung)
+      </add>
+      <add>
+        Provide a log format for JULI that provides the same information as the
+        default but on a single line. (markt)
       </add>
     </changelog>
   </subsection>
