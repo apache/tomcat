@@ -23,6 +23,7 @@ import java.util.Iterator;
 
 import org.apache.catalina.Group;
 import org.apache.catalina.Role;
+import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 
 
@@ -104,7 +105,7 @@ public abstract class AbstractGroup implements Group {
     /**
      * Return the set of {@link Role}s assigned specifically to this group.
      */
-    public abstract Iterator getRoles();
+    public abstract Iterator<Role> getRoles();
 
 
     /**
@@ -117,7 +118,7 @@ public abstract class AbstractGroup implements Group {
      * Return an Iterator over the set of {@link org.apache.catalina.User}s that 
      * are members of this group.
      */
-    public abstract Iterator getUsers();
+    public abstract Iterator<User> getUsers();
 
 
     // --------------------------------------------------------- Public Methods

@@ -85,7 +85,7 @@ public abstract class AbstractUser implements User {
     /**
      * Return the set of {@link Group}s to which this user belongs.
      */
-    public abstract Iterator getGroups();
+    public abstract Iterator<Group> getGroups();
 
 
     /**
@@ -117,7 +117,7 @@ public abstract class AbstractUser implements User {
     /**
      * Return the set of {@link Role}s assigned specifically to this user.
      */
-    public abstract Iterator getRoles();
+    public abstract Iterator<Role> getRoles();
 
 
     /**
