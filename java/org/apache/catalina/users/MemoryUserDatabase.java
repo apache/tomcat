@@ -87,7 +87,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link Group}s defined in this database, keyed by
      * group name.
      */
-    protected HashMap groups = new HashMap();
+    protected HashMap<String,Group> groups = new HashMap<String,Group>();
 
 
     /**
@@ -126,7 +126,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link Role}s defined in this database, keyed by
      * role name.
      */
-    protected HashMap roles = new HashMap();
+    protected HashMap<String,Role> roles = new HashMap<String,Role>();
 
 
     /**
@@ -140,7 +140,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * The set of {@link User}s defined in this database, keyed by
      * user name.
      */
-    protected HashMap users = new HashMap();
+    protected HashMap<String,User> users = new HashMap<String,User>();
 
 
     // ------------------------------------------------------------- Properties
@@ -149,7 +149,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * Return the set of {@link Group}s defined in this user database.
      */
-    public Iterator getGroups() {
+    public Iterator<Group> getGroups() {
 
         synchronized (groups) {
             return (groups.values().iterator());
@@ -217,7 +217,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * Return the set of {@link Role}s defined in this user database.
      */
-    public Iterator getRoles() {
+    public Iterator<Role> getRoles() {
 
         synchronized (roles) {
             return (roles.values().iterator());
@@ -229,7 +229,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * Return the set of {@link User}s defined in this user database.
      */
-    public Iterator getUsers() {
+    public Iterator<User> getUsers() {
 
         synchronized (users) {
             return (users.values().iterator());
@@ -323,7 +323,7 @@ public class MemoryUserDatabase implements UserDatabase {
     public Group findGroup(String groupname) {
 
         synchronized (groups) {
-            return ((Group) groups.get(groupname));
+            return groups.get(groupname);
         }
 
     }
@@ -338,7 +338,7 @@ public class MemoryUserDatabase implements UserDatabase {
     public Role findRole(String rolename) {
 
         synchronized (roles) {
-            return ((Role) roles.get(rolename));
+            return roles.get(rolename);
         }
 
     }
@@ -353,7 +353,7 @@ public class MemoryUserDatabase implements UserDatabase {
     public User findUser(String username) {
 
         synchronized (users) {
-            return ((User) users.get(username));
+            return users.get(username);
         }
 
     }
@@ -405,7 +405,7 @@ public class MemoryUserDatabase implements UserDatabase {
                     try {
                         fis.close();
                     } catch (Throwable t) {
-                        ;
+                        // Ignore
                     }
                     throw e;
                 }
@@ -424,9 +424,9 @@ public class MemoryUserDatabase implements UserDatabase {
     public void removeGroup(Group group) {
 
         synchronized (groups) {
-            Iterator users = getUsers();
+            Iterator<User> users = getUsers();
             while (users.hasNext()) {
-                User user = (User) users.next();
+                User user = users.next();
                 user.removeGroup(group);
             }
             groups.remove(group.getGroupname());
@@ -443,14 +443,14 @@ public class MemoryUserDatabase implements UserDatabase {
     public void removeRole(Role role) {
 
         synchronized (roles) {
-            Iterator groups = getGroups();
+            Iterator<Group> groups = getGroups();
             while (groups.hasNext()) {
-                Group group = (Group) groups.next();
+                Group group = groups.next();
                 group.removeRole(role);
             }
-            Iterator users = getUsers();
+            Iterator<User> users = getUsers();
             while (users.hasNext()) {
-                User user = (User) users.next();
+                User user = users.next();
                 user.removeRole(role);
             }
             roles.remove(role.getRolename());
@@ -527,7 +527,7 @@ public class MemoryUserDatabase implements UserDatabase {
             writer.println("<tomcat-users>");
 
             // Print entries for each defined role, group, and user
-            Iterator values = null;
+            Iterator<?> values = null;
             values = getRoles();
             while (values.hasNext()) {
                 writer.print("  ");

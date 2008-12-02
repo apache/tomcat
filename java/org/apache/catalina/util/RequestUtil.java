@@ -159,8 +159,8 @@ public final class RequestUtil {
      *
      * @exception IllegalArgumentException if the data is malformed
      */
-    public static void parseParameters(Map map, String data, String encoding)
-        throws UnsupportedEncodingException {
+    public static void parseParameters(Map<String,String[]> map, String data,
+            String encoding) throws UnsupportedEncodingException {
 
         if ((data != null) && (data.length() > 0)) {
 
@@ -328,9 +328,10 @@ public final class RequestUtil {
      * @param name The parameter name
      * @param value The parameter value
      */
-    private static void putMapEntry( Map map, String name, String value) {
+    private static void putMapEntry( Map<String,String[]> map, String name,
+            String value) {
         String[] newValues = null;
-        String[] oldValues = (String[]) map.get(name);
+        String[] oldValues = map.get(name);
         if (oldValues == null) {
             newValues = new String[1];
             newValues[0] = value;
@@ -362,8 +363,8 @@ public final class RequestUtil {
      *
      * @exception UnsupportedEncodingException if the data is malformed
      */
-    public static void parseParameters(Map map, byte[] data, String encoding)
-        throws UnsupportedEncodingException {
+    public static void parseParameters(Map<String,String[]> map, byte[] data,
+            String encoding) throws UnsupportedEncodingException {
 
         if (data != null && data.length > 0) {
             int    ix = 0;

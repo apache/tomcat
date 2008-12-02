@@ -34,7 +34,7 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 
-public final class ParameterMap extends HashMap {
+public final class ParameterMap<K,V> extends HashMap<K,V> {
 
 
     // ----------------------------------------------------------- Constructors
@@ -83,7 +83,7 @@ public final class ParameterMap extends HashMap {
      *
      * @param map Map whose contents are dupliated in the new map
      */
-    public ParameterMap(Map map) {
+    public ParameterMap(Map<K,V> map) {
 
         super(map);
 
@@ -160,7 +160,7 @@ public final class ParameterMap extends HashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
-    public Object put(Object key, Object value) {
+    public V put(K key, V value) {
 
         if (locked)
             throw new IllegalStateException
@@ -179,7 +179,7 @@ public final class ParameterMap extends HashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
-    public void putAll(Map map) {
+    public void putAll(Map<? extends K,? extends V> map) {
 
         if (locked)
             throw new IllegalStateException
@@ -199,7 +199,7 @@ public final class ParameterMap extends HashMap {
      *
      * @exception IllegalStateException if this map is currently locked
      */
-    public Object remove(Object key) {
+    public V remove(Object key) {
 
         if (locked)
             throw new IllegalStateException

@@ -71,7 +71,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
      *  creating this object
      */
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable environment)
+                                    Hashtable<?,?> environment)
         throws Exception {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
