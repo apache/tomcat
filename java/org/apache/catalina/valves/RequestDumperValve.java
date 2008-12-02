@@ -109,20 +109,20 @@ public class RequestDumperValve
                 log.info("            cookie=" + cookies[i].getName() + "=" +
                     cookies[i].getValue());
         }
-        Enumeration hnames = request.getHeaderNames();
+        Enumeration<String> hnames = request.getHeaderNames();
         while (hnames.hasMoreElements()) {
-            String hname = (String) hnames.nextElement();
-            Enumeration hvalues = request.getHeaders(hname);
+            String hname = hnames.nextElement();
+            Enumeration<String> hvalues = request.getHeaders(hname);
             while (hvalues.hasMoreElements()) {
-                String hvalue = (String) hvalues.nextElement();
+                String hvalue = hvalues.nextElement();
                 log.info("            header=" + hname + "=" + hvalue);
             }
         }
         log.info("            locale=" + request.getLocale());
         log.info("            method=" + request.getMethod());
-        Enumeration pnames = request.getParameterNames();
+        Enumeration<String> pnames = request.getParameterNames();
         while (pnames.hasMoreElements()) {
-            String pname = (String) pnames.nextElement();
+            String pname = pnames.nextElement();
             String pvalues[] = request.getParameterValues(pname);
             StringBuffer result = new StringBuffer(pname);
             result.append('=');

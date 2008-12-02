@@ -1412,7 +1412,7 @@ public class AccessLogValve
         if (buf.length() > 0) {
             list.add(new StringElement(buf.toString()));
         }
-        return (AccessLogElement[]) list.toArray(new AccessLogElement[0]);
+        return list.toArray(new AccessLogElement[0]);
     }
 
     /**
