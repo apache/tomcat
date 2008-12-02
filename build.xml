@@ -65,10 +65,10 @@
   <path id="tomcat.classpath">
     <pathelement location="${tomcat.classes}"/>
   </path>
-	
+  
   <path id="test.classpath">
-  	<pathelement location="${tomcat-jdbc.jar}"/>
-  	<pathelement location="${tomcat.classes}"/>
+    <pathelement location="${tomcat-jdbc.jar}"/>
+    <pathelement location="${tomcat.classes}"/>
     <fileset dir="${base.path}">
       <include name="**/tomcat-dbcp.jar"/>
       <include name="**/junit.jar"/>
@@ -102,7 +102,7 @@
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
     </jar>
-  	<!-- connection pool source file-->
+    <!-- connection pool source file-->
     <jar jarfile="${tomcat-jdbc-src.jar}">
       <fileset dir="${basedir}/modules/jdbc-pool/java">
         <include name="org/apache/tomcat/jdbc/**" />
@@ -124,8 +124,8 @@
           </fileset>
       </delete>
   </target>
-	
-  <target name="test" depends="clean,build">
+  
+  <target name="test-compile" depends="build">
     <!-- compile org.apache.tomcat.jdbc-->
     <javac srcdir="${basedir}/modules/jdbc-pool/test" destdir="${tomcat.classes}"
            debug="${compile.debug}"
@@ -135,39 +135,44 @@
       <classpath refid="test.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
-  	
-  	<java classname="org.junit.runner.JUnitCore" classpathref="test.classpath" fork="false">
+  </target>
+
+  <target name="test" depends="test-compile">
+    <java classname="org.junit.runner.JUnitCore" classpathref="test.classpath" fork="false">
       <arg line="org.apache.tomcat.jdbc.test.CheckOutThreadTest" />
     </java>
-  </target>	
-	
+    <java classname="org.junit.runner.JUnitCore" classpathref="test.classpath" fork="false">
+      <arg line="org.apache.tomcat.jdbc.test.FairnessTest" />
+    </java>
+  </target>  
+  
   <target name="docs"> 
-  	<xslt basedir="${basedir}/modules/jdbc-pool/doc"
+    <xslt basedir="${basedir}/modules/jdbc-pool/doc"
           destdir="${tomcat.pool}/"
-  	      extension=".html"
-  	      style="webapps/docs/tomcat-docs.xsl"
-  	      excludes="build.xml project.xml"
-  	      includes="*.xml">
-  	  <param name="relative-path" expression="."/>
-  	</xslt>	
+          extension=".html"
+          style="webapps/docs/tomcat-docs.xsl"
+          excludes="build.xml project.xml"
+          includes="*.xml">
+      <param name="relative-path" expression="."/>
+    </xslt>  
   </target>
-	
+  
   <target name="dist" depends="clean, build, docs">
-	<property name="destdir" value="${tomcat.pool}/release/v${version}"/>
-  	<mkdir dir="${destdir}"/>
-  	<zip destfile="${destdir}/apache-tomcat-jdbc-${version}.zip">
-  	  <fileset dir="${tomcat.pool}">
-  	  	<include name="jdbc-pool.html"/>
-  	  	<include name="changelog.html"/>
-  	  	<include name="tomcat-jdbc.jar"/>
+  <property name="destdir" value="${tomcat.pool}/release/v${version}"/>
+    <mkdir dir="${destdir}"/>
+    <zip destfile="${destdir}/apache-tomcat-jdbc-${version}.zip">
+      <fileset dir="${tomcat.pool}">
+        <include name="jdbc-pool.html"/>
+        <include name="changelog.html"/>
+        <include name="tomcat-jdbc.jar"/>
         <include name="tomcat-jdbc-src.jar"/>
         <include name="tomcat-jdbc.jar.md5"/>
         <include name="tomcat-jdbc-src.jar.md5"/>
-  	  </fileset>
+      </fileset>
       <fileset dir="${basedir}/output/build/bin">
-      	<include name="tomcat-juli.jar"/>
-      </fileset>	
-  	</zip>
+        <include name="tomcat-juli.jar"/>
+      </fileset>  
+    </zip>
     <tar destfile="${destdir}/apache-tomcat-jdbc-${version}.tar">
       <fileset dir="${tomcat.pool}">
         <include name="jdbc-pool.html"/>
@@ -181,11 +186,11 @@
       </fileset>    
     </tar>
     <gzip src="${destdir}/apache-tomcat-jdbc-${version}.tar"
-  	      destfile="${destdir}/apache-tomcat-jdbc-${version}.tar.gz"/>
+          destfile="${destdir}/apache-tomcat-jdbc-${version}.tar.gz"/>
     <delete file="${destdir}/apache-tomcat-jdbc-${version}.tar"/>
     <echo message="Options +Indexes" file="${destdir}/.htaccess"/>
   </target>
-  	
+    
   <!-- Download and dependency building -->
   <target name="proxyflags">
     <!-- check proxy parameters. -->
@@ -212,7 +217,7 @@
     <mkdir dir="${destdir}" />
     <get src="${sourcefile}" dest="${destfile}" />
   </target>
-	
+  
   <target name="downloadgz" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
     <get src="${sourcefile}" dest="${base.path}/file.tar.gz" />
