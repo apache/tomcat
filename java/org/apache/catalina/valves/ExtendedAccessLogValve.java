@@ -571,7 +571,7 @@ public class ExtendedAccessLogValve
             if (log.isDebugEnabled()) {
                 log.debug("finished decoding with element size of: " + list.size());
             }
-            return (AccessLogElement[]) list.toArray(new AccessLogElement[0]);
+            return list.toArray(new AccessLogElement[0]);
         } catch (IOException e) {
             log.error("parse error", e);
             return null;
