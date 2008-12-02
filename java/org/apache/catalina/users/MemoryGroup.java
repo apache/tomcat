@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.catalina.Role;
+import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 
 
@@ -72,7 +73,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * The set of {@link Role}s associated with this group.
      */
-    protected ArrayList roles = new ArrayList();
+    protected ArrayList<Role> roles = new ArrayList<Role>();
 
 
     // ------------------------------------------------------------- Properties
@@ -81,7 +82,7 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * Return the set of {@link Role}s assigned specifically to this group.
      */
-    public Iterator getRoles() {
+    public Iterator<Role> getRoles() {
 
         synchronized (roles) {
             return (roles.iterator());
@@ -103,12 +104,12 @@ public class MemoryGroup extends AbstractGroup {
     /**
      * Return the set of {@link org.apache.catalina.User}s that are members of this group.
      */
-    public Iterator getUsers() {
+    public Iterator<User> getUsers() {
 
-        ArrayList results = new ArrayList();
-        Iterator users = database.getUsers();
+        ArrayList<User> results = new ArrayList<User>();
+        Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
-            MemoryUser user = (MemoryUser) users.next();
+            User user = users.next();
             if (user.isInGroup(this)) {
                 results.add(user);
             }
@@ -194,13 +195,13 @@ public class MemoryGroup extends AbstractGroup {
             if (roles.size() > 0) {
                 sb.append(" roles=\"");
                 int n = 0;
-                Iterator values = roles.iterator();
+                Iterator<Role> values = roles.iterator();
                 while (values.hasNext()) {
                     if (n > 0) {
                         sb.append(',');
                     }
                     n++;
-                    sb.append((String) ((Role) values.next()).getRolename());
+                    sb.append((values.next()).getRolename());
                 }
                 sb.append("\"");
             }
