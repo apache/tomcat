@@ -23,6 +23,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
@@ -41,7 +42,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     LinkedList<E> items = null;
 
     LinkedList<ExchangeCountDownLatch<E>> waiters = null;
-
+    
     public FairBlockingQueue() {
         items = new LinkedList<E>();
         waiters = new LinkedList<ExchangeCountDownLatch<E>>();
