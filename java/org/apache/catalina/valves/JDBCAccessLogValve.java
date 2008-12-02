@@ -579,7 +579,7 @@ public final class JDBCAccessLogValve
         // Instantiate our database driver if necessary
         if (driver == null) {
             try {
-                Class clazz = Class.forName(driverName);
+                Class<?> clazz = Class.forName(driverName);
                 driver = (Driver) clazz.newInstance();
             } catch (Throwable e) {
                 throw new SQLException(e.getMessage());
@@ -627,7 +627,7 @@ public final class JDBCAccessLogValve
         try {
             ps.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.ps = null;
 

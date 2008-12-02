@@ -28,7 +28,6 @@ import javax.servlet.ServletException;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.StringManager;
 
 /*
  * Valve to fill the SSL informations in the request
@@ -48,22 +47,7 @@ import org.apache.catalina.util.StringManager;
 
 public class SSLValve
     extends ValveBase {
-/*
-    private static final String info =
-        "SSLValve/1.0";
-    protected static StringManager sm =
-        StringManager.getManager(Constants.Package);
-    public String getInfo() {
-        return (info);
-    }
-    public String toString() {
-        StringBuffer sb = new StringBuffer("SSLValve[");
-                if (container != null)
-            sb.append(container.getName());
-        sb.append("]");
-        return (sb.toString());
-    }
- */
+
     public String mygetHeader(Request request, String header) {
         String strcert0 = request.getHeader(header);
         if (strcert0 == null)
