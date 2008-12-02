@@ -75,13 +75,13 @@ public class MemoryUser extends AbstractUser {
     /**
      * The set of {@link Group}s that this user is a member of.
      */
-    protected ArrayList groups = new ArrayList();
+    protected ArrayList<Group> groups = new ArrayList<Group>();
 
 
     /**
      * The set of {@link Role}s associated with this user.
      */
-    protected ArrayList roles = new ArrayList();
+    protected ArrayList<Role> roles = new ArrayList<Role>();
 
 
     // ------------------------------------------------------------- Properties
@@ -90,7 +90,7 @@ public class MemoryUser extends AbstractUser {
     /**
      * Return the set of {@link Group}s to which this user belongs.
      */
-    public Iterator getGroups() {
+    public Iterator<Group> getGroups() {
 
         synchronized (groups) {
             return (groups.iterator());
@@ -102,7 +102,7 @@ public class MemoryUser extends AbstractUser {
     /**
      * Return the set of {@link Role}s assigned specifically to this user.
      */
-    public Iterator getRoles() {
+    public Iterator<Role> getRoles() {
 
         synchronized (roles) {
             return (roles.iterator());
@@ -262,13 +262,13 @@ public class MemoryUser extends AbstractUser {
             if (groups.size() > 0) {
                 sb.append(" groups=\"");
                 int n = 0;
-                Iterator values = groups.iterator();
+                Iterator<Group> values = groups.iterator();
                 while (values.hasNext()) {
                     if (n > 0) {
                         sb.append(',');
                     }
                     n++;
-                    sb.append(RequestUtil.filter(((Group) values.next()).getGroupname()));
+                    sb.append(RequestUtil.filter(values.next().getGroupname()));
                 }
                 sb.append("\"");
             }
@@ -277,13 +277,13 @@ public class MemoryUser extends AbstractUser {
             if (roles.size() > 0) {
                 sb.append(" roles=\"");
                 int n = 0;
-                Iterator values = roles.iterator();
+                Iterator<Role> values = roles.iterator();
                 while (values.hasNext()) {
                     if (n > 0) {
                         sb.append(',');
                     }
                     n++;
-                    sb.append(RequestUtil.filter(((Role) values.next()).getRolename()));
+                    sb.append(RequestUtil.filter(values.next().getRolename()));
                 }
                 sb.append("\"");
             }

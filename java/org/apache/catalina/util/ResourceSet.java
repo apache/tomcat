@@ -34,7 +34,7 @@ import java.util.HashSet;
  * @version $Revision$ $Date$
  */
 
-public final class ResourceSet extends HashSet {
+public final class ResourceSet<T> extends HashSet<T> {
 
 
     // ----------------------------------------------------------- Constructors
@@ -83,7 +83,7 @@ public final class ResourceSet extends HashSet {
      *
      * @param coll The collection whose contents we should copy
      */
-    public ResourceSet(Collection coll) {
+    public ResourceSet(Collection<T> coll) {
 
         super(coll);
 
@@ -139,7 +139,7 @@ public final class ResourceSet extends HashSet {
      *
      * @exception IllegalStateException if this ResourceSet is locked
      */
-    public boolean add(Object o) {
+    public boolean add(T o) {
 
         if (locked)
             throw new IllegalStateException
