@@ -91,6 +91,7 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
+           target="${compile.source}"
            optimize="${compile.optimize}">
       <classpath refid="tomcat.jdbc.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
@@ -131,6 +132,7 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
+           target="${compile.source}"
            optimize="${compile.optimize}">
       <classpath refid="test.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
