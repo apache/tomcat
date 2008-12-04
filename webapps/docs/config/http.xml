@@ -103,20 +103,14 @@
       the container during FORM or CLIENT-CERT authentication. For both types
       of authentication, the POST will be saved/buffered before the user is
       authenticated. For CLIENT-CERT authentication, the POST is buffered for
-      the duration of
- the SSL handshake and the buffer emptied when the request
-      is processed. For FORM authentication the POST is
- saved whilst the user
+      the duration of the SSL handshake and the buffer emptied when the request
+      is processed. For FORM authentication the POST is saved whilst the user
       is re-directed to the login form and is retained until the user
       successfully authenticates or the session associated with the
       authentication request expires. The limit can be disabled by setting this
-      attribute to -1. Setting the attribute to
- zero will disable the saving of
-      POST data during authentication
-. If not
- specified, this attribute is set
-      to
- 4096 (4 kilobytes).</p>
+      attribute to -1. Setting the attribute to zero will disable the saving of
+      POST data during authentication. If not specified, this attribute is set
+      to 4096 (4 kilobytes).</p>
     </attribute>
 
     <attribute name="protocol" required="false">
@@ -748,6 +742,18 @@
       </p>
     </attribute>
 
+    <attribute name="sessionCacheSize" required="false">
+      <p>The number of SSL sessions to maintain in the session cache. Use 0 to
+      specify an unlimited cache size. If not specified, a default of 0 is
+      used.</p>
+    </attribute>
+    
+    <attribute name="sessionTimeout" required="false">
+      <p>The time, in seconds, after the creation of an SSL session that it will
+      timeout. Use 0 to specify an unlimited timeout. If not specified, a
+      default of 86400 (24 hours) is used.</p>
+    </attribute>
+    
   </attributes>
 
   <p>For more information, see the
