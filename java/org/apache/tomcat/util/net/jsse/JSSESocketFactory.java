@@ -49,6 +49,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -88,6 +89,9 @@ public class JSSESocketFactory
     private static final String defaultKeystoreFile
         = System.getProperty("user.home") + "/.keystore";
     private static final String defaultKeyPass = "changeit";
+    private static final int defaultSessionCacheSize = 0;
+    private static final int defaultSessionTimeout = 86400;
+    
     static org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESocketFactory.class);
 
@@ -418,6 +422,28 @@ public class JSSESocketFactory
                          getTrustManagers(keystoreType, keystoreProvider,
                                  trustAlgorithm),
                          new SecureRandom());
+
+            // Configure SSL session cache
+            int sessionCacheSize;
+            if (attributes.get("sessionCacheSize") != null) {
+                sessionCacheSize = Integer.parseInt(
+                        (String)attributes.get("sessionCacheSize"));
+            } else {
+                sessionCacheSize = defaultSessionCacheSize;
+            }
+            int sessionCacheTimeout;
+            if (attributes.get("sessionCacheTimeout") != null) {
+                sessionCacheTimeout = Integer.parseInt(
+                        (String)attributes.get("sessionCacheTimeout"));
+            } else {
+                sessionCacheTimeout = defaultSessionTimeout;
+            }
+            SSLSessionContext sessionContext =
+                context.getServerSessionContext();
+            if (sessionContext != null) {
+                sessionContext.setSessionCacheSize(sessionCacheSize);
+                sessionContext.setSessionTimeout(sessionCacheTimeout);
+            }
 
             // create proxy
             sslProxy = context.getServerSocketFactory();
