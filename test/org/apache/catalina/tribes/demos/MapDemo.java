@@ -46,46 +46,78 @@ import javax.swing.table.TableColumn;
 import java.util.Random;
 
 /**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Company: </p>
- *
- * @author not attributable
- * @version 1.0
+ * Example of how the lazy replicated map works, also shows how the BackupManager 
+ * works in a Tomcat cluster
+ * @author fhanik
+ * @version 1.1
  */
 public class MapDemo implements ChannelListener, MembershipListener{
     
+    /**
+     * The Map containing the replicated data
+     */
     protected LazyReplicatedMap map;
+    
+    /**
+     * Table to be displayed in Swing
+     */
     protected SimpleTableDemo table;
     
+    /**
+     * Constructs a map demo object.
+     * @param channel - the Tribes channel object to be used for communication
+     * @param mapName - the name of this map
+     */
     public MapDemo(Channel channel, String mapName ) {
+        //instantiate the replicated map
         map = new LazyReplicatedMap(null,channel,5000, mapName,null);
+        //create a gui, name it with the member name of this JVM
         table = SimpleTableDemo.createAndShowGUI(map,channel.getLocalMember(false).getName());
+        //add ourself as a listener for messages
         channel.addChannelListener(this);
+        //add ourself as a listener for memberships
         channel.addMembershipListener(this);
-//        for ( int i=0; i<1000; i++ ) {
-//            map.put("MyKey-"+i,"My String Value-"+i);
-//        }
+        //initialize the map by receiving a fake message
         this.messageReceived(null,null);
     }
     
+    /**
+     * Decides if the messageReceived should be invoked
+     * will always return false since we rely on the 
+     * lazy map to do all the messaging for us
+     */
     public boolean accept(Serializable msg, Member source) {
+        //simple refresh the table model
         table.dataModel.getValueAt(-1,-1);
         return false;
     }
     
+    /**
+     * Invoked if accept returns true.
+     * No of for now
+     * @param msg - the message received
+     * @param source - the sending member
+     */
     public void messageReceived(Serializable msg, Member source) {
-        
     }
     
+    /**
+     * Invoked when a member is added to the group
+     */
     public void memberAdded(Member member) {
     }
+    
+    /**
+     * Invoked when a member leaves the group
+     */
     public void memberDisappeared(Member member) {
+        //just refresh the table model
         table.dataModel.getValueAt(-1,-1);
     }
     
+    /**
+     * Prints usage
+     */
     public static void usage() {
         System.out.println("Tribes MapDemo.");
         System.out.println("Usage:\n\t" + 
@@ -94,36 +126,53 @@ public class MapDemo implements ChannelListener, MembershipListener{
                            ChannelCreator.usage());
     }
 
+    /**
+     * Main method
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
         long start = System.currentTimeMillis();
+        //create a channel object
         ManagedChannel channel = (ManagedChannel) ChannelCreator.createChannel(args);
+        //define a map name, unless one is defined as a paramters
         String mapName = "MapDemo";
         if ( args.length > 0 && (!args[args.length-1].startsWith("-"))) {
             mapName = args[args.length-1];
         }
+        //start the channel
         channel.start(Channel.DEFAULT);
+        //listen for shutdown
         Runtime.getRuntime().addShutdownHook(new Shutdown(channel));
+        //create a map demo object
         new MapDemo(channel,mapName);
         
+        //put the main thread to sleep until we are done
         System.out.println("System test complete, time to start="+(System.currentTimeMillis()-start)+" ms. Sleeping to let threads finish.");
         Thread.sleep(60 * 1000 * 60);
     }
 
-    public static class Shutdown
-        extends Thread {
+    /**
+     * Listens for shutdown events, and stops this instance
+     */
+    public static class Shutdown extends Thread {
+        //the channel running in this demo
         ManagedChannel channel = null;
+        
         public Shutdown(ManagedChannel channel) {
             this.channel = channel;
         }
 
+        
         public void run() {
             System.out.println("Shutting down...");
+            //create an exit thread that forces a shutdown if the JVM wont exit cleanly
             SystemExit exit = new SystemExit(5000);
             exit.setDaemon(true);
             exit.start();
             try {
+                //stop the channel
                 channel.stop(Channel.DEFAULT);
-
             } catch (Exception x) {
                 x.printStackTrace();
             }
@@ -131,8 +180,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
         }
     }
 
-    public static class SystemExit
-        extends Thread {
+    public static class SystemExit extends Thread {
         private long delay;
         public SystemExit(long delay) {
             this.delay = delay;
@@ -145,7 +193,6 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 x.printStackTrace();
             }
             System.exit(0);
-
         }
     }
 
@@ -477,10 +524,6 @@ public class MapDemo implements ChannelListener, MembershipListener{
                 else if (backup) color = Color.BLUE;
                 if ( color != null ) cell.setBackground(color);
             }
-//            System.out.println("Row:"+row+" Column:"+column+" Color:"+cell.getBackground());
-//            cell.setBackground(bkgndColor);
-//            cell.setForeground(fgndColor);
-
             return cell;
         }
         
