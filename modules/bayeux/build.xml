@@ -93,7 +93,7 @@
 
     <!-- compile org.apache.tomcat.bayeux -->
     <!-- compile org.apache.cometd -->
-    <javac srcdir="java" destdir="${tomcat.classes}"
+    <javac srcdir="modules/bayeux/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
@@ -121,7 +121,7 @@
     </jar>
 
     <!-- cometd samples application -->
-    <javac srcdir="test" destdir="${tomcat.classes}"
+    <javac srcdir="modules/bayeux/test" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
@@ -145,7 +145,7 @@
   	<mkdir dir="${cometd-app}"/>
   	
   	<copy todir="${cometd-app}">
-  	  <fileset dir="${basedir}/webapps/cometd">
+  	  <fileset dir="${basedir}/modules/bayeux/webapps/cometd">
   		<include name="**/**"/>
   	  </fileset>
       <fileset dir="${dojo-js.home}">
