@@ -50,6 +50,7 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
@@ -604,7 +605,6 @@ public class NioEndpoint {
     public void setKeystoreType(String s ) { this.keystoreType = s;}
 
     protected String sslProtocol = "TLS"; 
-    
     public String getSslProtocol() { return sslProtocol;}
     public void setSslProtocol(String s) { sslProtocol = s;}
     
@@ -616,7 +616,6 @@ public class NioEndpoint {
         sslEnabledProtocolsarr = new String[t.countTokens()];
         for (int i=0; i<sslEnabledProtocolsarr.length; i++ ) sslEnabledProtocolsarr[i] = t.nextToken();
     }
-    
     
     protected String ciphers = null;
     protected String[] ciphersarr = new String[0];
@@ -630,7 +629,15 @@ public class NioEndpoint {
             for (int i=0; i<ciphersarr.length; i++ ) ciphersarr[i] = t.nextToken();
         }
     }
-    
+
+    protected int sessionCacheSize = 0;
+    public int getSessionCacheSize() { return sessionCacheSize;}
+    public void setSessionCacheSize(int i) { sessionCacheSize = i;}
+
+    protected int sessionCacheTimeout = 86400;
+    public int getSessionCacheTimeout() { return sessionCacheTimeout;}
+    public void setSessionCacheTimeout(int i) { sessionCacheTimeout = i;}
+
     /**
      * SSL engine.
      */
@@ -808,6 +815,12 @@ public class NioEndpoint {
 
             sslContext = SSLContext.getInstance(getSslProtocol());
             sslContext.init(wrap(kmf.getKeyManagers()), tmf.getTrustManagers(), null);
+            SSLSessionContext sessionContext =
+                sslContext.getServerSessionContext();
+            if (sessionContext != null) {
+                sessionContext.setSessionCacheSize(sessionCacheSize);
+                sessionContext.setSessionTimeout(sessionCacheTimeout);
+            }
         }
         
         if (oomParachute>0) reclaimParachute(true);
