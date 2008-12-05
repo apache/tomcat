@@ -28,6 +28,7 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -57,6 +58,9 @@ import javax.management.ObjectName;
  */
 
 public class ConnectionPool {
+    public static interface CloseListener {
+        void poolClosed(ConnectionPool pool);
+    }
 
     //logger
     protected static Log log = LogFactory.getLog(ConnectionPool.class);
@@ -64,7 +68,8 @@ public class ConnectionPool {
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE
     //===============================================================================
-
+    protected ConcurrentLinkedQueue<CloseListener> listeners = new ConcurrentLinkedQueue<CloseListener>();
+    
     /**
      * All the information about the connection pool
      */
@@ -226,11 +231,7 @@ public class ConnectionPool {
         }
 
         try {
-            //cache the constructor
-            if (proxyClassConstructor == null ) {
-                Class proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class});
-                proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
-            }
+            getProxyConstructor();
             //create the proxy
             //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new facade
             Connection connection = (Connection)proxyClassConstructor.newInstance(new Object[] { handler });
@@ -243,13 +244,25 @@ public class ConnectionPool {
         }
 
     }
-    
+
+    public Constructor getProxyConstructor() throws NoSuchMethodException {
+        //cache the constructor
+        if (proxyClassConstructor == null ) {
+            Class proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class});
+            proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        }
+        return proxyClassConstructor;
+    }
 
     @Override
     protected void finalize() throws Throwable {
         close(true);
     }
 
+    public void addCloseListener(CloseListener listener) {
+        listeners.add(listener);
+    }
+    
     /**
      * Closes the pool and all disconnects all idle connections
      * Active connections will be closed upon the {@link java.sql.Connection#close close} method is called
@@ -288,6 +301,11 @@ public class ConnectionPool {
         }
         size.set(0);
         if (this.getPoolProperties().isJmxEnabled()) stopJmx();
+        
+        while (listeners.size()>0) {
+            CloseListener listener = listeners.poll();
+            if (listener!=null) listener.poolClosed(this);
+        }
     } //closePool
 
 
