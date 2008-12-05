@@ -43,6 +43,10 @@ public class DataSourceProxy  {
     protected static Log log = LogFactory.getLog(DataSourceProxy.class);
     
     protected volatile ConnectionPool pool = null;
+    public ConnectionPool getPool() {
+        return pool;
+    }
+
     protected PoolProperties poolProperties = new PoolProperties();
 
     public DataSourceProxy() {
