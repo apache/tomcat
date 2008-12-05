@@ -69,8 +69,9 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     public abstract void closeInvoked();
 
     protected boolean process(String[] names, Method method, boolean process) {
+        final String name = method.getName();
         for (int i=0; (!process) && i<names.length; i++) {
-            process = compare(names[i],method);
+            process = compare(names[i],name);
         }
         return process;
     }
