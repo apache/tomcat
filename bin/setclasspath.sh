@@ -95,8 +95,11 @@ if [ ! -x "$BASEDIR"/bin/setclasspath.sh ]; then
   fi
 fi
 
-# Set the default -Djava.endorsed.dirs argument
-JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
+# Don't override the endorsed dir if the user has set it previously
+if [-z "$JAVA_ENDORSED_DIRS"]; then
+  # Set the default -Djava.endorsed.dirs argument
+  JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
+fi
 
 # Set standard CLASSPATH
 if [ "$1" = "javac" ] ; then
