@@ -707,7 +707,7 @@ public class NioEndpoint {
         } else {
             int sum = 0;
             for (int i=0; i<pollers.length; i++) {
-                sum += pollers[i].selector.keys().size();
+                sum += pollers[i].getKeyCount();
             }
             return sum;
         }
