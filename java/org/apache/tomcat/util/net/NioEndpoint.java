@@ -1280,11 +1280,13 @@ public class NioEndpoint {
         
         protected CountDownLatch stopLatch = new CountDownLatch(1);
 
-
+        protected volatile int keyCount = 0;
 
         public Poller() throws IOException {
             this.selector = Selector.open();
         }
+        
+        public int getKeyCount() { return keyCount; }
         
         public Selector getSelector() { return selector;}
 
@@ -1380,8 +1382,9 @@ public class NioEndpoint {
                     //processSocket(ka.getChannel(), status, dispatch);
                     ka.setComet(false);//to avoid a loop
                     if (status == SocketStatus.TIMEOUT ) {
-                        processSocket(ka.getChannel(), status, true);
-                        return; // don't close on comet timeout
+                        if (processSocket(ka.getChannel(), status, true)) {
+                            return; // don't close on comet timeout
+                        }
                     } else {
                         processSocket(ka.getChannel(), status, false); //don't dispatch if the lines below are cancelling the key
                     }                    
@@ -1430,7 +1433,8 @@ public class NioEndpoint {
                                 //do a non blocking select
                                 keyCount = selector.selectNow();
                             }else {
-                                wakeupCounter.set( -1);
+                                keyCount = selector.keys().size();
+                                wakeupCounter.set(-1);
                                 keyCount = selector.select(selectorTimeout);
                             }
                             wakeupCounter.set(0);
