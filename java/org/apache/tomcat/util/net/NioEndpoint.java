@@ -1139,6 +1139,7 @@ public class NioEndpoint {
             if (log.isDebugEnabled()) {
                 log.debug("Unable to process socket, executor rejected the task.",rx);
             }
+            return false;
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
