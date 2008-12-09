@@ -934,4 +934,9 @@ public class InternalNioInputBuffer implements InputBuffer {
     }
 
 
+    public int getParsingRequestLinePhase() {
+        return parsingRequestLinePhase;
+    }
+
+
 }
