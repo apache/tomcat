@@ -60,6 +60,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.TaskQueue;
+import org.apache.tomcat.util.threads.TaskThreadFactory;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -339,8 +341,15 @@ public class NioEndpoint {
      * External Executor based thread pool.
      */
     protected Executor executor = null;
-    public void setExecutor(Executor executor) { this.executor = executor; }
+    public void setExecutor(Executor executor) { 
+        this.executor = executor;
+        this.internalExecutor = (executor==null);
+    }
     public Executor getExecutor() { return executor; }
+    /**
+     * Are we using an internal executor
+     */
+    protected boolean internalExecutor = true;
     
     protected boolean useExecutor = true;
     /**
@@ -356,12 +365,8 @@ public class NioEndpoint {
     protected int maxThreads = 200;
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
-        if (running) {
-            if (executor!=null) {
-                if (executor instanceof ThreadPoolExecutor) {
-                    ((ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
-                }
-            }
+        if (running && executor!=null && executor instanceof ThreadPoolExecutor) {
+            ((ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
         }
     }
     public int getMaxThreads() { return maxThreads; }
@@ -872,10 +877,11 @@ public class NioEndpoint {
             
             // Create worker collection
             if ( executor == null ) {
+                internalExecutor = true;
                 TaskQueue taskqueue = new TaskQueue();
-                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-");
+                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
                 executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-                taskqueue.setParent( (ThreadPoolExecutor) executor, this);
+                taskqueue.setParent( (ThreadPoolExecutor) executor);
             }
 
             // Start poller threads
@@ -938,13 +944,13 @@ public class NioEndpoint {
         keyCache.clear();
         nioChannels.clear();
         processorCache.clear();
-        if ( executor!=null ) {
+        if ( executor!=null && internalExecutor ) {
             if ( executor instanceof ThreadPoolExecutor ) {
                 //this is our internal one, so we need to shut it down
                 ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdown();
                 TaskQueue queue = (TaskQueue) tpe.getQueue();
-                queue.setParent(null,null);
+                queue.setParent(null);
             }
             executor = null;
         }
@@ -1955,68 +1961,8 @@ public class NioEndpoint {
         }
 
     }
-    
-    // ---------------------------------------------- TaskQueue Inner Class
-    public static class TaskQueue extends LinkedBlockingQueue<Runnable> {
-        ThreadPoolExecutor parent = null;
-        NioEndpoint endpoint = null;
-        
-        public TaskQueue() {
-            super();
-        }
 
-        public TaskQueue(int initialCapacity) {
-            super(initialCapacity);
-        }
- 
-        public TaskQueue(Collection<? extends Runnable> c) {
-            super(c);
-        }
-
-        
-        public void setParent(ThreadPoolExecutor tp, NioEndpoint ep) {
-            parent = tp;
-            this.endpoint = ep;
-        }
-        
-        public boolean offer(Runnable o) {
-            //we can't do any checks
-            if (parent==null) return super.offer(o);
-            //we are maxed out on threads, simply queue the object
-            if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
-            //we have idle threads, just add it to the queue
-            //this is an approximation, so it could use some tuning
-            if (endpoint.activeSocketProcessors.get()<(parent.getPoolSize())) return super.offer(o);
-            //if we have less threads than maximum force creation of a new thread
-            if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
-            //if we reached here, we need to add it to the queue
-            return super.offer(o);
-        }
-    }
-
-    // ---------------------------------------------- ThreadFactory Inner Class
-    class TaskThreadFactory implements ThreadFactory {
-        final ThreadGroup group;
-        final AtomicInteger threadNumber = new AtomicInteger(1);
-        final String namePrefix;
-
-        TaskThreadFactory(String namePrefix) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null)? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-            this.namePrefix = namePrefix;
-        }
-
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
-            t.setDaemon(daemon);
-            t.setPriority(getThreadPriority());
-            return t;
-        }
-    }
-    
     // ----------------------------------------------- SendfileData Inner Class
-
-
     /**
      * SendfileData class.
      */
@@ -2029,5 +1975,4 @@ public class NioEndpoint {
         // KeepAlive flag
         public boolean keepAlive;
     }
-
 }
