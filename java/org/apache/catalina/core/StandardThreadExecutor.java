@@ -17,18 +17,16 @@
 
 package org.apache.catalina.core;
 
-import java.util.Collection;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.util.LifecycleSupport;
-import java.util.concurrent.RejectedExecutionException;
+import org.apache.tomcat.util.threads.TaskQueue;
+import org.apache.tomcat.util.threads.TaskThreadFactory;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 public class StandardThreadExecutor implements Executor {
     
@@ -90,7 +88,7 @@ public class StandardThreadExecutor implements Executor {
     public void start() throws LifecycleException {
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
         TaskQueue taskqueue = new TaskQueue(maxQueueSize);
-        TaskThreadFactory tf = new TaskThreadFactory(namePrefix);
+        TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
         taskqueue.setParent( (ThreadPoolExecutor) executor);
@@ -107,17 +105,10 @@ public class StandardThreadExecutor implements Executor {
     
     public void execute(Runnable command, long timeout, TimeUnit unit) {
         if ( executor != null ) {
-            try {
-                executor.execute(command);
-            } catch (RejectedExecutionException rx) {
-                //there could have been contention around the queue
-                try {
-                    if ( !( (TaskQueue) executor.getQueue()).force(command,timeout,unit) ) throw new RejectedExecutionException("Work queue full.");
-                }catch (InterruptedException x) {
-                    throw new RejectedExecutionException("Interrupted.",x);
-                }
-            }
-        } else throw new IllegalStateException("StandardThreadPool not started.");
+            executor.execute(command,timeout,unit);
+        } else { 
+            throw new IllegalStateException("StandardThreadExecutor not started.");
+        }
     }
     
     
@@ -258,71 +249,4 @@ public class StandardThreadExecutor implements Executor {
     public int getQueueSize() {
         return (executor != null) ? executor.getQueue().size() : -1;
     }
-
-    // ---------------------------------------------- TaskQueue Inner Class
-    class TaskQueue extends LinkedBlockingQueue<Runnable> {
-        ThreadPoolExecutor parent = null;
-
-        public TaskQueue() {
-            super();
-        }
-
-        public TaskQueue(int capacity) {
-            super(capacity);
-        }
-
-        public TaskQueue(Collection<? extends Runnable> c) {
-            super(c);
-        }
-
-        public void setParent(ThreadPoolExecutor tp) {
-            parent = tp;
-        }
-        
-        public boolean force(Runnable o) {
-            if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
-            return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
-        }
-
-        public boolean force(Runnable o, long timeout, TimeUnit unit) throws InterruptedException {
-            if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
-            return super.offer(o,timeout,unit); //forces the item onto the queue, to be used if the task is rejected
-        }
-
-        public boolean offer(Runnable o) {
-            //we can't do any checks
-            if (parent==null) return super.offer(o);
-            //we are maxed out on threads, simply queue the object
-            if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
-            //we have idle threads, just add it to the queue
-            //this is an approximation, so it could use some tuning
-            if (parent.getActiveCount()<(parent.getPoolSize())) return super.offer(o);
-            //if we have less threads than maximum force creation of a new thread
-            if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
-            //if we reached here, we need to add it to the queue
-            return super.offer(o);
-        }
-    }
-
-    // ---------------------------------------------- ThreadFactory Inner Class
-    class TaskThreadFactory implements ThreadFactory {
-        final ThreadGroup group;
-        final AtomicInteger threadNumber = new AtomicInteger(1);
-        final String namePrefix;
-
-        TaskThreadFactory(String namePrefix) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-            this.namePrefix = namePrefix;
-        }
-
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement());
-            t.setDaemon(daemon);
-            t.setPriority(getThreadPriority());
-            return t;
-        }
-    }
-
-
 }
