@@ -40,6 +40,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,24 +134,6 @@ public class NioEndpoint {
      * Track the initialization state of the endpoint.
      */
     protected boolean initialized = false;
-
-
-    /**
-     * Current worker threads busy count.
-     */
-    protected int curThreadsBusy = 0;
-
-
-    /**
-     * Current worker threads count.
-     */
-    protected int curThreads = 0;
-
-
-    /**
-     * Sequence number used to generate thread names.
-     */
-    protected int sequence = 0;
     
     protected NioSelectorPool selectorPool = new NioSelectorPool();
     
@@ -746,7 +729,13 @@ public class NioEndpoint {
      * @return the amount of threads that are managed by the pool
      */
     public int getCurrentThreadCount() {
-        return curThreads;
+        final Executor executor = this.executor;
+        if (executor!=null) {
+            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                return ((java.util.concurrent.ThreadPoolExecutor)executor).getPoolSize();
+            }
+        } 
+        return 0;
     }
 
 
@@ -756,7 +745,13 @@ public class NioEndpoint {
      * @return the amount of threads currently busy
      */
     public int getCurrentThreadsBusy() {
-        return curThreadsBusy;
+        final Executor executor = this.executor;
+        if (executor!=null) {
+            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                return ((java.util.concurrent.ThreadPoolExecutor)executor).getPoolSize();
+            }
+        } 
+        return activeSocketProcessors.get();
     }
 
 
@@ -979,13 +974,6 @@ public class NioEndpoint {
     // ------------------------------------------------------ Protected Methods
 
 
-    /**
-     * Get a sequence number used for thread naming.
-     */
-    protected int getSequence() {
-        return sequence++;
-    }
-
     public int getWriteBufSize() {
         return socketProperties.getTxBufSize();
     }
@@ -1147,6 +1135,10 @@ public class NioEndpoint {
             else sc.reset(socket,status);
             if ( dispatch && executor!=null ) executor.execute(sc);
             else sc.run();
+        } catch (RejectedExecutionException rx) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to process socket, executor rejected the task.",rx);
+            }
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
