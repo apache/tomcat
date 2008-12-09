@@ -19,6 +19,7 @@ package org.apache.coyote.http11;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
+import java.nio.channels.SocketChannel;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -212,7 +213,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     protected Hashtable<String, Object> attributes =
         new Hashtable<String, Object>();
 
-    private int maxKeepAliveRequests=100; // as in Apache HTTPD server
     private int timeout = 300000;   // 5 minutes as in Apache HTTPD server
     private int maxSavePostSize = 4 * 1024;
     private int maxHttpHeaderSize = 8 * 1024;
@@ -456,6 +456,14 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         ep.setSoTimeout(i);
         setAttribute("soTimeout", "" + i);
     }
+    
+    public void setKeepAliveTimeout(int keepAliveTimeout) {
+        ep.setKeepAliveTimeout(keepAliveTimeout);
+    }
+    
+    public int getKeepAliveTimeout() {
+        return ep.getKeepAliveTimeout();
+    }
 
     public String getProtocol() {
         return getProperty("protocol");
@@ -477,13 +485,13 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
     }
 
     public int getMaxKeepAliveRequests() {
-        return maxKeepAliveRequests;
+        return ep.getMaxKeepAliveRequests();
     }
 
     /** Set the maximum number of Keep-Alive requests that we will honor.
      */
     public void setMaxKeepAliveRequests(int mkar) {
-        maxKeepAliveRequests = mkar;
+        ep.setMaxKeepAliveRequests(mkar);
         setAttribute("maxKeepAliveRequests", "" + mkar);
     }
 
@@ -491,7 +499,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
      * Return the Keep-Alive policy for the connection.
      */
     public boolean getKeepAlive() {
-        return ((maxKeepAliveRequests != 0) && (maxKeepAliveRequests != 1));
+        return ((ep.getMaxKeepAliveRequests() != 0) && (ep.getMaxKeepAliveRequests() != 1));
     }
 
     /**
@@ -638,6 +646,25 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             recycledProcessors.clear();
         }
         
+        public void release(SocketChannel socket) {
+            if (log.isDebugEnabled()) 
+                log.debug("Iterating through our connections to release a socket channel:"+socket);
+            boolean released = false;
+            Iterator<java.util.Map.Entry<NioChannel, Http11NioProcessor>> it = connections.entrySet().iterator();
+            while (it.hasNext()) {
+                java.util.Map.Entry<NioChannel, Http11NioProcessor> entry = it.next();
+                if (entry.getKey().getIOChannel()==socket) {
+                    it.remove();
+                    Http11NioProcessor result = entry.getValue();
+                    result.recycle();
+                    released = true;
+                    break;
+                }
+            }
+            if (log.isDebugEnabled()) 
+                log.debug("Done iterating through our connections to release a socket channel:"+socket +" released:"+released);
+        }
+        
         public void release(NioChannel socket) {
             Http11NioProcessor result = connections.remove(socket);
             if ( result != null ) {
@@ -770,7 +797,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
               proto.maxHttpHeaderSize,
               proto.ep);
             processor.setAdapter(proto.adapter);
-            processor.setMaxKeepAliveRequests(proto.maxKeepAliveRequests);
+            processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setTimeout(proto.timeout);
             processor.setDisableUploadTimeout(proto.disableUploadTimeout);
             processor.setCompressionMinSize(proto.compressionMinSize);

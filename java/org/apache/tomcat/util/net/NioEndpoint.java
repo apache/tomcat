@@ -366,6 +366,18 @@ public class NioEndpoint {
     }
     public int getMaxThreads() { return maxThreads; }
 
+    /**
+     * Max keep alive requests 
+     */
+    protected int maxKeepAliveRequests=100; // as in Apache HTTPD server
+    public int getMaxKeepAliveRequests() {
+        return maxKeepAliveRequests;
+    }
+    public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
+        this.maxKeepAliveRequests = maxKeepAliveRequests;
+    }
+
+
 
     /**
      * Priority of the worker threads.
@@ -421,6 +433,14 @@ public class NioEndpoint {
     public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
     public int getBacklog() { return backlog; }
 
+    /**
+     * Keepalive timeout, if lesser or equal to 0 then soTimeout will be used.
+     */
+    protected int keepAliveTimeout = 0;
+    public void setKeepAliveTimeout(int keepAliveTimeout) { this.keepAliveTimeout = keepAliveTimeout; }
+    public int getKeepAliveTimeout() { return keepAliveTimeout;}
+
+    
     protected SocketProperties socketProperties = new SocketProperties();
 
     /**
@@ -1367,6 +1387,7 @@ public class NioEndpoint {
             KeyAttachment key = keyCache.poll();
             final KeyAttachment ka = key!=null?key:new KeyAttachment();
             ka.reset(this,socket,getSocketProperties().getSoTimeout());
+            ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             PollerEvent r = eventCache.poll();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
@@ -1391,6 +1412,7 @@ public class NioEndpoint {
                 }
                 
                 if (ka!=null) handler.release(ka.getChannel());
+                else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {ka.channel.close(true);}catch (Exception ignore){}
@@ -1713,6 +1735,7 @@ public class NioEndpoint {
             cometNotify = false;
             cometOps = SelectionKey.OP_READ;
             sendfileData = null;
+            keepAliveLeft = 100;
         }
         
         public void reset() {
@@ -1759,7 +1782,9 @@ public class NioEndpoint {
         }
         public void startReadLatch(int cnt) { readLatch = startLatch(readLatch,cnt);}
         public void startWriteLatch(int cnt) { writeLatch = startLatch(writeLatch,cnt);}
-        
+        public int getKeepAliveLeft() { return this.keepAliveLeft; }
+        public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
+        public int decrementKeepAlive() { return (--keepAliveLeft);}
         
         protected void awaitLatch(CountDownLatch latch, long timeout, TimeUnit unit) throws InterruptedException {
             if ( latch == null ) throw new IllegalStateException("Latch cannot be null");
@@ -1786,6 +1811,7 @@ public class NioEndpoint {
         protected CountDownLatch writeLatch = null;
         protected long lastRegistered = 0;
         protected SendfileData sendfileData = null;
+        protected int keepAliveLeft = 100;
     }
 
     // ------------------------------------------------ Application Buffer Handler
@@ -1825,6 +1851,7 @@ public class NioEndpoint {
         public SocketState event(NioChannel socket, SocketStatus status);
         public void releaseCaches();
         public void release(NioChannel socket);
+        public void release(SocketChannel socket);
     }
 
 
