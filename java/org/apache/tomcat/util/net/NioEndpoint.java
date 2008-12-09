@@ -41,7 +41,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -62,6 +61,7 @@ import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -365,8 +365,8 @@ public class NioEndpoint {
     protected int maxThreads = 200;
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
-        if (running && executor!=null && executor instanceof ThreadPoolExecutor) {
-            ((ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
+        if (running && executor!=null && executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+            ((java.util.concurrent.ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
         }
     }
     public int getMaxThreads() { return maxThreads; }
