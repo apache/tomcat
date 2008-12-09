@@ -208,8 +208,7 @@ public class Http11NioProcessor implements ActionHook {
      * Maximum number of Keep-Alive requests to honor.
      */
     protected int maxKeepAliveRequests = -1;
-
-
+    
     /**
      * SSL enabled ?
      */
@@ -726,13 +725,15 @@ public class Http11NioProcessor implements ActionHook {
     public SocketState event(SocketStatus status)
         throws IOException {
 
-        RequestInfo rp = request.getRequestProcessor();
+        long soTimeout = endpoint.getSoTimeout();
+        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
+        RequestInfo rp = request.getRequestProcessor();
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
             error = !adapter.event(request, response, status);
             if ( !error ) {
-                NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                 if (attach != null) {
                     attach.setComet(comet);
                     if (comet) {
@@ -740,7 +741,11 @@ public class Http11NioProcessor implements ActionHook {
                         if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
                     } else {
                         //reset the timeout
-                        attach.setTimeout(endpoint.getSocketProperties().getSoTimeout());
+                        if (keepAlive && keepAliveTimeout>0) {
+                            attach.setTimeout(keepAliveTimeout);
+                        } else {
+                            attach.setTimeout(soTimeout);
+                        }
                     }
 
                 }
@@ -761,7 +766,6 @@ public class Http11NioProcessor implements ActionHook {
             return SocketState.CLOSED;
         } else if (!comet) {
             recycle();
-            //pay attention to the keep alive flag set in process()
             return (keepAlive)?SocketState.OPEN:SocketState.CLOSED;
         } else {
             return SocketState.LONG;
@@ -791,15 +795,17 @@ public class Http11NioProcessor implements ActionHook {
         keepAlive = true;
         comet = false;
         
-
-        int keepAliveLeft = maxKeepAliveRequests;
         long soTimeout = endpoint.getSoTimeout();
+        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
 
         boolean keptAlive = false;
         boolean openSocket = false;
         boolean recycle = true;
+        final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
+        
         while (!error && keepAlive && !comet) {
-
+            //always default to our soTimeout
+            ka.setTimeout(soTimeout);
             // Parsing the request header
             try {
                 if( !disableUploadTimeout && keptAlive && soTimeout > 0 ) {
@@ -810,6 +816,10 @@ public class Http11NioProcessor implements ActionHook {
                     //of the request line, we can't recycle the processor
                     openSocket = true;
                     recycle = false;
+                    if (inputBuffer.getParsingRequestLinePhase()<2) {
+                        //keep alive timeout here
+                        if (keepAliveTimeout>0) ka.setTimeout(keepAliveTimeout);
+                    }
                     break;
                 }
                 keptAlive = true;
@@ -851,8 +861,10 @@ public class Http11NioProcessor implements ActionHook {
                 response.setStatus(400);
                 error = true;
             }
-
-            if (maxKeepAliveRequests > 0 && --keepAliveLeft == 0)
+            
+            if (maxKeepAliveRequests == 1 )
+                keepAlive = false;
+            if (maxKeepAliveRequests > 0 && ka.decrementKeepAlive() <= 0)
                 keepAlive = false;
 
             // Process the request in the adapter
@@ -916,7 +928,6 @@ public class Http11NioProcessor implements ActionHook {
             
             // Do sendfile as needed: add socket to sendfile and end
             if (sendfileData != null && !error) {
-                KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
                 ka.setSendfileData(sendfileData);
                 sendfileData.keepAlive = keepAlive;
                 SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
@@ -928,10 +939,9 @@ public class Http11NioProcessor implements ActionHook {
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
-        }
+        }//while
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-
         if (comet) {
             if (error) {
                 recycle();
@@ -940,7 +950,9 @@ public class Http11NioProcessor implements ActionHook {
                 return SocketState.LONG;
             }
         } else {
-            if ( recycle ) recycle();
+            if ( recycle ) {
+                recycle();
+            }
             //return (openSocket) ? (SocketState.OPEN) : SocketState.CLOSED;
             return (openSocket) ? (recycle?SocketState.OPEN:SocketState.LONG) : SocketState.CLOSED;
         }
