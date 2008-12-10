@@ -29,6 +29,8 @@ import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 
+import javax.management.openmbean.CompositeData;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
@@ -110,7 +112,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor implemen
      */
     @Override
     public void closeInvoked() {
-        // TODO Auto-generated method stub
+        queries = null;
         
     }
     
@@ -187,11 +189,19 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor implemen
         }
         this.pool = parent;
     }
+    
+    public void finalize() {
+        if (pool!=null) pool.removeCloseListener(this);
+    }
 
     
     public void poolClosed(ConnectionPool pool) {
         //clean up after ourselves.
         perPoolStats.remove(pool);
+    }
+    
+    public CompositeData[] getSlowQueriesCD() {
+        return null;
     }
     
 
@@ -326,29 +336,32 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor implemen
             long delta = (process)?(System.currentTimeMillis()-start):Long.MIN_VALUE;
             //see if we meet the requirements to measure
             if (delta>threshold) {
-                //extract the query string
-                String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
-                //if we do batch execution, then we name the query 'batch'
-                if (sql==null && compare(executes[3],name)) {
-                    sql = "batch";
-                }
-                //if we have a query, record the stats
-                if (sql!=null) {
-                    QueryStats qs = SlowQueryReport.this.queries.get(sql);
-                    if (qs == null) {
-                        qs = new QueryStats(sql);
-                        SlowQueryReport.this.queries.put((String)sql,qs);
-                    }
-                    qs.add(delta,start);
-                }
+                reportSlowQuery(args, name, start, delta);
             }
             //perform close cleanup
             if (close) {
                 closed=true;
                 delegate = null;
-                queries = null;
             }
             return result;
+        }
+
+        protected void reportSlowQuery(Object[] args, final String name, long start, long delta) {
+            //extract the query string
+            String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+            //if we do batch execution, then we name the query 'batch'
+            if (sql==null && compare(executes[3],name)) {
+                sql = "batch";
+            }
+            //if we have a query, record the stats
+            if (sql!=null) {
+                QueryStats qs = SlowQueryReport.this.queries.get(sql);
+                if (qs == null) {
+                    qs = new QueryStats(sql);
+                    SlowQueryReport.this.queries.put((String)sql,qs);
+                }
+                qs.add(delta,start);
+            }
         }
     }
 }
