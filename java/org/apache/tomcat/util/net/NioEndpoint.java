@@ -1577,12 +1577,15 @@ public class NioEndpoint {
                 WritableByteChannel wc =(WritableByteChannel) ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
                 
                 if (sc.getOutboundRemaining()>0) {
-                    sc.flushOutbound();
+                    if (sc.flushOutbound()) {
+                        attachment.access();
+                    }
                 } else {
                     long written = sd.fchannel.transferTo(sd.pos,sd.length,wc);
                     if ( written > 0 ) {
                         sd.pos += written;
                         sd.length -= written;
+                        attachment.access();
                     }
                 }
                 if ( sd.length <= 0 && sc.getOutboundRemaining()<=0) {
@@ -1662,13 +1665,14 @@ public class NioEndpoint {
                     if ( ka == null ) {
                         cancelledKey(key, SocketStatus.ERROR,false); //we don't support any keys without attachments
                     } else if ( ka.getError() ) {
-                        cancelledKey(key, SocketStatus.ERROR,true);
+                        cancelledKey(key, SocketStatus.ERROR,true);//TODO this is not yet being used
                     } else if (ka.getComet() && ka.getCometNotify() ) {
                         ka.setCometNotify(false);
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
                         if (!processSocket(ka.getChannel(), SocketStatus.OPEN, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
-                    }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                    }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ ||
+                              (ka.interestOps()&SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
                         long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
