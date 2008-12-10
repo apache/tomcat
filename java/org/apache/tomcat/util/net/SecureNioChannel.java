@@ -440,8 +440,11 @@ public class SecureNioChannel extends NioChannel  {
     }
     
     @Override
-    public void flushOutbound() throws IOException {
+    public boolean flushOutbound() throws IOException {
+        int remaining = netOutBuffer.remaining();
         flush(netOutBuffer);
+        int remaining2= netOutBuffer.remaining();
+        return remaining2 < remaining;
     }
 
     
