@@ -1400,8 +1400,8 @@ public class NioEndpoint {
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
-                try {ka.channel.close(true);}catch (Exception ignore){}
-                ka.reset();
+                try {if (ka!=null) ka.channel.close(true);}catch (Exception ignore){}
+                if (ka!=null) ka.reset();
             } catch (Throwable e) {
                 if ( log.isDebugEnabled() ) log.error("",e);
                 // Ignore
