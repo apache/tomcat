@@ -1111,21 +1111,7 @@ public class NioEndpoint {
         }
         return false;
     }
-    /**
-     * Process given socket.
-     */
-    protected boolean processSocket(NioChannel socket) {
-        return processSocket(socket,null);
-    }
 
-
-    /**
-     * Process given socket for an event.
-     */
-    protected boolean processSocket(NioChannel socket, SocketStatus status) {
-        return processSocket(socket,status,true);
-    }
-    
     protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
             KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
@@ -1409,13 +1395,12 @@ public class NioEndpoint {
                         processSocket(ka.getChannel(), status, false); //don't dispatch if the lines below are cancelling the key
                     }                    
                 }
-                
+                key.attach(null);
                 if (ka!=null) handler.release(ka.getChannel());
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {ka.channel.close(true);}catch (Exception ignore){}
-                key.attach(null);
             } catch (Throwable e) {
                 if ( log.isDebugEnabled() ) log.error("",e);
                 // Ignore
@@ -1539,12 +1524,12 @@ public class NioEndpoint {
                                 //read goes before write
                                 if (sk.isReadable()) {
                                     //read notification
-                                    if (!processSocket(channel, SocketStatus.OPEN))
-                                        processSocket(channel, SocketStatus.DISCONNECT);
+                                    if (!processSocket(channel, SocketStatus.OPEN, true))
+                                        processSocket(channel, SocketStatus.DISCONNECT, true);
                                 } else {
                                     //future placement of a WRITE notif
-                                    if (!processSocket(channel, SocketStatus.OPEN))
-                                        processSocket(channel, SocketStatus.DISCONNECT);
+                                    if (!processSocket(channel, SocketStatus.OPEN, true))
+                                        processSocket(channel, SocketStatus.DISCONNECT, true);
                                 }
                             } else {
                                 result = false;
@@ -1553,7 +1538,7 @@ public class NioEndpoint {
                             //later on, improve latch behavior
                             if ( isWorkerAvailable() ) {
                                 unreg(sk, attachment,sk.readyOps());
-                                boolean close = (!processSocket(channel));
+                                boolean close = (!processSocket(channel, null, true));
                                 if (close) {
                                     cancelledKey(sk,SocketStatus.DISCONNECT,false);
                                 }
@@ -1682,7 +1667,7 @@ public class NioEndpoint {
                         ka.setCometNotify(false);
                         reg(key,ka,0);//avoid multiple calls, this gets reregistered after invokation
                         //if (!processSocket(ka.getChannel(), SocketStatus.OPEN_CALLBACK)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
-                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT);
+                        if (!processSocket(ka.getChannel(), SocketStatus.OPEN, true)) processSocket(ka.getChannel(), SocketStatus.DISCONNECT, true);
                     }else if ((ka.interestOps()&SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         //only timeout sockets that we are waiting for a read from
                         long delta = now - ka.getLastAccess();
