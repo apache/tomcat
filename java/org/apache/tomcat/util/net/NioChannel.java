@@ -199,8 +199,13 @@ public class NioChannel implements ByteChannel{
         return 0;
     }
     
-    public void flushOutbound() throws IOException {
-        
+    /**
+     * Return true if the buffer wrote data
+     * @return
+     * @throws IOException
+     */
+    public boolean flushOutbound() throws IOException {
+        return false;
     }
     
     public boolean isSendFile() {
