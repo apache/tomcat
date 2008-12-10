@@ -263,6 +263,10 @@ public class ConnectionPool {
         listeners.add(listener);
     }
     
+    public void removeCloseListener(CloseListener listener) {
+        listeners.remove(listener);
+    }
+    
     /**
      * Closes the pool and all disconnects all idle connections
      * Active connections will be closed upon the {@link java.sql.Connection#close close} method is called
