@@ -431,7 +431,7 @@ public class PoolProperties {
     public static class InterceptorDefinition {
         protected String className;
         protected List<InterceptorProperty> properties = new ArrayList<InterceptorProperty>();
-
+        protected volatile Class clazz = null;
         public InterceptorDefinition(String className) {
             this.className = className;
         }
@@ -450,6 +450,13 @@ public class PoolProperties {
         
         public List<InterceptorProperty> getProperties() {
             return properties;
+        }
+        
+        public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
+            if (clazz==null) {
+                clazz = Class.forName(getClassName(), true, JdbcInterceptor.class.getClassLoader());
+            }
+            return clazz;
         }
     } 
     
