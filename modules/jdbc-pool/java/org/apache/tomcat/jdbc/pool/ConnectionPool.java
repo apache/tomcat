@@ -291,7 +291,14 @@ public class ConnectionPool {
         }
         size.set(0);
         if (this.getPoolProperties().isJmxEnabled()) stopJmx();
-        
+        PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        for (int i=0; i<proxies.length; i++) {
+            try {
+                proxies[i].getInterceptorClass().newInstance().poolClosed(this);
+            }catch (Exception x) {
+                log.debug("Unable to inform interceptor of pool closure.",x);
+            }
+        }
     } //closePool
 
 

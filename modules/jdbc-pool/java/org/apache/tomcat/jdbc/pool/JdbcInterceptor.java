@@ -90,4 +90,14 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     public void setUseEquals(boolean useEquals) {
         this.useEquals = useEquals;
     }
+    
+    /**
+     * This method is invoked by a connection pool when the pool is closed.
+     * Interceptor classes can override this method if they keep static
+     * variables or other tracking means around.
+     * <b>This method is only invoked on a single instance of the interceptor, and not on every instance created.</b>
+     * @param pool - the pool that is being closed.
+     */
+    public void poolClosed(ConnectionPool pool) {
+    }
 }
