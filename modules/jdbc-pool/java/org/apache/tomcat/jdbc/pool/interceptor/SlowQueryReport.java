@@ -184,6 +184,16 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         }
     }
     
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void poolClosed(ConnectionPool pool) {
+        perPoolStats.remove(pool.getName());
+        super.poolClosed(pool);
+    }
+
     public CompositeData[] getSlowQueriesCD() {
         return null;
     }
