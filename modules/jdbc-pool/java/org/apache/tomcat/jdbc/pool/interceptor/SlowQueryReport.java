@@ -105,12 +105,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      */
     @Override
     public void closeInvoked() {
-        try {
-            queries = null;
-        }catch (Exception x) {
-            log.debug(x);
-        }
-        
+        queries = null;
     }
     
     /**
