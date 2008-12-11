@@ -256,6 +256,17 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         } 
     }
     
+    
+    
+
+    @Override
+    public void reset(ConnectionPool parent, PooledConnection con) {
+        super.reset(parent, con);
+        queries = SlowQueryReport.perPoolStats.get(parent.getName());
+    }
+
+
+
 
     /**
      * 
