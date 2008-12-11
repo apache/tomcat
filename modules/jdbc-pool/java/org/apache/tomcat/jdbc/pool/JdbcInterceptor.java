@@ -74,7 +74,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * @param con - the pooled connection
      */
     public abstract void reset(ConnectionPool parent, PooledConnection con);
-
+    
     public List<InterceptorProperty> getProperties() {
         return properties;
     }
