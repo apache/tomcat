@@ -15,7 +15,6 @@ public class TestSlowQueryReport extends DefaultTestCase {
     public TestSlowQueryReport(String name) {
         super(name);
     }
-
     
     public void testSlowSql() throws Exception {
         int count = 3;
@@ -81,4 +80,36 @@ public class TestSlowQueryReport extends DefaultTestCase {
         assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }    
     
+    public void testFailedSql() throws Exception {
+        int count = 3;
+        this.init();
+        this.datasource.setMaxActive(1);
+        this.datasource.setJdbcInterceptors(SlowQueryReport.class.getName());
+        Connection con = this.datasource.getConnection();
+        String slowSql = "select 1 from non_existent";
+        int exceptionCount = 0;
+        for (int i=0; i<count; i++) {
+            Statement st = con.createStatement();
+            try {
+                ResultSet rs = st.executeQuery(slowSql);
+                rs.close();
+            }catch (Exception x) {
+                exceptionCount++;
+            }
+            st.close();
+            
+        }
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
+        assertNotNull(map);
+        assertEquals(1,map.size());
+        ConnectionPool pool = datasource.getPool();
+        String key = map.keySet().iterator().next();
+        SlowQueryReport.QueryStats stats = map.get(key);
+        System.out.println("Stats:"+stats);
+        con.close();
+        tearDown();
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
+    }    
+
+
 }
