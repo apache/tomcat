@@ -27,8 +27,6 @@ import java.sql.Statement;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.management.openmbean.CompositeData;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
@@ -48,8 +46,9 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      */
     protected static final Constructor[] constructors = 
         new Constructor[AbstractCreateStatementInterceptor.statements.length];
+
     /**
-     * we will be keeping track of query stats on a per pool basis, do we want this, or global?
+     * we will be keeping track of query stats on a per pool basis
      */
     protected static ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>> perPoolStats = 
         new ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>>();
@@ -194,12 +193,6 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         super.poolClosed(pool);
     }
 
-    public CompositeData[] getSlowQueriesCD() {
-        return null;
-    }
-    
-
-    
     /**
      * 
      * @author fhanik
