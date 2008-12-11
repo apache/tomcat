@@ -124,5 +124,16 @@ public class CometEventImpl implements CometEvent {
             throw new UnsupportedOperationException();
         }
     }
+    
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append(super.toString());
+        buf.append("[EventType:");
+        buf.append(eventType);
+        buf.append(", EventSubType:");
+        buf.append(eventSubType);
+        buf.append("]");
+        return buf.toString();
+    }
 
 }
