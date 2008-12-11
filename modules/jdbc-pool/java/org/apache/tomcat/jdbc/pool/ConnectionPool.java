@@ -64,6 +64,7 @@ public class ConnectionPool {
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE
     //===============================================================================
+    
     /**
      * All the information about the connection pool
      */
