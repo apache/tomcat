@@ -202,11 +202,10 @@ public class ConnectionPool {
             PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
             for (int i=proxies.length-1; i>=0; i--) {
                 try {
-                    JdbcInterceptor interceptor =
-                        (JdbcInterceptor) Class.forName(proxies[i].getClassName(), true, Thread.currentThread().getContextClassLoader()).newInstance(); //should this be the class loader?
+                    JdbcInterceptor interceptor = proxies[i].getInterceptorClass().newInstance();
                     interceptor.setProperties(proxies[i].getProperties());
                     interceptor.setNext(handler);
-                    interceptor.reset(this, con); //initialize
+                    interceptor.reset(this, con);
                     handler = interceptor;
                 }catch(Exception x) {
                     SQLException sx = new SQLException("Unable to instantiate interceptor chain.");
