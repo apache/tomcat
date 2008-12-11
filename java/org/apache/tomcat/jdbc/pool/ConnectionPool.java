@@ -58,18 +58,12 @@ import javax.management.ObjectName;
  */
 
 public class ConnectionPool {
-    public static interface CloseListener {
-        void poolClosed(ConnectionPool pool);
-    }
-
     //logger
     protected static Log log = LogFactory.getLog(ConnectionPool.class);
 
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE
     //===============================================================================
-    protected ConcurrentLinkedQueue<CloseListener> listeners = new ConcurrentLinkedQueue<CloseListener>();
-    
     /**
      * All the information about the connection pool
      */
@@ -259,14 +253,6 @@ public class ConnectionPool {
         close(true);
     }
 
-    public void addCloseListener(CloseListener listener) {
-        listeners.add(listener);
-    }
-    
-    public void removeCloseListener(CloseListener listener) {
-        listeners.remove(listener);
-    }
-    
     /**
      * Closes the pool and all disconnects all idle connections
      * Active connections will be closed upon the {@link java.sql.Connection#close close} method is called
@@ -306,10 +292,6 @@ public class ConnectionPool {
         size.set(0);
         if (this.getPoolProperties().isJmxEnabled()) stopJmx();
         
-        while (listeners.size()>0) {
-            CloseListener listener = listeners.poll();
-            if (listener!=null) listener.poolClosed(this);
-        }
     } //closePool
 
 

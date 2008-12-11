@@ -42,13 +42,14 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * @author Filip Hanik
  * @version 1.0
  */
-public class SlowQueryReport extends AbstractCreateStatementInterceptor implements ConnectionPool.CloseListener {
+public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
     //logger
     protected static Log log = LogFactory.getLog(SlowQueryReport.class);
     /**
      * the constructors that are used to create statement proxies 
      */
-    protected static final Constructor[] constructors = new Constructor[AbstractCreateStatementInterceptor.statements.length];
+    protected static final Constructor[] constructors = 
+        new Constructor[AbstractCreateStatementInterceptor.statements.length];
     /**
      * we will be keeping track of query stats on a per pool basis, do we want this, or global?
      */
@@ -112,7 +113,13 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor implemen
      */
     @Override
     public void closeInvoked() {
-        queries = null;
+        try {
+            queries = null;
+            finalize();
+            pool = null;
+        }catch (Exception x) {
+            log.debug(x);
+        }
         
     }
     
@@ -184,22 +191,13 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor implemen
 
             };
             perPoolStats.put(parent, queries);
-            //add ourselves to the pool listener, so we can cleanup
-            parent.addCloseListener(this);
         }
         this.pool = parent;
     }
     
     public void finalize() {
-        if (pool!=null) pool.removeCloseListener(this);
     }
 
-    
-    public void poolClosed(ConnectionPool pool) {
-        //clean up after ourselves.
-        perPoolStats.remove(pool);
-    }
-    
     public CompositeData[] getSlowQueriesCD() {
         return null;
     }
