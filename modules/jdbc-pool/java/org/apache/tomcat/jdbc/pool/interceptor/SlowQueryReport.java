@@ -53,8 +53,8 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
     /**
      * we will be keeping track of query stats on a per pool basis, do we want this, or global?
      */
-    protected static IdentityHashMap<ConnectionPool,HashMap<String,QueryStats>> perPoolStats = 
-        new IdentityHashMap<ConnectionPool,HashMap<String,QueryStats>>();
+    protected static HashMap<String,HashMap<String,QueryStats>> perPoolStats = 
+        new HashMap<String,HashMap<String,QueryStats>>();
     /**
      * the queries that are used for this interceptor.
      */
@@ -68,11 +68,6 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      */
     protected int  maxQueries= 1000; //don't store more than this amount of queries
     
-    /**
-     * The pool that is associated with this interceptor so that we can clean up
-     */
-    private ConnectionPool pool = null;
-
     /**
      * Returns the query stats for a given pool
      * @param pool - the pool we want to retrieve stats for
@@ -115,8 +110,6 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
     public void closeInvoked() {
         try {
             queries = null;
-            finalize();
-            pool = null;
         }catch (Exception x) {
             log.debug(x);
         }
@@ -190,14 +183,10 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
                 }
 
             };
-            perPoolStats.put(parent, queries);
+            perPoolStats.put(parent.getName(), queries);
         }
-        this.pool = parent;
     }
     
-    public void finalize() {
-    }
-
     public CompositeData[] getSlowQueriesCD() {
         return null;
     }
