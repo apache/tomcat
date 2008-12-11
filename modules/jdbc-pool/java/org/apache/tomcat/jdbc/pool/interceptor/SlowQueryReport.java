@@ -169,9 +169,11 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
     /**
      * {@inheritDoc}
      */
-    public void reset(ConnectionPool parent, PooledConnection con) {
+    @Override
+    public void poolStarted(ConnectionPool pool) {
+        super.poolStarted(pool);
         //see if we already created a map for this pool
-        queries = SlowQueryReport.perPoolStats.get(parent.getName());
+        queries = SlowQueryReport.perPoolStats.get(pool.getName());
         if (queries==null) {
             //create the map to hold our stats
             //however TODO we need to improve the eviction
@@ -179,13 +181,12 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             queries = new ConcurrentHashMap<String,QueryStats>() {
                 
             };
-            if (perPoolStats.putIfAbsent(parent.getName(), queries)!=null) {
+            if (perPoolStats.putIfAbsent(pool.getName(), queries)!=null) {
                 //there already was one
-                queries = SlowQueryReport.perPoolStats.get(parent.getName());
+                queries = SlowQueryReport.perPoolStats.get(pool.getName());
             }
         }
     }
-    
     
     /**
      * {@inheritDoc}
