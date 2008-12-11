@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
@@ -30,7 +30,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
             rs.close();
             st.close();
         }
-        HashMap<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool());
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         assertNotNull(map);
         assertEquals(1,map.size());
         String key = map.keySet().iterator().next();
@@ -56,7 +56,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
         con.close();
         tearDown();
         //make sure we actually did clean up when the pool closed
-        assertNull(SlowQueryReport.getPoolStats(pool));
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }
 
     public void testFastSql() throws Exception {
@@ -72,13 +72,13 @@ public class TestSlowQueryReport extends DefaultTestCase {
             rs.close();
             st.close();
         }
-        HashMap<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool());
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         assertNotNull(map);
         assertEquals(0,map.size());
         ConnectionPool pool = datasource.getPool();
         con.close();
         tearDown();
-        assertNull(SlowQueryReport.getPoolStats(pool));
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }    
     
 }
