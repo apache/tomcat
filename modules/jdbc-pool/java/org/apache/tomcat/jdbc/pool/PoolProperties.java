@@ -54,7 +54,7 @@ public class PoolProperties {
     protected int removeAbandonedTimeout = 60;
     protected boolean logAbandoned = false;
     protected int loginTimeout = 10000;
-    protected String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+","+System.identityHashCode(PoolProperties.class)+"]";
+    protected String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+":"+System.identityHashCode(PoolProperties.class)+"]";
     protected String password;
     protected String username;
     protected long validationInterval = 30000;

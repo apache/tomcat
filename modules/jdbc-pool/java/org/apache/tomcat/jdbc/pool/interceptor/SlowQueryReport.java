@@ -24,10 +24,8 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.Map.Entry;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.openmbean.CompositeData;
 
@@ -53,12 +51,12 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
     /**
      * we will be keeping track of query stats on a per pool basis, do we want this, or global?
      */
-    protected static HashMap<String,HashMap<String,QueryStats>> perPoolStats = 
-        new HashMap<String,HashMap<String,QueryStats>>();
+    protected static ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>> perPoolStats = 
+        new ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>>();
     /**
      * the queries that are used for this interceptor.
      */
-    protected HashMap<String,QueryStats> queries = null;
+    protected ConcurrentHashMap<String,QueryStats> queries = null;
     /**
      * The threshold in milliseconds. If the query is faster than this, we don't measure it
      */
@@ -73,8 +71,8 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      * @param pool - the pool we want to retrieve stats for
      * @return a hash map containing statistics for 0 to maxQueries 
      */
-    public static HashMap<String,QueryStats> getPoolStats(ConnectionPool pool) {
-        return perPoolStats.get(pool);
+    public static ConcurrentHashMap<String,QueryStats> getPoolStats(String poolname) {
+        return perPoolStats.get(poolname);
     }
     
     /**
@@ -171,19 +169,18 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      */
     public void reset(ConnectionPool parent, PooledConnection con) {
         //see if we already created a map for this pool
-        queries = SlowQueryReport.perPoolStats.get(parent);
+        queries = SlowQueryReport.perPoolStats.get(parent.getName());
         if (queries==null) {
             //create the map to hold our stats
             //however TODO we need to improve the eviction
             //selection
-            queries = new LinkedHashMap<String,QueryStats>() {
-                @Override
-                protected boolean removeEldestEntry(Entry<String, QueryStats> eldest) {
-                    return size()>maxQueries;
-                }
-
+            queries = new ConcurrentHashMap<String,QueryStats>() {
+                
             };
-            perPoolStats.put(parent.getName(), queries);
+            if (perPoolStats.putIfAbsent(parent.getName(), queries)!=null) {
+                //there already was one
+                queries = SlowQueryReport.perPoolStats.get(parent.getName());
+            }
         }
     }
     
@@ -206,6 +203,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         private long minInvocationTime = Long.MAX_VALUE;
         private long minInvocationDate;
         private long totalInvocationTime;
+        private volatile long lastInvocation = 0;
         
         public String toString() {
             StringBuffer buf = new StringBuffer("QueryStats[query:");
@@ -244,6 +242,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             }
             nrOfInvocations++;
             totalInvocationTime+=invocationTime;
+            lastInvocation = now;
         }
         
         public String getQuery() {
@@ -285,6 +284,10 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             } 
             return false;
         }
+        
+        public boolean isOlderThan(QueryStats other) {
+            return this.lastInvocation < other.lastInvocation;
+        }
     }
     
     /**
@@ -323,7 +326,12 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             long delta = (process)?(System.currentTimeMillis()-start):Long.MIN_VALUE;
             //see if we meet the requirements to measure
             if (delta>threshold) {
-                reportSlowQuery(args, name, start, delta);
+                try {
+                    //report the slow query
+                    reportSlowQuery(args, name, start, delta);
+                }catch (Exception t) {
+                    if (log.isWarnEnabled()) log.warn("Unable to process slow query",t);
+                }
             }
             //perform close cleanup
             if (close) {
@@ -342,13 +350,40 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             }
             //if we have a query, record the stats
             if (sql!=null) {
-                QueryStats qs = SlowQueryReport.this.queries.get(sql);
-                if (qs == null) {
-                    qs = new QueryStats(sql);
-                    SlowQueryReport.this.queries.put((String)sql,qs);
-                }
-                qs.add(delta,start);
+                QueryStats qs = getQueryStats(sql);
+                if (qs!=null) qs.add(delta,start);
             }
+        }
+
+        private QueryStats getQueryStats(String sql) {
+            ConcurrentHashMap<String,QueryStats> queries = SlowQueryReport.this.queries;
+            if (queries==null) return null;
+            QueryStats qs = queries.get(sql);
+            if (qs == null) {
+                qs = new QueryStats(sql);
+                if (queries.putIfAbsent(sql,qs)!=null) {
+                    qs = queries.get(sql);
+                } else {
+                    //we added a new element, see if we need to remove the oldest
+                    if (queries.size() > maxQueries) {
+                        removeOldest(queries);
+                    }
+                }
+            }
+            return qs;
+        }
+        
+        /**
+         * TODO - implement a better algorithm
+         * @param queries
+         */
+        protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
+            Iterator<String> it = queries.keySet().iterator();
+            while (queries.size()>maxQueries && it.hasNext()) {
+                String sql = it.next();
+                it.remove();
+                if (log.isDebugEnabled()) log.debug("Removing slow query, capacity reached:"+sql);
+            } 
         }
     }
 }
