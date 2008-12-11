@@ -43,6 +43,7 @@ public class DataSourceProxy  {
     protected static Log log = LogFactory.getLog(DataSourceProxy.class);
     
     protected volatile ConnectionPool pool = null;
+    
     public ConnectionPool getPool() {
         return pool;
     }
@@ -173,7 +174,7 @@ public class DataSourceProxy  {
                 if (p!=null) p.close(all);
             }
         }catch (Exception x) {
-            x.printStackTrace();
+            log.warn("Error duing connection pool closure.", x);
         }
     }
 

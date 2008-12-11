@@ -307,7 +307,7 @@ public class ConnectionPool {
      * @param properties PoolProperties - properties used to initialize the pool with
      * @throws SQLException
      */
-    protected void init (PoolProperties properties) throws SQLException {
+    protected void init(PoolProperties properties) throws SQLException {
         poolProperties = properties;
         //make space for 10 extra in case we flow over a bit
         busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
@@ -343,6 +343,16 @@ public class ConnectionPool {
         }
 
 
+        PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
+        for (int i=0; i<proxies.length; i++) {
+            try {
+                proxies[i].getInterceptorClass().newInstance().poolStarted(this);
+            }catch (Exception x) {
+                log.warn("Unable to inform interceptor of pool start.",x);
+                close(true);
+                throw new SQLException(x);
+            }
+        }        
         //initialize the pool with its initial set of members
         PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
         try {
