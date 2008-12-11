@@ -454,9 +454,9 @@ public class PoolProperties {
         
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
-                clazz = Class.forName(getClassName(), true, JdbcInterceptor.class.getClassLoader());
+                clazz = Class.forName(getClassName(), true, this.getClass().getClassLoader());
             }
-            return clazz;
+            return (Class<? extends JdbcInterceptor>)clazz;
         }
     } 
     
