@@ -47,8 +47,10 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
             boolean process = false;
             process = process(statements, method, process);
             if (process) {
+                long start = System.currentTimeMillis();
                 Object statement = super.invoke(proxy,method,args);
-                return createStatement(proxy,method,args,statement);
+                long delta = System.currentTimeMillis() - start;
+                return createStatement(proxy,method,args,statement, delta);
             } else {
                 return super.invoke(proxy,method,args);
             }
@@ -64,7 +66,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      * @param statement
      * @return
      */
-    public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement);
+    public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time);
     
     public abstract void closeInvoked();
 

@@ -36,7 +36,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     protected ArrayList<WeakReference<Statement>> statements = new ArrayList<WeakReference<Statement>>();
     
     @Override
-    public Object createStatement(Object proxy, Method method, Object[] args, Object statement) {
+    public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         // TODO Auto-generated method stub
         try {
             statements.add(new WeakReference((Statement)statement));
