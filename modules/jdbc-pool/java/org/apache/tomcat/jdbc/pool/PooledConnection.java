@@ -117,7 +117,7 @@ public class PooledConnection {
 
 
 //============================================================================
-//             com.filip.util.IPoolObject methods
+//             
 //============================================================================
 
     public long getAbandonTimeout() {
