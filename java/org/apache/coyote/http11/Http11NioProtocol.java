@@ -657,6 +657,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     it.remove();
                     Http11NioProcessor result = entry.getValue();
                     result.recycle();
+                    deregister(result);
                     released = true;
                     break;
                 }
