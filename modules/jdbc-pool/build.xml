@@ -102,6 +102,9 @@
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
+      <fileset dir="${basedir}/modules/jdbc-pool/java">
+        <include name="org/apache/tomcat/jdbc/**/*.xml" />
+      </fileset>
     </jar>
     <!-- connection pool source file-->
     <jar jarfile="${tomcat-jdbc-src.jar}">
