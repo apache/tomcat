@@ -73,8 +73,12 @@ public class PooledConnection {
             driver = (java.sql.Driver) Class.forName(poolProperties.getDriverClassName(),
                                                      true, PooledConnection.class.getClassLoader()).newInstance();
         } catch (java.lang.Exception cn) {
-            log.error("Unable to instantiate JDBC driver.", cn);
-            throw new SQLException(cn.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to instantiate JDBC driver.", cn);
+            }
+            SQLException ex = new SQLException(cn.getMessage());
+            ex.initCause(cn);
+            throw ex;
         }
         String driverURL = poolProperties.getUrl();
         String usr = poolProperties.getUsername();
