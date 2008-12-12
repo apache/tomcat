@@ -350,7 +350,9 @@ public class ConnectionPool {
             }catch (Exception x) {
                 log.warn("Unable to inform interceptor of pool start.",x);
                 close(true);
-                throw new SQLException(x);
+                SQLException ex = new SQLException();
+                ex.initCause(x);
+                throw ex;
             }
         }        
         //initialize the pool with its initial set of members
@@ -477,7 +479,7 @@ public class ConnectionPool {
         } //while
     }
 
-    protected PooledConnection createConnection(long now, PooledConnection con) {
+    protected PooledConnection createConnection(long now, PooledConnection con) throws SQLException {
         //no connections where available we'll create one
         boolean error = false;
         try {
@@ -502,7 +504,15 @@ public class ConnectionPool {
             } //end if
         } catch (Exception e) {
             error = true;
-            log.error("Unable to create a new JDBC connection.", e);
+            if (log.isDebugEnabled())
+                log.debug("Unable to create a new JDBC connection.", e);
+            if (e instanceof SQLException) {
+                throw (SQLException)e;
+            } else {
+                SQLException ex = new SQLException(e.getMessage());
+                ex.initCause(e);
+                throw ex;
+            }
         } finally {
             if (error ) {
                 release(con);
