@@ -27,6 +27,12 @@ import java.sql.Statement;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.OpenDataException;
+import javax.management.openmbean.OpenType;
+import javax.management.openmbean.SimpleType;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
@@ -197,7 +203,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         super.poolClosed(pool);
     }
     
-    protected void reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
+    protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
         //extract the query string
         String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
         //if we do batch execution, then we name the query 'batch'
@@ -209,9 +215,10 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             QueryStats qs = getQueryStats(sql);
             if (qs!=null) qs.failure(System.currentTimeMillis()-start,start);
         }
+        return sql;
     }
     
-    protected void reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
+    protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
         String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
         //if we do batch execution, then we name the query 'batch'
@@ -223,6 +230,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             QueryStats qs = getQueryStats(sql);
             if (qs!=null) qs.add(delta,start);
         }
+        return sql;
     }
     
     protected QueryStats getQueryStats(String sql) {
@@ -274,6 +282,48 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      *
      */
     public static class QueryStats {
+        static final String[] FIELD_NAMES = new String[] {
+            "query",
+            "nrOfInvocations",
+            "maxInvocationTime",
+            "maxInvocationDate",
+            "minInvocationTime",
+            "minInvocationDate",
+            "totalInvocationTime",
+            "failures",
+            "prepareCount",
+            "prepareTime",
+            "lastInvocation"
+        };
+        
+        static final  String[] FIELD_DESCRIPTIONS = new String[] {
+            "The SQL query",
+            "The number of query invocations, a call to executeXXX",
+            "The longest time for this query in milliseconds",
+            "The time and date for when the longest query took place",
+            "The shortest time for this query in milliseconds",
+            "The time and date for when the shortest query took place",
+            "The total amount of milliseconds spent executing this query",
+            "The number of failures for this query",
+            "The number of times this query was prepared (prepareStatement/prepareCall)",
+            "The total number of milliseconds spent preparing this query",
+            "The date and time of the last invocation"
+        };
+        
+        static final OpenType[] FIELD_TYPES = new OpenType[] { 
+            SimpleType.STRING,
+            SimpleType.INTEGER,
+            SimpleType.LONG,
+            SimpleType.LONG,
+            SimpleType.LONG,
+            SimpleType.LONG,
+            SimpleType.LONG,
+            SimpleType.LONG,
+            SimpleType.INTEGER,
+            SimpleType.LONG,
+            SimpleType.LONG 
+        };
+
         private final String query;
         private int nrOfInvocations;
         private long maxInvocationTime = Long.MIN_VALUE;
@@ -285,6 +335,18 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         private int prepareCount;
         private long prepareTime;
         private volatile long lastInvocation = 0;
+        
+        public static String[] getFieldNames() {
+            return FIELD_NAMES;
+        }
+        
+        public static String[] getFieldDescriptions() {
+            return FIELD_DESCRIPTIONS;
+        }
+        
+        public static OpenType[] getFieldTypes() {
+            return FIELD_TYPES;
+        }
         
         public String toString() {
             StringBuffer buf = new StringBuffer("QueryStats[query:");
@@ -311,6 +373,23 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
             buf.append(prepareTime);
             buf.append("]");
             return buf.toString();
+        }
+        
+        public CompositeDataSupport getCompositeData(final CompositeType type) throws OpenDataException{
+            Object[] values = new Object[] {
+                    query,
+                    nrOfInvocations,
+                    maxInvocationTime,
+                    maxInvocationDate,
+                    minInvocationTime,
+                    minInvocationDate,
+                    totalInvocationTime,
+                    failures,
+                    prepareCount,
+                    prepareTime,
+                    lastInvocation
+            };
+            return new CompositeDataSupport(type,FIELD_NAMES,values);
         }
         
         public QueryStats(String query) {
