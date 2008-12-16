@@ -106,7 +106,11 @@ public class ConnectionPool {
      * Executor service used to cancel Futures
      */
     protected ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
-
+    
+    /**
+     * reference to mbean
+     */
+    protected org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = null;
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -393,8 +397,12 @@ public class ConnectionPool {
             return;
         try {
             con.lock();
+            String trace = con.getStackTrace();
             if (getPoolProperties().isLogAbandoned()) {
-                log.warn("Connection has been abandoned " + con + ":" +con.getStackTrace());
+                log.warn("Connection has been abandoned " + con + ":" + trace);
+            }
+            if (jmxPool!=null) {
+                jmxPool.notify(jmxPool.NOTIFY_ABANDON, trace);
             }
             con.abandon();
         } finally {
@@ -740,7 +748,7 @@ public class ConnectionPool {
             java.io.PrintStream writer = new java.io.PrintStream(bout);
             x.printStackTrace(writer);
             String result = bout.toString();
-            return result;
+            return (x.getMessage()!=null && x.getMessage().length()>0)? x.getMessage()+";"+result:result;
         } //end if
     }
 
@@ -758,7 +766,8 @@ public class ConnectionPool {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type=ConnectionPool,name="+getName());
-            mbs.registerMBean(new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this), name);
+            jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
+            mbs.registerMBean(jmxPool, name);
         } catch (Exception x) {
             log.warn("Unable to start JMX integration for connection pool. Instance["+getName()+"] can't be monitored.",x);
         }
@@ -769,6 +778,7 @@ public class ConnectionPool {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type=ConnectionPool,name="+getName());
             mbs.unregisterMBean(name);
+            jmxPool = null;
         }catch (Exception x) {
             log.warn("Unable to stop JMX integration for connection pool. Instance["+getName()+"].",x);
         }
