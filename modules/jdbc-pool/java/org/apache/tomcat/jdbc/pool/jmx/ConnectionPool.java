@@ -18,22 +18,59 @@ package org.apache.tomcat.jdbc.pool.jmx;
  * @author Filip Hanik
  */
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.DynamicMBean;
+import javax.management.MBeanNotificationInfo;
+import javax.management.Notification;
+import javax.management.NotificationBroadcasterSupport;
 
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 
-public class ConnectionPool implements ConnectionPoolMBean  {
+public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean  {
     protected org.apache.tomcat.jdbc.pool.ConnectionPool pool = null;
+    protected AtomicInteger sequence = new AtomicInteger(0);
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
+        super(getDefaultNotificationInfo());
         this.pool = pool;
     }
 
     public org.apache.tomcat.jdbc.pool.ConnectionPool getPool() {
         return pool;
     }
-
+    
+    //=================================================================
+    //       NOTIFICATION INFO
+    //=================================================================
+    public static final String NOTIFY_CONNECT = "CONNECTION FAILED";
+    public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
+    
+    
+    
+    @Override 
+    public MBeanNotificationInfo[] getNotificationInfo() { 
+        return getDefaultNotificationInfo(); 
+    }
+    
+    public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
+        String[] types = new String[] {NOTIFY_CONNECT, NOTIFY_ABANDON}; 
+        String name = Notification.class.getName(); 
+        String description = "A connection pool error condition was met."; 
+        MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description); 
+        return new MBeanNotificationInfo[] {info};
+    }
+    
+    public void notify(final String type, String message) {
+        Notification n = new Notification(
+            type,
+            this,
+            sequence.incrementAndGet(),
+            System.currentTimeMillis(),
+            message!=null?message:"");
+        sendNotification(n);
+    }
+    
     //=================================================================
     //       POOL STATS
     //=================================================================
