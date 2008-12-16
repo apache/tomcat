@@ -85,7 +85,23 @@ public class PooledConnection {
         String pwd = poolProperties.getPassword();
         poolProperties.getDbProperties().setProperty("user", usr);
         poolProperties.getDbProperties().setProperty("password", pwd);
-        connection = driver.connect(driverURL, poolProperties.getDbProperties());
+        try {
+            connection = driver.connect(driverURL, poolProperties.getDbProperties());
+        } catch (Exception x) {
+            if (log.isDebugEnabled()) {
+                log.debug("Unable to connect to database.", x);
+            }
+            if (parent.jmxPool!=null) {
+                parent.jmxPool.notify(parent.jmxPool.NOTIFY_CONNECT, parent.getStackTrace(x));
+            }
+            if (x instanceof SQLException) {
+                throw (SQLException)x;
+            } else {
+                SQLException ex = new SQLException(x.getMessage());
+                ex.initCause(x);
+                throw ex;
+            }
+        }
         //set up the default state, unless we expect the interceptor to do it
         if (poolProperties.getJdbcInterceptors()==null || poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName())<0) {
             if (poolProperties.getDefaultReadOnly()!=null) connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
