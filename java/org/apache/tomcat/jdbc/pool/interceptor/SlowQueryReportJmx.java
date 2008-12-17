@@ -202,7 +202,7 @@ public class SlowQueryReportJmx extends SlowQueryReport {
                 Registry registry = Registry.getRegistry(null, null);
                 ManagedBean managed = registry.findManagedBean(this.getClass().getName());
                 if (managed!=null) {
-                    ObjectName oname = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type="+getClass().getName()+",name=" + poolName);
+                    ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+getClass().getName()+",name=" + poolName);
                     registry.unregisterComponent(oname);
                     registry.removeManagedBean(managed);
                 }
@@ -219,15 +219,15 @@ public class SlowQueryReportJmx extends SlowQueryReport {
     protected void registerJmx() {
         try {
             if (getCompositeType()!=null) {
-                ObjectName oname = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type="+getClass().getName()+",name=" + poolName);
+                ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+getClass().getName()+",name=" + poolName);
                 Registry registry = Registry.getRegistry(null, null);
                 registry.loadDescriptors(getClass().getPackage().getName(),getClass().getClassLoader());
                 ManagedBean managed = registry.findManagedBean(this.getClass().getName());
                 DynamicMBean mbean = managed!=null?managed.createMBean(this):null;
                 if (mbean!=null && mbeans.putIfAbsent(poolName, mbean)==null) {
                     registry.getMBeanServer().registerMBean( mbean, oname);
-                } else {
-                    log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
+                } else if (mbean==null){
+                    log.warn(SlowQueryReport.class.getName()+ "- No JMX support, unable to initiate Tomcat JMX.");
                 }
             } else {
                 log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
