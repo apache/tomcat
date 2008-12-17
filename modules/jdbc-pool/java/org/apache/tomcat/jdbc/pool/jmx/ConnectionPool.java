@@ -43,6 +43,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     //=================================================================
     //       NOTIFICATION INFO
     //=================================================================
+    public static final String NOTIFY_INIT = "INIT FAILED";
     public static final String NOTIFY_CONNECT = "CONNECTION FAILED";
     public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
     
@@ -54,7 +55,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
     
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
-        String[] types = new String[] {NOTIFY_CONNECT, NOTIFY_ABANDON}; 
+        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON}; 
         String name = Notification.class.getName(); 
         String description = "A connection pool error condition was met."; 
         MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description); 
