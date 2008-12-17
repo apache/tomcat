@@ -58,6 +58,8 @@ import javax.management.ObjectName;
  */
 
 public class ConnectionPool {
+    public static final String POOL_JMX_TYPE_PREFIX = "org.apache.tomcat.jdbc.pool.jmx:type=";
+    
     //logger
     protected static Log log = LogFactory.getLog(ConnectionPool.class);
 
@@ -346,13 +348,15 @@ public class ConnectionPool {
             properties.setMaxIdle(properties.getMinIdle());
         }
 
-
+        if (this.getPoolProperties().isJmxEnabled()) startJmx();
+        
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
             try {
                 proxies[i].getInterceptorClass().newInstance().poolStarted(this);
             }catch (Exception x) {
                 log.warn("Unable to inform interceptor of pool start.",x);
+                if (jmxPool!=null) jmxPool.notify(jmxPool.NOTIFY_INIT, getStackTrace(x));
                 close(true);
                 SQLException ex = new SQLException();
                 ex.initCause(x);
@@ -367,6 +371,7 @@ public class ConnectionPool {
             } //for
 
         } catch (SQLException x) {
+            if (jmxPool!=null) jmxPool.notify(jmxPool.NOTIFY_INIT, getStackTrace(x));
             close(true);
             throw x;
         } finally {
@@ -377,7 +382,7 @@ public class ConnectionPool {
                 } //end if
             } //for
         } //catch
-        if (this.getPoolProperties().isJmxEnabled()) startJmx();
+        
         closed = false;
     }
 
@@ -765,7 +770,7 @@ public class ConnectionPool {
     protected void startJmx() {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type=ConnectionPool,name="+getName());
+            ObjectName name = new ObjectName(POOL_JMX_TYPE_PREFIX+"ConnectionPool,name="+getName());
             jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
             mbs.registerMBean(jmxPool, name);
         } catch (Exception x) {
@@ -776,8 +781,9 @@ public class ConnectionPool {
     protected void stopJmx() {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName name = new ObjectName("org.apache.tomcat.jdbc.pool.jmx:type=ConnectionPool,name="+getName());
-            mbs.unregisterMBean(name);
+            ObjectName name = new ObjectName(POOL_JMX_TYPE_PREFIX+"ConnectionPool,name="+getName());
+            if (mbs.isRegistered(name))
+                mbs.unregisterMBean(name);
             jmxPool = null;
         }catch (Exception x) {
             log.warn("Unable to stop JMX integration for connection pool. Instance["+getName()+"].",x);
