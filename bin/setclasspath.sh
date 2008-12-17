@@ -96,7 +96,7 @@ if [ ! -x "$BASEDIR"/bin/setclasspath.sh ]; then
 fi
 
 # Don't override the endorsed dir if the user has set it previously
-if [-z "$JAVA_ENDORSED_DIRS"]; then
+if [ -z "$JAVA_ENDORSED_DIRS" ]; then
   # Set the default -Djava.endorsed.dirs argument
   JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
 fi
