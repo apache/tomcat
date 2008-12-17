@@ -25,9 +25,14 @@ import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 
 public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean  {
+    //logger
+    protected static Log log = LogFactory.getLog(ConnectionPool.class);
+
     protected org.apache.tomcat.jdbc.pool.ConnectionPool pool = null;
     protected AtomicInteger sequence = new AtomicInteger(0);
 
@@ -62,14 +67,29 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return new MBeanNotificationInfo[] {info};
     }
     
-    public void notify(final String type, String message) {
-        Notification n = new Notification(
-            type,
-            this,
-            sequence.incrementAndGet(),
-            System.currentTimeMillis(),
-            message!=null?message:"");
-        sendNotification(n);
+    /**
+     * Return true if the notification was sent successfully, false otherwise.
+     * @param type
+     * @param message
+     * @return
+     */
+    public boolean notify(final String type, String message) {
+        try {
+            Notification n = new Notification(
+                    type,
+                    this,
+                    sequence.incrementAndGet(),
+                    System.currentTimeMillis(),
+                    message!=null?message:"");
+            sendNotification(n);
+            return true;
+        }catch (Exception x) {
+            if (log.isDebugEnabled()) {
+                log.debug("Notify failed. Type="+type+"; Message="+message,x);
+            }
+            return false;
+        }
+        
     }
     
     //=================================================================
