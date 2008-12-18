@@ -97,14 +97,12 @@ Advanced Configuration - Multiple Tomcat Instances
 
 In many circumstances, it is desirable to have a single copy of a Tomcat
 binary distribution shared among multiple users on the same server.  To make
-this possible, you can pass a "-Dcatalina.base=$CATALINA_BASE" argument when
-executing the startup command (see (2)). In this
-"-Dcatalina.base=$CATALINA_BASE" argument, replace $CATALINA_BASE with the
+this possible, you can set the $CATALINA_BASE environment variable to the
 directory that contains the files for your 'personal' Tomcat instance.
 
-When you use this "-Dcatalina.base=$CATALINA_BASE" argument, Tomcat will
-calculate all relative references for files in the following directories based
-on the value of $CATALINA_BASE instead of $CATALINA_HOME:
+When you use $CATALINA_BASE, Tomcat will calculate all relative references for
+files in the following directories based on the value of $CATALINA_BASE instead
+of $CATALINA_HOME:
 
 * bin  - Only setenv.sh (*nix) and setenv.bat (windows)
 
@@ -118,9 +116,9 @@ on the value of $CATALINA_BASE instead of $CATALINA_HOME:
 
 * temp - Directory used by the JVM for temporary files (java.io.tmpdir)
 
-If you do not pass the "-Dcatalina.base=$CATALINA_BASE" argument to the
-startup command, $CATALINA_BASE will default to the same value as $CATALINA_HOME,
- which means that the same directory is used for all relative path resolutions.
+If you do set $CATALINA_BASE, $CATALINA_BASE will default to the same value as
+$CATALINA_HOME, which means that the same directory is used for all relative
+path resolutions.
 
 
 ================
