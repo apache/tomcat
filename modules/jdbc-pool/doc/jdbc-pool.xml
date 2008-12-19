@@ -350,6 +350,75 @@
     of the results from a method invokation as well. You could build query performance analyzer that provides JMX notifications when a 
     query is running longer than the expected time.</p>
   </subsection>
+  <subsection name="JDBC interceptors">
+    <p>Configuring JDBC interceptors is done using the <b>jdbcInterceptors</b> property.
+    The property contains a list of semi colon separated class names. If the classname if not fully qualified it will be prefixed with the 
+    <code>org.apache.tomcat.jdbc.pool.interceptor.</code> prefix.<br/>
+    Example:<br/>
+    <code>
+      jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
+      <br/>
+      is the same as 
+      <br/>
+      jdbcInterceptors=&quot;ConnectionState;StatementFinalizer&quot;
+    </code><br/>
+    Interceptors can have properties as well. These would be configured within the paranthesis of the class names.
+    Example:<br/>
+    <code>
+      jdbcInterceptors=&quot;ConnectionState;StatementFinalizer(useWeakReferences=true,useEquals=true)&quot;
+    </code><br/>
+    </p>  
+  </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.JdbcInterceptor">
+    <p>Abstract base class for all interceptors, can not be instantiated.</p>
+    <attributes>
+      <attribute name="useEquals" required="false">
+        <p>(String as boolean) A custom query to be run when a connection is first created. 
+           The default value is <code>false</code>.
+        </p>
+      </attribute>
+    </attributes>  
+  </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState">
+    <p>Caches the connection for the following attributes <code>autoCommit</code>, <code>readOnly</code>,
+       <code>transactionIsolation</code> and <code>catalog</code>.
+       It is a performance enhancement to avoid roundtrip to the database when getters are called or setters are called with an already set value.
+    </p>   
+    <attributes>
+    </attributes>  
+  </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer">
+    <p>Keeps track of all statements created using <code>createStatement</code>, <code>prepareStatement</code> or <code>prepareCall</code>
+       and closes these statements when the connection is returned to the pool.
+    </p>   
+    <attributes>
+    </attributes>  
+  </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport">
+    <p>Keeps track of query performance and issues log entries when queries exceed a time threshold of fail.
+       The log level used is <code>WARN</code>
+    </p>   
+    <attributes>
+      <attribute name="threshold" required="false">
+        <p>(int as String) The number of milliseconds a query has to exceed before issuing a log alert.
+           The default value is <code>1000</code> milliseconds.
+        </p>
+      </attribute>
+      <attribute name="maxQueries" required="false">
+        <p>(int as String) The maximum number of queries to keep track of in order to preserve memory space 
+           The default value is <code>1000</code>.
+        </p>
+      </attribute>
+    </attributes>  
+  </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
+    <p>Extends the <code>SlowQueryReport</code> and in addition to log entries it issues JMX notification
+       for monitoring tools to react to. Inherits all the attributes from its parent class.
+       This class uses Tomcat's JMX engine so it wont work outside of the Tomcat container.
+    </p>   
+    <attributes>
+    </attributes>
+  </subsection>
 </section>
 
 <section name="Code Example">
@@ -519,15 +588,41 @@
         </source>
         The <code>compare(String,Method)</code> will use the <code>useEquals</code> flag on an interceptor and do either reference comparison or 
         a string value comparison when the <code>useEquals=true</code> flag is set.
-    </p>                   
+    </p>
+    <p>Pool start/stop<br/>
+       When the connection pool is started or closed, you can be notifed. You will only be notified once per interceptor class
+       even though it is an instance method. and you will be notified using an interceptor currently not attached to a pool.
+       <source>
+       public void poolStarted(ConnectionPool pool) {
+       }
+       
+       public void poolClosed(ConnectionPool pool) {
+       }
+       </source>
+       When overriding these methods, don't forget to call super if you are extending a class other than <code>JdbcInterceptor</code>
+    </p>       
     <p>Configuring interceptors<br/>
        Interceptors are configured using the <code>jdbcInterceptors</code> property or the <code>setJdbcInterceptors</code> method.
        An interceptor can have properties, and would be configured like this
        <source>
-       
        String jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState(useEquals=true,fast=yes)&quot;
        </source> 
     </p>   
+    <p>Interceptor properties<br/>
+       Since interceptors can have properties, you need to be able to read the values of these properties within your 
+       interceptor. Taking an example like the one above, you can override the <code>setProperties</code> method.
+       <source>
+	   @Override
+	   public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
+	       super.setProperties(properties);
+	       final String myprop = &quot;myprop&quot;;
+	       InterceptorProperty p1 = properties.get(myprop);
+	       if (p1!=null) {
+	           setMyprop(Long.parseLong(p1.getValue()));
+	       }
+	   }
+        </source>
+    </p>
   </subsection>
   
   
