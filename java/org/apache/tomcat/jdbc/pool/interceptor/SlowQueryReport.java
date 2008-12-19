@@ -25,6 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.openmbean.CompositeDataSupport;
@@ -38,6 +39,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 /**
  * Slow query report interceptor. Tracks timing of query executions.
@@ -65,7 +67,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
     /**
      * The threshold in milliseconds. If the query is faster than this, we don't measure it
      */
-    protected long threshold = 100; //don't report queries less than this
+    protected long threshold = 1000; //don't report queries less than this
     /**
      * Maximum number of queries we will be storing
      */
@@ -103,6 +105,10 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
      */
     public void setThreshold(long threshold) {
         this.threshold = threshold;
+    }
+    
+    public void setMaxQueries(int maxQueries) {
+        this.maxQueries = maxQueries;
     }
 
     /**
@@ -214,6 +220,8 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         if (sql!=null) {
             QueryStats qs = getQueryStats(sql);
             if (qs!=null) qs.failure(System.currentTimeMillis()-start,start);
+            if (log.isWarnEnabled()) log.warn("Failed query["+sql+"] Stacktrace:"+ConnectionPool.getStackTrace(t));
+
         }
         return sql;
     }
@@ -229,6 +237,7 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         if (sql!=null) {
             QueryStats qs = getQueryStats(sql);
             if (qs!=null) qs.add(delta,start);
+            if (log.isWarnEnabled()) log.warn("Slow query["+sql+"] Time to execute:"+delta+" ms.");
         }
         return sql;
     }
@@ -272,6 +281,26 @@ public class SlowQueryReport extends AbstractCreateStatementInterceptor  {
         super.reset(parent, con);
         queries = SlowQueryReport.perPoolStats.get(parent.getName());
     }
+
+    
+
+
+
+    @Override
+    public void setProperties(Map<String, InterceptorProperty> properties) {
+        super.setProperties(properties);
+        final String threshold = "threshold";
+        final String maxqueries= "maxQueries";
+        InterceptorProperty p1 = properties.get(threshold);
+        InterceptorProperty p2 = properties.get(maxqueries);
+        if (p1!=null) {
+            setThreshold(Long.parseLong(p1.getValue()));
+        }
+        if (p2!=null) {
+            setMaxQueries(Integer.parseInt(p2.getValue()));
+        }
+    }
+
 
 
 
