@@ -299,9 +299,14 @@ public final class SecurityUtil{
             }
 
             Subject.doAsPrivileged(subject, pea, null);       
-       } catch( PrivilegedActionException pe) {
-            Throwable e = ((InvocationTargetException)pe.getException())
+        } catch( PrivilegedActionException pe) {
+            Throwable e;
+            if (pe.getException() instanceof InvocationTargetException) {
+                e = ((InvocationTargetException)pe.getException())
                                 .getTargetException();
+            } else {
+                e = pe;
+            }
             
             if (log.isDebugEnabled()){
                 log.debug(sm.getString("SecurityUtil.doAsPrivilege"), e); 
