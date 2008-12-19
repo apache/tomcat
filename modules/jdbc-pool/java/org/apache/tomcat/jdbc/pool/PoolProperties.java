@@ -220,12 +220,13 @@ public class PoolProperties {
                 InterceptorDefinition[] definitions = new InterceptorDefinition[interceptorValues.length];
                 for (int i=0; i<interceptorValues.length; i++) {
                     int propIndex = interceptorValues[i].indexOf("(");
-                    if (propIndex<0) {
+                    int endIndex = interceptorValues[i].indexOf(")");
+                    if (propIndex<0 || endIndex<0 || endIndex <= propIndex) {
                         definitions[i] = new InterceptorDefinition(interceptorValues[i]);
                     } else {
                         String name = interceptorValues[i].substring(0,propIndex);
                         definitions[i] = new InterceptorDefinition(name);
-                        String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length());
+                        String propsAsString = interceptorValues[i].substring(propIndex+1, interceptorValues[i].length()-1);
                         String[] props = propsAsString.split(",");
                         for (int j=0; j<props.length; j++) {
                             int pidx = props[j].indexOf("=");
