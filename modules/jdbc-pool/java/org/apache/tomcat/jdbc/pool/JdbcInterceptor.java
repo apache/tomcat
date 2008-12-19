@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
@@ -32,7 +33,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     public  static final String TOSTRING_VAL = "toString";
     public  static final String ISCLOSED_VAL = "isClosed"; 
     
-    protected List<InterceptorProperty> properties = null; 
+    protected Map<String,InterceptorProperty> properties = null; 
     
     private JdbcInterceptor next = null;
     private boolean useEquals = false;
@@ -75,12 +76,17 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      */
     public abstract void reset(ConnectionPool parent, PooledConnection con);
     
-    public List<InterceptorProperty> getProperties() {
+    public Map<String,InterceptorProperty> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<InterceptorProperty> properties) {
+    public void setProperties(Map<String,InterceptorProperty> properties) {
         this.properties = properties;
+        final String useEquals = "useEquals";
+        InterceptorProperty p = properties.get(useEquals);
+        if (p!=null) {
+            setUseEquals(Boolean.parseBoolean(p.getValue()));
+        }
     }
     
     public boolean isUseEquals() {
