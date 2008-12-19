@@ -355,7 +355,7 @@ public class ConnectionPool {
             try {
                 proxies[i].getInterceptorClass().newInstance().poolStarted(this);
             }catch (Exception x) {
-                log.warn("Unable to inform interceptor of pool start.",x);
+                log.error("Unable to inform interceptor of pool start.",x);
                 if (jmxPool!=null) jmxPool.notify(jmxPool.NOTIFY_INIT, getStackTrace(x));
                 close(true);
                 SQLException ex = new SQLException();
@@ -745,7 +745,7 @@ public class ConnectionPool {
         return getStackTrace(x);
     }
 
-    protected static String getStackTrace(Exception x) {
+    public static String getStackTrace(Throwable x) {
         if (x == null) {
             return null;
         } else {

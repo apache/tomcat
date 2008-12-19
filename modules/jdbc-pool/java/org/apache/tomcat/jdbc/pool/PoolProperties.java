@@ -19,7 +19,9 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,6 +30,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class PoolProperties {
+    public static final String PKG_PREFIX = "org.apache.tomcat.jdbc.pool.interceptor.";
+    
     protected static AtomicInteger poolCounter = new AtomicInteger(0);
     protected Properties dbProperties = new Properties();
     protected String url = null;
@@ -430,7 +434,7 @@ public class PoolProperties {
     
     public static class InterceptorDefinition {
         protected String className;
-        protected List<InterceptorProperty> properties = new ArrayList<InterceptorProperty>();
+        protected Map<String,InterceptorProperty> properties = new HashMap<String,InterceptorProperty>();
         protected volatile Class clazz = null;
         public InterceptorDefinition(String className) {
             this.className = className;
@@ -445,16 +449,20 @@ public class PoolProperties {
         }
         
         public void addProperty(InterceptorProperty p) {
-            properties.add(p);
+            properties.put(p.getName(), p);
         }
         
-        public List<InterceptorProperty> getProperties() {
+        public Map<String,InterceptorProperty> getProperties() {
             return properties;
         }
         
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
-                clazz = Class.forName(getClassName(), true, this.getClass().getClassLoader());
+                if (getClassName().indexOf(".")<0) {
+                    clazz = Class.forName(PoolProperties.PKG_PREFIX+getClassName(), true, this.getClass().getClassLoader());
+                } else {
+                    clazz = Class.forName(getClassName(), true, this.getClass().getClassLoader());
+                }
             }
             return (Class<? extends JdbcInterceptor>)clazz;
         }
@@ -464,6 +472,7 @@ public class PoolProperties {
         String name;
         String value;
         public InterceptorProperty(String name, String value) {
+            assert(name!=null);
             this.name = name;
             this.value = value;
         }
@@ -472,6 +481,17 @@ public class PoolProperties {
         }
         public String getValue() {
             return value;
+        }
+        public int hashCode() {
+            return name.hashCode();
+        }
+        public boolean equals(Object o) {
+            if (o==this) return true;
+            if (o instanceof InterceptorProperty) {
+                InterceptorProperty other = (InterceptorProperty)o;
+                return other.name.equals(this.name);
+            }
+            return false;
         }
     }
 
