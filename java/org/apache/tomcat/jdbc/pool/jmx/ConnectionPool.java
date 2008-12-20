@@ -37,6 +37,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     protected AtomicInteger sequence = new AtomicInteger(0);
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
+        super();
+        this.pool = pool;
+    }
+
+    public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool, boolean for16) {
         super(getDefaultNotificationInfo());
         this.pool = pool;
     }
