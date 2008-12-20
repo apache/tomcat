@@ -25,12 +25,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * @author Filip Hanik
  *
  */
 public class PoolProperties {
     public static final String PKG_PREFIX = "org.apache.tomcat.jdbc.pool.interceptor.";
+    protected static Log log = LogFactory.getLog(PoolProperties.class);
     
     protected static AtomicInteger poolCounter = new AtomicInteger(0);
     protected Properties dbProperties = new Properties();
@@ -460,8 +464,14 @@ public class PoolProperties {
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
             if (clazz==null) {
                 if (getClassName().indexOf(".")<0) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Loading interceptor class:"+PoolProperties.PKG_PREFIX+getClassName());
+                    }
                     clazz = Class.forName(PoolProperties.PKG_PREFIX+getClassName(), true, this.getClass().getClassLoader());
                 } else {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Loading interceptor class:"+getClassName());
+                    }
                     clazz = Class.forName(getClassName(), true, this.getClass().getClassLoader());
                 }
             }
