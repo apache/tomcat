@@ -353,6 +353,9 @@ public class ConnectionPool {
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
             try {
+                if (log.isDebugEnabled()) {
+                    log.debug("Creating interceptor instance of class:"+proxies[i].getInterceptorClass());
+                }
                 proxies[i].getInterceptorClass().newInstance().poolStarted(this);
             }catch (Exception x) {
                 log.error("Unable to inform interceptor of pool start.",x);
@@ -771,7 +774,11 @@ public class ConnectionPool {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName(POOL_JMX_TYPE_PREFIX+"ConnectionPool,name="+getName());
-            jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
+            if ("1.5".equals(System.getProperty("java.specification.version"))) {
+                jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
+            } else {
+                jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this,true);
+            }
             mbs.registerMBean(jmxPool, name);
         } catch (Exception x) {
             log.warn("Unable to start JMX integration for connection pool. Instance["+getName()+"] can't be monitored.",x);
