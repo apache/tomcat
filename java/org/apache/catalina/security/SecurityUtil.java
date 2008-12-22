@@ -52,11 +52,15 @@ public final class SecurityUtil{
     private final static int INIT= 0;
     private final static int SERVICE = 1;
     private final static int DOFILTER = 1;
-    private final static int DESTROY = 2;
+    private final static int EVENT = 2;
+    private final static int DOFILTEREVENT = 2;
+    private final static int DESTROY = 3;
     
     private final static String INIT_METHOD = "init";
     private final static String DOFILTER_METHOD = "doFilter";
     private final static String SERVICE_METHOD = "service";
+    private final static String EVENT_METHOD = "event";
+    private final static String DOFILTEREVENT_METHOD = "doFilterEvent";
     private final static String DESTROY_METHOD = "destroy";
    
     /**
@@ -346,6 +350,12 @@ public final class SecurityUtil{
         } else if (methodName.equalsIgnoreCase(DOFILTER_METHOD) 
                 && methodsCache[DOFILTER] != null){
             return methodsCache[DOFILTER];          
+        } else if (methodName.equalsIgnoreCase(EVENT_METHOD) 
+                && methodsCache[EVENT] != null){
+            return methodsCache[EVENT];          
+        } else if (methodName.equalsIgnoreCase(DOFILTEREVENT_METHOD) 
+                && methodsCache[DOFILTEREVENT] != null){
+            return methodsCache[DOFILTEREVENT];          
         } 
         return null;
     }
@@ -368,7 +378,7 @@ public final class SecurityUtil{
             throws Exception{
         
         if ( methodsCache == null){
-            methodsCache = new Method[3];
+            methodsCache = new Method[4];
         }               
                 
         Method method = 
@@ -382,6 +392,10 @@ public final class SecurityUtil{
             methodsCache[SERVICE] = method;
         } else if (methodName.equalsIgnoreCase(DOFILTER_METHOD)){
             methodsCache[DOFILTER] = method;
+        } else if (methodName.equalsIgnoreCase(EVENT_METHOD)){
+            methodsCache[EVENT] = method;
+        } else if (methodName.equalsIgnoreCase(DOFILTEREVENT_METHOD)){
+            methodsCache[DOFILTEREVENT] = method;
         } 
          
         objectCache.put(targetObject, methodsCache );
