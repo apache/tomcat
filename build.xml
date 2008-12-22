@@ -23,7 +23,7 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="10" />
+  <property name="version.build"         value="11" />
   <property name="version.patch"         value="-beta" />
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
