@@ -80,6 +80,8 @@ public class ProxyConnection extends JdbcInterceptor {
             return null;
         } else if (compare(TOSTRING_VAL,method)) {
             return this.toString();
+        } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
+            return connection.getConnection();
         }
         if (isClosed()) throw new SQLException("Connection has already been closed.");
         return method.invoke(connection.getConnection(),args);
