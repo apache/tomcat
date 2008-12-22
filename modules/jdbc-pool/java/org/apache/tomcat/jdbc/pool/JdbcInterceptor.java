@@ -29,9 +29,10 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
  * @version 1.0
  */
 public abstract class JdbcInterceptor implements InvocationHandler {
-    public  static final String CLOSE_VAL = "close";
-    public  static final String TOSTRING_VAL = "toString";
-    public  static final String ISCLOSED_VAL = "isClosed"; 
+    public static final String CLOSE_VAL = "close";
+    public static final String TOSTRING_VAL = "toString";
+    public static final String ISCLOSED_VAL = "isClosed"; 
+    public static final String GETCONNECTION_VAL = "getConnection";
     
     protected Map<String,InterceptorProperty> properties = null; 
     
