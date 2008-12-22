@@ -408,8 +408,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                         ev.getHttpServletRequest().getUserPrincipal();
 
                     Object[] args = new Object[]{ev, this};
-                    SecurityUtil.doAsPrivilege
-                        ("doFilterEvent", (Filter) filter, cometClassType, args);
+                    SecurityUtil.doAsPrivilege("doFilterEvent", filter,
+                            cometClassType, args, principal);
 
                     args = null;
                 } else {  
