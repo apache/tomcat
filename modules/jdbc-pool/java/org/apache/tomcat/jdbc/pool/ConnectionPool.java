@@ -248,7 +248,7 @@ public class ConnectionPool {
     public Constructor getProxyConstructor() throws NoSuchMethodException {
         //cache the constructor
         if (proxyClassConstructor == null ) {
-            Class proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class});
+            Class proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class});
             proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         }
         return proxyClassConstructor;
