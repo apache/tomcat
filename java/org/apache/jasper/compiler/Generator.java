@@ -2423,7 +2423,7 @@ class Generator {
                 out.println(".doFinally();");
             }
 
-            if (isPoolingEnabled) {
+            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
                 out.printin(n.getTagHandlerPoolName());
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
