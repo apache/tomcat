@@ -73,6 +73,11 @@ public class ServerCookie implements Serializable {
     public static final boolean STRICT_SERVLET_COMPLIANCE =
         Boolean.valueOf(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false")).booleanValue();
 
+    /**
+     * If set to false, we don't use the IE6/7 Max-Age/Expires work around
+     */
+    public static final boolean ALWAYS_ADD_EXPIRES =
+        Boolean.valueOf(System.getProperty("org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES", "true")).booleanValue();
 
     // Note: Servlet Spec =< 2.5 only refers to Netscape and RFC2109,
     // not RFC2965
@@ -282,7 +287,13 @@ public class ServerCookie implements Serializable {
         // Max-Age=secs ... or use old "Expires" format
         // TODO RFC2965 Discard
         if (maxAge >= 0) {
-            if (version == 0) {
+            if (version > 0) {
+                buf.append ("; Max-Age=");
+                buf.append (maxAge);
+            }
+            // IE6, IE7 and possibly other browsers don't understand Max-Age.
+            // They do understand Expires, even with V1 cookies!
+            if (version == 0 || ALWAYS_ADD_EXPIRES) {
                 // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
                 buf.append ("; Expires=");
                 // To expire immediately we need to set the time in past
@@ -295,10 +306,6 @@ public class ServerCookie implements Serializable {
                                         maxAge*1000L),
                                 buf, new FieldPosition(0));
                     }
-
-            } else {
-                buf.append ("; Max-Age=");
-                buf.append (maxAge);
             }
         }
 
