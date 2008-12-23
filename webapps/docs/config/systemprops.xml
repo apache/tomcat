@@ -247,6 +247,15 @@
       default value of <code>false</code> will be used.</p>
     </property>
 
+    <property
+    name="org.apache.tomcat.util.http. ServerCookie.ALWAYS_ADD_EXPIRES">
+      <p>If this is <code>true</code> Tomcat will always add an expires
+      parameter to a SetCookie header even for cookies with version greater than
+      zero. This is to work around a known IE6 and IE7 bug that causes IE to
+      ignore the Max-Age parameter in a SetCookie header.If not specified, the
+      default value of <code>true</code> will be used.</p>
+    </property>
+
   </properties>
 
 </section>
