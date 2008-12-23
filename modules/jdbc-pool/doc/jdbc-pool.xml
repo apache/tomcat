@@ -624,7 +624,17 @@
         </source>
     </p>
   </subsection>
-  
+  <subsection name="Getting the actual JDBC connection">
+    <p>Connection pools create wrappers around the actual connection in order to properly pool them.
+       We also create interceptors in these wrappers to be able to perform certain functions.
+       If there is a need to retrieve the actual connection, one can do so using the <code>javax.sql.PooledConnection</code>
+       interface.
+       <source>
+          Connection con = datasource.getConnection();
+          Connection actual = ((javax.sql.PooledConnection)con).getConnection();
+       </source>
+    </p>
+  </subsection>
   
 </section>
 
