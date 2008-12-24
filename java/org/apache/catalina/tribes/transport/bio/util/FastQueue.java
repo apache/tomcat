@@ -61,11 +61,7 @@ public class FastQueue {
      */
     private boolean checkLock = false;
 
-    /**
-     * protocol the thread wait times
-     */
-    private boolean timeWait = false;
-
+    
     private boolean inAdd = false;
 
     private boolean inRemove = false;
@@ -97,11 +93,6 @@ public class FastQueue {
      *  max queue size
      */
     private int maxSize = 0;
-
-    /**
-     *  avg size sample interval
-     */
-    private int sampleInterval = 100;
 
     /**
      * Generate Queue SingleRemoveSynchronizedAddLock and set add and wait
@@ -251,7 +242,6 @@ public class FastQueue {
      */
     public boolean add(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
         boolean ok = true;
-        long time = 0;
 
         if (!enabled) {
             if (log.isInfoEnabled())
@@ -259,9 +249,6 @@ public class FastQueue {
             return false;
         }
 
-        if (timeWait) {
-            time = System.currentTimeMillis();
-        }
         lock.lockAdd();
         try {
             if (log.isTraceEnabled()) {
@@ -327,7 +314,6 @@ public class FastQueue {
     public LinkObject remove() {
         LinkObject element;
         boolean gotLock;
-        long time = 0;
 
         if (!enabled) {
             if (log.isInfoEnabled())
@@ -335,9 +321,6 @@ public class FastQueue {
             return null;
         }
 
-        if (timeWait) {
-            time = System.currentTimeMillis();
-        }
         gotLock = lock.lockRemove();
         try {
 
@@ -381,9 +364,6 @@ public class FastQueue {
                 log.trace("FastQueue.remove: remove ending with size " + size);
             }
 
-            if (timeWait) {
-                time = System.currentTimeMillis();
-            }
         } finally {
             lock.unlockRemove();
         }
