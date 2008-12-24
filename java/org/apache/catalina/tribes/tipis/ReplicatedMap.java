@@ -24,7 +24,6 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.RpcCallback;
-import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 
 /**
  * All-to-all replication for a hash map implementation. Each node in the cluster will carry an identical 

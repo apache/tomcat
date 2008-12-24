@@ -26,7 +26,6 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.RpcCallback;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.UniqueId;
-import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
 
 /**
  * A smart implementation of a stateful replicated map. uses primary/secondary backup strategy. 
