@@ -18,7 +18,6 @@
 package org.apache.catalina.tribes.transport.nio;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectableChannel;
@@ -63,7 +62,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
-    protected LinkedList events = new LinkedList();
+    protected LinkedList<Runnable> events = new LinkedList<Runnable>();
 //    private Object interestOpsMutex = new Object();
 
     public NioReceiver() {
@@ -133,7 +132,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         selector = Selector.open();
         // set the port the server channel will listen to
         //serverSocket.bind(new InetSocketAddress(getBind(), getTcpListenPort()));
-        bind(serverSocket,getTcpListenPort(),getAutoBind());
+        bind(serverSocket,getPort(),getAutoBind());
         // set non-blocking mode for the listening socket
         serverChannel.configureBlocking(false);
         // register the ServerSocketChannel with the Selector
@@ -165,7 +164,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         if ( events.size() == 0 ) return;
         synchronized (events) {
             Runnable r = null;
-            while ( (events.size() > 0) && (r = (Runnable)events.removeFirst()) != null ) {
+            while ( (events.size() > 0) && (r = events.removeFirst()) != null ) {
                 try {
                     if ( log.isTraceEnabled() ) log.trace("Processing event in selector:"+r);
                     r.run();
@@ -198,10 +197,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         if ( (now-lastCheck) < getSelectorTimeout() ) return;
         //timeout
         Selector tmpsel = selector;
-        Set keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
+        Set<SelectionKey> keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
         if ( keys == null ) return;
-        for (Iterator iter = keys.iterator(); iter.hasNext(); ) {
-            SelectionKey key = (SelectionKey) iter.next();
+        for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext(); ) {
+            SelectionKey key = iter.next();
             try {
 //                if (key.interestOps() == SelectionKey.OP_READ) {
 //                    //only timeout sockets that we are waiting for a read from
@@ -217,7 +216,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                     ObjectReader ka = (ObjectReader) key.attachment();
                     if ( ka != null ) {
                         long delta = now - ka.getLastAccess();
-                        if (delta > (long) getTimeout() && (!ka.isAccessed())) {
+                        if (delta > getTimeout() && (!ka.isAccessed())) {
                             if (log.isWarnEnabled())
                                 log.warn("Channel key is registered, but has had no interest ops for the last "+getTimeout()+" ms. (cancelled:"+ka.isCancelled()+"):"+key+" last access:"+new java.sql.Timestamp(ka.getLastAccess())+" Possible cause: all threads used, perform thread dump");
                             ka.setLastAccess(now);
@@ -264,7 +263,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
             try {
                 events();
                 socketTimeouts();
-                int n = selector.select(getTcpSelectorTimeout());
+                int n = selector.select(getSelectorTimeout());
                 if (n == 0) {
                     //there is a good chance that we got here
                     //because the TcpReplicationThread called
@@ -279,10 +278,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
                     continue; // nothing to do
                 }
                 // get an iterator over the set of selected keys
-                Iterator it = (selector!=null)?selector.selectedKeys().iterator():null;
+                Iterator<SelectionKey> it = (selector!=null)?selector.selectedKeys().iterator():null;
                 // look at each key in the selected set
                 while (selector!=null && it.hasNext()) {
-                    SelectionKey key = (SelectionKey) it.next();
+                    SelectionKey key = it.next();
                     // Is a new connection coming in?
                     if (key.isAcceptable()) {
                         ServerSocketChannel server = (ServerSocketChannel) key.channel();
@@ -364,10 +363,10 @@ public class NioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
         this.selector = null;
         if (selector==null) return;
         try {
-            Iterator it = selector.keys().iterator();
+            Iterator<SelectionKey> it = selector.keys().iterator();
             // look at each key in the selected set
             while (it.hasNext()) {
-                SelectionKey key = (SelectionKey)it.next();
+                SelectionKey key = it.next();
                 key.channel().close();
                 key.attach(null);
                 key.cancel();
