@@ -57,13 +57,8 @@ public class AbsoluteOrder {
     }
     
     
-    public static class AbsoluteComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            if ( !((o1 instanceof Member) && (o2 instanceof Member)) ) return 0;
-            return compareMembers((Member)o1,(Member)o2);
-        }
-        
-        public int compareMembers(Member m1, Member m2) {
+    public static class AbsoluteComparator implements Comparator<Member> {
+        public int compare(Member m1, Member m2) {
             int result = compareIps(m1,m2);
             if ( result == 0 ) result = comparePorts(m1,m2);
             if ( result == 0 ) result = compareIds(m1,m2);
@@ -97,7 +92,7 @@ public class AbsoluteOrder {
         }
         
         protected int compareBytes(byte b1, byte b2) {
-            return compareInts((int)b1,(int)b2);
+            return compareInts(b1,b2);
         }
         
         protected int compareInts(int b1, int b2) {

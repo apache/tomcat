@@ -64,11 +64,11 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
             if ( access.get() == 1 ) access.addAndGet(-1);
             throw x;
         } 
-        mbTx += ((double)(bytes*destination.length))/(1024d*1024d);
-        mbAppTx += ((double)(bytes))/(1024d*1024d);
+        mbTx += (bytes*destination.length)/(1024d*1024d);
+        mbAppTx += bytes/(1024d*1024d);
         if ( access.addAndGet(-1) == 0 ) {
             long stop = System.currentTimeMillis();
-            timeTx += ( (double) (stop - txStart)) / 1000d;
+            timeTx += (stop - txStart) / 1000d;
             if ((msgTxCnt.get() / interval) >= lastCnt) {
                 lastCnt++;
                 report(timeTx);
@@ -80,7 +80,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
     public void messageReceived(ChannelMessage msg) {
         if ( rxStart == 0 ) rxStart = System.currentTimeMillis();
         long bytes = XByteBuffer.getDataPackageLength(((ChannelData)msg).getDataPackageLength());
-        mbRx += ((double)bytes)/(1024d*1024d);
+        mbRx += bytes/(1024d*1024d);
         msgRxCnt.addAndGet(1);
         if ( msgRxCnt.get() % interval == 0 ) report(timeTx);
         super.messageReceived(msg);
@@ -103,7 +103,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
         buf.append(msgTxErr).append("\n\tRx Msg:");
         buf.append(msgRxCnt);
         buf.append(" messages\n\tRx Speed:");
-        buf.append(df.format(mbRx/((double)((System.currentTimeMillis()-rxStart)/1000))));
+        buf.append(df.format(mbRx/((System.currentTimeMillis()-rxStart)/1000)));
         buf.append(" MB/sec (since 1st msg)\n\tReceived:");
         buf.append(df.format(mbRx)).append(" MB]\n");
         if ( log.isInfoEnabled() ) log.info(buf);
