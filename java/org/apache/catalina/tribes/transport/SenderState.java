@@ -32,24 +32,19 @@ public class SenderState {
     
     public static final int READY = 0;
     public static final int SUSPECT = 1;
-    public static final int FAILING = 2;
-    /**
-     * The descriptive information about this implementation.
-     */
-    private static final String info = "SenderState/1.0";
+    public static final int FAILING = 2;    
     
-    
-    protected static HashMap memberStates = new HashMap();
+    protected static HashMap<Member, SenderState> memberStates = new HashMap<Member, SenderState>();
     
     public static SenderState getSenderState(Member member) {
         return getSenderState(member,true);
     }
 
     public static SenderState getSenderState(Member member, boolean create) {
-        SenderState state = (SenderState)memberStates.get(member);
+        SenderState state = memberStates.get(member);
         if ( state == null && create) {
             synchronized ( memberStates ) {
-                state = (SenderState)memberStates.get(member);
+                state = memberStates.get(member);
                 if ( state == null ) {
                     state = new SenderState();
                     memberStates.put(member,state);
