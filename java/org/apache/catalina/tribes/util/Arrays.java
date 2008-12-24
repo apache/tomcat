@@ -132,7 +132,8 @@ public class Arrays {
     public static Member[] merge(Member[] m1, Member[] m2) {
         AbsoluteOrder.absoluteOrder(m1);
         AbsoluteOrder.absoluteOrder(m2);
-        ArrayList list = new ArrayList(java.util.Arrays.asList(m1));
+        ArrayList<Member> list =
+            new ArrayList<Member>(java.util.Arrays.asList(m1));
         for (int i=0; i<m2.length; i++) if ( !list.contains(m2[i]) ) list.add(m2[i]);
         Member[] result = new Member[list.size()];
         list.toArray(result);
@@ -145,13 +146,13 @@ public class Arrays {
     }
     
     public static Member[] diff(Membership complete, Membership local, MemberImpl ignore) {
-        ArrayList result = new ArrayList();
+        ArrayList<Member> result = new ArrayList<Member>();
         MemberImpl[] comp = complete.getMembers();
         for ( int i=0; i<comp.length; i++ ) {
             if ( ignore!=null && ignore.equals(comp[i]) ) continue;
             if ( local.getMember(comp[i]) == null ) result.add(comp[i]);
         }
-        return (MemberImpl[])result.toArray(new MemberImpl[result.size()]);
+        return result.toArray(new MemberImpl[result.size()]);
     }
     
     public static Member[] remove(Member[] all, Member remove) {
@@ -159,10 +160,10 @@ public class Arrays {
     }
     
     public static Member[] extract(Member[] all, Member[] remove) {
-        List alist = java.util.Arrays.asList(all);
-        ArrayList list = new ArrayList(alist);
+        List<Member> alist = java.util.Arrays.asList(all);
+        ArrayList<Member> list = new ArrayList<Member>(alist);
         for (int i=0; i<remove.length; i++ ) list.remove(remove[i]);
-        return (Member[])list.toArray(new Member[list.size()]);
+        return list.toArray(new Member[list.size()]);
     }
     
     public static int indexOf(Member member, Member[] members) {
