@@ -41,7 +41,8 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     }
     
     protected long selectTimeout = 1000; 
-    protected HashMap bioSenders = new HashMap();
+    protected HashMap<Member, BioSender> bioSenders =
+        new HashMap<Member, BioSender>();
 
     public synchronized void sendMessage(Member[] destination, ChannelMessage msg) throws ChannelException {
         byte[] data = XByteBuffer.createDataPackage((ChannelData)msg);
@@ -65,10 +66,10 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         BioSender[] result = new BioSender[destination.length];
         for ( int i=0; i<destination.length; i++ ) {
             try {
-                BioSender sender = (BioSender) bioSenders.get(destination[i]);
+                BioSender sender = bioSenders.get(destination[i]);
                 if (sender == null) {
                     sender = new BioSender();
-                    sender.transferProperties(this,sender);
+                    AbstractSender.transferProperties(this,sender);
                     sender.setDestination(destination[i]);
                     bioSenders.put(destination[i], sender);
                 }
@@ -96,7 +97,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
         for (int i=0; i<members.length; i++ ) {
             Member mbr = (Member)members[i];
             try {
-                BioSender sender = (BioSender)bioSenders.get(mbr);
+                BioSender sender = bioSenders.get(mbr);
                 sender.disconnect();
             }catch ( Exception e ) {
                 if ( x == null ) x = new ChannelException(e);
@@ -113,7 +114,7 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
 
     public void remove(Member member) {
         //disconnect senders
-        BioSender sender = (BioSender)bioSenders.remove(member);
+        BioSender sender = bioSenders.remove(member);
         if ( sender != null ) sender.disconnect();
     }
 
@@ -131,9 +132,9 @@ public class MultipointBioSender extends AbstractSender implements MultiPointSen
     public boolean keepalive() {
         //throw new UnsupportedOperationException("Method ParallelBioSender.checkKeepAlive() not implemented");
         boolean result = false;
-        Map.Entry[] entries = (Map.Entry[])bioSenders.entrySet().toArray(new Map.Entry[bioSenders.size()]);
+        Map.Entry<Member,BioSender>[] entries = bioSenders.entrySet().toArray(new Map.Entry[bioSenders.size()]);
         for ( int i=0; i<entries.length; i++ ) {
-            BioSender sender = (BioSender)entries[i].getValue();
+            BioSender sender = entries[i].getValue();
             if ( sender.keepalive() ) {
                 bioSenders.remove(entries[i].getKey());
             }
