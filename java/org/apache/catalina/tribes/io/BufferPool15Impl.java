@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 class BufferPool15Impl implements BufferPool.BufferPoolAPI {
     protected int maxSize;
     protected AtomicInteger size = new AtomicInteger(0);
-    protected ConcurrentLinkedQueue queue = new ConcurrentLinkedQueue();
+    protected ConcurrentLinkedQueue<XByteBuffer> queue = new ConcurrentLinkedQueue<XByteBuffer>();
 
     public void setMaxSize(int bytes) {
         this.maxSize = bytes;
@@ -35,7 +35,7 @@ class BufferPool15Impl implements BufferPool.BufferPoolAPI {
 
 
     public XByteBuffer getBuffer(int minSize, boolean discard) {
-        XByteBuffer buffer = (XByteBuffer)queue.poll();
+        XByteBuffer buffer = queue.poll();
         if ( buffer != null ) size.addAndGet(-buffer.getCapacity());
         if ( buffer == null ) buffer = new XByteBuffer(minSize,discard);
         else if ( buffer.getCapacity() <= minSize ) buffer.expand(minSize);
