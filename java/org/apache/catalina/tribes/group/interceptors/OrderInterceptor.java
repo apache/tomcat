@@ -54,9 +54,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @version 1.1
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
-    private HashMap outcounter = new HashMap();
-    private HashMap incounter = new HashMap();
-    private HashMap incoming = new HashMap();
+    private HashMap<Member, Counter> outcounter = new HashMap<Member, Counter>();
+    private HashMap<Member, Counter> incounter = new HashMap<Member, Counter>();
+    private HashMap<Member, MessageOrder> incoming = new HashMap<Member, MessageOrder>();
     private long expire = 3000;
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;
@@ -110,7 +110,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         }
     }
     protected void processLeftOvers(Member member, boolean force) {
-        MessageOrder tmp = (MessageOrder)incoming.get(member);
+        MessageOrder tmp = incoming.get(member);
         if ( force ) {
             Counter cnt = getInCounter(member);
             cnt.setCounter(Integer.MAX_VALUE);
@@ -127,7 +127,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
         Member member = order.getMessage().getAddress();
         Counter cnt = getInCounter(member);
         
-        MessageOrder tmp = (MessageOrder)incoming.get(member);
+        MessageOrder tmp = incoming.get(member);
         if ( tmp != null ) {
             order = MessageOrder.add(tmp,order);
         }
@@ -189,7 +189,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
     
     protected Counter getInCounter(Member mbr) {
-        Counter cnt = (Counter)incounter.get(mbr);
+        Counter cnt = incounter.get(mbr);
         if ( cnt == null ) {
             cnt = new Counter();
             cnt.inc(); //always start at 1 for incoming
@@ -199,7 +199,7 @@ public class OrderInterceptor extends ChannelInterceptorBase {
     }
 
     protected Counter getOutCounter(Member mbr) {
-        Counter cnt = (Counter)outcounter.get(mbr);
+        Counter cnt = outcounter.get(mbr);
         if ( cnt == null ) {
             cnt = new Counter();
             outcounter.put(mbr,cnt);
