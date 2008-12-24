@@ -43,7 +43,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 public class FragmentationInterceptor extends ChannelInterceptorBase {
     private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog( FragmentationInterceptor.class );
     
-    protected HashMap fragpieces = new HashMap();
+    protected HashMap<FragKey, FragCollection> fragpieces = new HashMap<FragKey, FragCollection>();
     private int maxSize = 1024*100;
     private long expire = 1000 * 60; //one minute expiration
     protected boolean deepclone = true;
@@ -72,10 +72,10 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
 
     
     public FragCollection getFragCollection(FragKey key, ChannelMessage msg) {
-        FragCollection coll = (FragCollection)fragpieces.get(key);
+        FragCollection coll = fragpieces.get(key);
         if ( coll == null ) {
             synchronized (fragpieces) {
-                coll = (FragCollection)fragpieces.get(key);
+                coll = fragpieces.get(key);
                 if ( coll == null ) {
                     coll = new FragCollection(msg);
                     fragpieces.put(key, coll);
@@ -135,7 +135,7 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
     
     public void heartbeat() {
         try {
-            Set set = fragpieces.keySet(); 
+            Set<FragKey> set = fragpieces.keySet(); 
             Object[] keys = set.toArray();
             for ( int i=0; i<keys.length; i++ ) {
                 FragKey key = (FragKey)keys[i];

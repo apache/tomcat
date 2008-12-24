@@ -78,9 +78,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
     
     protected Membership membership = null;
     
-    protected HashMap removeSuspects = new HashMap();
+    protected HashMap<Member, Long> removeSuspects = new HashMap<Member, Long>();
     
-    protected HashMap addSuspects = new HashMap();
+    protected HashMap<Member, Long> addSuspects = new HashMap<Member, Long>();
     
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         try {
@@ -119,7 +119,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             if (removeSuspects.containsKey(member)) {
                 //previously marked suspect, system below picked up the member again
                 removeSuspects.remove(member);
-            } else if (membership.getMember( (MemberImpl) member) == null){
+            } else if (membership.getMember(member) == null){
                 //if we add it here, then add it upwards too
                 //check to see if it is alive
                 if (memberAlive(member)) {
@@ -213,7 +213,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 if (membership.getMember(members[i])!=null) {
                     membership.removeMember((MemberImpl)members[i]);
                     removeSuspects.remove(members[i]);
-                    super.memberDisappeared((MemberImpl)members[i]);
+                    super.memberDisappeared(members[i]);
                 }
             } //end if
         } //for
@@ -237,9 +237,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
         //check suspect members if they are still alive,
         //if not, simply issue the memberDisappeared message
-        MemberImpl[] keys = (MemberImpl[]) removeSuspects.keySet().toArray(new MemberImpl[removeSuspects.size()]);
+        MemberImpl[] keys = removeSuspects.keySet().toArray(new MemberImpl[removeSuspects.size()]);
         for (int i = 0; i < keys.length; i++) {
-            MemberImpl m = (MemberImpl) keys[i];
+            MemberImpl m = keys[i];
             if (membership.getMember(m) != null && (!memberAlive(m))) {
                 membership.removeMember(m);
                 super.memberDisappeared(m);
@@ -251,9 +251,9 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
 
         //check add suspects members if they are alive now,
         //if they are, simply issue the memberAdded message
-        keys = (MemberImpl[]) addSuspects.keySet().toArray(new MemberImpl[addSuspects.size()]);
+        keys = addSuspects.keySet().toArray(new MemberImpl[addSuspects.size()]);
         for (int i = 0; i < keys.length; i++) {
-            MemberImpl m = (MemberImpl) keys[i];
+            MemberImpl m = keys[i];
             if ( membership.getMember(m) == null && (memberAlive(m))) {
                 membership.memberAlive(m);
                 super.memberAdded(m);

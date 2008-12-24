@@ -38,7 +38,7 @@ public class ChannelException extends Exception {
     /*
      * Holds a list of faulty members
      */
-    private ArrayList faultyMembers=null;
+    private ArrayList<FaultyMember> faultyMembers=null;
     
     /**
      * Constructor, creates a ChannelException
@@ -87,7 +87,7 @@ public class ChannelException extends Exception {
         } else {
             buf.append("; Faulty members:");
             for ( int i=0; i<faultyMembers.size(); i++ ) {
-                FaultyMember mbr = (FaultyMember)faultyMembers.get(i);
+                FaultyMember mbr = faultyMembers.get(i);
                 buf.append(mbr.getMember().getName());
                 buf.append("; ");
             }
@@ -121,7 +121,7 @@ public class ChannelException extends Exception {
      * @param mbr FaultyMember
      */
     public boolean addFaultyMember(FaultyMember mbr) {
-        if ( this.faultyMembers==null ) this.faultyMembers = new ArrayList();
+        if ( this.faultyMembers==null ) this.faultyMembers = new ArrayList<FaultyMember>();
         if ( !faultyMembers.contains(mbr) ) return faultyMembers.add(mbr);
         else return false;
     }
@@ -132,7 +132,7 @@ public class ChannelException extends Exception {
      */
     public FaultyMember[] getFaultyMembers() {
         if ( this.faultyMembers==null ) return EMPTY_LIST;
-        return (FaultyMember[])faultyMembers.toArray(new FaultyMember[faultyMembers.size()]);
+        return faultyMembers.toArray(new FaultyMember[faultyMembers.size()]);
     }
     
     /**

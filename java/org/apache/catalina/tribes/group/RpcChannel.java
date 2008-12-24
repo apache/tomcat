@@ -43,7 +43,7 @@ public class RpcChannel implements ChannelListener{
     private RpcCallback callback;
     private byte[] rpcId;
     
-    private HashMap responseMap = new HashMap();
+    private HashMap<RpcCollectorKey, RpcCollector> responseMap = new HashMap<RpcCollectorKey, RpcCollector>();
 
     /**
      * Create an RPC channel. You can have several RPC channels attached to a group
@@ -90,7 +90,7 @@ public class RpcChannel implements ChannelListener{
                 if ( rpcOptions != NO_REPLY ) collector.wait(timeout);
             }
         } catch ( InterruptedException ix ) {
-            Thread.currentThread().interrupted();
+            Thread.interrupted();
             //throw new ChannelException(ix);
         }finally {
             responseMap.remove(key);
@@ -102,7 +102,7 @@ public class RpcChannel implements ChannelListener{
         RpcMessage rmsg = (RpcMessage)msg;
         RpcCollectorKey key = new RpcCollectorKey(rmsg.uuid);
         if ( rmsg.reply ) {
-            RpcCollector collector = (RpcCollector)responseMap.get(key);
+            RpcCollector collector = responseMap.get(key);
             if (collector == null) {
                 callback.leftOver(rmsg.message, sender);
             } else {
@@ -180,7 +180,7 @@ public class RpcChannel implements ChannelListener{
      * @version 1.0
      */
     public static class RpcCollector {
-        public ArrayList responses = new ArrayList(); 
+        public ArrayList<Response> responses = new ArrayList<Response>(); 
         public RpcCollectorKey key;
         public int options;
         public int destcnt;
@@ -227,7 +227,7 @@ public class RpcChannel implements ChannelListener{
         }
         
         public Response[] getResponses() {
-            return (Response[])responses.toArray(new Response[responses.size()]);
+            return responses.toArray(new Response[responses.size()]);
         }
     }
     
