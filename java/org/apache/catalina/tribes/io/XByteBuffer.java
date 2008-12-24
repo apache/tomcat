@@ -62,16 +62,6 @@ public class XByteBuffer
     public static final byte[] END_DATA = {84,76,70,50,48,48,51};
  
     /**
-     * Default size on the initial byte buffer
-     */
-    private static final int DEF_SIZE = 2048;
- 
-    /**
-     * Default size to extend the buffer with
-     */
-    private static final int DEF_EXT  = 1024;
-    
-    /**
      * Variable to hold the data
      */
     protected byte[] buf = null;
@@ -407,10 +397,10 @@ public class XByteBuffer
      * @exception java.lang.ArrayIndexOutOfBoundsException
      */
     public static int toInt(byte[] b,int off){
-        return ( ( (int) b[off+3]) & 0xFF) +
-            ( ( ( (int) b[off+2]) & 0xFF) << 8) +
-            ( ( ( (int) b[off+1]) & 0xFF) << 16) +
-            ( ( ( (int) b[off+0]) & 0xFF) << 24);
+        return ( ( b[off+3]) & 0xFF) +
+            ( ( ( b[off+2]) & 0xFF) << 8) +
+            ( ( ( b[off+1]) & 0xFF) << 16) +
+            ( ( ( b[off+0]) & 0xFF) << 24);
     }
 
     /**

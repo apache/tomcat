@@ -69,7 +69,7 @@ public final class ReplicationStream extends ObjectInputStream {
      * @exception ClassNotFoundException if this class cannot be found
      * @exception IOException if an input/output error occurs
      */
-    public Class resolveClass(ObjectStreamClass classDesc)
+    public Class<?> resolveClass(ObjectStreamClass classDesc)
         throws ClassNotFoundException, IOException {
         String name = classDesc.getName();
         try {
@@ -79,7 +79,7 @@ public final class ReplicationStream extends ObjectInputStream {
         }
     }
     
-    public Class resolveClass(String name)
+    public Class<?> resolveClass(String name)
         throws ClassNotFoundException, IOException {
 
         boolean tryRepFirst = name.startsWith("org.apache.catalina.tribes");
@@ -109,9 +109,9 @@ public final class ReplicationStream extends ObjectInputStream {
         boolean hasNonPublicInterface = false;
 
         // define proxy in class loader of non-public interface(s), if any
-        Class[] classObjs = new Class[interfaces.length];
+        Class<?>[] classObjs = new Class[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {
-            Class cl = this.resolveClass(interfaces[i]);
+            Class<?> cl = this.resolveClass(interfaces[i]);
             if (latestLoader==null) latestLoader = cl.getClassLoader();
             if ((cl.getModifiers() & Modifier.PUBLIC) == 0) {
                 if (hasNonPublicInterface) {
@@ -135,17 +135,17 @@ public final class ReplicationStream extends ObjectInputStream {
     }
 
     
-    public Class findReplicationClass(String name)
+    public Class<?> findReplicationClass(String name)
         throws ClassNotFoundException, IOException {
-        Class clazz = Class.forName(name, false, getClass().getClassLoader());
+        Class<?> clazz = Class.forName(name, false, getClass().getClassLoader());
         return clazz;
     }
 
-    public Class findExternalClass(String name) throws ClassNotFoundException  {
+    public Class<?> findExternalClass(String name) throws ClassNotFoundException  {
         ClassNotFoundException cnfe = null;
         for (int i=0; i<classLoaders.length; i++ ) {
             try {
-                Class clazz = Class.forName(name, false, classLoaders[i]);
+                Class<?> clazz = Class.forName(name, false, classLoaders[i]);
                 return clazz;
             } catch ( ClassNotFoundException x ) {
                 cnfe = x;
