@@ -23,6 +23,7 @@ import java.nio.channels.Selector;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
@@ -52,7 +53,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     protected static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(ParallelNioSender.class);
     protected long selectTimeout = 5000; //default 5 seconds, same as send timeout
     protected Selector selector;
-    protected HashMap nioSenders = new HashMap();
+    protected HashMap<Member, NioSender> nioSenders =
+        new HashMap<Member, NioSender>();
 
     public ParallelNioSender() throws IOException {
         selector = Selector.open();
@@ -120,9 +122,9 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
             return 0;
         }
 
-        Iterator it = selector.selectedKeys().iterator();
+        Iterator<SelectionKey> it = selector.selectedKeys().iterator();
         while (it.hasNext()) {
-            SelectionKey sk = (SelectionKey) it.next();
+            SelectionKey sk = it.next();
             it.remove();
             int readyOps = sk.readyOps();
             sk.interestOps(sk.interestOps() & ~readyOps);
@@ -211,21 +213,19 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         ChannelException cx = null;
         NioSender[] result = new NioSender[destination.length];
         for ( int i=0; i<destination.length; i++ ) {
-            NioSender sender = (NioSender)nioSenders.get(destination[i]);
+            NioSender sender = nioSenders.get(destination[i]);
             try {
 
                 if (sender == null) {
                     sender = new NioSender();
-                    sender.transferProperties(this, sender);
+                    AbstractSender.transferProperties(this, sender);
                     nioSenders.put(destination[i], sender);
                 }
-                if (sender != null) {
-                    sender.reset();
-                    sender.setDestination(destination[i]);
-                    sender.setSelector(selector);
-                    sender.setUdpBased(isUdpBased());
-                    result[i] = sender;
-                }
+                sender.reset();
+                sender.setDestination(destination[i]);
+                sender.setSelector(selector);
+                sender.setUdpBased(isUdpBased());
+                result[i] = sender;
             }catch ( UnknownHostException x ) {
                 if (cx == null) cx = new ChannelException("Unable to setup NioSender.", x);
                 cx.addFaultyMember(destination[i], x);
@@ -247,7 +247,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         for (int i=0; i<members.length; i++ ) {
             Member mbr = (Member)members[i];
             try {
-                NioSender sender = (NioSender)nioSenders.get(mbr);
+                NioSender sender = nioSenders.get(mbr);
                 sender.disconnect();
             }catch ( Exception e ) {
                 if ( x == null ) x = new ChannelException(e);
@@ -264,7 +264,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
     public void remove(Member member) {
         //disconnect senders
-        NioSender sender = (NioSender)nioSenders.remove(member);
+        NioSender sender = nioSenders.remove(member);
         if ( sender != null ) sender.disconnect();
     }
 
@@ -282,9 +282,9 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
 
     public boolean keepalive() {
         boolean result = false;
-        for ( Iterator i = nioSenders.entrySet().iterator(); i.hasNext();  ) {
-            Map.Entry entry = (Map.Entry)i.next();
-            NioSender sender = (NioSender)entry.getValue();
+        for ( Iterator<Entry<Member, NioSender>> i = nioSenders.entrySet().iterator(); i.hasNext();  ) {
+            Map.Entry<Member, NioSender> entry = i.next();
+            NioSender sender = entry.getValue();
             if ( sender.keepalive() ) {
                 //nioSenders.remove(entry.getKey());
                 i.remove();
