@@ -1401,6 +1401,7 @@ public class NioEndpoint {
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
                 try {if (ka!=null) ka.channel.close(true);}catch (Exception ignore){}
+                try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
                 if (ka!=null) ka.reset();
             } catch (Throwable e) {
                 if ( log.isDebugEnabled() ) log.error("",e);
@@ -1594,6 +1595,7 @@ public class NioEndpoint {
                         log.debug("Send file complete for:"+sd.fileName);
                     }
                     attachment.setSendfileData(null);
+                    try {sd.fchannel.close();}catch(Exception ignore){}
                     if ( sd.keepAlive ) {
                         if (reg) {
                             if (log.isDebugEnabled()) {
