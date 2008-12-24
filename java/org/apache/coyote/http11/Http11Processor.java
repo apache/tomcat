@@ -73,6 +73,8 @@ public class Http11Processor implements ActionHook {
     protected static StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    protected static boolean isSecurityEnabled = 
+        org.apache.coyote.Constants.IS_SECURITY_ENABLED;
 
     // ------------------------------------------------------------ Constructor
 
@@ -1544,7 +1546,7 @@ public class Http11Processor implements ActionHook {
 
         // Add date header
         String date = null;
-        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
+        if (isSecurityEnabled){
             date = AccessController.doPrivileged(
                     new PrivilegedAction<String>() {
                         public String run(){
