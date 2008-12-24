@@ -101,17 +101,17 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
 
         PooledSender parent = null;
 
-        private List notinuse = null;
+        private List<DataSender> notinuse = null;
 
-        private List inuse = null;
+        private List<DataSender> inuse = null;
 
         private boolean isOpen = true;
 
         public SenderQueue(PooledSender parent, int limit) {
             this.limit = limit;
             this.parent = parent;
-            notinuse = new java.util.LinkedList();
-            inuse = new java.util.LinkedList();
+            notinuse = new java.util.LinkedList<DataSender>();
+            inuse = new java.util.LinkedList<DataSender>();
         }
 
         /**
@@ -158,7 +158,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                 if (notinuse.size() == 0 && inuse.size() < limit) {
                     sender = parent.getNewDataSender();
                 } else if (notinuse.size() > 0) {
-                    sender = (DataSender) notinuse.remove(0);
+                    sender = notinuse.remove(0);
                 }
                 if (sender != null) {
                     inuse.add(sender);
