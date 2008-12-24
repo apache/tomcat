@@ -183,7 +183,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     public void startElection(boolean force) throws ChannelException {
         synchronized (electionMutex) {
             MemberImpl local = (MemberImpl)getLocalMember(false);
-            MemberImpl[] others = (MemberImpl[])membership.getMembers();
+            MemberImpl[] others = membership.getMembers();
             fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_START_ELECT,this,"Election initated"));
             if ( others.length == 0 ) {
                 this.viewId = new UniqueId(UUIDGenerator.randomUUID(false));
@@ -221,7 +221,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                     fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG,this,"Election, waiting for request"));
                     electionMutex.wait(waitForCoordMsgTimeout);
                 }catch ( InterruptedException x ) {
-                    Thread.currentThread().interrupted();
+                    Thread.interrupted();
                 }
                 if ( suggestedviewId == null && (!coordMsgReceived.get())) {
                     //no message arrived, send the coord msg
@@ -241,7 +241,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Arrays.fill(m,others);
         MemberImpl[] mbrs = m.getMembers();
         m.reset(); 
-        CoordinationMessage msg = new CoordinationMessage(leader, local, mbrs,new UniqueId(UUIDGenerator.randomUUID(true)), this.COORD_REQUEST);
+        CoordinationMessage msg = new CoordinationMessage(leader, local, mbrs,new UniqueId(UUIDGenerator.randomUUID(true)), COORD_REQUEST);
         return msg;
     }
 
@@ -257,7 +257,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         boolean sent =  false;
         while ( !sent && current >= 0 ) {
             try {
-                sendElectionMsg(local, (MemberImpl) msg.getMembers()[current], msg);
+                sendElectionMsg(local, msg.getMembers()[current], msg);
                 sent = true;
             }catch ( ChannelException x  ) {
                 log.warn("Unable to send election message to:"+msg.getMembers()[current]);
@@ -323,8 +323,6 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Membership merged = mergeOnArrive(msg, sender);
         if (isViewConf(msg)) handleViewConf(msg, sender, merged);
         else handleToken(msg, sender, merged);
-        ClassLoader loader;
-
     }
     
     protected void handleToken(CoordinationMessage msg, Member sender,Membership merged) throws ChannelException {
@@ -349,14 +347,14 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 suggestedView = new Membership(local,AbsoluteOrder.comp,true);
                 suggestedviewId = msg.getId();
                 Arrays.fill(suggestedView,merged.getMembers());
-                msg.view = (MemberImpl[])merged.getMembers();
+                msg.view = merged.getMembers();
                 sendElectionMsgToNextInline(local,msg);
             }
         } else {
             //leadership change
             suggestedView = null;
             suggestedviewId = null;
-            msg.view = (MemberImpl[])merged.getMembers();
+            msg.view = merged.getMembers();
             sendElectionMsgToNextInline(local,msg);
         }
     }
@@ -366,7 +364,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             //I am the new leader
             //startElection(false);
         } else {
-            msg.view = (MemberImpl[])merged.getMembers();
+            msg.view = merged.getMembers();
             sendElectionMsgToNextInline(local,msg);
         }
     }
@@ -692,25 +690,25 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             //header
             int offset = 16;
             //leader
-            int ldrLen = buf.toInt(buf.getBytesDirect(),offset);
+            int ldrLen = XByteBuffer.toInt(buf.getBytesDirect(),offset);
             offset += 4;
             byte[] ldr = new byte[ldrLen];
             System.arraycopy(buf.getBytesDirect(),offset,ldr,0,ldrLen);
             leader = MemberImpl.getMember(ldr);
             offset += ldrLen;
             //source
-            int srcLen = buf.toInt(buf.getBytesDirect(),offset);
+            int srcLen = XByteBuffer.toInt(buf.getBytesDirect(),offset);
             offset += 4;
             byte[] src = new byte[srcLen];
             System.arraycopy(buf.getBytesDirect(),offset,src,0,srcLen);
             source = MemberImpl.getMember(src);
             offset += srcLen;
             //view
-            int mbrCount = buf.toInt(buf.getBytesDirect(),offset);
+            int mbrCount = XByteBuffer.toInt(buf.getBytesDirect(),offset);
             offset += 4;
             view = new MemberImpl[mbrCount];
             for (int i=0; i<view.length; i++ ) {
-                int mbrLen = buf.toInt(buf.getBytesDirect(),offset);
+                int mbrLen = XByteBuffer.toInt(buf.getBytesDirect(),offset);
                 offset += 4;
                 byte[] mbr = new byte[mbrLen];
                 System.arraycopy(buf.getBytesDirect(), offset, mbr, 0, mbrLen);
