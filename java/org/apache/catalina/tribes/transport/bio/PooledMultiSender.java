@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.transport.bio;
 
+import org.apache.catalina.tribes.transport.AbstractSender;
 import org.apache.catalina.tribes.transport.DataSender;
 import org.apache.catalina.tribes.transport.PooledSender;
 import org.apache.catalina.tribes.Member;
@@ -65,7 +66,7 @@ public class PooledMultiSender extends PooledSender {
      */
     public DataSender getNewDataSender() {
         MultipointBioSender sender = new MultipointBioSender();
-        sender.transferProperties(this,sender);
+        AbstractSender.transferProperties(this,sender);
         return sender;
     }
 
