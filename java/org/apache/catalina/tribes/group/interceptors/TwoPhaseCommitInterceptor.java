@@ -44,7 +44,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     public static final byte[] END_DATA = new byte[] {54, -13, 90, 110, 47, -31, 75, -24, -81, -29, 36, 52, -58, 77, -110, 56};
     private static org.apache.juli.logging.Log log = org.apache.juli.logging.LogFactory.getLog(TwoPhaseCommitInterceptor.class);
 
-    protected HashMap messages = new HashMap();
+    protected HashMap<UniqueId, MapEntry> messages = new HashMap<UniqueId, MapEntry>();
     protected long expire = 1000 * 60; //one minute expiration
     protected boolean deepclone = true;
 
@@ -79,7 +79,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                  Arrays.contains(msg.getMessage().getBytesDirect(),0,START_DATA,0,START_DATA.length) &&
                  Arrays.contains(msg.getMessage().getBytesDirect(),START_DATA.length+msg.getUniqueId().length,END_DATA,0,END_DATA.length) ) {
                 UniqueId id = new UniqueId(msg.getMessage().getBytesDirect(),START_DATA.length,msg.getUniqueId().length);
-                MapEntry original = (MapEntry)messages.get(id);
+                MapEntry original = messages.get(id);
                 if ( original != null ) {
                     super.messageReceived(original.msg);
                     messages.remove(id);
@@ -113,9 +113,9 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
     public void heartbeat() {
         try {
             long now = System.currentTimeMillis();
-            Map.Entry[] entries = (Map.Entry[])messages.entrySet().toArray(new Map.Entry[messages.size()]);
+            Map.Entry<UniqueId,MapEntry>[] entries = messages.entrySet().toArray(new Map.Entry[messages.size()]);
             for (int i=0; i<entries.length; i++ ) {
-                MapEntry entry = (MapEntry)entries[i].getValue();
+                MapEntry entry = entries[i].getValue();
                 if ( entry.expired(now,expire) ) {
                     if(log.isInfoEnabled())
                         log.info("Message ["+entry.id+"] has expired. Removing.");

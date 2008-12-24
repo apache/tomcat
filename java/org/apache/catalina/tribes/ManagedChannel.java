@@ -74,5 +74,5 @@ public interface ManagedChannel extends Channel {
      * @return Iterator
      * @see Channel#addInterceptor(ChannelInterceptor)
      */
-    public Iterator getInterceptors();
+    public Iterator<ChannelInterceptor> getInterceptors();
 }

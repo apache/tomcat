@@ -60,7 +60,7 @@ public class Membership
     /**
       * sort members by alive time
       */
-    protected Comparator<MemberImpl> memberComparator = new MemberComparator();
+    protected Comparator<Member> memberComparator = new MemberComparator();
 
     public Object clone() {
         synchronized (members) {
@@ -85,11 +85,11 @@ public class Membership
         this(local,false);
     }
 
-    public Membership(MemberImpl local, Comparator<MemberImpl> comp) {
+    public Membership(MemberImpl local, Comparator<Member> comp) {
         this(local,comp,false);
     }
 
-    public Membership(MemberImpl local, Comparator<MemberImpl> comp, boolean includeLocal) {
+    public Membership(MemberImpl local, Comparator<Member> comp, boolean includeLocal) {
         this(local,includeLocal);
         this.memberComparator = comp;
     }
@@ -264,9 +264,9 @@ public class Membership
     
     // --------------------------------------------- Inner Class
 
-    private class MemberComparator implements Comparator<MemberImpl> {
+    private class MemberComparator implements Comparator<Member> {
 
-        public int compare(MemberImpl m1, MemberImpl m2) {
+        public int compare(Member m1, Member m2) {
             //longer alive time, means sort first
             long result = m2.getMemberAliveTime() - m1.getMemberAliveTime();
             if (result < 0)

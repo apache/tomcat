@@ -25,7 +25,7 @@ import org.apache.catalina.tribes.Channel;
 
 public class StaticMembershipInterceptor
     extends ChannelInterceptorBase {
-    protected ArrayList members = new ArrayList();
+    protected ArrayList<Member> members = new ArrayList<Member>();
     protected Member localMember = null;
 
     public StaticMembershipInterceptor() {
@@ -66,7 +66,7 @@ public class StaticMembershipInterceptor
                 Member[] others = super.getMembers();
                 Member[] result = new Member[members.size() + others.length];
                 for (int i = 0; i < others.length; i++) result[i] = others[i];
-                for (int i = 0; i < members.size(); i++) result[i + others.length] = (Member) members.get(i);
+                for (int i = 0; i < members.size(); i++) result[i + others.length] = members.get(i);
                 AbsoluteOrder.absoluteOrder(result);
                 return result;
             }//sync
@@ -79,7 +79,7 @@ public class StaticMembershipInterceptor
      * @return Member
      */
     public Member getMember(Member mbr) {
-        if ( members.contains(mbr) ) return (Member)members.get(members.indexOf(mbr));
+        if ( members.contains(mbr) ) return members.get(members.indexOf(mbr));
         else return super.getMember(mbr);
     }
 
@@ -101,7 +101,7 @@ public class StaticMembershipInterceptor
     public void start(int svc) throws ChannelException {
         if ( (Channel.SND_RX_SEQ&svc)==Channel.SND_RX_SEQ ) super.start(Channel.SND_RX_SEQ); 
         if ( (Channel.SND_TX_SEQ&svc)==Channel.SND_TX_SEQ ) super.start(Channel.SND_TX_SEQ); 
-        final Member[] mbrs = (Member[])members.toArray(new Member[members.size()]);
+        final Member[] mbrs = members.toArray(new Member[members.size()]);
         final ChannelInterceptorBase base = this;
         Thread t = new Thread() {
             public void run() {

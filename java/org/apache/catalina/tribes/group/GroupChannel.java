@@ -88,12 +88,12 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     /**
      * A list of membership listeners that subscribe to membership announcements
      */
-    protected ArrayList membershipListeners = new ArrayList();
+    protected ArrayList<Object> membershipListeners = new ArrayList<Object>();
 
     /**
      * A list of channel listeners that subscribe to incoming messages
      */
-    protected ArrayList channelListeners = new ArrayList();
+    protected ArrayList<Object> channelListeners = new ArrayList<Object>();
 
     /**
      * If set to true, the GroupChannel will check to make sure that
@@ -147,7 +147,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      */
     public void heartbeat() {
         super.heartbeat();
-        Iterator i = membershipListeners.iterator();
+        Iterator<Object> i = membershipListeners.iterator();
         while ( i.hasNext() ) {
             Object o = i.next();
             if ( o instanceof Heartbeat ) ((Heartbeat)o).heartbeat();
@@ -344,7 +344,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         if ( getFirstInterceptor() != null &&
              ((getFirstInterceptor().getNext() instanceof ChannelCoordinator))) {
             ChannelInterceptor interceptor = null;
-            Class clazz = null;
+            Class<?> clazz = null;
             try {
                 clazz = Class.forName("org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor",
                                       true,GroupChannel.class.getClassLoader());
@@ -529,7 +529,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * Returns an iterator of all the interceptors in this stack
      * @return Iterator
      */
-    public Iterator getInterceptors() {
+    public Iterator<ChannelInterceptor> getInterceptors() {
         return new InterceptorIterator(this.getNext(),this.coordinator);
     }
 
@@ -596,7 +596,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      *
      * @version 1.0
      */
-    public static class InterceptorIterator implements Iterator {
+    public static class InterceptorIterator implements Iterator<ChannelInterceptor> {
         private ChannelInterceptor end;
         private ChannelInterceptor start;
         public InterceptorIterator(ChannelInterceptor start, ChannelInterceptor end) {
@@ -608,8 +608,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             return start!=null && start != end;
         }
 
-        public Object next() {
-            Object result = null;
+        public ChannelInterceptor next() {
+            ChannelInterceptor result = null;
             if ( hasNext() ) {
                 result = start;
                 start = start.getNext();
