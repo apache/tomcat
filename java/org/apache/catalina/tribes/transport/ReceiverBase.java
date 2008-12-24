@@ -227,7 +227,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     throw x;
                 }
                 portstart++;
-                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.currentThread().interrupted();}
+                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.interrupted();}
                 retries = bind(socket,portstart,retries);
             }
         }
@@ -258,7 +258,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     throw x;
                 }
                 portstart++;
-                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.currentThread().interrupted();}
+                try {Thread.sleep(25);}catch( InterruptedException ti){Thread.interrupted();}
                 retries = bindUdp(socket,portstart,retries);
             }
         }
@@ -444,7 +444,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     public void setLog(Log log) {
-        this.log = log;
+        ReceiverBase.log = log;
     }
 
     public void setPool(RxTaskPool pool) {

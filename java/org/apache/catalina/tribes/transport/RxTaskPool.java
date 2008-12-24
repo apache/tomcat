@@ -19,7 +19,6 @@ package org.apache.catalina.tribes.transport;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * @author not attributable
@@ -34,21 +33,16 @@ public class RxTaskPool
      * through a FIFO idle queue.
      */
 
-    List idle = new LinkedList();
-    List used = new LinkedList();
+    List<AbstractRxTask> idle = new LinkedList<AbstractRxTask>();
+    List<AbstractRxTask> used = new LinkedList<AbstractRxTask>();
     
     Object mutex = new Object();
     boolean running = true;
     
-    private static int counter = 1;
     private int maxTasks;
     private int minTasks;
     
     private TaskCreator creator = null;
-
-    private static synchronized int inc() {
-        return counter++;
-    }
 
     
     public RxTaskPool (int maxTasks, int minTasks, TaskCreator creator) throws Exception {
@@ -78,7 +72,7 @@ public class RxTaskPool
             while ( worker == null && running ) {
                 if (idle.size() > 0) {
                     try {
-                        worker = (AbstractRxTask) idle.remove(0);
+                        worker = idle.remove(0);
                     } catch (java.util.NoSuchElementException x) {
                         //this means that there are no available workers
                         worker = null;
@@ -87,7 +81,7 @@ public class RxTaskPool
                     worker = creator.createRxTask();
                     configureTask(worker);
                 } else {
-                    try { mutex.wait(); } catch ( java.lang.InterruptedException x ) {Thread.currentThread().interrupted();}
+                    try { mutex.wait(); } catch ( java.lang.InterruptedException x ) {Thread.interrupted();}
                 }
             }//while
             if ( worker != null ) used.add(worker);
@@ -132,9 +126,9 @@ public class RxTaskPool
     public void stop() {
         running = false;
         synchronized (mutex) {
-            Iterator i = idle.iterator();
+            Iterator<AbstractRxTask> i = idle.iterator();
             while ( i.hasNext() ) {
-                AbstractRxTask worker = (AbstractRxTask)i.next();
+                AbstractRxTask worker = i.next();
                 returnWorker(worker);
                 i.remove();
             }
