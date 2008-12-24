@@ -57,7 +57,7 @@ public class TestELSupport extends TestCase {
     }
 
     public void testCoerceIntegerToNumber() {
-        Integer input = 4390241;
+        Integer input = Integer.valueOf(4390241);
         Object output = ELSupport.coerceToType(input, Number.class);
         assertEquals(input, output);
     }
