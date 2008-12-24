@@ -260,14 +260,14 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
         //update our map of members, expire some if we didn't receive a ping back
         synchronized (mapMembers) {
-            Iterator it = mapMembers.entrySet().iterator();
+            Iterator<Map.Entry<Member, Long>> it = mapMembers.entrySet().iterator();
             long now = System.currentTimeMillis();
             while ( it.hasNext() ) {
-                Map.Entry entry = (Map.Entry)it.next();
-                long access = ((Long)entry.getValue()).longValue(); 
+                Map.Entry<Member,Long> entry = it.next();
+                long access = entry.getValue().longValue(); 
                 if ( (now - access) > timeout ) {
                     it.remove();
-                    memberDisappeared( (Member) entry.getKey());
+                    memberDisappeared(entry.getKey());
                 }
             }
         }//synch
@@ -377,7 +377,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         MapEntry entry = (MapEntry)super.get(key);
         if ( entry == null ) return;
         if ( !entry.isSerializable() ) return;
-        if (entry != null && entry.isPrimary() && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0) {
+        if (entry.isPrimary() && entry.getBackupNodes()!= null && entry.getBackupNodes().length > 0) {
             Object value = entry.getValue();
             //check to see if we need to replicate this object isDirty()||complete
             boolean repl = complete || ( (value instanceof ReplicatedMapEntry) && ( (ReplicatedMapEntry) value).isDirty());
@@ -1053,10 +1053,6 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                 }
             }
             return counter;
-        }
-    
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            return false;
         }
     
         public boolean isEmpty() {
