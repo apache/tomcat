@@ -59,7 +59,7 @@ public class BufferPool {
             synchronized (BufferPool.class) {
                 if ( instance == null ) {
                    BufferPoolAPI pool = null;
-                   Class clazz = null;
+                   Class<?> clazz = null;
                    try {
                        clazz = Class.forName("org.apache.catalina.tribes.io.BufferPool15Impl");
                        pool = (BufferPoolAPI)clazz.newInstance();
