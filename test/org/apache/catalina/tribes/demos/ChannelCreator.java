@@ -193,7 +193,7 @@ public class ChannelCreator {
         sender.setRxBufSize(43800);
         sender.setTxBufSize(25188);
 
-        Iterator i = transportProperties.keySet().iterator();
+        Iterator<Object> i = transportProperties.keySet().iterator();
         while ( i.hasNext() ) {
             String key = (String)i.next();
             IntrospectionUtils.setProperty(sender,key,transportProperties.getProperty(key));
