@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.catalina.tribes.Member;
 import java.util.Comparator;
@@ -49,7 +50,7 @@ public class Membership
     /**
      * A map of all the members in the cluster.
      */
-    protected HashMap map = new HashMap();
+    protected HashMap<MemberImpl, MbrEntry> map = new HashMap<MemberImpl, MbrEntry>();
     
     /**
      * A list of all the members in the cluster.
@@ -59,12 +60,12 @@ public class Membership
     /**
       * sort members by alive time
       */
-    protected Comparator memberComparator = new MemberComparator();
+    protected Comparator<MemberImpl> memberComparator = new MemberComparator();
 
     public Object clone() {
         synchronized (members) {
             Membership clone = new Membership(local, memberComparator);
-            clone.map = (HashMap) map.clone();
+            clone.map = (HashMap<MemberImpl, MbrEntry>) map.clone();
             clone.members = new MemberImpl[members.length];
             System.arraycopy(members,0,clone.members,0,members.length);
             return clone;
@@ -84,11 +85,11 @@ public class Membership
         this(local,false);
     }
 
-    public Membership(MemberImpl local, Comparator comp) {
+    public Membership(MemberImpl local, Comparator<MemberImpl> comp) {
         this(local,comp,false);
     }
 
-    public Membership(MemberImpl local, Comparator comp, boolean includeLocal) {
+    public Membership(MemberImpl local, Comparator<MemberImpl> comp, boolean includeLocal) {
         this(local,includeLocal);
         this.memberComparator = comp;
     }
@@ -114,7 +115,7 @@ public class Membership
         if (  member.equals(local) ) return result;
 
         //return true if the membership has changed
-        MbrEntry entry = (MbrEntry)map.get(member);
+        MbrEntry entry = map.get(member);
         if ( entry == null ) {
             entry = addMember(member);
             result = true;
@@ -189,13 +190,13 @@ public class Membership
         if(!hasMembers() )
            return EMPTY_MEMBERS;
        
-        ArrayList list = null;
-        Iterator i = map.values().iterator();
+        ArrayList<MemberImpl> list = null;
+        Iterator<MbrEntry> i = map.values().iterator();
         while(i.hasNext()) {
-            MbrEntry entry = (MbrEntry)i.next();
+            MbrEntry entry = i.next();
             if( entry.hasExpired(maxtime) ) {
                 if(list == null) // only need a list when members are expired (smaller gc)
-                    list = new java.util.ArrayList();
+                    list = new java.util.ArrayList<MemberImpl>();
                 list.add(entry.getMember());
             }
         }
@@ -254,24 +255,16 @@ public class Membership
     protected synchronized MbrEntry[] getMemberEntries()
     {
         MbrEntry[] result = new MbrEntry[map.size()];
-        java.util.Iterator i = map.entrySet().iterator();
+        Iterator<Map.Entry<MemberImpl,MbrEntry>> i = map.entrySet().iterator();
         int pos = 0;
         while ( i.hasNext() )
-            result[pos++] = ((MbrEntry)((java.util.Map.Entry)i.next()).getValue());
+            result[pos++] = i.next().getValue();
         return result;
     }
     
     // --------------------------------------------- Inner Class
 
-    private class MemberComparator implements java.util.Comparator {
-
-        public int compare(Object o1, Object o2) {
-            try {
-                return compare((MemberImpl) o1, (MemberImpl) o2);
-            } catch (ClassCastException x) {
-                return 0;
-            }
-        }
+    private class MemberComparator implements Comparator<MemberImpl> {
 
         public int compare(MemberImpl m1, MemberImpl m2) {
             //longer alive time, means sort first
