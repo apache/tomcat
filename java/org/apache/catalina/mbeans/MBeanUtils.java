@@ -740,10 +740,6 @@ public class MBeanUtils {
                     IntrospectionUtils.getProperty(connector, "address");
                 Integer port = (Integer)
                     IntrospectionUtils.getProperty(connector, "port");
-                Service service = connector.getService();
-                String serviceName = null;
-                if (service != null)
-                    serviceName = service.getName();
                 StringBuffer sb = new StringBuffer(domain);
                 sb.append(":type=Connector");
                 sb.append(",port=" + port);
@@ -779,7 +775,6 @@ public class MBeanUtils {
 
         ObjectName name = null;
         Host host = (Host)context.getParent();
-        Service service = ((Engine)host.getParent()).getService();
         String path = context.getPath();
         if (path.length() < 1)
             path = "/";
@@ -817,8 +812,6 @@ public class MBeanUtils {
             if (path.length() < 1)
                 path = "/";
             Host host = (Host) ((Context)container).getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Environment" + 
                         ",resourcetype=Context,path=" + path + 
                         ",host=" + host.getName() +
@@ -855,8 +848,6 @@ public class MBeanUtils {
             if (path.length() < 1)
                 path = "/";
             Host host = (Host) ((Context)container).getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Resource" +
                         ",resourcetype=Context,path=" + path + 
                         ",host=" + host.getName() +
@@ -896,8 +887,6 @@ public class MBeanUtils {
             if (path.length() < 1)
                 path = "/";
             Host host = (Host) ((Context)container).getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=ResourceLink" +
                         ",resourcetype=Context,path=" + path + 
                         ",host=" + host.getName() +
@@ -966,8 +955,6 @@ public class MBeanUtils {
         throws MalformedObjectNameException {
 
         ObjectName name = null;
-        Engine engine = (Engine)host.getParent();
-        Service service = engine.getService();
         name = new ObjectName(domain + ":type=Host,host=" +
                               host.getName());
         return (name);
@@ -992,11 +979,8 @@ public class MBeanUtils {
         Container container = loader.getContainer();
 
         if (container instanceof Engine) {
-            Service service = ((Engine)container).getService();
             name = new ObjectName(domain + ":type=Loader");
         } else if (container instanceof Host) {
-            Engine engine = (Engine) container.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Loader,host=" +
                               container.getName());
         } else if (container instanceof Context) {
@@ -1005,8 +989,6 @@ public class MBeanUtils {
                 path = "/";
             }
             Host host = (Host) container.getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Loader,path=" + path +
                               ",host=" + host.getName());
         }
@@ -1033,11 +1015,8 @@ public class MBeanUtils {
         Container container = manager.getContainer();
 
         if (container instanceof Engine) {
-            Service service = ((Engine)container).getService();
             name = new ObjectName(domain + ":type=Manager");
         } else if (container instanceof Host) {
-            Engine engine = (Engine) container.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Manager,host=" +
                               container.getName());
         } else if (container instanceof Context) {
@@ -1046,8 +1025,6 @@ public class MBeanUtils {
                 path = "/";
             }
             Host host = (Host) container.getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Manager,path=" + path +
                               ",host=" + host.getName());
         }
@@ -1080,8 +1057,6 @@ public class MBeanUtils {
             if (path.length() < 1)
                 path = "/";
             Host host = (Host) ((Context)container).getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=NamingResources" + 
                         ",resourcetype=Context,path=" + path + 
                         ",host=" + host.getName());
@@ -1129,11 +1104,8 @@ public class MBeanUtils {
         Container container = realm.getContainer();
 
         if (container instanceof Engine) {
-            Service service = ((Engine)container).getService();
             name = new ObjectName(domain + ":type=Realm");
         } else if (container instanceof Host) {
-            Engine engine = (Engine) container.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Realm,host=" +
                               container.getName());
         } else if (container instanceof Context) {
@@ -1142,8 +1114,6 @@ public class MBeanUtils {
                 path = "/";
             }
             Host host = (Host) container.getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=Realm,path=" + path +
                               ",host=" + host.getName());
         }
@@ -1292,7 +1262,6 @@ public class MBeanUtils {
                                valve);
         }        
         if (container instanceof Engine) {
-            Service service = ((Engine)container).getService();
             String local="";
             int seq = getSeq(local);
             String ext="";
@@ -1302,7 +1271,6 @@ public class MBeanUtils {
             name = new ObjectName(domain + ":type=Valve,name=" + className + 
                                     ext + local );
         } else if (container instanceof Host) {
-            Service service = ((Engine)container.getParent()).getService();
             String local=",host=" +container.getName();
             int seq = getSeq(local);
             String ext="";
@@ -1317,7 +1285,6 @@ public class MBeanUtils {
                 path = "/";
             }
             Host host = (Host) container.getParent();
-            Service service = ((Engine) host.getParent()).getService();
             String local=",path=" + path + ",host=" +
                     host.getName();
             int seq = getSeq(local);
@@ -1333,9 +1300,9 @@ public class MBeanUtils {
 
     }
 
-    static Hashtable seq=new Hashtable();
+    static Hashtable<String,int[]> seq = new Hashtable<String,int[]>();
     static int getSeq( String key ) {
-        int i[]=(int [])seq.get( key );
+        int i[]=seq.get( key );
         if (i == null ) {
             i=new int[1];
             i[0]=0;
@@ -1862,7 +1829,7 @@ public class MBeanUtils {
         try {
             ((Contained)valve).setContainer(null);
         } catch (Throwable t) {
-        ;
+            // Ignore
         }
         if( mserver.isRegistered(oname) ) {
             mserver.unregisterMBean(oname);

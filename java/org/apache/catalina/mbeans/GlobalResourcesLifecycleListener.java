@@ -132,9 +132,9 @@ public class GlobalResourcesLifecycleListener
         }
 
         try {
-            NamingEnumeration bindings = context.listBindings("");
+            NamingEnumeration<Binding> bindings = context.listBindings("");
             while (bindings.hasMore()) {
-                Binding binding = (Binding) bindings.next();
+                Binding binding = bindings.next();
                 String name = prefix + binding.getName();
                 Object value = context.lookup(binding.getName());
                 if (log.isDebugEnabled()) {
@@ -182,9 +182,9 @@ public class GlobalResourcesLifecycleListener
         }
 
         // Create the MBeans for each defined Role
-        Iterator roles = database.getRoles();
+        Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {
-            Role role = (Role) roles.next();
+            Role role = roles.next();
             if (log.isDebugEnabled()) {
                 log.debug("  Creating Role MBean for role " + role);
             }
@@ -195,9 +195,9 @@ public class GlobalResourcesLifecycleListener
         }
 
         // Create the MBeans for each defined Group
-        Iterator groups = database.getGroups();
+        Iterator<Group> groups = database.getGroups();
         while (groups.hasNext()) {
-            Group group = (Group) groups.next();
+            Group group = groups.next();
             if (log.isDebugEnabled()) {
                 log.debug("  Creating Group MBean for group " + group);
             }
@@ -208,9 +208,9 @@ public class GlobalResourcesLifecycleListener
         }
 
         // Create the MBeans for each defined User
-        Iterator users = database.getUsers();
+        Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
-            User user = (User) users.next();
+            User user = users.next();
             if (log.isDebugEnabled()) {
                 log.debug("  Creating User MBean for user " + user);
             }
