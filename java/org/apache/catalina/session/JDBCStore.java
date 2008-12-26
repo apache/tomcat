@@ -21,7 +21,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
-import org.apache.catalina.Store;
 import org.apache.catalina.util.CustomObjectInputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -48,8 +47,7 @@ import java.util.Properties;
  * @version $Revision$, $Date$
  */
 
-public class JDBCStore
-        extends StoreBase implements Store {
+public class JDBCStore extends StoreBase {
 
     /**
      * The descriptive information about this implementation.
@@ -461,13 +459,13 @@ public class JDBCStore
 
                     preparedKeysSql.setString(1, getName());
                     rst = preparedKeysSql.executeQuery();
-                    ArrayList tmpkeys = new ArrayList();
+                    ArrayList<String> tmpkeys = new ArrayList<String>();
                     if (rst != null) {
                         while (rst.next()) {
                             tmpkeys.add(rst.getString(1));
                         }
                     }
-                    keys = (String[]) tmpkeys.toArray(new String[tmpkeys.size()]);
+                    keys = tmpkeys.toArray(new String[tmpkeys.size()]);
                     // Break out after the finally block
                     numberOfTries = 0;
                 } catch (SQLException e) {
@@ -482,7 +480,7 @@ public class JDBCStore
                             rst.close();
                         }
                     } catch (SQLException e) {
-                        ;
+                        // Ignore
                     }
 
                     release(_conn);
@@ -538,7 +536,7 @@ public class JDBCStore
                         if (rst != null)
                             rst.close();
                     } catch (SQLException e) {
-                        ;
+                        // Ignore
                     }
 
                     release(_conn);
@@ -627,13 +625,13 @@ public class JDBCStore
                             rst.close();
                         }
                     } catch (SQLException e) {
-                        ;
+                        // Ignore
                     }
                     if (ois != null) {
                         try {
                             ois.close();
                         } catch (IOException e) {
-                            ;
+                            // Ignore
                         }
                     }
                     release(_conn);
@@ -793,7 +791,7 @@ public class JDBCStore
                     if (dbConnection != null)
                         close(dbConnection);
                 } catch (IOException e) {
-                    ;
+                    // Ignore
                 } finally {
                     if (oos != null) {
                         oos.close();
@@ -858,7 +856,7 @@ public class JDBCStore
         // Instantiate our database driver if necessary
         if (driver == null) {
             try {
-                Class clazz = Class.forName(driverName);
+                Class<?> clazz = Class.forName(driverName);
                 driver = (Driver) clazz.newInstance();
             } catch (ClassNotFoundException ex) {
                 manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
@@ -899,41 +897,41 @@ public class JDBCStore
         try {
             preparedSizeSql.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedSizeSql = null;
 
         try {
             preparedKeysSql.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedKeysSql = null;
 
         try {
             preparedSaveSql.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedSaveSql = null;
 
         try {
             preparedClearSql.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
          
 		try {
             preparedRemoveSql.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedRemoveSql = null;
 
         try {
             preparedLoadSql.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedLoadSql = null;
 
@@ -955,7 +953,7 @@ public class JDBCStore
      * @param conn The connection to be released
      */
     protected void release(Connection conn) {
-        ;
+        // NOOP
     }
 
     /**
@@ -981,7 +979,7 @@ public class JDBCStore
             try {
                 dbConnection.commit();
             } catch (SQLException e) {
-                ;
+                // Ignore
             }
             close(dbConnection);
         }
