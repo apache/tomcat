@@ -93,7 +93,7 @@ public class WebAnnotationSet {
         
         ClassLoader classLoader = context.getLoader().getClassLoader();
         StandardWrapper wrapper = null;
-        Class classClass = null;
+        Class<?> classClass = null;
         
         Container[] children = context.findChildren();
         for (int i = 0; i < children.length; i++) {
@@ -122,8 +122,7 @@ public class WebAnnotationSet {
                  * the deployment descriptor
                  */
                 if (classClass.isAnnotationPresent(RunAs.class)) {
-                    RunAs annotation = (RunAs) 
-                        classClass.getAnnotation(RunAs.class);
+                    RunAs annotation = classClass.getAnnotation(RunAs.class);
                     wrapper.setRunAs(annotation.value());
                 }
             }
@@ -139,7 +138,7 @@ public class WebAnnotationSet {
     protected static void loadClassAnnotation(Context context, String fileString) {
         
         ClassLoader classLoader = context.getLoader().getClassLoader();
-        Class classClass = null;
+        Class<?> classClass = null;
         
         try {
             classClass = classLoader.loadClass(fileString);
@@ -156,16 +155,14 @@ public class WebAnnotationSet {
         // Initialize the annotations
         
         if (classClass.isAnnotationPresent(Resource.class)) {
-            Resource annotation = (Resource) 
-                classClass.getAnnotation(Resource.class);
+            Resource annotation = classClass.getAnnotation(Resource.class);
             addResource(context, annotation);
         }
         /* Process Resources annotation.
          * Ref JSR 250
          */
         if (classClass.isAnnotationPresent(Resources.class)) {
-            Resources annotation = (Resources) 
-                classClass.getAnnotation(Resources.class);
+            Resources annotation = classClass.getAnnotation(Resources.class);
             for (int i = 0; annotation.value() != null && i < annotation.value().length; i++) {
                 addResource(context, annotation.value()[i]);
             }
@@ -242,7 +239,7 @@ public class WebAnnotationSet {
          * the deployment descriptor
          */
         if (classClass.isAnnotationPresent(DeclareRoles.class)) {
-            DeclareRoles annotation = (DeclareRoles) 
+            DeclareRoles annotation =
                 classClass.getAnnotation(DeclareRoles.class);
             for (int i = 0; annotation.value() != null && i < annotation.value().length; i++) {
                 context.addSecurityRole(annotation.value()[i]);
