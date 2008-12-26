@@ -78,7 +78,6 @@ public class ConnectorMBean extends ClassNameMBean {
     public Object getAttribute(String name) throws AttributeNotFoundException,
             MBeanException, ReflectionException {
 
-        Object attribute = null;
         // Validate the input parameters
         if (name == null)
             throw new RuntimeOperationsException(new IllegalArgumentException(
