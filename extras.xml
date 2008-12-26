@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 6.0" default="extras" basedir="../..">
+<project name="Tomcat 6.0" default="extras" basedir=".">
 
 
   <!-- ===================== Initialize Property Values =================== -->
