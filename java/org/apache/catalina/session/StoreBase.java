@@ -173,7 +173,6 @@ public abstract class StoreBase
      *
      */
     public void processExpires() {
-        long timeNow = System.currentTimeMillis();
         String[] keys = null;
 
          if(!started) {
