@@ -165,9 +165,9 @@ public class UserDatabaseRealm
         if(user.isInRole(dbrole)) {
             return true;
         }
-        Iterator groups = user.getGroups();
+        Iterator<Group> groups = user.getGroups();
         while(groups.hasNext()) {
-            Group group = (Group)groups.next();
+            Group group = groups.next();
             if(group.isInRole(dbrole)) {
                 return true;
             }
@@ -215,17 +215,17 @@ public class UserDatabaseRealm
         }
 
         List<String> roles = new ArrayList<String>();
-        Iterator uroles = user.getRoles();
+        Iterator<Role> uroles = user.getRoles();
         while(uroles.hasNext()) {
-            Role role = (Role)uroles.next();
+            Role role = uroles.next();
             roles.add(role.getName());
         }
-        Iterator groups = user.getGroups();
+        Iterator<Group> groups = user.getGroups();
         while(groups.hasNext()) {
-            Group group = (Group)groups.next();
+            Group group = groups.next();
             uroles = group.getRoles();
             while(uroles.hasNext()) {
-                Role role = (Role)uroles.next();
+                Role role = uroles.next();
                 roles.add(role.getName());
             }
         }

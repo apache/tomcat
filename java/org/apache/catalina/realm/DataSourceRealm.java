@@ -505,7 +505,7 @@ public class DataSourceRealm
      * Return the roles associated with the given user name.
      * @param username Username for which roles should be retrieved
      */
-    protected ArrayList getRoles(String username) {
+    protected ArrayList<String> getRoles(String username) {
 
         Connection dbConnection = null;
 
