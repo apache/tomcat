@@ -38,7 +38,6 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Realm;
 import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.SecurityConstraint;
@@ -78,7 +77,7 @@ import org.apache.tomcat.util.digester.Digester;
  * @version $Revision$ $Date$
  */
 
-public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule, Realm {
+public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // We need to extend MemoryRealm to avoid class cast
 
     private static Log log = LogFactory.getLog(JAASMemoryLoginModule.class);

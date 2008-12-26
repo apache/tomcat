@@ -1294,7 +1294,7 @@ public class JNDIRealm extends RealmBase {
             attrIds = new String[0];
         constraints.setReturningAttributes(attrIds);
 
-        NamingEnumeration results =
+        NamingEnumeration<SearchResult> results =
             context.search(userBase, filter, constraints);
 
 
@@ -1311,7 +1311,7 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Get result for the first entry found
-        SearchResult result = (SearchResult)results.next();
+        SearchResult result = results.next();
 
         // Check no further entries were found
         try {
@@ -1587,12 +1587,13 @@ public class JNDIRealm extends RealmBase {
                                    " with filter expression '" + filter + "'");
             }
             // Searching groups that assign the given group
-            NamingEnumeration results = context.search(roleBase, filter, controls);
+            NamingEnumeration<SearchResult> results =
+                context.search(roleBase, filter, controls);
             if (results != null) {
                 // Iterate over the resulting groups
                 try {
                     while (results.hasMore()) {
-                        SearchResult result = (SearchResult) results.next();
+                        SearchResult result = results.next();
                         Attributes attrs = result.getAttributes();
                         if (attrs == null)
                             continue;
@@ -1645,13 +1646,9 @@ public class JNDIRealm extends RealmBase {
             list.add(commonRole);
 
         if (containerLog.isTraceEnabled()) {
-            if (list != null) {
-                containerLog.trace("  Found " + list.size() + " user internal roles");
-                for (int i=0; i<list.size(); i++)
-                    containerLog.trace(  "  Found user internal role " + list.get(i));
-            } else {
-                containerLog.trace("  Found no user internal roles");
-            }
+            containerLog.trace("  Found " + list.size() + " user internal roles");
+            for (int i=0; i<list.size(); i++)
+                containerLog.trace(  "  Found user internal role " + list.get(i));
         }
 
         // Are we configured to do role searches?
@@ -1668,7 +1665,7 @@ public class JNDIRealm extends RealmBase {
         controls.setReturningAttributes(new String[] {roleName});
 
         // Perform the configured search and process the results
-        NamingEnumeration results =
+        NamingEnumeration<SearchResult> results =
             context.search(roleBase, filter, controls);
         if (results == null)
             return (list);  // Should never happen, but just in case ...
@@ -1676,7 +1673,7 @@ public class JNDIRealm extends RealmBase {
         HashMap<String, String> groupMap = new HashMap<String, String>();
         try {
             while (results.hasMore()) {
-                SearchResult result = (SearchResult) results.next();
+                SearchResult result = results.next();
                 Attributes attrs = result.getAttributes();
                 if (attrs == null)
                     continue;
@@ -1778,7 +1775,7 @@ public class JNDIRealm extends RealmBase {
         Attribute attr = attrs.get(attrId);
         if (attr == null)
             return (values);
-        NamingEnumeration e = attr.getAll();
+        NamingEnumeration<?> e = attr.getAll();
         try {
             while(e.hasMore()) {
                 String value = (String)e.next();
@@ -1969,7 +1966,7 @@ public class JNDIRealm extends RealmBase {
      *
      * @return java.util.Hashtable the configuration for the directory context.
      */
-    protected Hashtable getDirectoryContextEnvironment() {
+    protected Hashtable<String,String> getDirectoryContextEnvironment() {
 
         Hashtable<String,String> env = new Hashtable<String,String>();
 
@@ -2008,7 +2005,7 @@ public class JNDIRealm extends RealmBase {
      */
     protected void release(DirContext context) {
 
-        ; // NO-OP since we are not pooling anything
+        // NO-OP since we are not pooling anything
 
     }
 
@@ -2092,7 +2089,7 @@ public class JNDIRealm extends RealmBase {
                 startingPoint = endParenLoc+1;
                 startParenLoc = userPatternString.indexOf('(', startingPoint);
             }
-            return (String[])pathList.toArray(new String[] {});
+            return pathList.toArray(new String[] {});
         }
         return null;
 
