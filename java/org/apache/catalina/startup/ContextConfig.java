@@ -79,7 +79,7 @@ public class ContextConfig
     /**
      * Custom mappings of login methods to authenticators
      */
-    protected Map customAuthenticators;
+    protected Map<String,Authenticator> customAuthenticators;
 
 
     /**
@@ -233,7 +233,8 @@ public class ContextConfig
      * @param customAuthenticators Custom mappings of login methods to
      * authenticators
      */
-    public void setCustomAuthenticators(Map customAuthenticators) {
+    public void setCustomAuthenticators(
+            Map<String,Authenticator> customAuthenticators) {
         this.customAuthenticators = customAuthenticators;
     }
 
@@ -259,9 +260,9 @@ public class ContextConfig
         // Process the event that has occurred
         if (event.getType().equals(Lifecycle.START_EVENT)) {
             start();
-        } else if (event.getType().equals(StandardContext.BEFORE_START_EVENT)) {
+        } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
-        } else if (event.getType().equals(StandardContext.AFTER_START_EVENT)) {
+        } else if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
             // Restore docBase for management tools
             if (originalDocBase != null) {
                 String docBase = context.getDocBase();
@@ -487,7 +488,7 @@ public class ContextConfig
 
             // Instantiate and install an Authenticator of the requested class
             try {
-                Class authenticatorClass = Class.forName(authenticatorName);
+                Class<?> authenticatorClass = Class.forName(authenticatorName);
                 authenticator = (Valve) authenticatorClass.newInstance();
             } catch (Throwable t) {
                 log.error(sm.getString(

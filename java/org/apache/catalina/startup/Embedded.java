@@ -101,7 +101,7 @@ import org.apache.tomcat.util.log.SystemLogHandler;
  * @version $Revision$ $Date$
  */
 
-public class Embedded  extends StandardService implements Lifecycle {
+public class Embedded  extends StandardService {
     private static Log log = LogFactory.getLog(Embedded.class);
 
     // ----------------------------------------------------------- Constructors
@@ -157,7 +157,7 @@ public class Embedded  extends StandardService implements Lifecycle {
     /**
      * Custom mappings of login methods to authenticators
      */
-    protected HashMap authenticators;
+    protected HashMap<String,Authenticator> authenticators;
 
 
     /**
@@ -175,7 +175,7 @@ public class Embedded  extends StandardService implements Lifecycle {
 
     /**
      * The default realm to be used by all containers associated with
-     * this compoennt.
+     * this component.
      */
     protected Realm realm = null;
 
@@ -653,7 +653,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         while (true) {
             int n = -1;
             for (int i = 0; i < connectors.length; i++) {
-                if (connectors[i].getContainer() == (Container) engine) {
+                if (connectors[i].getContainer() == engine) {
                     n = i;
                     break;
                 }
@@ -746,7 +746,7 @@ public class Embedded  extends StandardService implements Lifecycle {
         if (authenticators == null) {
             synchronized (this) {
                 if (authenticators == null) {
-                    authenticators = new HashMap();
+                    authenticators = new HashMap<String,Authenticator>();
                 }
             }
         }

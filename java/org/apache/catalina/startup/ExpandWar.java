@@ -139,9 +139,9 @@ public class ExpandWar {
         InputStream input = null;
         try {
             jarFile = juc.getJarFile();
-            Enumeration jarEntries = jarFile.entries();
+            Enumeration<JarEntry> jarEntries = jarFile.entries();
             while (jarEntries.hasMoreElements()) {
-                JarEntry jarEntry = (JarEntry) jarEntries.nextElement();
+                JarEntry jarEntry = jarEntries.nextElement();
                 String name = jarEntry.getName();
                 int last = name.lastIndexOf('/');
                 if (last >= 0) {

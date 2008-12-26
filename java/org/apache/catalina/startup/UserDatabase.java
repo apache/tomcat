@@ -64,7 +64,7 @@ public interface UserDatabase {
     /**
      * Return an enumeration of the usernames defined on this server.
      */
-    public Enumeration getUsers();
+    public Enumeration<String> getUsers();
 
 
 }

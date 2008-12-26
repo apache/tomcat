@@ -89,7 +89,7 @@ public class LifecycleListenerRule extends Rule {
             if (value != null)
                 className = value;
         }
-        Class clazz = Class.forName(className);
+        Class<?> clazz = Class.forName(className);
         LifecycleListener listener =
             (LifecycleListener) clazz.newInstance();
 

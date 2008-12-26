@@ -249,7 +249,7 @@ public final class UserConfig
         // Load the user database object for this host
         UserDatabase database = null;
         try {
-            Class clazz = Class.forName(userClass);
+            Class<?> clazz = Class.forName(userClass);
             database = (UserDatabase) clazz.newInstance();
             database.setUserConfig(this);
         } catch (Exception e) {
@@ -258,9 +258,9 @@ public final class UserConfig
         }
 
         // Deploy the web application (if any) for each defined user
-        Enumeration users = database.getUsers();
+        Enumeration<String> users = database.getUsers();
         while (users.hasMoreElements()) {
-            String user = (String) users.nextElement();
+            String user = users.nextElement();
             String home = database.getHome(user);
             deploy(user, home);
         }
@@ -293,7 +293,7 @@ public final class UserConfig
 
         // Deploy the web application for this user
         try {
-            Class clazz = Class.forName(contextClass);
+            Class<?> clazz = Class.forName(contextClass);
             Context context =
               (Context) clazz.newInstance();
             context.setPath(contextPath);
