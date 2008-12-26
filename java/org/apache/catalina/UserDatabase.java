@@ -42,7 +42,7 @@ public interface UserDatabase {
     /**
      * Return the set of {@link Group}s defined in this user database.
      */
-    public Iterator getGroups();
+    public Iterator<Group> getGroups();
 
 
     /**
@@ -54,13 +54,13 @@ public interface UserDatabase {
     /**
      * Return the set of {@link Role}s defined in this user database.
      */
-    public Iterator getRoles();
+    public Iterator<Role> getRoles();
 
 
     /**
      * Return the set of {@link User}s defined in this user database.
      */
-    public Iterator getUsers();
+    public Iterator<User> getUsers();
 
 
     // --------------------------------------------------------- Public Methods
