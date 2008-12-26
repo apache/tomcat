@@ -652,9 +652,8 @@ final class SetPublicIdRule extends Rule {
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
-        Context context = (Context) digester.peek(digester.getCount() - 1);
         Object top = digester.peek();
-        Class paramClasses[] = new Class[1];
+        Class<?> paramClasses[] = new Class[1];
         paramClasses[0] = "String".getClass();
         String paramValues[] = new String[1];
         paramValues[0] = digester.getPublicId();
@@ -721,10 +720,11 @@ final class CallParamMultiRule extends CallParamRule {
     public void end(String namespace, String name) {
         if (bodyTextStack != null && !bodyTextStack.empty()) {
             // what we do now is push one parameter onto the top set of parameters
-            Object parameters[] = (Object[]) digester.peekParams();
-            ArrayList params = (ArrayList) parameters[paramIndex];
+            ArrayList<String> parameters[] =
+                (ArrayList<String>[]) digester.peekParams();
+            ArrayList<String> params = parameters[paramIndex];
             if (params == null) {
-                params = new ArrayList();
+                params = new ArrayList<String>();
                 parameters[paramIndex] = params;
             }
             params.add(bodyTextStack.pop());
@@ -763,10 +763,10 @@ final class CallMethodMultiRule extends CallMethodRule {
         if (paramCount > 0) {
             parameters = (Object[]) digester.popParams();
         } else {
-            super.end();
+            super.end(namespace, name);
         }
         
-        ArrayList multiParams = (ArrayList) parameters[multiParamIndex];
+        ArrayList<?> multiParams = (ArrayList<?>) parameters[multiParamIndex];
         
         // Construct the parameter values array we will need
         // We only do the conversion if the param value is a String and

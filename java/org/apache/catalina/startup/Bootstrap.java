@@ -110,8 +110,8 @@ public final class Bootstrap {
         if ((value == null) || (value.equals("")))
             return parent;
 
-        ArrayList repositoryLocations = new ArrayList();
-        ArrayList repositoryTypes = new ArrayList();
+        ArrayList<String> repositoryLocations = new ArrayList<String>();
+        ArrayList<Integer> repositoryTypes = new ArrayList<Integer>();
         int i;
  
         StringTokenizer tokenizer = new StringTokenizer(value, ",");
@@ -168,8 +168,8 @@ public final class Bootstrap {
             }
         }
 
-        String[] locations = (String[]) repositoryLocations.toArray(new String[0]);
-        Integer[] types = (Integer[]) repositoryTypes.toArray(new Integer[0]);
+        String[] locations = repositoryLocations.toArray(new String[0]);
+        Integer[] types = repositoryTypes.toArray(new Integer[0]);
  
         ClassLoader classLoader = ClassLoaderFactory.createClassLoader
             (locations, types, parent);
@@ -213,7 +213,7 @@ public final class Bootstrap {
         // Load our startup class and call its process() method
         if (log.isDebugEnabled())
             log.debug("Loading startup class");
-        Class startupClass =
+        Class<?> startupClass =
             catalinaLoader.loadClass
             ("org.apache.catalina.startup.Catalina");
         Object startupInstance = startupClass.newInstance();
@@ -222,7 +222,7 @@ public final class Bootstrap {
         if (log.isDebugEnabled())
             log.debug("Setting startup class properties");
         String methodName = "setParentClassLoader";
-        Class paramTypes[] = new Class[1];
+        Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Class.forName("java.lang.ClassLoader");
         Object paramValues[] = new Object[1];
         paramValues[0] = sharedLoader;
@@ -244,7 +244,7 @@ public final class Bootstrap {
         // Call the load() method
         String methodName = "load";
         Object param[];
-        Class paramTypes[];
+        Class<?> paramTypes[];
         if (arguments==null || arguments.length==0) {
             paramTypes = null;
             param = null;
@@ -323,7 +323,7 @@ public final class Bootstrap {
         throws Exception {
 
         Object param[];
-        Class paramTypes[];
+        Class<?> paramTypes[];
         if (arguments==null || arguments.length==0) {
             paramTypes = null;
             param = null;
@@ -346,7 +346,7 @@ public final class Bootstrap {
     public void setAwait(boolean await)
         throws Exception {
 
-        Class paramTypes[] = new Class[1];
+        Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = Boolean.TYPE;
         Object paramValues[] = new Object[1];
         paramValues[0] = new Boolean(await);
@@ -359,7 +359,7 @@ public final class Bootstrap {
     public boolean getAwait()
         throws Exception
     {
-        Class paramTypes[] = new Class[0];
+        Class<?> paramTypes[] = new Class[0];
         Object paramValues[] = new Object[0];
         Method method =
             catalinaDaemon.getClass().getMethod("getAwait", paramTypes);
