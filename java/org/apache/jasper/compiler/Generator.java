@@ -836,6 +836,7 @@ class Generator {
         private String attributeValueWithEL(boolean isTag, String tx,
                 Class<?> expectedType, String mapName) {
             if (tx==null) return null;
+            Class<?> type = expectedType;
             int size = tx.length();
             StringBuffer output = new StringBuffer(size);
             boolean el = false;
@@ -851,6 +852,8 @@ class Generator {
                     if (mark < i) {
                         if (output.length() > 0) {
                             output.append(" + ");
+                            // Composite expression - must coerce to String
+                            type = String.class;
                         }
                         output.append(quote(tx.substring(mark, i)));
                     }
@@ -865,10 +868,12 @@ class Generator {
                     // End of an EL expression
                     if (output.length() > 0) {
                         output.append(" + ");
+                        // Composite expression - must coerce to String
+                        type = String.class;
                     }
                     output.append(
                             JspUtil.interpreterCall(isTag,
-                                    tx.substring(mark, i+1), expectedType,
+                                    tx.substring(mark, i+1), type,
                                     mapName, false));
                     mark = i + 1;
                     el = false;
