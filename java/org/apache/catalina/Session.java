@@ -281,7 +281,7 @@ public interface Session {
      * Return an Iterator containing the String names of all notes bindings
      * that exist for this session.
      */
-    public Iterator getNoteNames();
+    public Iterator<String> getNoteNames();
 
 
     /**
