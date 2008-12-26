@@ -72,7 +72,7 @@ public interface Group extends Principal {
     /**
      * Return the set of {@link Role}s assigned specifically to this group.
      */
-    public Iterator getRoles();
+    public Iterator<Role> getRoles();
 
 
     /**
@@ -84,7 +84,7 @@ public interface Group extends Principal {
     /**
      * Return the set of {@link User}s that are members of this group.
      */
-    public Iterator getUsers();
+    public Iterator<User> getUsers();
 
 
     // --------------------------------------------------------- Public Methods
