@@ -213,6 +213,7 @@ public class DefaultServlet
      * Finalize this servlet.
      */
     public void destroy() {
+        // NOOP
     }
 
 
