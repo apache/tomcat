@@ -446,6 +446,7 @@ public abstract class RealmBase
      * throwables will be caught and logged.
      */
     public void backgroundProcess() {
+        // NOOP in base class
     }
 
 
@@ -1332,12 +1333,15 @@ public abstract class RealmBase
     }
 
     public void postRegister(Boolean registrationDone) {
+        // NOOP in base class
     }
 
     public void preDeregister() throws Exception {
+        // NOOP in base class
     }
 
     public void postDeregister() {
+        // NOOP in base class
     }
 
     protected boolean initialized=false;

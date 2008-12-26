@@ -444,7 +444,7 @@ public class JDBCRealm
         try {
             preparedCredentials.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedCredentials = null;
 
@@ -452,7 +452,7 @@ public class JDBCRealm
         try {
             preparedRoles.close();
         } catch (Throwable f) {
-            ;
+            // Ignore
         }
         this.preparedRoles = null;
 
@@ -686,7 +686,7 @@ public class JDBCRealm
         // Instantiate our database driver if necessary
         if (driver == null) {
             try {
-                Class clazz = Class.forName(driverName);
+                Class<?> clazz = Class.forName(driverName);
                 driver = (Driver) clazz.newInstance();
             } catch (Throwable e) {
                 throw new SQLException(e.getMessage());
@@ -713,7 +713,7 @@ public class JDBCRealm
      */
     protected void release(Connection dbConnection) {
 
-        ; // NO-OP since we are not pooling anything
+        // NO-OP since we are not pooling anything
 
     }
 

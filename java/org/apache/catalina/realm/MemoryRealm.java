@@ -144,8 +144,7 @@ public class MemoryRealm  extends RealmBase {
      */
     public Principal authenticate(String username, String credentials) {
 
-        GenericPrincipal principal =
-            (GenericPrincipal) principals.get(username);
+        GenericPrincipal principal = principals.get(username);
 
         boolean validated = false;
         if (principal != null) {
@@ -238,8 +237,7 @@ public class MemoryRealm  extends RealmBase {
      */
     protected String getPassword(String username) {
 
-        GenericPrincipal principal =
-            (GenericPrincipal) principals.get(username);
+        GenericPrincipal principal = principals.get(username);
         if (principal != null) {
             return (principal.getPassword());
         } else {
@@ -254,7 +252,7 @@ public class MemoryRealm  extends RealmBase {
      */
     protected Principal getPrincipal(String username) {
 
-        return (Principal) principals.get(username);
+        return principals.get(username);
 
     }
 
@@ -263,7 +261,7 @@ public class MemoryRealm  extends RealmBase {
      *
      * @return The principals, keyed by user name (a String)
      */
-    protected Map getPrincipals() {
+    protected Map<String,GenericPrincipal> getPrincipals() {
         return principals;
     }
 
