@@ -344,7 +344,7 @@ public final class TldConfig  implements LifecycleListener {
 
         Iterator<String> paths = resourcePaths.iterator();
         while (paths.hasNext()) {
-            String path = (String) paths.next();
+            String path = paths.next();
             URL url = context.getServletContext().getResource(path);
             if (url == null) {
                 log.debug( "Null url "+ path );
@@ -527,11 +527,6 @@ public final class TldConfig  implements LifecycleListener {
                         resourcePath));
             }
             inputSource = new InputSource(stream);
-            if (inputSource == null) {
-                throw new IllegalArgumentException
-                    (sm.getString("contextConfig.tldResourcePath",
-                                  resourcePath));
-            }
             tldScanStream(inputSource);
         } catch (Exception e) {
              throw new ServletException

@@ -155,8 +155,8 @@ public final class Tool {
         // Construct the class loader we will be using
         ClassLoader classLoader = null;
         try {
-            ArrayList packed = new ArrayList();
-            ArrayList unpacked = new ArrayList();
+            ArrayList<File> packed = new ArrayList<File>();
+            ArrayList<File> unpacked = new ArrayList<File>();
             unpacked.add(new File(catalinaHome, "classes"));
             packed.add(new File(catalinaHome, "lib"));
             if (common) {
@@ -179,8 +179,8 @@ public final class Tool {
             }
             classLoader =
                 ClassLoaderFactory.createClassLoader
-                ((File[]) unpacked.toArray(new File[0]),
-                 (File[]) packed.toArray(new File[0]),
+                (unpacked.toArray(new File[0]),
+                 packed.toArray(new File[0]),
                  null);
         } catch (Throwable t) {
             log.error("Class loader creation threw exception", t);
@@ -189,7 +189,7 @@ public final class Tool {
         Thread.currentThread().setContextClassLoader(classLoader);
 
         // Load our application class
-        Class clazz = null;
+        Class<?> clazz = null;
         String className = args[index++];
         try {
             if (log.isDebugEnabled())
@@ -208,7 +208,7 @@ public final class Tool {
             if (log.isDebugEnabled())
                 log.debug("Identifying main() method");
             String methodName = "main";
-            Class paramTypes[] = new Class[1];
+            Class<?> paramTypes[] = new Class[1];
             paramTypes[0] = params.getClass();
             method = clazz.getMethod(methodName, paramTypes);
         } catch (Throwable t) {

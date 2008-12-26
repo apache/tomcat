@@ -112,7 +112,7 @@ public final class ClassLoaderFactory {
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        ArrayList list = new ArrayList();
+        ArrayList<URL> list = new ArrayList<URL>();
 
         // Add unpacked directories
         if (unpacked != null) {
@@ -150,7 +150,7 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        URL[] array = (URL[]) list.toArray(new URL[list.size()]);
+        URL[] array = list.toArray(new URL[list.size()]);
         StandardClassLoader classLoader = null;
         if (parent == null)
             classLoader = new StandardClassLoader(array);
@@ -185,7 +185,7 @@ public final class ClassLoaderFactory {
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        ArrayList list = new ArrayList();
+        ArrayList<URL> list = new ArrayList<URL>();
 
         if (locations != null && types != null && locations.length == types.length) {
             for (int i = 0; i < locations.length; i++)  {
@@ -242,7 +242,7 @@ public final class ClassLoaderFactory {
         }
 
         // Construct the class loader itself
-        URL[] array = (URL[]) list.toArray(new URL[list.size()]);
+        URL[] array = list.toArray(new URL[list.size()]);
         if (log.isDebugEnabled())
             for (int i = 0; i < array.length; i++) {
                 log.debug("  location " + i + " is " + array[i]);
