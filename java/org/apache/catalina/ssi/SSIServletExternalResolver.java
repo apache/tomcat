@@ -90,9 +90,9 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 variableNames.add(variableName);
             }
         }
-        Enumeration e = req.getAttributeNames();
+        Enumeration<String> e = req.getAttributeNames();
         while (e.hasMoreElements()) {
-            String name = (String)e.nextElement();
+            String name = e.nextElement();
             if (!isNameReserved(name)) {
                 variableNames.add(name);
             }
@@ -105,9 +105,9 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         if (!isNameReserved(targetName)) {
             object = req.getAttribute(targetName);
             if (object == null) {
-                Enumeration e = req.getAttributeNames();
+                Enumeration<String> e = req.getAttributeNames();
                 while (e.hasMoreElements()) {
-                    String name = (String)e.nextElement();
+                    String name = e.nextElement();
                     if (targetName.equalsIgnoreCase(name)
                             && !isNameReserved(name)) {
                         object = req.getAttribute(name);
@@ -192,14 +192,14 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                     accept = "Accept-Language";
                 }
                 if (accept != null) {
-                    Enumeration acceptHeaders = req.getHeaders(accept);
+                    Enumeration<String> acceptHeaders = req.getHeaders(accept);
                     if (acceptHeaders != null)
                         if (acceptHeaders.hasMoreElements()) {
                             StringBuffer rv = new StringBuffer(
-                                    (String) acceptHeaders.nextElement());
+                                    acceptHeaders.nextElement());
                             while (acceptHeaders.hasMoreElements()) {
                                 rv.append(", ");
-                                rv.append((String) acceptHeaders.nextElement());
+                                rv.append(acceptHeaders.nextElement());
                             }
                         retVal = rv.toString();
                     }
