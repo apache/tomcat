@@ -273,7 +273,7 @@ public class JAASRealm
          for (int i=0; i<classNames.length; i++) {
              if (classNames[i].length()==0) continue;        
              try {
-                 Class principalClass = Class.forName(classNames[i], false,
+                 Class<?> principalClass = Class.forName(classNames[i], false,
                          loader);
                  if (Principal.class.isAssignableFrom(principalClass)) {
                      classNamesList.add(classNames[i]);

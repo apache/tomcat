@@ -91,7 +91,7 @@ public class GenericPrincipal implements Principal {
         this.userPrincipal = userPrincipal;
         if (roles != null) {
             this.roles = new String[roles.size()];
-            this.roles = (String[]) roles.toArray(this.roles);
+            this.roles = roles.toArray(this.roles);
             if (this.roles.length > 0)
                 Arrays.sort(this.roles);
         }

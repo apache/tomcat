@@ -107,6 +107,7 @@ final class MemoryUserRule extends Rule {
      * Construct a new instance of this <code>Rule</code>.
      */
     public MemoryUserRule() {
+        // No initialisation required
     }
 
 
