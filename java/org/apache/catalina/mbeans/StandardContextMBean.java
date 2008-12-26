@@ -107,7 +107,7 @@ public class StandardContextMBean extends BaseModelMBean {
      */
     public String[] getEnvironments() {
         ContextEnvironment[] envs = getNamingResources().findEnvironments();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < envs.length; i++) {
             try {
                 ObjectName oname =
@@ -120,7 +120,7 @@ public class StandardContextMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
     
@@ -132,7 +132,7 @@ public class StandardContextMBean extends BaseModelMBean {
     public String[] getResources() {
         
         ContextResource[] resources = getNamingResources().findResources();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < resources.length; i++) {
             try {
                 ObjectName oname =
@@ -145,7 +145,7 @@ public class StandardContextMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
@@ -157,7 +157,7 @@ public class StandardContextMBean extends BaseModelMBean {
     public String[] getResourceLinks() {
         
         ContextResourceLink[] links = getNamingResources().findResourceLinks();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < links.length; i++) {
             try {
                 ObjectName oname =
@@ -170,7 +170,7 @@ public class StandardContextMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 

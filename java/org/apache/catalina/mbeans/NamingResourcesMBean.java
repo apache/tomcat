@@ -87,7 +87,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getEnvironments() {
         ContextEnvironment[] envs = 
                             ((NamingResources)this.resource).findEnvironments();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < envs.length; i++) {
             try {
                 ObjectName oname =
@@ -100,7 +100,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
     
@@ -113,7 +113,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
         
         ContextResource[] resources = 
                             ((NamingResources)this.resource).findResources();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < resources.length; i++) {
             try {
                 ObjectName oname =
@@ -126,7 +126,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
     
@@ -139,7 +139,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
         
         ContextResourceLink[] resourceLinks = 
                             ((NamingResources)this.resource).findResourceLinks();
-        ArrayList results = new ArrayList();
+        ArrayList<String> results = new ArrayList<String>();
         for (int i = 0; i < resourceLinks.length; i++) {
             try {
                 ObjectName oname =
@@ -152,7 +152,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
