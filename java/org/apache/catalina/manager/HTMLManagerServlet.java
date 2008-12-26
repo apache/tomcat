@@ -45,6 +45,7 @@ import org.apache.catalina.manager.util.ReverseComparator;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.http.fileupload.DiskFileUpload;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 
@@ -73,11 +74,17 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 
 public final class HTMLManagerServlet extends ManagerServlet {
 
+    protected static final URLEncoder URL_ENCODER; 
     protected static final String APPLICATION_MESSAGE = "message";
     protected static final String APPLICATION_ERROR = "error";
     protected String sessionsListJspPath  = "/sessionsList.jsp";
     protected String sessionDetailJspPath = "/sessionDetail.jsp";
 
+    static {
+        URL_ENCODER = new URLEncoder();
+        // '/' should not be encoded in context paths
+        URL_ENCODER.addSafeCharacter('/');
+    }
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -359,7 +366,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             String displayPath = contextPaths[i];
             sortedContextPathsMap.put(displayPath, contextPaths[i]);
         }
-
+ 
         String appsStart = sm.getString("htmlManagerServlet.appsStart");
         String appsStop = sm.getString("htmlManagerServlet.appsStop");
         String appsReload = sm.getString("htmlManagerServlet.appsReload");
@@ -396,24 +403,25 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     isDeployed = false;
                 }
                 
-                args = new Object[6];
-                args[0] = displayPath;
-                args[1] = context.getDisplayName();
-                if (args[1] == null) {
-                    args[1] = "&nbsp;";
+                args = new Object[7];
+                args[0] = URL_ENCODER.encode(displayPath);
+                args[1] = displayPath;
+                args[2] = context.getDisplayName();
+                if (args[2] == null) {
+                    args[2] = "&nbsp;";
                 }
-                args[2] = new Boolean(context.getAvailable());
-                args[3] = response.encodeURL
+                args[3] = new Boolean(context.getAvailable());
+                args[4] = response.encodeURL
                     (request.getContextPath() +
-                     "/html/sessions?path=" + displayPath);
+                     "/html/sessions?path=" + URL_ENCODER.encode(displayPath));
                 if (context.getManager() != null) {
-                    args[4] = new Integer
+                    args[5] = new Integer
                         (context.getManager().getActiveSessions());
                 } else {
-                    args[4] = new Integer(0);
+                    args[5] = new Integer(0);
                 }
 
-                args[5] = highlightColor;
+                args[6] = highlightColor;
 
                 writer.print
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
@@ -421,24 +429,24 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args = new Object[14];
                 args[0] = response.encodeURL
                     (request.getContextPath() +
-                     "/html/start?path=" + displayPath);
+                     "/html/start?path=" + URL_ENCODER.encode(displayPath));
                 args[1] = appsStart;
                 args[2] = response.encodeURL
                     (request.getContextPath() +
-                     "/html/stop?path=" + displayPath);
+                     "/html/stop?path=" + URL_ENCODER.encode(displayPath));
                 args[3] = appsStop;
                 args[4] = response.encodeURL
                     (request.getContextPath() +
-                     "/html/reload?path=" + displayPath);
+                     "/html/reload?path=" + URL_ENCODER.encode(displayPath));
                 args[5] = appsReload;
                 args[6] = response.encodeURL
                     (request.getContextPath() +
-                     "/html/undeploy?path=" + displayPath);
+                     "/html/undeploy?path=" + URL_ENCODER.encode(displayPath));
                 args[7] = appsUndeploy;
                 
                 args[8] = response.encodeURL
                     (request.getContextPath() +
-                     "/html/expire?path=" + displayPath);
+                     "/html/expire?path=" + URL_ENCODER.encode(displayPath));
                 args[9] = appsExpire;
                 args[10] = sm.getString("htmlManagerServlet.expire.explain");
                 Manager manager = context.getManager();
@@ -968,12 +976,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String APPS_ROW_DETAILS_SECTION =
         "<tr>\n" +
-        " <td class=\"row-left\" bgcolor=\"{5}\" rowspan=\"2\"><small><a href=\"{0}\">{0}</a>" +
+        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small><a href=\"{0}\">{1}</a>" +
         "</small></td>\n" +
-        " <td class=\"row-left\" bgcolor=\"{5}\" rowspan=\"2\"><small>{1}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{5}\" rowspan=\"2\"><small>{2}</small></td>\n" +
-        " <td class=\"row-center\" bgcolor=\"{5}\" rowspan=\"2\">" +
-        "<small><a href=\"{3}\" target=\"_new\">{4}</a></small></td>\n";
+        " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
+        " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
+        " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\">" +
+        "<small><a href=\"{4}\" target=\"_new\">{5}</a></small></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
