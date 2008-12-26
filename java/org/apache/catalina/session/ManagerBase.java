@@ -225,9 +225,9 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     // ------------------------------------------------------------- Security classes
 
 
-    private class PrivilegedSetRandomFile implements PrivilegedAction{
+    private class PrivilegedSetRandomFile implements PrivilegedAction<DataInputStream>{
         
-        public Object run(){               
+        public DataInputStream run(){               
             try {
                 File f=new File( devRandomSource );
                 if( ! f.exists() ) return null;
@@ -376,7 +376,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
             boolean apr = false;
             try {
                 String methodName = "random";
-                Class paramTypes[] = new Class[2];
+                Class<?> paramTypes[] = new Class[2];
                 paramTypes[0] = result.getClass();
                 paramTypes[1] = int.class;
                 Object paramValues[] = new Object[2];
@@ -512,7 +512,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         // as a hack, you can use a static file - and genarate the same
         // session ids ( good for strange debugging )
         if (Globals.IS_SECURITY_ENABLED){
-            randomIS = (DataInputStream)AccessController.doPrivileged(new PrivilegedSetRandomFile());          
+            randomIS = AccessController.doPrivileged(new PrivilegedSetRandomFile());
         } else {
             try{
                 devRandomSource=s;
@@ -556,7 +556,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
             }
             try {
                 // Construct and seed a new random number generator
-                Class clazz = Class.forName(randomClass);
+                Class<?> clazz = Class.forName(randomClass);
                 this.random = (Random) clazz.newInstance();
                 this.random.setSeed(seed);
             } catch (Exception e) {
@@ -731,7 +731,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
         if( oname==null ) {
             try {
                 StandardContext ctx=(StandardContext)this.getContainer();
-                Engine eng=(Engine)ctx.getParent().getParent();
                 domain=ctx.getEngineName();
                 distributable = ctx.getDistributable();
                 StandardHost hst=(StandardHost)ctx.getParent();
@@ -884,7 +883,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
 
         if (id == null)
             return (null);
-        return (Session) sessions.get(id);
+        return sessions.get(id);
 
     }
 
@@ -1023,7 +1022,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     public Engine getEngine() {
         Engine e = null;
         for (Container c = getContainer(); e == null && c != null ; c = c.getParent()) {
-            if (c != null && c instanceof Engine) {
+            if (c instanceof Engine) {
                 e = (Engine)c;
             }
         }
@@ -1154,7 +1153,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      */
     public String listSessionIds() {
         StringBuffer sb=new StringBuffer();
-        Iterator keys = sessions.keySet().iterator();
+        Iterator<String> keys = sessions.keySet().iterator();
         while (keys.hasNext()) {
             sb.append(keys.next()).append(" ");
         }
@@ -1170,7 +1169,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      * @return The attribute value, if found, null otherwise
      */
     public String getSessionAttribute( String sessionId, String key ) {
-        Session s = (Session) sessions.get(sessionId);
+        Session s = sessions.get(sessionId);
         if( s==null ) {
             if(log.isInfoEnabled())
                 log.info("Session not found " + sessionId);
@@ -1194,8 +1193,8 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      * representation of their values, or null if no session with the
      * specified id exists, or if the session does not have any attributes
      */
-    public HashMap getSession(String sessionId) {
-        Session s = (Session) sessions.get(sessionId);
+    public HashMap<String, String> getSession(String sessionId) {
+        Session s = sessions.get(sessionId);
         if (s == null) {
             if (log.isInfoEnabled()) {
                 log.info("Session not found " + sessionId);
@@ -1203,14 +1202,14 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
             return null;
         }
 
-        Enumeration ee = s.getSession().getAttributeNames();
+        Enumeration<String> ee = s.getSession().getAttributeNames();
         if (ee == null || !ee.hasMoreElements()) {
             return null;
         }
 
-        HashMap map = new HashMap();
+        HashMap<String, String> map = new HashMap<String, String>();
         while (ee.hasMoreElements()) {
-            String attrName = (String) ee.nextElement();
+            String attrName = ee.nextElement();
             map.put(attrName, getSessionAttribute(sessionId, attrName));
         }
 
@@ -1219,7 +1218,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
 
 
     public void expireSession( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if( s==null ) {
             if(log.isInfoEnabled())
                 log.info("Session not found " + sessionId);
@@ -1229,14 +1228,14 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     }
 
     public long getThisAccessedTimestamp( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if(s== null)
             return -1 ;
         return s.getThisAccessedTime();
     }
 
     public String getThisAccessedTime( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if( s==null ) {
             if(log.isInfoEnabled())
                 log.info("Session not found " + sessionId);
@@ -1246,14 +1245,14 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     }
 
     public long getLastAccessedTimestamp( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if(s== null)
             return -1 ;
         return s.getLastAccessedTime();
     }
 
     public String getLastAccessedTime( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if( s==null ) {
             if(log.isInfoEnabled())
                 log.info("Session not found " + sessionId);
@@ -1263,7 +1262,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     }
 
     public String getCreationTime( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if( s==null ) {
             if(log.isInfoEnabled())
                 log.info("Session not found " + sessionId);
@@ -1273,7 +1272,7 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     }
 
     public long getCreationTimestamp( String sessionId ) {
-        Session s=(Session)sessions.get(sessionId);
+        Session s=sessions.get(sessionId);
         if(s== null)
             return -1 ;
         return s.getCreationTime();
@@ -1301,12 +1300,15 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     }
 
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
     public void postDeregister() {
+        // NOOP
     }
 
 }
