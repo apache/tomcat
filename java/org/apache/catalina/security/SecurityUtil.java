@@ -66,7 +66,8 @@ public final class SecurityUtil{
     /**
      * Cache every object for which we are creating method on it.
      */
-    private static HashMap objectCache = new HashMap();
+    private static HashMap<Object,Method[]> objectCache =
+        new HashMap<Object,Method[]>();
         
     private static org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( SecurityUtil.class );
@@ -112,7 +113,7 @@ public final class SecurityUtil{
      */
     public static void doAsPrivilege(final String methodName, 
                                      final Servlet targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments) 
         throws java.lang.Exception{    
 
@@ -140,7 +141,7 @@ public final class SecurityUtil{
      */    
     public static void doAsPrivilege(final String methodName, 
                                      final Servlet targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments,
                                      Principal principal) 
         throws java.lang.Exception{
@@ -148,7 +149,7 @@ public final class SecurityUtil{
         Method method = null;
         Method[] methodsCache = null;
         if(objectCache.containsKey(targetObject)){
-            methodsCache = (Method[])objectCache.get(targetObject);
+            methodsCache = objectCache.get(targetObject);
             method = findMethod(methodsCache, methodName);
             if (method == null){
                 method = createMethodAndCacheIt(methodsCache,
@@ -197,7 +198,7 @@ public final class SecurityUtil{
      */    
     public static void doAsPrivilege(final String methodName, 
                                      final Filter targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments) 
         throws java.lang.Exception{
 
@@ -221,7 +222,7 @@ public final class SecurityUtil{
      */    
     public static void doAsPrivilege(final String methodName, 
                                      final Filter targetObject, 
-                                     final Class[] targetType,
+                                     final Class<?>[] targetType,
                                      final Object[] targetArguments,
                                      Principal principal) 
         throws java.lang.Exception{
@@ -229,7 +230,7 @@ public final class SecurityUtil{
 
         Method[] methodsCache = null;
         if(objectCache.containsKey(targetObject)){
-            methodsCache = (Method[])objectCache.get(targetObject);
+            methodsCache = objectCache.get(targetObject);
             method = findMethod(methodsCache, methodName);
             if (method == null){
                 method = createMethodAndCacheIt(methodsCache,
@@ -268,8 +269,9 @@ public final class SecurityUtil{
        
         try{   
             Subject subject = null;
-            PrivilegedExceptionAction pea = new PrivilegedExceptionAction(){
-                    public Object run() throws Exception{
+            PrivilegedExceptionAction<Void> pea =
+                new PrivilegedExceptionAction<Void>(){
+                    public Void run() throws Exception{
                        method.invoke(targetObject, targetArguments);
                        return null;
                     }
@@ -374,7 +376,7 @@ public final class SecurityUtil{
     private static Method createMethodAndCacheIt(Method[] methodsCache,
                                                  String methodName,
                                                  Object targetObject,
-                                                 Class[] targetType) 
+                                                 Class<?>[] targetType) 
             throws Exception{
         
         if ( methodsCache == null){
