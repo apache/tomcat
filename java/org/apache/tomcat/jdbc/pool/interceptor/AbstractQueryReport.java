@@ -1,0 +1,241 @@
+package org.apache.tomcat.jdbc.pool.interceptor;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
+import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.QueryStats;
+
+public abstract class AbstractQueryReport extends AbstractCreateStatementInterceptor {
+    //logger
+    protected static Log log = LogFactory.getLog(AbstractQueryReport.class);
+
+    /**
+     * The threshold in milliseconds. If the query is faster than this, we don't measure it
+     */
+    protected long threshold = 1000; //don't report queries less than this
+    
+    /**
+     * the constructors that are used to create statement proxies 
+     */
+    protected static final Constructor[] constructors = new Constructor[AbstractCreateStatementInterceptor.statements.length];
+
+    
+    public AbstractQueryReport() {
+        super();
+    }
+    
+    
+    /**
+     * Invoked when prepareStatement has been called and completed.
+     * @param sql - the string used to prepare the statement with
+     * @param time - the time it took to invoke prepare
+     */
+    protected abstract void prepareStatement(String sql, long time);
+    
+    /**
+     * Invoked when prepareCall has been called and completed.
+     * @param sql - the string used to prepare the statement with
+     * @param time - the time it took to invoke prepare
+     */
+    protected abstract void prepareCall(String query, long time);
+
+    /**
+     * Invoked when a query execution, a call to execute/executeQuery or executeBatch failed.
+     * @param query
+     * @param args
+     * @param name
+     * @param start
+     * @param t
+     * @return - the SQL that was executed or the string &quot;batch&quot; 
+     */
+    protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
+        //extract the query string
+        String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+        //if we do batch execution, then we name the query 'batch'
+        if (sql==null && compare(executes[3],name)) {
+            sql = "batch";
+        }
+        return sql;
+    }
+
+    /**
+     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded but was below the threshold
+     * @param query
+     * @param args
+     * @param name
+     * @param start
+     * @param t
+     * @return - the SQL that was executed or the string &quot;batch&quot; 
+     */
+    protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
+        //extract the query string
+        String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+        //if we do batch execution, then we name the query 'batch'
+        if (sql==null && compare(executes[3],name)) {
+            sql = "batch";
+        }
+        return sql;
+    }
+
+    /**
+     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded but was above the query time threshold
+     * @param query
+     * @param args
+     * @param name
+     * @param start
+     * @param t
+     * @return - the SQL that was executed or the string &quot;batch&quot; 
+     */
+    protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
+        //extract the query string
+        String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
+        //if we do batch execution, then we name the query 'batch'
+        if (sql==null && compare(executes[3],name)) {
+            sql = "batch";
+        }
+        return sql;
+    }
+    
+    /**
+     * returns the query measure threshold.
+     * This value is in milliseconds. If the query is faster than this threshold than it wont be accounted for
+     * @return
+     */
+    public long getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * Sets the query measurement threshold. The value is in milliseconds.
+     * If the query goes faster than this threshold it will not be recorded.
+     * @param threshold set to -1 to record every query. Value is in milliseconds.
+     */
+    public void setThreshold(long threshold) {
+        this.threshold = threshold;
+    }
+
+    /**
+     * Creates a constructor for a proxy class, if one doesn't already exist
+     * @param idx - the index of the constructor
+     * @param clazz - the interface that the proxy will implement
+     * @return - returns a constructor used to create new instances
+     * @throws NoSuchMethodException
+     */
+    protected Constructor getConstructor(int idx, Class clazz) throws NoSuchMethodException {
+        if (constructors[idx]==null) {
+            Class proxyClass = Proxy.getProxyClass(SlowQueryReport.class.getClassLoader(), new Class[] {clazz});
+            constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        }
+        return constructors[idx];
+    }
+
+    /**
+     * Creates a statement interceptor to monitor query response times
+     */
+    @Override
+    public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
+        try {
+            Object result = null;
+            String name = method.getName();
+            String sql = null;
+            Constructor constructor = null;
+            if (compare(statements[0],name)) {
+                //createStatement
+                constructor = getConstructor(0,Statement.class);
+            }else if (compare(statements[1],name)) {
+                //prepareStatement
+                sql = (String)args[0];
+                constructor = getConstructor(1,PreparedStatement.class);
+                if (sql!=null) {
+                    prepareStatement(sql, time);
+                }
+            }else if (compare(statements[2],name)) {
+                //prepareCall
+                sql = (String)args[0];
+                constructor = getConstructor(2,CallableStatement.class);
+                prepareCall(sql,time);
+            }else {
+                //do nothing, might be a future unsupported method
+                //so we better bail out and let the system continue
+                return statement;
+            }
+            result = constructor.newInstance(new Object[] { new StatementProxy(statement,sql) });
+            return result;
+        }catch (Exception x) {
+            log.warn("Unable to create statement proxy for slow query report.",x);
+        }
+        return statement;
+    }
+
+
+    /**
+     * Class to measure query execute time
+     * @author fhanik
+     *
+     */
+    protected class StatementProxy implements InvocationHandler {
+        protected boolean closed = false;
+        protected Object delegate;
+        protected final String query;
+        public StatementProxy(Object parent, String query) {
+            this.delegate = parent;
+            this.query = query;
+        }
+        
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            //get the name of the method for comparison
+            final String name = method.getName();
+            //was close invoked?
+            boolean close = compare(JdbcInterceptor.CLOSE_VAL,name);
+            //allow close to be called multiple times
+            if (close && closed) return null; 
+            //are we calling isClosed?
+            if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) return closed;
+            //if we are calling anything else, bail out
+            if (closed) throw new SQLException("Statement closed.");
+            boolean process = false;
+            //check to see if we are about to execute a query
+            process = process(executes, method, process);
+            //if we are executing, get the current time
+            long start = (process)?System.currentTimeMillis():0;
+            Object result =  null;
+            try {
+                //execute the query
+                result =  method.invoke(delegate,args);
+            }catch (Throwable t) {
+                reportFailedQuery(query,args,name,start,t);
+                throw t;
+            }
+            //measure the time
+            long delta = (process)?(System.currentTimeMillis()-start):Long.MIN_VALUE;
+            //see if we meet the requirements to measure
+            if (delta>threshold) {
+                try {
+                    //report the slow query
+                    reportSlowQuery(query, args, name, start, delta);
+                }catch (Exception t) {
+                    if (log.isWarnEnabled()) log.warn("Unable to process slow query",t);
+                }
+            } else {
+                reportQuery(query, args, name, start, delta);
+            }
+            //perform close cleanup
+            if (close) {
+                closed=true;
+                delegate = null;
+            }
+            return result;
+        }
+    }    
+
+}
