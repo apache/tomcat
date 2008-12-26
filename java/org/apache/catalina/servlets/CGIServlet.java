@@ -40,7 +40,6 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -1701,7 +1700,9 @@ public final class CGIServlet extends HttpServlet {
                             // such as a socket disconnect on the servlet side; otherwise, the
                             // external process could hang
                             if (bufRead != -1) {
-                                while ((bufRead = cgiOutput.read(bBuf)) != -1) {}
+                                while ((bufRead = cgiOutput.read(bBuf)) != -1) {
+                                    // NOOP - just read the data
+                                }
                             }
                         }
         
@@ -1713,6 +1714,7 @@ public final class CGIServlet extends HttpServlet {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException ignored) {
+                            // Ignore
                         }
                     }
                 } //replacement for Process.waitFor()
