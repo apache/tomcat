@@ -96,12 +96,12 @@ public class GroupMBean extends BaseModelMBean {
     public String[] getRoles() {
 
         Group group = (Group) this.resource;
-        ArrayList results = new ArrayList();
-        Iterator roles = group.getRoles();
+        ArrayList<String> results = new ArrayList<String>();
+        Iterator<Role> roles = group.getRoles();
         while (roles.hasNext()) {
             Role role = null;
             try {
-                role = (Role) roles.next();
+                role = roles.next();
                 ObjectName oname =
                     MBeanUtils.createObjectName(managed.getDomain(), role);
                 results.add(oname.toString());
@@ -112,7 +112,7 @@ public class GroupMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
@@ -123,12 +123,12 @@ public class GroupMBean extends BaseModelMBean {
     public String[] getUsers() {
 
         Group group = (Group) this.resource;
-        ArrayList results = new ArrayList();
-        Iterator users = group.getUsers();
+        ArrayList<String> results = new ArrayList<String>();
+        Iterator<User> users = group.getUsers();
         while (users.hasNext()) {
             User user = null;
             try {
-                user = (User) users.next();
+                user = users.next();
                 ObjectName oname =
                     MBeanUtils.createObjectName(managed.getDomain(), user);
                 results.add(oname.toString());
@@ -139,7 +139,7 @@ public class GroupMBean extends BaseModelMBean {
                 throw iae;
             }
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 

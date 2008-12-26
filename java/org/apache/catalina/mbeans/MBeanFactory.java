@@ -54,7 +54,6 @@ import org.apache.catalina.valves.RemoteHostValve;
 import org.apache.catalina.valves.RequestDumperValve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
-import org.apache.tomcat.util.modeler.Registry;
 
 
 /**
@@ -74,11 +73,6 @@ public class MBeanFactory extends BaseModelMBean {
      * The <code>MBeanServer</code> for this application.
      */
     private static MBeanServer mserver = MBeanUtils.createServer();
-
-    /**
-     * The configuration information registry for our managed beans.
-     */
-    private static Registry registry = MBeanUtils.createRegistry();
 
 
     // ----------------------------------------------------------- Constructors
@@ -661,7 +655,7 @@ public class MBeanFactory extends BaseModelMBean {
      * @exception Exception if an MBean cannot be created or registered
      */
 
-    public Vector createStandardEngineService(String parent, 
+    public Vector<ObjectName> createStandardEngineService(String parent, 
             String engineName, String defaultHost, String serviceName)
         throws Exception {
 
@@ -677,7 +671,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Add the new instance to its parent component
         Server server = ServerFactory.getServer();
         server.addService(service);
-        Vector onames = new Vector();
+        Vector<ObjectName> onames = new Vector<ObjectName>();
         // FIXME service & engine.getObjectName
         //ObjectName oname = engine.getObjectName();
         ObjectName oname = 
@@ -873,12 +867,11 @@ public class MBeanFactory extends BaseModelMBean {
 
         // Acquire a reference to the component to be removed
         ObjectName oname = new ObjectName(name);
-        Server server = ServerFactory.getServer();
         Service service = getService(oname);
         String port = oname.getKeyProperty("port");
         //String address = oname.getKeyProperty("address");
 
-        Connector conns[] = (Connector[]) service.findConnectors();
+        Connector conns[] = service.findConnectors();
 
         for (int i = 0; i < conns.length; i++) {
             String connAddress = String.valueOf(conns[i].getProperty("address"));
@@ -1063,8 +1056,7 @@ public class MBeanFactory extends BaseModelMBean {
         // Acquire a reference to the component to be removed
         ObjectName oname = new ObjectName(name);
         ContainerBase container = getParentContainerFromChild(oname);
-        String sequence = oname.getKeyProperty("seq");
-        Valve[] valves = (Valve[])container.getValves();
+        Valve[] valves = container.getValves();
         for (int i = 0; i < valves.length; i++) {
             ObjectName voname = ((ValveBase) valves[i]).getObjectName();
             if (voname.equals(oname)) {

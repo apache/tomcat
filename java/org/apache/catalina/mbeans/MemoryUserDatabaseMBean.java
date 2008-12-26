@@ -118,13 +118,13 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     public String[] getGroups() {
 
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList results = new ArrayList();
-        Iterator groups = database.getGroups();
+        ArrayList<String> results = new ArrayList<String>();
+        Iterator<Group> groups = database.getGroups();
         while (groups.hasNext()) {
-            Group group = (Group) groups.next();
+            Group group = groups.next();
             results.add(findGroup(group.getGroupname()));
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
@@ -135,13 +135,13 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     public String[] getRoles() {
 
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList results = new ArrayList();
-        Iterator roles = database.getRoles();
+        ArrayList<String> results = new ArrayList<String>();
+        Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {
-            Role role = (Role) roles.next();
+            Role role = roles.next();
             results.add(findRole(role.getRolename()));
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
@@ -152,13 +152,13 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
     public String[] getUsers() {
 
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList results = new ArrayList();
-        Iterator users = database.getUsers();
+        ArrayList<String> results = new ArrayList<String>();
+        Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
-            User user = (User) users.next();
+            User user = users.next();
             results.add(findUser(user.getUsername()));
         }
-        return ((String[]) results.toArray(new String[results.size()]));
+        return results.toArray(new String[results.size()]);
 
     }
 
