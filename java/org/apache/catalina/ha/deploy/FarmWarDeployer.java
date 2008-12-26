@@ -149,7 +149,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     
         // Check to correct engine and host setup
         Container econtainer = host.getParent();
-        if(econtainer == null && econtainer instanceof Engine) {
+        if(!(econtainer instanceof Engine)) {
             log.error("FarmWarDeployer can only work if parent of " + host.getName()+ " is an engine!"); 
             return ;
         }
