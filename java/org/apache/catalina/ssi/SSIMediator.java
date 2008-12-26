@@ -190,7 +190,7 @@ public class SSIMediator {
             variableValue = ssiExternalResolver.getVariableValue(variableName);
             if (variableValue == null) {
                 variableName = variableName.toUpperCase();
-                variableValue = (String)ssiExternalResolver
+                variableValue = ssiExternalResolver
                         .getVariableValue(className + "." + variableName);
             }
             if (variableValue != null) {
