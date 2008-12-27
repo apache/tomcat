@@ -44,7 +44,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.Manager;
@@ -295,7 +294,7 @@ public class ManagerServlet
      */
     public void destroy() {
 
-        ;       // No actions necessary
+        // No actions necessary
 
     }
 
@@ -443,7 +442,7 @@ public class ManagerServlet
             value = getServletConfig().getInitParameter("debug");
             debug = Integer.parseInt(value);
         } catch (Throwable t) {
-            ;
+            // Ignore
         }
 
         // Acquire global JNDI resources if available
@@ -930,7 +929,7 @@ public class ManagerServlet
             writer.println(sm.getString("managerServlet.resourcesAll"));
         }
 
-        Class clazz = null;
+        Class<?> clazz = null;
         try {
             if (type != null) {
                 clazz = Class.forName(type);
@@ -952,12 +951,12 @@ public class ManagerServlet
      */
     protected void printResources(PrintWriter writer, String prefix,
                                   javax.naming.Context namingContext,
-                                  String type, Class clazz) {
+                                  String type, Class<?> clazz) {
 
         try {
-            NamingEnumeration items = namingContext.listBindings("");
+            NamingEnumeration<Binding> items = namingContext.listBindings("");
             while (items.hasMore()) {
-                Binding item = (Binding) items.next();
+                Binding item = items.next();
                 if (item.getObject() instanceof javax.naming.Context) {
                     printResources
                         (writer, prefix + item.getName() + "/",
@@ -1015,10 +1014,10 @@ public class ManagerServlet
 
         // Enumerate the available roles
         writer.println(sm.getString("managerServlet.rolesList"));
-        Iterator roles = database.getRoles();
+        Iterator<Role> roles = database.getRoles();
         if (roles != null) {
             while (roles.hasNext()) {
-                Role role = (Role) roles.next();
+                Role role = roles.next();
                 writer.print(role.getRolename());
                 writer.print(':');
                 if (role.getDescription() != null) {
@@ -1535,7 +1534,7 @@ public class ManagerServlet
                 try {
                     ostream.close();
                 } catch (Throwable t) {
-                    ;
+                    // Ignore
                 }
                 ostream = null;
             }
@@ -1543,7 +1542,7 @@ public class ManagerServlet
                 try {
                     istream.close();
                 } catch (Throwable t) {
-                    ;
+                    // Ignore
                 }
                 istream = null;
             }

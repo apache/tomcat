@@ -185,12 +185,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String war = null;
         FileItem warUpload = null;
         try {
-            List items = upload.parseRequest(request);
+            List<FileItem> items = upload.parseRequest(request);
         
             // Process the uploaded fields
-            Iterator iter = items.iterator();
+            Iterator<FileItem> iter = items.iterator();
             while (iter.hasNext()) {
-                FileItem item = (FileItem) iter.next();
+                FileItem item = iter.next();
         
                 if (!item.isFormField()) {
                     if (item.getFieldName().equals("deployWar") &&
@@ -360,7 +360,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         for (int i = 0; i < children.length; i++)
             contextPaths[i] = children[i].getName();
 
-        TreeMap sortedContextPathsMap = new TreeMap();
+        TreeMap<String,String> sortedContextPathsMap =
+            new TreeMap<String,String>();
 
         for (int i = 0; i < contextPaths.length; i++) {
             String displayPath = contextPaths[i];
@@ -373,7 +374,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String appsUndeploy = sm.getString("htmlManagerServlet.appsUndeploy");
         String appsExpire = sm.getString("htmlManagerServlet.appsExpire");
 
-        Iterator iterator = sortedContextPathsMap.entrySet().iterator();
+        Iterator<Map.Entry<String,String>> iterator =
+            sortedContextPathsMap.entrySet().iterator();
         boolean isHighlighted = true;
         boolean isDeployed = true;
         String highlightColor = null;
@@ -387,9 +389,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 highlightColor = "#FFFFFF";
             }
 
-            Map.Entry entry = (Map.Entry) iterator.next();
-            String displayPath = (String) entry.getKey();
-            String contextPath = (String) entry.getValue();
+            Map.Entry<String,String> entry = iterator.next();
+            String displayPath = entry.getKey();
+            String contextPath = entry.getValue();
             Context context = (Context) host.findChild(contextPath);
             if (displayPath.equals("")) {
                 displayPath = "/";
@@ -742,11 +744,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * @throws IOException
      */
     protected void displaySessionsListPage(String path, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List/*<Session>*/ activeSessions = Arrays.asList(getSessionsForPath(path));
+        List<Session> activeSessions = Arrays.asList(getSessionsForPath(path));
         String sortBy = req.getParameter("sort");
         String orderBy = null;
         if (null != sortBy && !"".equals(sortBy.trim())) {
-            Comparator comparator = getComparator(sortBy);
+            Comparator<Session> comparator = getComparator(sortBy);
             if (comparator != null) {
                 orderBy = req.getParameter("order");
                 if ("DESC".equalsIgnoreCase(orderBy)) {
@@ -888,65 +890,65 @@ public final class HTMLManagerServlet extends ManagerServlet {
 		}
     }
 
-    protected Comparator getComparator(String sortBy) {
-        Comparator comparator = null;
+    protected Comparator<Session> getComparator(String sortBy) {
+        Comparator<Session> comparator = null;
         if ("CreationTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Date>() {
+                public Comparable<Date> getComparableObject(Session session) {
                     return new Date(session.getCreationTime());
                 }
             };
         } else if ("id".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<String>() {
+                public Comparable<String> getComparableObject(Session session) {
                     return session.getId();
                 }
             };
         } else if ("LastAccessedTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Date>() {
+                public Comparable<Date> getComparableObject(Session session) {
                     return new Date(session.getLastAccessedTime());
                 }
             };
         } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Date>() {
+                public Comparable<Date> getComparableObject(Session session) {
                     return new Date(session.getMaxInactiveInterval());
                 }
             };
         } else if ("new".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Boolean>() {
+                public Comparable<Boolean> getComparableObject(Session session) {
                     return Boolean.valueOf(session.getSession().isNew());
                 }
             };
         } else if ("locale".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<String>() {
+                public Comparable<String> getComparableObject(Session session) {
                     return JspHelper.guessDisplayLocaleFromSession(session);
                 }
             };
         } else if ("user".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<String>() {
+                public Comparable<String> getComparableObject(Session session) {
                     return JspHelper.guessDisplayUserFromSession(session);
                 }
             };
         } else if ("UsedTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Date>() {
+                public Comparable<Date> getComparableObject(Session session) {
                     return new Date(SessionUtils.getUsedTimeForSession(session));
                 }
             };
         } else if ("InactiveTime".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Date>() {
+                public Comparable<Date> getComparableObject(Session session) {
                     return new Date(SessionUtils.getInactiveTimeForSession(session));
                 }
             };
         } else if ("TTL".equalsIgnoreCase(sortBy)) {
-            comparator = new BaseSessionComparator() {
-                public Comparable getComparableObject(Session session) {
+            comparator = new BaseSessionComparator<Date>() {
+                public Comparable<Date> getComparableObject(Session session) {
                     return new Date(SessionUtils.getTTLForSession(session));
                 }
             };
