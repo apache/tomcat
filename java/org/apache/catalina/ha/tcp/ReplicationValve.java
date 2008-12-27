@@ -96,7 +96,8 @@ public class ReplicationValve
     /**
      * crossContext session container 
      */
-    protected ThreadLocal crossContextSessions = new ThreadLocal() ;
+    protected ThreadLocal<ArrayList<DeltaSession>> crossContextSessions =
+        new ThreadLocal<ArrayList<DeltaSession>>() ;
     
     /**
      * doProcessingStats (default = off)
@@ -299,7 +300,7 @@ public class ReplicationValve
      * @param session cross context session
      */
     public void registerReplicationSession(DeltaSession session) {
-        List sessions = (List)crossContextSessions.get();
+        List<DeltaSession> sessions = crossContextSessions.get();
         if(sessions != null) {
             if(!sessions.contains(session)) {
                 if(log.isDebugEnabled())
@@ -342,7 +343,7 @@ public class ReplicationValve
                 if(log.isDebugEnabled())
                     log.debug(sm.getString("ReplicationValve.crossContext.add"));
                 //FIXME add Pool of Arraylists
-                crossContextSessions.set(new ArrayList());
+                crossContextSessions.set(new ArrayList<DeltaSession>());
             }
             getNext().invoke(request, response);
             if(context != null) {
@@ -448,9 +449,9 @@ public class ReplicationValve
     protected void sendCrossContextSession(CatalinaCluster containerCluster) {
         Object sessions = crossContextSessions.get();
         if(sessions != null && sessions instanceof List
-                && ((List)sessions).size() >0) {
-            for(Iterator iter = ((List)sessions).iterator(); iter.hasNext() ;) {          
-                Session session = (Session)iter.next();
+                && ((List<Session>)sessions).size() >0) {
+            for(Iterator<Session> iter = ((List<Session>)sessions).iterator(); iter.hasNext() ;) {          
+                Session session = iter.next();
                 if(log.isDebugEnabled())
                     log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",  
                             session.getManager().getContainer().getName() ));
@@ -469,17 +470,17 @@ public class ReplicationValve
      */
     protected void resetReplicationRequest(Request request, boolean isCrossContext) {
         Session contextSession = request.getSessionInternal(false);
-        if(contextSession != null & contextSession instanceof DeltaSession){
+        if(contextSession instanceof DeltaSession){
             resetDeltaRequest(contextSession);
             ((DeltaSession)contextSession).setPrimarySession(true);
         }
         if(isCrossContext) {
             Object sessions = crossContextSessions.get();
             if(sessions != null && sessions instanceof List
-               && ((List)sessions).size() >0) {
-                Iterator iter = ((List)sessions).iterator();
+               && ((List<Session>)sessions).size() >0) {
+                Iterator<Session> iter = ((List<Session>)sessions).iterator();
                 for(; iter.hasNext() ;) {          
-                    Session session = (Session)iter.next();
+                    Session session = iter.next();
                     resetDeltaRequest(session);
                     if(session instanceof DeltaSession)
                         ((DeltaSession)contextSession).setPrimarySession(true);
@@ -636,13 +637,12 @@ public class ReplicationValve
             Session session = manager.findSession(id);
             if (session instanceof ClusterSession) {
                 ClusterSession cses = (ClusterSession) session;
-                if (cses != null) {
-                    if (log.isDebugEnabled())
-                        log.debug(sm.getString(
-                                "ReplicationValve.session.indicator", request.getContext().getName(),id,
-                                primaryIndicatorName, cses.isPrimarySession()));
-                    request.setAttribute(primaryIndicatorName, cses.isPrimarySession()?Boolean.TRUE:Boolean.FALSE);
-                }
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString(
+                            "ReplicationValve.session.indicator", request.getContext().getName(),id,
+                            primaryIndicatorName,
+                            Boolean.valueOf(cses.isPrimarySession())));
+                request.setAttribute(primaryIndicatorName, cses.isPrimarySession()?Boolean.TRUE:Boolean.FALSE);
             } else {
                 if (log.isDebugEnabled()) {
                     if (session != null) {

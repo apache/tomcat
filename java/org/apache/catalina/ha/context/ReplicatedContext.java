@@ -26,18 +26,12 @@ import org.apache.catalina.core.ApplicationContext;
 import org.apache.catalina.Globals;
 import javax.servlet.ServletContext;
 import java.util.AbstractMap;
-import org.apache.catalina.tribes.tipis.AbstractReplicatedMap;
-import java.util.ArrayList;
-import java.util.Iterator;
-import javax.servlet.ServletContextAttributeListener;
-import javax.servlet.ServletContextAttributeEvent;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
-import org.apache.catalina.ha.session.DeltaSession;
 
 /**
  * @author Filip Hanik
@@ -79,7 +73,8 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
     public synchronized void stop() throws LifecycleException
     {
         if ( !this.started ) return;
-        AbstractMap map = (AbstractMap)((ReplApplContext)this.context).getAttributeMap();
+        AbstractMap<String,Object> map =
+            ((ReplApplContext)this.context).getAttributeMap();
         if ( map!=null && map instanceof ReplicatedMap) {
             ((ReplicatedMap)map).breakdown();
         }
@@ -131,7 +126,8 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
 
     
     protected static class ReplApplContext extends ApplicationContext {
-        protected ConcurrentHashMap tomcatAttributes = new ConcurrentHashMap();
+        protected ConcurrentHashMap<String, Object> tomcatAttributes =
+            new ConcurrentHashMap<String, Object>();
         
         public ReplApplContext(String basePath, ReplicatedContext context) {
             super(basePath,context);
@@ -145,10 +141,10 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
              return super.getFacade();
         }
         
-        public AbstractMap getAttributeMap() {
-            return (AbstractMap)this.attributes;
+        public AbstractMap<String,Object> getAttributeMap() {
+            return (AbstractMap<String,Object>)this.attributes;
         }
-        public void setAttributeMap(AbstractMap map) {
+        public void setAttributeMap(AbstractMap<String,Object> map) {
             this.attributes = map;
         }
         
@@ -172,15 +168,15 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
                 return super.getAttribute(name);
         }
         
-        public Enumeration getAttributeNames() {
-            return new MultiEnumeration(new Enumeration[] {super.getAttributeNames(),new Enumerator(tomcatAttributes.keySet(), true)});
+        public Enumeration<String> getAttributeNames() {
+            return new MultiEnumeration<String>(new Enumeration[] {super.getAttributeNames(),new Enumerator<String>(tomcatAttributes.keySet(), true)});
         }
         
     }
 
-    protected static class MultiEnumeration implements Enumeration {
-        Enumeration[] e=null;
-        public MultiEnumeration(Enumeration[] lists) {
+    protected static class MultiEnumeration<T> implements Enumeration<T> {
+        Enumeration<T>[] e=null;
+        public MultiEnumeration(Enumeration<T>[] lists) {
             e = lists;
         }
         public boolean hasMoreElements() {
@@ -189,7 +185,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
             }
             return false;
         }
-        public Object nextElement() {
+        public T nextElement() {
             for ( int i=0; i<e.length; i++ ) {
                 if ( e[i].hasMoreElements() ) return e[i].nextElement();
             }

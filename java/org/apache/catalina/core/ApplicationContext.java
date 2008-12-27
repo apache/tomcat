@@ -90,13 +90,15 @@ public class ApplicationContext
     /**
      * The context attributes for this context.
      */
-    protected Map attributes = new ConcurrentHashMap();
+    protected Map<String,Object> attributes =
+        new ConcurrentHashMap<String,Object>();
 
 
     /**
      * List of read only attributes for this context.
      */
-    private Map readOnlyAttributes = new ConcurrentHashMap();
+    private Map<String,String> readOnlyAttributes =
+        new ConcurrentHashMap<String,String>();
 
 
     /**

@@ -138,14 +138,14 @@ public class ClusterSingleSignOnListener extends ClusterListener {
 
     private Session getSession(String sessionId, String ctxname) {
 	
-	Map managers = clusterSSO.getCluster().getManagers() ;
+	Map<String,ClusterManager> managers = clusterSSO.getCluster().getManagers();
 	Session session = null;
 
 	if (ctxname == null) {
-	    java.util.Iterator i = managers.keySet().iterator();
+	    java.util.Iterator<String> i = managers.keySet().iterator();
 	    while (i.hasNext()) {
-		String key = (String) i.next();
-		ClusterManager mgr = (ClusterManager) managers.get(key);
+		String key = i.next();
+		ClusterManager mgr = managers.get(key);
 		if (mgr != null) {
 		    try {
 			session = mgr.findSession(sessionId);
@@ -162,7 +162,7 @@ public class ClusterSingleSignOnListener extends ClusterListener {
 		}
 	    }
 	} else {
-	    ClusterManager mgr = (ClusterManager) managers.get(ctxname);
+	    ClusterManager mgr = managers.get(ctxname);
 	    if (mgr != null) {
 		try {
 		    session = mgr.findSession(sessionId);
