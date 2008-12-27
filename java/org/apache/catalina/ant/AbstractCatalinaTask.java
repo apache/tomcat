@@ -269,7 +269,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 try {
                     reader.close();
                 } catch (Throwable u) {
-                    ;
+                    // Ignore
                 }
                 reader = null;
             }
@@ -277,7 +277,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 try {
                     istream.close();
                 } catch (Throwable u) {
-                    ;
+                    // Ignore
                 }
                 istream = null;
             }

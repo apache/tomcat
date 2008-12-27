@@ -94,7 +94,8 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
             file = file.getCanonicalFile();
             InputStream stream = 
                 new BufferedInputStream(new FileInputStream(file));
-            InputSource is = new InputSource(file.toURL().toExternalForm());
+            InputSource is =
+                new InputSource(file.toURI().toURL().toExternalForm());
             is.setByteStream(stream);
             digester.parse(is);
             handleOutput("web.xml validated");
