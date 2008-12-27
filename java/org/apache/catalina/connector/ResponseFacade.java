@@ -50,7 +50,7 @@ public class ResponseFacade
     // ----------------------------------------------------------- DoPrivileged
     
     private final class SetContentTypePrivilegedAction
-            implements PrivilegedAction {
+            implements PrivilegedAction<Void> {
 
         private String contentType;
 
@@ -58,14 +58,14 @@ public class ResponseFacade
             this.contentType = contentType;
         }
         
-        public Object run() {
+        public Void run() {
             response.setContentType(contentType);
             return null;
         }            
     }
 
     private final class DateHeaderPrivilegedAction
-            implements PrivilegedAction {
+            implements PrivilegedAction<Void> {
 
         private String name;
         private long value;
@@ -77,7 +77,7 @@ public class ResponseFacade
             this.add = add;
         }
 
-        public Object run() {
+        public Void run() {
             if(add) {
                 response.addDateHeader(name, value);
             } else {
@@ -258,9 +258,10 @@ public class ResponseFacade
 
         if (SecurityUtil.isPackageProtectionEnabled()){
             try{
-                AccessController.doPrivileged(new PrivilegedExceptionAction(){
+                AccessController.doPrivileged(
+                        new PrivilegedExceptionAction<Void>(){
 
-                    public Object run() throws IOException{
+                    public Void run() throws IOException{
                         response.setAppCommitted(true);
 
                         response.flushBuffer();
