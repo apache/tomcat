@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.CometEvent;
 import org.apache.catalina.util.StringManager;
-import org.apache.coyote.ActionCode;
 
 public class CometEventImpl implements CometEvent {
 
@@ -119,7 +118,7 @@ public class CometEventImpl implements CometEvent {
             UnsupportedOperationException {
         if (request.getAttribute("org.apache.tomcat.comet.timeout.support") == Boolean.TRUE) {
             request.setAttribute("org.apache.tomcat.comet.timeout", new Integer(timeout));
-            if (request.isComet()) request.setCometTimeout((long)timeout);
+            if (request.isComet()) request.setCometTimeout(timeout);
         } else {
             throw new UnsupportedOperationException();
         }

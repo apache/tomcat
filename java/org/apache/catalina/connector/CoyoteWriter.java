@@ -109,7 +109,7 @@ public class CoyoteWriter
         try {
             ob.close();
         } catch (IOException ex ) {
-            ;
+            // Ignore
         }
         error = false;
 
