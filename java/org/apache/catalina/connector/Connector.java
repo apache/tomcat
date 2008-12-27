@@ -79,7 +79,7 @@ public class Connector
         setProtocol(protocol);
         // Instantiate protocol handler
         try {
-            Class clazz = Class.forName(protocolHandlerClassName);
+            Class<?> clazz = Class.forName(protocolHandlerClassName);
             this.protocolHandler = (ProtocolHandler) clazz.newInstance();
         } catch (Exception e) {
             log.error
@@ -278,7 +278,8 @@ public class Connector
      protected boolean useBodyEncodingForURI = false;
 
 
-     protected static HashMap replacements = new HashMap();
+     protected static HashMap<String,String> replacements =
+         new HashMap<String,String>();
      static {
          replacements.put("acceptCount", "backlog");
          replacements.put("connectionLinger", "soLinger");
@@ -304,7 +305,7 @@ public class Connector
     public Object getProperty(String name) {
         String repl = name;
         if (replacements.get(name) != null) {
-            repl = (String) replacements.get(name);
+            repl = replacements.get(name);
         }
         return IntrospectionUtils.getProperty(protocolHandler, repl);
     }
@@ -316,7 +317,7 @@ public class Connector
     public boolean setProperty(String name, String value) {
         String repl = name;
         if (replacements.get(name) != null) {
-            repl = (String) replacements.get(name);
+            repl = replacements.get(name);
         }
         return IntrospectionUtils.setProperty(protocolHandler, repl, value);
     }
@@ -623,11 +624,11 @@ public class Connector
         int patch = 0;
         try {
             String methodName = "initialize";
-            Class paramTypes[] = new Class[1];
+            Class<?> paramTypes[] = new Class[1];
             paramTypes[0] = String.class;
             Object paramValues[] = new Object[1];
             paramValues[0] = null;
-            Class clazz = Class.forName("org.apache.tomcat.jni.Library");
+            Class<?> clazz = Class.forName("org.apache.tomcat.jni.Library");
             Method method = clazz.getMethod(methodName, paramTypes);
             method.invoke(null, paramValues);
             major = clazz.getField("TCN_MAJOR_VERSION").getInt(null);
