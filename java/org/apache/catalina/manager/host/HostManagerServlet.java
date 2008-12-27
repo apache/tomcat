@@ -38,7 +38,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.Wrapper;
@@ -193,7 +192,7 @@ public class HostManagerServlet
      */
     public void destroy() {
 
-        ;       // No actions necessary
+        // No actions necessary
 
     }
 
@@ -320,7 +319,7 @@ public class HostManagerServlet
             value = getServletConfig().getInitParameter("debug");
             debug = Integer.parseInt(value);
         } catch (Throwable t) {
-            ;
+            // Ignore
         }
 
     }

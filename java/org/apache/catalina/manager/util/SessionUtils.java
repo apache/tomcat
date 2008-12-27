@@ -106,9 +106,9 @@ public class SessionUtils {
             // Tapestry 3.0: Engine stored in session under "org.apache.tapestry.engine:" + config.getServletName()
             // TODO: Tapestry 4+
             {
-                final List tapestryArray = new ArrayList();
-                for (Enumeration enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
-                    String name = (String) enumeration.nextElement();
+                final List<Object> tapestryArray = new ArrayList<Object>();
+                for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
+                    String name = enumeration.nextElement();
                     if (name.indexOf("tapestry") > -1 && name.indexOf("engine") > -1 && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
                         tapestryArray.add(in_session.getAttribute(name));
                     }
@@ -118,10 +118,10 @@ public class SessionUtils {
                     Object probableEngine = tapestryArray.get(0);
                     if (null != probableEngine) {
                         try {
-                            Method readMethod = probableEngine.getClass().getMethod("getLocale", null);//$NON-NLS-1$
+                            Method readMethod = probableEngine.getClass().getMethod("getLocale", (Class<?>[])null);//$NON-NLS-1$
                             if (null != readMethod) {
                                 // Call the property getter and return the value
-                                Object possibleLocale = readMethod.invoke(probableEngine, null);
+                                Object possibleLocale = readMethod.invoke(probableEngine, (Object[]) null);
                                 if (null != possibleLocale && possibleLocale instanceof Locale) {
                                     locale = (Locale) possibleLocale;
                                 }
@@ -140,9 +140,9 @@ public class SessionUtils {
             // Last guess: iterate over all attributes, to find a Locale
             // If there is only one, consider it to be /the/ locale
             {
-                final List localeArray = new ArrayList();
-                for (Enumeration enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
-                    String name = (String) enumeration.nextElement();
+                final List<Object> localeArray = new ArrayList<Object>();
+                for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
+                    String name = enumeration.nextElement();
                     Object obj = in_session.getAttribute(name);
                     if (null != obj && obj instanceof Locale) {
                         localeArray.add(obj);
@@ -201,22 +201,13 @@ public class SessionUtils {
             // Last guess: iterate over all attributes, to find a java.security.Principal or javax.security.auth.Subject
             // If there is only one, consider it to be /the/ user
             {
-                final List principalArray = new ArrayList();
-                for (Enumeration enumeration = httpSession.getAttributeNames(); enumeration.hasMoreElements();) {
-                    String name = (String) enumeration.nextElement();
+                final List<Object> principalArray = new ArrayList<Object>();
+                for (Enumeration<String> enumeration = httpSession.getAttributeNames(); enumeration.hasMoreElements();) {
+                    String name = enumeration.nextElement();
                     Object obj = httpSession.getAttribute(name);
                     if (null != obj && (obj instanceof Principal || obj instanceof Subject)) {
                         principalArray.add(obj);
                     }
-                    // This workaround for JDK 1.3 compatibility. For JDK 1.4+, use previous (commented) instanceof.
-//                    try {
-//                        Class subjectClass = Class.forName("javax.security.auth.Subject", true, Thread.currentThread().getContextClassLoader());
-//                        if (subjectClass.isInstance(obj)) {
-//                            principalArray.add(obj);
-//                        }
-//                    } catch (ClassNotFoundException cnfe) {
-//                        // This is JDK 1.3: javax.security.auth.Subject does not exist; do nothing
-//                    }
                 }
                 if (principalArray.size() == 1) {
                     user = principalArray.get(0);

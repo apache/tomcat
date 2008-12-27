@@ -56,12 +56,6 @@ public class StatusManagerServlet
 
 
     /**
-     * The debugging detail level for this servlet.
-     */
-    private int debug = 0;
-
-
-    /**
      * MBean server.
      */
     protected MBeanServer mBeanServer = null;
@@ -70,25 +64,25 @@ public class StatusManagerServlet
     /**
      * Vector of protocol handlers object names.
      */
-    protected Vector protocolHandlers = new Vector();
+    protected Vector<ObjectName> protocolHandlers = new Vector<ObjectName>();
 
 
     /**
      * Vector of thread pools object names.
      */
-    protected Vector threadPools = new Vector();
+    protected Vector<ObjectName> threadPools = new Vector<ObjectName>();
 
 
     /**
      * Vector of request processors object names.
      */
-    protected Vector requestProcessors = new Vector();
+    protected Vector<ObjectName> requestProcessors = new Vector<ObjectName>();
 
 
     /**
      * Vector of global request processors object names.
      */
-    protected Vector globalRequestProcessors = new Vector();
+    protected Vector<ObjectName> globalRequestProcessors = new Vector<ObjectName>();
 
 
     /**
@@ -109,24 +103,15 @@ public class StatusManagerServlet
         // Retrieve the MBean server
         mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
 
-        // Set our properties from the initialization parameters
-        String value = null;
-        try {
-            value = getServletConfig().getInitParameter("debug");
-            debug = Integer.parseInt(value);
-        } catch (Throwable t) {
-            ;
-        }
-
         try {
 
             // Query protocol handlers
             String onStr = "*:type=ProtocolHandler,*";
             ObjectName objectName = new ObjectName(onStr);
-            Set set = mBeanServer.queryMBeans(objectName, null);
-            Iterator iterator = set.iterator();
+            Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
+            Iterator<ObjectInstance> iterator = set.iterator();
             while (iterator.hasNext()) {
-                ObjectInstance oi = (ObjectInstance) iterator.next();
+                ObjectInstance oi = iterator.next();
                 protocolHandlers.addElement(oi.getObjectName());
             }
 
@@ -136,7 +121,7 @@ public class StatusManagerServlet
             set = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
             while (iterator.hasNext()) {
-                ObjectInstance oi = (ObjectInstance) iterator.next();
+                ObjectInstance oi = iterator.next();
                 threadPools.addElement(oi.getObjectName());
             }
 
@@ -146,7 +131,7 @@ public class StatusManagerServlet
             set = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
             while (iterator.hasNext()) {
-                ObjectInstance oi = (ObjectInstance) iterator.next();
+                ObjectInstance oi = iterator.next();
                 globalRequestProcessors.addElement(oi.getObjectName());
             }
 
@@ -156,7 +141,7 @@ public class StatusManagerServlet
             set = mBeanServer.queryMBeans(objectName, null);
             iterator = set.iterator();
             while (iterator.hasNext()) {
-                ObjectInstance oi = (ObjectInstance) iterator.next();
+                ObjectInstance oi = iterator.next();
                 requestProcessors.addElement(oi.getObjectName());
             }
 
@@ -177,7 +162,7 @@ public class StatusManagerServlet
      */
     public void destroy() {
 
-        ;       // No actions necessary
+        // No actions necessary
 
     }
 
@@ -281,9 +266,9 @@ public class StatusManagerServlet
             // Display virtual machine statistics
             StatusTransformer.writeVMState(writer,mode);
 
-            Enumeration enumeration = threadPools.elements();
+            Enumeration<ObjectName> enumeration = threadPools.elements();
             while (enumeration.hasMoreElements()) {
-                ObjectName objectName = (ObjectName) enumeration.nextElement();
+                ObjectName objectName = enumeration.nextElement();
                 String name = objectName.getKeyProperty("name");
                 // use StatusTransformer to output status
                 StatusTransformer.writeConnectorState
