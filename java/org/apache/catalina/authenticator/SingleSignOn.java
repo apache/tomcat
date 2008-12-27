@@ -313,7 +313,7 @@ public class SingleSignOn
 
         String ssoId = null;
         synchronized (reverse) {
-            ssoId = (String) reverse.get(session);
+            ssoId = reverse.get(session);
         }
         if (ssoId == null)
             return;
@@ -489,7 +489,7 @@ public class SingleSignOn
         Session sessions[] = sso.findSessions();
         if ( sessions == null || sessions.length == 0 ) {
             synchronized (cache) {
-                sso = (SingleSignOnEntry) cache.remove(ssoId);
+                sso = cache.remove(ssoId);
             }
         }
 
@@ -510,7 +510,7 @@ public class SingleSignOn
         // Look up and remove the corresponding SingleSignOnEntry
         SingleSignOnEntry sso = null;
         synchronized (cache) {
-            sso = (SingleSignOnEntry) cache.remove(ssoId);
+            sso = cache.remove(ssoId);
         }
 
         if (sso == null)
@@ -661,7 +661,7 @@ public class SingleSignOn
     protected SingleSignOnEntry lookup(String ssoId) {
 
         synchronized (cache) {
-            return ((SingleSignOnEntry) cache.get(ssoId));
+            return cache.get(ssoId);
         }
 
     }

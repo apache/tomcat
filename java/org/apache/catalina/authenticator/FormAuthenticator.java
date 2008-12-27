@@ -395,34 +395,34 @@ public class FormAuthenticator
 
         // Modify our current request to reflect the original one
         request.clearCookies();
-        Iterator cookies = saved.getCookies();
+        Iterator<Cookie> cookies = saved.getCookies();
         while (cookies.hasNext()) {
-            request.addCookie((Cookie) cookies.next());
+            request.addCookie(cookies.next());
         }
 
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
         boolean cachable = "GET".equalsIgnoreCase(saved.getMethod()) ||
                            "HEAD".equalsIgnoreCase(saved.getMethod());
-        Iterator names = saved.getHeaderNames();
+        Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
-            String name = (String) names.next();
+            String name = names.next();
             // The browser isn't expecting this conditional reposponse now.
             // Assuming that it can quietly recover from an unexpected 412.
             // BZ 43687
             if(!("If-Modified-Since".equalsIgnoreCase(name) ||
                  (cachable && "If-None-Match".equalsIgnoreCase(name)))) {
-                Iterator values = saved.getHeaderValues(name);
+                Iterator<String> values = saved.getHeaderValues(name);
                 while (values.hasNext()) {
-                    rmh.addValue(name).setString( (String)values.next() );
+                    rmh.addValue(name).setString(values.next());
                 }
             }
         }
         
         request.clearLocales();
-        Iterator locales = saved.getLocales();
+        Iterator<Locale> locales = saved.getLocales();
         while (locales.hasNext()) {
-            request.addLocale((Locale) locales.next());
+            request.addLocale(locales.next());
         }
         
         request.getCoyoteRequest().getParameters().recycle();
@@ -478,18 +478,18 @@ public class FormAuthenticator
             for (int i = 0; i < cookies.length; i++)
                 saved.addCookie(cookies[i]);
         }
-        Enumeration names = request.getHeaderNames();
+        Enumeration<String> names = request.getHeaderNames();
         while (names.hasMoreElements()) {
-            String name = (String) names.nextElement();
-            Enumeration values = request.getHeaders(name);
+            String name = names.nextElement();
+            Enumeration<String> values = request.getHeaders(name);
             while (values.hasMoreElements()) {
-                String value = (String) values.nextElement();
+                String value = values.nextElement();
                 saved.addHeader(name, value);
             }
         }
-        Enumeration locales = request.getLocales();
+        Enumeration<Locale> locales = request.getLocales();
         while (locales.hasMoreElements()) {
-            Locale locale = (Locale) locales.nextElement();
+            Locale locale = locales.nextElement();
             saved.addLocale(locale);
         }
 
