@@ -117,85 +117,33 @@
     <delete file="${file}.asc"/>
   </target>
   
+  <macrodef name="doMavenDeploy">
+    <attribute name="artifactId"/>
+    <attribute name="jarFileName" default="@{artifactId}.jar" description="only need to be specified if not same as artifactId"/>
+    <sequential>
+      <antcall target="maven-deploy">
+        <param name="file" value="${tomcat.lib.path}/@{jarFileName}"/>
+        <param name="groupId" value="org.apache.tomcat"/>
+        <param name="artifactId" value="@{artifactId}"/>
+        <param name="pom" value="${tomcat.pom.path}/@{artifactId}.pom"/>
+      </antcall>
+    </sequential>
+  </macrodef>
+  
   <target name="generic-deploy" depends="init-maven">
-    <antcall target="maven-deploy"><!--Deploy annotations-->
-      <param name="file" value="${tomcat.lib.path}/annotations-api.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="annotations-api"/>
-      <param name="pom" value="${tomcat.pom.path}/annotations-api.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Servlet api-->
-      <param name="file" value="${tomcat.lib.path}/servlet-api.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="servlet-api"/>
-      <param name="pom" value="${tomcat.pom.path}/servlet-api.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy expression lanaguage api-->
-      <param name="file" value="${tomcat.lib.path}/el-api.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="el-api"/>
-      <param name="pom" value="${tomcat.pom.path}/el-api.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy JSP api-->
-      <param name="file" value="${tomcat.lib.path}/jsp-api.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="jsp-api"/>
-      <param name="pom" value="${tomcat.pom.path}/jsp-api.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy JULI-->
-      <param name="file" value="${tomcat.bin.path}/tomcat-juli.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="juli"/>
-      <param name="pom" value="${tomcat.pom.path}/juli.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Tribes-->
-      <param name="file" value="${tomcat.lib.path}/catalina-tribes.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="tribes"/>
-      <param name="pom" value="${tomcat.pom.path}/tribes.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Jasper EL-->
-      <param name="file" value="${tomcat.lib.path}/jasper-el.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="jasper-el"/>
-      <param name="pom" value="${tomcat.pom.path}/jasper-el.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Jasper JDT-->
-      <param name="file" value="${tomcat.lib.path}/jasper-jdt.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="jasper-jdt"/>
-      <param name="pom" value="${tomcat.pom.path}/jasper-jdt.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Coyote-->
-      <param name="file" value="${tomcat.lib.path}/tomcat-coyote.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="coyote"/>
-      <param name="pom" value="${tomcat.pom.path}/coyote.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Catalina-->
-      <param name="file" value="${tomcat.lib.path}/catalina.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="catalina"/>
-      <param name="pom" value="${tomcat.pom.path}/catalina.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Catalina-HA-->
-      <param name="file" value="${tomcat.lib.path}/catalina-ha.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="catalina-ha"/>
-      <param name="pom" value="${tomcat.pom.path}/catalina-ha.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Jasper-->
-      <param name="file" value="${tomcat.lib.path}/jasper.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="jasper"/>
-      <param name="pom" value="${tomcat.pom.path}/jasper.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy DBCP-->
-      <param name="file" value="${tomcat.lib.path}/tomcat-dbcp.jar"/>
-      <param name="groupId" value="org.apache.tomcat"/>
-      <param name="artifactId" value="dbcp"/>
-      <param name="pom" value="${tomcat.pom.path}/dbcp.pom"/>
-    </antcall>
+    <doMavenDeploy artifactId="annotations-api"/> <!--Deploy annotations-->
+    <doMavenDeploy artifactId="servlet-api"/> <!--Deploy Servlet api-->
+    <doMavenDeploy artifactId="el-api"/> <!--Deploy expression lanaguage api-->
+    <doMavenDeploy artifactId="jsp-api"/> <!--Deploy JSP api-->
+    <doMavenDeploy artifactId="juli" jarFileName="tomcat-juli.jar"/> <!--Deploy JULI-->
+    <doMavenDeploy artifactId="tribes" jarFileName="catalina-tribes.jar"/> <!--Deploy Tribes-->
+    <doMavenDeploy artifactId="jasper-el"/> <!--Deploy Jasper EL-->
+    <doMavenDeploy artifactId="jasper-jdt"/> <!--Deploy Jasper JDT-->
+    <doMavenDeploy artifactId="coyote" jarFileName="tomcat-coyote.jar"/> <!--Deploy Coyote-->
+    <doMavenDeploy artifactId="catalina"/> <!--Deploy Catalina-->
+    <doMavenDeploy artifactId="catalina-ha"/> <!--Deploy Catalina-HA-->
+    <doMavenDeploy artifactId="jasper"/> <!--Deploy Jasper -->
+    <doMavenDeploy artifactId="dbcp" jarFileName="tomcat-dbcp.jar"/> <!--Deploy DBCP-->
     <antcall target="maven-deploy"><!--Deploy Extras Juli-->
       <param name="file" value="${tomcat.extras.path}/tomcat-juli.jar"/>
       <param name="groupId" value="org.apache.tomcat.extras"/>
