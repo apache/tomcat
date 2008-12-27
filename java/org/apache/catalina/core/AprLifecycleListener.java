@@ -127,11 +127,11 @@ public class AprLifecycleListener
         }
         try {
             String methodName = "initialize";
-            Class paramTypes[] = new Class[1];
+            Class<?> paramTypes[] = new Class[1];
             paramTypes[0] = String.class;
             Object paramValues[] = new Object[1];
             paramValues[0] = null;
-            Class clazz = Class.forName("org.apache.tomcat.jni.Library");
+            Class<?> clazz = Class.forName("org.apache.tomcat.jni.Library");
             Method method = clazz.getMethod(methodName, paramTypes);
             method.invoke(null, paramValues);
             major = clazz.getField("TCN_MAJOR_VERSION").getInt(null);
@@ -188,8 +188,11 @@ public class AprLifecycleListener
                      + minor + "." + patch));
         }
         // Log APR flags
-        log.info(sm.getString("aprListener.flags", Library.APR_HAVE_IPV6, Library.APR_HAS_SENDFILE, 
-                Library.APR_HAS_SO_ACCEPTFILTER, Library.APR_HAS_RANDOM));
+        log.info(sm.getString("aprListener.flags",
+                Boolean.valueOf(Library.APR_HAVE_IPV6),
+                Boolean.valueOf(Library.APR_HAS_SENDFILE), 
+                Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),
+                Boolean.valueOf(Library.APR_HAS_RANDOM)));
         return true;
     }
 
@@ -206,11 +209,11 @@ public class AprLifecycleListener
             return;
         }
         String methodName = "randSet";
-        Class paramTypes[] = new Class[1];
+        Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = String.class;
         Object paramValues[] = new Object[1];
         paramValues[0] = SSLRandomSeed;
-        Class clazz = Class.forName("org.apache.tomcat.jni.SSL");
+        Class<?> clazz = Class.forName("org.apache.tomcat.jni.SSL");
         Method method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
         
@@ -228,7 +231,7 @@ public class AprLifecycleListener
     }
 
     public void setSSLEngine(String SSLEngine) {
-        this.SSLEngine = SSLEngine;
+        AprLifecycleListener.SSLEngine = SSLEngine;
     }
 
     public String getSSLRandomSeed() {
@@ -236,6 +239,6 @@ public class AprLifecycleListener
     }
 
     public void setSSLRandomSeed(String SSLRandomSeed) {
-        this.SSLRandomSeed = SSLRandomSeed;
+        AprLifecycleListener.SSLRandomSeed = SSLRandomSeed;
     }
 }

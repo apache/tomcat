@@ -39,13 +39,11 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
-import org.apache.catalina.Service;
 import org.apache.catalina.deploy.ContextEjb;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.catalina.deploy.ContextHandler;
@@ -137,7 +135,8 @@ public class NamingContextListener
     /**
      * Objectnames hashtable.
      */
-    protected HashMap objectNames = new HashMap();
+    protected HashMap<String, ObjectName> objectNames =
+        new HashMap<String, ObjectName>();
     
 
     /**
@@ -218,7 +217,7 @@ public class NamingContextListener
             if (initialized)
                 return;
 
-            Hashtable contextEnv = new Hashtable();
+            Hashtable<String, Object> contextEnv = new Hashtable<String, Object>();
             try {
                 namingContext = new NamingContext(contextEnv, getName());
             } catch (NamingException e) {
@@ -665,9 +664,9 @@ public class NamingContextListener
                 compCtx.bind("UserTransaction", ref);
                 ContextTransaction transaction = namingResources.getTransaction();
                 if (transaction != null) {
-                    Iterator params = transaction.listProperties();
+                    Iterator<String> params = transaction.listProperties();
                     while (params.hasNext()) {
-                        String paramName = (String) params.next();
+                        String paramName = params.next();
                         String paramValue = (String) transaction.getProperty(paramName);
                         StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
                         ref.add(refAddr);
@@ -726,8 +725,6 @@ public class NamingContextListener
             if (path.length() < 1)
                 path = "/";
             Host host = (Host) ((Context)container).getParent();
-            Engine engine = (Engine) host.getParent();
-            Service service = engine.getService();
             name = new ObjectName(domain + ":type=DataSource" +
                         ",path=" + path + 
                         ",host=" + host.getName() +
@@ -749,9 +746,9 @@ public class NamingContextListener
         Reference ref = new EjbRef
             (ejb.getType(), ejb.getHome(), ejb.getRemote(), ejb.getLink());
         // Adding the additional parameters, if any
-        Iterator params = ejb.listProperties();
+        Iterator<String> params = ejb.listProperties();
         while (params.hasNext()) {
-            String paramName = (String) params.next();
+            String paramName = params.next();
             String paramValue = (String) ejb.getProperty(paramName);
             StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
             ref.add(refAddr);
@@ -938,31 +935,31 @@ public class NamingContextListener
             (service.getName(), service.getType(), service.getServiceqname(),
              service.getWsdlfile(), service.getJaxrpcmappingfile());
         // Adding the additional port-component-ref, if any
-        Iterator portcomponent = service.getServiceendpoints();
+        Iterator<String> portcomponent = service.getServiceendpoints();
         while (portcomponent.hasNext()) {
-            String serviceendpoint = (String) portcomponent.next();
+            String serviceendpoint = portcomponent.next();
             StringRefAddr refAddr = new StringRefAddr(ServiceRef.SERVICEENDPOINTINTERFACE, serviceendpoint);
             ref.add(refAddr);
-            String portlink = (String) service.getPortlink(serviceendpoint);
+            String portlink = service.getPortlink(serviceendpoint);
             refAddr = new StringRefAddr(ServiceRef.PORTCOMPONENTLINK, portlink);
             ref.add(refAddr);
         }
         // Adding the additional parameters, if any
-        Iterator handlers = service.getHandlers();
+        Iterator<String> handlers = service.getHandlers();
         while (handlers.hasNext()) {
-            String handlername = (String) handlers.next();
-            ContextHandler handler = (ContextHandler) service.getHandler(handlername);
+            String handlername = handlers.next();
+            ContextHandler handler = service.getHandler(handlername);
             HandlerRef handlerRef = new HandlerRef(handlername, handler.getHandlerclass());
-            Iterator localParts = handler.getLocalparts();
+            Iterator<String> localParts = handler.getLocalparts();
             while (localParts.hasNext()) {
-                String localPart = (String) localParts.next();
-                String namespaceURI = (String) handler.getNamespaceuri(localPart);
+                String localPart = localParts.next();
+                String namespaceURI = handler.getNamespaceuri(localPart);
                 handlerRef.add(new StringRefAddr(HandlerRef.HANDLER_LOCALPART, localPart));
                 handlerRef.add(new StringRefAddr(HandlerRef.HANDLER_NAMESPACE, namespaceURI));
             }
-            Iterator params = handler.listProperties();
+            Iterator<String> params = handler.listProperties();
             while (params.hasNext()) {
-                String paramName = (String) params.next();
+                String paramName = params.next();
                 String paramValue = (String) handler.getProperty(paramName);
                 handlerRef.add(new StringRefAddr(HandlerRef.HANDLER_PARAMNAME, paramName));
                 handlerRef.add(new StringRefAddr(HandlerRef.HANDLER_PARAMVALUE, paramValue));
@@ -1000,9 +997,9 @@ public class NamingContextListener
             (resource.getType(), resource.getDescription(),
              resource.getScope(), resource.getAuth());
         // Adding the additional parameters, if any
-        Iterator params = resource.listProperties();
+        Iterator<String> params = resource.listProperties();
         while (params.hasNext()) {
-            String paramName = (String) params.next();
+            String paramName = params.next();
             String paramValue = (String) resource.getProperty(paramName);
             StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
             ref.add(refAddr);
@@ -1040,9 +1037,9 @@ public class NamingContextListener
         // Create a reference to the resource env.
         Reference ref = new ResourceEnvRef(resourceEnvRef.getType());
         // Adding the additional parameters, if any
-        Iterator params = resourceEnvRef.listProperties();
+        Iterator<String> params = resourceEnvRef.listProperties();
         while (params.hasNext()) {
-            String paramName = (String) params.next();
+            String paramName = params.next();
             String paramValue = (String) resourceEnvRef.getProperty(paramName);
             StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
             ref.add(refAddr);
@@ -1149,7 +1146,7 @@ public class NamingContextListener
             logger.error(sm.getString("naming.unbindFailed", e));
         }
 
-        ObjectName on = (ObjectName) objectNames.get(name);
+        ObjectName on = objectNames.get(name);
         if (on != null) {
             Registry.getRegistry(null, null).unregisterComponent(on);
         }

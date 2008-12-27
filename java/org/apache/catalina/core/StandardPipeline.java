@@ -375,7 +375,7 @@ public class StandardPipeline
                 try {
                     ((Contained) oldBasic).setContainer(null);
                 } catch (Throwable t) {
-                    ;
+                    // Ignore
                 }
             }
         }
@@ -474,7 +474,7 @@ public class StandardPipeline
      */
     public Valve[] getValves() {
 
-    	ArrayList valveList = new ArrayList();
+    	ArrayList<Valve> valveList = new ArrayList<Valve>();
         Valve current = first;
         if (current == null) {
         	current = basic;
@@ -484,13 +484,13 @@ public class StandardPipeline
         	current = current.getNext();
         }
 
-        return ((Valve[]) valveList.toArray(new Valve[0]));
+        return valveList.toArray(new Valve[0]);
 
     }
 
     public ObjectName[] getValveObjectNames() {
 
-    	ArrayList valveList = new ArrayList();
+    	ArrayList<ObjectName> valveList = new ArrayList<ObjectName>();
         Valve current = first;
         if (current == null) {
         	current = basic;
@@ -502,7 +502,7 @@ public class StandardPipeline
         	current = current.getNext();
         }
 
-        return ((ObjectName[]) valveList.toArray(new ObjectName[0]));
+        return valveList.toArray(new ObjectName[0]);
 
     }
 

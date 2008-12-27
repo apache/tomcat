@@ -140,11 +140,11 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
      */
     public String getInitParameter(String name) {
 
-        Map map = filterDef.getParameterMap();
+        Map<String,String> map = filterDef.getParameterMap();
         if (map == null)
             return (null);
         else
-            return ((String) map.get(name));
+            return map.get(name);
 
     }
 
@@ -155,11 +155,11 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
      */
     public Enumeration getInitParameterNames() {
 
-        Map map = filterDef.getParameterMap();
+        Map<String,String> map = filterDef.getParameterMap();
         if (map == null)
-            return (new Enumerator(new ArrayList()));
+            return (new Enumerator<String>(new ArrayList<String>()));
         else
-            return (new Enumerator(map.keySet()));
+            return (new Enumerator<String>(map.keySet()));
 
     }
 
@@ -329,7 +329,7 @@ final class ApplicationFilterConfig implements FilterConfig, Serializable {
         } else {
 
             // Allocate a new filter instance
-            Filter filter = getFilter();
+            getFilter();
 
         }
 
