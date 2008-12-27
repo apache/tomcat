@@ -251,7 +251,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
             sortedHostNamesMap.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String,String> entry = iterator.next();
-            String hostName = (String) entry.getKey();
+            String hostName = entry.getKey();
             Host host = (Host) engine.findChild(hostName);
 
             if (host != null ) {
