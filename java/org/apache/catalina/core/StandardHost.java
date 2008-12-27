@@ -134,12 +134,6 @@ public class StandardHost
 
 
     /**
-     * The live deploy flag for this Host.
-     */
-    private boolean liveDeploy = true;
-
-
-    /**
      * Unpack WARs property.
      */
     private boolean unpackWARs = true;

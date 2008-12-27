@@ -56,13 +56,13 @@ public final class ApplicationContextFacade
     /**
      * Cache Class object used for reflection.
      */
-    private HashMap classCache;
+    private HashMap<String,Class<?>[]> classCache;
     
     
     /**
      * Cache method object.
      */
-    private HashMap objectCache;
+    private HashMap<String,Method> objectCache;
     
     
     // ----------------------------------------------------------- Constructors
@@ -78,14 +78,14 @@ public final class ApplicationContextFacade
         super();
         this.context = context;
         
-        classCache = new HashMap();
-        objectCache = new HashMap();
+        classCache = new HashMap<String,Class<?>[]>();
+        objectCache = new HashMap<String,Method>();
         initClassCache();
     }
     
     
     private void initClassCache(){
-        Class[] clazz = new Class[]{String.class};
+        Class<?>[] clazz = new Class[]{String.class};
         classCache.put("getContext", clazz);
         classCache.put("getMimeType", clazz);
         classCache.put("getResourcePaths", clazz);
@@ -367,26 +367,6 @@ public final class ApplicationContextFacade
     /**
      * Use reflection to invoke the requested method. Cache the method object 
      * to speed up the process
-     * @param appContext The AppliationContext object on which the method
-     *                   will be invoked
-     * @param methodName The method to call.
-     * @param params The arguments passed to the called method.
-     */
-    private Object doPrivileged(ApplicationContext appContext,
-                                final String methodName, 
-                                final Object[] params) {
-        try{
-            return invokeMethod(appContext, methodName, params );
-        } catch (Throwable t){
-            throw new RuntimeException(t.getMessage());
-        }
-
-    }
-
-
-    /**
-     * Use reflection to invoke the requested method. Cache the method object 
-     * to speed up the process
      *                   will be invoked
      * @param methodName The method to call.
      * @param params The arguments passed to the called method.
@@ -414,16 +394,16 @@ public final class ApplicationContextFacade
         throws Throwable{
 
         try{
-            Method method = (Method)objectCache.get(methodName);
+            Method method = objectCache.get(methodName);
             if (method == null){
                 method = appContext.getClass()
-                    .getMethod(methodName, (Class[])classCache.get(methodName));
+                    .getMethod(methodName, classCache.get(methodName));
                 objectCache.put(methodName, method);
             }
             
             return executeMethod(method,appContext,params);
         } catch (Exception ex){
-            handleException(ex, methodName);
+            handleException(ex);
             return null;
         } finally {
             params = null;
@@ -438,16 +418,15 @@ public final class ApplicationContextFacade
      * @param params The arguments passed to the called method.
      */    
     private Object doPrivileged(final String methodName, 
-                                final Class[] clazz,
+                                final Class<?>[] clazz,
                                 Object[] params){
 
         try{
-            Method method = context.getClass()
-                    .getMethod(methodName, (Class[])clazz);
+            Method method = context.getClass().getMethod(methodName, clazz);
             return executeMethod(method,context,params);
         } catch (Exception ex){
             try{
-                handleException(ex, methodName);
+                handleException(ex);
             }catch (Throwable t){
                 throw new RuntimeException(t.getMessage());
             }
@@ -473,7 +452,7 @@ public final class ApplicationContextFacade
                    InvocationTargetException {
                                      
         if (SecurityUtil.isPackageProtectionEnabled()){
-           return AccessController.doPrivileged(new PrivilegedExceptionAction(){
+           return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
                 public Object run() throws IllegalAccessException, InvocationTargetException{
                     return method.invoke(context,  params);
                 }
@@ -489,7 +468,7 @@ public final class ApplicationContextFacade
      * Throw the real exception.
      * @param ex The current exception
      */
-    private void handleException(Exception ex, String methodName)
+    private void handleException(Exception ex)
 	    throws Throwable {
 
         Throwable realException;

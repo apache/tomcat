@@ -133,7 +133,7 @@ public abstract class ContainerBase
      * Tomcat.
      */
     protected class PrivilegedAddChild
-        implements PrivilegedAction {
+        implements PrivilegedAction<Void> {
 
         private Container child;
 
@@ -141,7 +141,7 @@ public abstract class ContainerBase
             this.child = child;
         }
 
-        public Object run() {
+        public Void run() {
             addChildInternal(child);
             return null;
         }
@@ -155,7 +155,8 @@ public abstract class ContainerBase
     /**
      * The child Containers belonging to this Container, keyed by name.
      */
-    protected HashMap children = new HashMap();
+    protected HashMap<String, Container> children =
+        new HashMap<String, Container>();
 
 
     /**
@@ -173,7 +174,7 @@ public abstract class ContainerBase
     /**
      * The container event listeners for this Container.
      */
-    protected ArrayList listeners = new ArrayList();
+    protected ArrayList<ContainerListener> listeners = new ArrayList<ContainerListener>();
 
 
     /**
@@ -731,7 +732,7 @@ public abstract class ContainerBase
         DirContext oldResources = this.resources;
         if (oldResources == resources)
             return;
-        Hashtable env = new Hashtable();
+        Hashtable<String, String> env = new Hashtable<String, String>();
         if (getParent() != null)
             env.put(ProxyDirContext.HOST, getParent().getName());
         env.put(ProxyDirContext.CONTEXT, getName());
@@ -764,7 +765,7 @@ public abstract class ContainerBase
      */
     public void addChild(Container child) {
         if (Globals.IS_SECURITY_ENABLED) {
-            PrivilegedAction dp =
+            PrivilegedAction<Void> dp =
                 new PrivilegedAddChild(child);
             AccessController.doPrivileged(dp);
         } else {
@@ -844,7 +845,7 @@ public abstract class ContainerBase
         if (name == null)
             return (null);
         synchronized (children) {       // Required by post-start changes
-            return ((Container) children.get(name));
+            return children.get(name);
         }
 
     }
@@ -858,7 +859,7 @@ public abstract class ContainerBase
 
         synchronized (children) {
             Container results[] = new Container[children.size()];
-            return ((Container[]) children.values().toArray(results));
+            return children.values().toArray(results);
         }
 
     }
@@ -874,7 +875,7 @@ public abstract class ContainerBase
         synchronized (listeners) {
             ContainerListener[] results = 
                 new ContainerListener[listeners.size()];
-            return ((ContainerListener[]) listeners.toArray(results));
+            return listeners.toArray(results);
         }
 
     }
@@ -1356,10 +1357,10 @@ public abstract class ContainerBase
         ContainerEvent event = new ContainerEvent(this, type, data);
         ContainerListener list[] = new ContainerListener[0];
         synchronized (listeners) {
-            list = (ContainerListener[]) listeners.toArray(list);
+            list = listeners.toArray(list);
         }
         for (int i = 0; i < list.length; i++)
-            ((ContainerListener) list[i]).containerEvent(event);
+            list[i].containerEvent(event);
 
     }
 
@@ -1471,7 +1472,7 @@ public abstract class ContainerBase
 
     public ObjectName[] getChildren() {
         ObjectName result[]=new ObjectName[children.size()];
-        Iterator it=children.values().iterator();
+        Iterator<Container> it=children.values().iterator();
         int i=0;
         while( it.hasNext() ) {
             Object next=it.next();
@@ -1556,7 +1557,7 @@ public abstract class ContainerBase
         try {
             thread.join();
         } catch (InterruptedException e) {
-            ;
+            // Ignore
         }
 
         thread = null;
@@ -1578,7 +1579,7 @@ public abstract class ContainerBase
                 try {
                     Thread.sleep(backgroundProcessorDelay * 1000L);
                 } catch (InterruptedException e) {
-                    ;
+                    // Ignore
                 }
                 if (!threadDone) {
                     Container parent = (Container) getMappingObject();

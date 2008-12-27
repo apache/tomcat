@@ -56,13 +56,13 @@ import org.apache.catalina.util.StringManager;
 final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
-    private final static ThreadLocal lastServicedRequest;
-    private final static ThreadLocal lastServicedResponse;
+    private final static ThreadLocal<ServletRequest> lastServicedRequest;
+    private final static ThreadLocal<ServletResponse> lastServicedResponse;
 
     static {
         if (Globals.STRICT_SERVLET_COMPLIANCE) {
-            lastServicedRequest = new ThreadLocal();
-            lastServicedResponse = new ThreadLocal();
+            lastServicedRequest = new ThreadLocal<ServletRequest>();
+            lastServicedResponse = new ThreadLocal<ServletResponse>();
         } else {
             lastServicedRequest = null;
             lastServicedResponse = null;
@@ -135,15 +135,15 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * Static class array used when the SecurityManager is turned on and 
      * <code>doFilter</code> is invoked.
      */
-    private static Class[] classType = new Class[]{ServletRequest.class, 
-                                                   ServletResponse.class,
-                                                   FilterChain.class};
+    private static Class<?>[] classType = new Class[]{ServletRequest.class, 
+                                                      ServletResponse.class,
+                                                      FilterChain.class};
                                                    
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>service</code> is invoked.
      */                                                 
-    private static Class[] classTypeUsedInService = new Class[]{
+    private static Class<?>[] classTypeUsedInService = new Class[]{
                                                          ServletRequest.class,
                                                          ServletResponse.class};
 
@@ -151,14 +151,14 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * Static class array used when the SecurityManager is turned on and 
      * <code>doFilterEvent</code> is invoked.
      */
-    private static Class[] cometClassType = 
+    private static Class<?>[] cometClassType = 
         new Class[]{ CometEvent.class, CometFilterChain.class};
                                                    
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>event</code> is invoked.
      */                                                 
-    private static Class[] classTypeUsedInEvent = 
+    private static Class<?>[] classTypeUsedInEvent = 
         new Class[] { CometEvent.class };
 
     // ---------------------------------------------------- FilterChain Methods
@@ -183,8 +183,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             final ServletResponse res = response;
             try {
                 java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedExceptionAction() {
-                        public Object run() 
+                    new java.security.PrivilegedExceptionAction<Void>() {
+                        public Void run() 
                             throws ServletException, IOException {
                             internalDoFilter(req,res);
                             return null;
@@ -287,8 +287,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
                                                principal);   
                     args = null;
                 } else {  
-                    servlet.service((HttpServletRequest) request,
-                                    (HttpServletResponse) response);
+                    servlet.service(request, response);
                 }
             } else {
                 servlet.service(request, response);
@@ -340,8 +339,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
             final CometEvent ev = event;
             try {
                 java.security.AccessController.doPrivileged(
-                    new java.security.PrivilegedExceptionAction() {
-                        public Object run() 
+                    new java.security.PrivilegedExceptionAction<Void>() {
+                        public Void run() 
                             throws ServletException, IOException {
                             internalDoFilterEvent(ev);
                             return null;
@@ -372,7 +371,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * @return The last request to be serviced. 
      */
     public static ServletRequest getLastServicedRequest() {
-        return (ServletRequest) lastServicedRequest.get();
+        return lastServicedRequest.get();
     }
 
     
@@ -383,7 +382,7 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      * @return The last response to be serviced. 
      */
     public static ServletResponse getLastServicedResponse() {
-        return (ServletResponse) lastServicedResponse.get();
+        return lastServicedResponse.get();
     }
     
     
