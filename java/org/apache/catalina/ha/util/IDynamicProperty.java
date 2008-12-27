@@ -46,7 +46,7 @@ public interface IDynamicProperty {
      * 
      * @return An iterator over the property names
      */
-    public Iterator getPropertyNames() ;
+    public Iterator<String> getPropertyNames() ;
 
     /**
      * remove a configured property.

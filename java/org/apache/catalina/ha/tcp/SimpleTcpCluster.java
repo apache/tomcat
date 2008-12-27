@@ -155,18 +155,19 @@ public class SimpleTcpCluster
     /**
      * The context name <->manager association for distributed contexts.
      */
-    protected Map managers = new HashMap();
+    protected Map<String, ClusterManager> managers =
+        new HashMap<String, ClusterManager>();
 
     protected ClusterManager managerTemplate = new DeltaManager();
 
-    private List valves = new ArrayList();
+    private List<Valve> valves = new ArrayList<Valve>();
 
     private org.apache.catalina.ha.ClusterDeployer clusterDeployer;
 
     /**
      * Listeners of messages
      */
-    protected List clusterListeners = new ArrayList();
+    protected List<ClusterListener> clusterListeners = new ArrayList<ClusterListener>();
 
     /**
      * Comment for <code>notifyLifecycleListenerOnFailure</code>
@@ -176,7 +177,7 @@ public class SimpleTcpCluster
     /**
      * dynamic sender <code>properties</code>
      */
-    private Map properties = new HashMap();
+    private Map<String, Object> properties = new HashMap<String, Object>();
     
     private int channelSendOptions = Channel.SEND_OPTIONS_ASYNCHRONOUS;
     
@@ -307,7 +308,7 @@ public class SimpleTcpCluster
      * @return current cluster valves
      */
     public Valve[] getValves() {
-        return (Valve[]) valves.toArray(new Valve[valves.size()]);
+        return valves.toArray(new Valve[valves.size()]);
     }
 
     /**
@@ -447,7 +448,7 @@ public class SimpleTcpCluster
      * 
      * @return An iterator over the property names.
      */
-    public Iterator getPropertyNames() {
+    public Iterator<String> getPropertyNames() {
         return properties.keySet().iterator();
     }
 
@@ -467,8 +468,8 @@ public class SimpleTcpCluster
      */
     protected void transferProperty(String prefix, Object bean) {
         if (prefix != null) {
-            for (Iterator iter = getPropertyNames(); iter.hasNext();) {
-                String pkey = (String) iter.next();
+            for (Iterator<String> iter = getPropertyNames(); iter.hasNext();) {
+                String pkey = iter.next();
                 if (pkey.startsWith(prefix)) {
                     String key = pkey.substring(prefix.length() + 1);
                     Object value = getProperty(pkey);
@@ -483,7 +484,7 @@ public class SimpleTcpCluster
     /**
      * @return Returns the managers.
      */
-    public Map getManagers() {
+    public Map<String, ClusterManager> getManagers() {
         return managers;
     }
 
@@ -538,7 +539,7 @@ public class SimpleTcpCluster
         cmanager.setCluster(this);
         cmanager.setDefaultMode(false);
     
-        managers.put(clusterName, manager);
+        managers.put(clusterName, cmanager);
         // Notify our interested LifecycleListeners
         lifecycle.fireLifecycleEvent(AFTER_MANAGERREGISTER_EVENT, manager);    
     }
@@ -585,7 +586,7 @@ public class SimpleTcpCluster
      * @see org.apache.catalina.ha.CatalinaCluster#getManager(java.lang.String)
      */
     public Manager getManager(String name) {
-        return (Manager) managers.get(name);
+        return managers.get(name);
     }
     
     // ------------------------------------------------------ Lifecycle Methods
@@ -712,7 +713,7 @@ public class SimpleTcpCluster
      */
     protected void registerClusterValve() throws Exception {
         if(container != null ) {
-            for (Iterator iter = valves.iterator(); iter.hasNext();) {
+            for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
                 ClusterValve valve = (ClusterValve) iter.next();
                 if (log.isDebugEnabled())
                     log.debug("Invoking addValve on " + getContainer()
@@ -734,7 +735,7 @@ public class SimpleTcpCluster
      * @throws ClassNotFoundException
      */
     protected void unregisterClusterValve() throws Exception {
-        for (Iterator iter = valves.iterator(); iter.hasNext();) {
+        for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
             ClusterValve valve = (ClusterValve) iter.next();
             if (log.isDebugEnabled())
                 log.debug("Invoking removeValve on " + getContainer()
@@ -897,7 +898,6 @@ public class SimpleTcpCluster
 
     public void messageReceived(ClusterMessage message) {
 
-        long start = 0;
         if (log.isDebugEnabled() && message != null)
             log.debug("Assuming clocks are synched: Replication for "
                     + message.getUniqueId() + " took="
@@ -907,8 +907,8 @@ public class SimpleTcpCluster
         //invoke all the listeners
         boolean accepted = false;
         if (message != null) {
-            for (Iterator iter = clusterListeners.iterator(); iter.hasNext();) {
-                ClusterListener listener = (ClusterListener) iter.next();
+            for (Iterator<ClusterListener> iter = clusterListeners.iterator(); iter.hasNext();) {
+                ClusterListener listener = iter.next();
                 if (listener.accept(message)) {
                     accepted = true;
                     listener.messageReceived(message);

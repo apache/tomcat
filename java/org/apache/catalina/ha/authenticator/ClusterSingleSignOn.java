@@ -169,7 +169,7 @@ public class ClusterSingleSignOn
 
 	super.stop();
 
-	if (getCluster() != null && getCluster() instanceof CatalinaCluster) {
+	if (getCluster() != null) {
 	    getCluster().removeClusterListener(clusterSSOListener);
 	}
 

@@ -122,7 +122,8 @@ public class DeltaManager extends ClusterManagerBase{
      * wait time between send session block (default 2 sec) 
      */
     private int sendAllSessionsWaitTime = 2 * 1000 ; 
-    private ArrayList receivedMessageQueue = new ArrayList() ;
+    private ArrayList<SessionMessage> receivedMessageQueue =
+        new ArrayList<SessionMessage>() ;
     private boolean receiverQueue = false ;
     private boolean stateTimestampDrop = true ;
     private long stateTransferCreateSendTime; 
@@ -742,7 +743,7 @@ public class DeltaManager extends ClusterManagerBase{
                 try {
                     oos.close();
                 } catch (IOException f) {
-                    ;
+                    // Ignore
                 }
                 oos = null;
             }
@@ -880,13 +881,14 @@ public class DeltaManager extends ClusterManagerBase{
                      receiverQueue = true ;
                 }
                 cluster.send(msg, mbr);
-                if (log.isWarnEnabled()) log.warn(sm.getString("deltaManager.waitForSessionState",getName(), mbr,getStateTransferTimeout()));
+                if (log.isWarnEnabled())
+                    log.warn(sm.getString("deltaManager.waitForSessionState",getName(), mbr, Integer.valueOf(getStateTransferTimeout())));
                 // FIXME At sender ack mode this method check only the state transfer and resend is a problem!
                 waitForSendAllSessions(beforeSendTime);
             } finally {
                 synchronized(receivedMessageQueue) {
-                    for (Iterator iter = receivedMessageQueue.iterator(); iter.hasNext();) {
-                        SessionMessage smsg = (SessionMessage) iter.next();
+                    for (Iterator<SessionMessage> iter = receivedMessageQueue.iterator(); iter.hasNext();) {
+                        SessionMessage smsg = iter.next();
                         if (!stateTimestampDrop) {
                             messageReceived(smsg, smsg.getAddress() != null ? (Member) smsg.getAddress() : null);
                         } else {
@@ -1020,7 +1022,7 @@ public class DeltaManager extends ClusterManagerBase{
             try {
                 session.expire(true, isExpireSessionsOnShutdown());
             } catch (Throwable ignore) {
-                ;
+                // Ignore
             } 
         }
 

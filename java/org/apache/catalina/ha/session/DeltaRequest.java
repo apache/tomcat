@@ -62,8 +62,9 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_ISNEW = "__SET__ISNEW__";
 
     private String sessionId;
-    private LinkedList actions = new LinkedList();
-    private LinkedList actionPool = new LinkedList();
+    private LinkedList<AttributeInfo> actions = new LinkedList<AttributeInfo>();
+    private LinkedList<AttributeInfo> actionPool =
+        new LinkedList<AttributeInfo>();
     
     private boolean recordAllActions = false;
 
@@ -125,7 +126,7 @@ public class DeltaRequest implements Externalizable {
         AttributeInfo info = null;
         if ( this.actionPool.size() > 0 ) {
             try {
-                info = (AttributeInfo) actionPool.removeFirst();
+                info = actionPool.removeFirst();
             }catch ( Exception x ) {
                 log.error("Unable to remove element:",x);
                 info = new AttributeInfo(type, action, name, value);
@@ -156,7 +157,7 @@ public class DeltaRequest implements Externalizable {
             throw new java.lang.IllegalArgumentException("Session id mismatch, not executing the delta request");
         session.access();
         for ( int i=0; i<actions.size(); i++ ) {
-            AttributeInfo info = (AttributeInfo)actions.get(i);
+            AttributeInfo info = actions.get(i);
             switch ( info.getType() ) {
                 case TYPE_ATTRIBUTE: {
                     if ( info.getAction() == ACTION_SET ) {
@@ -183,7 +184,7 @@ public class DeltaRequest implements Externalizable {
                     Principal p = null;
                     if ( info.getAction() == ACTION_SET ) {
                         SerializablePrincipal sp = (SerializablePrincipal)info.getValue();
-                        p = (Principal)sp.getPrincipal(session.getManager().getContainer().getRealm());
+                        p = sp.getPrincipal(session.getManager().getContainer().getRealm());
                     }
                     session.setPrincipal(p,false);
                     break;
@@ -198,7 +199,7 @@ public class DeltaRequest implements Externalizable {
     public void reset() {
         while ( actions.size() > 0 ) {
             try {
-                AttributeInfo info = (AttributeInfo) actions.removeFirst();
+                AttributeInfo info = actions.removeFirst();
                 info.recycle();
                 actionPool.addLast(info);
             }catch  ( Exception x ) {
@@ -236,14 +237,14 @@ public class DeltaRequest implements Externalizable {
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
         if (actions == null)
-            actions = new LinkedList();
+            actions = new LinkedList<AttributeInfo>();
         else
             actions.clear();
         for (int i = 0; i < cnt; i++) {
             AttributeInfo info = null;
             if (this.actionPool.size() > 0) {
                 try {
-                    info = (AttributeInfo) actionPool.removeFirst();
+                    info = actionPool.removeFirst();
                 } catch ( Exception x )  {
                     log.error("Unable to remove element",x);
                     info = new AttributeInfo(-1,-1,null,null);
@@ -268,7 +269,7 @@ public class DeltaRequest implements Externalizable {
         out.writeBoolean(recordAllActions);
         out.writeInt(getSize());
         for ( int i=0; i<getSize(); i++ ) {
-            AttributeInfo info = (AttributeInfo)actions.get(i);
+            AttributeInfo info = actions.get(i);
             info.writeExternal(out);
         }
     }
