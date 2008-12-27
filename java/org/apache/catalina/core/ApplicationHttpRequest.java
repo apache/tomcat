@@ -140,7 +140,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * The request parameters for this request.  This is initialized from the
      * wrapped request, but updates are allowed.
      */
-    protected Map parameters = null;
+    protected Map<String, String[]> parameters = null;
 
 
     /**
@@ -369,7 +369,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterMap()</code> method of the
      * wrapped request.
      */
-    public Map getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
 
 	parseParameters();
         return (parameters);
@@ -381,10 +381,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getParameterNames()</code> method of the
      * wrapped request.
      */
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
 
 	parseParameters();
-        return (new Enumerator(parameters.keySet()));
+        return (new Enumerator<String>(parameters.keySet()));
 
     }
 
@@ -400,7 +400,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 	parseParameters();
         Object value = parameters.get(name);
         if (value == null)
-            return ((String[]) null);
+            return null;
         else if (value instanceof String[])
             return ((String[]) value);
         else if (value instanceof String) {
@@ -613,14 +613,14 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      *
      * @param orig Origin Map to be copied
      */
-    Map copyMap(Map orig) {
+    Map<String, String[]> copyMap(Map<String, String[]> orig) {
 
         if (orig == null)
-            return (new HashMap());
-        HashMap dest = new HashMap();
-        Iterator keys = orig.keySet().iterator();
+            return (new HashMap<String, String[]>());
+        HashMap<String, String[]> dest = new HashMap<String, String[]>();
+        Iterator<String> keys = orig.keySet().iterator();
         while (keys.hasNext()) {
-            String key = (String) keys.next();
+            String key = keys.next();
             dest.put(key, orig.get(key));
         }
         return (dest);
@@ -724,7 +724,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 	    return;
 	}
 
-        parameters = new HashMap();
+        parameters = new HashMap<String, String[]>();
         parameters = copyMap(getRequest().getParameterMap());
         mergeParameters();
         parsedParams = true;
@@ -818,7 +818,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     protected String[] mergeValues(Object values1, Object values2) {
 
-        ArrayList results = new ArrayList();
+        ArrayList<Object> results = new ArrayList<Object>();
 
         if (values1 == null)
             ;
@@ -843,7 +843,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             results.add(values2.toString());
 
         String values[] = new String[results.size()];
-        return ((String[]) results.toArray(values));
+        return results.toArray(values);
 
     }
 
@@ -862,7 +862,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if ((queryParamString == null) || (queryParamString.length() < 1))
             return;
 
-        HashMap queryParameters = new HashMap();
+        HashMap<String, String[]> queryParameters = new HashMap<String, String[]>();
         String encoding = getCharacterEncoding();
         if (encoding == null)
             encoding = "ISO-8859-1";
@@ -870,11 +870,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             RequestUtil.parseParameters
                 (queryParameters, queryParamString, encoding);
         } catch (Exception e) {
-            ;
+            // Ignore
         }
-        Iterator keys = parameters.keySet().iterator();
+        Iterator<String> keys = parameters.keySet().iterator();
         while (keys.hasNext()) {
-            String key = (String) keys.next();
+            String key = keys.next();
             Object value = queryParameters.get(key);
             if (value == null) {
                 queryParameters.put(key, parameters.get(key));
@@ -895,11 +895,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Utility class used to expose the special attributes as being available
      * as request attributes.
      */
-    protected class AttributeNamesEnumerator implements Enumeration {
+    protected class AttributeNamesEnumerator implements Enumeration<String> {
 
         protected int pos = -1;
         protected int last = -1;
-        protected Enumeration parentEnumeration = null;
+        protected Enumeration<String> parentEnumeration = null;
         protected String next = null;
 
         public AttributeNamesEnumerator() {
@@ -916,7 +916,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     || ((next = findNext()) != null));
         }
 
-        public Object nextElement() {
+        public String nextElement() {
             if (pos != last) {
                 for (int i = pos + 1; i <= last; i++) {
                     if (getAttribute(specials[i]) != null) {
@@ -937,7 +937,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         protected String findNext() {
             String result = null;
             while ((result == null) && (parentEnumeration.hasMoreElements())) {
-                String current = (String) parentEnumeration.nextElement();
+                String current = parentEnumeration.nextElement();
                 if (!isSpecial(current)) {
                     result = current;
                 }

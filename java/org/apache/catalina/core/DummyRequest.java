@@ -77,7 +77,7 @@ public class DummyRequest
 
     protected FilterChain filterChain = null;
     
-    private static Enumeration dummyEnum = new Enumeration(){
+    private static Enumeration<Object> dummyEnum = new Enumeration<Object>(){
         public boolean hasMoreElements(){
             return false;
         }
@@ -179,7 +179,7 @@ public class DummyRequest
     }
     public void finishRequest() throws IOException {}
     public Object getNote(String name) { return null; }
-    public Iterator getNoteNames() { return null; }
+    public Iterator<String> getNoteNames() { return null; }
     public void removeNote(String name) {}
     public void setContentType(String type) {}
     public void setNote(String name, Object value) {}

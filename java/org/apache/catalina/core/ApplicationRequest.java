@@ -86,7 +86,8 @@ class ApplicationRequest extends ServletRequestWrapper {
      * The request attributes for this request.  This is initialized from the
      * wrapped request, but updates are allowed.
      */
-    protected HashMap attributes = new HashMap();
+    protected HashMap<String, Object> attributes =
+        new HashMap<String, Object>();
 
 
     /**
@@ -117,10 +118,10 @@ class ApplicationRequest extends ServletRequestWrapper {
      * Override the <code>getAttributeNames()</code> method of the wrapped
      * request.
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
 
         synchronized (attributes) {
-            return (new Enumerator(attributes.keySet()));
+            return (new Enumerator<String>(attributes.keySet()));
         }
 
     }
@@ -176,9 +177,9 @@ class ApplicationRequest extends ServletRequestWrapper {
         // Initialize the attributes for this request
         synchronized (attributes) {
             attributes.clear();
-            Enumeration names = request.getAttributeNames();
+            Enumeration<String> names = request.getAttributeNames();
             while (names.hasMoreElements()) {
-                String name = (String) names.nextElement();
+                String name = names.nextElement();
                 Object value = request.getAttribute(name);
                 attributes.put(name, value);
             }

@@ -66,7 +66,8 @@ final class ApplicationDispatcher
     implements RequestDispatcher {
 
 
-    protected class PrivilegedForward implements PrivilegedExceptionAction {
+    protected class PrivilegedForward
+            implements PrivilegedExceptionAction<Void> {
         private ServletRequest request;
         private ServletResponse response;
 
@@ -76,13 +77,14 @@ final class ApplicationDispatcher
             this.response = response;
         }
 
-        public Object run() throws java.lang.Exception {
+        public Void run() throws java.lang.Exception {
             doForward(request,response);
             return null;
         }
     }
 
-    protected class PrivilegedInclude implements PrivilegedExceptionAction {
+    protected class PrivilegedInclude implements
+            PrivilegedExceptionAction<Void> {
         private ServletRequest request;
         private ServletResponse response;
 
@@ -92,7 +94,7 @@ final class ApplicationDispatcher
             this.response = response;
         }
 
-        public Object run() throws ServletException, IOException {
+        public Void run() throws ServletException, IOException {
             doInclude(request,response);
             return null;
         }
@@ -397,12 +399,12 @@ final class ApplicationDispatcher
                     ServletOutputStream stream = response.getOutputStream();
                     stream.close();
                 } catch (IllegalStateException f) {
-                    ;
+                    // Ignore
                 } catch (IOException f) {
-                    ;
+                    // Ignore
                 }
             } catch (IOException e) {
-                ;
+                // Ignore
             }
         }
 

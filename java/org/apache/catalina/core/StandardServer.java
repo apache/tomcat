@@ -64,16 +64,6 @@ public final class StandardServer
     private static Log log = LogFactory.getLog(StandardServer.class);
    
 
-    // -------------------------------------------------------------- Constants
-
-
-    /**
-     * ServerLifecycleListener classname.
-     */
-    private static String SERVER_LISTENER_CLASS_NAME =
-        "org.apache.catalina.mbeans.ServerLifecycleListener";
-
-
     // ------------------------------------------------------------ Constructor
 
 
@@ -358,7 +348,7 @@ public final class StandardServer
                 try {
                     ((Lifecycle) service).start();
                 } catch (LifecycleException e) {
-                    ;
+                    // Ignore
                 }
             }
 
@@ -451,7 +441,7 @@ public final class StandardServer
             try {
                 socket.close();
             } catch (IOException e) {
-                ;
+                // Ignore
             }
 
             // Match against our command string
@@ -468,7 +458,7 @@ public final class StandardServer
         try {
             serverSocket.close();
         } catch (IOException e) {
-            ;
+            // Ignore
         }
 
     }
@@ -540,7 +530,7 @@ public final class StandardServer
                 try {
                     ((Lifecycle) services[j]).stop();
                 } catch (LifecycleException e) {
-                    ;
+                    // Ignore
                 }
             }
             int k = 0;
