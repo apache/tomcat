@@ -160,14 +160,14 @@ public class StandardWrapper
     /**
      * Mappings associated with the wrapper.
      */
-    protected ArrayList mappings = new ArrayList();
+    protected ArrayList<String> mappings = new ArrayList<String>();
 
 
     /**
      * The initialization parameters for this servlet, keyed by
      * parameter name.
      */
-    protected HashMap parameters = new HashMap();
+    protected HashMap<String, String> parameters = new HashMap<String, String>();
 
 
     /**
@@ -175,7 +175,7 @@ public class StandardWrapper
      * used in the servlet.  The corresponding value is the role name of
      * the web application itself.
      */
-    protected HashMap references = new HashMap();
+    protected HashMap<String, String> references = new HashMap<String, String>();
 
 
     /**
@@ -221,7 +221,7 @@ public class StandardWrapper
     /**
      * Stack containing the STM instances.
      */
-    protected Stack instancePool = null;
+    protected Stack<Servlet> instancePool = null;
 
     
     /**
@@ -256,14 +256,14 @@ public class StandardWrapper
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.init</code> is invoked.
      */
-    protected static Class[] classType = new Class[]{ServletConfig.class};
+    protected static Class<?>[] classType = new Class[]{ServletConfig.class};
     
     
     /**
      * Static class array used when the SecurityManager is turned on and 
      * <code>Servlet.service</code>  is invoked.
      */                                                 
-    protected static Class[] classTypeUsedInService = new Class[]{
+    protected static Class<?>[] classTypeUsedInService = new Class[]{
                                                          ServletRequest.class,
                                                          ServletResponse.class};
     
@@ -558,7 +558,7 @@ public class StandardWrapper
         try {
             loadServlet();
         } catch (Throwable t) {
-            ;
+            // Ignore
         }
         return (singleThreadModel);
 
@@ -593,13 +593,13 @@ public class StandardWrapper
      */
     public String[] getServletMethods() throws ServletException {
 
-        Class servletClazz = loadServlet().getClass();
+        Class<? extends Servlet> servletClazz = loadServlet().getClass();
         if (!javax.servlet.http.HttpServlet.class.isAssignableFrom(
                                                         servletClazz)) {
             return DEFAULT_SERVLET_METHODS;
         }
 
-        HashSet allow = new HashSet();
+        HashSet<String> allow = new HashSet<String>();
         allow.add("TRACE");
         allow.add("OPTIONS");
 	
@@ -620,7 +620,7 @@ public class StandardWrapper
         }
 
         String[] methodNames = new String[allow.size()];
-        return (String[]) allow.toArray(methodNames);
+        return allow.toArray(methodNames);
 
     }
 
@@ -827,14 +827,14 @@ public class StandardWrapper
                     try {
                         instancePool.wait();
                     } catch (InterruptedException e) {
-                        ;
+                        // Ignore
                     }
                 }
             }
             if (log.isTraceEnabled())
                 log.trace("  Returning allocated STM instance");
             countAllocated.incrementAndGet();
-            return (Servlet) instancePool.pop();
+            return instancePool.pop();
 
         }
 
@@ -877,7 +877,7 @@ public class StandardWrapper
     public String findInitParameter(String name) {
 
         synchronized (parameters) {
-            return ((String) parameters.get(name));
+            return parameters.get(name);
         }
 
     }
@@ -891,7 +891,7 @@ public class StandardWrapper
 
         synchronized (parameters) {
             String results[] = new String[parameters.size()];
-            return ((String[]) parameters.keySet().toArray(results));
+            return parameters.keySet().toArray(results);
         }
 
     }
@@ -903,7 +903,7 @@ public class StandardWrapper
     public String[] findMappings() {
 
         synchronized (mappings) {
-            return (String[]) mappings.toArray(new String[mappings.size()]);
+            return mappings.toArray(new String[mappings.size()]);
         }
 
     }
@@ -918,7 +918,7 @@ public class StandardWrapper
     public String findSecurityReference(String name) {
 
         synchronized (references) {
-            return ((String) references.get(name));
+            return references.get(name);
         }
 
     }
@@ -932,7 +932,7 @@ public class StandardWrapper
 
         synchronized (references) {
             String results[] = new String[references.size()];
-            return ((String[]) references.keySet().toArray(results));
+            return references.keySet().toArray(results);
         }
 
     }
@@ -1055,7 +1055,7 @@ public class StandardWrapper
 
                 if( Globals.IS_SECURITY_ENABLED) {
 
-                    Object[] args = new Object[]{((ServletConfig)facade)};
+                    Object[] args = new Object[]{(facade)};
                     SecurityUtil.doAsPrivilege("init",
                                                servlet,
                                                classType,
@@ -1111,7 +1111,7 @@ public class StandardWrapper
             singleThreadModel = servlet instanceof SingleThreadModel;
             if (singleThreadModel) {
                 if (instancePool == null)
-                    instancePool = new Stack();
+                    instancePool = new Stack<Servlet>();
             }
             fireContainerEvent("load", this);
 
@@ -1262,7 +1262,7 @@ public class StandardWrapper
                 try {
                     Thread.sleep(delay);
                 } catch (InterruptedException e) {
-                    ;
+                    // Ignore
                 }
                 nRetries++;
             }
@@ -1325,7 +1325,7 @@ public class StandardWrapper
         if (singleThreadModel && (instancePool != null)) {
             try {
                 while (!instancePool.isEmpty()) {
-                    Servlet s = (Servlet) instancePool.pop();
+                    Servlet s = instancePool.pop();
                     if (Globals.IS_SECURITY_ENABLED) {
                         SecurityUtil.doAsPrivilege("destroy", s);
                         SecurityUtil.remove(instance);                           
@@ -1378,10 +1378,10 @@ public class StandardWrapper
      * Return the set of initialization parameter names defined for this
      * servlet.  If none are defined, an empty Enumeration is returned.
      */
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
 
         synchronized (parameters) {
-            return (new Enumerator(parameters.keySet()));
+            return (new Enumerator<String>(parameters.keySet()));
         }
 
     }
@@ -1484,7 +1484,7 @@ public class StandardWrapper
      */
     protected void addDefaultMapper(String mapperClass) {
 
-        ;       // No need for a default Mapper on a Wrapper
+        // No need for a default Mapper on a Wrapper
 
     }
 
@@ -1502,7 +1502,7 @@ public class StandardWrapper
             return (true);
         }
         try {
-            Class clazz =
+            Class<?> clazz =
                 this.getClass().getClassLoader().loadClass(classname);
             return (ContainerServlet.class.isAssignableFrom(clazz));
         } catch (Throwable t) {
@@ -1512,7 +1512,7 @@ public class StandardWrapper
     }
 
 
-    protected Method[] getAllDeclaredMethods(Class c) {
+    protected Method[] getAllDeclaredMethods(Class<?> c) {
 
         if (c.equals(javax.servlet.http.HttpServlet.class)) {
             return null;

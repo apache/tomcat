@@ -158,7 +158,7 @@ public class StandardService
             try {
                 ((Lifecycle) this.container).start();
             } catch (LifecycleException e) {
-                ;
+                // Ignore
             }
         }
         synchronized (connectors) {
@@ -170,7 +170,7 @@ public class StandardService
             try {
                 ((Lifecycle) oldContainer).stop();
             } catch (LifecycleException e) {
-                ;
+                // Ignore
             }
         }
 
@@ -270,7 +270,7 @@ public class StandardService
                 }
             }
 
-            if (started && (connector instanceof Lifecycle)) {
+            if (started) {
                 try {
                     ((Lifecycle) connector).start();
                 } catch (LifecycleException e) {
@@ -334,7 +334,7 @@ public class StandardService
             }
             if (j < 0)
                 return;
-            if (started && (connectors[j] instanceof Lifecycle)) {
+            if (started) {
                 try {
                     ((Lifecycle) connectors[j]).stop();
                 } catch (LifecycleException e) {
@@ -527,8 +527,7 @@ public class StandardService
         // Start our defined Connectors second
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                if (connectors[i] instanceof Lifecycle)
-                    ((Lifecycle) connectors[i]).start();
+                ((Lifecycle) connectors[i]).start();
             }
         }
         
@@ -589,8 +588,7 @@ public class StandardService
         // Stop our defined Connectors first
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
-                if (connectors[i] instanceof Lifecycle)
-                    ((Lifecycle) connectors[i]).stop();
+                ((Lifecycle) connectors[i]).stop();
             }
         }
 
