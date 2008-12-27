@@ -222,7 +222,7 @@ public class Response
     /**
      * The set of Cookies associated with this Response.
      */
-    protected ArrayList cookies = new ArrayList();
+    protected ArrayList<Cookie> cookies = new ArrayList<Cookie>();
 
 
     /**
@@ -380,7 +380,7 @@ public class Response
      * @param request The new associated request
      */
     public void setRequest(org.apache.catalina.connector.Request request) {
-        this.request = (Request) request;
+        this.request = request;
     }
 
 
@@ -864,7 +864,7 @@ public class Response
      * a zero-length array if no cookies have been set.
      */
     public Cookie[] getCookies() {
-        return ((Cookie[]) cookies.toArray(new Cookie[cookies.size()]));
+        return cookies.toArray(new Cookie[cookies.size()]);
     }
 
 
@@ -907,8 +907,9 @@ public class Response
      */
     public String[] getHeaderValues(String name) {
 
-        Enumeration enumeration = coyoteResponse.getMimeHeaders().values(name);
-        Vector result = new Vector();
+        Enumeration<String> enumeration =
+            coyoteResponse.getMimeHeaders().values(name);
+        Vector<String> result = new Vector<String>();
         while (enumeration.hasMoreElements()) {
             result.addElement(enumeration.nextElement());
         }
@@ -995,8 +996,8 @@ public class Response
         //web application code can receive a IllegalArgumentException 
         //from the appendCookieValue invokation
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            AccessController.doPrivileged(new PrivilegedAction() {
-                public Object run(){
+            AccessController.doPrivileged(new PrivilegedAction<Void>() {
+                public Void run(){
                     ServerCookie.appendCookieValue
                         (sb, cookie.getVersion(), cookie.getName(), 
                          cookie.getValue(), cookie.getPath(), 
@@ -1430,10 +1431,10 @@ public class Response
             return (false);
         
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Boolean)
-                AccessController.doPrivileged(new PrivilegedAction() {
+            return (
+                AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
 
-                public Object run(){
+                public Boolean run(){
                     return new Boolean(doIsEncodeable(hreq, session, location));
                 }
             })).booleanValue();
@@ -1534,9 +1535,9 @@ public class Response
                     final String frelativePath = relativePath;
                     if (SecurityUtil.isPackageProtectionEnabled() ){
                         try{
-                            encodedURI = (String)AccessController.doPrivileged( 
-                                new PrivilegedExceptionAction(){                                
-                                    public Object run() throws IOException{
+                            encodedURI = AccessController.doPrivileged( 
+                                new PrivilegedExceptionAction<String>(){                                
+                                    public String run() throws IOException{
                                         return urlEncoder.encodeURL(frelativePath);
                                     }
                            });   
