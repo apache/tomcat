@@ -63,7 +63,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
 
     private String className;
     private String classLoader;
-    private List args=new ArrayList();
+    private List<Arg> args=new ArrayList<Arg>();
 
     // ----------------------------------------------------- Instance Info
 
@@ -121,13 +121,13 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
     /**
      * @return Returns the args.
      */
-    public List getArgs() {
+    public List<Arg> getArgs() {
         return args;
     }
     /**
      * @param args The args to set.
      */
-    public void setArgs(List args) {
+    public void setArgs(List<Arg> args) {
         this.args = args;
     }
 
@@ -170,7 +170,7 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
            argsA = new Object[ args.size()];
            sigA = new String[args.size()];
            for( int i=0; i<args.size(); i++ ) {
-               Arg arg=(Arg)args.get(i);
+               Arg arg=args.get(i);
                if( arg.type==null) {
                    arg.type="java.lang.String";
                    sigA[i]=arg.getType();
