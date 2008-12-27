@@ -94,7 +94,8 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
 
     protected CatalinaCluster cluster;
 
-    protected java.util.HashMap invalidatedSessions = new java.util.HashMap();
+    protected java.util.HashMap<String, String> invalidatedSessions =
+        new java.util.HashMap<String, String>();
 
     /**
      * Flag to keep track if the state has been transferred or not

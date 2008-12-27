@@ -234,7 +234,7 @@ implements org.apache.catalina.ha.ClusterSession{
     protected void log(String message) {
 
         if ((mManager != null) && (mManager instanceof SimpleTcpReplicationManager)) {
-            ((SimpleTcpReplicationManager) mManager).log.debug("ReplicatedSession: " + message);
+            SimpleTcpReplicationManager.log.debug("ReplicatedSession: " + message);
         } else {
             System.out.println("ReplicatedSession: " + message);
         }
@@ -244,7 +244,7 @@ implements org.apache.catalina.ha.ClusterSession{
     protected void log(String message, Throwable x) {
 
         if ((mManager != null) && (mManager instanceof SimpleTcpReplicationManager)) {
-            ((SimpleTcpReplicationManager) mManager).log.error("ReplicatedSession: " + message,x);
+            SimpleTcpReplicationManager.log.error("ReplicatedSession: " + message,x);
         } else {
             System.out.println("ReplicatedSession: " + message);
             x.printStackTrace();
@@ -255,9 +255,9 @@ implements org.apache.catalina.ha.ClusterSession{
     public String toString() {
         StringBuffer buf = new StringBuffer("ReplicatedSession id=");
         buf.append(getIdInternal()).append(" ref=").append(super.toString()).append("\n");
-        java.util.Enumeration e = getAttributeNames();
+        java.util.Enumeration<String> e = getAttributeNames();
         while ( e.hasMoreElements() ) {
-            String name = (String)e.nextElement();
+            String name = e.nextElement();
             Object value = getAttribute(name);
             buf.append("\tname=").append(name).append("; value=").append(value).append("\n");
         }

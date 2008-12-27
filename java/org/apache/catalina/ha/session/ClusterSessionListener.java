@@ -17,10 +17,9 @@
 
 package org.apache.catalina.ha.session;
 
+import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.catalina.ha.ClusterManager;
-import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.ha.*;
 
 /**
@@ -65,12 +64,12 @@ public class ClusterSessionListener extends ClusterListener {
             String ctxname = msg.getContextName();
             //check if the message is a EVT_GET_ALL_SESSIONS,
             //if so, wait until we are fully started up
-            Map managers = cluster.getManagers() ;
+            Map<String,ClusterManager> managers = cluster.getManagers() ;
             if (ctxname == null) {
-                java.util.Iterator i = managers.keySet().iterator();
+                Iterator<String> i = managers.keySet().iterator();
                 while (i.hasNext()) {
-                    String key = (String) i.next();
-                    ClusterManager mgr = (ClusterManager) managers.get(key);
+                    String key = i.next();
+                    ClusterManager mgr = managers.get(key);
                     if (mgr != null)
                         mgr.messageDataReceived(msg);
                     else {
@@ -82,7 +81,7 @@ public class ClusterSessionListener extends ClusterListener {
                     }
                 }
             } else {
-                ClusterManager mgr = (ClusterManager) managers.get(ctxname);
+                ClusterManager mgr = managers.get(ctxname);
                 if (mgr != null)
                     mgr.messageDataReceived(msg);
                 else if (log.isWarnEnabled())

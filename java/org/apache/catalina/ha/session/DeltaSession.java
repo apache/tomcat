@@ -36,6 +36,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionContext;
 
 import org.apache.catalina.Manager;
+import org.apache.catalina.SessionListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterSession;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -605,13 +606,13 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         if (log.isDebugEnabled()) log.debug(sm.getString("deltaSession.readSession", id));
 
         // Deserialize the attribute count and attribute values
-        if (attributes == null) attributes = new Hashtable();
+        if (attributes == null) attributes = new Hashtable<String, Object>();
         int n = ( (Integer) stream.readObject()).intValue();
         boolean isValidSave = isValid;
         isValid = true;
         for (int i = 0; i < n; i++) {
             String name = (String) stream.readObject();
-            Object value = (Object) stream.readObject();
+            Object value = stream.readObject();
             if ( (value instanceof String) && (value.equals(NOT_SERIALIZED)))
                 continue;
             attributes.put(name, value);
@@ -619,11 +620,13 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         isValid = isValidSave;
 
         if (listeners == null) {
-            listeners = new ArrayList();
+            ArrayList<SessionListener> arrayList =
+                new ArrayList<SessionListener>();
+            listeners = arrayList;
         }
 
         if (notes == null) {
-            notes = new Hashtable();
+            notes = new Hashtable<String,Object>();
         }
         activate();
     }
@@ -682,8 +685,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
         // Accumulate the names of serializable and non-serializable attributes
         String keys[] = keys();
-        ArrayList saveNames = new ArrayList();
-        ArrayList saveValues = new ArrayList();
+        ArrayList<String> saveNames = new ArrayList<String>();
+        ArrayList<Object> saveValues = new ArrayList<Object>();
         for (int i = 0; i < keys.length; i++) {
             Object value = null;
             value = attributes.get(keys[i]);
@@ -699,7 +702,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         int n = saveNames.size();
         stream.writeObject(new Integer(n));
         for (int i = 0; i < n; i++) {
-            stream.writeObject( (String) saveNames.get(i));
+            stream.writeObject( saveNames.get(i));
             try {
                 stream.writeObject(saveValues.get(i));
             } catch (NotSerializableException e) {
