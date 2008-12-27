@@ -91,7 +91,7 @@ public class StandardThreadExecutor implements Executor {
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
-        taskqueue.setParent( (ThreadPoolExecutor) executor);
+        taskqueue.setParent(executor);
         lifecycle.fireLifecycleEvent(AFTER_START_EVENT, null);
     }
     

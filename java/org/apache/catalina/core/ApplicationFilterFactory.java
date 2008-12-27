@@ -21,7 +21,6 @@ package org.apache.catalina.core;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.CometFilter;
 import org.apache.catalina.Globals;
@@ -58,7 +57,7 @@ public final class ApplicationFilterFactory {
     public static final String DISPATCHER_REQUEST_PATH_ATTR = 
         Globals.DISPATCHER_REQUEST_PATH_ATTR;
 
-    private static ApplicationFilterFactory factory = null;;
+    private static ApplicationFilterFactory factory = null;
 
 
     // ----------------------------------------------------------- Constructors
@@ -110,9 +109,6 @@ public final class ApplicationFilterFactory {
             requestPath = attribute.toString();
         }
         
-        HttpServletRequest hreq = null;
-        if (request instanceof HttpServletRequest) 
-            hreq = (HttpServletRequest)request;
         // If there is no servlet to execute, return null
         if (servlet == null)
             return (null);
@@ -168,7 +164,7 @@ public final class ApplicationFilterFactory {
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
                 context.findFilterConfig(filterMaps[i].getFilterName());
             if (filterConfig == null) {
-                ;       // FIXME - log configuration problem
+                // FIXME - log configuration problem
                 continue;
             }
             boolean isCometFilter = false;
@@ -198,7 +194,7 @@ public final class ApplicationFilterFactory {
             ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)
                 context.findFilterConfig(filterMaps[i].getFilterName());
             if (filterConfig == null) {
-                ;       // FIXME - log configuration problem
+                // FIXME - log configuration problem
                 continue;
             }
             boolean isCometFilter = false;

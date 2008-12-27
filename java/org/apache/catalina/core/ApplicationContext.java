@@ -111,7 +111,7 @@ public class ApplicationContext
      * Empty collection to serve as the basis for empty enumerations.
      * <strong>DO NOT ADD ANY ELEMENTS TO THIS COLLECTION!</strong>
      */
-    private static final ArrayList empty = new ArrayList();
+    private static final ArrayList<Object> empty = new ArrayList<Object>();
 
 
     /**
@@ -123,7 +123,7 @@ public class ApplicationContext
     /**
      * The merged context initialization parameters for this Context.
      */
-    private Map parameters = null;
+    private Map<String,String> parameters = null;
 
 
     /**
@@ -183,7 +183,7 @@ public class ApplicationContext
      */
     public Enumeration getAttributeNames() {
 
-        return new Enumerator(attributes.keySet(), true);
+        return new Enumerator<String>(attributes.keySet(), true);
 
     }
 
@@ -254,7 +254,7 @@ public class ApplicationContext
     public String getInitParameter(final String name) {
 
         mergeParameters();
-        return ((String) parameters.get(name));
+        return parameters.get(name);
 
     }
 
@@ -266,7 +266,7 @@ public class ApplicationContext
     public Enumeration getInitParameterNames() {
 
         mergeParameters();
-        return (new Enumerator(parameters.keySet()));
+        return (new Enumerator<String>(parameters.keySet()));
 
     }
 
@@ -478,7 +478,7 @@ public class ApplicationContext
                 jarFile = new File(context.getWorkPath(), path);
             }
             if (jarFile.exists()) {
-                return jarFile.toURL();
+                return jarFile.toURI().toURL();
             } else {
                 return null;
             }
@@ -572,9 +572,10 @@ public class ApplicationContext
      * @param resources Directory context to search
      * @param path Collection path
      */
-    private Set getResourcePathsInternal(DirContext resources, String path) {
+    private Set<String> getResourcePathsInternal(DirContext resources,
+            String path) {
 
-        ResourceSet set = new ResourceSet();
+        ResourceSet<String> set = new ResourceSet<String>();
         try {
             listCollectionPaths(set, resources, path);
         } catch (NamingException e) {
@@ -620,7 +621,7 @@ public class ApplicationContext
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
     public Enumeration getServletNames() {
-        return (new Enumerator(empty));
+        return (new Enumerator<Object>(empty));
     }
 
 
@@ -628,7 +629,7 @@ public class ApplicationContext
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
     public Enumeration getServlets() {
-        return (new Enumerator(empty));
+        return (new Enumerator<Object>(empty));
     }
 
 
@@ -809,7 +810,7 @@ public class ApplicationContext
         return this.context;
     }
     
-    protected Map getReadonlyAttributes() {
+    protected Map<String,String> getReadonlyAttributes() {
         return this.readOnlyAttributes;
     }
     /**
@@ -818,17 +819,17 @@ public class ApplicationContext
     protected void clearAttributes() {
 
         // Create list of attributes to be removed
-        ArrayList list = new ArrayList();
-        Iterator iter = attributes.keySet().iterator();
+        ArrayList<String> list = new ArrayList<String>();
+        Iterator<String> iter = attributes.keySet().iterator();
         while (iter.hasNext()) {
             list.add(iter.next());
         }
 
         // Remove application originated attributes
         // (read only attributes will be left in place)
-        Iterator keys = list.iterator();
+        Iterator<String> keys = list.iterator();
         while (keys.hasNext()) {
-            String key = (String) keys.next();
+            String key = keys.next();
             removeAttribute(key);
         }
         
@@ -908,7 +909,7 @@ public class ApplicationContext
 
         if (parameters != null)
             return;
-        Map results = new ConcurrentHashMap();
+        Map<String,String> results = new ConcurrentHashMap<String,String>();
         String names[] = context.findParameters();
         for (int i = 0; i < names.length; i++)
             results.put(names[i], context.findParameter(names[i]));
@@ -931,13 +932,12 @@ public class ApplicationContext
      * List resource paths (recursively), and store all of them in the given
      * Set.
      */
-    private static void listCollectionPaths
-        (Set set, DirContext resources, String path)
-        throws NamingException {
+    private static void listCollectionPaths(Set<String> set,
+            DirContext resources, String path) throws NamingException {
 
-        Enumeration childPaths = resources.listBindings(path);
+        Enumeration<Binding> childPaths = resources.listBindings(path);
         while (childPaths.hasMoreElements()) {
-            Binding binding = (Binding) childPaths.nextElement();
+            Binding binding = childPaths.nextElement();
             String name = binding.getName();
             StringBuffer childPath = new StringBuffer(path);
             if (!"/".equals(path) && !path.endsWith("/"))
