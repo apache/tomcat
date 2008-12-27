@@ -153,7 +153,7 @@ public class StatusTransformer {
         boolean ok = false;
         try {
             String methodName = "info";
-            Class paramTypes[] = new Class[1];
+            Class<?> paramTypes[] = new Class[1];
             paramTypes[0] = result.getClass();
             Object paramValues[] = new Object[1];
             paramValues[0] = result;
@@ -231,13 +231,10 @@ public class StatusTransformer {
     /**
      * Write connector state.
      */
-    public static void writeConnectorState(PrintWriter writer, 
-                                           ObjectName tpName, String name,
-                                           MBeanServer mBeanServer,
-                                           Vector globalRequestProcessors,
-                                           Vector requestProcessors,
-                                           int mode)
-        throws Exception {
+    public static void writeConnectorState(PrintWriter writer,
+            ObjectName tpName, String name, MBeanServer mBeanServer,
+            Vector<ObjectName> globalRequestProcessors,
+            Vector<ObjectName> requestProcessors, int mode) throws Exception {
 
         if (mode == 0) {
             writer.print("<h1>");
@@ -263,9 +260,10 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration enumeration = globalRequestProcessors.elements();
+            Enumeration<ObjectName> enumeration =
+                globalRequestProcessors.elements();
             while (enumeration.hasMoreElements()) {
-                ObjectName objectName = (ObjectName) enumeration.nextElement();
+                ObjectName objectName = enumeration.nextElement();
                 if (name.equals(objectName.getKeyProperty("name"))) {
                     grpName = objectName;
                 }
@@ -297,7 +295,7 @@ public class StatusTransformer {
 
             enumeration = requestProcessors.elements();
             while (enumeration.hasMoreElements()) {
-                ObjectName objectName = (ObjectName) enumeration.nextElement();
+                ObjectName objectName = enumeration.nextElement();
                 if (name.equals(objectName.getKeyProperty("worker"))) {
                     writer.print("<tr>");
                     writeProcessorState(writer, objectName, mBeanServer, mode);
@@ -321,9 +319,10 @@ public class StatusTransformer {
 
             ObjectName grpName = null;
 
-            Enumeration enumeration = globalRequestProcessors.elements();
+            Enumeration<ObjectName> enumeration =
+                globalRequestProcessors.elements();
             while (enumeration.hasMoreElements()) {
-                ObjectName objectName = (ObjectName) enumeration.nextElement();
+                ObjectName objectName = enumeration.nextElement();
                 if (name.equals(objectName.getKeyProperty("name"))) {
                     grpName = objectName;
                 }
@@ -343,7 +342,7 @@ public class StatusTransformer {
                 writer.write("<workers>");
                 enumeration = requestProcessors.elements();
                 while (enumeration.hasMoreElements()) {
-                    ObjectName objectName = (ObjectName) enumeration.nextElement();
+                    ObjectName objectName = enumeration.nextElement();
                     if (name.equals(objectName.getKeyProperty("worker"))) {
                         writeProcessorState(writer, objectName, mBeanServer, mode);
                     }
@@ -552,7 +551,7 @@ public class StatusTransformer {
 
         if (mode == 0){
             ObjectName queryHosts = new ObjectName("*:j2eeType=WebModule,*");
-            Set hostsON = mBeanServer.queryNames(queryHosts, null);
+            Set<ObjectName> hostsON = mBeanServer.queryNames(queryHosts, null);
 
             // Navigation menu
             writer.print("<h1>");
@@ -561,9 +560,9 @@ public class StatusTransformer {
 
             writer.print("<p>");
             int count = 0;
-            Iterator iterator = hostsON.iterator();
+            Iterator<ObjectName> iterator = hostsON.iterator();
             while (iterator.hasNext()) {
-                ObjectName contextON = (ObjectName) iterator.next();
+                ObjectName contextON = iterator.next();
                 String webModuleName = contextON.getKeyProperty("name");
                 if (webModuleName.startsWith("//")) {
                     webModuleName = webModuleName.substring(2);
@@ -588,7 +587,7 @@ public class StatusTransformer {
             count = 0;
             iterator = hostsON.iterator();
             while (iterator.hasNext()) {
-                ObjectName contextON = (ObjectName) iterator.next();
+                ObjectName contextON = iterator.next();
                 writer.print("<a class=\"A.name\" name=\"" 
                              + (count++) + ".0\">");
                 writeContext(writer, contextON, mBeanServer, mode);
@@ -632,17 +631,19 @@ public class StatusTransformer {
             ObjectName queryManager = new ObjectName
                 (objectName.getDomain() + ":type=Manager,path=" + contextName 
                  + ",host=" + hostName + ",*");
-            Set managersON = mBeanServer.queryNames(queryManager, null);
+            Set<ObjectName> managersON =
+                mBeanServer.queryNames(queryManager, null);
             ObjectName managerON = null;
-            Iterator iterator2 = managersON.iterator();
+            Iterator<ObjectName> iterator2 = managersON.iterator();
             while (iterator2.hasNext()) {
-                managerON = (ObjectName) iterator2.next();
+                managerON = iterator2.next();
             }
 
             ObjectName queryJspMonitor = new ObjectName
                 (objectName.getDomain() + ":type=JspMonitor,WebModule=" +
                  webModuleName + ",*");
-            Set jspMonitorONs = mBeanServer.queryNames(queryJspMonitor, null);
+            Set<ObjectName> jspMonitorONs =
+                mBeanServer.queryNames(queryJspMonitor, null);
 
             // Special case for the root context
             if (contextName.equals("/")) {
@@ -676,10 +677,11 @@ public class StatusTransformer {
             String onStr = objectName.getDomain() 
                 + ":j2eeType=Servlet,WebModule=" + webModuleName + ",*";
             ObjectName servletObjectName = new ObjectName(onStr);
-            Set set = mBeanServer.queryMBeans(servletObjectName, null);
-            Iterator iterator = set.iterator();
+            Set<ObjectInstance> set =
+                mBeanServer.queryMBeans(servletObjectName, null);
+            Iterator<ObjectInstance> iterator = set.iterator();
             while (iterator.hasNext()) {
-                ObjectInstance oi = (ObjectInstance) iterator.next();
+                ObjectInstance oi = iterator.next();
                 writeWrapper(writer, oi.getObjectName(), mBeanServer, mode);
             }
 
@@ -735,7 +737,7 @@ public class StatusTransformer {
      * Write JSP monitoring information.
      */
     public static void writeJspMonitor(PrintWriter writer,
-                                       Set jspMonitorONs,
+                                       Set<ObjectName> jspMonitorONs,
                                        MBeanServer mBeanServer,
                                        int mode)
             throws Exception {
@@ -743,9 +745,9 @@ public class StatusTransformer {
         int jspCount = 0;
         int jspReloadCount = 0;
 
-        Iterator iter = jspMonitorONs.iterator();
+        Iterator<ObjectName> iter = jspMonitorONs.iterator();
         while (iter.hasNext()) {
-            ObjectName jspMonitorON = (ObjectName) iter.next();
+            ObjectName jspMonitorON = iter.next();
             Object obj = mBeanServer.getAttribute(jspMonitorON, "jspCount");
             jspCount += ((Integer) obj).intValue();
             obj = mBeanServer.getAttribute(jspMonitorON, "jspReloadCount");

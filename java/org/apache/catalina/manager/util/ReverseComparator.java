@@ -19,17 +19,19 @@ package org.apache.catalina.manager.util;
 
 import java.util.Comparator;
 
+import org.apache.catalina.Session;
+
 /**
  * Comparator which reverse the sort order
  * @author C&eacute;drik LIME
  */
-public class ReverseComparator implements Comparator {
-    protected Comparator comparator;
+public class ReverseComparator implements Comparator<Session> {
+    protected Comparator<Session> comparator;
 
     /**
      * 
      */
-    public ReverseComparator(Comparator comparator) {
+    public ReverseComparator(Comparator<Session> comparator) {
         super();
         this.comparator = comparator;
     }
@@ -37,7 +39,7 @@ public class ReverseComparator implements Comparator {
     /* (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(Object o1, Object o2) {
+    public int compare(Session o1, Session o2) {
         int returnValue = comparator.compare(o1, o2);
         return (- returnValue);
     }

@@ -17,8 +17,6 @@
 
 package org.apache.catalina.manager;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -37,8 +35,6 @@ import org.apache.catalina.manager.util.SessionUtils;
 public class JspHelper {
 
     private static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final String DATE_FORMAT = "yyyy-MM-dd";
-    private static final String TIME_FORMAT = "HH:mm:ss";
 
     /**
      * Public constructor, so that this class can be considered a JavaBean
@@ -131,38 +127,6 @@ public class JspHelper {
         buff.append(second);
         return buff.toString();
     }
-
-
-    /**
-    * Following copied from org.apache.taglibs.standard.tag.common.core.OutSupport v1.1.2
-    * 
-    *  Optimized to create no extra objects and write directly
-    *  to the JspWriter using blocks of escaped and unescaped characters
-    *
-    */
-   private static void writeEscapedXml(char[] buffer, int length, Writer w) throws IOException {
-       int start = 0;
-
-       for (int i = 0; i < length; i++) {
-           char c = buffer[i];
-           if (c <= HIGHEST_SPECIAL) {
-               char[] escaped = specialCharactersRepresentation[c];
-               if (escaped != null) {
-                   // add unescaped portion
-                   if (start < i) {
-                       w.write(buffer,start,i-start);
-                   }
-                   // add escaped xml
-                   w.write(escaped);
-                   start = i + 1;
-               }
-           }
-       }
-       // add rest of unescaped portion
-       if (start < length) {
-           w.write(buffer,start,length-start);
-       }
-   }
 
 
     /*
