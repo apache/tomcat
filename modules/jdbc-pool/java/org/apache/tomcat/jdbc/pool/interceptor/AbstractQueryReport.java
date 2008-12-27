@@ -226,7 +226,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 }catch (Exception t) {
                     if (log.isWarnEnabled()) log.warn("Unable to process slow query",t);
                 }
-            } else {
+            } else if (process) {
                 reportQuery(query, args, name, start, delta);
             }
             //perform close cleanup
