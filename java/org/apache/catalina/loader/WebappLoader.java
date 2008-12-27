@@ -49,7 +49,6 @@ import javax.servlet.ServletContext;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -207,7 +206,7 @@ public class WebappLoader
     /**
      * Repositories that are set in the loader, for JMX.
      */
-    private ArrayList loaderRepositories = null;
+    private ArrayList<String> loaderRepositories = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -218,7 +217,7 @@ public class WebappLoader
      */
     public ClassLoader getClassLoader() {
 
-        return ((ClassLoader) classLoader);
+        return classLoader;
 
     }
 
@@ -423,12 +422,12 @@ public class WebappLoader
      */
     public String[] findRepositories() {
 
-        return ((String[])repositories.clone());
+        return repositories.clone();
 
     }
 
     public String[] getRepositories() {
-        return ((String[])repositories.clone());
+        return repositories.clone();
     }
 
     /** Extra repositories for this loader
@@ -564,7 +563,6 @@ public class WebappLoader
                 // Register ourself. The container must be a webapp
                 try {
                     StandardContext ctx=(StandardContext)container;
-                    Engine eng=(Engine)ctx.getParent().getParent();
                     String path = ctx.getPath();
                     if (path.equals("")) {
                         path = "/";
@@ -652,15 +650,13 @@ public class WebappLoader
 
             setPermissions();
 
-            if (classLoader instanceof Lifecycle)
-                ((Lifecycle) classLoader).start();
+            ((Lifecycle) classLoader).start();
 
             // Binding the Webapp class loader to the directory context
-            DirContextURLStreamHandler.bind
-                ((ClassLoader) classLoader, this.container.getResources());
+            DirContextURLStreamHandler.bind(classLoader,
+                    this.container.getResources());
 
             StandardContext ctx=(StandardContext)container;
-            Engine eng=(Engine)ctx.getParent().getParent();
             String path = ctx.getPath();
             if (path.equals("")) {
                 path = "/";
@@ -703,13 +699,11 @@ public class WebappLoader
         }
 
         // Throw away our current class loader
-        if (classLoader instanceof Lifecycle)
-            ((Lifecycle) classLoader).stop();
-        DirContextURLStreamHandler.unbind((ClassLoader) classLoader);
+        ((Lifecycle) classLoader).stop();
+        DirContextURLStreamHandler.unbind(classLoader);
 
         try {
             StandardContext ctx=(StandardContext)container;
-            Engine eng=(Engine)ctx.getParent().getParent();
             String path = ctx.getPath();
             if (path.equals("")) {
                 path = "/";
@@ -742,7 +736,6 @@ public class WebappLoader
         // Validate the source of this event
         if (!(event.getSource() instanceof Context))
             return;
-        Context context = (Context) event.getSource();
 
         // Process a relevant property change
         if (event.getPropertyName().equals("reloadable")) {
@@ -767,15 +760,15 @@ public class WebappLoader
     private WebappClassLoader createClassLoader()
         throws Exception {
 
-        Class clazz = Class.forName(loaderClass);
+        Class<?> clazz = Class.forName(loaderClass);
         WebappClassLoader classLoader = null;
 
         if (parentClassLoader == null) {
             parentClassLoader = container.getParentClassLoader();
         }
-        Class[] argTypes = { ClassLoader.class };
+        Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
-        Constructor constr = clazz.getConstructor(argTypes);
+        Constructor<?> constr = clazz.getConstructor(argTypes);
         classLoader = (WebappClassLoader) constr.newInstance(args);
 
         return classLoader;
@@ -887,7 +880,7 @@ public class WebappLoader
         if (servletContext == null)
             return;
 
-        loaderRepositories=new ArrayList();
+        loaderRepositories=new ArrayList<String>();
         // Loading the work directory
         File workDir =
             (File) servletContext.getAttribute(Globals.WORK_DIR_ATTR);
@@ -895,7 +888,7 @@ public class WebappLoader
             log.info("No work dir for " + servletContext);
         }
 
-        if( log.isDebugEnabled()) 
+        if( log.isDebugEnabled() && workDir != null) 
             log.debug(sm.getString("webappLoader.deploy", workDir.getAbsolutePath()));
 
         classLoader.setWorkDir(workDir);
@@ -981,10 +974,11 @@ public class WebappLoader
 
             // Looking up directory /WEB-INF/lib in the context
             try {
-                NamingEnumeration enumeration = resources.listBindings(libPath);
+                NamingEnumeration<Binding> enumeration =
+                    resources.listBindings(libPath);
                 while (enumeration.hasMoreElements()) {
 
-                    Binding binding = (Binding) enumeration.nextElement();
+                    Binding binding = enumeration.nextElement();
                     String filename = libPath + "/" + binding.getName();
                     if (!filename.endsWith(".jar"))
                         continue;
@@ -1139,10 +1133,9 @@ public class WebappLoader
 
         try {
 
-            NamingEnumeration enumeration = srcDir.list("");
+            NamingEnumeration<NameClassPair> enumeration = srcDir.list("");
             while (enumeration.hasMoreElements()) {
-                NameClassPair ncPair =
-                    (NameClassPair) enumeration.nextElement();
+                NameClassPair ncPair = enumeration.nextElement();
                 String name = ncPair.getName();
                 Object object = srcDir.lookup(name);
                 File currentFile = new File(destDir, name);
@@ -1201,16 +1194,11 @@ public class WebappLoader
         org.apache.juli.logging.LogFactory.getLog( WebappLoader.class );
 
     private ObjectName oname;
-    private MBeanServer mserver;
-    private String domain;
     private ObjectName controller;
 
     public ObjectName preRegister(MBeanServer server,
                                   ObjectName name) throws Exception {
         oname=name;
-        mserver=server;
-        domain=name.getDomain();
-
         return name;
     }
 
