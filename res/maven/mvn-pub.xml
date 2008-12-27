@@ -135,6 +135,7 @@
     <doMavenDeploy artifactId="servlet-api"/> <!--Deploy Servlet api-->
     <doMavenDeploy artifactId="el-api"/> <!--Deploy expression lanaguage api-->
     <doMavenDeploy artifactId="jsp-api"/> <!--Deploy JSP api-->
+    <doMavenDeploy artifactId="tomcat-api" /> <!--Deploy Tomcat api-->
     <doMavenDeploy artifactId="juli" jarFileName="tomcat-juli.jar"/> <!--Deploy JULI-->
     <doMavenDeploy artifactId="tribes" jarFileName="catalina-tribes.jar"/> <!--Deploy Tribes-->
     <doMavenDeploy artifactId="jasper-el"/> <!--Deploy Jasper EL-->

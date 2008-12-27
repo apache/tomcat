@@ -73,6 +73,7 @@
   <property name="catalina-ha.jar" value="${tomcat.build}/lib/catalina-ha.jar"/>
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+  <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
 
   <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
   <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
@@ -198,8 +199,11 @@
     <include name="org/apache/juli/**" />
   </patternset>
 
-  <patternset id="files.catalina">
+  <patternset id="files.tomcat-api">
     <include name="org/apache/*" />
+  </patternset>
+  	
+  <patternset id="files.catalina">
     <include name="org/apache/catalina/**" />
     <include name="org/apache/naming/**" />
     <!-- Modules -->
@@ -235,7 +239,6 @@
   </patternset>
 
   <patternset id="files.jasper">
-    <include name="org/apache/*" />
     <include name="org/apache/jasper/**" />
   </patternset>
   
@@ -335,11 +338,14 @@
     <!-- Catalina GroupCom/Tribes JAR File -->
     <jarIt jarfile="${catalina-tribes.jar}" filesId="files.catalina-tribes"/>
 
-  <!-- Catalina Cluster/HA JAR File -->
+    <!-- Catalina Cluster/HA JAR File -->
     <jarIt jarfile="${catalina-ha.jar}" filesId="files.catalina-ha"/>
 
     <!-- Catalina Ant Tasks JAR File -->
     <jarIt jarfile="${catalina-ant.jar}" filesId="files.catalina-ant"/>
+
+    <!-- Tomcat API JAR File -->
+    <jarIt jarfile="${tomcat-api.jar}" filesId="files.tomcat-api"/>
 
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote.jar}" filesId="files.tomcat-coyote"/>
