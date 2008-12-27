@@ -157,24 +157,115 @@
 
   <target name="build-only" depends="build-prepare,compile,package" />
 
+  <!-- Pattern sets for jar files -->
+  <patternset id="files.annotations-api">
+    <include name="javax/annotation/*" />
+    <include name="javax/annotation/security/*" />
+    <include name="javax/ejb/*" />
+    <include name="javax/persistence/*" />
+    <include name="javax/xml/ws/*" />
+  </patternset>
+
+  <patternset id="files.servlet-api">
+    <include name="javax/servlet/*" />
+    <include name="javax/servlet/http/*" />
+    <include name="javax/servlet/resources/*" />
+  </patternset>
+  
+  <patternset id="files.jsp-api">
+    <include name="javax/servlet/jsp/**" />
+  </patternset>
+
+  <patternset id="files.el-api">
+    <include name="javax/el/*" />
+  </patternset>
+
+  <patternset id="files.bootstrap">
+    <include name="org/apache/catalina/startup/Bootstrap.*" />
+    <include name="org/apache/catalina/startup/catalina.properties" />
+    <include name="org/apache/catalina/startup/CatalinaProperties.*" />
+    <include name="org/apache/catalina/startup/ClassLoaderFactory.*" />
+    <include name="org/apache/catalina/startup/Tool.*" />
+    <include name="org/apache/catalina/loader/StandardClassLoader*.*" />
+    <include name="org/apache/catalina/loader/Extension.*" />
+    <include name="org/apache/catalina/loader/Reloader.*" />
+    <include name="org/apache/catalina/security/SecurityClassLoad.*" />
+    <include name="org/apache/naming/JndiPermission.*" />
+    <include name="org/apache/tomcat/util/compat/*" />
+  </patternset>
+
+  <patternset id="files.tomcat-juli">
+    <include name="org/apache/juli/**" />
+  </patternset>
+
+  <patternset id="files.catalina">
+    <include name="org/apache/*" />
+    <include name="org/apache/catalina/**" />
+    <include name="org/apache/naming/**" />
+    <!-- Modules -->
+    <exclude name="org/apache/catalina/ant/**" />
+    <exclude name="org/apache/catalina/cluster/**" />
+    <exclude name="org/apache/catalina/ha/**" />
+    <exclude name="org/apache/catalina/mbeans/JmxRemote*" />
+    <exclude name="org/apache/catalina/tribes/**" />
+    <exclude name="org/apache/catalina/launcher/**" />
+    <exclude name="org/apache/catalina/storeconfig/**" />
+    <exclude name="org/apache/naming/factory/webservices/**" />
+  </patternset>
+
+  <patternset id="files.catalina-tribes">
+    <include name="org/apache/catalina/tribes/**" />
+  </patternset>
+
+  <patternset id="files.catalina-ha">
+    <include name="org/apache/catalina/ha/**" />
+  </patternset>
+
+  <patternset id="files.catalina-ant">
+    <include name="org/apache/catalina/ant/*" />
+    <include name="org/apache/catalina/ant/jmx/*" />
+    <include name="org/apache/catalina/util/Base64.*" />
+  </patternset>
+
+  <patternset id="files.tomcat-coyote">
+    <include name="org/apache/coyote/**" />
+    <include name="org/apache/tomcat/jni/**" />
+    <include name="org/apache/jk/**" />
+    <include name="org/apache/tomcat/util/**" />
+  </patternset>
+
+  <patternset id="files.jasper">
+    <include name="org/apache/*" />
+    <include name="org/apache/jasper/**" />
+  </patternset>
+  
+  <patternset id="files.jasper-el">
+    <include name="org/apache/el/**" />
+  </patternset>
+
+
+  <macrodef name="jarIt" description="utility macro for standard JAR packaging">
+    <attribute name="jarfile" description="the name of the JAR file to create"/>
+    <attribute name="filesId" description="the patternset id of the files to use"/>
+    <sequential>
+        <jar  jarfile="@{jarfile}">
+          <fileset dir="${tomcat.classes}">
+            <patternset refid="@{filesId}"/>
+            <!-- Javadoc and i18n exclusions -->
+            <exclude name="**/package.html" />
+            <exclude name="**/LocalStrings_*" />
+          </fileset>
+        </jar>
+    </sequential>
+  </macrodef>
+  
   <target name="package" >
     <!-- Common filtering tokens for JAR manifests-->
     <filter token="source.jdk" value="${compile.source}"/>
     <filter token="target.jdk" value="${compile.target}"/>
 
     <!-- Common Annotations 1.0 JAR File -->
-    <jar  jarfile="${annotations-api.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="javax/annotation/*" />
-        <include name="javax/annotation/security/*" />
-        <include name="javax/ejb/*" />
-        <include name="javax/persistence/*" />
-        <include name="javax/xml/ws/*" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${annotations-api.jar}" filesId="files.annotations-api"/>
 
     <!-- Servlet 2.5 Implementation JAR File -->
     <filter token="implementation.revision"
@@ -189,9 +280,7 @@
         <include name="META-INF/**" />
       </fileset>
       <fileset dir="${tomcat.classes}">
-        <include name="javax/servlet/*" />
-        <include name="javax/servlet/http/*" />
-        <include name="javax/servlet/resources/*" />
+        <patternset refid="files.servlet-api"/>
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -211,7 +300,7 @@
         <include name="META-INF/**" />
       </fileset>
       <fileset dir="${tomcat.classes}">
-        <include name="javax/servlet/jsp/**" />
+        <patternset refid="files.jsp-api"/>
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -219,14 +308,7 @@
     </jar>
 
     <!-- JSP 2.1 EL Implementation JAR File -->
-    <jar  jarfile="${el-api.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="javax/el/*" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${el-api.jar}" filesId="files.el-api"/>
 
     <!-- Bootstrap JAR File -->
     <copy tofile="res/manifest.tmp"
@@ -237,17 +319,7 @@
     <jar jarfile="${bootstrap.jar}"
         manifest="res/manifest.tmp">
       <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/startup/Bootstrap.class" />
-        <include name="org/apache/catalina/startup/catalina.properties" />
-        <include name="org/apache/catalina/startup/CatalinaProperties.class" />
-        <include name="org/apache/catalina/startup/ClassLoaderFactory.class" />
-        <include name="org/apache/catalina/startup/Tool.class" />
-        <include name="org/apache/catalina/loader/StandardClassLoader*.class" />
-        <include name="org/apache/catalina/loader/Extension.class" />
-        <include name="org/apache/catalina/loader/Reloader.class" />
-        <include name="org/apache/catalina/security/SecurityClassLoad.class" />
-        <include name="org/apache/naming/JndiPermission.class" />
-        <include name="org/apache/tomcat/util/compat/*" />
+        <patternset refid="files.bootstrap"/>
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -255,100 +327,28 @@
     </jar>
 
     <!-- Tomcat-juli JAR File -->
-    <jar jarfile="${tomcat-juli.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/juli/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${tomcat-juli.jar}" filesId="files.tomcat-juli"/>
 
     <!-- Catalina Main JAR File -->
-    <jar jarfile="${catalina.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/*" />
-        <include name="org/apache/catalina/**" />
-        <include name="org/apache/naming/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-        <!-- Modules -->
-        <exclude name="org/apache/catalina/ant/**" />
-        <exclude name="org/apache/catalina/cluster/**" />
-        <exclude name="org/apache/catalina/ha/**" />
-        <exclude name="org/apache/catalina/mbeans/JmxRemote*" />
-        <exclude name="org/apache/catalina/tribes/**" />
-        <exclude name="org/apache/catalina/launcher/**" />
-        <exclude name="org/apache/catalina/storeconfig/**" />
-        <exclude name="org/apache/naming/factory/webservices/**" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${catalina.jar}" filesId="files.catalina"/>
 
     <!-- Catalina GroupCom/Tribes JAR File -->
-    <jar jarfile="${catalina-tribes.jar}">
-      <fileset dir="${tomcat.classes}">
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-        <!-- Modules -->
-        <include name="org/apache/catalina/tribes/**" />
-      </fileset>
-    </jar>
-    <!-- Catalina Cluster/HA JAR File -->
-    <jar jarfile="${catalina-ha.jar}">
-      <fileset dir="${tomcat.classes}">
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-        <!-- Modules -->
-        <include name="org/apache/catalina/ha/**" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${catalina-tribes.jar}" filesId="files.catalina-tribes"/>
+
+  <!-- Catalina Cluster/HA JAR File -->
+    <jarIt jarfile="${catalina-ha.jar}" filesId="files.catalina-ha"/>
 
     <!-- Catalina Ant Tasks JAR File -->
-    <jar jarfile="${catalina-ant.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/catalina/ant/*" />
-        <include name="org/apache/catalina/ant/jmx/*" />
-        <include name="org/apache/catalina/util/Base64.class" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${catalina-ant.jar}" filesId="files.catalina-ant"/>
 
     <!-- Protocol handlers - Coyote -->
-    <jar jarfile="${tomcat-coyote.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/coyote/**" />
-        <include name="org/apache/tomcat/jni/**" />
-        <include name="org/apache/jk/**" />
-        <include name="org/apache/tomcat/util/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${tomcat-coyote.jar}" filesId="files.tomcat-coyote"/>
 
     <!-- Jasper Implementation JAR File -->
-    <jar  jarfile="${jasper.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/*" />
-        <include name="org/apache/jasper/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${jasper.jar}" filesId="files.jasper"/>
 
     <!-- Jasper EL Implementation JAR File -->
-    <jar  jarfile="${jasper-el.jar}">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/el/**" />
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${jasper-el.jar}" filesId="files.jasper-el"/>
 
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar">
