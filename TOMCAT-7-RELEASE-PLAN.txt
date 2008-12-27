@@ -1,0 +1,48 @@
+================================================================================
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+================================================================================
+
+$Id: $
+
+            =====================================================
+            An outline plan for the first stable Tomcat 7 release
+            =====================================================
+
+1. Update trunk with new API from Servlet Spec 3.0 PR
+
+2. Provide NOOP implementations with TODO SRV3 markers so it will build
+
+3. Implement all the new Servlet 3 features
+
+4. Do an alpha realease (from trunk)
+   - Create tc7.0.x\tags to hold release tags
+   - Create Bugzilla project
+   - Add to web site
+   - Update Wiki version status page
+
+5. Fix issues as they get reported
+
+6. Update for next public draft(s) of the spec if any.
+
+7. Aim for first stable TC7 release with final release of Servlet 3 spec
+   - Create tc7.0.x\trunk from trunk at first stable release
+
+8. Nice to haves in first Tomcat 7 stable release
+   - Remove old, unused code
+     - Clean up internal API (eg remove unused params from methods)
+     - Code needs to be ID'd and deprecated in 6.x first
+   - Support for standalone EL
+     - http://issues.apache.org/bugzilla/show_bug.cgi?id=43819
