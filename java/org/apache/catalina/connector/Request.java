@@ -169,26 +169,28 @@ public class Request
     /**
      * The attributes associated with this Request, keyed by attribute name.
      */
-    protected HashMap attributes = new HashMap();
+    protected HashMap<String, Object> attributes =
+        new HashMap<String, Object>();
 
 
     /**
      * List of read only attributes for this Request.
      */
-    private HashMap readOnlyAttributes = new HashMap();
+    private HashMap<String,Object> readOnlyAttributes =
+        new HashMap<String,Object>();
 
 
     /**
      * The preferred Locales assocaited with this Request.
      */
-    protected ArrayList locales = new ArrayList();
+    protected ArrayList<Locale> locales = new ArrayList<Locale>();
 
 
     /**
      * Internal notes associated with this request by Catalina components
      * and event listeners.
      */
-    private transient HashMap notes = new HashMap();
+    private transient HashMap<String, Object> notes = new HashMap<String, Object>();
 
 
     /**
@@ -292,7 +294,7 @@ public class Request
     /**
      * Hash map used in the getParametersMap method.
      */
-    protected ParameterMap parameterMap = new ParameterMap();
+    protected ParameterMap<String, String[]> parameterMap = new ParameterMap<String, String[]>();
 
 
     /**
@@ -424,7 +426,7 @@ public class Request
         requestedSessionURL = false;
 
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
-            parameterMap = new ParameterMap();
+            parameterMap = new ParameterMap<String, String[]>();
         } else {
             parameterMap.setLocked(false);
             parameterMap.clear();
@@ -740,7 +742,7 @@ public class Request
      * Return an Iterator containing the String names of all notes bindings
      * that exist for this request.
      */
-    public Iterator getNoteNames() {
+    public Iterator<String> getNoteNames() {
         return (notes.keySet().iterator());
     }
 
@@ -931,11 +933,11 @@ public class Request
      * Return the names of all request attributes for this Request, or an
      * empty <code>Enumeration</code> if there are none.
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         if (isSecure()) {
             getAttribute(Globals.CERTIFICATES_ATTR);
         }
-        return new Enumerator(attributes.keySet(), true);
+        return new Enumerator<String>(attributes.keySet(), true);
     }
 
 
@@ -999,7 +1001,7 @@ public class Request
             parseLocales();
 
         if (locales.size() > 0) {
-            return ((Locale) locales.get(0));
+            return locales.get(0);
         } else {
             return (defaultLocale);
         }
@@ -1013,16 +1015,16 @@ public class Request
      * headers that were encountered.  If the request did not specify a
      * preferred language, the server's default Locale is returned.
      */
-    public Enumeration getLocales() {
+    public Enumeration<Locale> getLocales() {
 
         if (!localesParsed)
             parseLocales();
 
         if (locales.size() > 0)
-            return (new Enumerator(locales));
-        ArrayList results = new ArrayList();
+            return (new Enumerator<Locale>(locales));
+        ArrayList<Locale> results = new ArrayList<Locale>();
         results.add(defaultLocale);
-        return (new Enumerator(results));
+        return (new Enumerator<Locale>(results));
 
     }
 
@@ -1054,14 +1056,14 @@ public class Request
      * @return A <code>Map</code> containing parameter names as keys
      *  and parameter values as map values.
      */
-    public Map getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
 
         if (parameterMap.isLocked())
             return parameterMap;
 
-        Enumeration enumeration = getParameterNames();
+        Enumeration<String> enumeration = getParameterNames();
         while (enumeration.hasMoreElements()) {
-            String name = enumeration.nextElement().toString();
+            String name = enumeration.nextElement();
             String[] values = getParameterValues(name);
             parameterMap.put(name, values);
         }
@@ -2533,10 +2535,10 @@ public class Request
 
         localesParsed = true;
 
-        Enumeration values = getHeaders("accept-language");
+        Enumeration<String> values = getHeaders("accept-language");
 
         while (values.hasMoreElements()) {
-            String value = values.nextElement().toString();
+            String value = values.nextElement();
             parseLocalesHeader(value);
         }
 
@@ -2552,7 +2554,7 @@ public class Request
         // a local collection, sorted by the quality value (so we can
         // add Locales in descending order).  The values will be ArrayLists
         // containing the corresponding Locales to be added
-        TreeMap locales = new TreeMap();
+        TreeMap<Double, ArrayList<Locale>> locales = new TreeMap<Double, ArrayList<Locale>>();
 
         // Preprocess the value to remove all whitespace
         int white = value.indexOf(' ');
@@ -2628,9 +2630,9 @@ public class Request
             // Add a new Locale to the list of Locales for this quality level
             Locale locale = new Locale(language, country, variant);
             Double key = new Double(-quality);  // Reverse the order
-            ArrayList values = (ArrayList) locales.get(key);
+            ArrayList<Locale> values = locales.get(key);
             if (values == null) {
-                values = new ArrayList();
+                values = new ArrayList<Locale>();
                 locales.put(key, values);
             }
             values.add(locale);
@@ -2639,13 +2641,13 @@ public class Request
 
         // Process the quality values in highest->lowest order (due to
         // negating the Double value when creating the key)
-        Iterator keys = locales.keySet().iterator();
+        Iterator<Double> keys = locales.keySet().iterator();
         while (keys.hasNext()) {
-            Double key = (Double) keys.next();
-            ArrayList list = (ArrayList) locales.get(key);
-            Iterator values = list.iterator();
+            Double key = keys.next();
+            ArrayList<Locale> list = locales.get(key);
+            Iterator<Locale> values = list.iterator();
             while (values.hasNext()) {
-                Locale locale = (Locale) values.next();
+                Locale locale = values.next();
                 addLocale(locale);
             }
         }
