@@ -136,7 +136,7 @@ public class JMXProxyServlet extends HttpServlet  {
     public void listBeans( PrintWriter writer, String qry )
     {
 
-        Set names = null;
+        Set<ObjectName> names = null;
         try {
             names=mBeanServer.queryNames(new ObjectName(qry), null);
             writer.println("OK - Number of results: " + names.size());
@@ -146,9 +146,9 @@ public class JMXProxyServlet extends HttpServlet  {
             return;
         }
 
-        Iterator it=names.iterator();
+        Iterator<ObjectName> it=names.iterator();
         while( it.hasNext()) {
-            ObjectName oname=(ObjectName)it.next();
+            ObjectName oname=it.next();
             writer.println( "Name: " + oname.toString());
 
             try {
