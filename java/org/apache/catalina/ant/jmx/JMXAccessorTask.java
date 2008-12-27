@@ -374,12 +374,12 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         else
             urlForJMX = JMX_SERVICE_PREFIX + host + ":" + port
                     + JMX_SERVICE_SUFFIX;
-        Map environment = null;
+        Map<String, String[]> environment = null;
         if (username != null && password != null) {
             String[] credentials = new String[2];
             credentials[0] = username;
             credentials[1] = password;
-            environment = new HashMap();
+            environment = new HashMap<String, String[]>();
             environment.put(JMXConnector.CREDENTIALS, credentials);
         }
         return JMXConnectorFactory.connect(new JMXServiceURL(urlForJMX),
@@ -617,9 +617,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         if (result instanceof CompositeDataSupport) {
             CompositeDataSupport data = (CompositeDataSupport) result;
             CompositeType compositeType = data.getCompositeType();
-            Set keys = compositeType.keySet();
-            for (Iterator iter = keys.iterator(); iter.hasNext();) {
-                String key = (String) iter.next();
+            Set<String> keys = compositeType.keySet();
+            for (Iterator<String> iter = keys.iterator(); iter.hasNext();) {
+                String key = iter.next();
                 Object value = data.get(key);
                 OpenType type = compositeType.getType(key);
                 if (type instanceof SimpleType) {
@@ -630,9 +630,9 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             }
         } else if (result instanceof TabularDataSupport) {
             TabularDataSupport data = (TabularDataSupport) result;
-            for (Iterator iter = data.keySet().iterator(); iter.hasNext();) {
+            for (Iterator<Object> iter = data.keySet().iterator(); iter.hasNext();) {
                 Object key = iter.next();
-                for (Iterator iter1 = ((List) key).iterator(); iter1.hasNext();) {
+                for (Iterator<Object> iter1 = ((List<Object>) key).iterator(); iter1.hasNext();) {
                     Object key1 = iter1.next();
                     CompositeData valuedata = data.get(new Object[] { key1 });
                     Object value = valuedata.get("value");
