@@ -630,7 +630,7 @@ public abstract class AuthenticatorBase
 
         if (this.random == null) {
             try {
-                Class clazz = Class.forName(randomClass);
+                Class<?> clazz = Class.forName(randomClass);
                 this.random = (Random) clazz.newInstance();
                 long seed = System.currentTimeMillis();
                 char entropy[] = getEntropy().toCharArray();

@@ -54,7 +54,7 @@ public final class SavedRequest {
         cookies.add(cookie);
     }
 
-    public Iterator getCookies() {
+    public Iterator<Cookie> getCookies() {
         return (cookies.iterator());
     }
 
@@ -69,7 +69,7 @@ public final class SavedRequest {
         new HashMap<String,ArrayList<String>>();
 
     public void addHeader(String name, String value) {
-        ArrayList<String> values = (ArrayList<String>) headers.get(name);
+        ArrayList<String> values = headers.get(name);
         if (values == null) {
             values = new ArrayList<String>();
             headers.put(name, values);
@@ -77,14 +77,14 @@ public final class SavedRequest {
         values.add(value);
     }
 
-    public Iterator getHeaderNames() {
+    public Iterator<String> getHeaderNames() {
         return (headers.keySet().iterator());
     }
 
-    public Iterator getHeaderValues(String name) {
-        ArrayList values = (ArrayList) headers.get(name);
+    public Iterator<String> getHeaderValues(String name) {
+        ArrayList<String> values = headers.get(name);
         if (values == null)
-            return ((new ArrayList()).iterator());
+            return ((new ArrayList<String>()).iterator());
         else
             return (values.iterator());
     }
@@ -99,7 +99,7 @@ public final class SavedRequest {
         locales.add(locale);
     }
 
-    public Iterator getLocales() {
+    public Iterator<Locale> getLocales() {
         return (locales.iterator());
     }
 
@@ -131,12 +131,12 @@ public final class SavedRequest {
         parameters.put(name, values);
     }
 
-    public Iterator getParameterNames() {
+    public Iterator<String> getParameterNames() {
         return (parameters.keySet().iterator());
     }
 
     public String[] getParameterValues(String name) {
-        return ((String[]) parameters.get(name));
+        return parameters.get(name);
     }
 
 
