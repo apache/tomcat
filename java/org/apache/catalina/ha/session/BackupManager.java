@@ -30,7 +30,6 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.LazyReplicatedMap;
 import org.apache.catalina.tribes.tipis.AbstractReplicatedMap.MapOwner;
-import org.apache.catalina.tribes.tipis.AbstractReplicatedMap;
 
 /**
  *@author Filip Hanik
@@ -193,7 +192,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
         
         try {
             cluster.registerManager(this);
-            CatalinaCluster catclust = (CatalinaCluster)cluster;
+            CatalinaCluster catclust = cluster;
             LazyReplicatedMap map = new LazyReplicatedMap(this,
                                                           catclust.getChannel(),
                                                           DEFAULT_REPL_TIMEOUT,
@@ -210,7 +209,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     }
     
     public String getMapName() {
-        CatalinaCluster catclust = (CatalinaCluster)cluster;
+        CatalinaCluster catclust = cluster;
         String name = catclust.getManagerName(getName(),this)+"-"+"map";
         if ( log.isDebugEnabled() ) log.debug("Backup manager, Setting map name to:"+name);
         return name;
@@ -299,7 +298,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     public String listSessionIdsFull() {
         StringBuffer sb=new StringBuffer();
         LazyReplicatedMap map = (LazyReplicatedMap)sessions;
-        Iterator keys = map.keySetFull().iterator();
+        Iterator<String> keys = map.keySetFull().iterator();
         while (keys.hasNext()) {
             sb.append(keys.next()).append(" ");
         }
