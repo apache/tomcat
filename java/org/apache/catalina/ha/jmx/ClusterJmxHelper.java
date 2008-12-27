@@ -60,7 +60,7 @@ public class ClusterJmxHelper {
         return mbeanServer;
     }
     
-    protected static boolean initMetaData(Class clazz) {
+    protected static boolean initMetaData(Class<?> clazz) {
         try {
             if (clazz==null) return false;
             getRegistry().loadMetadata(clazz.getResourceAsStream("mbeans-descriptors.xml"));

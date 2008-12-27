@@ -117,7 +117,7 @@ public interface CatalinaCluster extends Cluster {
     /**
      * @return The map of managers
      */
-    public Map getManagers();
+    public Map<String,ClusterManager> getManagers();
 
     public Manager getManager(String name);
     public String getManagerName(String name, Manager manager);
