@@ -700,6 +700,10 @@ public class JDBCRealm
         if (connectionPassword != null)
             props.put("password", connectionPassword);
         dbConnection = driver.connect(connectionURL, props);
+        if (dbConnection == null) {
+            throw new SQLException(sm.getString(
+                    "jdbcRealm.open.invalidurl",driverName, connectionURL));
+        }
         dbConnection.setAutoCommit(false);
         return (dbConnection);
 
