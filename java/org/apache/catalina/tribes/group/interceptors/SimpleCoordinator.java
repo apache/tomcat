@@ -86,7 +86,8 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
         }
 
         final Member[] members = getMembers();
-        final Member[] view = Arrays.copyOf(members, members.length + 1);
+        final Member[] view = new Member[members.length+1];
+        System.arraycopy(members, 0, view, 0, members.length);
         view[members.length] = getLocalMember(false);
         Arrays.sort(view, AbsoluteOrder.comp);
         if (Arrays.equals(view, this.view)) {
