@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -428,6 +429,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
 
         public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             element = elements[index++];
             return element;
         }
