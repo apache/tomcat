@@ -46,6 +46,7 @@
     <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.OrderInterceptor</code></li>
+    <li><code>org.apache.catalina.tribes.group.interceptors.SimpleCoordinator</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.TwoPhaseCommitInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.DomainFilterInterceptor</code></li>
