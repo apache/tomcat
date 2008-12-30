@@ -219,7 +219,7 @@ public class SlowQueryReportJmx extends SlowQueryReport {
     protected void registerJmx() {
         try {
             if (getCompositeType()!=null) {
-                ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+getClass().getName()+",name=" + poolName);
+                ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+"SlowQueryReport"+",name=" + poolName);
                 Registry registry = Registry.getRegistry(null, null);
                 registry.loadDescriptors(getClass().getPackage().getName(),getClass().getClassLoader());
                 ManagedBean managed = registry.findManagedBean(this.getClass().getName());
