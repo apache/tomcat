@@ -417,14 +417,19 @@ public class Catalina extends Embedded {
 
         // Stop the existing server
         try {
-            Socket socket = new Socket(server.getAddress(), server.getPort());
-            OutputStream stream = socket.getOutputStream();
-            String shutdown = server.getShutdown();
-            for (int i = 0; i < shutdown.length(); i++)
-                stream.write(shutdown.charAt(i));
-            stream.flush();
-            stream.close();
-            socket.close();
+            if (server.getPort()>0) { 
+                Socket socket = new Socket(server.getAddress(), server.getPort());
+                OutputStream stream = socket.getOutputStream();
+                String shutdown = server.getShutdown();
+                for (int i = 0; i < shutdown.length(); i++)
+                    stream.write(shutdown.charAt(i));
+                stream.flush();
+                stream.close();
+                socket.close();
+            } else {
+                log.error(sm.getString("catalina.stopServer"));
+                System.exit(1);
+            }
         } catch (IOException e) {
             log.error("Catalina.stop: ", e);
             System.exit(1);
