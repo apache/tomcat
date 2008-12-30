@@ -23,7 +23,7 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="12" />
+  <property name="version.build"         value="13" />
   <property name="version.patch"         value="-beta" />
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
@@ -194,6 +194,11 @@
           destfile="${destdir}/apache-tomcat-jdbc-${version}.tar.gz"/>
     <delete file="${destdir}/apache-tomcat-jdbc-${version}.tar"/>
     <echo message="Options +Indexes" file="${destdir}/.htaccess"/>
+    
+    <checksum file="${destdir}/apache-tomcat-jdbc-${version}.tar.gz" forceOverwrite="yes" fileext=".md5" />
+    <checksum file="${destdir}/apache-tomcat-jdbc-${version}.zip" forceOverwrite="yes" fileext=".md5" />
+    
+    
   </target>
     
   <!-- Download and dependency building -->
