@@ -62,7 +62,7 @@ goto exit
 :okBasedir
 
 rem Don't override the endorsed dir if the user has set it previously
-if not "%JAVA_ENDORSED_DIRS" == "" goto gotEndorseddir
+if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
 rem Set the default -Djava.endorsed.dirs argument
 set JAVA_ENDORSED_DIRS=%BASEDIR%\endorsed
 :gotEndorseddir
