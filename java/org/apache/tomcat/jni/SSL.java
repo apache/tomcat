@@ -227,12 +227,6 @@ public final class SSL {
     public static native int initialize(String engine);
 
     /**
-      * Set source of entropy to use in SSL
-      *  @param filename Filename containing random data
-      */
-    public static native boolean randSet(String filename);
-
-    /**
      * Add content of the file to the PRNG
      * @param filename Filename containing random data.
      *        If null the default file will be tested.
@@ -259,6 +253,14 @@ public final class SSL {
      */
     public static native boolean randMake(String filename, int len,
                                           boolean base64);
+
+    /**
+     * Sets global random filename.
+     * @param filename Filename to use.
+     *        If set it will be used for SSL initialization
+     *        and all contexts where explicitly not set.
+     */
+    public static native void randSet(String filename);
 
     /**
      * Initialize new BIO
