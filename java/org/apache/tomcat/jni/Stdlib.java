@@ -67,7 +67,7 @@ public class Stdlib {
      * @param num Number of elements.
      * @param sz Length in bytes of each element.
      */
-    public static native long calloc(long num, int sz);
+    public static native long calloc(int num, int sz);
 
     /**
      * Deallocates or frees a memory block.
