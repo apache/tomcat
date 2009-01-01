@@ -156,7 +156,7 @@ public class Registry {
      * @param val The the value to set
      * @return If the function succeeds, the return value is 0
      */
-    public static native int setValueJ(long key, String name, int val);
+    public static native int setValueJ(long key, String name, long val);
 
     /**
      * Set the Registry value for REG_SZ

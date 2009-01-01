@@ -226,6 +226,13 @@ public final class SSLContext {
         throws Exception;
 
     /**
+     * Set file for randomness
+     * @param ctx Server or Client context to use.
+     * @param file random file.
+     */
+    public static native void setRandom(long ctx, String file)
+
+    /**
      * Set SSL connection shutdown type
      * <br />
      * The following levels are available for level:
@@ -237,7 +244,7 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param type Shutdown type to use.
      */
-    public static native void setShutdowType(long ctx, int type);
+    public static native void setShutdownType(long ctx, int type);
 
     /**
      * Set Type of Client Certificate verification and Maximum depth of CA Certificates
