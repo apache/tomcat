@@ -230,7 +230,7 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param file random file.
      */
-    public static native void setRandom(long ctx, String file)
+    public static native void setRandom(long ctx, String file);
 
     /**
      * Set SSL connection shutdown type
