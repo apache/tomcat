@@ -122,7 +122,7 @@ public class JasperLoader extends URLClassLoader {
             }                              
         }
 
-        if( !name.startsWith(Constants.JSP_PACKAGE_NAME) ) {
+        if( !name.startsWith(Constants.JSP_PACKAGE_NAME + '.') ) {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = parent.loadClass(name);            
