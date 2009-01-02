@@ -35,6 +35,6 @@ PATCHES PROPOSED TO BACKPORT:
   http://people.apache.org/~rjung/patches/tcnative-sync.patch
   Partial backport of
   http://svn.apache.org/viewvc?view=rev&revision=730523
-  +1: rjung
+  +1: rjung, mturk
    0: 
   -1: 
