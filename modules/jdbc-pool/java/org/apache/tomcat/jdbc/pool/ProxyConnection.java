@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -84,7 +85,16 @@ public class ProxyConnection extends JdbcInterceptor {
             return connection.getConnection();
         }
         if (isClosed()) throw new SQLException("Connection has already been closed.");
-        return method.invoke(connection.getConnection(),args);
+        try {
+            return method.invoke(connection.getConnection(),args);
+        }catch (Throwable t) {
+            if (t instanceof InvocationTargetException) {
+                InvocationTargetException it = (InvocationTargetException)t;
+                throw it.getCause()!=null?it.getCause():it;
+            } else {
+                throw t;
+            }
+        }
     }
     
     public boolean isClosed() {
