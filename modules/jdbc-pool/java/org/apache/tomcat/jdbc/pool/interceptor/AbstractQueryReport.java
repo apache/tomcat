@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
@@ -231,7 +232,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
                 result =  method.invoke(delegate,args);
             }catch (Throwable t) {
                 reportFailedQuery(query,args,name,start,t);
-                throw t;
+                if (t instanceof InvocationTargetException) {
+                    InvocationTargetException it = (InvocationTargetException)t;
+                    throw it.getCause()!=null?it.getCause():it;
+                } else {
+                    throw t;
+                }
             }
             //measure the time
             long delta = (process)?(System.currentTimeMillis()-start):Long.MIN_VALUE;
