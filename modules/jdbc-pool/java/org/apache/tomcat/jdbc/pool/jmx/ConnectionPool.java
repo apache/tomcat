@@ -42,7 +42,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool, boolean for16) {
-        super(getDefaultNotificationInfo());
+        super();
         this.pool = pool;
     }
 
@@ -61,8 +61,16 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     
     @Override 
     public MBeanNotificationInfo[] getNotificationInfo() { 
-        return getDefaultNotificationInfo(); 
-    }
+	MBeanNotificationInfo[] pres = super.getNotificationInfo();
+	MBeanNotificationInfo[] loc = getDefaultNotificationInfo();
+	MBeanNotificationInfo[] aug = new MBeanNotificationInfo[
+						pres.length + loc.length
+							];
+ 	System.arraycopy(pres, 0, aug, 0, pres.length);
+	System.arraycopy(loc, 0, aug, pres.length+1, loc.length);	
+	
+        return aug; 
+    } 
     
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
         String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON}; 
