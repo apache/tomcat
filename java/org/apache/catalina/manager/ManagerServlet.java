@@ -801,8 +801,10 @@ public class ManagerServlet
                 }
             }
             context = (Context) host.findChild(path);
-            if (context != null && context.getConfigured()) {
+            if (context != null && context.getConfigured() && context.getAvailable()) {
                 writer.println(sm.getString("managerServlet.deployed", displayPath));
+            } else if (context!=null && !context.getAvailable()) {
+                writer.println(sm.getString("managerServlet.deployedButNotStarted", displayPath));
             } else {
                 // Something failed
                 writer.println(sm.getString("managerServlet.deployFailed", displayPath));
