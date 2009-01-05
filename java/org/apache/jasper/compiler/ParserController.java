@@ -144,15 +144,31 @@ class ParserController implements TagConstants {
      * This is invoked by the compiler 
      *
      * @param inFileName The name of the tag file to be parsed.
+     * @deprecated Use {@link #parseTagFileDirectives(String, URL)}
+     *             See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
      */
     public Node.Nodes parseTagFileDirectives(String inFileName)
     throws FileNotFoundException, JasperException, IOException {
+        return parseTagFileDirectives(
+                inFileName, ctxt.getTagFileJarUrl(inFileName));
+    }
+
+    /**
+     * Extracts tag file directive information from the given tag file.
+     *
+     * This is invoked by the compiler 
+     *
+     * @param inFileName    The name of the tag file to be parsed.
+     * @param tagFileJarUrl The location of the tag file.
+     */
+    public Node.Nodes parseTagFileDirectives(String inFileName,
+            URL tagFileJarUrl)
+            throws FileNotFoundException, JasperException, IOException {
         boolean isTagFileSave = isTagFile;
         boolean directiveOnlySave = directiveOnly;
         isTagFile = true;
         directiveOnly = true;
-        Node.Nodes page = doParse(inFileName, null,
-                ctxt.getTagFileJarUrl(inFileName));
+        Node.Nodes page = doParse(inFileName, null, tagFileJarUrl);
         directiveOnly = directiveOnlySave;
         isTagFile = isTagFileSave;
         return page;
