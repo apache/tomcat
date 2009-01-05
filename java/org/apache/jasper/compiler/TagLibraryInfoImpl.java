@@ -478,13 +478,16 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         if (path.startsWith("/META-INF/tags")) {
             // Tag file packaged in JAR
+            // See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
+            // This needs to be removed once all the broken code that depends on
+            // it has been removed
             ctxt.setTagFileJarUrl(path, jarFileUrl);
         } else if (!path.startsWith("/WEB-INF/tags")) {
             err.jspError("jsp.error.tagfile.illegalPath", path);
         }
 
         TagInfo tagInfo = TagFileProcessor.parseTagFileDirectives(
-                parserController, name, path, this);
+                parserController, name, path, jarFileUrl, this);
         return new TagFileInfo(name, path, tagInfo);
     }
 
@@ -686,7 +689,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             } else if ("param-value".equals(tname)) {
                 initParam[1] = element.getBody();
             } else if ("description".equals(tname)) {
-                ; // Do nothing
+                 // Do nothing
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage(
