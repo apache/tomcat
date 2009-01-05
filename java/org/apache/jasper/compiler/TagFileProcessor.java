@@ -19,6 +19,8 @@ package org.apache.jasper.compiler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.Vector;
@@ -380,7 +382,8 @@ class TagFileProcessor {
                 bodycontent = TagInfo.BODY_CONTENT_SCRIPTLESS;
             }
 
-            String tagClassName = JspUtil.getTagHandlerClassName(path, err);
+            String tagClassName = JspUtil.getTagHandlerClassName(
+                    path, tagLibInfo.getReliableURN(), err);
 
             TagVariableInfo[] tagVariableInfos = new TagVariableInfo[variableVector
                     .size()];
@@ -502,16 +505,46 @@ class TagFileProcessor {
      * @param tagLibInfo
      *            the TagLibraryInfo object associated with this TagInfo
      * @return a TagInfo object assembled from the directives in the tag file.
+     * @deprecated Use {@link TagFileProcessor#parseTagFileDirectives(
+     *                  ParserController, String, String, URL, TagLibraryInfo)}
+     *             See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
      */
     public static TagInfo parseTagFileDirectives(ParserController pc,
             String name, String path, TagLibraryInfo tagLibInfo)
             throws JasperException {
+        return parseTagFileDirectives(pc, name, path,
+                pc.getJspCompilationContext().getTagFileJarUrl(path),
+                tagLibInfo);
+    }
+    
+    /**
+     * Parses the tag file, and collects information on the directives included
+     * in it. The method is used to obtain the info on the tag file, when the
+     * handler that it represents is referenced. The tag file is not compiled
+     * here.
+     * 
+     * @param pc
+     *            the current ParserController used in this compilation
+     * @param name
+     *            the tag name as specified in the TLD
+     * @param tagfile
+     *            the path for the tagfile
+     * @param tagFileJarUrl
+     *            the url for the Jar containign the tag file 
+     * @param tagLibInfo
+     *            the TagLibraryInfo object associated with this TagInfo
+     * @return a TagInfo object assembled from the directives in the tag file.
+     */
+    public static TagInfo parseTagFileDirectives(ParserController pc,
+            String name, String path, URL tagFileJarUrl, TagLibraryInfo tagLibInfo)
+            throws JasperException {
+
 
         ErrorDispatcher err = pc.getCompiler().getErrorDispatcher();
 
         Node.Nodes page = null;
         try {
-            page = pc.parseTagFileDirectives(path);
+            page = pc.parseTagFileDirectives(path, tagFileJarUrl);
         } catch (FileNotFoundException e) {
             err.jspError("jsp.error.file.not.found", path);
         } catch (IOException e) {
@@ -532,16 +565,33 @@ class TagFileProcessor {
     private Class<?> loadTagFile(Compiler compiler, String tagFilePath,
             TagInfo tagInfo, PageInfo parentPageInfo) throws JasperException {
 
+        URL tagFileJarUrl = null;
+        if (tagFilePath.startsWith("/META-INF/")) {
+            try { 
+                tagFileJarUrl = new URL("jar:" +
+                        compiler.getCompilationContext().getTldLocation(
+                        tagInfo.getTagLibrary().getURI())[0] + "!/");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+        String tagFileJarPath;
+        if (tagFileJarUrl == null) {
+            tagFileJarPath = "";
+        } else {
+            tagFileJarPath = tagFileJarUrl.toString();
+        }
+
         JspCompilationContext ctxt = compiler.getCompilationContext();
         JspRuntimeContext rctxt = ctxt.getRuntimeContext();
-        JspServletWrapper wrapper = rctxt.getWrapper(tagFilePath);
+        JspServletWrapper wrapper = rctxt.getWrapper(tagFileJarPath + tagFilePath);
 
         synchronized (rctxt) {
             if (wrapper == null) {
                 wrapper = new JspServletWrapper(ctxt.getServletContext(), ctxt
                         .getOptions(), tagFilePath, tagInfo, ctxt
-                        .getRuntimeContext(), ctxt.getTagFileJarUrl(tagFilePath));
-                rctxt.addWrapper(tagFilePath, wrapper);
+                        .getRuntimeContext(), tagFileJarUrl);
+                rctxt.addWrapper(tagFileJarPath + tagFilePath, wrapper);
 
                 // Use same classloader and classpath for compiling tag files
                 wrapper.getJspEngineContext().setClassLoader(
