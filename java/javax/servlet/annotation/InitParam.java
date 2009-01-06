@@ -14,19 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package javax.servlet.annotation;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.annotation.Documented;
 
-package org.apache.catalina.core;
-
-
-public class Constants {
-
-    public static final String Package = "org.apache.catalina.core";
-    public static final int MAJOR_VERSION = 3;
-    public static final int MINOR_VERSION = 0;
-
-    public static final String JSP_SERVLET_CLASS =
-        "org.apache.jasper.servlet.JspServlet";
-    public static final String JSP_SERVLET_NAME = "jsp";
-
+/**
+ * @since 3.0
+ * $Id$
+ * TODO SERVLET3
+ */
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface InitParam {
+    String name();
+    String value();
+    String description() default "";
 }
