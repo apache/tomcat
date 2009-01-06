@@ -19,6 +19,8 @@ package javax.servlet.http;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import javax.servlet.DispatcherType;
+
 /**
  *
  * Creates a cookie, a small amount of information sent by a servlet to 
@@ -81,14 +83,15 @@ public class Cookie implements Cloneable {
     // Attributes encoded in the header's cookie fields.
     //
     
-    private String comment;	// ;Comment=VALUE ... describes cookie's use
-				// ;Discard ... implied by maxAge < 0
-    private String domain;	// ;Domain=VALUE ... domain that sees cookie
-    private int maxAge = -1;	// ;Max-Age=VALUE ... cookies auto-expire
-    private String path;	// ;Path=VALUE ... URLs that see the cookie
-    private boolean secure;	// ;Secure ... e.g. use SSL
-    private int version = 0;	// ;Version=1 ... means RFC 2109++ style
-    
+    private String comment;    // ;Comment=VALUE ... describes cookie's use
+                               // ;Discard ... implied by maxAge < 0
+    private String domain;     // ;Domain=VALUE ... domain that sees cookie
+    private int maxAge = -1;   // ;Max-Age=VALUE ... cookies auto-expire
+    private String path;       // ;Path=VALUE ... URLs that see the cookie
+    private boolean secure;    // ;Secure ... e.g. use SSL
+    private int version = 0;   // ;Version=1 ... means RFC 2109++ style
+    // TODO SERVLET3
+    private boolean httpOnly;  // Not in the spec but supported by most browsers
     
 
     /**
@@ -532,6 +535,24 @@ public class Cookie implements Cloneable {
 	} catch (CloneNotSupportedException e) {
 	    throw new RuntimeException(e.getMessage());
 	}
+    }
+
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public boolean isHttpOnly() {
+        return httpOnly;
+    }
+
+    /**
+     * 
+     * @param httpOnly
+     * since 3.0
+     */
+    public void setHttpOnly(boolean httpOnly) {
+        this.httpOnly = httpOnly;
     }
 }
 

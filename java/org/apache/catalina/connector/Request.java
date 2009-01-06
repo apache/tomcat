@@ -35,12 +35,16 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.security.auth.Subject;
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncListener;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -1484,6 +1488,50 @@ public class Request
 
     }
 
+
+    public void addAsyncListener(AsyncListener listener,
+            ServletRequest servletRequest, ServletResponse servletResponse) {
+        // TODO SERVLET3
+    }
+
+    public void addAsyncListener(AsyncListener listener) {
+        // TODO SERVLET3
+    }
+
+    public AsyncContext getAsyncContext() {
+        // TODO SERVLET3
+        return null;
+    }
+
+    public ServletContext getServletContext() {
+        // TODO SERVLET3
+        return null;
+    }
+
+    public boolean isAsyncStarted() {
+        // TODO SERVLET3
+        return false;
+    }
+
+    public boolean isAsyncSupported() {
+        // TODO SERVLET3
+        return false;
+    }
+
+    public void setAsyncTimeout(long timeout) {
+        // TODO SERVLET3
+    }
+
+    public AsyncContext startAsync() throws IllegalStateException {
+        // TODO SERVLET3
+        return null;
+    }
+
+    public AsyncContext startAsync(ServletRequest servletRequest,
+            ServletResponse servletResponse) throws IllegalStateException {
+        // TODO SERVLET3
+        return null;
+    }
 
     // ---------------------------------------------------- HttpRequest Methods
 

@@ -396,6 +396,116 @@ public class ServletRequestWrapper implements ServletRequest {
     public int getLocalPort(){
         return this.request.getLocalPort();
     }
+
+    /**
+     * The default behavior of this method is to return
+     * getServletContext() on the wrapped request object.
+     * 
+     * @return
+     * @since 3.0
+     */
+    public ServletContext getServletContext() {
+        return request.getServletContext();
+    }
     
+    /**
+     * The default behavior of this method is to return
+     * startAsync() on the wrapped request object.
+     * 
+     * @return
+     * @throws java.lang.IllegalStateException
+     * @since 3.0
+     */
+    public AsyncContext startAsync() throws java.lang.IllegalStateException {
+        return request.startAsync();
+    }
+    
+    /**
+     * The default behavior of this method is to return
+     * startAsync(ServletRequest, ServletResponse) on the wrapped request
+     * object.
+     * 
+     * @param servletRequest
+     * @param servletResponse
+     * @return
+     * @throws java.lang.IllegalStateException
+     * @since 3.0
+     */
+    public AsyncContext startAsync(ServletRequest servletRequest,
+            ServletResponse servletResponse)
+            throws java.lang.IllegalStateException {
+        return request.startAsync(servletRequest, servletResponse);
+    }
+    
+    /**
+     * The default behavior of this method is to return
+     * isAsyncStarted() on the wrapped request object.
+     * 
+     * @return
+     * @since 3.0
+     */
+    public boolean isAsyncStarted() {
+        return request.isAsyncStarted();
+    }
+    
+    /**
+     * The default behavior of this method is to return
+     * isAsyncSupported() on the wrapped request object.
+     * 
+     * @return
+     * @since 3.0
+     */
+    public boolean isAsyncSupported() {
+        return request.isAsyncSupported();
+    }
+    
+    /**
+     * The default behavior of this method is to return
+     * getAsyncContext() on the wrapped request object.
+     * 
+     * @return
+     * @since 3.0
+     */
+    public AsyncContext getAsyncContext() {
+        return request.getAsyncContext();
+    }
+
+    /**
+     * The default behavior of this method is to call
+     * addAsyncListener(AsyncListener) on the wrapped request object.
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public void addAsyncListener(AsyncListener listener) {
+        request.addAsyncListener(listener);
+    }
+    
+    /**
+     * The default behavior of this method is to call
+     * addAsyncListener(AsyncListener, ServletRequest, ServletResponse) on the
+     * wrapped request object.
+     * 
+     * @param listener
+     * @param servletRequest
+     * @param servletResponse
+     * @since 3.0
+     */
+    public void addAsyncListener(AsyncListener listener,
+            ServletRequest servletRequest, ServletResponse servletResponse) {
+        addAsyncListener(listener, servletRequest, servletResponse);
+    }
+    
+    /**
+     * The default behavior of this method is to call
+     * startAsync() on the wrapped request object.
+     * 
+     * @param timeout
+     * @since 3.0
+     */
+    public void setAsyncTimeout(long timeout) {
+        request.setAsyncTimeout(timeout);
+    }
+
 }
 

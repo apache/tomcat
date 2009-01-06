@@ -19,7 +19,9 @@ package javax.servlet;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -90,10 +92,10 @@ public interface ServletContext {
     /**
      * Returns the major version of the Java Servlet API that this
      * servlet container supports. All implementations that comply
-     * with Version 2.4 must have this method
-     * return the integer 2.
+     * with Version 3.0 must have this method
+     * return the integer 3.
      *
-     * @return 		2
+     * @return 		3
      *
      */
     
@@ -104,10 +106,10 @@ public interface ServletContext {
     /**
      * Returns the minor version of the Servlet API that this
      * servlet container supports. All implementations that comply
-     * with Version 2.4 must have this method
-     * return the integer 4.
+     * with Version 3.0 must have this method
+     * return the integer 0.
      *
-     * @return 		4
+     * @return 		0
      *
      */
 
@@ -641,6 +643,87 @@ public interface ServletContext {
      */
     
     public String getServletContextName();
+    
+    /**
+     * 
+     * @param servletName
+     * @param urlPatterns
+     * @since 3.0
+     */
+    public void addServletMapping(String servletName, String[] urlPatterns);
+
+    /**
+     * 
+     * @param filterName
+     * @param description
+     * @param className
+     * @param initParameters
+     * @param isAsyncSupported
+     * @since 3.0
+     */
+    public void addFilter(String filterName, String description,
+            String className, Map<String,String> initParameters,
+            boolean isAsyncSupported);
+    
+    /**
+     * 
+     * @param filterName
+     * @param dispatcherTypes
+     * @param isMatchAfter
+     * @param servletNames
+     * @since 3.0
+     */
+    public void addFilterMappingForServletNames(String filterName,
+            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
+            String... servletNames);
+    
+    /**
+     * 
+     * @param filterName
+     * @param dispatcherTypes
+     * @param isMatchAfter
+     * @param urlPatterns
+     * @since 3.0
+     */
+    public void addFilterMappingForUrlPatterns(String filterName,
+            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
+            String... urlPatterns);
+    
+    /**
+     * 
+     * @param sessionCookieConfig
+     * @since 3.0
+     */
+    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig);
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public SessionCookieConfig getSessionCookieConfig();
+
+    /**
+     * 
+     * @param sessionTrackingModes
+     * @since 3.0
+     */
+    public void setSessionTrackingModes(
+            EnumSet<SessionTrackingMode> sessionTrackingModes);
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes();
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes();
 }
 
 

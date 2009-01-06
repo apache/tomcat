@@ -23,16 +23,21 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 
 
 /**
@@ -159,7 +164,7 @@ public class JspCServletContext implements ServletContext {
      */
     public int getMajorVersion() {
 
-        return (2);
+        return (3);
 
     }
 
@@ -181,7 +186,7 @@ public class JspCServletContext implements ServletContext {
      */
     public int getMinorVersion() {
 
-        return (3);
+        return (0);
 
     }
 
@@ -437,5 +442,58 @@ public class JspCServletContext implements ServletContext {
     }
 
 
+    public void addFilter(String filterName, String description,
+            String className, Map<String, String> initParameters,
+            boolean isAsyncSupported) {
+        // TODO SERVLET3
+    }
+
+
+    public void addFilterMappingForServletNames(String filterName,
+            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
+            String... servletNames) {
+        // TODO SERVLET3
+    }
+
+
+    public void addFilterMappingForUrlPatterns(String filterName,
+            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
+            String... urlPatterns) {
+        // TODO SERVLET3
+    }
+
+
+    public void addServletMapping(String servletName, String[] urlPatterns) {
+        // TODO SERVLET3
+    }
+
+
+    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
+        // TODO SERVLET3
+        return null;
+    }
+
+
+    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+        // TODO SERVLET3
+        return null;
+    }
+
+
+    public SessionCookieConfig getSessionCookieConfig() {
+        // TODO SERVLET3
+        return null;
+    }
+
+
+    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
+        // TODO SERVLET3
+    }
+
+
+    public void setSessionTrackingModes(
+            EnumSet<SessionTrackingMode> sessionTrackingModes) {
+        // TODO SERVLET3
+    }
 
 }
