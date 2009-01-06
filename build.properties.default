@@ -25,7 +25,7 @@
 # -----------------------------------------------------------------------------
 
 # ----- Vesion Control Flags -----
-version.major=6
+version.major=7
 version.minor=0
 version.build=0
 version.patch=0

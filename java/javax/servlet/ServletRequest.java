@@ -594,5 +594,76 @@ public interface ServletRequest {
      */
     public int getLocalPort();
 
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public ServletContext getServletContext();
+    
+    /**
+     * 
+     * @return
+     * @throws java.lang.IllegalStateException
+     * @since 3.0
+     */
+    public AsyncContext startAsync() throws java.lang.IllegalStateException;
+    
+    /**
+     * 
+     * @param servletRequest
+     * @param servletResponse
+     * @return
+     * @throws java.lang.IllegalStateException
+     * @since 3.0
+     */
+    public AsyncContext startAsync(ServletRequest servletRequest,
+            ServletResponse servletResponse)
+            throws java.lang.IllegalStateException;
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public boolean isAsyncStarted();
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public boolean isAsyncSupported();
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public AsyncContext getAsyncContext();
+
+    /**
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public void addAsyncListener(AsyncListener listener);
+    
+    /**
+     * 
+     * @param listener
+     * @param servletRequest
+     * @param servletResponse
+     * @since 3.0
+     */
+    public void addAsyncListener(AsyncListener listener,
+            ServletRequest servletRequest, ServletResponse servletResponse);
+    
+    /**
+     * 
+     * @param timeout
+     * @since 3.0
+     */
+    public void setAsyncTimeout(long timeout);
 }
 

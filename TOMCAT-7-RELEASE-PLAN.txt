@@ -22,8 +22,10 @@ $Id: $
             =====================================================
 
 1. Update trunk with new API from Servlet Spec 3.0 PR
+   - Done
 
 2. Provide NOOP implementations with TODO SRV3 markers so it will build
+   - Done
 
 3. Implement all the new Servlet 3 features
 
