@@ -32,12 +32,20 @@
   <section name="Introduction">
   <p>
     A number of additional third party components may be used with Apache
-    Tomcat, but are not provided directly in the download bundle. These
-    components may be built by users should they need them.
+    Tomcat. These components may be built by users should they need them or they
+    can be downloaded from one of the mirrors.
   </p>
 
   </section>
 
+  <section name="Downloading">
+  <p>
+    To down load the extras components open the Tomcat 6 download page and
+    select browse from the Quick Navigation Links. The extras components can be
+    found in bin/extras. 
+  </p>
+  </section>
+  
   <section name="Building">
 
     <p>
