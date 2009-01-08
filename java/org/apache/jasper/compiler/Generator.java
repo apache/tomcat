@@ -35,7 +35,6 @@ import java.util.Vector;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
-import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagVariableInfo;
@@ -513,8 +512,7 @@ class Generator {
      *
      * In JSP 2.1, we also scope an instance of ExpressionFactory
      */
-    private void genPreambleClassVariableDeclarations(String className)
-            throws JasperException {
+    private void genPreambleClassVariableDeclarations() throws JasperException {
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
                 out.printil("private org.apache.jasper.runtime.TagHandlerPool "
@@ -583,7 +581,7 @@ class Generator {
         genPreambleStaticInitializers();
 
         // Class variable declarations
-        genPreambleClassVariableDeclarations(servletClassName);
+        genPreambleClassVariableDeclarations();
 
         // Constructor
         // generateConstructor(className);
@@ -703,16 +701,6 @@ class Generator {
         }
     }
 
-    /*
-     * Generates the constructor. (shared by servlet and tag handler preamble
-     * generation)
-     */
-    private void generateConstructor(String className) {
-        out.printil("public " + className + "() {");
-        out.printil("}");
-        out.println();
-    }
-
     /**
      * A visitor that generates codes for the elements in the page.
      */
@@ -750,10 +738,6 @@ class Generator {
 
         private int methodNesting;
 
-        private TagInfo tagInfo;
-
-        private ClassLoader loader;
-
         private int charArrayCount;
 
         private HashMap<String,String> textMap;
@@ -770,8 +754,6 @@ class Generator {
             this.out = out;
             this.methodsBuffered = methodsBuffered;
             this.fragmentHelperClass = fragmentHelperClass;
-            this.loader = loader;
-            this.tagInfo = tagInfo;
             methodNesting = 0;
             handlerInfos =
                 new Hashtable<String,Hashtable<String,TagHandlerInfo>>();
@@ -1797,8 +1779,6 @@ class Generator {
                 out = outSave;
             }
         }
-
-        private static final String SINGLE_QUOTE = "'";
 
         private static final String DOUBLE_QUOTE = "\\\"";
 
@@ -3321,7 +3301,7 @@ class Generator {
     /**
      * Generates the ending part of the static portion of the servlet.
      */
-    private void generatePostamble(Node.Nodes page) {
+    private void generatePostamble() {
         out.popIndent();
         out.printil("} catch (Throwable t) {");
         out.pushIndent();
@@ -3427,7 +3407,7 @@ class Generator {
             page.visit(gen.new GenerateVisitor(gen.ctxt.isTagFile(), out,
                     gen.methodsBuffered, gen.fragmentHelperClass, gen.ctxt
                             .getClassLoader(), null));
-            gen.generatePostamble(page);
+            gen.generatePostamble();
         }
     }
 
@@ -3477,7 +3457,7 @@ class Generator {
         out.printil("private java.io.Writer _jspx_sout;");
 
         // Class variable declarations
-        genPreambleClassVariableDeclarations(tagInfo.getTagName());
+        genPreambleClassVariableDeclarations();
 
         generateSetJspContext(tagInfo);
 
