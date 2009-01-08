@@ -572,7 +572,7 @@ class TagFileProcessor {
                         compiler.getCompilationContext().getTldLocation(
                         tagInfo.getTagLibrary().getURI())[0] + "!/");
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                // Ignore - tagFileJarUrl will be null
             }
         }
         String tagFileJarPath;
