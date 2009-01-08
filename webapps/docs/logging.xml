@@ -34,8 +34,8 @@
   <p>
     By default, only java.util.logging is available for the core Tomcat, as Tomcat uses
     a package renamed logging implementation which is hardcoded for that logger. Usage of
-    alternate loggers is available after building the extra components (see
-    the <a href="extras.html">extras components</a> documentation), which includes
+    alternate loggers is available after building or downloading the extra components
+    (see the <a href="extras.html">extras components</a> documentation), which includes
     a full commons-logging implementation.
   </p>
   </section>
@@ -103,8 +103,8 @@
 	<li><a href="http://logging.apache.org/log4j">Download Log4J</a> 
             (v1.2 or later) and place the log4j jar in $CATALINA_HOME/lib.</li>
 
-        <li>Build the commons-logging additional component using the extras.xml
-        Ant build script which is part of the Tomcat source bundle.</li>
+        <li>Build or download the additional logging components. See the
+        <a href="extras.html">extras components</a> documentation for details.</li>
         
         <li>Replace <code>$CATALINA_HOME/bin/tomcat-juli.jar</code> with
         <code>output/extras/tomcat-juli.jar</code>.</li>
