@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarFile;
 
-import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
@@ -56,7 +55,6 @@ class JspDocumentParser
     extends DefaultHandler
     implements LexicalHandler, TagConstants {
 
-    private static final String JSP_VERSION = "version";
     private static final String LEXICAL_HANDLER_PROPERTY =
         "http://xml.org/sax/properties/lexical-handler";
     private static final String JSP_URI = "http://java.sun.com/JSP/Page";
