@@ -503,7 +503,6 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public boolean accept(ChannelMessage msg) {
         return true;
     }
-    
     public void broadcast(ChannelMessage message) throws ChannelException {
         if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ )
             throw new ChannelException("Multicast send is not started or enabled.");
