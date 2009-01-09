@@ -44,9 +44,6 @@ import org.apache.jasper.JspCompilationContext;
  */
 public class SmapUtil {
 
-    private org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( SmapUtil.class );
-
     //*********************************************************************
     // Constants
 
@@ -177,14 +174,6 @@ public class SmapUtil {
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
-    /**
-     * Returns a file path corresponding to a potential SMAP input
-     * for the given compilation input (JSP file).
-     */
-    private static String inputSmapPath(String path) {
-        return path.substring(0, path.lastIndexOf('.') + 1) + "smap";
-    }
-
     //*********************************************************************
     // Installation logic (from Robert Field, JSR-045 spec lead)
     private static class SDEInstaller {
@@ -284,7 +273,6 @@ public class SmapUtil {
         }
 
         void addSDE() throws UnsupportedEncodingException, IOException {
-            int i;
             copy(4 + 2 + 2); // magic min/maj version
             int constantPoolCountPos = genPos;
             int constantPoolCount = readU2();

@@ -25,13 +25,11 @@ import java.util.ArrayList;
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ExpressionFactory;
-import javax.el.ValueExpression;
 import javax.servlet.jsp.tagext.BodyTag;
 import javax.servlet.jsp.tagext.DynamicAttributes;
 import javax.servlet.jsp.tagext.IterationTag;
 import javax.servlet.jsp.tagext.JspIdConsumer;
 import javax.servlet.jsp.tagext.SimpleTag;
-import javax.servlet.jsp.tagext.Tag;
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagData;
 import javax.servlet.jsp.tagext.TagFileInfo;
@@ -2137,8 +2135,7 @@ abstract class Node implements TagConstants {
                 throws ELException {
             if (this.el != null) {
                 // determine exact type
-                ValueExpression ve = ef.createValueExpression(ctx, this.value,
-                        String.class);
+                ef.createValueExpression(ctx, this.value, String.class);
             }
         }
 

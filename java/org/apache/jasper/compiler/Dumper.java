@@ -42,14 +42,6 @@ class Dumper {
 	    System.out.print(str);
 	}
 
-	private void printString(String prefix, char[] chars, String suffix) {
-	    String str = null;
-	    if (chars != null) {
-		str = new String(chars);
-	    }
-	    printString(prefix, str, suffix);
-	}
-	     
 	private void printString(String prefix, String str, String suffix) {
 	    printIndent();
 	    if (str != null) {

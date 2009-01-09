@@ -424,7 +424,6 @@ public class JspConfig {
         while (iter.hasNext()) {
 
             JspPropertyGroup jpg = iter.next();
-            JspProperty jp = jpg.getJspProperty();
 
             String extension = jpg.getExtension();
             String path = jpg.getPath();
