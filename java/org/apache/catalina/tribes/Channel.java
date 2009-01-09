@@ -191,6 +191,14 @@ public interface Channel {
     public static final int SEND_OPTIONS_UDP =  0x0020;
 
     /**
+     * Send options. When a message is sent with this flag on
+     * the system sends a UDP message on the Multicast address instead of UDP or TCP to individual addresses
+     * @see #send(Member[], Serializable , int)
+     * @see #send(Member[], Serializable, int, ErrorHandler)
+     */
+    public static final int SEND_OPTIONS_MULTICAST =  0x0040;
+
+    /**
      * Send options, when a message is sent, it can have an option flag
      * to trigger certain behavior. Most flags are used to trigger channel interceptors
      * as the message passes through the channel stack. <br>

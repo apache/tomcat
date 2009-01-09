@@ -75,7 +75,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
      */
     public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
         if ( destination == null ) destination = membershipService.getMembers();
-        clusterSender.sendMessage(msg,destination);
+        if ((msg.getOptions()&Channel.SEND_OPTIONS_MULTICAST) == Channel.SEND_OPTIONS_MULTICAST) {
+            membershipService.broadcast(msg);
+        } else {
+            clusterSender.sendMessage(msg,destination);
+        }
         if ( Logs.MESSAGES.isTraceEnabled() ) {
             Logs.MESSAGES.trace("ChannelCoordinator - Sent msg:" + new UniqueId(msg.getUniqueId()) + " at " +new java.sql.Timestamp(System.currentTimeMillis())+ " to "+Arrays.toNameString(destination));
         }
@@ -154,6 +158,9 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             
             if ( Channel.MBR_RX_SEQ==(svc & Channel.MBR_RX_SEQ) ) {
                 membershipService.setMembershipListener(this);
+                if (membershipService instanceof McastService) {
+                    ((McastService)membershipService).setMessageListener(this);
+                }
                 membershipService.start(MembershipService.MBR_RX);
                 valid = true;
             }
@@ -243,7 +250,6 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         }
         super.messageReceived(msg);
     }
-
 
     public ChannelReceiver getClusterReceiver() {
         return clusterReceiver;
