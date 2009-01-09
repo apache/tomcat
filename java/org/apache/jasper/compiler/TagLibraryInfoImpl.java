@@ -261,10 +261,10 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
                 }
                 functionTable.put(funcName, funcInfo);
-            } else if ("display-name".equals(tname) || // Ignored elements
+            } else if ("display-name".equals(tname) ||
                     "small-icon".equals(tname) || "large-icon".equals(tname)
                     || "listener".equals(tname)) {
-                ;
+                // Ignored elements
             } else if ("taglib-extension".equals(tname)) {
                 // Recognized but ignored
             } else {
@@ -496,7 +496,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         String type = null;
         String expectedType = null;
         String methodSignature = null;
-        boolean required = false, rtexprvalue = false, reqTime = false, isFragment = false, deferredValue = false, deferredMethod = false;
+        boolean required = false, rtexprvalue = false, isFragment = false, deferredValue = false, deferredMethod = false;
 
         Iterator<TreeNode> list = elem.findChildren();
         while (list.hasNext()) {
@@ -555,9 +555,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 } else {
                     methodSignature = "java.lang.Object method()";
                 }
-            } else if ("description".equals(tname) || // Ignored elements
-            false) {
-                ;
+            } else if ("description".equals(tname) || false) {
+                // Ignored elements
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage(
