@@ -19,8 +19,6 @@ package javax.servlet.http;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
-import javax.servlet.DispatcherType;
-
 /**
  *
  * Creates a cookie, a small amount of information sent by a servlet to 
