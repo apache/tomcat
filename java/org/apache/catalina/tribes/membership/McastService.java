@@ -17,14 +17,21 @@
 
 package org.apache.catalina.tribes.membership;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.util.Properties;
 
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelException;
+import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipService;
+import org.apache.catalina.tribes.MessageListener;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.UUIDGenerator;
-import java.io.IOException;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -37,7 +44,7 @@ import java.io.IOException;
  */
 
 
-public class McastService implements MembershipService,MembershipListener {
+public class McastService implements MembershipService,MembershipListener,MessageListener {
 
     private static org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog( McastService.class );
@@ -64,6 +71,10 @@ public class McastService implements MembershipService,MembershipListener {
      * A membership listener delegate (should be the cluster :)
      */
     protected MembershipListener listener;
+    /**
+     * A message listener delegate for broadcasts
+     */
+    protected MessageListener msglistener;
     /**
      * The local member
      */
@@ -371,6 +382,7 @@ public class McastService implements MembershipService,MembershipListener {
                                     java.net.InetAddress.getByName(properties.getProperty("mcastAddress")),
                                     ttl,
                                     soTimeout,
+                                    this,
                                     this);
         String value = properties.getProperty("recoveryEnabled","true");
         boolean recEnabled = Boolean.valueOf(value).booleanValue() ;
@@ -456,6 +468,14 @@ public class McastService implements MembershipService,MembershipListener {
     public void setMembershipListener(MembershipListener listener) {
         this.listener = listener;
     }
+    
+    public void setMessageListener(MessageListener listener) {
+        this.msglistener = listener;
+    }
+    
+    public void removeMessageListener() {
+        this.msglistener = null;
+    }
     /**
      * Remove the membership listener
      */
@@ -474,6 +494,27 @@ public class McastService implements MembershipService,MembershipListener {
     public void memberDisappeared(Member member)
     {
         if ( listener!=null ) listener.memberDisappeared(member);
+    }
+    
+    public void messageReceived(ChannelMessage msg) {
+        if (msglistener!=null && msglistener.accept(msg)) msglistener.messageReceived(msg); 
+    }
+    
+    public boolean accept(ChannelMessage msg) {
+        return true;
+    }
+    
+    public void broadcast(ChannelMessage message) throws ChannelException {
+        if (impl==null || (impl.startLevel & Channel.MBR_TX_SEQ)!=Channel.MBR_TX_SEQ )
+            throw new ChannelException("Multicast send is not started or enabled.");
+        
+        byte[] data = XByteBuffer.createDataPackage((ChannelData)message);
+        DatagramPacket packet = new DatagramPacket(data,0,data.length);
+        try {
+            impl.send(false, packet);
+        } catch (Exception x) {
+            throw new ChannelException(x);
+        }
     }
 
     /**
