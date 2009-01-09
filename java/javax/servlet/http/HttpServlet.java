@@ -416,7 +416,7 @@ public abstract class HttpServlet extends GenericServlet
     }
     
 
-    private static Method[] getAllDeclaredMethods(Class c) {
+    private static Method[] getAllDeclaredMethods(Class<?> c) {
 
         if (c.equals(javax.servlet.http.HttpServlet.class)) {
             return null;
@@ -501,7 +501,7 @@ public abstract class HttpServlet extends GenericServlet
         
         String allow = null;
         if (ALLOW_GET)
-            if (allow==null) allow=METHOD_GET;
+            allow=METHOD_GET;
         if (ALLOW_HEAD)
             if (allow==null) allow=METHOD_HEAD;
             else allow += ", " + METHOD_HEAD;
@@ -558,10 +558,10 @@ public abstract class HttpServlet extends GenericServlet
         String responseString = "TRACE "+ req.getRequestURI()+
             " " + req.getProtocol();
         
-        Enumeration reqHeaderEnum = req.getHeaderNames();
+        Enumeration<String> reqHeaderEnum = req.getHeaderNames();
         
         while( reqHeaderEnum.hasMoreElements() ) {
-            String headerName = (String)reqHeaderEnum.nextElement();
+            String headerName = reqHeaderEnum.nextElement();
             responseString += CRLF + headerName + ": " +
                 req.getHeader(headerName); 
         }
