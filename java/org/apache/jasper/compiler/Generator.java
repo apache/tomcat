@@ -2032,9 +2032,6 @@ class Generator {
 
             n.setBeginJavaLine(out.getJavaLine());
 
-            // Copy virtual page scope of tag file to page scope of invoking
-            // page
-            out.printil("((org.apache.jasper.runtime.JspContextWrapper) this.jspContext).syncBeforeInvoke();");
             String varReaderAttr = n.getTextAttribute("varReader");
             String varAttr = n.getTextAttribute("var");
             if (varReaderAttr != null || varAttr != null) {
@@ -2048,6 +2045,11 @@ class Generator {
             out.print(toGetterMethod(n.getTextAttribute("fragment")));
             out.println(" != null) {");
             out.pushIndent();
+            // Copy virtual page scope of tag file to page scope of invoking
+            // page
+            out.printil("((org.apache.jasper.runtime.JspContextWrapper) this.jspContext).syncBeforeInvoke(");
+            out.print(toGetterMethod(n.getTextAttribute("fragment")));
+            out.println(".getJspContext());");
             out.printin(toGetterMethod(n.getTextAttribute("fragment")));
             out.println(".invoke(_jspx_sout);");
             out.popIndent();
