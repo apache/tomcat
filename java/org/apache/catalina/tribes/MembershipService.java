@@ -131,5 +131,12 @@ public interface MembershipService {
     public void setPayload(byte[] payload);
     
     public void setDomain(byte[] domain);
+    
+    /**
+     * Broadcasts a message to all members
+     * @param message
+     * @throws ChannelException
+     */
+    public void broadcast(ChannelMessage message) throws ChannelException;
 
 }
