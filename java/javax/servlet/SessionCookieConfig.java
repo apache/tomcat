@@ -26,16 +26,16 @@ public class SessionCookieConfig {
     private String domain;
     private String path;
     private String comment;
-    private boolean isHttpOnly;
-    private boolean isSecure;
+    private boolean httpOnly;
+    private boolean secure;
 
     public SessionCookieConfig(String domain, String path, String comment,
             boolean isHttpOnly, boolean isSecure) {
         this.domain = domain;
         this.path = path;
         this.comment = comment;
-        this.isHttpOnly = isHttpOnly;
-        this.isSecure = isSecure;
+        this.httpOnly = isHttpOnly;
+        this.secure = isSecure;
     }
     
     public java.lang.String getDomain() {
@@ -51,10 +51,10 @@ public class SessionCookieConfig {
     }
     
     public boolean isHttpOnly() {
-        return isHttpOnly;
+        return httpOnly;
     }
     
     public boolean isSecure() {
-        return isSecure;
+        return secure;
     }
 }
