@@ -19,17 +19,24 @@ package org.apache.catalina.tribes.membership;
 
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
-import java.net.BindException;
+import org.apache.catalina.tribes.MessageListener;
+import org.apache.catalina.tribes.io.ChannelData;
+import org.apache.catalina.tribes.io.XByteBuffer;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -91,9 +98,13 @@ public class McastServiceImpl
      */
     protected Membership membership;
     /**
-     * The actual listener, for callback when shits goes down
+     * The actual listener, for callback when stuff goes down
      */
     protected MembershipListener service;
+    /**
+     * The actual listener for broadcast callbacks
+     */
+    protected MessageListener msgservice;
     /**
      * Thread to listen for pings
      */
@@ -135,6 +146,12 @@ public class McastServiceImpl
      * Add the ability to turn on/off recovery
      */
     protected boolean recoveryEnabled = true;
+    
+    /**
+     * Dont interrupt the sender/receiver thread, but pass off to an executor
+     */
+    protected ExecutorService executor = new ThreadPoolExecutor(0, 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+    
     /**
      * Create a new mcast service impl
      * @param member - the local member
@@ -155,7 +172,8 @@ public class McastServiceImpl
         InetAddress mcastAddress,
         int ttl,
         int soTimeout,
-        MembershipListener service)
+        MembershipListener service,
+        MessageListener msgservice)
     throws IOException {
         this.member = member;
         this.address = mcastAddress;
@@ -165,6 +183,7 @@ public class McastServiceImpl
         this.mcastBindAddress = bind;
         this.timeToExpiration = expireTime;
         this.service = service;
+        this.msgservice = msgservice;
         this.sendFrequency = sendFrequency;
         init();
     }
@@ -315,46 +334,104 @@ public class McastServiceImpl
      * @throws IOException
      */
     public void receive() throws IOException {
+        boolean checkexpired = true;
         try {
+            
             socket.receive(receivePacket);
             if(receivePacket.getLength() > MAX_PACKET_SIZE) {
                 log.error("Multicast packet received was too long, dropping package:"+receivePacket.getLength());
             } else {
                 byte[] data = new byte[receivePacket.getLength()];
                 System.arraycopy(receivePacket.getData(), receivePacket.getOffset(), data, 0, data.length);
-                final MemberImpl m = MemberImpl.getMember(data);
-                if (log.isTraceEnabled()) log.trace("Mcast receive ping from member " + m);
-                Thread t = null;
-                if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
-                    if (log.isDebugEnabled()) log.debug("Member has shutdown:" + m);
-                    membership.removeMember(m);
-                    t = new Thread() {
-                        public void run() {
-                            service.memberDisappeared(m);
+                if (XByteBuffer.firstIndexOf(data,0,MemberImpl.TRIBES_MBR_BEGIN)==0) {
+                    memberDataReceived(data);
+                } else {
+                    XByteBuffer buffer = new XByteBuffer(data,true);
+                    if (buffer.countPackages(true)>0) {
+                        int count = buffer.countPackages();
+                        ChannelData[] pkgs = new ChannelData[count];
+                        for (int i=0; i<count; i++) {
+                            try {
+                                pkgs[i] = buffer.extractPackage(true);
+                            }catch (IllegalStateException ise) {
+                                log.debug("Unable to decode message.",ise);
+                            }
                         }
-                    };
-                } else if (membership.memberAlive(m)) {
-                    if (log.isDebugEnabled()) log.debug("Mcast add member " + m);
-                    t = new Thread() {
-                        public void run() {
-                            service.memberAdded(m);
-                        }
-                    };
-                } //end if
-                if ( t != null ) {
-                    t.setDaemon(true);
-                    t.start();
+                        memberBroadcastsReceived(pkgs);
+                    }
                 }
+                
             }
         } catch (SocketTimeoutException x ) { 
             //do nothing, this is normal, we don't want to block forever
             //since the receive thread is the same thread
             //that does membership expiration
         }
-        checkExpired();
+        if (checkexpired) checkExpired();
+    }
+
+    private void memberDataReceived(byte[] data) {
+        final MemberImpl m = MemberImpl.getMember(data);
+        if (log.isTraceEnabled()) log.trace("Mcast receive ping from member " + m);
+        Runnable t = null;
+        if (Arrays.equals(m.getCommand(), Member.SHUTDOWN_PAYLOAD)) {
+            if (log.isDebugEnabled()) log.debug("Member has shutdown:" + m);
+            membership.removeMember(m);
+            t = new Runnable() {
+                public void run() {
+                    String name = Thread.currentThread().getName();
+                    try {
+                        Thread.currentThread().setName("Membership-MemberDisappeared.");
+                        service.memberDisappeared(m);
+                    }finally {
+                        Thread.currentThread().setName(name);
+                    }
+                }
+            };
+        } else if (membership.memberAlive(m)) {
+            if (log.isDebugEnabled()) log.debug("Mcast add member " + m);
+            t = new Runnable() {
+                public void run() {
+                    String name = Thread.currentThread().getName();
+                    try {
+                        Thread.currentThread().setName("Membership-MemberAdded.");
+                        service.memberAdded(m);
+                    }finally {
+                        Thread.currentThread().setName(name);
+                    }
+                }
+            };
+        } //end if
+        if ( t != null ) {
+            executor.execute(t);
+        }
     }
     
-    protected Object expiredMutex = new Object();
+    private void memberBroadcastsReceived(final ChannelData[] data) {
+        if (log.isTraceEnabled()) log.trace("Mcast received broadcasts.");
+        Runnable t = new Runnable() {
+            public void run() {
+                String name = Thread.currentThread().getName();
+                try {
+                    Thread.currentThread().setName("Membership-MemberAdded.");
+                    for (int i=0; i<data.length; i++ ) {
+                        try {
+                            if (data[i]!=null) {
+                                msgservice.messageReceived(data[i]);
+                            }
+                        }catch (Throwable t) {
+                            log.error("Unable to receive broadcast message.",t);
+                        }
+                    }
+                }finally {
+                    Thread.currentThread().setName(name);
+                }
+            }
+        };
+        executor.execute(t);
+    }
+
+    protected final Object expiredMutex = new Object();
     protected void checkExpired() {
         synchronized (expiredMutex) {
             MemberImpl[] expired = membership.expire(timeToExpiration);
@@ -363,12 +440,19 @@ public class McastServiceImpl
                 if (log.isDebugEnabled())
                     log.debug("Mcast exipre  member " + expired[i]);
                 try {
-                    Thread t = new Thread() {
+                    Runnable t = new Runnable() {
                         public void run() {
-                            service.memberDisappeared(member);
+                            String name = Thread.currentThread().getName();
+                            try {
+                                Thread.currentThread().setName("Membership-MemberExpired.");
+                                service.memberDisappeared(member);
+                            }finally {
+                                Thread.currentThread().setName(name);
+                            }
+                            
                         }
                     };
-                    t.start();
+                    executor.execute(t);
                 } catch (Exception x) {
                     log.error("Unable to process member disappeared message.", x);
                 }
@@ -381,16 +465,30 @@ public class McastServiceImpl
      * @throws Exception
      */ 
     public void send(boolean checkexpired) throws IOException{
+        send(checkexpired,null);
+    }
+    
+    private final Object sendLock = new Object();
+    public void send(boolean checkexpired, DatagramPacket packet) throws IOException{
+        checkexpired = (checkexpired && (packet==null));
         //ignore if we haven't started the sender
         //if ( (startLevel&Channel.MBR_TX_SEQ) != Channel.MBR_TX_SEQ ) return;
-        member.inc();
-        if(log.isTraceEnabled())
-            log.trace("Mcast send ping from member " + member);
-        byte[] data = member.getData();
-        DatagramPacket p = new DatagramPacket(data,data.length);
-        p.setAddress(address);
-        p.setPort(port);
-        socket.send(p);
+        if (packet==null) {
+            member.inc();
+            if(log.isTraceEnabled()) {
+                log.trace("Mcast send ping from member " + member);
+            }
+            byte[] data = member.getData();
+            packet = new DatagramPacket(data,data.length);
+        } else if (log.isTraceEnabled()) {
+            log.trace("Sending message broadcast "+packet.getLength()+ " bytes from "+ member);
+        }
+        packet.setAddress(address);
+        packet.setPort(port);
+        //TODO this operation is not thread safe
+        synchronized (sendLock) {
+            socket.send(packet);
+        }
         if ( checkexpired ) checkExpired();
     }
 
