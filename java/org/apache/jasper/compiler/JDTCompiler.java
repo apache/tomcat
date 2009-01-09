@@ -105,17 +105,15 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     is = new FileInputStream(sourceFile);
                     Reader reader = 
                         new BufferedReader(new InputStreamReader(is, ctxt.getOptions().getJavaEncoding()));
-                    if (reader != null) {
-                        char[] chars = new char[8192];
-                        StringBuffer buf = new StringBuffer();
-                        int count;
-                        while ((count = reader.read(chars, 0, 
-                                                    chars.length)) > 0) {
-                            buf.append(chars, 0, count);
-                        }
-                        result = new char[buf.length()];
-                        buf.getChars(0, result.length, result, 0);
+                    char[] chars = new char[8192];
+                    StringBuffer buf = new StringBuffer();
+                    int count;
+                    while ((count = reader.read(chars, 0, 
+                                                chars.length)) > 0) {
+                        buf.append(chars, 0, count);
                     }
+                    result = new char[buf.length()];
+                    buf.getChars(0, result.length, result, 0);
                 } catch (IOException e) {
                     log.error("Compilation error", e);
                 } finally {
@@ -421,12 +419,13 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             String className = classNames[i];
             compilationUnits[i] = new CompilationUnit(fileNames[i], className);
         }
+        CompilerOptions cOptions = new CompilerOptions(settings);
+        cOptions.parseLiteralExpressionsAsConstants = true;
         Compiler compiler = new Compiler(env,
                                          policy,
-                                         settings,
+                                         cOptions,
                                          requestor,
-                                         problemFactory,
-                                         true);
+                                         problemFactory);
         compiler.compile(compilationUnits);
 
         if (!ctxt.keepGenerated()) {

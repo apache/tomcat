@@ -376,7 +376,7 @@ public final class JspRuntimeContext {
                     codeBase = codeBase + File.separator;
                 }
                 File contextDir = new File(codeBase);
-                URL url = contextDir.getCanonicalFile().toURL();
+                URL url = contextDir.getCanonicalFile().toURI().toURL();
                 codeSource = new CodeSource(url,(Certificate[])null);
                 permissionCollection = policy.getPermissions(codeSource);
 
@@ -408,34 +408,32 @@ public final class JspRuntimeContext {
                 permissionCollection.add( new RuntimePermission(
                     "accessClassInPackage.org.apache.jasper.runtime") );
 
-                if (parentClassLoader instanceof URLClassLoader) {
-                    URL [] urls = parentClassLoader.getURLs();
-                    String jarUrl = null;
-                    String jndiUrl = null;
-                    for (int i=0; i<urls.length; i++) {
-                        if (jndiUrl == null
-                                && urls[i].toString().startsWith("jndi:") ) {
-                            jndiUrl = urls[i].toString() + "-";
-                        }
-                        if (jarUrl == null
-                                && urls[i].toString().startsWith("jar:jndi:")
-                                ) {
-                            jarUrl = urls[i].toString();
-                            jarUrl = jarUrl.substring(0,jarUrl.length() - 2);
-                            jarUrl = jarUrl.substring(0,
-                                     jarUrl.lastIndexOf('/')) + "/-";
-                        }
+                URL [] urls = parentClassLoader.getURLs();
+                String jarUrl = null;
+                String jndiUrl = null;
+                for (int i=0; i<urls.length; i++) {
+                    if (jndiUrl == null
+                            && urls[i].toString().startsWith("jndi:") ) {
+                        jndiUrl = urls[i].toString() + "-";
                     }
-                    if (jarUrl != null) {
-                        permissionCollection.add(
-                                new FilePermission(jarUrl,"read"));
-                        permissionCollection.add(
-                                new FilePermission(jarUrl.substring(4),"read"));
+                    if (jarUrl == null
+                            && urls[i].toString().startsWith("jar:jndi:")
+                            ) {
+                        jarUrl = urls[i].toString();
+                        jarUrl = jarUrl.substring(0,jarUrl.length() - 2);
+                        jarUrl = jarUrl.substring(0,
+                                 jarUrl.lastIndexOf('/')) + "/-";
                     }
-                    if (jndiUrl != null)
-                        permissionCollection.add(
-                                new FilePermission(jndiUrl,"read") );
                 }
+                if (jarUrl != null) {
+                    permissionCollection.add(
+                            new FilePermission(jarUrl,"read"));
+                    permissionCollection.add(
+                            new FilePermission(jarUrl.substring(4),"read"));
+                }
+                if (jndiUrl != null)
+                    permissionCollection.add(
+                            new FilePermission(jndiUrl,"read") );
             } catch(Exception e) {
                 context.log("Security Init for context failed",e);
             }
