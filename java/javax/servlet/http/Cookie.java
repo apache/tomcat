@@ -88,8 +88,7 @@ public class Cookie implements Cloneable {
     private String path;       // ;Path=VALUE ... URLs that see the cookie
     private boolean secure;    // ;Secure ... e.g. use SSL
     private int version = 0;   // ;Version=1 ... means RFC 2109++ style
-    // TODO SERVLET3
-    private boolean httpOnly;  // Not in the spec but supported by most browsers
+    private boolean httpOnly;  // Not in cookie specs, but supported by browsers
     
 
     /**
