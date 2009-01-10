@@ -45,6 +45,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletResponse;
+import javax.servlet.SessionCookieConfig;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -2381,7 +2382,7 @@ public class Request
             Cookie cookie = new Cookie(Globals.SESSION_COOKIE_NAME,
                                        session.getIdInternal());
             configureSessionCookie(cookie);
-            response.addCookieInternal(cookie, manager.getUseHttpOnly());
+            response.addCookieInternal(cookie);
         }
 
         if (session != null) {
@@ -2399,18 +2400,41 @@ public class Request
      * @param cookie The JSESSIONID cookie to be configured
      */
     protected void configureSessionCookie(Cookie cookie) {
+        SessionCookieConfig scc =
+            context.getServletContext().getSessionCookieConfig();
+
         cookie.setMaxAge(-1);
-        String contextPath = null;
-        if (!connector.getEmptySessionPath() && (getContext() != null)) {
-            contextPath = getContext().getEncodedPath();
+
+        if (scc != null) {
+            cookie.setComment(scc.getComment());
         }
-        if ((contextPath != null) && (contextPath.length() > 0)) {
-            cookie.setPath(contextPath);
-        } else {
-            cookie.setPath("/");
+
+        if (scc != null) {
+            cookie.setDomain(scc.getDomain());
         }
-        if (isSecure()) {
+
+        if ((scc != null && scc.isSecure()) || isSecure()) {
             cookie.setSecure(true);
+        }
+
+        if ((scc != null && scc.isHttpOnly()) ||
+                context.getManager().getUseHttpOnly()) {
+            cookie.setHttpOnly(true);
+        }
+        
+        if (!connector.getEmptySessionPath() &&
+                scc != null && scc.getPath() != null) {
+            cookie.setPath(scc.getPath());
+        } else {
+            String contextPath = null;
+            if (!connector.getEmptySessionPath() && (getContext() != null)) {
+                contextPath = getContext().getEncodedPath();
+            }
+            if ((contextPath != null) && (contextPath.length() > 0)) {
+                cookie.setPath(contextPath);
+            } else {
+                cookie.setPath("/");
+            }
         }
     }
     

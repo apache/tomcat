@@ -20,7 +20,6 @@ package javax.servlet;
  * 
  * @since 3.0
  * $Id$
- * TODO SERVLET3
  */
 public class SessionCookieConfig {
     private String domain;
@@ -29,6 +28,25 @@ public class SessionCookieConfig {
     private boolean httpOnly;
     private boolean secure;
 
+    /**
+     * 
+     * @param domain      Domain to use for session cookies generated for a
+     *                    {@link ServletContext} in which this
+     *                    {@link SessionCookieConfig} has been set
+     * @param path        Path to use for session cookies generated for a
+     *                    {@link ServletContext} in which this
+     *                    {@link SessionCookieConfig} has been set. If null
+     *                    {@link ServletContext#getContextPath()} is used
+     * @param comment     Comment to use for session cookies generated for a
+     *                    {@link ServletContext} in which this
+     *                    {@link SessionCookieConfig} has been set
+     * @param isHttpOnly  HttpOnly flag to use for session cookies generated for
+     *                    a {@link ServletContext} in which this
+     *                    {@link SessionCookieConfig} has been set
+     * @param isSecure    If <code>true</code>, the cookie will always be marked
+     *                    as secure. If <code>false</code> the cookie will only
+     *                    be marked as secure if the request is secure.
+     */
     public SessionCookieConfig(String domain, String path, String comment,
             boolean isHttpOnly, boolean isSecure) {
         this.domain = domain;

@@ -974,20 +974,9 @@ public class Response
      * Add the specified Cookie to those that will be included with
      * this Response.
      *
-     * @param cookie Cookie to be added
+     * @param cookie    Cookie to be added
      */
     public void addCookieInternal(final Cookie cookie) {
-        addCookieInternal(cookie, false);
-    }
-
-    /**
-     * Add the specified Cookie to those that will be included with
-     * this Response.
-     *
-     * @param cookie    Cookie to be added
-     * @param httpOnly  Should the httpOnly falg be set on this cookie
-     */
-    public void addCookieInternal(final Cookie cookie, final boolean httpOnly) {
 
         if (isCommitted())
             return;
@@ -1003,7 +992,7 @@ public class Response
                          cookie.getValue(), cookie.getPath(), 
                          cookie.getDomain(), cookie.getComment(), 
                          cookie.getMaxAge(), cookie.getSecure(),
-                         httpOnly);
+                         cookie.isHttpOnly());
                     return null;
                 }
             });
@@ -1011,7 +1000,8 @@ public class Response
             ServerCookie.appendCookieValue
                 (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
                      cookie.getPath(), cookie.getDomain(), cookie.getComment(), 
-                     cookie.getMaxAge(), cookie.getSecure(), httpOnly);
+                     cookie.getMaxAge(), cookie.getSecure(),
+                     cookie.isHttpOnly());
         }
         //if we reached here, no exception, cookie is valid
         // the header name is Set-Cookie for both "old" and v.1 ( RFC2109 )
