@@ -146,7 +146,7 @@ public class TagData implements Cloneable {
      */
     public java.util.Enumeration<String> getAttributes() {
         return attributes.keys();
-    };
+    }
 
     // private data
 
