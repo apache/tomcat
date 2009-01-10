@@ -150,6 +150,11 @@ public class ApplicationContext
         new ThreadLocal<DispatchData>();
 
 
+    /**
+     * Session Cookie config
+     */
+    private SessionCookieConfig sessionCookieConfig;
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -848,13 +853,12 @@ public class ApplicationContext
 
 
     public SessionCookieConfig getSessionCookieConfig() {
-        // TODO SERVLET3
-        return null;
+        return sessionCookieConfig;
     }
 
 
     public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
-        // TODO SERVLET3
+        this.sessionCookieConfig = sessionCookieConfig;
     }
 
 
