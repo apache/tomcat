@@ -53,7 +53,6 @@ import org.apache.catalina.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.tomcat.util.net.SSLSessionManager;
 
 
 /**
@@ -908,12 +907,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
     public void remove(Session session) {
 
         sessions.remove(session.getIdInternal());
-        // Close the underlying SSL session
-        SSLSessionManager mgr =
-            (SSLSessionManager) session.getNote(Constants.SESS_SSL_MGMT);
-        if (mgr != null) {
-            mgr.invalidateSession();
-        }
 
     }
 

@@ -925,6 +925,10 @@ public class Request
             if(attr != null) {
                 attributes.put(Globals.SSL_SESSION_ID_ATTR, attr);
             }
+            attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_MGR_ATTR);
+            if(attr != null) {
+                attributes.put(Globals.SSL_SESSION_MGR_ATTR, attr);
+            }
             attr = attributes.get(name);
         }
         return attr;
@@ -938,7 +942,8 @@ public class Request
         return Globals.CERTIFICATES_ATTR.equals(name) ||
             Globals.CIPHER_SUITE_ATTR.equals(name) ||
             Globals.KEY_SIZE_ATTR.equals(name)  ||
-            Globals.SSL_SESSION_ID_ATTR.equals(name);
+            Globals.SSL_SESSION_ID_ATTR.equals(name) ||
+            Globals.SSL_SESSION_MGR_ATTR.equals(name);
     }
 
     /**
@@ -2403,13 +2408,6 @@ public class Request
         if ((connector.getEmptySessionPath() 
                 && isRequestedSessionIdFromCookie()) || requestedSessionSSL ) {
             session = manager.createSession(getRequestedSessionId());
-            if (requestedSessionSSL) {
-                coyoteRequest.action(ActionCode.ACTION_REQ_SSL_SESSION_MGR,
-                        null);
-                session.setNote(
-                        org.apache.catalina.session.Constants.SESS_SSL_MGMT,
-                        getAttribute(Globals.SSL_SESSION_MGR_ATTR));
-            }
         } else {
             session = manager.createSession(null);
         }

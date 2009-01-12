@@ -1141,6 +1141,8 @@ public class Http11AprProcessor implements ActionHook {
                     if (sslO != null) {
                         request.setAttribute(AprEndpoint.SESSION_ID_KEY, sslO);
                     }
+                    //TODO provide a hook to enable the SSL session to be
+                    // invalidated. Set AprEndpoint.SESSION_MGR req attr
                 } catch (Exception e) {
                     log.warn(sm.getString("http11processor.socket.ssl"), e);
                 }
@@ -1198,9 +1200,6 @@ public class Http11AprProcessor implements ActionHook {
             //no op
         } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
             //no op
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_SESSION_MGR) {
-            //TODO SERVLET3 provide a hook to enable the SSL session to be
-            // invalidated
         }
 
     }
