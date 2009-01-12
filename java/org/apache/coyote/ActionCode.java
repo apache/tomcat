@@ -163,12 +163,6 @@ public final class ActionCode {
      */
     public static final ActionCode ACTION_COMET_SETTIMEOUT = new ActionCode(25);
     
-    /**
-     * Callback for lazy evaluation - obtain the SSL Session Manager
-     */
-    public static final ActionCode ACTION_REQ_SSL_SESSION_MGR =
-        new ActionCode(26);
-    
     // ----------------------------------------------------------- Constructors
     int code;
 

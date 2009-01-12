@@ -864,7 +864,7 @@ public class ApplicationContext
      * SessionTrackingMode#COOKIE} is supported unless the <code>cookies</code>
      * attribute has been set to <code>false</code> for the context and {@link
      * SessionTrackingMode#SSL} is supported if at least one of the connectors
-     * used by this context has the attribute <code>SSLEnabled</code> set to
+     * used by this context has the attribute <code>secure</code> set to
      * <code>true</code>.
      */
     public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
@@ -887,7 +887,7 @@ public class ApplicationContext
         // TODO extend this for SSL sessions managed by accelerators, web
         // servers etc
         for (Connector connector : connectors) {
-            if (Boolean.TRUE.equals(connector.getAttribute("SSLEnabled"))) {
+            if (Boolean.TRUE.equals(connector.getAttribute("secure"))) {
                 defaultSessionTrackingModes.add(SessionTrackingMode.SSL);
                 break;
             }
