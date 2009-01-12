@@ -32,16 +32,13 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.KeyStore;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -1576,7 +1573,7 @@ public class NioEndpoint {
                 }
                 sc = attachment.getChannel();
                 sc.setSendFile(true);
-                WritableByteChannel wc =(WritableByteChannel) ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
+                WritableByteChannel wc = ((sc instanceof SecureNioChannel)?sc:sc.getIOChannel());
                 
                 if (sc.getOutboundRemaining()>0) {
                     if (sc.flushOutbound()) {
@@ -1784,7 +1781,7 @@ public class NioEndpoint {
         public void awaitReadLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(readLatch,timeout,unit);}
         public void awaitWriteLatch(long timeout, TimeUnit unit) throws InterruptedException { awaitLatch(writeLatch,timeout,unit);}
         
-        public long getLastRegistered() { return lastRegistered; };
+        public long getLastRegistered() { return lastRegistered; }
         public void setLastRegistered(long reg) { lastRegistered = reg; }
         
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
