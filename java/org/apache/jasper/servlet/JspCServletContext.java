@@ -369,9 +369,9 @@ public class JspCServletContext implements ServletContext {
      *
      * @deprecated This method has been deprecated with no replacement
      */
-    public Enumeration<String> getServlets() {
+    public Enumeration<Servlet> getServlets() {
 
-        return (new Vector<String>().elements());
+        return (new Vector<Servlet>().elements());
 
     }
 
