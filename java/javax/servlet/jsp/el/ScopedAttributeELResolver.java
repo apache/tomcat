@@ -111,13 +111,13 @@ public class ScopedAttributeELResolver extends ELResolver {
 
 		PageContext ctxt = (PageContext) context.getContext(JspContext.class);
 		List<FeatureDescriptor> list = new ArrayList<FeatureDescriptor>();
-		Enumeration e;
+		Enumeration<String> e;
 		Object value;
 		String name;
 
 		e = ctxt.getAttributeNamesInScope(PageContext.PAGE_SCOPE);
 		while (e.hasMoreElements()) {
-			name = (String) e.nextElement();
+			name = e.nextElement();
 			value = ctxt.getAttribute(name, PageContext.PAGE_SCOPE);
 			FeatureDescriptor descriptor = new FeatureDescriptor();
 			descriptor.setName(name);
@@ -133,7 +133,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 
 		e = ctxt.getAttributeNamesInScope(PageContext.REQUEST_SCOPE);
 		while (e.hasMoreElements()) {
-			name = (String) e.nextElement();
+			name = e.nextElement();
 			value = ctxt.getAttribute(name, PageContext.REQUEST_SCOPE);
 			FeatureDescriptor descriptor = new FeatureDescriptor();
 			descriptor.setName(name);
@@ -150,7 +150,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 		if (ctxt.getSession() != null) {
 			e = ctxt.getAttributeNamesInScope(PageContext.SESSION_SCOPE);
 			while (e.hasMoreElements()) {
-				name = (String) e.nextElement();
+				name = e.nextElement();
 				value = ctxt.getAttribute(name, PageContext.SESSION_SCOPE);
 				FeatureDescriptor descriptor = new FeatureDescriptor();
 				descriptor.setName(name);
@@ -167,7 +167,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 
 		e = ctxt.getAttributeNamesInScope(PageContext.APPLICATION_SCOPE);
 		while (e.hasMoreElements()) {
-			name = (String) e.nextElement();
+			name = e.nextElement();
 			value = ctxt.getAttribute(name, PageContext.APPLICATION_SCOPE);
 			FeatureDescriptor descriptor = new FeatureDescriptor();
 			descriptor.setName(name);

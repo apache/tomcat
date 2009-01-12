@@ -257,7 +257,7 @@ public interface HttpSession {
      *
      */
     
-    public Enumeration getAttributeNames();
+    public Enumeration<String> getAttributeNames();
     
     
     

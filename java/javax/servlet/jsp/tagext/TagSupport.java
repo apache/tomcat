@@ -73,7 +73,7 @@ public class TagSupport implements IterationTag, Serializable {
      * or is an instance of the class specified
      */
 
-    public static final Tag findAncestorWithClass(Tag from, Class klass) {
+    public static final Tag findAncestorWithClass(Tag from, Class<?> klass) {
 	boolean isInterface = false;
 
 	if (from == null ||
