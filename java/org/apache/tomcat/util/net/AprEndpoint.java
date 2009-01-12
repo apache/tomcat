@@ -87,6 +87,13 @@ public class AprEndpoint {
      */
     public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
 
+    /**
+     * The request attribute key for the session manager.
+     * This one is a Tomcat extension to the Servlet spec.
+     */
+    public static final String SESSION_MGR =
+        "javax.servlet.request.ssl_session_mgr";
+
 
     // ----------------------------------------------------------------- Fields
 

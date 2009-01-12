@@ -145,6 +145,14 @@ public final class Globals {
 
 
     /**
+     * The request attribute key for the session manager.
+     * This one is a Tomcat extension to the Servlet spec.
+     */
+    public static final String SSL_SESSION_MGR_ATTR =
+        "javax.servlet.request.ssl_session_mgr";
+
+
+    /**
      * The servlet context attribute under which the managed bean Registry
      * will be stored for privileged contexts (if enabled).
      */

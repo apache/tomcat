@@ -31,6 +31,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocket;
 import javax.security.cert.X509Certificate;
 
+import org.apache.tomcat.util.net.SSLSessionManager;
 import org.apache.tomcat.util.net.SSLSupport;
 
 /** JSSESupport
@@ -48,7 +49,7 @@ import org.apache.tomcat.util.net.SSLSupport;
    Parts cribbed from CertificatesValve
 */
 
-class JSSESupport implements SSLSupport {
+class JSSESupport implements SSLSupport, SSLSessionManager {
     
     private static org.apache.juli.logging.Log log =
         org.apache.juli.logging.LogFactory.getLog(JSSESupport.class);
@@ -232,5 +233,11 @@ class JSSESupport implements SSLSupport {
         }
     }
 
+    /**
+     * Invalidate the session this support object is associated with.
+     */
+    public void invalidateSession() {
+        session.invalidate();
+    }
 }
 

@@ -29,4 +29,10 @@ public class Constants {
 
     public static final String Package = "org.apache.catalina.session";
 
+    /**
+     * Name of note containing SSL session manager
+     */
+    public static final String SESS_SSL_MGMT =
+        "org.apache.catalina.session.SSL_MGMT";
+
 }
