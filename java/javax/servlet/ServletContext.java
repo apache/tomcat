@@ -162,7 +162,7 @@ public interface ServletContext {
     * @since Servlet 2.3
     */
     
-    public Set getResourcePaths(String path);
+    public Set<String> getResourcePaths(String path);
     
     
 
@@ -352,7 +352,7 @@ public interface ServletContext {
      *
      */
     
-    public Enumeration getServlets();
+    public Enumeration<Servlet> getServlets();
     
     
     
@@ -371,7 +371,7 @@ public interface ServletContext {
      *
      */
  
-    public Enumeration getServletNames();
+    public Enumeration<String> getServletNames();
     
   
   
@@ -524,7 +524,7 @@ public interface ServletContext {
      * @see ServletConfig#getInitParameter
      */
 
-    public Enumeration getInitParameterNames();
+    public Enumeration<String> getInitParameterNames();
     
     
 
@@ -577,7 +577,7 @@ public interface ServletContext {
      *
      */
 
-    public Enumeration getAttributeNames();
+    public Enumeration<String> getAttributeNames();
     
     
     
