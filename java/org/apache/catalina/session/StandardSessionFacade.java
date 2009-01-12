@@ -122,7 +122,7 @@ public class StandardSessionFacade
     }
 
 
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         return session.getAttributeNames();
     }
 

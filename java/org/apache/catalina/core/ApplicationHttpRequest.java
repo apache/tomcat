@@ -239,7 +239,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Override the <code>getAttributeNames()</code> method of the wrapped
      * request.
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         return (new AttributeNamesEnumerator());
     }
 

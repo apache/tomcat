@@ -117,10 +117,18 @@ public class ApplicationContext
 
 
     /**
-     * Empty collection to serve as the basis for empty enumerations.
+     * Empty String collection to serve as the basis for empty enumerations.
      * <strong>DO NOT ADD ANY ELEMENTS TO THIS COLLECTION!</strong>
      */
-    private static final ArrayList<Object> empty = new ArrayList<Object>();
+    private static final ArrayList<String> emptyString =
+        new ArrayList<String>();
+
+    /**
+     * Empty Servlet collection to serve as the basis for empty enumerations.
+     * <strong>DO NOT ADD ANY ELEMENTS TO THIS COLLECTION!</strong>
+     */
+    private static final ArrayList<Servlet> emptyServlet =
+        new ArrayList<Servlet>();
 
 
     /**
@@ -201,7 +209,7 @@ public class ApplicationContext
      * Return an enumeration of the names of the context attributes
      * associated with this context.
      */
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
 
         return new Enumerator<String>(attributes.keySet(), true);
 
@@ -283,7 +291,7 @@ public class ApplicationContext
      * Return the names of the context's initialization parameters, or an
      * empty enumeration if the context has no initialization parameters.
      */
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
 
         mergeParameters();
         return (new Enumerator<String>(parameters.keySet()));
@@ -562,7 +570,7 @@ public class ApplicationContext
      *
      * @param path Collection path
      */
-    public Set getResourcePaths(String path) {
+    public Set<String> getResourcePaths(String path) {
 
         // Validate the path argument
         if (path == null) {
@@ -640,16 +648,16 @@ public class ApplicationContext
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
-    public Enumeration getServletNames() {
-        return (new Enumerator<Object>(empty));
+    public Enumeration<String> getServletNames() {
+        return (new Enumerator<String>(emptyString));
     }
 
 
     /**
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
-    public Enumeration getServlets() {
-        return (new Enumerator<Object>(empty));
+    public Enumeration<Servlet> getServlets() {
+        return (new Enumerator<Servlet>(emptyServlet));
     }
 
 
