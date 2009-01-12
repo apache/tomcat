@@ -39,8 +39,8 @@ base.path=/usr/share/java
 #base.path=C:/path/to/the/repository
 #base.path=/usr/local
 
-compile.source=1.5
-compile.target=1.5
+compile.source=1.6
+compile.target=1.6
 compile.debug=true
 
 base-commons.loc=http://archive.apache.org/dist/commons
