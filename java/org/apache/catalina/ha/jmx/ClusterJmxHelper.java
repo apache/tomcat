@@ -52,7 +52,7 @@ public class ClusterJmxHelper {
     public static MBeanServer getMBeanServer() throws Exception {
         if (mbeanServer == null) {
             if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
-                mbeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+                mbeanServer = MBeanServerFactory.findMBeanServer(null).get(0);
             } else {
                 mbeanServer = MBeanServerFactory.createMBeanServer();
             }

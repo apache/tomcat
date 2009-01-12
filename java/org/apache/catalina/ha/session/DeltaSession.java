@@ -779,7 +779,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 final class StandardSessionContext
     implements HttpSessionContext {
 
-    private HashMap dummy = new HashMap();
+    private HashMap<?,String> dummy = new HashMap<String,String>();
 
     /**
      * Return the session identifiers of all sessions defined within this
@@ -789,8 +789,8 @@ final class StandardSessionContext
      *             must return an empty <code>Enumeration</code> and will be
      *             removed in a future version of the API.
      */
-    public Enumeration getIds() {
-        return (new Enumerator(dummy));
+    public Enumeration<String> getIds() {
+        return (new Enumerator<String>(dummy));
     }
 
     /**

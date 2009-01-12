@@ -269,7 +269,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
 
         if (request == null) {
             throw new IllegalStateException(
@@ -362,7 +362,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
 
         if (request == null) {
             throw new IllegalStateException(
@@ -405,7 +405,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public Map getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
 
         if (request == null) {
             throw new IllegalStateException(
@@ -536,7 +536,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public Enumeration getLocales() {
+    public Enumeration<Locale> getLocales() {
 
         if (request == null) {
             throw new IllegalStateException(
@@ -649,7 +649,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public Enumeration getHeaders(String name) {
+    public Enumeration<String> getHeaders(String name) {
 
         if (request == null) {
             throw new IllegalStateException(
@@ -665,7 +665,7 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public Enumeration getHeaderNames() {
+    public Enumeration<String> getHeaderNames() {
 
         if (request == null) {
             throw new IllegalStateException(
