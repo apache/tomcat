@@ -335,6 +335,7 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
      *
      * @param sc The new status code
      * @param msg The new message
+     * @deprecated
      */
     public void setStatus(int sc, String msg) {
 

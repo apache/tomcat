@@ -621,7 +621,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             for (Iterator<String> iter = keys.iterator(); iter.hasNext();) {
                 String key = iter.next();
                 Object value = data.get(key);
-                OpenType type = compositeType.getType(key);
+                OpenType<?> type = compositeType.getType(key);
                 if (type instanceof SimpleType) {
                     setProperty(propertyPrefix + "." + key, value);
                 } else {
@@ -636,7 +636,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     Object key1 = iter1.next();
                     CompositeData valuedata = data.get(new Object[] { key1 });
                     Object value = valuedata.get("value");
-                    OpenType type = valuedata.getCompositeType().getType(
+                    OpenType<?> type = valuedata.getCompositeType().getType(
                             "value");
                     if (type instanceof SimpleType) {
                         setProperty(propertyPrefix + "." + key1, value);

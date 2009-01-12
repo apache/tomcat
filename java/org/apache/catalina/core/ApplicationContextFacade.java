@@ -159,9 +159,10 @@ public final class ApplicationContextFacade
     }
 
 
-    public Set getResourcePaths(String path) {
+    public Set<String> getResourcePaths(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()){
-            return (Set)doPrivileged("getResourcePaths", new Object[]{path});
+            return (Set<String>)doPrivileged("getResourcePaths",
+                    new Object[]{path});
         } else {
             return context.getResourcePaths(path);
         }
@@ -216,6 +217,9 @@ public final class ApplicationContextFacade
     }
 
 
+    /**
+     * @deprecated
+     */
     public Servlet getServlet(String name)
         throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -234,18 +238,24 @@ public final class ApplicationContextFacade
     }
 
 
-    public Enumeration getServlets() {
+    /**
+     * @deprecated
+     */
+    public Enumeration<Servlet> getServlets() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Enumeration) doPrivileged("getServlets", null);
+            return (Enumeration<Servlet>) doPrivileged("getServlets", null);
         } else {
             return context.getServlets();
         }
     }
 
 
-    public Enumeration getServletNames() {
+    /**
+     * @deprecated
+     */
+    public Enumeration<String> getServletNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Enumeration) doPrivileged("getServletNames", null);
+            return (Enumeration<String>) doPrivileged("getServletNames", null);
         } else {
             return context.getServletNames();
         }
@@ -261,6 +271,9 @@ public final class ApplicationContextFacade
     }
 
 
+    /**
+     * @deprecated
+     */
     public void log(Exception exception, String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Class[]{Exception.class, String.class}, 
@@ -309,9 +322,10 @@ public final class ApplicationContextFacade
     }
 
 
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Enumeration) doPrivileged("getInitParameterNames", null);
+            return (Enumeration<String>) doPrivileged(
+                    "getInitParameterNames", null);
         } else {
             return context.getInitParameterNames();
         }
@@ -327,9 +341,10 @@ public final class ApplicationContextFacade
      }
 
 
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Enumeration) doPrivileged("getAttributeNames", null);
+            return (Enumeration<String>) doPrivileged(
+                    "getAttributeNames", null);
         } else {
             return context.getAttributeNames();
         }

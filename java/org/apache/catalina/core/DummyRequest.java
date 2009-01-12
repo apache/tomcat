@@ -81,11 +81,11 @@ public class DummyRequest
 
     protected FilterChain filterChain = null;
     
-    private static Enumeration<Object> dummyEnum = new Enumeration<Object>(){
+    private static Enumeration<String> dummyEnum = new Enumeration<String>(){
         public boolean hasMoreElements(){
             return false;
         }
-        public Object nextElement(){
+        public String nextElement(){
             return null;
         }
     };
@@ -194,7 +194,7 @@ public class DummyRequest
     public void setServerName(String name) {}
     public void setServerPort(int port) {}
     public Object getAttribute(String name) { return null; }
-    public Enumeration getAttributeNames() { return null; }
+    public Enumeration<String> getAttributeNames() { return null; }
     public String getCharacterEncoding() { return null; }
     public int getContentLength() { return -1; }
     public void setContentLength(int length) {}
@@ -203,9 +203,10 @@ public class DummyRequest
         return null;
     }
     public Locale getLocale() { return null; }
-    public Enumeration getLocales() { return null; }
+    public Enumeration<Locale> getLocales() { return null; }
     public String getProtocol() { return null; }
     public BufferedReader getReader() throws IOException { return null; }
+    /** @deprecated */
     public String getRealPath(String path) { return null; }
     public String getRemoteAddr() { return null; }
     public String getRemoteHost() { return null; }
@@ -235,8 +236,8 @@ public class DummyRequest
     public void setSecure(boolean secure) {}
     public void setUserPrincipal(Principal principal) {}
     public String getParameter(String name) { return null; }
-    public Map getParameterMap() { return null; }
-    public Enumeration getParameterNames() { return dummyEnum; }
+    public Map<String,String[]> getParameterMap() { return null; }
+    public Enumeration<String> getParameterNames() { return dummyEnum; }
     public String[] getParameterValues(String name) { return null; }
     public RequestDispatcher getRequestDispatcher(String path) {
         return null;
@@ -245,8 +246,8 @@ public class DummyRequest
     public Cookie[] getCookies() { return null; }
     public long getDateHeader(String name) { return -1; }
     public String getHeader(String name) { return null; }
-    public Enumeration getHeaders(String name) { return null; }
-    public Enumeration getHeaderNames() { return null; }
+    public Enumeration<String> getHeaders(String name) { return null; }
+    public Enumeration<String> getHeaderNames() { return null; }
     public int getIntHeader(String name) { return -1; }
     public String getMethod() { return null; }
     public String getPathTranslated() { return null; }
@@ -259,6 +260,7 @@ public class DummyRequest
     public HttpSession getSession(boolean create) { return null; }
     public boolean isRequestedSessionIdFromCookie() { return false; }
     public boolean isRequestedSessionIdFromURL() { return false; }
+    /** @deprecated */
     public boolean isRequestedSessionIdFromUrl() { return false; }
     public boolean isRequestedSessionIdValid() { return false; }
     public boolean isUserInRole(String role) { return false; }
