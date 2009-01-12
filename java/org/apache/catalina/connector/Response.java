@@ -35,6 +35,7 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -1420,6 +1421,11 @@ public class Response
         if (hreq.isRequestedSessionIdFromCookie())
             return (false);
         
+        // Is URL encoding permitted
+        if (!hreq.getServletContext().getEffectiveSessionTrackingModes().
+                contains(SessionTrackingMode.URL))
+            return false;
+
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (
                 AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
