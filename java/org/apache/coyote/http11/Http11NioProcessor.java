@@ -1175,6 +1175,7 @@ public class Http11NioProcessor implements ActionHook {
                     if (sslO != null)
                         request.setAttribute
                             (SSLSupport.SESSION_ID_KEY, sslO);
+                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
                 }
             } catch (Exception e) {
                 log.warn(sm.getString("http11processor.socket.ssl"), e);
@@ -1236,10 +1237,6 @@ public class Http11NioProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
                 attach.setTimeout(timeout);
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_SESSION_MGR) {
-            if( sslSupport != null) {
-                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-            }
         }
     }
 
