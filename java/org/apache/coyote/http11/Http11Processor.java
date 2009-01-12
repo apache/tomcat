@@ -1012,6 +1012,7 @@ public class Http11Processor implements ActionHook {
                     if (sslO != null)
                         request.setAttribute
                             (SSLSupport.SESSION_ID_KEY, sslO);
+                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
                 }
             } catch (Exception e) {
                 log.warn(sm.getString("http11processor.socket.ssl"), e);
@@ -1105,10 +1106,6 @@ public class Http11Processor implements ActionHook {
             InternalInputBuffer internalBuffer = (InternalInputBuffer)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
-        } else if (actionCode == ActionCode.ACTION_REQ_SSL_SESSION_MGR) {
-            if( sslSupport != null) {
-                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-            }
         }
 
     }

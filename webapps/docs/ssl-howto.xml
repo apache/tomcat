@@ -638,25 +638,18 @@ information, at
 </section>
 
 <section name="Using the SSL for session tracking in your application">
-  <p>This is a new feature in the Servlet 3.0 specification. Because is uses the
-     SSL session ID associated with the physical client server connection there
-     are a number of limitations. They are:
+  <p>This is a new feature in the Servlet 3.0 specification. Because it uses the
+     SSL session ID associated with the physical client-server connection there
+     are some limitations. They are:
     <ul>
-      <li>The SSL connection must be managed by Tomcat, i.e. Tomcat must have a
-          connector with the attribute <strong>SSLEnabled</strong> set to
-          <code>true</code>. This is to enable Tomcat to invalidate the SSL
-          session if the HTTP session is invalidated. If SSL conections are
-          managed by a proxy or a hardware accelerator this is not possibe.</li>
-      <li>It cannot be used in conjunction with session replication as the SSL
-          session IDs will be different on each node.</li>
-      <li>When <code>session.invalidate()</code> is called within the application
-          <code>response.setHeader("Connection", "close")</code> must also be
-          called as invalidating the session does not affect any current
-          connections.</li>
-      <li>HTTP session timeouts, keep-alive timeouts and SSL session timeouts
-          should be consistent. Note that the default JSSE SSL session timeout
-          (24 hours) is significantly longer than the default Tomcat HTTP Sesson
-          timeout (30 minutes).</li>
+      <li>Tomcat must have a connector with the attribute
+          <strong>isSecure</strong> set to <code>true</code>.</li>
+      <li>If SSL conections are managed by a proxy or a hardware accelerator
+          they must populate the SSL request headers (see the SSLValve) so that
+          the SSL session ID is visibale to Tomcat.</li>
+      <li>If Tomcat terminates the SSL connection, it will not be possible to use
+          session replication as the SSL session IDs will be different on each
+          node.</li>
     </ul>
   </p>
 
@@ -709,6 +702,26 @@ public class SessionTrackingModeListener implements ServletContextListener {
 For additional discussion on this area, please see
 <a href="http://issues.apache.org/bugzilla/show_bug.cgi?id=22679">Bugzilla</a>.
 </p>
+
+  <p>To terminate an SSL session, use:
+    <source>
+// Standard HTTP session invalidation
+session.invalidate();
+
+// Invalidate the SSL Session
+org.apache.tomcat.util.net.SSLSessionManager mgr =
+    (org.apache.tomcat.util.net.SSLSessionManager)
+    request.getAttribute("javax.servlet.request.ssl_session_mgr");
+mgr.invalidateSession();
+
+// Close the conection since the SSL session will be active until the connection
+// is closed
+response.setHeader("Connection", "close");
+    </source>
+    Note that this code is Tomcat specific due to the use of the
+    SSLSessionManager class. This is currently only available for the BIO and
+    NIO conenctors, not the APR/native connector.
+  </p>
 </section>
 
 </body>
