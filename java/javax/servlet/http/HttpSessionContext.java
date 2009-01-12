@@ -62,7 +62,7 @@ public interface HttpSessionContext {
      *
      */
 
-    public Enumeration getIds();
+    public Enumeration<String> getIds();
 }
 
 

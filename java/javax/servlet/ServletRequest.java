@@ -91,7 +91,7 @@ public interface ServletRequest {
      *
      */
 
-    public Enumeration getAttributeNames();
+    public Enumeration<String> getAttributeNames();
     
     
     
@@ -229,7 +229,7 @@ public interface ServletRequest {
      *
      */
      
-    public Enumeration getParameterNames();
+    public Enumeration<String> getParameterNames();
     
     
     
@@ -266,7 +266,7 @@ public interface ServletRequest {
      *
      */
 
-    public Map getParameterMap();
+    public Map<String,String[]> getParameterMap();
     
     
 
@@ -480,7 +480,7 @@ public interface ServletRequest {
      *
      */
 
-    public Enumeration getLocales();
+    public Enumeration<Locale> getLocales();
     
     
     
