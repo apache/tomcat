@@ -38,7 +38,7 @@ public class Apr {
             aprInfo = props.getProperty("tcn.info");
         }
         catch (Throwable t) {
-            ; // Nothing
+            // Do nothing
         }
     }
 }
