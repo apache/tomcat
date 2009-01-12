@@ -19,6 +19,9 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.util.EnumSet;
+
+import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.CometEvent;
 import org.apache.catalina.Context;
@@ -36,6 +39,7 @@ import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 
 
@@ -55,6 +59,8 @@ public class CoyoteAdapter
 
     // -------------------------------------------------------------- Constants
 
+    private static final EnumSet<SessionTrackingMode> SSL_ONLY =
+        EnumSet.of(SessionTrackingMode.SSL);
 
     public static final int ADAPTER_NOTES = 1;
 
@@ -505,11 +511,31 @@ public class CoyoteAdapter
 
         // Parse session Id
         parseSessionCookiesId(req, request);
-
+        parseSessionSslId(request);
         return true;
     }
 
 
+    /**
+     * Look for SSL sesison ID if required. Only look for SSL Session ID if it
+     * is the only tracking method enabled.
+     */
+    protected void parseSessionSslId(Request request) {
+        if (request.getRequestedSessionId() == null &&
+                SSL_ONLY.equals(request.getServletContext()
+                        .getEffectiveSessionTrackingModes()) &&
+                Boolean.TRUE.equals(
+                        request.getConnector().getAttribute("SSLEnabled"))) {
+            // TODO Is there a better way to map SSL sessions to our sesison ID?
+            // TODO The request.getAttribute() will cause a number of other SSL
+            //      attribute to be populated. Is this a performance concern?
+            request.setRequestedSessionId(
+                    request.getAttribute(SSLSupport.SESSION_ID_KEY).toString());
+            request.setRequestedSessionSSL(true);
+        }
+    }
+    
+    
     /**
      * Parse session id in URL.
      */
@@ -518,7 +544,9 @@ public class CoyoteAdapter
         ByteChunk uriBC = req.requestURI().getByteChunk();
         int semicolon = uriBC.indexOf(match, 0, match.length(), 0);
 
-        if (semicolon > 0) {
+        if (semicolon > 0 &&
+                request.getServletContext().getEffectiveSessionTrackingModes()
+                        .contains(SessionTrackingMode.URL)) {
 
             // Parse session ID, and extract it from the decoded request URI
             int start = uriBC.getStart();
@@ -563,7 +591,9 @@ public class CoyoteAdapter
         // from a parent context with a session ID may be present which would
         // overwrite the valid session ID encoded in the URL
         Context context = (Context) request.getMappingData().context;
-        if (context != null && !context.getCookies())
+        if (context != null && !context.getServletContext()
+                .getEffectiveSessionTrackingModes().contains(
+                        SessionTrackingMode.COOKIE))
             return;
         
         // Parse session id from cookies

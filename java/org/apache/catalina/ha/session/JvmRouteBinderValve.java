@@ -19,6 +19,7 @@ package org.apache.catalina.ha.session;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 
 import org.apache.catalina.Container;
@@ -431,7 +432,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
                                        Response response, String sessionId) {
         if (response != null) {
             Context context = request.getContext();
-            if (context.getCookies()) {
+            if (context.getServletContext().getEffectiveSessionTrackingModes()
+                    .contains(SessionTrackingMode.COOKIE)) {
                 // set a new session cookie
                 Cookie newCookie = new Cookie(Globals.SESSION_COOKIE_NAME,
                         sessionId);

@@ -284,18 +284,21 @@ which contains further references for this issue.</p>
 <subsection name="Edit the Tomcat Configuration File">
 <p>If you are using APR, you have the option of configuring an alternative engine to OpenSSL.
 <source>
-&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="someengine" SSLRandomSeed="somedevice" /&gt;
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener"
+          SSLEngine="someengine" SSLRandomSeed="somedevice" /&gt;
 </source>
 The default value is
 <source>
-&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" SSLRandomSeed="builtin" /&gt;
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener"
+          SSLEngine="on" SSLRandomSeed="builtin" /&gt;
 </source>
 So to use SSL under APR, make sure the SSLEngine attribute is set to something other than <code>off</code>.
 The default value is <code>on</code> and if you specify another value, it has to be a valid engine name.
 <br/>
 If you haven't compiled in SSL support into your Tomcat Native library, then you can turn this initialization off
 <source>
-&lt;Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="off" /&gt;
+&lt;Listener className="org.apache.catalina.core.AprLifecycleListener"
+          SSLEngine="off" /&gt;
 </source>
 SSLRandomSeed allows to specify a source of entropy. Productive system needs a reliable source of entropy
 but entropy may need a lot of time to be collected therefore test systems could use no blocking entropy
@@ -632,6 +635,67 @@ of previous messages on this list, as well as subscription and unsubscription
 information, at
 <a href="http://tomcat.apache.org/lists.html">http://tomcat.apache.org/lists.html</a>.</p>
 
+</section>
+
+<section name="Using the SSL for session tracking in your application">
+  <p>This is a new feature in the Servlet 3.0 specification. Because is uses the
+     SSL session ID associated with the physical client server connection there
+     are a number of limitations. They are:
+    <ul>
+      <li>The SSL connection must be managed by Tomcat, i.e. Tomcat must have a
+          connector with the attribute <strong>SSLEnabled</strong> set to
+          <code>true</code>. This is to enable Tomcat to invalidate the SSL
+          session if the HTTP session is invalidated. If SSL conections are
+          managed by a proxy or a hardware accelerator this is not possibe.</li>
+      <li>It cannot be used in conjunction with session replication as the SSL
+          session IDs will be different on each node.</li>
+      <li>When <code>session.invalidate()</code> is called within the application
+          <code>response.setHeader("Connection", "close")</code> must also be
+          called as invalidating the session does not affect any current
+          connections.</li>
+      <li>HTTP session timeouts, keep-alive timeouts and SSL session timeouts
+          should be consistent. Note that the default JSSE SSL session timeout
+          (24 hours) is significantly longer than the default Tomcat HTTP Sesson
+          timeout (30 minutes).</li>
+    </ul>
+  </p>
+
+  <p>
+    To enable SSL session tracking you need to use a context listener to set the
+    tracking mode for the context to be just SSL (if any other tracking mode is
+    enabled, it will be used in preference). It might look something like:
+    <source>
+package org.apache.tomcat.example;
+
+import java.util.EnumSet;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.SessionTrackingMode;
+
+public class SessionTrackingModeListener implements ServletContextListener {
+
+    @Override
+    public void contextDestroyed(ServletContextEvent event) {
+        // Do nothing
+    }
+
+    @Override
+    public void contextInitialized(ServletContextEvent event) {
+        ServletContext context = event.getServletContext();
+        EnumSet&lt;SessionTrackingMode&gt; modes =
+            EnumSet.of(SessionTrackingMode.SSL);
+        
+        context.setSessionTrackingModes(modes);
+    }
+
+}
+    </source>
+  </p>
+  <p>Note: SSL session tracking is implemented for the BIO and NIO connetcors.
+     It is not yet implemented for the APR connector.</p>
+     
 </section>
 
 <section name="Miscellaneous Tips and Bits">

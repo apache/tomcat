@@ -1105,6 +1105,10 @@ public class Http11Processor implements ActionHook {
             InternalInputBuffer internalBuffer = (InternalInputBuffer)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
+        } else if (actionCode == ActionCode.ACTION_REQ_SSL_SESSION_MGR) {
+            if( sslSupport != null) {
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
         }
 
     }
