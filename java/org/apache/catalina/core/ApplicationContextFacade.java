@@ -105,6 +105,9 @@ public final class ApplicationContextFacade
         classCache.put("getRealPath", clazz);
         classCache.put("getAttribute", clazz);
         classCache.put("log", clazz);
+        classCache.put("getDefaultSessionTrackingModes", clazz);
+        classCache.put("getEffectiveSessionTrackingModes", clazz);
+        classCache.put("setSessionTrackingModes", clazz);
     }
 
 
@@ -396,14 +399,22 @@ public final class ApplicationContextFacade
 
 
     public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
-        // TODO SERVLET3
-        return null;
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (EnumSet<SessionTrackingMode>)
+                doPrivileged("getDefaultSessionTrackingModes", null);
+        } else {
+            return context.getDefaultSessionTrackingModes();
+        }
     }
 
 
     public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        // TODO SERVLET3
-        return null;
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (EnumSet<SessionTrackingMode>)
+                doPrivileged("getEffectiveSessionTrackingModes", null);
+        } else {
+            return context.getEffectiveSessionTrackingModes();
+        }
     }
 
 
@@ -420,7 +431,12 @@ public final class ApplicationContextFacade
 
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes) {
-        // TODO SERVLET3
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("setSessionTrackingModes",
+                    new Object[]{sessionTrackingModes});
+        } else {
+            context.setSessionTrackingModes(sessionTrackingModes);
+        }
     }
 
 

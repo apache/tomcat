@@ -46,6 +46,7 @@ import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletResponse;
 import javax.servlet.SessionCookieConfig;
+import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -330,6 +331,12 @@ public class Request
      * Was the requested session ID received in a URL?
      */
     protected boolean requestedSessionURL = false;
+
+
+    /**
+     * Was the requested session ID obtained from the SSL session?
+     */
+    protected boolean requestedSessionSSL = false;
 
 
     /**
@@ -1505,8 +1512,7 @@ public class Request
     }
 
     public ServletContext getServletContext() {
-        // TODO SERVLET3
-        return null;
+       return context.getServletContext();
     }
 
     public boolean isAsyncStarted() {
@@ -1731,6 +1737,20 @@ public class Request
     public void setRequestedSessionURL(boolean flag) {
 
         this.requestedSessionURL = flag;
+
+    }
+
+
+    /**
+     * Set a flag indicating whether or not the requested session ID for this
+     * request came in through SSL.  This is normally called by the
+     * HTTP Connector, when it parses the request headers.
+     *
+     * @param flag The new flag
+     */
+    public void setRequestedSessionSSL(boolean flag) {
+
+        this.requestedSessionSSL = flag;
 
     }
 
@@ -2321,6 +2341,15 @@ public class Request
         coyoteRequest.action(ActionCode.ACTION_COMET_SETTIMEOUT,new Long(timeout));
     }
     
+    /**
+     * Not part of Servlet 3 spec but probably should be.
+     * @return
+     */
+    public boolean isRequestedSessionIdFromSSL() {
+        return requestedSessionSSL;
+    }
+    
+    
     // ------------------------------------------------------ Protected Methods
 
 
@@ -2360,7 +2389,8 @@ public class Request
         if (!create)
             return (null);
         if ((context != null) && (response != null) &&
-            context.getCookies() &&
+            context.getServletContext().getEffectiveSessionTrackingModes().
+                    contains(SessionTrackingMode.COOKIE) &&
             response.getResponse().isCommitted()) {
             throw new IllegalStateException
               (sm.getString("coyoteRequest.sessionCreateCommitted"));
@@ -2369,16 +2399,26 @@ public class Request
         // Attempt to reuse session id if one was submitted in a cookie
         // Do not reuse the session id if it is from a URL, to prevent possible
         // phishing attacks
-        if (connector.getEmptySessionPath() 
-                && isRequestedSessionIdFromCookie()) {
+        // Use the SSL session ID if one is present. 
+        if ((connector.getEmptySessionPath() 
+                && isRequestedSessionIdFromCookie()) || requestedSessionSSL ) {
             session = manager.createSession(getRequestedSessionId());
+            if (requestedSessionSSL) {
+                coyoteRequest.action(ActionCode.ACTION_REQ_SSL_SESSION_MGR,
+                        null);
+                session.setNote(
+                        org.apache.catalina.session.Constants.SESS_SSL_MGMT,
+                        getAttribute(Globals.SSL_SESSION_MGR_ATTR));
+            }
         } else {
             session = manager.createSession(null);
         }
 
         // Creating a new session cookie based on that session
         if ((session != null) && (getContext() != null)
-               && getContext().getCookies()) {
+               && getContext().getServletContext().
+                       getEffectiveSessionTrackingModes().contains(
+                               SessionTrackingMode.COOKIE)) {
             Cookie cookie = new Cookie(Globals.SESSION_COOKIE_NAME,
                                        session.getIdInternal());
             configureSessionCookie(cookie);

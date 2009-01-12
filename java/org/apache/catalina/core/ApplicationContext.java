@@ -44,8 +44,10 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ResourceSet;
@@ -85,6 +87,9 @@ public class ApplicationContext
         super();
         this.context = context;
         this.basePath = basePath;
+        
+        // Populate default session tracking modes
+        populateDefaultSessionTrackingModes();
     }
 
 
@@ -154,6 +159,12 @@ public class ApplicationContext
      * Session Cookie config
      */
     private SessionCookieConfig sessionCookieConfig;
+    
+    /**
+     * Session tracking modes
+     */
+    private EnumSet<SessionTrackingMode> sessionTrackingModes = null;
+    private EnumSet<SessionTrackingMode> defaultSessionTrackingModes = null;
 
     // --------------------------------------------------------- Public Methods
 
@@ -840,15 +851,50 @@ public class ApplicationContext
     }
 
 
+    /**
+     * By default {@link SessionTrackingMode#URL} is always supported, {@link
+     * SessionTrackingMode#COOKIE} is supported unless the <code>cookies</code>
+     * attribute has been set to <code>false</code> for the context and {@link
+     * SessionTrackingMode#SSL} is supported if at least one of the connectors
+     * used by this context has the attribute <code>SSLEnabled</code> set to
+     * <code>true</code>.
+     */
     public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
-        // TODO SERVLET3
-        return null;
+        return defaultSessionTrackingModes;
     }
 
+    private void populateDefaultSessionTrackingModes() {
+        // URL re-writing is always enabled by default
+        defaultSessionTrackingModes = EnumSet.of(SessionTrackingMode.URL); 
+        
+        if (context.getCookies()) {
+            defaultSessionTrackingModes.add(SessionTrackingMode.COOKIE);
+        }
 
+        // Context > Host > Engine > Service
+        Connector[] connectors = ((Engine) context.getParent().getParent())
+                .getService().findConnectors();
+        // Need at least one SSL enabled connector to use the SSL session ID.
+        // has to be SSL enabled so we can close the SSL session.
+        // TODO extend this for SSL sessions managed by accelerators, web
+        // servers etc
+        for (Connector connector : connectors) {
+            if (Boolean.TRUE.equals(connector.getAttribute("SSLEnabled"))) {
+                defaultSessionTrackingModes.add(SessionTrackingMode.SSL);
+                break;
+            }
+        }
+    }
+
+    /**
+     * Return the supplied value if one was previously set, else return the
+     * defaults.
+     */
     public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes() {
-        // TODO SERVLET3
-        return null;
+        if (sessionTrackingModes != null) {
+            return sessionTrackingModes;
+        }
+        return defaultSessionTrackingModes;
     }
 
 
@@ -862,9 +908,33 @@ public class ApplicationContext
     }
 
 
+    /**
+     * @throws IllegalStateException if the context has already been initialised
+     * @throws IllegalArgumentException TODO SERVLET3 Something to do with SSL
+     *                                  but the spec language is not clear
+     *                                  If an unsupported tracking mode is
+     *                                  requested
+     */
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes) {
-        // TODO SERVLET3
+
+        if (context.getAvailable()) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.setSessionTracking.ise",
+                            getContextPath()));
+        }
+        
+        // Check that only supported tracking modes have been requested
+        for (SessionTrackingMode sessionTrackingMode : sessionTrackingModes) {
+            if (!defaultSessionTrackingModes.contains(sessionTrackingMode)) {
+                throw new IllegalArgumentException(sm.getString(
+                        "applicationContext.setSessionTracking.iae",
+                        sessionTrackingMode.toString(), getContextPath()));
+            }
+        }
+        // TODO SERVLET3 - The SSL test
+        
+        this.sessionTrackingModes = sessionTrackingModes;
     }
 
 

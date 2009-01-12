@@ -1198,6 +1198,9 @@ public class Http11AprProcessor implements ActionHook {
             //no op
         } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
             //no op
+        } else if (actionCode == ActionCode.ACTION_REQ_SSL_SESSION_MGR) {
+            //TODO SERVLET3 provide a hook to enable the SSL session to be
+            // invalidated
         }
 
     }
