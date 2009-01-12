@@ -336,16 +336,6 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	}
 
 	/**
-     * Synchronize variables before fragment invokation
-     * @param jspContext The JspContext the variable should sync to.  This
-     *        is usually the context of the page where the fragment is. 
-     */
-    public void syncBeforeInvoke(JspContext jspContext) {
-        copyTagToPageScope(VariableInfo.NESTED, (PageContext)jspContext);
-        copyTagToPageScope(VariableInfo.AT_BEGIN, (PageContext)jspContext);
-    }
-
-    /**
 	 * Synchronize variables at end of tag file
 	 */
 	public void syncEndTagFile() {
@@ -362,17 +352,6 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 	 *            variable scope (one of NESTED, AT_BEGIN, or AT_END)
 	 */
 	private void copyTagToPageScope(int scope) {
-        copyTagToPageScope(scope,  invokingJspCtxt);
-    }
-
-	/**
-     * Copies the variables of the given scope from the virtual page scope of
-     * this JSP context wrapper to the page scope of the specified JSP context.
-     *
-     * @param scope variable scope (one of NESTED, AT_BEGIN, or AT_END)
-     * @param jspContext the target context
-     */
-    private void copyTagToPageScope(int scope, PageContext jspContext) {
 		Iterator<String> iter = null;
 
 		switch (scope) {
@@ -398,9 +377,9 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
 			Object obj = getAttribute(varName);
 			varName = findAlias(varName);
 			if (obj != null) {
-			    jspContext.setAttribute(varName, obj);
+				invokingJspCtxt.setAttribute(varName, obj);
 			} else {
-			    jspContext.removeAttribute(varName, PAGE_SCOPE);
+				invokingJspCtxt.removeAttribute(varName, PAGE_SCOPE);
 			}
 		}
 	}
