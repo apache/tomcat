@@ -1090,7 +1090,7 @@ public class Request
     /**
      * Return the names of all defined request parameters for this request.
      */
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
 
         if (!parametersParsed)
             parseParameters();
@@ -1932,7 +1932,7 @@ public class Request
      *
      * @param name Name of the requested header
      */
-    public Enumeration getHeaders(String name) {
+    public Enumeration<String> getHeaders(String name) {
         return coyoteRequest.getMimeHeaders().values(name);
     }
 
@@ -1940,7 +1940,7 @@ public class Request
     /**
      * Return the names of all headers received with this request.
      */
-    public Enumeration getHeaderNames() {
+    public Enumeration<String> getHeaderNames() {
         return coyoteRequest.getMimeHeaders().names();
     }
 
