@@ -84,7 +84,7 @@ public interface FilterConfig {
      *
      */
 
-    public Enumeration getInitParameterNames();
+    public Enumeration<String> getInitParameterNames();
 
 
 

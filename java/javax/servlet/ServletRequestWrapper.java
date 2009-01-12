@@ -89,7 +89,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * on the wrapped request object.
      */
 
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
 	return this.request.getAttributeNames();
 	}    
     
@@ -162,7 +162,7 @@ public class ServletRequestWrapper implements ServletRequest {
       * The default behavior of this method is to return getParameterMap()
      * on the wrapped request object.
      */
-    public Map getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
 	return this.request.getParameterMap();
     }
     
@@ -174,7 +174,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * on the wrapped request object.
      */
      
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
 	return this.request.getParameterNames();
     }
     
@@ -315,7 +315,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * on the wrapped request object.
      */
 
-    public Enumeration getLocales() {
+    public Enumeration<Locale> getLocales() {
 	return this.request.getLocales();
     }
     
