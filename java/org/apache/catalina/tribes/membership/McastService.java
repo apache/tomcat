@@ -508,6 +508,9 @@ public class McastService implements MembershipService,MembershipListener,Messag
             throw new ChannelException("Multicast send is not started or enabled.");
         
         byte[] data = XByteBuffer.createDataPackage((ChannelData)message);
+        if (data.length>McastServiceImpl.MAX_PACKET_SIZE) {
+            throw new ChannelException("Packet length["+data.length+"] exceeds max packet size of "+McastServiceImpl.MAX_PACKET_SIZE+" bytes.");
+        }
         DatagramPacket packet = new DatagramPacket(data,0,data.length);
         try {
             impl.send(false, packet);
