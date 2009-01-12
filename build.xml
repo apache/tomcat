@@ -783,12 +783,13 @@
       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
     </move>
     <mkdir dir="${tomcat-dbcp.home}/classes"/>
+    <!-- TODO Fix DBCP so it builds on 1.6 JDKs -->
     <javac destdir="${tomcat-dbcp.home}/classes"
            optimize="off"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.target}"
+           source="1.5"
+           target="1.5"
            sourcepath="${tomcat-dbcp.home}/src/java"
            srcdir="${tomcat-dbcp.home}/src/java" >
       <include name="**" />
