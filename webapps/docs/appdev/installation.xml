@@ -39,7 +39,7 @@ in the following subsections.</p>
 
 <subsection name="JDK">
 
-<p>Tomcat 6.0 was designed to run on J2SE 5.0.
+<p>Tomcat 7.0 was designed to run on J2SE 6.0.
 </p>
 
 <p>Compatible JDKs for many platforms (or links to where they can be found)
