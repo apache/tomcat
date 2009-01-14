@@ -390,26 +390,52 @@ public final class ApplicationContextFacade
     public void addFilter(String filterName, String description,
             String className, Map<String, String> initParameters,
             boolean isAsyncSupported) {
-        // TODO SERVLET3
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addFilter", new Object[]{filterName, description,
+                    className, initParameters,
+                    Boolean.valueOf(isAsyncSupported)});
+        } else {
+            context.addFilter(filterName, description, className,
+                    initParameters, isAsyncSupported);
+        }
     }
 
 
     public void addFilterMappingForServletNames(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... servletNames) {
-        // TODO SERVLET3
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addFilterMappingForServletNames",
+                    new Object[]{filterName, dispatcherTypes,
+                    Boolean.valueOf(isMatchAfter), servletNames});
+        } else {
+            context.addFilterMappingForServletNames(filterName, dispatcherTypes,
+                    isMatchAfter, servletNames);
+        }
     }
 
 
     public void addFilterMappingForUrlPatterns(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... urlPatterns) {
-        // TODO SERVLET3
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addFilterMappingForUrlPatterns",
+                    new Object[]{filterName, dispatcherTypes,
+                    Boolean.valueOf(isMatchAfter), urlPatterns});
+        } else {
+            context.addFilterMappingForUrlPatterns(filterName, dispatcherTypes,
+                    isMatchAfter, urlPatterns);
+        }
     }
 
 
     public void addServletMapping(String servletName, String[] urlPatterns) {
-        // TODO SERVLET3
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addServletMapping",
+                    new Object[]{servletName, urlPatterns});
+        } else {
+            context.addServletMapping(servletName, urlPatterns);
+        }
     }
 
 
@@ -434,13 +460,22 @@ public final class ApplicationContextFacade
 
 
     public SessionCookieConfig getSessionCookieConfig() {
-        // TODO SERVLET3
-        return null;
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (SessionCookieConfig)
+                doPrivileged("getSessionCookieConfig", null);
+        } else {
+            return context.getSessionCookieConfig();
+        }
     }
 
 
     public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
-        // TODO SERVLET3
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("setSessionCookieConfig",
+                    new Object[]{sessionCookieConfig});
+        } else {
+            context.setSessionCookieConfig(sessionCookieConfig);
+        }
     }
 
 
