@@ -49,6 +49,8 @@ import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ApplicationParameter;
+import org.apache.catalina.deploy.FilterDef;
+import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
@@ -836,26 +838,82 @@ public class ApplicationContext
     public void addFilter(String filterName, String description,
             String className, Map<String, String> initParameters,
             boolean isAsyncSupported) {
-        // TODO SERVLET3
+
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addFilter.ise",
+                            getContextPath()));
+        }
+        FilterDef filterDef = new FilterDef();
+        filterDef.setFilterName(filterName);
+        filterDef.setDescription(description);
+        filterDef.setFilterClass(className);
+        filterDef.getParameterMap().putAll(initParameters);
+        context.addFilterDef(filterDef);
+        // TODO SERVLET3 - ASync support
     }
 
 
     public void addFilterMappingForServletNames(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... servletNames) {
-        // TODO SERVLET3
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(sm.getString(
+                    "applicationContext.addFilterMapping", getContextPath()));
+        }
+        FilterMap filterMap = new FilterMap(); 
+        for (String servletName : servletNames) {
+            filterMap.addServletName(servletName);
+        }
+        filterMap.setFilterName(filterName);
+        for (DispatcherType dispatcherType: dispatcherTypes) {
+            filterMap.setDispatcher(dispatcherType.name());
+        }
+        if (isMatchAfter) {
+            context.addFilterMap(filterMap);
+        } else {
+            context.addFilterMapBefore(filterMap);
+        }
     }
 
 
     public void addFilterMappingForUrlPatterns(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... urlPatterns) {
-        // TODO SERVLET3
+        
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(sm.getString(
+                    "applicationContext.addFilterMapping", getContextPath()));
+        }
+        FilterMap filterMap = new FilterMap(); 
+        for (String urlPattern : urlPatterns) {
+            filterMap.addURLPattern(urlPattern);
+        }
+        filterMap.setFilterName(filterName);
+        for (DispatcherType dispatcherType: dispatcherTypes) {
+            filterMap.setDispatcher(dispatcherType.name());
+        }
+        if (isMatchAfter) {
+            context.addFilterMap(filterMap);
+        } else {
+            context.addFilterMapBefore(filterMap);
+        }
     }
 
 
     public void addServletMapping(String servletName, String[] urlPatterns) {
-        // TODO SERVLET3
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(sm.getString(
+                    "applicationContext.addServletMapping", getContextPath()));
+        }
+        for (String urlPattern : urlPatterns) {
+            boolean jspWildCard = ("*.jsp".equals(urlPattern));
+            context.addServletMapping(servletName, urlPattern, jspWildCard);
+        }
     }
 
 
@@ -882,10 +940,7 @@ public class ApplicationContext
         // Context > Host > Engine > Service
         Connector[] connectors = ((Engine) context.getParent().getParent())
                 .getService().findConnectors();
-        // Need at least one SSL enabled connector to use the SSL session ID.
-        // has to be SSL enabled so we can close the SSL session.
-        // TODO extend this for SSL sessions managed by accelerators, web
-        // servers etc
+        // Need at least one secure connector to use the SSL session ID.
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getAttribute("secure"))) {
                 defaultSessionTrackingModes.add(SessionTrackingMode.SSL);
