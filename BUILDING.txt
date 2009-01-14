@@ -22,7 +22,7 @@ $Id$
             ====================================================
 
 This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Servlet 2.5 and JSP 2.1 specifications from the Java
+implements the Servlet 3.0 and JSP 2.1 specifications from the Java
 Community Process <http://www.jcp.org/>.  In order to build a binary
 distribution version of the container from a source distribution, 
 do the following:
@@ -32,7 +32,7 @@ do the following:
 
 * If the JDK is already installed, skip to (1).
 
-* Download a Java Development Kit (JDK) release (version 1.5.x or later) from:
+* Download a Java Development Kit (JDK) release (version 1.6.x or later) from:
 
     http://java.sun.com/j2se/
 
@@ -72,7 +72,7 @@ do the following:
   http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/
 
 * Download a source package from:
-  http://tomcat.apache.org/download-60.cgi
+  http://tomcat.apache.org/download-70.cgi
 
 * Checkout the source using SVN, selecting the desired version or
   branch (current development source is at 
@@ -113,7 +113,7 @@ do the following:
 
 (3) Updating sources
 
-It is recommended that you regularly update the downloaded Tomcat 6 sources
+It is recommended that you regularly update the downloaded Tomcat 7 sources
 using your SVN client.
 
 (4) Rebuilds
