@@ -956,8 +956,12 @@ public class RequestFacade implements HttpServletRequest {
 
 
     public ServletContext getServletContext() {
-        // TODO SERVLET3
-        return null;
+        if (request == null) {
+            throw new IllegalStateException(
+                            sm.getString("requestFacade.nullRequest"));
+        }
+
+        return request.getServletContext();
     }
 
 
