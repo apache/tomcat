@@ -34,9 +34,9 @@
 <section name="Introduction">
 
 <p>This is the top-level entry point of the documentation bundle for the
-<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 6.0
+<strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version 7.0
 implements the
-Servlet 2.5 and JavaServer Pages 2.1 specifications from the
+Servlet 3.0 and JavaServer Pages 2.1 specifications from the
 <a href="http://www.jcp.org">Java Community Process</a>, and includes many
 additional features that make it a useful platform for developing and deploying
 web applications and web services.</p>
@@ -149,6 +149,7 @@ are responsible for installing, configuring, and operating a Apache Tomcat 6 ser
     - Complete documentation and HOWTOs on the JK native webserver connector,
       used to interface Apache Tomcat with servers like Apache HTTPd, IIS
       and others.</li>
+<!--  TODO SERVLET3 Update when URL is available -->
 <li><a href="http://java.sun.com/products/servlet/2.5/docs/servlet-2_5-mr2/index.html">
     <strong>Servlet API Javadocs</strong></a> - The Servlet 2.5 API Javadocs.</li>
 <li><a href="http://java.sun.com/products/jsp/2.1/docs/jsp-2_1-pfd2/index.html">

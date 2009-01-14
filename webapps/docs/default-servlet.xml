@@ -272,7 +272,7 @@ The following is a sample xsl file which mimics the default tomcat behavior:
         &lt;/table&gt;
       &lt;xsl:apply-templates select="readme"/&gt;
       &lt;hr size="1" /&gt;
-      &lt;h3&gt;Apache Tomcat/6.0&lt;/h3&gt;
+      &lt;h3&gt;Apache Tomcat/7.0&lt;/h3&gt;
     &lt;/body&gt;
    &lt;/html&gt;
   &lt;/xsl:template&gt;
