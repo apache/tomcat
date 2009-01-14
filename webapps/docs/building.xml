@@ -75,11 +75,11 @@ available, which will be used to actually perform the build.
 
 </section>
 
-<section name="Checkout or obtain the source code for Tomcat 6.0">
+<section name="Checkout or obtain the source code for Tomcat 7.0">
 
   <p>
   Tomcat SVN repository URL:
-  <code>http://svn.apache.org/repos/asf/tomcat/tc6.0.x/</code>
+  <code>http://svn.apache.org/repos/asf/tomcat/tc7.0.x/</code>
   </p>
   
   <p>
@@ -90,7 +90,7 @@ available, which will be used to actually perform the build.
   <p>
   Checkout the source using SVN, selecting the desired version or
   branch (current development source is at 
-  <code>http://svn.apache.org/repos/asf/tomcat/tc6.0.x/trunk/</code>), or 
+  <code>http://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/</code>), or 
   unpack the source package. The location where the source has been
   placed will be referred as ${tomcat.source}.
   </p>
@@ -187,8 +187,7 @@ From there import the root directory where you have checked out tomcat.
 Eclipse .project and .classpath files are provided in to root directory of tomcat repository
 should allow Eclipse to find all source trees and jars, and
 hopefully compile without problems. <b>Note</b> that these
-files assume you are using Eclipse with a 5.0 or later JDK; also, the
-connectors module must be built with a compiler compliance level of 5.0.
+files assume you are using Eclipse with a 6.0 or later JDK.
 </p>
 
 <p>

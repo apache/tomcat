@@ -42,8 +42,8 @@
 
 <section name="Introduction">
 
-<p>Tomcat 6.0 uses the Jasper 2 JSP Engine to implement
-the <a href="http://java.sun.com/products/jsp/">JavaServer Pages 2.0</a>
+<p>Tomcat 7.0 uses the Jasper 2 JSP Engine to implement
+the <a href="http://java.sun.com/products/jsp/">JavaServer Pages 2.1</a>
 specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
