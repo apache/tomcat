@@ -360,10 +360,22 @@ public class StandardContext
 
     /**
      * The set of filter mappings for this application, in the order
-     * they were defined in the deployment descriptor.
+     * they were defined in the deployment descriptor with additional mappings
+     * added via the {@link ServletContext} possibly both before and after those
+     * defined in the deployment descriptor.
      */
     private FilterMap filterMaps[] = new FilterMap[0];
 
+    /**
+     * Filter mappings added via {@link ServletContext} may have to be inserted
+     * before the mappings in the deploymenmt descriptor but must be inserted in
+     * the order the {@link ServletContext} methods are called. This isn't an
+     * issue for the mappings added after the deployment descriptor - they are
+     * just added to the end - but correctly the adding mappings before the
+     * deployment descriptor mappings requires knowing where the last 'before'
+     * mapping was added.
+     */
+    private int filterMapInsertPoint = 0;
 
     /**
      * Ignore annotations.
@@ -2173,7 +2185,8 @@ public class StandardContext
 
 
     /**
-     * Add a filter mapping to this Context.
+     * Add a filter mapping to this Context at the end of the current set
+     * of filter mappings.
      *
      * @param filterMap The filter mapping to be added
      *
@@ -2183,6 +2196,54 @@ public class StandardContext
      */
     public void addFilterMap(FilterMap filterMap) {
 
+        validateFilterMap(filterMap);
+        // Add this filter mapping to our registered set
+        synchronized (filterMaps) {
+            FilterMap results[] =new FilterMap[filterMaps.length + 1];
+            System.arraycopy(filterMaps, 0, results, 0, filterMaps.length);
+            results[filterMaps.length] = filterMap;
+            filterMaps = results;
+        }
+        fireContainerEvent("addFilterMap", filterMap);
+    }
+
+    
+    /**
+     * Add a filter mapping to this Context before the mappings defined in the
+     * deployment descriptor but after any other mappings added via this method.
+     *
+     * @param filterMap The filter mapping to be added
+     *
+     * @exception IllegalArgumentException if the specified filter name
+     *  does not match an existing filter definition, or the filter mapping
+     *  is malformed
+     */
+    public void addFilterMapBefore(FilterMap filterMap) {
+
+        validateFilterMap(filterMap);
+
+        // Add this filter mapping to our registered set
+        synchronized (filterMaps) {
+            FilterMap results[] = new FilterMap[filterMaps.length + 1];
+            System.arraycopy(filterMaps, 0, results, 0, filterMapInsertPoint);
+            results[filterMapInsertPoint] = filterMap;
+            System.arraycopy(filterMaps, filterMapInsertPoint, results,
+                    filterMaps.length - filterMapInsertPoint+1,
+                    filterMapInsertPoint);
+            
+            filterMapInsertPoint++;
+            
+            results[filterMaps.length] = filterMap;
+            filterMaps = results;
+        }
+        fireContainerEvent("addFilterMap", filterMap);
+    }
+
+
+    /**
+     * Validate the supplied FilterMap.
+     */
+    private void validateFilterMap(FilterMap filterMap) {
         // Validate the proposed filter mapping
         String filterName = filterMap.getFilterName();
         String[] servletNames = filterMap.getServletNames();
@@ -2190,10 +2251,7 @@ public class StandardContext
         if (findFilterDef(filterName) == null)
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.name", filterName));
-//      <= Servlet API 2.4
-//      if ((servletNames.length == 0) && (urlPatterns.length == 0))
-//      Servlet API 2.5 (FIX 43338)
-//      SRV 6.2.5 says supporting for '*' as the servlet-name in filter-mapping.
+
         if (!filterMap.getMatchAllServletNames() && 
             !filterMap.getMatchAllUrlPatterns() && 
             (servletNames.length == 0) && (urlPatterns.length == 0))
@@ -2205,8 +2263,6 @@ public class StandardContext
             throw new IllegalArgumentException
                 (sm.getString("standardContext.filterMap.either"));
         */
-        // Because filter-pattern is new in 2.3, no need to adjust
-        // for 2.2 backwards compatibility
         for (int i = 0; i < urlPatterns.length; i++) {
             if (!validateURLPattern(urlPatterns[i])) {
                 throw new IllegalArgumentException
@@ -2214,18 +2270,7 @@ public class StandardContext
                             urlPatterns[i]));
             }
         }
-
-        // Add this filter mapping to our registered set
-        synchronized (filterMaps) {
-            FilterMap results[] =new FilterMap[filterMaps.length + 1];
-            System.arraycopy(filterMaps, 0, results, 0, filterMaps.length);
-            results[filterMaps.length] = filterMap;
-            filterMaps = results;
-        }
-        fireContainerEvent("addFilterMap", filterMap);
-
     }
-
 
     /**
      * Add the classname of an InstanceListener to be added to each
@@ -3339,6 +3384,9 @@ public class StandardContext
             System.arraycopy(filterMaps, 0, results, 0, n);
             System.arraycopy(filterMaps, n + 1, results, n,
                              (filterMaps.length - 1) - n);
+            if (n < filterMapInsertPoint) {
+                filterMapInsertPoint--;
+            }
             filterMaps = results;
 
         }
