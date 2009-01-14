@@ -152,7 +152,7 @@ public class AsyncFileHandler extends FileHandler {
                 try {
                     AsyncFileHandler.recordCounter.sleepUntilPositive();
                 } catch (InterruptedException x) {
-                    this.interrupted();
+                    Thread.interrupted();
                     continue;
                 }
                 AsyncFileHandler[] handlers = AsyncFileHandler.handlers.toArray(new AsyncFileHandler[0]);
