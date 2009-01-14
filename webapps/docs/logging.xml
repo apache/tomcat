@@ -42,7 +42,7 @@
   
   <section name="Introduction">
   <p>
-    Tomcat 6.0 uses 
+    Tomcat 7.0 uses 
     <a href="http://commons.apache.org/logging">Commons Logging</a>
     throughout its internal code allowing the 
     developer to choose a logging configuration that suits their needs, e.g
@@ -53,7 +53,7 @@
     logging implementation.
   </p>
   <p>
-    An important consequence for Tomcat 6.0 is that the &lt;Logger&gt; element found in 
+    An important consequence for Tomcat 7.0 is that the &lt;Logger&gt; element found in 
     previous versions to create a <code>localhost_log</code> is no longer a valid nested element 
     of &lt;Context&gt;. Instead, the default Tomcat configuration will use java.util.logging. 
     If the developer wishes to collect detailed internal Tomcat logging (i.e what is happening 
@@ -65,7 +65,7 @@
 
   <section name="log4j">
     <p>
-      Tomcat 6.0 has done away with <code>localhost_log</code> which you may be familiar with
+      Tomcat 7.0 has done away with <code>localhost_log</code> which you may be familiar with
       as the runtime exception/stack trace log. These types of error are usually thrown
       by uncaught exceptions, but are still valuable to the developer. They can now be
       found in the <code>stdout</code> log.
@@ -170,7 +170,7 @@
     constructs which allows more freedom for defining handlers and assigning them to loggers.
   </p>
   <p>
-    JULI is enabled by default in Tomcat 6.0, and supports per classloader configuration, in addition to 
+    JULI is enabled by default in Tomcat 7.0, and supports per classloader configuration, in addition to 
     the regular global java.util.logging configuration. This means that logging can be configured at 
     the following layers:
     <ul>
@@ -204,7 +204,7 @@
       <li>A prefix may be added to handler names, so that multiple handlers of a single class may be 
       instantiated. A prefix is a String which starts with a digit, and ends with '.'. For example, 
       <code>22foobar.</code> is a valid prefix.</li>
-      <li>As in Java 5.0, loggers can define a list of handlers using the <code>loggerName.handlers</code>
+      <li>As in Java 6.0, loggers can define a list of handlers using the <code>loggerName.handlers</code>
       property.</li>
       <li>By default, loggers will not delegate to their parent if they have associated handlers. This
       may be changed per logger using the <code>loggerName.useParentHandlers</code> property, which accepts 
