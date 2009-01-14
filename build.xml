@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 6.0" default="deploy" basedir=".">
+<project name="Tomcat 7.0" default="deploy" basedir=".">
 
 
   <!-- ===================== Initialize Property Values =================== -->
@@ -30,8 +30,8 @@
   <!-- Project Properties -->
   <property name="project"               value="apache-tomcat" />
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2008" />
-  <property name="version.major"         value="6" />
+  <property name="year"                  value="2009" />
+  <property name="version.major"         value="7" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
   <property name="version.patch"         value="0" />
@@ -51,13 +51,11 @@
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
-  <!-- Can't be lower - jsp uses templates -->
-  <property name="compile.source" value="1.5"/>
-  <!-- Can't be higher - must run on 1.5 -->
-  <property name="compile.target" value="1.5"/>
+  <property name="compile.source" value="1.6"/>
+  <property name="compile.target" value="1.6"/>
 
   <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="MR2" />
+  <property name="servlet.revision" value="PR" />
   <property name="jsp.revision" value="FR" />
 
   <!-- JAR artifacts -->
@@ -82,8 +80,6 @@
   <property name="jasper-jdt.home" value="${base.path}/tomcat${version.major}-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
-  <available property="tomcat-dbcp.present" file="${tomcat-dbcp.jar}" />
-  <available property="jdk16.present" classname="javax.sql.StatementEvent" />
 
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -270,7 +266,7 @@
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}" filesId="files.annotations-api"/>
 
-    <!-- Servlet 2.5 Implementation JAR File -->
+    <!-- Servlet 3.0 Implementation JAR File -->
     <filter token="implementation.revision"
             value="${servlet.revision}"/>
     <copy tofile="res/manifest.tmp"
@@ -458,13 +454,7 @@
     </xslt>
   </target>
  
-  <target name="warn.dbcp" unless="tomcat-dbcp.present">
-    <echo>WARNING: tomcat-dbcp.jar not included, this build can't be used
-    in a release. Please run 'ant download' with JDK1.5 if you are 
-    building a tomcat release.</echo>
-  </target>
-  
-  <target name="deploy" depends="build-only,build-docs,warn.dbcp">
+  <target name="deploy" depends="build-only,build-docs">
 
     <copy tofile="${tomcat.build}/bin/tomcat-native.tar.gz"
             file="${tomcat-native.tar.gz}" />
@@ -742,16 +732,8 @@
 
   </target>
 
-  <target name="build-tomcat-dbcp" unless="jdk16.present">
+  <target name="build-tomcat-dbcp">
     <copy todir="${tomcat-dbcp.home}">
-    <!--
-      <fileset dir="${commons-collections.home}" >
-        <include name="**/collections/CursorableLinkedList.java" />
-        <include name="**/collections/KeyValue.java" />
-        <include name="**/collections/LRUMap.java" />
-        <include name="**/collections/SequencedHashMap.java" />
-      </fileset>
-      -->
       <fileset dir="${commons-pool.home}">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
@@ -759,16 +741,9 @@
       <fileset dir="${commons-dbcp.home}">
         <include name="**/*.java" />
         <exclude name="**/test/**" />
+        <exclude name="**/managed/**" />
       </fileset>
     </copy>
-    <!--
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons">
-      <replacefilter token="return UnmodifiableList.decorate(l);"
-            value="return l;" />
-      <replacefilter token="import org.apache.commons.collections.list.UnmodifiableList;"
-            value=" " />
-    </replace>
-    -->
     <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons" >
       <replacefilter token="org.apache.commons"
             value="org.apache.tomcat.dbcp" />
@@ -783,13 +758,12 @@
       <fileset dir="${tomcat-dbcp.home}/src/java/org/apache/commons" />
     </move>
     <mkdir dir="${tomcat-dbcp.home}/classes"/>
-    <!-- TODO Fix DBCP so it builds on 1.6 JDKs -->
     <javac destdir="${tomcat-dbcp.home}/classes"
            optimize="off"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="1.5"
-           target="1.5"
+           source="${compile.source}"
+           target="${compile.target}"
            sourcepath="${tomcat-dbcp.home}/src/java"
            srcdir="${tomcat-dbcp.home}/src/java" >
       <include name="**" />

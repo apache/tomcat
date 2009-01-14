@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 6.0" default="extras" basedir=".">
+<project name="Tomcat 7.0" default="extras" basedir=".">
 
 
   <!-- ===================== Initialize Property Values =================== -->
@@ -30,8 +30,8 @@
   <!-- Project Properties -->
   <property name="project"               value="apache-tomcat" />
   <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2008" />
-  <property name="version.major"         value="6" />
+  <property name="year"                  value="2009" />
+  <property name="version.major"         value="7" />
   <property name="version.minor"         value="0" />
   <property name="version.build"         value="0" />
   <property name="version.patch"         value="0" />
@@ -54,8 +54,8 @@
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
-  <!-- Can't be lower - jsp uses templates -->
-  <property name="compile.source" value="1.5"/>
+  <!-- Servlet 3.0 spec requires 1.6+ -->
+  <property name="compile.source" value="1.6"/>
 
   <!-- JAR artifacts -->
   <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
