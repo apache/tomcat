@@ -70,8 +70,8 @@ tomcat-native.dll=${base-tomcat.loc}/tomcat-connectors/native/${tomcat-native.ve
 
 # ----- Commons DBCP, version 1.1 or later -----
 commons-dbcp.version=1.2.2
-commons-dbcp.home=${base.path}/commons-dbcp-1.2.2-src
-commons-dbcp-src.loc=${base-commons.loc}/dbcp/source/commons-dbcp-1.2.2-src.tar.gz
+commons-dbcp.home=${base.path}/commons-dbcp-r734404-src
+commons-dbcp-src.loc=http://people.apache.org/~markt/dev/commons-dbcp-r734404-src.tar.gz
 
 # ----- Commons Pool, version 1.1 or later -----
 commons-pool.home=${base.path}/commons-pool-1.4-src
