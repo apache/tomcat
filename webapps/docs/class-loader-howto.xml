@@ -113,7 +113,7 @@ loaders as it is initialized:</p>
     <li><em>jasper-el.jar</em> - Jasper 2 EL implementation.</li>
     <li><em>jasper-jdt.jar</em> - Eclipse JDT 3.2 Java compiler.</li>
     <li><em>jsp-api.jar</em> - JSP 2.1 API.</li>
-    <li><em>servlet-api.jar</em> - Servlet 2.5 API.</li>
+    <li><em>servlet-api.jar</em> - Servlet 3.0 API.</li>
     <li><em>tomcat-coyote.jar</em> - Tomcat connectors and utility classes.</li>
     <li><em>tomcat-dbcp.jar</em> - package renamed database connection 
         pool based on Commons DBCP.</li>
