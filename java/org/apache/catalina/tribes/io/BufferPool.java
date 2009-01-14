@@ -68,9 +68,11 @@ public class BufferPool {
                        log.warn("Unable to initilize BufferPool, not pooling XByteBuffer objects:"+x.getMessage());
                        if ( log.isDebugEnabled() ) log.debug("Unable to initilize BufferPool, not pooling XByteBuffer objects:",x);
                    }
-                   pool.setMaxSize(DEFAULT_POOL_SIZE);
-                   log.info("Created a buffer pool with max size:"+DEFAULT_POOL_SIZE+" bytes of type:"+(clazz!=null?clazz.getName():"null"));
-                   instance = new BufferPool(pool);
+                   if (pool != null) {
+                       pool.setMaxSize(DEFAULT_POOL_SIZE);
+                       log.info("Created a buffer pool with max size:"+DEFAULT_POOL_SIZE+" bytes of type:"+(clazz!=null?clazz.getName():"null"));
+                       instance = new BufferPool(pool);
+                   }
                 }//end if
             }//sync
         }//end if
