@@ -341,7 +341,7 @@ public class NioBlockingSelector {
                         KeyAttachment attachment = (KeyAttachment)sk.attachment();
                         try {
                             attachment.access();
-                            iterator.remove(); ;
+                            iterator.remove();
                             sk.interestOps(sk.interestOps() & (~sk.readyOps()));
                             if ( sk.isReadable() ) {
                                 countDown(attachment.getReadLatch());

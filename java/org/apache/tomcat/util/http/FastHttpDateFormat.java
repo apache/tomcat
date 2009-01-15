@@ -190,7 +190,7 @@ public final class FastHttpDateFormat {
             try {
                 date = formats[i].parse(value);
             } catch (ParseException e) {
-                ;
+                // Ignore
             }
         }
         if (date == null) {
