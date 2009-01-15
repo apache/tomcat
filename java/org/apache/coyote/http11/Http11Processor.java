@@ -96,7 +96,7 @@ public class Http11Processor implements ActionHook {
         initializeFilters();
 
         // Cause loading of HexUtils
-        int foo = HexUtils.DEC[0];
+        HexUtils.load();
 
     }
 

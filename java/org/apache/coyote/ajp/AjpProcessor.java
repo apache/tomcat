@@ -91,7 +91,7 @@ public class AjpProcessor implements ActionHook {
         bodyMessage = new AjpMessage(packetSize);
         
         // Cause loading of HexUtils
-        int foo = HexUtils.DEC[0];
+        HexUtils.load();
 
         // Cause loading of HttpMessages
         HttpMessages.getMessage(200);

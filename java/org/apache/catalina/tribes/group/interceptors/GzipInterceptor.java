@@ -92,7 +92,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
         byte[] data = new byte[1024];
         Arrays.fill(data,(byte)1);
         byte[] compress = compress(data);
-        byte[] decompress = decompress(compress);
+        decompress(compress);
         System.out.println("Debug test");
         
     }

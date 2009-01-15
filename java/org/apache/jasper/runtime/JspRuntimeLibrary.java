@@ -346,7 +346,6 @@ public class JspRuntimeLibrary {
                     if(t.equals(String.class)) {
                         method.invoke(bean, new Object[] { values });
                     } else {
-                        Object tmpval = null;
                         createTypedArray (prop, bean, method, values, t,
                                           propertyEditorClass); 
                     }
@@ -573,7 +572,6 @@ public class JspRuntimeLibrary {
     //allocate the buffer - use byte[] to avoid calls to new.
         byte holdbuffer[] = new byte[encoded.length()];
 
-        char holdchar;
         int bufcount = 0;
 
         for (int count = 0; count < encoded.length(); count++) {

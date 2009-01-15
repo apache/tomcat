@@ -96,7 +96,7 @@ public class AjpAprProcessor implements ActionHook {
         outputBuffer = ByteBuffer.allocateDirect(packetSize * 2);
 
         // Cause loading of HexUtils
-        int foo = HexUtils.DEC[0];
+        HexUtils.load();
 
         // Cause loading of HttpMessages
         HttpMessages.getMessage(200);
@@ -1142,7 +1142,6 @@ public class AjpAprProcessor implements ActionHook {
             boolean useAvailableData)
         throws IOException {
 
-        byte[] buf = message.getBuffer();
         int headerLength = message.getHeaderLength();
 
         if (first) {

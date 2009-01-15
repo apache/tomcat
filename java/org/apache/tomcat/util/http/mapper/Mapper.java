@@ -867,7 +867,6 @@ public final class Mapper {
          MappingData mappingData) {
 
         int pathEnd = path.getEnd();
-        int pathOffset = path.getOffset();
 
         int lastSlash = -1;
         int length = -1;
