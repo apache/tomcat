@@ -94,6 +94,10 @@
         Provide a log format for JULI that provides the same information as the
         default but on a single line. (markt)
       </add>
+      <add>
+        <rev>723889</rev> Provide the ability to configure the Executor job
+        queue size and a timeout for adding jobs to the queue. (fhanik) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -114,6 +118,17 @@
       </add>
       <update>
         Use tc-native 1.2.x which is based on APR 1.3.3+ (mturk)
+      </update>
+      <update>
+        <rev>724239</rev> NIO connector now always uses an Executor. (fhanik)
+      </update>
+      <update>
+        <rev>724393</rev> Implement keepAliveCount for NIO connector in a thread
+        safe manner. (fhanik)
+      </update>
+      <update>
+        <rev>724849</rev> Implement keep alive timeout for NIO connector.
+        (fhanik)
       </update>
     </changelog>
   </subsection>
