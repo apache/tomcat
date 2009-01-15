@@ -39,26 +39,26 @@ public class TwoDataSources extends DefaultTestCase {
         Thread.sleep(15000);
         try {
             c1.createStatement();
-            this.assertTrue("Connection should have been abandoned.",false);
+            assertTrue("Connection should have been abandoned.",false);
         }catch (Exception x) {
-            this.assertTrue("This is correct, c1 is abandoned",true);
+            assertTrue("This is correct, c1 is abandoned",true);
         }
 
         try {
             c2.createStatement();
-            this.assertTrue("Connection should not have been abandoned.",true);
+            assertTrue("Connection should not have been abandoned.",true);
         }catch (Exception x) {
-            this.assertTrue("Connection c2 should be working",false);
+            assertTrue("Connection c2 should be working",false);
         }
         try {
-            this.assertTrue("Connection should have been closed.",c1.isClosed());
+            assertTrue("Connection should have been closed.",c1.isClosed());
         }catch (Exception x) {
-            this.assertTrue("This is correct, c1 is closed",true);
+            assertTrue("This is correct, c1 is closed",true);
         }
         try {
-            this.assertFalse("Connection c2 should not have been closed.",c2.isClosed());
+            assertFalse("Connection c2 should not have been closed.",c2.isClosed());
         }catch (Exception x) {
-            this.assertTrue("Connection c2 should be working",false);
+            assertTrue("Connection c2 should be working",false);
         }
         
 

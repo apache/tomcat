@@ -59,7 +59,7 @@ public class SimplePOJOAsyncExample {
               try {
                   Thread.sleep(100); //simulate work
               }catch (InterruptedException x) {
-                  Thread.currentThread().interrupted();
+                  Thread.interrupted();
               }
           }
           con = future.get(); //should return instantly 

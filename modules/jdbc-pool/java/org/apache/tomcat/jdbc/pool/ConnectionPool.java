@@ -281,7 +281,7 @@ public class ConnectionPool {
                     con = pool.poll(1000, TimeUnit.MILLISECONDS);
                 } //while
             } catch (InterruptedException ex) {
-                Thread.currentThread().interrupted();
+                Thread.interrupted();
             }
             if (pool.size()==0 && force && pool!=busy) pool = busy;
         }
@@ -349,7 +349,7 @@ public class ConnectionPool {
                 proxies[i].getInterceptorClass().newInstance().poolStarted(this);
             }catch (Exception x) {
                 log.error("Unable to inform interceptor of pool start.",x);
-                if (jmxPool!=null) jmxPool.notify(jmxPool.NOTIFY_INIT, getStackTrace(x));
+                if (jmxPool!=null) jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
                 close(true);
                 SQLException ex = new SQLException();
                 ex.initCause(x);
@@ -364,7 +364,7 @@ public class ConnectionPool {
             } //for
 
         } catch (SQLException x) {
-            if (jmxPool!=null) jmxPool.notify(jmxPool.NOTIFY_INIT, getStackTrace(x));
+            if (jmxPool!=null) jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
             close(true);
             throw x;
         } finally {
@@ -400,7 +400,7 @@ public class ConnectionPool {
                 log.warn("Connection has been abandoned " + con + ":" + trace);
             }
             if (jmxPool!=null) {
-                jmxPool.notify(jmxPool.NOTIFY_ABANDON, trace);
+                jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
             }
             con.abandon();
         } finally {
@@ -465,7 +465,7 @@ public class ConnectionPool {
                 //retrieve an existing connection
                 con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) {
-                Thread.currentThread().interrupted();
+                Thread.interrupted();
             }
             if (maxWait==0 && con == null) { //no wait, return one if we have one
                 throw new SQLException("[" + Thread.currentThread().getName()+"] " +
@@ -878,10 +878,10 @@ public class ConnectionPool {
             this.pool = pool;
             this.sleepTime = sleepTime;
             if (sleepTime <= 0) {
-                pool.log.warn("Database connection pool evicter thread interval is set to 0, defaulting to 30 seconds");
+                log.warn("Database connection pool evicter thread interval is set to 0, defaulting to 30 seconds");
                 this.sleepTime = 1000 * 30;
             } else if (sleepTime < 1000) {
-                pool.log.warn("Database connection pool evicter thread interval is set to lower than 1 second.");
+                log.warn("Database connection pool evicter thread interval is set to lower than 1 second.");
             }
         }
 
@@ -891,7 +891,7 @@ public class ConnectionPool {
                     sleep(sleepTime);
                 } catch (InterruptedException e) {
                     // ignore it
-                    Thread.currentThread().interrupted();
+                    Thread.interrupted();
                     continue;
                 } //catch
 
@@ -908,7 +908,7 @@ public class ConnectionPool {
                         if (pool.getPoolProperties().isTestWhileIdle())
                             pool.testAllIdle();
                     } catch (Exception x) {
-                        pool.log.error("", x);
+                        log.error("", x);
                     } //catch
                 } //end if
             } //while
