@@ -98,7 +98,7 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
                         throw new RejectedExecutionException("Queue capacity is full.");
                     }
                 } catch (InterruptedException x) {
-                    Thread.currentThread().interrupted();
+                    Thread.interrupted();
                     throw new RejectedExecutionException(x);
                 }
             } else {

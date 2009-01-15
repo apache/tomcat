@@ -92,7 +92,8 @@ public class PooledConnection {
                 log.debug("Unable to connect to database.", x);
             }
             if (parent.jmxPool!=null) {
-                parent.jmxPool.notify(parent.jmxPool.NOTIFY_CONNECT, parent.getStackTrace(x));
+                parent.jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_CONNECT,
+                        ConnectionPool.getStackTrace(x));
             }
             if (x instanceof SQLException) {
                 throw (SQLException)x;
