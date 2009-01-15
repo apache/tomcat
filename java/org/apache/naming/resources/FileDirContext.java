@@ -863,8 +863,6 @@ public class FileDirContext extends BaseDirContext {
         }
 
         Arrays.sort(names);             // Sort alphabetically
-        if (names == null)
-            return entries;
         NamingEntry entry = null;
 
         for (int i = 0; i < names.length; i++) {
