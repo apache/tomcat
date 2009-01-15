@@ -19,7 +19,6 @@ package org.apache.tomcat.jdbc.test;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
