@@ -175,6 +175,13 @@ public final class HexUtils {
 
 
     /**
+     * Provide a mechanism for ensuring this class is loaded. 
+     */
+    public static void load() {
+        // Nothing to do
+    }
+
+    /**
      * [Private] Convert the specified value (0 .. 15) to the corresponding
      * hexadecimal digit.
      *

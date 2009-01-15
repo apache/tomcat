@@ -86,8 +86,6 @@ public class ResourceLinkFactory
         // Can we process this request?
         Reference ref = (Reference) obj;
 
-        String type = ref.getClassName();
-
         // Read the global ref addr
         String globalName = null;
         RefAddr refAddr = ref.get(ResourceLinkRef.GLOBALNAME);
