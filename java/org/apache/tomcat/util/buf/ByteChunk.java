@@ -112,7 +112,6 @@ public final class ByteChunk implements Cloneable, Serializable {
     private ByteInputChannel in = null;
     private ByteOutputChannel out = null;
 
-    private boolean isOutput=false;
     private boolean optimizedWrite=true;
     
     /**
@@ -156,7 +155,6 @@ public final class ByteChunk implements Cloneable, Serializable {
     // -------------------- Setup --------------------
 
     public void allocate( int initial, int limit  ) {
-	isOutput=true;
 	if( buff==null || buff.length < initial ) {
 	    buff=new byte[initial];
 	}    
