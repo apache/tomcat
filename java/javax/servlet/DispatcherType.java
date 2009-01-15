@@ -19,7 +19,6 @@ package javax.servlet;
 /**
  * @since 3.0
  * $Id$
- * TODO SERVLET3
  */
 public enum DispatcherType {
     FORWARD,
