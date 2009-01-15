@@ -359,7 +359,7 @@ public class JkMX extends JkHandler
     MBeanServer getMBeanServer() {
         MBeanServer server;
         if( MBeanServerFactory.findMBeanServer(null).size() > 0 ) {
-            server=(MBeanServer)MBeanServerFactory.findMBeanServer(null).get(0);
+            server = MBeanServerFactory.findMBeanServer(null).get(0);
         } else {
             server=MBeanServerFactory.createMBeanServer();
         }

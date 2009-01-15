@@ -131,8 +131,8 @@ public final class HexUtils {
 
 	StringBuffer sb = new StringBuffer(bytes.length * 2);
 	for (int i = 0; i < bytes.length; i++) {
-	    sb.append(convertDigit((int) (bytes[i] >> 4)));
-	    sb.append(convertDigit((int) (bytes[i] & 0x0f)));
+	    sb.append(convertDigit((bytes[i] >> 4)));
+	    sb.append(convertDigit((bytes[i] & 0x0f)));
 	}
 	return (sb.toString());
 
