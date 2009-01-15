@@ -208,9 +208,9 @@ public class FairnessTest extends DefaultTestCase {
                             st.close();
                         }
                         try { 
-                            this.sleep(FairnessTest.this.sleep); 
+                            sleep(FairnessTest.this.sleep); 
                         } catch (InterruptedException x) {
-                            this.interrupted();
+                            interrupted();
                         }
                     } finally {
                         long cstart = System.nanoTime();
