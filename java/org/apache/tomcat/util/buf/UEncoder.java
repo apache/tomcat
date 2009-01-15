@@ -74,7 +74,7 @@ public final class UEncoder {
 	}
 
 	for (int i = 0; i < s.length(); i++) {
-	    int c = (int) s.charAt(i);
+	    int c = s.charAt(i);
 	    if( safeChars.get( c ) ) {
 		if( debug > 0 ) log("Safe: " + (char)c);
 		buf.write((char)c);
@@ -86,7 +86,7 @@ public final class UEncoder {
 		// ( while UCS is 31 ). Amazing...
 		if (c >= 0xD800 && c <= 0xDBFF) {
 		    if ( (i+1) < s.length()) {
-			int d = (int) s.charAt(i+1);
+			int d = s.charAt(i+1);
 			if (d >= 0xDC00 && d <= 0xDFFF) {
 			    if( debug > 0 ) log("Unsafe:  " + c);
 			    c2b.convert( (char)d);
