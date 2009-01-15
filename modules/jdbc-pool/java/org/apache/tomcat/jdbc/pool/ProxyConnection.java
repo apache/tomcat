@@ -18,7 +18,6 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
 import java.sql.SQLException;
 /**
  * @author Filip Hanik

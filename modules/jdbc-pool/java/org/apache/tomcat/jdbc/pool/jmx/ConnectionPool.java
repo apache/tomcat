@@ -20,14 +20,12 @@ package org.apache.tomcat.jdbc.pool.jmx;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.management.DynamicMBean;
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 
 public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean  {
     //logger
