@@ -63,7 +63,7 @@ class DefaultServerSocketFactory extends ServerSocketFactory {
  
     public void handshake(Socket sock)
  	throws IOException {
- 	; // NOOP
+        // NOOP
     }
  	    
         

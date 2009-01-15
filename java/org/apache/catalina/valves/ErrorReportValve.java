@@ -117,7 +117,7 @@ public class ErrorReportValve
             try {
                 response.reset();
             } catch (IllegalStateException e) {
-                ;
+                // Ignore
             }
 
             response.sendError
@@ -130,7 +130,7 @@ public class ErrorReportValve
         try {
             report(request, response, throwable);
         } catch (Throwable tt) {
-            ;
+            // Ignore
         }
 
     }
@@ -167,7 +167,7 @@ public class ErrorReportValve
         try {
             report = sm.getString("http." + statusCode, message);
         } catch (Throwable t) {
-            ;
+            // Ignore
         }
         if (report == null)
             return;
@@ -254,9 +254,9 @@ public class ErrorReportValve
                 writer.write(sb.toString());
             }
         } catch (IOException e) {
-            ;
+            // Ignore
         } catch (IllegalStateException e) {
-            ;
+            // Ignore
         }
         
     }
