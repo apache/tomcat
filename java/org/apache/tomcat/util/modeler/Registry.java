@@ -491,7 +491,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */ 
     public MBeanOperationInfo getMethodInfo( ObjectName oname, String opName )
     {
-        String type=null;
         MBeanInfo info=null;
         try {
             info=server.getMBeanInfo(oname);

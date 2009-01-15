@@ -84,7 +84,7 @@ public class ConnectorCreateRule extends Rule {
      *   the element name otherwise
      */
     public void end(String namespace, String name) throws Exception {
-        Object top = digester.pop();
+        digester.pop();
     }
 
 

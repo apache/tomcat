@@ -604,7 +604,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
                     for ( int i=0; i<size; i++) {
                         String id = oin.readUTF();
                         byte[] data = (byte[])oin.readObject();
-                        Session session = readSession(data,id);
+                        readSession(data,id);
                     }//for
                     stateTransferred=true;
                     break;

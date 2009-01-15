@@ -246,7 +246,6 @@ public class NSConfig  extends BaseJkConfig {
     protected void generateStupidMappings(Context context, PrintWriter objfile )
     {
         String ctxPath  = context.getPath();
-	String nPath=("".equals(ctxPath)) ? "/" : ctxPath;
 
         if( noRoot &&  "".equals(ctxPath) ) {
             log.debug("Ignoring root context in forward-all mode  ");
