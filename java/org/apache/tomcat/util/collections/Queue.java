@@ -29,7 +29,7 @@ import java.util.Vector;
  * @deprecated
  */
 public class Queue {
-    private Vector vector = new Vector();
+    private Vector<Object> vector = new Vector<Object>();
     private boolean stopWaiting=false;
     private boolean waiting=false;
     
