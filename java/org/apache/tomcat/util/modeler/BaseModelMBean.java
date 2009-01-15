@@ -231,8 +231,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             try {
                 response.add(new Attribute(names[i],getAttribute(names[i])));
             } catch (Exception e) {
-                ; // Not having a particular attribute in the response
-                ; // is the indication of a getter problem
+                // Not having a particular attribute in the response
+                // is the indication of a getter problem
             }
         }
         return (response);
@@ -474,7 +474,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             try {
                 setAttribute(item);
             } catch (Exception e) {
-                ; // Ignore all exceptions
+                // Ignore all exceptions
             }
         }
 

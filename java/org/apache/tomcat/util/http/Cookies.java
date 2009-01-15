@@ -370,7 +370,7 @@ public final class Cookies { // extends MultiMap {
             pos = nameEnd = getTokenEndPosition(bytes,pos,end);
 
             // Skip whitespace
-            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }; 
+            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; } 
          
 
             // Check for an '=' -- This could also be a name-only
@@ -390,7 +390,7 @@ public final class Cookies { // extends MultiMap {
                 // Determine what type of value this is, quoted value,
                 // token, name-only with an '=', or other (bad)
                 switch (bytes[pos]) {
-                case '"':; // Quoted Value
+                case '"': // Quoted Value
                     isQuoted = true;
                     valueStart=pos + 1; // strip "
                     // getQuotedValue returns the position before 
@@ -413,7 +413,7 @@ public final class Cookies { // extends MultiMap {
                     valueStart = valueEnd = -1;
                     // The position is OK (On a delimiter)
                     break;
-                default:;
+                default:
                     if (!isSeparator(bytes[pos])) {
                         // Token
                         valueStart=pos;
@@ -429,7 +429,7 @@ public final class Cookies { // extends MultiMap {
                         log("Invalid cookie. Value not a token or quoted value");
                         while (pos < end && bytes[pos] != ';' && 
                                bytes[pos] != ',') 
-                            {pos++; };
+                            {pos++; }
                         pos++;
                         // Make sure no special avpairs can be attributed to 
                         // the previous cookie by setting the current cookie
@@ -450,7 +450,7 @@ public final class Cookies { // extends MultiMap {
             // in a good state.
   
             // Skip whitespace
-            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }; 
+            while (pos < end && isWhiteSpace(bytes[pos])) {pos++; }
 
 
             // Make sure that after the cookie we have a separator. This
@@ -557,7 +557,7 @@ public final class Cookies { // extends MultiMap {
      */
     public static final int getTokenEndPosition(byte bytes[], int off, int end){
         int pos = off;
-        while (pos < end && !isSeparator(bytes[pos])) {pos++; };
+        while (pos < end && !isSeparator(bytes[pos])) {pos++; }
         
         if (pos > end)
             return end;

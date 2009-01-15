@@ -174,7 +174,7 @@ public class ExpandWar {
                 try {
                     input.close();
                 } catch (Throwable t) {
-                    ;
+                    // Ignore
                 }
                 input = null;
             }
@@ -182,7 +182,7 @@ public class ExpandWar {
                 try {
                     jarFile.close();
                 } catch (Throwable t) {
-                    ;
+                    // Ignore
                 }
                 jarFile = null;
             }

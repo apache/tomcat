@@ -182,7 +182,7 @@ public final class PasswdUserDatabase
                 try {
                     reader.close();
                 } catch (IOException f) {
-                    ;
+                    // Ignore
                 }
                 reader = null;
             }
