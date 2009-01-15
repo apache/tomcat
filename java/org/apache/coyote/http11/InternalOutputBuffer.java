@@ -466,20 +466,6 @@ public class InternalOutputBuffer
 
     }
 
-    private String getMessage(final int message){
-        if (org.apache.coyote.Constants.IS_SECURITY_ENABLED){
-           return AccessController.doPrivileged(
-                new PrivilegedAction<String>(){
-                    public String run(){
-                        return HttpMessages.getMessage(message); 
-                    }
-                }
-           );
-        } else {
-            return HttpMessages.getMessage(message);
-        }
-    }
-
     /**
      * Send a header.
      * 

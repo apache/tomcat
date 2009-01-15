@@ -140,11 +140,6 @@ public final class UEncoder {
 
     // -------------------- Internal implementation --------------------
     
-    // 
-    private void init() {
-	
-    }
-    
     private void initSafeChars() {
 	safeChars=new BitSet(128);
 	int i;
