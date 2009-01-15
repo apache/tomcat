@@ -17,8 +17,6 @@
  
 package org.apache.coyote;
 
-import org.apache.tomcat.util.net.SSLSessionManager;
-
 
 /**
  * Enumerated class containing the adapter event codes.
