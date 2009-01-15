@@ -36,7 +36,6 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
-import org.apache.tomcat.util.net.JIoEndpoint.Worker;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
