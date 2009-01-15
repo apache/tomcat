@@ -52,11 +52,11 @@ public class TestAsyncQueue extends TestCase {
         Future<Object> future = queue.pollAsync();
         try {
             future.get(2000, TimeUnit.MILLISECONDS);
-            this.assertFalse("Request should have timed out",true);
+            assertFalse("Request should have timed out",true);
         }catch (TimeoutException x) {
-            this.assertTrue("Request timed out properly",true);
+            assertTrue("Request timed out properly",true);
         }catch (Exception x) {
-            this.assertTrue("Request threw an error",false);
+            assertTrue("Request threw an error",false);
             x.printStackTrace();
         }
         assertEquals(future.get(),item);
@@ -74,7 +74,7 @@ public class TestAsyncQueue extends TestCase {
         }
         public void run() {
             try {
-                this.sleep(delay);
+                sleep(delay);
             }catch (Exception ignore){}
             offered = true;
             TestAsyncQueue.this.queue.offer(item);
