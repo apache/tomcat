@@ -380,14 +380,6 @@ public class ApacheConfig  extends BaseJkConfig {
 	}
     }    
 
-    
-    private void generateNameVirtualHost( PrintWriter mod_jk, String ip ) {
-        if( !NamedVirtualHosts.containsKey(ip) ) {
-            mod_jk.println("NameVirtualHost " + ip + "");
-            NamedVirtualHosts.put(ip,ip);
-        }
-    }
-    
     // -------------------- Apache serves static mode --------------------
     // This is not going to work for all apps. We fall back to stupid mode.
     
@@ -559,16 +551,6 @@ public class ApacheConfig  extends BaseJkConfig {
 	    docBase = docBase.replace('\\','/');
 	}
         return docBase;
-    }
-
-    private String getVirtualHostAddress(String vhost, String vhostip) {
-        if( vhostip == null ) {
-            if ( vhost != null && vhost.length() > 0 && Character.isDigit(vhost.charAt(0)) )
-                vhostip=vhost;
-            else
-                vhostip="*";
-        }
-        return vhostip;
     }
 
 }
