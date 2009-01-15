@@ -64,8 +64,6 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     private boolean isSet=false;  // XXX 
 
-    private boolean isOutput=false;
-
     // -1: grow undefinitely
     // maximum amount to be cached
     private int limit=-1;
@@ -117,14 +115,12 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     // -------------------- Setup --------------------
 
     public void allocate( int initial, int limit  ) {
-	isOutput=true;
 	if( buff==null || buff.length < initial ) {
 	    buff=new char[initial];
 	}
 	this.limit=limit;
 	start=0;
 	end=0;
-	isOutput=true;
 	isSet=true;
     }
 
