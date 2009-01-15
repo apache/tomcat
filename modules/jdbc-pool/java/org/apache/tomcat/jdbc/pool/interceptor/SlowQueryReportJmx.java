@@ -31,7 +31,6 @@ import javax.management.NotCompliantMBeanException;
 import javax.management.Notification;
 import javax.management.ObjectName;
 import javax.management.RuntimeOperationsException;
-import javax.management.modelmbean.InvalidTargetObjectTypeException;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeDataSupport;
 import javax.management.openmbean.CompositeType;

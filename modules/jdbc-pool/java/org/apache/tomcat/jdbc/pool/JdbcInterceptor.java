@@ -18,8 +18,6 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
