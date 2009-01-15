@@ -17,11 +17,6 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.util.Properties;
 
-import javax.management.DynamicMBean;
-
-import org.apache.tomcat.jdbc.pool.ConnectionPool;
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
-
 public interface ConnectionPoolMBean  {
 
     //=================================================================

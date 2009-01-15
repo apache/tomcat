@@ -29,9 +29,7 @@ import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
-import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport.QueryStats;
 
 public abstract class AbstractQueryReport extends AbstractCreateStatementInterceptor {
     //logger
