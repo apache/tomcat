@@ -480,7 +480,7 @@ public class Catalina extends Embedded {
             inputStream = new FileInputStream(file);
             inputSource = new InputSource("file://" + file.getAbsolutePath());
         } catch (Exception e) {
-            ;
+            // Ignore
         }
         if (inputStream == null) {
             try {
@@ -490,7 +490,7 @@ public class Catalina extends Embedded {
                     (getClass().getClassLoader()
                      .getResource(getConfigFile()).toString());
             } catch (Exception e) {
-                ;
+                // Ignore
             }
         }
 
@@ -504,7 +504,7 @@ public class Catalina extends Embedded {
                 (getClass().getClassLoader()
                         .getResource("server-embed.xml").toString());
             } catch (Exception e) {
-                ;
+                // Ignore
             }
         }
         

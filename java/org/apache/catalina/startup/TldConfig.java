@@ -626,7 +626,7 @@ public final class TldConfig  implements LifecycleListener {
                 }
             }
         } catch (NamingException e) {
-            ; // Silent catch: it's valid that no /WEB-INF directory exists
+            // Silent catch: it's valid that no /WEB-INF directory exists
         }
     }
 

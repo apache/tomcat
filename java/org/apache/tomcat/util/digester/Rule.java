@@ -113,9 +113,7 @@ public abstract class Rule {
      *   parameters instead.
      */
     public void begin(Attributes attributes) throws Exception {
-
-        ;	// The default implementation does nothing
-
+        // The default implementation does nothing
     }
 
 
@@ -153,9 +151,7 @@ public abstract class Rule {
      *   instead.
      */
     public void body(String text) throws Exception {
-
-        ;	// The default implementation does nothing
-
+        // The default implementation does nothing
     }
 
 
@@ -190,9 +186,7 @@ public abstract class Rule {
      *   <code>namespace</code> and <code>name</code> parameters instead.
      */
     public void end() throws Exception {
-
-        ;	// The default implementation does nothing
-
+        // The default implementation does nothing
     }
 
 
@@ -223,9 +217,7 @@ public abstract class Rule {
      * called, to allow Rules to remove temporary data.
      */
     public void finish() throws Exception {
-
-        ;	// The default implementation does nothing
-
+        // The default implementation does nothing
     }
 
 

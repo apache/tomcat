@@ -501,7 +501,7 @@ public class ManagedBean implements java.io.Serializable
                 object = mbean;
                 m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
             } catch (NoSuchMethodException e) {
-                exception = e;;
+                exception = e;
             }
             if( m== null && resource != null ) {
                 try {
@@ -548,7 +548,7 @@ public class ManagedBean implements java.io.Serializable
                 object = bean;
                 m = object.getClass().getMethod(setMethod, signature);
             } catch (NoSuchMethodException e) {
-                exception = e;;
+                exception = e;
             }
             if( m== null && resource != null ) {
                 try {
@@ -608,7 +608,6 @@ public class ManagedBean implements java.io.Serializable
                 method = object.getClass().getMethod(aname, types);
             } catch (NoSuchMethodException e) {
                 exception = e;
-                ;
             }
             try {
                 if ((method == null) && (resource != null)) {
