@@ -214,32 +214,6 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
 
     }
 
-
-    // -------------------- Internal Extensions   --------------------
-
-    // Fast access. First index is the hook type
-    // ( FixedNotificationFilter.getType() ).
-    NotificationListener hooks[][]=new NotificationListener[20][];
-    int hookCount[]=new int[20];
-
-    private synchronized void registerNotifications( FixedNotificationFilter filter ) {
-        String names[]=filter.getNames();
-        Registry reg=Registry.getRegistry(null, null);
-        for( int i=0; i<names.length; i++ ) {
-            int code=reg.getId(null, names[i]);
-            if( hooks.length < code ) {
-                // XXX reallocate
-                throw new RuntimeException( "Too many hooks " + code );
-            }
-            NotificationListener listeners[]=hooks[code];
-            if( listeners== null ) {
-
-            }
-
-
-        }
-    }
-
 }
 
 

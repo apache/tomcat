@@ -16,7 +16,6 @@
  */
 package org.apache.jasper.el;
 
-import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.servlet.jsp.el.ELException;
