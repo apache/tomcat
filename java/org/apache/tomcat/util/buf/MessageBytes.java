@@ -17,7 +17,6 @@
 
 package org.apache.tomcat.util.buf;
 
-import java.util.*;
 import java.io.Serializable;
 import java.io.IOException;
 
@@ -114,7 +113,6 @@ public final class MessageBytes implements Cloneable, Serializable {
 	hasHashCode=false;
 	hasIntValue=false;
     hasLongValue=false;
-	hasDateValue=false;	
     }
 
 
@@ -132,7 +130,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasHashCode=false;
         hasIntValue=false;
         hasLongValue=false;
-        hasDateValue=false; 
     }
 
     /** Set the encoding. If the object was constructed from bytes[]. any
@@ -162,7 +159,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasHashCode=false;
         hasIntValue=false;
         hasLongValue=false;
-        hasDateValue=false; 
     }
 
     /** Remove the cached string value. Use it after a conversion on the
@@ -186,7 +182,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasHashCode=false;
         hasIntValue=false;
         hasLongValue=false;
-        hasDateValue=false; 
         if (s == null) {
             hasStrValue=false;
             type=T_NULL;
@@ -543,8 +538,6 @@ public final class MessageBytes implements Cloneable, Serializable {
     private boolean hasIntValue=false;
     private long longValue;
     private boolean hasLongValue=false;
-    private Date dateValue;
-    private boolean hasDateValue=false;
     
     /** Set the buffer to the representation of an int
      */
@@ -585,7 +578,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasHashCode=false;
         hasIntValue=true;
         hasLongValue=false;
-        hasDateValue=false; 
         type=T_BYTES;
     }
 
@@ -628,7 +620,6 @@ public final class MessageBytes implements Cloneable, Serializable {
         hasHashCode=false;
         hasIntValue=false;
         hasLongValue=true;
-        hasDateValue=false; 
         type=T_BYTES;
     }
 
