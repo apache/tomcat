@@ -375,7 +375,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
             }
         }
 
-        impl = new McastServiceImpl((MemberImpl)localMember,Long.parseLong(properties.getProperty("mcastFrequency")),
+        impl = new McastServiceImpl(localMember,Long.parseLong(properties.getProperty("mcastFrequency")),
                                     Long.parseLong(properties.getProperty("memberDropTime")),
                                     Integer.parseInt(properties.getProperty("mcastPort")),
                                     bind,
