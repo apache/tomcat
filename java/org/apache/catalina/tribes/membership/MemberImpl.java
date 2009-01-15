@@ -213,7 +213,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
                 //you'd be surprised, but System.currentTimeMillis
                 //shows up on the profiler
                 long alive=System.currentTimeMillis()-getServiceStartTime();
-                XByteBuffer.toBytes( (long) alive, dataPkg, TRIBES_MBR_BEGIN.length+4);
+                XByteBuffer.toBytes(alive, dataPkg, TRIBES_MBR_BEGIN.length+4);
             }
             return dataPkg;
         }
@@ -253,7 +253,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         pos += 4;
 
         //alive data
-        XByteBuffer.toBytes((long)alive,data,pos);
+        XByteBuffer.toBytes(alive,data,pos);
         pos += 8;
         //port
         XByteBuffer.toBytes(port,data,pos);

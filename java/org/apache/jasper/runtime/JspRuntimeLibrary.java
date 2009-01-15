@@ -142,14 +142,14 @@ public class JspRuntimeLibrary {
 
     public static double coerceToDouble(String s) {
         if (s == null || s.length() == 0)
-            return (double) 0;
+            return 0;
         else
             return Double.valueOf(s).doubleValue();
     }
 
     public static float coerceToFloat(String s) {
         if (s == null || s.length() == 0)
-            return (float) 0;
+            return 0;
         else
             return Float.valueOf(s).floatValue();
     }
@@ -170,7 +170,7 @@ public class JspRuntimeLibrary {
 
     public static long coerceToLong(String s) {
         if (s == null || s.length() == 0)
-            return (long) 0;
+            return 0;
         else
             return Long.valueOf(s).longValue();
     }
