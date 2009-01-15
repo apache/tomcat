@@ -103,7 +103,7 @@ public class Http11NioProcessor implements ActionHook {
         initializeFilters();
 
         // Cause loading of HexUtils
-        int foo = HexUtils.DEC[0];
+        HexUtils.load();
 
         // Cause loading of FastHttpDateFormat
         FastHttpDateFormat.getCurrentDate();
