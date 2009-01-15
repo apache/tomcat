@@ -147,7 +147,6 @@ public class ChannelJni extends JniHandler implements JkChannel {
         if( apr==null ) return -1;
         
         long xEnv=ep.getJniEnv();
-        long cEndpointP=ep.getJniContext();
 
         int type=ep.getType();
         if( log.isDebugEnabled() ) log.debug("ChannelJni.invoke: "  + ep + " " + type);

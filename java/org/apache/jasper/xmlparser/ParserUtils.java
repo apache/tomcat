@@ -176,7 +176,7 @@ public class ParserUtils {
                             treeNode.setBody(body);
                     }
                 } else {
-                    TreeNode treeChild = convert(treeNode, child);
+                    convert(treeNode, child);
                 }
             }
         }

@@ -808,8 +808,8 @@ final class CallMethodMultiRule extends CallMethodRule {
         
         if (multiParams == null) {
             paramValues[multiParamIndex] = null;
-            Object result = IntrospectionUtils.callMethodN(target, methodName,
-                    paramValues, paramTypes);   
+            IntrospectionUtils.callMethodN(target, methodName, paramValues,
+                    paramTypes);   
             return;
         }
         
@@ -822,8 +822,8 @@ final class CallMethodMultiRule extends CallMethodRule {
             } else {
                 paramValues[multiParamIndex] = param;
             }
-            Object result = IntrospectionUtils.callMethodN(target, methodName,
-                    paramValues, paramTypes);   
+            IntrospectionUtils.callMethodN(target, methodName, paramValues,
+                    paramTypes);   
         }
         
     }

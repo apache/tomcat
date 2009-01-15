@@ -451,7 +451,6 @@ public final class IntrospectionUtils {
         String setter = "set" + capitalize(name);
         try {
             Method methods[] = findMethods(o.getClass());
-            Method setPropertyMethod = null;
             // find setFoo() method
             for (int i = 0; i < methods.length; i++) {
                 Class<?> paramT[] = methods[i].getParameterTypes();
@@ -644,7 +643,6 @@ public final class IntrospectionUtils {
     public static void addJarsFromClassPath(Vector<URL> jars, String cp)
             throws IOException, MalformedURLException {
         String sep = System.getProperty("path.separator");
-        String token;
         StringTokenizer st;
         if (cp != null) {
             st = new StringTokenizer(cp, sep);

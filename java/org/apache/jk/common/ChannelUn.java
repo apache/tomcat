@@ -305,7 +305,7 @@ public class ChannelUn extends JniHandler implements JkChannel {
                 }
                 ep.setType(0);
                 log.debug( "Process msg ");
-                int status=next.invoke( recv, ep );
+                next.invoke( recv, ep );
             }
             if( log.isDebugEnabled() )
                 log.debug( "Closing un channel");

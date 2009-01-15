@@ -355,7 +355,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
         for (Node argN = firstArgN; argN != null;
              argN = DomUtil.getNext( argN ))
         {
-            String type=DomUtil.getAttribute(argN, "type");
+            DomUtil.getAttribute(argN, "type");
             String value=DomUtil.getAttribute(argN, "value");
             if( value==null ) {
                 // The value may be specified as CDATA
