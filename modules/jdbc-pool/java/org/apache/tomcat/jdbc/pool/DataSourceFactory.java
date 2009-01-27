@@ -397,7 +397,8 @@ public class DataSourceFactory implements ObjectFactory {
             dataSource.getPoolProperties().setUseEquals(Boolean.parseBoolean(value));
         }
         
-
+        //initialize the pool itself
+        dataSource.createPool();
         // Return the configured DataSource instance
         return dataSource;
     }
