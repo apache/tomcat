@@ -30,6 +30,7 @@ import java.util.TimeZone;
  * @author Jason Hunter [jch@eng.sun.com]
  * @author James Todd [gonzo@eng.sun.com]
  * @author Costin Manolache
+ * @author fhanik
  */
 public class DateTool {
 
@@ -71,26 +72,45 @@ public class DateTool {
     /**
      * DateFormat to be used to format dates
      */
-    public final static DateFormat rfc1123Format =
-        new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
+    public final static ThreadLocal<DateFormat> rfc1123Format = new ThreadLocal<DateFormat>() {
+        @Override
+        public DateFormat initialValue() {
+            DateFormat result = new SimpleDateFormat(RFC1123_PATTERN, LOCALE_US);
+            result.setTimeZone(GMT_ZONE);
+            return result;
+        }
+    };
 
     /**
      * DateFormat to be used to format old netscape cookies
      */
-    public final static DateFormat oldCookieFormat =
-        new SimpleDateFormat(OLD_COOKIE_PATTERN, LOCALE_US);
+    public final static ThreadLocal<DateFormat> oldCookieFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        public DateFormat initialValue() {
+            DateFormat result = new SimpleDateFormat(OLD_COOKIE_PATTERN, LOCALE_US);
+            result.setTimeZone(GMT_ZONE);
+            return result;
+        }
+    };
 
-    public final static DateFormat rfc1036Format =
-        new SimpleDateFormat(rfc1036Pattern, LOCALE_US);
+        
 
-    public final static DateFormat asctimeFormat =
-        new SimpleDateFormat(asctimePattern, LOCALE_US);
+    public final static ThreadLocal<DateFormat> rfc1036Format = new ThreadLocal<DateFormat>() {
+        @Override
+        public DateFormat initialValue() {
+            DateFormat result = new SimpleDateFormat(rfc1036Pattern, LOCALE_US);
+            result.setTimeZone(GMT_ZONE);
+            return result;
+        }
+    };
 
-    static {
-        rfc1123Format.setTimeZone(GMT_ZONE);
-        oldCookieFormat.setTimeZone(GMT_ZONE);
-        rfc1036Format.setTimeZone(GMT_ZONE);
-        asctimeFormat.setTimeZone(GMT_ZONE);
-    }
+    public final static ThreadLocal<DateFormat> asctimeFormat = new ThreadLocal<DateFormat>() {
+        @Override
+        public DateFormat initialValue() {
+            DateFormat result = new SimpleDateFormat(asctimePattern, LOCALE_US);
+            result.setTimeZone(GMT_ZONE);
+            return result;
+        }
+    };
 
 }
