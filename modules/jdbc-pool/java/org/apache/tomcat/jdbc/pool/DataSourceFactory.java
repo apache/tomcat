@@ -19,6 +19,7 @@ package org.apache.tomcat.jdbc.pool;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
@@ -439,7 +440,11 @@ public class DataSourceFactory implements ObjectFactory {
                 m = datasource.getClass().getMethod(method.getName(), method.getParameterTypes());
                 methods.put(method, m);
             }
-            return m.invoke(datasource, args);
+            try {
+                return m.invoke(datasource, args);
+            }catch (InvocationTargetException t) {
+                throw t.getTargetException();
+            }
         }
 
     }
