@@ -374,16 +374,16 @@ class Validator {
          * Compares page encodings specified in various places, and throws
          * exception in case of page encoding mismatch.
          * 
-         * @param pageDirEnc The value of the pageEncoding attribute of the page
+         * @param thePageDirEnc The value of the pageEncoding attribute of the page
          * directive @param pageDir The page directive node
          * 
          * @throws JasperException in case of page encoding mismatch
          */
-        private void compareTagEncodings(String pageDirEnc,
+        private void compareTagEncodings(String thePageDirEnc,
                 Node.TagDirective pageDir) throws JasperException {
 
             Node.Root root = pageDir.getRoot();
-
+            String pageDirEnc = thePageDirEnc.toUpperCase();
             /*
              * Compare the 'pageEncoding' attribute of the page directive with
              * the encoding specified in the XML prolog (only for XML syntax,
@@ -392,7 +392,7 @@ class Validator {
              * identical.
              */
             if ((root.isXmlSyntax() && root.isEncodingSpecifiedInProlog()) || root.isBomPresent()) {
-                String pageEnc = root.getPageEncoding();
+                String pageEnc = root.getPageEncoding().toUpperCase();
                 if (!pageDirEnc.equals(pageEnc)
                         && (!pageDirEnc.startsWith("UTF-16") || !pageEnc
                                 .startsWith("UTF-16"))) {
