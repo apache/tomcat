@@ -424,6 +424,9 @@ values, depending on how you configured your keystore earlier:</p>
         all SSL clients to present a client Certificate in order to use
         this socket.  Set this value to <code>want</code> if you want Tomcat
         to request a client Certificate, but not fail if one isn't presented.
+        A <code>false</code> value (which is the default) will not require a
+        certificate chain unless the client requests a resource protected by a
+        security constraint that uses <code>CLIENT-CERT</code> authentication.
     </td>
   </tr>
   <tr><td><code>SSLEnabled</code></td>
