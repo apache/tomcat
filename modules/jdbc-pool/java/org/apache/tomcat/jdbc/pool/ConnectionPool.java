@@ -48,7 +48,7 @@ import org.apache.juli.logging.LogFactory;
  */
 
 public class ConnectionPool {
-    public static final String POOL_JMX_TYPE_PREFIX = "org.apache.tomcat.jdbc.pool.jmx:type=";
+    public static final String POOL_JMX_TYPE_PREFIX = "tomcat.jdbc:type=";
     
     //logger
     protected static Log log = LogFactory.getLog(ConnectionPool.class);
@@ -82,11 +82,6 @@ public class ConnectionPool {
      * Pool closed flag
      */
     protected boolean closed = false;
-
-    /**
-     * Size of the pool
-     */
-    protected AtomicInteger size = new AtomicInteger(0);
 
     /**
      * Since newProxyInstance performs the same operation, over and over
@@ -285,7 +280,6 @@ public class ConnectionPool {
             }
             if (pool.size()==0 && force && pool!=busy) pool = busy;
         }
-        size.set(0);
         if (this.getPoolProperties().isJmxEnabled()) stopJmx();
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
@@ -445,14 +439,16 @@ public class ConnectionPool {
             if (con!=null) {
                 PooledConnection result = borrowConnection(now, con);
                 //validation might have failed, in which case null is returned
+                //should not happen anymore
                 if (result!=null) return result;
             }
-            if (size.get() < getPoolProperties().getMaxActive()) {
-                if (size.addAndGet(1) <= getPoolProperties().getMaxActive()) {
-                    return createConnection(now, con);
-                } else {
-                    size.addAndGet(-1); //restore the value, we didn't create a connection
-                }
+            
+            //if we get here, see if we need to create one
+            //this is not 100% accurate since it doesn't use a shared
+            //atomic variable - a connection can become idle while we are creating 
+            //a new connection
+            if (busy.size() < getPoolProperties().getMaxActive()) {
+                return createConnection(now, con);
             } //end if
 
             //calculate wait time for this iteration
@@ -609,9 +605,9 @@ public class ConnectionPool {
                             con.validate(PooledConnection.VALIDATE_RETURN)) {
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
-                        if (!idle.offer(con)) {
+                        if ((idle.size()>=poolProperties.getMaxIdle()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
-                                log.debug("Connection ["+con+"] will be closed and not returned to the pool, idle.offer failed.");
+                                log.debug("Connection ["+con+"] will be closed and not returned to the pool, idle["+idle.size()+"]>=maxIdle["+poolProperties.getMaxIdle()+"] idle.offer failed.");
                             }
                             release(con);
                         }
@@ -757,7 +753,7 @@ public class ConnectionPool {
     }
 
     protected void finalize(PooledConnection con) {
-        size.addAndGet(-1);
+        
     }
 
     protected void startJmx() {
