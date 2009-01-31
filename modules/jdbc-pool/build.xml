@@ -23,8 +23,8 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="14" />
-  <property name="version.patch"         value="-beta" />
+  <property name="version.build"         value="1" />
+  <property name="version.patch"         value="" />
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
@@ -34,8 +34,8 @@
   <property file="${basedir}/build.properties.default"/>
 
   <!-- Project Properties -->
-  <property name="name"                  value="Apache Tomcat" />
-  <property name="year"                  value="2007" />
+  <property name="name"                  value="Apache Tomcat JDBC Pool" />
+  <property name="year"                  value="2009" />
 
   <property name="project"               value="apache-tomcat-jdbc-pool" />
   <property name="final.name"            value="${project}-${version}" />
