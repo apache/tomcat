@@ -17,105 +17,133 @@
 #
 # Default place to look for apr source.  Can be overridden with 
 #   --with-apr=[directory]
-apr_src_dir=`pwd`/srclib/apr-1.2.8
+apr_src_dir=`pwd`/srclib/apr
+JKJNIEXT=""
+JKJNIVER=""
+SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
 
-while test $# -gt 0 
+for o
 do
-  # Normalize
-  case "$1" in
-  -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
-  *) optarg= ;;
-  esac
-
-  case "$1" in
-  --with-apr=*)
-  apr_src_dir=$optarg
-  ;;
-  esac
-
-  shift
+    case "$o" in
+    -*=*) a=`echo "$o" | sed 's/^[-_a-zA-Z0-9]*=//'` ;;
+       *) a='' ;;
+    esac
+    case "$o" in
+        --ver*=*    )
+            JKJNIEXT="$a"
+            shift
+            ;;
+        --with-apr=* )
+            apr_src_dir="$a" ;
+            shift ;;
+        *  )
+        echo ""
+        echo "Usage: jnirelease.sh [options]"
+        echo "  --ver[sion]=<version>  Tomcat Native version"
+        echo "  --with-apr=<directory> APR sources directory"
+    echo ""
+        exit 1
+        ;;
+    esac
 done
 
-if test -d "$apr_src_dir"
-then
-  echo ""
-  echo "Looking for apr source in $apr_src_dir"
+
+if [ -d "$apr_src_dir" ]; then
+    echo ""
+    echo "Using apr source from: \`$apr_src_dir'"
 else
-  echo ""
-  echo "Problem finding apr source in $apr_src_dir."
-  echo "Use:"
-  echo "  --with-apr=[directory]" 
-  exit 1
+    echo ""
+    echo "Problem finding apr source in: \`$apr_src_dir'"
+    echo "Use:"
+    echo "  --with-apr=<directory>" 
+    echo ""
+    exit 1
 fi
 
-# Replace JKJNIEXT with branch/or tag
-# and JKJNIVER by the version like 1.1.0
-# DON't forget to update native/include/tcn_version.h
-# and native/os/win32/libtcnative.rc
-# #define TCN_VERISON "1.1.14"
-# FILEVERSION 1,1,14,0
-# PRODUCTVERSION 1,1,14,0
-JKJNIEXT="tags/other/TOMCAT_NATIVE_1_1_15"
-JKJNIVER="1.1.15"
-#JKJNIEXT="trunk"
-#JKJNIVER="current"
-SVNBASE=https://svn.apache.org/repos/asf/tomcat/connectors/
+if [ "x$JKJNIEXT" = "x" ]; then
+    echo ""
+    echo "Unknown SVN version"
+    echo "Use:"
+    echo "  --ver=<version>|trunk" 
+    echo ""
+    exit 1
+fi
+
+# Check for links, elinks or w3m
+w3m_opts="-dump -cols 80 -t 4 -S -O iso-8859-1 -T text/html"
+elinks_opts="-dump -dump-width 80 -dump-charset iso-8859-1 -no-numbering -no-references -no-home"
+links_opts="-dump -width 80 -codepage iso-8859-1 -no-g -html-numbered-links 0"
+EXPTOOL=""
+EXPOPTS=""
+for i in w3m elinks links
+do
+    EXPTOOL="`which $i 2>/dev/null || type $i 2>&1`"
+    if [ -x "$EXPTOOL" ]; then
+        EXPOPTS="`eval echo \"\$$i_opts\"`"
+        break
+    fi
+done
+if [ ! -x "$EXPTOOL" ]; then
+    echo ""
+    echo "Cannot find html export tool"
+    echo "Make sure you have either w3m elinks or links in the PATH"
+    echo ""
+    exit 1
+fi
+
+echo "Using SVN repo       : \`$SVNBASE/${JKJNIEXT}'"
+if [ "x$JKJNIEXT" = "xtrunk" ]; then
+    JKJNIVER=`svn info $SVNBASE | awk '$1 == "Revision:" {print $2}'`
+else
+    JKJNIVER=$JKJNIEXT
+    JKJNIEXT="tags/other/TOMCAT_NATIVE_`echo $JKJNIVER | sed 's/\./_/g'`"
+fi
+echo "Using version        : \`${JKJNIVER}'"
+
+
 JKJNIDIST=tomcat-native-${JKJNIVER}-src
+
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
-svn export $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
-if [ $? -ne 0 ]; then
-  echo "svn export native failed"
-  exit 1
-fi
-svn export $SVNBASE/${JKJNIEXT}/jni/java ${JKJNIDIST}/jni/java
-if [ $? -ne 0 ]; then
-  echo "svn export java failed"
-  exit 1
-fi
-svn export $SVNBASE/${JKJNIEXT}/jni/build.xml ${JKJNIDIST}/jni/build.xml
-if [ $? -ne 0 ]; then
-  echo "svn export build.xml failed"
-  exit 1
-fi
-svn export $SVNBASE/${JKJNIEXT}/jni/build.properties.sample ${JKJNIDIST}/jni/build.properties.sample
-if [ $? -ne 0 ]; then
-  echo "svn export build.xml failed"
-  exit 1
-fi
-svn export $SVNBASE/${JKJNIEXT}/jni/examples ${JKJNIDIST}/jni/examples
-if [ $? -ne 0 ]; then
-  echo "svn export examples failed"
-  exit 1
-fi
-svn export $SVNBASE/${JKJNIEXT}/jni/test ${JKJNIDIST}/jni/test
-if [ $? -ne 0 ]; then
-  echo "svn export test failed"
-  exit 1
-fi
+for i in native java xdocs examples test build.xml build.properties.sample
+do
+    svn export $SVNBASE/${JKJNIEXT}/jni/${i} ${JKJNIDIST}/jni/${i}
+    if [ $? -ne 0 ]; then
+        echo "svn export ${i} failed"
+        exit 1
+    fi
+done
+
+top="`pwd`"
+cd ${JKJNIDIST}/jni/xdocs
+ant
+$EXPTOOL $EXPOPTS ../build/docs/miscellaneous/printer/changelog.html > ../../CHANGELOG.txt 2>/dev/null
+cd "$top"
+rm -rf ${JKJNIDIST}/jni/xdocs
+
 svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKJNIDIST}/KEYS
 svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKJNIDIST}/LICENSE
 svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKJNIDIST}/NOTICE
-svn cat $SVNBASE/${JKJNIEXT}/jni/CHANGELOG.txt > ${JKJNIDIST}/CHANGELOG.txt
 svn cat $SVNBASE/${JKJNIEXT}/jni/NOTICE.txt > ${JKJNIDIST}/NOTICE.txt
 svn cat $SVNBASE/${JKJNIEXT}/jni/README.txt > ${JKJNIDIST}/README.txt
+
 #
 # Prebuild
 cd ${JKJNIDIST}/jni/native
 ./buildconf --with-apr=$apr_src_dir
-cd ../../../
+cd "$top"
 # Create source distribution
-tar cfz ${JKJNIDIST}.tar.gz ${JKJNIDIST}
+tar -cf - ${JKJNIDIST} | gzip -c9 > ${JKJNIDIST}.tar.gz
 #
 # Create Win32 source distribution
-JKJNIDIST=tomcat-native-${JKJNIVER}-win32-src
-rm -rf ${JKJNIDIST}
-mkdir -p ${JKJNIDIST}/jni
-svn export --native-eol CRLF $SVNBASE/${JKJNIEXT}/jni/native ${JKJNIDIST}/jni/native
-svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKJNIDIST}/KEYS
-svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKJNIDIST}/LICENSE
-svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKJNIDIST}/NOTICE
-svn cat $SVNBASE/${JKJNIEXT}/jni/CHANGELOG.txt > ${JKJNIDIST}/CHANGELOG.txt
-svn cat $SVNBASE/${JKJNIEXT}/jni/NOTICE.txt > ${JKJNIDIST}/NOTICE.txt
-svn cat $SVNBASE/${JKJNIEXT}/jni/README.txt > ${JKJNIDIST}/README.txt
-zip -9rqo ${JKJNIDIST}.zip ${JKJNIDIST}
+JKWINDIST=tomcat-native-${JKJNIVER}-win32-src
+rm -rf ${JKWINDIST}
+mkdir -p ${JKWINDIST}/jni
+svn export --native-eol CRLF $SVNBASE/${JKJNIEXT}/jni/native ${JKWINDIST}/jni/native
+svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKWINDIST}/KEYS
+svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKWINDIST}/LICENSE
+svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKWINDIST}/NOTICE
+svn cat $SVNBASE/${JKJNIEXT}/jni/NOTICE.txt > ${JKWINDIST}/NOTICE.txt
+svn cat $SVNBASE/${JKJNIEXT}/jni/README.txt > ${JKWINDIST}/README.txt
+cp ${JKJNIDIST}/CHANGELOG.txt ${JKWINDIST}/
+zip -9rqyo ${JKWINDIST}.zip ${JKWINDIST}
