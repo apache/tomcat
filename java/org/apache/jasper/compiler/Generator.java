@@ -43,6 +43,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
+import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
 
@@ -267,8 +268,8 @@ class Generator {
 
                 if (!n.implementsSimpleTag()) {
                     String name = createTagHandlerPoolName(n.getPrefix(), n
-                            .getLocalName(), n.getAttributes(), n
-                            .hasEmptyBody());
+                            .getLocalName(), n.getAttributes(), 
+                            n.getNamedAttributeNodes(), n.hasEmptyBody());
                     n.setTagHandlerPoolName(name);
                     if (!names.contains(name)) {
                         names.add(name);
@@ -284,14 +285,20 @@ class Generator {
              * @return The name of the tag handler pool
              */
             private String createTagHandlerPoolName(String prefix,
-                    String shortName, Attributes attrs, boolean hasEmptyBody) {
+                    String shortName, Attributes attrs, Node.Nodes namedAttrs,
+                    boolean hasEmptyBody) {
                 String poolName = null;
 
                 poolName = "_jspx_tagPool_" + prefix + "_" + shortName;
                 if (attrs != null) {
-                    String[] attrNames = new String[attrs.getLength()];
+                    String[] attrNames =
+                        new String[attrs.getLength() + namedAttrs.size()];
                     for (int i = 0; i < attrNames.length; i++) {
                         attrNames[i] = attrs.getQName(i);
+                    }
+                    for (int i = 0; i < namedAttrs.size(); i++) {
+                        attrNames[attrs.getLength() + i] =
+                            ((NamedAttribute) namedAttrs.getNode(i)).getQName();
                     }
                     Arrays.sort(attrNames, Collections.reverseOrder());
                     if (attrNames.length > 0) {
