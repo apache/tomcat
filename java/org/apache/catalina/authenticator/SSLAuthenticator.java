@@ -140,7 +140,7 @@ public class SSLAuthenticator
         if ((certs == null) || (certs.length < 1)) {
             if (containerLog.isDebugEnabled())
                 containerLog.debug("  No certificates included with this request");
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                sm.getString("authenticator.certificates"));
             return (false);
         }
