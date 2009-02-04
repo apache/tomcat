@@ -513,6 +513,15 @@
            <code>-1</code> means unlimited, default is <code>200</code>. Set this value somewhere close to your maxThreads value.
         </p>
       </attribute>
+      <attribute name="maxKeepAliveRequests" required="false">
+        <p>The maximum number of HTTP requests which can be pipelined until
+        the connection is closed by the server. Setting this attribute to 1 will
+        disable HTTP/1.0 keep-alive, as well as HTTP/1.1 keep-alive and
+        pipelining. Setting this to -1 will allow an unlimited amount of
+        pipelined or keep-alive HTTP requests.
+        If not specified, this attribute is set to 100.</p>
+      </attribute>
+
       <attribute name="socket.directBuffer" required="false">
         <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped ByteBuffers. Default is <code>false</code>
            <br/>When you are using direct buffers, make sure you allocate the appropriate amount of memory for the 
