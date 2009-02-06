@@ -233,5 +233,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public String getJdbcInterceptors() {
         return pool.getPoolProperties().getJdbcInterceptors();
     }
+    public int getWaitCount() {
+        return pool.getWaitCount();
+    }
 
 }
