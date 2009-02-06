@@ -53,8 +53,8 @@ public class PooledConnection {
     protected ConnectionPool parent;
 
     protected WeakReference<JdbcInterceptor> handler = null;
-
-    public PooledConnection(PoolProperties prop, ConnectionPool parent) throws SQLException {
+    
+    public PooledConnection(PoolProperties prop, ConnectionPool parent) {
         instanceCount = counter.addAndGet(1);
         poolProperties = prop;
         this.parent = parent;
@@ -111,6 +111,10 @@ public class PooledConnection {
             if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
         }        
         this.discarded = false;
+    }
+    
+    public boolean isInitialized() {
+        return connection!=null;
     }
 
     protected void reconnect() throws SQLException {

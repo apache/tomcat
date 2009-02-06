@@ -98,7 +98,12 @@ public class ConnectionPool {
      * reference to mbean
      */
     protected org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = null;
-
+    
+    /**
+     * counter to track how many threads are waiting for a connection
+     */
+    protected AtomicInteger waitcount = new AtomicInteger(0);
+    
     //===============================================================================
     //         PUBLIC METHODS
     //===============================================================================
@@ -141,6 +146,14 @@ public class ConnectionPool {
      */
     public String getName() {
         return getPoolProperties().getPoolName();
+    }
+    
+    /**
+     * Return the number of threads waiting for a connection
+     * @return number of threads waiting for a connection
+     */
+    public int getWaitCount() {
+        return waitcount.get();
     }
 
     /**
@@ -397,6 +410,9 @@ public class ConnectionPool {
                 jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
             }
             con.abandon();
+            //we've asynchronously reduced the number of connections
+            //we could have threads stuck in idle.poll(timeout) that will never be notified
+            if (waitcount.get()>0) idle.offer(new PooledConnection(poolProperties,this));
         } finally {
             con.unlock();
         }
@@ -457,11 +473,17 @@ public class ConnectionPool {
                 maxWait = (getPoolProperties().getMaxWait()<=0)?Long.MAX_VALUE:getPoolProperties().getMaxWait();
             }
             long timetowait = Math.max(0, maxWait - (System.currentTimeMillis() - now));
+            waitcount.incrementAndGet();
             try {
                 //retrieve an existing connection
                 con = idle.poll(timetowait, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ex) {
-                Thread.interrupted();
+                Thread.interrupted();//clear the flag, and bail out
+                SQLException sx = new SQLException("Pool wait interrupted.");
+                sx.initCause(ex);
+                throw sx;
+            } finally {
+                waitcount.decrementAndGet();
             }
             if (maxWait==0 && con == null) { //no wait, return one if we have one
                 throw new SQLException("[" + Thread.currentThread().getName()+"] " +
@@ -529,6 +551,9 @@ public class ConnectionPool {
         boolean setToNull = false;
         try {
             con.lock();
+            if (!con.isDiscarded() && !con.isInitialized()) {
+                con.connect();
+            }
             if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
                 //set the timestamp
                 con.setTimestamp(now);
@@ -647,7 +672,6 @@ public class ConnectionPool {
                     if ((now - time) > con.getAbandonTimeout()) {
                         busy.remove(con);
                         abandon(con);
-                        release(con);
                         setToNull = true;
                     } else {
                         //do nothing
