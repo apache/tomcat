@@ -46,7 +46,9 @@ public class SocketReceive {
                     try {
                         Thread.sleep(1000);
                         printStats(start, mb, count, df, total);
-                    }catch ( Exception x ) {}
+                    }catch ( Exception x ) {
+                        // Ignore
+                    }
                 }
             }
         };

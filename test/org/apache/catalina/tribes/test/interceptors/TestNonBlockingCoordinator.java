@@ -64,8 +64,8 @@ public class TestNonBlockingCoordinator extends TestCase {
             assertEquals("Message count expected to be equal.",channels[i-1].getMembers().length,channels[i].getMembers().length);
         Member member = coordinators[0].getCoordinator();
         int cnt = 0;
-        while ( member == null && (cnt++ < 100 ) ) try {Thread.sleep(100); member = coordinators[0].getCoordinator();}catch ( Exception x){}
-        for (int i=0; i<channelCount; i++ ) super.assertEquals(member,coordinators[i].getCoordinator());
+        while ( member == null && (cnt++ < 100 ) ) try {Thread.sleep(100); member = coordinators[0].getCoordinator();}catch ( Exception x){ /* Ignore */ }
+        for (int i=0; i<channelCount; i++ ) assertEquals(member,coordinators[i].getCoordinator());
         System.out.println("Coordinator[1] is:"+member);
         
     }
@@ -86,7 +86,7 @@ public class TestNonBlockingCoordinator extends TestCase {
         if ( index == 0 ) index = 1; else index = 0;
         System.out.println("Member count:"+channels[index].getMembers().length);
         member = coordinators[index].getCoordinator();
-        for (int i = 1; i < channelCount; i++) if ( i != dead ) super.assertEquals(member, coordinators[i].getCoordinator());
+        for (int i = 1; i < channelCount; i++) if ( i != dead ) assertEquals(member, coordinators[i].getCoordinator());
         System.out.println("Coordinator[2b] is:" + member);
     }
 
