@@ -1079,7 +1079,7 @@ public class HostConfig
                         try {
                             File current = new File(resources[j]);
                             current = current.getCanonicalFile();
-                            if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath()))
+                            if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath() + File.separator))
                                     || (current.getAbsolutePath().startsWith(configBase().getAbsolutePath()))) {
                                 if (log.isDebugEnabled())
                                     log.debug("Delete " + current);
@@ -1120,7 +1120,7 @@ public class HostConfig
                     try {
                         File current = new File(resources[j]);
                         current = current.getCanonicalFile();
-                        if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath()))
+                        if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath() + File.separator))
                             || (current.getAbsolutePath().startsWith(configBase().getAbsolutePath()))) {
                             if (log.isDebugEnabled())
                                 log.debug("Delete " + current);
@@ -1138,7 +1138,7 @@ public class HostConfig
                     try {
                         File current = new File(resources2[j]);
                         current = current.getCanonicalFile();
-                        if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath()))
+                        if ((current.getAbsolutePath().startsWith(appBase().getAbsolutePath() + File.separator))
                             || ((current.getAbsolutePath().startsWith(configBase().getAbsolutePath())
                                  && (current.getAbsolutePath().endsWith(".xml"))))) {
                             if (log.isDebugEnabled())
