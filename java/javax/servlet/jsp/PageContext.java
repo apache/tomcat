@@ -100,6 +100,7 @@ abstract public class PageContext
      * typically implicit.)
      */
     public PageContext() {
+        // NOOP by default
     }
     
     /**
