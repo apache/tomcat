@@ -45,10 +45,9 @@ public class ArrayELResolver extends ELResolver {
 			int idx = coerce(property);
             if (idx < 0 || idx >= Array.getLength(base)) {
                 return null;
-            } else {
-                return Array.get(base, idx);
             }
-		}
+            return Array.get(base, idx);
+        }
 
 		return null;
 	}

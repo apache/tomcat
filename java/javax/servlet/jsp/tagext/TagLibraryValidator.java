@@ -87,6 +87,7 @@ abstract public class TagLibraryValidator {
      * typically implicit.)
      */
     public TagLibraryValidator() {
+        // NOOP by default
     }
     
     /**
@@ -96,7 +97,7 @@ abstract public class TagLibraryValidator {
      * @param map A Map describing the init parameters
      */
     public void setInitParameters(Map<String, Object> map) {
-	initParameters = map;
+        initParameters = map;
     }
 
 
@@ -107,7 +108,7 @@ abstract public class TagLibraryValidator {
      * @return The init parameters as an immutable map.
      */
     public Map<String, Object> getInitParameters() {
-	return initParameters;
+        return initParameters;
     }
 
     /**
@@ -126,16 +127,15 @@ abstract public class TagLibraryValidator {
      * of ValidationMessages otherwise.
      */
     public ValidationMessage[] validate(String prefix, String uri, 
-        PageData page) 
-    {
-	return null;
+        PageData page) {
+        return null;
     }
 
     /**
      * Release any data kept by this instance for validation purposes.
      */
     public void release() {
-	initParameters = null;
+        initParameters = null;
     }
 
     // Private data

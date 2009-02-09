@@ -162,12 +162,12 @@ public interface Tag extends JspTag {
      * The current version of the specification only provides one formal
      * way of indicating the observable type of a tag handler: its
      * tag handler implementation class, described in the tag-class
-     * subelement of the tag element.  This is extended in an
+     * sub-element of the tag element.  This is extended in an
      * informal manner by allowing the tag library author to
-     * indicate in the description subelement an observable type.
-     * The type should be a subtype of the tag handler implementation
+     * indicate in the description sub-element an observable type.
+     * The type should be a sub-type of the tag handler implementation
      * class or void.
-     * This addititional constraint can be exploited by a
+     * This additional constraint can be exploited by a
      * specialized container that knows about that specific tag library,
      * as in the case of the JSP standard tag library.
      *

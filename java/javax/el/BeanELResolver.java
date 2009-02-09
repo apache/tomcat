@@ -207,9 +207,9 @@ public class BeanELResolver extends ELResolver {
 	}
 
     protected final static class BeanProperty {
-		private final Class type;
+		private final Class<?> type;
 
-		private final Class owner;
+		private final Class<?> owner;
 
 		private final PropertyDescriptor descriptor;
 
@@ -283,7 +283,7 @@ public class BeanELResolver extends ELResolver {
 		if (m == null || Modifier.isPublic(type.getModifiers())) {
 			return m;
 		}
-		Class[] inf = type.getInterfaces();
+		Class<?>[] inf = type.getInterfaces();
 		Method mp = null;
 		for (int i = 0; i < inf.length; i++) {
 			try {
@@ -293,9 +293,10 @@ public class BeanELResolver extends ELResolver {
 					return mp;
 				}
 			} catch (NoSuchMethodException e) {
+			    // Ignore
 			}
 		}
-		Class sup = type.getSuperclass();
+		Class<?> sup = type.getSuperclass();
 		if (sup != null) {
 			try {
 				mp = sup.getMethod(m.getName(), m.getParameterTypes());
@@ -304,6 +305,7 @@ public class BeanELResolver extends ELResolver {
 					return mp;
 				}
 			} catch (NoSuchMethodException e) {
+			    // Ignore
 			}
 		}
 		return null;

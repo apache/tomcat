@@ -31,9 +31,7 @@ import java.io.IOException;
  *
  * @since 2.0
  */
-public class SimpleTagSupport 
-    implements SimpleTag
-{
+public class SimpleTagSupport implements SimpleTag {
     /** Reference to the enclosing tag. */
     private JspTag parentTag;
     
@@ -48,6 +46,7 @@ public class SimpleTagSupport
      * typically implicit.)
      */
     public SimpleTagSupport() {
+        // NOOP by default
     }
     
     /** 
@@ -66,9 +65,8 @@ public class SimpleTagSupport
      *     an error writing to the output stream
      * @see SimpleTag#doTag()
      */ 
-    public void doTag() 
-        throws JspException, IOException
-    {
+    public void doTag() throws JspException, IOException {
+        // NOOP by default
     }
     
     /**
@@ -176,38 +174,38 @@ public class SimpleTagSupport
      * or is an instance of the class specified
      */
     public static final JspTag findAncestorWithClass(
-	JspTag from, Class<?> klass) 
+        JspTag from, Class<?> klass) 
     {
-	boolean isInterface = false;
+        boolean isInterface = false;
 
-	if (from == null || klass == null
-	        || (!JspTag.class.isAssignableFrom(klass)
-		    && !(isInterface = klass.isInterface()))) {
-	    return null;
-	}
+        if (from == null || klass == null
+                || (!JspTag.class.isAssignableFrom(klass)
+                    && !(isInterface = klass.isInterface()))) {
+            return null;
+        }
 
-	for (;;) {
-	    JspTag parent = null;
-	    if( from instanceof SimpleTag ) {
-		parent = ((SimpleTag)from).getParent();
-	    }
-	    else if( from instanceof Tag ) {
-		parent = ((Tag)from).getParent();
-	    }
-	    if (parent == null) {
-		return null;
-	    }
+        for (;;) {
+            JspTag parent = null;
+            if( from instanceof SimpleTag ) {
+                parent = ((SimpleTag)from).getParent();
+            }
+            else if( from instanceof Tag ) {
+                parent = ((Tag)from).getParent();
+            }
+            if (parent == null) {
+                return null;
+            }
 
-	    if (parent instanceof TagAdapter) {
-		parent = ((TagAdapter) parent).getAdaptee();
-	    }
+            if (parent instanceof TagAdapter) {
+                parent = ((TagAdapter) parent).getAdaptee();
+            }
 
-	    if ((isInterface && klass.isInstance(parent))
-		    || klass.isAssignableFrom(parent.getClass())) {
-		return parent;
-	    }
+            if ((isInterface && klass.isInstance(parent))
+                    || klass.isAssignableFrom(parent.getClass())) {
+                return parent;
+            }
 
-	    from = parent;
-	}
+            from = parent;
+        }
     }    
 }
