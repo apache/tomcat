@@ -41,7 +41,7 @@ public class TestChannelOptionFlag extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        if ( channel != null ) try {channel.stop(Channel.DEFAULT);}catch ( Exception ignore) {}
+        if ( channel != null ) try {channel.stop(Channel.DEFAULT);}catch ( Exception ignore) { /* Ignore */ }
         channel = null;
     }
     
@@ -84,7 +84,7 @@ public class TestChannelOptionFlag extends TestCase {
     }
     
     public static class TestInterceptor extends ChannelInterceptorBase {
-        
+        // Just use base class
     }
 
 

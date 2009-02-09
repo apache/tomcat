@@ -94,17 +94,19 @@ public class MapDemo implements ChannelListener, MembershipListener{
     
     /**
      * Invoked if accept returns true.
-     * No of for now
+     * No op for now
      * @param msg - the message received
      * @param source - the sending member
      */
     public void messageReceived(Serializable msg, Member source) {
+        // NOOP
     }
     
     /**
      * Invoked when a member is added to the group
      */
     public void memberAdded(Member member) {
+        // NOOP
     }
     
     /**

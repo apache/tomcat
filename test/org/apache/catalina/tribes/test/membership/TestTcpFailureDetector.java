@@ -79,7 +79,7 @@ public class TestTcpFailureDetector extends TestCase {
             channel1.send(channel1.getMembers(), msg, 0);
             assertEquals("Message send should have failed.",true,false);
         } catch ( ChannelException x ) {
-            
+            // Ignore
         }
         assertEquals("Expecting member count to not be equal",mbrlist1.members.size()+1,mbrlist2.members.size());
         channel1.stop(Channel.DEFAULT);
@@ -125,9 +125,9 @@ public class TestTcpFailureDetector extends TestCase {
     protected void tearDown() throws Exception {
         tcpFailureDetector1 = null;
         tcpFailureDetector2 = null;
-        try { channel1.stop(Channel.DEFAULT);}catch (Exception ignore){}
+        try { channel1.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
         channel1 = null;
-        try { channel2.stop(Channel.DEFAULT);}catch (Exception ignore){}
+        try { channel2.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
         channel2 = null;
         super.tearDown();
     }

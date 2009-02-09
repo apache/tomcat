@@ -47,6 +47,7 @@ public class TestSenderConnections extends TestCase {
     }
 
     public void clear() {
+        // NOOP
     }
 
     public void sendMessages(long delay, long sleep) throws Exception {
