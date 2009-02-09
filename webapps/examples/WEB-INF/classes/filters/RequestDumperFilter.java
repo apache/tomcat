@@ -99,10 +99,10 @@ public final class RequestDumperFilter implements Filter {
 	writer.println("       contentType=" + request.getContentType());
 	writer.println("            locale=" + request.getLocale());
 	writer.print("           locales=");
-	Enumeration locales = request.getLocales();
+	Enumeration<Locale> locales = request.getLocales();
 	boolean first = true;
 	while (locales.hasMoreElements()) {
-	    Locale locale = (Locale) locales.nextElement();
+	    Locale locale = locales.nextElement();
 	    if (first)
 	        first = false;
 	    else
@@ -110,9 +110,9 @@ public final class RequestDumperFilter implements Filter {
 	    writer.print(locale.toString());
 	}
 	writer.println();
-	Enumeration names = request.getParameterNames();
+	Enumeration<String> names = request.getParameterNames();
 	while (names.hasMoreElements()) {
-	    String name = (String) names.nextElement();
+	    String name = names.nextElement();
 	    writer.print("         parameter=" + name + "=");
 	    String values[] = request.getParameterValues(name);
 	    for (int i = 0; i < values.length; i++) {
@@ -144,7 +144,7 @@ public final class RequestDumperFilter implements Filter {
 	    }
 	    names = hrequest.getHeaderNames();
 	    while (names.hasMoreElements()) {
-	        String name = (String) names.nextElement();
+	        String name = names.nextElement();
 		String value = hrequest.getHeader(name);
 	        writer.println("            header=" + name + "=" + value);
 	    }
