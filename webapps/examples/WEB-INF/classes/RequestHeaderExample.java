@@ -66,9 +66,9 @@ public class RequestHeaderExample extends HttpServlet {
 
         out.println("<h3>" + title + "</h3>");
         out.println("<table border=0>");
-        Enumeration e = request.getHeaderNames();
+        Enumeration<String> e = request.getHeaderNames();
         while (e.hasMoreElements()) {
-            String headerName = (String)e.nextElement();
+            String headerName = e.nextElement();
             String headerValue = request.getHeader(headerName);
             out.println("<tr><td bgcolor=\"#CCCCCC\">");
             out.println(HTMLFilter.filter(headerName));

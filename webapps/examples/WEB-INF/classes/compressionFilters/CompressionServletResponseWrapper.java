@@ -160,6 +160,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
                     stream.close();
             }
         } catch (IOException e) {
+            // Ignore
         }
     }
 
@@ -240,6 +241,7 @@ public class CompressionServletResponseWrapper extends HttpServletResponseWrappe
 
 
     public void setContentLength(int length) {
+        // Don't, as compression will change it
     }
 
 }

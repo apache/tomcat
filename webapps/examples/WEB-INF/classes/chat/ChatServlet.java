@@ -81,22 +81,20 @@ public class ChatServlet
                     response.sendRedirect("post.jsp");
                     event.close();
                     return;
-                } else {
-                    String nickname = (String) request.getSession(true).getAttribute("nickname");
-                    String message = request.getParameter("message");
-                    messageSender.send(nickname, message);
-                    response.sendRedirect("post.jsp");
-                    event.close();
-                    return;
                 }
-            } else {
-                if (request.getSession(true).getAttribute("nickname") == null) {
-                    // Redirect to "login"
-                    log("Redirect to login for session: " + request.getSession(true).getId());
-                    response.sendRedirect("login.jsp");
-                    event.close();
-                    return;
-                }
+                String nickname = (String) request.getSession(true).getAttribute("nickname");
+                String message = request.getParameter("message");
+                messageSender.send(nickname, message);
+                response.sendRedirect("post.jsp");
+                event.close();
+                return;
+            }
+            if (request.getSession(true).getAttribute("nickname") == null) {
+                // Redirect to "login"
+                log("Redirect to login for session: " + request.getSession(true).getId());
+                response.sendRedirect("login.jsp");
+                event.close();
+                return;
             }
             begin(event, request, response);
         } else if (event.getEventType() == CometEvent.EventType.ERROR) {
@@ -109,7 +107,7 @@ public class ChatServlet
     }
 
     protected void begin(CometEvent event, HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+        throws IOException {
         log("Begin for session: " + request.getSession(true).getId());
         
         PrintWriter writer = response.getWriter();
@@ -123,7 +121,7 @@ public class ChatServlet
     }
     
     protected void end(CometEvent event, HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+        throws IOException {
         log("End for session: " + request.getSession(true).getId());
         synchronized(connections) {
             connections.remove(response);
@@ -137,7 +135,7 @@ public class ChatServlet
     }
     
     protected void error(CometEvent event, HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+        throws IOException {
         log("Error for session: " + request.getSession(true).getId());
         synchronized(connections) {
             connections.remove(response);
@@ -146,7 +144,7 @@ public class ChatServlet
     }
     
     protected void read(CometEvent event, HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException {
+        throws IOException {
         InputStream is = request.getInputStream();
         byte[] buf = new byte[512];
         while (is.available() > 0) {
@@ -183,6 +181,7 @@ public class ChatServlet
         protected ArrayList<String> messages = new ArrayList<String>();
         
         public MessageSender() {
+            // Default contructor
         }
         
         public void stop() {

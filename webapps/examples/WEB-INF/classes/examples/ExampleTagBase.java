@@ -46,9 +46,9 @@ public abstract class ExampleTagBase extends BodyTagSupport {
     }
     
 
-    // Default implementations for BodyTag methods as well
-    // just in case a tag decides to implement BodyTag.
     public void doInitBody() throws JspException {
+        // Default implementations for BodyTag methods as well
+        // just in case a tag decides to implement BodyTag.
     }
 
     public int doAfterBody() throws JspException {
