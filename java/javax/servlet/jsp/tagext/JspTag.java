@@ -23,4 +23,5 @@ package javax.servlet.jsp.tagext;
  * @since 2.0
  */
 public interface JspTag {
+    // No methods even through there are some common methods
 }

@@ -55,17 +55,17 @@ public class TagData implements Cloneable {
      * @param atts the static attribute and values.  May be null.
      */
     public TagData(Object[] atts[]) {
-	if (atts == null) {
-	    attributes = new Hashtable<String, Object>();
-	} else {
-	    attributes = new Hashtable<String, Object>(atts.length);
-	}
+        if (atts == null) {
+            attributes = new Hashtable<String, Object>();
+        } else {
+            attributes = new Hashtable<String, Object>(atts.length);
+        }
 
-	if (atts != null) {
-	    for (int i = 0; i < atts.length; i++) {
-		attributes.put((String) atts[i][0], atts[i][1]);
-	    }
-	}
+        if (atts != null) {
+            for (int i = 0; i < atts.length; i++) {
+                attributes.put((String) atts[i][0], atts[i][1]);
+            }
+        }
     }
 
     /**
@@ -88,7 +88,7 @@ public class TagData implements Cloneable {
      */
 
     public String getId() {
-	return getAttributeString(TagAttributeInfo.ID);
+        return getAttributeString(TagAttributeInfo.ID);
     }
 
     /**
@@ -108,7 +108,7 @@ public class TagData implements Cloneable {
      */
 
     public Object getAttribute(String attName) {
-	return attributes.get(attName);
+        return attributes.get(attName);
     }
 
     /**
@@ -118,8 +118,8 @@ public class TagData implements Cloneable {
      * @param value the value.
      */
     public void setAttribute(String attName,
-			     Object value) {
-	attributes.put(attName, value);
+                             Object value) {
+        attributes.put(attName, value);
     }
 
     /**
@@ -131,12 +131,11 @@ public class TagData implements Cloneable {
      */
 
     public String getAttributeString(String attName) {
-	Object o = attributes.get(attName);
-	if (o == null) {
-	    return null;
-	} else {
-	    return (String) o;
-	}	
+        Object o = attributes.get(attName);
+        if (o == null) {
+            return null;
+        }
+        return (String) o;
     }
 
     /**
@@ -150,5 +149,5 @@ public class TagData implements Cloneable {
 
     // private data
 
-    private Hashtable<String, Object> attributes;	// the tagname/value map
+    private Hashtable<String, Object> attributes;        // the tagname/value map
 }

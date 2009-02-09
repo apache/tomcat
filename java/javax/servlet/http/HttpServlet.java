@@ -73,8 +73,7 @@ import javax.servlet.ServletResponse;
  * @author  Various
  * @version $Version$
  */
-public abstract class HttpServlet extends GenericServlet
-    implements java.io.Serializable {
+public abstract class HttpServlet extends GenericServlet {
 
     private static final String METHOD_DELETE = "DELETE";
     private static final String METHOD_HEAD = "HEAD";
@@ -96,7 +95,9 @@ public abstract class HttpServlet extends GenericServlet
     /**
      * Does nothing, because this is an abstract class.
      */
-    public HttpServlet() { }
+    public HttpServlet() {
+        // NOOP
+    }
     
     
     /**
@@ -783,7 +784,9 @@ class NoBodyOutputStream extends ServletOutputStream {
     private int                contentLength = 0;
 
     // file private
-    NoBodyOutputStream() {}
+    NoBodyOutputStream() {
+        // NOOP
+    }
 
     // file private
     int getContentLength() {

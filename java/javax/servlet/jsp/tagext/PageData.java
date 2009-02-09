@@ -36,6 +36,7 @@ abstract public class PageData {
      * typically implicit.)
      */
     public PageData() {
+        // NOOP by default
     }
     
     /**

@@ -28,6 +28,7 @@ public abstract class JspEngineInfo {
      * typically implicit.)
      */
     public JspEngineInfo() {
+        // NOOP by default
     }
     
     /**

@@ -51,8 +51,9 @@ public abstract class ServletInputStream extends InputStream {
      * Does nothing, because this is an abstract class.
      *
      */
-
-    protected ServletInputStream() { }
+    protected ServletInputStream() {
+        // NOOP
+    }
 
   
   

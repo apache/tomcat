@@ -59,6 +59,7 @@ public abstract class TagExtraInfo {
      * typically implicit.)
      */
     public TagExtraInfo() {
+        // NOOP by default
     }
     
     /**
@@ -71,7 +72,7 @@ public abstract class TagExtraInfo {
      *         if no scripting variables are to be defined.
      */
     public VariableInfo[] getVariableInfo(TagData data) {
-	return ZERO_VARIABLE_INFO;
+        return ZERO_VARIABLE_INFO;
     }
 
     /**
@@ -86,7 +87,7 @@ public abstract class TagExtraInfo {
      */
 
     public boolean isValid(TagData data) {
-	return true;
+        return true;
     }
 
     /**
@@ -107,14 +108,14 @@ public abstract class TagExtraInfo {
      * @since 2.0
      */
     public ValidationMessage[] validate( TagData data ) {
-	ValidationMessage[] result = null;
+        ValidationMessage[] result = null;
 
-	if( !isValid( data ) ) {
-	    result = new ValidationMessage[] {
-		new ValidationMessage( data.getId(), "isValid() == false" ) };
-	}
+        if( !isValid( data ) ) {
+            result = new ValidationMessage[] {
+                new ValidationMessage( data.getId(), "isValid() == false" ) };
+        }
 
-	return result;
+        return result;
     }
 
     /**
@@ -123,7 +124,7 @@ public abstract class TagExtraInfo {
      * @param tagInfo The TagInfo this instance is extending
      */
     public final void setTagInfo(TagInfo tagInfo) {
-	this.tagInfo = tagInfo;
+        this.tagInfo = tagInfo;
     }
 
     /**
@@ -132,7 +133,7 @@ public abstract class TagExtraInfo {
      * @return the taginfo instance this instance is extending
      */
     public final TagInfo getTagInfo() {
-	return tagInfo;
+        return tagInfo;
     }
     
     // private data
