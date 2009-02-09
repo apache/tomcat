@@ -846,7 +846,7 @@ public class FileDirContext extends BaseDirContext {
      * List the resources which are members of a collection.
      *
      * @param file Collection
-     * @return Vector containg NamingEntry objects
+     * @return Vector containing NamingEntry objects
      */
     protected ArrayList<NamingEntry> list(File file) {
 
@@ -867,8 +867,11 @@ public class FileDirContext extends BaseDirContext {
 
         for (int i = 0; i < names.length; i++) {
 
-            File currentFile = validate(new File(file, names[i]));
-            if (currentFile == null) continue;
+            File currentFile = new File(file, names[i]);
+            if (allowLinking) {
+                currentFile = validate(currentFile);
+                if (currentFile == null) continue;
+            }
             
             Object object = null;
             if (currentFile.isDirectory()) {
