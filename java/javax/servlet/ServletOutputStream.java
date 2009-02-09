@@ -53,8 +53,9 @@ public abstract class ServletOutputStream extends OutputStream {
      * Does nothing, because this is an abstract class.
      *
      */
-
-    protected ServletOutputStream() { }
+    protected ServletOutputStream() {
+        // NOOP
+    }
 
 
     /**

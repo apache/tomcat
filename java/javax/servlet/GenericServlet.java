@@ -62,8 +62,9 @@ public abstract class GenericServlet
      * is done by one of the <code>init</code> methods.
      *
      */
-
-    public GenericServlet() { }
+    public GenericServlet() {
+        // NOOP
+    }
     
     
     
@@ -75,6 +76,7 @@ public abstract class GenericServlet
      */
 
     public void destroy() {
+        // NOOP by default
     }
     
     
@@ -234,7 +236,7 @@ public abstract class GenericServlet
      */
     
     public void init() throws ServletException {
-
+        // NOOP by default
     }
     
 

@@ -28,8 +28,8 @@ public class ListELResolver extends ELResolver {
 
 	private final boolean readOnly;
 
-	private final static Class UNMODIFIABLE = Collections.unmodifiableList(
-			new ArrayList()).getClass();
+	private final static Class<? extends List> UNMODIFIABLE =
+	    Collections.unmodifiableList(new ArrayList<Object>()).getClass();
 
 	public ListELResolver() {
 		this.readOnly = false;
@@ -47,7 +47,7 @@ public class ListELResolver extends ELResolver {
 
 		if (base instanceof List) {
 			context.setPropertyResolved(true);
-			List list = (List) base;
+			List<Object> list = (List<Object>) base;
 			int idx = coerce(property);
 			if (idx < 0 || idx >= list.size()) {
 				return null;
@@ -66,7 +66,7 @@ public class ListELResolver extends ELResolver {
 
 		if (base instanceof List) {
 			context.setPropertyResolved(true);
-			List list = (List) base;
+			List<Object> list = (List<Object>) base;
 			int idx = coerce(property);
 			if (idx < 0 || idx >= list.size()) {
 				return null;
@@ -88,7 +88,7 @@ public class ListELResolver extends ELResolver {
 
 		if (base instanceof List) {
 			context.setPropertyResolved(true);
-			List list = (List) base;
+			List<Object> list = (List<Object>) base;
 
 			if (this.readOnly) {
 				throw new PropertyNotWritableException(message(context,
@@ -115,7 +115,7 @@ public class ListELResolver extends ELResolver {
 
 		if (base instanceof List) {
 			context.setPropertyResolved(true);
-			List list = (List) base;
+			List<Object> list = (List<Object>) base;
 			int idx = coerce(property);
 			if (idx < 0 || idx >= list.size()) {
 				throw new PropertyNotFoundException(
