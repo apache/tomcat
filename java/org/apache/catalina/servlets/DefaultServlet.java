@@ -56,6 +56,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.StringManager;
@@ -77,8 +78,7 @@ import org.apache.naming.resources.ResourceAttributes;
 
 public class DefaultServlet
     extends HttpServlet {
-
-
+    
     // ----------------------------------------------------- Instance Variables
 
 
@@ -354,6 +354,49 @@ public class DefaultServlet
     }
 
 
+    /**
+     * Override default implementation to ensure that TRACE is correctly
+     * handled.
+     *
+     * @param req   the {@link HttpServletRequest} object that
+     *                  contains the request the client made of
+     *                  the servlet
+     *
+     * @param resp  the {@link HttpServletResponse} object that
+     *                  contains the response the servlet returns
+     *                  to the client                                
+     *
+     * @exception IOException   if an input or output error occurs
+     *                              while the servlet is handling the
+     *                              OPTIONS request
+     *
+     * @exception ServletException  if the request for the
+     *                                  OPTIONS cannot be handled
+     */
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException {
+
+        StringBuffer allow = new StringBuffer();
+        // There is a doGet method
+        allow.append("GET, HEAD");
+        // There is a doPost
+        allow.append(", POST");
+        // There is a doPut
+        allow.append(", PUT");
+        // There is a doDelete
+        allow.append(", POST");
+        // Trace - assume disabled unless we can prove otherwise
+        if (req instanceof RequestFacade &&
+                ((RequestFacade) req).getAllowTrace()) {
+            allow.append(", TRACE");
+        }
+        // Always allow options
+        allow.append(", OPTIONS");
+        
+        resp.setHeader("Allow", allow.toString());
+    }
+    
+    
     /**
      * Process a POST request for the specified resource.
      *
