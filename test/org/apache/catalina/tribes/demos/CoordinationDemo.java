@@ -46,6 +46,7 @@ public class CoordinationDemo {
      * Construct and show the application.
      */
     public CoordinationDemo() {
+        // Default constructor
     }
     
     public void init() {
@@ -312,7 +313,9 @@ public class CoordinationDemo {
                 status = "Start failed:"+x.getMessage();
                 error = x;
                 startstatus = "failed";
-                try { channel.stop(GroupChannel.DEFAULT);}catch(Exception ignore){}
+                try { channel.stop(Channel.DEFAULT);}catch(Exception ignore){
+                    // Ignore
+                }
                 channel = null;
                 interceptor = null;
             }
@@ -351,7 +354,9 @@ public class CoordinationDemo {
                     int type = event.getEventType();
                     boolean display = VIEW_EVENTS[type];
                     if ( display ) parent.printScreen();
-                    try { Thread.sleep(SLEEP_TIME); }catch ( Exception x){}
+                    try { Thread.sleep(SLEEP_TIME); }catch ( Exception x){
+                        // Ignore
+                    }
                 }
             };
             channel.addInterceptor(interceptor);

@@ -957,6 +957,7 @@ public final class IntrospectionUtils {
             try {
                 result = new Integer(object);
             } catch (NumberFormatException ex) {
+                // Ignore
             }
             // Try a setFoo ( boolean )
         } else if ("java.lang.Boolean".equals(paramType.getName())

@@ -62,14 +62,14 @@ public class TestUdpPackages extends TestCase {
         rb1.setUdpPort(50000);
         rb2.setUdpPort(50000);
         channel2.addChannelListener(listener1);
-        channel1.start(GroupChannel.DEFAULT);
-        channel2.start(GroupChannel.DEFAULT);
+        channel1.start(Channel.DEFAULT);
+        channel2.start(Channel.DEFAULT);
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        channel1.stop(GroupChannel.DEFAULT);
-        channel2.stop(GroupChannel.DEFAULT);
+        channel1.stop(Channel.DEFAULT);
+        channel2.stop(Channel.DEFAULT);
     }
 
     public void testSingleDataSendNO_ACK() throws Exception {
@@ -178,7 +178,7 @@ public class TestUdpPackages extends TestCase {
     }
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_UDP);
+        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_UDP);
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
         while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count.get()) Thread.sleep(500);
@@ -188,7 +188,7 @@ public class TestUdpPackages extends TestCase {
 
     public void testDataSendACK() throws Exception {
         System.err.println("Starting ACK");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_UDP);
+        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_UDP);
         Thread.sleep(250);
         System.err.println("Finished ACK");
         assertEquals("Checking success messages.",msgCount,listener1.count.get());
@@ -196,7 +196,7 @@ public class TestUdpPackages extends TestCase {
 
     public void testDataSendSYNCACK() throws Exception {
         System.err.println("Starting SYNC_ACK");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),GroupChannel.SEND_OPTIONS_SYNCHRONIZED_ACK|GroupChannel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_UDP);
+        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_UDP);
         Thread.sleep(250);
         System.err.println("Finished SYNC_ACK");
         assertEquals("Checking success messages.",msgCount,listener1.count.get());

@@ -20,6 +20,8 @@ import junit.framework.TestCase;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.Arrays;
+
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
@@ -46,14 +48,14 @@ public class TestRemoteProcessException extends TestCase {
         channel2 = new GroupChannel();
         listener1 = new Listener();
         channel2.addChannelListener(listener1);
-        channel1.start(GroupChannel.DEFAULT);
-        channel2.start(GroupChannel.DEFAULT);
+        channel1.start(Channel.DEFAULT);
+        channel2.start(Channel.DEFAULT);
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        channel1.stop(GroupChannel.DEFAULT);
-        channel2.stop(GroupChannel.DEFAULT);
+        channel1.stop(Channel.DEFAULT);
+        channel2.stop(Channel.DEFAULT);
     }
 
     public void testDataSendSYNCACK() throws Exception {
@@ -61,7 +63,7 @@ public class TestRemoteProcessException extends TestCase {
         int errC=0, nerrC=0;
         for (int i=0; i<msgCount; i++) {
             boolean error = Data.r.nextBoolean();
-            channel1.send(channel1.getMembers(),Data.createRandomData(error),GroupChannel.SEND_OPTIONS_SYNCHRONIZED_ACK|GroupChannel.SEND_OPTIONS_USE_ACK);
+            channel1.send(channel1.getMembers(),Data.createRandomData(error),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK);
             if ( error ) errC++; else nerrC++;
         }
         System.err.println("Finished SYNC_ACK");
@@ -90,11 +92,10 @@ public class TestRemoteProcessException extends TestCase {
                         printStats(System.err);
                     }
                     throw new IllegalArgumentException();
-                } else {
-                    noErrCnt++;
-                    if ( (noErrCnt % 100) == 0) {
-                        printStats(System.err);
-                    }
+                }
+                noErrCnt++;
+                if ( (noErrCnt % 100) == 0) {
+                    printStats(System.err);
                 }
             }
         }

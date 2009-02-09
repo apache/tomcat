@@ -82,7 +82,7 @@ public class TestOrderInterceptor extends TestCase {
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
-            super.assertEquals(false,test[i].fail);
+            assertEquals(false,test[i].fail);
         }
     }
     
@@ -115,7 +115,7 @@ public class TestOrderInterceptor extends TestCase {
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
-            super.assertEquals(false,test[i].fail);
+            assertEquals(false,test[i].fail);
         }
     }
 

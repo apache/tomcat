@@ -248,8 +248,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
 
     
     
-    //public static class LoadMessage implements Serializable  {
-    public static class LoadMessage extends ByteMessage  implements Serializable {
+    public static class LoadMessage extends ByteMessage {
         
         public static byte[] outdata = new byte[size];
         public static Random r = new Random(System.currentTimeMillis());
@@ -263,6 +262,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
         protected byte[] message = getMessage();
         
         public LoadMessage() {
+            // Default constructor
         }
         
         public byte[] getMessage() {
