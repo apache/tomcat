@@ -96,8 +96,10 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                 for ( int i=0; i<resp.length; i++ ) {
                     System.out.println("Received a response message from ["+resp[i].getSource().getName()+"] with data ["+resp[i].getMessage()+"]");
                 }
-            Thread.sleep(pause);
-        }catch(Exception x){}
+                Thread.sleep(pause);
+            }catch(Exception x){
+                // Ignore
+            }
         }
     }
     
