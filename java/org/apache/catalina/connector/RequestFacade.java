@@ -994,4 +994,7 @@ public class RequestFacade implements HttpServletRequest {
         return null;
     }
 
+    public boolean getAllowTrace() {
+        return request.getConnector().getAllowTrace();
+    }
 }
