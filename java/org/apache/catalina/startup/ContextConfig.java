@@ -908,7 +908,7 @@ public class ContextConfig
             }
         }
 
-        if (docBase.startsWith(canonicalAppBase.getPath())) {
+        if (docBase.startsWith(canonicalAppBase.getPath() + File.separatorChar)) {
             docBase = docBase.substring(canonicalAppBase.getPath().length());
             docBase = docBase.replace(File.separatorChar, '/');
             if (docBase.startsWith("/")) {
