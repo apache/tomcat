@@ -50,6 +50,7 @@ public abstract class JspFactory {
      * typically implicit.)
      */
     public JspFactory() {
+        // NOOP by default
     }
 
     /**

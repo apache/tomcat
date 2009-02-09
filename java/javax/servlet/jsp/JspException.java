@@ -28,6 +28,7 @@ public class JspException extends Exception {
      * Construct a JspException.
      */
     public JspException() {
+        // NOOP
     }
 
 

@@ -100,6 +100,7 @@ public class BodyTagSupport extends TagSupport implements BodyTag {
      */
 
     public void doInitBody() throws JspException {
+        // NOOP by default
     }
 
 

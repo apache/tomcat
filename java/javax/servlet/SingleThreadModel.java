@@ -46,4 +46,5 @@ package javax.servlet;
  */
 
 public interface SingleThreadModel {
+    // No methods
 }

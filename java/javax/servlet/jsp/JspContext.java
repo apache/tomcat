@@ -76,6 +76,7 @@ public abstract class JspContext {
      * typically implicit.)
      */
     public JspContext() {
+        // NOOP by default
     }
     
     /** 
