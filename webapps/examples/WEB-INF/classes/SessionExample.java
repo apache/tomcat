@@ -52,12 +52,12 @@ public class SessionExample extends HttpServlet {
         out.println("<body>");
 
         // img stuff not req'd for source code html showing
-	// relative links everywhere!
+        // relative links everywhere!
 
         // XXX
         // making these absolute till we work out the
         // addition of a PathInfo issue 
-	
+        
         out.println("<a href=\"../sessions.html\">");
         out.println("<img src=\"../images/code.gif\" height=24 " +
                     "width=24 align=right border=0 alt=\"view code\"></a>");
@@ -83,9 +83,9 @@ public class SessionExample extends HttpServlet {
 
         out.println("<P>");
         out.println(rb.getString("sessions.data") + "<br>");
-        Enumeration names = session.getAttributeNames();
+        Enumeration<String> names = session.getAttributeNames();
         while (names.hasMoreElements()) {
-            String name = (String) names.nextElement(); 
+            String name = names.nextElement(); 
             String value = session.getAttribute(name).toString();
             out.println(HTMLFilter.filter(name) + " = " 
                         + HTMLFilter.filter(value) + "<br>");
@@ -93,7 +93,7 @@ public class SessionExample extends HttpServlet {
 
         out.println("<P>");
         out.print("<form action=\"");
-	out.print(response.encodeURL("SessionExample"));
+        out.print(response.encodeURL("SessionExample"));
         out.print("\" ");
         out.println("method=POST>");
         out.println(rb.getString("sessions.dataname"));
@@ -107,7 +107,7 @@ public class SessionExample extends HttpServlet {
 
         out.println("<P>GET based form:<br>");
         out.print("<form action=\"");
-	out.print(response.encodeURL("SessionExample"));
+        out.print(response.encodeURL("SessionExample"));
         out.print("\" ");
         out.println("method=GET>");
         out.println(rb.getString("sessions.dataname"));
@@ -120,9 +120,9 @@ public class SessionExample extends HttpServlet {
         out.println("</form>");
 
         out.print("<p><a href=\"");
-	out.print(response.encodeURL("SessionExample?dataname=foo&datavalue=bar"));
-	out.println("\" >URL encoded </a>");
-	
+        out.print(response.encodeURL("SessionExample?dataname=foo&datavalue=bar"));
+        out.println("\" >URL encoded </a>");
+        
         out.println("</body>");
         out.println("</html>");
         

@@ -68,8 +68,9 @@ public class FooTag
             if (i == 3) {
                 bodyOut.writeOut(bodyOut.getEnclosingWriter());
                 return SKIP_BODY;
-            } else
-                pageContext.setAttribute("member", atts[i]);
+            }
+            
+            pageContext.setAttribute("member", atts[i]);
             i++;
             return EVAL_BODY_BUFFERED;
         } catch (IOException ex) {

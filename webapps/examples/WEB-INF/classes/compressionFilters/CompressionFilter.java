@@ -155,10 +155,10 @@ public class CompressionFilter implements Filter{
                 return;
             }
 
-            Enumeration e =
+            Enumeration<String> e =
                 ((HttpServletRequest)request).getHeaders("Accept-Encoding");
             while (e.hasMoreElements()) {
-                String name = (String)e.nextElement();
+                String name = e.nextElement();
                 if (name.indexOf("gzip") != -1) {
                     if (debug > 0) {
                         System.out.println("supports compression");
@@ -178,22 +178,22 @@ public class CompressionFilter implements Filter{
             }
             chain.doFilter(request, response);
             return;
-        } else {
-            if (response instanceof HttpServletResponse) {
-                CompressionServletResponseWrapper wrappedResponse =
-                    new CompressionServletResponseWrapper((HttpServletResponse)response);
-                wrappedResponse.setDebugLevel(debug);
-                wrappedResponse.setCompressionThreshold(compressionThreshold);
-                if (debug > 0) {
-                    System.out.println("doFilter gets called with compression");
-                }
-                try {
-                    chain.doFilter(request, wrappedResponse);
-                } finally {
-                    wrappedResponse.finishResponse();
-                }
-                return;
+        } 
+        
+        if (response instanceof HttpServletResponse) {
+            CompressionServletResponseWrapper wrappedResponse =
+                new CompressionServletResponseWrapper((HttpServletResponse)response);
+            wrappedResponse.setDebugLevel(debug);
+            wrappedResponse.setCompressionThreshold(compressionThreshold);
+            if (debug > 0) {
+                System.out.println("doFilter gets called with compression");
             }
+            try {
+                chain.doFilter(request, wrappedResponse);
+            } finally {
+                wrappedResponse.finishResponse();
+            }
+            return;
         }
     }
 
