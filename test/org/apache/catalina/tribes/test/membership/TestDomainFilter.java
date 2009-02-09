@@ -80,7 +80,9 @@ public class TestDomainFilter
         for (int i = 0; i < channels.length; i++) {
             try {
                 channels[i].stop(Channel.DEFAULT);
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+                // Ignore
+            }
         }
         super.tearDown();
     }

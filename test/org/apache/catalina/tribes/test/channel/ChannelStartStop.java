@@ -34,7 +34,7 @@ public class ChannelStartStop extends TestCase {
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        try {channel.stop(Channel.DEFAULT);}catch (Exception ignore){}
+        try {channel.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
     }
 
     public void testDoubleFullStart() throws Exception {

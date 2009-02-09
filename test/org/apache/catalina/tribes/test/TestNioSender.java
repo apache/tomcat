@@ -42,7 +42,7 @@ public class TestNioSender {
     MemberImpl mbr;
     private static int testOptions = Channel.SEND_OPTIONS_DEFAULT;
     public TestNioSender()  {
-        
+        // Default constructor
     }
     
     public synchronized int inc() {
