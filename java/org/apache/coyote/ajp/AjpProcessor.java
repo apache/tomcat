@@ -854,9 +854,13 @@ public class AjpProcessor implements ActionHook {
 
         if (valueMB == null || (valueMB != null && valueMB.isNull()) ) {
             // HTTP/1.0
-            // Default is what the socket tells us. Overriden if a host is
-            // found/parsed
-            request.setServerPort(endpoint.getPort());
+            request.setServerPort(request.getLocalPort());
+            try {
+                request.serverName().duplicate(request.localName());
+            } catch (IOException e) {
+                response.setStatus(400);
+                error = true;
+            }
             return;
         }
 
