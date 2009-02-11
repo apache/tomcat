@@ -56,6 +56,7 @@ import org.apache.jk.core.WorkerEnv;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
+import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.threads.ThreadPool;
 import org.apache.tomcat.util.threads.ThreadPoolRunnable;
 
@@ -854,6 +855,7 @@ public class ChannelNioSocket extends JkHandler
                     status= invoke( recv, ep );
                     if( status != JkHandler.OK ) {
                         log.warn("processCallbacks status " + status );
+                        ep.action(ActionCode.ACTION_CLOSE, ep.getRequest().getResponse());
                         return false;
                     }
                     synchronized(this) {
