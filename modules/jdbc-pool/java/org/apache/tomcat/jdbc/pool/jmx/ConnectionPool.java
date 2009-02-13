@@ -28,10 +28,18 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean  {
-    //logger
+    /**
+     * logger
+     */
     protected static Log log = LogFactory.getLog(ConnectionPool.class);
 
+    /**
+     * the connection pool
+     */
     protected org.apache.tomcat.jdbc.pool.ConnectionPool pool = null;
+    /**
+     * sequence for JMX notifications
+     */
     protected AtomicInteger sequence = new AtomicInteger(0);
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
