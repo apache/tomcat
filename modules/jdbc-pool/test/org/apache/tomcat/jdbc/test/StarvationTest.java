@@ -44,6 +44,7 @@ public class StarvationTest extends DefaultTestCase {
         datasource.getPoolProperties().setRemoveAbandonedTimeout(5);
         datasource.getPoolProperties().setTimeBetweenEvictionRunsMillis(500);
         datasource.getPoolProperties().setMaxWait(10000);
+        datasource.getPoolProperties().setLogAbandoned(true);
     }
     
     public void testDBCPConnectionStarvation() throws Exception {
@@ -67,6 +68,7 @@ public class StarvationTest extends DefaultTestCase {
         }finally {
             if (con2!=null) con2.close();
         }
+
     }
     
     public void testConnectionStarvation() throws Exception {
