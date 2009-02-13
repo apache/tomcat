@@ -781,7 +781,7 @@ public class Http11Processor implements ActionHook {
 
             // Parsing the request header
             try {
-                if (!disableUploadTimeout && keptAlive) {
+                if (keptAlive) {
                     if (keepAliveTimeout > 0) {
                         socket.setSoTimeout(keepAliveTimeout);
                     }
