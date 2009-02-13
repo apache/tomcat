@@ -29,30 +29,82 @@ import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * Represents a pooled connection
+ * and holds a reference to the java.sql.Connection object
  * @author Filip Hanik
  * @version 1.0
  */
 public class PooledConnection {
-
-    public static final int VALIDATE_BORROW = 1;
-    public static final int VALIDATE_RETURN = 2;
-    public static final int VALIDATE_IDLE = 3;
-    public static final int VALIDATE_INIT = 4;
-
+    /**
+     * Logger
+     */
     protected static Log log = LogFactory.getLog(PooledConnection.class);
+    /**
+     * Instance counter
+     */
     protected static AtomicInteger counter = new AtomicInteger(01);
 
+    /**
+     * Validate when connection is borrowed flag
+     */
+    public static final int VALIDATE_BORROW = 1;
+    /**
+     * Validate when connection is returned flag
+     */
+    public static final int VALIDATE_RETURN = 2;
+    /**
+     * Validate when connection is idle flag
+     */
+    public static final int VALIDATE_IDLE = 3;
+    /**
+     * Validate when connection is initialized flag
+     */
+    public static final int VALIDATE_INIT = 4;
+
+    /**
+     * The properties for the connection pool
+     */
     protected PoolProperties poolProperties;
+    /**
+     * The underlying database connection
+     */
     protected java.sql.Connection connection;
+    /**
+     * When we track abandon traces, this string holds the thread dump
+     */
     protected String abandonTrace = null;
+    /**
+     * Timestamp the connection was last 'touched' by the pool
+     */
     protected long timestamp;
+    /**
+     * Lock for this connection only
+     */
     protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
+    /**
+     * Set to true if this connection has been discarded by the pool
+     */
     protected boolean discarded = false;
+    /**
+     * timestamp to keep track of validation intervals
+     */
     protected long lastValidated = System.currentTimeMillis();
+    /**
+     * The instance number for this connection
+     */
     protected int instanceCount = 0;
+    /**
+     * The parent
+     */
     protected ConnectionPool parent;
 
+    /**
+     * Weak reference to cache the list of interceptors for this connection
+     * so that we don't create a new list of interceptors each time we borrow
+     * the connection
+     */
     protected WeakReference<JdbcInterceptor> handler = null;
+    
     
     public PooledConnection(PoolProperties prop, ConnectionPool parent) {
         instanceCount = counter.addAndGet(1);
@@ -65,7 +117,7 @@ public class PooledConnection {
             try {
                 this.disconnect(false);
             } catch (Exception x) {
-                log.error("Unable to disconnect previous connection.", x);
+                log.debug("Unable to disconnect previous connection.", x);
             } //catch
         } //end if
         java.sql.Driver driver = null;
@@ -113,6 +165,10 @@ public class PooledConnection {
         this.discarded = false;
     }
     
+    /**
+     * 
+     * @return true if connect() was called successfully and disconnect has not yet been called
+     */
     public boolean isInitialized() {
         return connection!=null;
     }
@@ -122,7 +178,7 @@ public class PooledConnection {
         this.connect();
     } //reconnect
 
-    protected synchronized void disconnect(boolean finalize) {
+    protected void disconnect(boolean finalize) {
         if (isDiscarded()) {
             return;
         }
@@ -295,6 +351,10 @@ public class PooledConnection {
         return poolProperties;
     }
 
+    /**
+     * Locks the connection only if the sweeper thread is enabled
+     * Otherwise this is a noop for performance
+     */
     public void lock() {
         if (this.poolProperties.isPoolSweeperEnabled()) {
             //optimized, only use a lock when there is concurrency
@@ -302,6 +362,10 @@ public class PooledConnection {
         }
     }
 
+    /**
+     * Unlocks the connection only if the sweeper is enabled
+     * Otherwise this is a noop for performance
+     */
     public void unlock() {
         if (this.poolProperties.isPoolSweeperEnabled()) {
           //optimized, only use a lock when there is concurrency
@@ -309,10 +373,18 @@ public class PooledConnection {
         }
     }
 
+    /**
+     * Returns the underlying connection
+     * @return
+     */
     public java.sql.Connection getConnection() {
         return this.connection;
     }
 
+    /**
+     * Returns the first handler in the interceptor chain
+     * @return
+     */
     public JdbcInterceptor getHandler() {
         return (handler!=null)?handler.get():null;
     }
