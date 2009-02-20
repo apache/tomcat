@@ -82,7 +82,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
                 session-config, jsp-config, and login-config. When there
                 are multiple elements of welcome-file-list or
                 locale-encoding-mapping-list, the container must
-                concatenate the element contents. The multiple occurence
+                concatenate the element contents. The multiple occurrence
                 of the element distributable is redundant and the
                 container treats that case exactly in the same way when
                 there is only one distributable.
@@ -363,7 +363,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
                 which filters are invoked is the order in which
                 filter-mapping declarations that match a request URI for
                 a servlet appear in the list of filter-mapping
-                elements.The filter-name value must be the value of the
+                elements. The filter-name value must be the value of the
                 filter-name sub-elements of one of the filter
                 declarations in the deployment descriptor.
             </xsd:documentation>
@@ -702,7 +702,7 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
                     <xsd:documentation>
                         The load-on-startup element indicates that this
                         servlet should be loaded (instantiated and have
-                        its init() called) on the startup of the web
+                        its init() called) on the start-up of the web
                         application. The optional contents of these
                         element must be an integer indicating the order
                         in which the servlet should be loaded. If the
