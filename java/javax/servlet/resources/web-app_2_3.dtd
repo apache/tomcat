@@ -230,7 +230,7 @@ during deployment.
 env-entry-type)>
 
 <!--
-The env-entry-name element contains the name of a web applications's
+The env-entry-name element contains the name of a web application's
 environment entry.  The name is a JNDI name relative to the
 java:comp/env context.  The name must be unique within a web application.
 
@@ -336,7 +336,7 @@ to apply it matches filter-mapping declarations either on servlet-name,
 or on url-pattern for each filter-mapping element, depending on which
 style is used. The order in which filters are invoked is the order in
 which filter-mapping declarations that match a request URI for a
-servlet appear in the list of filter-mapping elements.The filter-name
+servlet appear in the list of filter-mapping elements. The filter-name
 value must be the value of the <filter-name> sub-elements of one of the
 <filter> declarations in the deployment descriptor.
 
@@ -460,7 +460,7 @@ Used in: listener
 
 <!--
 The load-on-startup element indicates that this servlet should be
-loaded (instantiated and have its init() called) on the startup
+loaded (instantiated and have its init() called) on the start-up
 of the web application. The optional contents of
 these element must be an integer indicating the order in which
 the servlet should be loaded. If the value is a negative integer,

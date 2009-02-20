@@ -94,7 +94,7 @@ The param-value element contains the value of a parameter.
 <!--
 The servlet element contains the declarative data of a
 servlet. If a jsp-file is specified and the load-on-startup element is
-present, then the JSP should be precompiled and loaded.
+present, then the JSP should be pre-compiled and loaded.
 -->
 
 <!ELEMENT servlet (icon?, servlet-name, display-name?, description?,
@@ -130,7 +130,7 @@ initialization param of the servlet
 
 <!--
 The load-on-startup element indicates that this servlet should be
-loaded on the startup of the web application. The optional contents of
+loaded on the start-up of the web application. The optional contents of
 these element must be a positive integer indicating the order in which
 the servlet should be loaded. Lower integers are loaded before higher
 integers. If no value is specified, or if the value specified is not a
@@ -509,7 +509,7 @@ application package.
 <!--
 The ID mechanism is to allow tools to easily make tool-specific
 references to the elements of the deployment descriptor. This allows
-tools that produce additional deployment information (i.e information
+tools that produce additional deployment information (i.e. information
 beyond the standard deployment descriptor information) to store the
 non-standard information in a separate file, and easily refer from
 these tools-specific files to the information in the standard web-app
