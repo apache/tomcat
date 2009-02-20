@@ -99,7 +99,7 @@
 	file must not contain multiple elements of session-config,
 	jsp-config, and login-config. When there are multiple elements of
 	welcome-file-list or locale-encoding-mapping-list, the container
-	must concatinate the element contents.  The multiple occurrence
+	must concatenate the element contents.  The multiple occurrence
 	of the element distributable is redundant and the container
 	treats that case exactly in the same way when there is only
 	one distributable.
@@ -452,7 +452,7 @@
 	element, depending on which style is used. The order in
 	which filters are invoked is the order in which
 	filter-mapping declarations that match a request URI for a
-	servlet appear in the list of filter-mapping elements.The
+	servlet appear in the list of filter-mapping elements. The
 	filter-name value must be the value of the filter-name
 	sub-elements of one of the filter declarations in the
 	deployment descriptor.
@@ -874,7 +874,7 @@
 	The servletType is used to declare a servlet.
 	It contains the declarative data of a
 	servlet. If a jsp-file is specified and the load-on-startup
-	element is present, then the JSP should be precompiled and
+	element is present, then the JSP should be pre-compiled and
 	loaded.
 
 	Used in: web-app
@@ -915,7 +915,7 @@
 
 	    The load-on-startup element indicates that this
 	    servlet should be loaded (instantiated and have
-	    its init() called) on the startup of the web
+	    its init() called) on the start-up of the web
 	    application. The optional contents of these
 	    element must be an integer indicating the order in
 	    which the servlet should be loaded. If the value
