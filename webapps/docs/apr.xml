@@ -181,6 +181,13 @@
       8192 keepalive connections.</p>
     </attribute>
 
+    <attribute name="pollerThreadCount" required="false">
+      <p>Number of threads used to poll kept alive connections. On Windows the
+      default is chosen so that the sockets managed by each thread is
+      less than 1024. For Linux the default is 1. Changing the default on
+      Windows is likely to have a negative performance impact.</p>
+    </attribute>
+
     <attribute name="useSendfile" required="false">
       <p>Use kernel level sendfile for certain static files. The default value is true.</p>
     </attribute>
@@ -189,9 +196,16 @@
       <p>Amount of sockets that the poller responsible for sending static files asynchronously can hold 
       at a given time. Extra connections will be closed right away without any data being sent 
       (resulting in a zero length file on the client side). Note that in most cases, sendfile is a call
-      that will return right away (being taken care of "synchonously" by the kernel), and the sendfile
+      that will return right away (being taken care of "synchronously" by the kernel), and the sendfile
       poller will not be used, so the amount of static files which can be sent concurrently is much larger
       than the specified amount. The default value is 1024.</p>
+    </attribute>
+
+    <attribute name="sendFileThreadCount" required="false">
+      <p>Number of threads used service sendfile sockets. On Windows the
+      default is chosen so that the sockets managed by each thread is
+      less than 1024. For Linux the default is 1. Changing the default on
+      Windows is likely to have a negative performance impact.</p>
     </attribute>
 
     </attributes>
