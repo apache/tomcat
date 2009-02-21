@@ -105,9 +105,9 @@ public final class ApplicationContextFacade
         classCache.put("getRealPath", clazz);
         classCache.put("getAttribute", clazz);
         classCache.put("log", clazz);
-        classCache.put("getDefaultSessionTrackingModes", clazz);
-        classCache.put("getEffectiveSessionTrackingModes", clazz);
-        classCache.put("setSessionTrackingModes", clazz);
+        classCache.put("setSessionTrackingModes", new Class[]{EnumSet.class} );
+        classCache.put("setSessionCookieConfig",
+                new Class[]{SessionCookieConfig.class});
     }
 
 
