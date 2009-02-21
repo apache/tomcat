@@ -31,7 +31,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
@@ -262,6 +261,11 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         ep.setExecutor(executor);
     }
     
+    /**
+     * NOOP.
+     * @param useexec - Ignored
+     * @deprecated Executors are always used for NIO
+     */
     public void setUseExecutor(boolean useexec) {
         ep.setUseExecutor(useexec);
     }
@@ -733,10 +737,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     processor = createProcessor();
                 }
 
-                if (processor instanceof ActionHook) {
-                    ((ActionHook) processor).action(ActionCode.ACTION_START, null);
-                }
-                
+                processor.action(ActionCode.ACTION_START, null);
                 
                 if (proto.ep.getSecure() && (proto.sslImplementation != null)) {
                     if (socket instanceof SecureNioChannel) {
