@@ -37,7 +37,8 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
 	public Expression parseExpression(String expression, Class expectedType,
 			FunctionMapper fMapper) throws ELException {
 		try {
-			ELContextImpl ctx = new ELContextImpl(ELResolverImpl.DefaultResolver);
+			ELContextImpl ctx =
+			    new ELContextImpl(ELResolverImpl.getDefaultResolver());
             if (fMapper != null) {
                 ctx.setFunctionMapper(new FunctionMapperImpl(fMapper));
             }
