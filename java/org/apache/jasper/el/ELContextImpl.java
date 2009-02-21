@@ -26,6 +26,8 @@ import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
+import org.apache.catalina.Globals;
+
 /**
  * Implementation of ELContext
  * 
@@ -61,12 +63,21 @@ public final class ELContextImpl extends ELContext {
 
     private final ELResolver resolver;
 
-    private FunctionMapper functionMapper = NullFunctionMapper; // immutable
+    private FunctionMapper functionMapper;
 
     private VariableMapper variableMapper;
 
     public ELContextImpl() {
-        this(ELResolverImpl.DefaultResolver);
+        this(ELResolverImpl.getDefaultResolver());
+        if (Globals.IS_SECURITY_ENABLED) {
+            functionMapper = new FunctionMapper() {
+                public Method resolveFunction(String prefix, String localName) {
+                    return null;
+                }
+            };
+        } else {
+            functionMapper = NullFunctionMapper;
+        }
     }
 
     public ELContextImpl(ELResolver resolver) {

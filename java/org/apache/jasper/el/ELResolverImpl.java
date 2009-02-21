@@ -32,8 +32,10 @@ import javax.el.PropertyNotWritableException;
 import javax.el.ResourceBundleELResolver;
 import javax.servlet.jsp.el.VariableResolver;
 
+import org.apache.catalina.Globals;
+
 public final class ELResolverImpl extends ELResolver {
-	
+	/** @deprecated - Use getDefaultResolver(). Needs to be made private */
 	public final static ELResolver DefaultResolver = new CompositeELResolver();
 
 	static {
@@ -69,7 +71,7 @@ public final class ELResolverImpl extends ELResolver {
 		}
 
 		if (!context.isPropertyResolved()) {
-			return DefaultResolver.getValue(context, base, property);
+			return getDefaultResolver().getValue(context, base, property);
 		}
 		return null;
 	}
@@ -94,7 +96,7 @@ public final class ELResolverImpl extends ELResolver {
 		}
 
 		if (!context.isPropertyResolved()) {
-			return DefaultResolver.getType(context, base, property);
+			return getDefaultResolver().getType(context, base, property);
 		}
 		return null;
 	}
@@ -114,7 +116,7 @@ public final class ELResolverImpl extends ELResolver {
 		}
 
 		if (!context.isPropertyResolved()) {
-			DefaultResolver.setValue(context, base, property, value);
+			getDefaultResolver().setValue(context, base, property, value);
 		}
 	}
 
@@ -129,18 +131,31 @@ public final class ELResolverImpl extends ELResolver {
 			return true;
 		}
 
-		return DefaultResolver.isReadOnly(context, base, property);
+		return getDefaultResolver().isReadOnly(context, base, property);
 	}
 
 	public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		return DefaultResolver.getFeatureDescriptors(context, base);
+		return getDefaultResolver().getFeatureDescriptors(context, base);
 	}
 
 	public Class<?> getCommonPropertyType(ELContext context, Object base) {
 		if (base == null) {
 			return String.class;
 		}
-		return DefaultResolver.getCommonPropertyType(context, base);
+		return getDefaultResolver().getCommonPropertyType(context, base);
 	}
 
+	public static ELResolver getDefaultResolver() {
+	    if (Globals.IS_SECURITY_ENABLED) {
+	        ELResolver defaultResolver = new CompositeELResolver();
+	        ((CompositeELResolver) defaultResolver).add(new MapELResolver());
+	        ((CompositeELResolver) defaultResolver).add(new ResourceBundleELResolver());
+	        ((CompositeELResolver) defaultResolver).add(new ListELResolver());
+	        ((CompositeELResolver) defaultResolver).add(new ArrayELResolver());
+	        ((CompositeELResolver) defaultResolver).add(new BeanELResolver());
+	        return defaultResolver;
+	    } else {
+	        return DefaultResolver;
+	    }
+	}
 }
