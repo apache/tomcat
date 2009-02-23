@@ -345,7 +345,7 @@ public class ContextConfig
         synchronized (webDigester) {
             try {
                 if (altDDName != null) {
-                    url = new File(altDDName).toURL();
+                    url = new File(altDDName).toURI().toURL();
                 } else {
                     url = servletContext.getResource(
                                                 Constants.ApplicationWebXml);
@@ -384,9 +384,7 @@ public class ContextConfig
                 webDigester.reset();
                 parseException = null;
                 try {
-                    if (stream != null) {
-                        stream.close();
-                    }
+                    stream.close();
                 } catch (IOException e) {
                     log.error(sm.getString("contextConfig.applicationClose"), e);
                 }
@@ -923,8 +921,7 @@ public class ContextConfig
     }
     
     
-    protected void antiLocking()
-        throws IOException {
+    protected void antiLocking() {
 
         if ((context instanceof StandardContext) 
             && ((StandardContext) context).getAntiResourceLocking()) {
@@ -1023,12 +1020,8 @@ public class ContextConfig
      */
     protected synchronized void beforeStart() {
         
-        try {
-            antiLocking();
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.antiLocking"), e);
-        }
-        
+        antiLocking();
+
     }
     
     
@@ -1335,9 +1328,8 @@ public class ContextConfig
             new File(System.getProperty("catalina.base"), "conf");
         if (!configBase.exists()) {
             return null;
-        } else {
-            return configBase;
         }
+        return configBase;
     }  
 
     
