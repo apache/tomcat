@@ -875,22 +875,22 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd
         <xsd:attribute name="version" type="javaee:web-app-versionType"
             use="required" />
         <xsd:attribute name="id" type="xsd:ID" />
-        xsd:attribute name="metadata-complete" type="xsd:boolean">
-        <xsd:annotation>
-            <xsd:documentation>
-                The metadata-complete attribute defines whether this
-                deployment descriptor is complete, or whether the class
-                files of the jar file should be examined for annotations
-                that specify deployment information. If
-                metadata-complete is set to "true", the deployment tool
-                must ignore any Servlet annotations present in the class
-                files of the application. If metadata-complete is not
-                specified or is set to "false", the deployment tool must
-                examine the class files of the application for
-                annotations, as specified by the Servlet specifications.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:attribute />
+        <xsd:attribute name="metadata-complete" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>
+                    The metadata-complete attribute defines whether this
+                    deployment descriptor is complete, or whether the class
+                    files of the jar file should be examined for annotations
+                    that specify deployment information. If
+                    metadata-complete is set to "true", the deployment tool
+                    must ignore any Servlet annotations present in the class
+                    files of the application. If metadata-complete is not
+                    specified or is set to "false", the deployment tool must
+                    examine the class files of the application for
+                    annotations, as specified by the Servlet specifications.
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
     <!-- **************************************************** -->
     <xsd:complexType name="web-resource-collectionType">
