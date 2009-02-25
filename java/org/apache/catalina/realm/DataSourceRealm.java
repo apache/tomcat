@@ -270,8 +270,9 @@ public class DataSourceRealm
      */
     public Principal authenticate(String username, String credentials) {
     	
-    	// No user - can't possibly authenticate, don't bother the database then
-    	if (username == null) {
+    	// No user or no credentials
+        // Can't possibly authenticate, don't bother the database then
+    	if (username == null || credentials == null) {
     		return null;
     	}
         

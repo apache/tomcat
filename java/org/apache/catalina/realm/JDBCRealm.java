@@ -393,9 +393,10 @@ public class JDBCRealm
                                                String username,
                                                String credentials) {
 
-        // No user - can't possibly authenticate
-        if (username == null) {
-            return (null);
+        // No user or no credentials
+        // Can't possibly authenticate, don't bother the database then
+        if (username == null || credentials == null) {
+            return null;
         }
 
         // Look up the user's credentials
