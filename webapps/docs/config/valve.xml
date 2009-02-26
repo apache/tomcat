@@ -448,6 +448,42 @@
 </section>
 
 
+<section name="WebDAV Fix Valve">
+
+  <subsection name="Introduction">
+
+    <p>Microsoft operating systems have two WebDAV clients. One is used with
+    port 80, the other is used for all other ports. The implementation used with
+    port 80 does not adhere to the WebDAV specification and fails when trying to
+    communicate with the Tomcat WebDAV Servlet. This valve provides a fix for
+    this by forcing the use of the WebDAV implementation that works, even when
+    connecting via port 80.</p>
+    
+    <p>This Valve may be used at the <code>Engine</code>, <code>Host</code> or
+    <code>Context</code> level as required. Normally, this Valve would be used
+    at the <code>Context</code> level.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>WebDAV Fix Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.WebdavFixValve</strong>.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 </body>
 
 
