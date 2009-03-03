@@ -57,7 +57,7 @@
 #                   and JPDA_SUSPEND are ignored. Thus, all required jpda
 #                   options MUST be specified. The default is:
 #
-#                   -Xdebug -Xrunjdwp:transport=$JPDA_TRANSPORT,
+#                   -agentlib:jdwp=transport=$JPDA_TRANSPORT,
 #                       address=$JPDA_ADDRESS,server=y,suspend=$JPDA_SUSPEND
 #
 #   JSSE_HOME       (Optional) May point at your Java Secure Sockets Extension
