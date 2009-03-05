@@ -2455,7 +2455,7 @@ public class Request
         }
 
         if ((scc != null && scc.isHttpOnly()) ||
-                context.getManager().getUseHttpOnly()) {
+                context.getUseHttpOnly()) {
             cookie.setHttpOnly(true);
         }
         

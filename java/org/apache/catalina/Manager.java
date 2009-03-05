@@ -240,24 +240,6 @@ public interface Manager {
     public void setSessionAverageAliveTime(int sessionAverageAliveTime);
 
 
-    /**
-     * Gets the value of the use HttpOnly cookies for session cookies flag.
-     * 
-     * @return <code>true</code> if the HttpOnly flag should be set on session
-     *         cookies
-     */
-    public boolean getUseHttpOnly();
-
-
-    /**
-     * Sets the use HttpOnly cookies for session cookies flag.
-     * 
-     * @param useHttpOnly   Set to <code>true</code> to use HttpOnly cookies
-     *                          for session cookies
-     */
-    public void setUseHttpOnly(boolean useHttpOnly);
-
-
     // --------------------------------------------------------- Public Methods
 
 

@@ -181,7 +181,23 @@ public interface Context extends Container {
      */
     public void setCookies(boolean cookies);
 
+    /**
+     * Gets the value of the use HttpOnly cookies for session cookies flag.
+     * 
+     * @return <code>true</code> if the HttpOnly flag should be set on session
+     *         cookies
+     */
+    public boolean getUseHttpOnly();
 
+
+    /**
+     * Sets the use HttpOnly cookies for session cookies flag.
+     * 
+     * @param useHttpOnly   Set to <code>true</code> to use HttpOnly cookies
+     *                          for session cookies
+     */
+    public void setUseHttpOnly(boolean useHttpOnly);
+    
     /**
      * Return the "allow crossing servlet contexts" flag.
      */
