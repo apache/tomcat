@@ -157,12 +157,6 @@
         The default is 16.</p>
       </attribute>
 
-      <attribute name="useHttpOnly" required="false">
-       <p>Should the HttpOnly flag be set on session cookies to prevent client
-          side script from accessing the session ID? Defaults to
-          <code>true</code>.</p>
-      </attribute>
-
     </attributes>
 
     <h3>Persistent Manager Implementation</h3>
