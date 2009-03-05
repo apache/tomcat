@@ -64,6 +64,13 @@ rem
 rem                   -agentlib:jdwp=transport=%JPDA_TRANSPORT%,
 rem                       address=%JPDA_ADDRESS%,server=y,suspend=%JPDA_SUSPEND%
 rem
+rem   LOGGING_CONFIG  (Optional) Override Tomcat's logging manager and logging config file
+rem                   Example (all one line)
+rem                   set LOGGING_CONFIG=-Djava.util.logging.manager=com.foo.MyLogManager 
+rem                                   -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties
+rem
+rem
+rem
 rem $Id$
 rem ---------------------------------------------------------------------------
 
@@ -114,9 +121,12 @@ if not "%CATALINA_TMPDIR%" == "" goto gotTmpdir
 set CATALINA_TMPDIR=%CATALINA_BASE%\temp
 :gotTmpdir
 
+if not "%LOGGING_CONFIG%" == "" goto noJuli
+set LOGGING_CONFIG=-Dnop
 if not exist "%CATALINA_BASE%\conf\logging.properties" goto noJuli
-set JAVA_OPTS=%JAVA_OPTS% -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file="%CATALINA_BASE%\conf\logging.properties"
+set LOGGING_CONFIG=-Djava.util.logging.config.file="%CATALINA_BASE%\conf\logging.properties" -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 :noJuli
+set JAVA_OPTS=%JAVA_OPTS% %LOGGING_CONFIG%
 
 rem ----- Execute The Requested Command ---------------------------------------
 
