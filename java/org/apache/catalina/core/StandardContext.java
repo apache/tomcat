@@ -700,6 +700,13 @@ public class StandardContext
      */
     private boolean saveConfig = true;
 
+    /**
+     * The flag that indicates that session cookies should use HttpOnly
+     */
+    private boolean useHttpOnly = true;
+
+
+
 
     // ----------------------------------------------------- Context Properties
 
@@ -1114,6 +1121,33 @@ public class StandardContext
                                    new Boolean(this.cookies));
 
     }
+    
+    /**
+     * Gets the value of the use HttpOnly cookies for session cookies flag.
+     * 
+     * @return <code>true</code> if the HttpOnly flag should be set on session
+     *         cookies
+     */
+    public boolean getUseHttpOnly() {
+        return useHttpOnly;
+    }
+
+
+    /**
+     * Sets the use HttpOnly cookies for session cookies flag.
+     * 
+     * @param useHttpOnly   Set to <code>true</code> to use HttpOnly cookies
+     *                          for session cookies
+     */
+    public void setUseHttpOnly(boolean useHttpOnly) {
+        boolean oldUseHttpOnly = this.useHttpOnly;
+        this.useHttpOnly = useHttpOnly;
+        support.firePropertyChange("useHttpOnly",
+                new Boolean(oldUseHttpOnly),
+                new Boolean(this.useHttpOnly));
+    }
+    
+    
 
 
     /**
