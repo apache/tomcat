@@ -229,6 +229,13 @@
         implementation class that will be used for servlets managed by this
         Context.  If not specified, a standard default value will be used.</p>
       </attribute>
+      
+      <attribute name="useHttpOnly" required="false">
+       <p>Should the HttpOnly flag be set on session cookies to prevent client
+          side script from accessing the session ID? Defaults to
+          <code>true</code>.</p>
+      </attribute>
+      
 
     </attributes>
 

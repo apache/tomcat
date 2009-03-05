@@ -217,10 +217,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
      */
     protected PropertyChangeSupport support = new PropertyChangeSupport(this);
     
-    /**
-     * The flag that indicates that session cookies should use HttpOnly
-     */
-    protected boolean useHttpOnly = true;
 
     // ------------------------------------------------------------- Security classes
 
@@ -658,28 +654,6 @@ public abstract class ManagerBase implements Manager, MBeanRegistration {
                                    new Integer(this.processExpiresFrequency));
 
     }
-
-    /**
-     * Gets the value of the use HttpOnly cookies for session cookies flag.
-     * 
-     * @return <code>true</code> if the HttpOnly flag should be set on session
-     *         cookies
-     */
-    public boolean getUseHttpOnly() {
-        return useHttpOnly;
-    }
-
-
-    /**
-     * Sets the use HttpOnly cookies for session cookies flag.
-     * 
-     * @param useHttpOnly   Set to <code>true</code> to use HttpOnly cookies
-     *                          for session cookies
-     */
-    public void setUseHttpOnly(boolean useHttpOnly) {
-        this.useHttpOnly = useHttpOnly;
-    }
-    
     // --------------------------------------------------------- Public Methods
 
 
