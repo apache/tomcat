@@ -67,10 +67,13 @@
 #   CATALINA_PID    (Optional) Path of the file which should contains the pid
 #                   of catalina startup java process, when start (fork) is used
 #
-#   LOGGING_CONFIG  (Optional) Override Tomcat's logging manager and logging config file
+#   LOGGING_CONFIG  (Optional) Override Tomcat's logging config file
 #                   Example (all one line)
-#                   LOGGING_CONFIG="-Djava.util.logging.manager=com.foo.MyLogManager \
-#                                   -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
+#                   LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
+#
+#   LOGGING_MANAGER (Optional) Override Tomcat's logging manager 
+#                   Example (all one line)
+#                   LOGGING_CONFIG="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 #
 # $Id$
 # -----------------------------------------------------------------------------
@@ -184,16 +187,22 @@ if $cygwin; then
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 
-# Set juli LogManager if it is present and an override has not been issued
+# Set juli LogManager config file if it is present and an override has not been issued
 if [ -z "$LOGGING_CONFIG" ]; then
   if [ -r "$CATALINA_BASE"/conf/logging.properties ]; then
-    JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
     LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
   else
     # Bugzilla 45585
     LOGGING_CONFIG="-Dnop"
   fi
 fi
+
+if [ -z "$LOGGING_MANAGER" ]; then
+  JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+else 
+  JAVA_OPTS="$JAVA_OPTS $LOGGING_MANAGER"
+fi
+
 # ----- Execute The Requested Command -----------------------------------------
 
 # Bugzilla 37848: only output this if we have a TTY
