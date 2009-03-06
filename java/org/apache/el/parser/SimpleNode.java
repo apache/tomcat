@@ -29,7 +29,7 @@ import org.apache.el.util.MessageFactory;
 
 /**
  * @author Jacob Hookom [jacob@hookom.net]
- * @version $Change: 181177 $$DateTime: 2001/06/26 08:45:09 $$Author$
+ * @version $Change: 181177 $$Date$$Author$
  */
 public abstract class SimpleNode extends ELSupport implements Node {
     protected Node parent;
