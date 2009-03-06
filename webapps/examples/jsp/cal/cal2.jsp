@@ -35,7 +35,7 @@
 <FORM METHOD=POST ACTION=cal1.jsp>
 <BR> 
 <BR> <INPUT NAME="date" TYPE=HIDDEN VALUE="current">
-<BR> <INPUT NAME="time" TYPE=HIDDEN VALUE=<%= util.HTMLFilter.filter(time) %>
+<BR> <INPUT NAME="time" TYPE=HIDDEN VALUE="<%= util.HTMLFilter.filter(time) %>">
 <BR> <h2> Description of the event <INPUT NAME="description" TYPE=TEXT SIZE=20> </h2>
 <BR> <INPUT TYPE=SUBMIT VALUE="submit">
 </FORM>
