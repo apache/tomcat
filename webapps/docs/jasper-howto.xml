@@ -126,7 +126,9 @@ dumped to a file? <code>true</code> or <code>false</code>, default
 <code>false</code>. <code>false</code> if suppressSmap is true.</li>
 
 <li><strong>enablePooling</strong> - Determines whether tag handler pooling is
-enabled. <code>true</code> or <code>false</code>, default <code>true</code>.
+enabled. This is a compilation option. It will not alter the behaviour of JSPs
+that have already been compiled. <code>true</code> or <code>false</code>,
+default <code>true</code>.
 </li>
 
 <li><strong>engineOptionsClass</strong> - Allows specifying the Options class
