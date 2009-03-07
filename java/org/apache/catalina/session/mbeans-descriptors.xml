@@ -240,10 +240,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="pathname"
-          description="Path name of the disk file in which active sessions"
-                 type="java.lang.String"/>
-
     <attribute   name="activeSessions"
           description="Number of active sessions at this moment"
                  type="int" 
@@ -267,6 +263,14 @@
 
     <attribute   name="maxIdleSwap"
           description="The maximum time a session may be idle before it should be swapped to file just on general principle"
+                 type="int" />
+
+    <attribute   name="sessionMaxAliveTime"
+          description="Longest time an expired session had been alive"
+                 type="int" />
+
+    <attribute   name="sessionAverageAliveTime"
+          description="Average time an expired session had been alive"
                  type="int" />
 
     <attribute   name="rejectedSessions"
