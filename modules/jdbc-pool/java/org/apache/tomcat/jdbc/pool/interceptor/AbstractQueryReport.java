@@ -43,7 +43,8 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     /**
      * the constructors that are used to create statement proxies 
      */
-    protected static final Constructor[] constructors = new Constructor[AbstractCreateStatementInterceptor.statements.length];
+    protected static final Constructor<?>[] constructors =
+        new Constructor[AbstractCreateStatementInterceptor.statements.length];
 
     
     public AbstractQueryReport() {
@@ -147,9 +148,9 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @return - returns a constructor used to create new instances
      * @throws NoSuchMethodException
      */
-    protected Constructor getConstructor(int idx, Class clazz) throws NoSuchMethodException {
+    protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
         if (constructors[idx]==null) {
-            Class proxyClass = Proxy.getProxyClass(SlowQueryReport.class.getClassLoader(), new Class[] {clazz});
+            Class<?> proxyClass = Proxy.getProxyClass(SlowQueryReport.class.getClassLoader(), new Class[] {clazz});
             constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         }
         return constructors[idx];
@@ -164,7 +165,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             Object result = null;
             String name = method.getName();
             String sql = null;
-            Constructor constructor = null;
+            Constructor<?> constructor = null;
             if (compare(statements[0],name)) {
                 //createStatement
                 constructor = getConstructor(0,Statement.class);
