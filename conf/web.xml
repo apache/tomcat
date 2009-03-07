@@ -149,7 +149,9 @@
   <!--                       False if suppressSmap is true                  -->
   <!--                                                                      -->
   <!--   enablePooling       Determines whether tag handler pooling is      -->
-  <!--                       enabled  [true]                                -->
+  <!--                       enabled. This is a compilation option. It will -->
+  <!--                       not alter the behaviour of JSPs that have      -->
+  <!--                       already been compiled. [true]                  -->
   <!--                                                                      -->
   <!--   engineOptionsClass  Allows specifying the Options class used to    -->
   <!--                       configure Jasper. If not present, the default  -->
