@@ -153,11 +153,11 @@ public class XMLEncodingDetector {
 		isBigEndian = (Boolean)(encodingDesc[1]);
         
         if (encodingDesc.length > 3) {
-            isBomPresent = (Boolean)(encodingDesc[2]);
-            skip = (Integer)(encodingDesc[3]);
+            isBomPresent = ((Boolean)(encodingDesc[2])).booleanValue();
+            skip = ((Integer)(encodingDesc[3])).intValue();
         } else {
             isBomPresent = true;
-            skip = (Integer)(encodingDesc[2]);
+            skip = ((Integer)(encodingDesc[2])).intValue();
         }
 
 		stream.reset();
