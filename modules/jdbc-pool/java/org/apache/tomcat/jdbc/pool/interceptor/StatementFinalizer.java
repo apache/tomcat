@@ -39,7 +39,7 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         // TODO Auto-generated method stub
         try {
-            statements.add(new WeakReference((Statement)statement));
+            statements.add(new WeakReference<Statement>((Statement)statement));
         }catch (ClassCastException x) {
             //ignore this one
         }
