@@ -120,7 +120,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * A flag, indicating if the user database is read only.
      */
-    protected boolean readonly = false;
+    protected boolean readonly = true;
 
     /**
      * The set of {@link Role}s defined in this database, keyed by
@@ -500,6 +500,7 @@ public class MemoryUserDatabase implements UserDatabase {
     public void save() throws Exception {
 
         if (getReadonly()) {
+            log.error(sm.getString("memoryUserDatabase.readOnly"));
             return;
         }
 
