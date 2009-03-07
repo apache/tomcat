@@ -126,7 +126,7 @@ public class UTF8Reader
                     expectedByte(2, 2);
                 }
                 if ((b1 & 0xC0) != 0x80) {
-                    invalidByte(2, 2, b1);
+                    invalidByte(2, 2);
                 }
                 c = ((b0 << 6) & 0x07C0) | (b1 & 0x003F);
             }
@@ -140,7 +140,7 @@ public class UTF8Reader
                     expectedByte(2, 3);
                 }
                 if ((b1 & 0xC0) != 0x80) {
-                    invalidByte(2, 3, b1);
+                    invalidByte(2, 3);
                 }
                 int b2 = index == fOffset 
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
@@ -148,7 +148,7 @@ public class UTF8Reader
                     expectedByte(3, 3);
                 }
                 if ((b2 & 0xC0) != 0x80) {
-                    invalidByte(3, 3, b2);
+                    invalidByte(3, 3);
                 }
                 c = ((b0 << 12) & 0xF000) | ((b1 << 6) & 0x0FC0) |
                     (b2 & 0x003F);
@@ -165,7 +165,7 @@ public class UTF8Reader
                     expectedByte(2, 4);
                 }
                 if ((b1 & 0xC0) != 0x80) {
-                    invalidByte(2, 3, b1);
+                    invalidByte(2, 3);
                 }
                 int b2 = index == fOffset 
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
@@ -173,7 +173,7 @@ public class UTF8Reader
                     expectedByte(3, 4);
                 }
                 if ((b2 & 0xC0) != 0x80) {
-                    invalidByte(3, 3, b2);
+                    invalidByte(3, 3);
                 }
                 int b3 = index == fOffset 
                        ? fInputStream.read() : fBuffer[index++] & 0x00FF;
@@ -181,7 +181,7 @@ public class UTF8Reader
                     expectedByte(4, 4);
                 }
                 if ((b3 & 0xC0) != 0x80) {
-                    invalidByte(4, 4, b3);
+                    invalidByte(4, 4);
                 }
                 int uuuuu = ((b0 << 2) & 0x001C) | ((b1 >> 4) & 0x0003);
                 if (uuuuu > 0x10) {
@@ -198,7 +198,7 @@ public class UTF8Reader
 
             // error
             else {
-                invalidByte(1, 1, b0);
+                invalidByte(1, 1);
             }
         }
 
@@ -307,7 +307,7 @@ public class UTF8Reader
                         fOffset = 2;
                         return out - offset;
                     }
-                    invalidByte(2, 2, b1);
+                    invalidByte(2, 2);
                 }
                 int c = ((b0 << 6) & 0x07C0) | (b1 & 0x003F);
                 ch[out++] = (char)c;
@@ -341,7 +341,7 @@ public class UTF8Reader
                         fOffset = 2;
                         return out - offset;
                     }
-                    invalidByte(2, 3, b1);
+                    invalidByte(2, 3);
                 }
                 int b2 = -1;
                 if (++in < total) { 
@@ -368,7 +368,7 @@ public class UTF8Reader
                         fOffset = 3;
                         return out - offset;
                     }
-                    invalidByte(3, 3, b2);
+                    invalidByte(3, 3);
                 }
                 int c = ((b0 << 12) & 0xF000) | ((b1 << 6) & 0x0FC0) |
                         (b2 & 0x003F);
@@ -405,7 +405,7 @@ public class UTF8Reader
                         fOffset = 2;
                         return out - offset;
                     }
-                    invalidByte(2, 4, b1);
+                    invalidByte(2, 4);
                 }
                 int b2 = -1;
                 if (++in < total) { 
@@ -432,7 +432,7 @@ public class UTF8Reader
                         fOffset = 3;
                         return out - offset;
                     }
-                    invalidByte(3, 4, b2);
+                    invalidByte(3, 4);
                 }
                 int b3 = -1;
                 if (++in < total) { 
@@ -461,7 +461,7 @@ public class UTF8Reader
                         fOffset = 4;
                         return out - offset;
                     }
-                    invalidByte(4, 4, b2);
+                    invalidByte(4, 4);
                 }
 
                 // decode bytes into surrogate characters
@@ -489,7 +489,7 @@ public class UTF8Reader
                 fOffset = 1;
                 return out - offset;
             }
-            invalidByte(1, 1, b0);
+            invalidByte(1, 1);
         }
 
         // return number of characters converted
@@ -612,17 +612,17 @@ public class UTF8Reader
 				     Integer.toString(position),
 				     Integer.toString(count)));
 
-    } // expectedByte(int,int,int)
+    }
 
     /** Throws an exception for invalid byte. */
-    private void invalidByte(int position, int count, int c) 
+    private void invalidByte(int position, int count) 
         throws UTFDataFormatException {
 
         throw new UTFDataFormatException(
                 Localizer.getMessage("jsp.error.xml.invalidByte",
 				     Integer.toString(position),
 				     Integer.toString(count)));
-    } // invalidByte(int,int,int,int)
+    }
 
     /** Throws an exception for invalid surrogate bits. */
     private void invalidSurrogate(int uuuuu) throws UTFDataFormatException {
@@ -630,6 +630,6 @@ public class UTF8Reader
         throw new UTFDataFormatException(
                 Localizer.getMessage("jsp.error.xml.invalidHighSurrogate",
 				     Integer.toHexString(uuuuu)));
-    } // invalidSurrogate(int)
+    }
 
 } // class UTF8Reader
