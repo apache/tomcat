@@ -144,26 +144,20 @@ public class ContextConfig
      * The <code>Digester</code> we will use to process web application
      * deployment descriptor files.
      */
-    protected static Digester webDigester = null;
+    protected Digester webDigester = null;
     
+    
+    /**
+     * The <code>Digester</code>s available to process web application
+     * deployment descriptor files.
+     */
+    protected static Digester[] webDigesters = new Digester[4];
     
     /**
      * The <code>Rule</code> used to parse the web.xml
      */
     protected static WebRuleSet webRuleSet = new WebRuleSet();
 
-    /**
-     * Attribute value used to turn on/off XML validation
-     */
-     protected static boolean xmlValidation = false;
-
-
-    /**
-     * Attribute value used to turn on/off XML namespace awarenes.
-     */
-    protected static boolean xmlNamespaceAware = false;
-
-    
     /**
      * Deployment count.
      */
@@ -516,24 +510,36 @@ public class ContextConfig
      * Create (if necessary) and return a Digester configured to process the
      * web application deployment descriptor (web.xml).
      */
-    protected static Digester createWebDigester() {
-        Digester webDigester =
-            createWebXmlDigester(xmlNamespaceAware, xmlValidation);
-        return webDigester;
-    }
-
-
-    /**
-     * Create (if necessary) and return a Digester configured to process the
-     * web application deployment descriptor (web.xml).
-     */
     public static Digester createWebXmlDigester(boolean namespaceAware,
                                                 boolean validation) {
         
-        Digester webDigester =  DigesterFactory.newDigester(xmlValidation,
-                                                            xmlNamespaceAware,
-                                                            webRuleSet);
-        return webDigester;
+        Digester digester = null;
+        if (!namespaceAware && !validation) {
+            if (webDigesters[0] == null) {
+                webDigesters[0] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+            }
+            digester = webDigesters[0];
+        } else if (!namespaceAware && validation) {
+            if (webDigesters[1] == null) {
+                webDigesters[1] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+            }
+            digester = webDigesters[1];
+        } else if (namespaceAware && !validation) {
+            if (webDigesters[2] == null) {
+                webDigesters[2] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+            }
+            digester = webDigesters[2];
+        } else {
+            if (webDigesters[3] == null) {
+                webDigesters[3] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webRuleSet);
+            }
+            digester = webDigesters[3];
+        }
+        return digester;
     }
 
     
@@ -989,11 +995,6 @@ public class ContextConfig
     protected void init() {
         // Called from StandardContext.init()
 
-        if (webDigester == null){
-            webDigester = createWebDigester();
-            webDigester.getParser();
-        }
-        
         if (contextDigester == null){
             contextDigester = createContextDigester();
             contextDigester.getParser();
@@ -1034,28 +1035,36 @@ public class ContextConfig
         if (log.isDebugEnabled())
             log.debug(sm.getString("contextConfig.start"));
 
+        // Process the default and application web.xml files
         // Set properties based on default context
+        boolean useXmlValidation = context.getXmlValidation();
+        boolean useXmlNamespaceAware = context.getXmlNamespaceAware();
+
         Container container = context.getParent();
+        // Use the value from the host if:
+        // - override is false on the context
+        // - value has been set to false / not set on the context
         if( !context.getOverride() ) {
             if( container instanceof Host ) {
-                // Reset the value only if the attribute wasn't
-                // set on the context.
-                xmlValidation = context.getXmlValidation();
-                if (!xmlValidation) {
-                    xmlValidation = ((Host)container).getXmlValidation();
+                if (!useXmlValidation) {
+                    useXmlValidation = ((Host)container).getXmlValidation();
                 }
                 
-                xmlNamespaceAware = context.getXmlNamespaceAware();
-                if (!xmlNamespaceAware){
-                    xmlNamespaceAware 
+                if (!useXmlNamespaceAware){
+                    useXmlNamespaceAware 
                                 = ((Host)container).getXmlNamespaceAware();
                 }
 
-                container = container.getParent();
             }
         }
-
-        // Process the default and application web.xml files
+        
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("contextConfig.xmlSettings",
+                    context.getName(), Boolean.valueOf(useXmlValidation),
+                    Boolean.valueOf(useXmlNamespaceAware)));
+        }
+        webDigester = createWebXmlDigester(useXmlNamespaceAware, useXmlValidation);
+        
         defaultWebConfig();
         applicationWebConfig();
         if (!context.getIgnoreAnnotations()) {

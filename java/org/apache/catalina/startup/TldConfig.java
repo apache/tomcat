@@ -20,12 +20,8 @@ package org.apache.catalina.startup;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -56,6 +52,7 @@ import org.apache.catalina.util.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.InputSource;
 
+
 /**
  * Startup event listener for a <b>Context</b> that configures application
  * listeners configured in any TLD files.
@@ -72,6 +69,19 @@ public final class TldConfig  implements LifecycleListener {
     private static org.apache.juli.logging.Log log=
         org.apache.juli.logging.LogFactory.getLog( TldConfig.class );
 
+    /**
+     * The string resources for this package.
+     */
+    private static final StringManager sm =
+        StringManager.getManager(Constants.Package);
+
+    /**
+     * The <code>Digester</code>s available to process tld files.
+     */
+    private static Digester[] tldDigesters = new Digester[4];
+
+    private static final TldRuleSet tldRuleSet = new TldRuleSet();
+    
     /*
      * Initializes the set of JARs that are known not to contain any TLDs
      */
@@ -123,6 +133,42 @@ public final class TldConfig  implements LifecycleListener {
         noTldJars.add("sunpkcs11.jar");
     }
 
+    /**
+     * Create (if necessary) and return a Digester configured to process the
+     * tld.
+     */
+    private static Digester createTldDigester(boolean namespaceAware,
+            boolean validation) {
+        
+        Digester digester = null;
+        if (!namespaceAware && !validation) {
+            if (tldDigesters[0] == null) {
+                tldDigesters[0] = DigesterFactory.newDigester(validation,
+                        namespaceAware, tldRuleSet);
+            }
+            digester = tldDigesters[0];
+        } else if (!namespaceAware && validation) {
+            if (tldDigesters[1] == null) {
+                tldDigesters[1] = DigesterFactory.newDigester(validation,
+                        namespaceAware, tldRuleSet);
+            }
+            digester = tldDigesters[1];
+        } else if (namespaceAware && !validation) {
+            if (tldDigesters[2] == null) {
+                tldDigesters[2] = DigesterFactory.newDigester(validation,
+                        namespaceAware, tldRuleSet);
+            }
+            digester = tldDigesters[2];
+        } else {
+            if (tldDigesters[3] == null) {
+                tldDigesters[3] = DigesterFactory.newDigester(validation,
+                        namespaceAware, tldRuleSet);
+            }
+            digester = tldDigesters[3];
+        }
+        return digester;
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 
@@ -133,28 +179,22 @@ public final class TldConfig  implements LifecycleListener {
 
 
     /**
-     * The string resources for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-    /**
      * The <code>Digester</code> we will use to process tag library
      * descriptor files.
      */
-    private static Digester tldDigester = null;
+    private Digester tldDigester = null;
 
 
     /**
      * Attribute value used to turn on/off TLD validation
      */
-     private static boolean tldValidation = false;
+    private boolean tldValidation = false;
 
 
     /**
      * Attribute value used to turn on/off TLD  namespace awarenes.
      */
-    private static boolean tldNamespaceAware = false;
+    private boolean tldNamespaceAware = false;
 
     private boolean rescan=true;
 
@@ -184,7 +224,7 @@ public final class TldConfig  implements LifecycleListener {
      * @param tldValidation true to enable xml instance validation
      */
     public void setTldValidation(boolean tldValidation){
-        TldConfig.tldValidation = tldValidation;
+        this.tldValidation = tldValidation;
     }
 
     /**
@@ -193,7 +233,7 @@ public final class TldConfig  implements LifecycleListener {
      *
      */
     public boolean getTldValidation(){
-        return tldValidation;
+        return this.tldValidation;
     }
 
     /**
@@ -202,7 +242,7 @@ public final class TldConfig  implements LifecycleListener {
      *
      */
     public boolean getTldNamespaceAware(){
-        return tldNamespaceAware;
+        return this.tldNamespaceAware;
     }
 
 
@@ -212,7 +252,7 @@ public final class TldConfig  implements LifecycleListener {
      * @param tldNamespaceAware true to enable namespace awareness
      */
     public void setTldNamespaceAware(boolean tldNamespaceAware){
-        TldConfig.tldNamespaceAware = tldNamespaceAware;
+        this.tldNamespaceAware = tldNamespaceAware;
     }    
 
 
@@ -254,33 +294,12 @@ public final class TldConfig  implements LifecycleListener {
     public void execute() throws Exception {
         long t1=System.currentTimeMillis();
 
-        File tldCache=null;
-
-        // Option to not rescan
-        if( ! rescan ) {
-            // find the cache
-            if( tldCache!= null && tldCache.exists()) {
-                // just read it...
-                processCache(tldCache);
-                return;
-            }
-        }
-
         /*
          * Acquire the list of TLD resource paths, possibly embedded in JAR
          * files, to be processed
          */
         Set<String> resourcePaths = tldScanResourcePaths();
         Map<String, File> jarPaths = getJarPaths();
-
-        // Check to see if we can use cached listeners
-        if (tldCache != null && tldCache.exists()) {
-            long lastModified = getLastModified(resourcePaths, jarPaths);
-            if (lastModified < tldCache.lastModified()) {
-                processCache(tldCache);
-                return;
-            }
-        }
 
         // Scan each accumulated resource path for TLDs to be processed
         Iterator<String> paths = resourcePaths.iterator();
@@ -302,18 +321,6 @@ public final class TldConfig  implements LifecycleListener {
 
         String list[] = getTldListeners();
 
-        if( tldCache!= null ) {
-            log.debug( "Saving tld cache: " + tldCache + " " + list.length);
-            try {
-                FileOutputStream out=new FileOutputStream(tldCache);
-                ObjectOutputStream oos=new ObjectOutputStream( out );
-                oos.writeObject( list );
-                oos.close();
-            } catch( IOException ex ) {
-                ex.printStackTrace();
-            }
-        }
-
         if( log.isDebugEnabled() )
             log.debug( "Adding tld listeners:" + list.length);
         for( int i=0; list!=null && i<list.length; i++ ) {
@@ -328,67 +335,6 @@ public final class TldConfig  implements LifecycleListener {
     }
 
     // -------------------------------------------------------- Private Methods
-
-    /*
-     * Returns the last modification date of the given sets of resources.
-     *
-     * @param resourcePaths
-     * @param jarPaths
-     *
-     * @return Last modification date
-     */
-    private long getLastModified(Set<String> resourcePaths,
-            Map<String, File> jarPaths) throws Exception {
-
-        long lastModified = 0;
-
-        Iterator<String> paths = resourcePaths.iterator();
-        while (paths.hasNext()) {
-            String path = paths.next();
-            URL url = context.getServletContext().getResource(path);
-            if (url == null) {
-                log.debug( "Null url "+ path );
-                break;
-            }
-            long lastM = url.openConnection().getLastModified();
-            if (lastM > lastModified) lastModified = lastM;
-            if (log.isDebugEnabled()) {
-                log.debug( "Last modified " + path + " " + lastM);
-            }
-        }
-
-        if (jarPaths != null) {
-            Iterator<File> files = jarPaths.values().iterator();
-            while (files.hasNext()) {
-                File jarFile = files.next();
-                long lastM = jarFile.lastModified();
-                if (lastM > lastModified) lastModified = lastM;
-                if (log.isDebugEnabled()) {
-                    log.debug("Last modified " + jarFile.getAbsolutePath()
-                              + " " + lastM);
-                }
-            }
-        }
-
-        return lastModified;
-    }
-
-    private void processCache(File tldCache ) throws IOException {
-        // read the cache and return;
-        try {
-            FileInputStream in=new FileInputStream(tldCache);
-            ObjectInputStream ois=new ObjectInputStream( in );
-            String list[]=(String [])ois.readObject();
-            if( log.isDebugEnabled() )
-                log.debug("Reusing tldCache " + tldCache + " " + list.length);
-            for( int i=0; list!=null && i<list.length; i++ ) {
-                context.addApplicationListener(list[i]);
-            }
-            ois.close();
-        } catch( ClassNotFoundException ex ) {
-            ex.printStackTrace();
-        }
-    }
 
     /**
      * Scan the JAR file at the specified resource path for TLDs in the
@@ -741,21 +687,19 @@ public final class TldConfig  implements LifecycleListener {
             setTldNamespaceAware(context.getTldNamespaceAware());
     
             // (2) if the attribute wasn't defined on the context
-            //     try the host.
-            if (!tldValidation) {
-              setTldValidation(
-                      ((StandardHost) context.getParent()).getXmlValidation());
-            }
+            //     and override is not set on the context try the host.
+            if (!context.getOverride()) {
+                if (!tldValidation) {
+                    setTldValidation(
+                            ((StandardHost) context.getParent()).getXmlValidation());
+                }
     
-            if (!tldNamespaceAware) {
-              setTldNamespaceAware(
+                if (!tldNamespaceAware) {
+                    setTldNamespaceAware(
                       ((StandardHost) context.getParent()).getXmlNamespaceAware());
+                }
             }
-
-            tldDigester = DigesterFactory.newDigester(tldValidation, 
-                    tldNamespaceAware, 
-                    new TldRuleSet());
-            tldDigester.getParser();
+            tldDigester = createTldDigester(tldNamespaceAware, tldValidation);
         }
     }
 }
