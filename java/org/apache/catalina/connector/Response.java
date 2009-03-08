@@ -811,11 +811,9 @@ public class Response
         if (included)
             return;     
         
-        // Normally calls to this method after the getWriter has been invoked
-        // will be ignored. The exception allows the addDefaultCharsetValve to
-        // insert the default charset in appropriate circumstances 
-        if (usingWriter && (isCharacterEncodingSet ||
-                !getCharacterEncoding().equalsIgnoreCase(charset)))
+        // Ignore any call made after the getWriter has been invoked
+        // The default should be used
+        if (usingWriter)
             return;
 
         coyoteResponse.setCharacterEncoding(charset);
