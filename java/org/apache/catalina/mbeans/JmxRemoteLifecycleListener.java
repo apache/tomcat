@@ -67,8 +67,6 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
     protected int rmiRegistryPortPlatform = -1;
     protected int rmiServerPortPlatform = -1;
-    protected int rmiRegistryPortCatalina = -1;
-    protected int rmiServerPortCatalina = -1;
     protected boolean rmiSSL = true;
     protected String ciphers[] = null;
     protected String protocols[] = null;
@@ -79,7 +77,6 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     protected boolean useLocalPorts = false;
 
     protected JMXConnectorServer csPlatform = null;
-    protected JMXConnectorServer csCatalina = null;
     
     /**
      * Get the port on which the Platform RMI server is exported. This is the
@@ -113,40 +110,6 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
      */
     public void setRmiRegistryPortPlatform(int theRmiRegistryPortPlatform) {
         rmiRegistryPortPlatform = theRmiRegistryPortPlatform;
-    }
-    
-    /**
-     * Get the port on which the Catalina RMI server is exported. This is the
-     * port that is normally chosen by the RMI stack.
-     * @returns The port number
-     */
-    public int getRmiServerPortCatalina() {
-        return rmiServerPortCatalina;
-    }
-    
-    /**
-     * Set the port on which the Catalina RMI server is exported. This is the
-     * port that is normally chosen by the RMI stack.
-     * @param theRmiServerPortCatalina The port number
-     */
-    public void setRmiServerPortCatalina(int theRmiServerPortCatalina) {
-        rmiServerPortCatalina = theRmiServerPortCatalina;
-    }
-    
-    /**
-     * Get the port on which the Catalina RMI registry is exported.
-     * @returns The port number
-     */
-    public int getRmiRegistryPortCatalina() {
-        return rmiRegistryPortCatalina;
-    }
-    
-    /**
-     * Set the port on which the Catalina RMI registry is exported.
-     * @param theRmiRegistryPortCatalina The port number
-     */
-    public void setRmiRegistryPortCatalina(int theRmiRegistryPortCatalina) {
-        rmiRegistryPortCatalina = theRmiRegistryPortCatalina;
     }
     
     /**
@@ -257,13 +220,8 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
                     rmiServerPortPlatform, env,
                     ManagementFactory.getPlatformMBeanServer());
             
-            // Create the catalina server
-            csCatalina = createServer("Catalina", rmiRegistryPortCatalina,
-                    rmiServerPortCatalina, env,
-                    MBeanUtils.createServer());
         } else if (Lifecycle.STOP_EVENT == event.getType()) {
             destroyServer("Platform", csPlatform);
-            destroyServer("Catalina", csCatalina);
         }
     }
 
