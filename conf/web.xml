@@ -798,10 +798,6 @@
         <mime-type>application/vnd.oasis.opendocument.text</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>ogg</extension>
-        <mime-type>application/ogg</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <!-- OpenDocument Drawing Template -->
         <extension>otg </extension>
         <mime-type>application/vnd.oasis.opendocument.graphics-template</mime-type>
@@ -825,6 +821,47 @@
         <!-- OpenDocument Text Template -->
         <extension>ott</extension>
         <mime-type>application/vnd.oasis.opendocument.text-template</mime-type>
+    </mime-mapping>
+    <!-- xiph mime types -->
+    <mime-mapping>
+        <extension>ogx</extension>
+        <mime-type>application/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ogv</extension>
+        <mime-type>video/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>oga</extension>
+        <mime-type>audio/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ogg</extension>
+        <mime-type>audio/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>spx</extension>
+        <mime-type>audio/ogg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>flac</extension>
+        <mime-type>audio/flac</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>anx</extension>
+        <mime-type>application/annodex</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>axa</extension>
+        <mime-type>audio/annodex</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>axv</extension>
+        <mime-type>video/annodex</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>xspf</extension>
+        <mime-type>application/xspf+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>pbm</extension>
