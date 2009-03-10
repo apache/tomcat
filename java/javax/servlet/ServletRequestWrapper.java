@@ -494,7 +494,7 @@ public class ServletRequestWrapper implements ServletRequest {
      */
     public void addAsyncListener(AsyncListener listener,
             ServletRequest servletRequest, ServletResponse servletResponse) {
-        addAsyncListener(listener, servletRequest, servletResponse);
+        request.addAsyncListener(listener, servletRequest, servletResponse);
     }
     
     /**
