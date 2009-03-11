@@ -533,7 +533,11 @@ public class Catalina extends Embedded {
             try {
                 server.initialize();
             } catch (LifecycleException e) {
-                log.error("Catalina.start", e);
+                if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))
+                    throw new java.lang.Error(e);
+                else   
+                    log.error("Catalina.start", e);
+                
             }
         }
 
