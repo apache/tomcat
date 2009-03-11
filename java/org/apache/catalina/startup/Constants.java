@@ -83,10 +83,25 @@ public final class Constants {
     public static final String J2eeSchemaResourcePath_14 =
         "/javax/servlet/resources/j2ee_1_4.xsd";
 
+    public static final String JavaeeSchemaPublicId_5 =
+        "javaee_5.xsd";
+    public static final String JavaeeSchemaResourcePath_5 =
+        "/javax/servlet/resources/javaee_5.xsd";
+
     public static final String W3cSchemaPublicId_10 =
         "xml.xsd";
     public static final String W3cSchemaResourcePath_10 =
         "/javax/servlet/resources/xml.xsd";
+
+    public static final String W3cSchemaDTDPublicId_10 =
+        "XMLSchema.dtd";
+    public static final String W3cSchemaDTDResourcePath_10 =
+        "/javax/servlet/resources/XMLSchema.dtd";
+
+    public static final String W3cDatatypesDTDPublicId_10 =
+        "datatypes.dtd";
+    public static final String W3cDatatypesDTDResourcePath_10 =
+        "/javax/servlet/resources/datatypes.dtd";
 
     public static final String JspSchemaPublicId_20 =
         "jsp_2_0.xsd";
@@ -107,5 +122,15 @@ public final class Constants {
             "j2ee_web_services_client_1_1.xsd";
     public static final String J2eeWebServiceClientSchemaResourcePath_11 =
             "/javax/servlet/resources/j2ee_web_services_client_1_1.xsd";
+
+    public static final String JavaeeWebServiceSchemaPublicId_12 =
+        "javaee_web_services_1_2.xsd";
+    public static final String JavaeeWebServiceSchemaResourcePath_12 =
+        "/javax/servlet/resources/javaee_web_services_1_2.xsd";
+
+    public static final String JavaeeWebServiceClientSchemaPublicId_12 =
+        "javaee_web_services_client_1_2.xsd";
+    public static final String JavaeeWebServiceClientSchemaResourcePath_12 =
+        "/javax/servlet/resources/javaee_web_services_client_1_2.xsd";
 
 }

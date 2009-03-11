@@ -37,12 +37,6 @@ public class DigesterFactory {
        org.apache.juli.logging.LogFactory.getLog(DigesterFactory.class);
 
     /**
-     * The XML entiry resolver used by the Digester.
-     */
-    private static SchemaResolver schemaResolver;
-
-
-    /**
      * Create a <code>Digester</code> parser with no <code>Rule</code>
      * associated and XML validation turned off.
      */
@@ -78,8 +72,8 @@ public class DigesterFactory {
             configureSchema(digester);        
         }
 
-        schemaResolver = new SchemaResolver(digester);
-        registerLocalSchema();
+        SchemaResolver schemaResolver = new SchemaResolver(digester);
+        registerLocalSchema(schemaResolver);
         
         digester.setEntityResolver(schemaResolver);
         if ( rule != null ) {
@@ -94,52 +88,88 @@ public class DigesterFactory {
      * Utilities used to force the parser to use local schema, when available,
      * instead of the <code>schemaLocation</code> XML element.
      */
-    protected static void registerLocalSchema(){
+    protected static void registerLocalSchema(SchemaResolver schemaResolver){
         // J2EE
         register(Constants.J2eeSchemaResourcePath_14,
-                 Constants.J2eeSchemaPublicId_14);
+                 Constants.J2eeSchemaPublicId_14,
+                 schemaResolver);
+
+        register(Constants.JavaeeSchemaResourcePath_5,
+                Constants.JavaeeSchemaPublicId_5,
+                schemaResolver);
+
         // W3C
         register(Constants.W3cSchemaResourcePath_10,
-                 Constants.W3cSchemaPublicId_10);
+                 Constants.W3cSchemaPublicId_10,
+                 schemaResolver);
+
+        register(Constants.W3cSchemaDTDResourcePath_10,
+                Constants.W3cSchemaDTDPublicId_10,
+                schemaResolver);
+
+        register(Constants.W3cDatatypesDTDResourcePath_10,
+                Constants.W3cDatatypesDTDPublicId_10,
+                schemaResolver);
+
         // JSP
         register(Constants.JspSchemaResourcePath_20,
-                 Constants.JspSchemaPublicId_20);
+                 Constants.JspSchemaPublicId_20,
+                 schemaResolver);
 
         register(Constants.JspSchemaResourcePath_21,
-                Constants.JspSchemaPublicId_21);
+                Constants.JspSchemaPublicId_21,
+                schemaResolver);
 
         // TLD
         register(Constants.TldDtdResourcePath_11,  
-                 Constants.TldDtdPublicId_11);
+                 Constants.TldDtdPublicId_11,
+                 schemaResolver);
         
         register(Constants.TldDtdResourcePath_12,
-                 Constants.TldDtdPublicId_12);
+                 Constants.TldDtdPublicId_12,
+                 schemaResolver);
 
         register(Constants.TldSchemaResourcePath_20,
-                 Constants.TldSchemaPublicId_20);
+                 Constants.TldSchemaPublicId_20,
+                 schemaResolver);
 
         register(Constants.TldSchemaResourcePath_21,
-                Constants.TldSchemaPublicId_21);
+                Constants.TldSchemaPublicId_21,
+                schemaResolver);
 
         // web.xml    
         register(Constants.WebDtdResourcePath_22,
-                 Constants.WebDtdPublicId_22);
+                 Constants.WebDtdPublicId_22,
+                 schemaResolver);
 
         register(Constants.WebDtdResourcePath_23,
-                 Constants.WebDtdPublicId_23);
+                 Constants.WebDtdPublicId_23,
+                 schemaResolver);
 
         register(Constants.WebSchemaResourcePath_24,
-                 Constants.WebSchemaPublicId_24);
+                 Constants.WebSchemaPublicId_24,
+                 schemaResolver);
 
         register(Constants.WebSchemaResourcePath_25,
-                Constants.WebSchemaPublicId_25);
+                Constants.WebSchemaPublicId_25,
+                schemaResolver);
 
         // Web Service
         register(Constants.J2eeWebServiceSchemaResourcePath_11,
-                 Constants.J2eeWebServiceSchemaPublicId_11);
+                 Constants.J2eeWebServiceSchemaPublicId_11,
+                 schemaResolver);
 
         register(Constants.J2eeWebServiceClientSchemaResourcePath_11,
-                 Constants.J2eeWebServiceClientSchemaPublicId_11);
+                 Constants.J2eeWebServiceClientSchemaPublicId_11,
+                 schemaResolver);
+
+        register(Constants.JavaeeWebServiceSchemaResourcePath_12,
+                Constants.JavaeeWebServiceSchemaPublicId_12,
+                schemaResolver);
+
+        register(Constants.JavaeeWebServiceClientSchemaResourcePath_12,
+                Constants.JavaeeWebServiceClientSchemaPublicId_12,
+                schemaResolver);
 
     }
 
@@ -147,7 +177,8 @@ public class DigesterFactory {
     /**
      * Load the resource and add it to the resolver.
      */
-    protected static void register(String resourceURL, String resourcePublicId){
+    protected static void register(String resourceURL, String resourcePublicId,
+            SchemaResolver schemaResolver){
         URL url = DigesterFactory.class.getResource(resourceURL);
    
         if(url == null) {
@@ -163,11 +194,11 @@ public class DigesterFactory {
      */
     protected static void configureSchema(Digester digester){
         URL url = DigesterFactory.class
-                        .getResource(Constants.WebSchemaResourcePath_24);
+                        .getResource(Constants.WebSchemaResourcePath_25);
   
         if(url == null) {
             log.error("Could not get url for " 
-                                        + Constants.WebSchemaResourcePath_24);
+                                        + Constants.WebSchemaResourcePath_25);
         } else {
             digester.setSchema(url.toString());     
         }
