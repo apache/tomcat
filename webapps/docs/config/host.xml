@@ -85,6 +85,17 @@
         Deployment</a> for more information on automatic recognition and
         deployment of web applications to be deployed automatically.</p>
       </attribute>
+      
+      <attribute name="xmlBase" required="false">
+        <p>The <em>XML Base</em> directory for this virtual host.
+        This is the pathname of a directory that may contain context XML descriptors
+        to be deployed on this virtual host.  You may specify an
+        absolute pathname for this directory, or a pathname that is relative
+        to the <code>$CATALINA_BASE</code> directory.  See
+        <a href="#Automatic Application Deployment">Automatic Application
+        Deployment</a> for more information on automatic recognition and
+        deployment of web applications to be deployed automatically.</p>
+      </attribute>
 
       <attribute name="autoDeploy" required="false">
         <p>This flag value indicates if new web applications, dropped in to
@@ -155,7 +166,7 @@
         applications from interacting with the container's configuration. The 
         administrator will then be responsible for providing an external context 
         configuration file, and put it in 
-        <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code>.
+        <code>$CATALINA_BASE/conf/[enginename]/[hostname]/</code> unless the attribute <code>xmlBase</code> is specified.
         The flag's value defaults to <code>true</code>.</p>
       </attribute>
 
