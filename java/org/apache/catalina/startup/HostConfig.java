@@ -304,6 +304,9 @@ public class HostConfig
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
                 setXmlNamespaceAware(((StandardHost) host).getXmlNamespaceAware());
                 setXmlValidation(((StandardHost) host).getXmlValidation());
+                if (((StandardHost) host).getXmlBase()!=null) {
+                    
+                }
             }
         } catch (ClassCastException e) {
             log.error(sm.getString("hostConfig.cce", event.getLifecycle()), e);
@@ -394,6 +397,18 @@ public class HostConfig
         return (digester);
     }
     
+    protected File returnCanonicalPath(String path) {
+        File file = new File(path);
+        File base = new File(System.getProperty("catalina.base"));
+        if (!file.isAbsolute())
+            file = new File(base,path);
+        try {
+            return file.getCanonicalFile();
+        } catch (IOException e) {
+            return file;
+        }
+    }
+    
 
     /**
      * Return a File object representing the "application root" directory
@@ -404,17 +419,9 @@ public class HostConfig
         if (appBase != null) {
             return appBase;
         }
-
-        File file = new File(host.getAppBase());
-        if (!file.isAbsolute())
-            file = new File(System.getProperty("catalina.base"),
-                            host.getAppBase());
-        try {
-            appBase = file.getCanonicalFile();
-        } catch (IOException e) {
-            appBase = file;
-        }
-        return (appBase);
+        
+        appBase = returnCanonicalPath(host.getAppBase());
+        return appBase;
 
     }
 
@@ -428,17 +435,11 @@ public class HostConfig
         if (configBase != null) {
             return configBase;
         }
-
-        File file = new File(System.getProperty("catalina.base"), "conf");
-        Container parent = host.getParent();
-        if ((parent != null) && (parent instanceof Engine)) {
-            file = new File(file, parent.getName());
-        }
-        file = new File(file, host.getName());
-        try {
-            configBase = file.getCanonicalFile();
-        } catch (IOException e) {
-            configBase = file;
+        
+        if (host.getXmlBase()!=null) {
+            configBase = returnCanonicalPath(host.getXmlBase());
+        } else {
+            configBase = returnCanonicalPath("conf");
         }
         return (configBase);
 
@@ -748,7 +749,7 @@ public class HostConfig
         InputStream istream = null;
         BufferedOutputStream ostream = null;
         File xml = new File
-            (configBase, file.substring(0, file.lastIndexOf(".")) + ".xml");
+            (configBase(), file.substring(0, file.lastIndexOf(".")) + ".xml");
         if (deployXML && !xml.exists()) {
             try {
                 jar = new JarFile(war);
@@ -756,7 +757,7 @@ public class HostConfig
                 if (entry != null) {
                     istream = jar.getInputStream(entry);
                     
-                    configBase.mkdirs();
+                    configBase().mkdirs();
                     
                     ostream =
                         new BufferedOutputStream
@@ -950,8 +951,8 @@ public class HostConfig
                         digester.reset();
                     }
                 }
-                configBase.mkdirs();
-                File xmlCopy = new File(configBase, file + ".xml");
+                configBase().mkdirs();
+                File xmlCopy = new File(configBase(), file + ".xml");
                 InputStream is = null;
                 OutputStream os = null;
                 try {

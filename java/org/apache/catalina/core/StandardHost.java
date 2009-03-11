@@ -79,6 +79,10 @@ public class StandardHost
      */
     private String appBase = ".";
 
+    /**
+     * The XML root for this Host.
+     */
+    private String xmlBase = null;
 
     /**
      * The auto deploy flag for this Host.
@@ -170,6 +174,16 @@ public class StandardHost
 
     }
 
+    /**
+     * Return the XML root for this Host.  This can be an absolute
+     * pathname, a relative pathname, or a URL.
+     * If null, defaults to ${catalina.base}/conf/ directory
+     */
+    public String getXmlBase() {
+
+        return (this.xmlBase);
+
+    }
 
     /**
      * Set the application root for this Host.  This can be an absolute
@@ -182,6 +196,21 @@ public class StandardHost
         String oldAppBase = this.appBase;
         this.appBase = appBase;
         support.firePropertyChange("appBase", oldAppBase, this.appBase);
+
+    }
+    
+    /**
+     * Set the Xml root for this Host.  This can be an absolute
+     * pathname, a relative pathname, or a URL.
+     * If null, defaults to ${catalina.base}/conf/ directory
+     *
+     * @param xmlBase The new XML root
+     */
+    public void setXmlBase(String xmlBase) {
+
+        String oldXmlBase = this.xmlBase;
+        this.xmlBase = xmlBase;
+        support.firePropertyChange("xmlBase", oldXmlBase, this.xmlBase);
 
     }
 
