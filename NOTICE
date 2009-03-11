@@ -5,14 +5,14 @@ This product includes software developed by
 The Apache Software Foundation (http://www.apache.org/).
 
 The Windows Installer is built with the Nullsoft
-Scriptable Install Sysem (NSIS), which is
+Scriptable Install System (NSIS), which is
 open source software.  The original software and
 related information is available at
 http://nsis.sourceforge.net.
 
 Java compilation software for JSP pages is provided by Eclipse, 
-which is open source software.  The orginal software and 
-related infomation is available at
+which is open source software.  The original software and 
+related information is available at
 http://www.eclipse.org.
 
 For the bayeux implementation
@@ -22,3 +22,8 @@ The org.apache.cometd.bayeux API is derivative work originating at the Dojo Foun
 * Copyright 2007 Dojo Foundation
 * Copyright 2007 Mort Bay Consulting Pty. Ltd.
 
+The original XML Schemas for Java EE Deployment Descriptors:
+ - javaee_5.xsd
+ - javaee_web_services_1_2.xsd
+ - javaee_web_services_client_1_2.xsd
+may be obtained from http://java.sun.com/xml/ns/javaee/
