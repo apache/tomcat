@@ -276,19 +276,6 @@ public class Digester extends DefaultHandler {
     protected Rules rules = null;
 
     /**
-     * The XML schema language to use for validating an XML instance. By
-     * default this value is set to <code>W3C_XML_SCHEMA</code>
-     */
-    protected String schemaLanguage = W3C_XML_SCHEMA;
-    
-        
-    /**
-     * The XML schema to use for validating an XML instance.
-     */
-    protected String schemaLocation = null;
-    
-    
-    /**
      * The object stack being constructed.
      */
     protected ArrayStack<Object> stack = new ArrayStack<Object>();
@@ -758,50 +745,6 @@ public class Digester extends DefaultHandler {
         this.rules.setDigester(this);
 
     }
-
-
-    /**
-     * Return the XML Schema URI used for validating an XML instance.
-     */
-    public String getSchema() {
-
-        return (this.schemaLocation);
-
-    }
-
-
-    /**
-     * Set the XML Schema URI used for validating a XML Instance.
-     *
-     * @param schemaLocation a URI to the schema.
-     */
-    public void setSchema(String schemaLocation){
-
-        this.schemaLocation = schemaLocation;
-
-    }   
-    
-
-    /**
-     * Return the XML Schema language used when parsing.
-     */
-    public String getSchemaLanguage() {
-
-        return (this.schemaLanguage);
-
-    }
-
-
-    /**
-     * Set the XML Schema language used when parsing. By default, we use W3C.
-     *
-     * @param schemaLanguage a URI to the schema language.
-     */
-    public void setSchemaLanguage(String schemaLanguage){
-
-        this.schemaLanguage = schemaLanguage;
-
-    }   
 
 
     /**
