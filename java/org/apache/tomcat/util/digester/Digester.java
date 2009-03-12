@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -276,7 +275,7 @@ public class Digester extends DefaultHandler {
      */
     protected Rules rules = null;
 
-   /**
+    /**
      * The XML schema language to use for validating an XML instance. By
      * default this value is set to <code>W3C_XML_SCHEMA</code>
      */
@@ -459,13 +458,28 @@ public class Digester extends DefaultHandler {
 
     /**
      * Return the SAXParserFactory we will use, creating one if necessary.
+     * @throws ParserConfigurationException 
+     * @throws SAXNotSupportedException 
+     * @throws SAXNotRecognizedException 
      */
-    public SAXParserFactory getFactory() {
+    public SAXParserFactory getFactory()
+    throws SAXNotRecognizedException, SAXNotSupportedException,
+    ParserConfigurationException {
 
         if (factory == null) {
             factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(namespaceAware);
             factory.setValidating(validating);
+            if (validating) {
+                // Enable DTD validation
+                factory.setFeature(
+                        "http://xml.org/sax/features/validation",
+                        true);
+                // Enable schema validation
+                factory.setFeature(
+                        "http://apache.org/xml/features/validation/schema",
+                        true);
+            }
         }
         return (factory);
 
@@ -660,16 +674,7 @@ public class Digester extends DefaultHandler {
 
         // Create a new parser
         try {
-            if (validating) {
-                Properties properties = new Properties();
-                properties.put("SAXParserFactory", getFactory());
-                if (schemaLocation != null) {
-                    properties.put("schemaLocation", schemaLocation);
-                    properties.put("schemaLanguage", schemaLanguage);
-                }
-                parser = ParserFeatureSetterFactory.newSAXParser(properties);               } else {
-                parser = getFactory().newSAXParser();
-            }
+            parser = getFactory().newSAXParser();
         } catch (Exception e) {
             log.error("Digester.getParser: ", e);
             return (null);
@@ -1431,11 +1436,6 @@ public class Digester extends DefaultHandler {
             entityURL = entityValidator.get(publicId);
         }
          
-        // Redirect the schema location to a local destination
-        if (schemaLocation != null && entityURL == null && systemId != null){
-            entityURL = entityValidator.get(systemId);
-        } 
-
         if (entityURL == null) { 
             if (systemId == null) {
                 // cannot resolve
