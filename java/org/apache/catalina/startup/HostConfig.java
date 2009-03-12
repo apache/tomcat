@@ -304,9 +304,6 @@ public class HostConfig
                 setUnpackWARs(((StandardHost) host).isUnpackWARs());
                 setXmlNamespaceAware(((StandardHost) host).getXmlNamespaceAware());
                 setXmlValidation(((StandardHost) host).getXmlValidation());
-                if (((StandardHost) host).getXmlBase()!=null) {
-                    
-                }
             }
         } catch (ClassCastException e) {
             log.error(sm.getString("hostConfig.cce", event.getLifecycle()), e);
@@ -439,7 +436,15 @@ public class HostConfig
         if (host.getXmlBase()!=null) {
             configBase = returnCanonicalPath(host.getXmlBase());
         } else {
-            configBase = returnCanonicalPath("conf");
+            StringBuffer xmlDir = new StringBuffer("conf");
+            Container parent = host.getParent();
+            if (parent instanceof Engine) {
+                xmlDir.append('/');
+                xmlDir.append(parent.getName());
+            }
+            xmlDir.append('/');
+            xmlDir.append(host.getName());
+            configBase = returnCanonicalPath(xmlDir.toString());
         }
         return (configBase);
 
