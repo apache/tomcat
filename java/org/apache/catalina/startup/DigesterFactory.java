@@ -68,10 +68,6 @@ public class DigesterFactory {
         digester.setValidating(xmlValidation);
         digester.setUseContextClassLoader(true);
 
-        if (xmlValidation || xmlNamespaceAware){
-            configureSchema(digester);        
-        }
-
         SchemaResolver schemaResolver = new SchemaResolver(digester);
         registerLocalSchema(schemaResolver);
         
@@ -188,19 +184,4 @@ public class DigesterFactory {
         }
     }
 
-
-    /**
-     * Turn on DTD and/or validation (based on the parser implementation)
-     */
-    protected static void configureSchema(Digester digester){
-        URL url = DigesterFactory.class
-                        .getResource(Constants.WebSchemaResourcePath_25);
-  
-        if(url == null) {
-            log.error("Could not get url for " 
-                                        + Constants.WebSchemaResourcePath_25);
-        } else {
-            digester.setSchema(url.toString());     
-        }
-    }
 }
