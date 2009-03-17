@@ -218,7 +218,7 @@ public class McastServiceImpl
         } else {
             socket = new MulticastSocket(port);
         }
-        socket.setLoopbackMode(false); //hint that we don't need loop back messages
+        socket.setLoopbackMode(true); //hint that we don't need loop back messages
         if (mcastBindAddress != null) {
 			if(log.isInfoEnabled())
                 log.info("Setting multihome multicast interface to:" +mcastBindAddress);
