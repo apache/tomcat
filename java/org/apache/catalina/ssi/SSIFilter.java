@@ -177,5 +177,6 @@ public class SSIFilter implements Filter {
     }
 
     public void destroy() {
+        // NOOP
     }
 }

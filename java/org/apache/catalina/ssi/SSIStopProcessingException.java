@@ -27,4 +27,5 @@ package org.apache.catalina.ssi;
  * @version $Revision$, $Date$
  */
 public class SSIStopProcessingException extends Exception {
+    // No specific functionality for this class
 }

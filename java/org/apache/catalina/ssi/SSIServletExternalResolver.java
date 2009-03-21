@@ -155,7 +155,6 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         if (nameParts.length == 1) {
             if (nameParts[0].equals("PATH")) {
                 requiredParts = 1;
-                retVal = null; // Not implemented
             }
         }
         else if (nameParts[0].equals("AUTH")) {
@@ -278,7 +277,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             } else if (nameParts[1].equals("HOST")) {
                 retVal = req.getRemoteHost();
             } else if (nameParts[1].equals("IDENT")) {
-                retVal = null; // Not implemented
+                // Not implemented
             } else if (nameParts[1].equals("PORT")) {
                 retVal = Integer.toString( req.getRemotePort());
             } else if (nameParts[1].equals("USER")) {
@@ -403,34 +402,34 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         if (!virtualPath.startsWith("/") && !virtualPath.startsWith("\\")) {
             return new ServletContextAndPath(context,
                     getAbsolutePath(virtualPath));
-        } else {
-            String normalized = RequestUtil.normalize(virtualPath);
-            if (isVirtualWebappRelative) {
-                return new ServletContextAndPath(context, normalized);
-            } else {
-                ServletContext normContext = context.getContext(normalized);
-                if (normContext == null) {
-                    throw new IOException("Couldn't get context for path: "
-                            + normalized);
-                }
-                //If it's the root context, then there is no context element
-                // to remove,
-                // ie:
-                // '/file1.shtml' vs '/appName1/file1.shtml'
-                if (!isRootContext(normContext)) {
-                    String noContext = getPathWithoutContext(
-                            normContext.getContextPath(), normalized);
-                    if (noContext == null) {
-                        throw new IOException(
-                                "Couldn't remove context from path: "
-                                        + normalized);
-                    }
-                    return new ServletContextAndPath(normContext, noContext);
-                } else {
-                    return new ServletContextAndPath(normContext, normalized);
-                }
-            }
         }
+
+        String normalized = RequestUtil.normalize(virtualPath);
+        if (isVirtualWebappRelative) {
+            return new ServletContextAndPath(context, normalized);
+        }
+
+        ServletContext normContext = context.getContext(normalized);
+        if (normContext == null) {
+            throw new IOException("Couldn't get context for path: "
+                    + normalized);
+        }
+        //If it's the root context, then there is no context element
+        // to remove,
+        // ie:
+        // '/file1.shtml' vs '/appName1/file1.shtml'
+        if (!isRootContext(normContext)) {
+            String noContext = getPathWithoutContext(
+                    normContext.getContextPath(), normalized);
+            if (noContext == null) {
+                throw new IOException(
+                        "Couldn't remove context from path: "
+                                + normalized);
+            }
+            return new ServletContextAndPath(normContext, noContext);
+        }
+
+        return new ServletContextAndPath(normContext, normalized);
     }
 
 
