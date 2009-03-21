@@ -377,8 +377,9 @@
     </attribute>
 
   </attributes>
+  </subsection>
   <subsection name="Java TCP socket attributes">
-  
+    <attributes>
       <attribute name="socket.rxBufSize" required="false">
         <p>(int)The socket receive buffer (SO_RCVBUF) size in bytes. JVM default
         used if not set.</p>
@@ -439,13 +440,10 @@
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>      
-  
-
-  </subsection>
-
+    </attributes>
   </subsection>
   
-    <subsection name="Nio Implementation">
+  <subsection name="Nio Implementation">
 
     <p>The NIO connector exposes all the low level socket properties that can be used to tune the connector.
     Most of these attributes are directly linked to the socket implementation in the JDK so you can find out 
