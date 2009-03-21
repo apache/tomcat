@@ -221,7 +221,9 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
                 synchronized(RFC1123_FORMAT) {
                     lastModified = RFC1123_FORMAT.parse(value).getTime();
                 }
-            } catch (Throwable ignore) { }
+            } catch (Throwable ignore) {
+                // Ignore
+            }
         } else if (lname.equals(CONTENT_TYPE)) {
             contentType = value;
         }
@@ -243,7 +245,9 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
                 synchronized(RFC1123_FORMAT) {
                     lastModified = RFC1123_FORMAT.parse(value).getTime();
                 }
-            } catch (Throwable ignore) { }
+            } catch (Throwable ignore) {
+                // Ignore
+            }
         }
         else if (lname.equals(CONTENT_TYPE))
         {
