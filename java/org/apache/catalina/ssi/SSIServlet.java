@@ -135,7 +135,7 @@ public class SSIServlet extends HttpServlet {
      *            a value of type 'HttpServletResponse'
      */
     protected void requestHandler(HttpServletRequest req,
-            HttpServletResponse res) throws IOException, ServletException {
+            HttpServletResponse res) throws IOException {
         ServletContext servletContext = getServletContext();
         String path = SSIServletRequestUtil.getRelativePath(req);
         if (debug > 0)
