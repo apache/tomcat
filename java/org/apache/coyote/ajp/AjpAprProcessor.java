@@ -716,6 +716,18 @@ public class AjpAprProcessor implements ActionHook {
                 requestHeaderMessage.getBytes(tmpMB);
                 String v = tmpMB.toString();
                 request.setAttribute(n, v);
+                /*
+                 * AJP13 misses to forward the remotePort.
+                 * Apache automatically sets REMOTE_PORT to the remote port.
+                 * Allow the user to set "JkEnvVar REMOTE_PORT" and
+                 * let us accept the forwarded port as the remote port.
+                 */
+                if(n.equals("REMOTE_PORT")) {
+                    try {
+                        request.setRemotePort(Integer.parseInt(v));
+                    } catch (NumberFormatException nfe) {
+                    }
+                }
                 break;
 
             case Constants.SC_A_CONTEXT :
