@@ -104,9 +104,8 @@ public class ExpressionTokenizer {
                 if (nextChar == '=') {
                     index++;
                     return TOKEN_NOT_EQ;
-                } else {
-                    return TOKEN_NOT;
                 }
+                return TOKEN_NOT;
             case '|' :
                 if (nextChar == '|') {
                     index++;
@@ -123,16 +122,14 @@ public class ExpressionTokenizer {
                 if (nextChar == '=') {
                     index++;
                     return TOKEN_GE; // Greater than or equal
-                } else {
-                    return TOKEN_GT; // Greater than
                 }
+                return TOKEN_GT; // Greater than
             case '<' :
                 if (nextChar == '=') {
                     index++;
                     return TOKEN_LE; // Less than or equal
-                } else {
-                    return TOKEN_LT; // Less than
                 }
+                return TOKEN_LT; // Less than
             default :
                 // Otherwise it's a string
                 break;
