@@ -454,20 +454,22 @@ public class HandlerRequest extends JkHandler
                 String n=tmpMB.toString();
                 msg.getBytes( tmpMB );
                 String v=tmpMB.toString();
-                req.setAttribute(n, v );
-                if(log.isTraceEnabled())
-                    log.trace("jk Attribute set " + n + "=" + v);
                 /*
                  * AJP13 misses to forward the remotePort.
-                 * Apache automatically sets REMOTE_PORT to the remote port.
-                 * Allow the user to set "JkEnvVar REMOTE_PORT" and
-                 * let us accept the forwarded port as the remote port.
+                 * Allow the AJP connector to add this info via
+                 * a private request attribute.
+                 * We will accept the forwarded data as the remote port,
+                 * and remove it from the public list of request attributes.
                  */
-                if(n.equals("REMOTE_PORT")) {
+                if(n.equals(AjpConstants.SC_A_REQ_REMOTE_PORT)) {
                     try {
                         req.setRemotePort(Integer.parseInt(v));
                     } catch (NumberFormatException nfe) {
                     }
+                } else {
+                    req.setAttribute(n, v );
+                    if(log.isTraceEnabled())
+                        log.trace("jk Attribute set " + n + "=" + v);
                 }
             }
 
