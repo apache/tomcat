@@ -88,6 +88,11 @@ public final class Constants {
     // Used for attributes which are not in the list above
     public static final byte SC_A_REQ_ATTRIBUTE = 10;
 
+    /**
+     * AJP private request attributes
+     */
+    public static final String SC_A_REQ_REMOTE_PORT = "AJP_REMOTE_PORT";
+
     // Terminates list of attributes
     public static final byte SC_A_ARE_DONE      = (byte)0xFF;
 
