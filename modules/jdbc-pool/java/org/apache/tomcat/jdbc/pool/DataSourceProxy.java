@@ -44,10 +44,6 @@ public class DataSourceProxy  {
     
     protected volatile ConnectionPool pool = null;
     
-    public ConnectionPool getPool() {
-        return pool;
-    }
-
     protected PoolProperties poolProperties = new PoolProperties();
 
     public DataSourceProxy() {
@@ -124,6 +120,14 @@ public class DataSourceProxy  {
     public PooledConnection getPooledConnection(String username,
                                                 String password) throws SQLException {
         return (PooledConnection) getConnection();
+    }
+    
+    public ConnectionPool getPool() {
+        return pool;
+    }
+
+    public String getPoolName() {
+        return pool.getName();
     }
 
     /**
