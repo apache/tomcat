@@ -26,7 +26,7 @@ import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
 
-import org.apache.catalina.Globals;
+import org.apache.jasper.Constants;
 
 /**
  * Implementation of ELContext
@@ -69,7 +69,7 @@ public final class ELContextImpl extends ELContext {
 
     public ELContextImpl() {
         this(ELResolverImpl.getDefaultResolver());
-        if (Globals.IS_SECURITY_ENABLED) {
+        if (Constants.IS_SECURITY_ENABLED) {
             functionMapper = new FunctionMapper() {
                 public Method resolveFunction(String prefix, String localName) {
                     return null;
