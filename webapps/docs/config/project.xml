@@ -61,6 +61,7 @@
         <item name="Realm"                 href="realm.html"/>
         <item name="Resources"             href="resources.html"/>
         <item name="Valve"                 href="valve.html"/>
+        <item name="Filters"               href="filters.html"/>
     </menu>
 
     <menu name="Cluster Elements">
