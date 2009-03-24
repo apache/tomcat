@@ -27,13 +27,8 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  *
- * <p>Title: Uber Pool</p>
- *
- * <p>Description: A simple, yet efficient and powerful connection pool</p>
- *
- * <p>Copyright: Copyright (c) 2008 Filip Hanik</p>
- *
- * <p> </p>
+ * The DataSource proxy lets us implements methods that don't exist in the current 
+ * compiler JDK but might be methods that are part of a future JDK DataSource interface.
  *
  * @author Filip Hanik
  * @version 1.0
