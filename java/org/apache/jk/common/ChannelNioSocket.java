@@ -100,8 +100,8 @@ public class ChannelNioSocket extends JkHandler
     private int socketTimeout = 0;
     private boolean nioIsBroken = false;
     private Selector selector = null;
-    private int bufferSize = 8*1024;
-    private int packetSize = 8*1024;
+    private int bufferSize = AjpConstants.MAX_PACKET_SIZE;
+    private int packetSize = AjpConstants.MAX_PACKET_SIZE;
 
     private long requestCount=0;
     
@@ -154,7 +154,7 @@ public class ChannelNioSocket extends JkHandler
     }
 
     public void setBufferSize(int bs) {
-        if(bs > 8*1024) {
+        if(bs > AjpConstants.MAX_PACKET_SIZE) {
             bufferSize = bs;
         }
     }
@@ -164,8 +164,8 @@ public class ChannelNioSocket extends JkHandler
     }
 
     public void setPacketSize(int ps) {
-        if(ps < 8*1024) {
-            ps = 8*1024;
+        if(ps < AjpConstants.MAX_PACKET_SIZE) {
+            ps = AjpConstants.MAX_PACKET_SIZE;
         }
         packetSize = ps;
     }

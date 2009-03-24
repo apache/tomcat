@@ -63,8 +63,8 @@ public class MsgAjp extends Msg {
      * Constructor that takes a buffer size
      */
     public MsgAjp(int bsize) {
-        if(bsize < 8*1024) {
-            bsize = 8*1024;
+        if(bsize < AjpConstants.MAX_PACKET_SIZE) {
+            bsize = AjpConstants.MAX_PACKET_SIZE;
         }
         bufsize = bsize;
         buf = new byte[bsize];
@@ -76,7 +76,7 @@ public class MsgAjp extends Msg {
      * @deprecated Use the buffer size constructor.
      */
     public MsgAjp() {
-        this(8*1024);
+        this(AjpConstants.MAX_PACKET_SIZE);
     }
 
     /**
