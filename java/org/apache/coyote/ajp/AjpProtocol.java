@@ -291,7 +291,13 @@ public class AjpProtocol
      */
     protected int packetSize = Constants.MAX_PACKET_SIZE;
     public int getPacketSize() { return packetSize; }
-    public void setPacketSize(int packetSize) { this.packetSize = packetSize; }
+    public void setPacketSize(int packetSize) {
+        if(packetSize < Constants.MAX_PACKET_SIZE) {
+            this.packetSize = Constants.MAX_PACKET_SIZE;
+        } else {
+            this.packetSize = packetSize;
+        }
+    }
 
     
     /**
