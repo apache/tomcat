@@ -102,6 +102,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        <bug>45026</bug>: Never return an empty HTTP status response phrase.
+        mod_jk and httpd 2.x do not like that. (rjung)
+      </fix>
       <update>
         Allow bigger AJP packets also for request bodies and responses
         using the packetSize attribute of the Connector. (rjung)

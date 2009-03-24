@@ -966,6 +966,10 @@ public class AjpProcessor implements ActionHook {
         } else {
             message = message.replace('\n', ' ').replace('\r', ' ');
         }
+        if (message == null) {
+            // mod_jk + httpd 2.x fails with a null status message - bug 45026
+            message = Integer.toString(response.getStatus());
+        }
         tmpMB.setString(message);
         responseHeaderMessage.appendBytes(tmpMB);
 
