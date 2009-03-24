@@ -384,7 +384,7 @@ public class DefaultServlet
         // There is a doPut
         allow.append(", PUT");
         // There is a doDelete
-        allow.append(", POST");
+        allow.append(", DELETE");
         // Trace - assume disabled unless we can prove otherwise
         if (req instanceof RequestFacade &&
                 ((RequestFacade) req).getAllowTrace()) {
