@@ -90,8 +90,8 @@
     <javac srcdir="${basedir}/modules/jdbc-pool/java" destdir="${tomcat.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
-           target="${compile.source}"
+           source="1.5"
+           target="1.5"
            optimize="${compile.optimize}">
       <classpath refid="tomcat.jdbc.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
