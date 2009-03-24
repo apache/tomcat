@@ -102,6 +102,10 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <update>
+        Allow bigger AJP packets also for request bodies and responses
+        using the packetSize attribute of the Connector. (rjung)
+      </update>
       <update><rev>703017</rev> Make Java socket options consistent between NIO
         and JIO connector. Expose all the socket options available on
         <code>java.net.Socket</code> (fhanik)
