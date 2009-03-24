@@ -226,7 +226,7 @@ public class SlowQueryReportJmx extends SlowQueryReport {
                 if (mbean!=null && mbeans.putIfAbsent(poolName, mbean)==null) {
                     registry.getMBeanServer().registerMBean( mbean, oname);
                 } else if (mbean==null){
-                    log.warn(SlowQueryReport.class.getName()+ "- No JMX support, unable to initiate Tomcat JMX.");
+                    log.warn(SlowQueryReport.class.getName()+ "- No JMX support, unable to initiate Tomcat JMX. This requires the system to run inside the Tomcat container.");
                 }
             } else {
                 log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
