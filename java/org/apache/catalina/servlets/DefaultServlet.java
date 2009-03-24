@@ -1131,10 +1131,9 @@ public class DefaultServlet
 
         if (xsltInputStream==null) {
             return renderHtml(contextPath, cacheEntry);
-        } else {
-            return renderXml(contextPath, cacheEntry, xsltInputStream);
         }
-
+        return renderXml(contextPath, cacheEntry, xsltInputStream);
+        
     }
 
     /**
@@ -1439,7 +1438,7 @@ public class DefaultServlet
      * Get the readme file as a string.
      */
     protected String getReadme(DirContext directory)
-        throws IOException, ServletException {
+        throws IOException {
 
         if (readmeFile != null) {
             try {
@@ -1467,7 +1466,7 @@ public class DefaultServlet
      * Return the xsl template inputstream (if possible)
      */
     protected InputStream findXsltInputStream(DirContext directory)
-        throws IOException, ServletException {
+        throws IOException {
 
         if (localXsltFile != null) {
             try {
@@ -1537,9 +1536,8 @@ public class DefaultServlet
             }
             request.setAttribute("org.apache.tomcat.sendfile.token", this);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
     
     
@@ -1599,9 +1597,8 @@ public class DefaultServlet
      * processing is stopped
      */
     protected boolean checkIfModifiedSince(HttpServletRequest request,
-                                         HttpServletResponse response,
-                                         ResourceAttributes resourceAttributes)
-        throws IOException {
+            HttpServletResponse response,
+            ResourceAttributes resourceAttributes) {
         try {
             long headerValue = request.getDateHeader("If-Modified-Since");
             long lastModified = resourceAttributes.getLastModified();
@@ -1675,11 +1672,9 @@ public class DefaultServlet
                     response.setHeader("ETag", eTag);
 
                     return false;
-                } else {
-                    response.sendError
-                        (HttpServletResponse.SC_PRECONDITION_FAILED);
-                    return false;
                 }
+                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return false;
             }
         }
         return true;
