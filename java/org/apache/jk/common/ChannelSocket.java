@@ -89,7 +89,7 @@ public class ChannelSocket extends JkHandler
     private int linger=100;
     private int socketTimeout;
     private int bufferSize = -1;
-    private int packetSize = 8*1024;
+    private int packetSize = AjpConstants.MAX_PACKET_SIZE;
 
     private long requestCount=0;
     
@@ -208,8 +208,8 @@ public class ChannelSocket extends JkHandler
     }
 
     public void setPacketSize(int ps) {
-        if(ps < 8*1024) {
-            ps = 8*1024;
+        if(ps < AjpConstants.MAX_PACKET_SIZE) {
+            ps = AjpConstants.MAX_PACKET_SIZE;
         }
         packetSize = ps;
     }
