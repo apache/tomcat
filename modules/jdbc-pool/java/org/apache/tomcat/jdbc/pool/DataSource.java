@@ -25,4 +25,12 @@ package org.apache.tomcat.jdbc.pool;
  */
 public class DataSource extends DataSourceProxy implements javax.sql.DataSource {
 
+    public DataSource() {
+        super();
+    }
+
+    public DataSource(PoolProperties poolProperties) {
+        super(poolProperties);
+    }
+    
 }

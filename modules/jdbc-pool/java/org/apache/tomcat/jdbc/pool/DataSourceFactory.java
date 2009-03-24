@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -187,27 +188,19 @@ public class DataSourceFactory implements ObjectFactory {
 
         return createDataSource(properties);
     }
-
-    /**
-     * Creates and configures a {@link BasicDataSource} instance based on the
-     * given properties.
-     *
-     * @param properties the datasource configuration properties
-     * @throws Exception if an error occurs creating the data source
-     */
-    public static DataSource createDataSource(Properties properties) throws Exception {
-        org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource();
-
+    
+    public static PoolProperties parsePoolProperties(Properties properties) throws IOException{
+        PoolProperties poolProperties = new PoolProperties();
         String value = null;
 
         value = properties.getProperty(PROP_DEFAULTAUTOCOMMIT);
         if (value != null) {
-            dataSource.getPoolProperties().setDefaultAutoCommit(Boolean.valueOf(value));
+            poolProperties.setDefaultAutoCommit(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_DEFAULTREADONLY);
         if (value != null) {
-            dataSource.getPoolProperties().setDefaultReadOnly(Boolean.valueOf(value));
+            poolProperties.setDefaultReadOnly(Boolean.valueOf(value));
         }
 
         value = properties.getProperty(PROP_DEFAULTTRANSACTIONISOLATION);
@@ -233,123 +226,122 @@ public class DataSourceFactory implements ObjectFactory {
                     level = UNKNOWN_TRANSACTIONISOLATION;
                 }
             }
-            dataSource.getPoolProperties().setDefaultTransactionIsolation(level);
+            poolProperties.setDefaultTransactionIsolation(level);
         }
 
         value = properties.getProperty(PROP_DEFAULTCATALOG);
         if (value != null) {
-            dataSource.getPoolProperties().setDefaultCatalog(value);
+            poolProperties.setDefaultCatalog(value);
         }
 
         value = properties.getProperty(PROP_DRIVERCLASSNAME);
         if (value != null) {
-            dataSource.getPoolProperties().setDriverClassName(value);
+            poolProperties.setDriverClassName(value);
         }
 
         value = properties.getProperty(PROP_MAXACTIVE);
         if (value != null) {
-            dataSource.getPoolProperties().setMaxActive(Integer.parseInt(value));
+            poolProperties.setMaxActive(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_MAXIDLE);
         if (value != null) {
-            dataSource.getPoolProperties().setMaxIdle(Integer.parseInt(value));
+            poolProperties.setMaxIdle(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_MINIDLE);
         if (value != null) {
-            dataSource.getPoolProperties().setMinIdle(Integer.parseInt(value));
+            poolProperties.setMinIdle(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_INITIALSIZE);
         if (value != null) {
-            dataSource.getPoolProperties().setInitialSize(Integer.parseInt(value));
+            poolProperties.setInitialSize(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_MAXWAIT);
         if (value != null) {
-            dataSource.getPoolProperties().setMaxWait(Integer.parseInt(value));
+            poolProperties.setMaxWait(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_TESTONBORROW);
         if (value != null) {
-            dataSource.getPoolProperties().setTestOnBorrow(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestOnBorrow(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_TESTONRETURN);
         if (value != null) {
-            dataSource.getPoolProperties().setTestOnReturn(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestOnReturn(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_TESTONCONNECT);
         if (value != null) {
-            dataSource.getPoolProperties().setTestOnConnect(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestOnConnect(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_TIMEBETWEENEVICTIONRUNSMILLIS);
         if (value != null) {
-            dataSource.getPoolProperties().setTimeBetweenEvictionRunsMillis(Integer.parseInt(value));
+            poolProperties.setTimeBetweenEvictionRunsMillis(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_NUMTESTSPEREVICTIONRUN);
         if (value != null) {
-            dataSource.getPoolProperties().setNumTestsPerEvictionRun(Integer.parseInt(value));
+            poolProperties.setNumTestsPerEvictionRun(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_MINEVICTABLEIDLETIMEMILLIS);
         if (value != null) {
-            dataSource.getPoolProperties().setMinEvictableIdleTimeMillis(Integer.parseInt(value));
+            poolProperties.setMinEvictableIdleTimeMillis(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_TESTWHILEIDLE);
         if (value != null) {
-            dataSource.getPoolProperties().setTestWhileIdle(Boolean.valueOf(value).booleanValue());
+            poolProperties.setTestWhileIdle(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_PASSWORD);
         if (value != null) {
-            dataSource.getPoolProperties().setPassword(value);
+            poolProperties.setPassword(value);
         }
 
         value = properties.getProperty(PROP_URL);
         if (value != null) {
-            dataSource.getPoolProperties().setUrl(value);
+            poolProperties.setUrl(value);
         }
 
         value = properties.getProperty(PROP_USERNAME);
         if (value != null) {
-            dataSource.getPoolProperties().setUsername(value);
+            poolProperties.setUsername(value);
         }
 
         value = properties.getProperty(PROP_VALIDATIONQUERY);
         if (value != null) {
-            dataSource.getPoolProperties().setValidationQuery(value);
+            poolProperties.setValidationQuery(value);
         }
 
         value = properties.getProperty(PROP_VALIDATIONINTERVAL);
         if (value != null) {
-            dataSource.getPoolProperties().setValidationInterval(Long.parseLong(value));
+            poolProperties.setValidationInterval(Long.parseLong(value));
         }
 
         value = properties.getProperty(PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED);
         if (value != null) {
-            dataSource.getPoolProperties().
-                setAccessToUnderlyingConnectionAllowed(Boolean.valueOf(value).booleanValue());
+            poolProperties.setAccessToUnderlyingConnectionAllowed(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_REMOVEABANDONED);
         if (value != null) {
-            dataSource.getPoolProperties().setRemoveAbandoned(Boolean.valueOf(value).booleanValue());
+            poolProperties.setRemoveAbandoned(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_REMOVEABANDONEDTIMEOUT);
         if (value != null) {
-            dataSource.getPoolProperties().setRemoveAbandonedTimeout(Integer.parseInt(value));
+            poolProperties.setRemoveAbandonedTimeout(Integer.parseInt(value));
         }
 
         value = properties.getProperty(PROP_LOGABANDONED);
         if (value != null) {
-            dataSource.getPoolProperties().setLogAbandoned(Boolean.valueOf(value).booleanValue());
+            poolProperties.setLogAbandoned(Boolean.valueOf(value).booleanValue());
         }
 
         value = properties.getProperty(PROP_POOLPREPAREDSTATEMENTS);
@@ -365,38 +357,52 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
         if (value != null) {
             Properties p = getProperties(value);
-            dataSource.getPoolProperties().setDbProperties(p);
+            poolProperties.setDbProperties(p);
         } else {
-            dataSource.getPoolProperties().setDbProperties(new Properties());
+            poolProperties.setDbProperties(new Properties());
         }
 
-        dataSource.getPoolProperties().getDbProperties().setProperty("user",dataSource.getPoolProperties().getUsername());
-        dataSource.getPoolProperties().getDbProperties().setProperty("password",dataSource.getPoolProperties().getPassword());
+        poolProperties.getDbProperties().setProperty("user",poolProperties.getUsername());
+        poolProperties.getDbProperties().setProperty("password",poolProperties.getPassword());
 
         value = properties.getProperty(PROP_INITSQL);
         if (value != null) {
-            dataSource.getPoolProperties().setInitSQL(value);
+            poolProperties.setInitSQL(value);
         }
 
         value = properties.getProperty(PROP_INTERCEPTORS);
         if (value != null) {
-            dataSource.getPoolProperties().setJdbcInterceptors(value);
+            poolProperties.setJdbcInterceptors(value);
         }
 
         value = properties.getProperty(PROP_JMX_ENABLED);
         if (value != null) {
-            dataSource.getPoolProperties().setJmxEnabled(Boolean.parseBoolean(value));
+            poolProperties.setJmxEnabled(Boolean.parseBoolean(value));
         }
         
         value = properties.getProperty(PROP_FAIR_QUEUE);
         if (value != null) {
-            dataSource.getPoolProperties().setFairQueue(Boolean.parseBoolean(value));
+            poolProperties.setFairQueue(Boolean.parseBoolean(value));
         }
         
         value = properties.getProperty(PROP_USE_EQUALS);
         if (value != null) {
-            dataSource.getPoolProperties().setUseEquals(Boolean.parseBoolean(value));
+            poolProperties.setUseEquals(Boolean.parseBoolean(value));
         }
+        return poolProperties;
+        
+    }
+
+    /**
+     * Creates and configures a {@link BasicDataSource} instance based on the
+     * given properties.
+     *
+     * @param properties the datasource configuration properties
+     * @throws Exception if an error occurs creating the data source
+     */
+    public static DataSource createDataSource(Properties properties) throws Exception {
+        PoolProperties poolProperties = DataSourceFactory.parsePoolProperties(properties);
+        org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
         
         //initialize the pool itself
         dataSource.createPool();
@@ -418,11 +424,10 @@ public class DataSourceFactory implements ObjectFactory {
      * @return Properties
      * @throws Exception
      */
-    static protected Properties getProperties(String propText) throws Exception {
+    static protected Properties getProperties(String propText) throws IOException {
         Properties p = new Properties();
         if (propText != null) {
-            p.load(new ByteArrayInputStream(propText.replace(';', '\n').
-                                            getBytes()));
+            p.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));
         }
         return p;
     }

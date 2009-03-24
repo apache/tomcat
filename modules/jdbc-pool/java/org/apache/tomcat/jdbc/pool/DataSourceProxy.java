@@ -44,10 +44,16 @@ public class DataSourceProxy  {
     
     protected volatile ConnectionPool pool = null;
     
-    protected PoolProperties poolProperties = new PoolProperties();
+    protected PoolProperties poolProperties = null;
 
     public DataSourceProxy() {
+        this(new PoolProperties());
     }
+    
+    public DataSourceProxy(PoolProperties poolProperties) {
+        this.poolProperties = poolProperties;
+    }
+    
 
 
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
