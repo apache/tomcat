@@ -86,10 +86,22 @@ public class AjpProcessor implements ActionHook {
         response.setOutputBuffer(new SocketOutputBuffer());
         request.setResponse(response);
 
+        this.packetSize = packetSize;
         requestHeaderMessage = new AjpMessage(packetSize);
         responseHeaderMessage = new AjpMessage(packetSize);
         bodyMessage = new AjpMessage(packetSize);
-        
+
+        // Set the get body message buffer
+        AjpMessage getBodyMessage = new AjpMessage(16);
+        getBodyMessage.reset();
+        getBodyMessage.appendByte(Constants.JK_AJP13_GET_BODY_CHUNK);
+        // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
+        getBodyMessage.appendInt(Constants.MAX_READ_SIZE + packetSize - Constants.MAX_PACKET_SIZE);
+        getBodyMessage.end();
+        getBodyMessageArray = new byte[getBodyMessage.getLen()];
+        System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray, 
+                         0, getBodyMessage.getLen());
+
         // Cause loading of HexUtils
         HexUtils.load();
 
@@ -119,6 +131,12 @@ public class AjpProcessor implements ActionHook {
      */
     protected Response response = null;
 
+
+    /**
+     * The socket timeout used when reading the first block of the request
+     * header.
+     */
+    protected int packetSize;
 
     /**
      * Header message. Note that this header is merely the one used during the
@@ -240,7 +258,7 @@ public class AjpProcessor implements ActionHook {
     /**
      * Direct buffer used for sending right away a get body message.
      */
-    protected static final byte[] getBodyMessageArray;
+    protected final byte[] getBodyMessageArray;
 
 
     /**
@@ -264,17 +282,6 @@ public class AjpProcessor implements ActionHook {
 
 
     static {
-
-        // Set the get body message buffer
-
-        AjpMessage getBodyMessage = new AjpMessage(16);
-        getBodyMessage.reset();
-        getBodyMessage.appendByte(Constants.JK_AJP13_GET_BODY_CHUNK);
-        getBodyMessage.appendInt(Constants.MAX_READ_SIZE);
-        getBodyMessage.end();
-        getBodyMessageArray = new byte[getBodyMessage.getLen()];
-        System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray, 
-                0, getBodyMessage.getLen());
 
         // Set the read body message buffer
         AjpMessage pongMessage = new AjpMessage(16);
@@ -1223,7 +1230,8 @@ public class AjpProcessor implements ActionHook {
 
             int len = chunk.getLength();
             // 4 - hardcoded, byte[] marshalling overhead
-            int chunkSize = Constants.MAX_SEND_SIZE;
+            // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
+            int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
             int off = 0;
             while (len > 0) {
                 int thisTime = len;

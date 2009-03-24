@@ -664,7 +664,7 @@ public class ChannelNioSocket extends JkHandler
     void acceptConnections() {
         if( running ) {
             try{
-                MsgContext ep=createMsgContext();
+                MsgContext ep=createMsgContext(packetSize);
                 ep.setSource(this);
                 ep.setWorkerEnv( wEnv );
                 this.accept(ep);
