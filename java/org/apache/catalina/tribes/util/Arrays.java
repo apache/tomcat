@@ -56,9 +56,14 @@ public class Arrays {
     }
 
     public static String toString(byte[] data, int offset, int length) {
+        return toString(data,offset,length,false);
+    }
+    
+    public static String toString(byte[] data, int offset, int length, boolean asInt) {
         StringBuffer buf = new StringBuffer("{");
         if ( data != null && length > 0 ) {
-            buf.append(data[offset++]);
+            if (asInt) buf.append((int)data[offset++]);
+            else buf.append(data[offset++]);
             for (int i = offset; i < length; i++) {
                 buf.append(", ").append(data[i]);
             }
@@ -66,7 +71,7 @@ public class Arrays {
         buf.append("}");
         return buf.toString();
     }
-    
+
     public static String toString(Object[] data) {
         return toString(data,0,data!=null?data.length:0);
     }
