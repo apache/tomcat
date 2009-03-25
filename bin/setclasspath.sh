@@ -127,7 +127,7 @@ if [ `uname -s` = "Darwin" ]; then
 fi
 
 # Set standard commands for invoking Java.
-  _RUNJAVA="$JRE_HOME"/bin/java
+_RUNJAVA="$JRE_HOME"/bin/java
 if [ "$os400" != "true" ]; then
   _RUNJDB="$JAVA_HOME"/bin/jdb
 fi
