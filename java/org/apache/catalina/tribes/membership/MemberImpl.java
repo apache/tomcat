@@ -452,7 +452,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
                 if (DO_DNS_LOOKUPS)
                     this.hostname = java.net.InetAddress.getByAddress(host).getHostName();
                 else
-                    this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host);
+                    this.hostname = org.apache.catalina.tribes.util.Arrays.toString(host,0,host.length,true);
                 return this.hostname;
             }catch ( IOException x ) {
                 throw new RuntimeException("Unable to parse hostname.",x);
