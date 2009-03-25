@@ -215,6 +215,13 @@ public class MemoryRealm  extends RealmBase {
         if (digester == null) {
             digester = new Digester();
             digester.setValidating(false);
+            try {
+                digester.setFeature(
+                        "http://apache.org/xml/features/allow-java-encodings",
+                        true);
+            } catch (Exception e) {
+                log.warn(sm.getString("memoryRealm.xmlFeatureEncoding"), e);
+            }
             digester.addRuleSet(new MemoryRuleSet());
         }
         return (digester);
