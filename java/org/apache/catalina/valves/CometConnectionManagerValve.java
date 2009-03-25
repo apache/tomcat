@@ -346,6 +346,7 @@ public class CometConnectionManagerValve
 
 
     public void sessionCreated(HttpSessionEvent se) {
+        // NOOP
     }
 
 
