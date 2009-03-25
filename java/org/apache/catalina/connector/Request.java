@@ -1534,8 +1534,7 @@ public class Request
     }
 
     public AsyncContext startAsync() throws IllegalStateException {
-        // TODO SERVLET3
-        return null;
+        return startAsync(getRequest(),getResponse().getResponse());
     }
 
     public AsyncContext startAsync(ServletRequest servletRequest,
