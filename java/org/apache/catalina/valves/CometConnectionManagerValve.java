@@ -312,8 +312,14 @@ public class CometConnectionManagerValve
                 HttpSession session = request.getSession(false);
                 if (session != null) {
                     synchronized (session) {
-                        Request[] reqs = (Request[])
-                            session.getAttribute(cometRequestsAttribute);
+                        Request[] reqs = null;
+                        try {
+                             reqs = (Request[])
+                                session.getAttribute(cometRequestsAttribute);
+                        } catch (IllegalStateException ise) {
+                            // Ignore - session has been invalidated
+                            // Listener will have cleaned up
+                        }
                         if (reqs != null) {
                             boolean found = false;
                             for (int i = 0; !found && (i < reqs.length); i++) {
@@ -329,11 +335,22 @@ public class CometConnectionManagerValve
                                             newConnectionInfos[pos++] = reqs[i];
                                         }
                                     }
-                                    session.setAttribute(cometRequestsAttribute,
-                                            newConnectionInfos);
+                                    try {
+                                        session.setAttribute(
+                                                cometRequestsAttribute,
+                                                newConnectionInfos);
+                                    } catch (IllegalStateException ise) {
+                                        // Ignore - session has been invalidated
+                                        // Listener will have cleaned up
+                                    }
                                 } else {
-                                    session.removeAttribute(
-                                            cometRequestsAttribute);
+                                    try {
+                                        session.removeAttribute(
+                                                cometRequestsAttribute);
+                                    } catch (IllegalStateException ise) {
+                                        // Ignore - session has been invalidated
+                                        // Listener will have cleaned up
+                                    }
                                 }
                             }
                         }
