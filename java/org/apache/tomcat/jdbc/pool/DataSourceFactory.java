@@ -172,9 +172,20 @@ public class DataSourceFactory implements ObjectFactory {
             return null;
         }
         Reference ref = (Reference) obj;
-        if (!"javax.sql.DataSource".equals(ref.getClassName())) {
+        
+        boolean ok = false;
+        if ("javax.sql.DataSource".equals(ref.getClassName())) {
+            ok = true;
+        }
+        if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
+            ok = true;
+        }
+        
+        if (!ok) {
+            log.warn(ref.getClassName()+" is not a valid class name/type for this JNDI factory.");
             return null;
         }
+        
 
         Properties properties = new Properties();
         for (int i = 0; i < ALL_PROPERTIES.length; i++) {
