@@ -266,6 +266,7 @@ public class PooledConnection {
         }
         long now = System.currentTimeMillis();
         if (this.poolProperties.getValidationInterval() > 0 &&
+            (validateAction!=VALIDATE_INIT) &&    
             (now - this.lastValidated) <
             this.poolProperties.getValidationInterval()) {
             return true;
