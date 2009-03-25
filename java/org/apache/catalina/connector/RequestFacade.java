@@ -938,20 +938,18 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public void addAsyncListener(AsyncListener listener,
-            ServletRequest servletRequest, ServletResponse servletResponse) {
-        // TODO SERVLET3
+    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
+        request.addAsyncListener(listener,servletRequest,servletResponse);
     }
 
 
     public void addAsyncListener(AsyncListener listener) {
-        // TODO SERVLET3
+        request.addAsyncListener(listener);
     }
 
 
     public AsyncContext getAsyncContext() {
-        // TODO SERVLET3
-        return null;
+        return request.getAsyncContext();
     }
 
 
@@ -966,32 +964,27 @@ public class RequestFacade implements HttpServletRequest {
 
 
     public boolean isAsyncStarted() {
-        // TODO SERVLET3
-        return false;
+        return request.isAsyncStarted();
     }
 
 
     public boolean isAsyncSupported() {
-        // TODO SERVLET3
-        return false;
+        return request.isAsyncStarted();
     }
 
 
     public void setAsyncTimeout(long timeout) {
-        // TODO SERVLET3
+        request.setAsyncTimeout(timeout);
     }
 
 
     public AsyncContext startAsync() throws IllegalStateException {
-        // TODO SERVLET3
-        return null;
+        return request.startAsync();
     }
 
 
-    public AsyncContext startAsync(ServletRequest servletRequest,
-            ServletResponse servletResponse) throws IllegalStateException {
-        // TODO SERVLET3
-        return null;
+    public AsyncContext startAsync(ServletRequest servletRequest,ServletResponse servletResponse) throws IllegalStateException {
+        return request.startAsync(servletRequest, servletResponse);
     }
 
     public boolean getAllowTrace() {
