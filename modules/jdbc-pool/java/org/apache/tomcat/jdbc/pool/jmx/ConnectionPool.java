@@ -146,7 +146,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     //       POOL PROPERTIES
     //=================================================================
     public Properties getDbProperties() {
-        return pool.getPoolProperties().getDbProperties();
+        return null; //pool.getPoolProperties().getDbProperties();
     }
     public String getUrl() {
         return pool.getPoolProperties().getUrl();
@@ -224,7 +224,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return pool.getPoolProperties().getName();
     }
     public String getPassword() {
-        return pool.getPoolProperties().getPassword();
+        return "";
     }
     public String getUsername() {
         return pool.getPoolProperties().getUsername();
