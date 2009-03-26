@@ -251,7 +251,7 @@ public class LoadTest implements MembershipListener,ChannelListener, Runnable {
     public static class LoadMessage extends ByteMessage {
         
         public static byte[] outdata = new byte[size];
-        public static Random r = new Random(System.currentTimeMillis());
+        public static Random r = new Random();
         public static int getMessageSize (LoadMessage msg) {
             return msg.getMessage().length;
         }
