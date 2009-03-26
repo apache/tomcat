@@ -38,12 +38,12 @@ public class ResourceBundleELResolver extends ELResolver {
 		}
 		
 		if (base instanceof ResourceBundle) {
-			context.setPropertyResolved(true);
-
 			if (property != null) {
 				try {
-					return ((ResourceBundle) base).getObject(property
+				    Object result = ((ResourceBundle) base).getObject(property
 							.toString());
+		            context.setPropertyResolved(true);
+				    return result;
 				} catch (MissingResourceException mre) {
 					return "???" + property.toString() + "???";
 				}
