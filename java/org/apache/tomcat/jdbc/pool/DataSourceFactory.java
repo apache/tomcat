@@ -107,6 +107,8 @@ public class DataSourceFactory implements ObjectFactory {
     protected static final String PROP_USE_EQUALS = "useEquals";
     
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
+    
+    public static final String OBJECT_NAME = "object_name";
 
 
     protected final static String[] ALL_PROPERTIES = {
@@ -143,7 +145,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_INTERCEPTORS,
         PROP_JMX_ENABLED,
         PROP_FAIR_QUEUE,
-        PROP_USE_EQUALS
+        PROP_USE_EQUALS,
+        OBJECT_NAME
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -400,6 +403,12 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setUseEquals(Boolean.parseBoolean(value));
         }
+
+        value = properties.getProperty(OBJECT_NAME);
+        if (value != null) {
+            poolProperties.setName(value);
+        }
+
         return poolProperties;
         
     }
