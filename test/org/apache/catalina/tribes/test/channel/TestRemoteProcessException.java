@@ -112,7 +112,7 @@ public class TestRemoteProcessException extends TestCase {
         public byte[] data;
         public byte key;
         public boolean error = false;
-        public static Random r = new Random(System.currentTimeMillis());
+        public static Random r = new Random();
         public static Data createRandomData(boolean error) {
             int i = r.nextInt();
             i = ( i % 127 );

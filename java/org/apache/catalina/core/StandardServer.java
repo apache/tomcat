@@ -420,7 +420,7 @@ public final class StandardServer
             int expected = 1024; // Cut off to avoid DoS attack
             while (expected < shutdown.length()) {
                 if (random == null)
-                    random = new Random(System.currentTimeMillis());
+                    random = new Random();
                 expected += (random.nextInt() % 1024);
             }
             while (expected > 0) {
