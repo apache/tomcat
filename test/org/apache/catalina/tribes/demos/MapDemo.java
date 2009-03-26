@@ -399,7 +399,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
             dataModel.getValueAt(-1,-1);
         }
 
-        public static Random random = new Random(System.currentTimeMillis());
+        public static Random random = new Random();
         public static String random(int count, int start, int end, boolean letters, boolean numbers,
                                     char[] chars ) {
             if (count == 0) {
