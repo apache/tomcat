@@ -849,8 +849,8 @@ public class StandardContext
 
         boolean oldDelegate = this.delegate;
         this.delegate = delegate;
-        support.firePropertyChange("delegate", new Boolean(oldDelegate),
-                                   new Boolean(this.delegate));
+        support.firePropertyChange("delegate", oldDelegate,
+                                   this.delegate);
 
     }
 
@@ -964,8 +964,8 @@ public class StandardContext
         boolean oldAntiJARLocking = this.antiJARLocking;
         this.antiJARLocking = antiJARLocking;
         support.firePropertyChange("antiJARLocking",
-                                   new Boolean(oldAntiJARLocking),
-                                   new Boolean(this.antiJARLocking));
+                                   oldAntiJARLocking,
+                                   this.antiJARLocking);
 
     }
 
@@ -980,8 +980,8 @@ public class StandardContext
         boolean oldAntiResourceLocking = this.antiResourceLocking;
         this.antiResourceLocking = antiResourceLocking;
         support.firePropertyChange("antiResourceLocking",
-                                   new Boolean(oldAntiResourceLocking),
-                                   new Boolean(this.antiResourceLocking));
+                                   oldAntiResourceLocking,
+                                   this.antiResourceLocking);
 
     }
 
@@ -1006,8 +1006,8 @@ public class StandardContext
         boolean oldAvailable = this.available;
         this.available = available;
         support.firePropertyChange("available",
-                                   new Boolean(oldAvailable),
-                                   new Boolean(this.available));
+                                   oldAvailable,
+                                   this.available);
 
     }
 
@@ -1091,8 +1091,8 @@ public class StandardContext
         boolean oldConfigured = this.configured;
         this.configured = configured;
         support.firePropertyChange("configured",
-                                   new Boolean(oldConfigured),
-                                   new Boolean(this.configured));
+                                   oldConfigured,
+                                   this.configured);
 
     }
 
@@ -1117,8 +1117,8 @@ public class StandardContext
         boolean oldCookies = this.cookies;
         this.cookies = cookies;
         support.firePropertyChange("cookies",
-                                   new Boolean(oldCookies),
-                                   new Boolean(this.cookies));
+                                   oldCookies,
+                                   this.cookies);
 
     }
     
@@ -1143,8 +1143,8 @@ public class StandardContext
         boolean oldUseHttpOnly = this.useHttpOnly;
         this.useHttpOnly = useHttpOnly;
         support.firePropertyChange("useHttpOnly",
-                new Boolean(oldUseHttpOnly),
-                new Boolean(this.useHttpOnly));
+                oldUseHttpOnly,
+                this.useHttpOnly);
     }
     
     
@@ -1170,8 +1170,8 @@ public class StandardContext
         boolean oldCrossContext = this.crossContext;
         this.crossContext = crossContext;
         support.firePropertyChange("crossContext",
-                                   new Boolean(oldCrossContext),
-                                   new Boolean(this.crossContext));
+                                   oldCrossContext,
+                                   this.crossContext);
 
     }
 
@@ -1303,8 +1303,8 @@ public class StandardContext
         boolean oldDistributable = this.distributable;
         this.distributable = distributable;
         support.firePropertyChange("distributable",
-                                   new Boolean(oldDistributable),
-                                   new Boolean(this.distributable));
+                                   oldDistributable,
+                                   this.distributable);
 
         // Bugzilla 32866
         if(getManager() != null) {
@@ -1416,8 +1416,8 @@ public class StandardContext
     public void setIgnoreAnnotations(boolean ignoreAnnotations) {
         boolean oldIgnoreAnnotations = this.ignoreAnnotations;
         this.ignoreAnnotations = ignoreAnnotations;
-        support.firePropertyChange("ignoreAnnotations", Boolean.valueOf(oldIgnoreAnnotations),
-                Boolean.valueOf(this.ignoreAnnotations));
+        support.firePropertyChange("ignoreAnnotations", oldIgnoreAnnotations,
+                this.ignoreAnnotations);
     }
     
     
@@ -1651,8 +1651,8 @@ public class StandardContext
         boolean oldPrivileged = this.privileged;
         this.privileged = privileged;
         support.firePropertyChange("privileged",
-                                   new Boolean(oldPrivileged),
-                                   new Boolean(this.privileged));
+                                   oldPrivileged,
+                                   this.privileged);
 
     }
 
@@ -1667,8 +1667,8 @@ public class StandardContext
         boolean oldReloadable = this.reloadable;
         this.reloadable = reloadable;
         support.firePropertyChange("reloadable",
-                                   new Boolean(oldReloadable),
-                                   new Boolean(this.reloadable));
+                                   oldReloadable,
+                                   this.reloadable);
 
     }
 
@@ -1683,8 +1683,8 @@ public class StandardContext
         boolean oldOverride = this.override;
         this.override = override;
         support.firePropertyChange("override",
-                                   new Boolean(oldOverride),
-                                   new Boolean(this.override));
+                                   oldOverride,
+                                   this.override);
 
     }
 
@@ -1709,8 +1709,8 @@ public class StandardContext
         boolean oldReplaceWelcomeFiles = this.replaceWelcomeFiles;
         this.replaceWelcomeFiles = replaceWelcomeFiles;
         support.firePropertyChange("replaceWelcomeFiles",
-                                   new Boolean(oldReplaceWelcomeFiles),
-                                   new Boolean(this.replaceWelcomeFiles));
+                                   oldReplaceWelcomeFiles,
+                                   this.replaceWelcomeFiles);
 
     }
 
@@ -1757,8 +1757,8 @@ public class StandardContext
          */
         this.sessionTimeout = (timeout == 0) ? -1 : timeout;
         support.firePropertyChange("sessionTimeout",
-                                   new Integer(oldSessionTimeout),
-                                   new Integer(this.sessionTimeout));
+                                   oldSessionTimeout,
+                                   this.sessionTimeout);
 
     }
 
@@ -1785,8 +1785,8 @@ public class StandardContext
         boolean oldSwallowOutput = this.swallowOutput;
         this.swallowOutput = swallowOutput;
         support.firePropertyChange("swallowOutput",
-                                   new Boolean(oldSwallowOutput),
-                                   new Boolean(this.swallowOutput));
+                                   oldSwallowOutput,
+                                   this.swallowOutput);
 
     }
 
@@ -1814,8 +1814,8 @@ public class StandardContext
         long oldUnloadDelay = this.unloadDelay;
         this.unloadDelay = unloadDelay;
         support.firePropertyChange("unloadDelay",
-                                   new Long(oldUnloadDelay),
-                                   new Long(this.unloadDelay));
+                                   Long.valueOf(oldUnloadDelay),
+                                   Long.valueOf(this.unloadDelay));
 
     }
 
@@ -2193,7 +2193,7 @@ public class StandardContext
                 if (errorPage.getErrorCode() == 200) {
                     this.okErrorPage = errorPage;
                 }
-                statusPages.put(new Integer(errorPage.getErrorCode()),
+                statusPages.put(Integer.valueOf(errorPage.getErrorCode()),
                                 errorPage);
             }
         }
@@ -2739,7 +2739,7 @@ public class StandardContext
         if (errorCode == 200) {
             return (okErrorPage);
         } else {
-            return (statusPages.get(new Integer(errorCode)));
+            return (statusPages.get(Integer.valueOf(errorCode)));
         }
 
     }
@@ -3047,7 +3047,7 @@ public class StandardContext
      */
     public String findStatusPage(int status) {
 
-        ErrorPage errorPage = statusPages.get(new Integer(status));
+        ErrorPage errorPage = statusPages.get(Integer.valueOf(status));
         if (errorPage!=null) {
             return errorPage.getLocation();
         }
@@ -3368,7 +3368,7 @@ public class StandardContext
                 if (errorPage.getErrorCode() == 200) {
                     this.okErrorPage = null;
                 }
-                statusPages.remove(new Integer(errorPage.getErrorCode()));
+                statusPages.remove(Integer.valueOf(errorPage.getErrorCode()));
             }
         }
         fireContainerEvent("removeErrorPage", errorPage);
@@ -4136,7 +4136,7 @@ public class StandardContext
             int loadOnStartup = wrapper.getLoadOnStartup();
             if (loadOnStartup < 0)
                 continue;
-            Integer key = new Integer(loadOnStartup);
+            Integer key = Integer.valueOf(loadOnStartup);
             ArrayList<Wrapper> list = map.get(key);
             if (list == null) {
                 list = new ArrayList<Wrapper>();
