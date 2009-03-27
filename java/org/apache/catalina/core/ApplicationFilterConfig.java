@@ -32,13 +32,13 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.apache.InstanceManager;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.log.SystemLogHandler;
 
 
