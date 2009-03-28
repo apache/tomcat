@@ -112,60 +112,6 @@ public class B2CConverter {
             log.debug("B2CConverter: " + s );
     }
 
-    // -------------------- Not used - the speed improvemnt is quite small
-
-    /*
-    private Hashtable decoders;
-    public static final boolean useNewString=false;
-    public static final boolean useSpecialDecoders=true;
-    private UTF8Decoder utfD;
-    // private char[] conversionBuff;
-    CharChunk conversionBuf;
-
-
-    private  static String decodeString(ByteChunk mb, String enc)
-        throws IOException
-    {
-        byte buff=mb.getBuffer();
-        int start=mb.getStart();
-        int end=mb.getEnd();
-        if( useNewString ) {
-            if( enc==null) enc="UTF8";
-            return new String( buff, start, end-start, enc );
-        }
-        B2CConverter b2c=null;
-        if( useSpecialDecoders &&
-            (enc==null || "UTF8".equalsIgnoreCase(enc))) {
-            if( utfD==null ) utfD=new UTF8Decoder();
-            b2c=utfD;
-        }
-        if(decoders == null ) decoders=new Hashtable();
-        if( enc==null ) enc="UTF8";
-        b2c=(B2CConverter)decoders.get( enc );
-        if( b2c==null ) {
-            if( useSpecialDecoders ) {
-                if( "UTF8".equalsIgnoreCase( enc ) ) {
-                    b2c=new UTF8Decoder();
-                }
-            }
-            if( b2c==null )
-                b2c=new B2CConverter( enc );
-            decoders.put( enc, b2c );
-        }
-        if( conversionBuf==null ) conversionBuf=new CharChunk(1024);
-
-        try {
-            conversionBuf.recycle();
-            b2c.convert( this, conversionBuf );
-            //System.out.println("XXX 1 " + conversionBuf );
-            return conversionBuf.toString();
-        } catch( IOException ex ) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    */
 }
 
 // -------------------- Private implementation --------------------
