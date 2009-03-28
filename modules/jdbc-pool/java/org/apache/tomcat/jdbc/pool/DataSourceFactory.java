@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Properties;
 
+import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
@@ -406,7 +407,7 @@ public class DataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(OBJECT_NAME);
         if (value != null) {
-            poolProperties.setName(value);
+            poolProperties.setName(ObjectName.quote(value));
         }
 
         return poolProperties;
