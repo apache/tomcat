@@ -139,7 +139,7 @@
       <exclude name="org/apache/tomcat/jdbc/**" />
     </javac>
     <!-- Copy static resource files -->
-    <copy todir="${tomcat.classes}">
+    <copy todir="${tomcat.classes}" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir="java">
         <include name="**/*.properties"/>
