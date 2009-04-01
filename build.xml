@@ -196,7 +196,7 @@
   </patternset>
 
   <patternset id="files.tomcat-api">
-    <include name="org/apache/*" />
+    <include name="org/apache/tomcat/*" />
   </patternset>
   	
   <patternset id="files.catalina">
