@@ -734,7 +734,7 @@ public class WebdavServlet
             return;
         }
 
-        if (req.getInputStream().available() > 0) {
+        if (req.getContentLength() > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
             try {
                 // Document document =
@@ -745,7 +745,7 @@ public class WebdavServlet
 
             } catch(SAXException saxe) {
                 // Parse error - assume invalid content
-                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                resp.sendError(WebdavStatus.SC_UNSUPPORTED_MEDIA_TYPE);
                 return;
             }
         }
