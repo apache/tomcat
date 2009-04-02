@@ -38,10 +38,9 @@ public class ELFunctionMapper {
     /**
      * Creates the functions mappers for all EL expressions in the JSP page.
      *
-     * @param compiler Current compiler, mainly for accessing error dispatcher.
      * @param page The current compilation unit.
      */
-    public static void map(Compiler compiler, Node.Nodes page) 
+    public static void map(Node.Nodes page) 
                 throws JasperException {
 
         ELFunctionMapper map = new ELFunctionMapper();

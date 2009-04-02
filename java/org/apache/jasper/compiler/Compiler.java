@@ -209,7 +209,7 @@ public abstract class Compiler {
             TextOptimizer.concatenate(this, pageNodes);
 
             // Generate static function mapper codes.
-            ELFunctionMapper.map(this, pageNodes);
+            ELFunctionMapper.map(pageNodes);
 
             // generate servlet .java file
             writer = setupContextWriter(javaFileName);
@@ -398,9 +398,8 @@ public abstract class Compiler {
                     + (ctxt.getOptions().getModificationTestInterval() * 1000) > System
                     .currentTimeMillis()) {
                 return false;
-            } else {
-                jsw.setLastModificationTest(System.currentTimeMillis());
             }
+            jsw.setLastModificationTest(System.currentTimeMillis());
         }
 
         long jspRealLastModified = 0;
