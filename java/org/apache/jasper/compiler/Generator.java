@@ -164,7 +164,7 @@ class Generator {
         return b.toString();
     }
 
-    private String createJspId() throws JasperException {
+    private String createJspId() {
         if (this.jspIdPrefix == null) {
             StringBuffer sb = new StringBuffer(32);
             String name = ctxt.getServletJavaFileName();
@@ -459,7 +459,7 @@ class Generator {
      * Generate preamble package name (shared by servlet and tag handler
      * preamble generation)
      */
-    private void genPreamblePackage(String packageName) throws JasperException {
+    private void genPreamblePackage(String packageName) {
         if (!"".equals(packageName) && packageName != null) {
             out.printil("package " + packageName + ";");
             out.println();
@@ -470,7 +470,7 @@ class Generator {
      * Generate preamble imports (shared by servlet and tag handler preamble
      * generation)
      */
-    private void genPreambleImports() throws JasperException {
+    private void genPreambleImports() {
         Iterator<String> iter = pageInfo.getImports().iterator();
         while (iter.hasNext()) {
             out.printin("import ");
@@ -486,7 +486,7 @@ class Generator {
      * list, el function map, prefix map. (shared by servlet and tag handler
      * preamble generation)
      */
-    private void genPreambleStaticInitializers() throws JasperException {
+    private void genPreambleStaticInitializers() {
         out.printil("private static final JspFactory _jspxFactory = JspFactory.getDefaultFactory();");
         out.println();
 
@@ -519,7 +519,7 @@ class Generator {
      *
      * In JSP 2.1, we also scope an instance of ExpressionFactory
      */
-    private void genPreambleClassVariableDeclarations() throws JasperException {
+    private void genPreambleClassVariableDeclarations() {
         if (isPoolingEnabled && !tagHandlerPoolNames.isEmpty()) {
             for (int i = 0; i < tagHandlerPoolNames.size(); i++) {
                 out.printil("private org.apache.jasper.runtime.TagHandlerPool "
@@ -540,7 +540,7 @@ class Generator {
      * Declare general-purpose methods (shared by servlet and tag handler
      * preamble generation)
      */
-    private void genPreambleMethods() throws JasperException {
+    private void genPreambleMethods() {
         // Method used to get compile time file dependencies
         out.printil("public java.util.List<String> getDependants() {");
         out.pushIndent();
@@ -754,8 +754,7 @@ class Generator {
          */
         public GenerateVisitor(boolean isTagFile, ServletWriter out,
                 ArrayList<GenBuffer> methodsBuffered,
-                FragmentHelperClass fragmentHelperClass, ClassLoader loader,
-                TagInfo tagInfo) {
+                FragmentHelperClass fragmentHelperClass) {
 
             this.isTagFile = isTagFile;
             this.out = out;
@@ -1029,7 +1028,7 @@ class Generator {
          * Finds the <jsp:body> subelement of the given parent node. If not
          * found, null is returned.
          */
-        private Node.JspBody findJspBody(Node parent) throws JasperException {
+        private Node.JspBody findJspBody(Node parent) {
             Node.JspBody result = null;
 
             Node.Nodes subelements = parent.getBody();
@@ -2720,9 +2719,8 @@ class Generator {
         private String getJspContextVar() {
             if (this.isTagFile) {
                 return "this.getJspContext()";
-            } else {
-                return "_jspx_page_context";
             }
+            return "_jspx_page_context";
         }
 
         private String getExpressionFactoryVar() {
@@ -2910,8 +2908,8 @@ class Generator {
          *
          * @return the name of the map
          */
-        private String generateAliasMap(Node.CustomTag n, String tagHandlerVar)
-                throws JasperException {
+        private String generateAliasMap(Node.CustomTag n,
+                String tagHandlerVar) {
 
             TagVariableInfo[] tagVars = n.getTagVariableInfos();
             String aliasMapVar = null;
@@ -3045,8 +3043,7 @@ class Generator {
          * jsp:attribute standard action), and false otherwise
          */
         private String convertString(Class<?> c, String s, String attrName,
-                Class<?> propEditorClass, boolean isNamedAttribute)
-                throws JasperException {
+                Class<?> propEditorClass, boolean isNamedAttribute) {
 
             String quoted = s;
             if (!isNamedAttribute) {
@@ -3139,7 +3136,7 @@ class Generator {
             // body. The implementation of this fragment can come from
             // the org.apache.jasper.runtime package as a support class.
             FragmentHelperClass.Fragment fragment = fragmentHelperClass
-                    .openFragment(n, tagHandlerVar, methodNesting);
+                    .openFragment(n, methodNesting);
             ServletWriter outSave = out;
             out = fragment.getGenBuffer().getOut();
             String tmpParent = parent;
@@ -3404,16 +3401,14 @@ class Generator {
             gen.generateXmlProlog(page);
             gen.fragmentHelperClass.generatePreamble();
             page.visit(gen.new GenerateVisitor(gen.ctxt.isTagFile(), out,
-                    gen.methodsBuffered, gen.fragmentHelperClass, gen.ctxt
-                            .getClassLoader(), tagInfo));
+                    gen.methodsBuffered, gen.fragmentHelperClass));
             gen.generateTagHandlerPostamble(tagInfo);
         } else {
             gen.generatePreamble(page);
             gen.generateXmlProlog(page);
             gen.fragmentHelperClass.generatePreamble();
             page.visit(gen.new GenerateVisitor(gen.ctxt.isTagFile(), out,
-                    gen.methodsBuffered, gen.fragmentHelperClass, gen.ctxt
-                            .getClassLoader(), null));
+                    gen.methodsBuffered, gen.fragmentHelperClass));
             gen.generatePostamble();
         }
     }
@@ -3572,8 +3567,7 @@ class Generator {
      * Generates declarations for tag handler attributes, and defines the getter
      * and setter methods for each.
      */
-    private void generateTagHandlerAttributes(TagInfo tagInfo)
-            throws JasperException {
+    private void generateTagHandlerAttributes(TagInfo tagInfo) {
 
         if (tagInfo.hasDynamicAttributes()) {
             out.printil("private java.util.HashMap _jspx_dynamic_attrs = new java.util.HashMap();");
@@ -3595,58 +3589,56 @@ class Generator {
         out.println();
 
         // Define attribute getter and setter methods
-        if (attrInfos != null) {
-            for (int i = 0; i < attrInfos.length; i++) {
-                // getter method
-                out.printin("public ");
-                if (attrInfos[i].isFragment()) {
-                    out.print("javax.servlet.jsp.tagext.JspFragment ");
-                } else {
-                    out.print(JspUtil.toJavaSourceType(attrInfos[i]
-                            .getTypeName()));
-                    out.print(" ");
-                }
-                out.print(toGetterMethod(attrInfos[i].getName()));
-                out.println(" {");
-                out.pushIndent();
-                out.printin("return this.");
-                out.print(attrInfos[i].getName());
-                out.println(";");
-                out.popIndent();
-                out.printil("}");
-                out.println();
-
-                // setter method
-                out.printin("public void ");
-                out.print(toSetterMethodName(attrInfos[i].getName()));
-                if (attrInfos[i].isFragment()) {
-                    out.print("(javax.servlet.jsp.tagext.JspFragment ");
-                } else {
-                    out.print("(");
-                    out.print(JspUtil.toJavaSourceType(attrInfos[i]
-                            .getTypeName()));
-                    out.print(" ");
-                }
-                out.print(attrInfos[i].getName());
-                out.println(") {");
-                out.pushIndent();
-                out.printin("this.");
-                out.print(attrInfos[i].getName());
-                out.print(" = ");
-                out.print(attrInfos[i].getName());
-                out.println(";");
-                if (ctxt.isTagFile()) {
-                    // Tag files should also set jspContext attributes
-                    out.printin("jspContext.setAttribute(\"");
-                    out.print(attrInfos[i].getName());
-                    out.print("\", ");
-                    out.print(attrInfos[i].getName());
-                    out.println(");");
-                }
-                out.popIndent();
-                out.printil("}");
-                out.println();
+        for (int i = 0; i < attrInfos.length; i++) {
+            // getter method
+            out.printin("public ");
+            if (attrInfos[i].isFragment()) {
+                out.print("javax.servlet.jsp.tagext.JspFragment ");
+            } else {
+                out.print(JspUtil.toJavaSourceType(attrInfos[i]
+                        .getTypeName()));
+                out.print(" ");
             }
+            out.print(toGetterMethod(attrInfos[i].getName()));
+            out.println(" {");
+            out.pushIndent();
+            out.printin("return this.");
+            out.print(attrInfos[i].getName());
+            out.println(";");
+            out.popIndent();
+            out.printil("}");
+            out.println();
+
+            // setter method
+            out.printin("public void ");
+            out.print(toSetterMethodName(attrInfos[i].getName()));
+            if (attrInfos[i].isFragment()) {
+                out.print("(javax.servlet.jsp.tagext.JspFragment ");
+            } else {
+                out.print("(");
+                out.print(JspUtil.toJavaSourceType(attrInfos[i]
+                        .getTypeName()));
+                out.print(" ");
+            }
+            out.print(attrInfos[i].getName());
+            out.println(") {");
+            out.pushIndent();
+            out.printin("this.");
+            out.print(attrInfos[i].getName());
+            out.print(" = ");
+            out.print(attrInfos[i].getName());
+            out.println(";");
+            if (ctxt.isTagFile()) {
+                // Tag files should also set jspContext attributes
+                out.printin("jspContext.setAttribute(\"");
+                out.print(attrInfos[i].getName());
+                out.print("\", ");
+                out.print(attrInfos[i].getName());
+                out.println(");");
+            }
+            out.popIndent();
+            out.printil("}");
+            out.println();
         }
     }
 
@@ -3975,6 +3967,7 @@ class Generator {
                         }
                     });
                 } catch (JasperException ex) {
+                    // Ignore
                 }
             }
         }
@@ -4060,8 +4053,8 @@ class Generator {
             out.printil("}");
         }
 
-        public Fragment openFragment(Node parent, String tagHandlerVar,
-                int methodNesting) throws JasperException {
+        public Fragment openFragment(Node parent, int methodNesting)
+        throws JasperException {
             Fragment result = new Fragment(fragments.size(), parent);
             fragments.add(result);
             this.used = true;
