@@ -19,6 +19,7 @@
 package org.apache.catalina.servlets;
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -463,7 +464,7 @@ public class WebdavServlet
 
         Node propNode = null;
         
-        if (req.getInputStream().available() > 0) {
+        if (req.getContentLength() > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
     
             try {
@@ -494,9 +495,11 @@ public class WebdavServlet
                     }
                 }
             } catch (SAXException e) {
-                // Something went wrong - use the defaults.
+                // Something went wrong - bad request
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             } catch (IOException e) {
-                // Something went wrong - use the defaults.
+                // Something went wrong - bad request
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             }
         }
 
@@ -1662,14 +1665,20 @@ public class WebdavServlet
                                       path, destinationPath);
 
         if ((!result) || (!errorList.isEmpty())) {
-
-            sendReport(req, resp, errorList);
+            if (errorList.size() == 1) {
+                resp.sendError(errorList.elements().nextElement().intValue());
+            } else {
+                sendReport(req, resp, errorList);
+            }
             return false;
-
         }
 
         // Copy was successful
-        resp.setStatus(WebdavStatus.SC_CREATED);
+        if (exists) {
+            resp.setStatus(WebdavStatus.SC_NO_CONTENT);
+        } else {
+            resp.setStatus(WebdavStatus.SC_CREATED);
+        }
 
         // Removing any lock-null resource which would be present at
         // the destination path
@@ -1739,9 +1748,15 @@ public class WebdavServlet
                 try {
                     resources.bind(dest, object);
                 } catch (NamingException e) {
-                    errorList.put
-                        (source,
-                         new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    if (e.getCause() instanceof FileNotFoundException) {
+                        // We know the source exists so it must be the
+                        // destination dir that can't be found
+                        errorList.put(source,
+                                new Integer(WebdavStatus.SC_CONFLICT));
+                    } else {
+                        errorList.put(source,
+                                new Integer(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    }
                     return false;
                 }
             } else {
