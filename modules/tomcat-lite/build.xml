@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<project name="Tomcat Lite" default="tomcat-lite.jar" basedir="../..">
+
+    <property file="${user.home}/build.properties" />
+    <property file="${basedir}/build.properties" />
+    <property file="${basedir}/build.properties.default" />
+
+    <property name="tomcat.build" value="${basedir}/output/build" />
+    <property name="tomcat.src" value="${basedir}/java" />
+    <property name="tomcat.lite.src" value="${basedir}/modules/tomcat-lite" />
+    
+    <property name="classes" value="${basedir}/output/tomcat-lite/classes" />
+    <property name="jar.dir" value="${basedir}/output/tomcat-lite/" />
+
+    <target name="compile">
+        <mkdir dir="${classes}" />
+	<!-- Tomcat deps first -->
+        <javac destdir="${classes}"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               source="${compile.source}"
+               optimize="${compile.optimize}"
+               srcdir="${tomcat.src}"
+        >
+            <include name="javax/servlet/**" />
+            <include name="javax/annotation/**" />
+            <!--include name="org/apache/coyote/**" />
+            <include name="org/apache/tomcat/util/**" /-->
+            <includesfile name="${tomcat.lite.src}/coyote-nio.files"/>
+            <include name="org/apache/jasper/**" />
+        </javac>
+
+        <javac destdir="${classes}"
+               debug="${compile.debug}"
+               deprecation="${compile.deprecation}"
+               source="${compile.source}"
+               optimize="${compile.optimize}"
+        >
+            <src path="${tomcat.lite.src}/java" />
+        </javac>
+
+        <copy todir="${classes}">
+            <fileset dir="${tomcat.lite.src}/java" includes="**/*.properties **/*.xml" />
+            <fileset dir="${tomcat.src}"
+                     includes="org/apache/tomcat/util/**/*.properties org/apache/tomcat/util/**/*.xml"
+            />
+            <fileset dir="${tomcat.src}"
+                     includes="javax/servlet/**/*.properties"
+            />
+            <fileset dir="${tomcat.src}"
+                     includes="org/apache/coyote/**/*.properties org/apache/coyote/**/*.xml"
+            />
+        </copy>
+
+    </target>
+
+    <target name="clean">
+        <delete dir="${classes}" includes="**" />
+        <delete dir="${jar.dir}" includes="**" />
+        <delete dir="${jar.dir}/jar" includes="**" />
+    </target>
+
+    <target name="tomcat-lite.jar" depends="compile,pack_tomcat-lite.jar" />
+
+    <target name="pack_tomcat-lite.jar">
+        <!-- individually packed jars for servlet support-->
+        <mkdir dir="${jar.dir}/jar" />
+        <jar destfile="${jar.dir}/jar/tomcat-lite.jar">
+            <manifest>
+                  <attribute name="Main-Class" value="org.apache.tomcat.lite.cli.Main"/>
+              </manifest>
+            <fileset dir="${classes}">
+                <include name ="org/apache/tomcat/lite/**" />
+                <include name ="org/apache/tomcat/servlets/**" />
+            </fileset>
+        </jar>
+	<copy file="${tomcat.build}/lib/annotations-api.jar" todir="${jar.dir}/jar"/>
+	<copy file="${tomcat.build}/lib/servlet-api.jar" todir="${jar.dir}/jar"/>
+        <copy file="${tomcat.build}/lib/tomcat-coyote.jar" todir="${jar.dir}/jar"/>
+        
+        <!-- Jasper jars -->
+        <mkdir dir="${jar.dir}/jasper" />
+        <copy file="${tomcat.build}/lib/el-api.jar" todir="${jar.dir}/jasper"/> 
+        <copy file="${tomcat.build}/lib/jsp-api.jar" todir="${jar.dir}/jasper"/>
+        <copy file="${tomcat.build}/lib/jasper.jar" todir="${jar.dir}/jasper"/> 
+        <copy file="${tomcat.build}/lib/jasper-el.jar" todir="${jar.dir}/jasper"/>
+        
+        <!-- Bundles -->
+        <!-- All included: javax, jasper, coyote, tomcat-lite -->
+        <jar destfile="${jar.dir}/tomcat-lite-all.jar">
+            <manifest>
+                  <attribute name="Main-Class" value="org.apache.tomcat.lite.cli.Main"/>
+              </manifest>
+            <fileset dir="${classes}">
+            </fileset>
+        </jar>
+
+        <!-- Tomcat lite without jasper -->
+        <jar destfile="${jar.dir}/tomcat-lite+javax+coyote.jar">
+             <manifest>
+                 <attribute name="Main-Class" value="org.apache.tomcat.lite.cli.Main"/>
+             </manifest>
+             <fileset dir="${classes}">
+                 <exclude name ="org/apache/jasper/**" />
+                 <exclude name ="org/apache/el/**" />
+             </fileset>
+        </jar>
+        
+        
+    </target>
+
+    <target name="run">
+        <java jar="${jar.dir}/tomcat-lite-ALL.jar"/>
+    </target>
+    
+</project>
