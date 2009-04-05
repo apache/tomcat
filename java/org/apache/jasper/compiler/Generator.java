@@ -530,7 +530,7 @@ class Generator {
         out.printin("private javax.el.ExpressionFactory ");
         out.print(VAR_EXPRESSIONFACTORY);
         out.println(";");
-        out.printin("private org.apache.InstanceManager ");
+        out.printin("private org.apache.tomcat.InstanceManager ");
         out.print(VAR_INSTANCEMANAGER);
         out.println(";");
         out.println();
