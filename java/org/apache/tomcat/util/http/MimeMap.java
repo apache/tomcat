@@ -36,6 +36,7 @@ public class MimeMap implements FileNameMap {
         new Hashtable<String,String>(101);
     static {
         defaultMap.put("txt", "text/plain");
+        defaultMap.put("css", "text/css");
         defaultMap.put("html","text/html");
         defaultMap.put("htm", "text/html");
         defaultMap.put("gif", "image/gif");
@@ -144,6 +145,10 @@ public class MimeMap implements FileNameMap {
         return map.keys();
     }
 
+    public String getMimeType(String ext) {
+        return getContentTypeFor(ext);
+    }
+    
     public String getContentType(String extn) {
         String type = map.get(extn.toLowerCase());
         if(type == null) type = defaultMap.get(extn);
