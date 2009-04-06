@@ -46,7 +46,7 @@ import org.apache.tomcat.util.modeler.Registry;
 public class HeartbeatListener
     implements LifecycleListener, ContainerListener {
 
-    public static Log log = LogFactory.getLog(HeartbeatListener.class);
+    private static Log log = LogFactory.getLog(HeartbeatListener.class);
 
     /* To allow to select the connector */
     int port = 0;
@@ -59,9 +59,14 @@ public class HeartbeatListener
     InetAddress group = null;
     String ip = "224.0.1.105"; /* Multicast IP */
     int multiport = 23364;     /* Multicast Port */
+    int ttl = 16;
 
     public void setGroup(String ip) { this.ip = ip; }
+    public String getGroup() { return ip; }
     public void setMultiport(int multiport) { this.multiport = multiport; }
+    public int getMultiport() { return multiport; }
+    public void setTtl(int ttl) { this.ttl = ttl; }
+    public int getTtl() { return ttl; }
 
     private CollectedInfo coll = null;
 
@@ -83,10 +88,8 @@ public class HeartbeatListener
                     return;
                 } 
             }
-// * *msg_format = "v=%u&ready=%u&busy=%u"; (message to send).
-// v = version (1)
-// ready & ready are read from the scoreboard in httpd.
-// Endpoint ( getCurrentThreadsBusy ) ( getMaxThreads )
+
+            /* Read busy and ready */
             if (coll == null) {
                 try {
                     coll = new CollectedInfo(host, port);
@@ -116,7 +119,6 @@ public class HeartbeatListener
                 s.send(data);
             } catch (Exception ex) {
                 log.error("Unable to send colllected load information: " + ex);
-                System.out.println(ex);
                 s.close();
                 s = null;
             }
