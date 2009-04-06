@@ -204,7 +204,6 @@
     <include name="org/apache/naming/**" />
     <!-- Modules -->
     <exclude name="org/apache/catalina/ant/**" />
-    <exclude name="org/apache/catalina/cluster/**" />
     <exclude name="org/apache/catalina/ha/**" />
     <exclude name="org/apache/catalina/mbeans/JmxRemote*" />
     <exclude name="org/apache/catalina/tribes/**" />
