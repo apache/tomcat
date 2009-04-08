@@ -110,8 +110,7 @@ class PageInfo {
         this.prefixes = new HashSet<String>();
 
         // Enter standard imports
-        for(int i = 0; i < Constants.STANDARD_IMPORTS.length; i++)
-            imports.add(Constants.STANDARD_IMPORTS[i]);
+        imports.addAll(Constants.STANDARD_IMPORTS);
     }
 
     /**
