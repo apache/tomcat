@@ -193,10 +193,11 @@ class MyEntityResolver implements EntityResolver {
 
     public InputSource resolveEntity(String publicId, String systemId)
             throws SAXException {
-        for (int i = 0; i < Constants.CACHED_DTD_PUBLIC_IDS.length; i++) {
-            String cachedDtdPublicId = Constants.CACHED_DTD_PUBLIC_IDS[i];
+        for (int i = 0; i < Constants.CACHED_DTD_PUBLIC_IDS.size(); i++) {
+            String cachedDtdPublicId = Constants.CACHED_DTD_PUBLIC_IDS.get(i);
             if (cachedDtdPublicId.equals(publicId)) {
-                String resourcePath = Constants.CACHED_DTD_RESOURCE_PATHS[i];
+                String resourcePath =
+                    Constants.CACHED_DTD_RESOURCE_PATHS.get(i);
                 InputStream input = this.getClass().getResourceAsStream(
                         resourcePath);
                 if (input == null) {
