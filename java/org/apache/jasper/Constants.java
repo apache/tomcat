@@ -17,6 +17,10 @@
 
 package org.apache.jasper;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 
 /**
  * Some constants and other global data that are used by the compiler and the runtime.
@@ -51,11 +55,13 @@ public class Constants {
      * These classes/packages are automatically imported by the
      * generated code. 
      */
-    public static final String[] STANDARD_IMPORTS = { 
+    private static final String[] PRIVATE_STANDARD_IMPORTS = { 
 	"javax.servlet.*", 
 	"javax.servlet.http.*", 
 	"javax.servlet.jsp.*"
     };
+    public static final List<String> STANDARD_IMPORTS =
+        Collections.unmodifiableList(Arrays.asList(PRIVATE_STANDARD_IMPORTS));
 
     /**
      * ServletContext attribute for classpath. This is tomcat specific. 
@@ -152,18 +158,25 @@ public class Constants {
      * an EntityResolver to return the location of the
      * cached copy of a DTD.
      */
-    public static final String[] CACHED_DTD_PUBLIC_IDS = {
+    // TODO Add 2.4, 2.5, 3.0
+    private static final String[] PRIVATE_CACHED_DTD_PUBLIC_IDS = {
 	TAGLIB_DTD_PUBLIC_ID_11,
 	TAGLIB_DTD_PUBLIC_ID_12,
 	WEBAPP_DTD_PUBLIC_ID_22,
 	WEBAPP_DTD_PUBLIC_ID_23,
     };
-    public static final String[] CACHED_DTD_RESOURCE_PATHS = {
+    public static final List<String> CACHED_DTD_PUBLIC_IDS =
+        Collections.unmodifiableList(
+                Arrays.asList(PRIVATE_CACHED_DTD_PUBLIC_IDS));
+    private static final String[] PRIVATE_CACHED_DTD_RESOURCE_PATHS = {
 	TAGLIB_DTD_RESOURCE_PATH_11,
 	TAGLIB_DTD_RESOURCE_PATH_12,
 	WEBAPP_DTD_RESOURCE_PATH_22,
 	WEBAPP_DTD_RESOURCE_PATH_23,
     };
+    public static final List<String> CACHED_DTD_RESOURCE_PATHS =
+        Collections.unmodifiableList(
+                Arrays.asList(PRIVATE_CACHED_DTD_RESOURCE_PATHS));
     
     /**
      * Default URLs to download the pluging for Netscape and IE.
