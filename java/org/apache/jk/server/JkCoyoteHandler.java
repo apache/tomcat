@@ -195,8 +195,8 @@ public class JkCoyoteHandler extends JkHandler implements ProtocolHandler {
             res.finish();
         }
 
-        req.recycle();
         req.updateCounters();
+        req.recycle();
         res.recycle();
         ep.recycle();
         if( ep.getStatus() == MsgContext.JK_STATUS_ERROR ) {
