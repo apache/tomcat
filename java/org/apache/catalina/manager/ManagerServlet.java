@@ -834,10 +834,10 @@ public class ManagerServlet
         Container[] contexts = host.findChildren();
         for (int i = 0; i < contexts.length; i++) {
             Context context = (Context) contexts[i];
-            String displayPath = context.getPath();
-            if( displayPath.equals("") )
-                displayPath = "/";
             if (context != null ) {
+                String displayPath = context.getPath();
+                if( displayPath.equals("") )
+                    displayPath = "/";
                 if (context.getAvailable()) {
                     writer.println(sm.getString("managerServlet.listitem",
                                                 displayPath,
