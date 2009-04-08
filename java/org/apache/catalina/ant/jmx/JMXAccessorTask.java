@@ -91,11 +91,11 @@ import org.apache.tools.ant.Project;
 
 public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
+    public static final String JMX_SERVICE_PREFIX = "service:jmx:rmi:///jndi/rmi://";
+
+    public static final String JMX_SERVICE_SUFFIX = "/jmxrmi";
+
     // ----------------------------------------------------- Instance Variables
-
-    public static String JMX_SERVICE_PREFIX = "service:jmx:rmi:///jndi/rmi://";
-
-    public static String JMX_SERVICE_SUFFIX = "/jmxrmi";
 
     private String name = null;
 
