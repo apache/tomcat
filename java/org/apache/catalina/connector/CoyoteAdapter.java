@@ -510,6 +510,16 @@ public class CoyoteAdapter
         }
 
         // Parse session Id
+        if (!request.getServletContext().getEffectiveSessionTrackingModes()
+                .contains(SessionTrackingMode.URL)) {
+            /* 
+             * If we saw an ID in the URL but this is disabled - remove it
+             * Can't handle it when we parse the URL as we don't have the
+             * context at that point
+             */
+            request.setRequestedSessionId(null);
+            request.setRequestedSessionURL(false);
+        }
         parseSessionCookiesId(req, request);
         parseSessionSslId(request);
         return true;
@@ -543,9 +553,7 @@ public class CoyoteAdapter
         ByteChunk uriBC = req.requestURI().getByteChunk();
         int semicolon = uriBC.indexOf(match, 0, match.length(), 0);
 
-        if (semicolon > 0 &&
-                request.getServletContext().getEffectiveSessionTrackingModes()
-                        .contains(SessionTrackingMode.URL)) {
+        if (semicolon > 0) {
 
             // Parse session ID, and extract it from the decoded request URI
             int start = uriBC.getStart();
