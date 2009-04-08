@@ -193,12 +193,5 @@ public class Constants {
         "</html>";
     public static final String CHARSET="utf-8";
 
-    // FIXME need we this?
-    public static final String XML_DECLARATION =
-        "<?xml version=\"1.0\" encoding=\""+CHARSET+"\"?>";
-		
-    public static final String XML_STYLE =
-        "<?xml-stylesheet type=\"text/xsl\" href=\"/manager/xform.xsl\" ?>";
-
 }
 
