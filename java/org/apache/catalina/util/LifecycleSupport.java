@@ -66,6 +66,8 @@ public final class LifecycleSupport {
      * The set of registered LifecycleListeners for event notifications.
      */
     private LifecycleListener listeners[] = new LifecycleListener[0];
+    
+    private final Object listenersLock = new Object(); // Lock object for changes to listeners
 
 
     // --------------------------------------------------------- Public Methods
@@ -78,7 +80,7 @@ public final class LifecycleSupport {
      */
     public void addLifecycleListener(LifecycleListener listener) {
 
-      synchronized (listeners) {
+      synchronized (listenersLock) {
           LifecycleListener results[] =
             new LifecycleListener[listeners.length + 1];
           for (int i = 0; i < listeners.length; i++)
@@ -126,7 +128,7 @@ public final class LifecycleSupport {
      */
     public void removeLifecycleListener(LifecycleListener listener) {
 
-        synchronized (listeners) {
+        synchronized (listenersLock) {
             int n = -1;
             for (int i = 0; i < listeners.length; i++) {
                 if (listeners[i] == listener) {

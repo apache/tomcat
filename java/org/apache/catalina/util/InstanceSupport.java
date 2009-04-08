@@ -64,6 +64,8 @@ public final class InstanceSupport {
      * The set of registered InstanceListeners for event notifications.
      */
     private InstanceListener listeners[] = new InstanceListener[0];
+    
+    private final Object listenersLock = new Object(); // Lock object for changes to listeners
 
 
     /**
@@ -95,7 +97,7 @@ public final class InstanceSupport {
      */
     public void addInstanceListener(InstanceListener listener) {
 
-      synchronized (listeners) {
+      synchronized (listenersLock) {
           InstanceListener results[] =
             new InstanceListener[listeners.length + 1];
           for (int i = 0; i < listeners.length; i++)
@@ -312,7 +314,7 @@ public final class InstanceSupport {
      */
     public void removeInstanceListener(InstanceListener listener) {
 
-        synchronized (listeners) {
+        synchronized (listenersLock) {
             int n = -1;
             for (int i = 0; i < listeners.length; i++) {
                 if (listeners[i] == listener) {

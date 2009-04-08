@@ -72,6 +72,8 @@ public class StandardHost
      * The set of aliases for this Host.
      */
     private String[] aliases = new String[0];
+    
+    private final Object aliasesLock = new Object();
 
 
     /**
@@ -514,20 +516,19 @@ public class StandardHost
 
         alias = alias.toLowerCase();
 
-        // Skip duplicate aliases
-        for (int i = 0; i < aliases.length; i++) {
-            if (aliases[i].equals(alias))
-                return;
+        synchronized (aliasesLock) {
+            // Skip duplicate aliases
+            for (int i = 0; i < aliases.length; i++) {
+                if (aliases[i].equals(alias))
+                    return;
+            }
+            // Add this alias to the list
+            String newAliases[] = new String[aliases.length + 1];
+            for (int i = 0; i < aliases.length; i++)
+                newAliases[i] = aliases[i];
+            newAliases[aliases.length] = alias;
+            aliases = newAliases;
         }
-
-        // Add this alias to the list
-        String newAliases[] = new String[aliases.length + 1];
-        for (int i = 0; i < aliases.length; i++)
-            newAliases[i] = aliases[i];
-        newAliases[aliases.length] = alias;
-
-        aliases = newAliases;
-
         // Inform interested listeners
         fireContainerEvent(ADD_ALIAS_EVENT, alias);
 
@@ -556,7 +557,9 @@ public class StandardHost
      */
     public String[] findAliases() {
 
-        return (this.aliases);
+        synchronized (aliasesLock) {
+            return (this.aliases);
+        }
 
     }
 
@@ -631,7 +634,7 @@ public class StandardHost
 
         alias = alias.toLowerCase();
 
-        synchronized (aliases) {
+        synchronized (aliasesLock) {
 
             // Make sure this alias is currently present
             int n = -1;
@@ -766,7 +769,9 @@ public class StandardHost
      }
 
     public String[] getAliases() {
-        return aliases;
+        synchronized (aliasesLock) {
+            return aliases;
+        }
     }
 
     private boolean initialized=false;
