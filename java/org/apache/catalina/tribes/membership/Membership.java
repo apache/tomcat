@@ -41,6 +41,8 @@ public class Membership
 {
     protected static final MemberImpl[] EMPTY_MEMBERS = new MemberImpl[0];
     
+    private final Object membersLock = new Object();
+    
     /**
      * The name of this membership, has to be the same as the name for the local
      * member
@@ -63,7 +65,7 @@ public class Membership
     protected Comparator<Member> memberComparator = new MemberComparator();
 
     public Object clone() {
-        synchronized (members) {
+        synchronized (membersLock) {
             Membership clone = new Membership(local, memberComparator);
             clone.map = (HashMap<MemberImpl, MbrEntry>) map.clone();
             clone.members = new MemberImpl[members.length];
@@ -139,7 +141,7 @@ public class Membership
      * @param member The member to add
      */
     public synchronized MbrEntry addMember(MemberImpl member) {
-      synchronized (members) {
+      synchronized (membersLock) {
           MbrEntry entry = new MbrEntry(member);
           if (!map.containsKey(member) ) {
               map.put(member, entry);
@@ -160,7 +162,7 @@ public class Membership
      */
     public void removeMember(MemberImpl member) {
         map.remove(member);
-        synchronized (members) {
+        synchronized (membersLock) {
             int n = -1;
             for (int i = 0; i < members.length; i++) {
                 if (members[i] == member || members[i].equals(member)) {
