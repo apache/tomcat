@@ -29,11 +29,6 @@ import org.apache.juli.logging.LogFactory;
 
 import org.apache.catalina.connector.Connector;
 
-import java.net.MulticastSocket;
-import java.net.InetAddress;
-import java.net.DatagramPacket;
-import java.io.UnsupportedEncodingException;
-
 import org.apache.tomcat.util.modeler.Registry;
 
 /*
@@ -66,6 +61,20 @@ public class HeartbeatListener
     public void setTtl(int ttl) { this.ttl = ttl; }
     public int getTtl() { return ttl; }
 
+    /**
+     * Proxy list, format "address:port,address:port".
+     */
+    protected String proxyList = null;
+    public String getProxyList() { return proxyList; }
+    public void setProxyList(String proxyList) { this.proxyList = proxyList; }
+
+    /**
+     * URL prefix.
+     */
+    protected String proxyURL = "/HeartbeatListener";
+    public String getProxyURL() { return proxyURL; }
+    public void setProxyURL(String proxyURL) { this.proxyURL = proxyURL; }
+
     private CollectedInfo coll = null;
 
     private Sender sender = null;
@@ -77,8 +86,18 @@ public class HeartbeatListener
         Object source = event.getLifecycle();
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
             if (sender == null) {
-                sender = new MultiCastSender();
-                sender.init(this);
+                if (proxyList == null)
+                    sender = new MultiCastSender();
+                else
+                    sender = new TcpSender();
+
+                try {
+                    sender.init(this);
+                } catch (Exception ex) {
+                    log.error("Unable to initialize Sender: " + ex);
+                    sender = null;
+                    return;
+                }
             }
 
             /* Read busy and ready */
