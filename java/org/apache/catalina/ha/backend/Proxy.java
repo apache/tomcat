@@ -18,19 +18,17 @@
 
 package org.apache.catalina.ha.backend;
 
+import java.net.InetAddress;
+
 /*
- * Interface to send data to proxies
+ * This class represents a front-end httpd server.
  *
  */
-public interface Sender {
+public class Proxy {
 
-  /**
-   * Set the configuration parameters
-   */
-  public void init(HeartbeatListener config) throws Exception;
+  protected enum State { OK, ERROR, DOWN };
 
-  /**
-   * Send the message to the proxies
-   */
-  public int send(String mess) throws Exception;
+  public InetAddress address = null;
+  public int port = 80;
+  public State state = State.OK;
 }
