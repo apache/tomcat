@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.catalina.cluster;
+package org.apache.catalina.ha.backend;
 
 /* for MBean to read ready and busy */
 

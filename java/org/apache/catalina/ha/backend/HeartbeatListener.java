@@ -16,7 +16,7 @@
  */
 
 
-package org.apache.catalina.cluster;
+package org.apache.catalina.ha.backend;
 
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
