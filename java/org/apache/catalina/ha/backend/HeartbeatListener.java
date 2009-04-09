@@ -55,8 +55,6 @@ public class HeartbeatListener
     public void setPort(int port) { this.port = port; }
 
     /* for multicasting stuff */
-    MulticastSocket s = null;
-    InetAddress group = null;
     String ip = "224.0.1.105"; /* Multicast IP */
     int multiport = 23364;     /* Multicast Port */
     int ttl = 16;
@@ -70,23 +68,17 @@ public class HeartbeatListener
 
     private CollectedInfo coll = null;
 
+    private Sender sender = null;
+
     public void containerEvent(ContainerEvent event) {
     }
 
     public void lifecycleEvent(LifecycleEvent event) {
         Object source = event.getLifecycle();
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
-            if (s == null) {
-                try {
-                    group = InetAddress.getByName(ip);
-                    s = new MulticastSocket(port);
-                    s.setTimeToLive(16);
-                    s.joinGroup(group);
-                } catch (Exception ex) {
-                    log.error("Unable to use multicast: " + ex);
-                    s = null;
-                    return;
-                } 
+            if (sender == null) {
+                sender = new MultiCastSender();
+                sender.init(this);
             }
 
             /* Read busy and ready */
@@ -108,19 +100,10 @@ public class HeartbeatListener
             }
             String output = new String();
             output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy;
-            byte[] buf;
             try {
-                buf = output.getBytes("US-ASCII");
-            } catch (UnsupportedEncodingException ex) {
-                buf = output.getBytes();
-            }
-            DatagramPacket data = new DatagramPacket(buf, buf.length, group, multiport);
-            try {
-                s.send(data);
+                sender.send(output);
             } catch (Exception ex) {
                 log.error("Unable to send colllected load information: " + ex);
-                s.close();
-                s = null;
             }
         }
     }
