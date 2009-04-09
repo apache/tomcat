@@ -849,17 +849,19 @@ public class Http11NioProcessor implements ActionHook {
                 error = true;
             }
 
-            // Setting up filters, and parse some request headers
-            rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
-            try {
-                prepareRequest();
-            } catch (Throwable t) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("http11processor.request.prepare"), t);
+            if (!error) {
+                // Setting up filters, and parse some request headers
+                rp.setStage(org.apache.coyote.Constants.STAGE_PREPARE);
+                try {
+                    prepareRequest();
+                } catch (Throwable t) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("http11processor.request.prepare"), t);
+                    }
+                    // 400 - Internal Server Error
+                    response.setStatus(400);
+                    error = true;
                 }
-                // 400 - Internal Server Error
-                response.setStatus(400);
-                error = true;
             }
             
             if (maxKeepAliveRequests == 1 )
