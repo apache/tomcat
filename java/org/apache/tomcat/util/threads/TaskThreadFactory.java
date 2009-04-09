@@ -24,11 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  */
 public class TaskThreadFactory implements ThreadFactory {
-    final ThreadGroup group;
-    final AtomicInteger threadNumber = new AtomicInteger(1);
-    final String namePrefix;
-    final boolean daemon;
-    final int threadPriority;
+    private final ThreadGroup group;
+    private final AtomicInteger threadNumber = new AtomicInteger(1);
+    private final String namePrefix;
+    private final boolean daemon;
+    private final int threadPriority;
     public TaskThreadFactory(String namePrefix, boolean daemon, int priority) {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
