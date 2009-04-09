@@ -116,21 +116,28 @@
     <attribute name="protocol" required="false">
       <p>
         Sets the protocol to handle incoming traffic.
-        The default value is <code>HTTP/1.1</code> and configures the 
-        <code>org.apache.coyote.http11.Http11Protocol</code>. This is the blocking Java connector.<br/>
-        If the <code>PATH(Windows)</code> or <code>LD_LIBRARY_PATH(on most unix system)</code>  
-        environment variables contain the Tomcat native library, the APR connector
-        will automatically be configured. Please be advised that the APR connector has different
-        settings for HTTPS than the default Java connector.<br/>
-        Other values for this attribute are, but not limited to:<br/>
-        <code>org.apache.coyote.http11.Http11Protocol</code> - same as HTTP/1.1<br/>
-        <code>org.apache.coyote.http11.Http11NioProtocol</code> - non blocking Java connector<br/>
-        <code>org.apache.coyote.http11.Http11AprProtocol</code> - the APR connector.<br/>
-        Take a look at our <a href="#Connector Comparison">Connector Comparison</a> chart.
-        The configuration for both Java connectors are identical, both for http and https. <br/>
-        For more information on the APR connector and APR specific SSL settings please 
-        visit the <a href="../apr.html">APR documentation</a>
-        
+        The default value is <code>HTTP/1.1</code> which uses an auto-switching
+        mechanism to select either a blocking Java based connector or an
+        APR/native based connector. If the <code>PATH(Windows)</code> or
+        <code>LD_LIBRARY_PATH</code> (on most unix system) environment variables
+        contain the Tomcat native library, the native/APR connector will be used.
+        If the native library cannot be found, the blocking Java based connector
+        will be used. Please be advised that the native/APR connector has
+        different settings for HTTPS than the Java connectors.<br/>
+        To use an explicit protocol rather than rely on the auto-switching
+        mechanism described above, the following values may be used:<br/>
+        <code>org.apache.coyote.http11.Http11Protocol</code> -
+              blocking Java connector<br/>
+        <code>org.apache.coyote.http11.Http11NioProtocol</code> -
+              non blocking Java connector<br/>
+        <code>org.apache.coyote.http11.Http11AprProtocol</code> -
+              the APR/native connector.<br/>
+        Custom implementations may also be used.<br/>
+        Take a look at our <a href="#Connector Comparison">Connector
+        Comparison</a> chart. The configuration for both Java connectors is
+        identical, for http and https.<br/>
+        For more information on the APR connector and APR specific SSL settings
+        please  visit the <a href="../apr.html">APR documentation</a>
       </p>
     </attribute>
 
