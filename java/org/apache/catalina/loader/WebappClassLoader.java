@@ -1335,7 +1335,8 @@ public class WebappClassLoader
             if (loader == null)
                 loader = system;
             try {
-                clazz = loader.loadClass(name);
+
+                clazz = Class.forName(name, false, loader);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
                         log.debug("  Loading class from parent");
@@ -1372,7 +1373,7 @@ public class WebappClassLoader
             if (loader == null)
                 loader = system;
             try {
-                clazz = loader.loadClass(name);
+                clazz = Class.forName(name, false, loader);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
                         log.debug("  Loading class from parent");
