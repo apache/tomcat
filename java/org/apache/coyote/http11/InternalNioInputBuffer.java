@@ -454,6 +454,11 @@ public class InternalNioInputBuffer implements InputBuffer {
                     if (!fill(true, false)) //request line parsing
                         return false;
                 }
+                // Spec says no CR or LF in method name
+                if (buf[pos] == Constants.CR || buf[pos] == Constants.LF) {
+                    throw new IllegalArgumentException(
+                            sm.getString("iib.invalidmethod"));
+                }
                 if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                     space = true;
                     request.method().setBytes(buf, parsingRequestLineStart, pos - parsingRequestLineStart);
