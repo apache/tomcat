@@ -18,6 +18,8 @@
 package org.apache.catalina.realm;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -2147,19 +2149,51 @@ public class JNDIRealm extends RealmBase {
      * @param result The search result
      * @return String containing the distinguished name
      */
-    protected String getDistinguishedName(DirContext context, String base, SearchResult result)
-        throws NamingException {
-        // Get the entry's distinguished name
-        NameParser parser = context.getNameParser("");
-        Name contextName = parser.parse(context.getNameInNamespace());
-        Name baseName = parser.parse(base);
-
-        // Bugzilla 32269
-        Name entryName = parser.parse(new CompositeName(result.getName()).get(0));
-
-        Name name = contextName.addAll(baseName);
-        name = name.addAll(entryName);
-        return name.toString();
+    protected String getDistinguishedName(DirContext context, String base,
+            SearchResult result) throws NamingException {
+        // Get the entry's distinguished name.  For relative results, this means
+        // we need to composite a name with the base name, the context name, and
+        // the result name.  For non-relative names, use the returned name.
+        if (result.isRelative()) {
+           if (containerLog.isTraceEnabled()) {
+               containerLog.trace("  search returned relative name: " +
+                       result.getName());
+           }
+           NameParser parser = context.getNameParser("");
+           Name contextName = parser.parse(context.getNameInNamespace());
+           Name baseName = parser.parse(base);
+   
+           // Bugzilla 32269
+           Name entryName =
+               parser.parse(new CompositeName(result.getName()).get(0));
+   
+           Name name = contextName.addAll(baseName);
+           name = name.addAll(entryName);
+           return name.toString();
+        } else {
+           String absoluteName = result.getName();
+           if (containerLog.isTraceEnabled())
+               containerLog.trace("  search returned absolute name: " +
+                       result.getName());
+           try {
+               // Normalize the name by running it through the name parser.
+               NameParser parser = context.getNameParser("");
+               URI userNameUri = new URI(absoluteName);
+               String pathComponent = userNameUri.getPath();
+               // Should not ever have an empty path component, since that is /{DN}
+               if (pathComponent.length() < 1 ) {
+                   throw new InvalidNameException(
+                           "Search returned unparseable absolute name: " +
+                           absoluteName );
+               }
+               Name name = parser.parse(pathComponent.substring(1));
+               return name.toString();
+           } catch ( URISyntaxException e ) {
+               throw new InvalidNameException(
+                       "Search returned unparseable absolute name: " +
+                       absoluteName );
+           }
+        }
     }
 
 
