@@ -701,117 +701,11 @@ public final class IntrospectionUtils {
         return getClassPath(jarsV);
     }
 
-    // -------------------- Mapping command line params to setters
-
-    public static boolean processArgs(Object proxy, String args[])
-            throws Exception {
-        String args0[] = null;
-        if (null != findMethod(proxy.getClass(), "getOptions1", new Class[] {})) {
-            args0 = (String[]) callMethod0(proxy, "getOptions1");
-        }
-
-        if (args0 == null) {
-            //args0=findVoidSetters(proxy.getClass());
-            args0 = findBooleanSetters(proxy.getClass());
-        }
-        Hashtable<Object,Object> h = null;
-        if (null != findMethod(proxy.getClass(), "getOptionAliases",
-                new Class[] {})) {
-            h = (Hashtable<Object,Object>) callMethod0(proxy,
-                    "getOptionAliases");
-        }
-        return processArgs(proxy, args, args0, null, h);
-    }
-
-    public static boolean processArgs(Object proxy, String args[],
-            String args0[], String args1[],
-            Hashtable<Object,Object> aliases) throws Exception {
-        for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            if (arg.startsWith("-"))
-                arg = arg.substring(1);
-            if (aliases != null && aliases.get(arg) != null)
-                arg = (String) aliases.get(arg);
-
-            if (args0 != null) {
-                boolean set = false;
-                for (int j = 0; j < args0.length; j++) {
-                    if (args0[j].equalsIgnoreCase(arg)) {
-                        setProperty(proxy, args0[j], "true");
-                        set = true;
-                        break;
-                    }
-                }
-                if (set)
-                    continue;
-            }
-            if (args1 != null) {
-                for (int j = 0; j < args1.length; j++) {
-                    if (args1[j].equalsIgnoreCase(arg)) {
-                        i++;
-                        if (i >= args.length)
-                            return false;
-                        setProperty(proxy, arg, args[i]);
-                        break;
-                    }
-                }
-            } else {
-                // if args1 is not specified,assume all other options have param
-                i++;
-                if (i >= args.length)
-                    return false;
-                setProperty(proxy, arg, args[i]);
-            }
-
-        }
-        return true;
-    }
-
     // -------------------- other utils --------------------
     public static void clear() {
         objectMethods.clear();
     }
     
-    public static String[] findVoidSetters(Class<?> c) {
-        Method m[] = findMethods(c);
-        if (m == null)
-            return null;
-        Vector<String> v = new Vector<String>();
-        for (int i = 0; i < m.length; i++) {
-            if (m[i].getName().startsWith("set")
-                    && m[i].getParameterTypes().length == 0) {
-                String arg = m[i].getName().substring(3);
-                v.addElement(unCapitalize(arg));
-            }
-        }
-        String s[] = new String[v.size()];
-        for (int i = 0; i < s.length; i++) {
-            s[i] = v.elementAt(i);
-        }
-        return s;
-    }
-
-    public static String[] findBooleanSetters(Class<?> c) {
-        Method m[] = findMethods(c);
-        if (m == null)
-            return null;
-        Vector<String> v = new Vector<String>();
-        for (int i = 0; i < m.length; i++) {
-            if (m[i].getName().startsWith("set")
-                    && m[i].getParameterTypes().length == 1
-                    && "boolean".equalsIgnoreCase(m[i].getParameterTypes()[0]
-                            .getName())) {
-                String arg = m[i].getName().substring(3);
-                v.addElement(unCapitalize(arg));
-            }
-        }
-        String s[] = new String[v.size()];
-        for (int i = 0; i < s.length; i++) {
-            s[i] = v.elementAt(i);
-        }
-        return s;
-    }
-
     static Hashtable<Class<?>,Method[]> objectMethods =
         new Hashtable<Class<?>,Method[]>();
 
