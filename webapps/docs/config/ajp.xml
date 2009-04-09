@@ -113,20 +113,21 @@
     </attribute>
 
     <attribute name="protocol" required="false">
-      <p>Sets the protocol to handle incoming traffic. The default value is
-        <code>AJP/1.3</code> and configures
-        <code>org.apache.jk.server.JkCoyoteHandler</code> the original blocking
-        Java connector by default.<br/>
-        If the <code>PATH(Windows)</code> or <code>LD_LIBRARY_PATH
-        (on most unix system)</code> environment variables contain the Tomcat
-        native library, the native/APR connector will automatically be
-        configured instead.<br/>
+      <p>Sets the protocol to handle incoming traffic. To configure an AJP
+        connector this must be specified. If no value for protocol is provided,
+        an <a href="http.html">HTTP connector</a> rather than an AJP connector
+        will be configured.<br/>
+        The standard protocol value for an AJP connector is <code>AJP/1.3</code>
+        which uses an auto-switching mechanism to select either a Java based
+        connector or an APR/native based connector. If the
+        <code>PATH(Windows)</code> or <code>LD_LIBRARY_PATH</code> (on most unix
+        system) environment variables contain the Tomcat native library, the
+        native/APR connector will be used. If the native library cannot be
+        found, the Java based connector will be used.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
-        <code>org.apache.jk.server.JkCoyoteHandler</code>
-        - original blocking Java connector<br/>
         <code>org.apache.coyote.ajp.AjpProtocol</code>
-        - new blocking Java connector that supports an executor<br/>
+        - blocking Java connector<br/>
         <code>org.apache.coyote.ajp.AjpAprProtocol</code>
         - the APR/native connector.<br/>
       Custom implementations may also be used.</p>
@@ -261,9 +262,7 @@
     <attribute name="executor" required="false">
       <p>A reference to the name in an <a href="executor.html">Executor</a> element.
          If this attribute is enabled, and the named executor exists, the connector will
-         use the executor, and all the other thread attributes will be ignored.
-         This attribute is not supported by the original blocking Java
-         connector.</p>
+         use the executor, and all the other thread attributes will be ignored.</p>
     </attribute>
 
     <attribute name="keepAliveTimeout" required="false">
