@@ -40,7 +40,7 @@ public class MultiCastSender
     MulticastSocket s = null;
     InetAddress group = null;
 
-    public void init(HeartbeatListener config) {
+    public void init(HeartbeatListener config) throws Exception {
         this.config = config;
     }
 
