@@ -253,7 +253,14 @@ public class JIoEndpoint {
      * Socket timeout.
      */
     public int getSoTimeout() { return socketProperties.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
+    public void setSoTimeout(int soTimeout) {
+        // APR/native uses -1 for infinite - Java uses 0
+        if (soTimeout == -1) {
+            socketProperties.setSoTimeout(0);
+        } else {
+            socketProperties.setSoTimeout(soTimeout);
+        }
+    }
 
 
     /**
