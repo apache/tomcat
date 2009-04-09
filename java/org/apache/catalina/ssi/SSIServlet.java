@@ -210,5 +210,6 @@ public class SSIServlet extends HttpServlet {
             String text = stringWriter.toString();
             res.getWriter().write(text);
         }
+        bufferedReader.close();
     }
 }
