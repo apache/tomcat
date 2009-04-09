@@ -51,9 +51,6 @@ public class BodyContentImpl extends BodyContent {
     // Enclosed writer to which any output is written
     private Writer writer;
     
-    // See comment in setWriter()
-    private int bufferSizeSave;
-    
     /**
      * Constructor.
      */
@@ -508,6 +505,19 @@ public class BodyContentImpl extends BodyContent {
     }
     
     /**
+     * This method returns the size of the buffer used by the JspWriter.
+     *
+     * @return the size of the buffer in bytes, or 0 is unbuffered.
+     */
+    public int getBufferSize() {
+        // According to the spec, the JspWriter returned by 
+        // JspContext.pushBody(java.io.Writer writer) must behave as
+        // though it were unbuffered. This means that its getBufferSize()
+        // must always return 0.
+        return (writer == null) ? bufferSize : 0;
+    }
+    
+    /**
      * @return the number of bytes unused in the buffer
      */
     public int getRemaining() {
@@ -558,22 +568,7 @@ public class BodyContentImpl extends BodyContent {
     void setWriter(Writer writer) {
         this.writer = writer;
         closed = false;
-        if (writer != null) {
-            // According to the spec, the JspWriter returned by 
-            // JspContext.pushBody(java.io.Writer writer) must behave as
-            // though it were unbuffered. This means that its getBufferSize()
-            // must always return 0. The implementation of
-            // JspWriter.getBufferSize() returns the value of JspWriter's
-            // 'bufferSize' field, which is inherited by this class. 
-            // Therefore, we simply save the current 'bufferSize' (so we can 
-            // later restore it should this BodyContentImpl ever be reused by
-            // a call to PageContext.pushBody()) before setting it to 0.
-            if (bufferSize != 0) {
-                bufferSizeSave = bufferSize;
-                bufferSize = 0;
-            }
-        } else {
-            bufferSize = bufferSizeSave;
+        if (writer == null) {
             clearBody();
         }
     }
