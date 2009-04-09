@@ -418,7 +418,7 @@ public class Embedded  extends StandardService {
         try {
 
             if (protocol.equals("ajp")) {
-                connector = new Connector("org.apache.jk.server.JkCoyoteHandler");
+                connector = new Connector("org.apache.coyote.ajp.AjpProtocol");
             } else if (protocol.equals("memory")) {
                 connector = new Connector("org.apache.coyote.memory.MemoryProtocolHandler");
             } else if (protocol.equals("http")) {
