@@ -1335,7 +1335,6 @@ public class WebappClassLoader
             if (loader == null)
                 loader = system;
             try {
-
                 clazz = Class.forName(name, false, loader);
                 if (clazz != null) {
                     if (log.isDebugEnabled())
