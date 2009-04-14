@@ -620,7 +620,6 @@ final class ApplicationDispatcher
             wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException",
                              wrapper.getName()), StandardWrapper.getRootCause(e));
             servletException = e;
-            servlet = null;
         } catch (Throwable e) {
             wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException",
                              wrapper.getName()), e);

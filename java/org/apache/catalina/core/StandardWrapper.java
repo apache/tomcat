@@ -1482,7 +1482,8 @@ public class StandardWrapper
      *
      * @param mapperClass Java class name of the default Mapper
      */
-    protected void addDefaultMapper(String mapperClass) {
+    protected void addDefaultMapper(
+            @SuppressWarnings("unused") String mapperClass) {
 
         // No need for a default Mapper on a Wrapper
 
