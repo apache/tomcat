@@ -148,7 +148,6 @@ final class StandardWrapperValve
                              wrapper.getName()), StandardWrapper.getRootCause(e));
             throwable = e;
             exception(request, response, e);
-            servlet = null;
         } catch (Throwable e) {
             container.getLogger().error(sm.getString("standardWrapper.allocateException",
                              wrapper.getName()), e);
@@ -181,10 +180,7 @@ final class StandardWrapperValve
             exception(request, response, e);
             servlet = null;
         }
-        MessageBytes requestPathMB = null;
-        if (request != null) {
-            requestPathMB = request.getRequestPathMB();
-        }
+        MessageBytes requestPathMB = request.getRequestPathMB();
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
              ApplicationFilterFactory.REQUEST_INTEGER);
@@ -374,7 +370,6 @@ final class StandardWrapperValve
                              wrapper.getName()), StandardWrapper.getRootCause(e));
             throwable = e;
             exception(request, response, e);
-            servlet = null;
         } catch (Throwable e) {
             container.getLogger().error(sm.getString("standardWrapper.allocateException",
                              wrapper.getName()), e);
@@ -383,10 +378,7 @@ final class StandardWrapperValve
             servlet = null;
         }
 
-        MessageBytes requestPathMB = null;
-        if (request != null) {
-            requestPathMB = request.getRequestPathMB();
-        }
+        MessageBytes requestPathMB = request.getRequestPathMB();
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
              ApplicationFilterFactory.REQUEST_INTEGER);
