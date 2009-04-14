@@ -145,6 +145,7 @@ public class TcpSender
                     if ("content-length".equalsIgnoreCase(headerName)) {
                         contentLength = Integer.parseInt(headerValue);
                     }
+                    header = connectionReaders[i].readLine();
                 }
                 if (contentLength > 0) {
                     char[] buf = new char[512];
