@@ -868,7 +868,7 @@ public class NamingContextListener
             try {
                 wsdlURL = new URL(service.getWsdlfile());
             } catch (MalformedURLException e) {
-                wsdlURL = null;
+                // Ignore and carry on
             }
             if (wsdlURL == null) {
                 try {
@@ -876,7 +876,7 @@ public class NamingContextListener
                                                     getServletContext().
                                                     getResource(service.getWsdlfile());
                 } catch (MalformedURLException e) {
-                    wsdlURL = null;
+                    // Ignore and carry on
                 }
             }
             if (wsdlURL == null) {
@@ -902,7 +902,7 @@ public class NamingContextListener
             try {
                 jaxrpcURL = new URL(service.getJaxrpcmappingfile());
             } catch (MalformedURLException e) {
-                jaxrpcURL = null;
+                // Ignore and carry on
             }
             if (jaxrpcURL == null) {
                 try {
@@ -910,7 +910,7 @@ public class NamingContextListener
                                                     getServletContext().
                                                     getResource(service.getJaxrpcmappingfile());
                 } catch (MalformedURLException e) {
-                    jaxrpcURL = null;
+                    // Ignore and carry on
                 }
             }
             if (jaxrpcURL == null) {
