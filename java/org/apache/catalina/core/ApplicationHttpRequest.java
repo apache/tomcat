@@ -570,7 +570,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             try {
                 session = manager.findSession(requestedSessionId);
             } catch (IOException e) {
-                session = null;
+                // Ignore
             }
             if ((session != null) && session.isValid()) {
                 return (true);
@@ -819,9 +819,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         ArrayList<Object> results = new ArrayList<Object>();
 
-        if (values1 == null)
-            ;
-        else if (values1 instanceof String)
+        if (values1 == null) {
+            // Skip - nothing to merge
+        } else if (values1 instanceof String)
             results.add(values1);
         else if (values1 instanceof String[]) {
             String values[] = (String[]) values1;
@@ -830,9 +830,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         } else
             results.add(values1.toString());
 
-        if (values2 == null)
-            ;
-        else if (values2 instanceof String)
+        if (values2 == null) {
+            // Skip - nothing to merge
+        } else if (values2 instanceof String)
             results.add(values2);
         else if (values2 instanceof String[]) {
             String values[] = (String[]) values2;

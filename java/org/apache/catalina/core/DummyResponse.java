@@ -48,22 +48,23 @@ public class DummyResponse
     }
 
 
-    public void setAppCommitted(boolean appCommitted) {}
+    public void setAppCommitted(
+            @SuppressWarnings("unused") boolean appCommitted) {}
     public boolean isAppCommitted() { return false; }
     public Connector getConnector() { return null; }
-    public void setConnector(Connector connector) {}
+    public void setConnector(@SuppressWarnings("unused") Connector connector) {}
     public int getContentCount() { return -1; }
     public Context getContext() { return null; }
-    public void setContext(Context context) {}
+    public void setContext(@SuppressWarnings("unused") Context context) {}
     public boolean getIncluded() { return false; }
-    public void setIncluded(boolean included) {}
+    public void setIncluded(@SuppressWarnings("unused") boolean included) {}
     public String getInfo() { return null; }
     public Request getRequest() { return null; }
-    public void setRequest(Request request) {}
+    public void setRequest(@SuppressWarnings("unused") Request request) {}
     public ServletResponse getResponse() { return null; }
     public OutputStream getStream() { return null; }
-    public void setStream(OutputStream stream) {}
-    public void setSuspended(boolean suspended) {}
+    public void setStream(@SuppressWarnings("unused") OutputStream stream) {}
+    public void setSuspended(@SuppressWarnings("unused") boolean suspended) {}
     public boolean isSuspended() { return false; }
     public void setError() {}
     public boolean isError() { return false; }
@@ -75,9 +76,12 @@ public class DummyResponse
     public String getContentType() { return null; }
     public PrintWriter getReporter() { return null; }
     public void recycle() {}
-    public void write(int b) throws IOException {}
-    public void write(byte b[]) throws IOException {}
-    public void write(byte b[], int off, int len) throws IOException {}
+    public void write(@SuppressWarnings("unused") int b) throws IOException {}
+    public void write(@SuppressWarnings("unused") byte b[]) throws IOException {
+    }
+    public void write(@SuppressWarnings("unused") byte b[],
+            @SuppressWarnings("unused") int off,
+            @SuppressWarnings("unused") int len) throws IOException {}
     public void flushBuffer() throws IOException {}
     public int getBufferSize() { return -1; }
     public String getCharacterEncoding() { return null; }
@@ -96,12 +100,17 @@ public class DummyResponse
     public void setLocale(Locale locale) {}
 
     public Cookie[] getCookies() { return null; }
-    public String getHeader(String name) { return null; }
+    public String getHeader(@SuppressWarnings("unused") String name) {
+        return null;
+    }
     public String[] getHeaderNames() { return null; }
-    public String[] getHeaderValues(String name) { return null; }
+    public String[] getHeaderValues(@SuppressWarnings("unused") String name) {
+        return null;
+    }
     public String getMessage() { return null; }
     public int getStatus() { return -1; }
-    public void reset(int status, String message) {}
+    public void reset(@SuppressWarnings("unused") int status,
+            @SuppressWarnings("unused") String message) {}
     public void addCookie(Cookie cookie) {}
     public void addDateHeader(String name, long value) {}
     public void addHeader(String name, String value) {}
