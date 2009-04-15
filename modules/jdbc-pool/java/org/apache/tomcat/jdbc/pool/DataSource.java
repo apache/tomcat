@@ -16,8 +16,18 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.lang.management.ManagementFactory;
 import java.sql.SQLException;
+import java.util.Hashtable;
 import java.util.Properties;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistration;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+
+import org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean;
 
 
 /**
@@ -26,7 +36,7 @@ import java.util.Properties;
  * @author Filip Hanik
  * @version 1.0
  */
-public class DataSource extends DataSourceProxy implements javax.sql.DataSource, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean {
+public class DataSource extends DataSourceProxy implements MBeanRegistration,javax.sql.DataSource, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean {
 
     public DataSource() {
         super();
@@ -34,6 +44,63 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
 
     public DataSource(PoolProperties poolProperties) {
         super(poolProperties);
+    }
+
+//===============================================================================
+//  Register the actual pool itself under the tomcat.jdbc domain
+//===============================================================================
+    protected volatile ObjectName oname = null;
+    public void postDeregister() {
+        if (oname!=null) unregisterJmx();
+    }
+
+    public void postRegister(Boolean registrationDone) {
+    }
+
+
+    public void preDeregister() throws Exception {
+    }
+
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        try {
+            this.oname = createObjectName(name);
+            if (oname!=null) registerJmx();
+        }catch (MalformedObjectNameException x) {
+            log.error("Unable to create object name for JDBC pool.",x);
+        }
+        return name;   
+    }
+    
+    public ObjectName createObjectName(ObjectName original) throws MalformedObjectNameException {
+        String domain = "tomcat.jdbc";
+        Hashtable<String,String> properties = original.getKeyPropertyList();
+        String origDomain = original.getDomain();
+        properties.put("type", "ConnectionPool");
+        properties.put("class", this.getClass().getName());
+        if (original.getKeyProperty("path")!=null) {
+            properties.put("engine", origDomain);
+        }
+        ObjectName name = new ObjectName(domain,properties);
+        return name;
+    }
+    
+    protected void registerJmx() {
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.registerMBean(pool.getJmxPool(), oname);
+        } catch (Exception e) {
+            log.error("Unable to register JDBC pool with JMX",e);
+        }
+    }
+    
+    protected void unregisterJmx() {
+        try {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            mbs.unregisterMBean(oname);
+        } catch (InstanceNotFoundException ignore) {
+        } catch (Exception e) {
+            log.error("Unable to unregister JDBC pool with JMX",e);
+        }
     }
 
 //===============================================================================
@@ -61,6 +128,10 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         }catch (SQLException x) {
             throw new RuntimeException(x);
         }
+    }
+    
+    public int getNumActive() {
+        return getActive();
     }
 
     public String getConnectionProperties() {
@@ -109,6 +180,10 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         }catch (SQLException x) {
             throw new RuntimeException(x);
         }
+    }
+    
+    public int getNumIdle() {
+        return getIdle();
     }
 
     public int getInitialSize() {
