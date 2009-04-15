@@ -630,7 +630,7 @@ public class ConnectionPool {
                             con.validate(PooledConnection.VALIDATE_RETURN)) {
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
-                        if ((idle.size()>=poolProperties.getMaxIdle()) || (!idle.offer(con))) {
+                        if (((idle.size()>=poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
                             if (log.isDebugEnabled()) {
                                 log.debug("Connection ["+con+"] will be closed and not returned to the pool, idle["+idle.size()+"]>=maxIdle["+poolProperties.getMaxIdle()+"] idle.offer failed.");
                             }
@@ -920,7 +920,7 @@ public class ConnectionPool {
                     try {
                         if (pool.getPoolProperties().isRemoveAbandoned())
                             pool.checkAbandoned();
-                        if (pool.getPoolProperties().getMaxIdle()<pool.idle.size())
+                        if (pool.getPoolProperties().getMinIdle()<pool.idle.size())
                             pool.checkIdle();
                         if (pool.getPoolProperties().isTestWhileIdle())
                             pool.testAllIdle();
