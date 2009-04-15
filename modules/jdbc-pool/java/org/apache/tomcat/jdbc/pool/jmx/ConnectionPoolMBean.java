@@ -30,7 +30,11 @@ public interface ConnectionPoolMBean  {
     public int getActive();
     
     public boolean isPoolSweeperEnabled();
-
+    
+    public int getNumIdle();
+    
+    public int getNumActive();
+    
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================

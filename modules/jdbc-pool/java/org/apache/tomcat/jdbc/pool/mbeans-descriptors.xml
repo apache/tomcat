@@ -15,7 +15,7 @@
 -->
 <mbeans-descriptors>
 
-    <mbean          name="DiagnosticsPool"
+    <mbean        name="TomcatJDBCPool"
            description="Provides per diagnostic metrics and notifications for JDBC operations"
                 domain="tomcat"
                  group="jdbc"
@@ -36,11 +36,21 @@
                   type="java.lang.Integer"
              writeable="false"/>
 
+    <attribute    name="numIdle"
+           description="Same as the idle attribute"
+                  type="java.lang.Integer"
+             writeable="false"/>
+
     <attribute    name="active"
            description="The number of established connections in the pool that are in use"
                   type="java.lang.Integer"
              writeable="false"/>
     
+    <attribute    name="numActive"
+           description="Same as the active attribute"
+                  type="java.lang.Integer"
+             writeable="false"/>
+
     <attribute    name="poolSweeperEnabled"
            description="Returns true if the pool has a background thread running"
                   type="java.lang.Boolean"
@@ -216,15 +226,6 @@
                   description="forces a validation of abandoned connections" 
                   impact="ACTION" 
                   returnType="void" />
-
-
-    <notification name="jdbc-diagnostic"
-                  description="Notification issued when the request diagnostic actions kick in" >
-      <notification-type>INIT FAILED</notification-type>
-      <notification-type>CONNECTION FAILED</notification-type>
-      <notification-type>CONNECTION ABANDONED</notification-type>
-    </notification>
-   
   </mbean>
 
 </mbeans-descriptors>

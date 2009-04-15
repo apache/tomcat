@@ -176,7 +176,9 @@ public class DataSourceProxy  {
             if (pool != null) {
                 final ConnectionPool p = pool;
                 pool = null;
-                if (p!=null) p.close(all);
+                if (p!=null) {
+                    p.close(all);
+                }
             }
         }catch (Exception x) {
             log.warn("Error duing connection pool closure.", x);
@@ -197,7 +199,7 @@ public class DataSourceProxy  {
     public String toString() {
         return super.toString()+"{"+getPoolProperties()+"}";
     }
-
+    
 /*-----------------------------------------------------------------------*/
 //      PROPERTIES WHEN NOT USED WITH FACTORY
 /*------------------------------------------------------------------------*/
