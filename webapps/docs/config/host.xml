@@ -324,13 +324,34 @@
     auto deployer will also track web applications for the following changes:
     <ul>
         <li>An update to the WEB-INF/web.xml file will trigger a reload of the
-        web application</li>
-        <li>An update to a WAR which has been expanded will trigger 
-        an undeploy (<strong>with a removal of the expanded webapp</strong>), 
-        followed by a deployment</li>
-        <li>An update to a XML configuration file will trigger an undeploy
-        (without the removal of any expanded directory), followed by 
-        a deployment of the associated web application</li>
+          web application</li>
+        <li>Deleting a WAR file will trigger an undeploy of the application with
+          the removal of any associated expanded directory, context file and
+          work directory. Any current user sessions will not be persisted.</li>
+        <li>Deleting a directory will trigger an undeploy of the application
+          with the removal of any associated context file and work directory.
+          Any current user sessions will not be persisted. If there is an
+          associated WAR file, it will not be deleted and the application will
+          be redeployed from the WAR file the next time the auto deployer checks
+          for changes.</li>
+        <li>Deleting a context file will trigger an undeploy of the application
+          with the removal of any associated work directory. Any current user
+          sessions will not be persisted. If there is an associated WAR file
+          and/or directory, they will not be deleted and the application will be
+          redeployed from the WAR file (or from directory if there is no WAR
+          file) the next time the auto deployer checks for changes.</li>
+        <li>Updating a WAR file will trigger an undeploy of the application with
+          the removal of any associated expanded directory, context file and
+          work directory. Any current user sessions will not be persisted.</li>
+        <li>Updating a directory (not the diretcory contents) will trigger an
+          undeploy of the application with the removal of any associated context
+          file and work directory. Any current user sessions will not be
+          persisted. The application will be redeployed the next time the auto
+          deployer checks for changes.</li>
+        <li>Updating a context file will trigger an undeploy of the application
+          with the removal of any associated work directory. Any current user
+          sessions will not be persisted. The application will be redeployed the
+          next time the auto deployer checks for changes.</li>
     </ul>
     </p>
 
