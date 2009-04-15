@@ -597,9 +597,7 @@ public class AprEndpoint {
         serverSockPool = Pool.create(rootPool);
         // Create the APR address that will be bound
         String addressStr = null;
-        if (address == null) {
-            addressStr = null;
-        } else {
+        if (address != null) {
             addressStr = address.getHostAddress();
         }
         int family = Socket.APR_INET;
