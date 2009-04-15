@@ -63,7 +63,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 c = waiters.poll();
                 c.setItem(e);
             } else {
-                items.add(e);
+                items.addFirst(e);
             }
         } finally {
             lock.unlock();
