@@ -343,7 +343,7 @@
         <li>Updating a WAR file will trigger an undeploy of the application with
           the removal of any associated expanded directory, context file and
           work directory. Any current user sessions will not be persisted.</li>
-        <li>Updating a directory (not the diretcory contents) will trigger an
+        <li>Updating a directory (not the directory contents) will trigger an
           undeploy of the application with the removal of any associated context
           file and work directory. Any current user sessions will not be
           persisted. The application will be redeployed the next time the auto
