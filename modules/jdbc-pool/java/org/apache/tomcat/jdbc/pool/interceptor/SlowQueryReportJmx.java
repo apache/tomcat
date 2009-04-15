@@ -50,8 +50,8 @@ import org.apache.tomcat.util.modeler.Registry;
  *
  */
 public class SlowQueryReportJmx extends SlowQueryReport {
-    public static final String SLOW_QUERY_NOTIFICATION = "Slow query";
-    public static final String FAILED_QUERY_NOTIFICATION = "Failed query";
+    public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
+    public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
 
     protected static CompositeType SLOW_QUERY_TYPE; 
         
@@ -64,6 +64,10 @@ public class SlowQueryReportJmx extends SlowQueryReport {
     protected String poolName = null;
     
     protected static AtomicLong notifySequence = new AtomicLong(0);
+    
+    protected boolean notifyPool = true;
+    
+    protected ConnectionPool pool = null;
     
     protected static CompositeType getCompositeType() {
         if (SLOW_QUERY_TYPE==null) {
@@ -85,7 +89,10 @@ public class SlowQueryReportJmx extends SlowQueryReport {
     public void reset(ConnectionPool parent, PooledConnection con) {
         // TODO Auto-generated method stub
         super.reset(parent, con);
-        if (parent!=null) poolName = parent.getName(); 
+        if (parent!=null) {
+            poolName = parent.getName();
+            pool = parent;
+        }
     }
 
 
@@ -99,6 +106,7 @@ public class SlowQueryReportJmx extends SlowQueryReport {
 
     @Override
     public void poolStarted(ConnectionPool pool) {
+        this.pool = pool;
         super.poolStarted(pool);
         this.poolName = pool.getName();
         registerJmx();
@@ -114,16 +122,23 @@ public class SlowQueryReportJmx extends SlowQueryReport {
     protected void notifyJmx(String query, String type) {
         try {
             DynamicMBean mbean = mbeans.get(poolName);
-            if (mbean!=null && mbean instanceof BaseModelMBean) {
-                BaseModelMBean bmbean = (BaseModelMBean)mbean;
-                long sequence = notifySequence.incrementAndGet();
-                Notification notification = 
-                    new Notification(type, 
-                                     mbean, 
-                                     sequence, 
-                                     System.currentTimeMillis(),
-                                     query);
-                bmbean.sendNotification(notification);
+            long sequence = notifySequence.incrementAndGet();
+            
+            if (isNotifyPool()) {
+                if (this.pool!=null && this.pool.getJmxPool()!=null) {
+                    this.pool.getJmxPool().notify(type, query);
+                }
+            } else {
+                if (mbean!=null && mbean instanceof BaseModelMBean) {
+                    Notification notification = 
+                        new Notification(type, 
+                                         mbean, 
+                                         sequence, 
+                                         System.currentTimeMillis(),
+                                         query);
+                    BaseModelMBean bmbean = (BaseModelMBean)mbean;
+                    bmbean.sendNotification(notification);
+                }
             }
         } catch (RuntimeOperationsException e) {
             if (log.isDebugEnabled()) {
@@ -160,6 +175,16 @@ public class SlowQueryReportJmx extends SlowQueryReport {
         return poolName;
     }
     
+    
+    
+    public boolean isNotifyPool() {
+        return notifyPool;
+    }
+
+    public void setNotifyPool(boolean notifyPool) {
+        this.notifyPool = notifyPool;
+    }
+
     /**
      * JMX operation - remove all stats for this connection pool
      */
@@ -205,7 +230,6 @@ public class SlowQueryReportJmx extends SlowQueryReport {
                     registry.unregisterComponent(oname);
                     registry.removeManagedBean(managed);
                 }
-                
             }
         } catch (MalformedObjectNameException e) {
             log.warn("Jmx deregistration failed.",e);
@@ -217,7 +241,10 @@ public class SlowQueryReportJmx extends SlowQueryReport {
     
     protected void registerJmx() {
         try {
-            if (getCompositeType()!=null) {
+            //only if we notify the pool itself
+            if (isNotifyPool()) {
+                
+            } else if (getCompositeType()!=null) {
                 ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+"SlowQueryReport"+",name=" + poolName);
                 Registry registry = Registry.getRegistry(null, null);
                 registry.loadDescriptors(getClass().getPackage().getName(),getClass().getClassLoader());
