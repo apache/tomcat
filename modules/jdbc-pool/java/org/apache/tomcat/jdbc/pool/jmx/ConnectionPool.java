@@ -17,12 +17,15 @@ package org.apache.tomcat.jdbc.pool.jmx;
 /**
  * @author Filip Hanik
  */
+import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.MBeanNotificationInfo;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
+import javax.management.NotificationListener;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -41,6 +44,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * sequence for JMX notifications
      */
     protected AtomicInteger sequence = new AtomicInteger(0);
+    
+    /**
+     * Listeners that are local and interested in our notifications, no need for JMX
+     */
+    protected ConcurrentLinkedQueue<NotificationListener> listeners = new ConcurrentLinkedQueue<NotificationListener>(); 
 
     public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool) {
         super();
@@ -62,6 +70,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public static final String NOTIFY_INIT = "INIT FAILED";
     public static final String NOTIFY_CONNECT = "CONNECTION FAILED";
     public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
+    public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
+    public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
     
     
     
@@ -76,7 +86,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     } 
     
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
-        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON}; 
+        String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION, FAILED_QUERY_NOTIFICATION}; 
         String name = Notification.class.getName(); 
         String description = "A connection pool error condition was met."; 
         MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description); 
@@ -96,8 +106,11 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
                     this,
                     sequence.incrementAndGet(),
                     System.currentTimeMillis(),
-                    message!=null?message:"");
+                    "["+type+"] "+message);
             sendNotification(n);
+            for (NotificationListener listener : listeners) {
+                listener.handleNotification(n,this);
+            }
             return true;
         }catch (Exception x) {
             if (log.isDebugEnabled()) {
@@ -106,6 +119,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
             return false;
         }
         
+    }
+    
+    public void addListener(NotificationListener list) {
+        listeners.add(list);
+    }
+    
+    public boolean removeListener(NotificationListener list) {
+        return listeners.remove(list);
     }
     
     //=================================================================
@@ -126,6 +147,14 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     
     public boolean isPoolSweeperEnabled() {
         return pool.getPoolProperties().isPoolSweeperEnabled();
+    }
+    
+    public int getNumIdle() {
+        return getIdle();
+    }
+    
+    public int getNumActive() {
+        return getNumActive();
     }
 
     //=================================================================
