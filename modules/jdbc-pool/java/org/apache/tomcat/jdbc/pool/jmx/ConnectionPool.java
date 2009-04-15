@@ -154,7 +154,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }
     
     public int getNumActive() {
-        return getNumActive();
+        return getActive();
     }
 
     //=================================================================
