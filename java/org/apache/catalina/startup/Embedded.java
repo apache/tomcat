@@ -828,8 +828,7 @@ public class Embedded  extends StandardService {
         // Start our defined Connectors second
         for (int i = 0; i < connectors.length; i++) {
             connectors[i].initialize();
-            if (connectors[i] instanceof Lifecycle)
-                ((Lifecycle) connectors[i]).start();
+            ((Lifecycle) connectors[i]).start();
         }
 
     }
@@ -857,8 +856,7 @@ public class Embedded  extends StandardService {
 
         // Stop our defined Connectors first
         for (int i = 0; i < connectors.length; i++) {
-            if (connectors[i] instanceof Lifecycle)
-                ((Lifecycle) connectors[i]).stop();
+            ((Lifecycle) connectors[i]).stop();
         }
 
         // Stop our defined Engines second
