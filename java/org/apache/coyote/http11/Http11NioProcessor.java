@@ -84,7 +84,7 @@ public class Http11NioProcessor implements ActionHook {
     // ----------------------------------------------------------- Constructors
 
 
-    public Http11NioProcessor(int rxBufSize, int txBufSize, int maxHttpHeaderSize, NioEndpoint endpoint) {
+    public Http11NioProcessor(int maxHttpHeaderSize, NioEndpoint endpoint) {
 
         this.endpoint = endpoint;
 
