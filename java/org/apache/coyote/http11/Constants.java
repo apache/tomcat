@@ -148,7 +148,10 @@ public final class Constants {
         ByteChunk.convertToBytes("400");
     public static final byte[] _404_BYTES = 
         ByteChunk.convertToBytes("404");
-    
+    public static final String VARY = "Vary";
+    public static final String VARY_UNSPECIFIED = "*";
+    public static final String ACCEPT_ENCODING = "Accept-Encoding";
+    public static final String ETAG = "ETag";
 
     /**
      * Identity filters (input and output).
