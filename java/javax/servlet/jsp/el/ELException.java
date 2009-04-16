@@ -25,13 +25,7 @@ package javax.servlet.jsp.el;
  * @deprecated
  */
 public class ELException extends Exception {
-    // -------------------------------------
-    // Member variables
-    // -------------------------------------
 
-    private Throwable mRootCause;
-
-    // -------------------------------------
     /**
      * Creates an ELException with no detail message.
      **/
@@ -39,7 +33,6 @@ public class ELException extends Exception {
         super();
     }
 
-    // -------------------------------------
     /**
      * Creates an ELException with the provided detail message.
      * 
@@ -50,7 +43,6 @@ public class ELException extends Exception {
         super(pMessage);
     }
 
-    // -------------------------------------
     /**
      * Creates an ELException with the given root cause.
      * 
@@ -58,8 +50,7 @@ public class ELException extends Exception {
      *            the originating cause of this exception
      **/
     public ELException(Throwable pRootCause) {
-        super(pRootCause.getLocalizedMessage());
-        mRootCause = pRootCause;
+        super(pRootCause);
     }
 
     // -------------------------------------
@@ -72,8 +63,7 @@ public class ELException extends Exception {
      *            the originating cause of this exception
      **/
     public ELException(String pMessage, Throwable pRootCause) {
-        super(pMessage);
-        mRootCause = pRootCause;
+        super(pMessage, pRootCause);
     }
 
     // -------------------------------------
@@ -83,6 +73,6 @@ public class ELException extends Exception {
      * @return the root cause of this exception
      */
     public Throwable getRootCause() {
-        return mRootCause;
+        return getCause();
     }
 }
