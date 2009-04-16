@@ -1486,16 +1486,9 @@ public class Http11AprProcessor implements ActionHook {
 
 
     /**
-     * Check for compression
+     * Check if browser allows compression
      */
-    private boolean isCompressable() {
-
-        // Nope Compression could works in HTTP 1.0 also
-        // cf: mod_deflate
-
-        // Compression only since HTTP 1.1
-        // if (! http11)
-        //    return false;
+    private boolean isCompressableBrowser() {
 
         // Check if browser support gzip encoding
         MessageBytes acceptEncodingMB =
@@ -1505,15 +1498,7 @@ public class Http11AprProcessor implements ActionHook {
             || (acceptEncodingMB.indexOf("gzip") == -1))
             return false;
 
-        // Check if content is not allready gzipped
-        MessageBytes contentEncodingMB =
-            response.getMimeHeaders().getValue("Content-Encoding");
-
-        if ((contentEncodingMB != null)
-            && (contentEncodingMB.indexOf("gzip") != -1))
-            return false;
-
-        // If force mode, allways compress (test purposes only)
+        // If force mode, always compress (test purposes only)
         if (compressionLevel == 2)
            return true;
 
@@ -1530,8 +1515,23 @@ public class Http11AprProcessor implements ActionHook {
                         return false;
             }
         }
+        return true;
+    }
+    
+    /*
+     * Check if response allows compression
+     */
+    private boolean isCompressableResponse() {
+        
+        // Check if content is not already gzipped
+        MessageBytes contentEncodingMB =
+            response.getMimeHeaders().getValue("Content-Encoding");
 
-        // Check if suffisant len to trig the compression
+        if ((contentEncodingMB != null)
+            && (contentEncodingMB.indexOf("gzip") != -1))
+            return false;
+
+        // Check if sufficient length to trigger the compression
         long contentLength = response.getContentLengthLong();
         if ((contentLength == -1)
             || (contentLength > compressionMinSize)) {
@@ -1598,18 +1598,35 @@ public class Http11AprProcessor implements ActionHook {
                     ((Long) request.getAttribute("org.apache.tomcat.sendfile.end")).longValue();
             }
         }
-        
+
+        MimeHeaders headers = response.getMimeHeaders();
+
         // Check for compression
         boolean useCompression = false;
         if (entityBody && (compressionLevel > 0) && (sendfileData == null)) {
-            useCompression = isCompressable();
+            if (isCompressableResponse()) {
+                // Always send the Vary header when response could be compressed
+                MessageBytes varyHeader = headers.getValue(Constants.VARY);
+                if (varyHeader == null) {
+                    headers.addValue(Constants.VARY).setString(
+                            Constants.ACCEPT_ENCODING);
+                } else {
+                    if (varyHeader.indexOf(Constants.ACCEPT_ENCODING) == -1 &&
+                            !varyHeader.equals(Constants.VARY_UNSPECIFIED)) {
+                        varyHeader.setString(varyHeader.toString() + "," +
+                                Constants.ACCEPT_ENCODING);
+                    }
+                }
+            }            
+            
+            useCompression = isCompressableBrowser();
+            
             // Change content-length to -1 to force chunking
             if (useCompression) {
                 response.setContentLength(-1);
             }
         }
 
-        MimeHeaders headers = response.getMimeHeaders();
         if (!entityBody) {
             response.setContentLength(-1);
         } else {
@@ -1645,8 +1662,22 @@ public class Http11AprProcessor implements ActionHook {
         if (useCompression) {
             outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
             headers.setValue("Content-Encoding").setString("gzip");
-            // Make Proxies happy via Vary (from mod_deflate)
-            headers.setValue("Vary").setString("Accept-Encoding");
+            
+            // Ensure eTag for compressed content is different to eTag for
+            // uncompressed content
+            MessageBytes eTagHeader = headers.getValue(Constants.ETAG);
+            if (eTagHeader != null) {
+                String eTag = eTagHeader.toString();
+                int len = eTag.length();
+                if (len > 1 && eTag.charAt(len - 1) == '"') {
+                    // Add compression marker before closing quote
+                    eTag = eTag.substring(0, len -1) + "-gz\"";
+                } else {
+                    // Unquoted ETag - shouldn't happen - TODO complain
+                    eTag = eTag + "-gz";
+                }
+                eTagHeader.setString(eTag);
+            }
         }
 
         // Add date header
