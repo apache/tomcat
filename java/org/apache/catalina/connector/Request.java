@@ -35,7 +35,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.security.auth.Subject;
-import javax.servlet.AsyncContext;
+import javax.servlet.AsyncDispatcher;
 import javax.servlet.AsyncListener;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -1501,22 +1501,16 @@ public class Request
     }
 
 
-    public void addAsyncListener(AsyncListener listener,
-            ServletRequest servletRequest, ServletResponse servletResponse) {
-        // TODO SERVLET3
-    }
-
-    public void addAsyncListener(AsyncListener listener) {
-        // TODO SERVLET3
-    }
-
-    public AsyncContext getAsyncContext() {
-        // TODO SERVLET3
-        return null;
-    }
-
     public ServletContext getServletContext() {
-       return context.getServletContext();
+        return context.getServletContext();
+     }
+
+    public void startAsync() throws IllegalStateException {
+        // TODO SERVLET3
+    }
+
+    public void startAsync(Runnable runnable) throws IllegalStateException {
+        // TODO SERVLET3
     }
 
     public boolean isAsyncStarted() {
@@ -1524,23 +1518,29 @@ public class Request
         return false;
     }
 
+    public void doneAsync() throws IllegalStateException {
+        // TODO SERVLET3
+    }
+
     public boolean isAsyncSupported() {
         // TODO SERVLET3
         return false;
     }
 
-    public void setAsyncTimeout(long timeout) {
-        // TODO SERVLET3
-    }
-
-    public AsyncContext startAsync() throws IllegalStateException {
-        return startAsync(getRequest(),getResponse().getResponse());
-    }
-
-    public AsyncContext startAsync(ServletRequest servletRequest,
-            ServletResponse servletResponse) throws IllegalStateException {
+    public AsyncDispatcher getAsyncDispatcher() {
         // TODO SERVLET3
         return null;
+    }
+
+    public AsyncDispatcher getAsyncDispatcher(String path) {
+        // TODO SERVLET3
+        return null;
+    }
+    
+
+    public void addAsyncListener(AsyncListener listener,
+            ServletRequest servletRequest, ServletResponse servletResponse) {
+        // TODO SERVLET3
     }
 
     // ---------------------------------------------------- HttpRequest Methods
@@ -2772,5 +2772,5 @@ public class Request
         }
         return true;
     }
-    
+
 }
