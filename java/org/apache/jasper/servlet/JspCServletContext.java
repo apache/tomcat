@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import javax.servlet.AsyncDispatcher;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -443,8 +444,7 @@ public class JspCServletContext implements ServletContext {
 
 
     public void addFilter(String filterName, String description,
-            String className, Map<String, String> initParameters,
-            boolean isAsyncSupported) {
+            String className, Map<String, String> initParameters) {
         // Do nothing
     }
 
@@ -459,6 +459,14 @@ public class JspCServletContext implements ServletContext {
     public void addFilterMappingForUrlPatterns(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
             String... urlPatterns) {
+        // Do nothing
+    }
+
+
+    public void addServlet(String servletName, String description,
+            String className, Map<String, String> initParameters,
+            int loadOnStartup) throws IllegalArgumentException,
+            IllegalStateException {
         // Do nothing
     }
 
@@ -491,6 +499,12 @@ public class JspCServletContext implements ServletContext {
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes) {
         // Do nothing
+    }
+
+
+    public AsyncDispatcher getAsyncDispatcher(String path) {
+        // Do nothing
+        return null;
     }
 
 }

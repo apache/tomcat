@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.naming.Binding;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.AsyncDispatcher;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -44,10 +45,8 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
@@ -840,8 +839,14 @@ public class ApplicationContext
 
 
     public void addFilter(String filterName, String description,
-            String className, Map<String, String> initParameters,
-            boolean isAsyncSupported) {
+            String className, Map<String, String> initParameters)
+            throws IllegalArgumentException, IllegalStateException {
+        
+        if (context.findFilterDef(filterName) != null) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addFilter.iae", filterName,
+                    getContextPath()));
+        }
 
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
@@ -855,17 +860,53 @@ public class ApplicationContext
         filterDef.setFilterClass(className);
         filterDef.getParameterMap().putAll(initParameters);
         context.addFilterDef(filterDef);
-        // TODO SERVLET3 - ASync support
+    }
+
+    
+    public void addServlet(String servletName, String description,
+            String className, Map<String, String> initParameters,
+            int loadOnStartup)
+            throws IllegalArgumentException, IllegalStateException {
+        
+        if (context.findFilterDef(servletName) != null) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addServlet.iae", servletName,
+                    getContextPath()));
+        }
+
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addServlet.ise",
+                            getContextPath()));
+        }
+        Wrapper wrapper = context.createWrapper();
+        wrapper.setName(servletName);
+        // Description is ignored
+        wrapper.setServletClass(className);
+        for (Map.Entry<String,String> initParam : initParameters.entrySet()) {
+            wrapper.addInitParameter(initParam.getKey(), initParam.getValue());
+        }
+        wrapper.setLoadOnStartup(loadOnStartup);
+        context.addChild(wrapper);
     }
 
 
     public void addFilterMappingForServletNames(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... servletNames) {
+            String... servletNames)
+            throws IllegalArgumentException, IllegalStateException {
+        
+        if (servletNames == null || servletNames.length == 0) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addFilterMapping.iae.servlet"));
+        }
+
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(sm.getString(
-                    "applicationContext.addFilterMapping", getContextPath()));
+                    "applicationContext.addFilterMapping.ise",
+                    getContextPath()));
         }
         FilterMap filterMap = new FilterMap(); 
         for (String servletName : servletNames) {
@@ -885,12 +926,20 @@ public class ApplicationContext
 
     public void addFilterMappingForUrlPatterns(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... urlPatterns) {
+            String... urlPatterns)
+            throws IllegalArgumentException, IllegalStateException {
+        
+        if (urlPatterns == null || urlPatterns.length == 0) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addFilterMapping.iae.url",
+                    getContextPath()));
+        }
         
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(sm.getString(
-                    "applicationContext.addFilterMapping", getContextPath()));
+                    "applicationContext.addFilterMapping.ise",
+                    getContextPath()));
         }
         FilterMap filterMap = new FilterMap(); 
         for (String urlPattern : urlPatterns) {
@@ -908,11 +957,17 @@ public class ApplicationContext
     }
 
 
-    public void addServletMapping(String servletName, String[] urlPatterns) {
+    public void addServletMapping(String servletName, String[] urlPatterns)
+            throws IllegalArgumentException, IllegalStateException {
+        if (urlPatterns == null || urlPatterns.length == 0) {
+            throw new IllegalArgumentException(sm.getString(
+                    "applicationContext.addServletMapping.iae"));
+        }
+        
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(sm.getString(
-                    "applicationContext.addServletMapping", getContextPath()));
+                    "applicationContext.addServletMapping.ise", getContextPath()));
         }
         for (String urlPattern : urlPatterns) {
             boolean jspWildCard = ("*.jsp".equals(urlPattern));
@@ -941,16 +996,7 @@ public class ApplicationContext
             defaultSessionTrackingModes.add(SessionTrackingMode.COOKIE);
         }
 
-        // Context > Host > Engine > Service
-        Connector[] connectors = ((Engine) context.getParent().getParent())
-                .getService().findConnectors();
-        // Need at least one secure connector to use the SSL session ID.
-        for (Connector connector : connectors) {
-            if (Boolean.TRUE.equals(connector.getAttribute("secure"))) {
-                defaultSessionTrackingModes.add(SessionTrackingMode.SSL);
-                break;
-            }
-        }
+        // SSL not enabled by default as it can only used on its own 
     }
 
     /**
@@ -970,17 +1016,25 @@ public class ApplicationContext
     }
 
 
-    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
+    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig)
+            throws IllegalArgumentException {
+        
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(sm.getString(
+                    "applicationContext.setSessionCookieConfig.ise",
+                    getContextPath()));
+        }
+
         this.sessionCookieConfig = sessionCookieConfig;
     }
 
 
     /**
      * @throws IllegalStateException if the context has already been initialised
-     * @throws IllegalArgumentException TODO SERVLET3 Something to do with SSL
-     *                                  but the spec language is not clear
-     *                                  If an unsupported tracking mode is
-     *                                  requested
+     * @throws IllegalArgumentException If SSL is requested in combination with
+     *                                  anything else or if an unsupported
+     *                                  tracking mode is requested
      */
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes) {
@@ -995,16 +1049,29 @@ public class ApplicationContext
         for (SessionTrackingMode sessionTrackingMode : sessionTrackingModes) {
             if (!defaultSessionTrackingModes.contains(sessionTrackingMode)) {
                 throw new IllegalArgumentException(sm.getString(
-                        "applicationContext.setSessionTracking.iae",
+                        "applicationContext.setSessionTracking.iae.invalid",
                         sessionTrackingMode.toString(), getContextPath()));
             }
         }
-        // TODO SERVLET3 - The SSL test
+
+        // Check SSL has not be configured with anything else
+        if (sessionTrackingModes.contains(SessionTrackingMode.SSL)) {
+            if (sessionTrackingModes.size() > 1) {
+                throw new IllegalArgumentException(sm.getString(
+                        "applicationContext.setSessionTracking.iae.ssl",
+                        getContextPath()));
+            }
+        }
         
         this.sessionTrackingModes = sessionTrackingModes;
     }
 
 
+    public AsyncDispatcher getAsyncDispatcher(String path) {
+        // TODO SERVLET 3
+        return null;
+    }
+    
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {
         return this.context;

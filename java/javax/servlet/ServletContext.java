@@ -643,14 +643,38 @@ public interface ServletContext {
      */
     
     public String getServletContextName();
+
+
+    /**
+     * 
+     * @param servletName
+     * @param description
+     * @param className
+     * @param initParameters
+     * @param loadOnStartup
+     * @throws IllegalArgumentException If the servlet name already exists
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
+     * @since 3.0
+     */
+    public void addServlet(String servletName, String description,
+            String className, Map<String,String> initParameters,
+            int loadOnStartup)
+            throws IllegalArgumentException, IllegalStateException;
+    
     
     /**
      * 
      * @param servletName
      * @param urlPatterns
+     * @throws IllegalArgumentException If urlPatters is null or empty
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
+     * 
      * @since 3.0
      */
-    public void addServletMapping(String servletName, String[] urlPatterns);
+    public void addServletMapping(String servletName, String[] urlPatterns)
+            throws IllegalArgumentException, IllegalStateException;
 
     /**
      * 
@@ -658,12 +682,15 @@ public interface ServletContext {
      * @param description
      * @param className
      * @param initParameters
-     * @param isAsyncSupported
+     * @throws IllegalArgumentException If the filter name already exists
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
+     * 
      * @since 3.0
      */
     public void addFilter(String filterName, String description,
-            String className, Map<String,String> initParameters,
-            boolean isAsyncSupported);
+            String className, Map<String,String> initParameters)
+            throws IllegalArgumentException, IllegalStateException;
     
     /**
      * 
@@ -671,11 +698,15 @@ public interface ServletContext {
      * @param dispatcherTypes
      * @param isMatchAfter
      * @param servletNames
+     * @throws IllegalArgumentException If servletNames is null or empty
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
      * @since 3.0
      */
     public void addFilterMappingForServletNames(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... servletNames);
+            String... servletNames)
+            throws IllegalArgumentException, IllegalStateException;
     
     /**
      * 
@@ -683,18 +714,24 @@ public interface ServletContext {
      * @param dispatcherTypes
      * @param isMatchAfter
      * @param urlPatterns
+4     *
      * @since 3.0
      */
     public void addFilterMappingForUrlPatterns(String filterName,
             EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... urlPatterns);
+            String... urlPatterns)
+            throws IllegalArgumentException, IllegalStateException;
     
+
     /**
      * 
      * @param sessionCookieConfig
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
      * @since 3.0
      */
-    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig);
+    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig)
+            throws IllegalStateException;
     
     /**
      * 
@@ -706,10 +743,17 @@ public interface ServletContext {
     /**
      * 
      * @param sessionTrackingModes
+     * @throws IllegalArgumentException If sessionTrackingModes specifies
+     *                                  {@link SessionTrackingMode.SSL} in
+     *                                  combination with any other
+     *                                  {@link SessionTrackingMode}
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
      * @since 3.0
      */
     public void setSessionTrackingModes(
-            EnumSet<SessionTrackingMode> sessionTrackingModes);
+            EnumSet<SessionTrackingMode> sessionTrackingModes)
+            throws IllegalStateException, IllegalArgumentException;
     
     /**
      * 
@@ -724,6 +768,12 @@ public interface ServletContext {
      * @since 3.0
      */
     public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes();
+    
+    /**
+     * 
+     * @param path
+     * @return
+     * @since 3.0
+     */
+    public AsyncDispatcher getAsyncDispatcher(String path);
 }
-
-

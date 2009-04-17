@@ -17,13 +17,14 @@
 package javax.servlet;
 
 import java.io.IOException;
+import java.util.EventListener;
 
 /**
  * @since 3.0
  * $Id$
- * TODO SERVLET3
+ * TODO SERVLET3 - Add comments
  */
-public interface AsyncListener {
-    void onComplete(AsyncEvent event) throws IOException;
+public interface AsyncListener extends EventListener {
+    void onDoneAsync(AsyncEvent event) throws IOException;
     void onTimeout(AsyncEvent event) throws IOException;
 }

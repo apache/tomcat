@@ -18,16 +18,9 @@ package javax.servlet;
 
 /**
  * @since 3.0
- * $Id$
- * TODO SERVLET3
+ * TODO SERVLET3 - Add comments
  */
-public interface AsyncContext {
-    ServletRequest getRequest();
-    ServletResponse getResponse();
-    boolean hasOriginalRequestAndResponse();
-    void forward();
-    void forward(String path);
-    void forward(ServletContext context, String path);
-    void complete();
-    void start(Runnable run);
+public interface AsyncDispatcher {
+    void forward(ServletRequest request, ServletResponse response)
+            throws IllegalStateException;
 }

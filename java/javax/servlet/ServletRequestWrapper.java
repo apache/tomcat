@@ -417,25 +417,22 @@ public class ServletRequestWrapper implements ServletRequest {
      * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public AsyncContext startAsync() throws java.lang.IllegalStateException {
-        return request.startAsync();
+    public void startAsync() throws java.lang.IllegalStateException {
+        request.startAsync();
     }
     
     /**
      * The default behavior of this method is to return
-     * startAsync(ServletRequest, ServletResponse) on the wrapped request
-     * object.
+     * startAsync(Runnable) on the wrapped request object.
      * 
-     * @param servletRequest
-     * @param servletResponse
+     * @param runnable
      * @return
      * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public AsyncContext startAsync(ServletRequest servletRequest,
-            ServletResponse servletResponse)
+    public void startAsync(Runnable runnable)
             throws java.lang.IllegalStateException {
-        return request.startAsync(servletRequest, servletResponse);
+        request.startAsync(runnable);
     }
     
     /**
@@ -448,7 +445,17 @@ public class ServletRequestWrapper implements ServletRequest {
     public boolean isAsyncStarted() {
         return request.isAsyncStarted();
     }
-    
+
+    /**
+     * The default behavior of this method is to return
+     * doneAsync() on the wrapped request object.
+     * @throws java.lang.IllegalStateException
+     * @since 3.0
+     */
+    public void doneAsync() throws IllegalStateException {
+        request.doneAsync();
+    }
+
     /**
      * The default behavior of this method is to return
      * isAsyncSupported() on the wrapped request object.
@@ -462,26 +469,26 @@ public class ServletRequestWrapper implements ServletRequest {
     
     /**
      * The default behavior of this method is to return
-     * getAsyncContext() on the wrapped request object.
+     * getAsyncDispatcher() on the wrapped request object.
      * 
      * @return
      * @since 3.0
      */
-    public AsyncContext getAsyncContext() {
-        return request.getAsyncContext();
+    public AsyncDispatcher getAsyncDispatcher() {
+        return request.getAsyncDispatcher();
     }
 
     /**
-     * The default behavior of this method is to call
-     * addAsyncListener(AsyncListener) on the wrapped request object.
+     * The default behavior of this method is to return
+     * getAsyncDispatcher(path) on the wrapped request object.
      * 
-     * @param listener
+     * @return
      * @since 3.0
      */
-    public void addAsyncListener(AsyncListener listener) {
-        request.addAsyncListener(listener);
+    public AsyncDispatcher getAsyncDispatcher(String path) {
+        return request.getAsyncDispatcher(path);
     }
-    
+
     /**
      * The default behavior of this method is to call
      * addAsyncListener(AsyncListener, ServletRequest, ServletResponse) on the
@@ -497,16 +504,5 @@ public class ServletRequestWrapper implements ServletRequest {
         request.addAsyncListener(listener, servletRequest, servletResponse);
     }
     
-    /**
-     * The default behavior of this method is to call
-     * startAsync() on the wrapped request object.
-     * 
-     * @param timeout
-     * @since 3.0
-     */
-    public void setAsyncTimeout(long timeout) {
-        request.setAsyncTimeout(timeout);
-    }
-
 }
 
