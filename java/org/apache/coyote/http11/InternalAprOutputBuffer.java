@@ -192,14 +192,6 @@ public class InternalAprOutputBuffer
 
 
     /**
-     * Set the socket buffer size.
-     */
-    public void setSocketBuffer(int socketBufferSize) {
-        // FIXME: Remove
-    }
-
-
-    /**
      * Add an output filter to the filter library.
      */
     public void addFilter(OutputFilter filter) {
