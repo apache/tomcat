@@ -26,7 +26,7 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.AsyncContext;
+import javax.servlet.AsyncDispatcher;
 import javax.servlet.AsyncListener;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -938,21 +938,6 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
-        request.addAsyncListener(listener,servletRequest,servletResponse);
-    }
-
-
-    public void addAsyncListener(AsyncListener listener) {
-        request.addAsyncListener(listener);
-    }
-
-
-    public AsyncContext getAsyncContext() {
-        return request.getAsyncContext();
-    }
-
-
     public ServletContext getServletContext() {
         if (request == null) {
             throw new IllegalStateException(
@@ -963,29 +948,45 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
+    public void startAsync() throws IllegalStateException {
+        request.startAsync();
+    }
+
+
+    public void startAsync(Runnable runnable) throws IllegalStateException {
+        request.startAsync(runnable);
+    }
+
+
     public boolean isAsyncStarted() {
         return request.isAsyncStarted();
     }
 
 
+    public void doneAsync() throws IllegalStateException {
+        request.doneAsync();
+    }
+
+    
     public boolean isAsyncSupported() {
         return request.isAsyncStarted();
     }
 
-
-    public void setAsyncTimeout(long timeout) {
-        request.setAsyncTimeout(timeout);
+    
+    public AsyncDispatcher getAsyncDispatcher() {
+        return request.getAsyncDispatcher();
     }
 
-
-    public AsyncContext startAsync() throws IllegalStateException {
-        return request.startAsync();
+    
+    public AsyncDispatcher getAsyncDispatcher(String path) {
+        return request.getAsyncDispatcher(path);
     }
 
-
-    public AsyncContext startAsync(ServletRequest servletRequest,ServletResponse servletResponse) throws IllegalStateException {
-        return request.startAsync(servletRequest, servletResponse);
+    
+    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
+        request.addAsyncListener(listener,servletRequest,servletResponse);
     }
+
 
     public boolean getAllowTrace() {
         return request.getConnector().getAllowTrace();

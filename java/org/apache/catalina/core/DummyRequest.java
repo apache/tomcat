@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.AsyncContext;
+import javax.servlet.AsyncDispatcher;
 import javax.servlet.AsyncListener;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -280,15 +280,13 @@ public class DummyRequest
     public int getRemotePort() { return -1; }
     public void addAsyncListener(AsyncListener listener, ServletRequest req,
             ServletResponse res) {}
-    public void addAsyncListener(AsyncListener listener) {}
-    public AsyncContext getAsyncContext() { return null; }
     public ServletContext getServletContext() { return null; }
     public boolean isAsyncStarted() { return false; }
+    public void doneAsync() {}
     public boolean isAsyncSupported() { return false; }
-    public void setAsyncTimeout(long timeout) {}
-    public AsyncContext startAsync() throws IllegalStateException {
-        return null; }
-    public AsyncContext startAsync(ServletRequest req, ServletResponse res)
-            throws IllegalStateException { return null; }
+    public void startAsync() throws IllegalStateException {}
+    public void startAsync(Runnable runnable) throws IllegalStateException {}
+    public AsyncDispatcher getAsyncDispatcher() { return null; }
+    public AsyncDispatcher getAsyncDispatcher(String path) { return null; }
 }
 
