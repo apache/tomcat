@@ -604,21 +604,20 @@ public interface ServletRequest {
     /**
      * 
      * @return
-     * @throws java.lang.IllegalStateException
+     * @throws java.lang.IllegalStateException  If async is not supported for
+     *                                          this request
      * @since 3.0
      */
-    public AsyncContext startAsync() throws java.lang.IllegalStateException;
+    public void startAsync() throws java.lang.IllegalStateException;
     
     /**
      * 
-     * @param servletRequest
-     * @param servletResponse
+     * @param runnable
      * @return
      * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public AsyncContext startAsync(ServletRequest servletRequest,
-            ServletResponse servletResponse)
+    public void startAsync(Runnable runnable)
             throws java.lang.IllegalStateException;
     
     /**
@@ -628,6 +627,13 @@ public interface ServletRequest {
      */
     public boolean isAsyncStarted();
     
+    /**
+     * 
+     * @throws IllegalStateException    If startAsync was never called
+     * @since 3.0
+     */
+    public void doneAsync() throws IllegalStateException;
+
     /**
      * 
      * @return
@@ -640,15 +646,16 @@ public interface ServletRequest {
      * @return
      * @since 3.0
      */
-    public AsyncContext getAsyncContext();
+    public AsyncDispatcher getAsyncDispatcher();
 
     /**
      * 
-     * @param listener
+     * @param path
+     * @return
      * @since 3.0
      */
-    public void addAsyncListener(AsyncListener listener);
-    
+    public AsyncDispatcher getAsyncDispatcher(String path);
+
     /**
      * 
      * @param listener
@@ -659,11 +666,5 @@ public interface ServletRequest {
     public void addAsyncListener(AsyncListener listener,
             ServletRequest servletRequest, ServletResponse servletResponse);
     
-    /**
-     * 
-     * @param timeout
-     * @since 3.0
-     */
-    public void setAsyncTimeout(long timeout);
 }
 
