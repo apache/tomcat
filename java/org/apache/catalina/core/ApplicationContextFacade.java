@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.AsyncDispatcher;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -388,15 +389,13 @@ public final class ApplicationContextFacade
 
        
     public void addFilter(String filterName, String description,
-            String className, Map<String, String> initParameters,
-            boolean isAsyncSupported) {
+            String className, Map<String, String> initParameters) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("addFilter", new Object[]{filterName, description,
-                    className, initParameters,
-                    Boolean.valueOf(isAsyncSupported)});
+                    className, initParameters});
         } else {
             context.addFilter(filterName, description, className,
-                    initParameters, isAsyncSupported);
+                    initParameters);
         }
     }
 
@@ -429,6 +428,19 @@ public final class ApplicationContextFacade
     }
 
 
+    public void addServlet(String servletName, String description,
+            String className, Map<String, String> initParameters,
+            int loadOnStartup) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addServlet", new Object[]{servletName, description,
+                    className, initParameters, Integer.valueOf(loadOnStartup)});
+        } else {
+            context.addServlet(servletName, description, className, initParameters,
+                    loadOnStartup);
+        }
+    }
+    
+    
     public void addServletMapping(String servletName, String[] urlPatterns) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("addServletMapping",
@@ -490,6 +502,17 @@ public final class ApplicationContextFacade
     }
 
 
+    public AsyncDispatcher getAsyncDispatcher(String path) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (AsyncDispatcher)
+                doPrivileged("getAsyncDispatcher",
+                        new Object[]{path});
+        } else {
+            return context.getAsyncDispatcher(path);
+        }
+    }
+    
+    
     /**
      * Use reflection to invoke the requested method. Cache the method object 
      * to speed up the process
