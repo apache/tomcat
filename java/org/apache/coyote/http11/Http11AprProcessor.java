@@ -658,7 +658,6 @@ public class Http11AprProcessor implements ActionHook {
      */
     public void setSocketBuffer(int socketBuffer) {
         this.socketBuffer = socketBuffer;
-        outputBuffer.setSocketBuffer(socketBuffer);
     }
 
     /**
