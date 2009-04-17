@@ -206,13 +206,6 @@ public class InternalNioOutputBuffer
     public NioSelectorPool getSelectorPool() {
         return pool;
     }    
-    /**
-     * Set the socket buffer size.
-     */
-    public void setSocketBuffer(int socketBufferSize) {
-        // FIXME: Remove
-    }
-
 
     /**
      * Add an output filter to the filter library.
