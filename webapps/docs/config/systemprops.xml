@@ -33,7 +33,18 @@
   the default Tomcat behaviour.</p>
 </section>
 
-
+<section name="Property replacements">
+  <properties>
+    <property name="org.apache.tomcat.util.digester. PROPERTY_SOURCE">
+      <p>Set this to a fully qualified name of a class that implements 
+         <code>org.apache.tomcat.util.IntrospectionUtils.PropertySource</code>.
+         Required to have a public constructor with no arguments.</p>
+      <p>Use this to add a property source, that will be invoked when <code>s{parameter}</code>
+         denoted parameters are found in the XML files that tomcat parses.</p>
+    </property>
+  </properties>
+  
+</section>  
 
 <section name="Clustering">
   <properties>

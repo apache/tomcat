@@ -76,10 +76,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class Digester extends DefaultHandler {
 
-
-    // ---------------------------------------------------------- Static Fields
-
-
+    
+    // ---------------------------------------------------------- Static Fields    
     private static class SystemPropertySource 
         implements IntrospectionUtils.PropertySource {
         public String getProperty( String key ) {
@@ -89,6 +87,28 @@ public class Digester extends DefaultHandler {
 
     protected static IntrospectionUtils.PropertySource source[] = 
         new IntrospectionUtils.PropertySource[] { new SystemPropertySource() };
+    
+    static {
+        String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
+        if (className!=null) {
+            IntrospectionUtils.PropertySource[] sources = new IntrospectionUtils.PropertySource[2];
+            sources[1] = source[0];
+            ClassLoader[] cls = new ClassLoader[] {Digester.class.getClassLoader(),Thread.currentThread().getContextClassLoader()};
+            boolean initialized = false;
+            for (int i=0; i<cls.length && (!initialized); i++) {
+                try {
+                    Class<?> clazz = Class.forName(className,true,cls[i]);
+                    IntrospectionUtils.PropertySource src = (IntrospectionUtils.PropertySource)clazz.newInstance();
+                    sources[0] = src;
+                    initialized = true;
+                } catch (Throwable t) {
+                    LogFactory.getLog("org.apache.commons.digester.Digester").
+                        error("Unable to load property source["+className+"].",t);
+                }
+            }
+            if (initialized) source = sources;
+        }
+    }
 
 
     // --------------------------------------------------------- Constructors
