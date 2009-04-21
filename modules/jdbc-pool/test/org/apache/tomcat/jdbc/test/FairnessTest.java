@@ -38,25 +38,34 @@ public class FairnessTest extends DefaultTestCase {
     }
     
     protected boolean run = true;
-    protected long sleep = 10;
-    protected long complete = 20000;
+    protected long sleep = Long.getLong("sleep", 10);
+    protected long complete = Long.getLong("complete",20000);
+    protected boolean printthread = Boolean.getBoolean("printthread");
     CountDownLatch latch = null;
     protected void printThreadResults(TestThread[] threads, String name) {
         long minfetch = Long.MAX_VALUE, maxfetch = Long.MIN_VALUE, totalfetch = 0;
+        long maxwait = 0, minwait = Long.MAX_VALUE, averagewait = 0, totalwait = 0;
         float avgfetch = 0;
         for (int i=0; i<threads.length; i++) {
             TestThread t = threads[i];
             totalfetch += t.nroffetch;
+            totalwait  += t.totalwait;
+            maxwait = Math.max(maxwait,t.maxwait);
+            minwait = Math.min(minwait, t.minwait);
             minfetch = Math.min(minfetch, t.nroffetch);
             maxfetch = Math.max(maxfetch, t.nroffetch);
-            System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+(((float)t.max)/1000000f)+"ms. :Max close time:"+(((float)t.cmax)/1000000f)+"ms.");
+            if (FairnessTest.this.printthread)
+                System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+(((float)t.maxwait)/1000000f)+"ms. :Max close time:"+(((float)t.cmax)/1000000f)+"ms.");
         }
         System.out.println("["+name+"] Max fetch:"+(maxfetch)+" Min fetch:"+(minfetch)+" Average fetch:"+
                            (((float)totalfetch))/(float)threads.length);
+        System.out.println("["+name+"] Max wait:"+(((float)maxwait)/1000000f)+"ms. Min wait:"+(((float)minwait)/1000000f)+"ms. Average wait:"+(((((float)totalwait))/(float)totalfetch)/1000000f)+" ms.");
+        
+        
     }
     
     public void testDBCPThreads20Connections10() throws Exception {
-        System.out.println("Starting fairness - DBCP");
+        System.out.println("[testDBCPThreads20Connections10] Starting fairness - DBCP");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.threadcount = 20;
@@ -80,14 +89,14 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testDBCPThreads20Connections10");
-        System.out.println("Completed fairness - DBCP");
         tearDown();
     }
 
     public void testPoolThreads20Connections10() throws Exception {
-        System.out.println("Starting fairness - Tomcat JDBC - Non Fair");
+        System.out.println("[testPoolThreads20Connections10] Starting fairness - Tomcat JDBC - Non Fair");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setFairQueue(false);
         this.threadcount = 20;
         this.transferProperties();
         this.datasource.getConnection().close();
@@ -109,13 +118,12 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10");
-        System.out.println("Completed fairness - Tomcat JDBC - Non Fair");
         tearDown();
 
     }
 
     public void testPoolThreads20Connections10Fair() throws Exception {
-        System.out.println("Starting fairness - Tomcat JDBC - Fair");
+        System.out.println("[testPoolThreads20Connections10Fair] Starting fairness - Tomcat JDBC - Fair");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(true);
@@ -140,12 +148,11 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10Fair");
-        System.out.println("Completed fairness - Tomcat JDBC - Fair");
         tearDown();
     }
-
+ 
     public void testPoolThreads20Connections10FairAsync() throws Exception {
-        System.out.println("Starting fairness - Tomcat JDBC - Fair - Async");
+        System.out.println("[testPoolThreads20Connections10FairAsync] Starting fairness - Tomcat JDBC - Fair - Async");
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setFairQueue(true);
@@ -171,7 +178,6 @@ public class FairnessTest extends DefaultTestCase {
         this.run = false;
         long delta = System.currentTimeMillis() - start;
         printThreadResults(threads,"testPoolThreads20Connections10FairAsync");
-        System.out.println("Completed fairness - Tomcat JDBC - Fair - Async");
         tearDown();
     }
     
@@ -180,7 +186,7 @@ public class FairnessTest extends DefaultTestCase {
         protected String query = null;
         protected long sleep = 10;
         protected boolean async = false;
-        long max = -1, totalmax=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
+        long minwait = Long.MAX_VALUE, maxwait = -1, totalwait=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
         public void run() {
             try {
                 long now = System.currentTimeMillis();
@@ -196,8 +202,9 @@ public class FairnessTest extends DefaultTestCase {
                             con = d.getConnection();
                         }
                         long delta = System.nanoTime() - start;
-                        totalmax += delta;
-                        max = Math.max(delta, max);
+                        totalwait += delta;
+                        maxwait = Math.max(delta, maxwait);
+                        minwait = Math.min(delta, minwait);
                         nroffetch++;
                         if (query!=null) {
                             Statement st = con.createStatement();
@@ -208,7 +215,7 @@ public class FairnessTest extends DefaultTestCase {
                             st.close();
                         }
                         try { 
-                            sleep(FairnessTest.this.sleep); 
+                            if (FairnessTest.this.sleep>0) sleep(FairnessTest.this.sleep); 
                         } catch (InterruptedException x) {
                             interrupted();
                         }
@@ -229,9 +236,9 @@ public class FairnessTest extends DefaultTestCase {
             }
             if (System.getProperty("print-thread-stats")!=null) {
                 System.out.println("["+getName()+"] "+
-                    "\n\tMax time to retrieve connection:"+(((float)max)/1000f/1000f)+" ms."+
-                    "\n\tTotal time to retrieve connection:"+(((float)totalmax)/1000f/1000f)+" ms."+
-                    "\n\tAverage time to retrieve connection:"+(((float)totalmax)/1000f/1000f)/(float)nroffetch+" ms."+
+                    "\n\tMax time to retrieve connection:"+(((float)maxwait)/1000f/1000f)+" ms."+
+                    "\n\tTotal time to retrieve connection:"+(((float)totalwait)/1000f/1000f)+" ms."+
+                    "\n\tAverage time to retrieve connection:"+(((float)totalwait)/1000f/1000f)/(float)nroffetch+" ms."+
                     "\n\tMax time to close connection:"+(((float)cmax)/1000f/1000f)+" ms."+
                     "\n\tTotal time to close connection:"+(((float)totalcmax)/1000f/1000f)+" ms."+
                     "\n\tAverage time to close connection:"+(((float)totalcmax)/1000f/1000f)/(float)nroffetch+" ms."+
@@ -241,3 +248,4 @@ public class FairnessTest extends DefaultTestCase {
         }
     }
 }
+
