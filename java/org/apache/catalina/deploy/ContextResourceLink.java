@@ -40,6 +40,10 @@ public class ContextResourceLink extends ResourceBase implements Serializable {
      * The global name of this resource.
      */
     private String global = null;
+    /**
+     * The factory to be used for creating the object
+     */
+    private String factory = null;
 
     public String getGlobal() {
         return (this.global);
@@ -49,7 +53,13 @@ public class ContextResourceLink extends ResourceBase implements Serializable {
         this.global = global;
     }
 
+    public String getFactory() {
+        return factory;
+    }
 
+    public void setFactory(String factory) {
+        this.factory = factory;
+    }
     // --------------------------------------------------------- Public Methods
 
 
