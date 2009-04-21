@@ -68,7 +68,7 @@ public class PoolProperties {
     protected String initSQL;
     protected boolean testOnConnect =false;
     private String jdbcInterceptors=null;
-    private boolean fairQueue = false;
+    private boolean fairQueue = true;
     private boolean useEquals = false;
 
     private InterceptorDefinition[] interceptors = null;
