@@ -56,7 +56,7 @@
   <property name="compile.source" value="1.5"/>
 
   <!-- JAR artifacts -->
-  <property name="tomcat-dbcp.home" value="${base.path}/tomcat6-deps/dbcp" />
+  <property name="tomcat-dbcp.home" value="${base.path}/tomcat7-deps/dbcp" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
