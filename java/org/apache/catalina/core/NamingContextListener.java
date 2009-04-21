@@ -1063,7 +1063,16 @@ public class NamingContextListener
 
         // Create a reference to the resource.
         Reference ref = new ResourceLinkRef
-            (resourceLink.getType(), resourceLink.getGlobal());
+            (resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(), null);
+        Iterator i = resourceLink.listProperties();
+        while (i.hasNext()) {
+            String key = i.next().toString();
+            Object val = resourceLink.getProperty(key);
+            if (val!=null) {
+                StringRefAddr refAddr = new StringRefAddr(key, val.toString());
+                ref.add(refAddr);
+            }
+        }
         javax.naming.Context ctx = 
             "UserTransaction".equals(resourceLink.getName()) 
             ? compCtx : envCtx;
