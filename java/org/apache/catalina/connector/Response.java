@@ -415,16 +415,6 @@ public class Response
 
 
     /**
-     * Set the output stream associated with this Response.
-     *
-     * @param stream The new output stream
-     */
-    public void setStream(OutputStream stream) {
-        // This method is evil
-    }
-
-
-    /**
      * Set the suspended flag.
      * 
      * @param suspended The new suspended flag value
