@@ -403,25 +403,6 @@ public class Connector
 
 
     /**
-     * Return the input buffer size for this Connector.
-     *
-     * @deprecated
-     */
-    public int getBufferSize() {
-        return 2048;
-    }
-
-    /**
-     * Set the input buffer size for this Connector.
-     *
-     * @param bufferSize The new input buffer size.
-     * @deprecated
-     */
-    public void setBufferSize(int bufferSize) {
-    }
-
-
-    /**
      * Return the Container used for processing requests received by this
      * Connector.
      */
