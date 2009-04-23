@@ -30,17 +30,21 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.AsyncDispatcher;
+import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
@@ -282,11 +286,23 @@ public class DummyRequest
             ServletResponse res) {}
     public ServletContext getServletContext() { return null; }
     public boolean isAsyncStarted() { return false; }
-    public void doneAsync() {}
     public boolean isAsyncSupported() { return false; }
-    public void startAsync() throws IllegalStateException {}
-    public void startAsync(Runnable runnable) throws IllegalStateException {}
-    public AsyncDispatcher getAsyncDispatcher() { return null; }
-    public AsyncDispatcher getAsyncDispatcher(String path) { return null; }
+    public AsyncContext startAsync() throws IllegalStateException {
+        return null;
+    }
+    public Part getPart(String name) { return null; }
+    public Iterable<Part> getParts() { return null; }
+    public boolean login(HttpServletResponse response)
+    throws IOException, ServletException { return false; }
+    public void login(String username, String password)
+    throws ServletException {}
+    public void logout() throws ServletException {}
+    public void addAsyncListener(AsyncListener listener) {}
+    public AsyncContext getAsyncContext() { return null; }
+    public long getAsyncTimeout() { return 0; }
+    public DispatcherType getDispatcherType() { return null; }
+    public void setAsyncTimeout(long timeout) {}
+    public AsyncContext startAsync(ServletRequest servletRequest,
+            ServletResponse servletResponse) { return null; }
 }
 

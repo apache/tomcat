@@ -30,14 +30,8 @@ import java.lang.annotation.Documented;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface WebServlet {
-    String name() default "";
-    String[] value() default {};
-    String[] urlPatterns() default {};
-    int loadOnStartup() default -1;
-    WebInitParam[] initParams() default {};
-    boolean asyncSupported() default false;
-    String smallIcon() default "";
-    String largeIcon() default "";
+public @interface WebInitParam {
+    String name();
+    String value();
     String description() default "";
 }

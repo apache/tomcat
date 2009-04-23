@@ -17,7 +17,10 @@
 
 package javax.servlet.http;
 
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+
+import java.io.IOException;
 import java.util.Enumeration;
 
 /**
@@ -657,5 +660,51 @@ public interface HttpServletRequest extends ServletRequest {
     public boolean isRequestedSessionIdFromUrl();
 
 
+    /**
+     * 
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     * @since Servlet 3.0
+     */
+    public boolean login(HttpServletResponse response)
+    throws IOException, ServletException;
     
+    
+    /**
+     * 
+     * @param username
+     * @param password
+     * @throws ServletException
+     * @since Servlet 3.0
+     */
+    public void login(java.lang.String username, String password)
+    throws ServletException;
+    
+    
+    /**
+     * 
+     * @throws ServletException
+     * @since Servlet 3.0
+     */
+    public void logout() throws ServletException;
+    
+    
+    /**
+     * 
+     * @return
+     * @since Servlet 3.0
+     */
+    public Iterable<Part> getParts();
+    
+    
+    /**
+     * 
+     * @param name
+     * @return
+     * @throws IllegalArgumentException
+     * @since Servlet 3.0
+     */
+    public Part getPart(java.lang.String name);
 }

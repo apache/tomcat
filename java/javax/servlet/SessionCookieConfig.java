@@ -21,58 +21,69 @@ package javax.servlet;
  * @since 3.0
  * $Id$
  */
-public class SessionCookieConfig {
-    private String domain;
-    private String path;
-    private String comment;
-    private boolean httpOnly;
-    private boolean secure;
+public interface SessionCookieConfig {
+    
+    /**
+     * 
+     * @param name
+     * @throws IllegalStateException
+     */
+    public void setName(String name);
+    
+    public String getName();
+    
+    /**
+     * 
+     * @param domain
+     * @throws IllegalStateException
+     */
+    public void setDomain(String domain);
+    
+    public String getDomain();
+    
+    /**
+     * 
+     * @param path
+     * @throws IllegalStateException
+     */
+    public void setPath(String path);
+    
+    public String getPath();
+    
+    /**
+     * 
+     * @param comment
+     * @throws IllegalStateException
+     */
+    public void setComment(String comment);
+    
+    public String getComment();
+    
+    /**
+     * 
+     * @param httpOnly
+     * @throws IllegalStateException
+     */
+    public void setHttpOnly(boolean httpOnly);
+    
+    public boolean isHttpOnly();
+    
+    /**
+     * 
+     * @param secure
+     * @throws IllegalStateException
+     */
+    public void setSecure(boolean secure);
+    
+    public boolean isSecure();
 
     /**
      * 
-     * @param domain      Domain to use for session cookies generated for a
-     *                    {@link ServletContext} in which this
-     *                    {@link SessionCookieConfig} has been set
-     * @param path        Path to use for session cookies generated for a
-     *                    {@link ServletContext} in which this
-     *                    {@link SessionCookieConfig} has been set. If null
-     *                    {@link ServletContext#getContextPath()} is used
-     * @param comment     Comment to use for session cookies generated for a
-     *                    {@link ServletContext} in which this
-     *                    {@link SessionCookieConfig} has been set
-     * @param isHttpOnly  HttpOnly flag to use for session cookies generated for
-     *                    a {@link ServletContext} in which this
-     *                    {@link SessionCookieConfig} has been set
-     * @param isSecure    If <code>true</code>, the cookie will always be marked
-     *                    as secure. If <code>false</code> the cookie will only
-     *                    be marked as secure if the request is secure.
+     * @param maxAge
+     * @throws IllegalStateException
      */
-    public SessionCookieConfig(String domain, String path, String comment,
-            boolean isHttpOnly, boolean isSecure) {
-        this.domain = domain;
-        this.path = path;
-        this.comment = comment;
-        this.httpOnly = isHttpOnly;
-        this.secure = isSecure;
-    }
+    public void setMaxAge(int MaxAge);
     
-    public java.lang.String getDomain() {
-        return domain;
-    }
+    public int getHttpOnly();
     
-    public java.lang.String getPath() {
-        return path;
-    }
-    
-    public java.lang.String getComment() {
-        return comment;
-    }
-    
-    public boolean isHttpOnly() {
-        return httpOnly;
-    }
-    
-    public boolean isSecure() {
-        return secure;
-    }
 }
