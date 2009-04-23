@@ -51,7 +51,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         super();
     }
     
-    
     /**
      * Invoked when prepareStatement has been called and completed.
      * @param sql - the string used to prepare the statement with

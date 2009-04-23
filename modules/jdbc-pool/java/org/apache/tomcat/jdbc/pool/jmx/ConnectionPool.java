@@ -273,5 +273,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public int getWaitCount() {
         return pool.getWaitCount();
     }
+    public int getAbandonWhenPercentageFull() {
+        return pool.getPoolProperties().getAbandonWhenPercentageFull();
+    }
 
 }

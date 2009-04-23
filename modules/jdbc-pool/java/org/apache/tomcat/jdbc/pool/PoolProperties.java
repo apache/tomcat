@@ -67,11 +67,22 @@ public class PoolProperties {
     protected boolean jmxEnabled = true;
     protected String initSQL;
     protected boolean testOnConnect =false;
-    private String jdbcInterceptors=null;
-    private boolean fairQueue = true;
-    private boolean useEquals = false;
+    protected String jdbcInterceptors=null;
+    protected boolean fairQueue = true;
+    protected boolean useEquals = false;
+    protected int abandonWhenPercentageFull = 0;
 
     private InterceptorDefinition[] interceptors = null;
+    
+    public void setAbandonWhenPercentageFull(int percentage) {
+        if (percentage<0) abandonWhenPercentageFull = 0;
+        else if (percentage>100) abandonWhenPercentageFull = 100;
+        else abandonWhenPercentageFull = percentage;
+    }
+    
+    public int getAbandonWhenPercentageFull() {
+        return abandonWhenPercentageFull;
+    }
     
     public boolean isFairQueue() {
         return fairQueue;
