@@ -16,13 +16,11 @@
  */
 package javax.servlet.annotation;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.annotation.Documented;
-
-import javax.servlet.DispatcherType;
 
 /**
  * @since 3.0
@@ -32,16 +30,6 @@ import javax.servlet.DispatcherType;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ServletFilter {
-    String description() default "";
-    String displayName() default "";
-    InitParam[] initParams() default {};
-    String filterName() default "";
-    String icon() default "";
-    String[] servletNames() default {};
-    String[] value() default {};
-    String[] urlPatterns() default {};
-    DispatcherType[] dispatcherTypes() default {DispatcherType.REQUEST};
-    boolean asyncSupported() default false;
-    long asyncTimeout() default 60000L;
+public @interface HandlesTypes {
+    Class<?>[] value();
 }

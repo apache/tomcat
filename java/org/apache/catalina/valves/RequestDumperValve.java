@@ -161,11 +161,11 @@ public class RequestDumperValve
                 rcookies[i].getValue() + "; domain=" +
                 rcookies[i].getDomain() + "; path=" + rcookies[i].getPath());
         }
-        String rhnames[] = response.getHeaderNames();
-        for (int i = 0; i < rhnames.length; i++) {
-            String rhvalues[] = response.getHeaderValues(rhnames[i]);
-            for (int j = 0; j < rhvalues.length; j++)
-                log.info("            header=" + rhnames[i] + "=" + rhvalues[j]);
+        Iterable<String> rhnames = response.getHeaderNames();
+        for (String rhname : rhnames) {
+            Iterable<String> rhvalues = response.getHeaders(rhname);
+            for (String rhvalue : rhvalues)
+                log.info("            header=" + rhname + "=" + rhvalue);
         }
         log.info("           message=" + response.getMessage());
         log.info("        remoteUser=" + request.getRemoteUser());

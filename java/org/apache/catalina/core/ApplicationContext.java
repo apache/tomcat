@@ -34,13 +34,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.naming.Binding;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
-import javax.servlet.AsyncDispatcher;
-import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextAttributeEvent;
 import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
@@ -48,8 +50,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ApplicationParameter;
-import org.apache.catalina.deploy.FilterDef;
-import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResourceSet;
@@ -838,143 +838,145 @@ public class ApplicationContext
     }
 
 
-    public void addFilter(String filterName, String description,
-            String className, Map<String, String> initParameters)
-            throws IllegalArgumentException, IllegalStateException {
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            String className) throws IllegalStateException {
         
-        if (context.findFilterDef(filterName) != null) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addFilter.iae", filterName,
-                    getContextPath()));
-        }
-
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addFilter.ise",
                             getContextPath()));
         }
-        FilterDef filterDef = new FilterDef();
-        filterDef.setFilterName(filterName);
-        filterDef.setDescription(description);
-        filterDef.setFilterClass(className);
-        filterDef.getParameterMap().putAll(initParameters);
-        context.addFilterDef(filterDef);
+        
+        if (context.findFilterDef(filterName) != null) {
+            return null;
+        }
+
+        // TODO Servlet 3
+        return null;
     }
 
     
-    public void addServlet(String servletName, String description,
-            String className, Map<String, String> initParameters,
-            int loadOnStartup)
-            throws IllegalArgumentException, IllegalStateException {
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            Filter filter) throws IllegalStateException {
         
-        if (context.findFilterDef(servletName) != null) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addServlet.iae", servletName,
-                    getContextPath()));
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addFilter.ise",
+                            getContextPath()));
+        }
+        
+        if (context.findFilterDef(filterName) != null) {
+            return null;
         }
 
+        // TODO Servlet 3
+        return null;
+    }
+
+    
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            Class<? extends Filter> filterClass) throws IllegalStateException {
+        
+        if (context.initialized) {
+            //TODO Spec breaking enhancement to ignore this restriction
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addFilter.ise",
+                            getContextPath()));
+        }
+        
+        if (context.findFilterDef(filterName) != null) {
+            return null;
+        }
+
+        // TODO Servlet 3
+        return null;
+    }
+
+    
+    public <T extends Filter> T createFilter(Class<T> c)
+    throws ServletException {
+        // TODO Servlet 3
+        return null;
+    }
+
+
+    public FilterRegistration findFilterRegistration(String filterName) {
+        // TODO Servlet 3.0
+        return null;
+    }
+    
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            String className) throws IllegalStateException {
+        
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
             throw new IllegalStateException(
                     sm.getString("applicationContext.addServlet.ise",
                             getContextPath()));
         }
-        Wrapper wrapper = context.createWrapper();
-        wrapper.setName(servletName);
-        // Description is ignored
-        wrapper.setServletClass(className);
-        for (Map.Entry<String,String> initParam : initParameters.entrySet()) {
-            wrapper.addInitParameter(initParam.getKey(), initParam.getValue());
+
+        if (context.findChild(servletName) != null) {
+            return null;
         }
-        wrapper.setLoadOnStartup(loadOnStartup);
-        context.addChild(wrapper);
+
+        // TODO Servlet 3
+        return null;
     }
 
 
-    public void addFilterMappingForServletNames(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... servletNames)
-            throws IllegalArgumentException, IllegalStateException {
-        
-        if (servletNames == null || servletNames.length == 0) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addFilterMapping.iae.servlet"));
-        }
-
-        if (context.initialized) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(sm.getString(
-                    "applicationContext.addFilterMapping.ise",
-                    getContextPath()));
-        }
-        FilterMap filterMap = new FilterMap(); 
-        for (String servletName : servletNames) {
-            filterMap.addServletName(servletName);
-        }
-        filterMap.setFilterName(filterName);
-        for (DispatcherType dispatcherType: dispatcherTypes) {
-            filterMap.setDispatcher(dispatcherType.name());
-        }
-        if (isMatchAfter) {
-            context.addFilterMap(filterMap);
-        } else {
-            context.addFilterMapBefore(filterMap);
-        }
-    }
-
-
-    public void addFilterMappingForUrlPatterns(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... urlPatterns)
-            throws IllegalArgumentException, IllegalStateException {
-        
-        if (urlPatterns == null || urlPatterns.length == 0) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addFilterMapping.iae.url",
-                    getContextPath()));
-        }
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            Servlet servlet) throws IllegalStateException {
         
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(sm.getString(
-                    "applicationContext.addFilterMapping.ise",
-                    getContextPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addServlet.ise",
+                            getContextPath()));
         }
-        FilterMap filterMap = new FilterMap(); 
-        for (String urlPattern : urlPatterns) {
-            filterMap.addURLPattern(urlPattern);
+
+        if (context.findChild(servletName) != null) {
+            return null;
         }
-        filterMap.setFilterName(filterName);
-        for (DispatcherType dispatcherType: dispatcherTypes) {
-            filterMap.setDispatcher(dispatcherType.name());
-        }
-        if (isMatchAfter) {
-            context.addFilterMap(filterMap);
-        } else {
-            context.addFilterMapBefore(filterMap);
-        }
+
+        // TODO Servlet 3
+        return null;
     }
 
-
-    public void addServletMapping(String servletName, String[] urlPatterns)
-            throws IllegalArgumentException, IllegalStateException {
-        if (urlPatterns == null || urlPatterns.length == 0) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addServletMapping.iae"));
-        }
+    
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            Class <? extends Servlet> servletClass)
+    throws IllegalStateException {
         
         if (context.initialized) {
             //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(sm.getString(
-                    "applicationContext.addServletMapping.ise", getContextPath()));
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.addServlet.ise",
+                            getContextPath()));
         }
-        for (String urlPattern : urlPatterns) {
-            boolean jspWildCard = ("*.jsp".equals(urlPattern));
-            context.addServletMapping(servletName, urlPattern, jspWildCard);
+
+        if (context.findChild(servletName) != null) {
+            return null;
         }
+
+        // TODO Servlet 3
+        return null;
     }
 
+
+    public <T extends Servlet> T createServlet(Class<T> c)
+    throws ServletException {
+        // TODO Servlet 3
+        return null;
+    }
+
+
+    public ServletRegistration findServletRegistration(String servletName) {
+        // TODO Servlet 3.0
+        return null;
+    }
+    
 
     /**
      * By default {@link SessionTrackingMode#URL} is always supported, {@link
@@ -1016,20 +1018,6 @@ public class ApplicationContext
     }
 
 
-    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig)
-            throws IllegalArgumentException {
-        
-        if (context.initialized) {
-            //TODO Spec breaking enhancement to ignore this restriction
-            throw new IllegalStateException(sm.getString(
-                    "applicationContext.setSessionCookieConfig.ise",
-                    getContextPath()));
-        }
-
-        this.sessionCookieConfig = sessionCookieConfig;
-    }
-
-
     /**
      * @throws IllegalStateException if the context has already been initialised
      * @throws IllegalArgumentException If SSL is requested in combination with
@@ -1067,10 +1055,11 @@ public class ApplicationContext
     }
 
 
-    public AsyncDispatcher getAsyncDispatcher(String path) {
-        // TODO SERVLET 3
-        return null;
+    public boolean setInitParameter(String name, String value) {
+        // TODO Servlet 3
+        return false;
     }
+    
     
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {

@@ -27,18 +27,19 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.servlet.AsyncDispatcher;
-import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.FilterRegistration.Dynamic;
 
 
 /**
@@ -443,36 +444,15 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    public void addFilter(String filterName, String description,
-            String className, Map<String, String> initParameters) {
-        // Do nothing
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            String className) {
+        return null;
     }
 
 
-    public void addFilterMappingForServletNames(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... servletNames) {
-        // Do nothing
-    }
-
-
-    public void addFilterMappingForUrlPatterns(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... urlPatterns) {
-        // Do nothing
-    }
-
-
-    public void addServlet(String servletName, String description,
-            String className, Map<String, String> initParameters,
-            int loadOnStartup) throws IllegalArgumentException,
-            IllegalStateException {
-        // Do nothing
-    }
-
-
-    public void addServletMapping(String servletName, String[] urlPatterns) {
-        // Do nothing
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            String className) {
+        return null;
     }
 
 
@@ -491,20 +471,59 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
-        // Do nothing
-    }
-
-
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes) {
         // Do nothing
     }
 
 
-    public AsyncDispatcher getAsyncDispatcher(String path) {
-        // Do nothing
+    public Dynamic addFilter(String filterName, Filter filter) {
         return null;
+    }
+
+
+    public Dynamic addFilter(String filterName,
+            Class<? extends Filter> filterClass) {
+        return null;
+    }
+
+
+    public javax.servlet.Registration.Dynamic addServlet(String servletName,
+            Servlet servlet) {
+        return null;
+    }
+
+
+    public javax.servlet.Registration.Dynamic addServlet(String servletName,
+            Class<? extends Servlet> servletClass) {
+        return null;
+    }
+
+
+    public <T extends Filter> T createFilter(Class<T> c)
+            throws ServletException {
+        return null;
+    }
+
+
+    public <T extends Servlet> T createServlet(Class<T> c)
+            throws ServletException {
+        return null;
+    }
+
+
+    public FilterRegistration findFilterRegistration(String filterName) {
+        return null;
+    }
+
+
+    public ServletRegistration findServletRegistration(String servletName) {
+        return null;
+    }
+
+
+    public boolean setInitParameter(String name, String value) {
+        return false;
     }
 
 }
