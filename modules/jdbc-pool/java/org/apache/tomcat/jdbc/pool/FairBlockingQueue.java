@@ -17,7 +17,6 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.util.Collection;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -40,7 +39,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class FairBlockingQueue<E> implements BlockingQueue<E> {
     ReentrantLock lock = new ReentrantLock(false);
 
-    Deque<E> items = null;
+    LinkedList<E> items = null;
 
     LinkedList<ExchangeCountDownLatch<E>> waiters = null;
     
