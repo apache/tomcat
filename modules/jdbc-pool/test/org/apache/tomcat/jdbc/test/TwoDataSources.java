@@ -28,8 +28,8 @@ public class TwoDataSources extends DefaultTestCase {
     }
     
     public void testTwoDataSources() throws Exception {
-        DataSourceProxy d1 = this.createDefaultDataSource();
-        DataSourceProxy d2 = this.createDefaultDataSource();
+        org.apache.tomcat.jdbc.pool.DataSource d1 = this.createDefaultDataSource();
+        org.apache.tomcat.jdbc.pool.DataSource d2 = this.createDefaultDataSource();
         d1.setRemoveAbandoned(true);
         d1.setRemoveAbandonedTimeout(10);
         d1.setTimeBetweenEvictionRunsMillis(1000);
