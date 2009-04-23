@@ -35,11 +35,13 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import javax.security.auth.Subject;
-import javax.servlet.AsyncDispatcher;
+import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
@@ -49,7 +51,9 @@ import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -73,7 +77,6 @@ import org.apache.catalina.core.ApplicationFilterFactory;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.util.StringParser;
 
@@ -1505,12 +1508,15 @@ public class Request
         return context.getServletContext();
      }
 
-    public void startAsync() throws IllegalStateException {
+    public AsyncContext startAsync() {
         // TODO SERVLET3
+        return null;
     }
 
-    public void startAsync(Runnable runnable) throws IllegalStateException {
+    public AsyncContext startAsync(ServletRequest request,
+            ServletResponse response) {
         // TODO SERVLET3
+        return null;
     }
 
     public boolean isAsyncStarted() {
@@ -1518,29 +1524,37 @@ public class Request
         return false;
     }
 
-    public void doneAsync() throws IllegalStateException {
-        // TODO SERVLET3
-    }
-
     public boolean isAsyncSupported() {
         // TODO SERVLET3
         return false;
     }
 
-    public AsyncDispatcher getAsyncDispatcher() {
+    public AsyncContext getAsyncContext() {
         // TODO SERVLET3
         return null;
     }
 
-    public AsyncDispatcher getAsyncDispatcher(String path) {
+    public void addAsyncListener(AsyncListener listener) {
         // TODO SERVLET3
-        return null;
     }
-    
 
     public void addAsyncListener(AsyncListener listener,
             ServletRequest servletRequest, ServletResponse servletResponse) {
         // TODO SERVLET3
+    }
+
+    public void setAsyncTimeout(long timeout) {
+        // TODO SERVLET3
+    }
+    
+    public long getAsyncTimeout() {
+        // TODO SERVLET3
+        return 0;
+    }
+    
+    public DispatcherType getDispatcherType() {
+        // TODO SERVLET3
+        return null;
     }
 
     // ---------------------------------------------------- HttpRequest Methods
@@ -2352,7 +2366,30 @@ public class Request
         return requestedSessionSSL;
     }
     
+    public boolean login(HttpServletResponse response) throws IOException {
+        // TODO Servlet 3
+        return false;
+    }
     
+    public void login(String username, String password)
+    throws ServletException {
+        // TODO Servlet 3
+    }
+    
+    public void logout() throws ServletException {
+        // TODO Servlet 3
+    }
+    
+    public Iterable<Part> getParts() {
+        // TODO Servlet 3
+        return null;
+    }
+    
+    public Part getPart(String name) throws IllegalArgumentException {
+        // TODO Servlet 3.0
+        return null;
+    }
+
     // ------------------------------------------------------ Protected Methods
 
 

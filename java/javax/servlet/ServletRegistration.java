@@ -16,14 +16,27 @@
 */
 package javax.servlet;
 
+import java.util.Set;
+
 /**
  * @since 3.0
  * $Id$
+ * TODO SERVLET3 - Add comments
  */
-public enum DispatcherType {
-    FORWARD,
-    INCLUDE,
-    REQUEST,
-    ASYNC,
-    ERROR
+public interface ServletRegistration extends Registration {
+    
+    /**
+     * 
+     * @param urlPatterns
+     * @return
+     * @throws IllegalArgumentException if urlPattern is null or empty
+     * @throws IllegalStateException if the associated ServletContext has
+     *                                  already been initialised
+     */
+    public Set<String> addMapping(String... urlPatterns); 
+    
+    public static interface Dynmaic
+    extends ServletRegistration, Registration.Dynamic {
+        
+    }
 }

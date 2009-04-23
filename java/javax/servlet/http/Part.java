@@ -14,13 +14,22 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package javax.servlet;
+package javax.servlet.http;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
- * @since 3.0
- * TODO SERVLET3 - Add comments
+ * @since Servlet 3.0
  */
-public interface AsyncDispatcher {
-    void forward(ServletRequest request, ServletResponse response)
-            throws IllegalStateException;
+public interface Part {
+    public InputStream getInputStream() throws IOException;
+    public String getContentType();
+    public String getName();
+    public long getSize();
+    public void write(String fileName) throws IOException;
+    public void delete() throws IOException;
+    public String getHeader(String name);
+    public Iterable<String> getHeaders(String name);
+    public Iterable<String> getHeaderNames();
 }

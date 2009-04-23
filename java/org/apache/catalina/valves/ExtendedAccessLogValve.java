@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -346,19 +347,20 @@ public class ExtendedAccessLogValve
         
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-           if (null != response) {
-                String[] values = response.getHeaderValues(header);
-                if(values.length > 0) {
+            if (null != response) {
+                Iterator<String> iter = response.getHeaders(header).iterator();
+                if (iter.hasNext()) {
                     StringBuffer buffer = new StringBuffer();
-                    for (int i = 0; i < values.length; i++) {
-                        String string = values[i];
-                        buffer.append(string) ;
-                        if(i+1<values.length)
+                    boolean first = true;
+                    while (iter.hasNext()) {
+                        if (!first) {
                             buffer.append(",");
+                        }
+                        buffer.append(iter.next());
                     }
                     buf.append(wrap(buffer.toString()));
-                    return ;
                 }
+                return ;
             }
             buf.append("-");
         }

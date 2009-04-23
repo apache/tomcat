@@ -16,15 +16,38 @@
 */
 package javax.servlet;
 
-import java.io.IOException;
-import java.util.EventListener;
+import java.util.EnumSet;
 
 /**
  * @since 3.0
  * $Id$
  * TODO SERVLET3 - Add comments
  */
-public interface AsyncListener extends EventListener {
-    void onComplete(AsyncEvent event) throws IOException;
-    void onTimeout(AsyncEvent event) throws IOException;
+public interface FilterRegistration extends Registration {
+    
+    /**
+     * 
+     * @param dispatcherTypes
+     * @param isMatchAfter
+     * @param servletNames
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
+     */
+    public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes,
+            boolean isMatchAfter, String... servletNames);
+    
+    /**
+     * 
+     * @param dispatcherTypes
+     * @param isMatchAfter
+     * @param urlPatterns
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
+     */
+    public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes,
+            boolean isMatchAfter, String... urlPatterns);
+
+    public static interface Dynamic
+    extends FilterRegistration, Registration.Dynamic {
+    }
 }

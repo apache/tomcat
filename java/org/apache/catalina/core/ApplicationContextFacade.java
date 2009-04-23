@@ -30,15 +30,15 @@ import java.security.PrivilegedExceptionAction;
 import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.AsyncDispatcher;
-import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 
@@ -388,69 +388,114 @@ public final class ApplicationContextFacade
     }
 
        
-    public void addFilter(String filterName, String description,
-            String className, Map<String, String> initParameters) {
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            String className) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("addFilter", new Object[]{filterName, description,
-                    className, initParameters});
+            return (FilterRegistration.Dynamic) doPrivileged(
+                    "addFilter", new Object[]{filterName, className});
         } else {
-            context.addFilter(filterName, description, className,
-                    initParameters);
+            return context.addFilter(filterName, className);
         }
     }
 
 
-    public void addFilterMappingForServletNames(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... servletNames) {
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            Filter filter) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("addFilterMappingForServletNames",
-                    new Object[]{filterName, dispatcherTypes,
-                    Boolean.valueOf(isMatchAfter), servletNames});
+            return (FilterRegistration.Dynamic) doPrivileged(
+                    "addFilter", new Object[]{filterName, filter});
         } else {
-            context.addFilterMappingForServletNames(filterName, dispatcherTypes,
-                    isMatchAfter, servletNames);
+            return context.addFilter(filterName, filter);
         }
     }
 
 
-    public void addFilterMappingForUrlPatterns(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... urlPatterns) {
+    public FilterRegistration.Dynamic addFilter(String filterName,
+            Class<? extends Filter> filterClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("addFilterMappingForUrlPatterns",
-                    new Object[]{filterName, dispatcherTypes,
-                    Boolean.valueOf(isMatchAfter), urlPatterns});
+            return (FilterRegistration.Dynamic) doPrivileged(
+                    "addFilter", new Object[]{filterName, filterClass});
         } else {
-            context.addFilterMappingForUrlPatterns(filterName, dispatcherTypes,
-                    isMatchAfter, urlPatterns);
+            return context.addFilter(filterName, filterClass);
         }
     }
 
 
-    public void addServlet(String servletName, String description,
-            String className, Map<String, String> initParameters,
-            int loadOnStartup) {
+    public <T extends Filter> T createFilter(Class<T> c)
+    throws ServletException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("addServlet", new Object[]{servletName, description,
-                    className, initParameters, Integer.valueOf(loadOnStartup)});
+            return (T) doPrivileged(
+                    "createFilter", new Object[]{c});
         } else {
-            context.addServlet(servletName, description, className, initParameters,
-                    loadOnStartup);
+            return context.createFilter(c);
+        }
+    }
+
+
+    public FilterRegistration findFilterRegistration(String filterName) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (FilterRegistration) doPrivileged(
+                    "findFilterRegistration", new Object[]{filterName});
+        } else {
+            return context.findFilterRegistration(filterName);
         }
     }
     
     
-    public void addServletMapping(String servletName, String[] urlPatterns) {
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            String className) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("addServletMapping",
-                    new Object[]{servletName, urlPatterns});
+            return (ServletRegistration.Dynmaic) doPrivileged(
+                    "addServlet", new Object[]{servletName, className});
         } else {
-            context.addServletMapping(servletName, urlPatterns);
+            return context.addServlet(servletName, className);
         }
     }
 
 
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            Servlet servlet) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (ServletRegistration.Dynmaic) doPrivileged(
+                    "addServlet", new Object[]{servletName, servlet});
+        } else {
+            return context.addServlet(servletName, servlet);
+        }
+    }
+
+
+    public ServletRegistration.Dynmaic addServlet(String servletName,
+            Class <? extends Servlet> servletClass) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (ServletRegistration.Dynmaic) doPrivileged(
+                    "addServlet", new Object[]{servletName, servletClass});
+        } else {
+            return context.addServlet(servletName, servletClass);
+        }
+    }
+
+
+    public <T extends Servlet> T createServlet(Class<T> c)
+    throws ServletException {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (T) doPrivileged(
+                    "createServlet", new Object[]{c});
+        } else {
+            return context.createServlet(c);
+        }
+    }
+
+    
+    public ServletRegistration findServletRegistration(String servletName) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (ServletRegistration) doPrivileged(
+                    "findServletRegistration", new Object[]{servletName});
+        } else {
+            return context.findServletRegistration(servletName);
+        }
+    }
+    
+    
     public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (EnumSet<SessionTrackingMode>)
@@ -481,16 +526,6 @@ public final class ApplicationContextFacade
     }
 
 
-    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("setSessionCookieConfig",
-                    new Object[]{sessionCookieConfig});
-        } else {
-            context.setSessionCookieConfig(sessionCookieConfig);
-        }
-    }
-
-
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -502,13 +537,12 @@ public final class ApplicationContextFacade
     }
 
 
-    public AsyncDispatcher getAsyncDispatcher(String path) {
+    public boolean setInitParameter(String name, String value) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (AsyncDispatcher)
-                doPrivileged("getAsyncDispatcher",
-                        new Object[]{path});
+            return ((Boolean) doPrivileged("setInitParameter",
+                    new Object[]{name, value})).booleanValue();
         } else {
-            return context.getAsyncDispatcher(path);
+            return context.setInitParameter(name, value);
         }
     }
     

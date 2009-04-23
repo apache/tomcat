@@ -26,16 +26,20 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.AsyncDispatcher;
+import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.util.StringManager;
@@ -948,13 +952,14 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public void startAsync() throws IllegalStateException {
-        request.startAsync();
+    public AsyncContext startAsync() throws IllegalStateException {
+        return request.startAsync();
     }
 
 
-    public void startAsync(Runnable runnable) throws IllegalStateException {
-        request.startAsync(runnable);
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response)
+    throws IllegalStateException {
+        return request.startAsync(request, response);
     }
 
 
@@ -963,23 +968,13 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    public void doneAsync() throws IllegalStateException {
-        request.doneAsync();
-    }
-
-    
     public boolean isAsyncSupported() {
         return request.isAsyncStarted();
     }
 
     
-    public AsyncDispatcher getAsyncDispatcher() {
-        return request.getAsyncDispatcher();
-    }
-
-    
-    public AsyncDispatcher getAsyncDispatcher(String path) {
-        return request.getAsyncDispatcher(path);
+    public void addAsyncListener(AsyncListener listener) {
+        request.addAsyncListener(listener);
     }
 
     
@@ -987,8 +982,45 @@ public class RequestFacade implements HttpServletRequest {
         request.addAsyncListener(listener,servletRequest,servletResponse);
     }
 
+    public AsyncContext getAsyncContext() {
+        return request.getAsyncContext();
+    }
+
+    public long getAsyncTimeout() {
+        return request.getAsyncTimeout();
+    }
+    
+    public void setAsyncTimeout(long timeout) {
+        request.setAsyncTimeout(timeout);
+    }
+    
+    public DispatcherType getDispatcherType() {
+        return request.getDispatcherType();
+    }
+    
+    public boolean login(HttpServletResponse response) throws IOException {
+        return request.login(response);
+    }
+
+    public void login(String username, String password)
+    throws ServletException {
+        login(username, password);
+    }
+    
+    public void logout() throws ServletException {
+        request.logout();
+    }
+    
+    public Iterable<Part> getParts() {
+        return request.getParts();
+    }
+    
+    public Part getPart(String name) {
+        return request.getPart(name);
+    }
 
     public boolean getAllowTrace() {
         return request.getConnector().getAllowTrace();
     }
+    
 }

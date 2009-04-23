@@ -384,7 +384,7 @@ public class CoyoteAdapter
             req.serverName().setString(proxyName);
         }
 
-        // Parse session Id
+        // Parse session Id before decoding / removal of path params
         parseSessionId(req, request);
 
         // URI decoding

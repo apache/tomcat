@@ -100,10 +100,8 @@ public class DummyResponse
     public void setLocale(Locale locale) {}
 
     public Cookie[] getCookies() { return null; }
-    public String getHeader(@SuppressWarnings("unused") String name) {
-        return null;
-    }
-    public String[] getHeaderNames() { return null; }
+    public String getHeader(String name) { return null; }
+    public Iterable<String> getHeaderNames() { return null; }
     public String[] getHeaderValues(@SuppressWarnings("unused") String name) {
         return null;
     }
@@ -132,6 +130,5 @@ public class DummyResponse
     public void setStatus(int status) {}
     /** @deprecated */
     public void setStatus(int status, String message) {}
-
-
+    public Iterable<String> getHeaders(String name) { return null; }
 }

@@ -195,5 +195,35 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
 	this._getHttpServletResponse().setStatus(sc, sm);
     }
 
-   
+
+    /**
+     * @since Servlet 3.0
+     */
+    public int getStatus() {
+        return this._getHttpServletResponse().getStatus();
+    }
+
+     
+    /**
+     * @since Servlet 3.0
+     */
+    public String getHeader(String name) {
+        return this._getHttpServletResponse().getHeader(name);
+    }
+
+    
+    /**
+     * @since Servlet 3.0
+     */
+    public Iterable<String> getHeaders(String name) {
+        return this._getHttpServletResponse().getHeaders(name);
+    }
+
+    /**
+     * @since Servlet 3.0
+     */
+    public Iterable<String> getHeaderNames() {
+        return this._getHttpServletResponse().getHeaderNames();
+    }
+
 }
