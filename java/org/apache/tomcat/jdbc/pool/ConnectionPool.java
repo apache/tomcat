@@ -654,9 +654,19 @@ public class ConnectionPool {
         } //end if
     } //checkIn
 
+    public boolean shouldAbandon() {
+        if (poolProperties.getAbandonWhenPercentageFull()==0) return true;
+        float used = (float)busy.size();
+        float max  = (float)poolProperties.getMaxActive();
+        float perc = (float)poolProperties.getAbandonWhenPercentageFull();
+        System.out.println("Abandon rate:"+(used/max*100f));
+        return (used/max*100f)>=perc;
+    }
+    
     public void checkAbandoned() {
         try {
             if (busy.size()==0) return;
+            if (!shouldAbandon()) return;
             Iterator<PooledConnection> locked = busy.iterator();
             while (locked.hasNext()) {
                 PooledConnection con = locked.next();

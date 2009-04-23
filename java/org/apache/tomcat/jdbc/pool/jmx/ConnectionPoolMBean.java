@@ -116,4 +116,6 @@ public interface ConnectionPoolMBean  {
 
     public String getJdbcInterceptors();
 
+    public int getAbandonWhenPercentageFull();
+    
 }
