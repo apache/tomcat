@@ -25,7 +25,6 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
-import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 
 /**
@@ -106,7 +105,7 @@ public class FairnessTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             threads[i] = new TestThread();
             threads[i].setName("tomcat-pool-"+i);
-            threads[i].d = DataSourceFactory.getDataSource(this.datasource);
+            threads[i].d = this.datasource;
             
         }
         for (int i=0; i<threadcount; i++) {
@@ -136,7 +135,7 @@ public class FairnessTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             threads[i] = new TestThread();
             threads[i].setName("tomcat-pool-"+i);
-            threads[i].d = DataSourceFactory.getDataSource(this.datasource);
+            threads[i].d = this.datasource;
             
         }
         for (int i=0; i<threadcount; i++) {
@@ -166,7 +165,7 @@ public class FairnessTest extends DefaultTestCase {
             threads[i] = new TestThread();
             threads[i].setName("tomcat-pool-"+i);
             threads[i].async = true;
-            threads[i].d = DataSourceFactory.getDataSource(this.datasource);
+            threads[i].d = this.datasource;
             
         }
         for (int i=0; i<threadcount; i++) {
@@ -180,6 +179,37 @@ public class FairnessTest extends DefaultTestCase {
         printThreadResults(threads,"testPoolThreads20Connections10FairAsync");
         tearDown();
     }
+    
+    public void testC3P0Threads20Connections10() throws Exception {
+        System.out.println("[testC3P0Threads20Connections10] Starting fairness - C3P0");
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setFairQueue(false);
+        this.threadcount = 20;
+        this.transferPropertiesToC3P0();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        TestThread[] threads = new TestThread[threadcount];
+        for (int i=0; i<threadcount; i++) {
+            threads[i] = new TestThread();
+            threads[i].setName("tomcat-pool-"+i);
+            threads[i].d = this.c3p0Datasource;
+            
+        }
+        for (int i=0; i<threadcount; i++) {
+            threads[i].start();
+        }
+        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
+            System.out.println("Latch timed out.");
+        }
+        this.run = false;
+        long delta = System.currentTimeMillis() - start;
+        printThreadResults(threads,"testC3P0Threads20Connections10");
+        tearDown();
+
+    }
+
     
     public class TestThread extends Thread {
         protected DataSource d;
