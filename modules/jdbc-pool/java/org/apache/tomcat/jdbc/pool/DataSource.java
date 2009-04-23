@@ -374,6 +374,14 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    public int getAbandonWhenPercentageFull() {
+        try {
+            return createPool().getPoolProperties().getAbandonWhenPercentageFull();
+        }catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
     public boolean isTestOnBorrow() {
         try {
             return createPool().getPoolProperties().isTestOnBorrow();

@@ -94,6 +94,7 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_REMOVEABANDONED = "removeAbandoned";
     protected final static String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
     protected final static String PROP_LOGABANDONED = "logAbandoned";
+    protected final static String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
     
     protected final static String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
     protected final static String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
@@ -147,7 +148,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_JMX_ENABLED,
         PROP_FAIR_QUEUE,
         PROP_USE_EQUALS,
-        OBJECT_NAME
+        OBJECT_NAME,
+        PROP_ABANDONWHENPERCENTAGEFULL
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -409,9 +411,13 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setName(ObjectName.quote(value));
         }
-
-        return poolProperties;
         
+        value = properties.getProperty(PROP_ABANDONWHENPERCENTAGEFULL);
+        if (value != null) {
+            poolProperties.setAbandonWhenPercentageFull(Integer.parseInt(value));
+        }
+        
+        return poolProperties;
     }
 
     /**
