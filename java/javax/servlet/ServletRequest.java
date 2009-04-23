@@ -608,17 +608,18 @@ public interface ServletRequest {
      *                                          this request
      * @since 3.0
      */
-    public void startAsync() throws java.lang.IllegalStateException;
+    public AsyncContext startAsync();
     
     /**
      * 
-     * @param runnable
+     * @param servletRequest
+     * @param servletResponse
      * @return
      * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public void startAsync(Runnable runnable)
-            throws java.lang.IllegalStateException;
+    public AsyncContext startAsync(ServletRequest servletRequest,
+            ServletResponse servletResponse);
     
     /**
      * 
@@ -629,13 +630,6 @@ public interface ServletRequest {
     
     /**
      * 
-     * @throws IllegalStateException    If startAsync was never called
-     * @since 3.0
-     */
-    public void doneAsync() throws IllegalStateException;
-
-    /**
-     * 
      * @return
      * @since 3.0
      */
@@ -644,17 +638,17 @@ public interface ServletRequest {
     /**
      * 
      * @return
+     * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public AsyncDispatcher getAsyncDispatcher();
+    public AsyncContext getAsyncContext();
 
     /**
      * 
-     * @param path
-     * @return
+     * @param listener
      * @since 3.0
      */
-    public AsyncDispatcher getAsyncDispatcher(String path);
+    public void addAsyncListener(AsyncListener listener);
 
     /**
      * 
@@ -666,5 +660,28 @@ public interface ServletRequest {
     public void addAsyncListener(AsyncListener listener,
             ServletRequest servletRequest, ServletResponse servletResponse);
     
+    /**
+     * 
+     * @param timeout
+     * @throws java.lang.IllegalStateException
+     * @since 3.0
+     */
+    public void setAsyncTimeout(long timeout);
+    
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public long getAsyncTimeout();
+
+    
+    /**
+     * 
+     * @return
+     * @since 3.0
+     */
+    public DispatcherType getDispatcherType();
 }
 

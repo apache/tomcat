@@ -21,9 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Set;
-
 
 /**
  * 
@@ -57,6 +55,7 @@ import java.util.Set;
 
 public interface ServletContext {
 
+    public static final String TEMPDIR = "javax.servlet.context.tempdir";
 
     /**
      * Returns a <code>ServletContext</code> object that 
@@ -527,7 +526,17 @@ public interface ServletContext {
     public Enumeration<String> getInitParameterNames();
     
     
-
+    /**
+     * 
+     * @param name
+     * @param value
+     * @return
+     * @throws IllegalStateException
+     * @since Servlet 3.0
+     */
+    public boolean setInitParameter(String name, String value);
+    
+    
     /**
      * Returns the servlet container attribute with the given name, 
      * or <code>null</code> if there is no attribute by that name.
@@ -648,91 +657,118 @@ public interface ServletContext {
     /**
      * 
      * @param servletName
-     * @param description
      * @param className
-     * @param initParameters
-     * @param loadOnStartup
-     * @throws IllegalArgumentException If the servlet name already exists
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
      * @since 3.0
      */
-    public void addServlet(String servletName, String description,
-            String className, Map<String,String> initParameters,
-            int loadOnStartup)
-            throws IllegalArgumentException, IllegalStateException;
+    public ServletRegistration.Dynamic addServlet(String servletName,
+            String className);
     
     
     /**
      * 
      * @param servletName
-     * @param urlPatterns
-     * @throws IllegalArgumentException If urlPatters is null or empty
+     * @param servlet
+     * @since 3.0
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
-     * 
-     * @since 3.0
      */
-    public void addServletMapping(String servletName, String[] urlPatterns)
-            throws IllegalArgumentException, IllegalStateException;
+    public ServletRegistration.Dynamic addServlet(String servletName,
+            Servlet servlet);
+    
+    
+    /**
+     * 
+     * @param servletName
+     * @param servletClass
+     * @since 3.0
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
+     */
+    public ServletRegistration.Dynamic addServlet(String servletName,
+            Class<? extends Servlet> servletClass);
+    
+
+    /**
+     * 
+     * @param c
+     * @return
+     * @throws ServletException
+     * @since Servlet 3.0
+     */
+    public <T extends Servlet> T createServlet(Class<T> c)
+    throws ServletException;
+
+    
+    /**
+     * 
+     * @param servletName
+     * @return
+     * @since Servlet 3.0 
+     */
+    public ServletRegistration findServletRegistration(String servletName);
+
 
     /**
      * 
      * @param filterName
-     * @param description
      * @param className
-     * @param initParameters
-     * @throws IllegalArgumentException If the filter name already exists
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
      * 
      * @since 3.0
      */
-    public void addFilter(String filterName, String description,
-            String className, Map<String,String> initParameters)
-            throws IllegalArgumentException, IllegalStateException;
+    public FilterRegistration.Dynamic  addFilter(String filterName,
+            String className);
+    
     
     /**
      * 
      * @param filterName
-     * @param dispatcherTypes
-     * @param isMatchAfter
-     * @param servletNames
-     * @throws IllegalArgumentException If servletNames is null or empty
+     * @param filter
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
+     * 
      * @since 3.0
      */
-    public void addFilterMappingForServletNames(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... servletNames)
-            throws IllegalArgumentException, IllegalStateException;
+    public FilterRegistration.Dynamic  addFilter(String filterName,
+            Filter filter);
+
     
     /**
      * 
      * @param filterName
-     * @param dispatcherTypes
-     * @param isMatchAfter
-     * @param urlPatterns
-4     *
+     * @param filterClass
+     * @throws IllegalStateException    If the context has already been
+     *                                  initialised
+     * 
      * @since 3.0
      */
-    public void addFilterMappingForUrlPatterns(String filterName,
-            EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
-            String... urlPatterns)
-            throws IllegalArgumentException, IllegalStateException;
+    public FilterRegistration.Dynamic  addFilter(String filterName,
+            Class<? extends Filter> filterClass);
     
 
     /**
      * 
-     * @param sessionCookieConfig
-     * @throws IllegalStateException    If the context has already been
-     *                                  initialised
-     * @since 3.0
+     * @param c
+     * @return
+     * @throws ServletException
+     * @since Servlet 3.0
      */
-    public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig)
-            throws IllegalStateException;
+    public <T extends Filter> T createFilter(Class<T> c)
+    throws ServletException;
+
     
+    /**
+     * 
+     * @param filterName
+     * @return
+     * @since Servlet 3.0 
+     */
+    public FilterRegistration findFilterRegistration(String filterName);
+
+
     /**
      * 
      * @return
@@ -769,11 +805,4 @@ public interface ServletContext {
      */
     public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes();
     
-    /**
-     * 
-     * @param path
-     * @return
-     * @since 3.0
-     */
-    public AsyncDispatcher getAsyncDispatcher(String path);
 }

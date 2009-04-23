@@ -19,11 +19,9 @@ package javax.servlet;
 /**
  * @since 3.0
  * $Id$
+ * TODO SERVLET3 - Add comments
  */
-public enum DispatcherType {
-    FORWARD,
-    INCLUDE,
-    REQUEST,
-    ASYNC,
-    ERROR
+public interface ServletContainerInitializer {
+    public void onStartup(java.util.Set<java.lang.Class<?>> c,
+            ServletContext ctx);
 }

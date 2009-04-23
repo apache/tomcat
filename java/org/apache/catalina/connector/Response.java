@@ -30,6 +30,7 @@ import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
@@ -883,16 +884,15 @@ public class Response
 
 
     /**
-     * Return an array of all the header names set for this response, or
-     * a zero-length array if no headers have been set.
+     * Return an Iterable of all the header names set for this response.
      */
-    public String[] getHeaderNames() {
+    public Iterable<String> getHeaderNames() {
 
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         int n = headers.size();
-        String[] result = new String[n];
+        List<String> result = new ArrayList<String>(n);
         for (int i = 0; i < n; i++) {
-            result[i] = headers.getName(i).toString();
+            result.add(headers.getName(i).toString());
         }
         return result;
 
@@ -900,13 +900,12 @@ public class Response
 
 
     /**
-     * Return an array of all the header values associated with the
-     * specified header name, or an zero-length array if there are no such
-     * header values.
+     * Return an Iterable of all the header values associated with the
+     * specified header name.
      *
      * @param name Header name to look up
      */
-    public String[] getHeaderValues(String name) {
+    public Iterable<String> getHeaders(String name) {
 
         Enumeration<String> enumeration =
             coyoteResponse.getMimeHeaders().values(name);
@@ -914,10 +913,7 @@ public class Response
         while (enumeration.hasMoreElements()) {
             result.addElement(enumeration.nextElement());
         }
-        String[] resultArray = new String[result.size()];
-        result.copyInto(resultArray);
-        return resultArray;
-
+        return result;
     }
 
 

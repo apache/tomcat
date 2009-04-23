@@ -417,22 +417,24 @@ public class ServletRequestWrapper implements ServletRequest {
      * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public void startAsync() throws java.lang.IllegalStateException {
-        request.startAsync();
+    public AsyncContext startAsync() {
+        return request.startAsync();
     }
     
     /**
      * The default behavior of this method is to return
      * startAsync(Runnable) on the wrapped request object.
      * 
-     * @param runnable
+     * @param servletRequest
+     * @param servletResponse
      * @return
      * @throws java.lang.IllegalStateException
      * @since 3.0
      */
-    public void startAsync(Runnable runnable)
+    public AsyncContext startAsync(ServletRequest servletRequest,
+            ServletResponse servletResponse)
             throws java.lang.IllegalStateException {
-        request.startAsync(runnable);
+        return request.startAsync(servletRequest, servletResponse);
     }
     
     /**
@@ -448,16 +450,6 @@ public class ServletRequestWrapper implements ServletRequest {
 
     /**
      * The default behavior of this method is to return
-     * doneAsync() on the wrapped request object.
-     * @throws java.lang.IllegalStateException
-     * @since 3.0
-     */
-    public void doneAsync() throws IllegalStateException {
-        request.doneAsync();
-    }
-
-    /**
-     * The default behavior of this method is to return
      * isAsyncSupported() on the wrapped request object.
      * 
      * @return
@@ -469,26 +461,26 @@ public class ServletRequestWrapper implements ServletRequest {
     
     /**
      * The default behavior of this method is to return
-     * getAsyncDispatcher() on the wrapped request object.
+     * getAsyncContext() on the wrapped request object.
      * 
      * @return
      * @since 3.0
      */
-    public AsyncDispatcher getAsyncDispatcher() {
-        return request.getAsyncDispatcher();
+    public AsyncContext getAsyncContext() {
+        return request.getAsyncContext();
     }
 
     /**
-     * The default behavior of this method is to return
-     * getAsyncDispatcher(path) on the wrapped request object.
+     * The default behavior of this method is to call
+     * addAsyncListener(AsyncListener) on the wrapped request object.
      * 
-     * @return
+     * @param listener
      * @since 3.0
      */
-    public AsyncDispatcher getAsyncDispatcher(String path) {
-        return request.getAsyncDispatcher(path);
+    public void addAsyncListener(AsyncListener listener) {
+        request.addAsyncListener(listener);
     }
-
+    
     /**
      * The default behavior of this method is to call
      * addAsyncListener(AsyncListener, ServletRequest, ServletResponse) on the
@@ -504,5 +496,65 @@ public class ServletRequestWrapper implements ServletRequest {
         request.addAsyncListener(listener, servletRequest, servletResponse);
     }
     
+    /**
+     * The default behavior of this method is to call
+     * setAsyncTimeout(long) on the wrapped request object.
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public void setAsyncTimeout(long timeout) {
+        request.setAsyncTimeout(timeout);
+    }
+    
+    /**
+     * The default behavior of this method is to call
+     * getAsyncTimeout() on the wrapped request object.
+     * 
+     * @since 3.0
+     */
+    public long getAsyncTimeout() {
+        return request.getAsyncTimeout();
+    }
+    
+    /**
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public boolean isWrapperFor(ServletRequest wrapped) {
+        if (request == wrapped) {
+            return true;
+        }
+        if (request instanceof ServletRequestWrapper) {
+            return ((ServletRequestWrapper)request).isWrapperFor(wrapped);
+        }
+        return false;
+    }
+    
+    /**
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public boolean isWrapperFor(Class<? extends ServletRequest> wrappedType) {
+        if (wrappedType.isAssignableFrom(request.getClass())) {
+            return true;
+        }
+        if (request instanceof ServletRequestWrapper) {
+            return ((ServletRequestWrapper)request).isWrapperFor(wrappedType);
+        }
+        return false;
+    }
+    
+    /**
+     * The default behavior of this method is to call
+     * getDispatcherType() on the wrapped request object.
+     * 
+     * @since 3.0
+     */
+    public DispatcherType getDispatcherType() {
+        return this.request.getDispatcherType();
+    }
 }
 

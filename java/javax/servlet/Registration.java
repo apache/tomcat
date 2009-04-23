@@ -16,14 +16,28 @@
 */
 package javax.servlet;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @since 3.0
  * $Id$
+ * TODO SERVLET3 - Add comments
  */
-public enum DispatcherType {
-    FORWARD,
-    INCLUDE,
-    REQUEST,
-    ASYNC,
-    ERROR
+public interface Registration {
+    
+    public boolean setInitParameter(String name, String value)
+    throws IllegalArgumentException, IllegalStateException;
+
+    public Set<String> setInitParameters(Map<String,String> initParameters)
+    throws IllegalArgumentException, IllegalStateException;
+
+    public interface Dynamic {
+        
+        public void setDescription(String description)
+        throws IllegalStateException;
+        
+        public void setAsyncSupported(boolean isAsyncSupported)
+        throws IllegalStateException;
+    }
 }

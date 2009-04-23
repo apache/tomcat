@@ -209,6 +209,36 @@ public class ServletResponseWrapper implements ServletResponse {
 	return this.response.getLocale();
     }
 
+    /**
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public boolean isWrapperFor(ServletResponse wrapped) {
+        if (response == wrapped) {
+            return true;
+        }
+        if (response instanceof ServletResponseWrapper) {
+            return ((ServletResponseWrapper)response).isWrapperFor(wrapped);
+        }
+        return false;
+    }
+    
+    /**
+     * 
+     * @param listener
+     * @since 3.0
+     */
+    public boolean isWrapperFor(Class<? extends ServletResponse> wrappedType) {
+        if (wrappedType.isAssignableFrom(response.getClass())) {
+            return true;
+        }
+        if (response instanceof ServletResponseWrapper) {
+            return ((ServletResponseWrapper)response).isWrapperFor(wrappedType);
+        }
+        return false;
+    }
+    
 
 }
 
