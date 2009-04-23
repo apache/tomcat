@@ -658,16 +658,6 @@ public class Request
     }
 
     /**
-     * Set the input stream associated with this Request.
-     *
-     * @param stream The new input stream
-     */
-    public void setStream(InputStream stream) {
-        // Ignore
-    }
-
-
-    /**
      * URI byte to char converter (not recycled).
      */
     protected B2CConverter URIConverter = null;
@@ -782,70 +772,6 @@ public class Request
      */
     public void setNote(String name, Object value) {
         notes.put(name, value);
-    }
-
-
-    /**
-     * Set the content length associated with this Request.
-     *
-     * @param length The new content length
-     */
-    public void setContentLength(int length) {
-        // Not used
-    }
-
-
-    /**
-     * Set the content type (and optionally the character encoding)
-     * associated with this Request.  For example,
-     * <code>text/html; charset=ISO-8859-4</code>.
-     *
-     * @param type The new content type
-     */
-    public void setContentType(String type) {
-        // Not used
-    }
-
-
-    /**
-     * Set the protocol name and version associated with this Request.
-     *
-     * @param protocol Protocol name and version
-     */
-    public void setProtocol(String protocol) {
-        // Not used
-    }
-
-
-    /**
-     * Set the IP address of the remote client associated with this Request.
-     *
-     * @param remoteAddr The remote IP address
-     */
-    public void setRemoteAddr(String remoteAddr) {
-        // Not used
-    }
-
-
-    /**
-     * Set the fully qualified name of the remote client associated with this
-     * Request.
-     *
-     * @param remoteHost The remote host name
-     */
-    public void setRemoteHost(String remoteHost) {
-        // Not used
-    }
-
-
-    /**
-     * Set the name of the scheme associated with this request.  Typical values
-     * are <code>http</code>, <code>https</code>, and <code>ftp</code>.
-     *
-     * @param scheme The scheme
-     */
-    public void setScheme(String scheme) {
-        // Not used
     }
 
 
@@ -1587,17 +1513,6 @@ public class Request
 
 
     /**
-     * Add a Header to the set of Headers associated with this Request.
-     *
-     * @param name The new header name
-     * @param value The new header value
-     */
-    public void addHeader(String name, String value) {
-        // Not used
-    }
-
-
-    /**
      * Add a Locale to the set of preferred Locales for this Request.  The
      * first added Locale will be the first one returned by getLocales().
      *
@@ -1685,27 +1600,6 @@ public class Request
 
 
     /**
-     * Set the HTTP request method used for this Request.
-     *
-     * @param method The request method
-     */
-    public void setMethod(String method) {
-        // Not used
-    }
-
-
-    /**
-     * Set the query string for this Request.  This will normally be called
-     * by the HTTP Connector, when it parses the request headers.
-     *
-     * @param query The query string
-     */
-    public void setQueryString(String query) {
-        // Not used
-    }
-
-
-    /**
      * Set the path information for this Request.  This will normally be called
      * when the associated Context is mapping the Request to a particular
      * Wrapper.
@@ -1769,27 +1663,6 @@ public class Request
 
         this.requestedSessionSSL = flag;
 
-    }
-
-
-    /**
-     * Set the unparsed request URI for this Request.  This will normally be
-     * called by the HTTP Connector, when it parses the request headers.
-     *
-     * @param uri The request URI
-     */
-    public void setRequestURI(String uri) {
-        // Not used
-    }
-
-
-    /**
-     * Set the decoded request URI.
-     * 
-     * @param uri The decoded request URI
-     */
-    public void setDecodedRequestURI(String uri) {
-        // Not used
     }
 
 
@@ -2226,7 +2099,7 @@ public class Request
         try {
             session = manager.findSession(requestedSessionId);
         } catch (IOException e) {
-            session = null;
+            // Can't find the session 
         }
         if ((session != null) && session.isValid())
             return (true);
