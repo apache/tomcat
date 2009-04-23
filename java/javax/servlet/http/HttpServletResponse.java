@@ -322,6 +322,40 @@ public interface HttpServletResponse extends ServletResponse {
     public void setStatus(int sc, String sm);
 
     
+    /**
+     * 
+     * @return
+     * @since Servlet 3.0
+     */
+    public int getStatus();
+    
+    
+    /**
+     * 
+     * @param name
+     * @return
+     * @since Servlet 3.0
+     */
+    public String getHeader(String name);
+    
+    
+    /**
+     * 
+     * @param name
+     * @return
+     * @since Servlet 3.0
+     */
+    public Iterable<String> getHeaders(String name);
+
+    
+    /**
+     * 
+     * @return
+     * @since Servlet 3.0
+     */
+    public Iterable<String> getHeaderNames();
+
+    
     /*
      * Server status codes; see RFC 2068.
      */

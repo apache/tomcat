@@ -553,4 +553,19 @@ public class ResponseFacade
         response.setCharacterEncoding(arg0);
     }
 
+    public int getStatus() {
+        return response.getStatus();
+    }
+    
+    public String getHeader(String name) {
+        return response.getHeader(name);
+    }
+    
+    public Iterable<String> getHeaderNames() {
+        return response.getHeaderNames();
+    }
+    
+    public Iterable<String> getHeaders(String name) {
+        return response.getHeaders(name);
+    }
 }

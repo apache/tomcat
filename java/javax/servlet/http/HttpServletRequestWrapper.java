@@ -16,7 +16,10 @@
 */
 package javax.servlet.http;
 
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequestWrapper;
+
+import java.io.IOException;
 import java.util.Enumeration;
 
 /**
@@ -259,6 +262,41 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
 	return this._getHttpServletRequest().isRequestedSessionIdFromUrl();
     }
 
+    /**
+     * @since Servlet 3.0
+     */
+    public boolean login(HttpServletResponse response)
+    throws IOException, ServletException {
+        return this._getHttpServletRequest().login(response);
+    }
 
-    
+    /**
+     * @since Servlet 3.0
+     */
+    public void login(String username, String password) throws ServletException {
+        this._getHttpServletRequest().login(username, password);
+    }
+
+    /**
+     * @since Servlet 3.0
+     */
+    public void logout() throws ServletException {
+        this._getHttpServletRequest().logout();
+    }
+
+
+    /**
+     * @since Servlet 3.0
+     */
+    public Iterable<Part> getParts() {
+        return this._getHttpServletRequest().getParts();
+    }
+
+    /**
+     * @since Servlet 3.0
+     */
+    public Part getPart(String name) {
+        return this._getHttpServletRequest().getPart(name);
+    }
+
 }
