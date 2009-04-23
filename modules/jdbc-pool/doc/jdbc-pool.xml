@@ -329,6 +329,15 @@
          This flag is required when you want to use asynchronous connection retrieval.
       </p>
     </attribute>
+
+    <attribute name="abandonWhenPercentageFull" required="false">
+      <p>(int) Connections that have been abandoned (timed out) wont get closed and reported up unless
+         the number of connections in use are above the percentage defined by <code>abandonWhenPercentageFull</code>.
+         The value should be between 0-100.
+         The default value is <code>0</code>, which implies that connections are eligible for closure as soon
+         as <code>removeAbandonedTimeout</code> has been reached.</p>
+    </attribute>
+
     <attribute name="useEquals" required="false">
       <p>(boolean) Set to true if you wish the <code>ProxyConnection</code> class to use <code>String.equals</code> instead of 
          <code>==</code> when comparing method names. This property does not apply to added interceptors as those are configured individually.
@@ -415,6 +424,18 @@
     <p>Extends the <code>SlowQueryReport</code> and in addition to log entries it issues JMX notification
        for monitoring tools to react to. Inherits all the attributes from its parent class.
        This class uses Tomcat's JMX engine so it wont work outside of the Tomcat container.
+    </p>   
+    <attributes>
+    </attributes>
+  </subsection>
+  <subsection name="org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer">
+    <p>
+        The abandoned timer starts when a connection is checked out from the pool.
+        This means if you have a 30second timeout and run 10x10second queries using the connection
+        it will be marked abandoned and potentially reclaimed depending on the <code>abandonWhenPercentageFull</code>
+        attribute. 
+        Using this interceptor it will reset the checkout timer every time you perform an operation on the connection or execute a 
+        query successfully.
     </p>   
     <attributes>
     </attributes>
