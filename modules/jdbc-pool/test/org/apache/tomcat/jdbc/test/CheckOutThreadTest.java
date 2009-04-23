@@ -23,7 +23,6 @@ import java.sql.ResultSet;
 
 import javax.sql.DataSource;
 
-import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 
 /**
  * @author Filip Hanik
@@ -67,12 +66,32 @@ public class CheckOutThreadTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             TestThread t = new TestThread();
             t.setName("tomcat-pool-"+i);
-            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.d = this.datasource;
             t.start();
         }
         latch.await();
         long delta = System.currentTimeMillis() - start;
         System.out.println("[testPoolThreads10Connections10]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+
+    public void testC3P0Threads10Connections10() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.threadcount = 10;
+        this.transferPropertiesToC3P0();
+        this.c3p0Datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-"+i);
+            t.d = this.c3p0Datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testC3P0Threads10Connections10]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
 
@@ -107,7 +126,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             TestThread t = new TestThread();
             t.setName("tomcat-pool-"+i);
-            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.d = this.datasource;
             t.start();
         }
         latch.await();
@@ -128,7 +147,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             TestThread t = new TestThread();
             t.setName("tomcat-pool-"+i);
-            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.d = this.datasource;
             t.start();
         }
         latch.await();
@@ -137,6 +156,25 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    public void testC3P0Threads20Connections10() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.threadcount = 20;
+        this.transferPropertiesToC3P0();
+        this.c3p0Datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-"+i);
+            t.d = this.c3p0Datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testC3P0Threads20Connections10]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
     
     public void testDBCPThreads10Connections10Validate() throws Exception {
         init();
@@ -173,12 +211,34 @@ public class CheckOutThreadTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             TestThread t = new TestThread();
             t.setName("tomcat-pool-validate-"+i);
-            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.d = this.datasource;
             t.start();
         }
         latch.await();
         long delta = System.currentTimeMillis() - start;
         System.out.println("[testPoolThreads10Connections10Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+    
+    public void testC3P0Threads10Connections10Validate() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
+        this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.threadcount = 10;
+        this.transferPropertiesToC3P0();
+        this.c3p0Datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-validate-"+i);
+            t.d = this.c3p0Datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testC3P0Threads10Connections10Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
 
@@ -217,7 +277,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         for (int i=0; i<threadcount; i++) {
             TestThread t = new TestThread();
             t.setName("tomcat-pool-validate-"+i);
-            t.d = DataSourceFactory.getDataSource(this.datasource);
+            t.d = this.datasource;
             t.start();
         }
         latch.await();
@@ -226,6 +286,28 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
     
+    public void testC3P0Threads10Connections20Validate() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
+        this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.threadcount = 20;
+        this.transferPropertiesToC3P0();
+        this.c3p0Datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-validate-"+i);
+            t.d = this.c3p0Datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testC3P0Threads10Connections20Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+
     public class TestThread extends Thread {
         protected DataSource d;
         protected String query = null;
