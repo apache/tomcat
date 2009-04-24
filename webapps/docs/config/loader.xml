@@ -122,6 +122,8 @@
       <attribute name="loaderClass" required="false">
         <p>Java class name of the <code>java.lang.ClassLoader</code>
         implementation class to use.  If not specified, the default value is
+        <code>org.apache.catalina.loader.WebappClassLoader</code>. Custom
+        <strong>loaderClass</strong> implementations must extend
         <code>org.apache.catalina.loader.WebappClassLoader</code>.</p>
       </attribute>
 
