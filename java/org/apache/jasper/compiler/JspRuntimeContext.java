@@ -110,11 +110,9 @@ public final class JspRuntimeContext {
         this.options = options;
 
         // Get the parent class loader
-        parentClassLoader =
-            (URLClassLoader) Thread.currentThread().getContextClassLoader();
+        parentClassLoader = Thread.currentThread().getContextClassLoader();
         if (parentClassLoader == null) {
-            parentClassLoader =
-                (URLClassLoader)this.getClass().getClassLoader();
+            parentClassLoader = this.getClass().getClassLoader();
         }
 
         if (log.isDebugEnabled()) {
@@ -154,7 +152,7 @@ public final class JspRuntimeContext {
      */
     private ServletContext context;
     private Options options;
-    private URLClassLoader parentClassLoader;
+    private ClassLoader parentClassLoader;
     private PermissionCollection permissionCollection;
     private CodeSource codeSource;                    
     private String classpath;
@@ -218,11 +216,11 @@ public final class JspRuntimeContext {
     }
 
     /**
-     * Get the parent URLClassLoader.
+     * Get the parent ClassLoader.
      *
-     * @return URLClassLoader parent
+     * @return ClassLoader parent
      */
-    public URLClassLoader getParentClassLoader() {
+    public ClassLoader getParentClassLoader() {
         return parentClassLoader;
     }
 
@@ -325,20 +323,23 @@ public final class JspRuntimeContext {
      */
     private void initClassPath() {
 
-        URL [] urls = parentClassLoader.getURLs();
         StringBuffer cpath = new StringBuffer();
         String sep = System.getProperty("path.separator");
 
-        for(int i = 0; i < urls.length; i++) {
-            // Tomcat 4 can use URL's other than file URL's,
-            // a protocol other than file: will generate a
-            // bad file system path, so only add file:
-            // protocol URL's to the classpath.
-            
-            if( urls[i].getProtocol().equals("file") ) {
-                cpath.append(urls[i].getFile()+sep);
+        if (parentClassLoader instanceof URLClassLoader) {
+            URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
+    
+            for(int i = 0; i < urls.length; i++) {
+                // Tomcat 4 can use URL's other than file URL's,
+                // a protocol other than file: will generate a
+                // bad file system path, so only add file:
+                // protocol URL's to the classpath.
+                
+                if( urls[i].getProtocol().equals("file") ) {
+                    cpath.append(urls[i].getFile()+sep);
+                }
             }
-        }    
+        }
 
         cpath.append(options.getScratchDir() + sep);
 
@@ -408,32 +409,34 @@ public final class JspRuntimeContext {
                 permissionCollection.add( new RuntimePermission(
                     "accessClassInPackage.org.apache.jasper.runtime") );
 
-                URL [] urls = parentClassLoader.getURLs();
-                String jarUrl = null;
-                String jndiUrl = null;
-                for (int i=0; i<urls.length; i++) {
-                    if (jndiUrl == null
-                            && urls[i].toString().startsWith("jndi:") ) {
-                        jndiUrl = urls[i].toString() + "-";
+                if (parentClassLoader instanceof URLClassLoader) {
+                    URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
+                    String jarUrl = null;
+                    String jndiUrl = null;
+                    for (int i=0; i<urls.length; i++) {
+                        if (jndiUrl == null
+                                && urls[i].toString().startsWith("jndi:") ) {
+                            jndiUrl = urls[i].toString() + "-";
+                        }
+                        if (jarUrl == null
+                                && urls[i].toString().startsWith("jar:jndi:")
+                                ) {
+                            jarUrl = urls[i].toString();
+                            jarUrl = jarUrl.substring(0,jarUrl.length() - 2);
+                            jarUrl = jarUrl.substring(0,
+                                     jarUrl.lastIndexOf('/')) + "/-";
+                        }
                     }
-                    if (jarUrl == null
-                            && urls[i].toString().startsWith("jar:jndi:")
-                            ) {
-                        jarUrl = urls[i].toString();
-                        jarUrl = jarUrl.substring(0,jarUrl.length() - 2);
-                        jarUrl = jarUrl.substring(0,
-                                 jarUrl.lastIndexOf('/')) + "/-";
+                    if (jarUrl != null) {
+                        permissionCollection.add(
+                                new FilePermission(jarUrl,"read"));
+                        permissionCollection.add(
+                                new FilePermission(jarUrl.substring(4),"read"));
                     }
+                    if (jndiUrl != null)
+                        permissionCollection.add(
+                                new FilePermission(jndiUrl,"read") );
                 }
-                if (jarUrl != null) {
-                    permissionCollection.add(
-                            new FilePermission(jarUrl,"read"));
-                    permissionCollection.add(
-                            new FilePermission(jarUrl.substring(4),"read"));
-                }
-                if (jndiUrl != null)
-                    permissionCollection.add(
-                            new FilePermission(jndiUrl,"read") );
             } catch(Exception e) {
                 context.log("Security Init for context failed",e);
             }
