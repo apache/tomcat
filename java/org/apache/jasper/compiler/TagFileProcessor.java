@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.HashMap;
@@ -595,7 +594,7 @@ class TagFileProcessor {
 
                 // Use same classloader and classpath for compiling tag files
                 wrapper.getJspEngineContext().setClassLoader(
-                        (URLClassLoader) ctxt.getClassLoader());
+                        ctxt.getClassLoader());
                 wrapper.getJspEngineContext().setClassPath(ctxt.getClassPath());
             } else {
                 // Make sure that JspCompilationContext gets the latest TagInfo
