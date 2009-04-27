@@ -34,6 +34,10 @@
   <subsection name="Catalina">
     <changelog>
       <update>
+        <bug>46925</bug>: Replace recusive search for nested roles with
+        iterative search. Patch provided by Stefan Zoerner. (rjung)
+      </update>
+      <update>
         Switch from AnnotationProcessor to InstanceManager. Patch provided by
         David Jecks with modifications by Remy. (remm/fhanik)
       </update>
@@ -78,7 +82,7 @@
       </add>
       <fix>
         <rev>713953</rev> Include name of attribute when logging failure of
-        session attribute serializatyion. (mturk)
+        session attribute serialization. (mturk)
       </fix>
       <update>
         Improve JNDI realm compatability with Active Directory. (rjung)
