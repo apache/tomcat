@@ -353,7 +353,9 @@ public class MapperListener
                 domain).getContainer().findChild(name);
         
             mapper.removeHost(name);
-            host.removeContainerListener(this);
+            if (host != null) {
+                host.removeContainerListener(this);
+            }
             if(log.isDebugEnabled())
                 log.debug(sm.getString
                         ("mapperListener.unregisterHost", name, domain));
