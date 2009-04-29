@@ -873,14 +873,6 @@ public class ServerLifecycleListener
         // Destroy the MBeans for each child Service
         Service services[] = server.findServices();
         for (int i = 0; i < services.length; i++) {
-            // FIXME - Warp object hierarchy not currently supported
-            if (services[i].getContainer().getClass().getName().equals
-                ("org.apache.catalina.connector.warp.WarpEngine")) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Skipping MBean for Service " + services[i]);
-                }
-                continue;
-            }
             destroyMBeans(services[i]);
         }
 
