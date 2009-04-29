@@ -105,7 +105,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class WebappClassLoader
     extends URLClassLoader
-    implements Reloader, Lifecycle
+    implements Lifecycle
  {
 
     protected static org.apache.juli.logging.Log log=
