@@ -19,6 +19,7 @@ package org.apache.catalina.mbeans;
 
 
 import java.util.Hashtable;
+import java.util.Set;
 
 import javax.management.DynamicMBean;
 import javax.management.MBeanException;
@@ -47,6 +48,12 @@ import org.apache.catalina.deploy.ContextResource;
 import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.NamingResources;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.ProtocolHandler;
+import org.apache.coyote.ajp.AjpAprProtocol;
+import org.apache.coyote.ajp.AjpProtocol;
+import org.apache.coyote.http11.Http11AprProtocol;
+import org.apache.coyote.http11.Http11NioProtocol;
+import org.apache.coyote.http11.Http11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -734,29 +741,23 @@ public class MBeanUtils {
         throws MalformedObjectNameException {
 
         ObjectName name = null;
-        if (connector.getClass().getName().indexOf("CoyoteConnector") >= 0 ) {
-            try {
-                String address = (String)
-                    IntrospectionUtils.getProperty(connector, "address");
-                Integer port = (Integer)
-                    IntrospectionUtils.getProperty(connector, "port");
-                StringBuffer sb = new StringBuffer(domain);
-                sb.append(":type=Connector");
-                sb.append(",port=" + port);
-                if ((address != null) && (address.length()>0)) {
-                    sb.append(",address=" + address);
-                }
-                name = new ObjectName(sb.toString());
-                return (name);
-            } catch (Exception e) {
-                throw new MalformedObjectNameException
-                    ("Cannot create object name for " + connector+e);
+        try {
+            String address = (String)
+                IntrospectionUtils.getProperty(connector, "address");
+            Integer port = (Integer)
+                IntrospectionUtils.getProperty(connector, "port");
+            StringBuffer sb = new StringBuffer(domain);
+            sb.append(":type=Connector");
+            sb.append(",port=" + port);
+            if ((address != null) && (address.length()>0)) {
+                sb.append(",address=" + address);
             }
-        } else {
+            name = new ObjectName(sb.toString());
+            return (name);
+        } catch (Exception e) {
             throw new MalformedObjectNameException
-                ("Cannot create object name for " + connector);
+                ("Cannot create object name for " + connector+e);
         }
-
     }
 
 
@@ -1373,19 +1374,34 @@ public class MBeanUtils {
     static void destroyMBean(Connector connector, Service service)
         throws Exception {
 
-        connector.setService(service);
-        String mname = createManagedName(connector);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
+        // domain is engine name
+        String domain = service.getContainer().getName();
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, connector);
         connector.setService(null);
         if( mserver.isRegistered( oname ))  {
             mserver.unregisterMBean(oname);
+        }
+        // Unregister associated request processor
+        String worker = null;
+        ProtocolHandler handler = connector.getProtocolHandler();
+        if (handler instanceof Http11Protocol) {
+            worker = ((Http11Protocol)handler).getName();
+        } else if (handler instanceof Http11NioProtocol) {
+            worker = ((Http11NioProtocol)handler).getName();
+        } else if (handler instanceof Http11AprProtocol) {
+            worker = ((Http11AprProtocol)handler).getName();
+        } else if (handler instanceof AjpProtocol) {
+            worker = ((AjpProtocol)handler).getName();
+        } else if (handler instanceof AjpAprProtocol) {
+            worker = ((AjpAprProtocol)handler).getName();
+        }
+        ObjectName query = new ObjectName(
+                domain + ":type=RequestProcessor,worker=" + worker + ",*");
+        Set<ObjectName> results = mserver.queryNames(query, null);
+        for(ObjectName result : results) {
+            mserver.unregisterMBean(result);
         }
     }
 
@@ -1401,12 +1417,7 @@ public class MBeanUtils {
     static void destroyMBean(Context context)
         throws Exception {
 
-        String mname = createManagedName(context);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
+        String domain = context.getParent().getParent().getName();
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, context);
@@ -1452,6 +1463,12 @@ public class MBeanUtils {
      */
     static void destroyMBean(ContextResource resource)
         throws Exception {
+
+        // If this is a user database resource need to destroy groups, roles,
+        // users and UserDatabase mbean
+        if ("org.apache.catalina.UserDatabase".equals(resource.getType())) {
+            destroyMBeanUserDatabase(resource.getName());
+        }
 
         String mname = createManagedName(resource);
         ManagedBean managed = registry.findManagedBean(mname);
@@ -1503,13 +1520,7 @@ public class MBeanUtils {
      */
     static void destroyMBean(Engine engine)
         throws Exception {
-
-        String mname = createManagedName(engine);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
+        String domain = engine.getName();
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, engine);
@@ -1556,12 +1567,7 @@ public class MBeanUtils {
     static void destroyMBean(Host host)
         throws Exception {
 
-        String mname = createManagedName(host);
-        ManagedBean managed = registry.findManagedBean(mname);
-        if (managed == null) {
-            return;
-        }
-        String domain = managed.getDomain();
+        String domain = host.getParent().getName();
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, host);
@@ -1643,7 +1649,7 @@ public class MBeanUtils {
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, resources);
-       if( mserver.isRegistered(oname) )
+        if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
 
     }
@@ -1721,6 +1727,16 @@ public class MBeanUtils {
         if (domain == null)
             domain = mserver.getDefaultDomain();
         ObjectName oname = createObjectName(domain, server);
+        if( mserver.isRegistered(oname) )
+            mserver.unregisterMBean(oname);
+        
+        // Global String cache - fixed name
+        oname = new ObjectName("Catalina:type=StringCache");
+        if( mserver.isRegistered(oname) )
+            mserver.unregisterMBean(oname);
+
+        // MBean Factory - fixed name
+        oname = new ObjectName("Catalina:type=MBeanFactory");
         if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
 
@@ -1802,6 +1818,51 @@ public class MBeanUtils {
         if( mserver.isRegistered(oname) )
             mserver.unregisterMBean(oname);
 
+    }
+
+
+    /**
+     * Deregister the MBean for the
+     * <code>UserDatabase</code> object with this name.
+     *
+     * @param userDatabase The UserDatabase to be managed
+     *
+     * @exception Exception if an MBean cannot be deregistered
+     */
+    static void destroyMBeanUserDatabase(String userDatabase)
+        throws Exception {
+
+        ObjectName query = null;
+        Set<ObjectName> results = null;
+        
+        // Groups
+        query = new ObjectName(
+                "Users:type=Group,database=" + userDatabase + ",*");
+        results = mserver.queryNames(query, null);
+        for(ObjectName result : results) {
+            mserver.unregisterMBean(result);
+        }
+        
+        // Roles
+        query = new ObjectName(
+                "Users:type=Role,database=" + userDatabase + ",*");
+        results = mserver.queryNames(query, null);
+        for(ObjectName result : results) {
+            mserver.unregisterMBean(result);
+        }
+        
+        // Users
+        query = new ObjectName(
+                "Users:type=User,database=" + userDatabase + ",*");
+        results = mserver.queryNames(query, null);
+        for(ObjectName result : results) {
+            mserver.unregisterMBean(result);
+        }
+
+        // The database itself
+        ObjectName db = new ObjectName(
+                "Users:type=UserDatabase,database=" + userDatabase);
+        mserver.unregisterMBean(db);
     }
 
 
