@@ -71,6 +71,7 @@ public class PoolProperties {
     protected boolean fairQueue = true;
     protected boolean useEquals = false;
     protected int abandonWhenPercentageFull = 0;
+    protected long maxAge = 0;
 
     private InterceptorDefinition[] interceptors = null;
     
@@ -522,5 +523,15 @@ public class PoolProperties {
     public void setUseEquals(boolean useEquals) {
         this.useEquals = useEquals;
     }
+
+    public long getMaxAge() {
+        return maxAge;
+    }
+
+    public void setMaxAge(long maxAge) {
+        this.maxAge = maxAge;
+    }
+    
+    
 
 }

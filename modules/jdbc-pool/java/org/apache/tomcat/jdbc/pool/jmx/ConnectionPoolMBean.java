@@ -118,4 +118,6 @@ public interface ConnectionPoolMBean  {
 
     public int getAbandonWhenPercentageFull();
     
+    public long getMaxAge();
+    
 }
