@@ -48,6 +48,7 @@
   <property name="tomcat.build"      value="${basedir}/output/build"/>
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
   <property name="tomcat.dist"       value="${basedir}/output/dist"/>
+  <property name="tomcat.embed"      value="${basedir}/output/embed"/>
   <property name="test.failonerror"  value="true"/>
   <property name="test.runner"       value="junit.textui.TestRunner"/>
 
@@ -80,6 +81,9 @@
   <property name="jasper-jdt.home" value="${base.path}/tomcat${version.major}-deps/jdt" />
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
+
+  <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-core.jar"/>
+  <property name="tomcat-embed-jasper.jar" value="${tomcat.embed}/tomcat-jasper.jar"/>
 
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -242,7 +246,29 @@
     <include name="org/apache/el/**" />
   </patternset>
 
+  <!-- Pattern sets for embedded JARs -->
+  <patternset id="files.tomcat-embed-core" >
+  	<patternset refid="files.annotations-api" />
+    <patternset refid="files.servlet-api" />
+    <patternset refid="files.el-api" />
+    <patternset refid="files.bootstrap" />
+    <patternset refid="files.tomcat-juli" />
+    <patternset refid="files.tomcat-api" />
+    <patternset refid="files.catalina" />
+    <patternset refid="files.tomcat-coyote" />
+  </patternset>
 
+  <patternset id="files.tomcat-embed-jasper" >
+    <patternset refid="files.jsp-api" />
+    <patternset refid="files.jasper" />
+    <patternset refid="files.jasper-el" />
+  </patternset>
+	
+  <!-- Pattern sets not included in embedded -->
+    <!--<patternset refid="files.catalina-tribes" />-->
+    <!--<patternset refid="files.catalina-ha" />-->
+    <!--<patternset refid="files.catalina-ant" />-->
+	
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">
     <attribute name="jarfile" description="the name of the JAR file to create"/>
     <attribute name="filesId" description="the patternset id of the files to use"/>
@@ -606,6 +632,24 @@
     <copy file="${tomcat-dbcp.jar}" todir="${tomcat.build}/lib" 
       failonerror="false"/>
     <copy file="${jasper-jdt.jar}" todir="${tomcat.build}/lib" />
+
+  </target>
+
+  <target name="embed" description="Create experimental embedded jars"
+    depends="build-prepare,compile" >
+
+    <mkdir dir="${tomcat.embed}" />
+  	
+  	<copy file="${basedir}/LICENSE" todir="${tomcat.embed}" />
+    <copy file="${basedir}/NOTICE" todir="${tomcat.embed}" />
+    <copy file="${tomcat-dbcp.jar}" todir="${tomcat.embed}" 
+      failonerror="false"/>
+    <copy file="${jasper-jdt.jar}" todir="${tomcat.embed}" />
+
+  	<jarIt jarfile="${tomcat-embed-core.jar}"
+  	  filesId="files.tomcat-embed-core"/>
+    <jarIt jarfile="${tomcat-embed-jasper.jar}"
+     filesId="files.tomcat-embed-jasper"/>
 
   </target>
 
