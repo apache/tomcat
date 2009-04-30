@@ -78,6 +78,7 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_MINIDLE = "minIdle";
     protected final static String PROP_INITIALSIZE = "initialSize";
     protected final static String PROP_MAXWAIT = "maxWait";
+    protected final static String PROP_MAXAGE = "maxAge";
     
     protected final static String PROP_TESTONBORROW = "testOnBorrow";
     protected final static String PROP_TESTONRETURN = "testOnReturn";
@@ -149,7 +150,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_FAIR_QUEUE,
         PROP_USE_EQUALS,
         OBJECT_NAME,
-        PROP_ABANDONWHENPERCENTAGEFULL
+        PROP_ABANDONWHENPERCENTAGEFULL,
+        PROP_MAXAGE
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -415,6 +417,11 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_ABANDONWHENPERCENTAGEFULL);
         if (value != null) {
             poolProperties.setAbandonWhenPercentageFull(Integer.parseInt(value));
+        }
+        
+        value = properties.getProperty(PROP_MAXAGE);
+        if (value != null) {
+            poolProperties.setMaxAge(Long.parseLong(value));
         }
         
         return poolProperties;
