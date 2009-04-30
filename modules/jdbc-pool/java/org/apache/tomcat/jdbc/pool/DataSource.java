@@ -249,6 +249,14 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
             throw new RuntimeException(x);
         }
     }
+    
+    public long getMaxAge() {
+        try {
+            return createPool().getPoolProperties().getMaxAge();
+        }catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }    
 
     public String getName() {
         try {

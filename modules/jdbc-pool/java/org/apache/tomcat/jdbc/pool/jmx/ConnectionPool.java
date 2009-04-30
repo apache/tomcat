@@ -276,5 +276,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public int getAbandonWhenPercentageFull() {
         return pool.getPoolProperties().getAbandonWhenPercentageFull();
     }
+    public long getMaxAge() {
+        return pool.getPoolProperties().getMaxAge();
+    }
 
 }

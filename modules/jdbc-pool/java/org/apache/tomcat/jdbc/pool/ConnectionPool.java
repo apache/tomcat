@@ -609,6 +609,17 @@ public class ConnectionPool {
         }
     }
 
+    protected boolean shouldClose(PooledConnection con, int action) {
+        if (con.isDiscarded()) return true;
+        if (isClosed()) return true;
+        if (!con.validate(action)) return true;
+        if (getPoolProperties().getMaxAge()>0 ) {
+            return (System.currentTimeMillis()-con.getLastConnected()) > getPoolProperties().getMaxAge();
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * Returns a connection to the pool
      * @param con PooledConnection
@@ -626,8 +637,8 @@ public class ConnectionPool {
                 con.lock();
 
                 if (busy.remove(con)) {
-                    if ((!con.isDiscarded()) && (!isClosed()) &&
-                            con.validate(PooledConnection.VALIDATE_RETURN)) {
+                    
+                    if (!shouldClose(con,PooledConnection.VALIDATE_RETURN)) {
                         con.setStackTrace(null);
                         con.setTimestamp(System.currentTimeMillis());
                         if (((idle.size()>=poolProperties.getMaxIdle()) && !poolProperties.isPoolSweeperEnabled()) || (!idle.offer(con))) {
@@ -654,12 +665,11 @@ public class ConnectionPool {
         } //end if
     } //checkIn
 
-    public boolean shouldAbandon() {
+    protected boolean shouldAbandon() {
         if (poolProperties.getAbandonWhenPercentageFull()==0) return true;
         float used = (float)busy.size();
         float max  = (float)poolProperties.getMaxActive();
         float perc = (float)poolProperties.getAbandonWhenPercentageFull();
-        System.out.println("Abandon rate:"+(used/max*100f));
         return (used/max*100f)>=perc;
     }
     
