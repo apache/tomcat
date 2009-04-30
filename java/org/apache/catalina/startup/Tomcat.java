@@ -359,7 +359,7 @@ public class Tomcat {
         if(engine == null ) {
             getServer();
             engine = new StandardEngine();
-            engine.setName( "default" );
+            engine.setName( "Tomcat" );
             engine.setDefaultHost(hostname);
             service.setContainer(engine);
         }
