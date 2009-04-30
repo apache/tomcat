@@ -73,6 +73,15 @@
           that has over 200 source files(last time we checked), Tomcat jdbc has a core of 8 files, the connection pool itself is about half 
           that. As bugs may occur, they will be faster to track down, and easier to fix. Complexity reduction has been a focus from inception.</li>
       <li>Asynchronous connection retrieval - you can queue your request for a connection and receive a Future&lt;Connection&gt; back.</li>    
+      <li>Better idle connection handling. Instead of closing connections directly, it can still pool connections and sizes the idle pool with a smarter algorithm.</li>    
+      <li>You can decide at what moment connections are considered abandoned, is it when the pool is full, or directly at a timeout
+          by specifying a threshold.
+      </li>    
+      <li>The abandon connection timer will reset upon a statement/query activity. Allowing a connections that is in use for a long time to not timeout.
+          This is achieved using the ResetAbandonedTimer
+      </li>    
+      <li>Close connections after they have been connected for a certain time. Age based close upon return to the pool.
+      </li>    
     </ol>
   </p>
 
@@ -336,6 +345,14 @@
          The value should be between 0-100.
          The default value is <code>0</code>, which implies that connections are eligible for closure as soon
          as <code>removeAbandonedTimeout</code> has been reached.</p>
+    </attribute>
+
+    <attribute name="maxAge" required="false">
+      <p>(long) Time in milliseconds to keep this connection. When a connection is returned to the pool,
+         the pool will check to see if the <code>now - time-when-connected > maxAge</code> has been reached,
+         and if so, it closes the connection rather than returning it to the pool.
+         The default value is <code>0</code>, which implies that connections will be left open and no age check
+         will be done upon returning the connection to the pool.</p>
     </attribute>
 
     <attribute name="useEquals" required="false">

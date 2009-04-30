@@ -86,6 +86,10 @@ public class PooledConnection {
      */
     protected boolean discarded = false;
     /**
+     * The Timestamp when the last time the connect() method was called successfully
+     */
+    protected volatile long lastConnected = -1;
+    /**
      * timestamp to keep track of validation intervals
      */
     protected long lastValidated = System.currentTimeMillis();
@@ -163,6 +167,7 @@ public class PooledConnection {
             if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
         }        
         this.discarded = false;
+        this.lastConnected = System.currentTimeMillis();
     }
     
     /**
@@ -193,6 +198,7 @@ public class PooledConnection {
             }
         }
         connection = null;
+        lastConnected = -1;
         if (finalize) parent.finalize(this);
     }
 
@@ -380,6 +386,12 @@ public class PooledConnection {
      */
     public java.sql.Connection getConnection() {
         return this.connection;
+    }
+    
+    
+
+    public long getLastConnected() {
+        return lastConnected;
     }
 
     /**
