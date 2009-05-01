@@ -481,14 +481,14 @@ public abstract class RealmBase
             // If collection is null, continue to avoid an NPE
             // See Bugzilla 30624
             if ( collection == null) {
-		continue;
+                continue;
             }
 
             if (log.isDebugEnabled()) {
                 log.debug("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
-	    }
+            }
 
             for(int j=0; j < collection.length; j++){
                 String [] patterns = collection[j].findPatterns();
@@ -496,7 +496,7 @@ public abstract class RealmBase
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
                 if ( patterns == null) {
-		    continue;
+                    continue;
                 }
 
                 for(int k=0; k < patterns.length; k++) {
@@ -525,14 +525,14 @@ public abstract class RealmBase
             // If collection is null, continue to avoid an NPE
             // See Bugzilla 30624
             if ( collection == null) {
-		continue;
+                continue;
             }
 
             if (log.isDebugEnabled()) {
                 log.debug("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
-	    }
+            }
 
             for(int j=0; j < collection.length; j++){
                 String [] patterns = collection[j].findPatterns();
@@ -540,7 +540,7 @@ public abstract class RealmBase
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
                 if ( patterns == null) {
-		    continue;
+                    continue;
                 }
 
                 boolean matched = false;
@@ -591,14 +591,14 @@ public abstract class RealmBase
             // If collection is null, continue to avoid an NPE
             // See Bugzilla 30624
             if ( collection == null) {
-		continue;
+                continue;
             }
             
             if (log.isDebugEnabled()) {
                 log.debug("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
-	    }
+            }
 
             boolean matched = false;
             int pos = -1;
@@ -608,7 +608,7 @@ public abstract class RealmBase
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
                 if ( patterns == null) {
-		    continue;
+                    continue;
                 }
 
                 for(int k=0; k < patterns.length && !matched; k++) {
@@ -648,14 +648,14 @@ public abstract class RealmBase
             // If collection is null, continue to avoid an NPE
             // See Bugzilla 30624
             if ( collection == null) {
-		continue;
+                continue;
             }
 
             if (log.isDebugEnabled()) {
                 log.debug("  Checking constraint '" + constraints[i] +
                     "' against " + method + " " + uri + " --> " +
                     constraints[i].included(uri, method));
-	    }
+            }
 
             for(int j=0; j < collection.length; j++){
                 String [] patterns = collection[j].findPatterns();
@@ -663,7 +663,7 @@ public abstract class RealmBase
                 // If patterns is null, continue to avoid an NPE
                 // See Bugzilla 30624
                 if ( patterns == null) {
-		    continue;
+                    continue;
                 }
 
                 boolean matched = false;
@@ -1157,11 +1157,11 @@ public abstract class RealmBase
             }
         }
 
-    	if (hasMessageDigest()) {
-    		// Use pre-generated digest
-    		return getPassword(username);
-    	}
-    	
+        if (hasMessageDigest()) {
+            // Use pre-generated digest
+            return getPassword(username);
+        }
+            
         String digestValue = username + ":" + realmName + ":"
             + getPassword(username);
 
