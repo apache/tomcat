@@ -471,6 +471,11 @@ public abstract class RealmBase
 
         // Check each defined security constraint
         String uri = request.getRequestPathMB().toString();
+        // Bug47080 - in rare cases this may be null
+        // Mapper treats as '/' do the same to prevent NPE
+        if (uri == null) {
+            uri = "/";
+        }
         
         String method = request.getMethod();
         int i;
