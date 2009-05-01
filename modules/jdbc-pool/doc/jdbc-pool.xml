@@ -52,6 +52,9 @@
       <li>Tomcat jdbc pool implements a fairness option not available in commons-dbcp and still performs faster than commons-dbcp</li>
       <li>Tomcat jdbc pool implements the ability retrieve a connection asynchronously, without adding additional threads to the library itself</li> 
       <li>Tomcat jdbc pool is a Tomcat module, it depends on Tomcat JULI, a simplified logging framework used in Tomcat.</li>
+      <li>Retrieve the underlying connection using the javax.sql.PooledConnection interface.</li>
+      <li>Starvation proof. If a pool is empty, and threads are waiting for a connection, when a connection is returned, 
+          the pool will awake the correct thread waiting. Most pools will simply starve.</li>
     </ol>
   </p>
 
