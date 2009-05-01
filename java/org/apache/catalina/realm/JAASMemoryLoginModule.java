@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.security.auth.Subject;
@@ -100,7 +99,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     /**
      * The configuration information for this <code>LoginModule</code>.
      */
-    protected Map options = null;
+    protected Map<String,?> options = null;
 
 
     /**
@@ -117,11 +116,6 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
 
     /**
-     * The set of <code>Principals</code> loaded from our configuration file.
-     */
-    protected HashMap principals = new HashMap();
-
-    /**
      * The string manager for this package.
      */
     protected static StringManager sm =
@@ -131,7 +125,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
      * The state information that is shared with other configured
      * <code>LoginModule</code> instances.
      */
-    protected Map sharedState = null;
+    protected Map<String,?> sharedState = null;
 
 
     /**
@@ -277,7 +271,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
      *  <code>LoginModule</code> instance
      */
     public void initialize(Subject subject, CallbackHandler callbackHandler,
-                           Map sharedState, Map options) {
+                           Map<String,?> sharedState, Map<String,?> options) {
         log.debug("Init");
 
         // Save configuration values
