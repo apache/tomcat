@@ -34,7 +34,6 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.ErrorPage;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.StringManager;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.Log;
@@ -323,7 +322,7 @@ final class StandardHostValve
             request.setAttribute(Globals.STATUS_CODE_ATTR,
                               new Integer(statusCode));
 
-            String message = RequestUtil.filter(response.getMessage());
+            String message = response.getMessage();
             if (message == null)
                 message = "";
             request.setAttribute(Globals.ERROR_MESSAGE_ATTR, message);
