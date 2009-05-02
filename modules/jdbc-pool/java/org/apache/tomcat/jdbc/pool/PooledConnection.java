@@ -68,35 +68,35 @@ public class PooledConnection {
     /**
      * The underlying database connection
      */
-    protected java.sql.Connection connection;
+    private java.sql.Connection connection;
     /**
      * When we track abandon traces, this string holds the thread dump
      */
-    protected String abandonTrace = null;
+    private String abandonTrace = null;
     /**
      * Timestamp the connection was last 'touched' by the pool
      */
-    protected long timestamp;
+    private long timestamp;
     /**
      * Lock for this connection only
      */
-    protected ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
     /**
      * Set to true if this connection has been discarded by the pool
      */
-    protected boolean discarded = false;
+    private boolean discarded = false;
     /**
      * The Timestamp when the last time the connect() method was called successfully
      */
-    protected volatile long lastConnected = -1;
+    private volatile long lastConnected = -1;
     /**
      * timestamp to keep track of validation intervals
      */
-    protected long lastValidated = System.currentTimeMillis();
+    private volatile long lastValidated = System.currentTimeMillis();
     /**
      * The instance number for this connection
      */
-    protected int instanceCount = 0;
+    private int instanceCount = 0;
     /**
      * The parent
      */
@@ -107,7 +107,7 @@ public class PooledConnection {
      * so that we don't create a new list of interceptors each time we borrow
      * the connection
      */
-    protected WeakReference<JdbcInterceptor> handler = null;
+    private WeakReference<JdbcInterceptor> handler = null;
     
     
     public PooledConnection(PoolProperties prop, ConnectionPool parent) {
@@ -116,7 +116,7 @@ public class PooledConnection {
         this.parent = parent;
     }
 
-    protected void connect() throws SQLException {
+    public void connect() throws SQLException {
         if (connection != null) {
             try {
                 this.disconnect(false);
@@ -178,12 +178,12 @@ public class PooledConnection {
         return connection!=null;
     }
 
-    protected void reconnect() throws SQLException {
+    public void reconnect() throws SQLException {
         this.disconnect(false);
         this.connect();
     } //reconnect
 
-    protected void disconnect(boolean finalize) {
+    private void disconnect(boolean finalize) {
         if (isDiscarded()) {
             return;
         }
@@ -215,16 +215,7 @@ public class PooledConnection {
         } //end if
     }
 
-    public boolean abandon() {
-        try {
-            disconnect(true);
-        } catch (Exception x) {
-            log.error("", x);
-        } //catch
-        return false;
-    }
-
-    protected boolean doValidate(int action) {
+    private boolean doValidate(int action) {
         if (action == PooledConnection.VALIDATE_BORROW &&
             poolProperties.isTestOnBorrow())
             return true;

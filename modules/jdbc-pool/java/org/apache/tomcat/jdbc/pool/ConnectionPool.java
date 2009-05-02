@@ -56,7 +56,7 @@ public class ConnectionPool {
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE
     //===============================================================================
-    
+    private AtomicInteger size = new AtomicInteger(0);
     /**
      * All the information about the connection pool
      */
@@ -169,7 +169,7 @@ public class ConnectionPool {
      * @return int
      */
     public int getSize() {
-        return idle.size()+busy.size();
+        return size.get();
     }
 
     /**
@@ -409,7 +409,7 @@ public class ConnectionPool {
             if (jmxPool!=null) {
                 jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
             }
-            con.abandon();
+            release(con);
             //we've asynchronously reduced the number of connections
             //we could have threads stuck in idle.poll(timeout) that will never be notified
             if (waitcount.get()>0) idle.offer(new PooledConnection(poolProperties,this));
@@ -429,6 +429,7 @@ public class ConnectionPool {
             con.lock();
             con.release();
         } finally {
+            size.addAndGet(-1);
             con.unlock();
         }
     }
@@ -463,7 +464,8 @@ public class ConnectionPool {
             //this is not 100% accurate since it doesn't use a shared
             //atomic variable - a connection can become idle while we are creating 
             //a new connection
-            if (busy.size() < getPoolProperties().getMaxActive()) {
+            if (size.get() < getPoolProperties().getMaxActive()) {
+                size.addAndGet(1);
                 return createConnection(now, con);
             } //end if
 
@@ -757,7 +759,7 @@ public class ConnectionPool {
                         continue;
                     if (!con.validate(PooledConnection.VALIDATE_IDLE)) {
                         idle.remove(con);
-                        con.release();
+                        release(con);
                     }
                 } finally {
                     con.unlock();
