@@ -16,6 +16,22 @@
  */
 package org.apache.catalina.tribes.test;
 
+import org.apache.catalina.tribes.test.channel.ChannelStartStop;
+import org.apache.catalina.tribes.test.channel.TestChannelOptionFlag;
+import org.apache.catalina.tribes.test.channel.TestDataIntegrity;
+import org.apache.catalina.tribes.test.channel.TestMulticastPackages;
+import org.apache.catalina.tribes.test.channel.TestRemoteProcessException;
+import org.apache.catalina.tribes.test.channel.TestUdpPackages;
+import org.apache.catalina.tribes.test.interceptors.TestNonBlockingCoordinator;
+import org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor;
+import org.apache.catalina.tribes.test.interceptors.TestTwoPhaseCommit;
+import org.apache.catalina.tribes.test.io.TestSenderConnections;
+import org.apache.catalina.tribes.test.io.TestSerialization;
+import org.apache.catalina.tribes.test.membership.MemberSerialization;
+import org.apache.catalina.tribes.test.membership.TestDomainFilter;
+import org.apache.catalina.tribes.test.membership.TestMemberArrival;
+import org.apache.catalina.tribes.test.membership.TestTcpFailureDetector;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -29,13 +45,25 @@ public class TribesTestSuite
 
     public static Test suite() {
         TestSuite suite = new TestSuite();
-        suite.addTestSuite(org.apache.catalina.tribes.test.channel.ChannelStartStop.class);
-        suite.addTestSuite(org.apache.catalina.tribes.test.channel.TestChannelOptionFlag.class);
-        suite.addTestSuite(org.apache.catalina.tribes.test.membership.MemberSerialization.class);
-        suite.addTestSuite(org.apache.catalina.tribes.test.membership.TestMemberArrival.class);
-        suite.addTestSuite(org.apache.catalina.tribes.test.membership.TestTcpFailureDetector.class);
-        suite.addTestSuite(org.apache.catalina.tribes.test.channel.TestDataIntegrity.class);
-        suite.addTestSuite(org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor.class);
+        // o.a.catalina.tribes.test.channel
+        suite.addTestSuite(ChannelStartStop.class);
+        suite.addTestSuite(TestChannelOptionFlag.class);
+        suite.addTestSuite(TestDataIntegrity.class);
+        suite.addTestSuite(TestMulticastPackages.class);
+        suite.addTestSuite(TestRemoteProcessException.class);
+        suite.addTestSuite(TestUdpPackages.class);
+        // o.a.catalina.tribes.test.interceptors
+        suite.addTestSuite(TestNonBlockingCoordinator.class);
+        suite.addTestSuite(TestOrderInterceptor.class);
+        suite.addTestSuite(TestTwoPhaseCommit.class);
+        // o.a.catalina.tribes.test.io
+        suite.addTestSuite(TestSenderConnections.class);
+        suite.addTestSuite(TestSerialization.class);
+        // o.a.catalina.tribes.test.membership
+        suite.addTestSuite(MemberSerialization.class);
+        suite.addTestSuite(TestDomainFilter.class);
+        suite.addTestSuite(TestMemberArrival.class);
+        suite.addTestSuite(TestTcpFailureDetector.class);
         return suite;
     }
 }
