@@ -106,6 +106,7 @@ public class DefaultTestCase extends TestCase {
     protected void transferPropertiesToC3P0() throws Exception {
         System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
         MLog.getLogger().setLevel(MLevel.WARNING);
+        MLog.getLogger("com").setLevel(MLevel.WARNING);
         //http://www.mchange.com/projects/c3p0/index.html#automaticTestTable
         ComboPooledDataSource c3p0 = new ComboPooledDataSource();  
         c3p0.setAcquireIncrement(1);
