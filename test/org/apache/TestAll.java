@@ -2,10 +2,10 @@ package org.apache;
 
 import org.apache.catalina.ha.session.TestSerializablePrincipal;
 import org.apache.catalina.startup.TomcatStartupAPITest;
-import org.apache.catalina.tomcat.util.http.TestCookies;
 import org.apache.catalina.tribes.test.TribesTestSuite;
 import org.apache.el.lang.TestELSupport;
 import org.apache.el.parser.TestELParser;
+import org.apache.tomcat.util.http.TestCookies;
 import org.apache.tomcat.util.res.TestStringManager;
 
 import junit.framework.Test;
