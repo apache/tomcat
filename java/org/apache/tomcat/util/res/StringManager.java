@@ -67,18 +67,9 @@ public class StringManager {
      * @param packageName Name of package to create StringManager for.
      */
     private StringManager(String packageName) {
-        this( packageName, Locale.getDefault() );
-    }
-
-    private StringManager(String packageName, Locale loc) {
         String bundleName = packageName + ".LocalStrings";
-        bundle = ResourceBundle.getBundle(bundleName, loc);
+        bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
         // Get the actual locale, which may be different from the requested one
-        locale = bundle.getLocale();
-    }
-
-    private StringManager(ResourceBundle bundle ) {
-        this.bundle=bundle;
         locale = bundle.getLocale();
     }
 
@@ -156,34 +147,6 @@ public class StringManager {
         if (mgr == null) {
             mgr = new StringManager(packageName);
             managers.put(packageName, mgr);
-        }
-        return mgr;
-    }
-
-    /**
-     * Get the StringManager for a particular package. If a manager for
-     * a package already exists, it will be reused, else a new
-     * StringManager will be created and returned.
-     *
-     * @param bundle The resource bundle
-     */
-    public synchronized static StringManager getManager(ResourceBundle bundle) {
-        return new StringManager( bundle );
-    }
-
-    /**
-     * Get the StringManager for a particular package and Locale. If a manager for
-     * a package already exists, it will be reused, else a new
-     * StringManager will be created for that Locale and returned.
-     *
-     * @param packageName The package name
-     * @param loc The locale
-     */
-    public synchronized static StringManager getManager(String packageName,Locale loc) {
-        StringManager mgr = managers.get(packageName+"_"+loc.toString());
-        if (mgr == null) {
-            mgr = new StringManager(packageName,loc);
-            managers.put(packageName+"_"+loc.toString(), mgr);
         }
         return mgr;
     }
