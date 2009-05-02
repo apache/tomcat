@@ -29,6 +29,8 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.mchange.v2.log.MLevel;
+import com.mchange.v2.log.MLog;
 
 /**
  * @author Filip Hanik
@@ -103,6 +105,7 @@ public class DefaultTestCase extends TestCase {
     
     protected void transferPropertiesToC3P0() throws Exception {
         System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
+        MLog.getLogger().setLevel(MLevel.WARNING);
         //http://www.mchange.com/projects/c3p0/index.html#automaticTestTable
         ComboPooledDataSource c3p0 = new ComboPooledDataSource();  
         c3p0.setAcquireIncrement(1);
@@ -126,6 +129,7 @@ public class DefaultTestCase extends TestCase {
         c3p0.setJdbcUrl(datasource.getPoolProperties().getUrl());
         c3p0.setDriverClass(datasource.getPoolProperties().getDriverClassName());
         this.c3p0Datasource = c3p0;
+        
       /**
         acquireIncrement
         acquireRetryAttempts
@@ -166,8 +170,11 @@ public class DefaultTestCase extends TestCase {
 
     protected void tearDown() throws Exception {
         try {datasource.close();}catch(Exception ignore){}
+        try {tDatasource.close();}catch(Exception ignore){}
+        try {((ComboPooledDataSource)c3p0Datasource).close(true);}catch(Exception ignore){}
         datasource = null;
         tDatasource = null;
+        c3p0Datasource = null;
         System.gc();
     }
 

@@ -58,6 +58,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
     public void testPoolThreads10Connections10() throws Exception {
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setFairQueue(false);
         this.threadcount = 10;
         this.transferProperties();
         this.datasource.getConnection().close();
