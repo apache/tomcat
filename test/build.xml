@@ -20,51 +20,79 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
-  <property file="build.properties"/>
+  <property file="../build.properties"/>
 
-  <property file="build.properties.default"/>
+  <property file="../build.properties.default"/>
 
   <property name="test.classes" value="${basedir}/output/classes"/>
-  <property name="tomcat.build" value="${basedir}/../output/build"/>
+  <property name="tomcat.classes" value="${basedir}/../output/classes"/>
 
   <property name="compile.source" value="1.5"/>
   <property name="compile.debug" value="true"/>
 
-  <property name="junit.jar" value="${junit.home}/junit.jar"/>
   <property name="test.runner" value="junit.textui.TestRunner"/>
 
   <path id="tomcat.test.classpath">
     <pathelement location="${test.classes}"/>
+    <pathelement location="${tomcat.classes}"/>
     <pathelement location="${junit.jar}"/>
-    <fileset dir="${tomcat.build}/lib/">
-      <include name="tomcat-coyote.jar"/>
-    </fileset>
-    <fileset dir="${tomcat.build}/bin/">
-      <include name="tomcat-juli.jar"/>
-    </fileset>
   </path>
 
-  <target name="compile">
-
-  <mkdir dir="${test.classes}"/>
-
-  <!-- Compile -->
-  <javac srcdir="." destdir="${test.classes}"
-         debug="${compile.debug}"
-         deprecation="${compile.deprecation}"
-         source="${compile.source}"
-         optimize="${compile.optimize}">
-         <classpath refid="tomcat.test.classpath" />
-         <include name="org/apache/catalina/tomcat/util/**" />
-  </javac>
-
+  <target name="compile" depends="download" >
+    <mkdir dir="${test.classes}"/>
+    <!-- Compile -->
+    <javac srcdir="." destdir="${test.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}">
+      <classpath refid="tomcat.test.classpath" />
+      <include name="org/apache/**" />
+    </javac>
   </target>
 
   <target name="all" depends="compile">
-     <java dir="${test.classes}" classname="${test.runner}" fork="yes" failonerror="${test.failonerror}">
-            <arg value="org.apache.catalina.tomcat.util.http.TestCookies"/>
-            <classpath refid="tomcat.test.classpath"/>
-        </java>
-
+    <java dir="${test.classes}" classname="${test.runner}" fork="yes"
+          failonerror="${test.failonerror}">
+      <arg value="org.apache.TestAll"/>
+      <classpath refid="tomcat.test.classpath"/>
+    </java>
   </target>
+	
+  <target name="download" >
+  	<antcall target="downloadzip">
+      <param name="sourcefile" value="${junit.loc}"/>
+      <param name="destfile" value="${junit.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+  	</antcall>
+  </target>
+	
+  <target name="downloadzip" unless="exist" depends="setproxy,testexist">
+    <!-- Download and extract the package -->
+    <get src="${sourcefile}" dest="${base.path}/file.zip" />
+    <mkdir dir="${destdir}" />
+    <unzip src="${base.path}/file.zip" dest="${destdir}"/>
+    <delete file="${base.path}/file.zip"/>
+  </target>
+	
+  <target name="proxyflags">
+    <!-- check proxy parameters. -->
+    <condition property="useproxy">
+      <equals arg1="${proxy.use}" arg2="on" />
+    </condition>
+  </target>
+
+  <target name="setproxy" depends="proxyflags" if="useproxy">
+    <taskdef name="setproxy"
+            classname="org.apache.tools.ant.taskdefs.optional.net.SetProxy" />
+    <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}"
+              proxyuser="${proxy.user}" proxypassword="${proxy.password}" />
+    <echo message="Using ${proxy.host}:${proxy.port} to download ${sourcefile}"/>
+  </target>
+
+  <target name="testexist">
+    <echo message="Testing  for ${destfile}"/>
+    <available file="${destfile}" property="exist"/>
+  </target>
+
 </project>

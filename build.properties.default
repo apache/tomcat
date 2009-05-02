@@ -109,3 +109,8 @@ dojo-js.home=${base.path}/dojo-release-1.1.1
 dojo-js.loc=http://download.dojotoolkit.org/release-1.1.1/dojo-release-1.1.1.tar.gz
 dojo-js.jar=${dojo-js.home}/dojo/dojo.js
 
+# ----- JUnit Unit Test Suite, version 3.7 or later -----
+junit.home=${base.path}/junit3.8.2
+junit.lib=${junit.home}
+junit.jar=${junit.lib}/junit.jar
+junit.loc=${base-sf.loc}/junit/junit3.8.2.zip
