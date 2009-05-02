@@ -20,12 +20,12 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
-  <property file="../build.properties"/>
+  <property file="build.properties"/>
 
-  <property file="../build.properties.default"/>
+  <property file="build.properties.default"/>
 
-  <property name="test.classes" value="${basedir}/output/classes"/>
-  <property name="tomcat.classes" value="${basedir}/../output/classes"/>
+  <property name="test.classes" value="${basedir}/output/testclasses"/>
+  <property name="tomcat.classes" value="${basedir}/output/classes"/>
 
   <property name="compile.source" value="1.5"/>
   <property name="compile.debug" value="true"/>
@@ -41,7 +41,7 @@
   <target name="compile" depends="download" >
     <mkdir dir="${test.classes}"/>
     <!-- Compile -->
-    <javac srcdir="." destdir="${test.classes}"
+    <javac srcdir="test" destdir="${test.classes}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
