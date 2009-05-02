@@ -76,6 +76,27 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
 
+    public void testPoolThreads10Connections10Fair() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setFairQueue(true);
+        this.threadcount = 10;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-"+i);
+            t.d = this.datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testPoolThreads10Connections10Fair]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+
     public void testC3P0Threads10Connections10() throws Exception {
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
@@ -205,6 +226,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
         this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.datasource.getPoolProperties().setFairQueue(false);
         this.threadcount = 10;
         this.transferProperties();
         this.datasource.getConnection().close();
@@ -222,6 +244,29 @@ public class CheckOutThreadTest extends DefaultTestCase {
         tearDown();
     }
     
+    public void testPoolThreads10Connections10ValidateFair() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
+        this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.datasource.getPoolProperties().setFairQueue(true);
+        this.threadcount = 10;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-validate-"+i);
+            t.d = this.datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testPoolThreads10Connections10ValidateFair]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+
     public void testC3P0Threads10Connections10Validate() throws Exception {
         init();
         this.datasource.getPoolProperties().setMaxActive(10);
@@ -271,6 +316,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
         this.datasource.getPoolProperties().setMaxActive(10);
         this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
         this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.datasource.getPoolProperties().setFairQueue(false);
         this.threadcount = 20;
         this.transferProperties();
         this.datasource.getConnection().close();
@@ -285,6 +331,29 @@ public class CheckOutThreadTest extends DefaultTestCase {
         latch.await();
         long delta = System.currentTimeMillis() - start;
         System.out.println("[testPoolThreads20Connections10Validate]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
+        tearDown();
+    }
+    
+    public void testPoolThreads10Connections20ValidateFair() throws Exception {
+        init();
+        this.datasource.getPoolProperties().setMaxActive(10);
+        this.datasource.getPoolProperties().setValidationQuery("SELECT 1");
+        this.datasource.getPoolProperties().setTestOnBorrow(true);
+        this.datasource.getPoolProperties().setFairQueue(true);
+        this.threadcount = 20;
+        this.transferProperties();
+        this.datasource.getConnection().close();
+        latch = new CountDownLatch(threadcount);
+        long start = System.currentTimeMillis();
+        for (int i=0; i<threadcount; i++) {
+            TestThread t = new TestThread();
+            t.setName("tomcat-pool-validate-"+i);
+            t.d = this.datasource;
+            t.start();
+        }
+        latch.await();
+        long delta = System.currentTimeMillis() - start;
+        System.out.println("[testPoolThreads20Connections10ValidateFair]Test complete:"+delta+" ms. Iterations:"+(threadcount*this.iterations));
         tearDown();
     }
     
