@@ -146,7 +146,6 @@ Section "Core" SecTomcatCore
   SetOutPath $INSTDIR\bin
   File bin\bootstrap.jar
   File bin\tomcat-juli.jar
-  File bin\*.exe
   SetOutPath $INSTDIR\conf
   File conf\*.*
   SetOutPath $INSTDIR\webapps\ROOT
@@ -168,6 +167,21 @@ Section "Core" SecTomcatCore
   Pop $2
 
   DetailPrint "Using Jvm: $2"
+
+  SetOutPath $INSTDIR\bin
+  ; Get the current platform x86 / AMD64 / IA64
+  ExpandEnvStrings $0 "%PROCESSOR_ARCHITEW6432%"
+  StrCmp $0 "%PROCESSOR_ARCHITEW6432%" 0 +2
+  ExpandEnvStrings $0 "%PROCESSOR_ARCHITECTURE%"
+  StrCmp $0 "x86" 0 +3
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
+  File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
+  StrCmp $0 "AMD64" 0 +3
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\procrun\amd64\tomcat@VERSION_MAJOR@.exe
+  File /oname=tomcat@VERSION_MAJOR@w.exe bin\procrun\amd64\tomcat@VERSION_MAJOR@w.exe
+  StrCmp $0 "IA64" 0 +3
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\procrun\ia64\tomcat@VERSION_MAJOR@.exe
+  File /oname=tomcat@VERSION_MAJOR@w.exe bin\procrun\ia64\tomcat@VERSION_MAJOR@w.exe
 
   InstallRetry:
   ClearErrors
@@ -299,6 +313,10 @@ Section -post
 SectionEnd
 
 Function .onInit
+  ;Reset install dir for 64-bit
+  ExpandEnvStrings $0 "%PROGRAMW6432%"
+  StrCmp $0 "%PROGRAMW6432%" +2 0
+  StrCpy $INSTDIR "$0\Apache Software Foundation\Tomcat @VERSION_MAJOR_MINOR@"
 
   ;Extract Install Options INI Files
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "config.ini"
@@ -382,6 +400,11 @@ FunctionEnd
 Function findJavaPath
 
   ClearErrors
+
+  ; Use the 64-bit registry on 64-bit machines
+  ExpandEnvStrings $0 "%PROGRAMW6432%"
+  StrCmp $0 "%PROGRAMW6432%" +2 0
+  SetRegView 64
 
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$2" "JavaHome"
