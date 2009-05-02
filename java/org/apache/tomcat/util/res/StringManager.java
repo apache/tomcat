@@ -55,7 +55,6 @@ public class StringManager {
     /**
      * The ResourceBundle for this StringManager.
      */
-
     private ResourceBundle bundle;
     private Locale locale;
 
@@ -67,9 +66,8 @@ public class StringManager {
      *
      * @param packageName Name of package to create StringManager for.
      */
-
     private StringManager(String packageName) {
-	this( packageName, Locale.getDefault() );
+        this( packageName, Locale.getDefault() );
     }
 
     private StringManager(String packageName, Locale loc) {
@@ -79,9 +77,8 @@ public class StringManager {
         locale = bundle.getLocale();
     }
 
-    private StringManager(ResourceBundle bundle )
-    {
-	this.bundle=bundle;
+    private StringManager(ResourceBundle bundle ) {
+        this.bundle=bundle;
         locale = bundle.getLocale();
     }
 
@@ -94,7 +91,6 @@ public class StringManager {
                 bundle or null if not found.
         @throws IllegalArgumentException if <i>key</i> is null.        
      */
-
     public String getString(String key) {
         if(key == null){
             String msg = "key may not have a null value";
@@ -104,20 +100,20 @@ public class StringManager {
 
         String str = null;
 
-        try{
-	        str = bundle.getString(key);
-        }catch(MissingResourceException mre){
+        try {
+            str = bundle.getString(key);
+        } catch(MissingResourceException mre) {
             //bad: shouldn't mask an exception the following way:
             //   str = "[cannot find message associated with key '" + key + "' due to " + mre + "]";
-	        //     because it hides the fact that the String was missing
-	        //     from the calling code.
-	        //good: could just throw the exception (or wrap it in another)
-	        //      but that would probably cause much havoc on existing
-	        //      code.
-	        //better: consistent with container pattern to
-	        //      simply return null.  Calling code can then do
-	        //      a null check.
-	        str = null;
+            //     because it hides the fact that the String was missing
+            //     from the calling code.
+            //good: could just throw the exception (or wrap it in another)
+            //      but that would probably cause much havoc on existing
+            //      code.
+            //better: consistent with container pattern to
+            //      simply return null.  Calling code can then do
+            //      a null check.
+            str = null;
         }
 
         return str;
@@ -130,7 +126,6 @@ public class StringManager {
      * @param key
      * @param args
      */
-
     public String getString(final String key, final Object... args) {
         String value = getString(key);
         if (value == null) {
@@ -157,12 +152,12 @@ public class StringManager {
      * @param packageName The package name
      */
     public synchronized static StringManager getManager(String packageName) {
-      StringManager mgr = managers.get(packageName);
-      if (mgr == null) {
-          mgr = new StringManager(packageName);
-          managers.put(packageName, mgr);
-      }
-      return mgr;
+        StringManager mgr = managers.get(packageName);
+        if (mgr == null) {
+            mgr = new StringManager(packageName);
+            managers.put(packageName, mgr);
+        }
+        return mgr;
     }
 
     /**
@@ -173,7 +168,7 @@ public class StringManager {
      * @param bundle The resource bundle
      */
     public synchronized static StringManager getManager(ResourceBundle bundle) {
-      return new StringManager( bundle );
+        return new StringManager( bundle );
     }
 
     /**
@@ -184,14 +179,13 @@ public class StringManager {
      * @param packageName The package name
      * @param loc The locale
      */
-
-   public synchronized static StringManager getManager(String packageName,Locale loc) {
-      StringManager mgr = managers.get(packageName+"_"+loc.toString());
-      if (mgr == null) {
-          mgr = new StringManager(packageName,loc);
-          managers.put(packageName+"_"+loc.toString(), mgr);
-      }
-      return mgr;
+    public synchronized static StringManager getManager(String packageName,Locale loc) {
+        StringManager mgr = managers.get(packageName+"_"+loc.toString());
+        if (mgr == null) {
+            mgr = new StringManager(packageName,loc);
+            managers.put(packageName+"_"+loc.toString(), mgr);
+        }
+        return mgr;
     }
 
 }
