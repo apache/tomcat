@@ -39,7 +39,7 @@ import com.mchange.v2.log.MLog;
 public class DefaultTestCase extends TestCase {
     protected org.apache.tomcat.jdbc.pool.DataSource datasource;
     protected BasicDataSource tDatasource;
-    protected DataSource c3p0Datasource;
+    protected ComboPooledDataSource c3p0Datasource;
     protected int threadcount = 10;
     protected int iterations = 100000;
     public DefaultTestCase(String name) {
