@@ -60,39 +60,39 @@ public class ConnectionPool {
     /**
      * All the information about the connection pool
      */
-    protected PoolProperties poolProperties;
+    private PoolProperties poolProperties;
 
     /**
      * Contains all the connections that are in use
      * TODO - this shouldn't be a blocking queue, simply a list to hold our objects
      */
-    protected BlockingQueue<PooledConnection> busy;
+    private BlockingQueue<PooledConnection> busy;
 
     /**
      * Contains all the idle connections
      */
-    protected BlockingQueue<PooledConnection> idle;
+    private BlockingQueue<PooledConnection> idle;
 
     /**
      * The thread that is responsible for checking abandoned and idle threads
      */
-    protected PoolCleaner poolCleaner;
+    private PoolCleaner poolCleaner;
 
     /**
      * Pool closed flag
      */
-    protected boolean closed = false;
+    private boolean closed = false;
 
     /**
      * Since newProxyInstance performs the same operation, over and over
      * again, it is much more optimized if we simply store the constructor ourselves.
      */
-    protected Constructor proxyClassConstructor;
+    private Constructor proxyClassConstructor;
 
     /**
      * Executor service used to cancel Futures
      */
-    protected ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+    private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
     
     /**
      * reference to mbean
@@ -102,7 +102,7 @@ public class ConnectionPool {
     /**
      * counter to track how many threads are waiting for a connection
      */
-    protected AtomicInteger waitcount = new AtomicInteger(0);
+    private AtomicInteger waitcount = new AtomicInteger(0);
     
     //===============================================================================
     //         PUBLIC METHODS
@@ -427,9 +427,11 @@ public class ConnectionPool {
             return;
         try {
             con.lock();
-            con.release();
+            if (con.release()) {
+                size.addAndGet(-1);
+            }
         } finally {
-            size.addAndGet(-1);
+            
             con.unlock();
         }
     }
@@ -441,7 +443,7 @@ public class ConnectionPool {
      * @return PooledConnection
      * @throws SQLException
      */
-    protected PooledConnection borrowConnection(int wait) throws SQLException {
+    private PooledConnection borrowConnection(int wait) throws SQLException {
 
         if (isClosed()) {
             throw new SQLException("Connection pool closed.");
