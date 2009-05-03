@@ -41,7 +41,7 @@ public class FairnessTest extends DefaultTestCase {
     protected long complete = Long.getLong("complete",20000);
     protected boolean printthread = Boolean.getBoolean("printthread");
     CountDownLatch latch = null;
-    protected void printThreadResults(TestThread[] threads, String name) {
+    protected void printThreadResults(TestThread[] threads, String name, int active, int expected) {
         long minfetch = Long.MAX_VALUE, maxfetch = Long.MIN_VALUE, totalfetch = 0;
         long maxwait = 0, minwait = Long.MAX_VALUE, averagewait = 0, totalwait = 0;
         float avgfetch = 0;
@@ -59,6 +59,7 @@ public class FairnessTest extends DefaultTestCase {
         System.out.println("["+name+"] Max fetch:"+(maxfetch)+" Min fetch:"+(minfetch)+" Average fetch:"+
                            (((float)totalfetch))/(float)threads.length);
         System.out.println("["+name+"] Max wait:"+(((float)maxwait)/1000000f)+"ms. Min wait:"+(((float)minwait)/1000000f)+"ms. Average wait:"+(((((float)totalwait))/(float)totalfetch)/1000000f)+" ms.");
+        System.out.println("["+name+"] Max active:"+active+" Expected Active:"+expected);
         
         
     }
@@ -87,7 +88,7 @@ public class FairnessTest extends DefaultTestCase {
         }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
-        printThreadResults(threads,"testDBCPThreads20Connections10");
+        printThreadResults(threads,"testDBCPThreads20Connections10",this.tDatasource.getNumActive(),10);
         tearDown();
     }
 
@@ -116,7 +117,7 @@ public class FairnessTest extends DefaultTestCase {
         }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
-        printThreadResults(threads,"testPoolThreads20Connections10");
+        printThreadResults(threads,"testPoolThreads20Connections10",this.datasource.getSize(),10);
         tearDown();
 
     }
@@ -146,7 +147,7 @@ public class FairnessTest extends DefaultTestCase {
         }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
-        printThreadResults(threads,"testPoolThreads20Connections10Fair");
+        printThreadResults(threads,"testPoolThreads20Connections10Fair",this.datasource.getSize(),10);
         tearDown();
     }
  
@@ -176,7 +177,7 @@ public class FairnessTest extends DefaultTestCase {
         }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
-        printThreadResults(threads,"testPoolThreads20Connections10FairAsync");
+        printThreadResults(threads,"testPoolThreads20Connections10FairAsync",this.datasource.getSize(),10);
         tearDown();
     }
     
@@ -205,7 +206,7 @@ public class FairnessTest extends DefaultTestCase {
         }
         this.run = false;
         long delta = System.currentTimeMillis() - start;
-        printThreadResults(threads,"testC3P0Threads20Connections10");
+        printThreadResults(threads,"testC3P0Threads20Connections10",c3p0Datasource.getNumConnectionsAllUsers(),10);
         tearDown();
 
     }

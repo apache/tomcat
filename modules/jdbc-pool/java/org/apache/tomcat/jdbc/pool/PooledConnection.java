@@ -26,6 +26,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -109,6 +110,8 @@ public class PooledConnection {
      */
     private WeakReference<JdbcInterceptor> handler = null;
     
+    private AtomicBoolean released = new AtomicBoolean(false);
+    
     
     public PooledConnection(PoolProperties prop, ConnectionPool parent) {
         instanceCount = counter.addAndGet(1);
@@ -117,6 +120,7 @@ public class PooledConnection {
     }
 
     public void connect() throws SQLException {
+        if (released.get()) throw new SQLException("A connection once released, can't be reestablished.");
         if (connection != null) {
             try {
                 this.disconnect(false);
@@ -292,7 +296,7 @@ public class PooledConnection {
     /**
      * This method is called if (Now - timeCheckedIn > getReleaseTime())
      */
-    public void release() {
+    public boolean release() {
         try {
             disconnect(true);
         } catch (Exception x) {
@@ -300,6 +304,7 @@ public class PooledConnection {
                 log.debug("Unable to close SQL connection",x);
             }
         }
+        return released.compareAndSet(false, true);
 
     }
 
