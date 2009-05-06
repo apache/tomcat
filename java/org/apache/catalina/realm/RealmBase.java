@@ -37,11 +37,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
+import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.ContainerBase;
@@ -1219,6 +1223,30 @@ public abstract class RealmBase
     protected abstract Principal getPrincipal(String username);
 
 
+    /**
+     * Return the Server object that is the ultimate parent for the container
+     * with which this Realm is associated. If the server cannot be found (eg
+     * because the container hierarchy is not complete), <code>null</code> is
+     * returned.
+     */
+    protected Server getServer() {
+        Container c = container;
+        if (c instanceof Context) {
+            c = c.getParent();
+        }
+        if (c instanceof Host) {
+            c = c.getParent();
+        }
+        if (c instanceof Engine) {
+            Service s = ((Engine)c).getService();
+            if (s != null) {
+                return s.getServer();
+            }
+        }
+        return null;
+    }
+
+    
     // --------------------------------------------------------- Static Methods
 
 

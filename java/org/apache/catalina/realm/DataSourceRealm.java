@@ -31,7 +31,6 @@ import javax.sql.DataSource;
 
 import org.apache.naming.ContextBindings;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.StringManager;
 
@@ -396,9 +395,8 @@ public class DataSourceRealm
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
             } else {
-                StandardServer server = 
-                    (StandardServer) ServerFactory.getServer();
-                context = server.getGlobalNamingContext();
+                context =
+                    ((StandardServer)getServer()).getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource)context.lookup(dataSourceName);
 	    return dataSource.getConnection();
