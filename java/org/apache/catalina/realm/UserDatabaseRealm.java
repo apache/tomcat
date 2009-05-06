@@ -29,7 +29,6 @@ import javax.naming.Context;
 import org.apache.catalina.Group;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Role;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.core.StandardServer;
@@ -248,8 +247,8 @@ public class UserDatabaseRealm
         super.start();
 
         try {
-            StandardServer server = (StandardServer) ServerFactory.getServer();
-            Context context = server.getGlobalNamingContext();
+            Context context =
+                ((StandardServer)getServer()).getGlobalNamingContext();
             database = (UserDatabase) context.lookup(resourceName);
         } catch (Throwable e) {
             containerLog.error(sm.getString("userDatabaseRealm.lookup",
