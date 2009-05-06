@@ -17,40 +17,50 @@
 package org.apache.tomcat.jdbc.test.driver;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Driver implements java.sql.Driver {
+    public static final String url = "jdbc:tomcat:test";
+    public static AtomicInteger connectCount = new AtomicInteger(0);
 
+    static {
+        try {
+            DriverManager.registerDriver(new Driver());
+        }catch (Exception x) {
+            x.printStackTrace();
+            throw new RuntimeException(x);
+        }
+    }
+    
+    public Driver() {
+    }
+    
     public boolean acceptsURL(String url) throws SQLException {
-        // TODO Auto-generated method stub
-        return false;
+        return url == Driver.url;
     }
 
     public Connection connect(String url, Properties info) throws SQLException {
-        // TODO Auto-generated method stub
+        connectCount.addAndGet(1);
         return new org.apache.tomcat.jdbc.test.driver.Connection();
     }
 
     public int getMajorVersion() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     public int getMinorVersion() {
-        // TODO Auto-generated method stub
         return 0;
     }
 
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties info) throws SQLException {
-        // TODO Auto-generated method stub
         return null;
     }
 
     public boolean jdbcCompliant() {
-        // TODO Auto-generated method stub
         return false;
     }
-
 }
