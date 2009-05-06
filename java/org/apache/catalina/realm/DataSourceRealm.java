@@ -277,29 +277,19 @@ public class DataSourceRealm
         
     	Connection dbConnection = null;
 
-        try {
-
-            // Ensure that we have an open database connection
-            dbConnection = open();
-            if (dbConnection == null) {
-                // If the db connection open fails, return "not authenticated"
-                return null;
-            }
-            
-            // Acquire a Principal object for this user
-            return authenticate(dbConnection, username, credentials);
-            
-        } catch (SQLException e) {
-            // Log the problem for posterity
-            containerLog.error(sm.getString("dataSourceRealm.exception"), e);
-
-            // Return "not authenticated" for this request
-            return (null);
-
-        } finally {
-        	close(dbConnection);
+        // Ensure that we have an open database connection
+        dbConnection = open();
+        if (dbConnection == null) {
+            // If the db connection open fails, return "not authenticated"
+            return null;
         }
+        
+        // Acquire a Principal object for this user
+        Principal principal = authenticate(dbConnection, username, credentials);
+            
+    	close(dbConnection);
 
+    	return principal;
     }
 
 
@@ -320,7 +310,7 @@ public class DataSourceRealm
      */
     protected Principal authenticate(Connection dbConnection,
                                                String username,
-                                               String credentials) throws SQLException{
+                                               String credentials) {
 
         String dbCredentials = getPassword(dbConnection, username);
 
