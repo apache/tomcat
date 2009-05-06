@@ -39,7 +39,6 @@ public class Connection implements java.sql.Connection {
     }
 
     public void close() throws SQLException {
-        //TODO
     }
 
     public void commit() throws SQLException {
