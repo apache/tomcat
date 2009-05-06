@@ -23,7 +23,7 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="2" />
+  <property name="version.build"         value="3" />
   <property name="version.patch"         value="" />
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
@@ -69,6 +69,7 @@
   <path id="test.classpath">
     <pathelement location="${tomcat-jdbc.jar}"/>
     <pathelement location="${tomcat.classes}"/>
+    <pathelement location="${basedir}/modules/jdbc-pool/c3p0-0.9.1.2.jar"/>
     <fileset dir="${base.path}">
       <include name="**/tomcat-dbcp.jar"/>
       <include name="**/junit.jar"/>
