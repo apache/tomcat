@@ -2097,15 +2097,14 @@ public class WebappClassLoader
                             break;
                         pos += n;
                     }
-                    binaryStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error(sm.getString("webappClassLoader.readError", name), e);
                     return null;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
+                } finally {
+                    try {
+                        binaryStream.close();
+                    } catch (IOException e) {}
                 }
-
                 if (fileNeedConvert) {
                     String str = new String(binaryContent,0,pos);
                     try {
