@@ -504,8 +504,7 @@ public class ManagerServlet
      */
     protected synchronized void save(PrintWriter writer, String path) {
 
-        Server server =
-            ((Engine)context.getParent().getParent()).getService().getServer();
+        Server server = ((Engine)host.getParent()).getService().getServer();
 
         if (!(server instanceof StandardServer)) {
             writer.println(sm.getString("managerServlet.saveFail", server));
