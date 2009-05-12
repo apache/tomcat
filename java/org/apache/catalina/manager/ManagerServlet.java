@@ -445,8 +445,7 @@ public class ManagerServlet
         }
 
         // Acquire global JNDI resources if available
-        Server server =
-            ((Engine)context.getParent().getParent()).getService().getServer();
+        Server server = ((Engine)host.getParent()).getService().getServer();
         if ((server != null) && (server instanceof StandardServer)) {
             global = ((StandardServer) server).getGlobalNamingContext();
         }
