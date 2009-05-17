@@ -116,8 +116,8 @@ of $CATALINA_HOME:
 
 * temp - Directory used by the JVM for temporary files (java.io.tmpdir)
 
-If you do set $CATALINA_BASE, $CATALINA_BASE will default to the same value as
-$CATALINA_HOME, which means that the same directory is used for all relative
+If you do not set $CATALINA_BASE, $CATALINA_BASE will default to the same value
+as $CATALINA_HOME, which means that the same directory is used for all relative
 path resolutions.
 
 
