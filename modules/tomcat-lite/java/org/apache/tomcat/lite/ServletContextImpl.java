@@ -79,7 +79,7 @@ import org.apache.tomcat.util.http.MimeMap;
  *
  * @author Craig R. McClanahan
  * @author Remy Maucherat
- * @version $Revision: 377994 $ $Date: 2006-02-15 04:37:28 -0800 (Wed, 15 Feb 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class ServletContextImpl implements ServletContext {
