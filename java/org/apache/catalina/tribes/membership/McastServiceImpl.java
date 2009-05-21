@@ -115,11 +115,6 @@ public class McastServiceImpl
     protected SenderThread sender;
 
     /**
-     * When was the service started
-     */
-    protected long serviceStartTime = System.currentTimeMillis();
-    
-    /**
      * Time to live for the multicast packets that are being sent out
      */
     protected int mcastTTL = -1;
@@ -267,7 +262,6 @@ public class McastServiceImpl
             //make sure at least one packet gets out there
             send(false);
             doRunSender = true;
-            serviceStartTime = System.currentTimeMillis();
             sender = new SenderThread(sendFrequency);
             sender.setDaemon(true);
             sender.start();
@@ -324,7 +318,7 @@ public class McastServiceImpl
             //leave mcast group
             try {socket.leaveGroup(address);}catch ( Exception ignore){}
             try {socket.close();}catch ( Exception ignore){}
-            serviceStartTime = Long.MAX_VALUE;
+            member.setServiceStartTime(-1);
         }
         return (startLevel == 0);
     }
@@ -496,7 +490,7 @@ public class McastServiceImpl
     }
 
     public long getServiceStartTime() {
-       return this.serviceStartTime;
+        return (member!=null) ? member.getServiceStartTime() : -1l;
     }
 
     public int getRecoveryCounter() {
