@@ -53,7 +53,7 @@ import org.apache.naming.NamingEntry;
  *
  *
  * @author Fabrizio Giustina
- * @version $Id: $
+ * @version $Id$
  */
 public class VirtualDirContext extends FileDirContext {
 

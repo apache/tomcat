@@ -25,7 +25,7 @@ import javax.servlet.ServletConfig;
 import org.apache.tomcat.InstanceManager;
 
 /**
- * @version $Rev:$ $Date:$
+ * @version $Rev$ $Date$
  */
 public class InstanceManagerFactory {
 
