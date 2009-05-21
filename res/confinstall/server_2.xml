@@ -29,7 +29,7 @@
          Documentation at /docs/config/engine.html -->
 
     <!-- You should set jvmRoute to support load-balancing via AJP ie :
-    <Engine name="Standalone" defaultHost="localhost" jvmRoute="jvm1">         
+    <Engine name="Catalina" defaultHost="localhost" jvmRoute="jvm1">         
     --> 
     <Engine name="Catalina" defaultHost="localhost">
 
