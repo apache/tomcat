@@ -48,7 +48,7 @@ import org.apache.tomcat.util.http.ServerCookie;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision: 371866 $ $Date: 2006-01-24 00:52:54 -0800 (Tue, 24 Jan 2006) $
+ * @version $Revision$ $Date$
  */
 
 public class ServletResponseImpl
