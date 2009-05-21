@@ -178,6 +178,10 @@ public class Tomcat {
      *    ctx.addErrorPage(ep);
      *   
      * ctx.addMimeMapping("ext", "type");
+     * 
+     * Note: If you reload the Context, all your configuration will be lost. If
+     * you need reload support, consider using a LifecycleListener to provide
+     * your configuration.
      *  
      * TODO: add the rest
      *
@@ -212,7 +216,7 @@ public class Tomcat {
      * 
      *    wrapper.addInitParameter("name", "value");
      */
-    public StandardWrapper addServlet(StandardContext ctx, 
+    public static StandardWrapper addServlet(StandardContext ctx, 
                                       String servletName, 
                                       String servletClass) {
         // will do class for name and set init params
@@ -227,7 +231,7 @@ public class Tomcat {
     /** Use an existing servlet, no class.forName or initialization will be 
      *  performed
      */
-    public StandardWrapper addServlet(StandardContext ctx,
+    public static StandardWrapper addServlet(StandardContext ctx,
                                       String servletName, 
                                       Servlet servlet) {
         // will do class for name and set init params
@@ -525,7 +529,7 @@ public class Tomcat {
      *  TODO: in normal tomcat, if default-web.xml is not found, use this 
      *  method
      */
-    protected void initWebappDefaults(StandardContext ctx) {
+    public static void initWebappDefaults(StandardContext ctx) {
         // Default servlet 
         StandardWrapper servlet = 
             addServlet(ctx, "default", 
