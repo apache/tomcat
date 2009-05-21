@@ -70,7 +70,7 @@ import org.apache.tomcat.util.http.mapper.MappingData;
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision: 325874 $ $Date: 2005-10-17 03:39:15 -0700 (Mon, 17 Oct 2005) $
+ * @version $Revision$ $Date$
  */
 
 public class ServletRequestImpl implements HttpServletRequest {
