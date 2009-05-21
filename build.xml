@@ -298,7 +298,8 @@
     <copy tofile="res/manifest.tmp"
           file="res/servlet-api.jar.manifest"
           overwrite="yes"
-          filtering="true" />
+          filtering="true"
+          encoding="ISO-8859-1" />
     <jar jarfile="${servlet-api.jar}"
          manifest="res/manifest.tmp">
       <fileset dir="res">
@@ -318,7 +319,8 @@
     <copy tofile="res/manifest.tmp"
           file="res/jsp-api.jar.manifest"
           overwrite="yes"
-          filtering="true" />
+          filtering="true"
+          encoding="ISO-8859-1" />
     <jar  jarfile="${jsp-api.jar}"
           manifest="res/manifest.tmp">
       <fileset dir="res">
@@ -338,7 +340,8 @@
     <!-- Bootstrap JAR File -->
     <copy tofile="res/manifest.tmp"
           file="res/bootstrap.jar.manifest"
-          overwrite="yes">
+          overwrite="yes"
+          encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
     <jar jarfile="${bootstrap.jar}"
@@ -412,14 +415,14 @@
           <exclude name="docs/architecture/*.xml"/>
         </fileset>
     </copy>
-    <copy todir="${tomcat.build}/webapps/docs">
+    <copy todir="${tomcat.build}/webapps/docs" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir=".">
         <include name="BUILDING.txt"/>
         <include name="RUNNING.txt"/>
       </fileset>
     </copy>
-    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES">
+    <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
 
@@ -496,7 +499,7 @@
          <exclude name="**/*.bat"/>
       </fileset>
     </copy>
-    <copy todir="${tomcat.build}/bin">
+    <copy todir="${tomcat.build}/bin" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir="bin">
          <include name="**/*.sh"/>
@@ -507,7 +510,7 @@
     <chmod dir="${tomcat.build}/bin" includes="*.sh" perm="+x"/>
 
     <!-- Copy static resource files -->
-    <copy todir="${tomcat.build}/conf">
+    <copy todir="${tomcat.build}/conf" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir="conf">
         <include name="**/*.policy"/>
@@ -526,7 +529,7 @@
       </fileset>
     </copy>
 
-    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES">
+    <copy tofile="${tomcat.build}/webapps/ROOT/RELEASE-NOTES.txt" file="RELEASE-NOTES" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
 
