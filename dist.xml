@@ -471,8 +471,8 @@
 
   <!-- Packages the core tar.gz distro -->
   <target name="package-tgz">
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" />
-    <fixcrlf srcdir="${tomcat.dist}/conf" eol="lf" encoding="ISO-8859-1" />
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}/conf" eol="lf" encoding="ISO-8859-1" fixlast="false" />
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}" mode="755" prefix="${final.name}">
@@ -531,8 +531,8 @@
   <!-- Packages the deployer Tomcat distro in tar.gz format -->
   <target name="package-deployer-tgz">
     <fixcrlf srcdir="${tomcat.dist}"
-     includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" />
-    <fixcrlf srcdir="${tomcat.deployer}" includes="*.xml" eol="lf" encoding="ISO-8859-1" />
+     includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.deployer}" includes="*.xml" eol="lf" encoding="ISO-8859-1" fixlast="false" />
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}-deployer.tar.gz">
@@ -557,7 +557,7 @@
   <target name="package-docs-tgz">
 
     <!-- Package gocs -->
-    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" />
+    <fixcrlf srcdir="${tomcat.dist}" includes="*.txt,LICENSE,NOTICE" eol="lf" encoding="ISO-8859-1" fixlast="false" />
 
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/bin/${final.name}-fulldocs.tar.gz">
@@ -594,7 +594,7 @@
   <target name="package-src-tgz">
     <fixcrlf srcdir="${tomcat.dist}/src"
      excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war,**/*.exe,**/*.pdf,**/*.bin,**/*.dia"
-          eol="lf" encoding="ISO-8859-1" />
+          eol="lf" encoding="ISO-8859-1" fixlast="false" />
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
       <tarfileset dir="${tomcat.dist}/src" prefix="${final-src.name}" />
