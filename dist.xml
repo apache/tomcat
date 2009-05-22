@@ -273,7 +273,7 @@
       author="true" version="true"
       windowtitle="Tomcat API Documentation"
       doctitle="Tomcat API"
-      bottom="Copyright &#169; 2000-${year} Apache Software Foundation.  All Rights Reserved."
+      bottom="Copyright &amp;#169; 2000-${year} Apache Software Foundation.  All Rights Reserved."
       additionalparam="-breakiterator"
       maxmemory="256m" >
     </javadoc>
