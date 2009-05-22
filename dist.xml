@@ -259,9 +259,9 @@
     <touch file="${tomcat.dist}/temp/safeToDelete.tmp" />
 
     <!-- Correct permissions and line endings on "bin" scripts -->
-    <fixcrlf srcdir="${tomcat.dist}/bin"   includes="*.sh"  eol="lf" encoding="ISO-8859-1" />
-    <fixcrlf srcdir="${tomcat.dist}/bin"   includes="*.bat" eol="crlf" encoding="ISO-8859-1" />
-    <chmod      dir="${tomcat.dist}/bin"   includes="*.sh"  perm="+x"/>
+    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.sh"  eol="lf"   encoding="ISO-8859-1" fixlast="false" />
+    <fixcrlf srcdir="${tomcat.dist}/bin" includes="*.bat" eol="crlf" encoding="ISO-8859-1" fixlast="false" />
+    <chmod      dir="${tomcat.dist}/bin" includes="*.sh"  perm="+x"/>
 
   </target>
 
