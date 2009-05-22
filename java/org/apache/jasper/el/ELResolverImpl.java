@@ -147,12 +147,12 @@ public final class ELResolverImpl extends ELResolver {
 
 	public static ELResolver getDefaultResolver() {
 	    if (Constants.IS_SECURITY_ENABLED) {
-	        ELResolver defaultResolver = new CompositeELResolver();
-	        ((CompositeELResolver) defaultResolver).add(new MapELResolver());
-	        ((CompositeELResolver) defaultResolver).add(new ResourceBundleELResolver());
-	        ((CompositeELResolver) defaultResolver).add(new ListELResolver());
-	        ((CompositeELResolver) defaultResolver).add(new ArrayELResolver());
-	        ((CompositeELResolver) defaultResolver).add(new BeanELResolver());
+	        CompositeELResolver defaultResolver = new CompositeELResolver();
+	        defaultResolver.add(new MapELResolver());
+	        defaultResolver.add(new ResourceBundleELResolver());
+	        defaultResolver.add(new ListELResolver());
+	        defaultResolver.add(new ArrayELResolver());
+	        defaultResolver.add(new BeanELResolver());
 	        return defaultResolver;
 	    } else {
 	        return DefaultResolver;
