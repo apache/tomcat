@@ -68,7 +68,7 @@ class ScriptingVariabler {
 	public void visit(Node.CustomTag n) throws JasperException {
 	    setScriptingVars(n, VariableInfo.AT_BEGIN);
 	    setScriptingVars(n, VariableInfo.NESTED);
-	    new ScriptingVariableVisitor(err).visitBody(n);
+	    visitBody(n);
 	    setScriptingVars(n, VariableInfo.AT_END);
 	}
 
