@@ -263,7 +263,7 @@ public class Connector
      /**
       * Mapper listener.
       */
-     protected MapperListener mapperListener = new MapperListener(mapper);
+     protected MapperListener mapperListener = new MapperListener(mapper, this);
 
 
      /**
