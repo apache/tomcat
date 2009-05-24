@@ -31,7 +31,6 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
