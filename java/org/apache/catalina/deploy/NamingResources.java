@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.io.Serializable;
 
-import org.apache.catalina.ServerFactory;
+import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Server;
 
 
 /**
@@ -212,8 +214,7 @@ public class NamingResources implements Serializable {
                 }
             } else if (rl != null) {
                 // Link. Need to look at the global resources
-                NamingResources global =
-                    ServerFactory.getServer().getGlobalNamingResources();
+                NamingResources global = getServer().getGlobalNamingResources();
                 if (global.findEnvironment(rl.getGlobal()) != null) {
                     if (global.findEnvironment(rl.getGlobal()).getOverride()) {
                         removeResourceLink(environment.getName());
@@ -237,6 +238,20 @@ public class NamingResources implements Serializable {
 
     }
 
+    // Container should be an instance of Server or Context. If it is anything
+    // else, return null which will trigger a NPE.
+    private Server getServer() {
+        if (container instanceof Server) {
+            return (Server) container;
+        }
+        if (container instanceof Context) {
+            // Could do this in one go. Lots of casts so split out for clarity
+            Engine engine =
+                (Engine) ((Context) container).getParent().getParent();
+            return engine.getService().getServer();
+        }
+        return null;
+    }
 
     /**
      * Add a local EJB resource reference for this web application.
