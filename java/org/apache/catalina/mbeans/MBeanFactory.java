@@ -97,11 +97,20 @@ public class MBeanFactory extends BaseModelMBean {
 
     // ------------------------------------------------------------- Attributes
 
-
+    /**
+     * The container (Server/Service) for which this factory was created.
+     */
+    private Object container;
 
 
     // ------------------------------------------------------------- Operations
 
+    /**
+     * Set the container that this factory was created for.
+     */
+    public void setContainer(Object container) {
+        this.container = container;
+    }
 
     /**
      * Return the managed bean definition for the specified bean type
@@ -202,17 +211,25 @@ public class MBeanFactory extends BaseModelMBean {
     
     private Service getService(ObjectName oname) throws Exception {
     
-        String domain = oname.getDomain();
-        Server server = ServerFactory.getServer();
-        Service[] services = server.findServices();
+        if (container instanceof Service) {
+            // Don't bother checking the domain - this is the only option
+            return (Service) container;
+        }
+
         StandardService service = null;
-        for (int i = 0; i < services.length; i++) {
-            service = (StandardService) services[i];
-            if (domain.equals(service.getObjectName().getDomain())) {
-                break;
+        String domain = oname.getDomain();
+        if (container instanceof Service) {
+            Server server = ServerFactory.getServer();
+            Service[] services = server.findServices();
+            for (int i = 0; i < services.length; i++) {
+                service = (StandardService) services[i];
+                if (domain.equals(service.getObjectName().getDomain())) {
+                    break;
+                }
             }
         }
-        if (!service.getObjectName().getDomain().equals(domain)) {
+        if (service == null ||
+                !service.getObjectName().getDomain().equals(domain)) {
             throw new Exception("Service with the domain is not found");
         }        
         return service;
