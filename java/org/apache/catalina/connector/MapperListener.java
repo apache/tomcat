@@ -29,7 +29,6 @@ import javax.management.ObjectName;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Host;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.core.StandardContext;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -62,6 +61,11 @@ public class MapperListener
      * Associated mapper.
      */
     protected Mapper mapper = null;
+    
+    /**
+     * Associated connector
+     */
+    protected Connector connector = null;
 
     /**
      * MBean server.
@@ -77,7 +81,6 @@ public class MapperListener
 
     // It should be null - and fail if not set
     private String domain="*";
-    private String engine="*";
 
     // ----------------------------------------------------------- Constructors
 
@@ -85,8 +88,9 @@ public class MapperListener
     /**
      * Create mapper listener.
      */
-    public MapperListener(Mapper mapper) {
+    public MapperListener(Mapper mapper, Connector connector) {
         this.mapper = mapper;
+        this.connector = connector;
     }
 
 
@@ -98,14 +102,6 @@ public class MapperListener
 
     public void setDomain(String domain) {
         this.domain = domain;
-    }
-
-    public String getEngine() {
-        return engine;
-    }
-
-    public void setEngine(String engine) {
-        this.engine = engine;
     }
 
     /**
@@ -329,9 +325,8 @@ public class MapperListener
         String name=objectName.getKeyProperty("host");
         if( name != null ) {        
 
-            Host host = (Host) ServerFactory.getServer().findService(
-                    domain).getContainer().findChild(name);
-        
+            Host host =
+                (Host) connector.getService().getContainer().findChild(name);
             String[] aliases = host.findAliases();
             mapper.addHost(name, aliases, objectName);
             host.addContainerListener(this);
@@ -349,8 +344,8 @@ public class MapperListener
         throws Exception {
         String name=objectName.getKeyProperty("host");
         if( name != null ) { 
-            Host host = (Host) ServerFactory.getServer().findService(
-                domain).getContainer().findChild(name);
+            Host host =
+                (Host) connector.getService().getContainer().findChild(name);
         
             mapper.removeHost(name);
             if (host != null) {
