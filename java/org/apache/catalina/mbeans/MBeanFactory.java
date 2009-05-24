@@ -29,7 +29,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Server;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.Service;
 import org.apache.catalina.Valve;
 import org.apache.catalina.authenticator.SingleSignOn;
@@ -218,9 +217,8 @@ public class MBeanFactory extends BaseModelMBean {
 
         StandardService service = null;
         String domain = oname.getDomain();
-        if (container instanceof Service) {
-            Server server = ServerFactory.getServer();
-            Service[] services = server.findServices();
+        if (container instanceof Server) {
+            Service[] services = ((Server)container).findServices();
             for (int i = 0; i < services.length; i++) {
                 service = (StandardService) services[i];
                 if (domain.equals(service.getObjectName().getDomain())) {
