@@ -128,12 +128,14 @@ public class ServerLifecycleListener
 
                 if (lifecycle instanceof Server) {
                     MBeanFactory factory = new MBeanFactory();
+                    factory.setContainer(lifecycle);
                     createMBeans(factory);
                     createMBeans((Server) lifecycle);
                 }
 
                 if( lifecycle instanceof Service ) {
                     MBeanFactory factory = new MBeanFactory();
+                    factory.setContainer(lifecycle);
                     createMBeans(factory);
                     createMBeans((Service)lifecycle);
                 }
