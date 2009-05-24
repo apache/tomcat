@@ -644,48 +644,6 @@ public class MBeanFactory extends BaseModelMBean {
     }
 
 
-   /**
-     * Create a new StandardEngine.
-     *
-     * @param parent MBean Name of the associated parent component
-     * @param engineName Unique name of this Engine
-     * @param defaultHost Default hostname of this Engine
-     * @param serviceName Unique name of this Service
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     */
-
-    public Vector<ObjectName> createStandardEngineService(String parent, 
-            String engineName, String defaultHost, String serviceName)
-        throws Exception {
-
-        // Create a new StandardService instance
-        StandardService service = new StandardService();
-        service.setName(serviceName);
-        // Create a new StandardEngine instance
-        StandardEngine engine = new StandardEngine();
-        engine.setName(engineName);
-        engine.setDefaultHost(defaultHost);
-        // Need to set engine before adding it to server in order to set domain
-        service.setContainer(engine);
-        // Add the new instance to its parent component
-        Server server = ServerFactory.getServer();
-        server.addService(service);
-        Vector<ObjectName> onames = new Vector<ObjectName>();
-        // FIXME service & engine.getObjectName
-        //ObjectName oname = engine.getObjectName();
-        ObjectName oname = 
-            MBeanUtils.createObjectName(engineName, engine);
-        onames.add(0, oname);
-        //oname = service.getObjectName();
-        oname = 
-            MBeanUtils.createObjectName(engineName, service);
-        onames.add(1, oname);
-        return (onames);
-
-    }
-
-
     /**
      * Create a new StandardHost.
      *
@@ -765,32 +723,6 @@ public class MBeanFactory extends BaseModelMBean {
         }
         
     }
-
-
-    /**
-     * Create a new StandardService.
-     *
-     * @param parent MBean Name of the associated parent component
-     * @param name Unique name of this StandardService
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     */
-    public String createStandardService(String parent, String name, String domain)
-        throws Exception {
-
-        // Create a new StandardService instance
-        StandardService service = new StandardService();
-        service.setName(name);
-
-        // Add the new instance to its parent component
-        Server server = ServerFactory.getServer();
-        server.addService(service);
-
-        // Return the corresponding MBean name
-        return (service.getObjectName().toString());
-
-    }
-
 
 
     /**
@@ -1020,27 +952,6 @@ public class MBeanFactory extends BaseModelMBean {
         // Acquire a reference to the component to be removed
         ContainerBase container = getParentContainerFromChild(oname); 
         container.setRealm(null);
-    }
-
-
-    /**
-     * Remove an existing Service.
-     *
-     * @param name MBean Name of the component to remove
-     *
-     * @exception Exception if a component cannot be removed
-     */
-    public void removeService(String name) throws Exception {
-
-        // Acquire a reference to the component to be removed
-        ObjectName oname = new ObjectName(name);
-        String serviceName = oname.getKeyProperty("serviceName");
-        Server server = ServerFactory.getServer();
-        Service service = server.findService(serviceName);
-
-        // Remove this component from its parent component
-        server.removeService(service);
-
     }
 
 
