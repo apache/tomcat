@@ -18,7 +18,6 @@
 package org.apache.catalina.mbeans;
 
 import java.io.File;
-import java.util.Vector;
 
 import javax.management.MBeanException;
 import javax.management.MBeanServer;
