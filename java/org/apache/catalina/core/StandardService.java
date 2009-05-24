@@ -662,10 +662,9 @@ public class StandardService
             
         }
         if( server==null ) {
-            // Register with the server 
-            // HACK: ServerFactory should be removed...
-            
-            ServerFactory.getServer().addService(this);
+            // If no server was defined - create one
+            server = new StandardServer();
+            server.addService(this);
         }
                
 
