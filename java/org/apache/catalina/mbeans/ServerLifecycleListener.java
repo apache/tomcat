@@ -36,7 +36,6 @@ import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Server;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
@@ -125,22 +124,34 @@ public class ServerLifecycleListener
         Lifecycle lifecycle = event.getLifecycle();
         if (Lifecycle.START_EVENT.equals(event.getType())) {
 
-            if (lifecycle instanceof Server) {
-                createMBeans();
-            }
+            try {
 
-            // We are embedded.
-            if( lifecycle instanceof Service ) {
-                try {
+                if (lifecycle instanceof Server) {
+                    MBeanFactory factory = new MBeanFactory();
+                    createMBeans(factory);
+                    createMBeans((Server) lifecycle);
+                }
+
+                if( lifecycle instanceof Service ) {
                     MBeanFactory factory = new MBeanFactory();
                     createMBeans(factory);
                     createMBeans((Service)lifecycle);
-                } catch( Exception ex ) {
-                    log.error("Create mbean factory");
                 }
+
+            } catch (MBeanException t) {
+
+                Exception e = t.getTargetException();
+                if (e == null)
+                    e = t;
+                log.error("createMBeans: MBeanException", e);
+
+            } catch (Throwable t) {
+
+                log.error("createMBeans: Throwable", t);
+
             }
 
-            /*
+             /*
             // Ignore events from StandardContext objects to avoid
             // reregistering the context
             if (lifecycle instanceof StandardContext)
@@ -254,33 +265,6 @@ public class ServerLifecycleListener
 
 
     // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * Create the MBeans that correspond to every existing node of our tree.
-     */
-    protected void createMBeans() {
-
-        try {
-
-            MBeanFactory factory = new MBeanFactory();
-            createMBeans(factory);
-            createMBeans(ServerFactory.getServer());
-
-        } catch (MBeanException t) {
-
-            Exception e = t.getTargetException();
-            if (e == null)
-                e = t;
-            log.error("createMBeans: MBeanException", e);
-
-        } catch (Throwable t) {
-
-            log.error("createMBeans: Throwable", t);
-
-        }
-
-    }
 
 
     /**
