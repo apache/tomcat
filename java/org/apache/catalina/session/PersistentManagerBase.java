@@ -816,6 +816,9 @@ public abstract class PersistentManagerBase
         ((StandardSession)session).tellNew();
         add(session);
         ((StandardSession)session).activate();
+        // endAccess() to ensure timeouts happen correctly.
+        // access() to keep access count correct or it will end up negative
+        session.access();
         session.endAccess();
 
         return (session);
