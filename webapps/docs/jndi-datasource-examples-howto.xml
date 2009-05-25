@@ -240,15 +240,12 @@ resource to your <a href="config/context.html">Context</a>.</p>
          --&gt;
     
     &lt;!-- url: The JDBC connection url for connecting to your MySQL dB.
-         The autoReconnect=true argument to the url makes sure that the
-         mm.mysql JDBC Driver will automatically reconnect if mysqld closed the
-         connection.  mysqld by default closes idle connections after 8 hours.
          --&gt;
 
   &lt;Resource name="jdbc/TestDB" auth="Container" type="javax.sql.DataSource"
                maxActive="100" maxIdle="30" maxWait="10000"
                username="javauser" password="javadude" driverClassName="com.mysql.jdbc.Driver"
-               url="jdbc:mysql://localhost:3306/javatest?autoReconnect=true"/&gt;
+               url="jdbc:mysql://localhost:3306/javatest"/&gt;
 
 &lt;/Context&gt;
 </source>
