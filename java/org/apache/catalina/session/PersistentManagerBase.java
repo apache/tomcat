@@ -1054,6 +1054,12 @@ public abstract class PersistentManagerBase
                     int timeIdle = // Truncate, do not round up
                         (int) ((timeNow - session.getThisAccessedTime()) / 1000L);
                     if (timeIdle > maxIdleSwap && timeIdle > minIdleSwap) {
+                        if (sessions[i] instanceof StandardSession) {
+                            if (((StandardSession) sessions[i]).accessCount.get() > 0) {
+                                // Session is currently being accessed - skip it
+                                continue;
+                            }
+                        }                       
                         if (log.isDebugEnabled())
                             log.debug(sm.getString
                                 ("persistentManager.swapMaxIdle",
@@ -1098,6 +1104,12 @@ public abstract class PersistentManagerBase
                 int timeIdle = // Truncate, do not round up
                     (int) ((timeNow - sessions[i].getThisAccessedTime()) / 1000L);
                 if (timeIdle > minIdleSwap) {
+                    if (sessions[i] instanceof StandardSession) {
+                        if (((StandardSession) sessions[i]).accessCount.get() > 0) {
+                            // Session is currently being accessed - skip it
+                            continue;
+                        }
+                    }
                     if(log.isDebugEnabled())
                         log.debug(sm.getString
                             ("persistentManager.swapTooManyActive",
