@@ -478,7 +478,7 @@
         
             public static void main(String[] args) throws Exception {
                 PoolProperties p = new PoolProperties();
-                p.setUrl("jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
+                p.setUrl("jdbc:mysql://localhost:3306/mysql");
                 p.setDriverClassName("com.mysql.jdbc.Driver");
                 p.setUsername("root");
                 p.setPassword("password");
@@ -546,7 +546,7 @@
               username=&quot;root&quot; 
               password=&quot;password&quot; 
               driverClassName=&quot;com.mysql.jdbc.Driver&quot;
-              url=&quot;jdbc:mysql://localhost:3306/mysql?autoReconnect=true&quot;/&gt;
+              url=&quot;jdbc:mysql://localhost:3306/mysql&quot;/&gt;
 
     
     </source>
