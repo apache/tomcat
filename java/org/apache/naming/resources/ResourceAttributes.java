@@ -688,8 +688,6 @@ public class ResourceAttributes implements Attributes {
         if (result == null) {
             if (collection)
                 result = COLLECTION_TYPE;
-            else
-                result = null;
         }
         return result;
     }

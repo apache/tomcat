@@ -819,12 +819,11 @@ public class FileDirContext extends BaseDirContext {
                 if (fileAbsPath.endsWith("."))
                     fileAbsPath = fileAbsPath + "/";
                 String absPath = normalize(fileAbsPath);
-                if (canPath != null)
-                    canPath = normalize(canPath);
+                canPath = normalize(canPath);
                 if ((absoluteBase.length() < absPath.length())
                     && (absoluteBase.length() < canPath.length())) {
                     absPath = absPath.substring(absoluteBase.length() + 1);
-                    if ((canPath == null) || (absPath == null))
+                    if (absPath == null)
                         return null;
                     if (absPath.equals(""))
                         absPath = "/";
