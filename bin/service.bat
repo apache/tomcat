@@ -24,11 +24,12 @@ rem                        Service is installed using default settings.
 rem remove                 Remove the service from the System.
 rem
 rem name        (optional) If the second argument is present it is considered
-rem                        to be new service name                                           
+rem                        to be new service name
 rem
 rem $Id$
 rem ---------------------------------------------------------------------------
 
+set SELF=%~dp0%service.bat
 rem Guess CATALINA_HOME if not defined
 set CURRENT_DIR=%cd%
 if not "%CATALINA_HOME%" == "" goto gotHome
@@ -47,35 +48,54 @@ rem Make sure prerequisite environment variables are set
 if not "%JAVA_HOME%" == "" goto okHome
 echo The JAVA_HOME environment variable is not defined
 echo This environment variable is needed to run this program
-goto end 
+goto end
 :okHome
 if not "%CATALINA_BASE%" == "" goto gotBase
 set CATALINA_BASE=%CATALINA_HOME%
 :gotBase
- 
+
 set EXECUTABLE=%CATALINA_HOME%\bin\tomcat@VERSION_MAJOR@.exe
 
 rem Set default Service name
 set SERVICE_NAME=Tomcat@VERSION_MAJOR@
 set PR_DISPLAYNAME=Apache Tomcat @VERSION_MAJOR@
 
-if "%1" == "" goto displayUsage
-if "%2" == "" goto setServiceName
-set SERVICE_NAME=%2
-set PR_DISPLAYNAME=Apache Tomcat %2
-:setServiceName
-if %1 == install goto doInstall
-if %1 == remove goto doRemove
-if %1 == uninstall goto doRemove
+if "x%1x" == "xx" goto displayUsage
+set SERVICE_CMD=%1
+shift
+if "x%1x" == "xx" goto checkServiceCmd
+:checkUser
+if "x%1x" == "x/userx" goto runAsUser
+if "x%1x" == "x--userx" goto runAsUser
+set SERVICE_NAME=%1
+set PR_DISPLAYNAME=Apache Tomcat %1
+shift
+if "x%1x" == "xx" goto checkServiceCmd
+goto checkUser
+:runAsUser
+shift
+if "x%1x" == "xx" goto displayUsage
+set SERVICE_USER=%1
+shift
+runas /env /savecred /user:%SERVICE_USER% "%COMSPEC% /K \"%SELF%\" %SERVICE_CMD% %SERVICE_NAME%"
+goto end
+:checkServiceCmd
+if /i %SERVICE_CMD% == install goto doInstall
+if /i %SERVICE_CMD% == remove goto doRemove
+if /i %SERVICE_CMD% == uninstall goto doRemove
 echo Unknown parameter "%1"
 :displayUsage
 echo.
-echo Usage: service.bat install/remove [service_name]
+echo Usage: service.bat install/remove [service_name] [/user username]
 goto end
 
 :doRemove
 rem Remove the service
 "%EXECUTABLE%" //DS//%SERVICE_NAME%
+if not errorlevel 1 goto removed
+echo Failed removing '%SERVICE_NAME%' service
+goto end
+:removed
 echo The service '%SERVICE_NAME%' has been removed
 goto end
 
