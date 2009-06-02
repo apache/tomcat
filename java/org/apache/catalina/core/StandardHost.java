@@ -161,7 +161,11 @@ public class StandardHost
      * Attribute value used to turn on/off XML namespace awarenes.
      */
      private boolean xmlNamespaceAware = false;
-
+     
+    /**
+     * Should we create directories upon startup for appBase and xmlBase
+     */
+     private boolean createDirs = true;
 
     // ------------------------------------------------------------- Properties
 
@@ -216,6 +220,22 @@ public class StandardHost
 
     }
 
+    /**
+     * Returns true if the Host will attempt to create directories for appBase and xmlBase
+     * unless they already exist.
+     * @return
+     */
+    public boolean getCreateDirs() {
+        return createDirs;
+    }
+
+    /**
+     * Set to true if the Host should attempt to create directories for xmlBase and appBase upon startup
+     * @param createDirs
+     */
+    public void setCreateDirs(boolean createDirs) {
+        this.createDirs = createDirs;
+    }
 
     /**
      * Return the value of the auto deploy flag.  If true, it indicates that 
@@ -680,8 +700,7 @@ public class StandardHost
         return (sb.toString());
 
     }
-
-
+    
     /**
      * Start this host.
      *
