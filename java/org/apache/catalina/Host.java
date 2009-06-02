@@ -232,5 +232,16 @@ public interface Host extends Container {
      */
     public void removeAlias(String alias);
 
+    /**
+     * Returns true if the Host will attempt to create directories for appBase and xmlBase
+     * unless they already exist.
+     * @return
+     */
+    public boolean getCreateDirs();
+    /**
+     * Set to true if the Host should attempt to create directories for xmlBase and appBase upon startup
+     * @param createDirs
+     */
+    public void setCreateDirs(boolean createDirs);
 
 }

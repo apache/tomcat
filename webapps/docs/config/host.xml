@@ -96,6 +96,14 @@
         Deployment</a> for more information on automatic recognition and
         deployment of web applications to be deployed automatically.</p>
       </attribute>
+      
+      <attribute name="createDirs" required="false">
+        <p>If set to true, Tomcat will attempt to create the directories defined by the 
+        attributes <code>appBase</code> and <code>xmlBase</code> during the startup phase.
+        The default value is <code>true</code>.
+        If set to true, and directory creation fails, an error message will be printed out but will not halt 
+        the startup sequence.</p>
+      </attribute>
 
       <attribute name="autoDeploy" required="false">
         <p>This flag value indicates if new web applications, dropped in to
