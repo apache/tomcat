@@ -762,8 +762,6 @@ public class HostConfig
                 if (entry != null) {
                     istream = jar.getInputStream(entry);
                     
-                    configBase().mkdirs();
-                    
                     ostream =
                         new BufferedOutputStream
                         (new FileOutputStream(xml), 1024);
@@ -956,7 +954,6 @@ public class HostConfig
                         digester.reset();
                     }
                 }
-                configBase().mkdirs();
                 File xmlCopy = new File(configBase(), file + ".xml");
                 InputStream is = null;
                 OutputStream os = null;
@@ -1211,6 +1208,15 @@ public class HostConfig
                 (this, oname, this.getClass().getName());
         } catch (Exception e) {
             log.error(sm.getString("hostConfig.jmx.register", oname), e);
+        }
+        
+        if (host.getCreateDirs()) {
+            File[] dirs = new File[] {appBase(),configBase()};
+            for (int i=0; i<dirs.length; i++) {
+                if ( (!dirs[i].exists()) && (!dirs[i].mkdirs())) {
+                    log.error(sm.getString("hostConfig.createDirs",dirs[i]));
+                }
+            }
         }
 
         if (host.getDeployOnStartup())
