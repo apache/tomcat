@@ -546,7 +546,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>doc</extension>
-        <mime-type>application/msword</mime-type>
+        <mime-type>application/vnd.ms-word</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>dtd</extension>
@@ -909,7 +909,11 @@
     </mime-mapping>
     <mime-mapping>
         <extension>ppt</extension>
-        <mime-type>application/powerpoint</mime-type>
+        <mime-type>application/vnd.ms-powerpoint</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>pps</extension>
+        <mime-type>application/vnd.ms-powerpoint</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>ps</extension>
@@ -998,6 +1002,14 @@
         <mime-type>application/x-sv4crc</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>svg</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>svgz</extension>
+        <mime-type>image/svg+xml</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>swf</extension>
         <mime-type>application/x-shockwave-flash</mime-type>
     </mime-mapping>
@@ -1070,6 +1082,10 @@
         <mime-type>application/xhtml+xml</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>xls</extension>
+        <mime-type>application/vnd.ms-excel</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>xml</extension>
         <mime-type>application/xml</mime-type>
     </mime-mapping>
@@ -1094,20 +1110,12 @@
         <mime-type>image/x-xwindowdump</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>wav</extension>
-        <mime-type>audio/x-wav</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>svg</extension>
-        <mime-type>image/svg+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>svgz</extension>
-        <mime-type>image/svg+xml</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>vsd</extension>
         <mime-type>application/x-visio</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>wav</extension>
+        <mime-type>audio/x-wav</mime-type>
     </mime-mapping>
     <mime-mapping>
         <!-- Wireless Bitmap -->
@@ -1157,18 +1165,6 @@
     <mime-mapping>
         <extension>zip</extension>
         <mime-type>application/zip</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>xls</extension>
-        <mime-type>application/vnd.ms-excel</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>doc</extension>
-        <mime-type>application/vnd.ms-word</mime-type>
-    </mime-mapping>
-    <mime-mapping>
-        <extension>ppt</extension>
-        <mime-type>application/vnd.ms-powerpoint</mime-type>
     </mime-mapping>
 
   <!-- ==================== Default Welcome File List ===================== -->
