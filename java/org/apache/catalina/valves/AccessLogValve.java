@@ -132,7 +132,7 @@ public class AccessLogValve
      * The as-of date for the currently open log file, or a zero-length
      * string if there is no open log file.
      */
-    private String dateStamp = "";
+    private volatile String dateStamp = "";
 
 
     /**
@@ -283,7 +283,7 @@ public class AccessLogValve
      */
     private Date currentDate = null;
     
-    private long currentMillis = 0;
+    private volatile long currentMillis = 0;
 
 
     /**
@@ -609,8 +609,8 @@ public class AccessLogValve
             }
 
             /* Make sure date is correct */
-            currentDate = new Date(System.currentTimeMillis());
-            dateStamp = fileDateFormatter.format(currentDate);
+            dateStamp = fileDateFormatter.format(
+                    new Date(System.currentTimeMillis()));
 
             open();
             return true;
@@ -650,12 +650,10 @@ public class AccessLogValve
             long systime = System.currentTimeMillis();
             if ((systime - rotationLastChecked) > 1000) {
 
-                // We need a new currentDate
-                currentDate = new Date(systime);
                 rotationLastChecked = systime;
 
                 // Check for a change of date
-                String tsDate = fileDateFormatter.format(currentDate);
+                String tsDate = fileDateFormatter.format(new Date(systime));
 
                 // If the date has changed, switch log files
                 if (!dateStamp.equals(tsDate)) {
@@ -681,8 +679,8 @@ public class AccessLogValve
                     }
 
                     /* Make sure date is correct */
-                    currentDate = new Date(System.currentTimeMillis());
-                    dateStamp = fileDateFormatter.format(currentDate);
+                    dateStamp = fileDateFormatter.format(
+                            new Date(System.currentTimeMillis()));
 
                     open();
                 }
