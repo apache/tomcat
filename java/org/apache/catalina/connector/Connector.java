@@ -595,7 +595,7 @@ public class Connector
      */
     public void setProtocol(String protocol) {
 
-        if (AprLifecycleListener.isAprInitialized()) {
+        if (AprLifecycleListener.isAprAvailable()) {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.http11.Http11AprProtocol");
