@@ -18,7 +18,6 @@
 
 package org.apache.catalina.connector;
 
-import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.HashMap;
 
@@ -32,6 +31,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Service;
+import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.util.StringManager;
@@ -587,54 +587,6 @@ public class Connector
 
     }
     
-    // ---------------------------------------------- APR Version Constants
-
-    private static final int TCN_REQUIRED_MAJOR = 1;
-    private static final int TCN_REQUIRED_MINOR = 1;
-    private static final int TCN_REQUIRED_PATCH = 3;
-    private static boolean aprInitialized = false;
-
-    // APR init support
-    private static synchronized void initializeAPR()
-    {
-        if (aprInitialized) {
-            return;
-        }
-        int major = 0;
-        int minor = 0;
-        int patch = 0;
-        try {
-            String methodName = "initialize";
-            Class<?> paramTypes[] = new Class[1];
-            paramTypes[0] = String.class;
-            Object paramValues[] = new Object[1];
-            paramValues[0] = null;
-            Class<?> clazz = Class.forName("org.apache.tomcat.jni.Library");
-            Method method = clazz.getMethod(methodName, paramTypes);
-            method.invoke(null, paramValues);
-            major = clazz.getField("TCN_MAJOR_VERSION").getInt(null);
-            minor = clazz.getField("TCN_MINOR_VERSION").getInt(null);
-            patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
-        } catch (Throwable t) {
-            return;
-        }
-        if ((major != TCN_REQUIRED_MAJOR) ||
-            (minor != TCN_REQUIRED_MINOR) ||
-            (patch <  TCN_REQUIRED_PATCH)) {
-            try {
-                // Terminate the APR in case the version
-                // is below required.
-                String methodName = "terminate";
-                Method method = Class.forName("org.apache.tomcat.jni.Library")
-                                    .getMethod(methodName, (Class [])null);
-                method.invoke(null, (Object []) null);
-            } catch (Throwable t) {
-                // Ignore
-            }
-            return;
-        }
-        aprInitialized = true;
-    }
 
     /**
      * Set the Coyote protocol which will be used by the connector.
@@ -643,10 +595,7 @@ public class Connector
      */
     public void setProtocol(String protocol) {
 
-        // Test APR support
-        initializeAPR();
-
-        if (aprInitialized) {
+        if (AprLifecycleListener.isAprInitialized()) {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
                     ("org.apache.coyote.http11.Http11AprProtocol");
