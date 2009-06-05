@@ -68,6 +68,10 @@ public class AprLifecycleListener
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
 
+    public static boolean isAprInitialized() {
+        return aprInitialized;
+    }
+
     // ---------------------------------------------- LifecycleListener Methods
 
     /**
@@ -241,4 +245,5 @@ public class AprLifecycleListener
     public void setSSLRandomSeed(String SSLRandomSeed) {
         AprLifecycleListener.SSLRandomSeed = SSLRandomSeed;
     }
+    
 }
