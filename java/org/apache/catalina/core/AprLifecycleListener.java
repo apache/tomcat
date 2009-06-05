@@ -34,7 +34,7 @@ import org.apache.tomcat.jni.Library;
 /**
  * Implementation of <code>LifecycleListener</code> that will init and
  * and destroy APR.
- *
+ * 
  * @author Remy Maucherat
  * @author Filip Hanik
  * @version $Revision$ $Date$
@@ -49,7 +49,7 @@ public class AprLifecycleListener
     /**
      * The string manager for this package.
      */
-    protected StringManager sm =
+    protected static StringManager sm =
         StringManager.getManager(Constants.Package);
 
 
@@ -68,9 +68,12 @@ public class AprLifecycleListener
     protected static String SSLRandomSeed = "builtin";
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
+    protected static boolean sslAvailable = false;
+    protected static boolean aprAvailable = false;
 
-    public static boolean isAprInitialized() {
-        return aprInitialized;
+    public static boolean isAprAvailable() {
+        init();
+        return aprAvailable;
     }
 
     // ---------------------------------------------- LifecycleListener Methods
@@ -83,8 +86,8 @@ public class AprLifecycleListener
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.INIT_EVENT.equals(event.getType())) {
-            aprInitialized = init();
-            if (aprInitialized) {
+            init();
+            if (aprAvailable) {
                 try {
                     initializeSSL();
                 } catch (Throwable t) {
@@ -92,7 +95,7 @@ public class AprLifecycleListener
                 }
             }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
-            if (!aprInitialized) {
+            if (!aprAvailable) {
                 return;
             }
             try {
@@ -114,14 +117,16 @@ public class AprLifecycleListener
         method.invoke(null, (Object []) null);
     }
 
-    private boolean init()
+    private static void init()
     {
         int major = 0;
         int minor = 0;
         int patch = 0;
         if (aprInitialized) {
-            return true;    
+            return;    
         }
+        aprInitialized = true;
+        
         try {
             String methodName = "initialize";
             Class<?> paramTypes[] = new Class[1];
@@ -137,7 +142,7 @@ public class AprLifecycleListener
         } catch (Throwable t) {
             log.info(sm.getString("aprListener.aprInit",
                     System.getProperty("java.library.path")));
-            return false;
+            return;
         }
         if ((major != TCN_REQUIRED_MAJOR)  ||
             (minor < TCN_REQUIRED_MINOR) ||
@@ -154,7 +159,7 @@ public class AprLifecycleListener
             } catch (Throwable t) {
                 // Ignore
             }
-            return false;
+            return;
         }
         if (minor < TCN_RECOMMENDED_MIN ||
                 (minor == TCN_RECOMMENDED_MIN && patch <  TCN_RECOMMENDED_PV)) {
@@ -174,7 +179,7 @@ public class AprLifecycleListener
                 Boolean.valueOf(Library.APR_HAS_SENDFILE), 
                 Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),
                 Boolean.valueOf(Library.APR_HAS_RANDOM)));
-        return true;
+        aprAvailable = true;
     }
 
     private static synchronized void initializeSSL()
@@ -189,6 +194,8 @@ public class AprLifecycleListener
              //only once per VM
             return;
         }
+        sslInitialized = true;
+
         String methodName = "randSet";
         Class<?> paramTypes[] = new Class[1];
         paramTypes[0] = String.class;
@@ -204,7 +211,7 @@ public class AprLifecycleListener
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
  
-        sslInitialized = true;
+        sslAvailable = true;
     }
 
     public String getSSLEngine() {
