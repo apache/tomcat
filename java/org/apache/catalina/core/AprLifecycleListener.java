@@ -141,7 +141,7 @@ public class AprLifecycleListener
         }
         if ((major != TCN_REQUIRED_MAJOR)  ||
             (minor < TCN_REQUIRED_MINOR) ||
-            (patch <  TCN_REQUIRED_PATCH)) {
+            (minor == TCN_REQUIRED_MINOR && patch <  TCN_REQUIRED_PATCH)) {
             log.error(sm.getString("aprListener.tcnInvalid", major + "."
                     + minor + "." + patch,
                     TCN_REQUIRED_MAJOR + "." +
@@ -157,7 +157,7 @@ public class AprLifecycleListener
             return false;
         }
         if (minor < TCN_RECOMMENDED_MIN ||
-                (minor >= TCN_RECOMMENDED_MIN && patch <  TCN_RECOMMENDED_PV)) {
+                (minor == TCN_RECOMMENDED_MIN && patch <  TCN_RECOMMENDED_PV)) {
             log.info(sm.getString("aprListener.tcnVersion", major + "."
                     + minor + "." + patch,
                     TCN_REQUIRED_MAJOR + "." +
