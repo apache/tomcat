@@ -25,7 +25,6 @@ import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
@@ -57,6 +56,7 @@ import org.apache.catalina.SessionListener;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.security.SecurityUtil;
 
 /**
@@ -139,24 +139,6 @@ public class StandardSession
      * version of this object.
      */
     protected transient String authType = null;
-
-
-    /**
-     * The <code>java.lang.Method</code> for the
-     * <code>fireContainerEvent()</code> method of the
-     * <code>org.apache.catalina.core.StandardContext</code> method,
-     * if our Context implementation is of this class.  This value is
-     * computed dynamically the first time it is needed, or after
-     * a session reload (since it is declared transient).
-     */
-    protected transient Method containerEventMethod = null;
-
-
-    /**
-     * The method signature for the <code>fireContainerEvent</code> method.
-     */
-    protected static final Class<?> containerEventTypes[] =
-        { String.class, Object.class };
 
 
     /**
@@ -1594,21 +1576,10 @@ public class StandardSession
                                     String type, Object data)
         throws Exception {
 
-        if (!"org.apache.catalina.core.StandardContext".equals
-            (context.getClass().getName())) {
-            return; // Container events are not supported
+        if (context instanceof StandardContext) {
+            // NOTE:  Race condition is harmless, so do not synchronize
+            ((StandardContext) context).fireContainerEvent(type, data);
         }
-        // NOTE:  Race condition is harmless, so do not synchronize
-        if (containerEventMethod == null) {
-            containerEventMethod =
-                context.getClass().getMethod("fireContainerEvent",
-                                             containerEventTypes);
-        }
-        Object containerEventParams[] = new Object[2];
-        containerEventParams[0] = type;
-        containerEventParams[1] = data;
-        containerEventMethod.invoke(context, containerEventParams);
-
     }
                                       
 
