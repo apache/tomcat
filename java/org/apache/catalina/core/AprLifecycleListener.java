@@ -87,11 +87,7 @@ public class AprLifecycleListener
                 try {
                     initializeSSL();
                 } catch (Throwable t) {
-                    if (!log.isDebugEnabled()) {
-                        log.info(sm.getString("aprListener.sslInit"));
-                    } else {
-                        log.debug(sm.getString("aprListener.sslInit"), t);
-                    }
+                    log.info(sm.getString("aprListener.sslInit"));
                 }
             }
         } else if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
@@ -101,11 +97,7 @@ public class AprLifecycleListener
             try {
                 terminateAPR();
             } catch (Throwable t) {
-                if (!log.isDebugEnabled()) {
-                    log.info(sm.getString("aprListener.aprDestroy"));
-                } else {
-                    log.debug(sm.getString("aprListener.aprDestroy"), t);
-                }
+                log.info(sm.getString("aprListener.aprDestroy"));
             }
         }
 
@@ -142,13 +134,8 @@ public class AprLifecycleListener
             minor = clazz.getField("TCN_MINOR_VERSION").getInt(null);
             patch = clazz.getField("TCN_PATCH_VERSION").getInt(null);
         } catch (Throwable t) {
-            if (!log.isDebugEnabled()) {
-                log.info(sm.getString("aprListener.aprInit",
-                        System.getProperty("java.library.path")));
-            } else {
-                log.debug(sm.getString("aprListener.aprInit",
-                        System.getProperty("java.library.path")), t);
-            }
+            log.info(sm.getString("aprListener.aprInit",
+                    System.getProperty("java.library.path")));
             return false;
         }
         if ((major != TCN_REQUIRED_MAJOR)  ||
@@ -169,28 +156,16 @@ public class AprLifecycleListener
             return false;
         }
         if (patch <  TCN_RECOMMENDED_PV) {
-            if (!log.isDebugEnabled()) {
-                log.info(sm.getString("aprListener.tcnVersion", major + "."
-                        + minor + "." + patch,
-                        TCN_REQUIRED_MAJOR + "." +
-                        TCN_REQUIRED_MINOR + "." +
-                        TCN_RECOMMENDED_PV));
-            } else {
-                log.debug(sm.getString("aprListener.tcnVersion", major + "."
-                        + minor + "." + patch,
-                        TCN_REQUIRED_MAJOR + "." +
-                        TCN_REQUIRED_MINOR + "." +
-                        TCN_RECOMMENDED_PV));
-            }
+            log.info(sm.getString("aprListener.tcnVersion", major + "."
+                    + minor + "." + patch,
+                    TCN_REQUIRED_MAJOR + "." +
+                    TCN_REQUIRED_MINOR + "." +
+                    TCN_RECOMMENDED_PV));
         }
-        if (!log.isDebugEnabled()) {
-           log.info(sm.getString("aprListener.tcnValid", major + "."
+
+        log.info(sm.getString("aprListener.tcnValid", major + "."
                     + minor + "." + patch));
-        }
-        else {
-           log.debug(sm.getString("aprListener.tcnValid", major + "."
-                     + minor + "." + patch));
-        }
+
         // Log APR flags
         log.info(sm.getString("aprListener.flags",
                 Boolean.valueOf(Library.APR_HAVE_IPV6),
