@@ -533,6 +533,7 @@ public interface ServletContext {
      * @return
      * @throws IllegalStateException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public boolean setInitParameter(String name, String value);
     
@@ -660,7 +661,8 @@ public interface ServletContext {
      * @param className
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
-     * @since 3.0
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             String className);
@@ -670,9 +672,10 @@ public interface ServletContext {
      * 
      * @param servletName
      * @param servlet
-     * @since 3.0
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet);
@@ -682,9 +685,10 @@ public interface ServletContext {
      * 
      * @param servletName
      * @param servletClass
-     * @since 3.0
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public ServletRegistration.Dynamic addServlet(String servletName,
             Class<? extends Servlet> servletClass);
@@ -696,6 +700,7 @@ public interface ServletContext {
      * @return
      * @throws ServletException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public <T extends Servlet> T createServlet(Class<T> c)
     throws ServletException;
@@ -706,6 +711,7 @@ public interface ServletContext {
      * @param servletName
      * @return
      * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
      */
     public ServletRegistration findServletRegistration(String servletName);
 
@@ -717,7 +723,8 @@ public interface ServletContext {
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
      * 
-     * @since 3.0
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public FilterRegistration.Dynamic  addFilter(String filterName,
             String className);
@@ -730,7 +737,8 @@ public interface ServletContext {
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
      * 
-     * @since 3.0
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public FilterRegistration.Dynamic  addFilter(String filterName,
             Filter filter);
@@ -743,7 +751,8 @@ public interface ServletContext {
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
      * 
-     * @since 3.0
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public FilterRegistration.Dynamic  addFilter(String filterName,
             Class<? extends Filter> filterClass);
@@ -755,6 +764,7 @@ public interface ServletContext {
      * @return
      * @throws ServletException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public <T extends Filter> T createFilter(Class<T> c)
     throws ServletException;
@@ -765,6 +775,7 @@ public interface ServletContext {
      * @param filterName
      * @return
      * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
      */
     public FilterRegistration findFilterRegistration(String filterName);
 
@@ -772,7 +783,8 @@ public interface ServletContext {
     /**
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
      */
     public SessionCookieConfig getSessionCookieConfig();
 
@@ -785,7 +797,8 @@ public interface ServletContext {
      *                                  {@link SessionTrackingMode}
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
-     * @since 3.0
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
      */
     public void setSessionTrackingModes(
             EnumSet<SessionTrackingMode> sessionTrackingModes)
@@ -794,14 +807,16 @@ public interface ServletContext {
     /**
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
      */
     public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes();
     
     /**
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
      */
     public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes();
     

@@ -403,7 +403,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * getServletContext() on the wrapped request object.
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public ServletContext getServletContext() {
         return request.getServletContext();
@@ -415,7 +415,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * 
      * @return
      * @throws java.lang.IllegalStateException
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public AsyncContext startAsync() {
         return request.startAsync();
@@ -429,7 +429,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * @param servletResponse
      * @return
      * @throws java.lang.IllegalStateException
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public AsyncContext startAsync(ServletRequest servletRequest,
             ServletResponse servletResponse)
@@ -442,7 +442,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * isAsyncStarted() on the wrapped request object.
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public boolean isAsyncStarted() {
         return request.isAsyncStarted();
@@ -453,7 +453,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * isAsyncSupported() on the wrapped request object.
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public boolean isAsyncSupported() {
         return request.isAsyncSupported();
@@ -464,7 +464,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * getAsyncContext() on the wrapped request object.
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public AsyncContext getAsyncContext() {
         return request.getAsyncContext();
@@ -475,7 +475,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * addAsyncListener(AsyncListener) on the wrapped request object.
      * 
      * @param listener
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public void addAsyncListener(AsyncListener listener) {
         request.addAsyncListener(listener);
@@ -489,7 +489,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * @param listener
      * @param servletRequest
      * @param servletResponse
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public void addAsyncListener(AsyncListener listener,
             ServletRequest servletRequest, ServletResponse servletResponse) {
@@ -501,7 +501,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * setAsyncTimeout(long) on the wrapped request object.
      * 
      * @param listener
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public void setAsyncTimeout(long timeout) {
         request.setAsyncTimeout(timeout);
@@ -511,7 +511,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to call
      * getAsyncTimeout() on the wrapped request object.
      * 
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public long getAsyncTimeout() {
         return request.getAsyncTimeout();
@@ -519,8 +519,9 @@ public class ServletRequestWrapper implements ServletRequest {
     
     /**
      * 
-     * @param listener
-     * @since 3.0
+     * @param wrapped
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public boolean isWrapperFor(ServletRequest wrapped) {
         if (request == wrapped) {
@@ -534,8 +535,9 @@ public class ServletRequestWrapper implements ServletRequest {
     
     /**
      * 
-     * @param listener
-     * @since 3.0
+     * @param wrappedType
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public boolean isWrapperFor(Class<? extends ServletRequest> wrappedType) {
         if (wrappedType.isAssignableFrom(request.getClass())) {
@@ -551,7 +553,7 @@ public class ServletRequestWrapper implements ServletRequest {
      * The default behavior of this method is to call
      * getDispatcherType() on the wrapped request object.
      * 
-     * @since 3.0
+     * @since Servlet 3.0
      */
     public DispatcherType getDispatcherType() {
         return this.request.getDispatcherType();

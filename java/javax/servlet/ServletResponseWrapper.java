@@ -211,8 +211,9 @@ public class ServletResponseWrapper implements ServletResponse {
 
     /**
      * 
-     * @param listener
-     * @since 3.0
+     * @param wrapped
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public boolean isWrapperFor(ServletResponse wrapped) {
         if (response == wrapped) {
@@ -226,8 +227,9 @@ public class ServletResponseWrapper implements ServletResponse {
     
     /**
      * 
-     * @param listener
-     * @since 3.0
+     * @param wrappedType
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public boolean isWrapperFor(Class<? extends ServletResponse> wrappedType) {
         if (wrappedType.isAssignableFrom(response.getClass())) {
