@@ -198,6 +198,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public int getStatus() {
         return this._getHttpServletResponse().getStatus();
@@ -206,6 +207,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
      
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public String getHeader(String name) {
         return this._getHttpServletResponse().getHeader(name);
@@ -214,6 +216,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
     
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public Iterable<String> getHeaders(String name) {
         return this._getHttpServletResponse().getHeaders(name);
@@ -221,6 +224,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper implement
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public Iterable<String> getHeaderNames() {
         return this._getHttpServletResponse().getHeaderNames();
