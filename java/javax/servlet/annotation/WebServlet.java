@@ -23,9 +23,9 @@ import java.lang.annotation.Target;
 import java.lang.annotation.Documented;
 
 /**
- * @since 3.0
+ * @since Servlet 3.0
  * $Id$
- * TODO SERVLET3
+ * TODO SERVLET3 - Add comments
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

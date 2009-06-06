@@ -19,7 +19,7 @@ package javax.servlet;
 import java.util.EnumSet;
 
 /**
- * @since 3.0
+ * @since Servlet 3.0
  * $Id$
  * TODO SERVLET3 - Add comments
  */
@@ -33,7 +33,8 @@ public interface FilterRegistration extends Registration {
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      */
-    public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes,
+    public void addMappingForServletNames(
+            EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... servletNames);
     
     /**
@@ -44,7 +45,8 @@ public interface FilterRegistration extends Registration {
      * @throws IllegalArgumentException
      * @throws IllegalStateException
      */
-    public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes,
+    public void addMappingForUrlPatterns(
+            EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... urlPatterns);
 
     public static interface Dynamic
