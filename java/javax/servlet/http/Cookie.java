@@ -537,7 +537,8 @@ public class Cookie implements Cloneable {
     /**
      * 
      * @return
-     * @since 3.0
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public boolean isHttpOnly() {
         return httpOnly;
@@ -546,7 +547,8 @@ public class Cookie implements Cloneable {
     /**
      * 
      * @param httpOnly
-     * since 3.0
+     * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public void setHttpOnly(boolean httpOnly) {
         this.httpOnly = httpOnly;
