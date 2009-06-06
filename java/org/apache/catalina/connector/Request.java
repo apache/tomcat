@@ -2239,7 +2239,7 @@ public class Request
         return requestedSessionSSL;
     }
     
-    public boolean login(HttpServletResponse response) throws IOException {
+    public boolean authenticate(HttpServletResponse response) throws IOException {
         // TODO Servlet 3
         return false;
     }
