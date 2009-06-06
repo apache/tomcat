@@ -998,8 +998,8 @@ public class RequestFacade implements HttpServletRequest {
         return request.getDispatcherType();
     }
     
-    public boolean login(HttpServletResponse response) throws IOException {
-        return request.login(response);
+    public boolean authenticate(HttpServletResponse response) throws IOException {
+        return request.authenticate(response);
     }
 
     public void login(String username, String password)
