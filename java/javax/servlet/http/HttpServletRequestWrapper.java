@@ -264,14 +264,16 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
-    public boolean login(HttpServletResponse response)
+    public boolean authenticate(HttpServletResponse response)
     throws IOException, ServletException {
-        return this._getHttpServletRequest().login(response);
+        return this._getHttpServletRequest().authenticate(response);
     }
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public void login(String username, String password) throws ServletException {
         this._getHttpServletRequest().login(username, password);
@@ -279,6 +281,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public void logout() throws ServletException {
         this._getHttpServletRequest().logout();
@@ -287,6 +290,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public Iterable<Part> getParts() {
         return this._getHttpServletRequest().getParts();
@@ -294,6 +298,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
 
     /**
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public Part getPart(String name) {
         return this._getHttpServletRequest().getPart(name);

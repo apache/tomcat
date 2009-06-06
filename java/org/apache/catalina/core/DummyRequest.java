@@ -292,7 +292,7 @@ public class DummyRequest
     }
     public Part getPart(String name) { return null; }
     public Iterable<Part> getParts() { return null; }
-    public boolean login(HttpServletResponse response)
+    public boolean authenticate(HttpServletResponse response)
     throws IOException, ServletException { return false; }
     public void login(String username, String password)
     throws ServletException {}
