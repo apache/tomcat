@@ -667,8 +667,9 @@ public interface HttpServletRequest extends ServletRequest {
      * @throws IOException
      * @throws ServletException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
-    public boolean login(HttpServletResponse response)
+    public boolean authenticate(HttpServletResponse response)
     throws IOException, ServletException;
     
     
@@ -678,6 +679,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @param password
      * @throws ServletException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public void login(java.lang.String username, String password)
     throws ServletException;
@@ -687,6 +689,7 @@ public interface HttpServletRequest extends ServletRequest {
      * 
      * @throws ServletException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public void logout() throws ServletException;
     
@@ -695,6 +698,7 @@ public interface HttpServletRequest extends ServletRequest {
      * 
      * @return
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public Iterable<Part> getParts();
     
@@ -705,6 +709,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @return
      * @throws IllegalArgumentException
      * @since Servlet 3.0
+     * TODO SERVLET3 - Add comments
      */
     public Part getPart(java.lang.String name);
 }
