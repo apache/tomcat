@@ -23,16 +23,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @since 3.0
+ * @since Servlet 3.0
  * $Id$
- * TODO SERVLET3
+ * TODO SERVLET3 - Add comments
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface MultipartConfig {
     String location() default "";
-    int maxFileSize() default 0;
-    int maxRequestSize() default 0;
+    long maxFileSize() default 0L;
+    long maxRequestSize() default 0L;
     int fileSizeThreshold() default 0;
 }
