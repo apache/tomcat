@@ -83,7 +83,8 @@
         to the <code>$CATALINA_BASE</code> directory.  See
         <a href="#Automatic Application Deployment">Automatic Application
         Deployment</a> for more information on automatic recognition and
-        deployment of web applications to be deployed automatically.</p>
+        deployment of web applications to be deployed automatically. If not
+        specified, the default of <code>webapps</code> will be used.</p>
       </attribute>
       
       <attribute name="xmlBase" required="false">
