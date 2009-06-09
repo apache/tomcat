@@ -17,10 +17,12 @@
 
 package org.apache.tomcat.util.net;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -36,6 +38,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -538,27 +541,62 @@ public class AprEndpoint {
         }
     }
 
-
     /**
      * Return the amount of threads that are managed by the pool.
      *
      * @return the amount of threads that are managed by the pool
      */
     public int getCurrentThreadCount() {
-        return curThreads;
+        if (executor!=null) {
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getPoolSize();
+            } else {
+                try {
+                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getPoolSize", new Class[] {}); 
+                    if (m!=null) {
+                        return ((Integer)m.invoke(executor, null)).intValue();
+                    } else {
+                        return -1;
+                    }
+                }catch (Exception ignore) {
+                    if (log.isDebugEnabled()) 
+                        log.debug("Unable to invoke getPoolSize",ignore);
+                    return -2;
+                }
+            }
+        } else {
+            return curThreads;
+        }
     }
-
 
     /**
-     * Return the amount of threads currently busy.
+     * Return the amount of threads that are in use 
      *
-     * @return the amount of threads currently busy
+     * @return the amount of threads that are in use
      */
     public int getCurrentThreadsBusy() {
-        return curThreadsBusy;
+        if (executor!=null) {
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getActiveCount();
+            } else {
+                try {
+                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getActiveCount", new Class[] {}); 
+                    if (m!=null) {
+                        return ((Integer)m.invoke(executor, null)).intValue();
+                    } else {
+                        return -1;
+                    }
+                }catch (Exception ignore) {
+                    if (log.isDebugEnabled()) 
+                        log.debug("Unable to invoke getActiveCount",ignore);
+                    return -2;
+                }
+            }
+        } else {
+            return workers!=null?curThreads - workers.size():0;
+        }
     }
-
-
+    
     /**
      * Return the state of the endpoint.
      *

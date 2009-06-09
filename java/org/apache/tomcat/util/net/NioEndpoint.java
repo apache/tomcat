@@ -20,6 +20,7 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -726,32 +727,56 @@ public class NioEndpoint {
      * @return the amount of threads that are managed by the pool
      */
     public int getCurrentThreadCount() {
-        final Executor executor = this.executor;
         if (executor!=null) {
-            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                return ((java.util.concurrent.ThreadPoolExecutor)executor).getPoolSize();
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getPoolSize();
+            } else {
+                try {
+                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getPoolSize", new Class[] {}); 
+                    if (m!=null) {
+                        return ((Integer)m.invoke(executor, null)).intValue();
+                    } else {
+                        return -1;
+                    }
+                }catch (Exception ignore) {
+                    if (log.isDebugEnabled()) 
+                        log.debug("Unable to invoke getPoolSize",ignore);
+                    return -2;
+                }
             }
-        } 
-        return 0;
+        } else {
+            return -1;
+        }
     }
-
 
     /**
-     * Return the amount of threads currently busy.
+     * Return the amount of threads that are in use 
      *
-     * @return the amount of threads currently busy
+     * @return the amount of threads that are in use
      */
     public int getCurrentThreadsBusy() {
-        final Executor executor = this.executor;
         if (executor!=null) {
-            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                return ((java.util.concurrent.ThreadPoolExecutor)executor).getPoolSize();
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getActiveCount();
+            } else {
+                try {
+                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getActiveCount", new Class[] {}); 
+                    if (m!=null) {
+                        return ((Integer)m.invoke(executor, null)).intValue();
+                    } else {
+                        return -1;
+                    }
+                }catch (Exception ignore) {
+                    if (log.isDebugEnabled()) 
+                        log.debug("Unable to invoke getActiveCount",ignore);
+                    return -2;
+                }
             }
-        } 
-        return activeSocketProcessors.get();
+        } else {
+            return -1;
+        }
     }
-
-
+    
     /**
      * Return the state of the endpoint.
      *
