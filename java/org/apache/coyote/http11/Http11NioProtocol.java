@@ -760,6 +760,8 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         socket.getPoller().add(socket,att.getCometOps());
                     } else {
+                        //we should not hold on to the processor objects
+                        release(socket);
                         socket.getPoller().add(socket);
                     }
                 } else {
