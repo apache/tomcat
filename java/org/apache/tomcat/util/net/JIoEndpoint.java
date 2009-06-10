@@ -18,13 +18,11 @@
 package org.apache.tomcat.util.net;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -306,22 +304,7 @@ public class JIoEndpoint {
      */
     public int getCurrentThreadCount() {
         if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getPoolSize();
-            } else {
-                try {
-                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getPoolSize", new Class[] {}); 
-                    if (m!=null) {
-                        return ((Integer)m.invoke(executor, null)).intValue();
-                    } else {
-                        return -1;
-                    }
-                }catch (Exception ignore) {
-                    if (log.isDebugEnabled()) 
-                        log.debug("Unable to invoke getPoolSize",ignore);
-                    return -2;
-                }
-            }
+            return -1;
         } else {
             return curThreads;
         }
@@ -334,22 +317,7 @@ public class JIoEndpoint {
      */
     public int getCurrentThreadsBusy() {
         if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getActiveCount();
-            } else {
-                try {
-                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getActiveCount", new Class[] {}); 
-                    if (m!=null) {
-                        return ((Integer)m.invoke(executor, null)).intValue();
-                    } else {
-                        return -1;
-                    }
-                }catch (Exception ignore) {
-                    if (log.isDebugEnabled()) 
-                        log.debug("Unable to invoke getActiveCount",ignore);
-                    return -2;
-                }
-            }
+            return -1;
         } else {
             return workers!=null?curThreads - workers.size():0;
         }
