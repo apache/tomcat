@@ -124,20 +124,19 @@ class Parser implements TagConstants {
         root.setIsDefaultPageEncoding(isDefaultPageEncoding);
         root.setIsBomPresent(isBomPresent);
 
-        if (directivesOnly) {
-            parser.parseTagFileDirectives(root);
-            return new Node.Nodes(root);
-        }
-
-        // For the Top level page, add inlcude-prelude and include-coda
+        // For the Top level page, add include-prelude and include-coda
         PageInfo pageInfo = pc.getCompiler().getPageInfo();
-        if (parent == null) {
+        if (parent == null && !isTagFile) {
             parser.addInclude(root, pageInfo.getIncludePrelude());
         }
-        while (reader.hasMoreInput()) {
-            parser.parseElements(root);
+        if (directivesOnly) {
+            parser.parseFileDirectives(root);
+        } else {
+            while (reader.hasMoreInput()) {
+                parser.parseElements(root);
+            }
         }
-        if (parent == null) {
+        if (parent == null && !isTagFile) {
             parser.addInclude(root, pageInfo.getIncludeCoda());
         }
 
@@ -1775,7 +1774,7 @@ class Parser implements TagConstants {
         return JAVAX_BODY_CONTENT_TEMPLATE_TEXT;
     }
 
-    private void parseTagFileDirectives(Node parent) throws JasperException {
+    private void parseFileDirectives(Node parent) throws JasperException {
         reader.setSingleFile(true);
         reader.skipUntil("<");
         while (reader.hasMoreInput()) {
