@@ -546,7 +546,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>doc</extension>
-        <mime-type>application/vnd.ms-word</mime-type>
+        <mime-type>application/msword</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>dtd</extension>
