@@ -1577,7 +1577,6 @@ public class StandardSession
         throws Exception {
 
         if (context instanceof StandardContext) {
-            // NOTE:  Race condition is harmless, so do not synchronize
             ((StandardContext) context).fireContainerEvent(type, data);
         }
     }
