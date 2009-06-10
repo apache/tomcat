@@ -20,7 +20,6 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -731,21 +730,10 @@ public class NioEndpoint {
             if (executor instanceof ThreadPoolExecutor) {
                 return ((ThreadPoolExecutor)executor).getPoolSize();
             } else {
-                try {
-                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getPoolSize", new Class[] {}); 
-                    if (m!=null) {
-                        return ((Integer)m.invoke(executor, null)).intValue();
-                    } else {
-                        return -1;
-                    }
-                }catch (Exception ignore) {
-                    if (log.isDebugEnabled()) 
-                        log.debug("Unable to invoke getPoolSize",ignore);
-                    return -2;
-                }
+                return -1;
             }
         } else {
-            return -1;
+            return -2;
         }
     }
 
@@ -759,21 +747,10 @@ public class NioEndpoint {
             if (executor instanceof ThreadPoolExecutor) {
                 return ((ThreadPoolExecutor)executor).getActiveCount();
             } else {
-                try {
-                    Method m = IntrospectionUtils.findMethod(executor.getClass(), "getActiveCount", new Class[] {}); 
-                    if (m!=null) {
-                        return ((Integer)m.invoke(executor, null)).intValue();
-                    } else {
-                        return -1;
-                    }
-                }catch (Exception ignore) {
-                    if (log.isDebugEnabled()) 
-                        log.debug("Unable to invoke getActiveCount",ignore);
-                    return -2;
-                }
+                return -1;
             }
         } else {
-            return -1;
+            return -2;
         }
     }
     
