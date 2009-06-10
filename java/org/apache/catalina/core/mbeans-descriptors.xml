@@ -617,6 +617,65 @@
     <operation name="start" description="Start" impact="ACTION" returnType="void" />
     <operation name="stop" description="Stop" impact="ACTION" returnType="void" />
   </mbean>
+  
+  <mbean name="StandardThreadExecutor"
+         description="Standard implementation of a thread pool"
+         domain="Catalina"
+         group="Executor"
+         type="org.apache.catalina.core.StandardThreadExecutor">
+    
+    <attribute name="threadPriority"
+               description="The thread priority for threads in this thread pool"
+               type="int"/>
+      
+    <attribute name="name"
+               description="Unique name of this Executor"
+               type="java.lang.String"/>
+      
+    <attribute name="namePrefix"
+               description="Name prefix for thread names created by this executor"
+               type="java.lang.String"/>
+               
+    <attribute name="maxThreads"
+               description="Maximum number of allocated threads"
+               type="int"/>
+
+    <attribute name="minSpareThreads"
+               description="Minimum number of allocated threads"
+               type="int"/>
+               
+    <attribute name="maxIdleTime"
+               description="Max number of milliseconds a thread can be idle before it can be shutdown"
+               type="int"/>
+
+    <attribute name="maxQueueSize"
+               description="Maximum number of tasks for the pending task queue"
+               type="int"/>
+
+    <attribute name="activeCount"
+               description="Number of threads current processing a task"
+               type="int"/>
+
+    <attribute name="completedTaskCount"
+               description="Nr of tasks completed by the executor"
+               type="int"/>
+
+    <attribute name="corePoolSize"
+               description="Core size of the thread pool"
+               type="int"/>
+
+    <attribute name="largestPoolSize"
+               description="Peak number of threads"
+               type="int"/>
+
+    <attribute name="poolSize"
+               description="Number of threads in the pool"
+               type="int"/>
+
+    <attribute name="queueSize"
+               description="Number of tasks waiting to be processed"
+               type="int"/>
+  </mbean>
 
   <mbean name="StandardWrapper"
          description="Wrapper that represents an individual servlet definition"
