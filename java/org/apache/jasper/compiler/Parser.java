@@ -124,24 +124,25 @@ class Parser implements TagConstants {
         root.setIsDefaultPageEncoding(isDefaultPageEncoding);
         root.setIsBomPresent(isBomPresent);
 
+        if (directivesOnly) {
+            parser.parseTagFileDirectives(root);
+            return new Node.Nodes(root);
+        }
 
-        // For the Top level page, add include-prelude and include-coda
+        // For the Top level page, add inlcude-prelude and include-coda
         PageInfo pageInfo = pc.getCompiler().getPageInfo();
         if (parent == null) {
             parser.addInclude(root, pageInfo.getIncludePrelude());
         }
-        if (directivesOnly) {
-            parser.parseTagFileDirectives(root);
-        } else {
-            while (reader.hasMoreInput()) {
-                parser.parseElements(root);
-            }
+        while (reader.hasMoreInput()) {
+            parser.parseElements(root);
         }
         if (parent == null) {
             parser.addInclude(root, pageInfo.getIncludeCoda());
         }
 
-        return new Node.Nodes(root);
+        Node.Nodes page = new Node.Nodes(root);
+        return page;
     }
 
     /**
