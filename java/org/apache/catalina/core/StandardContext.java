@@ -669,8 +669,6 @@ public class StandardContext
     protected int cacheTTL = 5000;
 
 
-    private boolean lazy=true;
-
     /**
      * Non proxied resources.
      */
@@ -1360,16 +1358,6 @@ public class StandardContext
         this.docBase = docBase;
 
     }
-
-    // experimental
-    public boolean isLazy() {
-        return lazy;
-    }
-
-    public void setLazy(boolean lazy) {
-        this.lazy = lazy;
-    }
-
 
     /**
      * Return descriptive information about this Container implementation and
