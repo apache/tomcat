@@ -319,7 +319,7 @@
       </attribute>
 
       <attribute name="caseSensitive" required="false">
-        <p>If the value of this flag is <code>true</code>, all case sensitivity
+        <p>If the value of this flag is <code>false</code>, all case sensitivity
         checks will be disabled. If not 
         specified, the default value of the flag is <code>true</code>.</p>
         <p><b>NOTE: This flag MUST NOT be set to false on the Windows platform
