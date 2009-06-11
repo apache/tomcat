@@ -582,8 +582,8 @@ public class HostConfig
         DeployedApplication deployedApp = new DeployedApplication(contextPath);
 
         // Assume this is a configuration descriptor and deploy it
-        if(log.isDebugEnabled()) {
-            log.debug(sm.getString("hostConfig.deployDescriptor", file));
+        if(log.isInfoEnabled()) {
+            log.info(sm.getString("hostConfig.deployDescriptor", file));
         }
 
         Context context = null;
@@ -933,8 +933,8 @@ public class HostConfig
             return;
 
         // Deploy the application in this directory
-        if( log.isDebugEnabled() ) 
-            log.debug(sm.getString("hostConfig.deployDir", file));
+        if( log.isInfoEnabled() ) 
+            log.info(sm.getString("hostConfig.deployDir", file));
         try {
             Context context = null;
             File xml = new File(dir, Constants.ApplicationContextXml);
