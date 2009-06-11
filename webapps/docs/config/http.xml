@@ -79,7 +79,13 @@
     <attribute name="emptySessionPath" required="false">
       <p>If set to <code>true</code>, all paths for session cookies will be set
       to <code>/</code>. This can be useful for portlet specification implementations.
-      If not specified, this attribute is set to <code>false</code>.</p>
+      If not specified, this attribute is set to <code>false</code>.<br/>
+      A side effect to setting this to true, is that if Tomcat creates a new session it will attempt to use the 
+      cookie session id if supplied by the client.<br/>
+      <a href="http://svn.apache.org/viewvc/tomcat/container/tc5.5.x/catalina/src/share/org/apache/catalina/connector/Request.java?diff_format=h&amp;view=log#rev303682">SVN check in</a><br/>
+      <a href="http://tomcat.markmail.org/search/?q=emptysessionpath%20reuse#query:emptysessionpath%20reuse%20date%3A200502%20+page:1+mid:2bocwjhn3cczsoii+state:results">Dev discussion</a><br/>
+      <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=47298">Work around</a>
+      </p>
     </attribute>
 
     <attribute name="enableLookups" required="false">
