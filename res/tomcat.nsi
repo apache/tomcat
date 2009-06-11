@@ -178,10 +178,10 @@ Section "Core" SecTomcatCore
   File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
   StrCmp $0 "AMD64" 0 +3
   File /oname=tomcat@VERSION_MAJOR@.exe bin\procrun\amd64\tomcat@VERSION_MAJOR@.exe
-  File /oname=tomcat@VERSION_MAJOR@w.exe bin\procrun\amd64\tomcat@VERSION_MAJOR@w.exe
+  File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
   StrCmp $0 "IA64" 0 +3
   File /oname=tomcat@VERSION_MAJOR@.exe bin\procrun\ia64\tomcat@VERSION_MAJOR@.exe
-  File /oname=tomcat@VERSION_MAJOR@w.exe bin\procrun\ia64\tomcat@VERSION_MAJOR@w.exe
+  File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
 
   InstallRetry:
   ClearErrors
