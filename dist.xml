@@ -317,13 +317,12 @@
     <!-- Copy deployer documentation -->
     <copy todir="${tomcat.deployer}">
       <fileset dir="${tomcat.build}/webapps/docs">
-        <include name="images/jakarta-logo.gif" />
+        <include name="images/asf-logo.gif" />
         <include name="images/tomcat.gif" />
       </fileset>
     </copy>
-    <copy tofile="${tomcat.deployer}/docs/manual.html"
-      file="${tomcat.build}/webapps/docs/printer/deployer-howto.html" 
-      failonerror="false"/>
+    <copy tofile="${tomcat.deployer}/deployer-howto.html"
+      file="${tomcat.build}/webapps/docs/deployer-howto.html"/>
 
   </target>
 
