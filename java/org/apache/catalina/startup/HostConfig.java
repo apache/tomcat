@@ -835,8 +835,6 @@ public class HostConfig
                     }
                 }
                 context.setConfigFile(xml.getAbsolutePath());
-                deployedApp.redeployResources.put
-                    (xml.getAbsolutePath(), new Long(xml.lastModified()));
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
@@ -844,6 +842,11 @@ public class HostConfig
             // Populate redeploy resources with the WAR file
             deployedApp.redeployResources.put
                 (war.getAbsolutePath(), new Long(war.lastModified()));
+
+            if (deployXML && xml.exists()) {
+                deployedApp.redeployResources.put
+                (xml.getAbsolutePath(), new Long(xml.lastModified()));
+            }
 
             if (context instanceof Lifecycle) {
                 Class<?> clazz = Class.forName(host.getConfigClass());
@@ -938,6 +941,7 @@ public class HostConfig
         try {
             Context context = null;
             File xml = new File(dir, Constants.ApplicationContextXml);
+            File xmlCopy = null;
             if (deployXML && xml.exists()) {
                 // Will only do this on initial deployment. On subsequent
                 // deployments the copied xml file means we'll use
@@ -954,7 +958,7 @@ public class HostConfig
                         digester.reset();
                     }
                 }
-                File xmlCopy = new File(configBase(), file + ".xml");
+                xmlCopy = new File(configBase(), file + ".xml");
                 InputStream is = null;
                 OutputStream os = null;
                 try {
@@ -975,8 +979,6 @@ public class HostConfig
                     }
                 }
                 context.setConfigFile(xmlCopy.getAbsolutePath());
-                deployedApp.redeployResources.put
-                    (xmlCopy.getAbsolutePath(), new Long(xmlCopy.lastModified()));
             } else {
                 context = (Context) Class.forName(contextClass).newInstance();
             }
@@ -992,6 +994,10 @@ public class HostConfig
             host.addChild(context);
             deployedApp.redeployResources.put(dir.getAbsolutePath(),
                     new Long(dir.lastModified()));
+            if (xmlCopy != null) {
+                deployedApp.redeployResources.put
+                (xmlCopy.getAbsolutePath(), new Long(xmlCopy.lastModified()));
+            }
             addWatchedResources(deployedApp, dir.getAbsolutePath(), context);
         } catch (Throwable t) {
             log.error(sm.getString("hostConfig.deployDir.error", file), t);
