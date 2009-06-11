@@ -361,13 +361,9 @@
   	<!-- 64 bit amd -->
     <copy file="res/procrun/amd64/tomcat${version.major}.exe"
         tofile="${tomcat.dist}/bin/procrun/amd64/tomcat${version.major}.exe" />
-    <copy file="res/procrun/amd64/tomcat${version.major}w.exe"
-        tofile="${tomcat.dist}/bin/procrun/amd64/tomcat${version.major}w.exe" />
   	<!-- 64 bit ia -->
     <copy file="res/procrun/ia64/tomcat${version.major}.exe"
         tofile="${tomcat.dist}/bin/procrun/ia64/tomcat${version.major}.exe" />
-    <copy file="res/procrun/ia64/tomcat${version.major}w.exe"
-        tofile="${tomcat.dist}/bin/procrun/ia64/tomcat${version.major}w.exe" />
   	<!-- tc native -->
     <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
         tofile="${tomcat.dist}/bin/tcnative-1.dll" />
