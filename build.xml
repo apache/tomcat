@@ -741,10 +741,6 @@
 
     <!-- Build Tomcat DBCP bundle -->
     <antcall target="downloadgz">
-      <param name="sourcefile" value="${commons-collections-src.loc}"/>
-      <param name="destfile" value="${tomcat-dbcp.jar}" />
-    </antcall>
-    <antcall target="downloadgz">
       <param name="sourcefile" value="${commons-pool-src.loc}"/>
       <param name="destfile" value="${tomcat-dbcp.jar}" />
     </antcall>

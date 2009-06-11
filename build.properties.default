@@ -77,13 +77,6 @@ commons-dbcp-src.loc=http://people.apache.org/~markt/dev/commons-dbcp-r734404-sr
 commons-pool.home=${base.path}/commons-pool-1.4-src
 commons-pool-src.loc=${base-commons.loc}/pool/source/commons-pool-1.4-src.tar.gz
 
-# ----- Commons Collections, version 2.0 or later -----
-commons-collections.home=${base.path}/commons-collections-3.2-src
-commons-collections.lib=${commons-collections.home}
-commons-collections.jar=${commons-collections.lib}/commons-collections-3.2.jar
-commons-collections.loc=${base-jakarta.loc}/commons/collections/binaries/commons-collections-3.2.tar.gz
-commons-collections-src.loc=${base-commons.loc}/collections/source/commons-collections-3.2-src.tar.gz
-
 # ----- NSIS, version 2.0 or later -----
 nsis.home=${base.path}/nsis-2.44
 nsis.exe=${nsis.home}/makensis.exe
