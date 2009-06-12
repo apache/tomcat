@@ -611,13 +611,6 @@ public final class CGIServlet extends HttpServlet {
     } //doGet
 
 
-
-    /** For future testing use only; does nothing right now */
-    public static void main(String[] args) {
-        System.out.println("$Header$");
-    }
-
-
     /**
      * Encapsulates the CGI environment and rules to derive
      * that environment from the servlet container and request information.
