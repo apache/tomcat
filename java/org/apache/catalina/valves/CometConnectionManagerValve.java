@@ -192,7 +192,7 @@ public class CometConnectionManagerValve
 
     
     public void lifecycleEvent(LifecycleEvent event) {
-        if (event.getType() == Lifecycle.BEFORE_STOP_EVENT) {
+        if (Lifecycle.BEFORE_STOP_EVENT.equals(event.getType())) {
             // The container is getting stopped, close all current connections 
             Iterator<Request> iterator = cometRequests.iterator();
             while (iterator.hasNext()) {
