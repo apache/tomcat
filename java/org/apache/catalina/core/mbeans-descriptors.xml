@@ -45,6 +45,10 @@
                 description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
                 type="org.apache.catalina.instanceManagement.InstanceManager" />
 
+    <attribute name="aliases"
+               description="List of resource aliases"
+               type="java.lang.String" />
+
     <attribute name="antiJARLocking"
                description="Take care to not lock jar files"
                type="boolean" />

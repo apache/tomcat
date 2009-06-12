@@ -371,17 +371,7 @@ public class ApplicationContext
      * @param path The path to the desired resource
      */
     public String getRealPath(String path) {
-
-        if (!context.isFilesystemBased())
-            return null;
-
-        if (path == null) {
-            return null;
-        }
-
-        File file = new File(basePath, path);
-        return (file.getAbsolutePath());
-
+        return context.getRealPath(path);
     }
 
 
