@@ -1073,6 +1073,13 @@ public interface Context extends Container {
      */
     public void setTldNamespaceAware(boolean tldNamespaceAware);
 
+    /**
+     * Return the real path for a given virtual path, if possible; otherwise
+     * return <code>null</code>.
+     *
+     * @param path The path to the desired resource
+     */
+    public String getRealPath(String path);
 
 }
 
