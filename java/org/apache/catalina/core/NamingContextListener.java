@@ -212,7 +212,7 @@ public class NamingContextListener
             return;
         }
 
-        if (event.getType() == Lifecycle.START_EVENT) {
+        if (Lifecycle.START_EVENT.equals(event.getType())) {
 
             if (initialized)
                 return;
@@ -271,7 +271,7 @@ public class NamingContextListener
 
             initialized = true;
 
-        } else if (event.getType() == Lifecycle.STOP_EVENT) {
+        } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
 
             if (!initialized)
                 return;
@@ -1064,7 +1064,7 @@ public class NamingContextListener
         // Create a reference to the resource.
         Reference ref = new ResourceLinkRef
             (resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(), null);
-        Iterator i = resourceLink.listProperties();
+        Iterator<String> i = resourceLink.listProperties();
         while (i.hasNext()) {
             String key = i.next().toString();
             Object val = resourceLink.getProperty(key);
