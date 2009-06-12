@@ -44,7 +44,7 @@ public class ReplicatedContext extends StandardContext implements LifecycleListe
     protected static long DEFAULT_REPL_TIMEOUT = 15000;//15 seconds
     
     public void lifecycleEvent(LifecycleEvent event) {
-        if ( event.getType() == AFTER_START_EVENT ) 
+        if (AFTER_START_EVENT.equals(event.getType())) 
             startComplete = true;
     }
 
