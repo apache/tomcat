@@ -202,12 +202,20 @@ public abstract class BaseDirContext implements DirContext {
             if (kv.length != 2 || kv[0].length() == 0 || kv[1].length() == 0)
                 throw new IllegalArgumentException(
                         sm.getString("resources.invalidAliasMapping", kvp));
-            
+
+            File aliasLoc = new File(kv[1]);
+            if (!aliasLoc.exists()) {
+                throw new IllegalArgumentException(
+                        sm.getString("resources.invalidAliasNotExist", kv[1]));
+            }
             BaseDirContext context;
-            if (kv[1].endsWith(".war") && !(new File(kv[1]).isDirectory())) {
+            if (kv[1].endsWith(".war") && !(aliasLoc.isDirectory())) {
                 context = new WARDirContext();
-            } else {
+            } else if (aliasLoc.isDirectory()) {
                 context = new FileDirContext();
+            } else {
+                throw new IllegalArgumentException(
+                        sm.getString("resources.invalidAliasFile", kv[1]));
             }
             context.setDocBase(kv[1]);
             addAlias(kv[0], context);
