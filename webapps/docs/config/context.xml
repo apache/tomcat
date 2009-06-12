@@ -251,6 +251,16 @@
 
     <attributes>
 
+      <attribute name="alises" required="false">
+        <p>This attribute provides a list of external locations from which to
+        load resources for this context. These external locations will not be
+        emptied if the context is un-deployed. The list of aliases should be of
+        the form <code>"/aliasPath1=docBase1,/aliasPath2=docBase2"</code> where
+        <code>aliasPathN</code> must include a leading '/' and
+        <code>docBaseN</code> must be an absolute path to either a .war file or
+        a directory.</p>
+      </attribute>
+
       <attribute name="allowLinking" required="false">
         <p>If the value of this flag is <code>true</code>, symlinks will be
         allowed inside the web application, pointing to resources outside the

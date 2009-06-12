@@ -670,6 +670,12 @@ public class StandardContext
 
 
     /**
+     * List of resource aliases.
+     */
+    protected String aliases = null;
+
+
+    /**
      * Non proxied resources.
      */
     private DirContext webappResources = null;
@@ -847,6 +853,25 @@ public class StandardContext
     }
 
 
+    /**
+     * Return the list of resource aliases. 
+     */
+    public String getAliases() {
+        return this.aliases;
+    }
+
+
+    /**
+     * Set the current alias configuration. The list of aliases should be of the
+     * form "/aliasPath1=docBase1,/aliasPath2=docBase2" where aliasPathN must
+     * include a leading '/' and docBaseN must be an absolute path to either a
+     * .war file or a directory.
+     */
+    public void setAliases(String aliases) {
+        this.aliases = aliases;
+    }
+    
+    
     /**
      * Return the "follow standard delegation model" flag used to configure
      * our ClassLoader.
@@ -1908,6 +1933,7 @@ public class StandardContext
             ((BaseDirContext) resources).setCacheMaxSize(getCacheMaxSize());
             ((BaseDirContext) resources).setCacheObjectMaxSize(
                     getCacheObjectMaxSize());
+            ((BaseDirContext) resources).setAliases(getAliases());
         }
         if (resources instanceof FileDirContext) {
             filesystemBased = true;
@@ -3814,6 +3840,19 @@ public class StandardContext
         return result;
     }
 
+
+    /**
+     * Return the real path for a given virtual path, if possible; otherwise
+     * return <code>null</code>.
+     *
+     * @param path The path to the desired resource
+     */
+    public String getRealPath(String path) {
+        if (webappResources instanceof BaseDirContext) {
+            return ((BaseDirContext) webappResources).getRealPath(path);
+        }
+        return null;
+    }
 
     // --------------------------------------------------------- Public Methods
 
