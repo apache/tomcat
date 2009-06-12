@@ -251,7 +251,7 @@
 
     <attributes>
 
-      <attribute name="alises" required="false">
+      <attribute name="aliases" required="false">
         <p>This attribute provides a list of external locations from which to
         load resources for this context. These external locations will not be
         emptied if the context is un-deployed. The list of aliases should be of

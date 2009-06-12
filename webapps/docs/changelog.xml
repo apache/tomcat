@@ -34,7 +34,7 @@
   <subsection name="Catalina">
     <changelog>
       <update>
-        <bug>46925</bug>: Replace recusive search for nested roles with
+        <bug>46925</bug>: Replace recursive search for nested roles with
         iterative search. Patch provided by Stefan Zoerner. (rjung)
       </update>
       <update>
@@ -101,6 +101,11 @@
       <add>
         <rev>723889</rev> Provide the ability to configure the Executor job
         queue size and a timeout for adding jobs to the queue. (fhanik) 
+      </add>
+      <add>
+        Add support for aliases to StandardContext. This allows content from other
+        directories and/or WAR files to be mapped to paths within the context.
+        (markt)
       </add>
     </changelog>
   </subsection>
