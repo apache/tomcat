@@ -18,7 +18,12 @@
 
 package org.apache.naming.resources;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.naming.Binding;
 import javax.naming.Context;
@@ -119,9 +124,97 @@ public abstract class BaseDirContext implements DirContext {
     protected int cacheObjectMaxSize = 512; // 512 K
 
 
+    /**
+     * Aliases allow content to be included from other locations.
+     */
+    protected Map<String,BaseDirContext> aliases =
+        new HashMap<String,BaseDirContext>();
+
+
     // ------------------------------------------------------------- Properties
 
 
+    /**
+     * Add an alias.
+     */
+    public void addAlias(String path, BaseDirContext dirContext) {
+        if (!path.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    sm.getString("resources.invalidAliasPath", path));
+        }
+        aliases.put(path, dirContext);
+    }
+
+    
+    /**
+     * Remove an alias.
+     */
+    public void removeAlias(String path) {
+        if (!path.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    sm.getString("resources.invalidAliasPath", path));
+        }
+        aliases.remove(path);
+    }
+    
+    
+    /**
+     * Get the current alias configuration in String form. If no aliases are
+     * configured, an empty string will be returned.
+     */
+    public String getAliases() {
+        StringBuilder result = new StringBuilder();
+        Iterator<Entry<String,BaseDirContext>> iter =
+            aliases.entrySet().iterator();
+        boolean first = true;
+        while (iter.hasNext()) {
+            if (first) {
+                first = false;
+            } else {
+                result.append(',');
+            }
+            Entry<String,BaseDirContext> entry = iter.next();
+            result.append(entry.getKey());
+            result.append('=');
+            result.append(entry.getValue().getDocBase());
+        }
+        return result.toString();
+    }
+
+    
+    /**
+     * Set the current alias configuration from a String. The String should be
+     * of the form "/aliasPath1=docBase1,/aliasPath2=docBase2" where aliasPathN
+     * must include a leading '/' and docBaseN must be an absolute path to
+     * either a .war file or a directory. Any call to this method will replace
+     * the current set of aliases.
+     */
+    public void setAliases(String theAliases) {
+        // Overwrite whatever is currently set
+        aliases.clear();
+        
+        if (theAliases == null || theAliases.length() == 0)
+            return;
+        
+        String[] kvps = theAliases.split(",");
+        for (String kvp : kvps) {
+            String[] kv = kvp.split("=");
+            if (kv.length != 2 || kv[0].length() == 0 || kv[1].length() == 0)
+                throw new IllegalArgumentException(
+                        sm.getString("resources.invalidAliasMapping", kvp));
+            
+            BaseDirContext context;
+            if (kv[1].endsWith(".war") && !(new File(kv[1]).isDirectory())) {
+                context = new WARDirContext();
+            } else {
+                context = new FileDirContext();
+            }
+            context.setDocBase(kv[1]);
+            addAlias(kv[0], context);
+        }
+    }
+
+    
     /**
      * Return the document root for this component.
      */
@@ -235,6 +328,22 @@ public abstract class BaseDirContext implements DirContext {
         // No action taken by the default implementation
     }
 
+    
+    /**
+     * Return the real path for a given virtual path, if possible; otherwise
+     * return <code>null</code>.
+     *
+     * @param path The path to the desired resource
+     */
+    public String getRealPath(String name) {
+        if (!aliases.isEmpty()) {
+            AliasResult result = findAlias(name);
+            if (result.dirContext != null) {
+                return result.dirContext.doGetRealPath(result.aliasName);
+            }
+        }
+        return doGetRealPath(name);
+    }
 
     // -------------------------------------------------------- Context Methods
 
@@ -262,9 +371,15 @@ public abstract class BaseDirContext implements DirContext {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract Object lookup(String name)
-        throws NamingException;
-
+    public final Object lookup(String name) throws NamingException {
+        if (!aliases.isEmpty()) {
+            AliasResult result = findAlias(name);
+            if (result.dirContext != null) {
+                return result.dirContext.lookup(result.aliasName);
+            }
+        }
+        return doLookup(name);
+    }
 
     /**
      * Binds a name to an object. All intermediate contexts and the target 
@@ -779,9 +894,17 @@ public abstract class BaseDirContext implements DirContext {
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
-    public abstract Attributes getAttributes(String name, String[] attrIds)
-        throws NamingException;
-
+    public final Attributes getAttributes(String name, String[] attrIds)
+        throws NamingException {
+        if (!aliases.isEmpty()) {
+            AliasResult result = findAlias(name);
+            if (result.dirContext != null) {
+                return result.dirContext.getAttributes(
+                        result.aliasName, attrIds);
+            }
+        }
+        return doGetAttributes(name, attrIds);
+    }
 
     /**
      * Modifies the attributes associated with a named object. The order of 
@@ -1229,6 +1352,37 @@ public abstract class BaseDirContext implements DirContext {
 
     // ------------------------------------------------------ Protected Methods
 
+    protected abstract Attributes doGetAttributes(String name, String[] attrIds)
+        throws NamingException;
 
+    protected abstract Object doLookup(String name) throws NamingException;
+
+    protected abstract String doGetRealPath(String name);
+
+    // -------------------------------------------------------- Private Methods
+    private AliasResult findAlias(String name) {
+        AliasResult result = new AliasResult();
+        
+        String searchName = name;
+        
+        result.dirContext = aliases.get(searchName);
+        while (result.dirContext == null) {
+            int slash = searchName.lastIndexOf('/');
+            if (slash < 0)
+                break;
+            searchName = searchName.substring(0, slash);
+            result.dirContext = aliases.get(searchName);
+        }
+        
+        if (result.dirContext != null)
+            result.aliasName = name.substring(searchName.length());
+        
+        return result;
+    }
+
+    private static class AliasResult {
+        BaseDirContext dirContext;
+        String aliasName;
+    }
 }
 

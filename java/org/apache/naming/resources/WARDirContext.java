@@ -167,6 +167,16 @@ public class WARDirContext extends BaseDirContext {
 
     }
 
+    /**
+     * Return the real path for a given virtual path, if possible; otherwise
+     * return <code>null</code>.
+     *
+     * @param path The path to the desired resource
+     */
+    protected String doGetRealPath(String path) {
+        return null;
+    }
+
 
     // -------------------------------------------------------- Context Methods
 
@@ -178,7 +188,7 @@ public class WARDirContext extends BaseDirContext {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
-    public Object lookup(String name)
+    protected Object doLookup(String name)
         throws NamingException {
         return lookup(new CompositeName(name));
     }
@@ -423,7 +433,7 @@ public class WARDirContext extends BaseDirContext {
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
-    public Attributes getAttributes(String name, String[] attrIds)
+    protected Attributes doGetAttributes(String name, String[] attrIds)
         throws NamingException {
         return getAttributes(new CompositeName(name), attrIds);
     }

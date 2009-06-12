@@ -193,6 +193,17 @@ public class FileDirContext extends BaseDirContext {
     }
 
 
+    /**
+     * Return the real path for a given virtual path, if possible; otherwise
+     * return <code>null</code>.
+     *
+     * @param path The path to the desired resource
+     */
+    protected String doGetRealPath(String path) {
+        File file = new File(getDocBase(), path);
+        return file.getAbsolutePath();
+    }
+
     // -------------------------------------------------------- Context Methods
 
 
@@ -203,7 +214,7 @@ public class FileDirContext extends BaseDirContext {
      * @return the object bound to name
      * @exception NamingException if a naming exception is encountered
      */
-    public Object lookup(String name)
+    protected Object doLookup(String name)
         throws NamingException {
         Object result = null;
         File file = file(name);
@@ -425,7 +436,7 @@ public class FileDirContext extends BaseDirContext {
      * indicates that none should be retrieved
      * @exception NamingException if a naming exception is encountered
      */
-    public Attributes getAttributes(String name, String[] attrIds)
+    protected Attributes doGetAttributes(String name, String[] attrIds)
         throws NamingException {
 
         // Building attribute list
