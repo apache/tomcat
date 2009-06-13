@@ -640,12 +640,6 @@ public class StandardContext
 
 
     /**
-     * Case sensitivity.
-     */
-    protected boolean caseSensitive = true;
-
-
-    /**
      * Allow linking.
      */
     protected boolean allowLinking = false;
@@ -770,22 +764,6 @@ public class StandardContext
      */
     public void setCachingAllowed(boolean cachingAllowed) {
         this.cachingAllowed = cachingAllowed;
-    }
-
-
-    /**
-     * Set case sensitivity.
-     */
-    public void setCaseSensitive(boolean caseSensitive) {
-        this.caseSensitive = caseSensitive;
-    }
-
-
-    /**
-     * Is case sensitive ?
-     */
-    public boolean isCaseSensitive() {
-        return caseSensitive;
     }
 
 
@@ -1937,7 +1915,6 @@ public class StandardContext
         }
         if (resources instanceof FileDirContext) {
             filesystemBased = true;
-            ((FileDirContext) resources).setCaseSensitive(isCaseSensitive());
             ((FileDirContext) resources).setAllowLinking(isAllowLinking());
         }
         this.webappResources = resources;
@@ -4108,8 +4085,6 @@ public class StandardContext
                 new ProxyDirContext(env, webappResources);
             if (webappResources instanceof FileDirContext) {
                 filesystemBased = true;
-                ((FileDirContext) webappResources).setCaseSensitive
-                    (isCaseSensitive());
                 ((FileDirContext) webappResources).setAllowLinking
                     (isAllowLinking());
             }
