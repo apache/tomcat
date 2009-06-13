@@ -101,12 +101,6 @@ public class FileDirContext extends BaseDirContext {
 
 
     /**
-     * Case sensitivity.
-     */
-    protected boolean caseSensitive = true;
-
-
-    /**
      * Allow linking.
      */
     protected boolean allowLinking = false;
@@ -147,22 +141,6 @@ public class FileDirContext extends BaseDirContext {
         this.absoluteBase = base.getAbsolutePath();
         super.setDocBase(docBase);
 
-    }
-
-
-    /**
-     * Set case sensitivity.
-     */
-    public void setCaseSensitive(boolean caseSensitive) {
-        this.caseSensitive = caseSensitive;
-    }
-
-
-    /**
-     * Is case sensitive ?
-     */
-    public boolean isCaseSensitive() {
-        return caseSensitive;
     }
 
 
@@ -227,7 +205,6 @@ public class FileDirContext extends BaseDirContext {
             FileDirContext tempContext = new FileDirContext(env);
             tempContext.setDocBase(file.getPath());
             tempContext.setAllowLinking(getAllowLinking());
-            tempContext.setCaseSensitive(isCaseSensitive());
             result = tempContext;
         } else {
             result = new FileResource(file);
@@ -824,26 +801,24 @@ public class FileDirContext extends BaseDirContext {
                 return null;
             }
 
-            // Case sensitivity check
-            if (caseSensitive) {
-                String fileAbsPath = file.getAbsolutePath();
-                if (fileAbsPath.endsWith("."))
-                    fileAbsPath = fileAbsPath + "/";
-                String absPath = normalize(fileAbsPath);
-                canPath = normalize(canPath);
-                if ((absoluteBase.length() < absPath.length())
-                    && (absoluteBase.length() < canPath.length())) {
-                    absPath = absPath.substring(absoluteBase.length() + 1);
-                    if (absPath == null)
-                        return null;
-                    if (absPath.equals(""))
-                        absPath = "/";
-                    canPath = canPath.substring(absoluteBase.length() + 1);
-                    if (canPath.equals(""))
-                        canPath = "/";
-                    if (!canPath.equals(absPath))
-                        return null;
-                }
+            // Case sensitivity check - this is now always done
+            String fileAbsPath = file.getAbsolutePath();
+            if (fileAbsPath.endsWith("."))
+                fileAbsPath = fileAbsPath + "/";
+            String absPath = normalize(fileAbsPath);
+            canPath = normalize(canPath);
+            if ((absoluteBase.length() < absPath.length())
+                && (absoluteBase.length() < canPath.length())) {
+                absPath = absPath.substring(absoluteBase.length() + 1);
+                if (absPath == null)
+                    return null;
+                if (absPath.equals(""))
+                    absPath = "/";
+                canPath = canPath.substring(absoluteBase.length() + 1);
+                if (canPath.equals(""))
+                    canPath = "/";
+                if (!canPath.equals(absPath))
+                    return null;
             }
 
         } else {
@@ -887,7 +862,6 @@ public class FileDirContext extends BaseDirContext {
                 FileDirContext tempContext = new FileDirContext(env);
                 tempContext.setDocBase(file.getPath());
                 tempContext.setAllowLinking(getAllowLinking());
-                tempContext.setCaseSensitive(isCaseSensitive());
                 object = tempContext;
             } else {
                 object = new FileResource(currentFile);
