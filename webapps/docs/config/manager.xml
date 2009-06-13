@@ -165,6 +165,12 @@
     has not been thoroughly tested, and should be considered experimental!
     </strong></em></p>
 
+    <p><strong>NOTE:</strong> You must set either the
+    <code>org.apache.catalina.session.StandardSession.ACTIVITY_CHECK</code> or
+    <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+    <a href="systemprops.html">system properties</a> to <code>true</code> for
+    the persistent manager to work correctly.</p>
+    
     <p>The persistent implementation of <strong>Manager</strong> is
     <strong>org.apache.catalina.session.PersistentManager</strong>.  In
     addition to the usual operations of creating and deleting sessions, a
