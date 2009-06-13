@@ -51,9 +51,6 @@ public final class MessageBytes implements Cloneable, Serializable {
     // did we computed the hashcode ? 
     private boolean hasHashCode=false;
 
-    // Is the represented object case sensitive ?
-    private boolean caseSensitive=true;
-
     // Internal objects to represent array + offset, and specific methods
     private ByteChunk byteC=new ByteChunk();
     private CharChunk charC=new CharChunk();
@@ -76,12 +73,6 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     public static MessageBytes newInstance() {
 	return factory.newInstance();
-    }
-
-    /** Configure the case sensitivity
-     */
-    public void setCaseSenitive( boolean b ) {
-	caseSensitive=b;
     }
 
     public MessageBytes getClone() {
@@ -107,7 +98,6 @@ public final class MessageBytes implements Cloneable, Serializable {
 	charC.recycle();
 
 	strValue=null;
-	caseSensitive=true;
 
 	hasStrValue=false;
 	hasHashCode=false;
@@ -298,8 +288,6 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return true if the comparison succeeded, false otherwise
      */
     public boolean equals(String s) {
-	if( ! caseSensitive )
-	    return equalsIgnoreCase( s );
 	switch (type) {
 	case T_STR:
 	    if( strValue==null && s!=null) return false;
@@ -413,16 +401,13 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // -------------------- Hash code  --------------------
     public  int hashCode() {
-	if( hasHashCode ) return hashCode;
-	int code = 0;
+        if( hasHashCode ) return hashCode;
+        int code = 0;
 
-	if( caseSensitive ) 
-	    code=hash(); 
-	else
-	    code=hashIgnoreCase();
-	hashCode=code;
-	hasHashCode=true;
-	return code;
+        code=hash(); 
+        hashCode=code;
+        hasHashCode=true;
+        return code;
     }
 
     // normal hash. 
@@ -439,24 +424,6 @@ public final class MessageBytes implements Cloneable, Serializable {
 	    return charC.hash();
 	case T_BYTES:
 	    return byteC.hash();
-	default:
-	    return 0;
-	}
-    }
-
-    // hash ignoring case
-    private int hashIgnoreCase() {
-	int code=0;
-	switch (type) {
-	case T_STR:
-	    for (int i = 0; i < strValue.length(); i++) {
-		code = code * 37 + Ascii.toLower(strValue.charAt( i ));
-	    }
-	    return code;
-	case T_CHARS:
-	    return charC.hashIgnoreCase();
-	case T_BYTES:
-	    return byteC.hashIgnoreCase();
 	default:
 	    return 0;
 	}
