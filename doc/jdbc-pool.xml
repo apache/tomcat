@@ -43,8 +43,8 @@
       <li>commons-dbcp is single threaded, in order to be thread safe commons-dbcp locks the entire pool, even during query validation.</li>
       <li>commons-dbcp is slow - as the number of logical CPUs grow, the performance suffers, the above point shows that there is not support for high concurrency
           Even with the enormous optimizations of the <code>synchronized</code> statement in Java 6, commons-dbcp still suffers in speed and concurrency.</li>
-      <li>commons-dbcp is complex, over 60 classes. tomcat-jdbc-pool, is 8 classes, hence modifications for future requirement will require
-          much less changes.</li>
+      <li>commons-dbcp is complex, over 60 classes. tomcat-jdbc-pool, core is 8 classes, hence modifications for future requirement will require
+          much less changes. This is all you need to run the connection pool itself, the rest is gravy.</li>
       <li>commons-dbcp uses static interfaces. This means you can't compile it with JDK 1.6, or if you run on JDK 1.6/1.7 you will get 
           NoSuchMethodException for all the methods not implemented, even if the driver supports it.  </li>
       <li>The commons-dbcp has become fairly stagnant. Sparse updates, releases, and new feature support.</li>
