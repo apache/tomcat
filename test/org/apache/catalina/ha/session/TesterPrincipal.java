@@ -20,11 +20,11 @@ package org.apache.catalina.ha.session;
 import java.io.Serializable;
 import java.security.Principal;
 
-public class TestPrincipal implements Principal, Serializable {
+public class TesterPrincipal implements Principal, Serializable {
     
     private String name;
 
-    public TestPrincipal(String theName) {
+    public TesterPrincipal(String theName) {
         name = theName;
     }
     
