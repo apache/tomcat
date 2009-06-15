@@ -23,7 +23,7 @@
   <!-- See "build.properties.sample" in the top level directory for all     -->
   <property name="version.major"         value="1" />
   <property name="version.minor"         value="0" />
-  <property name="version.build"         value="3" />
+  <property name="version.build"         value="4" />
   <property name="version.patch"         value="" />
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.patch}" />
   <!-- property values you must customize for successful building!!!        -->
@@ -127,6 +127,11 @@
           <fileset dir="${tomcat.classes}">
             <include name="org/apache/tomcat/jdbc/**"/>
           </fileset>
+          <fileset dir="${tomcat.pool}">
+            <include name="*.html"/>
+            <include name="LICENSE"/>
+            <include name="NOTICE"/>
+          </fileset>
       </delete>
   </target>
   
@@ -152,24 +157,34 @@
     </java>
   </target>  
   
-  <target name="docs"> 
+  <target name="docs">
     <xslt basedir="${basedir}/modules/jdbc-pool/doc"
           destdir="${tomcat.pool}/"
           extension=".html"
           style="webapps/docs/tomcat-docs.xsl"
           excludes="build.xml project.xml"
           includes="*.xml">
-      <param name="relative-path" expression="."/>
+      <param name="relative-path" expression="http://tomcat.apache.org/tomcat-6.0-doc"/>
+      <param name="apache-logo" expression="/images/asf-logo.gif"/>
     </xslt>  
   </target>
   
   <target name="dist" depends="clean, build, docs">
-  <property name="destdir" value="${tomcat.pool}/release/v${version}"/>
+    <copy todir="${tomcat.pool}">
+      <fileset dir="${basedir}/modules/jdbc-pool">
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+      </fileset>  
+    </copy>
+    <property name="destdir" value="${tomcat.pool}/release/v${version}"/>
     <mkdir dir="${destdir}"/>
     <zip destfile="${destdir}/apache-tomcat-jdbc-${version}.zip">
       <fileset dir="${tomcat.pool}">
         <include name="jdbc-pool.html"/>
         <include name="changelog.html"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="images/**"/>
         <include name="tomcat-jdbc.jar"/>
         <include name="tomcat-jdbc-src.jar"/>
         <include name="tomcat-jdbc.jar.md5"/>
@@ -182,6 +197,10 @@
     <tar destfile="${destdir}/apache-tomcat-jdbc-${version}.tar">
       <fileset dir="${tomcat.pool}">
         <include name="jdbc-pool.html"/>
+        <include name="changelog.html"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="images/**"/>
         <include name="tomcat-jdbc.jar"/>
         <include name="tomcat-jdbc-src.jar"/>
         <include name="tomcat-jdbc.jar.md5"/>
@@ -241,3 +260,4 @@
     <echoproperties/>
   </target>
 </project>
+
