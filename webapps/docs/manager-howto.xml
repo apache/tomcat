@@ -267,13 +267,6 @@ its message strings in resource bundles, so it is possible that the strings
 have been translated for your platform.  The examples below show the English
 version of the messages.</p>
 
-<blockquote><em>
-<p><strong>WARNING:</strong>  the legacy commands <code>/install</code> and 
-<code>/remove</code> are deprecated.
-They are presently equivalent to <code>/deploy</code> and <code>/undeploy</code>,
-but could be removed in a future release.</p>
-</em></blockquote>
-
 <subsection name="Deploy A New Application Remotely">
 
 <source>
