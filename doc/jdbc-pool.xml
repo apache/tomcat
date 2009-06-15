@@ -394,7 +394,7 @@
     Interceptors can have properties as well. These would be configured within the paranthesis of the class names.
     Example:<br/>
     <code>
-      jdbcInterceptors=&quot;ConnectionState;StatementFinalizer(useWeakReferences=true,useEquals=true)&quot;
+      jdbcInterceptors=&quot;ConnectionState;StatementFinalizer(useEquals=true)&quot;
     </code><br/>
     </p>  
   </subsection>
@@ -679,7 +679,22 @@
   
 </section>
 
-
+<section name="Building">
+  <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
+  <subsection name="Building from source">
+    <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code>
+    it also requires the <code>tomcat-coyote.jar</code> library.</p>
+    <source>
+       javac -classpath /development/tomcat/trunk/trunk/output/build/bin/tomcat-juli.jar:/development/tomcat/trunk/trunk/output/build/lib/tomcat-coyote.jar \
+             -d . \
+             org/apache/tomcat/jdbc/pool/*.java org/apache/tomcat/jdbc/pool/interceptor/*.java org/apache/tomcat/jdbc/pool/jmx/*.java
+    </source>
+    <p>
+       A build file can be found in the Tomcat <a href="http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
+       It depends on the entire Tomcat <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">trunk</a> being checked out. 
+    </p>           
+  </subsection>
+</section>
 </body>
 
 </document>
