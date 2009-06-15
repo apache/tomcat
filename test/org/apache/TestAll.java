@@ -1,7 +1,7 @@
 package org.apache;
 
-import org.apache.catalina.ha.session.TestSerializablePrincipal;
-import org.apache.catalina.startup.TomcatStartupAPITest;
+import org.apache.catalina.ha.session.TesterSerializablePrincipal;
+import org.apache.catalina.startup.TestTomcat;
 import org.apache.catalina.tribes.test.TribesTestSuite;
 import org.apache.el.lang.TestELSupport;
 import org.apache.el.parser.TestELParser;
@@ -16,9 +16,9 @@ public class TestAll {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for org.apache");
         // o.a.catalina.ha.session
-        suite.addTestSuite(TestSerializablePrincipal.class); // TODO rename
+        suite.addTestSuite(TesterSerializablePrincipal.class); // TODO rename
         // o.a.catalina.startup
-        suite.addTestSuite(TomcatStartupAPITest.class);
+        suite.addTestSuite(TestTomcat.class);
         // o.a.catalina.tomcat.util.http - TODO fix package
         suite.addTestSuite(TestCookies.class); // TODO rename
         // Tribes

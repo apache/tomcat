@@ -36,12 +36,12 @@ import org.apache.catalina.tribes.Channel;
  * @author not attributable
  * @version 1.0
  */
-public class TestNioSender {
+public class NioSenderTest {
     private Selector selector = null;
     private int counter = 0;
     MemberImpl mbr;
     private static int testOptions = Channel.SEND_OPTIONS_DEFAULT;
-    public TestNioSender()  {
+    public NioSenderTest()  {
         // Default constructor
     }
     
@@ -112,7 +112,7 @@ public class TestNioSender {
     }
 
     public static void main(String[] args) throws Exception {
-        TestNioSender sender = new TestNioSender();
+        NioSenderTest sender = new NioSenderTest();
         sender.init();
         sender.run();
     }
