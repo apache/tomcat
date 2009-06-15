@@ -24,7 +24,7 @@ import org.apache.catalina.tribes.transport.ReceiverBase;
  * @author Filip Hanik
  * @version 1.0
  */
-public class ChannelStartStop extends TestCase {
+public class TestChannelStartStop extends TestCase {
     GroupChannel channel = null;
     int udpPort = 45543;
     protected void setUp() throws Exception {

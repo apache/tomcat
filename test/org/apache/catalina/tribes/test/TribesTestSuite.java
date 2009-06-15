@@ -16,7 +16,7 @@
  */
 package org.apache.catalina.tribes.test;
 
-import org.apache.catalina.tribes.test.channel.ChannelStartStop;
+import org.apache.catalina.tribes.test.channel.TestChannelStartStop;
 import org.apache.catalina.tribes.test.channel.TestChannelOptionFlag;
 import org.apache.catalina.tribes.test.channel.TestDataIntegrity;
 import org.apache.catalina.tribes.test.channel.TestMulticastPackages;
@@ -27,7 +27,7 @@ import org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor;
 import org.apache.catalina.tribes.test.interceptors.TestTwoPhaseCommit;
 import org.apache.catalina.tribes.test.io.TestSenderConnections;
 import org.apache.catalina.tribes.test.io.TestSerialization;
-import org.apache.catalina.tribes.test.membership.MemberSerialization;
+import org.apache.catalina.tribes.test.membership.TestMemberSerialization;
 import org.apache.catalina.tribes.test.membership.TestDomainFilter;
 import org.apache.catalina.tribes.test.membership.TestMemberArrival;
 import org.apache.catalina.tribes.test.membership.TestTcpFailureDetector;
@@ -46,7 +46,7 @@ public class TribesTestSuite
     public static Test suite() {
         TestSuite suite = new TestSuite();
         // o.a.catalina.tribes.test.channel
-        suite.addTestSuite(ChannelStartStop.class);
+        suite.addTestSuite(TestChannelStartStop.class);
         suite.addTestSuite(TestChannelOptionFlag.class);
         suite.addTestSuite(TestDataIntegrity.class);
         suite.addTestSuite(TestMulticastPackages.class);
@@ -60,7 +60,7 @@ public class TribesTestSuite
         suite.addTestSuite(TestSenderConnections.class);
         suite.addTestSuite(TestSerialization.class);
         // o.a.catalina.tribes.test.membership
-        suite.addTestSuite(MemberSerialization.class);
+        suite.addTestSuite(TestMemberSerialization.class);
         suite.addTestSuite(TestDomainFilter.class);
         suite.addTestSuite(TestMemberArrival.class);
         suite.addTestSuite(TestTcpFailureDetector.class);

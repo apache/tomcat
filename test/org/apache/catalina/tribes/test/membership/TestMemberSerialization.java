@@ -29,7 +29,7 @@ import java.util.Arrays;
  * @author not attributable
  * @version 1.0
  */
-public class MemberSerialization extends TestCase {
+public class TestMemberSerialization extends TestCase {
     MemberImpl m1, m2, p1,p2;
     byte[] payload = null;
     int udpPort = 3445;
