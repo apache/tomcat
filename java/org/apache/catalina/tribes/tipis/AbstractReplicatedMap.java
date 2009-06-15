@@ -401,6 +401,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
                                          rentry.getDiff(),
                                          entry.getPrimary(),
                                          entry.getBackupNodes());
+                    rentry.resetDiff();
                 } catch (IOException x) {
                     log.error("Unable to diff object. Will replicate the entire object instead.", x);
                 } finally {
