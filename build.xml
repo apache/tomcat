@@ -51,8 +51,7 @@
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
   <property name="tomcat.dist"       value="${basedir}/output/dist"/>
   <property name="tomcat.embed"      value="${basedir}/output/embed"/>
-  <property name="test.failonerror"  value="true"/>
-  <property name="test.runner"       value="junit.textui.TestRunner"/>
+  <property name="test.classes"      value="${basedir}/output/testclasses"/>
 
   <property name="compile.source" value="1.6"/>
   <property name="compile.target" value="1.6"/>
@@ -91,6 +90,12 @@
   <path id="tomcat.classpath">
     <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
+  </path>
+
+  <path id="tomcat.test.classpath">
+    <pathelement location="${test.classes}"/>
+    <pathelement location="${tomcat.classes}"/>
+    <pathelement location="${junit.jar}"/>
   </path>
 
   <!-- Version info filter set -->
@@ -658,6 +663,42 @@
 
   </target>
 
+  <target name="test-compile" depends="compile" >
+    <mkdir dir="${test.classes}"/>
+    <!-- Compile -->
+    <javac srcdir="test" destdir="${test.classes}"
+           debug="${compile.debug}"
+           deprecation="${compile.deprecation}"
+           source="${compile.source}"
+           optimize="${compile.optimize}">
+      <classpath refid="tomcat.test.classpath" />
+      <include name="org/apache/**" />
+    </javac>
+  </target>
+
+  <target name="test" description="JUnit test cases"
+    depends="compile,test-compile" >
+  	
+  	<junit printsummary="yes" fork="yes">
+  	  <classpath refid="tomcat.test.classpath" />
+
+      <formatter type="plain" usefile="false" />
+
+      <batchtest>
+        <fileset dir="test" >
+          <!-- Include all by default -->
+      	  <include name="**/Test*.java" />
+          <!-- Exclude TestAll ortherwise there will be duplicated -->
+          <exclude name="**/TestAll.java" />
+          <!-- Exclude helper classes -->
+          <exclude name="**/Tester*.java" />
+          <!-- Exclude the tests known to fail -->
+          <exclude name="org/apache/catalina/tribes/**" />
+        </fileset>
+  	  </batchtest>
+  	</junit>
+  </target>
+
   <target name="clean-depend"
          description="Clean depend src components">
      <delete dir="${tomcat-dbcp.home}"/>
@@ -776,6 +817,14 @@
       <param name="destfile" value="${json-lib.home}/${json-lib.jar}"/>
       <param name="destdir" value="${json-lib.home}"/>
     </antcall>
+
+    <target name="download" >
+      <antcall target="downloadzip">
+        <param name="sourcefile" value="${junit.loc}"/>
+        <param name="destfile" value="${junit.jar}"/>
+        <param name="destdir" value="${base.path}"/>
+      </antcall>
+    </target>
 
   </target>
 
