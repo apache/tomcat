@@ -34,7 +34,7 @@ import junit.framework.TestCase;
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TomcatStartupAPITest extends TestCase {
+public class TestTomcat extends TestCase {
     Tomcat tomcat;
     // if you run in eclipse - or tomcat src dir 
     String base = "./"; 

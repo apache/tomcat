@@ -31,7 +31,7 @@ import org.apache.catalina.realm.GenericPrincipal;
 
 import junit.framework.TestCase;
 
-public class TestSerializablePrincipal extends TestCase {
+public class TesterSerializablePrincipal extends TestCase {
 
     /**
      * Simple serialization / de-serialization test for bug 43840.
@@ -51,7 +51,7 @@ public class TestSerializablePrincipal extends TestCase {
         List<String> roles = new ArrayList<String>();
         roles.add("RoleA");
         roles.add("RoleB");
-        TestPrincipal tpOriginal = new TestPrincipal("inner");
+        TesterPrincipal tpOriginal = new TesterPrincipal("inner");
         GenericPrincipal gpOriginal =
             new GenericPrincipal(null, "usr", "pwd", roles, tpOriginal);
         
