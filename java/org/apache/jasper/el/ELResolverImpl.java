@@ -35,8 +35,7 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.apache.jasper.Constants;
 
 public final class ELResolverImpl extends ELResolver {
-	/** @deprecated - Use getDefaultResolver(). Needs to be made private */
-	public final static ELResolver DefaultResolver = new CompositeELResolver();
+	private final static ELResolver DefaultResolver = new CompositeELResolver();
 
 	static {
 		((CompositeELResolver) DefaultResolver).add(new MapELResolver());

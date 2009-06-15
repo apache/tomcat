@@ -90,17 +90,6 @@ public class TagHandlerPool {
     }
 
     /**
-     * Constructs a tag handler pool with the given capacity.
-     *
-     * @param capacity Tag handler pool capacity
-     * @deprecated Use static getTagHandlerPool
-     */
-    public TagHandlerPool(int capacity) {
-	this.handlers = new Tag[capacity];
-	this.current = -1;
-    }
-
-    /**
      * Gets the next available tag handler from this tag handler pool,
      * instantiating one if this tag handler pool is empty.
      *
