@@ -71,17 +71,8 @@ public class JavacErrorDetail {
      * @param jspBeginLineNum The start line number of the JSP element
      * responsible for the compilation error
      * @param errMsg The compilation error message
+     * @param ctxt The compilation context
      */
-    public JavacErrorDetail(String javaFileName,
-                            int javaLineNum,
-                            String jspFileName,
-                            int jspBeginLineNum,
-                            StringBuffer errMsg) {
-
-        this(javaFileName, javaLineNum, jspFileName, jspBeginLineNum, errMsg,
-                null);
-    }
-
     public JavacErrorDetail(String javaFileName,
             int javaLineNum,
             String jspFileName,
