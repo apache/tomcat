@@ -160,7 +160,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                     err.jspError("jsp.error.file.not.found", location[0]);
                 }
 
-                parseTLD(ctxt, location[0], in, null);
+                parseTLD(location[0], in, null);
                 // Add TLD to dependency list
                 PageInfo pageInfo = ctxt.createCompiler().getPageInfo();
                 if (pageInfo != null) {
@@ -177,7 +177,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                     jarFile = conn.getJarFile();
                     ZipEntry jarEntry = jarFile.getEntry(location[1]);
                     in = jarFile.getInputStream(jarEntry);
-                    parseTLD(ctxt, location[0], in, jarFileUrl);
+                    parseTLD(location[0], in, jarFileUrl);
                 } catch (Exception ex) {
                     err.jspError("jsp.error.tld.unable_to_read", location[0],
                             location[1], ex.toString());
@@ -210,8 +210,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      * in The TLD's input stream @param jarFileUrl The JAR file containing the
      * TLD, or null if the tag library is not packaged in a JAR
      */
-    private void parseTLD(JspCompilationContext ctxt, String uri,
-            InputStream in, URL jarFileUrl) throws JasperException {
+    private void parseTLD(String uri, InputStream in, URL jarFileUrl)
+            throws JasperException {
         Vector<TagInfo> tagVector = new Vector<TagInfo>();
         Vector<TagFileInfo> tagFileVector = new Vector<TagFileInfo>();
         Hashtable<String, FunctionInfo> functionTable = new Hashtable<String, FunctionInfo>();
@@ -249,7 +249,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             else if ("tag".equals(tname))
                 tagVector.addElement(createTagInfo(element, jspversion));
             else if ("tag-file".equals(tname)) {
-                TagFileInfo tagFileInfo = createTagFileInfo(element, uri,
+                TagFileInfo tagFileInfo = createTagFileInfo(element,
                         jarFileUrl);
                 tagFileVector.addElement(tagFileInfo);
             } else if ("function".equals(tname)) { // JSP2.0
@@ -446,8 +446,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
      * 
      * @return TagInfo correspoding to tag file directives
      */
-    private TagFileInfo createTagFileInfo(TreeNode elem, String uri,
-            URL jarFileUrl) throws JasperException {
+    private TagFileInfo createTagFileInfo(TreeNode elem, URL jarFileUrl)
+            throws JasperException {
 
         String name = null;
         String path = null;

@@ -501,33 +501,6 @@ class TagFileProcessor {
      *            the tag name as specified in the TLD
      * @param tagfile
      *            the path for the tagfile
-     * @param tagLibInfo
-     *            the TagLibraryInfo object associated with this TagInfo
-     * @return a TagInfo object assembled from the directives in the tag file.
-     * @deprecated Use {@link TagFileProcessor#parseTagFileDirectives(
-     *                  ParserController, String, String, URL, TagLibraryInfo)}
-     *             See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
-     */
-    public static TagInfo parseTagFileDirectives(ParserController pc,
-            String name, String path, TagLibraryInfo tagLibInfo)
-            throws JasperException {
-        return parseTagFileDirectives(pc, name, path,
-                pc.getJspCompilationContext().getTagFileJarUrl(path),
-                tagLibInfo);
-    }
-    
-    /**
-     * Parses the tag file, and collects information on the directives included
-     * in it. The method is used to obtain the info on the tag file, when the
-     * handler that it represents is referenced. The tag file is not compiled
-     * here.
-     * 
-     * @param pc
-     *            the current ParserController used in this compilation
-     * @param name
-     *            the tag name as specified in the TLD
-     * @param tagfile
-     *            the path for the tagfile
      * @param tagFileJarUrl
      *            the url for the Jar containign the tag file 
      * @param tagLibInfo

@@ -138,22 +138,6 @@ class ParserController implements TagConstants {
     }
 
     /**
-     * Extracts tag file directive information from the tag file with the
-     * given name.
-     *
-     * This is invoked by the compiler 
-     *
-     * @param inFileName The name of the tag file to be parsed.
-     * @deprecated Use {@link #parseTagFileDirectives(String, URL)}
-     *             See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
-     */
-    public Node.Nodes parseTagFileDirectives(String inFileName)
-    throws FileNotFoundException, JasperException, IOException {
-        return parseTagFileDirectives(
-                inFileName, ctxt.getTagFileJarUrl(inFileName));
-    }
-
-    /**
      * Extracts tag file directive information from the given tag file.
      *
      * This is invoked by the compiler 
