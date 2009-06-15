@@ -219,10 +219,6 @@ final class Mark {
         return ctxt.getResource(getFile());
     }
 
-    public String toShortString() {
-        return "("+line+","+col+")";
-    }
-
     public boolean equals(Object other) {
 	if (other instanceof Mark) {
 	    Mark m = (Mark) other;
@@ -231,23 +227,6 @@ final class Mark {
 		&& this.col == m.col;
 	} 
 	return false;
-    }
-
-    /**
-     * @return true if this Mark is greather than the <code>other</code>
-     * Mark, false otherwise.
-     */
-    public boolean isGreater(Mark other) {
-
-        boolean greater = false;
-
-        if (this.line > other.line) {
-            greater = true;
-        } else if (this.line == other.line && this.col > other.col) {
-            greater = true;
-        }
-
-        return greater;
     }
 
     /**
@@ -261,7 +240,6 @@ final class Mark {
         int fileId;
         String fileName;
         String baseDir;
-        String encoding;
         char[] stream = null;
 
         IncludeState(int inCursor, int inLine, int inCol, int inFileId, 

@@ -117,26 +117,6 @@ abstract class Node implements TagConstants {
     }
 
     /**
-     * Constructor.
-     * 
-     * @param qName
-     *            The action's qualified name
-     * @param localName
-     *            The action's local name
-     * @param start
-     *            The location of the jsp page
-     * @param parent
-     *            The enclosing node
-     */
-    public Node(String qName, String localName, Mark start, Node parent) {
-        this.qName = qName;
-        this.localName = localName;
-        this.startMark = start;
-        this.isDummy = (start == null);
-        addToParent(parent);
-    }
-
-    /**
      * Constructor for Nodes parsed from standard syntax.
      * 
      * @param qName
@@ -1545,19 +1525,6 @@ abstract class Node implements TagConstants {
 
         public void setJspAttributes(JspAttribute[] jspAttrs) {
             this.jspAttrs = jspAttrs;
-        }
-
-        public TagAttributeInfo getTagAttributeInfo(String name) {
-            TagInfo info = this.getTagInfo();
-            if (info == null)
-                return null;
-            TagAttributeInfo[] tai = info.getAttributes();
-            for (int i = 0; i < tai.length; i++) {
-                if (tai[i].getName().equals(name)) {
-                    return tai[i];
-                }
-            }
-            return null;
         }
 
         public JspAttribute[] getJspAttributes() {
