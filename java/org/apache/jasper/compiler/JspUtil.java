@@ -817,27 +817,6 @@ public class JspUtil {
      * 
      * @return Fully-qualified class name of the tag handler corresponding to
      *         the given tag file path
-     * 
-     * @deprecated Use {@link #getTagHandlerClassName(String, String,
-     *             ErrorDispatcher)
-     *             See https://issues.apache.org/bugzilla/show_bug.cgi?id=46471
-     */
-    public static String getTagHandlerClassName(String path, ErrorDispatcher err)
-            throws JasperException {
-        return getTagHandlerClassName(path, null, err);
-    }
-    
-    /**
-     * Gets the fully-qualified class name of the tag handler corresponding to
-     * the given tag file path.
-     * 
-     * @param path
-     *            Tag file path
-     * @param err
-     *            Error dispatcher
-     * 
-     * @return Fully-qualified class name of the tag handler corresponding to
-     *         the given tag file path
      */
     public static String getTagHandlerClassName(String path, String urn,
             ErrorDispatcher err) throws JasperException {

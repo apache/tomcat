@@ -356,8 +356,7 @@ class JspDocumentParser
                     nonTaglibAttrs,
                     nonTaglibXmlnsAttrs,
                     taglibAttrs,
-                    startMark,
-                    current);
+                    startMark);
             return;
         }
 
@@ -370,8 +369,7 @@ class JspDocumentParser
                     nonTaglibAttrs,
                     nonTaglibXmlnsAttrs,
                     taglibAttrs,
-                    startMark,
-                    current);
+                    startMark);
             return;
         }
 
@@ -398,8 +396,7 @@ class JspDocumentParser
                     nonTaglibAttrs,
                     nonTaglibXmlnsAttrs,
                     taglibAttrs,
-                    startMark,
-                    current);
+                    startMark);
         } else {
             node =
                 parseCustomAction(
@@ -815,8 +812,7 @@ class JspDocumentParser
         Attributes nonTaglibAttrs,
         Attributes nonTaglibXmlnsAttrs,
         Attributes taglibAttrs,
-        Mark start,
-        Node parent)
+        Mark start)
         throws SAXException {
 
         Node node = null;
