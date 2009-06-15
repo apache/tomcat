@@ -17,7 +17,6 @@
 
 package org.apache.jasper.compiler;
 
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,8 +48,6 @@ public class JspUtil {
     // Delimiters for request-time expressions (JSP and XML syntax)
     private static final String OPEN_EXPR = "<%=";
     private static final String CLOSE_EXPR = "%>";
-    private static final String OPEN_EXPR_XML = "%=";
-    private static final String CLOSE_EXPR_XML = "%";
 
     // private static ExpressionEvaluatorImpl expressionEvaluator
     // = new ExpressionEvaluatorImpl();
@@ -66,101 +63,6 @@ public class JspUtil {
             "volatile", "while" };
 
     public static final int CHUNKSIZE = 1024;
-
-    public static char[] removeQuotes(char[] chars) {
-        CharArrayWriter caw = new CharArrayWriter();
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '%' && chars[i + 1] == '\\' &&
-                    chars[i + 2] == '>') {
-                caw.write('%');
-                caw.write('>');
-                i = i + 2;
-            } else {
-                caw.write(chars[i]);
-            }
-        }
-        return caw.toCharArray();
-    }
-
-    public static char[] escapeQuotes(char[] chars) {
-        // Prescan to convert %\> to %>
-        String s = new String(chars);
-        while (true) {
-            int n = s.indexOf("%\\>");
-            if (n < 0)
-                break;
-            StringBuffer sb = new StringBuffer(s.substring(0, n));
-            sb.append("%>");
-            sb.append(s.substring(n + 3));
-            s = sb.toString();
-        }
-        chars = s.toCharArray();
-        return (chars);
-
-        // Escape all backslashes not inside a Java string literal
-        /*
-        CharArrayWriter caw = new CharArrayWriter();
-        boolean inJavaString = false;
-        for (int i = 0; i < chars.length; i++) {
-            if (chars[i] == '"') inJavaString = !inJavaString;
-            // escape out the escape character
-            if (!inJavaString && (chars[i] == '\\')) caw.write('\\');
-            caw.write(chars[i]);
-        }
-        return caw.toCharArray();
-         */
-    }
-
-    /**
-     * Checks if the token is a runtime expression. In standard JSP syntax, a
-     * runtime expression starts with '<%' and ends with '%>'. When the JSP
-     * document is in XML syntax, a runtime expression starts with '%=' and ends
-     * with '%'.
-     * 
-     * @param token The token to be checked
-     * @return whether the token is a runtime expression or not.
-     */
-    public static boolean isExpression(String token, boolean isXml) {
-        String openExpr;
-        String closeExpr;
-        if (isXml) {
-            openExpr = OPEN_EXPR_XML;
-            closeExpr = CLOSE_EXPR_XML;
-        } else {
-            openExpr = OPEN_EXPR;
-            closeExpr = CLOSE_EXPR;
-        }
-        if (token.startsWith(openExpr) && token.endsWith(closeExpr)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @return the "expression" part of a runtime expression, taking the
-     *         delimiters out.
-     */
-    public static String getExpr(String expression, boolean isXml) {
-        String returnString;
-        String openExpr;
-        String closeExpr;
-        if (isXml) {
-            openExpr = OPEN_EXPR_XML;
-            closeExpr = CLOSE_EXPR_XML;
-        } else {
-            openExpr = OPEN_EXPR;
-            closeExpr = CLOSE_EXPR;
-        }
-        int length = expression.length();
-        if (expression.startsWith(openExpr) && expression.endsWith(closeExpr)) {
-            returnString = expression.substring(openExpr.length(), length
-                    - closeExpr.length());
-        } else {
-            returnString = "";
-        }
-        return returnString;
-    }
 
     /**
      * Takes a potential expression and converts it into XML form
@@ -297,24 +199,6 @@ public class JspUtil {
                         attribute);
         }
         // XXX *could* move EL-syntax validation here... (sb)
-    }
-
-    public static String escapeQueryString(String unescString) {
-        if (unescString == null)
-            return null;
-
-        String escString = "";
-        String shellSpChars = "\\\"";
-
-        for (int index = 0; index < unescString.length(); index++) {
-            char nextChar = unescString.charAt(index);
-
-            if (shellSpChars.indexOf(nextChar) != -1)
-                escString += "\\";
-
-            escString += nextChar;
-        }
-        return escString;
     }
 
     /**
@@ -981,28 +865,6 @@ public class JspUtil {
             }
         }
         return false;
-    }
-
-    /**
-     * Converts the given Xml name to a legal Java identifier. This is slightly
-     * more efficient than makeJavaIdentifier in that we only need to worry
-     * about '.', '-', and ':' in the string. We also assume that the resultant
-     * string is further concatenated with some prefix string so that we don't
-     * have to worry about it being a Java key word.
-     * 
-     * @param name
-     *            Identifier to convert
-     * 
-     * @return Legal Java identifier corresponding to the given identifier
-     */
-    public static final String makeXmlJavaIdentifier(String name) {
-        if (name.indexOf('-') >= 0)
-            name = replace(name, '-', "$1");
-        if (name.indexOf('.') >= 0)
-            name = replace(name, '.', "$2");
-        if (name.indexOf(':') >= 0)
-            name = replace(name, ':', "$3");
-        return name;
     }
 
     static InputStreamReader getReader(String fname, String encoding,
