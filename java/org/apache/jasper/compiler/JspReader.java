@@ -24,8 +24,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Vector;
 import java.util.jar.JarFile;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -225,21 +223,6 @@ class JspReader {
 
     void reset(Mark mark) {
         current = new Mark(mark);
-    }
-
-    boolean matchesIgnoreCase(String string) throws JasperException {
-        Mark mark = mark();
-        int ch = 0;
-        int i = 0;
-        do {
-            ch = nextChar();
-            if (Character.toLowerCase((char) ch) != string.charAt(i++)) {
-                reset(mark);
-                return false;
-            }
-        } while (i < string.length());
-        reset(mark);
-        return true;
     }
 
     /**
@@ -470,21 +453,6 @@ class JspReader {
 
     void setSingleFile(boolean val) {
         singleFile = val;
-    }
-
-
-    /**
-     * Gets the URL for the given path name.
-     *
-     * @param path Path name
-     *
-     * @return URL for the given path name.
-     *
-     * @exception MalformedURLException if the path name is not given in 
-     * the correct form
-     */
-    URL getResource(String path) throws MalformedURLException {
-        return context.getResource(path);
     }
 
 

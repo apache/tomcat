@@ -71,26 +71,6 @@ public class ServletWriter {
     }
 
     /**
-     * Print a standard comment for echo outputed chunk.
-     * @param start The starting position of the JSP chunk being processed. 
-     * @param stop  The ending position of the JSP chunk being processed. 
-     */
-    public void printComment(Mark start, Mark stop, char[] chars) {
-        if (start != null && stop != null) {
-            println("// from="+start);
-            println("//   to="+stop);
-        }
-        
-        if (chars != null)
-            for(int i = 0; i < chars.length;) {
-                printin();
-                print("// ");
-                while (chars[i] != '\n' && i < chars.length)
-                    writer.print(chars[i++]);
-            }
-    }
-
-    /**
      * Prints the given string followed by '\n'
      */
     public void println(String s) {
