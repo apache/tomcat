@@ -58,6 +58,7 @@ public class TestTomcat extends TestCase {
         tempDir.mkdir();
         
         tomcat = new Tomcat();
+        tomcat.getHost().setAppBase(tempDir.getAbsolutePath());
         tomcat.setBaseDir(tempDir.getAbsolutePath());
           
         // If each test is running on same port - they
