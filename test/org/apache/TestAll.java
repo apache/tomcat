@@ -16,11 +16,11 @@ public class TestAll {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for org.apache");
         // o.a.catalina.ha.session
-        suite.addTestSuite(TestSerializablePrincipal.class); // TODO rename
+        suite.addTestSuite(TestSerializablePrincipal.class);
         // o.a.catalina.startup
         suite.addTestSuite(TestTomcat.class);
-        // o.a.catalina.tomcat.util.http - TODO fix package
-        suite.addTestSuite(TestCookies.class); // TODO rename
+        // o.a.tomcat.util.http
+        suite.addTestSuite(TestCookies.class);
         // Tribes
         // suite.addTest(TribesTestSuite.suite());
         // o.a.el
