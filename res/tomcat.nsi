@@ -169,19 +169,18 @@ Section "Core" SecTomcatCore
   DetailPrint "Using Jvm: $2"
 
   SetOutPath $INSTDIR\bin
+  File bin\tomcat@VERSION_MAJOR@w.exe
+
   ; Get the current platform x86 / AMD64 / IA64
   ExpandEnvStrings $0 "%PROCESSOR_ARCHITEW6432%"
   StrCmp $0 "%PROCESSOR_ARCHITEW6432%" 0 +2
   ExpandEnvStrings $0 "%PROCESSOR_ARCHITECTURE%"
-  StrCmp $0 "x86" 0 +3
+  StrCmp $0 "x86" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
-  File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
-  StrCmp $0 "AMD64" 0 +3
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\procrun\amd64\tomcat@VERSION_MAJOR@.exe
-  File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
-  StrCmp $0 "IA64" 0 +3
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\procrun\ia64\tomcat@VERSION_MAJOR@.exe
-  File /oname=tomcat@VERSION_MAJOR@w.exe bin\tomcat@VERSION_MAJOR@w.exe
+  StrCmp $0 "AMD64" 0 +2
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\x86_64\tomcat@VERSION_MAJOR@.exe
+  StrCmp $0 "IA64" 0 +2
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\ia64\tomcat@VERSION_MAJOR@.exe
 
   InstallRetry:
   ClearErrors
@@ -225,7 +224,15 @@ Section "Native" SecTomcatNative
   SectionIn 3
 
   SetOutPath $INSTDIR\bin
+  ExpandEnvStrings $0 "%PROCESSOR_ARCHITEW6432%"
+  StrCmp $0 "%PROCESSOR_ARCHITEW6432%" 0 +2
+  ExpandEnvStrings $0 "%PROCESSOR_ARCHITECTURE%"
+  StrCmp $0 "x86" 0 +2
   File bin\tcnative-1.dll
+  StrCmp $0 "AMD64" 0 +2
+  File /oname=tcnative-1.dll bin\x86_64\tcnative-1.dll
+  StrCmp $0 "IA64" 0 +2
+  File /oname=tcnative-1.dll bin\ia64\tcnative-1.dll
 
   ClearErrors
 
