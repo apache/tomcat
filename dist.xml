@@ -458,7 +458,6 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               forceOverwrite="yes" fileext=".md5" />
     <echo     file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" 
                       message="${md5sum.binary-prefix}${final.name}.exe${line.separator}" append="true" />
-    <delete file="${tomcat.dist}/bin/tcnative-1.dll"/>
   </target>
 
 
@@ -511,6 +510,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
         <exclude name="bin/service.bat"/>
+        <exclude name="bin/x86_64/"/>
+        <exclude name="bin/ia64/"/>
+        <exclude name="bin/*.exe"/>
+        <exclude name="bin/*.dll"/>
       </zipfileset>
     </zip>
 
@@ -587,6 +590,10 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="bin/version.sh" />
         <exclude name="conf/**" />
         <exclude name="src/**" />
+        <exclude name="bin/x86_64/"/>
+        <exclude name="bin/ia64/"/>
+        <exclude name="bin/*.exe"/>
+        <exclude name="bin/*.dll"/>
       </tarfileset>
     </tar>
 
