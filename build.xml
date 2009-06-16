@@ -775,6 +775,12 @@
       <param name="destdir" value="${tomcat-native.home}"/>
     </antcall>
 
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${tomcat-native.dll}/win64/ia64/tcnative-1.dll"/>
+      <param name="destfile" value="${tomcat-native.home}/tcnative-1.dll.i64"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
     <antcall target="downloadgz">
       <param name="sourcefile" value="${commons-daemon.loc}"/>
       <param name="destfile" value="${commons-daemon.jar}"/>
