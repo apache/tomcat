@@ -49,8 +49,8 @@ public class TestRequest extends TestCase {
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
      * POST parameters are not returned from a call to 
-     * any of the {@link HttpServletRequest} getParameterXXX() methods.
-     * @throws Exception 
+     * any of the {@link HttpServletRequest} getParameterXXX() methods if the
+     * request is chunked.
      */
     public void testBug37794() throws Exception {
         Bug37794Client client = new Bug37794Client();
