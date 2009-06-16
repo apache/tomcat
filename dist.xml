@@ -342,6 +342,64 @@
 
   </target>
 
+  <!-- Create Windows Platfrom native packages -->
+  <target name="package-natives"
+   description="Create Windows native packages" unless="skip.installer">
+    <!-- windows-ia32.zip -->
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-win32-x86-native.zip">
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/tcnative-1.dll"/>
+        <include name="bin/tomcat*.exe"/>
+        <include name="bin/service.bat"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+      </zipfileset>
+    </zip>
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-win32-x86-native.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-win32-x86-native.zip.zip${line.separator}" append="true" />
+    <!-- windows-x86_64.zip -->
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-win64-x86_64-native.zip">
+      <zipfileset dir="${tomcat.dist}/bin/x86_64" prefix="${final.name}/bin">
+        <include name="tcnative-1.dll"/>
+        <include name="tomcat*.exe"/>
+      </zipfileset>
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/tomcat${version.major}w.exe"/>
+        <include name="bin/service.bat"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+      </zipfileset>
+    </zip>
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-win64-x86_64-native.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-win64-x86_64-native.zip${line.separator}" append="true" />
+    <!-- windows-ia64.zip -->
+    <zip zipfile="${tomcat.release}/v${version}/bin/${final.name}-win64-ia64-native.zip">
+      <zipfileset dir="${tomcat.dist}/bin/ia64" prefix="${final.name}/bin">
+        <include name="tcnative-1.dll"/>
+        <include name="tomcat*.exe"/>
+      </zipfileset>
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}">
+        <include name="bin/tomcat${version.major}w.exe"/>
+        <include name="bin/service.bat"/>
+        <include name="LICENSE"/>
+        <include name="NOTICE"/>
+        <include name="README.txt"/>
+        <include name="RELEASE-NOTES"/>
+      </zipfileset>
+    </zip>
+    <checksum file="${tomcat.release}/v${version}/bin/${final.name}-win64-ia64-native.zip"
+              forceOverwrite="yes" fileext=".md5" />
+    <echo     file="${tomcat.release}/v${version}/bin/${final.name}.zip.md5"
+                      message="${md5sum.binary-prefix}${final.name}-win64-ia64-native.zip${line.separator}" append="true" />
+  </target>
 
   <!-- ================= DIST: Create Windows Installer =================== -->
   <target name="installer"
@@ -360,13 +418,26 @@
         tofile="${tomcat.dist}/bin/tomcat${version.major}w.exe" />
   	<!-- 64 bit amd -->
     <copy file="res/procrun/amd64/tomcat${version.major}.exe"
-        tofile="${tomcat.dist}/bin/procrun/amd64/tomcat${version.major}.exe" />
+        tofile="${tomcat.dist}/bin/x86_64/tomcat${version.major}.exe" />
   	<!-- 64 bit ia -->
     <copy file="res/procrun/ia64/tomcat${version.major}.exe"
-        tofile="${tomcat.dist}/bin/procrun/ia64/tomcat${version.major}.exe" />
+        tofile="${tomcat.dist}/bin/ia64/tomcat${version.major}.exe" />
   	<!-- tc native -->
     <copy file="${tomcat-native.home}/tcnative-1.dll.x86"
         tofile="${tomcat.dist}/bin/tcnative-1.dll" />
+  	<!-- tc native 64 bit for amd/emt -->
+    <copy file="${tomcat-native.home}/tcnative-1.dll.x64"
+        tofile="${tomcat.dist}/bin/x86_64/tcnative-1.dll" />
+  	<!-- tc native 64 bit for ia -->
+    <copy file="${tomcat-native.home}/tcnative-1.dll.i64"
+        tofile="${tomcat.dist}/bin/ia64/tcnative-1.dll" />
+	<!-- platform README files -->
+	<echo append="false" file="${tomcat.dist}/bin/ia64/README">
+Apache Tomcat ${version} native binaries for Win64 IA64 platform.
+	</echo>
+	<echo append="false" file="${tomcat.dist}/bin/x86_64/README">
+Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
+	</echo>
 
     <copy file="res/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
@@ -392,7 +463,7 @@
 
 
   <!-- ==================== RELEASE: Create Release ======================= -->
-  <target name="release" depends="clean,dist-static,dist-deployer,installer,package-zip,package-tgz,package-deployer-zip,package-deployer-tgz,dist-source,dist-javadoc,package-docs-tgz,package-src-zip,package-src-tgz"
+  <target name="release" depends="clean,dist-static,dist-deployer,installer,package-zip,package-natives,package-tgz,package-deployer-zip,package-deployer-tgz,dist-source,dist-javadoc,package-docs-tgz,package-src-zip,package-src-tgz"
    description="Create a Tomcat 7 packaged distribution">
 
     <copy file="KEYS"
