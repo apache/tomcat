@@ -56,6 +56,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringCache;
 import org.apache.tomcat.util.http.Cookies;
@@ -2497,7 +2498,8 @@ public class Request
             int maxPostSize = connector.getMaxPostSize();
             if ((maxPostSize > 0) && (len > maxPostSize)) {
                 if (context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug("Post too large");
+                    context.getLogger().debug(
+                            sm.getString("coyoteRequest.postTooLarge"));
                 }
                 return;
             }
@@ -2522,6 +2524,20 @@ public class Request
                 return;
             }
             parameters.processParameters(formData, 0, len);
+        } else if ("chunked".equals(
+                coyoteRequest.getHeader("transfer-encoding"))) {
+            byte[] formData = null;
+            try {
+                formData = readChunkedPostBody();
+            } catch (IOException e) {
+                // Client disconnect
+                if (context.getLogger().isDebugEnabled()) {
+                    context.getLogger().debug(
+                            sm.getString("coyoteRequest.parseParameters"), e);
+                }
+                return;
+            }
+            parameters.processParameters(formData, 0, formData.length);
         }
 
     }
@@ -2546,6 +2562,38 @@ public class Request
     }
 
 
+    /**
+     * Read chunked post body.
+     */
+    protected byte[] readChunkedPostBody() throws IOException {
+        ByteChunk body = new ByteChunk();
+        
+        byte[] buffer = new byte[CACHED_POST_LEN];
+        
+        int len = 0;
+        while (len > -1) {
+            len = getStream().read(buffer, 0, CACHED_POST_LEN);
+            if (connector.getMaxPostSize() > 0 &&
+                    (body.getLength() + len) > connector.getMaxPostSize()) {
+                // Too much data
+                throw new IllegalArgumentException(
+                        sm.getString("coyoteRequest.chunkedPostTooLarge"));
+            }
+            if (len > 0) {
+                body.append(buffer, 0, len);
+            }
+        }
+        if (body.getLength() < body.getBuffer().length) {
+            int length = body.getLength();
+            byte[] result = new byte[length];
+            System.arraycopy(body.getBuffer(), 0, result, 0, length);
+            return result;
+        } else {
+            return body.getBuffer();
+        }
+    }
+    
+    
     /**
      * Parse request locales.
      */
