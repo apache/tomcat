@@ -510,6 +510,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
         <include name="BENCHMARKS.txt"/>
+        <exclude name="bin/service.bat"/>
       </zipfileset>
     </zip>
 
@@ -575,6 +576,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="bin/digest.sh" />
         <exclude name="bin/jasper.sh" />
         <exclude name="bin/jspc.sh" />
+        <exclude name="bin/service.bat"/>
         <exclude name="bin/setclasspath.sh" />
         <exclude name="bin/startup.sh" />
         <exclude name="bin/shutdown.sh" />
