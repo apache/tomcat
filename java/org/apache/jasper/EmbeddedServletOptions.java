@@ -378,15 +378,16 @@ public final class EmbeddedServletOptions implements Options {
             ServletContext context) {
         
         // JVM version numbers
-        try {
-            if (Float.parseFloat(System.getProperty("java.specification.version")) > 1.4) {
-                compilerSourceVM = compilerTargetVM = "1.5";
-            } else {
-                compilerSourceVM = compilerTargetVM = "1.4";
-            }
-        } catch (NumberFormatException e) {
-            // Ignore
-        }
+        // - not needed, because this version of Tomcat requires at least JDK 1.5
+        // try {
+        //    if (Float.parseFloat(System.getProperty("java.specification.version")) > 1.4) {
+        //        compilerSourceVM = compilerTargetVM = "1.5";
+        //    } else {
+        //        compilerSourceVM = compilerTargetVM = "1.4";
+        //    }
+        // } catch (NumberFormatException e) {
+        //    // Ignore
+        // }
         
         Enumeration<String> enumeration=config.getInitParameterNames();
         while( enumeration.hasMoreElements() ) {
