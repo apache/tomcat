@@ -94,7 +94,7 @@
 
       <attribute name="name" required="true">
         <p>Logical name of this Engine, used in log and error messages. <em>When
-        using muliple <a href="service.html">Service</a> elements in the same
+        using multiple <a href="service.html">Service</a> elements in the same
         <a href="server.html">Server</a>, each Engine MUST be assigned a unique
         name.</em></p>
       </attribute>
@@ -196,7 +196,7 @@
     nesting a <strong>Listener</strong> element inside this element.  The
     class name you specify must implement the
     <code>org.apache.catalina.LifecycleListener</code> interface, and
-    it will be notified about the occurrence of the coresponding
+    it will be notified about the occurrence of the corresponding
     lifecycle events.  Configuration of such a listener looks like this:</p>
 
 <source>

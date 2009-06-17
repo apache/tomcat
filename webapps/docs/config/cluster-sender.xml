@@ -51,7 +51,7 @@
   When is this useful? The simplest example we can think of is when part of your code is sending a 10MB message,
   like a war file being deployed, and you need to push through a small 10KB message, say a session being replicated,
   you don't have to wait for the 10MB message to finish, as a separate thread will push in the small message 
-  transmission at the same time. Currently there is no interrupt, pause or priority mechanism avaiable, but check back soon.
+  transmission at the same time. Currently there is no interrupt, pause or priority mechanism available, but check back soon.
   </p>
 </section>
 
@@ -61,7 +61,7 @@
    you would set all the socket options for the outgoing messages. Please see its attributes below.
    There are two implementations, in a similar manner to the <a href="cluster-receiver.html">receiver</a>, one is non-blocking
    based and the other is built using blocking IO. <br/>
-   <code>org.apache.catalina.tribes.transport.bio.PooledMultiSender</code> is the blocking implemenation and 
+   <code>org.apache.catalina.tribes.transport.bio.PooledMultiSender</code> is the blocking implementation and 
    <code>org.apache.catalina.tribes.transport.nio.PooledParallelSender</code>.
    Parallel delivery is not available for the blocking implementation due to the fact that it is blocking a thread on sending data.
  </p>

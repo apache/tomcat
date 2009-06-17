@@ -211,7 +211,7 @@
 
 
     <p>On each HTTP PUT request processed by this servlet, the following
-    processing shall be perfomred:</p>
+    processing shall be performed:</p>
     <ul>
     <li>If modifications to the static resources are not allowed (set by a
         configuration parameter), return HTTP status 403 (forbidden).</li>

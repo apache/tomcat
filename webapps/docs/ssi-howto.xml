@@ -143,7 +143,7 @@ Used to set the format of dates and other items processed by SSI
 </li>
 <li>
 <strong>echo</strong> -   <code>&lt;!--#echo var=&quot;VARIABLE_NAME&quot; --&gt;</code>
-will be replaced bt the value of the variable.
+will be replaced by the value of the variable.
 </li>
 <li>
 <strong>exec</strong> -  Used to run commands on the host system.
@@ -257,7 +257,7 @@ Virtual path to the file</td>
 <tr>
 <td>HTTP_ACCEPT_LANGUAGE</td>
 <td>
-  A list of the laguages that the client can accept.</td>
+  A list of the languages that the client can accept.</td>
 </tr>
 <tr>
 <td>HTTP_CONNECTION</td>

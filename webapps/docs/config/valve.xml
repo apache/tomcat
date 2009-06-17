@@ -116,9 +116,10 @@
       </attribute>
 
       <attribute name="rotatable" required="false">
-        <p>Deafult true. Flag to determine if log rotation should occur.
-           If set to false, then this file is never rotated and
+        <p>Flag to determine if log rotation should occur.
+           If set to <tt>false</tt>, then this file is never rotated and
            <tt>fileDateFormat</tt> is ignored. Use with caution!
+           Default value: <tt>true</tt>
         </p>
       </attribute>
 
@@ -142,9 +143,9 @@
       </attribute>
 
       <attribute name="buffered" required="false">
-        <p>Deafult true. Flag to determine if logging will be buffered.
-           If set to false, then access logging will be written after each 
-           request.
+        <p>Flag to determine if logging will be buffered.
+           If set to <tt>false</tt>, then access logging will be written after each 
+           request. Default value: <tt>true</tt>
         </p>
       </attribute>
 

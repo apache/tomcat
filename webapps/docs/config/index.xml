@@ -65,7 +65,7 @@ outline:</p>
 <ul>
 <li><strong>Introduction</strong> - Overall description of this particular
     component.  There will be a corresponding Java <em>interface</em> (in
-    the <code>org.apache.catalina</code> pacakge) that is implemented by one
+    the <code>org.apache.catalina</code> package) that is implemented by one
     or more standard implementations.</li>
 <li><strong>Attributes</strong> - The set of attributes that are legal for
     this element.  Generally, this will be subdivided into <em>Common</em>

@@ -55,7 +55,7 @@ A UML sequence diagram of the request process is available
 <subsection name="comments">
 <p>
 The Servlet Specification provides many opportunities for
-listening in (using Listeners) or modiying (using Filters)
+listening in (using Listeners) or modifying (using Filters)
 the request handling process even before the request arrives
 at the servlet that will handle it.
 </p>

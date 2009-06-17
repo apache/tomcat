@@ -172,14 +172,14 @@
     <p>but does <em>not</em> require modification of the deployment
     descriptor to customize this value.</p>
 
-    <p>The valid attriutes for a <code>&lt;Resource&gt;</code> element
+    <p>The valid attributes for a <code>&lt;Resource&gt;</code> element
     are as follows:</p>
 
     <attributes>
 
       <attribute name="auth" required="false">
         <p>Specify whether the web Application code signs on to the
-        corresponding resource manager programatically, or whether the
+        corresponding resource manager programmatically, or whether the
         Container will sign on to the resource manager on behalf of the
         application.  The value of this attribute must be
         <code>Application</code> or <code>Container</code>.  This

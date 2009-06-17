@@ -140,7 +140,7 @@
       <attribute name="processExpiresFrequency" required="false">
         <p>Frequency of the session expiration, and related manager operations.
         Manager operations will be done once for the specified amount of
-        backgrondProcess calls (ie, the lower the amount, the more often the
+        backgrondProcess calls (i.e., the lower the amount, the more often the
         checks will occur). The minimum value is 1, and the default value is 6.
         </p>
       </attribute>
@@ -296,7 +296,7 @@
   <strong>&lt;Store&gt;</strong> element inside, which defines the
   characteristics of the persistent data storage.  Two implementations
   of the <code>&lt;Store&gt;</code> element are currently available,
-  with different characteristics, as described belowl</p>
+  with different characteristics, as described below.</p>
 
   <h5>File Based Store</h5>
 
@@ -455,7 +455,7 @@ create table tomcat_sessions (
 
   <subsection name="Restart Persistence">
 
-    <p>Whenver Catalina is shut down normally and restarted, or when an
+    <p>Whenever Catalina is shut down normally and restarted, or when an
     application reload is triggered, the standard Manager implementation
     will attempt to serialize all currently active sessions to a disk
     file located via the <code>pathname</code> attribute.  All such saved

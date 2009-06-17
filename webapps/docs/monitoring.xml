@@ -55,14 +55,14 @@
     </p>
     <p>
     <ol>
-    <li>If you require authorisation, add and change this :
+    <li>If you require authorization, add and change this :
     <source>
     -Dcom.sun.management.jmxremote.authenticate=true \
     -Dcom.sun.management.jmxremote.password.file=../conf/jmxremote.password \
     -Dcom.sun.management.jmxremote.access.file=../conf/jmxremote.access \
     </source>
     </li>
-    <li>edit the access authorisation file <em>$CATALINA_BASE/conf/jmxremote.access</em> :
+    <li>edit the access authorization file <em>$CATALINA_BASE/conf/jmxremote.access</em> :
     <source>
 monitorRole readonly
 controlRole readwrite
@@ -252,7 +252,7 @@ List of Attributes<br/>
 
   <tr>
     <td>echo</td>
-    <td>Echo the command usage (for analyse access or debugging)
+    <td>Echo the command usage (for access analysis or debugging)
     </td>
     <td><code>false</code></td>
   </tr>
@@ -283,7 +283,7 @@ Example to open a new JMX connection<br/>
 </source>
 </p>  
 <p>
-Example to open a JMX connection from URL, with authorisation and 
+Example to open a JMX connection from URL, with authorization and 
 store at other reference <br/>
 <source>
     &lt;jmx:open
@@ -296,7 +296,7 @@ store at other reference <br/>
 </p>  
 
 <p>
-Example to open a JMX connection from URL, with authorisation and 
+Example to open a JMX connection from URL, with authorization and 
 store at other reference, but only when property <em>jmx.if</em> exists and 
 <em>jmx.unless</em> not exists<br/>
 <source>

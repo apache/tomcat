@@ -48,10 +48,10 @@
   <section name="Comet support">
 
   <p>
-    Comet support allows a servlet to process IO aynchronously, receiving
+    Comet support allows a servlet to process IO asynchronously, receiving
     events when data is available for reading on the connection (rather than
     always using a blocking read), and writing data back on connections
-    asychnonously (most likely responding to some event raised from some
+    asynchronously (most likely responding to some event raised from some
     other source).
   </p>
 
@@ -74,7 +74,7 @@
      fields using the request and response objects. Between the end of the processing 
      of this event, and the beginning of the processing of the end or error events,
      it is possible to use the response object to write data on the open connection.
-     Note that the response object and depedent OutputStream and Writer are still 
+     Note that the response object and dependent OutputStream and Writer are still 
      not synchronized, so when they are accessed by multiple threads, 
      synchronization is mandatory. After processing the initial event, the request 
      is considered to be committed.</li>

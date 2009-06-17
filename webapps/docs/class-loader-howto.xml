@@ -149,7 +149,7 @@ All other class loaders in Tomcat 6 follow the usual delegation pattern.</p>
 loading looks in the following repositories, in this order:</p>
 <ul>
 <li>Bootstrap classes of your JVM</li>
-<li>System class loader classses (described above)</li>
+<li>System class loader classes (described above)</li>
 <li><em>/WEB-INF/classes</em> of your web application</li>
 <li><em>/WEB-INF/lib/*.jar</em> of your web application</li>
 <li><em>$CATALINA_HOME/lib</em></li>

@@ -69,7 +69,7 @@
 
   <p><b>For Tomcat 6, unlike Tomcat 4.x, it is NOT recommended to place
   &lt;Context&gt; elements directly in the server.xml file.</b> This
-  is because it makes modifing the <strong>Context</strong> configuration
+  is because it makes modifying the <strong>Context</strong> configuration
   more invasive since the main <code>conf/server.xml</code> file cannot be
   reloaded without restarting Tomcat.</p>
 
@@ -184,7 +184,7 @@
         from a default context will be used.</p>
         <p>If a symbolic link is used for docBase then changes to the
         symbolic link will only be effective after a Tomcat restart or
-        by undeploying and redeploying the conext. A context reload is not
+        by undeploying and redeploying the context. A context reload is not
         sufficient.</p>
       </attribute>
 
@@ -474,7 +474,7 @@
   <subsection name="Automatic Context Configuration">
 
     <p>If you use the standard <strong>Context</strong> implementation,
-    the following configuration steps occur automtically when Catalina
+    the following configuration steps occur automatically when Catalina
     is started, or whenever this web application is reloaded.  No special
     configuration is required to enable this feature.</p>
     

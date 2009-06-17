@@ -121,7 +121,7 @@ Apache Tomcat 6, and using many of the Apache Tomcat features.</p>
     Using APR to provide superior performance, scalability and better
     integration with native server technologies.</li>
 <li><a href="virtual-hosting-howto.html"><strong>Virtual Hosting</strong></a> -
-    Configuring vitual hosting in Apache Tomcat.</li>
+    Configuring virtual hosting in Apache Tomcat.</li>
 <li><a href="aio.html"><strong>Advanced IO</strong></a> -
     Extensions available over regular, blocking IO.</li>
 <li><a href="extras.html"><strong>Additional Components</strong></a> -
