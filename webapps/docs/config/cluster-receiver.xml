@@ -102,7 +102,7 @@
     <attribute name="maxThreads" required="false">
       The maximum number of threads in the receiver thread pool. The default value is <code>6</code>
       Adjust this value relative to the number of nodes in the cluster, the number of messages being exchanged and 
-      the hardware you are running on. A higher value doesn't mean more effiecency, tune this value according to your 
+      the hardware you are running on. A higher value doesn't mean more efficiency, tune this value according to your 
       own test results.
     </attribute>
     <attribute name="minThreads" required="false">

@@ -52,7 +52,7 @@ Please refer to the JK 1.2.x documentation.
 <section name="Using Apache HTTP Server 2.x with mod_proxy">
 
 Please refer to the mod_proxy documentation for Apache HTTP Server 2.2. This supports either
-HTTP or AJP load balancing. This new version of mod_proxy is also useable with
+HTTP or AJP load balancing. This new version of mod_proxy is also usable with
 Apache HTTP Server 2.0, but mod_proxy will have to be compiled separately using the code
 from Apache HTTP Server 2.2.
 

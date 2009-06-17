@@ -33,7 +33,7 @@
 <section name="Introduction">
   <p>
   A cluster valve is no different from any other <a href="valve.html">Tomcat <code>Valve</code></a>.
-  The cluster valves are interceptors in the invokation chain for HTTP requests, and the clustering implementation
+  The cluster valves are interceptors in the invocation chain for HTTP requests, and the clustering implementation
   uses these valves to make intelligent decision around data and when data should be replicated.
   </p>
   <p>

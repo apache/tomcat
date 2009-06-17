@@ -124,7 +124,7 @@ The DefaultServlet allows the following initParamters:
     <td valign='top'>
         If you wish to customize your directory listing, you
         can use an XSL transformation. This value is an absolute
-        file name which be used for all direcotory listings.
+        file name which be used for all directory listings.
         This can be disabled by per webapp by also declaring the
         default servlet in your local webapp's web.xml. The format
         of the xml is shown below.
@@ -194,7 +194,7 @@ The DefaultServlet allows the following initParamters:
 <a name="dir"></a>
 <p>You can override DefaultServlet with you own implementation and use that
 in your web.xml declaration. If you
-can undertand what was just said, we will assume yo can read the code
+can understand what was just said, we will assume you can read the code
 to DefaultServlet servlet and make the appropriate adjustments. (If not,
 then that method isn't for you)
 </p>

@@ -126,9 +126,9 @@ including commercial ones.
 </p>
 <p>
 In recent releases of Tomcat, mostly starting with Tomcat 5,
-we have begun effots to make more aspects of Tomcat managable via
+we have begun efforts to make more aspects of Tomcat manageable via
 JMX.  In addition, the Manager and Admin webapps have been greatly
-enhanced and improved.  Managability is a primary area of concern
+enhanced and improved.  Manageability is a primary area of concern
 for us as the product matures and the specification becomes more
 stable.
 </p>
