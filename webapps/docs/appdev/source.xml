@@ -240,7 +240,7 @@ archive file so you can distribute your application.  A well-constructed
 <code>build.xml</code> file will contain internal documentation describing
 the targets that are designed for use by the developer, versus those targets
 used internally.  To ask Ant to display the project documentation, change to
-the directory containing the <code>build.xml</code> flie and type:</p>
+the directory containing the <code>build.xml</code> file and type:</p>
 <source>
 ant -projecthelp
 </source>

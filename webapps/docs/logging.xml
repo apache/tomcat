@@ -49,7 +49,7 @@
     java.util.logging or 
     <a href="http://logging.apache.org/log4j">Log4J</a>. 
     Commons Logging provides Tomcat the ability to log
-    hierarchially across various log levels without needing to rely on a particular
+    hierarchically across various log levels without needing to rely on a particular
     logging implementation.
   </p>
   <p>
@@ -159,7 +159,7 @@
   <section name="java.util.logging">
 
   <p>
-    The default implemenatation of java.util.logging provided in the JDK is too limited to be 
+    The default implementation of java.util.logging provided in the JDK is too limited to be 
     useful. A limitation of JDK Logging appears to be the inability to have per-web application logging, 
     as the configuration is per-VM. As a result, Tomcat will, in the default configuration,
     replace the default LogManager implementation with a container friendly implementation

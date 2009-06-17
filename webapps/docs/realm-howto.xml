@@ -103,7 +103,7 @@ associated with their username.</p>
 applications to <em>declare</em> their security requirements (in the
 <code>web.xml</code> deployment descriptor), there is no portable API
 defining the interface between a servlet container and the associated user
-and role information.  In many cases, however, it is desireable to "connect"
+and role information.  In many cases, however, it is desirable to "connect"
 a servlet container to some existing authentication database or mechanism
 that already exists in the production environment.  Therefore, Tomcat 6
 defines a Java interface (<code>org.apache.catalina.Realm</code>) that
@@ -184,7 +184,7 @@ Realm element has a direct impact on the "scope" of that Realm
 
 <p>For each of the standard <code>Realm</code> implementations, the
 user's password (by default) is stored in clear text.  In many
-environments, this is undesireable because casual observers of the
+environments, this is undesirable because casual observers of the
 authentication data can collect enough information to log on
 successfully, and impersonate other users.  To avoid this problem, the
 standard implementations support the concept of <em>digesting</em>
@@ -276,7 +276,7 @@ security constraint that requires role "manager" to access ANY request URI
 within that application.</p>
 
 <p>For security reasons, no username in the default Realm (i.e. using
-<code>conf/tomcat-users.xml</code> is assigned the "manager" role.  Therfore,
+<code>conf/tomcat-users.xml</code> is assigned the "manager" role.  Therefore,
 no one will be able to utilize the features of this application until the
 Tomcat administrator specifically assigns this role to one or more users.</p>
 
