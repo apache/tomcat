@@ -107,10 +107,10 @@ then the default Eclipse JDT Java compiler will be used instead of using Ant.
 No default value.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files
-compatible with? (Default JDK 1.4)</li>
+compatible with? (Default value: <code>1.5</code>)</li>
 
 <li><strong>compilerTargetVM</strong> - What JDK version are the generated files
-compatible with? (Default JDK 1.4)</li>
+compatible with? (Default value: <code>1.5</code>)</li>
 
 <li><strong>development</strong> - Is Jasper used in development mode? If true,
 the frequency at which JSPs are checked for modification may be specified via
