@@ -96,7 +96,7 @@
         submits in the app will be submitted to a request URI like
         "saveCustomer.do", which will therefore be mapped to this servlet.
 
-        The initialization parameter namess for this servlet are the
+        The initialization parameter names for this servlet are the
         "servlet path" that will be received by this servlet (after the
         filename extension is removed).  The corresponding value is the
         name of the action class that will be used to process this request.

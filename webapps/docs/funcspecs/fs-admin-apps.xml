@@ -125,7 +125,7 @@
     <li>It shall be possible to save the configured state of the running
         Tomcat container such that this state can be reproduced when the
         container is shut down and restarted.</li>
-    <li>Adminstrative commands to start up and shut down the overall
+    <li>Administrative commands to start up and shut down the overall
         Tomcat container are <strong>out of scope</strong> for the
         purposes of these applications.  It is assumed that other
         (usually platform-specific) mechanisms will be used for container
@@ -272,7 +272,7 @@
       described under "External Technologies", above.</li>
   <li>Prompts and error messages must be internationalizable to multiple
       languages.</li>
-  <li>Rendered HTML must be compatible with Netscape Navigator (verson 4.7
+  <li>Rendered HTML must be compatible with Netscape Navigator (version 4.7
       or later) and Internet Explorer (version 5.0 or later).</li>
   </ul>
 

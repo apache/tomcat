@@ -41,7 +41,7 @@
 
   <p>A unified caching engine is provided for all accesses to the webapp
   resources made by the servlet container and web applications which use the
-  container provided mechanisms to access such resources, such as class laoder
+  container provided mechanisms to access such resources, such as classloader
   access, access through the <code>ServletContext</code> interface, or native
   access through the <code>DirectoryContext</code> interface.</p>
 

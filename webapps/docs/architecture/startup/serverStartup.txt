@@ -62,7 +62,7 @@ What it does:
 		    XML-object mapping tool, that will create the objects defined in server.xml
 		    Startup of the actual container has not started yet.
 		b5) Assigns System.out and System.err to the SystemLogHandler class
-		b6) Calls intialize on all components, this makes each object register itself with the 
+		b6) Calls initialize on all components, this makes each object register itself with the 
 		    JMX agent.
 		    During the process call the Connectors also initialize the adapters.
 		    The adapters are the components that do the request pre-processing.
@@ -124,7 +124,7 @@ What it does:
 	        invokes the invoke() method on the Host pipeline (StandardHost.getPipeLine())
 	    d9) the StandardHost has two valves by default, the StandardHostValve and the ErrorReportValve
 	    d10) The standard host valve associates the correct class loader with the current thread
-	         It also retrives the Manager and the session associated with the request (if there is one)
+	         It also retrieves the Manager and the session associated with the request (if there is one)
 	         If there is a session access() is called to keep the session alive
 	    d11) After that the StandardHostValve invokes the pipeline on the context associated
 	         with the request.
@@ -132,20 +132,7 @@ What it does:
 	         valve. Then the StandardContextValve gets invoke.
 	         The StandardContextValve invokes any context listeners associated with the context.
 	         Next it invokes the pipeline on the Wrapper component (StandardWrapperValve)
-	    d13) During the invokation of the StandardWrapperValve, the JSP wrapper (Jasper) gets invoked
+	    d13) During the invocation of the StandardWrapperValve, the JSP wrapper (Jasper) gets invoked
 	         This results in the actual compilation of the JSP.
 	         And then invokes the actual servlet.
-	e) Invokation of the servlet class
-	         
-	         
-	         
-	    
-	        
-	        
-	        
-	    
-			
-			
-		
-		
-			
+	e) Invocation of the servlet class

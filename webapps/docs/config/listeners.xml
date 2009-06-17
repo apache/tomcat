@@ -97,7 +97,7 @@
 
     <h3>Jasper Listener (org.apache.catalina.core.JasperListener)</h3>
 
-    <p>The <strong>Jasper Listener</strong> initialises the Jasper 2 JSP engine
+    <p>The <strong>Jasper Listener</strong> initializes the Jasper 2 JSP engine
     before any web applications that may use it are loaded. For more
     information on the Jasper 2 JSP engine see the
     <a href="../jasper-howto.html">Jasper How To</a>.</p>
@@ -111,7 +111,7 @@
     <h3>Server Lifecycle Listener
     (org.apache.catalina.mbeans.ServerLifecycleListener)</h3>
 
-    <p>The <strong>Server Lifecycle Listener</strong> initialises the
+    <p>The <strong>Server Lifecycle Listener</strong> initializes the
     MBeanServer for the MBeans that may be used to manager Tomcat via JMX.
     Without this listener, none of the Tomcat MBeans will be available.</p>
 
@@ -124,7 +124,7 @@
     <h3>Global Resources Lifecycle Listener
     (org.apache.catalina.mbeans.GlobalResourcesLifecycleListener)</h3>
 
-    <p>The <strong>Global Resources Lifecycle Listener</strong> initialises the
+    <p>The <strong>Global Resources Lifecycle Listener</strong> initializes the
     Global JNDI resources defined in server.xml as part of the <a
     href="globalresources.html">Global Resources</a> element. Without this
     listener, none of the Global Resources will be available.</p>
@@ -157,7 +157,7 @@
 &lt;Listener className="org.apache.catalina.mbeans.JmxRemoteLifecycleListener"
           rmiRegistryPortPlatform="10001" rmiServerPortPlatform="10002" /&gt;
 </source>
-    with the following system properties set (eg in setenv.sh):
+    with the following system properties set (e.g. in setenv.sh):
 <source>
 -Dcom.sun.management.jmxremote.password.file=${catalina.base}/conf/jmxremote.password
 -Dcom.sun.management.jmxremote.access.file=${catalina.base}/conf/jmxremote.access

@@ -120,8 +120,8 @@
         The standard protocol value for an AJP connector is <code>AJP/1.3</code>
         which uses an auto-switching mechanism to select either a Java based
         connector or an APR/native based connector. If the
-        <code>PATH(Windows)</code> or <code>LD_LIBRARY_PATH</code> (on most unix
-        system) environment variables contain the Tomcat native library, the
+        <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on most unix
+        systems) environment variables contain the Tomcat native library, the
         native/APR connector will be used. If the native library cannot be
         found, the Java based connector will be used.<br/>
         To use an explicit protocol rather than rely on the auto-switching
@@ -188,7 +188,7 @@
       <p>This specifies if the encoding specified in contentType should be used
       for URI query parameters, instead of using the URIEncoding. This
       setting is present for compatibility with Tomcat 4.1.x, where the
-      encoding specified in the contentType, or explicitely set using
+      encoding specified in the contentType, or explicitly set using
       Request.setCharacterEncoding method was also used for the parameters from
       the URL. The default value is <code>false</code>.
       </p>
@@ -202,7 +202,7 @@
 
     <attribute name="xpoweredBy" required="false">
       <p>Set this attribute to <code>true</code> to cause Tomcat to advertise
-      support for the Srevlet specification using the header recommended in the
+      support for the Servlet specification using the header recommended in the
       specification.  The default value is <code>false</code>.</p>
     </attribute>
     
@@ -303,7 +303,7 @@
     </attribute>
 
     <attribute name="request.shutdownEnabled" required="false">
-      <p>If true and a secret has been configured, a correctly fomatted AJP
+      <p>If true and a secret has been configured, a correctly formatted AJP
       request (that includes the secret) will shutdown the Tomcat instance
       associated with this connector. This is set to <code>false</code> by
       default.</p>
@@ -323,7 +323,7 @@
     </attribute>
 
     <attribute name="tomcatAuthentication" required="false">
-      <p>If set to <code>true</code>, the authetication will be done in Tomcat. 
+      <p>If set to <code>true</code>, the authentication will be done in Tomcat. 
       Otherwise, the authenticated principal will be propagated from the native
       webserver and used for authorization in Tomcat.  
       The default value is <code>true</code>.</p>

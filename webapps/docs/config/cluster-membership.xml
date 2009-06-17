@@ -127,7 +127,7 @@
     </attribute>
     <attribute name="recoveryEnabled" required="false">
       <p>
-      In case of a network failure, Java multicast socket don't transparently fail over, instead the socket will continously
+      In case of a network failure, Java multicast socket don't transparently fail over, instead the socket will continuously
       throw IOException upon each receive request. When recoveryEnabled is set to true, this will close the multicast socket
       and open a new socket with the same properties as defined above.<br/>
       The default is <code>true</code>. <br/>

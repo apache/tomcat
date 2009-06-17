@@ -248,7 +248,7 @@ the host and port appropriately for your installation.</p>
         absolute path of a web application Context configuration ".xml"
         file which contains the Context configuration element.</li>
     <li><strong>directory</strong> - The directory name for the web
-        applciation context in the Host's application base directory.</li>
+        application context in the Host's application base directory.</li>
     <li><strong>webapp.war</strong> - The name of a web application war file
         located in the Host's application base directory.</li>
     </ul></li>
@@ -256,7 +256,7 @@ the host and port appropriately for your installation.</p>
 
 <p>Each command will return a response in <code>text/plain</code> format
 (i.e. plain ASCII with no HTML markup), making it easy for both humans and
-programs to read).  The first line of the response wil begin with either
+programs to read).  The first line of the response will begin with either
 <code>OK</code> or <code>FAIL</code>, indicating whether the requested
 command was successful or not.  In the case of failure, the rest of the first
 line will contain a description of the problem that was encountered.  Some
@@ -639,7 +639,7 @@ the resource type you are interested in (for example, you would specify
 JDBC data sources).  If you do not specify the <code>type</code> request
 parameter, resources of all types will be returned.</p>
 
-<p>Depending on whether the <code>type</code> request parameter is specfied
+<p>Depending on whether the <code>type</code> request parameter is specified
 or not, the first line of a normal response will be:</p>
 <pre>
   OK - Listed global resources of all types
