@@ -149,8 +149,8 @@
     <subsection name="HTTP">
     
     <p>
-      When APR is enabled, the HTTP connector will use sendfile for hadling large static files (all such
-      files will be sent ansychronously using high performance kernel level calls), and will use 
+      When APR is enabled, the HTTP connector will use sendfile for handling large static files (all such
+      files will be sent asynchronously using high performance kernel level calls), and will use 
       a socket poller for keepalive, increasing scalability of the server.
     </p>
 
@@ -264,7 +264,7 @@
     </attribute>
     <attribute name="SSLPassword" required="false">
     <p>
-      Pass phrase for the encrypted private key. If "SSLPassword" is not provided, the callback fonction
+      Pass phrase for the encrypted private key. If "SSLPassword" is not provided, the callback function
       should prompt for the pass phrase.
     </p>
     </attribute>

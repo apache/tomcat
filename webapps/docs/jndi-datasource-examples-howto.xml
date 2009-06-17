@@ -50,7 +50,7 @@ JNDI-Resources-HOWTO.  However, feedback from <code>tomcat-user</code> has
 shown that specifics for individual configurations can be rather tricky.</p>
 
 <p>Here then are some example configurations that have been posted to
-tomcat-user for popular databases and some general tips for db useage.</p>
+tomcat-user for popular databases and some general tips for db usage.</p>
 
 <p>You should be aware that since these notes are derived from configuration
 and/or feedback posted to <code>tomcat-user</code> YMMV :-). Please let us
@@ -110,7 +110,7 @@ to a dB is more efficient than opening a new connection.
 
 <p>
 There is one problem with connection pooling.  A web application has
-to explicetely close ResultSet's, Statement's, and Connection's.
+to explicitly close ResultSet's, Statement's, and Connection's.
 Failure of a web application to close these resources can result in
 them never being available again for reuse, a db connection pool "leak".
 This can eventually result in your web application db connections failing
@@ -129,7 +129,7 @@ removed and recycled add the following attribute to the
 <source>
             removeAbandoned="true"
 </source>
-When available db connections run low DBCP will recover and recyle
+When available db connections run low DBCP will recover and recycle
 any abandoned dB connections it finds. The default is <code>false</code>.
 </p>
 

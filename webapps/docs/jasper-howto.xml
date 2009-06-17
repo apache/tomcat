@@ -47,7 +47,7 @@ the <a href="http://java.sun.com/products/jsp/">JavaServer Pages 2.1</a>
 specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
-the orignal Jasper.  In addition to general code improvements the following
+the original Jasper.  In addition to general code improvements the following
 changes were made:
 <ul>
 <li><strong>JSP Custom Tag Pooling</strong> - The java objects instantiated
@@ -57,7 +57,7 @@ the performance of JSP pages which use custom tags.</li>
 a JSP page which had already been compiled Jasper 2 can recompile that
 page in the background.  The previously compiled JSP page will still be
 available to serve requests.  Once the new page has been compiled
-successfully it will replace the old page.  This helps improve availablity
+successfully it will replace the old page.  This helps improve availability
 of your JSP pages on a production server.</li>
 <li><strong>Recompile JSP when included page changes</strong> - Jasper 2
 can now detect when a page included at compile time from a JSP has changed
@@ -142,7 +142,7 @@ valid bean class? <code>true</code> or <code>false</code>, default
 <code>true</code>.</li>
 
 <li><strong>fork</strong> - Have Ant fork JSP page compiles so they are
-performed in a seperate JVM from Tomcat? <code>true</code> or
+performed in a separate JVM from Tomcat? <code>true</code> or
 <code>false</code>, default <code>true</code>.</li>
 
 <li><strong>genStringAsCharArray</strong> - Should text strings be generated as char

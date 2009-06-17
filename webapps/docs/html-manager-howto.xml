@@ -85,7 +85,7 @@ application documentation.
 applications and provides links for managing them. For each web application
 the following is displayed:
 <ul>
-  <li><strong>Path</strong> - The web applicaton context path.</li>
+  <li><strong>Path</strong> - The web application context path.</li>
   <li><strong>Display Name</strong> - The display name for the web application
       if it has one configured in its "web.xml" file.</li>
   <li><strong>Running</strong> - Whether the web application is running and

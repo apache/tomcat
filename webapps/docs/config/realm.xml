@@ -567,12 +567,12 @@
       </attribute>
 
       <attribute name="userClassNames" required="true">
-        <p>A comma-seperated list of the names of the classes that you have made 
+        <p>A comma-separated list of the names of the classes that you have made 
         for your user <code>Principals</code>.</p>
       </attribute>
 
       <attribute name="roleClassNames" required="false">
-        <p>A comma-seperated list of the names of the classes that you have made 
+        <p>A comma-separated list of the names of the classes that you have made 
         for your role <code>Principals</code>.</p>
       </attribute>
 
@@ -623,10 +623,10 @@
     failed authentication attempts in a given period of time.</p>
     
     <p>To ensure correct operation, there is a reasonable degree of
-    synchronisation in this Realm.</p>
+    synchronization in this Realm.</p>
     
     <p>This Realm does not require modification to the underlying Realms or the
-    associated user storage mecahisms. It achieves this by recording all failed
+    associated user storage mechanisms. It achieves this by recording all failed
     logins, including those for users that do not exist. To prevent a DOS by
     deliberating making requests with invalid users (and hence causing this
     cache to grow) the size of the list of users that have failed authentication

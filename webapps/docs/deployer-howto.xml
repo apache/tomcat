@@ -248,7 +248,7 @@
         </p>
     
         <p>
-            It is assumed the user will be familar with Apache Ant for using the TCD.
+            It is assumed the user will be familiar with Apache Ant for using the TCD.
             Apache Ant is a scripted build tool. The TCD comes pre-packaged with a
             build script to use. Only a modest understanding of Apache Ant is
             required (installation as listed earlier in this page, and familiarity
@@ -266,8 +266,8 @@
     
         <p>
             The TCD uses an exploded web application as input (see the list of the
-            properties used below). A web application that is programatically 
-            deployed with the deployer may include a Context Desciptor in 
+            properties used below). A web application that is programmatically 
+            deployed with the deployer may include a Context Descriptor in 
             <code>/META-INF/context.xml</code>.
         </p>
     

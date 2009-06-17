@@ -70,7 +70,7 @@
         <td>Run the service as console application</td>
         <td>This is the default operation. It is called if the no option is
             provided. The ServiceName is the name of the executable without
-            exe sufix, meaning Tomcat6</td>
+            exe suffix, meaning Tomcat6</td>
     </tr>
     <tr><th>//RS//</th>
         <td>Run the service</td>

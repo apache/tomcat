@@ -226,7 +226,7 @@ Operations</a> that can be performed when the administrative application is
   <li>An optional <em>Loader</em> representing default configuration
       properties for the Loader component of deployed web applications.</li>
   <li>An optional <em>Manager</em> representing default configuration
-      properties for the Manager component fo deployed web applications.</li>
+      properties for the Manager component of deployed web applications.</li>
   </ul>
 
 </section>
