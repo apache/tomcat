@@ -245,6 +245,9 @@ public class McastService implements MembershipService,MembershipListener,Messag
         properties.setProperty("recoverySleepTime", String.valueOf(recoverySleepTime));
     }
 
+    public void setLocalLoopbackDisabled(boolean localLoopbackDisabled) {
+        properties.setProperty("localLoopbackDisabled",String.valueOf(localLoopbackDisabled));
+    }
 
     /**
      * @deprecated use getPort()
@@ -383,7 +386,8 @@ public class McastService implements MembershipService,MembershipListener,Messag
                                     ttl,
                                     soTimeout,
                                     this,
-                                    this);
+                                    this,
+                                    Boolean.valueOf(properties.getProperty("localLoopbackDisabled","false")).booleanValue());
         String value = properties.getProperty("recoveryEnabled","true");
         boolean recEnabled = Boolean.valueOf(value).booleanValue() ;
         impl.setRecoveryEnabled(recEnabled);
