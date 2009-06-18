@@ -26,16 +26,6 @@
 
 dojo.require("dojox.cometd");
 
-dojo.addOnUnload(function() {
-	  dojox.cometd.init("/cometd/cometd");
-	  dojox.cometd.startBatch();
-	  dojox.cometd.unsubscribe("/stock/GOOG", this,"");
-	  dojox.cometd.unsubscribe("/stock/YHOO", this,"");
-	  dojox.cometd.unsubscribe("/stock/SPRG", this,"");
-	  dojox.cometd.endBatch();
-	});
-
-
 dojo.addOnLoad(function() {
   dojox.cometd.init("/cometd/cometd");
   dojox.cometd.startBatch();
@@ -44,6 +34,17 @@ dojo.addOnLoad(function() {
   dojox.cometd.subscribe("/stock/SPRG", onMsgEvent);
   dojox.cometd.endBatch();
 });
+
+
+dojo.addOnUnload(function() {
+	  dojox.cometd.startBatch();
+	  dojox.cometd.unsubscribe("/stock/GOOG", this,"");
+	  dojox.cometd.unsubscribe("/stock/YHOO", this,"");
+	  dojox.cometd.unsubscribe("/stock/SPRG", this,"");
+	  dojox.cometd.endBatch();
+	});
+
+
 
 
 function subscribe(box, symbol) {
