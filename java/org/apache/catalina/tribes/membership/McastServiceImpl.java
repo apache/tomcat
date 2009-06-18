@@ -148,6 +148,11 @@ public class McastServiceImpl
     protected ExecutorService executor = new ThreadPoolExecutor(0, 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     
     /**
+     * disable/enable local loopback message
+     */
+    protected boolean localLoopbackDisabled = false;
+    
+    /**
      * Create a new mcast service impl
      * @param member - the local member
      * @param sendFrequency - the time (ms) in between pings sent out
@@ -156,6 +161,7 @@ public class McastServiceImpl
      * @param bind - the bind address (not sure this is used yet)
      * @param mcastAddress - the mcast address
      * @param service - the callback service
+     * @param disableLoopbackMode - disable loopbackMode
      * @throws IOException
      */
     public McastServiceImpl(
@@ -168,7 +174,8 @@ public class McastServiceImpl
         int ttl,
         int soTimeout,
         MembershipListener service,
-        MessageListener msgservice)
+        MessageListener msgservice,
+        boolean localLoopbackDisabled)
     throws IOException {
         this.member = member;
         this.address = mcastAddress;
@@ -180,6 +187,7 @@ public class McastServiceImpl
         this.service = service;
         this.msgservice = msgservice;
         this.sendFrequency = sendFrequency;
+        this.localLoopbackDisabled = localLoopbackDisabled;
         init();
     }
 
@@ -213,7 +221,7 @@ public class McastServiceImpl
         } else {
             socket = new MulticastSocket(port);
         }
-        socket.setLoopbackMode(true); //hint that we don't need loop back messages
+        socket.setLoopbackMode(localLoopbackDisabled); //hint if we want disable loop back(local machine) messages
         if (mcastBindAddress != null) {
 			if(log.isInfoEnabled())
                 log.info("Setting multihome multicast interface to:" +mcastBindAddress);
