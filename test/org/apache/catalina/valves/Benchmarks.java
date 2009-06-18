@@ -36,7 +36,7 @@ public class Benchmarks extends TestCase {
     }
 
     private static class GetDateBenchmarkTest extends BenchmarkTest {
-        private long currentMillis = 0;
+        private volatile long currentMillis = 0;
         private Date currentDate = null;
 
         private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
@@ -78,8 +78,8 @@ public class Benchmarks extends TestCase {
     }
 
     private static class TimeDateElementBenchmarkTest extends BenchmarkTest {
-        private long currentMillis = 0;
-        private Date currentDate = null;
+        private volatile long currentMillis = 0;
+        private volatile Date currentDate = null;
         private String currentDateString = null;
         private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
         private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
