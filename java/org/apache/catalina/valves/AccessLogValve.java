@@ -295,7 +295,7 @@ public class AccessLogValve
     /**
      * Instant when the log daily rotation was last checked.
      */
-    private long rotationLastChecked = 0L;
+    private volatile long rotationLastChecked = 0L;
 
     /**
      * Do we check for log file existence? Helpful if an external
@@ -649,19 +649,21 @@ public class AccessLogValve
             // Only do a logfile switch check once a second, max.
             long systime = System.currentTimeMillis();
             if ((systime - rotationLastChecked) > 1000) {
-
-                rotationLastChecked = systime;
-
-                // Check for a change of date
-                String tsDate = fileDateFormatter.format(new Date(systime));
-
-                // If the date has changed, switch log files
-                if (!dateStamp.equals(tsDate)) {
-                    synchronized (this) {
+                synchronized(this) {
+                    if ((systime - rotationLastChecked) > 1000) {
+                        rotationLastChecked = systime;
+    
+                        String tsDate;
+                        // Check for a change of date
+                        tsDate = fileDateFormatter.format(new Date(systime));
+    
+                        // If the date has changed, switch log files
                         if (!dateStamp.equals(tsDate)) {
-                            close();
-                            dateStamp = tsDate;
-                            open();
+                            if (!dateStamp.equals(tsDate)) {
+                                close();
+                                dateStamp = tsDate;
+                                open();
+                            }
                         }
                     }
                 }
