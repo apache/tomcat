@@ -147,6 +147,14 @@
       The default is <code>5000</code> (5 seconds). <br/>
       </p>
     </attribute>
+    
+    <attribute name="localLoopbackDisabled" required="false">
+      <p>
+      Membership uses multicast, it will call <code>java.net.MulticastSocket.setLoopbackMode(localLoopbackDisabled)</code>.
+      When <code>localLoopbackDisabled==true</code> multicast messages will not reach other nodes on the same local machine.
+      The default is <code>false</code>. <br/>
+      </p>
+    </attribute>
 
 
   </attributes>
