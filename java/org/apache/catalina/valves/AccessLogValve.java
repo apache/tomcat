@@ -281,7 +281,7 @@ public class AccessLogValve
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private Date currentDate = null;
+    private volatile Date currentDate = null;
     
     private volatile long currentMillis = 0;
 
@@ -690,10 +690,12 @@ public class AccessLogValve
         }
 
         // Log this message
-        if (writer != null) {
-            writer.println(message);
-            if (!buffered) {
-                writer.flush();
+        synchronized(this) {
+            if (writer != null) {
+                writer.println(message);
+                if (!buffered) {
+                    writer.flush();
+                }
             }
         }
 
