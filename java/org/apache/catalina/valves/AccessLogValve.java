@@ -690,12 +690,10 @@ public class AccessLogValve
         }
 
         // Log this message
-        synchronized(this) {
-            if (writer != null) {
-                writer.println(message);
-                if (!buffered) {
-                    writer.flush();
-                }
+        if (writer != null) {
+            writer.println(message);
+            if (!buffered) {
+                writer.flush();
             }
         }
 

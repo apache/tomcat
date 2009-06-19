@@ -56,41 +56,35 @@ public class TestRequest extends TestCase {
         Bug37794Client client = new Bug37794Client();
 
         // Edge cases around zero
-        client.doRequest(-1, false); // Unlimited
+        client.doRequest(-1); // Unlimited
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
         client.reset();
-        client.doRequest(0, false); // Unlimited
+        client.doRequest(0); // Unlimited
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
         client.reset();
-        client.doRequest(1, false); // 1 byte - too small should fail
+        client.doRequest(1); // 1 byte - too small should fail
         assertTrue(client.isResponse500());
         
         client.reset();
         
         // Edge cases around actual content length
         client.reset();
-        client.doRequest(6, false); // Too small should fail
+        client.doRequest(6); // Too small should fail
         assertTrue(client.isResponse500());
         client.reset();
-        client.doRequest(7, false); // Just enough should pass
+        client.doRequest(7); // Just enough should pass
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
         client.reset();
-        client.doRequest(8, false); // 1 extra - should pass
+        client.doRequest(8); // 1 extra - should pass
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
         
         // Much larger
         client.reset();
-        client.doRequest(8096, false); // Plenty of space - should pass
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
-
-        // Check for case insensitivity
-        client.reset();
-        client.doRequest(8096, true); // Plenty of space - should pass
+        client.doRequest(8096); // Plenty of space - should pass
         assertTrue(client.isResponse200());
         assertTrue(client.isResponseBodyOK());
     }
@@ -121,7 +115,7 @@ public class TestRequest extends TestCase {
      * Bug 37794 test client.
      */
     private static class Bug37794Client extends SimpleHttpClient {
-        private Exception doRequest(int postLimit, boolean ucChunkedHead) {
+        private Exception doRequest(int postLimit) {
             Tomcat tomcat = new Tomcat();
             try {
                 StandardContext root = tomcat.addContext("", TEMP_DIR);
@@ -135,25 +129,14 @@ public class TestRequest extends TestCase {
                 
                 // Send request in two parts
                 String[] request = new String[2];
-                if (ucChunkedHead) {
-                    request[0] =
-                        "POST http://localhost:8080/test HTTP/1.1" + CRLF +
-                        "content-type: application/x-www-form-urlencoded" + CRLF +
-                        "Transfer-Encoding: CHUNKED" + CRLF +
-                        "Connection: close" + CRLF +
-                        CRLF +
-                        "3" + CRLF +
-                        "a=1" + CRLF;
-                } else {
-                    request[0] =
-                        "POST http://localhost:8080/test HTTP/1.1" + CRLF +
-                        "content-type: application/x-www-form-urlencoded" + CRLF +
-                        "Transfer-Encoding: chunked" + CRLF +
-                        "Connection: close" + CRLF +
-                        CRLF +
-                        "3" + CRLF +
-                        "a=1" + CRLF;
-                }
+                request[0] =
+                    "POST http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "content-type: application/x-www-form-urlencoded" + CRLF +
+                    "Transfer-Encoding: chunked" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + CRLF +
+                    "a=1" + CRLF;
                 request[1] =
                     "4" + CRLF +
                     "&b=2" + CRLF +
