@@ -792,7 +792,7 @@ public class WebappLoader
 
         // Assigning permissions for the work directory
         File workDir =
-            (File) servletContext.getAttribute(Globals.WORK_DIR_ATTR);
+            (File) servletContext.getAttribute(ServletContext.TEMPDIR);
         if (workDir != null) {
             try {
                 String workDirPath = workDir.getCanonicalPath();
@@ -883,7 +883,7 @@ public class WebappLoader
         loaderRepositories=new ArrayList<String>();
         // Loading the work directory
         File workDir =
-            (File) servletContext.getAttribute(Globals.WORK_DIR_ATTR);
+            (File) servletContext.getAttribute(ServletContext.TEMPDIR);
         if (workDir == null) {
             log.info("No work dir for " + servletContext);
         }

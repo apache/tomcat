@@ -120,7 +120,6 @@ public class Constants {
      * uses. 
      */
     public static final String INC_SERVLET_PATH = "javax.servlet.include.servlet_path";
-    public static final String TMP_DIR = "javax.servlet.context.tempdir";
 
     // Must be kept in sync with org/apache/catalina/Globals.java
     public static final String ALT_DD_ATTR = 

@@ -42,6 +42,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.UnavailableException;
@@ -497,7 +498,7 @@ public class DefaultServlet
         // resource - create a temp. file on the local filesystem to
         // perform this operation
         File tempDir = (File) getServletContext().getAttribute
-            ("javax.servlet.context.tempdir");
+            (ServletContext.TEMPDIR);
         // Convert all '/' characters to '.' in resourcePath
         String convertedResourcePath = path.replace('/', '.');
         File contentFile = new File(tempDir, convertedResourcePath);

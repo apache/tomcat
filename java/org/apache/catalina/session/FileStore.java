@@ -399,7 +399,7 @@ public final class FileStore extends StoreBase {
                 ServletContext servletContext =
                     ((Context) container).getServletContext();
                 File work = (File)
-                    servletContext.getAttribute(Globals.WORK_DIR_ATTR);
+                    servletContext.getAttribute(ServletContext.TEMPDIR);
                 file = new File(work, this.directory);
             } else {
                 throw new IllegalArgumentException
