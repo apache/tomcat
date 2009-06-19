@@ -694,7 +694,7 @@ public final class CGIServlet extends HttpServlet {
         protected void setupFromContext(ServletContext context) {
             this.context = context;
             this.webAppRootDir = context.getRealPath("/");
-            this.tmpDir = (File) context.getAttribute(Globals.WORK_DIR_ATTR);
+            this.tmpDir = (File) context.getAttribute(ServletContext.TEMPDIR);
         }
 
 

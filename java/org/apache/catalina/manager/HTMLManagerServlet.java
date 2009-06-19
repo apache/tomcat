@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -175,7 +177,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         // Get the tempdir
         File tempdir = (File) getServletContext().getAttribute
-            ("javax.servlet.context.tempdir");
+            (ServletContext.TEMPDIR);
         // Set upload parameters
         upload.setSizeMax(-1);
         upload.setRepositoryPath(tempdir.getCanonicalPath());
