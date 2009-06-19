@@ -742,7 +742,7 @@ public class StandardManager
                 ServletContext servletContext =
                     ((Context) container).getServletContext();
                 File tempdir = (File)
-                    servletContext.getAttribute(Globals.WORK_DIR_ATTR);
+                    servletContext.getAttribute(ServletContext.TEMPDIR);
                 if (tempdir != null)
                     file = new File(tempdir, pathname);
             }

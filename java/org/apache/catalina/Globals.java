@@ -317,15 +317,6 @@ public final class Globals {
 
 
     /**
-     * The servlet context attribute under which we store a temporary
-     * working directory (as an object of type File) for use by servlets
-     * within this web application.
-     */
-    public static final String WORK_DIR_ATTR =
-        "javax.servlet.context.tempdir";
-
-
-    /**
      * The master flag which controls strict servlet specification 
      * compliance.
      */
