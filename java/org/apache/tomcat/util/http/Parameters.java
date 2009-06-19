@@ -382,10 +382,11 @@ public final class Parameters extends MultiMap {
             pos=valEnd+1;
             
             if( nameEnd<=nameStart ) {
-                StringBuffer msg = new StringBuffer("Parameters: Invalid chunk ");
+                StringBuilder msg = new StringBuilder("Parameters: Invalid chunk ");
+                // No name eg ...&=xx&... will trigger this
                 if (valEnd >= nameStart) {
                     msg.append('\'');
-                    msg.append(new String(bytes, nameStart, valEnd));
+                    msg.append(new String(bytes, nameStart, valEnd - nameStart));
                     msg.append("' ");
                 }
                 msg.append("ignored.");
@@ -399,10 +400,15 @@ public final class Parameters extends MultiMap {
             try {
                 addParam( urlDecode(tmpName, enc), urlDecode(tmpValue, enc) );
             } catch (IOException e) {
-                // Exception during character decoding: skip parameter
-                String msg = "Parameters: Character decoding failed. " + 
-                        "Parameter '" + tmpName + "' with value '" +
-                        tmpValue + "' has been ignored.";
+                // tmpName or tmpValue will be corrupted at this point due to
+                // failed decoding. Have to go to queryMB to get original data
+                StringBuilder msg =
+                    new StringBuilder("Parameters: Character decoding failed.");
+                msg.append(" Parameter '");
+                msg.append(queryMB.toString().substring(nameStart, nameEnd));
+                msg.append("' with value '");
+                msg.append(queryMB.toString().substring(valStart, valEnd));
+                msg.append("' has been ignored.");
                 if (log.isDebugEnabled()) {
                     log.debug(msg, e);
                 } else {
