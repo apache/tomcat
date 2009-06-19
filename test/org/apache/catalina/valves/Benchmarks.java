@@ -135,8 +135,8 @@ public class Benchmarks extends TestCase {
 
         // note, that we can avoid (long -> Long) conversion
         private static class Struct {
-            long currentMillis = 0;
-            Date currentDate;
+            public long currentMillis = 0;
+            public Date currentDate;
         }
 
         private ThreadLocal<Struct> currentStruct = new ThreadLocal<Struct>() {
@@ -165,7 +165,9 @@ public class Benchmarks extends TestCase {
         BenchmarkTest benchmark = new BenchmarkTest();
         Runnable[] tests = new Runnable[] {
                 new TimeDateElementBenchmarkTest_Sync(),
-                new TimeDateElementBenchmarkTest_Local() };
+                new TimeDateElementBenchmarkTest_Local(),
+                new TimeDateElementBenchmarkTest_LocalStruct(),
+                new TimeDateElementBenchmarkTest_LocalStruct_SBuilder() };
         benchmark.doTest(5, tests);
     }
 
@@ -285,13 +287,17 @@ public class Benchmarks extends TestCase {
             if (currentDateStringLocal.get() == null) {
                 StringBuffer current = new StringBuffer(32);
                 current.append('[');
-                current.append(dayFormatterLocal.get().format(currentDateLocal.get())); // Day
+                current.append(dayFormatterLocal.get().format(
+                        currentDateLocal.get())); // Day
                 current.append('/');
-                current.append(lookup(monthFormatterLocal.get().format(currentDateLocal.get()))); // Month
+                current.append(lookup(monthFormatterLocal.get().format(
+                        currentDateLocal.get()))); // Month
                 current.append('/');
-                current.append(yearFormatterLocal.get().format(currentDateLocal.get())); // Year
+                current.append(yearFormatterLocal.get().format(
+                        currentDateLocal.get())); // Year
                 current.append(':');
-                current.append(timeFormatterLocal.get().format(currentDateLocal.get())); // Time
+                current.append(timeFormatterLocal.get().format(
+                        currentDateLocal.get())); // Time
                 current.append(']');
                 currentDateStringLocal.set(current.toString());
             }
@@ -305,6 +311,122 @@ public class Benchmarks extends TestCase {
                 currentDateStringLocal.set(null);
             }
             return currentDateLocal.get();
+        }
+    }
+
+    private static class TimeDateElementBenchmarkTest_LocalStruct extends
+            TimeDateElementBenchmarkTestBase implements Runnable {
+
+        public String toString() {
+            return "single ThreadLocal";
+        }
+
+        private static class Struct {
+            public String currentDateString;
+            public Date currentDate = new Date();
+            public SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
+            public SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
+            public SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
+            public SimpleDateFormat timeFormatter = new SimpleDateFormat(
+                    "hh:mm:ss");
+        }
+
+        private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+            protected Struct initialValue() {
+                return new Struct();
+            }
+        };
+
+        public void run() {
+            printDate();
+        }
+
+        public String printDate() {
+            getDateLocal();
+            Struct struct = structLocal.get();
+            if (struct.currentDateString == null) {
+                StringBuffer current = new StringBuffer(32);
+                current.append('[');
+                current.append(struct.dayFormatter.format(struct.currentDate)); // Day
+                current.append('/');
+                current.append(lookup(struct.monthFormatter
+                        .format(struct.currentDate))); // Month
+                current.append('/');
+                current.append(struct.yearFormatter.format(struct.currentDate)); // Year
+                current.append(':');
+                current.append(struct.timeFormatter.format(struct.currentDate)); // Time
+                current.append(']');
+                struct.currentDateString = current.toString();
+            }
+            return struct.currentDateString;
+        }
+
+        private Date getDateLocal() {
+            Struct struct = structLocal.get();
+            long systime = System.currentTimeMillis();
+            if ((systime - struct.currentDate.getTime()) > 1000) {
+                struct.currentDate.setTime(systime);
+                struct.currentDateString = null;
+            }
+            return struct.currentDate;
+        }
+    }
+
+    private static class TimeDateElementBenchmarkTest_LocalStruct_SBuilder extends
+            TimeDateElementBenchmarkTestBase implements Runnable {
+
+        public String toString() {
+            return "single ThreadLocal, with StringBuilder";
+        }
+
+        private static class Struct {
+            public String currentDateString;
+            public Date currentDate = new Date();
+            public SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
+            public SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
+            public SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
+            public SimpleDateFormat timeFormatter = new SimpleDateFormat(
+                    "hh:mm:ss");
+        }
+
+        private ThreadLocal<Struct> structLocal = new ThreadLocal<Struct>() {
+            protected Struct initialValue() {
+                return new Struct();
+            }
+        };
+
+        public void run() {
+            printDate();
+        }
+
+        public String printDate() {
+            getDateLocal();
+            Struct struct = structLocal.get();
+            if (struct.currentDateString == null) {
+                StringBuilder current = new StringBuilder(32);
+                current.append('[');
+                current.append(struct.dayFormatter.format(struct.currentDate)); // Day
+                current.append('/');
+                current.append(lookup(struct.monthFormatter
+                        .format(struct.currentDate))); // Month
+                current.append('/');
+                current.append(struct.yearFormatter.format(struct.currentDate)); // Year
+                current.append(':');
+                current.append(struct.timeFormatter.format(struct.currentDate)); // Time
+                current.append(']');
+                struct.currentDateString = current.toString();
+            }
+            return struct.currentDateString;
+        }
+
+        private Date getDateLocal() {
+            Struct struct = structLocal.get();
+            long systime = System.currentTimeMillis();
+            if ((systime - struct.currentDate.getTime()) > 1000) {
+                struct.currentDate.setTime(systime);
+                struct.currentDateString = null;
+            }
+            return struct.currentDate;
         }
     }
 
@@ -332,9 +454,10 @@ public class Benchmarks extends TestCase {
             }
             long end = System.currentTimeMillis();
 
-            System.out.println(test.getClass().getName() + ": " + threadCount
-                    + " threads and " + iterations + " iterations using "
-                    + test + " took " + (end - start) + "ms");
+            System.out.println(test.getClass().getSimpleName() + ": "
+                    + threadCount + " threads and " + iterations
+                    + " iterations using " + test + " took " + (end - start)
+                    + "ms");
         }
     }
 
