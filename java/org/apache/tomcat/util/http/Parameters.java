@@ -338,6 +338,8 @@ public final class Parameters extends MultiMap {
     // if needed
     ByteChunk tmpName=new ByteChunk();
     ByteChunk tmpValue=new ByteChunk();
+    ByteChunk origName=new ByteChunk();
+    ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
     CharChunk tmpValueC=new CharChunk(1024);
     
@@ -396,18 +398,25 @@ public final class Parameters extends MultiMap {
             }
             tmpName.setBytes( bytes, nameStart, nameEnd-nameStart );
             tmpValue.setBytes( bytes, valStart, valEnd-valStart );
-
+            try {
+                // Take copies as if anything goes wrong originals will be
+                // corrupted. This means original values can be logged
+                origName.append(bytes, nameStart, nameEnd-nameStart);
+                origValue.append(bytes, valStart, valEnd-valStart);
+            } catch (IOException ioe) {
+                // Should never happen...
+                log.error("Error copying parameters", ioe);
+            }
+            
             try {
                 addParam( urlDecode(tmpName, enc), urlDecode(tmpValue, enc) );
             } catch (IOException e) {
-                // tmpName or tmpValue will be corrupted at this point due to
-                // failed decoding. Have to go to queryMB to get original data
                 StringBuilder msg =
                     new StringBuilder("Parameters: Character decoding failed.");
                 msg.append(" Parameter '");
-                msg.append(queryMB.toString().substring(nameStart, nameEnd));
+                msg.append(origName.toString());
                 msg.append("' with value '");
-                msg.append(queryMB.toString().substring(valStart, valEnd));
+                msg.append(origValue.toString());
                 msg.append("' has been ignored.");
                 if (log.isDebugEnabled()) {
                     log.debug(msg, e);
@@ -418,7 +427,8 @@ public final class Parameters extends MultiMap {
 
             tmpName.recycle();
             tmpValue.recycle();
-
+            origName.recycle();
+            origValue.recycle();
         } while( pos<end );
     }
 
