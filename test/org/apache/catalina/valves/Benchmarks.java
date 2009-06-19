@@ -191,8 +191,7 @@ public class Benchmarks extends TestCase {
             return "Syncs";
         }
 
-        private volatile long currentMillis = 0;
-        private volatile Date currentDate = null;
+        private volatile Date currentDate = new Date();
         private String currentDateString = null;
         private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
         private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
@@ -231,11 +230,10 @@ public class Benchmarks extends TestCase {
 
         private Date getDateSync() {
             long systime = System.currentTimeMillis();
-            if ((systime - currentMillis) > 1000) {
+            if ((systime - currentDate.getTime()) > 1000) {
                 synchronized (this) {
-                    if ((systime - currentMillis) > 1000) {
-                        currentDate = new Date(systime);
-                        currentMillis = systime;
+                    if ((systime - currentDate.getTime()) > 1000) {
+                        currentDate.setTime(systime);
                     }
                 }
             }
@@ -250,15 +248,13 @@ public class Benchmarks extends TestCase {
             return "ThreadLocals";
         }
 
-        private volatile Date currentDate = null;
-        private String currentDateString = null;
+        private ThreadLocal<String> currentDateStringLocal = new ThreadLocal<String>();
 
-        private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
-            protected Long initialValue() {
-                return Long.valueOf(0);
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>() {
+            protected Date initialValue() {
+                return new Date();
             }
         };
-        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
         private ThreadLocal<SimpleDateFormat> dayFormatterLocal = new ThreadLocal<SimpleDateFormat>() {
             protected SimpleDateFormat initialValue() {
                 return new SimpleDateFormat("dd");
@@ -285,31 +281,28 @@ public class Benchmarks extends TestCase {
         }
 
         public String printDate() {
-            StringBuffer buf = new StringBuffer();
-            Date date = getDateLocal();
-            if (currentDate != date) {
+            getDateLocal();
+            if (currentDateStringLocal.get() == null) {
                 StringBuffer current = new StringBuffer(32);
                 current.append('[');
-                current.append(dayFormatterLocal.get().format(date)); // Day
+                current.append(dayFormatterLocal.get().format(currentDateLocal.get())); // Day
                 current.append('/');
-                current.append(lookup(monthFormatterLocal.get().format(date))); // Month
+                current.append(lookup(monthFormatterLocal.get().format(currentDateLocal.get()))); // Month
                 current.append('/');
-                current.append(yearFormatterLocal.get().format(date)); // Year
+                current.append(yearFormatterLocal.get().format(currentDateLocal.get())); // Year
                 current.append(':');
-                current.append(timeFormatterLocal.get().format(date)); // Time
+                current.append(timeFormatterLocal.get().format(currentDateLocal.get())); // Time
                 current.append(']');
-                currentDateString = current.toString();
-                currentDate = date;
+                currentDateStringLocal.set(current.toString());
             }
-            buf.append(currentDateString);
-            return buf.toString();
+            return currentDateStringLocal.get();
         }
 
         private Date getDateLocal() {
             long systime = System.currentTimeMillis();
-            if ((systime - currentMillisLocal.get().longValue()) > 1000) {
-                currentDateLocal.set(new Date(systime));
-                currentMillisLocal.set(Long.valueOf(systime));
+            if ((systime - currentDateLocal.get().getTime()) > 1000) {
+                currentDateLocal.get().setTime(systime);
+                currentDateStringLocal.set(null);
             }
             return currentDateLocal.get();
         }
