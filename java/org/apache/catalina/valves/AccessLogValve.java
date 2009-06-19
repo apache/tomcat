@@ -224,34 +224,6 @@ public class AccessLogValve
 
 
     /**
-     * A date formatter to format Dates into a day string in the format
-     * "dd".
-     */
-    private SimpleDateFormat dayFormatter = null;
-
-
-    /**
-     * A date formatter to format a Date into a month string in the format
-     * "MM".
-     */
-    private SimpleDateFormat monthFormatter = null;
-
-
-    /**
-     * A date formatter to format a Date into a year string in the format
-     * "yyyy".
-     */
-    private SimpleDateFormat yearFormatter = null;
-
-
-    /**
-     * A date formatter to format a Date into a time in the format
-     * "kk:mm:ss" (kk is a 24-hour representation of the hour).
-     */
-    private SimpleDateFormat timeFormatter = null;
-
-
-    /**
      * The system timezone.
      */
     private TimeZone timezone = null;
@@ -281,9 +253,13 @@ public class AccessLogValve
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private volatile Date currentDate = null;
-    
-    private volatile long currentMillis = 0;
+    private ThreadLocal<Date> currentDate = new ThreadLocal<Date>() {
+        protected Date initialValue() {
+            return new Date();
+        }
+    };
+    private ThreadLocal<String> currentDateString =
+        new ThreadLocal<String>();
 
 
     /**
@@ -760,15 +736,11 @@ public class AccessLogValve
     private Date getDate() {
         // Only create a new Date once per second, max.
         long systime = System.currentTimeMillis();
-        if ((systime - currentMillis) > 1000) {
-            synchronized (this) {
-                if ((systime - currentMillis) > 1000) {
-                    currentDate = new Date(systime);
-                    currentMillis = systime;
-                }
-            }
+        if ((systime - currentDate.get().getTime()) > 1000) {
+            currentDate.get().setTime(systime);
+            currentDateString.set(null);
         }
-        return currentDate;
+        return currentDate.get();
     }
 
 
@@ -864,16 +836,7 @@ public class AccessLogValve
             fileDateFormat = "yyyy-MM-dd";
         fileDateFormatter = new SimpleDateFormat(fileDateFormat);
         fileDateFormatter.setTimeZone(timezone);
-        dayFormatter = new SimpleDateFormat("dd");
-        dayFormatter.setTimeZone(timezone);
-        monthFormatter = new SimpleDateFormat("MM");
-        monthFormatter.setTimeZone(timezone);
-        yearFormatter = new SimpleDateFormat("yyyy");
-        yearFormatter.setTimeZone(timezone);
-        timeFormatter = new SimpleDateFormat("HH:mm:ss");
-        timeFormatter.setTimeZone(timezone);
-        currentDate = new Date();
-        dateStamp = fileDateFormatter.format(currentDate);
+        dateStamp = fileDateFormatter.format(currentDate.get());
         open();
     }
 
@@ -927,20 +890,21 @@ public class AccessLogValve
      */
     protected class LocalAddrElement implements AccessLogElement {
         
-        private String value = null;
+        private ThreadLocal<String> value = new ThreadLocal<String>() {
+            protected String initialValue() {
+                String init;
+                try {
+                    init = InetAddress.getLocalHost().getHostAddress();
+                } catch (Throwable e) {
+                    init = "127.0.0.1";
+                }
+                return init;
+            }
+        };
         
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            if (value == null) {
-                synchronized (this) {
-                    try {
-                        value = InetAddress.getLocalHost().getHostAddress();
-                    } catch (Throwable e) {
-                        value = "127.0.0.1";
-                    }
-                }
-            }
-            buf.append(value);
+            buf.append(value.get());
         }
     }
     
@@ -1007,33 +971,83 @@ public class AccessLogValve
      * write date and time, in Common Log Format - %t
      */
     protected class DateAndTimeElement implements AccessLogElement {
-        private Date currentDate = new Date(0);
-
-        private String currentDateString = null;
         
+        /**
+         * A date formatter to format Dates into a day string in the format
+         * "dd".
+         */
+        private ThreadLocal<SimpleDateFormat> dayFormatter =
+            new ThreadLocal<SimpleDateFormat>() {
+            protected SimpleDateFormat initialValue() {
+                SimpleDateFormat init = new SimpleDateFormat("dd");
+                init.setTimeZone(timezone);
+                return init;
+
+            }
+        };
+
+        /**
+         * A date formatter to format a Date into a month string in the format
+         * "MM".
+         */
+        private ThreadLocal<SimpleDateFormat> monthFormatter =
+            new ThreadLocal<SimpleDateFormat>() {
+            protected SimpleDateFormat initialValue() {
+                SimpleDateFormat init = new SimpleDateFormat("MM");
+                init.setTimeZone(timezone);
+                return init;
+
+            }
+        };
+
+
+        /**
+         * A date formatter to format a Date into a year string in the format
+         * "yyyy".
+         */
+        private ThreadLocal<SimpleDateFormat> yearFormatter =
+            new ThreadLocal<SimpleDateFormat>() {
+            protected SimpleDateFormat initialValue() {
+                SimpleDateFormat init = new SimpleDateFormat("yyyy");
+                init.setTimeZone(timezone);
+                return init;
+
+            }
+        };
+
+
+        /**
+         * A date formatter to format a Date into a time in the format
+         * "kk:mm:ss" (kk is a 24-hour representation of the hour).
+         */
+        private ThreadLocal<SimpleDateFormat> timeFormatter =
+            new ThreadLocal<SimpleDateFormat>() {
+            protected SimpleDateFormat initialValue() {
+                SimpleDateFormat init = new SimpleDateFormat("HH:mm:ss");
+                init.setTimeZone(timezone);
+                return init;
+            }
+        };
+
+
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            if (currentDate != date) {
-                synchronized (this) {
-                    if (currentDate != date) {
-                        StringBuffer current = new StringBuffer(32);
-                        current.append('[');
-                        current.append(dayFormatter.format(date)); // Day
-                        current.append('/');
-                        current.append(lookup(monthFormatter.format(date))); // Month
-                        current.append('/');
-                        current.append(yearFormatter.format(date)); // Year
-                        current.append(':');
-                        current.append(timeFormatter.format(date)); // Time
-                        current.append(' ');
-                        current.append(getTimeZone(date)); // Timezone
-                        current.append(']');
-                        currentDateString = current.toString();
-                        currentDate = date;
-                    }
-                }
+            if (currentDateString.get() == null) {
+                StringBuffer current = new StringBuffer(32);
+                current.append('[');
+                current.append(dayFormatter.get().format(date));
+                current.append('/');
+                current.append(lookup(monthFormatter.get().format(date)));
+                current.append('/');
+                current.append(yearFormatter.get().format(date));
+                current.append(':');
+                current.append(timeFormatter.get().format(date));
+                current.append(' ');
+                current.append(getTimeZone(date));
+                current.append(']');
+                currentDateString.set(current.toString());
             }
-            buf.append(currentDateString);
+            buf.append(currentDateString.get());
         }
     }
 
