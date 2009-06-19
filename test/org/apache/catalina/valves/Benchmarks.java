@@ -37,7 +37,7 @@ public class Benchmarks extends TestCase {
 
     private static class GetDateBenchmarkTest extends BenchmarkTest {
         private volatile long currentMillis = 0;
-        private Date currentDate = null;
+        private volatile Date currentDate = null;
 
         private ThreadLocal<Long> currentMillisLocal = new ThreadLocal<Long>() {
             protected Long initialValue() {
@@ -227,7 +227,7 @@ public class Benchmarks extends TestCase {
             }
             long end = System.currentTimeMillis();
             
-            System.out.println("testAccessLogGetDate: " + threadCount +
+            System.out.println(this.getClass().getName() + ": " + threadCount +
                     " threads and " + iterations + " iterations " +
                     (useSyncs?"using Syncs":"using ThreadLocals") +
                     " took " + (end-start) + "ms");
