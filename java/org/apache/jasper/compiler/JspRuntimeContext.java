@@ -394,16 +394,19 @@ public final class JspRuntimeContext {
                 docBase = docBase + "-";
                 permissionCollection.add(new FilePermission(docBase,"read"));
 
-                // Create a file read permission for web app tempdir (work)
-                // directory
+                // Spec says apps should have read/write for their temp
+                // directory. This is fine, as no security sensitive files, at
+                // least any that the app doesn't have full control of anyway,
+                // will be written here.
                 String workDir = options.getScratchDir().toString();
                 if (!workDir.endsWith(File.separator)){
                     permissionCollection.add
-                        (new FilePermission(workDir,"read"));
+                        (new FilePermission(workDir,"read,write"));
                     workDir = workDir + File.separator;
                 }
                 workDir = workDir + "-";
-                permissionCollection.add(new FilePermission(workDir,"read"));
+                permissionCollection.add(new FilePermission(
+                        workDir,"read,write,delete"));
 
                 // Allow the JSP to access org.apache.jasper.runtime.HttpJspBase
                 permissionCollection.add( new RuntimePermission(
