@@ -571,7 +571,7 @@ public final class EmbeddedServletOptions implements Options {
             scratchDir = new File(dir);
         } else {
             // First try the Servlet 2.2 javax.servlet.context.tempdir property
-            scratchDir = (File) context.getAttribute(Constants.TMP_DIR);
+            scratchDir = (File) context.getAttribute(ServletContext.TEMPDIR);
             if (scratchDir == null) {
                 // Not running in a Servlet 2.2 container.
                 // Try to get the JDK 1.2 java.io.tmpdir property
