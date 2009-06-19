@@ -2524,7 +2524,7 @@ public class Request
                 return;
             }
             parameters.processParameters(formData, 0, len);
-        } else if ("chunked".equals(
+        } else if ("chunked".equalsIgnoreCase(
                 coyoteRequest.getHeader("transfer-encoding"))) {
             byte[] formData = null;
             try {
