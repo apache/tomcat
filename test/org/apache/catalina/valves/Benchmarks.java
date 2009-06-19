@@ -33,7 +33,9 @@ public class Benchmarks extends TestCase {
         // Is it better to use a sync or a thread local here?
         BenchmarkTest benchmark = new BenchmarkTest();
         Runnable[] tests = new Runnable[] { new GetDateBenchmarkTest_Sync(),
-                new GetDateBenchmarkTest_Local() };
+                new GetDateBenchmarkTest_Local(),
+                new GetDateBenchmarkTest_LocalMutableLong(),
+                new GetDateBenchmarkTest_LocalStruct() };
         benchmark.doTest(5, tests);
     }
 
@@ -92,6 +94,72 @@ public class Benchmarks extends TestCase {
         }
     }
 
+    private static class GetDateBenchmarkTest_LocalMutableLong implements
+            Runnable {
+
+        public String toString() {
+            return "ThreadLocals with a mutable Long";
+        }
+
+        private static class MutableLong {
+            long value = 0;
+        }
+
+        private ThreadLocal<MutableLong> currentMillisLocal = new ThreadLocal<MutableLong>() {
+            protected MutableLong initialValue() {
+                return new MutableLong();
+            }
+        };
+
+        private ThreadLocal<Date> currentDateLocal = new ThreadLocal<Date>();
+
+        public void run() {
+            getCurrentDate();
+        }
+
+        public Date getCurrentDate() {
+            long systime = System.currentTimeMillis();
+            if ((systime - currentMillisLocal.get().value) > 1000) {
+                currentDateLocal.set(new Date(systime));
+                currentMillisLocal.get().value = systime;
+            }
+            return currentDateLocal.get();
+        }
+    }
+
+    private static class GetDateBenchmarkTest_LocalStruct implements Runnable {
+
+        public String toString() {
+            return "single ThreadLocal";
+        }
+
+        // note, that we can avoid (long -> Long) conversion
+        private static class Struct {
+            long currentMillis = 0;
+            Date currentDate;
+        }
+
+        private ThreadLocal<Struct> currentStruct = new ThreadLocal<Struct>() {
+            protected Struct initialValue() {
+                return new Struct();
+            }
+        };
+
+        public void run() {
+            getCurrentDate();
+        }
+
+        public Date getCurrentDate() {
+            Struct struct = currentStruct.get();
+            long systime = System.currentTimeMillis();
+            if ((systime - struct.currentMillis) > 1000) {
+                struct.currentDate = new Date(systime);
+                struct.currentMillis = systime;
+            }
+            return struct.currentDate;
+        }
+    }
+
     public void testAccessLogTimeDateElement() throws Exception {
         // Is it better to use a sync or a thread local here?
         BenchmarkTest benchmark = new BenchmarkTest();
@@ -136,7 +204,7 @@ public class Benchmarks extends TestCase {
             printDate();
         }
 
-        public StringBuffer printDate() {
+        public String printDate() {
             StringBuffer buf = new StringBuffer();
             Date date = getDateSync();
             if (currentDate != date) {
@@ -158,7 +226,7 @@ public class Benchmarks extends TestCase {
                 }
             }
             buf.append(currentDateString);
-            return buf;
+            return buf.toString();
         }
 
         private Date getDateSync() {
@@ -216,7 +284,7 @@ public class Benchmarks extends TestCase {
             printDate();
         }
 
-        public StringBuffer printDate() {
+        public String printDate() {
             StringBuffer buf = new StringBuffer();
             Date date = getDateLocal();
             if (currentDate != date) {
@@ -234,7 +302,7 @@ public class Benchmarks extends TestCase {
                 currentDate = date;
             }
             buf.append(currentDateString);
-            return buf;
+            return buf.toString();
         }
 
         private Date getDateLocal() {
