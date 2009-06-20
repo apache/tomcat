@@ -888,23 +888,23 @@ public class AccessLogValve
     /**
      * write local IP address - %A
      */
-    protected class LocalAddrElement implements AccessLogElement {
+    protected static class LocalAddrElement implements AccessLogElement {
         
-        private ThreadLocal<String> value = new ThreadLocal<String>() {
-            protected String initialValue() {
-                String init;
-                try {
-                    init = InetAddress.getLocalHost().getHostAddress();
-                } catch (Throwable e) {
-                    init = "127.0.0.1";
-                }
-                return init;
+        private static final String LOCAL_ADDR_VALUE;
+
+        static {
+            String init;
+            try {
+                init = InetAddress.getLocalHost().getHostAddress();
+            } catch (Throwable e) {
+                init = "127.0.0.1";
             }
-        };
+            LOCAL_ADDR_VALUE = init;
+        }
         
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            buf.append(value.get());
+            buf.append(LOCAL_ADDR_VALUE);
         }
     }
     
