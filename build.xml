@@ -343,6 +343,7 @@
       <batchtest fork="yes" todir="${tomcat.testclasses}">
         <fileset dir="${basedir}/test">
           <include name="org/apache/tomcat/jdbc/test/*Test*.java"/>
+          <exclude name="**/CreateTestTable*"/>
         </fileset>
       </batchtest>
     </junit>
