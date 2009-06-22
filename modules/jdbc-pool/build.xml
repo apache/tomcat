@@ -56,7 +56,7 @@
   
   <path id="test.classpath">
     <pathelement location="${tomcat-jdbc.jar}"/>
-    <pathelement location="${tomcat.classes}"/>
+    <pathelement location="${tomcat.testclasses}"/>
     <pathelement location="${c3p0.jar}"/>
     <pathelement location="${mysql.jar}"/>
     <pathelement location="${dbcp.jar}"/>
@@ -334,6 +334,18 @@
       <param name="destfile" value="${tomcat.project.dest}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
+  </target>
+
+  <target name="test" depends="build">
+    <junit printsummary="withOutAndErr" showoutput="on">
+      <classpath refid="tomcat.jdbc.classpath"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${tomcat.testclasses}">
+        <fileset dir="${basedir}/test">
+          <include name="org/apache/tomcat/jdbc/test/*Test*.java"/>
+        </fileset>
+      </batchtest>
+    </junit>
   </target>
 
 </project>
