@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <!DOCTYPE document [
-  <!ENTITY project SYSTEM "../../../webapps/docs/project.xml">
+  <!ENTITY project SYSTEM "@tomcat.project.dest@">
 ]>
 <document url="jdbc-pool.html">
 
@@ -680,6 +680,7 @@
 </section>
 
 <section name="Building">
+  <p>We build the JDBC pool code with 1.6, but it is backwards compatible down to 1.5 for runtime environment. For unit test, we use 1.6 and higher</p>
   <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Building from source">
     <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code>
@@ -691,8 +692,16 @@
     </source>
     <p>
        A build file can be found in the Tomcat <a href="http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
-       It depends on the entire Tomcat <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">trunk</a> being checked out. 
-    </p>           
+    </p>
+    <p>
+      As a convenience, a build file is also included where a simple build command will generate all files needed.
+      <source>
+        ant download  (downloads dependencies)
+        ant build     (compiles and generates .jar files)
+        ant dist      (creates a release package)
+        ant test      (runs tests, expects a test database to be setup)
+      </source>
+    </p>               
   </subsection>
 </section>
 </body>
