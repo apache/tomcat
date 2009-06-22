@@ -562,7 +562,7 @@ public class AccessLogValve
             }
     
             Date date = getDate();
-            StringBuffer result = new StringBuffer();
+            StringBuffer result = new StringBuffer(128);
     
             for (int i = 0; i < logElements.length; i++) {
                 logElements[i].addElement(result, date, request, response, time);
