@@ -107,7 +107,6 @@ public class TestTomcat extends TestCase {
             tomcat.addWebapp(null, "/examples", 
                     appDir.getAbsolutePath());
         
-        ctx.start();
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + port + "/examples/servlets/servlet/HelloWorldExample");
