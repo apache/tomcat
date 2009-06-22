@@ -88,8 +88,7 @@ public class TestTomcat extends TestCase {
         // You can customize the context by calling 
         // its API
         
-        tomcat.addServlet(ctx, "myServlet", 
-                new HelloWorld());
+        Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
         ctx.addServletMapping("/", "myServlet");
         
         tomcat.start();
@@ -103,9 +102,7 @@ public class TestTomcat extends TestCase {
         File appDir = 
             new File(base + "output/build/webapps/examples");
         // app dir is relative to server home
-        StandardContext ctx = 
-            tomcat.addWebapp(null, "/examples", 
-                    appDir.getAbsolutePath());
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
         tomcat.start();
 
