@@ -5,8 +5,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-trunk"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/tomcat-dbcp.jar" sourcepath="/TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/src/java"/>
-	<classpathentry kind="lib" path="mysql-connector-java-5.1.6-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="c3p0-0.9.1.2.jar" sourcepath="c3p0-0.9.1.2.src.jar"/>
+	<classpathentry kind="lib" path="includes/c3p0-0.9.1.2/lib/c3p0-0.9.1.2.jar"/>
+	<classpathentry kind="lib" path="includes/mysql-connector-java-5.1.7/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
