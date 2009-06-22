@@ -246,7 +246,6 @@ public class Tomcat {
      * Initialize and start the server.
      */
     public void start() throws Exception {
-        setSilent();
         getServer();
         getConnector();
         server.initialize();
@@ -505,8 +504,14 @@ public class Tomcat {
         "org.apache.catalina.core.StandardEngine",
         "org.apache.catalina.startup.ContextConfig",
         "org.apache.catalina.core.ApplicationContext",
+        "org.apache.catalina.core.AprLifecycleListener"
     };
     
+    /**
+     * Sets the log level to WARN for the loggers that log information on
+     * Tomcat start up. This prevents the usual startup information being
+     * logged to the console.
+     */
     public void setSilent() {
         for (String s : silences) {
             Logger.getLogger(s).setLevel(Level.WARNING);
