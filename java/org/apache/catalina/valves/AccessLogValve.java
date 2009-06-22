@@ -248,20 +248,30 @@ public class AccessLogValve
      * is true.
      */
     protected File currentLogFile = null;
+    private class AccessDateStruct {
+        private Date currentDate = new Date();
+        private String currentDateString = null;
+        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");;
+        private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
+        private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
+        private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+        public AccessDateStruct() {
+            dayFormatter.setTimeZone(timezone);
+            monthFormatter.setTimeZone(timezone);
+            yearFormatter.setTimeZone(timezone);
+            timeFormatter.setTimeZone(timezone);
+        }
+    }
     
     /**
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private ThreadLocal<Date> currentDate = new ThreadLocal<Date>() {
-        protected Date initialValue() {
-            return new Date();
+    private ThreadLocal<AccessDateStruct> currentDateStruct = new ThreadLocal<AccessDateStruct>() {
+        protected AccessDateStruct initialValue() {
+            return new AccessDateStruct();
         }
     };
-    private ThreadLocal<String> currentDateString =
-        new ThreadLocal<String>();
-
-
     /**
      * Resolve hosts.
      */
@@ -736,11 +746,12 @@ public class AccessLogValve
     private Date getDate() {
         // Only create a new Date once per second, max.
         long systime = System.currentTimeMillis();
-        if ((systime - currentDate.get().getTime()) > 1000) {
-            currentDate.get().setTime(systime);
-            currentDateString.set(null);
+        AccessDateStruct struct = currentDateStruct.get(); 
+        if ((systime - struct.currentDate.getTime()) > 1000) {
+            struct.currentDate.setTime(systime);
+            struct.currentDateString = null;
         }
-        return currentDate.get();
+        return struct.currentDate;
     }
 
 
@@ -836,7 +847,7 @@ public class AccessLogValve
             fileDateFormat = "yyyy-MM-dd";
         fileDateFormatter = new SimpleDateFormat(fileDateFormat);
         fileDateFormatter.setTimeZone(timezone);
-        dateStamp = fileDateFormatter.format(currentDate.get());
+        dateStamp = fileDateFormatter.format(currentDateStruct.get().currentDate);
         open();
     }
 
@@ -972,82 +983,28 @@ public class AccessLogValve
      */
     protected class DateAndTimeElement implements AccessLogElement {
         
-        /**
-         * A date formatter to format Dates into a day string in the format
-         * "dd".
-         */
-        private ThreadLocal<SimpleDateFormat> dayFormatter =
-            new ThreadLocal<SimpleDateFormat>() {
-            protected SimpleDateFormat initialValue() {
-                SimpleDateFormat init = new SimpleDateFormat("dd");
-                init.setTimeZone(timezone);
-                return init;
-
-            }
-        };
-
-        /**
-         * A date formatter to format a Date into a month string in the format
-         * "MM".
-         */
-        private ThreadLocal<SimpleDateFormat> monthFormatter =
-            new ThreadLocal<SimpleDateFormat>() {
-            protected SimpleDateFormat initialValue() {
-                SimpleDateFormat init = new SimpleDateFormat("MM");
-                init.setTimeZone(timezone);
-                return init;
-
-            }
-        };
-
-
-        /**
-         * A date formatter to format a Date into a year string in the format
-         * "yyyy".
-         */
-        private ThreadLocal<SimpleDateFormat> yearFormatter =
-            new ThreadLocal<SimpleDateFormat>() {
-            protected SimpleDateFormat initialValue() {
-                SimpleDateFormat init = new SimpleDateFormat("yyyy");
-                init.setTimeZone(timezone);
-                return init;
-
-            }
-        };
-
-
-        /**
-         * A date formatter to format a Date into a time in the format
-         * "kk:mm:ss" (kk is a 24-hour representation of the hour).
-         */
-        private ThreadLocal<SimpleDateFormat> timeFormatter =
-            new ThreadLocal<SimpleDateFormat>() {
-            protected SimpleDateFormat initialValue() {
-                SimpleDateFormat init = new SimpleDateFormat("HH:mm:ss");
-                init.setTimeZone(timezone);
-                return init;
-            }
-        };
+        
 
 
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            if (currentDateString.get() == null) {
+            AccessDateStruct struct = currentDateStruct.get();
+            if (struct.currentDateString == null) {
                 StringBuffer current = new StringBuffer(32);
                 current.append('[');
-                current.append(dayFormatter.get().format(date));
+                current.append(struct.dayFormatter.format(date));
                 current.append('/');
-                current.append(lookup(monthFormatter.get().format(date)));
+                current.append(lookup(struct.monthFormatter.format(date)));
                 current.append('/');
-                current.append(yearFormatter.get().format(date));
+                current.append(struct.yearFormatter.format(date));
                 current.append(':');
-                current.append(timeFormatter.get().format(date));
+                current.append(struct.timeFormatter.format(date));
                 current.append(' ');
                 current.append(getTimeZone(date));
                 current.append(']');
-                currentDateString.set(current.toString());
+                struct.currentDateString = current.toString();
             }
-            buf.append(currentDateString.get());
+            buf.append(struct.currentDateString);
         }
     }
 
