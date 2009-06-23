@@ -108,7 +108,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
 
     public void setCluster(CatalinaCluster cluster) {
         if(log.isDebugEnabled())
-            log.debug("Cluster associated with SimpleTcpReplicationManager");
+            log.debug("Cluster associated with BackupManager");
         this.cluster = cluster;
     }
 
