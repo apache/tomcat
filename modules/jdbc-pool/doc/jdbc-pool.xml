@@ -497,24 +497,26 @@
                 p.setMinIdle(10);
                 p.setLogAbandoned(true);
                 p.setRemoveAbandoned(true);
-                p.setJdbcInterceptors(&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;);
+                p.setJdbcInterceptors(&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;&quot;+
+                  &quot;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;);
                 DataSource datasource = new DataSource();
                 datasource.setPoolProperties(p); 
                 
                 Connection con = null;
-                try {            
+                try {
                   con = datasource.getConnection();
                   Statement st = con.createStatement();
                   ResultSet rs = st.executeQuery("select * from user");
                   int cnt = 1;
                   while (rs.next()) {
-                      System.out.println((cnt++)+". Host:" +rs.getString("Host")+" User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
+                      System.out.println((cnt++)+". Host:" +rs.getString("Host")+
+                        " User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
                   }
                   rs.close();
                   st.close();
                 } finally {
                   if (con!=null) try {con.close();}catch (Exception ignore) {}
-                }  
+                }
             }
         
         }
@@ -542,7 +544,8 @@
               logAbandoned=&quot;true&quot;
               minEvictableIdleTimeMillis=&quot;30000&quot; 
               jmxEnabled=&quot;true&quot;
-              jdbcInterceptors=&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
+              jdbcInterceptors=
+&quot;org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer&quot;
               username=&quot;root&quot; 
               password=&quot;password&quot; 
               driverClassName=&quot;com.mysql.jdbc.Driver&quot;
@@ -653,15 +656,15 @@
        Since interceptors can have properties, you need to be able to read the values of these properties within your 
        interceptor. Taking an example like the one above, you can override the <code>setProperties</code> method.
        <source>
-	   @Override
-	   public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
-	       super.setProperties(properties);
-	       final String myprop = &quot;myprop&quot;;
-	       InterceptorProperty p1 = properties.get(myprop);
-	       if (p1!=null) {
-	           setMyprop(Long.parseLong(p1.getValue()));
-	       }
-	   }
+       @Override
+       public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
+           super.setProperties(properties);
+           final String myprop = &quot;myprop&quot;;
+           InterceptorProperty p1 = properties.get(myprop);
+           if (p1!=null) {
+               setMyprop(Long.parseLong(p1.getValue()));
+           }
+       }
         </source>
     </p>
   </subsection>
@@ -686,9 +689,11 @@
     <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code>
     it also requires the <code>tomcat-coyote.jar</code> library.</p>
     <source>
-       javac -classpath /development/tomcat/trunk/trunk/output/build/bin/tomcat-juli.jar:/development/tomcat/trunk/trunk/output/build/lib/tomcat-coyote.jar \
+       javac -classpath tomcat-juli.jar:tomcat-coyote.jar \
              -d . \
-             org/apache/tomcat/jdbc/pool/*.java org/apache/tomcat/jdbc/pool/interceptor/*.java org/apache/tomcat/jdbc/pool/jmx/*.java
+             org/apache/tomcat/jdbc/pool/*.java \
+             org/apache/tomcat/jdbc/pool/interceptor/*.java \
+             org/apache/tomcat/jdbc/pool/jmx/*.java
     </source>
     <p>
        A build file can be found in the Tomcat <a href="http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
