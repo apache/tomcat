@@ -652,11 +652,11 @@
                type="int"/>
 
     <attribute name="activeCount"
-               description="Number of threads current processing a task"
+               description="Number of threads currently processing a task"
                type="int"/>
 
     <attribute name="completedTaskCount"
-               description="Nr of tasks completed by the executor"
+               description="Number of tasks completed by the executor"
                type="int"/>
 
     <attribute name="corePoolSize"
