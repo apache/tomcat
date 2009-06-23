@@ -629,8 +629,8 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <exclude name="bin/version.sh" />
         <exclude name="conf/**" />
         <exclude name="src/**" />
-        <exclude name="bin/x86_64/"/>
-        <exclude name="bin/ia64/"/>
+        <exclude name="bin/x64/"/>
+        <exclude name="bin/i64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
       </tarfileset>
