@@ -177,9 +177,9 @@ Section "Core" SecTomcatCore
   StrCmp $0 "x86" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
   StrCmp $0 "x86_64" 0 +2
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\x86_64\tomcat@VERSION_MAJOR@.exe
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\x64\tomcat@VERSION_MAJOR@.exe
   StrCmp $0 "ia64" 0 +2
-  File /oname=tomcat@VERSION_MAJOR@.exe bin\ia64\tomcat@VERSION_MAJOR@.exe
+  File /oname=tomcat@VERSION_MAJOR@.exe bin\i64\tomcat@VERSION_MAJOR@.exe
 
   InstallRetry:
   ClearErrors
@@ -229,9 +229,9 @@ Section "Native" SecTomcatNative
   StrCmp $0 "x86" 0 +2
   File bin\tcnative-1.dll
   StrCmp $0 "x86_64" 0 +2
-  File /oname=tcnative-1.dll bin\x86_64\tcnative-1.dll
+  File /oname=tcnative-1.dll bin\x64\tcnative-1.dll
   StrCmp $0 "ia64" 0 +2
-  File /oname=tcnative-1.dll bin\ia64\tcnative-1.dll
+  File /oname=tcnative-1.dll bin\i64\tcnative-1.dll
 
   ClearErrors
 
@@ -378,9 +378,9 @@ Function FindCpuType
   ExpandEnvStrings $0 "%PROCESSOR_ARCHITEW6432%"
   StrCmp $0 "%PROCESSOR_ARCHITEW6432%" 0 +5
   StrCmp $0 "IA64" 0 +3	
-  StrCpy $1 "ia64"
+  StrCpy $1 "i64"
   Goto FoundCpu
-  StrCpy $1 "x86_64"
+  StrCpy $1 "x64"
 
 FoundCpu:
   ; Put the result in the stack
