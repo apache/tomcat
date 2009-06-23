@@ -24,7 +24,7 @@ import java.sql.Statement;
 import java.util.Map;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
-import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
 
 public class TestSlowQueryReport extends DefaultTestCase {
 
@@ -36,20 +36,20 @@ public class TestSlowQueryReport extends DefaultTestCase {
         int count = 3;
         this.init();
         this.datasource.setMaxActive(1);
-        this.datasource.setJdbcInterceptors(SlowQueryReportJmx.class.getName());
+        this.datasource.setJdbcInterceptors(SlowQueryReport.class.getName()+"(threshold=50)");
         Connection con = this.datasource.getConnection();
-        String slowSql = "select count(1) from test where val1 like 'ewqeq' and val2 = 'ewrre' and val3 = 'sdada' and val4 = 'dadada'";
+        String slowSql = "select count(1) from test where val1 like 'ewq%eq' and val2 = 'ew%rre' and val3 = 'sda%da' and val4 = 'dad%ada'";
         for (int i=0; i<count; i++) {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(slowSql);
             rs.close();
             st.close();
         }
-        Map<String,SlowQueryReportJmx.QueryStats> map = SlowQueryReportJmx.getPoolStats(datasource.getPool().getName());
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         assertNotNull(map);
         assertEquals(1,map.size());
         String key = map.keySet().iterator().next();
-        SlowQueryReportJmx.QueryStats stats = map.get(key);
+        SlowQueryReport.QueryStats stats = map.get(key);
         System.out.println("Stats:"+stats);
         
         for (int i=0; i<count; i++) {
@@ -71,14 +71,14 @@ public class TestSlowQueryReport extends DefaultTestCase {
         con.close();
         tearDown();
         //make sure we actually did clean up when the pool closed
-        assertNull(SlowQueryReportJmx.getPoolStats(pool.getName()));
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }
 
     public void testFastSql() throws Exception {
         int count = 3;
         this.init();
         this.datasource.setMaxActive(1);
-        this.datasource.setJdbcInterceptors(SlowQueryReportJmx.class.getName());
+        this.datasource.setJdbcInterceptors(SlowQueryReport.class.getName());
         Connection con = this.datasource.getConnection();
         String slowSql = "select 1";
         for (int i=0; i<count; i++) {
@@ -87,20 +87,20 @@ public class TestSlowQueryReport extends DefaultTestCase {
             rs.close();
             st.close();
         }
-        Map<String,SlowQueryReportJmx.QueryStats> map = SlowQueryReportJmx.getPoolStats(datasource.getPool().getName());
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         assertNotNull(map);
         assertEquals(0,map.size());
         ConnectionPool pool = datasource.getPool();
         con.close();
         tearDown();
-        assertNull(SlowQueryReportJmx.getPoolStats(pool.getName()));
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }    
     
     public void testFailedSql() throws Exception {
         int count = 3;
         this.init();
         this.datasource.setMaxActive(1);
-        this.datasource.setJdbcInterceptors(SlowQueryReportJmx.class.getName());
+        this.datasource.setJdbcInterceptors(SlowQueryReport.class.getName());
         Connection con = this.datasource.getConnection();
         String slowSql = "select 1 from non_existent";
         int exceptionCount = 0;
@@ -115,16 +115,16 @@ public class TestSlowQueryReport extends DefaultTestCase {
             st.close();
             
         }
-        Map<String,SlowQueryReportJmx.QueryStats> map = SlowQueryReportJmx.getPoolStats(datasource.getPool().getName());
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         assertNotNull(map);
         assertEquals(1,map.size());
         ConnectionPool pool = datasource.getPool();
         String key = map.keySet().iterator().next();
-        SlowQueryReportJmx.QueryStats stats = map.get(key);
+        SlowQueryReport.QueryStats stats = map.get(key);
         System.out.println("Stats:"+stats);
         con.close();
         tearDown();
-        assertNull(SlowQueryReportJmx.getPoolStats(pool.getName()));
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }    
 
 
