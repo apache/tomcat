@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <!-- Basedir points at tomcat-trunk directory -->
-<project name="Tomcat JDBC Pool" default="build" basedir=".">
+<project name="Tomcat JDBC Pool" default="simplebuild" basedir=".">
 
 
   <!-- ===================== Initialize Property Values =================== -->
@@ -223,7 +223,8 @@
       <zipfileset src="${tomcat-jdbc-src.jar}" prefix="java"/>
       <zipfileset src="${tomcat-jdbc-test-src.jar}" prefix="test"/>
       <fileset dir="${basedir}">
-        <include name="build.*"/>
+        <include name="build.xml"/>
+        <include name="build.properties.default"/>
         <include name="doc/*.xml"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
@@ -233,7 +234,8 @@
       <zipfileset src="${tomcat-jdbc-src.jar}" prefix="java"/>
       <zipfileset src="${tomcat-jdbc-test-src.jar}" prefix="test"/>
       <fileset dir="${basedir}">
-        <include name="build.*"/>
+        <include name="build.xml"/>
+        <include name="build.properties.default"/>
         <include name="doc/*.xml"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
@@ -348,6 +350,8 @@
       </batchtest>
     </junit>
   </target>
+
+  <target name="simplebuild" depends="download,build"/>
 
 </project>
 
