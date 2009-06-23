@@ -346,6 +346,7 @@
         <fileset dir="${basedir}/test">
           <include name="org/apache/tomcat/jdbc/test/*Test*.java"/>
           <exclude name="**/CreateTestTable*"/>
+          <exclude name="**/DefaultTestCase*"/>
         </fileset>
       </batchtest>
     </junit>
