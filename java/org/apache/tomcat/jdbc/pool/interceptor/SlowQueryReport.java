@@ -75,6 +75,30 @@ public class SlowQueryReport extends AbstractQueryReport  {
         this.maxQueries = maxQueries;
     }
     
+    
+    
+    @Override
+    protected String reportFailedQuery(String query, Object[] args, String name, long start, Throwable t) {
+        String sql = super.reportFailedQuery(query, args, name, start, t);
+        if (this.maxQueries > 0 ) {
+            long now = System.currentTimeMillis();
+            long delta = now - start;
+            QueryStats qs = this.getQueryStats(sql);
+            qs.failure(delta, now);
+        }
+        return sql;
+    }
+
+    @Override
+    protected String reportSlowQuery(String query, Object[] args, String name, long start, long delta) {
+        String sql = super.reportSlowQuery(query, args, name, start, delta);
+        if (this.maxQueries > 0 ) {
+            QueryStats qs = this.getQueryStats(sql);
+            qs.add(delta, start);
+        }
+        return sql;
+    }
+
     /**
      * invoked when the connection receives the close request
      * Not used for now.
