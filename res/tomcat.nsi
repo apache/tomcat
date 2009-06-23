@@ -176,9 +176,9 @@ Section "Core" SecTomcatCore
   Pop $0
   StrCmp $0 "x86" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\tomcat@VERSION_MAJOR@.exe
-  StrCmp $0 "x86_64" 0 +2
+  StrCmp $0 "x64" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\x64\tomcat@VERSION_MAJOR@.exe
-  StrCmp $0 "ia64" 0 +2
+  StrCmp $0 "i64" 0 +2
   File /oname=tomcat@VERSION_MAJOR@.exe bin\i64\tomcat@VERSION_MAJOR@.exe
 
   InstallRetry:
