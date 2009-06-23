@@ -67,12 +67,16 @@ public final class Parameters extends MultiMap {
 
     public void setEncoding( String s ) {
         encoding=s;
-        if(debug>0) log( "Set encoding to " + s );
+        if(log.isDebugEnabled()) {
+            log.debug( "Set encoding to " + s );
+        }
     }
 
     public void setQueryStringEncoding( String s ) {
         queryStringEncoding=s;
-        if(debug>0) log( "Set query string encoding to " + s );
+        if(log.isDebugEnabled()) {
+            log.debug( "Set query string encoding to " + s );
+        }
     }
 
     public void recycle() {
@@ -141,8 +145,10 @@ public final class Parameters extends MultiMap {
         if( queryMB==null || queryMB.isNull() )
             return;
         
-        if( debug > 0  )
-            log( "Decoding query " + decodedQuery + " " + queryStringEncoding);
+        if(log.isDebugEnabled()) {
+            log.debug("Decoding query " + decodedQuery + " " +
+                    queryStringEncoding);
+        }
 
         try {
             decodedQuery.duplicate( queryMB );
@@ -196,8 +202,9 @@ public final class Parameters extends MultiMap {
         int end=start+len;
         int pos=start;
         
-        if( debug>0 ) 
-            log( "Bytes: " + new String( bytes, start, len ));
+        if(log.isDebugEnabled()) { 
+            log.debug("Bytes: " + new String( bytes, start, len ));
+        }
 
         do {
             boolean noEq=false;
@@ -214,7 +221,10 @@ public final class Parameters extends MultiMap {
                 noEq=true;
                 valStart=nameEnd;
                 valEnd=nameEnd;
-                if( debug>0) log("no equal " + nameStart + " " + nameEnd + " " + new String(bytes, nameStart, nameEnd-nameStart) );
+                if(log.isDebugEnabled()) {
+                    log.debug("no equal " + nameStart + " " + nameEnd + " " +
+                            new String(bytes, nameStart, nameEnd-nameStart) );
+                }
             }
             if( nameEnd== -1 ) 
                 nameEnd=end;
@@ -343,12 +353,6 @@ public final class Parameters extends MultiMap {
             sb.append("\n");
         }
         return sb.toString();
-    }
-
-    private static int debug=0;
-    private void log(String s ) {
-        if (log.isDebugEnabled())
-            log.debug("Parameters: " + s );
     }
 
 }
