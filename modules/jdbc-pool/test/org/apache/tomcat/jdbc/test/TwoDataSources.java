@@ -36,7 +36,7 @@ public class TwoDataSources extends DefaultTestCase {
         d2.setRemoveAbandoned(false);
         Connection c1 = d1.getConnection();
         Connection c2 = d2.getConnection();
-        Thread.sleep(15000);
+        Thread.sleep(5000);
         try {
             c1.createStatement();
             assertTrue("Connection should have been abandoned.",false);
