@@ -18,6 +18,7 @@
 package org.apache.tomcat.util.http;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -189,9 +190,10 @@ public final class Parameters extends MultiMap {
     // if needed
     ByteChunk tmpName=new ByteChunk();
     ByteChunk tmpValue=new ByteChunk();
-    ByteChunk origName=new ByteChunk();
-    ByteChunk origValue=new ByteChunk();
+    private ByteChunk origName=new ByteChunk();
+    private ByteChunk origValue=new ByteChunk();
     CharChunk tmpNameC=new CharChunk(1024);
+    private static final String DEFAULT_ENCODING = "ISO-8859-1";
     
     public void processParameters( byte bytes[], int start, int len ) {
         processParameters(bytes, start, len, encoding);
@@ -202,8 +204,14 @@ public final class Parameters extends MultiMap {
         int end=start+len;
         int pos=start;
         
-        if(log.isDebugEnabled()) { 
-            log.debug("Bytes: " + new String( bytes, start, len ));
+        if(log.isDebugEnabled()) {
+            try {
+                log.debug("Bytes: " +
+                        new String(bytes, start, len, DEFAULT_ENCODING));
+            } catch (UnsupportedEncodingException e) {
+                // Should never happen...
+                log.error("Unable to convert bytes", e);
+            }
         }
 
         do {
@@ -222,8 +230,14 @@ public final class Parameters extends MultiMap {
                 valStart=nameEnd;
                 valEnd=nameEnd;
                 if(log.isDebugEnabled()) {
-                    log.debug("no equal " + nameStart + " " + nameEnd + " " +
-                            new String(bytes, nameStart, nameEnd-nameStart) );
+                    try {
+                        log.debug("no equal " + nameStart + " " + nameEnd + " " +
+                                new String(bytes, nameStart, nameEnd-nameStart,
+                                        DEFAULT_ENCODING) );
+                    } catch (UnsupportedEncodingException e) {
+                        // Should never happen...
+                        log.error("Unable to convert bytes", e);
+                    }
                 }
             }
             if( nameEnd== -1 ) 
@@ -242,7 +256,13 @@ public final class Parameters extends MultiMap {
                 // No name eg ...&=xx&... will trigger this
                 if (valEnd >= nameStart) {
                     msg.append('\'');
-                    msg.append(new String(bytes, nameStart, valEnd - nameStart));
+                    try {
+                        msg.append(new String(bytes, nameStart,
+                                valEnd - nameStart, DEFAULT_ENCODING));
+                    } catch (UnsupportedEncodingException e) {
+                        // Should never happen...
+                        log.error("Unable to convert bytes", e);
+                    }
                     msg.append("' ");
                 }
                 msg.append("ignored.");
