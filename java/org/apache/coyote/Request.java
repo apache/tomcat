@@ -73,7 +73,6 @@ public final class Request {
 
         parameters.setQuery(queryMB);
         parameters.setURLDecoder(urlDecoder);
-        parameters.setHeaders(headers);
 
     }
 
