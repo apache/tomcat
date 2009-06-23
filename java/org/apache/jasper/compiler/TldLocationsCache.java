@@ -112,7 +112,6 @@ public class TldLocationsCache {
 
     /*
      * Initializes the set of JARs that are known not to contain any TLDs
-     * Keep in sync with o.a.c.startup.TldConfig
      */
     static {
         noTldJars = new HashSet<String>();
@@ -346,8 +345,6 @@ public class TldLocationsCache {
      * @param conn The JarURLConnection to the JAR file to scan
      * @param ignore true if any exceptions raised when processing the given
      * JAR should be ignored, false otherwise
-     *
-     * Keep in sync with o.a.c.startup.TldConfig
      */
     private void scanJar(JarURLConnection conn, boolean ignore)
                 throws JasperException {
@@ -415,8 +412,6 @@ public class TldLocationsCache {
      * Searches the filesystem under /WEB-INF for any TLD files, and adds
      * an implicit map entry to the taglib map for any TLD that has a <uri>
      * element.
-     *
-     * Keep in sync with o.a.c.startup.TldConfig
      */
     private void processTldsInFileSystem(String startPath)
             throws Exception {
@@ -491,8 +486,6 @@ public class TldLocationsCache {
      * The set of shared JARs to be scanned for TLDs is narrowed down by
      * the <tt>noTldJars</tt> class variable, which contains the names of JARs
      * that are known not to contain any TLDs.
-     *
-     * Keep in sync with o.a.c.startup.TldConfig
      */
     private void scanJars() throws Exception {
 
@@ -537,8 +530,6 @@ public class TldLocationsCache {
      *
      * @return TRUE if the JAR file identified by <tt>jarPath</tt> needs to be
      * scanned for TLDs, FALSE otherwise
-     *
-     * Keep in sync with o.a.c.startup.TldConfig
      */
     private boolean needScanJar(ClassLoader loader, ClassLoader webappLoader,
                                 String jarPath) {
