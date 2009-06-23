@@ -398,14 +398,18 @@ public final class Parameters extends MultiMap {
             }
             tmpName.setBytes( bytes, nameStart, nameEnd-nameStart );
             tmpValue.setBytes( bytes, valStart, valEnd-valStart );
-            try {
-                // Take copies as if anything goes wrong originals will be
-                // corrupted. This means original values can be logged
-                origName.append(bytes, nameStart, nameEnd-nameStart);
-                origValue.append(bytes, valStart, valEnd-valStart);
-            } catch (IOException ioe) {
-                // Should never happen...
-                log.error("Error copying parameters", ioe);
+            
+            // Take copies as if anything goes wrong originals will be
+            // corrupted. This means original values can be logged.
+            // For performance - only done for debug
+            if (log.isDebugEnabled()) {
+                try {
+                    origName.append(bytes, nameStart, nameEnd-nameStart);
+                    origValue.append(bytes, valStart, valEnd-valStart);
+                } catch (IOException ioe) {
+                    // Should never happen...
+                    log.error("Error copying parameters", ioe);
+                }
             }
             
             try {
@@ -414,21 +418,31 @@ public final class Parameters extends MultiMap {
                 StringBuilder msg =
                     new StringBuilder("Parameters: Character decoding failed.");
                 msg.append(" Parameter '");
-                msg.append(origName.toString());
-                msg.append("' with value '");
-                msg.append(origValue.toString());
-                msg.append("' has been ignored.");
                 if (log.isDebugEnabled()) {
+                    msg.append(origName.toString());
+                    msg.append("' with value '");
+                    msg.append(origValue.toString());
+                    msg.append("' has been ignored.");
                     log.debug(msg, e);
                 } else {
+                    msg.append(tmpName.toString());
+                    msg.append("' with value '");
+                    msg.append(tmpValue.toString());
+                    msg.append("' has been ignored. Note that the name and ");
+                    msg.append("value quoted here may corrupted due to the ");
+                    msg.append("failed decoding. Use debug level logging to ");
+                    msg.append("see the original, non-corrupted values.");
                     log.warn(msg);
                 }
             }
 
             tmpName.recycle();
             tmpValue.recycle();
-            origName.recycle();
-            origValue.recycle();
+            // Only recycle copies if we used them
+            if (log.isDebugEnabled()) {
+                origName.recycle();
+                origValue.recycle();
+            }
         } while( pos<end );
     }
 
