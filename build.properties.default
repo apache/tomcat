@@ -59,7 +59,7 @@ wsdl4j-src.loc=http://repo1.maven.org/maven2/wsdl4j/wsdl4j/1.6.1/wsdl4j-1.6.1.ja
 jdt.home=${base.path}/eclipse/plugins
 jdt.lib=${jdt.home}
 jdt.jar=${jdt.lib}/org.eclipse.jdt.core_3.3.1.v_780_R33x.jar
-jdt.loc=http://www.eclipse.org/downloads/download.php?file=/eclipse/downloads/drops/R-3.3.1-200709211145/eclipse-JDT-3.3.1.zip
+jdt.loc=http://archive.eclipse.org/eclipse/downloads/drops/R-3.3.1-200709211145/eclipse-JDT-3.3.1.zip
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.1.16
