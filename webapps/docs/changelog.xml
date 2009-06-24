@@ -26,6 +26,7 @@
     <author email="remm@apache.org">Remy Maucherat</author>
     <author email="fhanik@apache.org">Filip Hanik</author>
     <author email="rjung@apache.org">Rainer Jung</author>
+    <author email="kkolinko@apache.org">Konstantin Kolinko</author>
     <title>Changelog</title>
   </properties>
 
@@ -142,6 +143,14 @@
       <update>
         <rev>724849</rev> Implement keep alive timeout for NIO connector.
         (fhanik)
+      </update>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        <rev>787978</rev> Use "1.6" as the default value for compilerSourceVM and compilerTargetVM
+        options of Jasper. (kkolinko)
       </update>
     </changelog>
   </subsection>
