@@ -107,10 +107,10 @@ then the default Eclipse JDT Java compiler will be used instead of using Ant.
 No default value.</li>
 
 <li><strong>compilerSourceVM</strong> - What JDK version are the source files
-compatible with? (Default value: <code>1.5</code>)</li>
+compatible with? (Default value: <code>1.6</code>)</li>
 
 <li><strong>compilerTargetVM</strong> - What JDK version are the generated files
-compatible with? (Default value: <code>1.5</code>)</li>
+compatible with? (Default value: <code>1.6</code>)</li>
 
 <li><strong>development</strong> - Is Jasper used in development mode? If true,
 the frequency at which JSPs are checked for modification may be specified via
@@ -318,9 +318,9 @@ are automatically compiled as part of the build process.
 At the jasper2 task you can use the option <code>addWebXmlMappings</code> for 
 automatic merge the <code>${webapp.path}/WEB-INF/generated_web.xml</code>
 with the current web application deployment descriptor at
-<code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 5
+<code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 6
 features inside your jsp's, add the following javac compiler task attributes:
-<code>source=&quot;1.5&quot; target=&quot;1.5&quot;</code>. For live
+<code>source=&quot;1.6&quot; target=&quot;1.6&quot;</code>. For live
 applications you can also compile with <code>optimize=&quot;on&quot;</code> and
 without debug info <code>debug=&quot;off&quot;</code>.
 </p>
