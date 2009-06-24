@@ -251,7 +251,7 @@ public class AccessLogValve
     private class AccessDateStruct {
         private Date currentDate = new Date();
         private String currentDateString = null;
-        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");;
+        private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
         private SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
         private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
         private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
