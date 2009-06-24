@@ -131,12 +131,12 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Compiler target VM.
      */
-    private String compilerTargetVM = "1.5";
+    private String compilerTargetVM = "1.6";
     
     /**
      * The compiler source VM.
      */
-    private String compilerSourceVM = "1.5";
+    private String compilerSourceVM = "1.6";
     
     /**
      * The compiler class name.
@@ -376,18 +376,6 @@ public final class EmbeddedServletOptions implements Options {
      */
     public EmbeddedServletOptions(ServletConfig config,
             ServletContext context) {
-        
-        // JVM version numbers
-        // - not needed, because this version of Tomcat requires at least JDK 1.5
-        // try {
-        //    if (Float.parseFloat(System.getProperty("java.specification.version")) > 1.4) {
-        //        compilerSourceVM = compilerTargetVM = "1.5";
-        //    } else {
-        //        compilerSourceVM = compilerTargetVM = "1.4";
-        //    }
-        // } catch (NumberFormatException e) {
-        //    // Ignore
-        // }
         
         Enumeration<String> enumeration=config.getInitParameterNames();
         while( enumeration.hasMoreElements() ) {
