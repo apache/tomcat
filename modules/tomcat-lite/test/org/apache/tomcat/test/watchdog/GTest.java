@@ -35,7 +35,8 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.lite.HexDump;
+import org.apache.tools.ant.BuildException;
 
 
 // derived from Jsp
@@ -679,7 +680,9 @@ public class GTest {
                             for ( int i = 0; i < eSize; i++ ) {
                                 if ( headerValues.contains( unexpectedValues.get( i ) ) ) {
                                     numberFound++;
-                                    headerValues.remove( headerValues.indexOf( headerFieldName ) );
+                                    if (headerValues.indexOf(headerFieldName) >= 0) {
+                                        headerValues.remove( headerValues.indexOf( headerFieldName ) );
+                                    }
                                 }
                             }
                             if ( numberFound == eSize ) {
@@ -1044,8 +1047,8 @@ public class GTest {
     private void dumpHex( byte[] serverResponse, byte[] goldenFile ) {
         StringBuffer outBuf = new StringBuffer( ( serverResponse.length + goldenFile.length ) * 2 );
 
-        String fromServerString = HexUtils.getHexDump( serverResponse, 0, serverResponse.length, true );
-        String fromGoldenFileString = HexUtils.getHexDump( goldenFile, 0, goldenFile.length, true );
+        String fromServerString = HexDump.getHexDump( serverResponse, 0, serverResponse.length, true );
+        String fromGoldenFileString = HexDump.getHexDump( goldenFile, 0, goldenFile.length, true );
 
         outBuf.append( " Hex dump of server response and goldenfile below.\n\n### RESPONSE FROM SERVER ###\n" );
         outBuf.append( "----------------------------\n" );
