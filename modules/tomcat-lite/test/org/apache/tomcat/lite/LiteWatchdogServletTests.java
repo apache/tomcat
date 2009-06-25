@@ -61,6 +61,10 @@ public class LiteWatchdogServletTests extends WatchdogClient {
       }
   }
   
+  protected void addConnector(TomcatLite liteServer) {
+      LiteTestHelper.addConnector(liteServer, 8080, true);      
+  }
+  
   public void initServerWithWatchdog(String wdDir) throws ServletException, 
           IOException {
 
@@ -70,7 +74,7 @@ public class LiteWatchdogServletTests extends WatchdogClient {
       //connector.addAdapter("/", new MapperAdapter());
 
       TomcatLite liteServer = new TomcatLite();
-      LiteTestHelper.addConnector(liteServer, 8080, true);
+      addConnector(liteServer);
       liteServer.init("webapps/ROOT", "/");
 
       for (String s : new String[] {      
