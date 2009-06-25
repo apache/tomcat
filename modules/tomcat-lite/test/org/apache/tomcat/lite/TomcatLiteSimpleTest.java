@@ -22,14 +22,10 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TomcatLiteSimpleTest extends TestCase {
 
-  TomcatLite lite = new TomcatLite(); 
-  
-  void initServer() throws Exception {
-    LiteTestHelper.initServletsAndRun(lite, 8804);
-  }
+  protected TomcatLite lite = new TomcatLite(); 
   
   public void setUp() throws Exception {
-    initServer();
+      LiteTestHelper.initServletsAndRun(lite, 8804);
   }
   
   public void tearDown() throws Exception {

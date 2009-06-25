@@ -23,9 +23,9 @@ public class PropertiesSpiTest extends TestCase {
     }
     
     public void testArgs() throws IOException { 
-        Properties res = new Properties();
-        SimpleObjectManager.processArgs(new String[] {
-            "-a=1", "-b", "2"}, res);
+        spi = new SimpleObjectManager(new String[] {
+            "-a=1", "-b", "2"});
+        Properties res = spi.getProperties();
         
         assertEquals("1", res.get("a"));
         assertEquals("2", res.get("b"));
