@@ -89,7 +89,7 @@ public class TomcatLite implements Runnable {
     
     Map<String,String> ctxDefaultInitParam = new HashMap();
         
-    Connector coyoteAdapter;
+    Connector connector;
     
     ObjectManager om;
     
@@ -106,7 +106,12 @@ public class TomcatLite implements Runnable {
     }
 
     // --------------- start/stop ---------------
-    
+
+    public static ObjectManager defaultObjectManager() {
+        SimpleObjectManager cfg = new SimpleObjectManager();
+        cfg.loadResource("org/apache/tomcat/lite/config.properties");
+        return cfg;
+    }
     /**
      * Return the object manager associated with this tomcat.
      * If none set, create a minimal one with the default 
@@ -114,12 +119,7 @@ public class TomcatLite implements Runnable {
      */
     public ObjectManager getObjectManager() {
         if (om == null) {
-            // Defaults.
-            om = new ObjectManager();
-            SimpleObjectManager props = new SimpleObjectManager(om);
-            // Init defaults. If using a custom OM, you should register 
-            // at the default objects as well.
-            props.loadResource("org/apache/tomcat/lite/config.properties");
+            om = defaultObjectManager();
         }
         return om;
     }
@@ -223,7 +223,12 @@ public class TomcatLite implements Runnable {
                 e.printStackTrace();
             }
         }
-        stopConnector();
+        try {
+            stopConnector();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     // -------------- Context add/remove --------------
@@ -309,9 +314,9 @@ public class TomcatLite implements Runnable {
         req.parseSessionId();
         
         try {
-          UriNormalizer.decodeRequest(req.getCoyoteRequest().decodedURI(), 
-                  req.getCoyoteRequest().requestURI(),
-                  req.getCoyoteRequest().getURLDecoder());
+          UriNormalizer.decodeRequest(req.getHttpRequest().decodedURI(), 
+                  req.getHttpRequest().requestURI(),
+                  req.getHttpRequest().getURLDecoder());
         } catch(IOException ioe) {
             res.setStatus(400);
             return;
@@ -336,7 +341,7 @@ public class TomcatLite implements Runnable {
           Thread.currentThread().setContextClassLoader(ctx.getClassLoader());
 
           WebappServletMapper mapper = ctx.getMapper();
-          mapper.map(req.getCoyoteRequest().decodedURI(), mapRes);
+          mapper.map(req.getHttpRequest().decodedURI(), mapRes);
 
           // Possible redirect
           MessageBytes redirectPathMB = mapRes.redirectPath;
@@ -548,8 +553,8 @@ public class TomcatLite implements Runnable {
       
       getConnector().initRequest(req, res);
       
-      req.getCoyoteRequest().method().setString("GET");
-      req.getCoyoteRequest().protocol().setString("HTTP/1.1");
+      req.getHttpRequest().method().setString("GET");
+      req.getHttpRequest().protocol().setString("HTTP/1.1");
       
       return req;
     }
@@ -585,42 +590,41 @@ public class TomcatLite implements Runnable {
     public void endRequest(ServletRequestImpl req,
                            ServletResponseImpl res) throws IOException {
      res.outputBuffer.flush();
-     res.getCoyoteResponse().finish();
+     req.getConnector().finishResponse(res);
     }
     
     public Connector getConnector() {
-        if (coyoteAdapter == null) {
-            coyoteAdapter = (Connector) getObjectManager().get(Connector.class);
-            setConnector(coyoteAdapter);
+        if (connector == null) {
+            connector = (Connector) getObjectManager().get(Connector.class);
+            setConnector(connector);
         }
-        return coyoteAdapter;
+        return connector;
     }
 
     public void setConnector(Connector c) {
-        coyoteAdapter = c;
-        coyoteAdapter.setTomcatLite(this);
-        getObjectManager().bind("Connector", coyoteAdapter);
+        connector = c;
+        connector.setTomcatLite(this);
+        getObjectManager().bind("Connector", connector);
     }
 
     
     public void setDaemon(boolean d) {
         getConnector();
-        if (coyoteAdapter != null) {
-            coyoteAdapter.setDaemon(d);
+        if (connector != null) {
+            connector.setDaemon(d);
         }
     }
 
-    public void startConnector() {
+    public void startConnector() throws IOException {
         getConnector();
-        if (coyoteAdapter != null) {
-            coyoteAdapter.start();
+        if (connector != null) {
+            connector.start();
         }
     }
 
-    public void stopConnector() {
-        getConnector();
-        if (coyoteAdapter != null) {
-            coyoteAdapter.stop();
+    public void stopConnector() throws Exception {
+        if (connector != null) {
+            connector.stop();
         }
     }
 

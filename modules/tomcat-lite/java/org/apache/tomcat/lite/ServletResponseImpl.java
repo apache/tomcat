@@ -1,5 +1,5 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
+ * ontentLicensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
@@ -34,12 +34,11 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.coyote.Response;
-import org.apache.tomcat.lite.coyote.MessageWriter;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.HttpResponse;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ServerCookie;
 
@@ -62,25 +61,12 @@ public class ServletResponseImpl
         "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // ----------------------------------------------------------- Constructors
-
-    private Response resB;
+    
     
     ServletResponseImpl() {
         urlEncoder.addSafeCharacter('/');
     }
 
-
-    // ----------------------------------------------------- Class Variables
-
-
-    /**
-     * Descriptive information about this Response implementation.
-     */
-    protected static final String info =
-        "org.apache.tomcat.lite/1.0";
-
-
-    // ----------------------------------------------------- Instance Variables
 
     /**
      * The date format we will use for creating date headers.
@@ -88,30 +74,10 @@ public class ServletResponseImpl
     protected SimpleDateFormat format = null;
 
 
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Set the Connector through which this Request was received.
-     *
-     * @param connector The new connector
-     */
-    public void setConnector() {
-        // default size to size of one ajp-packet
-        outputBuffer = MessageWriter.getWriter(req.getCoyoteRequest(), getCoyoteResponse(), 4096);
-        outputStream = new ServletOutputStreamImpl(outputBuffer);
-    }
-
-    /**
-     * Coyote response.
-     */
-    //protected org.apache.coyote.Response coyoteResponse;
-
-
     /**
      * The associated output buffer.
      */
-    protected MessageWriter outputBuffer;
+    protected BodyWriter outputBuffer;
 
 
     /**
@@ -168,6 +134,11 @@ public class ServletResponseImpl
 
 
     /**
+     * The request with which this response is associated.
+     */
+    protected ServletRequestImpl req = null;
+
+    /**
      * URL encoder.
      */
     protected UEncoder urlEncoder = new UEncoder();
@@ -179,6 +150,27 @@ public class ServletResponseImpl
     protected CharChunk redirectURLCC = new CharChunk(1024);
 
 
+    private HttpResponse resB;
+    
+    
+    // Cached/derived information - reflected in headers
+    protected static Locale DEFAULT_LOCALE = Locale.getDefault();
+    
+    public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
+
+    protected Locale locale = DEFAULT_LOCALE;
+
+    // XXX 
+    protected boolean commited = false;
+    protected String contentType = null;
+    
+    /**
+     * Has the charset been explicitly set.
+     */
+    protected boolean charsetSet = false;
+    protected String characterEncoding = DEFAULT_CHARACTER_ENCODING;
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -188,10 +180,10 @@ public class ServletResponseImpl
      */
     public void recycle() {
 
-        outputBuffer.recycle();
         usingOutputStream = false;
         usingWriter = false;
         appCommitted = false;
+        commited = false;
         included = false;
         error = false;
         isCharacterEncodingSet = false;
@@ -199,7 +191,8 @@ public class ServletResponseImpl
         cookies.clear();
 
         outputBuffer.recycle();
-
+        
+        resB.recycle();
     }
 
 
@@ -210,7 +203,7 @@ public class ServletResponseImpl
      * Return the number of bytes actually written to the output stream.
      */
     public int getContentCount() {
-        return outputBuffer.getContentWritten();
+        return outputBuffer.getBytesWritten() + outputBuffer.getCharsWritten();
     }
 
 
@@ -229,8 +222,8 @@ public class ServletResponseImpl
      */
     public boolean isAppCommitted() {
         return (this.appCommitted || isCommitted() || isSuspended()
-                || ((getContentLength() > 0) 
-                    && (getContentCount() >= getContentLength())));
+                || ((getHttpResponse().getContentLength() > 0) 
+                    && (getContentCount() >= getHttpResponse().getContentLength())));
     }
 
 
@@ -254,21 +247,6 @@ public class ServletResponseImpl
 
 
     /**
-     * Return descriptive information about this Response implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
-    public String getInfo() {
-        return (info);
-    }
-
-
-    /**
-     * The request with which this response is associated.
-     */
-    protected ServletRequestImpl req = null;
-
-    /**
      * Return the Request with which this Response is associated.
      */
     public ServletRequestImpl getRequest() {
@@ -289,9 +267,6 @@ public class ServletResponseImpl
      * Return the output stream associated with this Response.
      */
     public OutputStream getStream() {
-        if (outputStream == null) {
-            outputStream = new ServletOutputStreamImpl(outputBuffer);
-        }
         return outputStream;
     }
 
@@ -351,27 +326,23 @@ public class ServletResponseImpl
     public ServletOutputStream createOutputStream() 
         throws IOException {
         // Probably useless
-        if (outputStream == null) {
-            outputStream = new ServletOutputStreamImpl(outputBuffer);
-        }
         return outputStream;
     }
-
-
-    /**
-     * Return the content length that was set or calculated for this Response.
-     */
-    public int getContentLength() {
-        return getCoyoteResponse().getContentLength();
-    }
-
 
     /**
      * Return the content type that was set or calculated for this response,
      * or <code>null</code> if no content type was set.
      */
     public String getContentType() {
-        return getCoyoteResponse().getContentType();
+        String ret = contentType;
+
+        if (ret != null 
+            && characterEncoding != null
+            && charsetSet) {
+            ret = ret + ";charset=" + characterEncoding;
+        }
+
+        return ret;
     }
 
 
@@ -426,7 +397,7 @@ public class ServletResponseImpl
      * Return the character encoding used for this Response.
      */
     public String getCharacterEncoding() {
-        return (getCoyoteResponse().getCharacterEncoding());
+        return characterEncoding;
     }
 
 
@@ -445,19 +416,19 @@ public class ServletResponseImpl
                 ("usingWriter");
 
         usingOutputStream = true;
-        if (outputStream == null) {
-            outputStream = new ServletOutputStreamImpl(outputBuffer);
-        }
         return outputStream;
 
     }
 
+    public BodyWriter getBodyWriter() {
+        return outputBuffer;
+    }
 
     /**
      * Return the Locale assigned to this response.
      */
     public Locale getLocale() {
-        return (getCoyoteResponse().getLocale());
+        return locale;
     }
 
 
@@ -503,9 +474,8 @@ public class ServletResponseImpl
      * Has the output of this response already been committed?
      */
     public boolean isCommitted() {
-        return (getCoyoteResponse().isCommitted());
+        return getHttpResponse().isCommitted();
     }
-
 
     /**
      * Clear any content written to the buffer.
@@ -518,8 +488,16 @@ public class ServletResponseImpl
         if (included)
             return;     // Ignore any call from an included servlet
 
-        getCoyoteResponse().reset();
-        //req.con.reset();
+        if (isCommitted())
+            throw new IllegalStateException("isCommitted");
+        
+        resB.recycle(); // reset headers, status code, message
+        req.getConnector().reset(this);
+        contentType = null;
+        locale = DEFAULT_LOCALE;
+        characterEncoding = DEFAULT_CHARACTER_ENCODING;
+        charsetSet = false;
+        
         outputBuffer.reset();
     }
 
@@ -577,7 +555,7 @@ public class ServletResponseImpl
         if (usingWriter && !"ISO-8859-1".equals(getCharacterEncoding())) {
             return;
         }
-        getCoyoteResponse().setContentLength(length);
+        getHttpResponse().setContentLength(length);
 
     }
 
@@ -606,7 +584,7 @@ public class ServletResponseImpl
             }
         }
 
-        getCoyoteResponse().setContentType(type);
+        getHttpResponse().setContentType(type);
 
         // Check to see if content type contains charset
         if (type != null) {
@@ -654,7 +632,13 @@ public class ServletResponseImpl
         if (usingWriter)
             return;
 
-        getCoyoteResponse().setCharacterEncoding(charset);
+        if (isCommitted())
+            return;
+        if (charset == null)
+            return;
+
+        characterEncoding = charset;
+        charsetSet=true;
         isCharacterEncodingSet = true;
     }
 
@@ -675,7 +659,25 @@ public class ServletResponseImpl
         if (included)
             return;
 
-        getCoyoteResponse().setLocale(locale);
+        if (locale == null) {
+            return;  // throw an exception?
+        }
+
+        // Save the locale for use by getLocale()
+        this.locale = locale;
+
+        // Set the contentLanguage for header output
+        String contentLanguage = locale.getLanguage();
+        if ((contentLanguage != null) && (contentLanguage.length() > 0)) {
+            String country = locale.getCountry();
+            StringBuffer value = new StringBuffer(contentLanguage);
+            if ((country != null) && (country.length() > 0)) {
+                value.append('-');
+                value.append(country);
+            }
+            contentLanguage = value.toString();
+        }
+        resB.setHeader("Content-Language", contentLanguage);
 
         // Ignore any call made after the getWriter has been invoked.
         // The default should be used
@@ -689,7 +691,7 @@ public class ServletResponseImpl
         Locale2Charset cm = req.getContext().getCharsetMapper();
         String charset = cm.getCharset( locale );
         if ( charset != null ){
-            getCoyoteResponse().setCharacterEncoding(charset);
+            setCharacterEncoding(charset);
         }
 
     }
@@ -716,7 +718,7 @@ public class ServletResponseImpl
      * @param name Header name to look up
      */
     public String getHeader(String name) {
-        return getCoyoteResponse().getMimeHeaders().getHeader(name);
+        return getHttpResponse().getMimeHeaders().getHeader(name);
     }
 
 
@@ -724,16 +726,15 @@ public class ServletResponseImpl
      * Return an array of all the header names set for this response, or
      * a zero-length array if no headers have been set.
      */
-    public String[] getHeaderNames() {
+    public Iterable<String> getHeaderNames() {
 
-        MimeHeaders headers = getCoyoteResponse().getMimeHeaders();
+        MimeHeaders headers = getHttpResponse().getMimeHeaders();
         int n = headers.size();
-        String[] result = new String[n];
+        ArrayList<String> result = new ArrayList<String>();
         for (int i = 0; i < n; i++) {
-            result[i] = headers.getName(i).toString();
+            result.add(headers.getName(i).toString());
         }
         return result;
-
     }
 
 
@@ -746,7 +747,7 @@ public class ServletResponseImpl
      */
     public String[] getHeaderValues(String name) {
 
-        Enumeration enumeration = getCoyoteResponse().getMimeHeaders().values(name);
+        Enumeration enumeration = getHttpResponse().getMimeHeaders().values(name);
         Vector result = new Vector();
         while (enumeration.hasMoreElements()) {
             result.addElement(enumeration.nextElement());
@@ -763,7 +764,7 @@ public class ServletResponseImpl
      * for this Response.
      */
     public String getMessage() {
-        return getCoyoteResponse().getMessage();
+        return getHttpResponse().getMessage();
     }
 
 
@@ -771,7 +772,7 @@ public class ServletResponseImpl
      * Return the HTTP status code associated with this Response.
      */
     public int getStatus() {
-        return getCoyoteResponse().getStatus();
+        return getHttpResponse().getStatus();
     }
 
 
@@ -864,7 +865,7 @@ public class ServletResponseImpl
         if (included)
             return;
 
-        getCoyoteResponse().addHeader(name, value);
+        getHttpResponse().addHeader(name, value);
 
     }
 
@@ -901,15 +902,15 @@ public class ServletResponseImpl
         if(cc=='C' || cc=='c') {
             if(name.equalsIgnoreCase("Content-Type")) {
                 // Will return null if this has not been set
-                return (getCoyoteResponse().getContentType() != null);
+                return getContentType() != null;
             }
             if(name.equalsIgnoreCase("Content-Length")) {
                 // -1 means not known and is not sent to client
-                return (getCoyoteResponse().getContentLengthLong() != -1);
+                return (getHttpResponse().getContentLength() != -1);
             }
         }
 
-        return getCoyoteResponse().containsHeader(name);
+        return getHttpResponse().containsHeader(name);
     }
 
 
@@ -995,8 +996,7 @@ public class ServletResponseImpl
         if (included)
             return; 
 
-        getCoyoteResponse().acknowledge();
-
+        req.getConnector().acknowledge(this);
     }
 
 
@@ -1039,8 +1039,8 @@ public class ServletResponseImpl
 
         setError();
 
-        getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
+        getHttpResponse().setStatus(status);
+        getHttpResponse().setMessage(message);
 
         // Clear any data content that has been buffered
         resetBuffer();
@@ -1156,7 +1156,7 @@ public class ServletResponseImpl
         if (included)
             return;
 
-        getCoyoteResponse().setHeader(name, value);
+        getHttpResponse().setHeader(name, value);
 
     }
 
@@ -1210,8 +1210,8 @@ public class ServletResponseImpl
         if (included)
             return;
 
-        getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
+        getHttpResponse().setStatus(status);
+        getHttpResponse().setMessage(message);
 
     }
 
@@ -1425,23 +1425,35 @@ public class ServletResponseImpl
       return outputBuffer.getBytesWritten();
     }
 
-    public MessageWriter getOutputBuffer() {
+    public BodyWriter getOutputBuffer() {
       return outputBuffer;
+    }
+    
+    public void setWriter(BodyWriter ob) {
+        outputBuffer = ob;
+        outputStream = new ServletOutputStreamImpl(outputBuffer);
     }
 
     public CharSequence getResponseHeader(String name) {
-      MessageBytes v = getCoyoteResponse().getMimeHeaders().getValue(name);
+      MessageBytes v = getHttpResponse().getMimeHeaders().getValue(name);
       return (v == null) ? null : v.toString();
     }
 
 
-    public Response getCoyoteResponse() {
+    public HttpResponse getHttpResponse() {
       return resB;
     }
 
 
-    public void setCoyoteResponse(Response resB) {
+    public void setHttpResponse(HttpResponse resB, BodyWriter ob) {
         this.resB = resB;
+        setWriter(ob);
+    }
+
+
+    @Override
+    public Iterable<String> getHeaders(String name) {
+        return null;
     }
 
 

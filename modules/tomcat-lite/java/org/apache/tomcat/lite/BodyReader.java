@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.lite.coyote;
+package org.apache.tomcat.lite;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.HashMap;
 
-import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -30,7 +29,6 @@ import org.apache.tomcat.util.buf.CharChunk;
  * Refactored from catalina.connector.InputBuffer. Renamed to avoid conflict
  * with coyote class.
  * 
- * TODO: move to coyote package.
  */
 
 /**
@@ -41,7 +39,7 @@ import org.apache.tomcat.util.buf.CharChunk;
  *
  * @author Remy Maucherat
  */
-public class MessageReader extends Reader
+public class BodyReader extends Reader
     implements ByteChunk.ByteInputChannel, CharChunk.CharInputChannel,
                CharChunk.CharOutputChannel {
 
@@ -126,8 +124,8 @@ public class MessageReader extends Reader
     /**
      * Associated Coyote request.
      */
-    private Request coyoteRequest;
-
+    private ServletRequestImpl coyoteRequest;
+    Connector connector;
 
     /**
      * Buffer position.
@@ -147,7 +145,7 @@ public class MessageReader extends Reader
     /**
      * Default constructor. Allocate the buffer with the default buffer size.
      */
-    public MessageReader() {
+    public BodyReader() {
         this(DEFAULT_BUFFER_SIZE);
     }
 
@@ -157,7 +155,7 @@ public class MessageReader extends Reader
      * 
      * @param size Buffer size to use
      */
-    public MessageReader(int size) {
+    public BodyReader(int size) {
         this.size = size;
         bb = new ByteChunk(size);
         bb.setLimit(size);
@@ -178,19 +176,11 @@ public class MessageReader extends Reader
      * 
      * @param coyoteRequest Associated Coyote request
      */
-    public void setRequest(Request coyoteRequest) {
-	this.coyoteRequest = coyoteRequest;
+    public void setConnector(Connector c, ServletRequestImpl coyoteRequest) {
+        this.connector = c;
+        this.coyoteRequest = coyoteRequest;
     }
 
-
-    /**
-     * Get associated Coyote request.
-     * 
-     * @return the associated Coyote request
-     */
-    public Request getRequest() {
-        return this.coyoteRequest;
-    }
 
 
     // --------------------------------------------------------- Public Methods
@@ -273,7 +263,7 @@ public class MessageReader extends Reader
 
         state = BYTE_STATE;
 
-        int result = coyoteRequest.doRead(bb);
+        int result = connector.doRead(coyoteRequest, bb);
 
         return result;
 
@@ -460,13 +450,13 @@ public class MessageReader extends Reader
     public class MRInputStream extends InputStream {
         public long skip(long n)
                 throws IOException {
-            return MessageReader.this.skip(n);
+            return BodyReader.this.skip(n);
         }
 
         public void mark(int readAheadLimit)
         {
             try {
-                MessageReader.this.mark(readAheadLimit);
+                BodyReader.this.mark(readAheadLimit);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -475,29 +465,29 @@ public class MessageReader extends Reader
 
         public void reset()
         throws IOException {
-            MessageReader.this.reset();
+            BodyReader.this.reset();
         }
 
 
 
         public int read()
         throws IOException {    
-            return MessageReader.this.readByte();
+            return BodyReader.this.readByte();
         }
 
         public int available() throws IOException {
-            return MessageReader.this.available();
+            return BodyReader.this.available();
         }
 
         public int read(final byte[] b) throws IOException {
-            return MessageReader.this.read(b, 0, b.length);
+            return BodyReader.this.read(b, 0, b.length);
         }
 
 
         public int read(final byte[] b, final int off, final int len)
         throws IOException {
 
-            return MessageReader.this.read(b, off, len);
+            return BodyReader.this.read(b, off, len);
         }
 
 
@@ -507,7 +497,7 @@ public class MessageReader extends Reader
          * which would permantely disable us.
          */
         public void close() throws IOException {
-            MessageReader.this.close();
+            BodyReader.this.close();
         }
     }
     

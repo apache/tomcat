@@ -4,10 +4,7 @@ package org.apache.tomcat.lite.webxml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,16 +36,6 @@ public class WebXml {
         d = cfg;
     }
 
-    /**
-     * Serialize the data, for caching. 
-     */
-    public void saveWebAppData(String fileName) throws IOException {
-        ObjectOutputStream oos = 
-            new ObjectOutputStream(new FileOutputStream(fileName));
-        oos.writeObject(d);
-        oos.close();
-    }
-    
     public ServletContextConfig getWebAppData() {
         return d;
     }
