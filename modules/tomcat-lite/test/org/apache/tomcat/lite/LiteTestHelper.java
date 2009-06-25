@@ -15,26 +15,29 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
-import org.apache.tomcat.lite.coyote.CoyoteHttp;
+import org.apache.tomcat.lite.coyote.CoyoteConnector;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class LiteTestHelper {
 
-    public static void initServletsAndRun(TomcatLite lite, int port) throws ServletException, IOException {
+    public static void addContext(TomcatLite lite) throws ServletException {
         ServletContextImpl ctx = 
-          (ServletContextImpl) lite.addServletContext(null, null, "/test1");
-        
-        ctx.addServlet("test", new SimpleServlet());
-        ctx.addMapping("/1stTest", "test");
+            (ServletContextImpl) lite.addServletContext(null, null, "/test1");
+          
+          ctx.addServlet("test", new SimpleServlet());
+          ctx.addMapping("/1stTest", "test");
 
-        ctx.addServlet("testException", new HttpServlet() {
-            public void doGet(HttpServletRequest req, HttpServletResponse res) 
-              throws IOException {
-              throw new NullPointerException();
-            }
-          });
-          ctx.addMapping("/testException", "testException");
-        
+          ctx.addServlet("testException", new HttpServlet() {
+              public void doGet(HttpServletRequest req, HttpServletResponse res) 
+                throws IOException {
+                throw new NullPointerException();
+              }
+            });
+            ctx.addMapping("/testException", "testException");
+    }
+    
+    public static void initServletsAndRun(TomcatLite lite, int port) throws ServletException, IOException {
+        addContext(lite);
         lite.init();
         lite.start(); 
 
@@ -54,9 +57,9 @@ public class LiteTestHelper {
     
     public static void addConnector(TomcatLite lite, 
                                     int port, boolean daemon) { 
-        CoyoteHttp coyoteAdapter = (CoyoteHttp) lite.getConnector();
-        coyoteAdapter.getConnectors().setPort(port);
-        coyoteAdapter.getConnectors().setDaemon(daemon);
+        CoyoteConnector coyoteAdapter = (CoyoteConnector) lite.getConnector();
+        coyoteAdapter.setPort(port);
+        coyoteAdapter.setDaemon(daemon);
     }
     
     /**
@@ -79,29 +82,7 @@ public class LiteTestHelper {
         }
         return out;
     }
-
-    /** 
-     * Create a ServletRequestImpl object that can be used with 
-     *  TomcatLite.service(request).
-     *  
-     * All output will be added to the ByteChunk out.
-     * 
-     * This requires no HTTP connector.
-     * 
-     * @see TomcatLiteNoConnector
-     */
-    public static ServletRequestImpl createMessage(TomcatLite lite, 
-                                                   String uri,
-                                                   final ByteChunk out) {
-       ServletRequestImpl req = lite.createMessage();
-       req.setRequestURI(uri);
-       ServletResponseImpl res = req.getResponse();
-       res.getCoyoteResponse().setOutputBuffer(
-                   new ByteChunkOutputBuffer(out));
-       return req;
-     }
     
-
     static class ByteChunkOutputBuffer implements OutputBuffer {
         
         protected ByteChunk output = null;

@@ -46,7 +46,7 @@ public class WatchdogHttpClient {
         
         // XXX headers are ignored
         Socket socket = new Socket( host, port );
-
+        
         //socket obtained, rebuild the request.
         rebuildRequest(client, client.request, socket);
 
@@ -249,6 +249,8 @@ public class WatchdogHttpClient {
                     System.out.println( "Partial read: " + sb.toString() );
                     ex.printStackTrace();
                 }
+                input.close();
+                break;
             }
         }
         return  sb.toString();
