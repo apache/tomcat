@@ -5,8 +5,8 @@ package org.apache.tomcat.lite.webxml;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.apache.tomcat.lite.ServletContextImpl;
 import org.apache.tomcat.lite.ContextPreinitListener;
+import org.apache.tomcat.lite.ServletContextImpl;
 
 /**
  * Default configurator - parse web.xml, init the context.
