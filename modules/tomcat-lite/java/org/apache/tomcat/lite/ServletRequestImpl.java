@@ -36,8 +36,10 @@ import java.util.logging.Level;
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
@@ -45,12 +47,11 @@ import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
-import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
 import org.apache.tomcat.addons.UserSessionManager;
-import org.apache.tomcat.lite.coyote.MessageReader;
 import org.apache.tomcat.servlets.util.Enumerator;
 import org.apache.tomcat.servlets.util.LocaleParser;
 import org.apache.tomcat.servlets.util.RequestUtil;
@@ -60,19 +61,19 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UriNormalizer;
 import org.apache.tomcat.util.http.Cookies;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.HttpRequest;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.mapper.MappingData;
 
 
 /**
+ * 
  * Wrapper object for the Coyote request.
  *
  * @author Remy Maucherat
  * @author Craig R. McClanahan
- * @version $Revision$ $Date$
  */
-
 public class ServletRequestImpl implements HttpServletRequest {
 
     /**
@@ -287,21 +288,21 @@ public class ServletRequestImpl implements HttpServletRequest {
     /**
      * The associated input buffer.
      */
-    protected MessageReader inputBuffer = new MessageReader();
+    protected BodyReader inputBuffer;
 
+    Connector connector;
 
     /**
      * ServletInputStream.
      */
-    protected ServletInputStreamImpl inputStream = 
-        new ServletInputStreamImpl(inputBuffer.asInputStream());
+    protected ServletInputStreamImpl inputStream; 
 
 
     /**
      * Reader.
      */
-    protected BufferedReader reader = new ServletReaderImpl(inputBuffer);
-
+    protected BufferedReader reader;
+    
 
     /**
      * Using stream flag.
@@ -426,7 +427,7 @@ public class ServletRequestImpl implements HttpServletRequest {
     public  byte[] postData = null;
 
     
-    private Request coyoteRequest;
+    private HttpRequest httpRequest;
     
     /** New IO/buffer model  
      */
@@ -495,6 +496,13 @@ public class ServletRequestImpl implements HttpServletRequest {
         // Not used
     }
 
+    public void setConnector(Connector c) {
+        connector = c;
+    }
+    
+    public Connector getConnector() {
+        return connector;
+    }
 
     /**
      * Add a Locale to the set of preferred Locales for this Request.  The
@@ -516,7 +524,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param values Corresponding values for this request parameter
      */
     public void addParameter(String name, String values[]) {
-        coyoteRequest.getParameters().addParameterValues(name, values);
+        httpRequest.getParameters().addParameterValues(name, values);
     }
 
     /**
@@ -648,7 +656,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the character encoding for this Request.
      */
     public String getCharacterEncoding() {
-      return (coyoteRequest.getCharacterEncoding());
+      return (httpRequest.getCharacterEncoding());
     }
 
 
@@ -656,7 +664,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the content length for this Request.
      */
     public int getContentLength() {
-        return (coyoteRequest.getContentLength());
+        return (httpRequest.getContentLength());
     }
 
 
@@ -707,7 +715,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the content type for this Request.
      */
     public String getContentType() {
-        return (coyoteRequest.getContentType());
+        return (httpRequest.getContentType());
     }
 
 
@@ -792,7 +800,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @return the URL decoded request URI
      */
     public String getDecodedRequestURI() {
-        return (coyoteRequest.decodedURI().toString());
+        return (httpRequest.decodedURI().toString());
     }
 
 
@@ -802,7 +810,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @return the URL decoded request URI
      */
     public MessageBytes getDecodedRequestURIMB() {
-        return (coyoteRequest.decodedURI());
+        return (httpRequest.decodedURI());
     }
 
 
@@ -823,14 +831,14 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param name Name of the requested header
      */
     public String getHeader(String name) {
-        return coyoteRequest.getHeader(name);
+        return httpRequest.getHeader(name);
     }
     
     /**
      * Return the names of all headers received with this request.
      */
     public Enumeration getHeaderNames() {
-        return coyoteRequest.getMimeHeaders().names();
+        return httpRequest.getMimeHeaders().names();
     }
 
 
@@ -841,7 +849,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param name Name of the requested header
      */
     public Enumeration getHeaders(String name) {
-        return coyoteRequest.getMimeHeaders().values(name);
+        return httpRequest.getMimeHeaders().values(name);
     }
 
     /**
@@ -891,7 +899,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * which the request  was received.
      */       
     public String getLocalAddr(){
-        return coyoteRequest.localAddr().toString();
+        return httpRequest.localAddr().toString();
     }
 
 
@@ -940,7 +948,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * which the request was received.
      */
     public String getLocalName(){
-        return coyoteRequest.localName().toString();
+        return httpRequest.localName().toString();
     }
 
 
@@ -949,7 +957,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * on which the request was received.
      */
     public int getLocalPort(){
-        return coyoteRequest.getLocalPort();
+        return httpRequest.getLocalPort();
     }
 
 
@@ -966,7 +974,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the HTTP request method used in this Request.
      */
     public String getMethod() {
-        return coyoteRequest.method().toString();
+        return httpRequest.method().toString();
     }
 
 
@@ -982,7 +990,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         if (!parametersParsed)
             parseParameters();
 
-        return coyoteRequest.getParameters().getParameter(name);
+        return httpRequest.getParameters().getParameter(name);
 
     }
 
@@ -1023,7 +1031,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         if (!parametersParsed)
             parseParameters();
 
-        return coyoteRequest.getParameters().getParameterNames();
+        return httpRequest.getParameters().getParameterNames();
 
     }
 
@@ -1039,7 +1047,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         if (!parametersParsed)
             parseParameters();
 
-        return coyoteRequest.getParameters().getParameterValues(name);
+        return httpRequest.getParameters().getParameterValues(name);
 
     }
 
@@ -1090,14 +1098,14 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the protocol and version used to make this Request.
      */
     public String getProtocol() {
-        return coyoteRequest.protocol().toString();
+        return httpRequest.protocol().toString();
     }
 
     /**
      * Return the query string associated with this request.
      */
     public String getQueryString() {
-        String queryString = coyoteRequest.queryString().toString();
+        String queryString = httpRequest.queryString().toString();
         if (queryString == null || queryString.equals("")) {
             return (null);
         } else {
@@ -1184,10 +1192,10 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the remote IP address making this Request.
      */
     public String getRemoteAddr() {
-      if (coyoteRequest.remoteAddr().isNull()) {
-        coyoteRequest.action(ActionCode.ACTION_REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
+      if (httpRequest.remoteAddr().isNull()) {
+        httpRequest.remoteAddr().setString(connector.getRemoteAddr(this));
       }
-      return coyoteRequest.remoteAddr().toString();
+      return httpRequest.remoteAddr().toString();
     }
 
 
@@ -1195,10 +1203,10 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the remote host name making this Request.
      */
     public String getRemoteHost() {
-      if (coyoteRequest.remoteHost().isNull()) {
-        coyoteRequest.action(ActionCode.ACTION_REQ_HOST_ATTRIBUTE, coyoteRequest);
+      if (httpRequest.remoteHost().isNull()) {
+        httpRequest.remoteHost().setString(connector.getRemoteHost(this));
       }
-      return coyoteRequest.remoteHost().toString();
+      return httpRequest.remoteHost().toString();
     }
 
 
@@ -1207,7 +1215,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * or last proxy that sent the request.
      */    
     public int getRemotePort(){
-        return coyoteRequest.getRemotePort();
+        return httpRequest.getRemotePort();
     }
 
 
@@ -1234,15 +1242,20 @@ public class ServletRequestImpl implements HttpServletRequest {
         return this;
     }
     
-    public Request getCoyoteRequest() {
-      return coyoteRequest;
+    public HttpRequest getHttpRequest() {
+      return httpRequest;
     }
     
-    public void setCoyoteRequest(Request req) {
-      this.coyoteRequest = req;
-      inputBuffer.setRequest(req);
+    public void setHttpRequest(HttpRequest req, BodyReader in) {
+      this.httpRequest = req;
+      inputBuffer = in;
+      inputStream = new ServletInputStreamImpl(inputBuffer.asInputStream());
+      reader = new ServletReaderImpl(inputBuffer);
     }
 
+    public BodyReader getBodyReader() {
+        return inputBuffer;
+    }
 
     /**
      * Return a RequestDispatcher that wraps the resource at the specified
@@ -1315,16 +1328,16 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the request URI for this request.
      */
     public String getRequestURI() {
-        return coyoteRequest.requestURI().toString();
+        return httpRequest.requestURI().toString();
     }
     
     /**
      */
     public void setRequestURI(String uri) {
-      coyoteRequest.decodedURI().setString(uri);
+      httpRequest.decodedURI().setString(uri);
       try {
-        UriNormalizer.decodeRequest(coyoteRequest.decodedURI(), 
-                coyoteRequest.requestURI(), coyoteRequest.getURLDecoder());
+        UriNormalizer.decodeRequest(httpRequest.decodedURI(), 
+                httpRequest.requestURI(), httpRequest.getURLDecoder());
       } catch(IOException ioe) {
         ioe.printStackTrace();
         return;
@@ -1384,7 +1397,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the scheme used to make this Request.
      */
     public String getScheme() {
-        String scheme = coyoteRequest.scheme().toString();
+        String scheme = httpRequest.scheme().toString();
         if (scheme == null) {
             scheme = (isSecure() ? "https" : "http");
         }
@@ -1396,7 +1409,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the server name responding to this Request.
      */
     public String getServerName() {
-        return (coyoteRequest.serverName().toString());
+        return (httpRequest.serverName().toString());
     }
 
 
@@ -1404,7 +1417,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Return the server port responding to this Request.
      */
     public int getServerPort() {
-        return (coyoteRequest.getServerPort());
+        return (httpRequest.getServerPort());
     }
 
 
@@ -1600,7 +1613,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         parameterMap.clear();
 
         mappingData.recycle();
-
+        httpRequest.recycle();
     }
 
 
@@ -1772,7 +1785,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         String dummy = new String(buffer, enc);
 
         // Save the validated encoding
-        coyoteRequest.setCharacterEncoding(enc);
+        httpRequest.setCharacterEncoding(enc);
 
     }
 
@@ -1863,7 +1876,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param method The request method
      */
     public void setMethod(String method) {
-      coyoteRequest.method().setString(method);
+      httpRequest.method().setString(method);
     }
 
 
@@ -1990,7 +2003,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param name The server name
      */
     public void setServerName(String name) {
-        coyoteRequest.serverName().setString(name);
+        httpRequest.serverName().setString(name);
     }
 
 
@@ -2000,7 +2013,7 @@ public class ServletRequestImpl implements HttpServletRequest {
      * @param port The server port
      */
     public void setServerPort(int port) {
-        coyoteRequest.setServerPort(port);
+        httpRequest.setServerPort(port);
     }
 
 
@@ -2067,7 +2080,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
 
     public String toString() {
-        return coyoteRequest.requestURI().toString();
+        return httpRequest.requestURI().toString();
     }
 
 
@@ -2195,7 +2208,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
         cookiesParsed = true;
 
-        Cookies serverCookies = coyoteRequest.getCookies();
+        Cookies serverCookies = httpRequest.getCookies();
         int count = serverCookies.getCookieCount();
         if (count <= 0)
             return;
@@ -2271,7 +2284,7 @@ public class ServletRequestImpl implements HttpServletRequest {
 
         parametersParsed = true;
 
-        Parameters parameters = coyoteRequest.getParameters();
+        Parameters parameters = httpRequest.getParameters();
 
         // getCharacterEncoding() may have been overridden to search for
         // hidden form field containing request encoding
@@ -2349,7 +2362,7 @@ public class ServletRequestImpl implements HttpServletRequest {
         String sessionCookieName = context.getSessionCookieName();
         
         // Parse session id from cookies
-        Cookies serverCookies = coyoteRequest.getCookies();
+        Cookies serverCookies = httpRequest.getCookies();
         int count = serverCookies.getCookieCount();
         if (count <= 0)
             return;
@@ -2382,9 +2395,8 @@ public class ServletRequestImpl implements HttpServletRequest {
      * Parse session id in URL.
      */
     protected void parseSessionId() {
-        Request req = coyoteRequest;
         ServletRequestImpl request = this;
-        ByteChunk uriBC = req.requestURI().getByteChunk();
+        ByteChunk uriBC = httpRequest.requestURI().getByteChunk();
         int semicolon = uriBC.indexOf(match, 0, match.length(), 0);
 
         if (semicolon > 0) {
@@ -2503,6 +2515,47 @@ public class ServletRequestImpl implements HttpServletRequest {
     public AsyncContext startAsync(ServletRequest servletRequest,
                                    ServletResponse servletResponse)
             throws IllegalStateException {
+        return null;
+    }
+
+
+    @Override
+    public boolean authenticate(HttpServletResponse response)
+            throws IOException, ServletException {
+        return false;
+    }
+
+
+    @Override
+    public Part getPart(String name) {
+        return null;
+    }
+
+
+    @Override
+    public Iterable<Part> getParts() {
+        return null;
+    }
+
+
+    @Override
+    public void login(String username, String password) throws ServletException {
+    }
+
+
+    @Override
+    public void logout() throws ServletException {
+    }
+
+
+    @Override
+    public long getAsyncTimeout() {
+        return 0;
+    }
+
+
+    @Override
+    public DispatcherType getDispatcherType() {
         return null;
     }
 

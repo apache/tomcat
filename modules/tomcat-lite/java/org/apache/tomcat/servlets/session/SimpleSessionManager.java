@@ -23,17 +23,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.addons.UserSessionManager;
 
 // TODO: move 'expiring objects' to a separate utility class
@@ -48,7 +47,7 @@ import org.apache.tomcat.addons.UserSessionManager;
  * @author Craig R. McClanahan
  */
 public class SimpleSessionManager implements UserSessionManager {
-    protected static Log log = LogFactory.getLog(SimpleSessionManager.class);
+    protected static Logger log = Logger.getLogger(SimpleSessionManager.class.getName());
 
     protected RandomGenerator randomG = new RandomGenerator();
     
@@ -89,17 +88,17 @@ public class SimpleSessionManager implements UserSessionManager {
     protected int expiredSessions = 0;
 
     static class SessionLRU extends LinkedHashMap {
-        protected boolean removeEldestEntry(Map.Entry eldest) {
-            HttpSessionImpl s = (HttpSessionImpl)eldest.getValue();
-            int size = this.size();
-            
-            // TODO: check if eldest is expired or if we're above the limit.
-            // if eldest is expired, turn a flag to check for more.
-            
-            // Note: this doesn't work well for sessions that set shorter
-            // expiry time, or longer expiry times. 
-            return false;
-        }
+//        protected boolean removeEldestEntry(Map.Entry eldest) {
+//            HttpSessionImpl s = (HttpSessionImpl)eldest.getValue();
+//            int size = this.size();
+//            
+//            // TODO: check if eldest is expired or if we're above the limit.
+//            // if eldest is expired, turn a flag to check for more.
+//            
+//            // Note: this doesn't work well for sessions that set shorter
+//            // expiry time, or longer expiry times. 
+//            return false;
+//        }
 
     }
     
@@ -314,8 +313,8 @@ public class SimpleSessionManager implements UserSessionManager {
         HttpSessionImpl sessions[] = findSessions();
         int expireHere = 0 ;
         
-        if(log.isDebugEnabled())
-            log.debug("Start expire sessions "  + " at " + timeNow + " sessioncount " + sessions.length);
+        if(log.isLoggable(Level.FINE))
+            log.fine("Start expire sessions "  + " at " + timeNow + " sessioncount " + sessions.length);
         
         for (int i = 0; i < sessions.length; i++) {
             if (!sessions[i].isValid()) {
@@ -325,8 +324,8 @@ public class SimpleSessionManager implements UserSessionManager {
         }
         
         long timeEnd = System.currentTimeMillis();
-        if(log.isDebugEnabled())
-             log.debug("End expire sessions " + " processingTime " + 
+        if(log.isLoggable(Level.FINE))
+             log.fine("End expire sessions " + " processingTime " + 
                        (timeEnd - timeNow) + " expired sessions: " + expireHere);
         
         processingTime += ( timeEnd - timeNow );

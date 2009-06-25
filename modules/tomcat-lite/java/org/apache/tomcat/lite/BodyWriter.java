@@ -1,21 +1,6 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
-package org.apache.tomcat.lite.coyote;
-
+package org.apache.tomcat.lite;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -24,37 +9,50 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
-import org.apache.coyote.ActionCode;
-import org.apache.coyote.Request;
-import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
 
-/*
- * Refactoring: original code in catalina.connector.
- * - renamed to OutputWriter to avoid confusion with coyote OutputBuffer
- * - 
- * TODO: move it to coyote, add Response.getWriter 
- * 
- */
-
 /**
- * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3
- * OutputBuffer, with the removal of some of the state handling (which in 
- * Coyote is mostly the Processor's responsability).
- *
+ * Implement buffering and character translation acording to the 
+ * servlet spec.  
+ * 
+ * This class handles both chars and bytes.
+ * 
+ * It is tightly integrated with servlet response, sending headers
+ * and updating the commit state.
+ * 
+ * TODO: add 'extension' interface that allows direct access to 
+ * the async connector non-copy non-blocking queue. Same for the 
+ * OutputStream. Maybe switch the buffer to the brigade. 
+ * 
  * @author Costin Manolache
- * @author Remy Maucherat
  */
-public class MessageWriter extends Writer
-    implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
+public class BodyWriter extends Writer {
 
     // used in getWriter, until a method is added to res.
-    private static final int WRITER_NOTE = 3;
+    protected static final int WRITER_NOTE = 3;
 
-    // -------------------------------------------------------------- Constants
 
+    private ByteChunk.ByteOutputChannel byteFlusher = 
+        new ByteChunk.ByteOutputChannel() {
+
+        @Override
+        public void realWriteBytes(byte[] cbuf, int off, int len)
+                throws IOException {
+            BodyWriter.this.realWriteBytes(cbuf, off, len);
+        }
+    };
+
+    private CharChunk.CharOutputChannel charFlusher = 
+        new CharChunk.CharOutputChannel() {
+        @Override
+        public void realWriteChars(char[] cbuf, int off, int len)
+                throws IOException {
+            BodyWriter.this.realWriteChars(cbuf, off, len);
+        }
+    };
+    
 
     public static final String DEFAULT_ENCODING = 
         org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
@@ -64,74 +62,73 @@ public class MessageWriter extends Writer
     // The buffer can be used for byte[] and char[] writing
     // ( this is needed to support ServletOutputStream and for
     // efficient implementations of templating systems )
-    public final int INITIAL_STATE = 0;
     public final int CHAR_STATE = 1;
     public final int BYTE_STATE = 2;
 
-
+    boolean headersSent = false;
     // ----------------------------------------------------- Instance Variables
-
+    ServletResponseImpl res;
 
     /**
      * The byte buffer.
      */
-    private ByteChunk bb;
+    protected ByteChunk bb;
 
 
     /**
      * The chunk buffer.
      */
-    private CharChunk cb;
+    protected CharChunk cb;
 
 
     /**
      * State of the output buffer.
      */
-    private int state = 0;
+    protected int state = 0;
 
 
     /**
      * Number of bytes written.
      */
-    private int bytesWritten = 0;
+    protected int bytesWritten = 0;
 
 
     /**
      * Number of chars written.
      */
-    private int charsWritten = 0;
+    protected int charsWritten = 0;
 
 
     /**
      * Flag which indicates if the output buffer is closed.
      */
-    private boolean closed = false;
+    protected boolean closed = false;
 
 
     /**
      * Do a flush on the next operation.
      */
-    private boolean doFlush = false;
+    protected boolean doFlush = false;
 
 
     /**
      * Byte chunk used to output bytes. This is just used to wrap the byte[]
      * to match the coyote OutputBuffer interface
      */
-    private ByteChunk outputChunk = new ByteChunk();
+    protected ByteChunk outputChunk = new ByteChunk();
 
 
     /**
      * Encoding to use. 
      * TODO: isn't it redundant ? enc, gotEnc, conv plus the enc in the bb
      */
-    private String enc;
+    protected String enc;
 
 
     /**
      * Encoder is set.
      */
-    private boolean gotEnc = false;
+    protected boolean gotEnc = false;
 
 
     /**
@@ -146,17 +143,12 @@ public class MessageWriter extends Writer
      */
     protected C2BConverter conv;
 
-
-    /**
-     * Associated Coyote response.
-     */
-    private Response coyoteResponse;
-
-
     /**
      * Suspended flag. All output bytes will be swallowed if this is true.
      */
-    private boolean suspended = false;
+    protected boolean suspended = false;
+
+    private Connector connector;
 
 
     // ----------------------------------------------------------- Constructors
@@ -165,7 +157,7 @@ public class MessageWriter extends Writer
     /**
      * Default constructor. Allocate the buffer with the default buffer size.
      */
-    public MessageWriter() {
+    public BodyWriter() {
 
         this(DEFAULT_BUFFER_SIZE);
 
@@ -177,39 +169,24 @@ public class MessageWriter extends Writer
      * 
      * @param size Buffer size to use
      */
-    public MessageWriter(int size) {
+    public BodyWriter(int size) {
 
         bb = new ByteChunk(size);
         bb.setLimit(size);
-        bb.setByteOutputChannel(this);
+        bb.setByteOutputChannel(byteFlusher);
         cb = new CharChunk(size);
-        cb.setCharOutputChannel(this);
+        cb.setCharOutputChannel(charFlusher);
         cb.setLimit(size);
 
+    }
+    
+    public void setConnector(Connector c, ServletResponseImpl res) {
+        this.res = res;
+        this.connector = c;
     }
 
 
     // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Associated Coyote response.
-     * 
-     * @param coyoteResponse Associated Coyote response
-     */
-    public void setResponse(Response coyoteResponse) {
-	this.coyoteResponse = coyoteResponse;
-    }
-
-
-    /**
-     * Get associated Coyote response.
-     * 
-     * @return the associated Coyote response
-     */
-    public Response getResponse() {
-        return this.coyoteResponse;
-    }
 
 
     /**
@@ -240,7 +217,8 @@ public class MessageWriter extends Writer
      */
     public void recycle() {
         
-        state = INITIAL_STATE;
+        state = BYTE_STATE;
+        headersSent = false;
         bytesWritten = 0;
         charsWritten = 0;
         
@@ -273,25 +251,16 @@ public class MessageWriter extends Writer
         if (suspended)
             return;
 
-        if ((!coyoteResponse.isCommitted()) 
-            && (coyoteResponse.getContentLengthLong() == -1)) {
-            // Flushing the char buffer
-            if (state == CHAR_STATE) {
-                cb.flushBuffer();
-                state = BYTE_STATE;
-            }
-            // If this didn't cause a commit of the response, the final content
-            // length can be calculated
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.setContentLength(bb.getLength());
-            }
+        if (state == CHAR_STATE) {
+            cb.flushBuffer();
+            state = BYTE_STATE;
         }
+        connector.beforeClose(res, bb.getLength());
 
         doFlush(false);
         closed = true;
 
-        coyoteResponse.finish();
-
+        connector.finishResponse(res);
     }
 
 
@@ -305,7 +274,6 @@ public class MessageWriter extends Writer
         doFlush(true);
     }
 
-
     /**
      * Flush bytes or chars contained in the buffer.
      * 
@@ -318,27 +286,22 @@ public class MessageWriter extends Writer
             return;
 
         doFlush = true;
+        if (!headersSent) {
+            // If the buffers are empty, commit the response header
+            connector.sendHeaders(res);
+            headersSent = true;
+        }
         if (state == CHAR_STATE) {
             cb.flushBuffer();
-            bb.flushBuffer();
             state = BYTE_STATE;
-        } else if (state == BYTE_STATE) {
+        } 
+        if (state == BYTE_STATE) {
             bb.flushBuffer();
-        } else if (state == INITIAL_STATE) {
-            // If the buffers are empty, commit the response header
-            coyoteResponse.sendHeaders();
-        }
+        }  
         doFlush = false;
 
         if (realFlush) {
-            coyoteResponse.action(ActionCode.ACTION_CLIENT_FLUSH, 
-                                  coyoteResponse);
-            // If some exception occurred earlier, or if some IOE occurred
-            // here, notify the servlet with an IOE
-            if (coyoteResponse.isExceptionPresent()) {
-                throw new ClientAbortException
-                    (coyoteResponse.getErrorException());
-            }
+            connector.realFlush(res);
         }
 
     }
@@ -357,12 +320,10 @@ public class MessageWriter extends Writer
      * 
      * @throws IOException An underlying IOException occurred
      */
-    public void realWriteBytes(byte buf[], int off, int cnt)
-	throws IOException {
+    private void realWriteBytes(byte buf[], int off, int cnt)
+        throws IOException {
 
         if (closed)
-            return;
-        if (coyoteResponse == null)
             return;
 
         // If we really have something to write
@@ -370,7 +331,7 @@ public class MessageWriter extends Writer
             // real write to the adapter
             outputChunk.setBytes(buf, off, cnt);
             try {
-                coyoteResponse.doWrite(outputChunk);
+                connector.doWrite(res, outputChunk);
             } catch (IOException e) {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request.  Wrap this
@@ -550,14 +511,14 @@ public class MessageWriter extends Writer
     }
 
 
-    public void realWriteChars(char c[], int off, int len) 
+    private void realWriteChars(char c[], int off, int len) 
         throws IOException {
 
         if (!gotEnc)
             setConverter();
 
         conv.convert(c, off, len);
-        conv.flushBuffer();	// ???
+        conv.flushBuffer();     // ???
 
     }
 
@@ -574,8 +535,7 @@ public class MessageWriter extends Writer
     protected void setConverter() 
         throws IOException {
 
-        if (coyoteResponse != null)
-            enc = coyoteResponse.getCharacterEncoding();
+        enc = res.getCharacterEncoding();
 
         gotEnc = true;
         if (enc == null)
@@ -649,8 +609,8 @@ public class MessageWriter extends Writer
 
     public void setBufferSize(int size) {
         if (size > bb.getLimit()) {// ??????
-	    bb.setLimit(size);
-	}
+            bb.setLimit(size);
+        }
     }
 
 
@@ -663,28 +623,12 @@ public class MessageWriter extends Writer
         charsWritten = 0;
         gotEnc = false;
         enc = null;
-        state = INITIAL_STATE;
+        state = BYTE_STATE;
     }
 
 
     public int getBufferSize() {
-	return bb.getLimit();
-    }
-
-
-    public static MessageWriter getWriter(Request req, Response res, int size) 
-    {        
-        MessageWriter out=(MessageWriter)req.getNote(MessageWriter.WRITER_NOTE);
-        if( out == null ) {
-            if( size<=0 ) {
-                out=new MessageWriter();
-            } else {
-                out=new MessageWriter(size);
-            }
-            out.setResponse(res);
-            req.setNote(MessageWriter.WRITER_NOTE, out );
-        }
-        return out;
+        return bb.getLimit();
     }
 
     public ByteChunk getByteBuffer() {
@@ -692,3 +636,21 @@ public class MessageWriter extends Writer
     }
 
 }
+//{
+//    public abstract int getBytesWritten();
+//    public abstract int getCharsWritten();
+//    public abstract void recycle();
+//    public abstract void setSuspended(boolean suspended);
+//    public abstract boolean isSuspended();
+//    
+//    public abstract void reset();
+//    public abstract int getBufferSize();
+//    public abstract void setBufferSize(int n);
+//    public abstract void checkConverter() throws IOException;
+//    public boolean isNew() {
+//        return getBytesWritten() == 0 && getCharsWritten() == 0;
+//    }
+//    public abstract void write(byte[] b, int off, int len) throws IOException;
+//    public abstract void writeByte(int b) throws IOException;
+//    
+//}

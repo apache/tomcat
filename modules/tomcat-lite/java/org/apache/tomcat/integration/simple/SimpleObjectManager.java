@@ -2,6 +2,7 @@
  */
 package org.apache.tomcat.integration.simple;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +12,8 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.apache.tomcat.integration.ObjectManager;
-import org.apache.tomcat.integration.ObjectManagerSpi;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tools.ant.taskdefs.LoadResource;
 
 /**
  * This is a very small 'dependency injection'/registry poor-man substitute, 
@@ -39,36 +40,30 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * 
  * @author Costin Manolache
  */
-public class SimpleObjectManager extends ObjectManagerSpi {
-
+public class SimpleObjectManager extends ObjectManager {
     static Logger log = Logger.getLogger(SimpleObjectManager.class.getName());
-    
-    /** 
-     * Saved CLI arguments. Will be added to the properties.
-     */
-    public static String[] args;
     
     protected Properties props = new Properties();
     protected Map<String, Object> objects = new HashMap();
     ObjectManager om;
     
     public SimpleObjectManager() {
+        // Register PropertiesSpi
     }
 
-    public SimpleObjectManager(ObjectManager om) {
-        register(om);
+    public SimpleObjectManager(String[] args) {
+        this();
+        bind("Main.args", args);
     }
-
+    
+    public void loadResource(String res) {
+        InputStream in = this.getClass().getClassLoader()
+            .getResourceAsStream(res);
+        load(in);
+    }
+    
     public void register(ObjectManager om) {
         this.om = om;
-        if (args != null) {
-            try {
-                processArgs(args, props);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
         super.register(om);
     }
     
@@ -84,12 +79,6 @@ public class SimpleObjectManager extends ObjectManagerSpi {
         }
     }
     
-    public void loadResource(String res) {
-        InputStream in = this.getClass().getClassLoader()
-            .getResourceAsStream(res);
-        load(in);
-    }
-    
     public Properties getProperties() {
         return props;
     }
@@ -100,8 +89,16 @@ public class SimpleObjectManager extends ObjectManagerSpi {
 
     @Override
     public void bind(String name, Object o) {
-        log.info("Bound: " + name + " " + o);
+        //log.info("Bound: " + name + " " + o);
 
+        if ("Main.args".equals(name)) {
+            try {
+                processArgs((String[]) o, props);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
         // TODO: can I make 'inject' public - Guice seems to 
         // support this.
         inject(name, o);
@@ -170,7 +167,7 @@ public class SimpleObjectManager extends ObjectManagerSpi {
      * @return everything after the first non arg not starting with '-'
      * @throws IOException 
      */
-    public static String[] processArgs(String[] args, Properties props) 
+    public String[] processArgs(String[] args, Properties props) 
             throws IOException {
 
         for (int i = 0; i < args.length; i++) {
@@ -200,15 +197,15 @@ public class SimpleObjectManager extends ObjectManagerSpi {
             }
 
             if ("config".equals(arg)) {
-                props.load(new FileInputStream(value));
+                if (new File(value).exists()) {
+                    load(new FileInputStream(value));                    
+                } else {
+                    loadResource(value);
+                }
             } else {
                 props.put(name, value);
             }
         }
         return new String[] {};
-    }
-
-    public static void setArgs(String[] argv) {
-        SimpleObjectManager.args = argv;
-    }
+    }    
 }
