@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.lite.coyote;
+package org.apache.tomcat.lite;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ import java.io.IOException;
  * of a request by a remote client.
  *
  * @author Glenn L. Nielsen
- * @version $Revision$ $Date$
+ * @version $Revision: 304063 $ $Date: 2005-08-18 06:25:18 -0700 (Thu, 18 Aug 2005) $
  */
 
 public final class ClientAbortException extends IOException {

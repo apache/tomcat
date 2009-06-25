@@ -37,11 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.DispatcherType;
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -51,8 +51,10 @@ import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.FilterRegistration.Dynamic;
 
 import org.apache.tomcat.addons.UserSessionManager;
 import org.apache.tomcat.integration.ObjectManager;
@@ -933,10 +935,8 @@ public class ServletContextImpl implements ServletContext {
     public void processWebAppData(ServletContextConfig d) throws ServletException {
         this.contextConfig = d;
         
-        Iterator i1 = d.mimeMapping.entrySet().iterator();
-        while (i1.hasNext()) {
-            Entry k = (Entry)i1.next();
-            addMimeType((String)k.getKey(), (String)k.getValue());
+        for (String k: d.mimeMapping.keySet()) {
+            addMimeType(k, d.mimeMapping.get(k));            
         }
         
         String[] wFiles = (String[])d.welcomeFileList.toArray(new String[0]);
@@ -976,10 +976,8 @@ public class ServletContextImpl implements ServletContext {
             addServletConfig(sw);
         }
         
-        Iterator i4 = d.servletMapping.entrySet().iterator();
-        while (i4.hasNext()) {
-            Entry/*<String, String>*/ k = (Entry) i4.next();
-            addMapping((String) k.getKey(), (String) k.getValue());
+        for (String k: d.servletMapping.keySet()) {
+            addMapping(k, d.servletMapping.get(k));            
         }
         
         Iterator i5 = d.filterMappings.iterator();
@@ -1013,10 +1011,11 @@ public class ServletContextImpl implements ServletContext {
       addServletConfig(sc);
     }
     
-    public void addServlet(String servletName, Servlet servlet) {
+    public javax.servlet.Registration.Dynamic addServlet(String servletName, Servlet servlet) {
       ServletConfigImpl sc = new ServletConfigImpl(this, servletName, null);
       sc.setServlet(servlet);
       addServletConfig(sc);
+      return null;
     }
     
     public void addServletSec(String serlvetName, String runAs, Map roles) {
@@ -1375,32 +1374,6 @@ public class ServletContextImpl implements ServletContext {
    }
 
    @Override
-   public void addFilter(String filterName, String description, String className,
-                         Map<String, String> initParameters,
-                         boolean isAsyncSupported) {
-   }
-
-   @Override
-   public void addFilterMappingForServletNames(
-                                               String filterName,
-                                               EnumSet<DispatcherType> dispatcherTypes,
-                                               boolean isMatchAfter,
-                                               String... servletNames) {
-   }
-
-   @Override
-   public void addFilterMappingForUrlPatterns(
-                                              String filterName,
-                                              EnumSet<DispatcherType> dispatcherTypes,
-                                              boolean isMatchAfter,
-                                              String... urlPatterns) {
-   }
-
-   @Override
-   public void addServletMapping(String servletName, String[] urlPatterns) {
-   }
-
-   @Override
    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes() {
        return null;
    }
@@ -1416,13 +1389,60 @@ public class ServletContextImpl implements ServletContext {
    }
 
    @Override
-   public void setSessionCookieConfig(SessionCookieConfig sessionCookieConfig) {
+   public void setSessionTrackingModes(EnumSet<SessionTrackingMode> sessionTrackingModes) {
    }
 
    @Override
-   public void setSessionTrackingModes(
-                                       EnumSet<SessionTrackingMode> sessionTrackingModes) {
+   public Dynamic addFilter(String filterName, String className) {
+       return null;
    }
 
+   @Override
+   public Dynamic addFilter(String filterName, Filter filter) {
+       return null;
+   }
+
+   @Override
+   public Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
+       return null;
+   }
+
+   @Override
+   public javax.servlet.Registration.Dynamic addServlet(String servletName,
+                                                        String className) {
+       return null;
+   }
+
+   @Override
+   public javax.servlet.Registration.Dynamic addServlet(
+                                                        String servletName,
+                                                        Class<? extends Servlet> servletClass) {
+       return null;
+   }
+
+   @Override
+   public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
+       return null;
+   }
+
+   @Override
+   public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
+       return null;
+   }
+
+   @Override
+   public FilterRegistration findFilterRegistration(String filterName) {
+       return null;
+   }
+
+   @Override
+   public ServletRegistration findServletRegistration(String servletName) {
+       return null;
+   }
+
+   @Override
+   public boolean setInitParameter(String name, String value) {
+       return false;
+   }
 }
 

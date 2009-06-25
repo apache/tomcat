@@ -36,7 +36,7 @@ public class ObjectManager {
      * The framework may inject properties - if it supports that.
      */
     public void bind(String name, Object o) {
-        for (ObjectManagerSpi p : providers) {
+        for (ObjectManager p : children) {
             p.bind(name, o);
         }
     }
@@ -45,7 +45,7 @@ public class ObjectManager {
      * When an object is no longer in use.
      */
     public void unbind(String name) {
-        for (ObjectManagerSpi p : providers) {
+        for (ObjectManager p : children) {
             p.unbind(name);
         }        
     }
@@ -54,7 +54,7 @@ public class ObjectManager {
      * Create or get a new object with the given name.
      */
     public Object get(String key) {
-        for (ObjectManagerSpi p : providers) {
+        for (ObjectManager p : children) {
             Object o = p.get(key);
             if (o != null) {
                 return o;
@@ -74,6 +74,10 @@ public class ObjectManager {
      * ObjectManager delegates to providers. You can have multiple
      * providers - for example JMX, DI and OSGI at the same time.
      */
-    protected List<ObjectManagerSpi> providers = 
-        new ArrayList<ObjectManagerSpi>(); 
+    protected List<ObjectManager> children = 
+        new ArrayList<ObjectManager>(); 
+    
+    public void register(ObjectManager om) {
+        om.children.add(this);
+    }    
 }

@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
@@ -362,7 +363,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
                 try {
                     ((HttpSessionBindingListener) value).valueBound(event);
                 } catch (Throwable t){
-                    manager.log.error("Listener valueBound() error", t); 
+                    manager.log.log(Level.SEVERE, "Listener valueBound() error", t); 
                 }
             }
         }
@@ -377,7 +378,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
                 ((HttpSessionBindingListener) unbound).valueUnbound
                     (new HttpSessionBindingEvent(getSession(), name));
             } catch (Throwable t) {
-                manager.log.error("Listener valueUnbound()", t);
+                manager.log.log(Level.SEVERE, "Listener valueUnbound()", t);
             }
         }
 
@@ -406,7 +407,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
                     listener.attributeAdded(event);
                 }
             } catch (Throwable t) {
-                manager.log.error("Listener attibuteAdded/Replaced()", t);
+                manager.log.log(Level.SEVERE, "Listener attibuteAdded/Replaced()", t);
             }
         }
 
@@ -462,7 +463,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
                 try {
                     listener.sessionCreated(event);
                 } catch (Throwable t) {
-                    manager.log.error("listener.sessionCreated()", t);
+                    manager.log.log(Level.SEVERE, "listener.sessionCreated()", t);
                 }
             }
         }
@@ -592,7 +593,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
                     try {
                         listener.sessionDestroyed(event);
                     } catch (Throwable t) {
-                        manager.log.error("listener.sessionDestroyed", t);
+                        manager.log.log(Level.SEVERE, "listener.sessionDestroyed", t);
                     }
                 }
             }
@@ -720,7 +721,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
                 }
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
-                manager.log.error("listener.attributeRemoved", t);
+                manager.log.log(Level.SEVERE, "listener.attributeRemoved", t);
             }
         }
 

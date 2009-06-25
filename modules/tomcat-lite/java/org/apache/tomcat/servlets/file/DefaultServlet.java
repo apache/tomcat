@@ -33,7 +33,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -42,6 +41,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.addons.Filesystem;
+import org.apache.tomcat.integration.ObjectManager;
+import org.apache.tomcat.integration.simple.ServletHelper;
 import org.apache.tomcat.servlets.util.Range;
 
 /**
@@ -56,7 +58,6 @@ public class DefaultServlet  extends HttpServlet {
 
 
     // ----------------------------------------------------- Instance Variables
-    
 
     /**
      * Should we generate directory listings?
@@ -126,6 +127,8 @@ public class DefaultServlet  extends HttpServlet {
 
     // --------------------------------------------------------- Public Methods
 
+    protected ObjectManager om;
+    protected Filesystem fs;
 
     /**
      * Finalize this servlet.
@@ -138,6 +141,9 @@ public class DefaultServlet  extends HttpServlet {
      * Initialize this servlet.
      */
     public void init() throws ServletException {
+        om = ServletHelper.getObjectManager(getServletContext());
+        fs = (Filesystem) om.get(Filesystem.class.getName());
+
         String realPath = getServletContext().getRealPath("/");
         basePath = new File(realPath);
         try {
@@ -145,6 +151,7 @@ public class DefaultServlet  extends HttpServlet {
         } catch (IOException e) {
             basePathName = basePath.getAbsolutePath();
         }
+        log("Init fs " + fs + " base: " + basePathName);
         
         // Set our properties from the initialization parameters
         String value = null;
@@ -177,9 +184,42 @@ public class DefaultServlet  extends HttpServlet {
             input = 256;
         if (output < 256)
             output = 256;
-
     }
 
+    public void setFilesystem(Filesystem fs) {
+        this.fs = fs;
+    }
+    
+    public Filesystem getFilesystem() {
+        return fs;
+    }
+    
+    public void setBasePath(String s) {
+        this.basePathName = s;
+        this.basePath = new File(s);
+    }
+    
+    public String getBasePath() {
+        return basePathName;
+    }
+    
+    public void setInput(int i) {
+        this.input = i;
+    }
+    
+    public void setListings(boolean b) {
+        this.listings = b;
+    }
+
+    public void setReadme(String s) {
+        readmeFile = s;
+    }
+
+    public void setFileEncoding(String s) {
+        fileEncoding = s;
+    }
+    
+    
     public void loadDefaultMime() throws IOException {
         File mimeF = new File("/etc/mime.types");
         boolean loaded =false;
@@ -349,9 +389,9 @@ public class DefaultServlet  extends HttpServlet {
         int cacheSize;
         public LRUFileCache() {
         }
-        protected boolean removeEldestEntity(Map.Entry eldest) {
-            return size() > cacheSize;
-        }
+//        protected boolean removeEldestEntity(Map.Entry eldest) {
+//            return size() > cacheSize;
+//        }
     }
     
 

@@ -8,9 +8,8 @@ import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
-
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *  Generates random IDs, useable as cookies.
@@ -24,7 +23,7 @@ public class RandomGenerator {
     protected DataInputStream randomIS=null;
     protected String devRandomSource="/dev/urandom";
 
-    protected static Log log = LogFactory.getLog(RandomGenerator.class);
+    protected static Logger log = Logger.getLogger(RandomGenerator.class.getName());
 
     /**
      * The message digest algorithm to be used when generating session
@@ -92,17 +91,17 @@ public class RandomGenerator {
             try {
                 this.digest = MessageDigest.getInstance(algorithm);
             } catch (NoSuchAlgorithmException e) {
-                log.error("Algorithm not found", e);
+                log.log(Level.SEVERE, "Algorithm not found", e);
                 try {
                     this.digest = MessageDigest.getInstance("MD5");
                 } catch (NoSuchAlgorithmException f) {
-                    log.error("No message digest available", f);
+                    log.log(Level.SEVERE, "No message digest available", f);
                     this.digest = null;
                 }
             }
             long t2=System.currentTimeMillis();
-            if( log.isDebugEnabled() )
-                log.debug("getDigest() " + (t2-t1));
+            if( log.isLoggable(Level.FINEST) )
+                log.finest("getDigest() " + (t2-t1));
         }
 
         return (this.digest);
@@ -159,8 +158,6 @@ public class RandomGenerator {
                 if (len == bytes.length) {
                     return;
                 }
-                if(log.isDebugEnabled())
-                    log.debug("Got " + len + " " + bytes.length );
             } catch (Exception ex) {
                 // Ignore
             }
@@ -169,7 +166,7 @@ public class RandomGenerator {
             try {
                 randomIS.close();
             } catch (Exception e) {
-                log.warn("Failed to close randomIS.");
+                log.warning("Failed to close randomIS.");
             }
             
             randomIS = null;
@@ -199,14 +196,14 @@ public class RandomGenerator {
                 this.random.setSeed(seed);
             } catch (Exception e) {
                 // Fall back to the simple case
-                log.error("Failed to create random " + randomClass, e);
+                log.log(Level.SEVERE, "Failed to create random " + randomClass, e);
                 this.random = new java.util.Random();
                 this.random.setSeed(seed);
             }
-            if(log.isDebugEnabled()) {
+            if(log.isLoggable(Level.FINEST)) {
                 long t2=System.currentTimeMillis();
                 if( (t2-t1) > 100 )
-                    log.debug("Init random: " + " " + (t2-t1));
+                    log.finest("Init random: " + " " + (t2-t1));
             }
         }
         
@@ -309,13 +306,13 @@ public class RandomGenerator {
             if( ! f.exists() ) return;
             randomIS= new DataInputStream( new FileInputStream(f));
             randomIS.readLong();
-            if( log.isDebugEnabled() )
-                log.debug( "Opening " + devRandomSource );
+//            if( log.isDebugEnabled() )
+//                log.debug( "Opening " + devRandomSource );
         } catch( IOException ex ) {
             try {
                 randomIS.close();
             } catch (Exception e) {
-                log.warn("Failed to close randomIS.");
+                log.warning("Failed to close randomIS.");
             }
             
             randomIS=null;
