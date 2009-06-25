@@ -11,6 +11,7 @@
     
     <property name="classes" value="${basedir}/output/tomcat-lite/classes" />
     <property name="jar.dir" value="${basedir}/output/tomcat-lite/" />
+    <property name="MAIN" value="org.apache.tomcat.integration.simple.Main"/>
 
     <target name="compile">
         <mkdir dir="${classes}" />
@@ -67,7 +68,7 @@
         <mkdir dir="${jar.dir}/jar" />
         <jar destfile="${jar.dir}/jar/tomcat-lite.jar">
             <manifest>
-                  <attribute name="Main-Class" value="org.apache.tomcat.lite.cli.Main"/>
+                  <attribute name="Main-Class" value="${MAIN}"/>
               </manifest>
             <fileset dir="${classes}">
                 <include name ="org/apache/tomcat/lite/**" />
@@ -89,7 +90,7 @@
         <!-- All included: javax, jasper, coyote, tomcat-lite -->
         <jar destfile="${jar.dir}/tomcat-lite-all.jar">
             <manifest>
-                  <attribute name="Main-Class" value="org.apache.tomcat.lite.cli.Main"/>
+                  <attribute name="Main-Class" value="${MAIN}"/>
               </manifest>
             <fileset dir="${classes}">
             </fileset>
@@ -98,7 +99,7 @@
         <!-- Tomcat lite without jasper -->
         <jar destfile="${jar.dir}/tomcat-lite+javax+coyote.jar">
              <manifest>
-                 <attribute name="Main-Class" value="org.apache.tomcat.lite.cli.Main"/>
+                 <attribute name="Main-Class" value="${MAIN}"/>
              </manifest>
              <fileset dir="${classes}">
                  <exclude name ="org/apache/jasper/**" />
