@@ -18,10 +18,9 @@ package org.apache.tomcat.servlets.file;
 
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -121,7 +120,7 @@ public class WebdavServlet extends DefaultServlet {
     }
 
     // TODO: replace it with writeRole - who is enabled to write
-    protected boolean readOnly = false;
+    protected boolean readOnly = true;
 
     /**
      * Repository of the lock-null resources.
@@ -152,9 +151,16 @@ public class WebdavServlet extends DefaultServlet {
         } catch (Throwable t) {
             ;
         }
+        log("Starting webdav");
     }
 
-
+    public void setReadonly(boolean ro) {
+        readOnly = ro;
+    }
+    
+    public boolean getReadonly() {
+        return readOnly;
+    }
     // ------------------------------------------------------ Protected Methods
 
     /**
@@ -834,7 +840,7 @@ public class WebdavServlet extends DefaultServlet {
 
         try {
             // will override 
-            FileOutputStream fos = new FileOutputStream(resFile);
+            OutputStream fos = getFilesystem().getOutputStream(resFile.getPath());
             CopyUtils.copy(resourceInputStream, fos);
         } catch(IOException e) {
             result = false;
@@ -1215,8 +1221,8 @@ public class WebdavServlet extends DefaultServlet {
         } else {
 
             try {
-                CopyUtils.copy( new FileInputStream(object), 
-                    new FileOutputStream(dest));
+                CopyUtils.copy(getFilesystem().getInputStream(object.getPath()), 
+                    getFilesystem().getOutputStream(dest));
             } catch(IOException ex ) {
                 errorList.put
                 (source,

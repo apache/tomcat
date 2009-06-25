@@ -26,13 +26,13 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.apache.tomcat.InstanceManager;
 import org.apache.jasper.EmbeddedServletOptions;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspC;
 import org.apache.jasper.Options;
 import org.apache.jasper.compiler.JspRuntimeContext;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.tomcat.InstanceManager;
 
 /** 
  * The actual compiler. Maps and compile a jsp-file to a class.

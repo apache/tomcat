@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
 
-import org.apache.tomcat.lite.coyote.MessageWriter;
 
 /**
  * Coyote implementation of the servlet output stream.
@@ -36,13 +35,13 @@ public class ServletOutputStreamImpl
     // ----------------------------------------------------- Instance Variables
 
 
-    protected MessageWriter ob;
+    protected BodyWriter ob;
 
 
     // ----------------------------------------------------------- Constructors
 
 
-    public ServletOutputStreamImpl(MessageWriter ob) {
+    public ServletOutputStreamImpl(BodyWriter ob) {
         this.ob = ob;
     }
 

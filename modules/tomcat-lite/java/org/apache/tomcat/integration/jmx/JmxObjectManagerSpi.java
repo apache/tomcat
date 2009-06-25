@@ -4,7 +4,7 @@ package org.apache.tomcat.integration.jmx;
 
 import java.util.logging.Logger;
 
-import org.apache.tomcat.integration.ObjectManagerSpi;
+import org.apache.tomcat.integration.ObjectManager;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -12,7 +12,7 @@ import org.apache.tomcat.util.modeler.Registry;
  * 
  * All objects of interest are registered automatically.
  */
-public class JmxObjectManagerSpi extends ObjectManagerSpi {
+public class JmxObjectManagerSpi extends ObjectManager {
     Registry registry;
     Logger log = Logger.getLogger("JmxObjectManager");
     

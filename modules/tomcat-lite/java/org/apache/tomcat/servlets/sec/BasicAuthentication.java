@@ -23,8 +23,6 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.addons.UserAuthentication;
 
 
@@ -33,7 +31,6 @@ import org.apache.tomcat.addons.UserAuthentication;
  */
 public class BasicAuthentication implements UserAuthentication {
 
-    private static Log log = LogFactory.getLog(BasicAuthentication.class);
     String realm;
     
     @Override
