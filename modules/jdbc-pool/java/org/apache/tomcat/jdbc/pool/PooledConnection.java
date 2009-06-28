@@ -163,6 +163,10 @@ public class PooledConnection {
                 throw ex;
             }
         }
+        if (connection==null) {
+            throw new SQLException("Driver:"+driver+" returned null for URL:"+driverURL);
+        }
+        
         //set up the default state, unless we expect the interceptor to do it
         if (poolProperties.getJdbcInterceptors()==null || poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName())<0) {
             if (poolProperties.getDefaultReadOnly()!=null) connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
