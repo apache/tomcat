@@ -36,9 +36,6 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -1603,15 +1600,52 @@ public class WebappClassLoader
      */
     protected void clearReferences() {
 
-        // Unregister any JDBC drivers loaded by this classloader
-        Enumeration<Driver> drivers = DriverManager.getDrivers();
-        while (drivers.hasMoreElements()) {
-            Driver driver = drivers.nextElement();
-            if (driver.getClass().getClassLoader() == this) {
+        /*
+         * Deregister any JDBC drivers registered by the webapp that the webapp
+         * forgot. This is made unnecessary complex because a) DriverManager
+         * checks the class loader of the calling class (it would be much easier
+         * if it checked the context class loader) b) using reflection would
+         * create a dependency on the DriverManager implementation which can,
+         * and has, changed.
+         * 
+         * We can't just create an instance of JdbcLeakPrevention as it will be
+         * loaded by the common class loader (since it's .class file is in the
+         * $CATALINA_HOME/lib directory). This would fail DriverManager's check
+         * on the class loader of the calling class. So, we load the bytes via
+         * our parent class loader but define the class with this class loader
+         * so the JdbcLeakPrevention looks like a webapp class to the
+         * DriverManager.
+         * 
+         * If only apps cleaned up after themselves...
+         */
+        InputStream is = getResourceAsStream(
+                "org/apache/catalina/loader/JdbcLeakPrevention.class");
+        // Cheat - we know roughly how big the class will be (~1K) but allow
+        // plenty room to grow
+        byte[] classBytes = new byte[4096];
+        int offset = 0;
+        try {
+            int read = is.read(classBytes, offset, 4096-offset);
+            while (read > -1) {
+                offset += read;
+                read = is.read(classBytes, offset, 4096-offset);
+            }
+            Class<?> lpClass =
+                defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
+                    classBytes, 0, offset);
+            Object obj = lpClass.newInstance();
+            obj.getClass().getMethod(
+                    "clearJdbcDriverRegistrations").invoke(obj);
+        } catch (Exception e) {
+            // So many things to go wrong above...
+            log.warn(sm.getString("webappClassLoader.jdbcRemoveFailed"), e);
+        } finally {
+            if (is != null) {
                 try {
-                    DriverManager.deregisterDriver(driver);
-                } catch (SQLException e) {
-                    log.warn("SQL driver deregistration failed", e);
+                    is.close();
+                } catch (IOException ioe) {
+                    log.warn(sm.getString(
+                            "webappClassLoader.jdbcRemoveStreamError"), ioe);
                 }
             }
         }
