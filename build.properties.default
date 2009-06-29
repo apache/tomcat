@@ -27,7 +27,7 @@
 # ----- Vesion Control Flags -----
 version.major=1
 version.minor=0
-version.build=5
+version.build=6
 version.patch=
 version.suffix=
 
@@ -70,3 +70,11 @@ tomcat.project.dest=${base.path}/project.xml
 
 tomcat.xsl.loc=http://svn.apache.org/repos/asf/tomcat/trunk/webapps/docs/tomcat-docs.xsl
 tomcat.xsl.dest=${base.path}/tomcat-docs.xsl
+
+derby.home=${base.path}/db-derby-10.5.1.1-bin
+derby.loc=http://archive.apache.org/dist/db/derby/db-derby-10.5.1.1/db-derby-10.5.1.1-bin.tar.gz
+derby.jar=${derby.home}/lib/derby.jar
+
+h2.home=${base.path}/h2
+h2.loc=http://www.h2database.com/h2-2009-06-01.zip
+h2.jar=${h2.home}/bin/h2-1.1.114.jar
