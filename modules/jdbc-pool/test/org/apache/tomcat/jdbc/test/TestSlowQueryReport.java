@@ -80,10 +80,10 @@ public class TestSlowQueryReport extends DefaultTestCase {
         this.datasource.setMaxActive(1);
         this.datasource.setJdbcInterceptors(SlowQueryReport.class.getName());
         Connection con = this.datasource.getConnection();
-        String slowSql = "select 1";
+        String fastSql = this.datasource.getValidationQuery();
         for (int i=0; i<count; i++) {
             Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery(slowSql);
+            ResultSet rs = st.executeQuery(fastSql);
             rs.close();
             st.close();
         }
