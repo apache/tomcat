@@ -47,29 +47,29 @@ public class StarvationTest extends DefaultTestCase {
         datasource.getPoolProperties().setLogAbandoned(true);
     }
     
-    public void testDBCPConnectionStarvation() throws Exception {
-        init();
-        config();
-        this.transferProperties();
-        this.tDatasource.getConnection().close();
-        javax.sql.DataSource datasource = this.tDatasource;
-        Connection con1 = datasource.getConnection(); 
-        Connection con2 = null;
-        try {
-            con2 = datasource.getConnection();
-            try {
-                con2.setCatalog("mysql");//make sure connection is valid
-            }catch (SQLException x) {
-                assertFalse("2nd Connection is not valid:"+x.getMessage(),true);
-            }
-            assertTrue("Connection 1 should be closed.",con1.isClosed()); //first connection should be closed
-        }catch (Exception x) {
-            assertFalse("Connection got starved:"+x.getMessage(),true);
-        }finally {
-            if (con2!=null) con2.close();
-        }
-
-    }
+//    public void testDBCPConnectionStarvation() throws Exception {
+//        init();
+//        config();
+//        this.transferProperties();
+//        this.tDatasource.getConnection().close();
+//        javax.sql.DataSource datasource = this.tDatasource;
+//        Connection con1 = datasource.getConnection(); 
+//        Connection con2 = null;
+//        try {
+//            con2 = datasource.getConnection();
+//            try {
+//                con2.setCatalog("mysql");//make sure connection is valid
+//            }catch (SQLException x) {
+//                assertFalse("2nd Connection is not valid:"+x.getMessage(),true);
+//            }
+//            assertTrue("Connection 1 should be closed.",con1.isClosed()); //first connection should be closed
+//        }catch (Exception x) {
+//            assertFalse("Connection got starved:"+x.getMessage(),true);
+//        }finally {
+//            if (con2!=null) con2.close();
+//        }
+//
+//    }
     
     public void testConnectionStarvation() throws Exception {
         init();
