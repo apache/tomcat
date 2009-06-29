@@ -39,6 +39,7 @@
   <property name="tomcat.pool" value="${basedir}/./output"/>
   <property name="tomcat.build"      value="${tomcat.pool}/build"/>
   <property name="tomcat.classes"    value="${tomcat.pool}/classes"/>
+  <property name="tomcat.api"    value="${tomcat.pool}/api"/>
   <property name="tomcat.testclasses"    value="${tomcat.pool}/testclasses"/>
   
   <!-- JAR Artifacts -->
@@ -46,7 +47,7 @@
   <property name="tomcat-jdbc-src.jar" value="${tomcat.pool}/tomcat-jdbc-src.jar"/>
   <property name="tomcat-jdbc-test.jar" value="${tomcat.pool}/tomcat-jdbc-test.jar"/>
   <property name="tomcat-jdbc-test-src.jar" value="${tomcat.pool}/tomcat-jdbc-test-src.jar"/>
-
+  <property name="tomcat-jdbc-api.jar" value="${tomcat.pool}/tomcat-jdbc-api.jar"/>
   <!-- Classpath -->
   <path id="tomcat.jdbc.classpath">
     <pathelement location="${tomcat.classes}"/>
@@ -62,6 +63,8 @@
     <pathelement location="${dbcp.jar}"/>
     <pathelement location="${junit.jar}"/>
     <pathelement location="${tomcat.dbcp.jar}"/>
+    <pathelement location="${derby.jar}"/>
+    <pathelement location="${h2.jar}"/>
   </path>
   
   <target name="prepare">
@@ -82,7 +85,7 @@
     </copy>
   </target>
 
-  <target name="build" depends="prepare">
+  <target name="build" depends="prepare,download">
     <mkdir dir="${tomcat.pool}"/>
     <!-- compile org.apache.tomcat.jdbc-->
     <javac srcdir="${basedir}/java" destdir="${tomcat.classes}"
@@ -94,7 +97,35 @@
       <classpath refid="tomcat.jdbc.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
+
+    <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false"/>
     
+    <!-- connection pool JAR File -->
+    <jar jarfile="${tomcat-jdbc.jar}" update="true">
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/tomcat/jdbc/**" />
+      </fileset>
+      <fileset dir="${basedir}/java">
+        <include name="org/apache/tomcat/jdbc/**/*.xml" />
+      </fileset>
+    </jar>
+
+    <!-- connection pool source file-->
+    <jar jarfile="${tomcat-jdbc-src.jar}" update="true">
+      <fileset dir="${basedir}/java">
+        <include name="org/apache/tomcat/jdbc/**" />
+      </fileset>
+    </jar>
+
+    <!-- connection pool API  file-->
+    <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
+      <fileset dir="${tomcat.api}"/>
+    </jar>
+  </target>
+
+  <target name="build-test" depends="prepare, build, download-test">
+    <mkdir dir="${tomcat.pool}"/>
+    <!-- compile org.apache.tomcat.jdbc-->
     <javac srcdir="${basedir}/test" destdir="${tomcat.testclasses}"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
@@ -106,14 +137,6 @@
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
     <!-- connection pool JAR File -->
-    <jar jarfile="${tomcat-jdbc.jar}" update="true">
-      <fileset dir="${tomcat.classes}">
-        <include name="org/apache/tomcat/jdbc/**" />
-      </fileset>
-      <fileset dir="${basedir}/java">
-        <include name="org/apache/tomcat/jdbc/**/*.xml" />
-      </fileset>
-    </jar>
     <jar jarfile="${tomcat-jdbc-test.jar}" update="true">
       <fileset dir="${tomcat.testclasses}">
         <include name="org/apache/tomcat/jdbc/**" />
@@ -122,31 +145,18 @@
         <include name="org/apache/tomcat/jdbc/**/*.xml" />
       </fileset>
     </jar>
-
-    <!-- connection pool source file-->
-    <jar jarfile="${tomcat-jdbc-src.jar}" update="true">
-      <fileset dir="${basedir}/java">
-        <include name="org/apache/tomcat/jdbc/**" />
-      </fileset>
-    </jar>
     <jar jarfile="${tomcat-jdbc-test-src.jar}" update="true">
       <fileset dir="${basedir}/test">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
     </jar>
-    <!-- create checksums -->
-    <checksum file="${tomcat-jdbc.jar}" forceOverwrite="yes" fileext=".md5" />
-    <checksum file="${tomcat-jdbc-src.jar}" forceOverwrite="yes" fileext=".md5" />
-    <checksum file="${tomcat-jdbc-test.jar}" forceOverwrite="yes" fileext=".md5" />
-    <checksum file="${tomcat-jdbc-test-src.jar}" forceOverwrite="yes" fileext=".md5" />
   </target>
+
 
   <target name="clean"> 
       <mkdir dir="${tomcat.pool}"/>
       <delete file="${tomcat-jdbc.jar}" />
-      <delete file="${tomcat-jdbc.jar}.md5"/>
       <delete file="${tomcat-jdbc-src.jar}"/>
-      <delete file="${tomcat-jdbc-src.jar}.md5"/>
       <delete includeemptydirs="true" failonerror="false">
           <fileset dir="${tomcat.classes}">
             <include name="org/apache/tomcat/jdbc/**"/>
@@ -160,6 +170,9 @@
       <delete dir="${tomcat.pool}/doc"/>
       <delete dir="${tomcat.classes}"/>
       <delete dir="${tomcat.testclasses}"/>
+      <delete file="${tomcat.pool}/build.xml"/>
+      <delete dir="${tomcat.pool}/build"/>
+      <delete dir="${tomcat.api}"/>
   </target>
   
   <target name="docs" depends="prepare">
@@ -184,13 +197,9 @@
         <include name="LICENSE"/>
         <include name="NOTICE"/>
         <include name="tomcat-jdbc.jar"/>
-        <include name="tomcat-jdbc.jar.md5"/>
         <include name="tomcat-jdbc-test.jar"/>
-        <include name="tomcat-jdbc-test.jar.md5"/>
         <include name="tomcat-jdbc-src.jar"/>
-        <include name="tomcat-jdbc-src.jar.md5"/>
         <include name="tomcat-jdbc-test-src.jar"/>
-        <include name="tomcat-jdbc-test-src.jar.md5"/>
       </fileset>
       <fileset dir="${tomcat.home}/bin">
         <include name="tomcat-juli.jar"/>
@@ -203,13 +212,9 @@
         <include name="LICENSE"/>
         <include name="NOTICE"/>
         <include name="tomcat-jdbc.jar"/>
-        <include name="tomcat-jdbc.jar.md5"/>
         <include name="tomcat-jdbc-test.jar"/>
-        <include name="tomcat-jdbc-test.jar.md5"/>
         <include name="tomcat-jdbc-src.jar"/>
-        <include name="tomcat-jdbc-src.jar.md5"/>
         <include name="tomcat-jdbc-test-src.jar"/>
-        <include name="tomcat-jdbc-test-src.jar.md5"/>
       </fileset>
       <fileset dir="${tomcat.home}/bin">
         <include name="tomcat-juli.jar"/>
@@ -302,23 +307,8 @@
   <target name="download">
     <mkdir dir="${base.path}"/>
     <antcall target="downloadzip">
-      <param name="sourcefile" value="${c3p0.loc}"/>
-      <param name="destfile" value="${c3p0.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${mysql.loc}"/>
-      <param name="destfile" value="${mysql.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-    <antcall target="downloadzip">
       <param name="sourcefile" value="${dbcp.loc}"/>
       <param name="destfile" value="${dbcp.jar}"/>
-      <param name="destdir" value="${base.path}"/>
-    </antcall>
-    <antcall target="downloadzip">
-      <param name="sourcefile" value="${junit.loc}"/>
-      <param name="destfile" value="${junit.jar}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
     <antcall target="downloadzip">
@@ -336,10 +326,79 @@
       <param name="destfile" value="${tomcat.project.dest}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
+    <!-- Derby database
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${derby.loc}"/>
+      <param name="destfile" value="${derby.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+     -->
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${h2.loc}"/>
+      <param name="destfile" value="${h2.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${junit.loc}"/>
+      <param name="destfile" value="${junit.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+    
   </target>
 
-  <target name="test" depends="build">
+  <target name="download-test" depends="prepare">  
+    <mkdir dir="${base.path}"/>
+    <!-- Derby database
+    <antcall target="downloadgz">
+      <param name="sourcefile" value="${derby.loc}"/>
+      <param name="destfile" value="${derby.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+     -->
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${h2.loc}"/>
+      <param name="destfile" value="${h2.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+    <antcall target="downloadzip">
+      <param name="sourcefile" value="${junit.loc}"/>
+      <param name="destfile" value="${junit.jar}"/>
+      <param name="destdir" value="${base.path}"/>
+    </antcall>
+  </target>
+  
+  <target name="test" depends="build,build-test">
+    <echo/>
+    <echo>Creating test table for test purposes.</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
+      <classpath refid="tomcat.jdbc.classpath"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${tomcat.testclasses}">
+        <fileset dir="${basedir}/test">
+          <include name="**/CreateTestTable*"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <echo/>
+    <echo>Performance and fairness tests.</echo>
+    <junit printsummary="withOutAndErr" showoutput="on">
+      <classpath refid="tomcat.jdbc.classpath"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${tomcat.testclasses}">
+        <fileset dir="${basedir}/test">
+          <include name="org/apache/tomcat/jdbc/test/*CheckOutThreadTest*.java"/>
+          <include name="org/apache/tomcat/jdbc/test/FairnessTest*.java"/>
+          <exclude name="**/CreateTestTable*"/>
+          <exclude name="**/DefaultTestCase*"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <echo/>
+    <echo>Functional tests.</echo>
+    <junit printsummary="yes">
+      <formatter type="plain"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
@@ -347,12 +406,16 @@
           <include name="org/apache/tomcat/jdbc/test/*Test*.java"/>
           <exclude name="**/CreateTestTable*"/>
           <exclude name="**/DefaultTestCase*"/>
+          <exclude name="**/CheckOutThread*"/>
+          <exclude name="**/Fairness*"/>
         </fileset>
       </batchtest>
     </junit>
+
   </target>
 
-  <target name="simplebuild" depends="download,build"/>
+  <target name="simplebuild" depends="build">
+  </target>
 
 </project>
 

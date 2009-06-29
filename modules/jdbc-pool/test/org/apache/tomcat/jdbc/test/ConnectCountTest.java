@@ -204,33 +204,33 @@ public class ConnectCountTest extends DefaultTestCase {
         tearDown();
     }
     
-    public void testC3P0Threads20Connections10() throws Exception {
-        System.out.println("[testC3P0Threads20Connections10] Starting fairness - C3P0");
-        init();
-        this.threadcount = 20;
-        this.transferPropertiesToC3P0();
-        this.datasource.getConnection().close();
-        latch = new CountDownLatch(threadcount);
-        long start = System.currentTimeMillis();
-        TestThread[] threads = new TestThread[threadcount];
-        for (int i=0; i<threadcount; i++) {
-            threads[i] = new TestThread();
-            threads[i].setName("tomcat-pool-"+i);
-            threads[i].d = this.c3p0Datasource;
-            
-        }
-        for (int i=0; i<threadcount; i++) {
-            threads[i].start();
-        }
-        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
-            System.out.println("Latch timed out.");
-        }
-        this.run = false;
-        long delta = System.currentTimeMillis() - start;
-        printThreadResults(threads,"testC3P0Threads20Connections10",Driver.connectCount.get(),10);
-        tearDown();
-
-    }
+//    public void testC3P0Threads20Connections10() throws Exception {
+//        System.out.println("[testC3P0Threads20Connections10] Starting fairness - C3P0");
+//        init();
+//        this.threadcount = 20;
+//        this.transferPropertiesToC3P0();
+//        this.datasource.getConnection().close();
+//        latch = new CountDownLatch(threadcount);
+//        long start = System.currentTimeMillis();
+//        TestThread[] threads = new TestThread[threadcount];
+//        for (int i=0; i<threadcount; i++) {
+//            threads[i] = new TestThread();
+//            threads[i].setName("tomcat-pool-"+i);
+//            threads[i].d = this.c3p0Datasource;
+//            
+//        }
+//        for (int i=0; i<threadcount; i++) {
+//            threads[i].start();
+//        }
+//        if (!latch.await(complete+1000,TimeUnit.MILLISECONDS)) {
+//            System.out.println("Latch timed out.");
+//        }
+//        this.run = false;
+//        long delta = System.currentTimeMillis() - start;
+//        printThreadResults(threads,"testC3P0Threads20Connections10",Driver.connectCount.get(),10);
+//        tearDown();
+//
+//    }
 
     
     public class TestThread extends Thread {
