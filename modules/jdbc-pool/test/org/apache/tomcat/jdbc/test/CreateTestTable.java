@@ -21,27 +21,59 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.Random;
-
-
+import java.sql.ResultSet;
 
 public class CreateTestTable extends DefaultTestCase {
-
+    
+    public static final boolean recreate = Boolean.getBoolean("recreate");
+    
     public CreateTestTable(String name) {
         super(name);
+    }
+    
+    public void testCreateTestTable() throws Exception {
+        this.init();
+        Connection con = datasource.getConnection();
+        Statement st = con.createStatement();
+        try {
+            st.execute("create table test(id int not null, val1 varchar(255), val2 varchar(255), val3 varchar(255), val4 varchar(255))");
+        }catch (Exception ignore) {}
+        st.close();
+        con.close();
+    }
+    
+    public int testCheckData() throws Exception {
+        int count = 0;
+        String check = "select count (*) from test";
+        this.init();
+        Connection con = datasource.getConnection();
+        Statement st = con.createStatement();
+        try {
+            ResultSet rs = st.executeQuery(check);
+            
+            if (rs.next())
+                count = rs.getInt(1);
+            System.out.println("Count:"+count);
+        }catch (Exception ignore) {}
+        return count;
     }
     
     public void testPopulateData() throws Exception {
         String insert = "insert into test values (?,?,?,?,?)";
         this.init();
+        this.datasource.setRemoveAbandoned(false);
         Connection con = datasource.getConnection();
-        Statement st = con.createStatement();
-        try {
-            st.execute("drop table test");
-        }catch (Exception ignore) {}
-        st.execute("create table test(id int not null, val1 varchar(255), val2 varchar(255), val3 varchar(255), val4 varchar(255))");
-        st.close();
+        if (recreate) {
+            Statement st = con.createStatement();
+            try {
+                st.execute("drop table test");
+            }catch (Exception ignore) {}
+            st.execute("create table test(id int not null, val1 varchar(255), val2 varchar(255), val3 varchar(255), val4 varchar(255))");
+            st.close();
+        }
         PreparedStatement ps = con.prepareStatement(insert);
-        for (int i=0; i<10000000; i++) {
+        ps.setQueryTimeout(0);
+        for (int i=testCheckData(); i<1000000; i++) {
             ps.setInt(1,i);
             String s = getRandom();
             ps.setString(2, s);
@@ -56,7 +88,8 @@ public class CreateTestTable extends DefaultTestCase {
             if ((i+1) % 10000 == 0) {
                 System.out.print("\n"+(i+1));
                 ps.executeBatch();
-                ps.clearBatch();
+                ps.close();
+                ps = con.prepareStatement(insert);
             }
 
         }

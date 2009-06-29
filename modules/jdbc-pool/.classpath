@@ -6,7 +6,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/tomcat-dbcp.jar" sourcepath="/TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="includes/c3p0-0.9.1.2/lib/c3p0-0.9.1.2.jar"/>
 	<classpathentry kind="lib" path="includes/mysql-connector-java-5.1.7/mysql-connector-java-5.1.7-bin.jar"/>
+	<classpathentry kind="lib" path="includes/db-derby-10.5.1.1-bin/lib/derby.jar"/>
+	<classpathentry kind="lib" path="includes/h2/bin/h2-1.1.114.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
