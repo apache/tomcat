@@ -28,10 +28,13 @@ import org.apache.tomcat.jdbc.pool.PoolProperties;
 public class DefaultProperties extends PoolProperties {
     public DefaultProperties() {
         dbProperties = new Properties();
-        url = "jdbc:mysql://localhost:3306/mysql?autoReconnect=true";
-        driverClassName = "com.mysql.jdbc.Driver";
-        password = "password";
-        username = "root";
+        
+        url = System.getProperty("url","jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
+        driverClassName = System.getProperty("driverClassName","com.mysql.jdbc.Driver");
+        password = System.getProperty("password","password");
+        username = System.getProperty("username","root");
+        
+        validationQuery = System.getProperty("validationQuery","SELECT 1");
         defaultAutoCommit = true;
         defaultReadOnly = false;
         defaultTransactionIsolation = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
@@ -42,7 +45,7 @@ public class DefaultProperties extends PoolProperties {
         maxIdle = initialSize;
         minIdle = initialSize;
         maxWait = 10000;
-        validationQuery = "SELECT 1";
+        
         testOnBorrow = true;
         testOnReturn = false;
         testWhileIdle = true;
