@@ -28,9 +28,9 @@ import junit.framework.TestCase;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import com.mchange.v2.log.MLevel;
-import com.mchange.v2.log.MLog;
+//import com.mchange.v2.c3p0.ComboPooledDataSource;
+//import com.mchange.v2.log.MLevel;
+//import com.mchange.v2.log.MLog;
 
 /**
  * @author Filip Hanik
@@ -39,7 +39,7 @@ import com.mchange.v2.log.MLog;
 public class DefaultTestCase extends TestCase {
     protected org.apache.tomcat.jdbc.pool.DataSource datasource;
     protected BasicDataSource tDatasource;
-    protected ComboPooledDataSource c3p0Datasource;
+//    protected ComboPooledDataSource c3p0Datasource;
     protected int threadcount = 10;
     protected int iterations = 100000;
     public DefaultTestCase(String name) {
@@ -104,32 +104,32 @@ public class DefaultTestCase extends TestCase {
     }
     
     protected void transferPropertiesToC3P0() throws Exception {
-        System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
-        MLog.getLogger().setLevel(MLevel.WARNING);
-        MLog.getLogger("com").setLevel(MLevel.WARNING);
-        //http://www.mchange.com/projects/c3p0/index.html#automaticTestTable
-        ComboPooledDataSource c3p0 = new ComboPooledDataSource();  
-        c3p0.setAcquireIncrement(1);
-        c3p0.setAcquireRetryAttempts(2);
-        c3p0.setAcquireRetryDelay(datasource.getPoolProperties().getMaxWait());
-        c3p0.setCheckoutTimeout(datasource.getPoolProperties().getMaxWait());
-        c3p0.setDebugUnreturnedConnectionStackTraces(datasource.getPoolProperties().isLogAbandoned());
-        c3p0.setIdleConnectionTestPeriod(datasource.getPoolProperties().getTimeBetweenEvictionRunsMillis()/1000);
-        c3p0.setInitialPoolSize(datasource.getPoolProperties().getInitialSize());
-        c3p0.setMaxIdleTime(datasource.getPoolProperties().getMinEvictableIdleTimeMillis()/1000);
-        c3p0.setMaxIdleTimeExcessConnections(datasource.getPoolProperties().getMaxIdle());
-        c3p0.setMaxPoolSize(datasource.getPoolProperties().getMaxActive());
-        c3p0.setMinPoolSize(datasource.getPoolProperties().getMinIdle());
-        c3p0.setPassword(datasource.getPoolProperties().getPassword());
-        c3p0.setPreferredTestQuery(datasource.getPoolProperties().getValidationQuery());
-        c3p0.setTestConnectionOnCheckin(datasource.getPoolProperties().isTestOnReturn());
-        c3p0.setTestConnectionOnCheckout(datasource.getPoolProperties().isTestOnBorrow());
-        c3p0.setUnreturnedConnectionTimeout(datasource.getPoolProperties().getRemoveAbandonedTimeout());
-        c3p0.setUser(datasource.getPoolProperties().getUsername());
-        c3p0.setUsesTraditionalReflectiveProxies(true);
-        c3p0.setJdbcUrl(datasource.getPoolProperties().getUrl());
-        c3p0.setDriverClass(datasource.getPoolProperties().getDriverClassName());
-        this.c3p0Datasource = c3p0;
+//        System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
+//        MLog.getLogger().setLevel(MLevel.WARNING);
+//        MLog.getLogger("com").setLevel(MLevel.WARNING);
+//        //http://www.mchange.com/projects/c3p0/index.html#automaticTestTable
+//        ComboPooledDataSource c3p0 = new ComboPooledDataSource();  
+//        c3p0.setAcquireIncrement(1);
+//        c3p0.setAcquireRetryAttempts(2);
+//        c3p0.setAcquireRetryDelay(datasource.getPoolProperties().getMaxWait());
+//        c3p0.setCheckoutTimeout(datasource.getPoolProperties().getMaxWait());
+//        c3p0.setDebugUnreturnedConnectionStackTraces(datasource.getPoolProperties().isLogAbandoned());
+//        c3p0.setIdleConnectionTestPeriod(datasource.getPoolProperties().getTimeBetweenEvictionRunsMillis()/1000);
+//        c3p0.setInitialPoolSize(datasource.getPoolProperties().getInitialSize());
+//        c3p0.setMaxIdleTime(datasource.getPoolProperties().getMinEvictableIdleTimeMillis()/1000);
+//        c3p0.setMaxIdleTimeExcessConnections(datasource.getPoolProperties().getMaxIdle());
+//        c3p0.setMaxPoolSize(datasource.getPoolProperties().getMaxActive());
+//        c3p0.setMinPoolSize(datasource.getPoolProperties().getMinIdle());
+//        c3p0.setPassword(datasource.getPoolProperties().getPassword());
+//        c3p0.setPreferredTestQuery(datasource.getPoolProperties().getValidationQuery());
+//        c3p0.setTestConnectionOnCheckin(datasource.getPoolProperties().isTestOnReturn());
+//        c3p0.setTestConnectionOnCheckout(datasource.getPoolProperties().isTestOnBorrow());
+//        c3p0.setUnreturnedConnectionTimeout(datasource.getPoolProperties().getRemoveAbandonedTimeout());
+//        c3p0.setUser(datasource.getPoolProperties().getUsername());
+//        c3p0.setUsesTraditionalReflectiveProxies(true);
+//        c3p0.setJdbcUrl(datasource.getPoolProperties().getUrl());
+//        c3p0.setDriverClass(datasource.getPoolProperties().getDriverClassName());
+//        this.c3p0Datasource = c3p0;
         
       /**
         acquireIncrement
@@ -172,10 +172,10 @@ public class DefaultTestCase extends TestCase {
     protected void tearDown() throws Exception {
         try {datasource.close();}catch(Exception ignore){}
         try {tDatasource.close();}catch(Exception ignore){}
-        try {((ComboPooledDataSource)c3p0Datasource).close(true);}catch(Exception ignore){}
+        //try {((ComboPooledDataSource)c3p0Datasource).close(true);}catch(Exception ignore){}
         datasource = null;
         tDatasource = null;
-        c3p0Datasource = null;
+        //c3p0Datasource = null;
         System.gc();
     }
 
