@@ -178,7 +178,7 @@
   <!-- Process a menu item for the navigation bar -->
   <xsl:template match="item">
     <xsl:variable name="href">
-      <xsl:value-of select="$relative-path"/>/<xsl:value-of select="@href"/>
+      <xsl:value-of select="@href"/>
     </xsl:variable>
     <li><a href="{$href}"><xsl:value-of select="@name"/></a></li>
   </xsl:template>
