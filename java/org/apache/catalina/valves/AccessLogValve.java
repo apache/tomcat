@@ -248,7 +248,7 @@ public class AccessLogValve
      * is true.
      */
     protected File currentLogFile = null;
-    private class AccessDateStruct {
+    private static class AccessDateStruct {
         private Date currentDate = new Date();
         private String currentDateString = null;
         private SimpleDateFormat dayFormatter = new SimpleDateFormat("dd");
@@ -256,10 +256,11 @@ public class AccessLogValve
         private SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
         private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
         public AccessDateStruct() {
-            dayFormatter.setTimeZone(timezone);
-            monthFormatter.setTimeZone(timezone);
-            yearFormatter.setTimeZone(timezone);
-            timeFormatter.setTimeZone(timezone);
+            TimeZone tz = TimeZone.getDefault();
+            dayFormatter.setTimeZone(tz);
+            monthFormatter.setTimeZone(tz);
+            yearFormatter.setTimeZone(tz);
+            timeFormatter.setTimeZone(tz);
         }
     }
     
@@ -267,7 +268,8 @@ public class AccessLogValve
      * The system time when we last updated the Date that this valve
      * uses for log lines.
      */
-    private ThreadLocal<AccessDateStruct> currentDateStruct = new ThreadLocal<AccessDateStruct>() {
+    private static final ThreadLocal<AccessDateStruct> currentDateStruct =
+            new ThreadLocal<AccessDateStruct>() {
         protected AccessDateStruct initialValue() {
             return new AccessDateStruct();
         }
