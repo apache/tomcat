@@ -367,10 +367,17 @@
     </antcall>
   </target>
   
+  <!-- Extract the testdb.* properties and remove the leading testdb. -->
+  <propertyset dynamic="false" id="testdb">
+  	<propertyref prefix="testdb"/>
+  	<mapper type="regexp" from="^testdb\.(.*)$$" to="\1"/>
+  </propertyset>
+
   <target name="test" depends="build,build-test">
     <echo/>
     <echo>Creating test table for test purposes.</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
+      <syspropertyset refid="testdb"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
@@ -383,6 +390,7 @@
     <echo/>
     <echo>Performance and fairness tests.</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
+      <syspropertyset refid="testdb"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
@@ -398,6 +406,7 @@
     <echo/>
     <echo>Functional tests.</echo>
     <junit printsummary="yes">
+      <syspropertyset refid="testdb"/>
       <formatter type="plain"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
