@@ -48,7 +48,7 @@ testdb.username=root
 testdb.password=password
 
 # H2
-testdb.url=jdbc:h2x:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE
+testdb.url=jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE
 testdb.driverClassName=org.h2.Driver
 testdb.validationQuery=SELECT 1
 
