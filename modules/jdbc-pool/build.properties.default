@@ -41,6 +41,27 @@ compile.source=1.5
 compile.target=1.5
 compile.debug=true
 
+# ----- Settings for Junit test database.
+
+# Common settings
+testdb.username=root
+testdb.password=password
+
+# H2
+testdb.url=jdbc:h2x:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE
+testdb.driverClassName=org.h2.Driver
+testdb.validationQuery=SELECT 1
+
+# MySQL
+#testdb.url=jdbc:mysql://localhost:3306/mysql?autoReconnect=true
+#testdb.driverClassName=com.mysql.jdbc.Driver
+#testdb.validationQuery=SELECT 1
+
+# Derby
+#testdb.url=jdbc:derby:derbyDB;create=true
+#testdb.driverClassName=org.apache.derby.jdbc.EmbeddedDriver
+#testdb.validationQuery=VALUES 1       
+
 # ----- JUnit Unit Test Suite, version 3.7 or later -----
 junit.home=${base.path}/junit3.8.2
 junit.lib=${junit.home}
