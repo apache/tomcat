@@ -48,17 +48,28 @@ import org.apache.juli.logging.LogFactory;
  */
 
 public class ConnectionPool {
+    /**
+     * Prefix type for JMX registration
+     */
     public static final String POOL_JMX_TYPE_PREFIX = "tomcat.jdbc:type=";
     
-    //logger
+    /**
+     * Logger
+     */
     protected static Log log = LogFactory.getLog(ConnectionPool.class);
 
     //===============================================================================
     //         INSTANCE/QUICK ACCESS VARIABLE
     //===============================================================================
+    /**
+     * Carries the size of the pool, instead of relying on a queue implementation
+     * that usually iterates over to get an exact count
+     */
     private AtomicInteger size = new AtomicInteger(0);
+
     /**
      * All the information about the connection pool
+     * These are the properties the pool got instantiated with
      */
     private PoolProperties poolProperties;
 
@@ -76,12 +87,12 @@ public class ConnectionPool {
     /**
      * The thread that is responsible for checking abandoned and idle threads
      */
-    private PoolCleaner poolCleaner;
+    private volatile PoolCleaner poolCleaner;
 
     /**
      * Pool closed flag
      */
-    private boolean closed = false;
+    private volatile boolean closed = false;
 
     /**
      * Since newProxyInstance performs the same operation, over and over
@@ -95,7 +106,7 @@ public class ConnectionPool {
     private ThreadPoolExecutor cancellator = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
     
     /**
-     * reference to mbean
+     * reference to the JMX mbean
      */
     protected org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmxPool = null;
     
@@ -119,6 +130,14 @@ public class ConnectionPool {
     }
 
 
+    /**
+     * Retrieves a Connection future. If a connection is not available, one can block using future.get()
+     * until a connection has become available.
+     * If a connection is not retrieved, the Future must be cancelled in order for the connection to be returned
+     * to the pool.
+     * @return
+     * @throws SQLException
+     */
     public Future<Connection> getConnectionAsync() throws SQLException {
         if (idle instanceof FairBlockingQueue) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
@@ -130,7 +149,7 @@ public class ConnectionPool {
     
     /**
      * Borrows a connection from the pool
-     * @return Connection - a java.sql.Connection reflection proxy, wrapping the underlying object.
+     * @return Connection - a java.sql.Connection/javax.sql.PooledConnection reflection proxy, wrapping the underlying object.
      * @throws SQLException
      */
     public Connection getConnection() throws SQLException {
@@ -180,6 +199,10 @@ public class ConnectionPool {
         return busy.size();
     }
 
+    /**
+     * Returns the number of idle connections
+     * @return
+     */
     public int getIdle() {
         return idle.size();
     }
@@ -197,7 +220,11 @@ public class ConnectionPool {
     //===============================================================================
     
     
+    /**
+     * configures a pooled connection as a proxy
+     */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
+        //fetch previous interceptor proxy
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
             //build the proxy handler
@@ -252,6 +279,10 @@ public class ConnectionPool {
         return proxyClassConstructor;
     }
 
+    /**
+     * If the connection pool gets garbage collected, lets make sure we clean up
+     * and close all the connections
+     */
     @Override
     protected void finalize() throws Throwable {
         close(true);
