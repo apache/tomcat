@@ -85,6 +85,14 @@
     </copy>
   </target>
 
+  <target name="javadoc" depends="prepare">
+    <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false"/>
+    <!-- connection pool API  file-->
+    <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
+      <fileset dir="${tomcat.api}"/>
+    </jar>
+  </target>
+  
   <target name="build" depends="prepare,download">
     <mkdir dir="${tomcat.pool}"/>
     <!-- compile org.apache.tomcat.jdbc-->
@@ -98,8 +106,6 @@
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
 
-    <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false"/>
-    
     <!-- connection pool JAR File -->
     <jar jarfile="${tomcat-jdbc.jar}" update="true">
       <fileset dir="${tomcat.classes}">
@@ -115,11 +121,6 @@
       <fileset dir="${basedir}/java">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
-    </jar>
-
-    <!-- connection pool API  file-->
-    <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
-      <fileset dir="${tomcat.api}"/>
     </jar>
   </target>
 
@@ -187,7 +188,7 @@
     </xslt>  
   </target>
   
-  <target name="dist" depends="clean, build, docs">
+  <target name="dist" depends="clean, build, docs, javadoc">
     <property name="destdir" value="${tomcat.pool}/release/v${version}"/>
     <mkdir dir="${destdir}"/>
     <zip destfile="${destdir}/apache-tomcat-jdbc-${version}-bin.zip">
