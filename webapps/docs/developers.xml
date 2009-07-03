@@ -45,31 +45,32 @@
     </p>
 
     <ul>
-      <li>Amy Roh (amyroh): Catalina, Admin webapp</li>
       <li>Bill Barker (billbarker): Connectors</li>
       <li>Costin Manolache (costin): Catalina, Connectors</li>
-      <li>Filip Hanik (fhanik): Clustering</li>
-      <li>Glenn Nielsen (glenn): Catalina, Connectors</li>
-      <li>Henri Gomez (hgomez): Connectors</li>
-      <li>Jan Luehe (luehe): Jasper</li>
-      <li>Jean-Francois Arcand (jfarcand): Catalina</li>
+      <li>Filip Hanik (fhanik): Clustering, Release Manager</li>
       <li>Jean-Frederic Clere (jfclere): Connectors</li>
       <li>Jim Jagielski (jim): Connectors</li>
-      <li>Kin-Man Chung (kinman): Jasper</li>
-      <li>Mark Thomas (markt): Servlet 3.0, embedded, bug fixing</li>
+      <li>Mark Thomas (markt): CGI, SSI, WebDAV, bug fixing</li>
       <li>Mladen Turk (mturk): Connectors</li>
       <li>Peter Rossbach (pero): Catalina, Clustering, JMX</li>
+      <li>Rainer Jung (rjung): Catalina, Clustering, Connectors</li>
       <li>Remy Maucherat (remm): Catalina, Connectors, Docs</li>
       <li>Tim Funk (funkman): Catalina, Docs</li>
-      <li>Yoav Shapira (yoavs): Docs, JMX, Catalina, balancer, Release Manager</li>
     </ul>
 
   </section>
 
   <section name="Retired Developers">
 
-
-
+    <ul>
+      <li>Amy Roh (amyroh): Catalina</li>
+      <li>Glenn Nielsen (glenn): Catalina, Connectors</li>
+      <li>Henri Gomez (hgomez): Connectors</li>
+      <li>Jan Luehe (luehe): Jasper</li>
+      <li>Jean-Francois Arcand (jfarcand): Catalina</li>
+      <li>Kin-Man Chung (kinman): Jasper</li>
+      <li>Yoav Shapira (yoavs): Docs, JMX, Catalina, balancer</li>
+    </ul>
   </section>
 
 </body>
