@@ -702,7 +702,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   <!-- Packages the source code distribution in tar.gz format -->
   <target name="package-src-tgz">
     <fixcrlf srcdir="${tomcat.dist}/src"
-     excludes="**/*.jar,**/*.gif,**/*.bmp,**/*.jpg,**/*.ico,**/*.war,**/*.exe,**/*.pdf,**/*.bin,**/*.dia"
+        excludes="**/*.bin,**/*.bmp,**/*.dia,**/*.exe,**/*.gif,**/*.ico,**/*.jar,**/*.jpg,**/*.pdf,**/*.rtf,**/*.war"
           eol="lf" encoding="ISO-8859-1" fixlast="false" />
     <tar longfile="gnu" compression="gzip"
          tarfile="${tomcat.release}/v${version}/src/${final-src.name}.tar.gz">
