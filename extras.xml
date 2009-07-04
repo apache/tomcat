@@ -208,7 +208,8 @@
 	           debug="${compile.debug}"
 	           deprecation="${compile.deprecation}"
 	           source="${compile.source}"
-	           optimize="${compile.optimize}">
+	           optimize="${compile.optimize}"
+	           encoding="ISO-8859-1">
 	      <classpath refid="tomcat.webservices.classpath" />
 	      <include name="org/apache/naming/factory/webservices/**" />
 	    </javac>
