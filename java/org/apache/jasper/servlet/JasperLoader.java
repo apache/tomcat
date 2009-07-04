@@ -37,17 +37,13 @@ import org.apache.jasper.Constants;
 public class JasperLoader extends URLClassLoader {
 
     private PermissionCollection permissionCollection;
-    private CodeSource codeSource;
-    private String className;
     private ClassLoader parent;
     private SecurityManager securityManager;
 
     public JasperLoader(URL[] urls, ClassLoader parent,
-                        PermissionCollection permissionCollection,
-                        CodeSource codeSource) {
+                        PermissionCollection permissionCollection) {
         super(urls, parent);
         this.permissionCollection = permissionCollection;
-        this.codeSource = codeSource;
         this.parent = parent;
         this.securityManager = System.getSecurityManager();
     }
@@ -148,7 +144,7 @@ public class JasperLoader extends URLClassLoader {
                 try {
                     is = url.openStream();
                 } catch (IOException e) {
-                    is = null;
+                    // Ignore
                 }
             }
         }
