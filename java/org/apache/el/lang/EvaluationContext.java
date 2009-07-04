@@ -51,7 +51,7 @@ public final class EvaluationContext extends ELContext {
         return this.varMapper;
     }
 
-    public Object getContext(Class key) {
+    public Object getContext(Class<?> key) {
         return this.elContext.getContext(key);
     }
 
@@ -63,7 +63,7 @@ public final class EvaluationContext extends ELContext {
         return this.elContext.isPropertyResolved();
     }
 
-    public void putContext(Class key, Object contextObject) {
+    public void putContext(Class<?> key, Object contextObject) {
         this.elContext.putContext(key, contextObject);
     }
 
