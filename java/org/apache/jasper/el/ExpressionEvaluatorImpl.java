@@ -34,7 +34,7 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
 		this.factory = factory;
 	}
 
-	public Expression parseExpression(String expression, Class expectedType,
+	public Expression parseExpression(String expression, Class<?> expectedType,
 			FunctionMapper fMapper) throws ELException {
 		try {
 			ELContextImpl ctx =
@@ -49,7 +49,7 @@ public final class ExpressionEvaluatorImpl extends ExpressionEvaluator {
 		}
 	}
 
-	public Object evaluate(String expression, Class expectedType,
+	public Object evaluate(String expression, Class<?> expectedType,
 			VariableResolver vResolver, FunctionMapper fMapper)
 			throws ELException {
 		return this.parseExpression(expression, expectedType, fMapper).evaluate(vResolver);
