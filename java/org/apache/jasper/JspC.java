@@ -1283,7 +1283,7 @@ public class JspC implements Options {
             String path = tokenizer.nextToken();
             try {
                 File libFile = new File(path);
-                urls.add(libFile.toURL());
+                urls.add(libFile.toURI().toURL());
             } catch (IOException ioe) {
                 // Failing a toCanonicalPath on a file that
                 // exists() should be a JVM regression test,
@@ -1299,7 +1299,7 @@ public class JspC implements Options {
                 if (classes.exists()) {
                     classPath = classPath + File.pathSeparator
                         + classes.getCanonicalPath();
-                    urls.add(classes.getCanonicalFile().toURL());
+                    urls.add(classes.getCanonicalFile().toURI().toURL());
                 }
             } catch (IOException ioe) {
                 // failing a toCanonicalPath on a file that
@@ -1324,7 +1324,7 @@ public class JspC implements Options {
                         File libFile = new File(lib, libs[i]);
                         classPath = classPath + File.pathSeparator
                             + libFile.getAbsolutePath();
-                        urls.add(libFile.getAbsoluteFile().toURL());
+                        urls.add(libFile.getAbsoluteFile().toURI().toURL());
                     } catch (IOException ioe) {
                         // failing a toCanonicalPath on a file that
                         // exists() should be a JVM regression test,
@@ -1336,7 +1336,8 @@ public class JspC implements Options {
         }
 
         // What is this ??
-        urls.add(new File(clctxt.getRealPath("/")).getCanonicalFile().toURL());
+        urls.add(new File(
+                clctxt.getRealPath("/")).getCanonicalFile().toURI().toURL());
 
         URL urlsA[]=new URL[urls.size()];
         urls.toArray(urlsA);
