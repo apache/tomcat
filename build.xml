@@ -140,7 +140,8 @@
            source="${compile.source}"
            target="${compile.target}"
            optimize="${compile.optimize}"
-           excludes="**/CVS/**,**/.svn/**">
+           excludes="**/CVS/**,**/.svn/**"
+           encoding="ISO-8859-1">
 <!-- Comment this in to show unchecked warnings:     
       <compilerarg value="-Xlint:unchecked"/>
  -->
@@ -548,7 +549,8 @@
              target="${compile.target}"
              optimize="${compile.optimize}"
              classpath="${tomcat.classes}"
-             excludes="**/CVS/**,**/.svn/**">
+             excludes="**/CVS/**,**/.svn/**"
+             encoding="ISO-8859-1">
     </javac>
 
     <javac   srcdir="webapps/examples/jsp/plugin/applet"
@@ -558,7 +560,8 @@
              target="${compile.target}"
              optimize="${compile.optimize}"
              classpath="$tomcat.lcasses}"
-             excludes="**/CVS/**,**/.svn/**">
+             excludes="**/CVS/**,**/.svn/**"
+             encoding="ISO-8859-1">
     </javac>
 
     <!-- Add sources for examples -->
@@ -670,7 +673,8 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}">
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1">
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/**" />
     </javac>
@@ -865,7 +869,8 @@
            source="${compile.source}"
            target="${compile.target}"
            sourcepath="${tomcat-dbcp.home}/src/java"
-           srcdir="${tomcat-dbcp.home}/src/java" >
+           srcdir="${tomcat-dbcp.home}/src/java"
+           encoding="ISO-8859-1">
       <include name="**" />
     </javac>
     <jar jarfile="${tomcat-dbcp.jar}"
