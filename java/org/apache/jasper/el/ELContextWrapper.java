@@ -51,7 +51,7 @@ public final class ELContextWrapper extends ELContext {
         return this.target.getVariableMapper();
     }
 
-    public Object getContext(Class key) {
+    public Object getContext(Class<?> key) {
         return this.target.getContext(key);
     }
 
@@ -63,7 +63,7 @@ public final class ELContextWrapper extends ELContext {
         return this.target.isPropertyResolved();
     }
 
-    public void putContext(Class key, Object contextObject) throws NullPointerException {
+    public void putContext(Class<?> key, Object contextObject) throws NullPointerException {
         this.target.putContext(key, contextObject);
     }
 
