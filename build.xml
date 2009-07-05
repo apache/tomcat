@@ -848,11 +848,13 @@
         <exclude name="**/managed/**" />
       </fileset>
     </copy>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons" >
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons"
+        encoding="ISO-8859-1">
       <replacefilter token="org.apache.commons"
             value="org.apache.tomcat.dbcp" />
     </replace>
-    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl" >
+    <replace dir="${tomcat-dbcp.home}/src/java/org/apache/commons/pool/impl"
+        encoding="ISO-8859-1">
       <replacefilter token="enum"
             value="enumeration" />
     </replace>
