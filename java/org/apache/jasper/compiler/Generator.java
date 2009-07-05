@@ -1801,7 +1801,7 @@ class Generator {
                 for (int i = 0; i < infos.length; i++) {
                     VariableInfo info = infos[i];
                     if (info != null && info.getVarName() != null)
-                    pageInfo.getVarInfoNames().add(info.getVarName());
+                        pageInfo.getVarInfoNames().add(info.getVarName());
                 }
             }
             
