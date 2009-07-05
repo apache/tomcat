@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.el.ExpressionFactoryImpl;
@@ -42,6 +43,7 @@ class PageInfo {
     private Vector<String> dependants;
 
     private BeanRepository beanRepository;
+    private Set<String> varInfoNames;
     private HashMap<String,TagLibraryInfo> taglibsMap;
     private HashMap<String, String> jspPrefixMapper;
     private HashMap<String, LinkedList<String>> xmlPrefixMapper;
@@ -98,6 +100,7 @@ class PageInfo {
 
         this.jspFile = jspFile;
         this.beanRepository = beanRepository;
+        this.varInfoNames = new HashSet<String>();
         this.taglibsMap = new HashMap<String, TagLibraryInfo>();
         this.jspPrefixMapper = new HashMap<String, String>();
         this.xmlPrefixMapper = new HashMap<String, LinkedList<String>>();
@@ -706,5 +709,9 @@ class PageInfo {
 
     public void setTrimDirectiveWhitespaces(boolean trimDirectiveWhitespaces) {
         this.trimDirectiveWhitespaces = trimDirectiveWhitespaces;
+    }
+
+    public Set<String> getVarInfoNames() {
+        return varInfoNames;
     }
 }
