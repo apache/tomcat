@@ -1794,7 +1794,7 @@ class Generator {
                 out = outSave;
             }
             
-            // Add the named objects to the lits of 'introduced' names to enable
+            // Add the named objects to the list of 'introduced' names to enable
             // a later test as per JSP.5.3
             VariableInfo[] infos = n.getVariableInfos();
             if (infos != null && infos.length > 0) {
