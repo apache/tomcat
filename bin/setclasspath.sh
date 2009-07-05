@@ -112,6 +112,9 @@ fi
 if [ "$1" = "debug" -o "$1" = "javac" ] ; then
   if [ -f "$JAVA_HOME"/lib/tools.jar ]; then
     CLASSPATH="$JAVA_HOME"/lib/tools.jar
+    if [ "$1" = "javac" ] ; then
+      shift
+    fi
   fi
 fi
 
