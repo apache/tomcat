@@ -31,6 +31,7 @@ import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.el.MethodExpression;
@@ -86,6 +87,8 @@ class Generator {
     private ErrorDispatcher err;
 
     private BeanRepository beanInfo;
+    
+    private Set<String> varInfoNames;
 
     private JspCompilationContext ctxt;
 
@@ -1107,18 +1110,26 @@ class Generator {
                                 + ")_jspx_page_context.findAttribute("
                                 + "\""
                                 + name + "\"))." + methodName + "())));");
-            } else {
-                // The object could be a custom action with an associated
+            } else if (varInfoNames.contains(name)) {
+                // The object is a custom action with an associated
                 // VariableInfo entry for this name.
                 // Get the class name and then introspect at runtime.
                 out
                         .printil("out.write(org.apache.jasper.runtime.JspRuntimeLibrary.toString"
                                 + "(org.apache.jasper.runtime.JspRuntimeLibrary.handleGetProperty"
-                                + "(_jspx_page_context.getAttribute(\""
+                                + "(_jspx_page_context.findAttribute(\""
                                 + name
-                                + "\", PageContext.PAGE_SCOPE), \""
+                                + "\"), \""
                                 + property
                                 + "\")));");
+            } else {
+                StringBuilder msg =
+                    new StringBuilder("jsp:getProperty for bean with name '");
+                msg.append(name);
+                msg.append(
+                        "'. Name was not previously introduced as per JSP.5.3");
+                
+                throw new JasperException(msg.toString());
             }
 
             n.setEndJavaLine(out.getJavaLine());
@@ -1782,6 +1793,18 @@ class Generator {
                 // restore previous writer
                 out = outSave;
             }
+            
+            // Add the named objects to the lits of 'introduced' names to enable
+            // a later test as per JSP.5.3
+            VariableInfo[] infos = n.getVariableInfos();
+            if (infos != null && infos.length > 0) {
+                for (int i = 0; i < infos.length; i++) {
+                    VariableInfo info = infos[i];
+                    if (info != null && info.getVarName() != null)
+                    pageInfo.getVarInfoNames().add(info.getVarName());
+                }
+            }
+            
         }
 
         private static final String DOUBLE_QUOTE = "\\\"";
@@ -3364,6 +3387,7 @@ class Generator {
             isPoolingEnabled = false;
         }
         beanInfo = pageInfo.getBeanRepository();
+        varInfoNames = pageInfo.getVarInfoNames();
         breakAtLF = ctxt.getOptions().getMappedFile();
         if (isPoolingEnabled) {
             tagHandlerPoolNames = new Vector<String>();
