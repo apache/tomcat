@@ -204,8 +204,9 @@ if [ $have_tty -eq 1 ]; then
   if [ "$1" = "debug" -o "$1" = "javac" ] ; then
     echo "Using JAVA_HOME:       $JAVA_HOME"
   else
-    echo "Using JRE_HOME:       $JRE_HOME"
+    echo "Using JRE_HOME:        $JRE_HOME"
   fi
+  echo "Using CLASSPATH:       $CLASSPATH"
 fi
 
 if [ "$1" = "jpda" ] ; then
