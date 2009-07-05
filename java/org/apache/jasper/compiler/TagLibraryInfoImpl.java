@@ -278,11 +278,11 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         if (tlibversion == null) {
             err.jspError("jsp.error.tld.mandatory.element.missing",
-                    "tlib-version");
+                    "tlib-version", uri);
         }
         if (jspversion == null) {
             err.jspError("jsp.error.tld.mandatory.element.missing",
-                    "jsp-version");
+                    "jsp-version", uri);
         }
 
         this.tags = new TagInfo[tagVector.size()];
