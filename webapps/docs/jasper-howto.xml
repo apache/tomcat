@@ -200,6 +200,25 @@ argument to catalina.sh.</p>
 
 </section>
 
+<section name="Known issues">
+
+<p>As described in
+<a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=39089">
+bug 39089</a>, a known JVM issue,
+<a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6294277">
+bug 6294277</a>, may cause a
+<code>java.lang.InternalError: name is too long to represent</code> exception
+when compiling very large JSPs. If this is observed then it may be worked around
+by using one of the following:
+<ul>
+<li>reduce the size of the JSP</li>
+<li>disable SMAP generation and JSR-045 support by setting
+<code>suppressSmap</code> to <code>true</code>.</li>
+</ul>
+</p>
+
+</section>
+
 <section name="Production Configuration">
 
 <p>The main JSP optimization which can be done is precompilation of JSPs.
