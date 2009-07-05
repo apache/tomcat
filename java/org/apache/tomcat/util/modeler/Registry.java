@@ -879,14 +879,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     // May still be used in tomcat 
     // Never part of an official release
     
-    /** Called by a registry or by the container to unload a loader
-     * @param loader
-     */
-    public void unregisterRegistry(ClassLoader loader ) {
-        // XXX Cleanup ?
-        perLoaderRegistries.remove(loader);
-    }
-
     public ManagedBean findManagedBean(Class<?> beanClass, String type)
         throws Exception
     {
@@ -906,31 +898,5 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     public void resetMetadata() {
         stop();
     }
-    /**
-     * Load the registry from the XML input found in the specified input
-     * stream.
-     *
-     * @param source Source to be used to load. Can be an InputStream or URL.
-     *
-     * @exception Exception if any parsing or processing error occurs
-     */
-    public void loadDescriptors( Object source )
-            throws Exception
-    {
-        loadDescriptors("MbeansDescriptorsDigesterSource", source, null );
-    }
 
-
-    // should be removed
-    public void unregisterComponent( String domain, String name ) {
-        try {
-            ObjectName oname=new ObjectName( domain + ":" + name );
-
-            // XXX remove from our tables.
-            getMBeanServer().unregisterMBean( oname );
-        } catch( Throwable t ) {
-            log.error( "Error unregistering mbean ", t );
-        }
-    }
-    
 }
