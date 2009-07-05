@@ -150,7 +150,10 @@ else
 fi
 
 # Add on extra jar files to CLASSPATH
-CLASSPATH="$CLASSPATH":"$CATALINA_HOME"/bin/bootstrap.jar
+if [ ! -z "$CLASSPATH" ] ; then
+  CLASSPATH="$CLASSPATH":
+fi
+CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar
 
 if [ -z "$CATALINA_BASE" ] ; then
   CATALINA_BASE="$CATALINA_HOME"
@@ -345,7 +348,10 @@ elif [ "$1" = "version" ] ; then
 
 else
 
-  echo "Usage: catalina.sh ( commands ... )"
+  echo "Usage: catalina.sh [javac] ( commands ... )"
+  echo "optional arguments:"
+  echo "  javac             Adds tools.jar to the classpath so javac is"
+  echo "                      available as a compiler"
   echo "commands:"
   if $os400; then
     echo "  debug             Start Catalina in a debugger (not available on OS400)"
