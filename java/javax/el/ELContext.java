@@ -39,14 +39,14 @@ public abstract class ELContext {
         this.resolved = false;
     }
     
-    public Object getContext(Class<?> key) {
+    public Object getContext(Class key) {
         if (this.map == null) {
             return null;
         }
         return this.map.get(key);
     }
     
-    public void putContext(Class<?> key, Object contextObject) throws NullPointerException {
+    public void putContext(Class key, Object contextObject) throws NullPointerException {
         if (key == null || contextObject == null) {
             throw new NullPointerException();
         }
