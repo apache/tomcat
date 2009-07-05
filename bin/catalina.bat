@@ -42,10 +42,6 @@ rem
 rem   JAVA_OPTS       (Optional) Java runtime options used when the "start",
 rem                   "stop", or "run" command is executed.
 rem
-rem   JSSE_HOME       (Optional) May point at your Java Secure Sockets Extension
-rem                   (JSSE) installation, whose JAR files will be added to the
-rem                   system class path used to start Tomcat.
-rem
 rem   JPDA_TRANSPORT  (Optional) JPDA transport used when the "jpda start"
 rem                   command is executed. The default is "dt_shmem".
 rem
@@ -111,9 +107,6 @@ call "%CATALINA_HOME%\bin\setclasspath.bat" %1
 if errorlevel 1 goto end
 
 rem Add on extra jar files to CLASSPATH
-if "%JSSE_HOME%" == "" goto noJsse
-set CLASSPATH=%CLASSPATH%;%JSSE_HOME%\lib\jcert.jar;%JSSE_HOME%\lib\jnet.jar;%JSSE_HOME%\lib\jsse.jar
-:noJsse
 set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar
 
 if not "%CATALINA_BASE%" == "" goto gotBase
