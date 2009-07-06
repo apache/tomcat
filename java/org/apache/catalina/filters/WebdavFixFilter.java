@@ -51,7 +51,7 @@ import javax.servlet.http.HttpServletResponse;
  * also been observed that cannot be fixed by this filter. Where possible the
  * filter will add an message to the logs.
  * <p>
- * XP x64 SP2 (MiniRedir Version 3790
+ * XP x64 SP2 (MiniRedir Version 3790)
  * <ul>
  *   <li>Only connects to port 80</li>
  *   <li>Requires an upper case context path</li>
