@@ -54,7 +54,6 @@ import javax.servlet.http.HttpServletResponse;
  * XP x64 SP2 (MiniRedir Version 3790)
  * <ul>
  *   <li>Only connects to port 80</li>
- *   <li>Requires an upper case context path</li>
  *   <li>Unknown issue means it doesn't work</li>
  * </ul>
  */
@@ -109,14 +108,12 @@ public class WebdavFixFilter implements Filter {
 		    httpResponse.sendRedirect(buildRedirect(httpRequest));
 		} else if (ua.startsWith(UA_MINIDIR_5_2_3790)) {
 		    // XP 64-bit SP2
-		    // Check context path case
-		    if (!httpRequest.getContextPath().equals(
-		            httpRequest.getContextPath().toUpperCase())) {
+		    if (!"".equals(httpRequest.getContextPath())) {
 		        log(request,
-		                "XP-x64-SP2 expects context path to be upper case");
+		                "XP-x64-SP2 clients only work with the root context");
 		    }
-		    // Some other, as yet unknown issue means I can't get this client
-		    // to work 
+		    // Namespace issue maybe
+		    // see http://greenbytes.de/tech/webdav/webdav-redirector-list.html
 		    log(request, "XP-x64-SP2 is known not to work with WebDAV Servlet");
 		    
 		    chain.doFilter(request, response);
