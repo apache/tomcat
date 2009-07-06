@@ -67,8 +67,12 @@ public class WebdavFixFilter implements Filter {
     /* Start string for all versions */
     private static final String UA_MINIDIR_START =
         "Microsoft-WebDAV-MiniRedir";
+    /* XP 32-bit SP3 */
+    private static final String UA_MINIDIR_5_1_2600 =
+        "Microsoft-WebDAV-MiniRedir/5.1.2600";
+    
     /* XP 64-bit SP2 */
-    private static final String UA_MINIDIR_3790 =
+    private static final String UA_MINIDIR_5_2_3790 =
         "Microsoft-WebDAV-MiniRedir/5.2.3790";
 
     @Override
@@ -100,7 +104,10 @@ public class WebdavFixFilter implements Filter {
 	        // No UA or starts with non MS value
 		    // Hope everything just works...
 		    chain.doFilter(request, response);
-		} else if (ua.startsWith(UA_MINIDIR_3790)) {
+		} else if (ua.startsWith(UA_MINIDIR_5_1_2600)) {
+		    // XP 32-bit SP3 - needs redirect with explicit port
+		    httpResponse.sendRedirect(buildRedirect(httpRequest));
+		} else if (ua.startsWith(UA_MINIDIR_5_2_3790)) {
 		    // XP 64-bit SP2
 		    // Check context path case
 		    if (!httpRequest.getContextPath().equals(
