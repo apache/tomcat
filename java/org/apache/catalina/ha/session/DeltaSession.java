@@ -175,7 +175,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                     ClassLoader[] loaders = getClassLoaders();
                     if (loaders != null && loaders.length > 0)
                         Thread.currentThread().setContextClassLoader(loaders[0]);
-                    getDeltaRequest().execute(this);
+                    getDeltaRequest().execute(this, ((ClusterManager)getManager()).isNotifyListenersOnReplication());
                 } finally {
                     Thread.currentThread().setContextClassLoader(contextLoader);
                 }
