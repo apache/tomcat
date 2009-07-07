@@ -177,6 +177,11 @@ public class SocketProperties {
      * poller going boinkers during high traffic
      */
     protected long timeoutInterval = 1000;
+    
+    /**
+     * Timeout in milliseconds for an unlock to take place.
+     */
+    protected int unlockTimeout = 250;
 
     public void setProperties(Socket socket) throws SocketException{
         if (rxBufSize != null)
@@ -406,5 +411,15 @@ public class SocketProperties {
     public void setDirectBufferPool(int directBufferPool) {
         this.bufferPool = directBufferPool;
     }
+
+    public int getUnlockTimeout() {
+        return unlockTimeout;
+    }
+
+    public void setUnlockTimeout(int unlockTimeout) {
+        this.unlockTimeout = unlockTimeout;
+    }
+    
+    
 
 }
