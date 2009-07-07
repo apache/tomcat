@@ -47,7 +47,7 @@ public class OneLineFormatter extends Formatter {
     private final SimpleDateFormat monthFormatter = new SimpleDateFormat("MM");
     private final SimpleDateFormat yearFormatter = new SimpleDateFormat("yyyy");
     private final SimpleDateFormat timeFormatter =
-        new SimpleDateFormat("HH:mm:ss");
+        new SimpleDateFormat("HH:mm:ss.S");
     
     private Date currentDate;
     private String currentDateString;
