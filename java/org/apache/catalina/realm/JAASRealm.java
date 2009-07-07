@@ -427,7 +427,7 @@ public class JAASRealm
             log.debug(sm.getString("jaasRealm.loginContextCreated", username));
 
         // Return the appropriate Principal for this authenticated Subject
-        Principal principal = createPrincipal(username, subject);
+        Principal principal = createPrincipal(username, subject, loginContext);
         if (principal == null) {
             log.debug(sm.getString("jaasRealm.authenticateFailure", username));
             return (null);
@@ -488,8 +488,11 @@ public class JAASRealm
      * roles, but only if their respective classes match one of the "role class" classes. 
      * If a user Principal cannot be constructed, return <code>null</code>.
      * @param subject The <code>Subject</code> representing the logged-in user
+     * @param loginContext Associated with th Princpal so
+     *                     {@link LoginContext#logout()} can be called later
      */
-    protected Principal createPrincipal(String username, Subject subject) {
+    protected Principal createPrincipal(String username, Subject subject,
+            LoginContext loginContext) {
         // Prepare to scan the Principals for this Subject
 
         List<String> roles = new ArrayList<String>();
@@ -536,7 +539,8 @@ public class JAASRealm
         }
 
         // Return the resulting Principal for our authenticated user
-        return new GenericPrincipal(this, username, null, roles, userPrincipal);
+        return new GenericPrincipal(this, username, null, roles, userPrincipal,
+                loginContext);
     }
 
      /**

@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.security.auth.login.LoginException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionActivationListener;
@@ -57,6 +58,7 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.security.SecurityUtil;
 
 /**
@@ -756,6 +758,20 @@ public class StandardSession
             // Notify interested session event listeners
             if (notify) {
                 fireSessionEvent(Session.SESSION_DESTROYED_EVENT, null);
+            }
+
+            // Call the JAAS logout method if necessary
+            if (principal instanceof GenericPrincipal) {
+                GenericPrincipal gp = (GenericPrincipal) principal;
+                if (gp.getLoginContext() != null) {
+                    try {
+                        gp.getLoginContext().logout();
+                    } catch (LoginException e) {
+                        manager.getContainer().getLogger().error(
+                                sm.getString("standardSession.jaaslogoutfail"),
+                                e);
+                    }
+                }
             }
 
             // We have completed expire of this session
