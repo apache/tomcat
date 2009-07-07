@@ -98,7 +98,7 @@ public class StandardThreadExecutor implements Executor {
     public void stop() throws LifecycleException{
         lifecycle.fireLifecycleEvent(BEFORE_STOP_EVENT, null);
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
-        if ( executor != null ) executor.shutdown();
+        if ( executor != null ) executor.shutdownNow();
         executor = null;
         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
     }
