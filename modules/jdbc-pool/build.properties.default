@@ -82,7 +82,6 @@ dbcp.loc=http://archive.apache.org/dist/commons/dbcp/binaries/commons-dbcp-1.2.z
 
 tomcat.home=${base.path}/apache-tomcat-6.0.20
 tomcat.dbcp.jar=${tomcat.home}/lib/tomcat-dbcp.jar
-tomcat.coyote.jar=${tomcat.home}/lib/tomcat-coyote.jar
 tomcat.juli.jar=${tomcat.home}/bin/tomcat-juli.jar
 tomcat.loc=http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.20/bin/apache-tomcat-6.0.20.zip
 
