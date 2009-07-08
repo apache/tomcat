@@ -21,6 +21,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -187,7 +190,13 @@ public class DataSourceProxy  {
 
     protected void finalize() throws Throwable {
         //terminate the pool?
-        close(true);
+        ThreadPoolExecutor closer = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
+        final Runnable r = new Runnable() {
+            public void run(){ 
+                close(true);                
+            }
+        };
+        closer.execute(r);
     }
 
     public int getPoolSize() throws SQLException{

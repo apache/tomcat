@@ -444,8 +444,15 @@
     <p>Extends the <code>SlowQueryReport</code> and in addition to log entries it issues JMX notification
        for monitoring tools to react to. Inherits all the attributes from its parent class.
        This class uses Tomcat's JMX engine so it wont work outside of the Tomcat container.
+       By default, JMX notifications are sent through the ConnectionPool mbean if it is enabled.
+       The SlowQueryReportJmx can also register an MBean if <code>notifyPool=false</code>
     </p>   
     <attributes>
+      <attribute name="notifyPool" required="false">
+        <p>(boolean as String) Set to false if you want JMX notifications to go to the SlowQueryReportJmx MBean
+           The default value is <code>true</code>.
+        </p>
+      </attribute>
     </attributes>
   </subsection>
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer">
@@ -687,9 +694,8 @@
   <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Building from source">
     <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code>
-    it also requires the <code>tomcat-coyote.jar</code> library.</p>
     <source>
-       javac -classpath tomcat-juli.jar:tomcat-coyote.jar \
+       javac -classpath tomcat-juli.jar \
              -d . \
              org/apache/tomcat/jdbc/pool/*.java \
              org/apache/tomcat/jdbc/pool/interceptor/*.java \
