@@ -19,5 +19,4 @@ Import-Package:
   javax.management.openmbean;version="0",
   javax.naming;version="0",
   javax.sql;version="0",
-  org.apache.juli.logging;version="[6.0.18, 7.0.0)",
-  org.apache.tomcat.util.modeler;version="[6.0.18, 7.0.0)"
+  org.apache.juli.logging;version="[6.0.18, 7.0.0)"

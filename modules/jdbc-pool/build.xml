@@ -51,7 +51,6 @@
   <!-- Classpath -->
   <path id="tomcat.jdbc.classpath">
     <pathelement location="${tomcat.classes}"/>
-    <pathelement location="${tomcat.coyote.jar}"/>
     <pathelement location="${tomcat.juli.jar}"/>
   </path>
   
