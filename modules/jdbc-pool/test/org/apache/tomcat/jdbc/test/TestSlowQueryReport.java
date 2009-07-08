@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.test;
 
+import java.lang.management.ManagementFactory;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,8 +24,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
 
+import javax.management.AttributeChangeNotification;
+import javax.management.Notification;
+import javax.management.NotificationListener;
+
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport;
+import org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx;
 
 public class TestSlowQueryReport extends DefaultTestCase {
 
@@ -74,6 +80,56 @@ public class TestSlowQueryReport extends DefaultTestCase {
         assertNull(SlowQueryReport.getPoolStats(pool.getName()));
     }
 
+    public void testSlowSqlJmx() throws Exception {
+        int count = 1;
+        this.init();
+        this.datasource.setMaxActive(1);
+        this.datasource.setJdbcInterceptors(SlowQueryReportJmx.class.getName()+"(threshold=50,notifyPool=false)");
+        Connection con = this.datasource.getConnection();
+        String slowSql = "select count(1) from test where val1 like 'ewq%eq'";
+        for (int i=0; i<count; i++) {
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(slowSql);
+            rs.close();
+            st.close();
+        }
+        Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
+        assertNotNull(map);
+        assertEquals(1,map.size());
+        String key = map.keySet().iterator().next();
+        SlowQueryReport.QueryStats stats = map.get(key);
+        System.out.println("Stats:"+stats);
+        ClientListener listener = new ClientListener();
+        ConnectionPool pool = datasource.getPool();
+        ManagementFactory.getPlatformMBeanServer().addNotificationListener(
+                SlowQueryReportJmx.getObjectName(SlowQueryReportJmx.class, pool.getName()), 
+                listener,
+                null,
+                null);
+        
+        for (int i=0; i<count; i++) {
+            PreparedStatement st = con.prepareStatement(slowSql);
+            ResultSet rs = st.executeQuery();
+            rs.close();
+            st.close();
+        }
+        System.out.println("Stats:"+stats);
+        
+        for (int i=0; i<count; i++) {
+            CallableStatement st = con.prepareCall(slowSql);
+            ResultSet rs = st.executeQuery();
+            rs.close();
+            st.close();
+        }
+        System.out.println("Stats:"+stats);
+        assertEquals("Expecting to have received "+(2*count)+" notifications.",2*count, listener.notificationCount);
+        con.close();
+        tearDown();
+        //make sure we actually did clean up when the pool closed
+        assertNull(SlowQueryReport.getPoolStats(pool.getName()));
+    }
+
+    
     public void testFastSql() throws Exception {
         int count = 3;
         this.init();
@@ -125,7 +181,29 @@ public class TestSlowQueryReport extends DefaultTestCase {
         con.close();
         tearDown();
         assertNull(SlowQueryReport.getPoolStats(pool.getName()));
-    }    
+    }   
+    
+    
+    public class ClientListener implements NotificationListener {
+        volatile int notificationCount = 0;
+        public void handleNotification(Notification notification,
+                                       Object handback) {
+            notificationCount++;
+            System.out.println("\nReceived notification:");
+            System.out.println("\tClassName: " + notification.getClass().getName());
+            System.out.println("\tSource: " + notification.getSource());
+            System.out.println("\tType: " + notification.getType());
+            System.out.println("\tMessage: " + notification.getMessage());
+            if (notification instanceof AttributeChangeNotification) {
+                AttributeChangeNotification acn =
+                    (AttributeChangeNotification) notification;
+                System.out.println("\tAttributeName: " + acn.getAttributeName());
+                System.out.println("\tAttributeType: " + acn.getAttributeType());
+                System.out.println("\tNewValue: " + acn.getNewValue());
+                System.out.println("\tOldValue: " + acn.getOldValue());
+            }
+        }
+    }
 
 
 }
