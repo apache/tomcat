@@ -93,6 +93,12 @@
         </p>
       </attribute>
 
+      <attribute name="SSLRandomSeed" required="false">
+        <p>Entropy source used to seed the SSLEngine's PRNG. The default value
+        is <code>builtin</code>. On development systems, you may want to set
+        this to <code>/dev/urandom</code> to allow quicker start times.</p>
+      </attribute>
+
     </attributes>
 
     <h3>Jasper Listener (org.apache.catalina.core.JasperListener)</h3>
