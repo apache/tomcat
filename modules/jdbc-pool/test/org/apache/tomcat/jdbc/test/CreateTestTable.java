@@ -25,12 +25,12 @@ import java.sql.ResultSet;
 
 public class CreateTestTable extends DefaultTestCase {
     
-    public static final boolean recreate = Boolean.getBoolean("recreate");
+    public static volatile boolean recreate = Boolean.getBoolean("recreate");
     
     public CreateTestTable(String name) {
         super(name);
     }
-    
+
     public void testCreateTestTable() throws Exception {
         this.init();
         Connection con = datasource.getConnection();
@@ -73,7 +73,7 @@ public class CreateTestTable extends DefaultTestCase {
         }
         PreparedStatement ps = con.prepareStatement(insert);
         ps.setQueryTimeout(0);
-        for (int i=testCheckData(); i<1000000; i++) {
+        for (int i=testCheckData(); i<100000; i++) {
             ps.setInt(1,i);
             String s = getRandom();
             ps.setString(2, s);
@@ -106,6 +106,12 @@ public class CreateTestTable extends DefaultTestCase {
             s.append(c);
         }
         return s.toString();
+    }
+    
+    public static void main(String[] args) throws Exception {
+        recreate = true;
+        CreateTestTable test = new CreateTestTable("CreateTestTable");
+        test.testPopulateData();
     }
 
 }
