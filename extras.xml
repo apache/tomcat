@@ -60,24 +60,6 @@
   <property name="compile.source" value="1.6"/>
 
   <!-- JAR artifacts -->
-  <property name="bootstrap.jar" value="${tomcat.build}/bin/bootstrap.jar"/>
-
-  <property name="annotations-api.jar" value="${tomcat.build}/lib/annotations-api.jar"/>
-  <property name="servlet-api.jar" value="${tomcat.build}/lib/servlet-api.jar"/>
-  <property name="jsp-api.jar" value="${tomcat.build}/lib/jsp-api.jar"/>
-  <property name="el-api.jar" value="${tomcat.build}/lib/el-api.jar"/>
-  <property name="catalina.jar" value="${tomcat.build}/lib/catalina.jar"/>
-  <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
-  <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
-
-  <property name="jasper.jar" value="${tomcat.build}/lib/jasper.jar"/>
-  <property name="jasper-el.jar" value="${tomcat.build}/lib/jasper-el.jar"/>
-
-  <property name="tomcat-dbcp.home" value="${base.path}/tomcat${version.major}-deps/dbcp" />
-  <property name="jasper-jdt.home" value="${base.path}/tomcat${version.major}-deps/jdt" />
-  <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
-  <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
-
   <property name="tomcat-juli.jar" value="${tomcat.extras}/tomcat-juli.jar"/>
   <property name="tomcat-juli-adapters.jar" value="${tomcat.extras}/tomcat-juli-adapters.jar"/>
   <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
