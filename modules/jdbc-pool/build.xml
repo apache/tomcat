@@ -100,7 +100,8 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           optimize="${compile.optimize}">
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1">
       <classpath refid="tomcat.jdbc.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />
     </javac>
@@ -131,7 +132,8 @@
            deprecation="${compile.deprecation}"
            source="${compile.source}"
            target="${compile.target}"
-           optimize="${compile.optimize}">
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1">
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <include name="org/apache/tomcat/jdbc/**" />

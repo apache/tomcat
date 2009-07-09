@@ -97,7 +97,8 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}">
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1">
       <classpath refid="tomcat.bayeux.classpath" />
       <include name="org/apache/tomcat/bayeux/**" />
       <include name="org/apache/cometd/**" />
@@ -125,7 +126,8 @@
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            source="${compile.source}"
-           optimize="${compile.optimize}">
+           optimize="${compile.optimize}"
+           encoding="ISO-8859-1">
       <classpath refid="tomcat.bayeux.classpath" />
       <include name="org/apache/tomcat/bayeux/**" />
       <include name="org/apache/cometd/**" />
