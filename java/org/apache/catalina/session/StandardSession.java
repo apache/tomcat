@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.security.auth.login.LoginException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionActivationListener;
@@ -760,17 +759,15 @@ public class StandardSession
                 fireSessionEvent(Session.SESSION_DESTROYED_EVENT, null);
             }
 
-            // Call the JAAS logout method if necessary
+            // Call the logout method
             if (principal instanceof GenericPrincipal) {
                 GenericPrincipal gp = (GenericPrincipal) principal;
-                if (gp.getLoginContext() != null) {
-                    try {
-                        gp.getLoginContext().logout();
-                    } catch (LoginException e) {
-                        manager.getContainer().getLogger().error(
-                                sm.getString("standardSession.jaaslogoutfail"),
-                                e);
-                    }
+                try {
+                    gp.logout();
+                } catch (Exception e) {
+                    manager.getContainer().getLogger().error(
+                            sm.getString("standardSession.logoutfail"),
+                            e);
                 }
             }
 
