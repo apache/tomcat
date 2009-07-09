@@ -22,6 +22,7 @@
                source="${compile.source}"
                optimize="${compile.optimize}"
                srcdir="${tomcat.src}"
+               encoding="ISO-8859-1"
         >
             <include name="javax/servlet/**" />
             <include name="javax/annotation/**" />
@@ -36,6 +37,7 @@
                deprecation="${compile.deprecation}"
                source="${compile.source}"
                optimize="${compile.optimize}"
+               encoding="ISO-8859-1"
         >
             <src path="${tomcat.lite.src}/java" />
         </javac>
