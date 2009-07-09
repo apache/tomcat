@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.security.auth.login.LoginContext;
+import javax.security.auth.login.LoginException;
 
 import org.apache.catalina.Realm;
 
@@ -189,11 +190,6 @@ public class GenericPrincipal implements Principal {
      */
     protected LoginContext loginContext = null;
 
-    public LoginContext getLoginContext() {
-        return loginContext;
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
 
@@ -229,6 +225,24 @@ public class GenericPrincipal implements Principal {
         return (sb.toString());
 
     }
+
+    
+    /**
+     * Calls logout, if necessary, on any associated JAASLoginContext. May in
+     * the future be extended to cover other logout requirements.
+     * 
+     * @throws Exception If something goes wrong with the logout. Uses Exception
+     *                   to allow for future expansion of this method to cover
+     *                   other logout mechanisms that might throw a different
+     *                   exception to LoginContext
+     * 
+     */
+    public void logout() throws Exception {
+        if (loginContext != null) {
+            loginContext.logout();
+        }
+    }
+
 
 
 }
