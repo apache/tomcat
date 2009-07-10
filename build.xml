@@ -192,7 +192,7 @@
     </xslt>  
   </target>
   
-  <target name="dist" depends="clean, build, docs, javadoc">
+  <target name="dist" depends="clean, build, build-test, docs, javadoc">
     <property name="destdir" value="${tomcat.pool}/release/v${version}"/>
     <mkdir dir="${destdir}"/>
     <zip destfile="${destdir}/apache-tomcat-jdbc-${version}-bin.zip">
