@@ -50,17 +50,34 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
 //  Register the actual pool itself under the tomcat.jdbc domain
 //===============================================================================
     protected volatile ObjectName oname = null;
+
+    /**
+     * Unregisters the underlying connection pool mbean.<br/>
+     * {@inheritDoc}
+     */
     public void postDeregister() {
         if (oname!=null) unregisterJmx();
     }
 
+    /**
+     * no-op<br/>
+     * {@inheritDoc}
+     */
     public void postRegister(Boolean registrationDone) {
     }
 
 
+    /**
+     * no-op<br/>
+     * {@inheritDoc}
+     */
     public void preDeregister() throws Exception {
     }
 
+    /**
+     * If the connection pool MBean exists, it will be registered during this operation.<br/>
+     * {@inheritDoc}
+     */
     public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
         try {
             this.oname = createObjectName(name);
@@ -71,6 +88,12 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         return name;   
     }
     
+    /**
+     * Creates the ObjectName for the ConnectionPoolMBean object to be registered
+     * @param original the ObjectName for the DataSource
+     * @return the ObjectName for the ConnectionPoolMBean
+     * @throws MalformedObjectNameException
+     */
     public ObjectName createObjectName(ObjectName original) throws MalformedObjectNameException {
         String domain = "tomcat.jdbc";
         Hashtable<String,String> properties = original.getKeyPropertyList();
@@ -84,10 +107,15 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         return name;
     }
     
+    /**
+     * Registers the ConnectionPoolMBean
+     */
     protected void registerJmx() {
         try {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            mbs.registerMBean(pool.getJmxPool(), oname);
+            if (pool.getJmxPool()!=null) {
+                MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+                mbs.registerMBean(pool.getJmxPool(), oname);
+            }
         } catch (Exception e) {
             log.error("Unable to register JDBC pool with JMX",e);
         }
