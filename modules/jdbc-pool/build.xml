@@ -59,7 +59,6 @@
     <pathelement location="${tomcat.testclasses}"/>
     <pathelement location="${c3p0.jar}"/>
     <pathelement location="${mysql.jar}"/>
-    <pathelement location="${dbcp.jar}"/>
     <pathelement location="${junit.jar}"/>
     <pathelement location="${tomcat.dbcp.jar}"/>
     <pathelement location="${derby.jar}"/>
@@ -310,11 +309,13 @@
   
   <target name="download">
     <mkdir dir="${base.path}"/>
+<!-- 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${dbcp.loc}"/>
       <param name="destfile" value="${dbcp.jar}"/>
       <param name="destdir" value="${base.path}"/>
     </antcall>
+ -->    
     <antcall target="downloadzip">
       <param name="sourcefile" value="${tomcat.loc}"/>
       <param name="destfile" value="${tomcat.juli.jar}"/>
