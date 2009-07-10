@@ -108,6 +108,7 @@ public class DataSourceFactory implements ObjectFactory {
     protected final static String PROP_FAIR_QUEUE = "fairQueue";
     
     protected static final String PROP_USE_EQUALS = "useEquals";
+    protected static final String PROP_USE_CON_LOCK = "useLock";
     
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
     
@@ -151,7 +152,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_USE_EQUALS,
         OBJECT_NAME,
         PROP_ABANDONWHENPERCENTAGEFULL,
-        PROP_MAXAGE
+        PROP_MAXAGE,
+        PROP_USE_CON_LOCK
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -422,6 +424,11 @@ public class DataSourceFactory implements ObjectFactory {
         value = properties.getProperty(PROP_MAXAGE);
         if (value != null) {
             poolProperties.setMaxAge(Long.parseLong(value));
+        }
+        
+        value = properties.getProperty(PROP_USE_CON_LOCK);
+        if (value != null) {
+            poolProperties.setUseLock(Boolean.parseBoolean(value));
         }
         
         return poolProperties;
