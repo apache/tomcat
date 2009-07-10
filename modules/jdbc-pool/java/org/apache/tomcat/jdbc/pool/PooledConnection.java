@@ -77,7 +77,7 @@ public class PooledConnection {
     /**
      * Timestamp the connection was last 'touched' by the pool
      */
-    private long timestamp;
+    private volatile long timestamp;
     /**
      * Lock for this connection only
      */
