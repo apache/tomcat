@@ -215,6 +215,10 @@ public class PooledConnection {
 //             
 //============================================================================
 
+    /**
+     * Returns abandon timeout in milliseconds
+     * @return abandon timeout in milliseconds
+     */
     public long getAbandonTimeout() {
         if (poolProperties.getRemoveAbandonedTimeout() <= 0) {
             return Long.MAX_VALUE;
