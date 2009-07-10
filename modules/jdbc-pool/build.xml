@@ -77,9 +77,11 @@
         <include name="NOTICE"/>
         <include name="build.xml"/>
         <include name="doc/*.xml"/>
+        <include name="resources/MANIFEST.MF"/>
       </fileset>
       <filterset>
         <filter token="tomcat.project.dest" value="${project.xml}"/>
+        <filter token="version" value="${version}"/>
       </filterset>  
     </copy>
   </target>
@@ -107,7 +109,7 @@
     </javac>
 
     <!-- connection pool JAR File -->
-    <jar jarfile="${tomcat-jdbc.jar}" update="true">
+    <jar jarfile="${tomcat-jdbc.jar}" update="true" manifest="${tomcat.pool}/resources/MANIFEST.MF">
       <fileset dir="${tomcat.classes}">
         <include name="org/apache/tomcat/jdbc/**" />
       </fileset>
