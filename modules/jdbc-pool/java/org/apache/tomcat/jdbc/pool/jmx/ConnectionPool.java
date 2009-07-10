@@ -55,11 +55,6 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         this.pool = pool;
     }
 
-    public ConnectionPool(org.apache.tomcat.jdbc.pool.ConnectionPool pool, boolean for16) {
-        super();
-        this.pool = pool;
-    }
-
     public org.apache.tomcat.jdbc.pool.ConnectionPool getPool() {
         return pool;
     }
