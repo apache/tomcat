@@ -124,7 +124,8 @@ public class ConnectionPool {
     //===============================================================================
 
     /**
-     * Instantiate a connection pool. This will create connections if initialSize is larger than 0
+     * Instantiate a connection pool. This will create connections if initialSize is larger than 0.
+     * The {@link PoolProperties} should not be reused for another connection pool.
      * @param prop PoolProperties - all the properties for this connection pool
      * @throws SQLException
      */
@@ -311,7 +312,12 @@ public class ConnectionPool {
      */
     @Override
     protected void finalize() throws Throwable {
-        close(true);
+        Runnable closer = new Runnable() {
+            public void run() {
+                close(true);
+            }
+        };
+        this.cancellator.execute(closer);
     }
 
     /**
@@ -365,7 +371,7 @@ public class ConnectionPool {
     /**
      * Initialize the connection pool - called from the constructor
      * @param properties PoolProperties - properties used to initialize the pool with
-     * @throws SQLException
+     * @throws SQLException if initialization fails
      */
     protected void init(PoolProperties properties) throws SQLException {
         poolProperties = properties;
@@ -578,6 +584,13 @@ public class ConnectionPool {
         } //while
     }
 
+    /**
+     * Creates a JDBC connection and tries to connect to the database.
+     * @param now timestamp of when this was called
+     * @param con the previous pooled connection - argument not used
+     * @return a PooledConnection that has been connected
+     * @throws SQLException
+     */
     protected PooledConnection createConnection(long now, PooledConnection con) throws SQLException {
         //no connections where available we'll create one
         boolean error = false;
@@ -621,6 +634,13 @@ public class ConnectionPool {
         return null;
     }
 
+    /**
+     * Validates and configures a previously idle connection
+     * @param now - timestamp  
+     * @param con - the connection to validate and configure
+     * @return con
+     * @throws SQLException if a validation error happens
+     */
     protected PooledConnection borrowConnection(long now, PooledConnection con) throws SQLException {
         //we have a connection, lets set it up
         
@@ -687,6 +707,12 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Determines if a connection should be closed upon return to the pool.
+     * @param con - the connection
+     * @param action - the validation action that should be performed
+     * @return true if the connection should be closed
+     */
     protected boolean shouldClose(PooledConnection con, int action) {
         if (con.isDiscarded()) return true;
         if (isClosed()) return true;
@@ -700,7 +726,10 @@ public class ConnectionPool {
     
     /**
      * Returns a connection to the pool
-     * @param con PooledConnection
+     * If the pool is closed, the connection will be released
+     * If the connection is not part of the busy queue, it will be released.
+     * If {@link PoolProperties#testOnReturn} is set to true it will be validated
+     * @param con PooledConnection to be returned to the pool
      */
     protected void returnConnection(PooledConnection con) {
         if (isClosed()) {
@@ -743,6 +772,11 @@ public class ConnectionPool {
         } //end if
     } //checkIn
 
+    /**
+     * Determines if a connection should be abandoned based on 
+     * {@link PoolProperties#abandonWhenPercentageFull} setting.
+     * @return true if the connection should be abandoned
+     */
     protected boolean shouldAbandon() {
         if (poolProperties.getAbandonWhenPercentageFull()==0) return true;
         float used = (float)busy.size();
@@ -751,6 +785,9 @@ public class ConnectionPool {
         return (used/max*100f)>=perc;
     }
     
+    /**
+     * Iterates through all the busy connections and checks for connections that have timed out
+     */
     public void checkAbandoned() {
         try {
             if (busy.size()==0) return;
@@ -787,6 +824,10 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * Iterates through the idle connections and resizes the idle pool based on parameters
+     * {@link PoolProperties#maxIdle}, {@link PoolProperties#minIdle}, {@link PoolProperties#minEvictableIdleTimeMillis}
+     */
     public void checkIdle() {
         try {
             if (idle.size()==0) return;
@@ -822,6 +863,9 @@ public class ConnectionPool {
 
     }
 
+    /**
+     * Forces a validation of all idle connections if {@link PoolProperties#testWhileIdle} is set.
+     */
     public void testAllIdle() {
         try {
             if (idle.size()==0) return;
@@ -849,13 +893,22 @@ public class ConnectionPool {
 
     }
 
-
+    /**
+     * Creates a stack trace representing the existing thread's current state.
+     * @return a string object representing the current state.
+     * TODO investigate if we simply should store {@link java.lang.Thread#getStackTrace()} elements
+     */
     protected static String getThreadDump() {
         Exception x = new Exception();
         x.fillInStackTrace();
         return getStackTrace(x);
     }
 
+    /**
+     * Convert an exception into a String
+     * @param x - the throwable
+     * @return a string representing the stack trace
+     */
     public static String getStackTrace(Throwable x) {
         if (x == null) {
             return null;
@@ -869,19 +922,34 @@ public class ConnectionPool {
     }
 
 
-    protected PooledConnection create() throws java.lang.Exception {
+    /**
+     * Create a new pooled connection object. Not connected nor validated.
+     * @return a pooled connection object
+     */
+    protected PooledConnection create() {
         PooledConnection con = new PooledConnection(getPoolProperties(), this);
         return con;
     }
 
+    /**
+     * Hook to perform final actions on a pooled connection object once it has been disconnected and will be discarded
+     * @param con
+     */
     protected void finalize(PooledConnection con) {
         
     }
     
+    /**
+     * Return the object that is potentially registered in JMX for notifications
+     * @return the object implementing the {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean} interface 
+     */
     public org.apache.tomcat.jdbc.pool.jmx.ConnectionPool getJmxPool() {
         return jmxPool;
     }
 
+    /**
+     * Create MBean object that can be registered.
+     */
     protected void createMBean() {
         try {
             jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
@@ -910,6 +978,9 @@ public class ConnectionPool {
             this.pcFuture = pcf;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         public boolean cancel(boolean mayInterruptIfRunning) {
             if ((!cancelled.get()) && cancelled.compareAndSet(false, true)) {
                 //cancel by retrieving the connection and returning it to the pool
@@ -918,6 +989,9 @@ public class ConnectionPool {
             return true;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Connection get() throws InterruptedException, ExecutionException {
             try {
                 return get(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -926,6 +1000,9 @@ public class ConnectionPool {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public Connection get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             PooledConnection pc = pcFuture.get(timeout,unit);
             if (pc!=null) {
@@ -950,14 +1027,23 @@ public class ConnectionPool {
             }
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isCancelled() {
             return pcFuture.isCancelled() || cancelled.get();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         public boolean isDone() {
             return pcFuture.isDone();
         }
         
+        /**
+         * run method to be executed when cancelled by an executor
+         */
         public void run() {
             try {
                 Connection con = get(); //complete this future
@@ -974,7 +1060,7 @@ public class ConnectionPool {
     protected class PoolCleaner extends Thread {
         protected ConnectionPool pool;
         protected long sleepTime;
-        protected boolean run = true;
+        protected volatile boolean run = true;
         PoolCleaner(String name, ConnectionPool pool, long sleepTime) {
             super(name);
             this.setDaemon(true);
