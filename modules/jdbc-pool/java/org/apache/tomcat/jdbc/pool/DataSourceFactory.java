@@ -428,7 +428,7 @@ public class DataSourceFactory implements ObjectFactory {
     }
 
     /**
-     * Creates and configures a {@link BasicDataSource} instance based on the
+     * Creates and configures a {@link DataSource} instance based on the
      * given properties.
      *
      * @param properties the datasource configuration properties

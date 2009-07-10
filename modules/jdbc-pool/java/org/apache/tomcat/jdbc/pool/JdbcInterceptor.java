@@ -77,7 +77,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
 
     /**
      * Returns the next interceptor in the chain
-     * @return
+     * @return the next interceptor in the chain
      */
     public JdbcInterceptor getNext() {
         return next;
@@ -95,7 +95,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * Performs a string comparison, using references unless the useEquals property is set to true.
      * @param name1
      * @param name2
-     * @return
+     * @return true if name1 is equal to name2 based on {@link #useEquals}
      */
     public boolean compare(String name1, String name2) {
         if (isUseEquals()) {
@@ -107,7 +107,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     
     /**
      * Compares a method name (String) to a method (Method)
-     * {@link compare(String,String)}
+     * {@link #compare(String,String)}
      * Uses reference comparison unless the useEquals property is set to true
      * @param methodName
      * @param method
@@ -157,7 +157,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     }
     
     /**
-     * Set to true if string comparisons (for the {@link compare} method) should use the Object.equals(Object) method
+     * Set to true if string comparisons (for the {@link #compare(String, Method)} and {@link #compare(String, String)} methods) should use the Object.equals(Object) method
      * The default is false
      * @param useEquals
      */
