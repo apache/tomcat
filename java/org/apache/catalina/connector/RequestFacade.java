@@ -1004,7 +1004,7 @@ public class RequestFacade implements HttpServletRequest {
 
     public void login(String username, String password)
     throws ServletException {
-        login(username, password);
+        request.login(username, password);
     }
     
     public void logout() throws ServletException {
