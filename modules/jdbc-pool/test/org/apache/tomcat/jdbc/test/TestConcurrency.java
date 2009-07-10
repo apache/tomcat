@@ -91,6 +91,7 @@ public class TestConcurrency extends DefaultTestCase {
     
     public void testBrutal() throws Exception {
         ds.getPoolProperties().setRemoveAbandoned(false);
+        ds.getPoolProperties().setRemoveAbandonedTimeout(1);
         ds.getPoolProperties().setMinEvictableIdleTimeMillis(10);
         ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
         ds.getConnection().close();
@@ -135,7 +136,7 @@ public class TestConcurrency extends DefaultTestCase {
         assertEquals("Size comparison:",10, ds.getPool().getSize());
         assertEquals("Idle comparison:",10, ds.getPool().getIdle());
         assertEquals("Used comparison:",0, ds.getPool().getActive());
-        assertEquals("Connect count",10,Driver.connectCount.get()-Driver.disconnectCount.get());
+        assertEquals("Connect count",10,Driver.connectCount.get());
             
     }
 
