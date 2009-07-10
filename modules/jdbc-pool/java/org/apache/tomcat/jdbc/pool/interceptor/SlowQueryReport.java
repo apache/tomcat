@@ -57,7 +57,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     
     /**
      * Returns the query stats for a given pool
-     * @param pool - the pool we want to retrieve stats for
+     * @param poolname - the name of the pool we want to retrieve stats for
      * @return a hash map containing statistics for 0 to maxQueries 
      */
     public static ConcurrentHashMap<String,QueryStats> getPoolStats(String poolname) {

@@ -60,7 +60,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     
     /**
      * Invoked when prepareCall has been called and completed.
-     * @param sql - the string used to prepare the statement with
+     * @param query - the string used to prepare the statement with
      * @param time - the time it took to invoke prepare
      */
     protected abstract void prepareCall(String query, long time);
@@ -90,7 +90,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param args
      * @param name
      * @param start
-     * @param t
+     * @param delta
      * @return - the SQL that was executed or the string &quot;batch&quot; 
      */
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
@@ -109,7 +109,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param args
      * @param name
      * @param start
-     * @param t
+     * @param delta
      * @return - the SQL that was executed or the string &quot;batch&quot; 
      */
     protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
@@ -125,7 +125,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     /**
      * returns the query measure threshold.
      * This value is in milliseconds. If the query is faster than this threshold than it wont be accounted for
-     * @return
+     * @return the threshhold in milliseconds
      */
     public long getThreshold() {
         return threshold;

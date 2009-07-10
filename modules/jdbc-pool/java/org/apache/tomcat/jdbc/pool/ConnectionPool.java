@@ -139,7 +139,7 @@ public class ConnectionPool {
      * until a connection has become available.
      * If a connection is not retrieved, the Future must be cancelled in order for the connection to be returned
      * to the pool.
-     * @return
+     * @return a Future containing a reference to the connection or the future connection
      * @throws SQLException
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
@@ -234,7 +234,7 @@ public class ConnectionPool {
      * All calls on {@link java.sql.Connection} methods will be propagated down to the actual JDBC connection except for the 
      * {@link java.sql.Connection#close()} method.
      * @param con a {@link PooledConnection} to wrap in a Proxy
-     * @return a {@java.sql.Connection} object wrapping a pooled connection.
+     * @return a {@link java.sql.Connection} object wrapping a pooled connection.
      * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {

@@ -187,7 +187,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * JMX operation - return the names of all the pools
-     * @return
+     * @return - all the names of pools that we have stored data for
      */
     public String[] getPoolNames() {
         Set<String> keys = perPoolStats.keySet();
@@ -196,7 +196,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     /**
      * JMX operation - return the name of the pool
-     * @return
+     * @return the name of the pool, unique within the JVM
      */
     public String getPoolName() {
         return poolName;
@@ -225,7 +225,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     
     /**
      * JMX operation - returns all the queries we have collected.
-     * @return
+     * @return - the slow query report as composite data.
      */
     public CompositeData[] getSlowQueriesCD() throws OpenDataException {
         CompositeDataSupport[] result = null;
