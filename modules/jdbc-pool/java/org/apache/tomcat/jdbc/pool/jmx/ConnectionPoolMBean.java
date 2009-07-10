@@ -35,6 +35,8 @@ public interface ConnectionPoolMBean  {
     
     public int getNumActive();
     
+    public int getWaitCount();
+    
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================

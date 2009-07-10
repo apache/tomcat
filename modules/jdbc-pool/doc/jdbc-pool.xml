@@ -120,6 +120,19 @@
       pool as a JNDI resource, are used to configure a data source as a bean.
     </p>
   </subsection>
+  <subsection name="JMX">
+    <p>
+      The connection pool object exposes an MBean that can be registered. 
+      In order for the connection pool object to create the MBean, the flag <code>jmxEnabled</code> has to be set to true.
+      This doesn't imply that the pool will be registered with an MBean server, merely that the MBean is created.
+      In a container like Tomcat, Tomcat itself registers the DataSource with the MBean server, the 
+      <code>org.apache.tomcat.jdbc.pool.DataSource</code> object will then register the actual 
+      connection pool MBean.
+      If you're running outside of a container, you can register the DataSource yourself under any object name you specify,
+      and it propagates the registration to the underlying pool.
+    </p>
+  </subsection>
+  
 </section>
 <section name="Attributes">
   <p>To provide a very simple switch to and from commons-dbcp and tomcat-jdbc-pool,
