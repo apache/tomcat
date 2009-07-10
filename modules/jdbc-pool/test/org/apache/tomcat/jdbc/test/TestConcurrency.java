@@ -91,17 +91,16 @@ public class TestConcurrency extends DefaultTestCase {
     
     public void testBrutal() throws Exception {
         ds.getPoolProperties().setRemoveAbandoned(false);
-        ds.getPoolProperties().setMinEvictableIdleTimeMillis(-1);
+        ds.getPoolProperties().setMinEvictableIdleTimeMillis(10);
         ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
         ds.getConnection().close();
-        final int iter = 1000 * 10;
+        final int iter = 100000 * 10;
         final AtomicInteger loopcount = new AtomicInteger(0);
         final Runnable run = new Runnable() {
             public void run() {
                 try {
                     while (loopcount.incrementAndGet() < iter) {
                         Connection con = ds.getConnection();
-                        Thread.sleep(10);
                         con.close();
                     }
                 }catch (Exception x) {
@@ -136,7 +135,7 @@ public class TestConcurrency extends DefaultTestCase {
         assertEquals("Size comparison:",10, ds.getPool().getSize());
         assertEquals("Idle comparison:",10, ds.getPool().getIdle());
         assertEquals("Used comparison:",0, ds.getPool().getActive());
-        assertEquals("Connect count",10,Driver.connectCount.get());
+        assertEquals("Connect count",10,Driver.connectCount.get()-Driver.disconnectCount.get());
             
     }
 

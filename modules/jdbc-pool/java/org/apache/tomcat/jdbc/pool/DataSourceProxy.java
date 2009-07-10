@@ -287,6 +287,10 @@ public class DataSourceProxy  {
         this.getPoolProperties().setFairQueue(fairQueue);
     }
     
+    public void setUseLock(boolean useLock) {
+        this.getPoolProperties().setUseLock(useLock);
+    }
+    
     public void setDefaultCatalog(String catalog) {
         this.getPoolProperties().setDefaultCatalog(catalog);
     }
