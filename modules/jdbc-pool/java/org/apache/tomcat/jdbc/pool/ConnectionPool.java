@@ -43,6 +43,10 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
+ * Implementation of simple connection pool.
+ * The ConnectionPool uses a {@link PoolProperties} object for storing all the meta information about the connection pool.
+ * As the underlying implementation, the connection pool uses {@link java.util.concurrent.BlockingQueue} to store active and idle connections.
+ * A custom implementation of a fair {@link FairBlockingQueue} blocking queue is provided with the connection pool itself. 
  * @author Filip Hanik
  * @version 1.0
  */
@@ -139,6 +143,7 @@ public class ConnectionPool {
      * @throws SQLException
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
+        //we can only retrieve a future if the underlying queue supports it.
         if (idle instanceof FairBlockingQueue) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
             return new ConnectionFuture(pcf);
@@ -148,9 +153,11 @@ public class ConnectionPool {
     }
     
     /**
-     * Borrows a connection from the pool
+     * Borrows a connection from the pool. If a connection is available (in the idle queue) or the pool has not reached 
+     * {@link PoolProperties#maxActive maxActive} connections a connection is returned immediately.
+     * If no connection is available, the pool will attempt to fetch a connection for {@link PoolProperties#maxWait maxWait} milliseconds.
      * @return Connection - a java.sql.Connection/javax.sql.PooledConnection reflection proxy, wrapping the underlying object.
-     * @throws SQLException
+     * @throws SQLException - if the wait times out or a failure occurs creating a connection
      */
     public Connection getConnection() throws SQLException {
         //check out a connection
@@ -161,7 +168,7 @@ public class ConnectionPool {
     
     /**
      * Returns the name of this pool
-     * @return String
+     * @return String - the name of the pool
      */
     public String getName() {
         return getPoolProperties().getPoolName();
@@ -178,6 +185,7 @@ public class ConnectionPool {
     /**
      * Returns the pool properties associated with this connection pool
      * @return PoolProperties
+     * 
      */
     public PoolProperties getPoolProperties() {
         return this.poolProperties;
@@ -185,7 +193,7 @@ public class ConnectionPool {
 
     /**
      * Returns the total size of this pool, this includes both busy and idle connections
-     * @return int
+     * @return int - number of established connections to the database
      */
     public int getSize() {
         return size.get();
@@ -193,7 +201,7 @@ public class ConnectionPool {
 
     /**
      * Returns the number of connections that are in use
-     * @return int
+     * @return int - number of established connections that are being used by the application
      */
     public int getActive() {
         return busy.size();
@@ -201,7 +209,7 @@ public class ConnectionPool {
 
     /**
      * Returns the number of idle connections
-     * @return
+     * @return int - number of established connections not being used
      */
     public int getIdle() {
         return idle.size();
@@ -221,10 +229,16 @@ public class ConnectionPool {
     
     
     /**
-     * configures a pooled connection as a proxy
+     * configures a pooled connection as a proxy.
+     * This Proxy implements {@link java.sql.Connection} and {@link javax.sql.PooledConnection} interfaces.
+     * All calls on {@link java.sql.Connection} methods will be propagated down to the actual JDBC connection except for the 
+     * {@link java.sql.Connection#close()} method.
+     * @param con a {@link PooledConnection} to wrap in a Proxy
+     * @return a {@java.sql.Connection} object wrapping a pooled connection.
+     * @throws SQLException if an interceptor can't be configured, if the proxy can't be instantiated
      */
     protected Connection setupConnection(PooledConnection con) throws SQLException {
-        //fetch previous interceptor proxy
+        //fetch previously cached interceptor proxy - one per connection
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
             //build the proxy handler
@@ -233,10 +247,15 @@ public class ConnectionPool {
             PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
             for (int i=proxies.length-1; i>=0; i--) {
                 try {
+                    //create a new instance
                     JdbcInterceptor interceptor = proxies[i].getInterceptorClass().newInstance();
+                    //configure properties
                     interceptor.setProperties(proxies[i].getProperties());
+                    //setup the chain
                     interceptor.setNext(handler);
+                    //call reset
                     interceptor.reset(this, con);
+                    //configure the last one to be held by the connection
                     handler = interceptor;
                 }catch(Exception x) {
                     SQLException sx = new SQLException("Unable to instantiate interceptor chain.");
@@ -269,7 +288,13 @@ public class ConnectionPool {
         }
 
     }
-
+    
+    /**
+     * Creates and caches a {@link java.lang.reflect.Constructor} used to instantiate the proxy object.
+     * We cache this, since the creation of a constructor is fairly slow. 
+     * @return constructor used to instantiate the wrapper object
+     * @throws NoSuchMethodException
+     */
     public Constructor getProxyConstructor() throws NoSuchMethodException {
         //cache the constructor
         if (proxyClassConstructor == null ) {
@@ -281,7 +306,8 @@ public class ConnectionPool {
 
     /**
      * If the connection pool gets garbage collected, lets make sure we clean up
-     * and close all the connections
+     * and close all the connections.
+     * {@inheritDoc}
      */
     @Override
     protected void finalize() throws Throwable {
@@ -324,7 +350,7 @@ public class ConnectionPool {
             }
             if (pool.size()==0 && force && pool!=busy) pool = busy;
         }
-        if (this.getPoolProperties().isJmxEnabled()) stopJmx();
+        if (this.getPoolProperties().isJmxEnabled()) this.jmxPool = null;
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
             try {
@@ -359,6 +385,7 @@ public class ConnectionPool {
             poolCleaner.start();
         } //end if
 
+        //make sure the pool is properly configured
         if (properties.getMaxActive()<properties.getInitialSize()) {
             log.warn("initialSize is larger than maxActive, setting initialSize to: "+properties.getMaxActive());
             properties.setInitialSize(properties.getMaxActive());
@@ -375,9 +402,12 @@ public class ConnectionPool {
             log.warn("maxIdle is smaller than minIdle, setting maxIdle to: "+properties.getMinIdle());
             properties.setMaxIdle(properties.getMinIdle());
         }
-
-        if (this.getPoolProperties().isJmxEnabled()) startJmx();
         
+        //create JMX MBean
+        if (this.getPoolProperties().isJmxEnabled()) createMBean();
+        
+        //Parse and create an initial set of interceptors. Letting them know the pool has started.
+        //These interceptors will not get any connection.
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
             try {
@@ -393,7 +423,8 @@ public class ConnectionPool {
                 ex.initCause(x);
                 throw ex;
             }
-        }        
+        }
+        
         //initialize the pool with its initial set of members
         PooledConnection[] initialPool = new PooledConnection[poolProperties.getInitialSize()];
         try {
@@ -839,26 +870,14 @@ public class ConnectionPool {
         return jmxPool;
     }
 
-    protected void startJmx() {
+    protected void createMBean() {
         try {
-            if ("1.5".equals(System.getProperty("java.specification.version"))) {
-                jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
-            } else {
-                jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this,true);
-            }
+            jmxPool = new org.apache.tomcat.jdbc.pool.jmx.ConnectionPool(this);
         } catch (Exception x) {
             log.warn("Unable to start JMX integration for connection pool. Instance["+getName()+"] can't be monitored.",x);
         }
     }
 
-    protected void stopJmx() {
-        try {
-            jmxPool = null;
-        }catch (Exception x) {
-            log.warn("Unable to stop JMX integration for connection pool. Instance["+getName()+"].",x);
-        }
-    }
-    
     /**
      * Tread safe wrapper around a future for the regular queue
      * This one retrieves the pooled connection object
