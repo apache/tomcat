@@ -66,7 +66,7 @@ public class DataSourceProxy  {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link javax.sql.DataSource#getConnection()}
      */
     public Connection getConnection(String username, String password) throws SQLException {
         return getConnection();
@@ -91,7 +91,7 @@ public class DataSourceProxy  {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link javax.sql.DataSource#getConnection()}
      */
 
     public Connection getConnection() throws SQLException {
@@ -102,7 +102,7 @@ public class DataSourceProxy  {
     
     /**
      * Invokes an sync operation to retrieve the connection.
-     * @return
+     * @return a Future containing a reference to the connection when it becomes available 
      * @throws SQLException
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
@@ -112,14 +112,14 @@ public class DataSourceProxy  {
     }
 
     /**
-     * {@inheritDoc}
+     * {@link javax.sql.DataSource#getConnection()}
      */
     public PooledConnection getPooledConnection() throws SQLException {
         return (PooledConnection) getConnection();
     }
 
     /**
-     * {@inheritDoc}
+     * {@link javax.sql.DataSource#getConnection()}
      */
     public PooledConnection getPooledConnection(String username,
                                                 String password) throws SQLException {
@@ -134,41 +134,7 @@ public class DataSourceProxy  {
         return pool.getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public PrintWriter getLogWriter() throws SQLException {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setLogWriter(PrintWriter out) throws SQLException {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public int getLoginTimeout() {
-        if (poolProperties == null) {
-            return 0;
-        } else {
-            return poolProperties.getMaxWait() / 1000;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void setLoginTimeout(int i) {
-        if (poolProperties == null) {
-            return;
-        } else {
-            poolProperties.setMaxWait(1000 * i);
-        }
-
-    }
+    
 
 
     public void close() {
@@ -354,4 +320,43 @@ public class DataSourceProxy  {
         this.getPoolProperties().setUseEquals(useEquals);
     }
 
+    /**
+     * no-op
+     * {@link javax.sql.DataSource#getLogWriter}
+     */
+    public PrintWriter getLogWriter() throws SQLException {
+        return null;
+    }
+
+    /**
+     * {@link javax.sql.DataSource#setLogWriter(PrintWriter)}
+     */
+    public void setLogWriter(PrintWriter out) throws SQLException {
+    }
+
+    /**
+     * {@link javax.sql.DataSource#getLoginTimeout}
+     */
+    public int getLoginTimeout() {
+        if (poolProperties == null) {
+            return 0;
+        } else {
+            return poolProperties.getMaxWait() / 1000;
+        }
+    }
+
+    /**
+     * {@link javax.sql.DataSource#setLoginTimeout(int)}
+     */
+    public void setLoginTimeout(int i) {
+        if (poolProperties == null) {
+            return;
+        } else {
+            poolProperties.setMaxWait(1000 * i);
+        }
+
+    }    
+
+    
+    
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.io.PrintWriter;
 import java.lang.management.ManagementFactory;
 import java.sql.SQLException;
 import java.util.Hashtable;
@@ -108,7 +109,7 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
     }
     
     /**
-     * Registers the ConnectionPoolMBean
+     * Registers the ConnectionPoolMBean under a unique name based on the ObjectName for the DataSource
      */
     protected void registerJmx() {
         try {
@@ -134,6 +135,10 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
 //===============================================================================
 //  Expose JMX attributes through Tomcat's dynamic reflection
 //===============================================================================
+    /**
+     * Forces an abandon check on the connection pool.
+     * If connections that have been abandoned exists, they will be closed during this run
+     */
     public void checkAbandoned() {
         try {
             createPool().checkAbandoned();
@@ -142,6 +147,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * Forces a check for downsizing the idle connections
+     */
     public void checkIdle() {
         try {
             createPool().checkIdle();
@@ -150,6 +158,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return number of connections in use by the application
+     */
     public int getActive() {
         try {
             return createPool().getActive();
@@ -158,10 +169,17 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
     
+    /**
+     * @return number of connections in use by the application
+     * {@link DataSource#getActive()}
+     */
     public int getNumActive() {
         return getActive();
     }
 
+    /**
+     * @return number of threads waiting for a connection
+     */
     public int getWaitCount() {
         try {
             return createPool().getWaitCount();
@@ -170,6 +188,10 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * NOT USED ANYWHERE
+     * @return nothing 
+     */
     public String getConnectionProperties() {
         try {
             return createPool().getPoolProperties().getConnectionProperties();
@@ -178,6 +200,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return connection properties passed into the JDBC Driver upon connect
+     */
     public Properties getDbProperties() {
         try {
             return createPool().getPoolProperties().getDbProperties();
@@ -186,6 +211,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured default catalog
+     */
     public String getDefaultCatalog() {
         try {
             return createPool().getPoolProperties().getDefaultCatalog();
@@ -194,6 +222,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured default isolation level
+     */
     public int getDefaultTransactionIsolation() {
         try {
             return createPool().getPoolProperties().getDefaultTransactionIsolation();
@@ -202,6 +233,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured driver class name
+     */
     public String getDriverClassName() {
         try {
             return createPool().getPoolProperties().getDriverClassName();
@@ -210,6 +244,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the number of established but idle connections
+     */
     public int getIdle() {
         try {
             return createPool().getIdle();
@@ -217,11 +254,17 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
             throw new RuntimeException(x);
         }
     }
-    
+
+    /**
+     * {@link #getIdle()}
+     */
     public int getNumIdle() {
         return getIdle();
     }
 
+    /**
+     * @return the configured number of initial connections 
+     */
     public int getInitialSize() {
         try {
             return createPool().getPoolProperties().getInitialSize();
@@ -230,6 +273,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured initialization SQL 
+     */
     public String getInitSQL() {
         try {
             return createPool().getPoolProperties().getInitSQL();
@@ -238,6 +284,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configuration string for interceptors
+     */
     public String getJdbcInterceptors() {
         try {
             return createPool().getPoolProperties().getJdbcInterceptors();
@@ -246,6 +295,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured number of maximum allowed connections
+     */
     public int getMaxActive() {
         try {
             return createPool().getPoolProperties().getMaxActive();
@@ -254,6 +306,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured number of maximum idle connections
+     */
     public int getMaxIdle() {
         try {
             return createPool().getPoolProperties().getMaxIdle();
@@ -262,6 +317,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured maximum wait time in milliseconds if a connection is not available
+     */
     public int getMaxWait() {
         try {
             return createPool().getPoolProperties().getMaxWait();
@@ -270,6 +328,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured idle time, before a connection that is idle can be released
+     */
     public int getMinEvictableIdleTimeMillis() {
         try {
             return createPool().getPoolProperties().getMinEvictableIdleTimeMillis();
@@ -278,6 +339,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured minimum amount of idle connections 
+     */
     public int getMinIdle() {
         try {
             return createPool().getPoolProperties().getMinIdle();
@@ -286,6 +350,11 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
     
+    /**
+     * @return the configured maxAge for a connection.
+     * A connection that has been established for longer than this configured value in milliseconds
+     * will be closed upon a return
+     */
     public long getMaxAge() {
         try {
             return createPool().getPoolProperties().getMaxAge();
@@ -294,6 +363,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }    
 
+    /**
+     * @return the name of the pool
+     */
     public String getName() {
         try {
             return createPool().getName();
@@ -302,6 +374,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the configured value - not used in this implementation
+     */
     public int getNumTestsPerEvictionRun() {
         try {
             return createPool().getPoolProperties().getNumTestsPerEvictionRun();
@@ -310,10 +385,16 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return DOES NOT RETURN THE PASSWORD, IT WOULD SHOW UP IN JMX
+     */
     public String getPassword() {
         return "Password not available as DataSource/JMX operation.";
     }
 
+    /**
+     * @return the configured remove abandoned timeout in seconds
+     */
     public int getRemoveAbandonedTimeout() {
         try {
             return createPool().getPoolProperties().getRemoveAbandonedTimeout();
@@ -322,6 +403,9 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         }
     }
 
+    /**
+     * @return the current size of the pool
+     */
     public int getSize() {
         try {
             return createPool().getSize();
@@ -465,6 +549,5 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
             throw new RuntimeException(x);
         }
     }
-    
 
 }

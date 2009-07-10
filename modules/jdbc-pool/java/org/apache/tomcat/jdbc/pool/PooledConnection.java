@@ -382,7 +382,7 @@ public class PooledConnection {
 
     /**
      * Returns the underlying connection
-     * @return
+     * @return the underlying JDBC connection as it was returned from the JDBC driver
      */
     public java.sql.Connection getConnection() {
         return this.connection;
@@ -396,7 +396,7 @@ public class PooledConnection {
 
     /**
      * Returns the first handler in the interceptor chain
-     * @return
+     * @return the first interceptor for this connection
      */
     public JdbcInterceptor getHandler() {
         return (handler!=null)?handler.get():null;
