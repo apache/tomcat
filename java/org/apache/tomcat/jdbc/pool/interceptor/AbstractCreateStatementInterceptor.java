@@ -55,12 +55,12 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     
     /**
      * This method should return a wrapper object around a
-     * java.sql.Statement, java.sql.PreparedStatement or java.sql.CallableStatement
+     * {@link java.sql.Statement}, {@link java.sql.PreparedStatement} or {@link java.sql.CallableStatement}
      * @param proxy
      * @param method
      * @param args
      * @param statement
-     * @return
+     * @return a {@link java.sql.Statement} object
      */
     public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time);
     
