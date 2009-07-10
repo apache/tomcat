@@ -62,7 +62,7 @@ public class ConnectCountTest extends DefaultTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Driver.connectCount.set(0);
+        Driver.reset();
         super.tearDown();
     }
 

@@ -112,7 +112,6 @@ public class PooledConnection {
     
     private AtomicBoolean released = new AtomicBoolean(false);
     
-    
     public PooledConnection(PoolProperties prop, ConnectionPool parent) {
         instanceCount = counter.addAndGet(1);
         poolProperties = prop;
@@ -367,7 +366,7 @@ public class PooledConnection {
      * Otherwise this is a noop for performance
      */
     public void lock() {
-        if (this.poolProperties.isPoolSweeperEnabled()) {
+        if (poolProperties.getUseLock() || this.poolProperties.isPoolSweeperEnabled()) {
             //optimized, only use a lock when there is concurrency
             lock.writeLock().lock();
         }
@@ -378,7 +377,7 @@ public class PooledConnection {
      * Otherwise this is a noop for performance
      */
     public void unlock() {
-        if (this.poolProperties.isPoolSweeperEnabled()) {
+        if (poolProperties.getUseLock() || this.poolProperties.isPoolSweeperEnabled()) {
           //optimized, only use a lock when there is concurrency
             lock.writeLock().unlock();
         }
@@ -422,6 +421,10 @@ public class PooledConnection {
     
     public String toString() {
         return "PooledConnection["+(connection!=null?connection.toString():"null")+"]";
+    }
+    
+    public boolean isReleased() {
+        return released.get();
     }
 
 }
