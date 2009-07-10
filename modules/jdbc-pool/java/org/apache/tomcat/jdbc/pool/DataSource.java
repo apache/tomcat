@@ -134,6 +134,14 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
         return getActive();
     }
 
+    public int getWaitCount() {
+        try {
+            return createPool().getWaitCount();
+        }catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
     public String getConnectionProperties() {
         try {
             return createPool().getPoolProperties().getConnectionProperties();
