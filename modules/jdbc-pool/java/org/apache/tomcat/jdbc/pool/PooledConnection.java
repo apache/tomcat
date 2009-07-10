@@ -85,7 +85,7 @@ public class PooledConnection {
     /**
      * Set to true if this connection has been discarded by the pool
      */
-    private boolean discarded = false;
+    private volatile boolean discarded = false;
     /**
      * The Timestamp when the last time the connect() method was called successfully
      */
