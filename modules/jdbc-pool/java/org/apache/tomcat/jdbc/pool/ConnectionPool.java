@@ -532,10 +532,11 @@ public class ConnectionPool {
             if (size.get() < getPoolProperties().getMaxActive()) {
                 //atomic duplicate check
                 if (size.addAndGet(1) > getPoolProperties().getMaxActive()) {
-                    return createConnection(now, con);
-                } else {
                     //if we got here, two threads passed through the first if
                     size.decrementAndGet();
+                } else {
+                    //create a connection, we're below the limit
+                    return createConnection(now, con);
                 }
             } //end if
 
