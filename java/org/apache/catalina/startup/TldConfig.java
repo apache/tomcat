@@ -507,11 +507,6 @@ public final class TldConfig  implements LifecycleListener {
         String taglibs[] = context.findTaglibs();
         for (int i = 0; i < taglibs.length; i++) {
             String resourcePath = context.findTaglib(taglibs[i]);
-            // FIXME - Servlet 2.4 DTD implies that the location MUST be
-            // a context-relative path starting with '/'?
-            if (!resourcePath.startsWith("/")) {
-                resourcePath = "/WEB-INF/" + resourcePath;
-            }
             if (log.isTraceEnabled()) {
                 log.trace("   Adding path '" + resourcePath +
                     "' for URI '" + taglibs[i] + "'");
