@@ -80,10 +80,11 @@ dbcp.home=${base.path}/commons-dbcp-1.2
 dbcp.jar=${dbcp.home}/commons-dbcp-1.2.jar
 dbcp.loc=http://archive.apache.org/dist/commons/dbcp/binaries/commons-dbcp-1.2.zip
 
-tomcat.home=${base.path}/apache-tomcat-6.0.20
+tomcat.version=6.0.20
+tomcat.home=${base.path}/apache-tomcat-${tomcat.version}
 tomcat.dbcp.jar=${tomcat.home}/lib/tomcat-dbcp.jar
 tomcat.juli.jar=${tomcat.home}/bin/tomcat-juli.jar
-tomcat.loc=http://archive.apache.org/dist/tomcat/tomcat-6/v6.0.20/bin/apache-tomcat-6.0.20.zip
+tomcat.loc=http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip
 
 tomcat.project.loc=http://svn.apache.org/repos/asf/tomcat/trunk/webapps/docs/project.xml
 tomcat.project.dest=${base.path}/project.xml
