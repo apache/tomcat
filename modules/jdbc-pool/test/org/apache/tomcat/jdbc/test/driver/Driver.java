@@ -25,8 +25,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Driver implements java.sql.Driver {
     public static final String url = "jdbc:tomcat:test";
-    public static AtomicInteger connectCount = new AtomicInteger(0);
+    public static final AtomicInteger connectCount = new AtomicInteger(0);
+    public static final AtomicInteger disconnectCount = new AtomicInteger(0);
 
+    public static void reset() {
+        connectCount.set(0);
+        disconnectCount.set(0);
+    }
+    
     static {
         try {
             DriverManager.registerDriver(new Driver());

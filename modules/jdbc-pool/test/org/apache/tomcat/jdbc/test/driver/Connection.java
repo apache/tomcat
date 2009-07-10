@@ -39,6 +39,7 @@ public class Connection implements java.sql.Connection {
     }
 
     public void close() throws SQLException {
+        Driver.disconnectCount.incrementAndGet();
     }
 
     public void commit() throws SQLException {

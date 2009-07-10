@@ -648,6 +648,11 @@ public class ConnectionPool {
         boolean setToNull = false;
         try {
             con.lock();
+            
+            if (con.isReleased()) {
+                return null;
+            }
+            
             if (!con.isDiscarded() && !con.isInitialized()) {
                 //attempt to connect
                 con.connect();
