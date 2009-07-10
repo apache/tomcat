@@ -135,7 +135,7 @@ public class StandardWrapper
     /**
      * The (single) initialized instance of this servlet.
      */
-    protected Servlet instance = null;
+    protected volatile Servlet instance = null;
 
 
     /**
