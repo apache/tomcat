@@ -72,7 +72,7 @@ public class PoolProperties {
     protected boolean useEquals = false;
     protected int abandonWhenPercentageFull = 0;
     protected long maxAge = 0;
-
+    protected boolean useLock = true;
     private InterceptorDefinition[] interceptors = null;
     
     public void setAbandonWhenPercentageFull(int percentage) {
@@ -531,7 +531,15 @@ public class PoolProperties {
     public void setMaxAge(long maxAge) {
         this.maxAge = maxAge;
     }
+
+    public boolean getUseLock() {
+        return useLock;
+    }
+
+    public void setUseLock(boolean useLock) {
+        this.useLock = useLock;
+    }
     
-    
+        
 
 }
