@@ -301,10 +301,19 @@ public class WebRuleSet extends RuleSetBase {
                                new Class[] { Integer.TYPE });
         digester.addCallParam(prefix + "web-app/session-config/session-timeout", 0);
 
+        // Taglibs pre Servlet 2.4
+        digester.addRule(prefix + "web-app/taglib", new TaglibLocationRule(false));
         digester.addCallMethod(prefix + "web-app/taglib",
                                "addTaglib", 2);
         digester.addCallParam(prefix + "web-app/taglib/taglib-location", 1);
         digester.addCallParam(prefix + "web-app/taglib/taglib-uri", 0);
+
+        // Taglibs Servlet 2.4 onwards
+        digester.addRule(prefix + "web-app/jsp-config/taglib", new TaglibLocationRule(true));
+        digester.addCallMethod(prefix + "web-app/jsp-config/taglib",
+                "addTaglib", 2);
+        digester.addCallParam(prefix + "web-app/jsp-config/taglib/taglib-location", 1);
+        digester.addCallParam(prefix + "web-app/jsp-config/taglib/taglib-uri", 0);
 
         digester.addCallMethod(prefix + "web-app/welcome-file-list/welcome-file",
                                "addWelcomeFile", 0);
@@ -925,5 +934,32 @@ final class ServiceQnameRule extends Rule {
         contextService.setServiceqnameLocalpart(localpart);
         contextService.setServiceqnameNamespaceURI(namespaceuri);
     }
+    
 }
 
+/**
+ * A rule that checks if the taglib element is in the right place. 
+ */
+final class TaglibLocationRule extends Rule {
+
+    final boolean isServlet24OrLater;
+    
+    public TaglibLocationRule(boolean isServlet24OrLater) {
+        this.isServlet24OrLater = isServlet24OrLater;
+    }
+    
+    @Override
+    public void begin(String namespace, String name, Attributes attributes)
+            throws Exception {
+        Context context = (Context) digester.peek(digester.getCount() - 1);
+        // If we have a public ID, this is not a 2.4 or later webapp
+        boolean havePublicId = (context.getPublicId() != null);
+        // havePublicId and isServlet24OrLater should be mutually exclusive
+        if (havePublicId == isServlet24OrLater) {
+            throw new IllegalArgumentException(
+                    "taglib definition not consistent with specification version");
+        }
+    }
+
+    
+}
