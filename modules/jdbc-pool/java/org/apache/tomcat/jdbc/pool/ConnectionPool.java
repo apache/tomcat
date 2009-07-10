@@ -450,7 +450,7 @@ public class ConnectionPool {
 
 
 //===============================================================================
-//         CONNECTION POOLING IMPL
+//         CONNECTION POOLING IMPL LOGIC
 //===============================================================================
 
     /**
@@ -471,6 +471,7 @@ public class ConnectionPool {
             if (jmxPool!=null) {
                 jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
             }
+            //release the connection
             release(con);
             //we've asynchronously reduced the number of connections
             //we could have threads stuck in idle.poll(timeout) that will never be notified
@@ -490,10 +491,10 @@ public class ConnectionPool {
         try {
             con.lock();
             if (con.release()) {
+                //counter only decremented once
                 size.addAndGet(-1);
             }
         } finally {
-            
             con.unlock();
         }
     }
@@ -518,9 +519,9 @@ public class ConnectionPool {
 
         while (true) {
             if (con!=null) {
+                //configure the connection and return it
                 PooledConnection result = borrowConnection(now, con);
-                //validation might have failed, in which case null is returned
-                //should not happen anymore
+                //null should never be returned, but was in a previous impl.
                 if (result!=null) return result;
             }
             
@@ -529,15 +530,22 @@ public class ConnectionPool {
             //atomic variable - a connection can become idle while we are creating 
             //a new connection
             if (size.get() < getPoolProperties().getMaxActive()) {
-                size.addAndGet(1);
-                return createConnection(now, con);
+                //atomic duplicate check
+                if (size.addAndGet(1) > getPoolProperties().getMaxActive()) {
+                    return createConnection(now, con);
+                } else {
+                    //if we got here, two threads passed through the first if
+                    size.decrementAndGet();
+                }
             } //end if
 
             //calculate wait time for this iteration
             long maxWait = wait;
+            //if the passed in wait time is -1, means we should use the pool property value
             if (wait==-1) {
                 maxWait = (getPoolProperties().getMaxWait()<=0)?Long.MAX_VALUE:getPoolProperties().getMaxWait();
             }
+            
             long timetowait = Math.max(0, maxWait - (System.currentTimeMillis() - now));
             waitcount.incrementAndGet();
             try {
@@ -614,10 +622,13 @@ public class ConnectionPool {
 
     protected PooledConnection borrowConnection(long now, PooledConnection con) throws SQLException {
         //we have a connection, lets set it up
+        
+        //flag to see if we need to nullify
         boolean setToNull = false;
         try {
             con.lock();
             if (!con.isDiscarded() && !con.isInitialized()) {
+                //attempt to connect
                 con.connect();
             }
             if ((!con.isDiscarded()) && con.validate(PooledConnection.VALIDATE_BORROW)) {
