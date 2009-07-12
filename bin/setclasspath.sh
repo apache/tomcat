@@ -59,7 +59,7 @@ if [ -z "$JRE_HOME" ]; then
 fi
 
 # If we're running under jdb, we need a full jdk.
-if [ "$1" = "debug" -o "$1" = "javac" ] ; then
+if [ "$1" = "debug" ] ; then
   if [ "$os400" = "true" ]; then
     if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
@@ -102,14 +102,7 @@ if [ -z "$JAVA_ENDORSED_DIRS" ]; then
 fi
 
 # Set standard CLASSPATH
-if [ "$1" = "javac" ] ; then
-  if [ ! -f "$JAVA_HOME"/lib/tools.jar ]; then
-    echo "Can't find tools.jar in JAVA_HOME"
-    echo "Need a JDK to run javac"
-    exit 1
-  fi
-fi
-if [ "$1" = "debug" -o "$1" = "javac" ] ; then
+if [ "$1" = "debug" ] ; then
   if [ -f "$JAVA_HOME"/lib/tools.jar ]; then
     CLASSPATH="$JAVA_HOME"/lib/tools.jar
   fi
@@ -131,4 +124,3 @@ _RUNJAVA="$JRE_HOME"/bin/java
 if [ "$os400" != "true" ]; then
   _RUNJDB="$JAVA_HOME"/bin/jdb
 fi
-_RUNJAVAC="$JAVA_HOME"/bin/javac
