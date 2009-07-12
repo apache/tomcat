@@ -106,13 +106,8 @@ set BASEDIR=%CATALINA_HOME%
 call "%CATALINA_HOME%\bin\setclasspath.bat" %1
 if errorlevel 1 goto end
 
-if "%1" == "javac" shift
- 
 rem Add on extra jar files to CLASSPATH
-if "%CLASSPATH%" == "" goto emptyClasspath
-set CLASSPATH=%CLASSPATH%;
-:emptyClasspath
-set CLASSPATH=%CLASSPATH%%CATALINA_HOME%\bin\bootstrap.jar
+set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar
 
 if not "%CATALINA_BASE%" == "" goto gotBase
 set CATALINA_BASE=%CATALINA_HOME%
@@ -177,10 +172,7 @@ if ""%1"" == ""start"" goto doStart
 if ""%1"" == ""stop"" goto doStop
 if ""%1"" == ""version"" goto doVersion
 
-echo Usage:  catalina [javac] ( commands ... )
-echo optional arguments:
-echo   javac             Adds tools.jar to the classpath so javac is available
-echo                       as a compiler
+echo Usage:  catalina ( commands ... )
 echo commands:
 echo   debug             Start Catalina in a debugger
 echo   debug -security   Debug Catalina with a security manager
