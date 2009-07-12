@@ -34,7 +34,7 @@
 #                   $CATALINA_BASE/temp.
 #
 #   JAVA_HOME       Must point at your Java Development Kit installation.
-#                   Required to run the with the "debug" or "javac" argument.
+#                   Required to run the with the "debug" argument.
 #
 #   JRE_HOME        Must point at your Java Development Kit installation.
 #                   Defaults to JAVA_HOME if empty.
@@ -150,7 +150,10 @@ else
 fi
 
 # Add on extra jar files to CLASSPATH
-CLASSPATH="$CLASSPATH":"$CATALINA_HOME"/bin/bootstrap.jar
+if [ ! -z "$CLASSPATH" ] ; then
+  CLASSPATH="$CLASSPATH":
+fi
+CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar
 
 if [ -z "$CATALINA_BASE" ] ; then
   CATALINA_BASE="$CATALINA_HOME"
@@ -201,7 +204,7 @@ if [ $have_tty -eq 1 ]; then
   echo "Using CATALINA_BASE:   $CATALINA_BASE"
   echo "Using CATALINA_HOME:   $CATALINA_HOME"
   echo "Using CATALINA_TMPDIR: $CATALINA_TMPDIR"
-  if [ "$1" = "debug" -o "$1" = "javac" ] ; then
+  if [ "$1" = "debug" ] ; then
     echo "Using JAVA_HOME:       $JAVA_HOME"
   else
     echo "Using JRE_HOME:        $JRE_HOME"

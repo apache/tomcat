@@ -106,8 +106,11 @@ set BASEDIR=%CATALINA_HOME%
 call "%CATALINA_HOME%\bin\setclasspath.bat" %1
 if errorlevel 1 goto end
 
-rem Add on extra jar files to CLASSPATH
-set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar
+rem Add on extra jar file to CLASSPATH
+if "%CLASSPATH%" == "" goto emptyClasspath
+set CLASSPATH=%CLASSPATH%;
+:emptyClasspath
+set CLASSPATH=%CLASSPATH%%CATALINA_HOME%\bin\bootstrap.jar
 
 if not "%CATALINA_BASE%" == "" goto gotBase
 set CATALINA_BASE=%CATALINA_HOME%
