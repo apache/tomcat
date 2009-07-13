@@ -23,7 +23,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

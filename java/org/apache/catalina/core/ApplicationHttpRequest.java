@@ -38,7 +38,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Manager;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

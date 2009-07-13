@@ -23,7 +23,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
 
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class is loaded by the  {@link WebappClassLoader} to enable it to

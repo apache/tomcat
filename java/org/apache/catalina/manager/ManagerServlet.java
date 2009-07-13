@@ -56,7 +56,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
 
 
