@@ -21,12 +21,13 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 public class SimplePOJOExample {
 
     public static void main(String[] args) throws Exception {
-        PoolProperties p = new PoolProperties();
+        PoolConfiguration p = new PoolProperties();
         p.setUrl("jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
         p.setDriverClassName("com.mysql.jdbc.Driver");
         p.setUsername("root");

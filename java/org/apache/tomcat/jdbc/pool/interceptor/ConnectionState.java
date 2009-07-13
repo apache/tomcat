@@ -24,7 +24,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSourceFactory;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
-import org.apache.tomcat.jdbc.pool.PoolProperties;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
@@ -46,7 +46,7 @@ public class ConnectionState extends JdbcInterceptor  {
     
     
     public void reset(ConnectionPool parent, PooledConnection con) {
-        PoolProperties poolProperties = parent.getPoolProperties();
+        PoolConfiguration poolProperties = parent.getPoolProperties();
         if (poolProperties.getDefaultReadOnly()!=null) {
             try {
                 if (readOnly==null || readOnly.booleanValue()!=poolProperties.getDefaultReadOnly().booleanValue()) {

@@ -17,7 +17,9 @@ package org.apache.tomcat.jdbc.pool.jmx;
 
 import java.util.Properties;
 
-public interface ConnectionPoolMBean  {
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+
+public interface ConnectionPoolMBean extends PoolConfiguration  {
 
     //=================================================================
     //       POOL STATS
@@ -50,76 +52,5 @@ public interface ConnectionPoolMBean  {
     //       POOL NOTIFICATIONS
     //=================================================================
 
-    
-    //=================================================================
-    //       POOL PROPERTIES
-    //=================================================================
-    public Properties getDbProperties();
-
-    public String getUrl();
-
-    public String getDriverClassName();
-
-    public boolean isDefaultAutoCommit();
-
-    public boolean isDefaultReadOnly();
-
-    public int getDefaultTransactionIsolation();
-
-    public String getConnectionProperties();
-
-    public String getDefaultCatalog();
-
-    public int getInitialSize();
-
-    public int getMaxActive();
-
-    public int getMaxIdle();
-
-    public int getMinIdle();
-
-    public int getMaxWait();
-
-    public String getValidationQuery();
-
-    public boolean isTestOnBorrow();
-
-    public boolean isTestOnReturn();
-
-    public boolean isTestWhileIdle();
-
-    public int getTimeBetweenEvictionRunsMillis();
-
-    public int getNumTestsPerEvictionRun();
-
-    public int getMinEvictableIdleTimeMillis();
-
-    public boolean isAccessToUnderlyingConnectionAllowed();
-
-    public boolean isRemoveAbandoned();
-
-    public int getRemoveAbandonedTimeout();
-
-    public boolean isLogAbandoned();
-
-    public int getLoginTimeout();
-
-    public String getName();
-
-    public String getPassword();
-
-    public String getUsername();
-
-    public long getValidationInterval();
-
-    public String getInitSQL();
-
-    public boolean isTestOnConnect();
-
-    public String getJdbcInterceptors();
-
-    public int getAbandonWhenPercentageFull();
-    
-    public long getMaxAge();
     
 }
