@@ -20,6 +20,7 @@ package org.apache.catalina.startup;
 
 
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSetBase;
 
 
@@ -87,10 +88,65 @@ public class TldRuleSet extends RuleSetBase {
      */
     public void addRuleInstances(Digester digester) {
 
-        digester.addCallMethod(prefix + "taglib/listener/listener-class",
-                               "addApplicationListener", 0);
+        TaglibUriRule taglibUriRule = new TaglibUriRule(); 
+        
+        digester.addRule(prefix + "taglib/uri", taglibUriRule);
+
+        digester.addRule(prefix + "taglib/listener/listener-class",
+                new TaglibListenerRule(taglibUriRule));
 
     }
 
 
+}
+
+final class TaglibUriRule extends Rule {
+    
+    private boolean duplicateUri;
+    
+    public TaglibUriRule() {
+    }
+
+    @Override
+    public void body(String namespace, String name, String text)
+            throws Exception {
+        TldConfig tldConfig =
+            (TldConfig) digester.peek(digester.getCount() - 1);
+        if (tldConfig.isKnownTaglibUri(text)) {
+            // Already seen this URI
+            duplicateUri = true;
+            digester.getLogger().info(
+                    "TLD skipped. URI: " + text + " is already defined");
+        } else {
+            // New URI. Add it to known list and carry on
+            duplicateUri = false;
+            tldConfig.addTaglibUri(text);
+        }
+    }
+    
+    public boolean isDuplicateUri() {
+        return duplicateUri;
+    }
+}
+
+final class TaglibListenerRule extends Rule {
+    
+    private final TaglibUriRule taglibUriRule;
+    
+    public TaglibListenerRule(TaglibUriRule taglibUriRule) {
+        this.taglibUriRule = taglibUriRule;
+    }
+
+    @Override
+    public void body(String namespace, String name, String text)
+            throws Exception {
+        TldConfig tldConfig =
+            (TldConfig) digester.peek(digester.getCount() - 1);
+        
+        // Only process the listener if the URI is not a duplicate
+        if (!taglibUriRule.isDuplicateUri()) {
+            tldConfig.addApplicationListener(text);
+        }
+    }
+    
 }
