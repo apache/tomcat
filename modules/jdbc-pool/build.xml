@@ -86,6 +86,17 @@
   </target>
 
   <target name="javadoc" depends="prepare">
+     <xslt basedir="${tomcat.pool}/doc"
+          destdir="${basedir}/java/org/apache/tomcat/jdbc/pool"
+          extension=".html"
+          style="${basedir}/doc/package.xsl"
+          excludes="build.xml"
+          includes="jdbc-pool.xml">
+      <param name="relative-path" expression="http://tomcat.apache.org/tomcat-6.0-doc"/>
+      <param name="apache-logo" expression="/images/asf-logo.gif"/>
+    </xslt>
+    <move tofile="${basedir}/java/org/apache/tomcat/jdbc/pool/package.html"
+          file="${basedir}/java/org/apache/tomcat/jdbc/pool/jdbc-pool.html"/>
     <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false">
       <classpath refid="tomcat.jdbc.classpath"/>
     </javadoc>  
@@ -93,6 +104,7 @@
     <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
       <fileset dir="${tomcat.api}"/>
     </jar>
+    <delete file="${basedir}/java/org/apache/tomcat/jdbc/pool/package.html"/>
   </target>
   
   <target name="build" depends="prepare,download">
