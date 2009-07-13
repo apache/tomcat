@@ -32,17 +32,36 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * A simple implementation of a blocking queue with fairness waiting.
  * invocations to method poll(...) will get handed out in the order they were received.
+ * Locking is fine grained, a shared lock is only used during the first level of contention, waiting is done in a 
+ * lock per thread basis so that order is guaranteed once the thread goes into a suspended monitor state.
+ * <br/>
+ * Not all of the methods of the {@link java.util.concurrent.BlockingQueue} are implemented.
  * @author Filip Hanik
  *
  */
 
 public class FairBlockingQueue<E> implements BlockingQueue<E> {
-    ReentrantLock lock = new ReentrantLock(false);
-
-    LinkedList<E> items = null;
-
-    LinkedList<ExchangeCountDownLatch<E>> waiters = null;
     
+    /**
+     * Phase one entry lock in order to give out 
+     * per-thread-locks for the waiting phase we have 
+     * a phase one lock during the contention period.
+     */
+    final ReentrantLock lock = new ReentrantLock(false);
+
+    /**
+     * All the objects in the pool are stored in a simple linked list
+     */
+    final LinkedList<E> items;
+
+    /**
+     * All threads waiting for an object are stored in a linked list
+     */
+    final LinkedList<ExchangeCountDownLatch<E>> waiters;
+    
+    /**
+     * Creates a new fair blocking queue.
+     */
     public FairBlockingQueue() {
         items = new LinkedList<E>();
         waiters = new LinkedList<ExchangeCountDownLatch<E>>();
@@ -52,27 +71,37 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     // USED BY CONPOOL IMPLEMENTATION
     //------------------------------------------------------------------
     /**
+     * Will always return true, queue is unbounded.
      * {@inheritDoc}
      */
     public boolean offer(E e) {
+        //during the offer, we will grab the main lock
         final ReentrantLock lock = this.lock;
         lock.lock();
         ExchangeCountDownLatch<E> c = null;
         try {
+            //check to see if threads are waiting for an object
             if (waiters.size() > 0) {
+                //if threads are waiting grab the latch for that thread
                 c = waiters.poll();
+                //give the object to the thread instead of adding it to the pool
                 c.setItem(e);
             } else {
+                //we always add first, so that the most recently used object will be given out
                 items.addFirst(e);
             }
         } finally {
             lock.unlock();
         }
+        //if we exchanged an object with another thread, wake it up.
         if (c!=null) c.countDown();
+        //we have an unbounded queue, so always return true
         return true;
     }
 
     /**
+     * Will never timeout, as it invokes the {@link #offer(Object)} method.
+     * Once a lock has been acquired, the  
      * {@inheritDoc}
      */
     public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
@@ -80,26 +109,37 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
+     * Fair retrieval of an object in the queue.
+     * Objects are returned in the order the threads requested them.
      * {@inheritDoc}
      */
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         E result = null;
         final ReentrantLock lock = this.lock;
         boolean error = true;
+        //acquire the global lock until we know what to do
         lock.lock();
         try {
+            //check to see if we have objects
             result = items.poll();
             if (result==null && timeout>0) {
+                //the queue is empty we will wait for an object
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
+                //add to the bottom of the wait list
                 waiters.addLast(c);
+                //unlock the global lock
                 lock.unlock();
+                //wait for the specified timeout
                 if (!c.await(timeout, unit)) {
+                    //if we timed out, remove ourselves from the waitlist
                     lock.lock();
                     waiters.remove(c);
                     lock.unlock();
                 }
+                //return the item we received, can be null if we timed out
                 result = c.getItem();
             } else {
+                //we have an object, release
                 lock.unlock();
             }
             error = false;
@@ -119,16 +159,21 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         Future<E> result = null;
         final ReentrantLock lock = this.lock;
         boolean error = true;
+        //grab the global lock
         lock.lock();
         try {
+            //check to see if we have objects in the queue
             E item = items.poll();
             if (item==null) {
+                //queue is empty, add ourselves as waiters
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
                 waiters.addLast(c);
                 lock.unlock();
+                //return a future that will wait for the object
                 result = new ItemFuture(c);
             } else {
                 lock.unlock();
+                //return a future with the item
                 result = new ItemFuture(item);
             }
             error = false;

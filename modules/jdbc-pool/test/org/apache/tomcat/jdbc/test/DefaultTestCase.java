@@ -25,6 +25,8 @@ import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory;
 
 import junit.framework.TestCase;
+
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 
@@ -45,10 +47,15 @@ public class DefaultTestCase extends TestCase {
     public DefaultTestCase(String name) {
         super(name);
     }
+    
+    @Override
+    public void setUp() throws Exception {
+        init();
+    }
 
     public org.apache.tomcat.jdbc.pool.DataSource createDefaultDataSource() {
         org.apache.tomcat.jdbc.pool.DataSource datasource = null;
-        PoolProperties p = new DefaultProperties();
+        PoolConfiguration p = new DefaultProperties();
         p.setJmxEnabled(false);
         p.setTestWhileIdle(false);
         p.setTestOnBorrow(false);

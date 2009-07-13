@@ -21,12 +21,13 @@ import java.sql.Statement;
 import java.util.concurrent.Future;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
 public class SimplePOJOAsyncExample {
 
     public static void main(String[] args) throws Exception {
-        PoolProperties p = new PoolProperties();
+        PoolConfiguration p = new PoolProperties();
         p.setFairQueue(true);
         p.setUrl("jdbc:mysql://localhost:3306/mysql?autoReconnect=true");
         p.setDriverClassName("com.mysql.jdbc.Driver");

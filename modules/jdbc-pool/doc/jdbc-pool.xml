@@ -227,8 +227,10 @@
 
     <attribute name="testOnBorrow" required="false">
       <p>(boolean) The indication of whether objects will be validated before being borrowed from the pool. 
-         If the object fails to validate, it will be dropped from the pool, and we will attempt to borrow another.
-         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string.
+         If the object fails to validate, it will be dropped from the pool, and we will attempt to borrow another. 
+         NOTE - for a true value to have any effect, the validationQuery parameter must be set to a non-null string. 
+         Default value is false
+         In order to have a more efficient validation, see <code>validationInterval</code>
          Default value is <code>false</code>
       </p>
     </attribute>
@@ -275,7 +277,8 @@
 
     <attribute name="accessToUnderlyingConnectionAllowed" required="false">
       <p>(boolean) Property not used. Access can be achieved by calling <code>unwrap</code> on the pooled connection.
-         see <code>javax.sql.DataSource</code> interface, or call <code>getConnection</code> through reflection.</p>
+         see <code>javax.sql.DataSource</code> interface, or call <code>getConnection</code> through reflection or
+          or cast the object as <code>javax.sql.PooledConnection</code></p>
     </attribute>
 
     <attribute name="removeAbandoned" required="false">
@@ -415,8 +418,9 @@
     <p>Abstract base class for all interceptors, can not be instantiated.</p>
     <attributes>
       <attribute name="useEquals" required="false">
-        <p>(String as boolean) A custom query to be run when a connection is first created. 
-           The default value is <code>false</code>.
+        <p>(String as boolean) Set to true if you wish the interceptor class to use <code>String.equals</code> instead of 
+         <code>==</code> when comparing method names. This property does not apply to added interceptors as those are configured individually.
+         The default value is <code>false</code>.
         </p>
       </attribute>
     </attributes>  

@@ -62,11 +62,9 @@ public class DefaultProperties extends PoolProperties {
         timeBetweenEvictionRunsMillis = 5000;
         numTestsPerEvictionRun = 0;
         minEvictableIdleTimeMillis = 1000;
-        accessToUnderlyingConnectionAllowed = false;
         removeAbandoned = true;
         removeAbandonedTimeout = 5000;
         logAbandoned = true;
-        loginTimeout = 0;
         validationInterval = 0; //always validate
         initSQL = null;
         testOnConnect = false;;
