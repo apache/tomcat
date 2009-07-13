@@ -65,7 +65,7 @@ public class PooledConnection {
     /**
      * The properties for the connection pool
      */
-    protected PoolProperties poolProperties;
+    protected PoolConfiguration poolProperties;
     /**
      * The underlying database connection
      */
@@ -112,7 +112,7 @@ public class PooledConnection {
     
     private AtomicBoolean released = new AtomicBoolean(false);
     
-    public PooledConnection(PoolProperties prop, ConnectionPool parent) {
+    public PooledConnection(PoolConfiguration prop, ConnectionPool parent) {
         instanceCount = counter.addAndGet(1);
         poolProperties = prop;
         this.parent = parent;
@@ -341,7 +341,7 @@ public class PooledConnection {
         this.lastValidated = lastValidated;
     }
 
-    public void setPoolProperties(PoolProperties poolProperties) {
+    public void setPoolProperties(PoolConfiguration poolProperties) {
         this.poolProperties = poolProperties;
     }
 
@@ -357,7 +357,7 @@ public class PooledConnection {
         return lastValidated;
     }
 
-    public PoolProperties getPoolProperties() {
+    public PoolConfiguration getPoolProperties() {
         return poolProperties;
     }
 

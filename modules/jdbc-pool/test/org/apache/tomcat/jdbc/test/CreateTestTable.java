@@ -23,6 +23,8 @@ import java.sql.Statement;
 import java.util.Random;
 import java.sql.ResultSet;
 
+import org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer;
+
 public class CreateTestTable extends DefaultTestCase {
     
     public static volatile boolean recreate = Boolean.getBoolean("recreate");
@@ -59,6 +61,9 @@ public class CreateTestTable extends DefaultTestCase {
     }
     
     public void testPopulateData() throws Exception {
+        init();
+        datasource.setJdbcInterceptors(ResetAbandonedTimer.class.getName());
+        System.out.println("FILIP Using URL:"+this.datasource.getUrl());
         String insert = "insert into test values (?,?,?,?,?)";
         this.init();
         this.datasource.setRemoveAbandoned(false);
@@ -90,6 +95,7 @@ public class CreateTestTable extends DefaultTestCase {
                 ps.executeBatch();
                 ps.close();
                 ps = con.prepareStatement(insert);
+                ps.setQueryTimeout(0);
             }
 
         }

@@ -75,7 +75,7 @@ public class ConnectionPool {
      * All the information about the connection pool
      * These are the properties the pool got instantiated with
      */
-    private PoolProperties poolProperties;
+    private PoolConfiguration poolProperties;
 
     /**
      * Contains all the connections that are in use
@@ -129,7 +129,7 @@ public class ConnectionPool {
      * @param prop PoolProperties - all the properties for this connection pool
      * @throws SQLException
      */
-    public ConnectionPool(PoolProperties prop) throws SQLException {
+    public ConnectionPool(PoolConfiguration prop) throws SQLException {
         //setup quick access variables and pools
         init(prop);
     }
@@ -188,7 +188,7 @@ public class ConnectionPool {
      * @return PoolProperties
      * 
      */
-    public PoolProperties getPoolProperties() {
+    public PoolConfiguration getPoolProperties() {
         return this.poolProperties;
     }
 
@@ -312,12 +312,12 @@ public class ConnectionPool {
      */
     @Override
     protected void finalize() throws Throwable {
-        Runnable closer = new Runnable() {
-            public void run() {
-                close(true);
-            }
-        };
-        this.cancellator.execute(closer);
+//        Runnable closer = new Runnable() {
+//            public void run() {
+//                close(true);
+//            }
+//        };
+//        this.cancellator.execute(closer);
     }
 
     /**
@@ -373,7 +373,7 @@ public class ConnectionPool {
      * @param properties PoolProperties - properties used to initialize the pool with
      * @throws SQLException if initialization fails
      */
-    protected void init(PoolProperties properties) throws SQLException {
+    protected void init(PoolConfiguration properties) throws SQLException {
         poolProperties = properties;
         //make space for 10 extra in case we flow over a bit
         busy = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),false);
