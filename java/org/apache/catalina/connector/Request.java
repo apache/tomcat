@@ -78,7 +78,7 @@ import org.apache.catalina.core.ApplicationFilterFactory;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.util.StringParser;
 
 

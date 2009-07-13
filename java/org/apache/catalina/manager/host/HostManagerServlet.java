@@ -43,7 +43,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.catalina.core.ContainerBase;
 

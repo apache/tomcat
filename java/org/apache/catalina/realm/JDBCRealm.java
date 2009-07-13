@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
