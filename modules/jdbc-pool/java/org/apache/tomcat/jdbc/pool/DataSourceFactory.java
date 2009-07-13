@@ -451,14 +451,6 @@ public class DataSourceFactory implements ObjectFactory {
         return dataSource;
     }
 
-    public static DataSource getDataSource(org.apache.tomcat.jdbc.pool.DataSourceProxy dataSource) {
-        if (dataSource instanceof DataSource) return (DataSource)dataSource;
-        //only return a proxy if we didn't implement the DataSource interface
-        DataSourceHandler handler = new DataSourceHandler(dataSource);
-        DataSource ds = (DataSource)Proxy.newProxyInstance(DataSourceFactory.class.getClassLoader(), new Class[] {javax.sql.DataSource.class}, handler);
-        return ds;
-    }
-
     /**
      * <p>Parse properties from the string. Format of the string must be [propertyName=property;]*<p>
      * @param propText
@@ -469,25 +461,4 @@ public class DataSourceFactory implements ObjectFactory {
         return PoolProperties.getProperties(propText,null);
     }
 
-    protected static class DataSourceHandler implements InvocationHandler {
-        protected org.apache.tomcat.jdbc.pool.DataSourceProxy datasource = null;
-        protected static HashMap<Method,Method> methods = new HashMap<Method,Method>();
-        public DataSourceHandler(org.apache.tomcat.jdbc.pool.DataSourceProxy ds) {
-            this.datasource = ds;
-        }
-
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Method m = methods.get(method);
-            if (m==null) {
-                m = datasource.getClass().getMethod(method.getName(), method.getParameterTypes());
-                methods.put(method, m);
-            }
-            try {
-                return m.invoke(datasource, args);
-            }catch (InvocationTargetException t) {
-                throw t.getTargetException();
-            }
-        }
-
-    }
 }
