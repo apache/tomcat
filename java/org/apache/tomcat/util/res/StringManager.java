@@ -68,9 +68,25 @@ public class StringManager {
      */
     private StringManager(String packageName) {
         String bundleName = packageName + ".LocalStrings";
-        bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+        try {
+            bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+        } catch( MissingResourceException ex ) {
+            // Try from the current loader (that's the case for trusted apps)
+            // Should only be required if using a TC5 style classloader structure
+            // where common != shared != server
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            if( cl != null ) {
+                try {
+                    bundle = ResourceBundle.getBundle(
+                            bundleName, Locale.getDefault(), cl);
+                } catch(MissingResourceException ex2) {
+                }
+            }
+        }
         // Get the actual locale, which may be different from the requested one
-        locale = bundle.getLocale();
+        if (bundle != null) {
+            locale = bundle.getLocale();
+        }
     }
 
     /**
