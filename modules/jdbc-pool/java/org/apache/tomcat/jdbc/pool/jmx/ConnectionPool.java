@@ -29,6 +29,8 @@ import javax.management.NotificationListener;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 public class ConnectionPool extends NotificationBroadcasterSupport implements ConnectionPoolMBean  {
     /**
@@ -57,6 +59,10 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     public org.apache.tomcat.jdbc.pool.ConnectionPool getPool() {
         return pool;
+    }
+    
+    public PoolConfiguration getPoolProperties() {
+        return pool.getPoolProperties();
     }
     
     //=================================================================
@@ -140,16 +146,16 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return pool.getActive();
     }
     
-    public boolean isPoolSweeperEnabled() {
-        return pool.getPoolProperties().isPoolSweeperEnabled();
-    }
-    
     public int getNumIdle() {
         return getIdle();
     }
     
     public int getNumActive() {
         return getActive();
+    }
+    
+    public int getWaitCount() {
+        return pool.getWaitCount();
     }
 
     //=================================================================
@@ -169,110 +175,384 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     //=================================================================
     //       POOL PROPERTIES
     //=================================================================
-    public Properties getDbProperties() {
-        return null; //pool.getPoolProperties().getDbProperties();
-    }
-    public String getUrl() {
-        return pool.getPoolProperties().getUrl();
-    }
-    public String getDriverClassName() {
-        return pool.getPoolProperties().getDriverClassName();
-    }
-    public boolean isDefaultAutoCommit() {
-        return pool.getPoolProperties().isDefaultAutoCommit();
-    }
-    public boolean isDefaultReadOnly() {
-        return pool.getPoolProperties().isDefaultReadOnly();
-    }
-    public int getDefaultTransactionIsolation() {
-        return pool.getPoolProperties().getDefaultTransactionIsolation();
-    }
+    //=========================================================
+    //  PROPERTIES / CONFIGURATION
+    //=========================================================    
+    
+    
+    
     public String getConnectionProperties() {
-        return pool.getPoolProperties().getConnectionProperties();
+        return getPoolProperties().getConnectionProperties();
     }
+
+    public Properties getDbProperties() {
+        return getPoolProperties().getDbProperties();
+    }
+
     public String getDefaultCatalog() {
-        return pool.getPoolProperties().getDefaultCatalog();
+        return getPoolProperties().getDefaultCatalog();
     }
+
+    public int getDefaultTransactionIsolation() {
+        return getPoolProperties().getDefaultTransactionIsolation();
+    }
+
+    public String getDriverClassName() {
+        return getPoolProperties().getDriverClassName();
+    }
+
+
     public int getInitialSize() {
-        return pool.getPoolProperties().getInitialSize();
+        return getPoolProperties().getInitialSize();
     }
-    public int getMaxActive() {
-        return pool.getPoolProperties().getMaxActive();
-    }
-    public int getMaxIdle() {
-        return pool.getPoolProperties().getMaxIdle();
-    }
-    public int getMinIdle() {
-        return pool.getPoolProperties().getMinIdle();
-    }
-    public int getMaxWait() {
-        return pool.getPoolProperties().getMaxWait();
-    }
-    public String getValidationQuery() {
-        return pool.getPoolProperties().getValidationQuery();
-    }
-    public boolean isTestOnBorrow() {
-        return pool.getPoolProperties().isTestOnBorrow();
-    }
-    public boolean isTestOnReturn() {
-        return pool.getPoolProperties().isTestOnReturn();
-    }
-    public boolean isTestWhileIdle() {
-        return pool.getPoolProperties().isTestWhileIdle();
-    }
-    public int getTimeBetweenEvictionRunsMillis() {
-        return pool.getPoolProperties().getTimeBetweenEvictionRunsMillis();
-    }
-    public int getNumTestsPerEvictionRun() {
-        return pool.getPoolProperties().getNumTestsPerEvictionRun();
-    }
-    public int getMinEvictableIdleTimeMillis() {
-        return pool.getPoolProperties().getMinEvictableIdleTimeMillis();
-    }
-    public boolean isAccessToUnderlyingConnectionAllowed() {
-        return pool.getPoolProperties().isAccessToUnderlyingConnectionAllowed();
-    }
-    public boolean isRemoveAbandoned() {
-        return pool.getPoolProperties().isRemoveAbandoned();
-    }
-    public int getRemoveAbandonedTimeout() {
-        return pool.getPoolProperties().getRemoveAbandonedTimeout();
-    }
-    public boolean isLogAbandoned() {
-        return pool.getPoolProperties().isLogAbandoned();
-    }
-    public int getLoginTimeout() {
-        return pool.getPoolProperties().getLoginTimeout();
-    }
-    public String getName() {
-        return pool.getPoolProperties().getName();
-    }
-    public String getPassword() {
-        return "";
-    }
-    public String getUsername() {
-        return pool.getPoolProperties().getUsername();
-    }
-    public long getValidationInterval() {
-        return pool.getPoolProperties().getValidationInterval();
-    }
+
     public String getInitSQL() {
-        return pool.getPoolProperties().getInitSQL();
+        return getPoolProperties().getInitSQL();
     }
-    public boolean isTestOnConnect() {
-        return pool.getPoolProperties().isTestOnConnect();
-    }
+
     public String getJdbcInterceptors() {
-        return pool.getPoolProperties().getJdbcInterceptors();
+        return getPoolProperties().getJdbcInterceptors();
     }
-    public int getWaitCount() {
-        return pool.getWaitCount();
+
+    public int getMaxActive() {
+        return getPoolProperties().getMaxActive();
     }
-    public int getAbandonWhenPercentageFull() {
-        return pool.getPoolProperties().getAbandonWhenPercentageFull();
+
+    public int getMaxIdle() {
+        return getPoolProperties().getMaxIdle();
     }
+
+    public int getMaxWait() {
+        return getPoolProperties().getMaxWait();
+    }
+
+    public int getMinEvictableIdleTimeMillis() {
+        return getPoolProperties().getMinEvictableIdleTimeMillis();
+    }
+
+    public int getMinIdle() {
+        return getPoolProperties().getMinIdle();
+    }
+    
     public long getMaxAge() {
-        return pool.getPoolProperties().getMaxAge();
+        return getPoolProperties().getMaxAge();
+    }    
+
+    public String getName() {
+        return getName();
+    }
+
+    public int getNumTestsPerEvictionRun() {
+        return getPoolProperties().getNumTestsPerEvictionRun();
+    }
+
+    /**
+     * @return DOES NOT RETURN THE PASSWORD, IT WOULD SHOW UP IN JMX
+     */
+    public String getPassword() {
+        return "Password not available as DataSource/JMX operation.";
+    }
+
+    public int getRemoveAbandonedTimeout() {
+        return getPoolProperties().getRemoveAbandonedTimeout();
+    }
+
+
+    public int getTimeBetweenEvictionRunsMillis() {
+        return getPoolProperties().getTimeBetweenEvictionRunsMillis();
+    }
+
+    public String getUrl() {
+        return getPoolProperties().getUrl();
+    }
+
+    public String getUsername() {
+        return getPoolProperties().getUsername();
+    }
+
+    public long getValidationInterval() {
+        return getPoolProperties().getValidationInterval();
+    }
+
+    public String getValidationQuery() {
+        return getPoolProperties().getValidationQuery();
+    }
+
+    public boolean isAccessToUnderlyingConnectionAllowed() {
+        return getPoolProperties().isAccessToUnderlyingConnectionAllowed();
+    }
+
+    public Boolean isDefaultAutoCommit() {
+        return getPoolProperties().isDefaultAutoCommit();
+    }
+
+    public Boolean isDefaultReadOnly() {
+        return getPoolProperties().isDefaultReadOnly();
+    }
+
+    public boolean isLogAbandoned() {
+        return getPoolProperties().isLogAbandoned();
+    }
+
+    public boolean isPoolSweeperEnabled() {
+        return getPoolProperties().isPoolSweeperEnabled();
+    }
+
+    public boolean isRemoveAbandoned() {
+        return getPoolProperties().isRemoveAbandoned();
+    }
+
+    public int getAbandonWhenPercentageFull() {
+        return getPoolProperties().getAbandonWhenPercentageFull();
+    }
+
+    public boolean isTestOnBorrow() {
+        return getPoolProperties().isTestOnBorrow();
+    }
+
+    public boolean isTestOnConnect() {
+        return getPoolProperties().isTestOnConnect();
+    }
+
+    public boolean isTestOnReturn() {
+        return getPoolProperties().isTestOnReturn();
+    }
+
+    public boolean isTestWhileIdle() {
+        return getPoolProperties().isTestWhileIdle();
+    }
+
+
+    public Boolean getDefaultAutoCommit() {
+        return getPoolProperties().getDefaultAutoCommit();
+    }
+
+    public Boolean getDefaultReadOnly() {
+        return getPoolProperties().getDefaultReadOnly();
+    }
+
+    public InterceptorDefinition[] getJdbcInterceptorsAsArray() {
+        return getPoolProperties().getJdbcInterceptorsAsArray();
+    }
+
+    public boolean getUseLock() {
+        return getPoolProperties().getUseLock();
+    }
+
+    public boolean isFairQueue() {
+        return getPoolProperties().isFairQueue();
+    }
+
+    public boolean isJmxEnabled() {
+        return getPoolProperties().isJmxEnabled();
+    }
+
+    public boolean isUseEquals() {
+        return getPoolProperties().isUseEquals();
+    }
+
+    public void setAbandonWhenPercentageFull(int percentage) {
+        getPoolProperties().setAbandonWhenPercentageFull(percentage);
+    }
+
+    public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
+        getPoolProperties().setAccessToUnderlyingConnectionAllowed(accessToUnderlyingConnectionAllowed);
+    }
+
+    public void setDbProperties(Properties dbProperties) {
+        getPoolProperties().setDbProperties(dbProperties);
+    }
+
+    public void setDefaultReadOnly(Boolean defaultReadOnly) {
+        getPoolProperties().setDefaultReadOnly(defaultReadOnly);
+    }
+
+    public void setMaxAge(long maxAge) {
+        getPoolProperties().setMaxAge(maxAge);
+    }
+
+    public void setName(String name) {
+        getPoolProperties().setName(name);
+    }
+
+    public String getPoolName() {
+        return getPoolProperties().getName();
+    }
+    
+
+    public void setConnectionProperties(String connectionProperties) {
+        getPoolProperties().setConnectionProperties(connectionProperties);
+        
+    }
+
+    public void setDefaultAutoCommit(Boolean defaultAutoCommit) {
+        getPoolProperties().setDefaultAutoCommit(defaultAutoCommit);
+    }
+
+    public void setDefaultCatalog(String defaultCatalog) {
+        getPoolProperties().setDefaultCatalog(defaultCatalog);
+    }
+
+    public void setDefaultTransactionIsolation(int defaultTransactionIsolation) {
+        getPoolProperties().setDefaultTransactionIsolation(defaultTransactionIsolation);
+    }
+
+    public void setDriverClassName(String driverClassName) {
+        getPoolProperties().setDriverClassName(driverClassName);
+    }
+
+    public void setFairQueue(boolean fairQueue) {
+        getPoolProperties().setFairQueue(fairQueue);
+    }
+
+    @Override
+    public void setInitialSize(int initialSize) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setInitSQL(String initSQL) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setJdbcInterceptors(String jdbcInterceptors) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setJmxEnabled(boolean jmxEnabled) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setLogAbandoned(boolean logAbandoned) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setMaxActive(int maxActive) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setMaxIdle(int maxIdle) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setMaxWait(int maxWait) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setMinIdle(int minIdle) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setPassword(String password) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setRemoveAbandoned(boolean removeAbandoned) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setTestOnBorrow(boolean testOnBorrow) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setTestOnConnect(boolean testOnConnect) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setTestOnReturn(boolean testOnReturn) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setTestWhileIdle(boolean testWhileIdle) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setTimeBetweenEvictionRunsMillis(int timeBetweenEvictionRunsMillis) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setUrl(String url) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setUseEquals(boolean useEquals) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setUseLock(boolean useLock) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setUsername(String username) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setValidationInterval(long validationInterval) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setValidationQuery(String validationQuery) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

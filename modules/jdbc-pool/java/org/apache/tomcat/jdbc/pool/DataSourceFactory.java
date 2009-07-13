@@ -210,8 +210,8 @@ public class DataSourceFactory implements ObjectFactory {
         return createDataSource(properties);
     }
     
-    public static PoolProperties parsePoolProperties(Properties properties) throws IOException{
-        PoolProperties poolProperties = new PoolProperties();
+    public static PoolConfiguration parsePoolProperties(Properties properties) throws IOException{
+        PoolConfiguration poolProperties = new PoolProperties();
         String value = null;
 
         value = properties.getProperty(PROP_DEFAULTAUTOCOMMIT);
@@ -442,7 +442,7 @@ public class DataSourceFactory implements ObjectFactory {
      * @throws Exception if an error occurs creating the data source
      */
     public static DataSource createDataSource(Properties properties) throws Exception {
-        PoolProperties poolProperties = DataSourceFactory.parsePoolProperties(properties);
+        PoolConfiguration poolProperties = DataSourceFactory.parsePoolProperties(properties);
         org.apache.tomcat.jdbc.pool.DataSource dataSource = new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
         
         //initialize the pool itself
@@ -466,11 +466,7 @@ public class DataSourceFactory implements ObjectFactory {
      * @throws Exception
      */
     static protected Properties getProperties(String propText) throws IOException {
-        Properties p = new Properties();
-        if (propText != null) {
-            p.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));
-        }
-        return p;
+        return PoolProperties.getProperties(propText,null);
     }
 
     protected static class DataSourceHandler implements InvocationHandler {
