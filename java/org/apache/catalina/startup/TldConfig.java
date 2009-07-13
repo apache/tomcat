@@ -80,8 +80,6 @@ public final class TldConfig  implements LifecycleListener {
      */
     private static Digester[] tldDigesters = new Digester[4];
 
-    private static final TldRuleSet tldRuleSet = new TldRuleSet();
-    
     /*
      * Initializes the set of JARs that are known not to contain any TLDs
      */
@@ -145,25 +143,25 @@ public final class TldConfig  implements LifecycleListener {
         if (!namespaceAware && !validation) {
             if (tldDigesters[0] == null) {
                 tldDigesters[0] = DigesterFactory.newDigester(validation,
-                        namespaceAware, tldRuleSet);
+                        namespaceAware, new TldRuleSet());
             }
             digester = tldDigesters[0];
         } else if (!namespaceAware && validation) {
             if (tldDigesters[1] == null) {
                 tldDigesters[1] = DigesterFactory.newDigester(validation,
-                        namespaceAware, tldRuleSet);
+                        namespaceAware, new TldRuleSet());
             }
             digester = tldDigesters[1];
         } else if (namespaceAware && !validation) {
             if (tldDigesters[2] == null) {
                 tldDigesters[2] = DigesterFactory.newDigester(validation,
-                        namespaceAware, tldRuleSet);
+                        namespaceAware, new TldRuleSet());
             }
             digester = tldDigesters[2];
         } else {
             if (tldDigesters[3] == null) {
                 tldDigesters[3] = DigesterFactory.newDigester(validation,
-                        namespaceAware, tldRuleSet);
+                        namespaceAware, new TldRuleSet());
             }
             digester = tldDigesters[3];
         }
@@ -199,9 +197,30 @@ public final class TldConfig  implements LifecycleListener {
 
     private boolean rescan=true;
 
+    /**
+     * Set of URIs discovered for the associated context. Used to enforce the
+     * correct processing priority. Only the TLD associated with the first
+     * instance of any URI will be processed.
+     */
+    private Set<String> taglibUris = new HashSet<String>();
+    
     private ArrayList<String> listeners = new ArrayList<String>();
 
     // --------------------------------------------------------- Public Methods
+
+    /**
+     * Adds a taglib URI to the list of known URIs.
+     */
+    public void addTaglibUri(String uri) {
+        taglibUris.add(uri);
+    }
+
+    /**
+     * Determines if the provided URI is a known taglib URI.
+     */
+    public boolean isKnownTaglibUri(String uri) {
+        return taglibUris.contains(uri);
+    }
 
     /**
      * Sets the list of JARs that are known not to contain any TLDs.
