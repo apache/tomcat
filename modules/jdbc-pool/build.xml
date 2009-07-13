@@ -86,6 +86,7 @@
   </target>
 
   <target name="javadoc" depends="prepare">
+  
      <xslt basedir="${tomcat.pool}/doc"
           destdir="${basedir}/java/org/apache/tomcat/jdbc/pool"
           extension=".html"
@@ -395,6 +396,7 @@
   <target name="test" depends="build,build-test">
     <echo/>
     <echo>Creating test table for test purposes.</echo>
+ 
     <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
       <classpath refid="tomcat.jdbc.classpath"/>
@@ -405,7 +407,7 @@
         </fileset>
       </batchtest>
     </junit>
-
+ 
     <echo/>
     <echo>Performance and fairness tests.</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
@@ -445,5 +447,26 @@
   <target name="simplebuild" depends="build">
   </target>
 
+  <target name="onetest" depends="build,build-test">
+    
+    <echo>Testing:${test}</echo>
+    <junit printsummary="yes">
+      <syspropertyset refid="testdb"/>
+      <formatter type="plain"/>
+      <classpath refid="tomcat.jdbc.classpath"/>
+      <classpath refid="test.classpath"/>
+      <batchtest fork="yes" todir="${tomcat.testclasses}">
+        <fileset dir="${basedir}/test">
+          <include name="org/apache/tomcat/jdbc/test/*${test}*.java"/>
+          <exclude name="**/CreateTestTable*"/>
+          <exclude name="**/DefaultTestCase*"/>
+          <exclude name="**/CheckOutThread*"/>
+          <exclude name="**/Fairness*"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+  </target>
+    
 </project>
 
