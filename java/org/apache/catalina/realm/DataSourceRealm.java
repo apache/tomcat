@@ -32,7 +32,7 @@ import javax.sql.DataSource;
 import org.apache.naming.ContextBindings;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.core.StandardServer;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
 *

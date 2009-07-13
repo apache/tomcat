@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 /**
  * This utility class associates a <code>Subject</code> to the current 
  * <code>AccessControlContext</code>. When a <code>SecurityManager</code> is

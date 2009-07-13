@@ -32,7 +32,7 @@ import java.security.Principal;
 import java.util.LinkedList;
 
 import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
