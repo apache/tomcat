@@ -676,7 +676,6 @@
        Since interceptors can have properties, you need to be able to read the values of these properties within your 
        interceptor. Taking an example like the one above, you can override the <code>setProperties</code> method.
        <source>
-       @Override
        public void setProperties(Map&lt;String, InterceptorProperty&gt; properties) {
            super.setProperties(properties);
            final String myprop = &quot;myprop&quot;;
