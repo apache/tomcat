@@ -46,7 +46,7 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.InstanceSupport;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Standard implementation of <code>RequestDispatcher</code> that allows a

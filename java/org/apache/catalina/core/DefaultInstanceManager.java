@@ -48,7 +48,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Globals;
 import org.apache.catalina.core.Constants;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.InstanceManager;
 
 /**

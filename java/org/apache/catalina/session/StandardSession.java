@@ -54,7 +54,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.SessionEvent;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.util.Enumerator;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.realm.GenericPrincipal;

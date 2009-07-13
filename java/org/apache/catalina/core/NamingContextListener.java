@@ -54,7 +54,7 @@ import org.apache.catalina.deploy.ContextResourceLink;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.ContextTransaction;
 import org.apache.catalina.deploy.NamingResources;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.naming.ContextAccessController;

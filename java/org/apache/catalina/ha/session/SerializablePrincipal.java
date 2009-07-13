@@ -31,7 +31,7 @@ import java.util.List;
 
 import org.apache.catalina.Realm;
 import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

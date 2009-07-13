@@ -54,7 +54,7 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.buf.CharChunk;

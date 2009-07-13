@@ -22,6 +22,8 @@ package org.apache.catalina.util;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.tomcat.util.res.StringManager;
+
 
 /**
  * Extended implementation of <strong>HashSet</strong> that includes a

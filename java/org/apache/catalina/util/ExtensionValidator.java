@@ -35,6 +35,7 @@ import javax.naming.directory.DirContext;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.naming.resources.Resource;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

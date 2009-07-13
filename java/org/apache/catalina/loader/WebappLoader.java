@@ -56,7 +56,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
 import org.apache.naming.resources.Resource;

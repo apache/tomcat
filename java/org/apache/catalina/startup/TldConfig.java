@@ -48,7 +48,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.InputSource;
 
