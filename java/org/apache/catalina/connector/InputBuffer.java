@@ -25,7 +25,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;

@@ -37,7 +37,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.Enumerator;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.log.SystemLogHandler;
 

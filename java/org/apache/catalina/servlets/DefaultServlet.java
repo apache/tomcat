@@ -60,7 +60,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.ProxyDirContext;

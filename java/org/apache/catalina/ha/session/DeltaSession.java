@@ -44,7 +44,7 @@ import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.catalina.tribes.tipis.ReplicatedMapEntry;
 import org.apache.catalina.util.Enumerator;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.ManagerBase;
 import java.util.concurrent.atomic.AtomicInteger;

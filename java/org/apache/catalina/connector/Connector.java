@@ -34,7 +34,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.util.LifecycleSupport;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.juli.logging.Log;

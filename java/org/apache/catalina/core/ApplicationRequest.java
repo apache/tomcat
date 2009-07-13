@@ -27,7 +27,7 @@ import javax.servlet.ServletRequestWrapper;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.util.Enumerator;
-import org.apache.catalina.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**

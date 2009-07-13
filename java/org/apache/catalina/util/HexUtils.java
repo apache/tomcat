@@ -20,6 +20,8 @@ package org.apache.catalina.util;
 
 import java.io.ByteArrayOutputStream;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Library of utility methods useful in dealing with converting byte arrays
  * to and from strings of hexadecimal digits.
