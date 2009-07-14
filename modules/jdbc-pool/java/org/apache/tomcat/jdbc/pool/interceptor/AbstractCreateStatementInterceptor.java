@@ -23,6 +23,9 @@ import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
+ * Abstraction interceptor. This component intercepts all calls to create some type of SQL statement.
+ * By extending this class, one can intercept queries and update statements by overriding the {@link #createStatement(Object, Method, Object[], Object, long)}
+ * method.
  * @author Filip Hanik
  * @version 1.0
  */
@@ -34,6 +37,9 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
         super();
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (compare(CLOSE_VAL,method)) {
@@ -54,18 +60,30 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
     }
     
     /**
-     * This method should return a wrapper object around a
+     * This method will be invoked after a successful statement creation. This method can choose to return a wrapper
+     * around the statement or return the statement itself.
+     * If this method returns a wrapper then it should return a wrapper object that implements one of the following interfaces.
      * {@link java.sql.Statement}, {@link java.sql.PreparedStatement} or {@link java.sql.CallableStatement}
-     * @param proxy
-     * @param method
-     * @param args
-     * @param statement
+     * @param proxy the actual proxy object
+     * @param method the method that was called. It will be one of the methods defined in {@link #statements}
+     * @param args the arguments to the method
+     * @param statement the statement that the underlying connection created
      * @return a {@link java.sql.Statement} object
      */
     public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time);
     
+    /**
+     * Method invoked when the operation {@link java.sql.Connection#close()} is invoked. 
+     */
     public abstract void closeInvoked();
 
+    /**
+     * Returns true if the method that is being invoked matches one of the method names passed in
+     * @param names list of method names that we want to intercept
+     * @param method the method being invoked on the proxy
+     * @param process boolean result used for recursion
+     * @return returns true if the method name matched
+     */
     protected boolean process(String[] names, Method method, boolean process) {
         final String name = method.getName();
         for (int i=0; (!process) && i<names.length; i++) {
@@ -74,7 +92,11 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
         return process;
     }
     
+    /**
+     * no-op for this interceptor. no state is stored.
+     */
+    @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
-
+        
     }
 }

@@ -30,7 +30,11 @@ import java.sql.Statement;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
-
+/**
+ * Abstract class that wraps statements and intercepts query executions.
+ * @author fhanik
+ *
+ */
 public abstract class AbstractQueryReport extends AbstractCreateStatementInterceptor {
     //logger
     protected static Log log = LogFactory.getLog(AbstractQueryReport.class);
@@ -67,12 +71,12 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
 
     /**
      * Invoked when a query execution, a call to execute/executeQuery or executeBatch failed.
-     * @param query
-     * @param args
-     * @param name
-     * @param start
-     * @param t
-     * @return - the SQL that was executed or the string &quot;batch&quot; 
+     * @param query the query that was executed and failed
+     * @param args the arguments to the execution
+     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#executes}
+     * @param start the time the query execution started
+     * @param t the exception that happened
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
      */
     protected String reportFailedQuery(String query, Object[] args, final String name, long start, Throwable t) {
         //extract the query string
@@ -85,13 +89,13 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     }
 
     /**
-     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded but was below the threshold
-     * @param query
-     * @param args
-     * @param name
-     * @param start
-     * @param delta
-     * @return - the SQL that was executed or the string &quot;batch&quot; 
+     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded and was within the timing threshold
+     * @param query the query that was executed and failed
+     * @param args the arguments to the execution
+     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#executes}
+     * @param start the time the query execution started
+     * @param delta the time the execution took
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
      */
     protected String reportQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
@@ -104,13 +108,13 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     }
 
     /**
-     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded but was above the query time threshold
-     * @param query
-     * @param args
-     * @param name
-     * @param start
-     * @param delta
-     * @return - the SQL that was executed or the string &quot;batch&quot; 
+     * Invoked when a query execution, a call to execute/executeQuery or executeBatch succeeded and was exceeded the timing threshold
+     * @param query the query that was executed and failed
+     * @param args the arguments to the execution
+     * @param name the name of the method used to execute {@link AbstractCreateStatementInterceptor#executes}
+     * @param start the time the query execution started
+     * @param delta the time the execution took
+     * @return - the SQL that was executed or the string &quot;batch&quot; if it was a batch execution 
      */
     protected String reportSlowQuery(String query, Object[] args, final String name, long start, long delta) {
         //extract the query string
