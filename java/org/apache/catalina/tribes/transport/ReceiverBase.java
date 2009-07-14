@@ -21,12 +21,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.Collection;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -34,6 +30,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ListenCallback;
+import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.juli.logging.Log;
 
 /**
@@ -94,10 +91,8 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public void start() throws IOException {
         if ( executor == null ) {
             //executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
-            TaskQueue taskqueue = new TaskQueue();
             TaskThreadFactory tf = new TaskThreadFactory("Tribes-Task-Receiver-");
-            executor = new ThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
-            taskqueue.setParent((ThreadPoolExecutor)executor);
+            executor = ExecutorFactory.newThreadPool(minThreads, maxThreads, maxIdleTime, TimeUnit.MILLISECONDS, tf);
         }
     }
 
@@ -547,46 +542,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setUdpTxBufSize(int udpTxBufSize) {
         this.udpTxBufSize = udpTxBufSize;
-    }
-
- // ---------------------------------------------- TaskQueue Inner Class
-    class TaskQueue extends LinkedBlockingQueue<Runnable> {
-        ThreadPoolExecutor parent = null;
-
-        public TaskQueue() {
-            super();
-        }
-
-        public TaskQueue(int initialCapacity) {
-            super(initialCapacity);
-        }
-
-        public TaskQueue(Collection<? extends Runnable> c) {
-            super(c);
-        }
-
-        public void setParent(ThreadPoolExecutor tp) {
-            parent = tp;
-        }
-        
-        public boolean force(Runnable o) {
-            if ( parent.isShutdown() ) throw new RejectedExecutionException("Executor not running, can't force a command into the queue");
-            return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
-        }
-
-        public boolean offer(Runnable o) {
-            //we can't do any checks
-            if (parent==null) return super.offer(o);
-            //we are maxed out on threads, simply queue the object
-            if (parent.getPoolSize() == parent.getMaximumPoolSize()) return super.offer(o);
-            //we have idle threads, just add it to the queue
-            //this is an approximation, so it could use some tuning
-            if (parent.getActiveCount()<(parent.getPoolSize())) return super.offer(o);
-            //if we have less threads than maximum force creation of a new thread
-            if (parent.getPoolSize()<parent.getMaximumPoolSize()) return false;
-            //if we reached here, we need to add it to the queue
-            return super.offer(o);
-        }
     }
 
     // ---------------------------------------------- ThreadFactory Inner Class
