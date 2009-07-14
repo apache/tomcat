@@ -94,12 +94,16 @@ public class WebappFilterMapper implements Filter {
     public void addMapping(String filterName, 
                            String url, 
                            String servletName, 
-                           String type[]) {
+                           String type[], boolean isMatchAfter) {
         FilterMap map = new FilterMap();
         map.setURLPattern(url);
         map.setFilterName(filterName);
         map.setServletName(servletName);
-        filterMaps.add(map);
+        if (isMatchAfter) {
+            filterMaps.add(map);
+        } else {
+            filterMaps.add(0, map);
+        }
     }
 
     /**
