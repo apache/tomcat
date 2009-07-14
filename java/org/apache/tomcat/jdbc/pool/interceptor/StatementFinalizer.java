@@ -26,7 +26,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 /**
- * Keeps track of statements associated with a connection and invokes close upon connection.close()
+ * Keeps track of statements associated with a connection and invokes close upon {@link java.sql.Connection#close()}
+ * Useful for applications that dont close the associated statements after being done with a connection.
  * @author fhanik
  *
  */
@@ -39,7 +40,8 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     public Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time) {
         // TODO Auto-generated method stub
         try {
-            statements.add(new WeakReference<Statement>((Statement)statement));
+            if (statement instanceof Statement)
+                statements.add(new WeakReference<Statement>((Statement)statement));
         }catch (ClassCastException x) {
             //ignore this one
         }

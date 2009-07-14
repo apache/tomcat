@@ -28,7 +28,14 @@ import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 /**
- * Interceptor that keep track of connection state to avoid roundtrips to the database
+ * Interceptor that keep track of connection state to avoid roundtrips to the database.
+ * The {@link org.apache.tomcat.jdbc.pool.ConnectionPool} is optimized to do as little work as possible.
+ * The pool itself doesn't remember settings like {@link java.sql.Connection#setAutoCommit(boolean)}, 
+ * {@link java.sql.Connection#setReadOnly(boolean)}, {@link java.sql.Connection#setCatalog(String)} or
+ * {@link java.sql.Connection#setTransactionIsolation(int)}. It relies on the application to remember how and when 
+ * these settings have been applied.
+ * In the cases where the application code doesn't know or want to keep track of the state, this interceptor helps cache the 
+ * state, and it also avoids roundtrips to the database asking for it.
  * @author fhanik
  *
  */
