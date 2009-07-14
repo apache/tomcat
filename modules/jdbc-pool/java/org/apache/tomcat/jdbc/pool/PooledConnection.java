@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a pooled connection
- * and holds a reference to the java.sql.Connection object
+ * and holds a reference to the {@link java.sql.Connection} object
  * @author Filip Hanik
  * @version 1.0
  */
@@ -69,7 +69,7 @@ public class PooledConnection {
     /**
      * The underlying database connection
      */
-    private java.sql.Connection connection;
+    private volatile java.sql.Connection connection;
     /**
      * When we track abandon traces, this string holds the thread dump
      */
@@ -108,16 +108,30 @@ public class PooledConnection {
      * so that we don't create a new list of interceptors each time we borrow
      * the connection
      */
-    private WeakReference<JdbcInterceptor> handler = null;
+    private volatile JdbcInterceptor handler = null;
     
     private AtomicBoolean released = new AtomicBoolean(false);
     
+    /**
+     * Constructor
+     * @param prop - pool properties
+     * @param parent - the parent connection pool
+     */
     public PooledConnection(PoolConfiguration prop, ConnectionPool parent) {
         instanceCount = counter.addAndGet(1);
         poolProperties = prop;
         this.parent = parent;
     }
 
+    /**
+     * Connects the underlying connection to the database.
+     * @throws SQLException if the method {@link #release()} has been called.
+     * @throws SQLException if driver instantiation fails
+     * @throws SQLException if a call to {@link java.sql.Driver#connect(String, java.util.Properties)} fails.
+     * @throws SQLException if default properties are configured and a call to 
+     * {@link java.sql.Connection#setAutoCommit(boolean)}, {@link java.sql.Connection#setCatalog(String)}, 
+     * {@link java.sql.Connection#setTransactionIsolation(int)} or {@link java.sql.Connection#setReadOnly(boolean)} fails.  
+     */
     public void connect() throws SQLException {
         if (released.get()) throw new SQLException("A connection once released, can't be reestablished.");
         if (connection != null) {
@@ -185,11 +199,20 @@ public class PooledConnection {
         return connection!=null;
     }
 
+    /**
+     * Issues a call to {@link #disconnect(boolean)} with the argument false followed by a call to 
+     * {@link #connect()}
+     * @throws SQLException if the call to {@link #connect()} fails.
+     */
     public void reconnect() throws SQLException {
         this.disconnect(false);
         this.connect();
     } //reconnect
 
+    /**
+     * Disconnects the connection. All exceptions are logged using debug level.
+     * @param finalize if set to true, a call to {@link ConnectionPool#finalize(PooledConnection)} is called.
+     */
     private void disconnect(boolean finalize) {
         if (isDiscarded()) {
             return;
@@ -226,6 +249,12 @@ public class PooledConnection {
         } //end if
     }
 
+    /**
+     * Returns true if the connection pool is configured 
+     * to do validation for a certain action.
+     * @param action
+     * @return
+     */
     private boolean doValidate(int action) {
         if (action == PooledConnection.VALIDATE_BORROW &&
             poolProperties.isTestOnBorrow())
@@ -254,6 +283,18 @@ public class PooledConnection {
         return validate(validateAction,null);
     }
 
+    /**
+     * Validates a connection. 
+     * @param validateAction the action used. One of {@link #VALIDATE_BORROW}, {@link #VALIDATE_IDLE}, 
+     * {@link #VALIDATE_INIT} or {@link #VALIDATE_RETURN}
+     * @param sql the SQL to be used during validation. If the {@link PoolConfiguration#setInitSQL(String)} has been called with a non null 
+     * value and the action is {@link #VALIDATE_INIT} the init SQL will be used for validation.
+     *  
+     * @return true if the connection was validated successfully. It returns true even if validation was not performed, such as when 
+     * {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive value. 
+     * @return false if the validation failed. The caller should close the connection if false is returned since a session could have been left in 
+     * an unknown state during initialization.
+     */
     public boolean validate(int validateAction,String sql) {
         if (this.isDiscarded()) {
             return false;
@@ -279,8 +320,9 @@ public class PooledConnection {
             this.poolProperties.getValidationInterval()) {
             return true;
         }
+        Statement stmt = null;
         try {
-            Statement stmt = connection.createStatement();
+            stmt = connection.createStatement();
             boolean exec = stmt.execute(query);
             stmt.close();
             this.lastValidated = now;
@@ -288,6 +330,8 @@ public class PooledConnection {
         } catch (Exception ignore) {
             if (log.isDebugEnabled())
                 log.debug("Unable to validate object:",ignore);
+            if (stmt!=null)
+                try { stmt.close();} catch (Exception ignore2){}
         }
         return false;
     } //validate
@@ -295,6 +339,7 @@ public class PooledConnection {
     /**
      * The time limit for how long the object
      * can remain unused before it is released
+     * @return {@link PoolConfiguration#getMinEvictableIdleTimeMillis()}
      */
     public long getReleaseTime() {
         return this.poolProperties.getMinEvictableIdleTimeMillis();
@@ -302,6 +347,11 @@ public class PooledConnection {
 
     /**
      * This method is called if (Now - timeCheckedIn > getReleaseTime())
+     * This method disconnects the connection, logs an error in debug mode if it happens
+     * then sets the {@link #released} flag to false. Any attempts to connect this cached object again
+     * will fail per {@link #connect()}
+     * The connection pool uses the atomic return value to decrement the pool size counter.
+     * @return true if this is the first time this method has been called. false if this method has been called before.
      */
     public boolean release() {
         try {
@@ -318,51 +368,97 @@ public class PooledConnection {
     /**
      * The pool will set the stack trace when it is check out and
      * checked in
+     * @param trace the stack trace for this connection
      */
 
     public void setStackTrace(String trace) {
         abandonTrace = trace;
     }
 
+    /**
+     * Returns the stack trace from when this connection was borrowed. Can return null if no stack trace was set.
+     * @return the stack trace or null of no trace was set
+     */
     public String getStackTrace() {
         return abandonTrace;
     }
 
+    /**
+     * Sets a timestamp on this connection. A timestamp usually means that some operation
+     * performed successfully.
+     * @param timestamp the timestamp as defined by {@link System#currentTimeMillis()}
+     */
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
+    /**
+     * An interceptor can call this method with the value true, and the connection will be closed when it is returned to the pool.
+     * @param discarded - only valid value is true
+     * @throws IllegalStateException if this method is called with the value false and the value true has already been set.
+     */
     public void setDiscarded(boolean discarded) {
         if (this.discarded && !discarded) throw new IllegalStateException("Unable to change the state once the connection has been discarded");
         this.discarded = discarded;
     }
 
+    /**
+     * Set the timestamp the connection was last validated.
+     * This flag is used to keep track when we are using a {@link PoolConfiguration#setValidationInterval(long) validation-interval}.
+     * @param lastValidated a timestamp as defined by {@link System#currentTimeMillis()} 
+     */
     public void setLastValidated(long lastValidated) {
         this.lastValidated = lastValidated;
     }
 
+    /**
+     * Sets the pool configuration for this connection and connection pool.
+     * Object is shared with the {@link ConnectionPool}
+     * @param poolProperties
+     */
     public void setPoolProperties(PoolConfiguration poolProperties) {
         this.poolProperties = poolProperties;
     }
 
+    /**
+     * Return the timestamps of last pool action. Timestamps are typically set when connections 
+     * are borrowed from the pool. It is used to keep track of {@link PoolConfiguration#setRemoveAbandonedTimeout(int) abandon-timeouts}.
+     * This timestamp can also be reset by the {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer#invoke(Object, java.lang.reflect.Method, Object[])}   
+     * @return the timestamp of the last pool action as defined by {@link System#currentTimeMillis()}
+     */
     public long getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Returns the discarded flag.
+     * @return the discarded flag. If the value is true, 
+     * either {@link #disconnect(boolean)} has been called or it will be called when the connection is returned to the pool.
+     */
     public boolean isDiscarded() {
         return discarded;
     }
 
+    /**
+     * Returns the timestamp of the last successful validation query execution. 
+     * @return the timestamp of the last successful validation query execution as defined by {@link System#currentTimeMillis()}
+     */
     public long getLastValidated() {
         return lastValidated;
     }
 
+    /**
+     * Returns the configuration for this connection and pool
+     * @return the configuration for this connection and pool
+     */
     public PoolConfiguration getPoolProperties() {
         return poolProperties;
     }
 
     /**
-     * Locks the connection only if the sweeper thread is enabled
+     * Locks the connection only if either {@link PoolConfiguration#isPoolSweeperEnabled()} or 
+     * {@link PoolConfiguration#getUseLock()} return true. The per connection lock ensures thread safety is
+     * multiple threads are performing operations on the connection. 
      * Otherwise this is a noop for performance
      */
     public void lock() {
@@ -386,13 +482,18 @@ public class PooledConnection {
     /**
      * Returns the underlying connection
      * @return the underlying JDBC connection as it was returned from the JDBC driver
+     * @see javax.sql.PooledConnection#getConnection()
      */
     public java.sql.Connection getConnection() {
         return this.connection;
     }
     
     
-
+    /**
+     * Returns the timestamp of when the connection was last connected to the database.
+     * ie, a successful call to {@link java.sql.Driver#connect(String, java.util.Properties)}.
+     * @return the timestamp when this connection was created as defined by {@link System#currentTimeMillis()}
+     */
     public long getLastConnected() {
         return lastConnected;
     }
@@ -402,27 +503,28 @@ public class PooledConnection {
      * @return the first interceptor for this connection
      */
     public JdbcInterceptor getHandler() {
-        return (handler!=null)?handler.get():null;
+        return handler;
     }
 
     public void setHandler(JdbcInterceptor handler) {
-        if (handler==null) {
-            if (this.handler!=null) this.handler.clear();
-        } else if (this.handler==null) {
-            this.handler = new WeakReference<JdbcInterceptor>(handler);
-        } else if (this.handler.get()==null) {
-            this.handler.clear();
-            this.handler = new WeakReference<JdbcInterceptor>(handler);
-        } else if (this.handler.get()!=handler) {
-            this.handler.clear();
-            this.handler = new WeakReference<JdbcInterceptor>(handler);
-        }
+        if (this.handler!=null && this.handler!=handler) {
+            JdbcInterceptor interceptor = this.handler;
+            while (interceptor!=null) {
+                interceptor.reset(null, null);
+                interceptor = interceptor.getNext();
+            }//while 
+        }//end if
+        this.handler = handler;
     }
     
     public String toString() {
         return "PooledConnection["+(connection!=null?connection.toString():"null")+"]";
     }
     
+    /**
+     * Returns true if this connection has been released and wont be reused.
+     * @return true if the method {@link #release()} has been called
+     */
     public boolean isReleased() {
         return released.get();
     }

@@ -20,6 +20,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 /**
+ * A ProxyConnection object is the bottom most interceptor that wraps an object of type 
+ * {@link PooledConnection}. The ProxyConnection intercepts three methods:
+ * <ul>
+ *   <li>{@link java.sql.Connection#close()} - returns the connection to the pool. May be called multiple times.</li>
+ *   <li>{@link java.lang.Object#toString()} - returns a custom string for this object</li>
+ *   <li>{@link javax.sql.PooledConnection#getConnection()} - returns the underlying connection</li>
+ * </ul>
+ * By default method comparisons is done on a String reference level, unless the {@link PoolConfiguration#setUseEquals(boolean)} has been called
+ * with a <code>true</code> argument.
  * @author Filip Hanik
  */
 public class ProxyConnection extends JdbcInterceptor {

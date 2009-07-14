@@ -499,6 +499,7 @@ public class ConnectionPool {
             if (con.release()) {
                 //counter only decremented once
                 size.addAndGet(-1);
+                con.setHandler(null);
             }
         } finally {
             con.unlock();
