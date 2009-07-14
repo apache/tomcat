@@ -21,9 +21,6 @@
 #  $Id$
 # -----------------------------------------------------------------------------
 
-# First clear out the user classpath
-CLASSPATH=
-
 # Make sure prerequisite environment variables are set
 if [ -z "$JAVA_HOME" -a -z "$JRE_HOME" ]; then
   # Bugzilla 37284 (reviewed).
@@ -99,13 +96,6 @@ fi
 if [ -z "$JAVA_ENDORSED_DIRS" ]; then
   # Set the default -Djava.endorsed.dirs argument
   JAVA_ENDORSED_DIRS="$BASEDIR"/endorsed
-fi
-
-# Set standard CLASSPATH
-if [ "$1" = "debug" ] ; then
-  if [ -f "$JAVA_HOME"/lib/tools.jar ]; then
-    CLASSPATH="$JAVA_HOME"/lib/tools.jar
-  fi
 fi
 
 # OSX hack to CLASSPATH
