@@ -18,9 +18,13 @@
 
 package org.apache.juli;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.logging.ErrorManager;
 import java.util.logging.Filter;
@@ -209,6 +213,16 @@ public class FileHandler
         if (suffix == null)
             suffix = getProperty(className + ".suffix", ".log");
 
+        // Get encoding for the logging file
+        String encoding = getProperty(className + ".encoding", null);
+        if (encoding != null && encoding.length() > 0) {
+            try {
+                setEncoding(encoding);
+            } catch (UnsupportedEncodingException ex) {
+                // Ignore
+            }
+        }
+
         // Get logging level for the handler
         setLevel(Level.parse(getProperty(className + ".level", "" + Level.ALL)));
 
@@ -268,7 +282,12 @@ public class FileHandler
         try {
             String pathname = dir.getAbsolutePath() + File.separator +
                 prefix + date + suffix;
-            writer = new PrintWriter(new FileWriter(pathname, true), true);
+            String encoding = getEncoding();
+            OutputStream os = new BufferedOutputStream(new FileOutputStream(
+                    pathname, true));
+            writer = new PrintWriter(
+                    (encoding != null) ? new OutputStreamWriter(os, encoding)
+                            : new OutputStreamWriter(os), true);
             writer.write(getFormatter().getHead(this));
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
