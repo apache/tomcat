@@ -27,8 +27,6 @@ import java.net.MulticastSocket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.tribes.Channel;
@@ -37,6 +35,7 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.util.ExecutorFactory;
 
 /**
  * A <b>membership</b> implementation using simple multicast.
@@ -145,7 +144,7 @@ public class McastServiceImpl
     /**
      * Dont interrupt the sender/receiver thread, but pass off to an executor
      */
-    protected ExecutorService executor = new ThreadPoolExecutor(0, 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+    protected ExecutorService executor = ExecutorFactory.newThreadPool(0, 2, 2, TimeUnit.SECONDS);
     
     /**
      * disable/enable local loopback message
