@@ -5,7 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-trunk"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="var" path="TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/tomcat-dbcp.jar" sourcepath="/TOMCAT_LIBS_BASE/tomcat6-deps/dbcp/src/java"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_14"/>
 	<classpathentry kind="lib" path="includes/mysql-connector-java-5.1.7/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="lib" path="includes/db-derby-10.5.1.1-bin/lib/derby.jar"/>
 	<classpathentry kind="lib" path="includes/h2/bin/h2-1.1.115.jar"/>
