@@ -10,12 +10,12 @@ import java.util.HashMap;
 
 import javax.servlet.ServletException;
 
-import org.apache.tomcat.lite.ServletContextConfig;
-import org.apache.tomcat.lite.ServletContextConfig.EnvEntryData;
-import org.apache.tomcat.lite.ServletContextConfig.FilterData;
-import org.apache.tomcat.lite.ServletContextConfig.FilterMappingData;
-import org.apache.tomcat.lite.ServletContextConfig.SecurityConstraintData;
-import org.apache.tomcat.lite.ServletContextConfig.ServletData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.EnvEntryData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.FilterData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.FilterMappingData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.SecurityConstraintData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.ServletData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.WebResourceCollectionData;
 import org.apache.tomcat.util.DomUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -252,7 +252,9 @@ public class WebXml {
                 scn = DomUtil.getNext(scn);
             }
             cn = DomUtil.getNext(cn);
+            sd.webResourceCollection.add(wrd);
         }
+        
         d.securityConstraint.add(sd);
     }
 
