@@ -59,6 +59,9 @@ public class SelectorContext implements Context {
     public static final String IC_PREFIX = "IC_";
 
 
+    private static org.apache.juli.logging.Log log =
+        org.apache.juli.logging.LogFactory.getLog(SelectorContext.class);
+
     // ----------------------------------------------------------- Constructors
 
 
@@ -119,6 +122,12 @@ public class SelectorContext implements Context {
      */
     public Object lookup(Name name)
         throws NamingException {
+        
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingName", "lookup",
+                    name));
+        }
+
         // Strip the URL header
         // Find the appropriate NamingContext according to the current bindings
         // Execute the lookup on that context
@@ -135,6 +144,12 @@ public class SelectorContext implements Context {
      */
     public Object lookup(String name)
         throws NamingException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingString", "lookup",
+                    name));
+        }
+
         // Strip the URL header
         // Find the appropriate NamingContext according to the current bindings
         // Execute the lookup on that context
@@ -293,6 +308,12 @@ public class SelectorContext implements Context {
      */
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
+        
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingName", "list",
+                    name));
+        }
+
         return getBoundContext().list(parseName(name));
     }
 
@@ -308,6 +329,12 @@ public class SelectorContext implements Context {
      */
     public NamingEnumeration<NameClassPair> list(String name)
         throws NamingException {
+        
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingString", "list",
+                    name));
+        }
+
         return getBoundContext().list(parseName(name));
     }
 
@@ -327,6 +354,12 @@ public class SelectorContext implements Context {
      */
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingName",
+                    "listBindings", name));
+        }
+
         return getBoundContext().listBindings(parseName(name));
     }
 
@@ -342,6 +375,12 @@ public class SelectorContext implements Context {
      */
     public NamingEnumeration<Binding> listBindings(String name)
         throws NamingException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingString",
+                    "listBindings", name));
+        }
+
         return getBoundContext().listBindings(parseName(name));
     }
 
@@ -439,6 +478,12 @@ public class SelectorContext implements Context {
      */
     public Object lookupLink(Name name)
         throws NamingException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingName",
+                    "lookupLink", name));
+        }
+
         return getBoundContext().lookupLink(parseName(name));
     }
 
@@ -454,6 +499,12 @@ public class SelectorContext implements Context {
      */
     public Object lookupLink(String name)
         throws NamingException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("selectorContext.methodUsingString",
+                    "lookupLink", name));
+        }
+
         return getBoundContext().lookupLink(parseName(name));
     }
 
