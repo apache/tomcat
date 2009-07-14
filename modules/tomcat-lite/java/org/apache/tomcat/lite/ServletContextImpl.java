@@ -37,9 +37,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
 import javax.servlet.RequestDispatcher;
@@ -58,9 +60,10 @@ import javax.servlet.FilterRegistration.Dynamic;
 
 import org.apache.tomcat.addons.UserSessionManager;
 import org.apache.tomcat.integration.ObjectManager;
-import org.apache.tomcat.lite.ServletContextConfig.FilterData;
-import org.apache.tomcat.lite.ServletContextConfig.FilterMappingData;
-import org.apache.tomcat.lite.ServletContextConfig.ServletData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.FilterData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.FilterMappingData;
+import org.apache.tomcat.lite.webxml.ServletContextConfig.ServletData;
 import org.apache.tomcat.servlets.util.Enumerator;
 import org.apache.tomcat.servlets.util.RequestUtil;
 import org.apache.tomcat.servlets.util.UrlUtils;
@@ -144,6 +147,11 @@ public class ServletContextImpl implements ServletContext {
 
     private String hostname;
 
+
+    boolean initDone = false;
+
+    boolean startDone = false;
+    
     // ------------------------------------------------- ServletContext Methods
     public ServletContextImpl() {
     }
@@ -836,13 +844,6 @@ public class ServletContextImpl implements ServletContext {
         }
     }
     
-    public void addFilter(String filterName, String filterClass, 
-                          Map params) {
-        FilterConfigImpl fc = new FilterConfigImpl(this);
-        fc.setData(filterName, filterClass, params);
-        filters.put(filterName, fc);
-    }
-    
     public void initFilters() throws ServletException {
         Iterator fI = getFilters().values().iterator();
         while (fI.hasNext()) {
@@ -856,6 +857,7 @@ public class ServletContextImpl implements ServletContext {
             
         }
     }
+    
     public void initServlets() throws ServletException {
         Iterator fI = getServletConfigs().values().iterator();
         Map/*<Integer, List<ServletConfigImpl>>*/ onStartup = 
@@ -914,6 +916,8 @@ public class ServletContextImpl implements ServletContext {
     public void addMapping(String path, ServletConfig wrapper) {
         getMapper().addWrapper(getMapper().contextMapElement, path, wrapper);
     }
+    
+    
     
     public void setWelcomeFiles(String[] name) {
       getMapper().contextMapElement.welcomeResources = name;
@@ -1010,12 +1014,13 @@ public class ServletContextImpl implements ServletContext {
       sc.setConfig(params);
       addServletConfig(sc);
     }
-    
+
+    @Override
     public javax.servlet.Registration.Dynamic addServlet(String servletName, Servlet servlet) {
       ServletConfigImpl sc = new ServletConfigImpl(this, servletName, null);
       sc.setServlet(servlet);
       addServletConfig(sc);
-      return null;
+      return sc.getDynamic();
     }
     
     public void addServletSec(String serlvetName, String runAs, Map roles) {
@@ -1027,7 +1032,7 @@ public class ServletContextImpl implements ServletContext {
     public void addFilterMapping(String path, String filterName, 
                                  String[] dispatcher) {
       getFilterMapper().addMapping(filterName, 
-          path, null, dispatcher);
+          path, null, dispatcher, true);
       
     }
 
@@ -1036,10 +1041,8 @@ public class ServletContextImpl implements ServletContext {
                                         String[] dispatcher) {
       getFilterMapper().addMapping(filterName, 
           null, servlet, 
-          dispatcher);      
+          dispatcher, true);      
     }
-    
-    boolean initDone = false;
     
     /**
      * Called from TomcatLite.init(), required before start.
@@ -1167,6 +1170,9 @@ public class ServletContextImpl implements ServletContext {
 
 
     public void start() throws ServletException {
+        if (startDone) {
+            return;
+        }
         String base = getBasePath();
         
         ArrayList urls = getClasspath(new File(base + "/WEB-INF/lib"),
@@ -1205,6 +1211,7 @@ public class ServletContextImpl implements ServletContext {
                 event = new ServletContextEvent(this);
             }
             try {
+                // May add servlets/filters
                 listener.contextInitialized(event);
             } catch (Throwable t) {
                 log.log(Level.WARNING, "Context.init() contextInitialized() error:", t);
@@ -1214,6 +1221,8 @@ public class ServletContextImpl implements ServletContext {
         
         initFilters();
         initServlets();
+        
+        startDone = true;
     }
 
     public UserSessionManager getManager() {
@@ -1392,57 +1401,151 @@ public class ServletContextImpl implements ServletContext {
    public void setSessionTrackingModes(EnumSet<SessionTrackingMode> sessionTrackingModes) {
    }
 
+   public void addFilter(String filterName, String filterClass, 
+                         Map params) {
+       FilterConfigImpl fc = new FilterConfigImpl(this);
+       fc.setData(filterName, filterClass, params);
+       filters.put(filterName, fc);
+   }
+   
    @Override
    public Dynamic addFilter(String filterName, String className) {
-       return null;
+       FilterConfigImpl fc = new FilterConfigImpl(this);
+       fc.setData(filterName, className, new HashMap());
+       filters.put(filterName, fc);
+       return fc.getDynamic();
    }
 
    @Override
    public Dynamic addFilter(String filterName, Filter filter) {
-       return null;
+       FilterConfigImpl fc = new FilterConfigImpl(this);
+       fc.setData(filterName, null, new HashMap());
+       fc.setFilter(filter);
+       filters.put(filterName, fc);
+       return fc.getDynamic();
    }
 
    @Override
    public Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
-       return null;
+       FilterConfigImpl fc = new FilterConfigImpl(this);
+       fc.setData(filterName, null, new HashMap());
+       fc.setFilterClass(filterClass);
+       filters.put(filterName, fc);
+       return fc.getDynamic();
    }
 
    @Override
    public javax.servlet.Registration.Dynamic addServlet(String servletName,
                                                         String className) {
-       return null;
+       ServletConfigImpl sc = new ServletConfigImpl(this, servletName, className);
+       addServletConfig(sc);
+       return sc.getDynamic();
    }
 
    @Override
-   public javax.servlet.Registration.Dynamic addServlet(
-                                                        String servletName,
+   public javax.servlet.Registration.Dynamic addServlet(String servletName,
                                                         Class<? extends Servlet> servletClass) {
-       return null;
+       ServletConfigImpl sc = new ServletConfigImpl(this, servletName, servletClass.getName());
+       sc.setServletClass(servletClass);
+       addServletConfig(sc);
+       return sc.getDynamic();
    }
 
+   // That's tricky - this filter will have no name. We need to generate one 
+   // because our code relies on names.
+   AtomicInteger autoName = new AtomicInteger();
+   
    @Override
    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
-       return null;
+       FilterConfigImpl fc = new FilterConfigImpl(this);
+       String filterName = "_tomcat_auto_filter_" + autoName.incrementAndGet();
+       fc.setData(filterName, null, new HashMap());
+       fc.setFilterClass(c);
+       filters.put(filterName, fc);
+
+       try {
+           return (T) fc.createFilter();
+       } catch (ClassCastException e) {
+           throw new ServletException(e);
+       } catch (ClassNotFoundException e) {
+           throw new ServletException(e);
+       } catch (IllegalAccessException e) {
+           throw new ServletException(e);
+       } catch (InstantiationException e) {
+           throw new ServletException(e);
+       }
    }
 
    @Override
    public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
-       return null;
+       String filterName = "_tomcat_auto_servlet_" + autoName.incrementAndGet();
+       ServletConfigImpl fc = new ServletConfigImpl(this, filterName, null);
+       fc.setServletClass(c);
+       servlets.put(filterName, fc);
+
+       try {
+           return (T) fc.newInstance();
+       } catch (ClassCastException e) {
+           throw new ServletException(e);
+       }
    }
 
    @Override
    public FilterRegistration findFilterRegistration(String filterName) {
-       return null;
+       return filters.get(filterName);
    }
 
    @Override
    public ServletRegistration findServletRegistration(String servletName) {
-       return null;
+       return servlets.get(servletName);
    }
-
+   
    @Override
    public boolean setInitParameter(String name, String value) {
-       return false;
+       HashMap<String, String> params = contextConfig.contextParam;
+       return setInitParameter(this, params, name, value);
+   }
+   
+   static Set<String> setInitParameters(ServletContextImpl ctx, 
+           Map<String, String> params,
+           Map<String, String> initParameters)
+           throws IllegalArgumentException, IllegalStateException {
+       if (ctx.startDone) {
+           throw new IllegalStateException();
+       }
+       Set<String> result = new HashSet<String>();
+       for (String name: initParameters.keySet()) {
+           String value = initParameters.get(name);
+           if (name == null || value == null) {
+               throw new IllegalArgumentException();
+           }
+           if (!setInitParameter(ctx, params, name, value)) {
+               result.add(name);
+           }
+       }
+       return result;
+   }   
+
+   /**
+    * true if the context initialization parameter with the given name and value was set successfully on this ServletContext, and false if it was not set because this ServletContext already contains a context initialization parameter with a matching name
+    * Throws:
+    * java.lang.IllegalStateException - if this ServletContext has already been initialized
+    */
+   static boolean setInitParameter(ServletContextImpl ctx, Map<String, String> params, 
+                                   String name, String value) {
+       if (name == null || value == null) {
+           throw new IllegalArgumentException();
+       }
+       if (ctx.startDone) {
+           throw new IllegalStateException();
+       }
+       String oldValue = params.get(name);
+       if (oldValue != null) {
+           return false;
+       } else {
+           params.put(name, value);
+           return true;
+       }
    }
 }
 

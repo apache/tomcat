@@ -1,14 +1,15 @@
 /**
  * 
  */
-package org.apache.tomcat.lite;
+package org.apache.tomcat.lite.webxml;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * All the data in web.xml should be represented here.
+ * All the data in web.xml, annotations, etc should be represented 
+ * here. This class is serializable.
  * 
  * Public fields to make it easy to access it. 
  * Naming should match the web.xml element name.
@@ -84,11 +85,16 @@ public class ServletContextConfig  implements Serializable {
         public String filterName;
     }
     
+    // Normalized
     public static class FilterMappingData implements Serializable {
         private static final long serialVersionUID = -4533568066713041994L;
         public String filterName;
+        
+        // Only one of the 2
         public String urlPattern;
         public String servletName;
+        
+        // REQUEST, FORWARD, INCLUDE, ERROR, ASYNC
         public ArrayList<String> dispatcher = new ArrayList<String>();
     }
     
@@ -119,12 +125,19 @@ public class ServletContextConfig  implements Serializable {
         
     }
     
+    public static class WebResourceCollectionData implements Serializable {
+        public String webResourceName;
+        public ArrayList urlPattern = new ArrayList();
+        public ArrayList httpMethod = new ArrayList();
+    }    
+    
     public static class SecurityConstraintData  implements Serializable {
         private static final long serialVersionUID = -4780214921810871769L;
 
         public ArrayList<String> roleName = new ArrayList<String>(); //   auth-constraint/role
 
-        public ArrayList<String> webResourceCollection = new ArrayList<String>();
+        public ArrayList<WebResourceCollectionData> webResourceCollection = 
+            new ArrayList<WebResourceCollectionData>();
         public String transportGuarantee;
         
     }    
