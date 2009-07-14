@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.SingleThreadModel;
 import javax.servlet.UnavailableException;
 
@@ -48,7 +50,12 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class ServletConfigImpl implements ServletConfig {
+@SuppressWarnings("deprecation")
+public class ServletConfigImpl implements ServletConfig, ServletRegistration {
+    
+    ServletDynamicRegistration dynamic = new ServletDynamicRegistration();
+    
+    protected boolean asyncSupported;
     
     private static Logger log=
         Logger.getLogger(ServletConfigImpl.class.getName());
@@ -60,10 +67,10 @@ public class ServletConfigImpl implements ServletConfig {
     //    public static final String SINGLE_THREADED_PROXY =
     //             "org.apache.tomcat.servlets.jsp.SingleThreadedProxyServlet";
 
-
+    protected String description;
     protected Map<String, String> initParams = new HashMap<String, String>();
     protected String servletName;
-    protected String servletClass;
+    protected String servletClassName;
     protected String jspFile;
     protected int loadOnStartup = -1;
     protected String runAs;
@@ -89,7 +96,7 @@ public class ServletConfigImpl implements ServletConfig {
      */
     private transient boolean unloading = false;
 
-    private Class classClass = null;
+    private Class servletClass = null;
 
     // Support for SingleThreaded
     /**
@@ -113,7 +120,7 @@ public class ServletConfigImpl implements ServletConfig {
     public ServletConfigImpl(ServletContextImpl ctx, String name, 
                              String classname) {
         this.servletName = name;
-        this.servletClass = classname;
+        this.servletClassName = classname;
         this.ctx = ctx;
         ctx.facade.notifyAdd(this);
     }
@@ -183,7 +190,7 @@ public class ServletConfigImpl implements ServletConfig {
      * Return the fully qualified servlet class name for this servlet.
      */
     public String getServletClass() {
-        return servletClass;
+        return servletClassName;
     }
 
     /**
@@ -368,9 +375,12 @@ public class ServletConfigImpl implements ServletConfig {
         }
     }
 
-    private Servlet newInstance() throws ServletException {
-        String actualClass = servletClass;
+    public Servlet newInstance() throws ServletException {
+        String actualClass = servletClassName;
 
+        if (instance != null) {
+            return instance;
+        }
         if (actualClass == null) {
             // No explicit name. Try to use the framework
             if (jspFile != null) {
@@ -378,8 +388,8 @@ public class ServletConfigImpl implements ServletConfig {
                 // Named JSPs can be handled by a servlet or by the mapper.
                 Servlet res = (Servlet) ctx.getObjectManager().get("filetemplate-servlet");
                 if (res != null) {
-                    classClass = res.getClass();
-                    actualClass = classClass.getName();
+                    servletClass = res.getClass();
+                    actualClass = servletClass.getName();
                     initParams.put("jsp-file", jspFile);
                     return res;
                 } else {
@@ -396,8 +406,8 @@ public class ServletConfigImpl implements ServletConfig {
                 Servlet res = (Servlet) ctx.getObjectManager().get( servletName +
                         "-servlet");
                 if (res != null) {
-                    classClass = res.getClass();
-                    actualClass = classClass.getName();
+                    servletClass = res.getClass();
+                    actualClass = servletClass.getName();
                     return res;
                 }
             }
@@ -407,7 +417,7 @@ public class ServletConfigImpl implements ServletConfig {
         }
             
         
-        if (classClass == null) {
+        if (servletClass == null) {
             // set classClass
             loadClass(actualClass);
         }
@@ -424,14 +434,14 @@ public class ServletConfigImpl implements ServletConfig {
         
         // the jsp proxy is replaced by the web.xml processor
         
-        if (classClass == null) {
+        if (servletClass == null) {
             unavailable(null);
             throw new UnavailableException("ClassNotFound: " + actualClass);
         }
         
         // Instantiate and initialize an instance of the servlet class itself
         try {
-            return (Servlet) classClass.newInstance();
+            return (Servlet) servletClass.newInstance();
         } catch (ClassCastException e) {
             unavailable(null);
             throw new UnavailableException("ClassCast: (Servlet)" + 
@@ -509,9 +519,9 @@ public class ServletConfigImpl implements ServletConfig {
         
         // Load the specified servlet class from the appropriate class loader
         try {
-            classClass = classLoader.loadClass(actualClass);
+            servletClass = classLoader.loadClass(actualClass);
         } catch (ClassNotFoundException e) {
-            classClass = null;
+            servletClass = null;
         }
     }
 
@@ -526,7 +536,7 @@ public class ServletConfigImpl implements ServletConfig {
         }
         sb.append("Servlet[");
         sb.append(getServletName()).append(" ");
-        sb.append(servletClass);
+        sb.append(servletClassName);
         if (jspFile != null) {
             sb.append(" jsp=").append(jspFile);
         }
@@ -652,9 +662,7 @@ public class ServletConfigImpl implements ServletConfig {
      * @param name Name of the initialization parameter to retrieve
      */
     public String getInitParameter(String name) {
-
-        return (String)initParams.get(name);
-
+        return initParams.get(name);
     }
 
 
@@ -663,11 +671,9 @@ public class ServletConfigImpl implements ServletConfig {
      * servlet.  If none are defined, an empty Enumeration is returned.
      */
     public Enumeration getInitParameterNames() {
-
         synchronized (initParams) {
             return (new Enumerator(initParams.keySet()));
         }
-
     }
 
 
@@ -805,5 +811,63 @@ public class ServletConfigImpl implements ServletConfig {
       this.loadOnStartup = loadOnStartup;
     }
 
+    @Override
+    public Set<String> addMapping(String... urlPatterns) {
+        if (ctx.startDone) {
+            // Use the context method instead of the servlet API to 
+            // add mappings after context init.
+            throw new IllegalStateException();
+        }
+        Set<String> failed = new HashSet<String>();
+        for (String url: urlPatterns) {
+            if (url == null) {
+                throw new IllegalArgumentException();
+            }
+            if (ctx.contextConfig.servletMapping.get(url) != null) {
+                failed.add(url);
+            } else {
+                ctx.contextConfig.servletMapping.put(url, getServletName());
+                ctx.addMapping(url, this);
+            }
+        }
+        return failed;
+    }
 
+    @Override
+    public boolean setInitParameter(String name, String value)
+            throws IllegalArgumentException, IllegalStateException {
+        return ServletContextImpl.setInitParameter(ctx, initParams, 
+                name, value);
+    }
+
+    @Override
+    public Set<String> setInitParameters(Map<String, String> initParameters)
+            throws IllegalArgumentException, IllegalStateException {
+        return ServletContextImpl.setInitParameters(ctx, initParams, 
+                initParameters);
+    }
+
+    public Dynamic getDynamic() {
+        return dynamic;
+    }
+    
+    class ServletDynamicRegistration implements Dynamic {
+
+        @Override
+        public void setAsyncSupported(boolean isAsyncSupported)
+                throws IllegalStateException {
+            asyncSupported = isAsyncSupported;
+        }
+
+        @Override
+        public void setDescription(String description)
+                throws IllegalStateException {
+            ServletConfigImpl.this.description = description;
+        }
+        
+    }
+
+    public void setServletClass(Class<? extends Servlet> servletClass2) {
+        servletClass = servletClass2;
+    }
 }
