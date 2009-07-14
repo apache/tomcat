@@ -63,7 +63,6 @@ public class CreateTestTable extends DefaultTestCase {
     public void testPopulateData() throws Exception {
         init();
         datasource.setJdbcInterceptors(ResetAbandonedTimer.class.getName());
-        System.out.println("FILIP Using URL:"+this.datasource.getUrl());
         String insert = "insert into test values (?,?,?,?,?)";
         this.init();
         this.datasource.setRemoveAbandoned(false);

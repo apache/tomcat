@@ -98,9 +98,10 @@
     </xslt>
     <move tofile="${basedir}/java/org/apache/tomcat/jdbc/pool/package.html"
           file="${basedir}/java/org/apache/tomcat/jdbc/pool/jdbc-pool.html"/>
-    <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false">
+    <javadoc sourcepath="${basedir}/java" destdir="${tomcat.api}" verbose="false"
+             link="http://java.sun.com/javase/6/docs/api/">
       <classpath refid="tomcat.jdbc.classpath"/>
-    </javadoc>  
+    </javadoc>
     <!-- connection pool API  file-->
     <jar jarfile="${tomcat-jdbc-api.jar}" update="true">
       <fileset dir="${tomcat.api}"/>

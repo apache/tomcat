@@ -24,30 +24,37 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 
 /**
  * Abstract class that is to be extended for implementations of interceptors.
+ * Everytime an operation is called on the {@link java.sql.Connection} object the 
+ * {@link #invoke(Object, Method, Object[])} method on the interceptor will be called.
+ * Interceptors are useful to change or improve behavior of the connection pool.<br/>
+ * Interceptors can receive a set of properties. Each sub class is responsible for parsing the properties during runtime when they 
+ * are needed or simply override the {@link #setProperties(Map)} method. 
+ * Properties arrive in a key-value pair of Strings as they were received through the configuration.
+ * This method is called once per cached connection object when the object is first configured.
  * 
  * @author Filip Hanik
  * @version 1.0
  */
 public abstract class JdbcInterceptor implements InvocationHandler {
     /**
-     * java.sql.Connection.close()
+     * {@link java.sql.Connection#close()} method name
      */
     public static final String CLOSE_VAL = "close";
     /**
-     * java.sql.Connection.toString()
+     * {@link Object#toString()} method name
      */
     public static final String TOSTRING_VAL = "toString";
     /**
-     * java.sql.Connection.isClosed()
+     * {@link java.sql.Connection#isClosed()} method name
      */
     public static final String ISCLOSED_VAL = "isClosed";
     /**
-     * javax.sql.DataSource.getConnection()
+     * {@link javax.sql.PooledConnection#getConnection()} method name
      */
     public static final String GETCONNECTION_VAL = "getConnection";
     
     /**
-     * Properties for this interceptor
+     * Properties for this interceptor.
      */
     protected Map<String,InterceptorProperty> properties = null; 
     
@@ -67,9 +74,10 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     }
 
     /**
-     * Gets invoked each time an operation on java.sql.Connection is invoked.
+     * Gets invoked each time an operation on {@link java.sql.Connection} is invoked.
      * {@inheritDoc}
      */
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (getNext()!=null) return getNext().invoke(this,method,args);
         else throw new NullPointerException();
@@ -121,13 +129,15 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * Gets called each time the connection is borrowed from the pool
      * This means that if an interceptor holds a reference to the connection
      * the interceptor can be reused for another connection.
+     * <br/>
+     * This method may be called with null as both arguments when we are closing down the connection.
      * @param parent - the connection pool owning the connection
      * @param con - the pooled connection
      */
     public abstract void reset(ConnectionPool parent, PooledConnection con);
     
     /**
-     * 
+     * Returns the properties configured for this interceptor
      * @return the configured properties for this interceptor
      */
     public Map<String,InterceptorProperty> getProperties() {
@@ -137,6 +147,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     /**
      * Called during the creation of an interceptor
      * The properties can be set during the configuration of an interceptor
+     * Override this method to perform type casts between string values and object properties
      * @param properties
      */
     public void setProperties(Map<String,InterceptorProperty> properties) {
