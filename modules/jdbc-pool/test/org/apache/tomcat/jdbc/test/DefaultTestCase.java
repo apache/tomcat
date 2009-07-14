@@ -19,16 +19,12 @@ package org.apache.tomcat.jdbc.test;
 import java.lang.reflect.Method;
 import java.util.Properties;
 
-import javax.sql.DataSource;
+import junit.framework.TestCase;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory;
-
-import junit.framework.TestCase;
-
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
-import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 
 //import com.mchange.v2.c3p0.ComboPooledDataSource;
 //import com.mchange.v2.log.MLevel;
