@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="includes/mysql-connector-java-5.1.7/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry kind="lib" path="includes/db-derby-10.5.1.1-bin/lib/derby.jar"/>
 	<classpathentry kind="lib" path="includes/h2/bin/h2-1.1.115.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
