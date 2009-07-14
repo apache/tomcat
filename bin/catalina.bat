@@ -88,6 +88,10 @@ echo This environment variable is needed to run this program
 goto end
 :okHome
 
+rem Ensure that any user defined CLASSPATH variables are not used on startup,
+rem but allow them to be specified in setenv.bat, in rare case when it is needed.
+set CLASSPATH=
+
 rem Get standard environment variables
 if "%CATALINA_BASE%" == "" goto gotSetenvHome
 if exist "%CATALINA_BASE%\bin\setenv.bat" call "%CATALINA_BASE%\bin\setenv.bat"
@@ -107,6 +111,8 @@ call "%CATALINA_HOME%\bin\setclasspath.bat" %1
 if errorlevel 1 goto end
 
 rem Add on extra jar file to CLASSPATH
+rem Note that there are no quotes as we do not want to introduce random
+rem quotes into the CLASSPATH
 if "%CLASSPATH%" == "" goto emptyClasspath
 set CLASSPATH=%CLASSPATH%;
 :emptyClasspath

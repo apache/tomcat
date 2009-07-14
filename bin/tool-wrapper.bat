@@ -45,6 +45,10 @@ echo This environment variable is needed to run this program
 goto end
 :okHome
 
+rem Ensure that any user defined CLASSPATH variables are not used on startup,
+rem but allow them to be specified in setenv.bat, in rare case when it is needed.
+set CLASSPATH=
+
 rem Get standard environment variables
 if exist "%CATALINA_HOME%\bin\setenv.bat" call "%CATALINA_HOME%\bin\setenv.bat"
 
@@ -58,11 +62,13 @@ set BASEDIR=%CATALINA_HOME%
 call "%CATALINA_HOME%\bin\setclasspath.bat"
 
 rem Add on extra jar files to CLASSPATH
+rem Note that there are no quotes as we do not want to introduce random
+rem quotes into the CLASSPATH
 if "%CLASSPATH%" == "" goto noclasspath
-set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar;"%BASEDIR%"\lib\servlet-api.jar
-goto :okclasspath
+set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\bootstrap.jar;%BASEDIR%\lib\servlet-api.jar
+goto okclasspath
 :noclasspath
-set CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;"%BASEDIR%"\lib\servlet-api.jar
+set CLASSPATH=%CATALINA_HOME%\bin\bootstrap.jar;%BASEDIR%\lib\servlet-api.jar
 :okclasspath
 
 rem Get remaining unshifted command line arguments and save them in the

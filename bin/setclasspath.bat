@@ -67,14 +67,6 @@ rem Set the default -Djava.endorsed.dirs argument
 set JAVA_ENDORSED_DIRS=%BASEDIR%\endorsed
 :gotEndorseddir
 
-rem Set standard CLASSPATH
-rem Note that there are no quotes as we do not want to introduce random
-rem quotes into the CLASSPATH
-if not exist "%JAVA_HOME%\lib\tools.jar" goto noJavac
-if not ""%1"" == ""debug"" goto noJavac
-set CLASSPATH=%JAVA_HOME%\lib\tools.jar
-:noJavac
-
 rem Set standard command for invoking Java.
 rem Note that NT requires a window name argument when using start.
 rem Also note the quoting as JAVA_HOME may contain spaces.
