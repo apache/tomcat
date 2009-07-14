@@ -19,13 +19,19 @@ package org.apache.tomcat.lite;
 
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.FilterRegistration.Dynamic;
 
 import org.apache.tomcat.servlets.util.Enumerator;
 
@@ -41,29 +47,37 @@ import org.apache.tomcat.servlets.util.Enumerator;
  * 
  * @see ServletConfigImpl
  */
-public final class FilterConfigImpl implements FilterConfig {
+public final class FilterConfigImpl implements FilterConfig, FilterRegistration {
 
+    DynamicFilterRegistration dynamic = new DynamicFilterRegistration();
+    
     public FilterConfigImpl(ServletContextImpl context) {
-        this.context = context;
+        this.ctx = context;
     }
     
-    private ServletContextImpl context = null;
+    boolean asyncSupported;
+    
+    private ServletContextImpl ctx = null;
 
     /**
      * The application Filter we are configured for.
      */
     private transient Filter filter = null;
-
+    
+    String descryption;
+    
     private String filterName;
 
-    private String filterClass;
+    private String filterClassName;
 
-    private Map<String, String> initParams;
+    Map<String, String> initParams;
+
+    private Class<? extends Filter> filterClass;
 
     public void setData(String filterName, String filterClass,
                         Map<String, String> params) {
         this.filterName = filterName;
-        this.filterClass = filterClass;
+        this.filterClassName = filterClass;
         this.initParams = params;
     }
     
@@ -74,6 +88,11 @@ public final class FilterConfigImpl implements FilterConfig {
     public String getFilterName() {
         return filterName;
     }
+
+    public void setFilterClass(Class<? extends Filter> filterClass2) {
+        this.filterClass = filterClass2;
+    }
+    
 
     public String getInitParameter(String name) {
         if (initParams == null) return null;
@@ -96,20 +115,20 @@ public final class FilterConfigImpl implements FilterConfig {
      * Return the ServletContext of our associated web application.
      */
     public ServletContext getServletContext() {
-        return context;
+        return ctx;
     }
 
     /**
      * Return the application Filter we are configured for.
      */
-    public Filter getFilter() throws ClassCastException, ClassNotFoundException,
+    public Filter createFilter() throws ClassCastException, ClassNotFoundException,
         IllegalAccessException, InstantiationException, ServletException {
 
         // Return the existing filter instance, if any
         if (filter != null)
             return filter;
 
-        ClassLoader classLoader = context.getClassLoader();
+        ClassLoader classLoader = ctx.getClassLoader();
 
         ClassLoader oldCtxClassLoader =
             Thread.currentThread().getContextClassLoader();
@@ -117,14 +136,23 @@ public final class FilterConfigImpl implements FilterConfig {
             Thread.currentThread().setContextClassLoader(classLoader);
         }
         try {
-            Class clazz = classLoader.loadClass(filterClass);
-            this.filter = (Filter) clazz.newInstance();
+            if (filterClass == null) {
+                filterClass = (Class<? extends Filter>) classLoader.loadClass(filterClassName);
+            }
+            this.filter = (Filter) filterClass.newInstance();
         } finally {        
             if (classLoader != oldCtxClassLoader) {
                 Thread.currentThread().setContextClassLoader(oldCtxClassLoader);
             }
         }
         
+        // TODO: resource injection
+        
+        return filter;
+    }
+    
+    public Filter getFilter() throws ClassCastException, ClassNotFoundException, IllegalAccessException, InstantiationException, ServletException {
+        Filter filter = createFilter();
         filter.init(this);
         return (this.filter);
     }
@@ -140,4 +168,105 @@ public final class FilterConfigImpl implements FilterConfig {
         }
         this.filter = null;
      }
+
+    @Override
+    public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes,
+                                          boolean isMatchAfter,
+                                          String... servletNames) {
+        if (ctx.startDone) {
+            // Use the context method instead of the servlet API to 
+            // add mappings after context init.
+            throw new IllegalStateException();
+        }
+        ArrayList<String> dispatchers = new ArrayList<String>();
+        for (DispatcherType dt: dispatcherTypes) {
+            dispatchers.add(dt.name());
+        }
+        for (String servletName: servletNames) {
+            ctx.getFilterMapper().addMapping(getFilterName(),
+                    null, servletName, (String[]) dispatchers.toArray(), isMatchAfter);
+        }
+    }
+
+    @Override
+    public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes,
+                                         boolean isMatchAfter,
+                                         String... urlPatterns) {
+        if (ctx.startDone) {
+            // Use the context method instead of the servlet API to 
+            // add mappings after context init.
+            throw new IllegalStateException();
+        }
+        ArrayList<String> dispatchers = new ArrayList<String>();
+        for (DispatcherType dt: dispatcherTypes) {
+            dispatchers.add(dt.name());
+        }
+        for (String url: urlPatterns) {
+            ctx.getFilterMapper().addMapping(getFilterName(),
+                    url, null, (String[]) dispatchers.toArray(), isMatchAfter);
+        }
+    }
+
+    @Override
+    public boolean setInitParameter(String name, String value)
+            throws IllegalArgumentException, IllegalStateException {
+        return ServletContextImpl.setInitParameter(ctx, initParams, 
+                name, value);
+    }
+
+    @Override
+    public Set<String> setInitParameters(Map<String, String> initParameters)
+    throws IllegalArgumentException, IllegalStateException {
+        return ServletContextImpl.setInitParameters(ctx, initParams, 
+                initParameters);
+    }
+    
+    public Dynamic getDynamic() {
+        return dynamic;
+    }
+    
+    public class DynamicFilterRegistration implements Dynamic {
+
+        @Override
+        public void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes,
+                                              boolean isMatchAfter,
+                                              String... servletNames) {
+            FilterConfigImpl.this.addMappingForServletNames(dispatcherTypes, isMatchAfter, servletNames);
+        }
+
+        @Override
+        public void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes,
+                                             boolean isMatchAfter,
+                                             String... urlPatterns) {
+            FilterConfigImpl.this.addMappingForUrlPatterns(dispatcherTypes, isMatchAfter, urlPatterns);
+        }
+
+        @Override
+        public boolean setInitParameter(String name, String value)
+                throws IllegalArgumentException, IllegalStateException {
+            return ServletContextImpl.setInitParameter(ctx, initParams, 
+                    name, value);
+        }
+
+        @Override
+        public Set<String> setInitParameters(Map<String, String> initParameters)
+                throws IllegalArgumentException, IllegalStateException {
+            return ServletContextImpl.setInitParameters(ctx, initParams, 
+                    initParameters);
+        }
+
+        @Override
+        public void setAsyncSupported(boolean isAsyncSupported)
+                throws IllegalStateException {
+            asyncSupported = isAsyncSupported;
+        }
+
+        @Override
+        public void setDescription(String description)
+                throws IllegalStateException {
+            FilterConfigImpl.this.descryption = description;
+        }
+    }
+
+    
 }
