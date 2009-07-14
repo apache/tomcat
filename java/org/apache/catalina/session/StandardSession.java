@@ -162,7 +162,7 @@ public class StandardSession
      * certain IllegalStateException tests.  NOTE:  This value is not
      * included in the serialized version of this object.
      */
-    protected transient boolean expiring = false;
+    protected transient volatile boolean expiring = false;
 
 
     /**
@@ -220,7 +220,7 @@ public class StandardSession
     /**
      * Flag indicating whether this session is valid or not.
      */
-    protected boolean isValid = false;
+    protected volatile boolean isValid = false;
 
     
     /**
@@ -683,15 +683,20 @@ public class StandardSession
      */
     public void expire(boolean notify) {
 
-        // Mark this session as "being expired" if needed
-        if (expiring)
+        // Check to see if expire is in progress or has previously been called
+        if (expiring || !isValid)
             return;
 
         synchronized (this) {
+            // Check again, now we are inside the sync so this code only runs once
+            // Double check locking - expiring and isValid need to be volatile
+            if (expiring || !isValid)
+                return;
 
             if (manager == null)
                 return;
 
+            // Mark this session as "being expired"
             expiring = true;
         
             // Notify interested application event listeners
