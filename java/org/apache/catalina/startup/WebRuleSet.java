@@ -171,6 +171,11 @@ public class WebRuleSet extends RuleSetBase {
                                "setLargeIcon", 0);
         digester.addCallMethod(prefix + "web-app/filter/small-icon",
                                "setSmallIcon", 0);
+        
+        //spec right now only has an annotation, not XML but we will add it
+        //TODO SERVLET3 - async 
+        digester.addCallMethod(prefix + "web-app/filter/asyncSupported",
+                "setAsyncSupported", 0);
 
         digester.addCallMethod(prefix + "web-app/filter/init-param",
                                "addInitParameter", 2);

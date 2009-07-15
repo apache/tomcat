@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.channels.IllegalSelectorException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -387,10 +388,29 @@ public class Request
      * Local address
      */
     protected String localName = null;
-
+    
+    /**
+     * asyncSupported
+     */
+    protected boolean asyncSupported = true;
+    
+    /**
+     * AsyncContext 
+     */
+    protected AsyncContextImpl asyncContext = null;
+    
+    /**
+     * async timeout
+     */
+    protected long asyncTimeout = 0;
 
     // --------------------------------------------------------- Public Methods
 
+    
+
+    public void setAsyncSupported(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
+    }
 
     /**
      * Release all object references, and initialize instance variables, in
@@ -464,6 +484,9 @@ public class Request
                 reader = null;
             }
         }
+        
+        asyncSupported = true;
+        if (asyncContext!=null) asyncContext.recycle();
 
     }
 
@@ -1436,51 +1459,69 @@ public class Request
      }
 
     public AsyncContext startAsync() {
-        // TODO SERVLET3
-        return null;
+        // TODO SERVLET3 - async
+        if (!isAsyncSupported()) throw new IllegalStateException("Not supported.");
+        if (asyncContext==null) asyncContext = new AsyncContextImpl();
+        else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
+        asyncContext.setServletRequest(getRequest());
+        asyncContext.setServletResponse(response.getResponse());
+        asyncContext.setStarted(true);
+        return asyncContext;
     }
 
-    public AsyncContext startAsync(ServletRequest request,
-            ServletResponse response) {
-        // TODO SERVLET3
-        return null;
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
+        startAsync();
+        asyncContext.setServletRequest(request);
+        asyncContext.setServletResponse(response);
+        asyncContext.setHasOriginalRequestAndResponse(request==getRequest() && response==getResponse());
+        return asyncContext;
     }
 
     public boolean isAsyncStarted() {
-        // TODO SERVLET3
-        return false;
+        if (asyncContext==null) return false;
+        else return asyncContext.isStarted();
     }
 
     public boolean isAsyncSupported() {
-        // TODO SERVLET3
-        return false;
+        // TODO SERVLET3 - async
+        return this.asyncSupported;
     }
 
     public AsyncContext getAsyncContext() {
-        // TODO SERVLET3
-        return null;
+        // TODO SERVLET3 - async
+        return this.asyncContext;
     }
 
     public void addAsyncListener(AsyncListener listener) {
-        // TODO SERVLET3
+        // TODO SERVLET3 - async
+        if (isAsyncSupported() && isAsyncStarted()) {
+            this.asyncContext.addAsyncListener(listener);
+        } else {
+            throw new IllegalStateException("Async [Supported:"+isAsyncSupported()+"; Started:"+isAsyncStarted()+"]");
+        }
     }
 
-    public void addAsyncListener(AsyncListener listener,
-            ServletRequest servletRequest, ServletResponse servletResponse) {
-        // TODO SERVLET3
+    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
+        // TODO SERVLET3 - async
+        if (isAsyncSupported() && isAsyncStarted()) {
+            this.asyncContext.addAsyncListener(listener,servletRequest,servletResponse);
+        } else {
+            throw new IllegalStateException("Async [Supported:"+isAsyncSupported()+"; Started:"+isAsyncStarted()+"]");
+        }
     }
 
     public void setAsyncTimeout(long timeout) {
-        // TODO SERVLET3
+        // TODO SERVLET3 - async
+        this.asyncTimeout = timeout;
     }
     
     public long getAsyncTimeout() {
-        // TODO SERVLET3
-        return 0;
+        // TODO SERVLET3 - async
+        return asyncTimeout;
     }
     
     public DispatcherType getDispatcherType() {
-        // TODO SERVLET3
+        // TODO SERVLET3 - dispatcher
         return null;
     }
 
@@ -2241,26 +2282,26 @@ public class Request
     }
     
     public boolean authenticate(HttpServletResponse response) throws IOException {
-        // TODO Servlet 3
+        // TODO Servlet 3 - authentication
         return false;
     }
     
     public void login(String username, String password)
     throws ServletException {
-        // TODO Servlet 3
+        // TODO Servlet 3 - authentication
     }
     
     public void logout() throws ServletException {
-        // TODO Servlet 3
+        // TODO Servlet 3 - authentication
     }
     
     public Iterable<Part> getParts() {
-        // TODO Servlet 3
+        // TODO Servlet 3 - authentication
         return null;
     }
     
     public Part getPart(String name) throws IllegalArgumentException {
-        // TODO Servlet 3.0
+        // TODO Servlet 3.0 - file upload
         return null;
     }
 

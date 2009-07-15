@@ -1106,6 +1106,12 @@ public class Http11Processor implements ActionHook {
             InternalInputBuffer internalBuffer = (InternalInputBuffer)
                 request.getInputBuffer();
             internalBuffer.addActiveFilter(savedBody);
+        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
+            //TODO SERVLET3 - async
+        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+          //TODO SERVLET3 - async
+        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+          //TODO SERVLET3 - async
         }
 
     }

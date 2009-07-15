@@ -1238,6 +1238,12 @@ public class Http11NioProcessor implements ActionHook {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
                 attach.setTimeout(timeout);
+        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
+            //TODO SERVLET3 - async
+        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+          //TODO SERVLET3 - async
+        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+          //TODO SERVLET3 - async
         }
     }
 
