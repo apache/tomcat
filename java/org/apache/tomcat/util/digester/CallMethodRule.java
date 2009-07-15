@@ -39,7 +39,7 @@ import org.xml.sax.Attributes;
  * </p>
  *
  * <p>This rule now uses
- * <a href="http://jakarta.apache.org/commons/beanutils/apidocs/org/apache/commons/beanutils/MethodUtils.html">
+ * <a href="http://commons.apache.org/beanutils/apidocs/org/apache/commons/beanutils/MethodUtils.html">
  * org.apache.commons.beanutils.MethodUtils#invokeMethod
  * </a> by default.
  * This increases the kinds of methods successfully and allows primitives

@@ -24,7 +24,6 @@ XML documents.
 <br><br>
 <a name="doc.Description"></a>
 <div align="center">
-<a href="#doc.Depend">[Dependencies]</a>
 <a href="#doc.Intro">[Introduction]</a>
 <a href="#doc.Properties">[Configuration Properties]</a>
 <a href="#doc.Stack">[The Object Stack]</a>
@@ -41,28 +40,6 @@ XML documents.
 <a href="#doc.FAQ">[FAQ]</a>
 <a href="#doc.Limits">[Known Limitations]</a>
 </div>
-
-<a name="doc.Depend"></a>
-<h3>External Dependencies</h3>
-
-<ul>
-  <li>An XML parser conforming to
-    <a href="http://java.sun.com/products/xml">JAXP
-    </a>, version 1.1 or later (the first one to support SAX 2.0)
-  </li>
-  <li>
-    <a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-beanutils">
-Beanutils Package (Jakarta Commons)</a>, version 1.5 or later
-  </li>
-  <li>
-    <a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-collections">
-Collections Package (Jakarta Commons)</a>, version 2.1 or later
-  </li>
-  <li>
-    <a href="http://jakarta.apache.org/builds/jakarta-commons/release/commons-logging">
-Commons Logging Package (Jakarta Commons)</a>, version 1.0.2 or later
-  </li>
-</ul>
 
 <a name="doc.Intro"></a>
 <h3>Introduction</h3>
@@ -473,15 +450,6 @@ class.  For example, the following code sequence:</p>
 copious amounts of debugging information. So, you need to know how logging
 works before you start using Digester seriously.</p>
 
-<p>Digester uses
-<a href="http://jakarta.apache.org/commons/logging.html">Jakarta Commons
-Logging</a>.  This component is not really a logging framework - rather
-an extensible, configurable bridge. It can be configured to swallow all log 
-messages, to provide very basic logging by itself or to pass logging messages
-on to more sophisticated logging frameworks. Commons-Logging comes with
-connectors for many popular logging frameworks. Consult the commons-logging
-documentation for more information.</p>
-
 <p>Two main logs are used by Digester:</p>
 <ul>
 <li>SAX-related messages are logged to
@@ -608,7 +576,7 @@ and configures the Digester to be used, and the <code>initMapping()</code>
 method for where the parsing actually takes place.</p>
 
 <p>(Struts binary and source distributions can be acquired at
-<a href="http://jakarta.apache.org/struts/">http://jakarta.apache.org/struts/</a>.)</p>
+<a href="http://struts.apache.org/">http://struts.apache.org/</a>.)</p>
 
 <p>The following discussion highlights a few of the matching patterns and
 processing rules that are configured, to illustrate the use of some of the
@@ -1266,8 +1234,8 @@ It works but we have no plans to add support for other versions of the format.
 <p>
 We would consider donations of standard digester applications but it's unlikely that
 these would ever be shipped with the base digester distribution.
-If you want to discuss this, please post to <a href='http://jakarta.apache.org/site/mail.html'>
-common-dev mailing list</a>
+If you want to discuss this, please post to <a href='http://commons.apache.org/mail-lists.html'>
+commons dev mailing list</a>
 </p>
 </li>
 </ul>
