@@ -1201,7 +1201,14 @@ public class Http11AprProcessor implements ActionHook {
             //no op
         } else if (actionCode == ActionCode.ACTION_COMET_SETTIMEOUT) {
             //no op
+        } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
+            //TODO SERVLET3 - async
+        } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
+          //TODO SERVLET3 - async
+        } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
+          //TODO SERVLET3 - async
         }
+        
 
     }
 

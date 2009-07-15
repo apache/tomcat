@@ -319,7 +319,10 @@ public class CoyoteAdapter
 
             }
 
-            if (!comet) {
+            if (request.isAsyncStarted()) {
+                //TODO SERVLET3 - async
+                res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+            } else if (!comet) {
                 response.finishResponse();
                 req.action(ActionCode.ACTION_POST_REQUEST , null);
             }
