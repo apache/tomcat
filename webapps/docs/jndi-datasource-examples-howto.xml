@@ -80,17 +80,16 @@ will support JDBC 3.0. Please let us know if you have used DBCP and its
 JDBC 3.0 features with a 1.4 JVM.
 </p>
 
-<p>See the <a href="http://jakarta.apache.org/commons/dbcp/configuration.html">
+<p>See the <a href="http://commons.apache.org/dbcp/configuration.html">
 DBCP documentation</a> for a complete list of configuration parameters.
 </p>
 
 <subsection name="Installation">
-<p>DBCP uses the Jakarta-Commons Database Connection Pool. It relies on
-number of Jakarta-Commons components:
+<p>DBCP uses the Commons Database Connection Pool. It relies on
+number of Commons components:
 <ul>
-<li>Jakarta-Commons DBCP</li>
-<li>Jakarta-Commons Collections</li>
-<li>Jakarta-Commons Pool</li>
+<li>Commons DBCP</li>
+<li>Commons Pool</li>
 </ul>
 These libraries are located in a single JAR at 
 <code>$CATALINA_HOME/lib/tomcat-dbcp.jar</code>. However,
