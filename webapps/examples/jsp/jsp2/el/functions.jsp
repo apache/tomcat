@@ -15,7 +15,7 @@
   limitations under the License.
 -->
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib prefix="my" uri="http://jakarta.apache.org/tomcat/jsp2-example-taglib"%>
+<%@ taglib prefix="my" uri="http://tomcat.apache.org/jsp2-example-taglib"%>
 
 <html>
   <head>
