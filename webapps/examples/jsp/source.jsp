@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<%@ taglib uri="http://jakarta.apache.org/tomcat/examples-taglib"
+<%@ taglib uri="http://tomcat.apache.org/examples-taglib"
         prefix="eg" %>
 
 <eg:ShowSource jspFile="<%= util.HTMLFilter.filter(request.getQueryString()) %>"/>

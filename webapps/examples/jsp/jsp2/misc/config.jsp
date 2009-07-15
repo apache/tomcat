@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<%@ taglib prefix="my" uri="http://jakarta.apache.org/tomcat/jsp2-example-taglib"%>
+<%@ taglib prefix="my" uri="http://tomcat.apache.org/jsp2-example-taglib"%>
     <h1>JSP 2.0 Examples - JSP Configuration</h1>
     <hr>
     <p>Using a &lt;jsp-property-group&gt; element in the web.xml 

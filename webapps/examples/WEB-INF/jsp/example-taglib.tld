@@ -24,7 +24,7 @@
   <tlib-version>1.0</tlib-version>
   <jsp-version>1.2</jsp-version>
   <short-name>simple</short-name>
-  <uri>http://jakarta.apache.org/tomcat/example-taglib</uri>
+  <uri>http://tomcat.apache.org/example-taglib</uri>
   <description>
 	A simple tab library for the examples
   </description>
