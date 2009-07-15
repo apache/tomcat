@@ -91,7 +91,7 @@ loaders as it is initialized:</p>
     <li><em>$CATALINA_HOME/bin/bootstrap.jar</em> - Contains the main() method
         that is used to initialize the Tomcat 6 server, and the class loader
         implementation classes it depends on.</li>
-    <li><em>$CATALINA_HOME/bin/tomcat-juli.jar</em> - Package renamed Jakarta commons 
+    <li><em>$CATALINA_HOME/bin/tomcat-juli.jar</em> - Package renamed Commons 
         logging API, and java.util.logging LogManager.</li>
     </ul></li>
 <li><strong>Common</strong> - This class loader contains additional classes
