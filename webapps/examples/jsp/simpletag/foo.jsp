@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <body>
-<%@ taglib uri="http://jakarta.apache.org/tomcat/examples-taglib" prefix="eg"%>
+<%@ taglib uri="http://tomcat.apache.org/examples-taglib" prefix="eg"%>
 
 Radio stations that rock:
 

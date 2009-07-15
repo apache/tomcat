@@ -25,7 +25,7 @@
   <tlib-version>1.0</tlib-version>
   <jsp-version>1.2</jsp-version>
   <short-name>debug</short-name>
-  <uri>http://jakarta.apache.org/tomcat/debug-taglib</uri>
+  <uri>http://tomcat.apache.org/debug-taglib</uri>
   <description>
     This tag library defines no tags.  Instead, its purpose is encapsulated
     in the TagLibraryValidator implementation that simply outputs the XML
