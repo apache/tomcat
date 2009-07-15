@@ -122,7 +122,7 @@ import org.apache.catalina.util.IOTools;
  * or an instance where the specification cited differs from Best
  * Community Practice (BCP).
  * Such instances should be well-documented here.  Please email the
- * <a href="mailto:tomcat-dev@jakarta.apache.org">Jakarta Tomcat group [tomcat-dev@jakarta.apache.org]</a>
+ * <a href="mailto:dev@tomcat.apache.org">Tomcat group [dev@tomcat.apache.org]</a>
  * with amendments.
  *
  * </p>
