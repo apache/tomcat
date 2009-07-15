@@ -101,10 +101,6 @@
     <p>Please note that you should use the GNU make (gmake) instead of
        the native BSD make on FreeBSD systems.</p>
 
-    <p>Download a commons-daemon binary from the Jakarta Commons download page, 
-       and place jsvc.tar.gz and commons-daemon.jar in the 
-       <code>$CATALINA_HOME/bin</code> folder.</p>
-
 <source>
     cd $CATALINA_HOME/bin
     tar xvfz jsvc.tar.gz

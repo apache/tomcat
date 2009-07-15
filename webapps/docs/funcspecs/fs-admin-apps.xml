@@ -180,7 +180,7 @@
     <li><a href="http://www.jcp.org/jsr/detail/152.jsp">JavaServer Pages 2.0</a>
         (supported natively by Tomcat 6)</li>
     <li><a href="http://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">JavaServer Pages Standard Tag Library 1.0 (Jakarta Taglibs-Standard 1.0.3)</a></li>
-    <li><a href="http://jakarta.apache.org/struts/">Struts Framework</a>
+    <li><a href="http://struts.apache.org/">Struts Framework</a>
         (Version 1.0) - MVC Framework for Web Applications</li>
     <li><strong>TO BE DETERMINED</strong> - Application for hosting SOAP
         based web services</li>
