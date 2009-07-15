@@ -134,6 +134,16 @@ public class FilterDef implements Serializable {
     public void setSmallIcon(String smallIcon) {
         this.smallIcon = smallIcon;
     }
+    
+    private boolean asyncSupported = false;
+    
+    public boolean isAsyncSupported() {
+        return asyncSupported;
+    }
+    
+    public void setAsyncSupported(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
+    }
 
 
     // --------------------------------------------------------- Public Methods
