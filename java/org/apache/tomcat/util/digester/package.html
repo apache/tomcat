@@ -462,21 +462,6 @@ works before you start using Digester seriously.</p>
     volume.</li>
 </ul>
 
-<p>Complete documentation of how to configure Commons-Logging can be found
-in the Commons Logging package documentation.  However, as a simple example,
-let's assume that you want to use the <code>SimpleLog</code> implementation
-that is included in Commons-Logging, and set up Digester to log events from
-the <code>Digester</code> logger at the DEBUG level, while you want to log
-events from the <code>Digester.log</code> logger at the INFO level.  You can
-accomplish this by creating a <code>commons-logging.properties</code> file
-in your classpath (or setting corresponding system properties on the command
-line that starts your application) with the following contents:</p>
-<pre>
-  org.apache.commons.logging.Log=org.apache.commons.logging.impl.SimpleLog
-  org.apache.commons.logging.simplelog.log.org.apache.commons.digester.Digester=debug
-  org.apache.commons.logging.simplelog.log.org.apache.commons.digester.Digester.sax=info
-</pre>
-
 <a name="doc.Usage"></a>
 <h3>Usage Examples</h3>
 
