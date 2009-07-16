@@ -114,6 +114,116 @@
 </section>
 
 
+<section name="Remote Address Filter">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Remote Address Filter</strong> allows you to compare the
+    IP address of the client that submitted this request against one or more
+    <em>regular expressions</em>, and either allow the request to continue
+    or refuse to process the request from this client. </p>
+
+    <p>The syntax for <em>regular expressions</em> is different than that for
+    'standard' wildcard matching. Tomcat uses the <code>java.util.regex</code>
+    package. Please consult the Java documentation for details of the
+    expressions supported.</p>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Remote Address Filter is
+    <strong><code>org.apache.catalina.filters.RemoteAddrFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The <strong>Remote Address Filter</strong> supports the following
+    initialisation parameters:</p>
+
+    <attributes>
+
+      <attribute name="allow" required="false">
+        <p>A comma-separated list of <em>regular expression</em> patterns
+        that the remote client's IP address is compared to.  If this attribute
+        is specified, the remote address MUST match for this request to be
+        accepted.  If this attribute is not specified, all requests will be
+        accepted UNLESS the remote address matches a <code>deny</code>
+        pattern.</p>
+      </attribute>
+
+      <attribute name="deny" required="false">
+        <p>A comma-separated list of <em>regular expression</em> patterns
+        that the remote client's IP address is compared to.  If this attribute
+        is specified, the remote address MUST NOT match for this request to be
+        accepted.  If this attribute is not specified, request acceptance is
+        governed solely by the <code>accept</code> attribute.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="Remote Host Filter">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Remote Host Filter</strong> allows you to compare the
+    hostname of the client that submitted this request against one or more
+    <em>regular expressions</em>, and either allow the request to continue
+    or refuse to process the request from this client. </p>
+
+    <p>The syntax for <em>regular expressions</em> is different than that for
+    'standard' wildcard matching. Tomcat uses the <code>java.util.regex</code>
+    package. Please consult the Java documentation for details of the
+    expressions supported.</p>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Remote Address Filter is
+    <strong><code>org.apache.catalina.filters.RemoteHostFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The <strong>Remote Host Filter</strong> supports the following
+    initialisation parameters:</p>
+
+    <attributes>
+
+      <attribute name="allow" required="false">
+        <p>A comma-separated list of <em>regular expression</em> patterns
+        that the remote client's hostname is compared to.  If this attribute
+        is specified, the remote hostname MUST match for this request to be
+        accepted.  If this attribute is not specified, all requests will be
+        accepted UNLESS the remote hostname matches a <code>deny</code>
+        pattern.</p>
+      </attribute>
+
+      <attribute name="deny" required="false">
+        <p>A comma-separated list of <em>regular expression</em> patterns
+        that the remote client's hostname is compared to.  If this attribute
+        is specified, the remote hostname MUST NOT match for this request to be
+        accepted.  If this attribute is not specified, request acceptance is
+        governed solely by the <code>accept</code> attribute.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 </body>
 
 
