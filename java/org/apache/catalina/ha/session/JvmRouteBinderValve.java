@@ -40,6 +40,7 @@ import org.apache.catalina.ha.session.DeltaSession;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.session.ManagerBase;
+import org.apache.catalina.session.PersistentManager;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.valves.ValveBase;
@@ -197,14 +198,18 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
             ServletException {
 
          if (getEnabled() 
-             && getCluster() != null
              && request.getContext() != null
              && request.getContext().getDistributable() ) {
              // valve cluster can access manager - other cluster handle turnover 
              // at host level - hopefully!
              Manager manager = request.getContext().getManager();
-             if (manager != null && manager instanceof ClusterManager
-                     && getCluster().getManager(((ClusterManager)manager).getName()) != null)
+
+             if (manager != null && (
+                     (manager instanceof ClusterManager
+                       && getCluster() != null
+                       && getCluster().getManager(((ClusterManager)manager).getName()) != null)
+                     ||
+                     (manager instanceof PersistentManager)))
                  handlePossibleTurnover(request, response);
         }
         // Pass this request on to the next valve in our pipeline
@@ -362,9 +367,13 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
         if (catalinaSession instanceof DeltaSession)
             ((DeltaSession) catalinaSession).resetDeltaRequest();
         changeRequestSessionID(request, response, sessionId, newSessionID);
-        // now sending the change to all other clusternode!
-        ClusterManager manager = (ClusterManager)catalinaSession.getManager();
-        sendSessionIDClusterBackup(manager,request,sessionId, newSessionID);
+
+        if (getCluster() != null) {
+            // now sending the change to all other clusternode!
+            ClusterManager manager = (ClusterManager)catalinaSession.getManager();
+            sendSessionIDClusterBackup(manager,request,sessionId, newSessionID);
+        }
+
         lifecycle.fireLifecycleEvent("After session migration", catalinaSession);
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("jvmRoute.changeSession", sessionId,
@@ -535,13 +544,12 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
                 }
             }
         }
-        if (cluster == null) {
-            throw new RuntimeException("No clustering support at container "
-                    + container.getName());
-        }
         
-        if (log.isInfoEnabled())
+        if (log.isInfoEnabled()) {
             log.info(sm.getString("jvmRoute.valve.started"));
+            if (cluster == null)
+                log.info(sm.getString("jvmRoute.noCluster"));
+        }
 
     }
 
