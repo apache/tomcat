@@ -558,7 +558,8 @@ public class StandardContext
 
 
     /**
-     * The JSP tag libraries for this web application, keyed by URI
+     * The JSP tag libraries defined in web.xml for this web application, keyed
+     * by URI.
      */
     private HashMap<String, String> taglibs = new HashMap<String, String>();
 
