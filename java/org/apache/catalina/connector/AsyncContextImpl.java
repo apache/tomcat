@@ -41,9 +41,13 @@ public class AsyncContextImpl implements AsyncContext {
     private ServletResponse servletResponse = null;
     private List<AsyncListenerWrapper> listeners = new ArrayList<AsyncListenerWrapper>();
     private boolean hasOriginalRequestAndResponse = true;
+    private boolean completed = false;
     
-    public AsyncContextImpl() {
+    private Request request;
+    
+    public AsyncContextImpl(Request request) {
         //TODO SERVLET3 - async
+        this.request = request;
     }
 
     @Override
@@ -59,6 +63,7 @@ public class AsyncContextImpl implements AsyncContext {
                 log.error("",x);
             }
         }
+        this.completed = true;
 
     }
 
@@ -119,6 +124,7 @@ public class AsyncContextImpl implements AsyncContext {
         servletResponse = null;
         listeners.clear();
         hasOriginalRequestAndResponse = true;
+        completed = false;
     }
 
     public boolean isStarted() {
@@ -153,8 +159,14 @@ public class AsyncContextImpl implements AsyncContext {
     public void setHasOriginalRequestAndResponse(boolean hasOriginalRequestAndResponse) {
         this.hasOriginalRequestAndResponse = hasOriginalRequestAndResponse;
     }
-    
-    
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
     
     
 
