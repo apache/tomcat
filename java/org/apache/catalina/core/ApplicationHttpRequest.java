@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -126,7 +127,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The current dispatcher type.
      */
-    protected Object dispatcherType = null;
+    protected DispatcherType dispatcherType = null;
 
 
     /**
@@ -268,7 +269,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     public void setAttribute(String name, Object value) {
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            dispatcherType = value;
+            dispatcherType = (DispatcherType)value;
             return;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             requestDispatcherPath = value;
@@ -673,7 +674,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         super.setRequest(request);
 
         // Initialize the attributes for this request
-        dispatcherType = request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
+        dispatcherType = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
         requestDispatcherPath = 
             request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
 

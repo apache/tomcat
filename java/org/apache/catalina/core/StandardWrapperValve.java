@@ -23,6 +23,7 @@ import java.io.IOException;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.servlet.DispatcherType;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
@@ -183,7 +184,7 @@ final class StandardWrapperValve
         MessageBytes requestPathMB = request.getRequestPathMB();
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-             ApplicationFilterFactory.REQUEST_INTEGER);
+             DispatcherType.REQUEST);
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
              requestPathMB);
@@ -381,7 +382,7 @@ final class StandardWrapperValve
         MessageBytes requestPathMB = request.getRequestPathMB();
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-             ApplicationFilterFactory.REQUEST_INTEGER);
+             DispatcherType.REQUEST);
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
              requestPathMB);
