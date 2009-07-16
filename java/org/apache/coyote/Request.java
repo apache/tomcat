@@ -528,4 +528,8 @@ public final class Request {
     public void setBytesRead(int bytesRead) {
         this.bytesRead = bytesRead;
     }
+    
+    public boolean isProcessing() {
+        return reqProcessorMX.getStage()==org.apache.coyote.Constants.STAGE_SERVICE;
+    }
 }

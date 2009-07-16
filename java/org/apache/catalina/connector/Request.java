@@ -19,11 +19,10 @@
 package org.apache.catalina.connector;
 
 
-import java.io.InputStream;
-import java.io.IOException;
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.channels.IllegalSelectorException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,18 +55,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
-import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.buf.StringCache;
-import org.apache.tomcat.util.http.Cookies;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
-import org.apache.tomcat.util.http.Parameters;
-import org.apache.tomcat.util.http.ServerCookie;
-import org.apache.tomcat.util.http.mapper.MappingData;
-
-import org.apache.coyote.ActionCode;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
@@ -79,8 +66,18 @@ import org.apache.catalina.core.ApplicationFilterFactory;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.catalina.util.StringParser;
+import org.apache.coyote.ActionCode;
+import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringCache;
+import org.apache.tomcat.util.http.Cookies;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Parameters;
+import org.apache.tomcat.util.http.ServerCookie;
+import org.apache.tomcat.util.http.mapper.MappingData;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -225,7 +222,7 @@ public class Request
     /**
      * The current dispatcher type.
      */
-    protected Object dispatcherType = null;
+    protected DispatcherType internalDispatcherType = null;
 
 
     /**
@@ -403,6 +400,8 @@ public class Request
      * async timeout
      */
     protected long asyncTimeout = 0;
+    
+    
 
     // --------------------------------------------------------- Public Methods
 
@@ -421,7 +420,7 @@ public class Request
         context = null;
         wrapper = null;
 
-        dispatcherType = null;
+        internalDispatcherType = null;
         requestDispatcherPath = null;
 
         comet = false;
@@ -490,7 +489,9 @@ public class Request
 
     }
 
-
+    protected boolean isProcessing() {
+        return coyoteRequest.isProcessing();
+    }
     /**
      * Clear cached encoders (to save memory for Comet requests).
      */
@@ -842,9 +843,9 @@ public class Request
     public Object getAttribute(String name) {
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            return (dispatcherType == null) 
-                ? ApplicationFilterFactory.REQUEST_INTEGER
-                : dispatcherType;
+            return (internalDispatcherType == null) 
+                ? DispatcherType.REQUEST
+                : internalDispatcherType;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             return (requestDispatcherPath == null) 
                 ? getRequestPathMB().toString()
@@ -1364,7 +1365,7 @@ public class Request
         }
 
         if (name.equals(Globals.DISPATCHER_TYPE_ATTR)) {
-            dispatcherType = value;
+            internalDispatcherType = (DispatcherType)value;
             return;
         } else if (name.equals(Globals.DISPATCHER_REQUEST_PATH_ATTR)) {
             requestDispatcherPath = value;
@@ -1461,7 +1462,7 @@ public class Request
     public AsyncContext startAsync() {
         // TODO SERVLET3 - async
         if (!isAsyncSupported()) throw new IllegalStateException("Not supported.");
-        if (asyncContext==null) asyncContext = new AsyncContextImpl();
+        if (asyncContext==null) asyncContext = new AsyncContextImpl(this);
         else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
         asyncContext.setServletRequest(getRequest());
         asyncContext.setServletResponse(response.getResponse());
@@ -1512,7 +1513,10 @@ public class Request
 
     public void setAsyncTimeout(long timeout) {
         // TODO SERVLET3 - async
-        this.asyncTimeout = timeout;
+        if (this.asyncTimeout!=timeout) {
+            this.asyncTimeout = timeout;
+            coyoteRequest.action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
+        }
     }
     
     public long getAsyncTimeout() {
@@ -1522,7 +1526,11 @@ public class Request
     
     public DispatcherType getDispatcherType() {
         // TODO SERVLET3 - dispatcher
-        return null;
+        if (internalDispatcherType==null) { 
+            return DispatcherType.REQUEST;
+        } else {
+            return this.internalDispatcherType;
+        }
     }
 
     // ---------------------------------------------------- HttpRequest Methods

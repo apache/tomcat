@@ -21,6 +21,7 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -251,7 +252,7 @@ final class StandardHostValve
                 (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                  errorPage.getLocation());
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                              new Integer(ApplicationFilterFactory.ERROR));
+                              DispatcherType.ERROR);
             request.setAttribute
                 (Globals.STATUS_CODE_ATTR,
                  new Integer(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
@@ -330,7 +331,7 @@ final class StandardHostValve
                 (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                  errorPage.getLocation());
             request.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                              new Integer(ApplicationFilterFactory.ERROR));
+                              DispatcherType.ERROR);
 
 
             Wrapper wrapper = request.getWrapper();

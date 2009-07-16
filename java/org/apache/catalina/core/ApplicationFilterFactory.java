@@ -19,6 +19,7 @@
 package org.apache.catalina.core;
 
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
 
@@ -42,15 +43,6 @@ public final class ApplicationFilterFactory {
 
     // -------------------------------------------------------------- Constants
 
-
-    public static final int ERROR = 1;
-    public static final Integer ERROR_INTEGER = new Integer(ERROR);
-    public static final int FORWARD = 2;
-    public static final Integer FORWARD_INTEGER = new Integer(FORWARD);
-    public static final int INCLUDE = 4;
-    public static final Integer INCLUDE_INTEGER = new Integer(INCLUDE);
-    public static final int REQUEST = 8;
-    public static final Integer REQUEST_INTEGER = new Integer(REQUEST);
 
     public static final String DISPATCHER_TYPE_ATTR = 
         Globals.DISPATCHER_TYPE_ATTR;
@@ -96,11 +88,9 @@ public final class ApplicationFilterFactory {
         (ServletRequest request, Wrapper wrapper, Servlet servlet) {
 
         // get the dispatcher type
-        int dispatcher = -1; 
+        DispatcherType dispatcher = null; 
         if (request.getAttribute(DISPATCHER_TYPE_ATTR) != null) {
-            Integer dispatcherInt = 
-                (Integer) request.getAttribute(DISPATCHER_TYPE_ATTR);
-            dispatcher = dispatcherInt.intValue();
+            dispatcher = (DispatcherType) request.getAttribute(DISPATCHER_TYPE_ATTR);
         }
         String requestPath = null;
         Object attribute = request.getAttribute(DISPATCHER_REQUEST_PATH_ATTR);
@@ -341,8 +331,8 @@ public final class ApplicationFilterFactory {
      * Convienience method which returns true if  the dispatcher type
      * matches the dispatcher types specified in the FilterMap
      */
-    private boolean matchDispatcher(FilterMap filterMap, int dispatcher) {
-        switch (dispatcher) {
+    private boolean matchDispatcher(FilterMap filterMap, DispatcherType type) {
+        switch (type) {
             case FORWARD : {
                 if (filterMap.getDispatcherMapping() == FilterMap.FORWARD ||
                     filterMap.getDispatcherMapping() == FilterMap.FORWARD_ERROR ||
