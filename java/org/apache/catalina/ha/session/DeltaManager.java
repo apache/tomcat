@@ -1164,7 +1164,10 @@ public class DeltaManager extends ClusterManagerBase{
             }
 
             //update last replicated time
-            if (msg != null) session.setLastTimeReplicated(System.currentTimeMillis());
+            if (msg != null){
+               session.setLastTimeReplicated(System.currentTimeMillis());
+               msg.setTimestamp(session.getLastTimeReplicated());
+            }
             return msg;
         } catch (IOException x) {
             log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest",sessionId), x);
