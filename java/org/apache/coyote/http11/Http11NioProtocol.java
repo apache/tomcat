@@ -680,13 +680,18 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
 
         public SocketState event(NioChannel socket, SocketStatus status) {
             Http11NioProcessor result = connections.get(socket);
-
+            NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            att.setAsync(false); //no longer check for timeout
             SocketState state = SocketState.CLOSED; 
             if (result != null) {
                 if (log.isDebugEnabled()) log.debug("Http11NioProcessor.error="+result.error);
                 // Call the appropriate event
                 try {
-                    state = result.event(status);
+                    if (result.async) {
+                        state = result.asyncDispatch(status);
+                    } else {
+                        state = result.event(status);
+                    }
                 } catch (java.net.SocketException e) {
                     // SocketExceptions are normal
                     Http11NioProtocol.log.debug
@@ -717,7 +722,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     } else {
                         if (log.isDebugEnabled()) log.debug("Keeping processor["+result);
                         //add correct poller events here based on Comet stuff
-                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         socket.getPoller().add(socket,att.getCometOps());
                     }
                 }
@@ -756,9 +760,13 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                     // processor.
                     //if (log.isDebugEnabled()) log.debug("Not recycling ["+processor+"] Comet="+((NioEndpoint.KeyAttachment)socket.getAttachment(false)).getComet());
                     connections.put(socket, processor);
+                    
                     if (processor.comet) {
                         NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
                         socket.getPoller().add(socket,att.getCometOps());
+                    } else if (processor.async) {
+                        NioEndpoint.KeyAttachment att = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+                        att.setAsync(true);
                     } else {
                         //we should not hold on to the processor objects
                         release(socket);

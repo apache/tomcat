@@ -184,6 +184,18 @@ public class Http11NioProcessor implements ActionHook {
      * Closed by HttpServletResponse.getWriter().close()
      */
     protected boolean cometClose = false;
+    
+    /**
+     * Async used
+     */
+    protected boolean async = false;
+    /**
+     * Closed flag, a Comet async thread can 
+     * signal for this Nio processor to be closed and recycled instead
+     * of waiting for a timeout.
+     * Closed by HttpServletRequest.getAsyncContext().complete()
+     */
+    protected boolean asyncClose;
 
     /**
      * Content delimitator for the request (if false, the connection will
@@ -322,8 +334,7 @@ public class Http11NioProcessor implements ActionHook {
      * Allow a customized the server header for the tin-foil hat folks.
      */
     protected String server = null;
-
-
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -770,6 +781,63 @@ public class Http11NioProcessor implements ActionHook {
             return SocketState.LONG;
         }
     }
+    
+    
+    /**
+     * Process pipelined HTTP requests using the specified input and output
+     * streams.
+     *
+     * @throws IOException error during an I/O operation
+     */
+    public SocketState asyncDispatch(SocketStatus status)
+        throws IOException {
+
+        long soTimeout = endpoint.getSoTimeout();
+        int keepAliveTimeout = endpoint.getKeepAliveTimeout();
+
+        RequestInfo rp = request.getRequestProcessor();
+        final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+        try {
+            rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+            error = !adapter.asyncDispatch(request, response);
+            if ( !error ) {
+                if (attach != null) {
+                    attach.setComet(comet);
+                    if (comet) {
+                        Integer comettimeout = (Integer) request.getAttribute("org.apache.tomcat.comet.timeout");
+                        if (comettimeout != null) attach.setTimeout(comettimeout.longValue());
+                    } else {
+                        //reset the timeout
+                        if (keepAlive && keepAliveTimeout>0) {
+                            attach.setTimeout(keepAliveTimeout);
+                        } else {
+                            attach.setTimeout(soTimeout);
+                        }
+                    }
+
+                }
+            }
+        } catch (InterruptedIOException e) {
+            error = true;
+        } catch (Throwable t) {
+            log.error(sm.getString("http11processor.request.process"), t);
+            // 500 - Internal Server Error
+            response.setStatus(500);
+            error = true;
+        }
+
+        rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
+
+        if (error) {
+            recycle();
+            return SocketState.CLOSED;
+        } else if (!comet) {
+            recycle();
+            return (keepAlive)?SocketState.OPEN:SocketState.CLOSED;
+        } else {
+            return SocketState.LONG;
+        }
+    }
 
     /**
      * Process pipelined HTTP requests using the specified input and output
@@ -905,7 +973,7 @@ public class Http11NioProcessor implements ActionHook {
             }
 
             // Finish the handling of the request
-            if (!comet) {
+            if (!comet && !async) {
                 // If we know we are closing the connection, don't drain input.
                 // This way uploading a 100GB file doesn't tie up the thread 
                 // if the servlet has rejected it.
@@ -921,7 +989,7 @@ public class Http11NioProcessor implements ActionHook {
             }
             request.updateCounters();
 
-            if (!comet) {
+            if (!comet && !async) {
                 // Next request
                 inputBuffer.nextRequest();
                 outputBuffer.nextRequest();
@@ -943,7 +1011,7 @@ public class Http11NioProcessor implements ActionHook {
         }//while
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
-        if (comet) {
+        if (comet || async) {
             if (error) {
                 recycle();
                 return SocketState.CLOSED;
@@ -1064,6 +1132,8 @@ public class Http11NioProcessor implements ActionHook {
 
             comet = false;
             cometClose = true;
+            async = false;
+            asyncClose = false;
             SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
@@ -1240,10 +1310,30 @@ public class Http11NioProcessor implements ActionHook {
                 attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ACTION_ASYNC_START) {
             //TODO SERVLET3 - async
+            async = true;
         } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
           //TODO SERVLET3 - async
+            asyncClose = true;
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
+                socket.getPoller().cometInterest(socket);
         } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
+            if (param==null) return;
+            if (socket==null || socket.getAttachment(false)==null) return;
+            NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
+            long timeout = ((Long)param).longValue();
+            //if we are not piggy backing on a worker thread, set the timeout
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
+                attach.setTimeout(timeout);
+        } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
+            RequestInfo rp = request.getRequestProcessor();
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
+                endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
+            } else { 
+                throw new UnsupportedOperationException("Can't call dispatch on the worker thread.");
+            }
         }
     }
 

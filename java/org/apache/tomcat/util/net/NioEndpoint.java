@@ -1133,7 +1133,7 @@ public class NioEndpoint {
         return false;
     }
 
-    protected boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
+    public boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
         try {
             KeyAttachment attachment = (KeyAttachment)socket.getAttachment(false);
             attachment.setCometNotify(false); //will get reset upon next reg
@@ -1745,12 +1745,15 @@ public class NioEndpoint {
             cometOps = SelectionKey.OP_READ;
             sendfileData = null;
             keepAliveLeft = 100;
+            async = false;
         }
         
         public void reset() {
             reset(null,null,-1);
         }
         
+        public boolean isAsync() { return async; }
+        public void setAsync(boolean async) { this.async = async; }
         public Poller getPoller() { return poller;}
         public void setPoller(Poller poller){this.poller = poller;}
         public long getLastAccess() { return lastAccess; }
@@ -1821,6 +1824,7 @@ public class NioEndpoint {
         protected long lastRegistered = 0;
         protected SendfileData sendfileData = null;
         protected int keepAliveLeft = 100;
+        protected boolean async = false;
     }
 
     // ------------------------------------------------ Application Buffer Handler
@@ -1864,9 +1868,8 @@ public class NioEndpoint {
     }
 
 
+
     // ---------------------------------------------- SocketProcessor Inner Class
-
-
     /**
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.

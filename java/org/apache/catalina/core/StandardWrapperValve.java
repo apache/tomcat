@@ -33,6 +33,7 @@ import org.apache.catalina.CometEvent;
 import org.apache.catalina.CometProcessor;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
+import org.apache.catalina.connector.AsyncContextImpl;
 import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -209,7 +210,9 @@ final class StandardWrapperValve
                 if (context.getSwallowOutput()) {
                     try {
                         SystemLogHandler.startCapture();
-                        if (comet) {
+                        if (request.isAsyncStarted()) {
+                           ((AsyncContextImpl)request.getAsyncContext()).doInternalDispatch(); 
+                        } else if (comet) {
                             filterChain.doFilterEvent(request.getEvent());
                             request.setComet(true);
                         } else {
@@ -223,7 +226,9 @@ final class StandardWrapperValve
                         }
                     }
                 } else {
-                    if (comet) {
+                    if (request.isAsyncStarted()) {
+                        ((AsyncContextImpl)request.getAsyncContext()).doInternalDispatch();
+                    } else if (comet) {
                         request.setComet(true);
                         filterChain.doFilterEvent(request.getEvent());
                     } else {
