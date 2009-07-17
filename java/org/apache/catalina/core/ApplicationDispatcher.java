@@ -96,7 +96,9 @@ final class ApplicationDispatcher
         }
 
         public Void run() throws ServletException, IOException {
-            doInclude(request,response);
+            DispatcherType type = DispatcherType.INCLUDE;
+            if (request.getDispatcherType()==DispatcherType.ASYNC) type = DispatcherType.ASYNC; 
+            doInclude(request,response,type);
             return null;
         }
     }
@@ -487,11 +489,13 @@ final class ApplicationDispatcher
                 throw (IOException) e;
             }
         } else {
-            doInclude(request,response);
+            DispatcherType type = DispatcherType.INCLUDE;
+            if (request.getDispatcherType()==DispatcherType.ASYNC) type = DispatcherType.ASYNC; 
+            doInclude(request,response,type);
         }
     }
 
-    private void doInclude(ServletRequest request, ServletResponse response)
+    private void doInclude(ServletRequest request, ServletResponse response, DispatcherType type)
         throws ServletException, IOException
     {
         // Set up to handle the specified request and response
@@ -514,7 +518,7 @@ final class ApplicationDispatcher
             if (servletPath != null)
                 wrequest.setServletPath(servletPath);
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                    DispatcherType.INCLUDE);
+                    type);
             wrequest.setAttribute(
                     ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                     getCombinedPath());
@@ -546,7 +550,7 @@ final class ApplicationDispatcher
             }
             
             wrequest.setAttribute(ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-                    DispatcherType.INCLUDE);
+                    type);
             wrequest.setAttribute(
                     ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
                     getCombinedPath());

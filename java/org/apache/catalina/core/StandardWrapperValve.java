@@ -183,9 +183,11 @@ final class StandardWrapperValve
             servlet = null;
         }
         MessageBytes requestPathMB = request.getRequestPathMB();
+        DispatcherType dispatcherType = DispatcherType.REQUEST;
+        if (request.getDispatcherType()==DispatcherType.ASYNC) dispatcherType = DispatcherType.ASYNC; 
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_TYPE_ATTR,
-             DispatcherType.REQUEST);
+             dispatcherType);
         request.setAttribute
             (ApplicationFilterFactory.DISPATCHER_REQUEST_PATH_ATTR,
              requestPathMB);
