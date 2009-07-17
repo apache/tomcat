@@ -59,15 +59,12 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void complete() {
         // TODO SERVLET3 - async
-        
         doInternalComplete(false);
-
     }
 
     @Override
     public void dispatch() {
         // TODO SERVLET3 - async
-
     }
 
     @Override
@@ -85,6 +82,8 @@ public class AsyncContextImpl implements AsyncContext {
         Runnable run = new Runnable() {
             public void run() {
                 try {
+                    //piggy back on the request dispatcher to ensure that filters etc get called.
+                    //TODO SERVLET3 - async should this be include/forward or a new dispatch type
                     requestDispatcher.include(servletRequest, servletResponse);
                 }catch (Exception x) {
                     //log.error("Async.dispatch",x);
@@ -93,7 +92,7 @@ public class AsyncContextImpl implements AsyncContext {
             }
         };
         this.dispatch = run;
-        request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, run );
+        request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, null );
     }
 
     @Override
