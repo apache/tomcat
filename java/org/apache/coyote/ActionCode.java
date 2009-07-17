@@ -175,6 +175,11 @@ public final class ActionCode {
      */
     public static final ActionCode ACTION_ASYNC_SETTIMEOUT = new ActionCode(28);
     
+    /**
+     * Callback for an async call to {@link javax.servlet.AsyncContext#dispatch()}
+     */
+    public static final ActionCode ACTION_ASYNC_DISPATCH = new ActionCode(29);
+    
     
     // ----------------------------------------------------------- Constructors
     int code;
