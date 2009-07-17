@@ -21,6 +21,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.util.EnumSet;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.CometEvent;
@@ -262,11 +263,15 @@ public class CoyoteAdapter
         boolean success = true;
         
         try {
+            DispatcherType prevDispatcherType = request.getDispatcherType();
+            request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
             // Calling the container
             try {
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }catch (RuntimeException x) {
                 success = false;
+            } finally {
+                request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, prevDispatcherType);
             }
 
             if (request.isComet()) {

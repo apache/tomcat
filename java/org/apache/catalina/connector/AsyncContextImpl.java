@@ -64,7 +64,9 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void dispatch() {
-        // TODO SERVLET3 - async
+        HttpServletRequest sr = (HttpServletRequest)getServletRequest();
+        String path = sr.getRequestURI();
+        dispatch(path);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class AsyncContextImpl implements AsyncContext {
                 try {
                     //piggy back on the request dispatcher to ensure that filters etc get called.
                     //TODO SERVLET3 - async should this be include/forward or a new dispatch type
+                    //javadoc suggests include with the type of DispatcherType.ASYNC
                     requestDispatcher.include(servletRequest, servletResponse);
                 }catch (Exception x) {
                     //log.error("Async.dispatch",x);
