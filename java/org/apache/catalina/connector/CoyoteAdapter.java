@@ -250,7 +250,75 @@ public class CoyoteAdapter
         }
     }
     
+    public boolean asyncDispatch(org.apache.coyote.Request req,org.apache.coyote.Response res) throws Exception {
+        Request request = (Request) req.getNote(ADAPTER_NOTES);
+        Response response = (Response) res.getNote(ADAPTER_NOTES);
 
+        if (request == null) {
+            throw new IllegalStateException("Dispatch may only happen on an existing request.");
+        }
+        boolean comet = false;
+        boolean async = false;
+        boolean success = true;
+        
+        try {
+            // Calling the container
+            try {
+                connector.getContainer().getPipeline().getFirst().invoke(request, response);
+            }catch (RuntimeException x) {
+                success = false;
+            }
+
+            if (request.isComet()) {
+                if (!response.isClosed() && !response.isError()) {
+                    if (request.getAvailable() || (request.getContentLength() > 0 && (!request.isParametersParsed()))) {
+                        // Invoke a read event right away if there are available bytes
+                        if (event(req, res, SocketStatus.OPEN)) {
+                            comet = true;
+                            res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                        }
+                    } else {
+                        comet = true;
+                        res.action(ActionCode.ACTION_COMET_BEGIN, null);
+                    }
+                } else {
+                    // Clear the filter chain, as otherwise it will not be reset elsewhere
+                    // since this is a Comet request
+                    request.setFilterChain(null);
+                }
+            }
+
+            if (request.isAsyncStarted()) {
+                //TODO SERVLET3 - async
+                res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                async = true;
+            } else if (!comet) {
+                response.finishResponse();
+                req.action(ActionCode.ACTION_POST_REQUEST , null);
+            }
+
+        } catch (IOException e) {
+            success = false;
+            // Ignore
+        } catch (Throwable t) {
+            success = false;
+            log.error(sm.getString("coyoteAdapter.service"), t);
+        } finally {
+            req.getRequestProcessor().setWorkerThreadName(null);
+            // Recycle the wrapper request and response
+            if (!comet && !async) {
+                request.recycle();
+                response.recycle();
+            } else {
+                // Clear converters so that the minimum amount of memory 
+                // is used by this processor
+                request.clearEncoders();
+                response.clearEncoders();
+            }
+        }
+        return success;
+    }
+    
     /**
      * Service method.
      */
@@ -288,6 +356,7 @@ public class CoyoteAdapter
         }
 
         boolean comet = false;
+        boolean async = request.isAsyncStarted();
         
         try {
 
@@ -322,6 +391,7 @@ public class CoyoteAdapter
             if (request.isAsyncStarted()) {
                 //TODO SERVLET3 - async
                 res.action(ActionCode.ACTION_ASYNC_START, request.getAsyncContext());
+                async = true;
             } else if (!comet) {
                 response.finishResponse();
                 req.action(ActionCode.ACTION_POST_REQUEST , null);
@@ -334,7 +404,7 @@ public class CoyoteAdapter
         } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
-            if (!comet) {
+            if (!comet && !async) {
                 request.recycle();
                 response.recycle();
             } else {
@@ -460,6 +530,11 @@ public class CoyoteAdapter
             }
         } else {
             serverName = req.serverName();
+        }
+        if (request.isAsyncStarted()) {
+            //TODO SERVLET3 - async
+            //reset mapping data, should prolly be done elsewhere
+            request.getMappingData().recycle();
         }
         connector.getMapper().map(serverName, decodedURI, 
                                   request.getMappingData());
