@@ -1653,7 +1653,31 @@ public class WebappClassLoader
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
         if (ENABLE_CLEAR_REFERENCES) {
-            Iterator<ResourceEntry> loadedClasses = ((HashMap<String, ResourceEntry>) resourceEntries.clone()).values().iterator();
+            java.util.Collection<ResourceEntry> values =
+                ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
+            Iterator<ResourceEntry> loadedClasses = values.iterator();
+            //
+            // walk through all loaded class to trigger initialization for
+            //    any uninitialized classes, otherwise initialization of
+            //    one class may call a previously cleared class.
+            while(loadedClasses.hasNext()) {
+                ResourceEntry entry = loadedClasses.next();
+                if (entry.loadedClass != null) {
+                    Class<?> clazz = entry.loadedClass;
+                    try {
+                        Field[] fields = clazz.getDeclaredFields();
+                        for (int i = 0; i < fields.length; i++) {
+                            if(Modifier.isStatic(fields[i].getModifiers())) {
+                                fields[i].get(null);
+                                break;
+                            }
+                        }
+                    } catch(Throwable t) {
+                        // Ignore
+                    }
+                }
+            }
+            loadedClasses = values.iterator();
             while (loadedClasses.hasNext()) {
                 ResourceEntry entry = loadedClasses.next();
                 if (entry.loadedClass != null) {
