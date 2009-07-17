@@ -71,14 +71,20 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void dispatch(String path) {
+        dispatch(request.getServletContext(),path);
+    }
+
+    @Override
+    public void dispatch(ServletContext context, String path) {
         // TODO SERVLET3 - async
+     // TODO SERVLET3 - async
         if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
             request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
             request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
             request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
             request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
         }
-        final RequestDispatcher requestDispatcher = request.getServletContext().getRequestDispatcher(path);
+        final RequestDispatcher requestDispatcher = context.getRequestDispatcher(path);
         final HttpServletRequest servletRequest = (HttpServletRequest)getRequest();
         final HttpServletResponse servletResponse = (HttpServletResponse)getResponse();
         Runnable run = new Runnable() {
@@ -99,12 +105,6 @@ public class AsyncContextImpl implements AsyncContext {
     }
 
     @Override
-    public void dispatch(ServletContext context, String path) {
-        // TODO SERVLET3 - async
-
-    }
-
-    @Override
     public ServletRequest getRequest() {
         return getServletRequest();
     }
@@ -117,7 +117,8 @@ public class AsyncContextImpl implements AsyncContext {
     @Override
     public void start(Runnable run) {
         // TODO SERVLET3 - async
-
+        this.dispatch = run;
+        request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, null );
     }
     
     public void addAsyncListener(AsyncListener listener) {
