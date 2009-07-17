@@ -1467,6 +1467,7 @@ public class Request
         asyncContext.setServletRequest(getRequest());
         asyncContext.setServletResponse(response.getResponse());
         asyncContext.setStarted(true);
+        asyncContext.setCompleted(false);
         return asyncContext;
     }
 
@@ -1474,7 +1475,7 @@ public class Request
         startAsync();
         asyncContext.setServletRequest(request);
         asyncContext.setServletResponse(response);
-        asyncContext.setHasOriginalRequestAndResponse(request==getRequest() && response==getResponse());
+        asyncContext.setHasOriginalRequestAndResponse(request==getRequest() && response==getResponse().getResponse());
         return asyncContext;
     }
 
