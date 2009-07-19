@@ -47,40 +47,52 @@ import org.apache.catalina.valves.ValveBase;
 
 /**
  * Valve to handle Tomcat jvmRoute takeover using mod_jk module after node
- * failure. After a node crashed the next request going to other cluster node.
- * Now the answering from apache is slower ( make some error handshaking. Very
- * bad with apache at my windows.). We rewrite now the cookie jsessionid
- * information to the backup cluster node. After the next response all client
- * request goes direct to the backup node. The change sessionid send also to all
- * other cluster nodes. Well, now the session stickyness work directly to the
- * backup node and traffic don't go back too restarted cluster nodes!
+ * failure. After a node crashes, subsequent requests go to other cluster nodes.
+ * That incurs a drop in performance. When this Valve is enabled on a backup
+ * node and sees a request, which was intended for another (thus failed) node,
+ * it will rewrite the cookie jsessionid information to use the route to this
+ * backup cluster node, that answered the request. After the response is
+ * delivered to the client, all subsequent client requests will go directly to
+ * the backup node. The change of sessionid is also sent to all other cluster
+ * nodes. After all that, the session stickyness will work directly to the
+ * backup node and the traffic will not go back to the failed node after it is
+ * restarted!
  * 
- * At all cluster node you must configure the as ClusterListener since 5.5.10
- * {@link org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener JvmRouteSessionIDBinderListener}
- * or before with
- * org.apache.catalina.ha.session.JvmRouteSessionIDBinderListenerLifecycle.
+ * <p>
+ * For this valve to function correctly, so that all nodes of the cluster
+ * receive the sessionid change notifications that it generates, the following
+ * ClusterListener MUST be configured at all nodes of the cluster:
+ * {@link org.apache.catalina.ha.session.JvmRouteSessionIDBinderListener
+ * JvmRouteSessionIDBinderListener} since Tomcat 5.5.10, and both
+ * JvmRouteSessionIDBinderListener and JvmRouteSessionIDBinderLifecycleListener
+ * for earlier versions of Tomcat.
  * 
+ * <p>
  * Add this Valve to your host definition at conf/server.xml .
  * 
  * Since 5.5.10 as direct cluster valve:<br/>
+ * 
  * <pre>
  *  &lt;Cluster&gt;
  *  &lt;Valve className=&quot;org.apache.catalina.ha.session.JvmRouteBinderValve&quot; /&gt;  
  *  &lt;/Cluster&gt;
  * </pre>
+ * 
  * <br />
  * Before 5.5.10 as Host element:<br/>
+ * 
  * <pre>
- *  &lt;Hostr&gt;
+ *  &lt;Host&gt;
  *  &lt;Valve className=&quot;org.apache.catalina.ha.session.JvmRouteBinderValve&quot; /&gt;  
- *  &lt;/Hostr&gt;
+ *  &lt;/Host&gt;
  * </pre>
  * 
- * Trick:<br/>
- * You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes!
- * Set enable true on all JvmRouteBinderValve backups, disable worker at mod_jk 
- * and then drop node and restart it! Then enable mod_jk Worker and disable JvmRouteBinderValves again. 
- * This use case means that only requested session are migrated.
+ * <em>A Trick:</em><br/>
+ * You can enable this mod_jk turnover mode via JMX before you drop a node to
+ * all backup nodes! Set enable true on all JvmRouteBinderValve backups, disable
+ * worker at mod_jk and then drop node and restart it! Then enable mod_jk worker
+ * and disable JvmRouteBinderValves again. This use case means that only
+ * requested sessions are migrated.
  * 
  * @author Peter Rossbach
  * @version $Revision$ $Date$
