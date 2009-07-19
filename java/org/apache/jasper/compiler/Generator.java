@@ -862,6 +862,10 @@ class Generator {
                         // Composite expression - must coerce to String
                         type = String.class;
                     }
+                    if (i+1 < size) {
+                        // Composite expression - must coerce to String
+                        type = String.class;
+                    }
                     output.append(
                             JspUtil.interpreterCall(isTag,
                                     tx.substring(mark, i+1), type,
