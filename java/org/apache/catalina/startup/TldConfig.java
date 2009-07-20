@@ -329,7 +329,7 @@ public final class TldConfig  implements LifecycleListener {
         tldScanWebXml();
         
         // Stage 3a - TLDs under WEB-INF (not lib or classes)
-        tldScanResourcePathsWebInf(context.getResources(), WEB_INF);
+        tldScanResourcePaths(context.getResources(), WEB_INF);
 
         // Stage 3b - .jar files in WEB-INF/lib/
         tldScanWebInfLib();
@@ -408,7 +408,7 @@ public final class TldConfig  implements LifecycleListener {
      * @param rootPath The path whose subdirectories are to be searched for
      * TLDs
      */
-    private void tldScanResourcePathsWebInf(DirContext resources,
+    private void tldScanResourcePaths(DirContext resources,
                                             String rootPath) {
 
         if (log.isTraceEnabled()) {
@@ -437,7 +437,7 @@ public final class TldConfig  implements LifecycleListener {
                                 "tldConfig.webinfFail", resourcePath),e);
                     }
                 } else {
-                    tldScanResourcePathsWebInf(resources, resourcePath + '/');
+                    tldScanResourcePaths(resources, resourcePath + '/');
                 }
             }
         } catch (NamingException e) {
