@@ -115,8 +115,17 @@ final class TaglibUriRule extends Rule {
         if (tldConfig.isKnownTaglibUri(text)) {
             // Already seen this URI
             duplicateUri = true;
-            digester.getLogger().info(
-                    "TLD skipped. URI: " + text + " is already defined");
+            // This is expected if the URI was defined in web.xml
+            // Log message at debug in this case
+            if (tldConfig.getContext().findTaglib(text) == null) {
+                digester.getLogger().info(
+                        "TLD skipped. URI: " + text + " is already defined");
+            } else {
+                if (digester.getLogger().isDebugEnabled()) {
+                    digester.getLogger().debug(
+                            "TLD skipped. URI: " + text + " is already defined");
+                }
+            }
         } else {
             // New URI. Add it to known list and carry on
             duplicateUri = false;
