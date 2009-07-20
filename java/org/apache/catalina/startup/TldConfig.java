@@ -423,8 +423,8 @@ public final class TldConfig  implements LifecycleListener {
                 NameClassPair item = items.nextElement();
                 String resourcePath = rootPath + item.getName();
                 if (!resourcePath.endsWith(TLD_EXT)
-                        && (resourcePath.startsWith("/WEB-INF/classes/")
-                            || resourcePath.startsWith("/WEB-INF/lib/"))) {
+                        && (resourcePath.equals("/WEB-INF/classes")
+                            || resourcePath.equals("/WEB-INF/lib"))) {
                     continue;
                 }
                 if (resourcePath.endsWith(TLD_EXT)) {
