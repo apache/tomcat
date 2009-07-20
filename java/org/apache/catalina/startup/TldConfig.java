@@ -323,6 +323,8 @@ public final class TldConfig  implements LifecycleListener {
          * 2. web.xml entries
          * 3. JARS in WEB-INF/lib & TLDs under WEB-INF (equal priority)
          * 4. Additional entries from the container
+         * 
+         * Keep processing order in sync with o.a.j.compiler.TldLocationsCache
          */
         
         // Stage 2 - web.xml entries

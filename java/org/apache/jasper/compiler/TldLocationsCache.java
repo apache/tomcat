@@ -238,6 +238,9 @@ public class TldLocationsCache {
         }
     }
 
+    /*
+     * Keep processing order in sync with o.a.c.startup.TldConfig
+     */
     private void init() throws JasperException {
         if (initialized) return;
         try {
