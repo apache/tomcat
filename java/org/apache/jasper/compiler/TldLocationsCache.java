@@ -242,8 +242,8 @@ public class TldLocationsCache {
         if (initialized) return;
         try {
             processWebDotXml();
-            scanJars();
             processTldsInFileSystem("/WEB-INF/");
+            scanJars();
             initialized = true;
         } catch (Exception ex) {
             throw new JasperException(Localizer.getMessage(
