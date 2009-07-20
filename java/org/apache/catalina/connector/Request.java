@@ -1466,8 +1466,7 @@ public class Request
         else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
         asyncContext.setServletRequest(getRequest());
         asyncContext.setServletResponse(response.getResponse());
-        asyncContext.setStarted(true);
-        asyncContext.setCompleted(false);
+        asyncContext.setStarted(getContext());
         return asyncContext;
     }
 
