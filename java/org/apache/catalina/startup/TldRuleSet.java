@@ -122,7 +122,7 @@ final class TaglibRule extends Rule {
 
 final class TaglibUriRule extends Rule {
     
-    // This is set to false for each fiel processed by the TaglibRule
+    // This is set to false for each file processed by the TaglibRule
     private boolean duplicateUri;
     
     public TaglibUriRule() {
