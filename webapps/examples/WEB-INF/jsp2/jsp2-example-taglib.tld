@@ -23,7 +23,7 @@
     <description>A tag library exercising SimpleTag handlers.</description>
     <tlib-version>1.0</tlib-version>
     <short-name>SimpleTagLibrary</short-name>
-    <uri>/SimpleTagLibrary</uri>
+    <uri>http://tomcat.apache.org/jsp2-example-taglib</uri>
     <tag>
 	<description>Outputs Hello, World</description>
         <name>helloWorld</name>
