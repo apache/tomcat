@@ -37,6 +37,7 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1653,7 +1654,7 @@ public class WebappClassLoader
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
         if (ENABLE_CLEAR_REFERENCES) {
-            java.util.Collection<ResourceEntry> values =
+            Collection<ResourceEntry> values =
                 ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
             Iterator<ResourceEntry> loadedClasses = values.iterator();
             //
