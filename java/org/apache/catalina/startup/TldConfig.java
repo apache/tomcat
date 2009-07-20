@@ -29,6 +29,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
@@ -38,6 +39,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.apache.catalina.Context;
@@ -331,7 +333,7 @@ public final class TldConfig  implements LifecycleListener {
         tldScanWebXml();
         
         // Stage 3a - TLDs under WEB-INF (not lib or classes)
-        tldScanResourcePaths(context.getResources(), WEB_INF);
+        tldScanResourcePaths(WEB_INF);
 
         // Stage 3b - .jar files in WEB-INF/lib/
         tldScanWebInfLib();
@@ -399,51 +401,51 @@ public final class TldConfig  implements LifecycleListener {
     }
     
     /*
-     * Scans the web application's subdirectory identified by rootPath,
-     * along with its subdirectories, for TLDs.
+     * Scans the web application's sub-directory identified by rootPath,
+     * along with its sub-directories, for TLDs.
      *
      * Initially, rootPath equals /WEB-INF/. The /WEB-INF/classes and
-     * /WEB-INF/lib subdirectories are excluded from the search, as per the
+     * /WEB-INF/lib sub-directories are excluded from the search, as per the
      * JSP 2.0 spec.
      *
-     * @param resources The web application's resources
-     * @param rootPath The path whose subdirectories are to be searched for
+     * @param startPath The path whose sub-directories are to be searched for
      * TLDs
+     * 
+     * Keep code in sync with o.a.j.compiler.TldLocationsCache
      */
-    private void tldScanResourcePaths(DirContext resources,
-                                            String rootPath) {
+    private void tldScanResourcePaths(String startPath) {
 
         if (log.isTraceEnabled()) {
-            log.trace(sm.getString("tldConfig.webinfScan", rootPath));
+            log.trace(sm.getString("tldConfig.webinfScan", startPath));
         }
 
-        try {
-            NamingEnumeration<NameClassPair> items = resources.list(rootPath);
-            while (items.hasMoreElements()) {
-                NameClassPair item = items.nextElement();
-                String resourcePath = rootPath + item.getName();
-                if (!resourcePath.endsWith(TLD_EXT)
-                        && (resourcePath.equals("/WEB-INF/classes")
-                            || resourcePath.equals("/WEB-INF/lib"))) {
+        ServletContext ctxt = getContext().getServletContext();
+        
+        Set<String> dirList = ctxt.getResourcePaths(startPath);
+        if (dirList != null) {
+            Iterator<String> it = dirList.iterator();
+            while (it.hasNext()) {
+                String path = it.next();
+                if (!path.endsWith(TLD_EXT)
+                        && (path.startsWith("/WEB-INF/lib/")
+                                || path.startsWith("/WEB-INF/classes/"))) {
                     continue;
                 }
-                if (resourcePath.endsWith(TLD_EXT)) {
-                    if (resourcePath.startsWith("/WEB-INF/tags") &&
-                            !resourcePath.endsWith("implicit.tld")) {
+                if (path.endsWith(".tld")) {
+                    if (path.startsWith("/WEB-INF/tags/") &&
+                            !path.endsWith("implicit.tld")) {
                         continue;
                     }
                     try {
-                        tldScanTld(resourcePath);
+                        tldScanTld(path);
                     } catch (Exception e) {
                         log.warn(sm.getString(
-                                "tldConfig.webinfFail", resourcePath),e);
+                                "tldConfig.webinfFail", path),e);
                     }
                 } else {
-                    tldScanResourcePaths(resources, resourcePath + '/');
+                    tldScanResourcePaths(path);
                 }
             }
-        } catch (NamingException e) {
-            // Silent catch: it's valid that no /WEB-INF directory exists
         }
     }
     
