@@ -193,7 +193,7 @@
 
         <taglib>
             <taglib-uri>
-               http://tomcat.apache.org/examples-taglib
+               http://tomcat.apache.org/example-taglib
             </taglib-uri>
             <taglib-location>
                /WEB-INF/jsp/example-taglib.tld
