@@ -88,7 +88,10 @@ public class TldRuleSet extends RuleSetBase {
      */
     public void addRuleInstances(Digester digester) {
 
+        // Note the sharing of state between rules
         TaglibUriRule taglibUriRule = new TaglibUriRule(); 
+
+        digester.addRule(prefix + "taglib", new TaglibRule(taglibUriRule));
         
         digester.addRule(prefix + "taglib/uri", taglibUriRule);
 
@@ -100,8 +103,26 @@ public class TldRuleSet extends RuleSetBase {
 
 }
 
+/*
+ * This rule only exists to reset the duplicateUri flag on the TaglibUriRule.
+ */
+final class TaglibRule extends Rule {
+    private final TaglibUriRule taglibUriRule;
+    
+    public TaglibRule(TaglibUriRule taglibUriRule) {
+        this.taglibUriRule = taglibUriRule;
+    }
+    
+    public void body(String namespace, String name, String text)
+    throws Exception {
+        taglibUriRule.setDuplicateUri(false);
+    }
+
+}
+
 final class TaglibUriRule extends Rule {
     
+    // This is set to false for each fiel processed by the TaglibRule
     private boolean duplicateUri;
     
     public TaglibUriRule() {
@@ -128,7 +149,6 @@ final class TaglibUriRule extends Rule {
             }
         } else {
             // New URI. Add it to known list and carry on
-            duplicateUri = false;
             tldConfig.addTaglibUri(text);
         }
     }
@@ -136,6 +156,11 @@ final class TaglibUriRule extends Rule {
     public boolean isDuplicateUri() {
         return duplicateUri;
     }
+
+    public void setDuplicateUri(boolean duplciateUri) {
+        this.duplicateUri = duplciateUri;
+    }
+
 }
 
 final class TaglibListenerRule extends Rule {
