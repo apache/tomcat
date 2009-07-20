@@ -19,26 +19,22 @@
 package org.apache.catalina.startup;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
@@ -49,6 +45,7 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -331,7 +328,7 @@ public final class TldConfig  implements LifecycleListener {
         tldScanWebXml();
         
         // Stage 3a - TLDs under WEB-INF (not lib or classes)
-        tldScanResourcePaths(context.getResources(), WEB_INF);
+        tldScanResourcePaths(WEB_INF);
 
         // Stage 3b - .jar files in WEB-INF/lib/
         tldScanWebInfLib();
@@ -343,7 +340,7 @@ public final class TldConfig  implements LifecycleListener {
         String list[] = getTldListeners();
 
         if( log.isDebugEnabled() )
-            log.debug(sm.getString("tdlConfig.addListeners",
+            log.debug(sm.getString("tldConfig.addListeners",
                     Integer.valueOf(list.length)));
 
         for( int i=0; list!=null && i<list.length; i++ ) {
@@ -362,6 +359,10 @@ public final class TldConfig  implements LifecycleListener {
 
     /**
      * Get the taglib entries from web.xml and add them to the map.
+     * 
+     * This is not kept in sync with o.a.j.compiler.TldLocationsCache as this
+     * code needs to scan the TLDs listed in web.xml whereas Jasper only needs
+     * the URI to TLD mappings.
      */
     private void tldScanWebXml() {
         
@@ -388,251 +389,108 @@ public final class TldConfig  implements LifecycleListener {
                             taglibs[i]));
                 }
                 try {
-                    tldScanTld(resourcePath);
+                    InputStream stream = context.getServletContext(
+                            ).getResourceAsStream(resourcePath);
+                    tldScanStream(stream);
                     taglibUris.add(taglibs[i]);
-                } catch (Exception e) {
+                } catch (IOException ioe) {
                     log.warn(sm.getString("tldConfig.webxmlFail", resourcePath,
-                            taglibs[i]), e);
+                            taglibs[i]), ioe);
                 }
             }
         }
     }
     
     /*
-     * Scans the web application's subdirectory identified by rootPath,
-     * along with its subdirectories, for TLDs.
+     * Scans the web application's sub-directory identified by startPath,
+     * along with its sub-directories, for TLDs.
      *
      * Initially, rootPath equals /WEB-INF/. The /WEB-INF/classes and
-     * /WEB-INF/lib subdirectories are excluded from the search, as per the
+     * /WEB-INF/lib sub-directories are excluded from the search, as per the
      * JSP 2.0 spec.
-     *
-     * @param resources The web application's resources
-     * @param rootPath The path whose subdirectories are to be searched for
-     * TLDs
+     * 
+     * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
-    private void tldScanResourcePaths(DirContext resources,
-                                            String rootPath) {
+    private void tldScanResourcePaths(String startPath) {
 
         if (log.isTraceEnabled()) {
-            log.trace(sm.getString("tldConfig.webinfScan", rootPath));
+            log.trace(sm.getString("tldConfig.webinfScan", startPath));
         }
 
-        try {
-            NamingEnumeration<NameClassPair> items = resources.list(rootPath);
-            while (items.hasMoreElements()) {
-                NameClassPair item = items.nextElement();
-                String resourcePath = rootPath + item.getName();
-                if (!resourcePath.endsWith(TLD_EXT)
-                        && (resourcePath.equals("/WEB-INF/classes")
-                            || resourcePath.equals("/WEB-INF/lib"))) {
+        ServletContext ctxt = context.getServletContext();
+
+        Set<String> dirList = ctxt.getResourcePaths(startPath);
+        if (dirList != null) {
+            Iterator<String> it = dirList.iterator();
+            while (it.hasNext()) {
+                String path = it.next();
+                if (!path.endsWith(TLD_EXT)
+                        && (path.startsWith(WEB_INF_LIB)
+                                || path.startsWith("/WEB-INF/classes/"))) {
                     continue;
                 }
-                if (resourcePath.endsWith(TLD_EXT)) {
-                    if (resourcePath.startsWith("/WEB-INF/tags") &&
-                            !resourcePath.endsWith("implicit.tld")) {
+                if (path.endsWith(TLD_EXT)) {
+                    if (path.startsWith("/WEB-INF/tags/") &&
+                            !path.endsWith("implicit.tld")) {
                         continue;
                     }
+                    InputStream stream = ctxt.getResourceAsStream(path);
                     try {
-                        tldScanTld(resourcePath);
-                    } catch (Exception e) {
-                        log.warn(sm.getString(
-                                "tldConfig.webinfFail", resourcePath),e);
+                        tldScanStream(stream);
+                    } catch (IOException ioe) {
+                        log.warn(sm.getString("tldConfig.webinfFail", path),
+                                ioe);
+                    } finally {
+                        if (stream != null) {
+                            try {
+                                stream.close();
+                            } catch (Throwable t) {
+                                // do nothing
+                            }
+                        }
                     }
                 } else {
-                    tldScanResourcePaths(resources, resourcePath + '/');
+                    tldScanResourcePaths(path);
                 }
             }
-        } catch (NamingException e) {
-            // Silent catch: it's valid that no /WEB-INF directory exists
         }
     }
     
-    /**
+    /*
      * Scan the JARs in the WEB-INF/lib directory. Skip the JARs known not to
      * have any TLDs in them.
+     * 
+     * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
     private void tldScanWebInfLib() {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("tldConfig.webinflibStart"));
         }
-
-        DirContext resources = context.getResources();
-        try {
-            NamingEnumeration<NameClassPair> items =
-                resources.list(WEB_INF_LIB);
-            
-            while (items.hasMoreElements()) {
-                NameClassPair item = items.nextElement();
-                String name = item.getName();
-                if (name.endsWith(JAR_EXT) && !noTldJars.contains(name)) {
+        ServletContext ctxt = context.getServletContext();
+        
+        Set<String> dirList = ctxt.getResourcePaths(WEB_INF_LIB);
+        if (dirList != null) {
+            Iterator<String> it = dirList.iterator();
+            while (it.hasNext()) {
+                String path = it.next();
+                if (path.endsWith(JAR_EXT) &&
+                        !noTldJars.contains(
+                                path.substring(path.lastIndexOf('/')))) {
                     // Need to scan this JAR for TLDs
+                    URL url = null;
                     try {
-                        tldScanJar(WEB_INF_LIB + name);
-                    } catch (Exception e) {
+                        url = ctxt.getResource(path);
+                        tldScanJar(url);
+                    } catch (IOException e) {
                         log.warn(sm.getString("tldConfig.webinflibJarFail"), e);
                     }
                 }
             }
-        } catch (NamingException e) {
-            // Silent catch: it's valid that no /WEB-INF/lib directory exists
         }
     }
 
-    /**
-     * Scan the JAR file at the specified resource path for TLDs in the
-     * <code>META-INF</code> subdirectory, and scan each TLD for application
-     * event listeners that need to be registered.
-     *
-     * @param resourcePath Resource path of the JAR file to scan
-     *
-     * @exception Exception if an exception occurs while scanning this JAR
-     */
-    private void tldScanJar(String resourcePath) throws Exception {
-
-        URL url = context.getServletContext().getResource(resourcePath);
-        if (url == null) {
-            throw new IllegalArgumentException
-                                (sm.getString("contextConfig.tldResourcePath",
-                                              resourcePath));
-        }
-
-        File file = null;
-        try {
-            file = new File(url.toURI());
-        } catch (URISyntaxException e) {
-            // Ignore, probably an unencoded char
-            file = new File(url.getFile());
-        }
-        try {
-            file = file.getCanonicalFile();
-        } catch (IOException e) {
-            // Ignore
-        }
-        tldScanJar(file);
-
-    }
-
-    /**
-     * Scans all TLD entries in the given JAR for application listeners.
-     *
-     * @param file JAR file whose TLD entries are scanned for application
-     * listeners
-     */
-    private void tldScanJar(File file) {
-
-        JarFile jarFile = null;
-        String jarPath = file.getAbsolutePath();
-
-        try {
-            jarFile = new JarFile(file);
-            tldScanJar(jarFile, jarPath);
-        } catch (Exception e) {
-            log.error(sm.getString("contextConfig.tldJarException",
-                                   jarPath, context.getPath()),
-                      e);
-        } finally {
-            if (jarFile != null) {
-                try {
-                    jarFile.close();
-                } catch (Throwable t) {
-                    // Ignore
-                }
-            }
-        }
-    }
-
-    private void tldScanJar(JarFile jarFile, String jarLocation) {
-
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("tldConfig.jarStart", jarLocation));
-        }
-
-        String name = null;
-        Enumeration<JarEntry> entries = jarFile.entries();
-        while (entries.hasMoreElements()) {
-            JarEntry entry = entries.nextElement();
-            name = entry.getName();
-            if (!name.startsWith("META-INF/")) {
-                continue;
-            }
-            if (!name.endsWith(TLD_EXT)) {
-                continue;
-            }
-            if (log.isTraceEnabled()) {
-                log.trace(sm.getString("tldConfig.processingTld", name));
-            }
-            try{
-                tldScanStream(
-                        new InputSource(jarFile.getInputStream(entry)));
-            } catch (Exception e) {
-                log.error(sm.getString("contextConfig.tldEntryException",
-                                       name, jarLocation, context.getPath()),
-                          e);
-            }
-        }
-    }
-
-
-    /**
-     * Scan the TLD contents in the specified input stream, and register
-     * any application event listeners found there.  <b>NOTE</b> - It is
-     * the responsibility of the caller to close the InputStream after this
-     * method returns.
-     *
-     * @param resourceStream InputStream containing a tag library descriptor
-     *
-     * @exception Exception if an exception occurs while scanning this TLD
-     */
-    private void tldScanStream(InputSource resourceStream)
-        throws Exception {
-
-        synchronized (tldDigester) {
-            try {
-                tldDigester.push(this);
-                tldDigester.parse(resourceStream);
-            } finally {
-                tldDigester.reset();
-            }
-        }
-
-    }
-
-    /**
-     * Scan the TLD contents at the specified resource path, and register
-     * any application event listeners found there.
-     *
-     * @param resourcePath Resource path being scanned
-     *
-     * @exception Exception if an exception occurs while scanning this TLD
-     */
-    private void tldScanTld(String resourcePath) throws Exception {
-
-        if (log.isTraceEnabled()) {
-            log.trace(sm.getString("tldConfig.processingTld", resourcePath));
-        }
-
-        InputSource inputSource = null;
-        try {
-            InputStream stream =
-                context.getServletContext().getResourceAsStream(resourcePath);
-            if (stream == null) {
-                throw new IllegalArgumentException
-                (sm.getString("contextConfig.tldResourcePath",
-                        resourcePath));
-            }
-            inputSource = new InputSource(stream);
-            tldScanStream(inputSource);
-        } catch (Exception e) {
-             throw new ServletException
-                 (sm.getString("contextConfig.tldFileException", resourcePath,
-                               context.getPath()),
-                  e);
-        } 
-
-    }
-
-    /**
+    /*
      * Scan the classloader hierarchy for JARs and, optionally, for JARs where
      * the name doesn't end in .jar and directories that represent exploded
      * JARs. The JARs under WEB-INF/lib will be skipped as they have been
@@ -642,100 +500,102 @@ public final class TldConfig  implements LifecycleListener {
      * order defined in the JSP spec. It allows tag libraries packaged as JAR
      * files to be shared by web applications by simply dropping them in a 
      * location that all web applications have access to (e.g.,
-     * <CATALINA_HOME>/common/lib). It also supports some of the weird and
+     * <CATALINA_HOME>/lib). It also supports some of the weird and
      * wonderful arrangements present when Tomcat gets embedded.
      *
      * The set of shared JARs to be scanned for TLDs is narrowed down by
      * the <tt>noTldJars</tt> class variable, which contains the names of JARs
      * that are known not to contain any TLDs.
+     * 
+     * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
     private void tldScanClassloaders() {
 
-        ClassLoader webappLoader = Thread.currentThread().getContextClassLoader();
-        ClassLoader loader = webappLoader;
+        ClassLoader loader = 
+            Thread.currentThread().getContextClassLoader();
+        
         while (loader != null) {
             if (loader instanceof URLClassLoader) {
                 URL[] urls = ((URLClassLoader) loader).getURLs();
                 for (int i=0; i<urls.length; i++) {
-                    URL url = urls[i];
-                    
                     // Extract the jarName if there is one to be found
-                    String jarName = getJarName(url);
+                    String jarName = getJarName(urls[i]);
                     
-                    // Skip JARs in WEB-INF/lib - we already scanned them
-                    if (jarName != null &&
-                            url.getPath().contains(WEB_INF_LIB + jarName)) {
-                        continue;
-                    }
-                    
-                    // Skip JARs we know we don't want to scan
-                    if (jarName != null && noTldJars.contains(jarName)) {
-                        continue;
-                    }
-
-                    // Handle JAR URLs
-                    if ("jar".equals(url.getProtocol())) {
-                        JarFile jarFile = null;
+                    // Skip JARs with known not to contain TLDs and JARs in
+                    // WEB-INF/lib we have already scanned
+                    if (!(noTldJars.contains(jarName) ||
+                            urls[i].toString().contains(
+                                    WEB_INF_LIB + jarName))) {
                         try {
-                            JarURLConnection conn =
-                                (JarURLConnection) url.openConnection();
-                            // Avoid the possibility of locking the JAR
-                            conn.setUseCaches(false);
-                            jarFile = conn.getJarFile(); 
-                            tldScanJar(jarFile, conn.getJarFileURL().toString());
-                        } catch (Exception e) {
-                            log.error(sm.getString("contextConfig.tldJarException",
-                                                   url, context.getPath()),
-                                      e);
-                        } finally {
-                            if (jarFile != null) {
-                                try {
-                                    jarFile.close();
-                                } catch (Throwable t) {
-                                    // ignore
-                                }
-                            }
+                            tldScanJar(urls[i]);
+                        } catch (IOException ioe) {
+                            log.warn(sm.getString(
+                                    "tldConfig.classloaderFail",urls[i]), ioe);
                         }
-                        
-                        // Move on to the next URL
-                        continue;
                     }
-
-                    // At this point, if it isn't a file URL - can't handle it
-                    if (!"file".equals(url.getProtocol())) {
-                        continue;
-                    }
-                    
-                    // File URLs may %xx encoded or not depending on the class
-                    // loader
-                    File file = null;
-                    try {
-                        file = new File(url.toURI());
-                    } catch (URISyntaxException e) {
-                        // Ignore, probably an unencoded char
-                        file = new File(urls[i].getFile());
-                    }
-                    try {
-                        file = file.getCanonicalFile();
-                    } catch (IOException e) {
-                        // Ignore
-                    }
-                    if (!file.exists()) {
-                        continue;
-                    }
-                    String path = file.getAbsolutePath();
-                    if (!path.endsWith(JAR_EXT)) {
-                        continue;
-                    }
-
-                    tldScanJar(file);
                 }
             }
             loader = loader.getParent();
         }
     }
 
-    // Extract the JAR name, if present, from a URL
+    /*
+     * Keep in sync with o.a.j.comiler.TldLocationsCache
+     */
+    private void tldScanJar(URL url) throws IOException {
+        URLConnection conn = url.openConnection();
+        if (conn instanceof JarURLConnection) {
+            tldScanJar((JarURLConnection) conn);
+        } else {
+            String urlStr = url.toString();
+            if (urlStr.startsWith("file:")
+                    && urlStr.endsWith(JAR_EXT)) {
+                URL jarURL = new URL("jar:" + urlStr + "!/");
+                tldScanJar((JarURLConnection) jarURL.openConnection());
+            }
+        }
+    }
+
+    /*
+     * Scans the given JarURLConnection for TLD files located in META-INF
+     * (or a sub-directory of it).
+     *
+     * @param conn The JarURLConnection to the JAR file to scan
+     * 
+     * Keep in sync with o.a.j.comiler.TldLocationsCache
+     */
+    private void tldScanJar(JarURLConnection conn) throws IOException {
+
+        JarFile jarFile = null;
+        try {
+            conn.setUseCaches(false);
+            jarFile = conn.getJarFile();
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                String name = entry.getName();
+                if (!name.startsWith("META-INF/")) continue;
+                if (!name.endsWith(".tld")) continue;
+                InputStream stream = jarFile.getInputStream(entry);
+                tldScanStream(stream);
+            }
+        } finally {
+            if (jarFile != null) {
+                try {
+                    jarFile.close();
+                } catch (Throwable t) {
+                    // ignore
+                }
+            }
+        }
+    }
+
+
+    /*
+     * Extract the JAR name, if present, from a URL
+     * 
+     * Keep in sync with o.a.j.comiler.TldLocationsCache
+     */
     private String getJarName(URL url) {
         
         String name = null;
@@ -748,6 +608,39 @@ public final class TldConfig  implements LifecycleListener {
         }
         
         return name;
+    }
+
+    /*
+     * Scan the TLD contents in the specified input stream, and register
+     * any application event listeners found there.  <b>NOTE</b> - This 
+     * method ensure that the InputStream is correctly closed.
+     *
+     * @param resourceStream InputStream containing a tag library descriptor
+     *
+     * @throws IOException  If the file cannot be read
+     */
+    private void tldScanStream(InputStream resourceStream) throws IOException {
+        
+        InputSource source = new InputSource(resourceStream);
+        
+        synchronized (tldDigester) {
+            try {
+                tldDigester.push(this);
+                tldDigester.parse(source);
+            } catch (SAXException s) {
+                // Hack - makes exception handling simpler
+                throw new IOException(s);
+            } finally {
+                tldDigester.reset();
+                if (resourceStream != null) {
+                    try {
+                        resourceStream.close();
+                    } catch (Throwable t) {
+                        // do nothing
+                    }
+                }
+            }
+        }
     }
 
     public void lifecycleEvent(LifecycleEvent event) {
