@@ -245,7 +245,7 @@ public class TldLocationsCache {
         if (initialized) return;
         try {
             processWebDotXml();
-            processTldsInFileSystem("/WEB-INF/");
+            tldScanResourcePaths("/WEB-INF/");
             scanJars();
             initialized = true;
         } catch (Exception ex) {
@@ -416,8 +416,10 @@ public class TldLocationsCache {
      * Searches the filesystem under /WEB-INF for any TLD files, and adds
      * an implicit map entry to the taglib map for any TLD that has a <uri>
      * element.
+     * 
+     * Keep code in sync with o.a.c.startup.TldConfig
      */
-    private void processTldsInFileSystem(String startPath)
+    private void tldScanResourcePaths(String startPath)
             throws Exception {
 
         Set<String> dirList = ctxt.getResourcePaths(startPath);
@@ -425,30 +427,38 @@ public class TldLocationsCache {
             Iterator<String> it = dirList.iterator();
             while (it.hasNext()) {
                 String path = it.next();
-                if (path.endsWith("/")) {
-                    processTldsInFileSystem(path);
-                }
-                if (!path.endsWith(".tld")) {
+                if (!path.endsWith(".tld")
+                        && (path.startsWith("/WEB-INF/lib/")
+                                || path.startsWith("/WEB-INF/classes/"))) {
                     continue;
                 }
-                InputStream stream = ctxt.getResourceAsStream(path);
-                String uri = null;
-                try {
-                    uri = getUriFromTld(path, stream);
-                } finally {
-                    if (stream != null) {
-                        try {
-                            stream.close();
-                        } catch (Throwable t) {
-                            // do nothing
+                if (path.endsWith(".tld")) {
+                    if (path.startsWith("/WEB-INF/tags/") &&
+                            !path.endsWith("implicit.tld")) {
+                        continue;
+                    }
+                    InputStream stream = ctxt.getResourceAsStream(path);
+                    String uri = null;
+                    try {
+                        uri = getUriFromTld(path, stream);
+                    } finally {
+                        if (stream != null) {
+                            try {
+                                stream.close();
+                            } catch (Throwable t) {
+                                // do nothing
+                            }
                         }
                     }
+                    // Add implicit map entry only if its uri is not already
+                    // present in the map
+                    if (uri != null && mappings.get(uri) == null) {
+                        mappings.put(uri, new String[] { path, null });
+                    }
+                } else {
+                    tldScanResourcePaths(path);
                 }
-                // Add implicit map entry only if its uri is not already
-                // present in the map
-                if (uri != null && mappings.get(uri) == null) {
-                    mappings.put(uri, new String[] { path, null });
-                }
+
             }
         }
     }
