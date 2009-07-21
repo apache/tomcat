@@ -80,7 +80,9 @@ public class AsyncContextImpl implements AsyncContext {
 
     public void dispatch(ServletContext context, String path) {
         // TODO SERVLET3 - async
-        if (this.state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING)) {
+        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
+            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
+
             if (request.getAttribute(ASYNC_REQUEST_URI)==null) {
                 request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
                 request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
@@ -159,7 +161,7 @@ public class AsyncContextImpl implements AsyncContext {
         if (state.compareAndSet(AsyncState.NOT_STARTED, AsyncState.STARTED)) {
             this.context = context;
         } else {
-            throw new IllegalStateException("Already started.");
+            throw new IllegalStateException("Start illegal. Invalid state: "+state.get());
         }
     }
 
