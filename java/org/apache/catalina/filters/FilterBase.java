@@ -42,7 +42,6 @@ public abstract class FilterBase implements Filter {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         Enumeration<String> paramNames = filterConfig.getInitParameterNames();
         while (paramNames.hasMoreElements()) {
