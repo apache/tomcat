@@ -46,6 +46,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
@@ -1464,9 +1465,9 @@ public class Request
         if (!isAsyncSupported()) throw new IllegalStateException("Not supported.");
         if (asyncContext==null) asyncContext = new AsyncContextImpl(this);
         else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
+        asyncContext.setStarted(getContext());
         asyncContext.setServletRequest(getRequest());
         asyncContext.setServletResponse(response.getResponse());
-        asyncContext.setStarted(getContext());
         return asyncContext;
     }
 
@@ -1474,6 +1475,9 @@ public class Request
         startAsync();
         asyncContext.setServletRequest(request);
         asyncContext.setServletResponse(response);
+        //TODO SERVLET3 - async - need to retrieve the ServletContext here
+        //or just the webapp classloader associated with to do 
+        //run with start(Runnable)
         asyncContext.setHasOriginalRequestAndResponse(request==getRequest() && response==getResponse().getResponse());
         return asyncContext;
     }

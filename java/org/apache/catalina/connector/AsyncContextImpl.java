@@ -121,10 +121,24 @@ public class AsyncContextImpl implements AsyncContext {
         return getServletResponse();
     }
 
-    public void start(Runnable run) {
-        // TODO SERVLET3 - async
-        this.dispatch = run;
-        request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, null );
+    public void start(final Runnable run) {
+        if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
+            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
+            // TODO SERVLET3 - async
+            Runnable r = new Runnable() {
+                public void run() {
+                    try {
+                        run.run();
+                    }catch (Exception x) {
+                        log.error("Unable to run async task.",x);
+                    }
+                }
+            };
+            this.dispatch = r;
+            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, null );
+        } else {
+            throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
+        }
     }
     
     public void addAsyncListener(AsyncListener listener) {
