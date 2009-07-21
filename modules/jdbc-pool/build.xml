@@ -451,7 +451,7 @@
   <target name="onetest" depends="build,build-test">
     
     <echo>Testing:${test}</echo>
-    <junit printsummary="yes">
+    <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
       <formatter type="plain"/>
       <classpath refid="tomcat.jdbc.classpath"/>
@@ -461,8 +461,6 @@
           <include name="org/apache/tomcat/jdbc/test/*${test}*.java"/>
           <exclude name="**/CreateTestTable*"/>
           <exclude name="**/DefaultTestCase*"/>
-          <exclude name="**/CheckOutThread*"/>
-          <exclude name="**/Fairness*"/>
         </fileset>
       </batchtest>
     </junit>
