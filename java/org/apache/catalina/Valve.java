@@ -94,7 +94,7 @@ public interface Valve {
      *     and pass them on.
      * <li>If the corresponding Response was not generated (and control was not
      *     returned, call the next Valve in the pipeline (if there is one) by
-     *     executing <code>context.invokeNext()</code>.
+     *     executing <code>getNext().invoke()</code>.
      * <li>Examine, but not modify, the properties of the resulting Response
      *     (which was created by a subsequently invoked Valve or Container).
      * </ul>
@@ -112,9 +112,9 @@ public interface Valve {
      *     unless it is completely generating the response, or wrapping the
      *     request before passing it on.
      * <li>Modify the HTTP headers included with the Response after the
-     *     <code>invokeNext()</code> method has returned.
+     *     <code>getNext().invoke()</code> method has returned.
      * <li>Perform any actions on the output stream associated with the
-     *     specified Response after the <code>invokeNext()</code> method has
+     *     specified Response after the <code>getNext().invoke()</code> method has
      *     returned.
      * </ul>
      *
