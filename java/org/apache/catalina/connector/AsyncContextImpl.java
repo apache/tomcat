@@ -44,7 +44,7 @@ public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
         NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING
-    };
+    }
     
     protected static Log log = LogFactory.getLog(AsyncContextImpl.class);
     
@@ -63,25 +63,21 @@ public class AsyncContextImpl implements AsyncContext {
         this.request = request;
     }
 
-    @Override
     public void complete() {
         // TODO SERVLET3 - async
         doInternalComplete(false);
     }
 
-    @Override
     public void dispatch() {
         HttpServletRequest sr = (HttpServletRequest)getServletRequest();
         String path = sr.getRequestURI();
         dispatch(path);
     }
 
-    @Override
     public void dispatch(String path) {
         dispatch(request.getServletContext(),path);
     }
 
-    @Override
     public void dispatch(ServletContext context, String path) {
         // TODO SERVLET3 - async
         if (this.state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING)) {
@@ -115,17 +111,14 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
 
-    @Override
     public ServletRequest getRequest() {
         return getServletRequest();
     }
 
-    @Override
     public ServletResponse getResponse() {
         return getServletResponse();
     }
 
-    @Override
     public void start(Runnable run) {
         // TODO SERVLET3 - async
         this.dispatch = run;
@@ -186,7 +179,6 @@ public class AsyncContextImpl implements AsyncContext {
         this.servletResponse = servletResponse;
     }
 
-    @Override
     public boolean hasOriginalRequestAndResponse() {
         return hasOriginalRequestAndResponse;
     }
