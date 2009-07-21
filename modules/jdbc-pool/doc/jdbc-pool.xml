@@ -354,7 +354,9 @@
       <p>(boolean) Set to true if you wish that calls to getConnection should be treated
          fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code> 
          implementation for the list of the idle connections. The default value is <code>false</code>.
-         This flag is required when you want to use asynchronous connection retrieval.
+         This flag is required when you want to use asynchronous connection retrieval.<br/>
+         During performance tests, the fairQueue does very well on a multi core Solaris system,
+         but performs terribly on a Linux Fedora 11 system. On Linux we recommend setting this to false. 
       </p>
     </attribute>
 
