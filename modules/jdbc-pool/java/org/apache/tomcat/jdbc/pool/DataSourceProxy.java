@@ -717,7 +717,7 @@ public class DataSourceProxy implements PoolConfiguration {
      */
     @Override
     public String getName() {
-        return getName();
+        return getPoolProperties().getName();
     }
 
     /** 
