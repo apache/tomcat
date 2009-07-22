@@ -239,7 +239,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     }    
 
     public String getName() {
-        return getName();
+        return this.getPoolName();
     }
 
     public int getNumTestsPerEvictionRun() {
