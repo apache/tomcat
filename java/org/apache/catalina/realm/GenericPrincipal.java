@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
 
 import org.apache.catalina.Realm;
 
