@@ -462,7 +462,7 @@ public class Tomcat {
                 if (p == null) {
                     String pass = userPass.get(username);
                     if (pass != null) {
-                        p = new GenericPrincipal(this, username, pass, 
+                        p = new GenericPrincipal(username, pass,
                                 userRoles.get(username));
                         userPrincipals.put(username, p);
                     }

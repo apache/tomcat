@@ -53,7 +53,7 @@ public class TestSerializablePrincipal extends TestCase {
         roles.add("RoleB");
         TesterPrincipal tpOriginal = new TesterPrincipal("inner");
         GenericPrincipal gpOriginal =
-            new GenericPrincipal(null, "usr", "pwd", roles, tpOriginal);
+            new GenericPrincipal("usr", "pwd", roles, tpOriginal);
         
         // Do the serialization
         try {
@@ -75,7 +75,7 @@ public class TestSerializablePrincipal extends TestCase {
         try {
             FileInputStream fis = new FileInputStream(file);
             ObjectInputStream ois = new ObjectInputStream(fis);
-            gpNew = SerializablePrincipal.readPrincipal(ois, null);
+            gpNew = SerializablePrincipal.readPrincipal(ois);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             fail("fnfe reading object output stream");

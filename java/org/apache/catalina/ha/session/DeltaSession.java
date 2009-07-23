@@ -598,7 +598,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         boolean hasPrincipal = stream.readBoolean();
         principal = null;
         if (hasPrincipal) {
-            principal = SerializablePrincipal.readPrincipal(stream,getManager().getContainer().getRealm());
+            principal = SerializablePrincipal.readPrincipal(stream);
         }
 
         //        setId((String) stream.readObject());
