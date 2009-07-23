@@ -184,7 +184,7 @@ public class DeltaRequest implements Externalizable {
                     Principal p = null;
                     if ( info.getAction() == ACTION_SET ) {
                         SerializablePrincipal sp = (SerializablePrincipal)info.getValue();
-                        p = sp.getPrincipal(session.getManager().getContainer().getRealm());
+                        p = sp.getPrincipal();
                     }
                     session.setPrincipal(p,false);
                     break;
