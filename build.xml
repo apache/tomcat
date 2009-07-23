@@ -20,7 +20,7 @@
 
   <!-- ===================== Initialize Property Values =================== -->
 
-  <!-- See "build.properties.sample" in the top level directory for all     -->
+  <!-- See "build.properties.default" in the top level directory for all     -->
   <!-- property values you must customize for successful building!!!        -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
