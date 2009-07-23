@@ -410,6 +410,110 @@
 </section>
 
 
+<section name="Basic Authenticator Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Basic Authenticator Valve</strong> is automatically added to
+    any <a href="context.html">Context</a> that is configured to use BASIC
+    authentication.</p>
+
+    <p>If any non-default settings are required, the valve may be configured
+    within <a href="context.html">Context</a> element with the required
+    values.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Basic Authenticator Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.BasicAuthenticator</strong>.</p>
+      </attribute>
+
+      <attribute name="disableProxyCaching" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers but will also cause secured pages to be
+        cached by proxies which will almost certainly be a security issue.
+        <code>securePagesWithPragma</code> offers an alternative, secure,
+        workaround for browser caching issues. If not set, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="securePagesWithPragma" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers by using
+        <code>Cache-Control: private</code> rather than the default of
+        <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
+        If not set, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="Digest Authenticator Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Digest Authenticator Valve</strong> is automatically added to
+    any <a href="context.html">Context</a> that is configured to use DIGEST
+    authentication.</p>
+
+    <p>If any non-default settings are required, the valve may be configured
+    within <a href="context.html">Context</a> element with the required
+    values.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Digest Authenticator Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.DigestAuthenticator</strong>.</p>
+      </attribute>
+
+      <attribute name="disableProxyCaching" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers but will also cause secured pages to be
+        cached by proxies which will almost certainly be a security issue.
+        <code>securePagesWithPragma</code> offers an alternative, secure,
+        workaround for browser caching issues. If not set, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="securePagesWithPragma" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers by using
+        <code>Cache-Control: private</code> rather than the default of
+        <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
+        If not set, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
 <section name="Form Authenticator Valve">
 
   <subsection name="Introduction">
@@ -440,6 +544,77 @@
         <p>Character encoding to use to read the username and password parameters
         from the request. If not set, the encoding of the request body will be
         used.</p>
+      </attribute>
+      
+      <attribute name="disableProxyCaching" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers but will also cause secured pages to be
+        cached by proxies which will almost certainly be a security issue.
+        <code>securePagesWithPragma</code> offers an alternative, secure,
+        workaround for browser caching issues. If not set, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="securePagesWithPragma" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers by using
+        <code>Cache-Control: private</code> rather than the default of
+        <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
+        If not set, the default value of <code>true</code> will be used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
+
+<section name="SSL Authenticator Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>SSL Authenticator Valve</strong> is automatically added to
+    any <a href="context.html">Context</a> that is configured to use SSL
+    authentication.</p>
+
+    <p>If any non-default settings are required, the valve may be configured
+    within <a href="context.html">Context</a> element with the required
+    values.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>SSL Authenticator Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.authenticator.SSLAuthenticator</strong>.</p>
+      </attribute>
+
+      <attribute name="disableProxyCaching" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers but will also cause secured pages to be
+        cached by proxies which will almost certainly be a security issue.
+        <code>securePagesWithPragma</code> offers an alternative, secure,
+        workaround for browser caching issues. If not set, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="securePagesWithPragma" required="false">
+        <p>Controls the caching of pages that are protected by security
+        constraints. Setting this to <code>false</code> may help work around
+        caching issues in some browsers by using
+        <code>Cache-Control: private</code> rather than the default of
+        <code>Pragma: No-cache</code> and <code>Cache-control: No-cache</code>.
+        If not set, the default value of <code>true</code> will be used.</p>
       </attribute>
 
     </attributes>
