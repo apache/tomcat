@@ -4,7 +4,7 @@ import org.apache.catalina.ha.session.TestSerializablePrincipal;
 import org.apache.catalina.startup.TestTomcat;
 import org.apache.catalina.tribes.test.TribesTestSuite;
 import org.apache.el.lang.TestELSupport;
-import org.apache.el.parser.TestELParser;
+import org.apache.el.TestELEvaluation;
 import org.apache.tomcat.util.http.TestCookies;
 import org.apache.tomcat.util.res.TestStringManager;
 
@@ -25,7 +25,7 @@ public class TestAll {
         // suite.addTest(TribesTestSuite.suite());
         // o.a.el
         suite.addTestSuite(TestELSupport.class);
-        suite.addTestSuite(TestELParser.class);
+        suite.addTestSuite(TestELEvaluation.class);
         // o.a.tomcat.util
         suite.addTestSuite(TestStringManager.class);
         
