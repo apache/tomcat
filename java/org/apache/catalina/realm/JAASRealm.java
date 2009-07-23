@@ -539,7 +539,7 @@ public class JAASRealm
         }
 
         // Return the resulting Principal for our authenticated user
-        return new GenericPrincipal(this, username, null, roles, userPrincipal,
+        return new GenericPrincipal(username, null, roles, userPrincipal,
                 loginContext);
     }
 

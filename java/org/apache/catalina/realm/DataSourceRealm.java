@@ -338,7 +338,7 @@ public class DataSourceRealm
         ArrayList<String> list = getRoles(dbConnection, username);
 
         // Create and return a suitable Principal for this user
-        return (new GenericPrincipal(this, username, credentials, list));
+        return (new GenericPrincipal(username, credentials, list));
 
     }
 
@@ -477,11 +477,10 @@ public class DataSourceRealm
     protected Principal getPrincipal(String username) {
     	Connection dbConnection = open();
         if (dbConnection == null) {
-            return new GenericPrincipal(this,username, null, null);
+            return new GenericPrincipal(username, null, null);
         }
         try {
-        	return (new GenericPrincipal(this,
-        			username,
+        	return (new GenericPrincipal(username,
 					getPassword(dbConnection, username),
 					getRoles(dbConnection, username)));
         } finally {

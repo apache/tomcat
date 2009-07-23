@@ -25,8 +25,6 @@ import java.util.List;
 
 import javax.security.auth.login.LoginContext;
 
-import org.apache.catalina.Realm;
-
 
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that
@@ -46,13 +44,12 @@ public class GenericPrincipal implements Principal {
      * Construct a new Principal, associated with the specified Realm, for the
      * specified username and password.
      *
-     * @param realm The Realm that owns this Principal
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      */
-    public GenericPrincipal(Realm realm, String name, String password) {
+    public GenericPrincipal(String name, String password) {
 
-        this(realm, name, password, null);
+        this(name, password, null);
 
     }
 
@@ -62,14 +59,12 @@ public class GenericPrincipal implements Principal {
      * specified username and password, with the specified role names
      * (as Strings).
      *
-     * @param realm The Realm that owns this principal
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
      */
-    public GenericPrincipal(Realm realm, String name, String password,
-                            List<String> roles) {
-        this(realm, name, password, roles, null);
+    public GenericPrincipal(String name, String password, List<String> roles) {
+        this(name, password, roles, null);
     }
 
     /**
@@ -77,16 +72,15 @@ public class GenericPrincipal implements Principal {
      * specified username and password, with the specified role names
      * (as Strings).
      *
-     * @param realm The Realm that owns this principal
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
      * @param userPrincipal - the principal to be returned from the request 
      *        getUserPrincipal call if not null; if null, this will be returned
      */
-    public GenericPrincipal(Realm realm, String name, String password,
-                            List<String> roles, Principal userPrincipal) {
-        this(realm, name, password, roles, userPrincipal, null);
+    public GenericPrincipal(String name, String password, List<String> roles,
+            Principal userPrincipal) {
+        this(name, password, roles, userPrincipal, null);
     }
     
     /**
@@ -94,7 +88,6 @@ public class GenericPrincipal implements Principal {
      * specified username and password, with the specified role names
      * (as Strings).
      *
-     * @param realm The Realm that owns this principal
      * @param name The username of the user represented by this Principal
      * @param password Credentials used to authenticate this user
      * @param roles List of roles (must be Strings) possessed by this user
@@ -103,11 +96,9 @@ public class GenericPrincipal implements Principal {
      * @param loginContext  - If provided, this will be used to log out the user
      *        at the appropriate time
      */
-    public GenericPrincipal(Realm realm, String name, String password,
-                            List<String> roles, Principal userPrincipal,
-                            LoginContext loginContext) {
+    public GenericPrincipal(String name, String password, List<String> roles,
+            Principal userPrincipal, LoginContext loginContext) {
         super();
-        this.realm = realm;
         this.name = name;
         this.password = password;
         this.userPrincipal = userPrincipal;
@@ -142,20 +133,6 @@ public class GenericPrincipal implements Principal {
 
     public String getPassword() {
         return (this.password);
-    }
-
-
-    /**
-     * The Realm with which this Principal is associated.
-     */
-    protected Realm realm = null;
-
-    public Realm getRealm() {
-        return (this.realm);
-    }
-
-    void setRealm( Realm realm ) {
-        this.realm=realm;
     }
 
 
