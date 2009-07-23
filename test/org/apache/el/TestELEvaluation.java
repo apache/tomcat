@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.el.parser;
+package org.apache.el;
 
 import javax.el.ValueExpression;
 
@@ -24,34 +24,36 @@ import org.apache.jasper.el.ELContextImpl;
 
 import junit.framework.TestCase;
 
-public class TestELParser extends TestCase {
-    
-    public void testBug45511() {
+/**
+ * Tests for EL parsing and evaluation.
+ */
+public class TestELEvaluation extends TestCase {
+
+    public void testParserBug45511() {
         // Test cases provided by OP
         assertEquals("true", evaluateExpression("${empty ('')}"));
         assertEquals("true", evaluateExpression("${empty('')}"));
         assertEquals("false", evaluateExpression("${(true) and (false)}"));
         assertEquals("false", evaluateExpression("${(true)and(false)}"));
     }
-    
 
-    public void testBug42565() {
+    public void testParserBug42565() {
         // Test cases provided by OP
         assertEquals("false", evaluateExpression("${false?true:false}"));
     }
-
 
     public void testMisc() {
         // From bug 45451 - not a parser bug
         assertEquals("\\", evaluateExpression("\\\\"));
     }
-    
+
+    // ************************************************************************
 
     private String evaluateExpression(String expression) {
         ELContextImpl ctx = new ELContextImpl();
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
-        ValueExpression ve =
-            exprFactory.createValueExpression(ctx, expression, String.class );
+        ValueExpression ve = exprFactory.createValueExpression(ctx, expression,
+                String.class);
         return (String) ve.getValue(ctx);
     }
 }
