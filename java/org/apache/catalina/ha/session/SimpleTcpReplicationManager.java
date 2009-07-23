@@ -434,7 +434,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
                 p = (SerializablePrincipal)session_in.readObject();
             ((ReplicatedSession)session).readObjectData(session_in);
             if ( hasPrincipal )
-                session.setPrincipal(p.getPrincipal(getContainer().getRealm()));
+                session.setPrincipal(p.getPrincipal());
             ((ReplicatedSession)session).setId(sessionId,isNew);
             ReplicatedSession rsession = (ReplicatedSession)session; 
             rsession.setAccessCount(1);

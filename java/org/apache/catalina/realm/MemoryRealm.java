@@ -197,7 +197,7 @@ public class MemoryRealm  extends RealmBase {
 
         // Construct and cache the Principal for this user
         GenericPrincipal principal =
-            new GenericPrincipal(this, username, password, list);
+            new GenericPrincipal(username, password, list);
         principals.put(username, principal);
 
     }
