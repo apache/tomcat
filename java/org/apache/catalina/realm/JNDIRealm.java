@@ -1025,8 +1025,7 @@ public class JNDIRealm extends RealmBase {
                                     containerLog.debug("Found role: " + it.next());
                                 }
                             }
-                            return (new GenericPrincipal(this,
-                                                         username,
+                            return (new GenericPrincipal(username,
                                                          credentials,
                                                          roles));
                         }
@@ -1061,7 +1060,7 @@ public class JNDIRealm extends RealmBase {
             }
 
             // Create and return a suitable Principal for this user
-            return (new GenericPrincipal(this, username, credentials, roles));
+            return (new GenericPrincipal(username, credentials, roles));
         }
     }
 
@@ -1883,7 +1882,7 @@ public class JNDIRealm extends RealmBase {
 
         User user = getUser(context, username);
 
-        return new GenericPrincipal(this, user.username, user.password ,
+        return new GenericPrincipal(user.username, user.password ,
                 getRoles(context, user));
     }
 

@@ -228,7 +228,7 @@ public class UserDatabaseRealm
                 roles.add(role.getName());
             }
         }
-        return new GenericPrincipal(this, username, user.getPassword(), roles, user);
+        return new GenericPrincipal(username, user.getPassword(), roles, user);
     }
 
 

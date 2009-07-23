@@ -870,10 +870,6 @@ public abstract class RealmBase
             return (false);
 
         GenericPrincipal gp = (GenericPrincipal) principal;
-        if (!(gp.getRealm() == this)) {
-            if(log.isDebugEnabled())
-                log.debug("Different realm " + this + " " + gp.getRealm());//    return (false);
-        }
         boolean result = gp.hasRole(role);
         if (log.isDebugEnabled()) {
             String name = principal.getName();
