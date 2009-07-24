@@ -353,10 +353,16 @@
     <attribute name="fairQueue" required="false">
       <p>(boolean) Set to true if you wish that calls to getConnection should be treated
          fairly in a true FIFO fashion. This uses the <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue</code> 
-         implementation for the list of the idle connections. The default value is <code>false</code>.
+         implementation for the list of the idle connections. The default value is <code>true</code>.
          This flag is required when you want to use asynchronous connection retrieval.<br/>
-         During performance tests, the fairQueue does very well on a multi core Solaris system,
-         but performs terribly on a Linux Fedora 11 system. On Linux we recommend setting this to false. 
+         Setting this flag ensures that threads receive connections in the order they arrive.<br/>
+         During performance tests, there is a very large difference in how locks
+         and lock waiting is implemented. When <code>fairQueue=true></code>
+         there is a decision making process based on what operating system the system is running.
+         If the system is running on Linux (property <code>os.name=Linux</code>.
+         To disable this Linux specific behavior and still use the fair queue, simply add the property
+         <code>org.apache.tomcat.jdbc.pool.FairBlockingQueue.ignoreOS=true</code> to your system properties
+         before the connection pool classes are loaded.
       </p>
     </attribute>
 
