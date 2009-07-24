@@ -20,8 +20,15 @@
 
   <!-- ===================== Initialize Property Values =================== -->
 
-  <!-- See "build.properties.sample" in the top level directory for all     -->
-  <!-- property values you must customize for successful building!!!        -->
+  <!-- We read customizable properties from the file "build.properties.default" -->
+  <!-- and also from "build.properties" if it exists.                           -->
+  <!-- The values in "build.properties" have stronger preference.               -->
+  <!-- If you want to customize your build, you can either change the values    -->
+  <!-- directly in the default file, or create a new build.properties and set   -->
+  <!-- the values there. This way you don't have to change a file which is part -->
+  <!-- of the original project source code.                                     -->
+  <!-- See "build.properties.default" in the top level directory for some       -->
+  <!-- property values you may customize.                                       -->
   <property file="${user.home}/build.properties"/>
   <property file="build.properties"/>
 
