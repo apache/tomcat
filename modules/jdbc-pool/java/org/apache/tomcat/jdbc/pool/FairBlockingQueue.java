@@ -43,6 +43,20 @@ import java.util.concurrent.locks.ReentrantLock;
 public class FairBlockingQueue<E> implements BlockingQueue<E> {
     
     /**
+     * This little sucker is used to reorder the way to do 
+     * {@link java.util.concurrent.locks.Lock#lock()},
+     * {@link java.util.concurrent.locks.Lock#unlock()}
+     * and 
+     * {@link java.util.concurrent.CountDownLatch#countDown()}
+     * during the {@link #poll(long, TimeUnit)} operation.
+     * On Linux, it performs much better if we count down while we hold the global
+     * lock, on Solaris its the other way around.
+     * Until we have tested other platforms we only check for Linux.
+     */
+    final static boolean isLinux = "Linux".equals(System.getProperty("os.name")) &&
+                                   (!Boolean.getBoolean(FairBlockingQueue.class.getName()+".ignoreOS"));
+    
+    /**
      * Phase one entry lock in order to give out 
      * per-thread-locks for the waiting phase we have 
      * a phase one lock during the contention period.
@@ -86,6 +100,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 c = waiters.poll();
                 //give the object to the thread instead of adding it to the pool
                 c.setItem(e);
+                if (isLinux && c!=null) c.countDown();
             } else {
                 //we always add first, so that the most recently used object will be given out
                 items.addFirst(e);
@@ -94,7 +109,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             lock.unlock();
         }
         //if we exchanged an object with another thread, wake it up.
-        if (c!=null) c.countDown();
+        if (!isLinux && c!=null) c.countDown();
         //we have an unbounded queue, so always return true
         return true;
     }
@@ -261,6 +276,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * {@inheritDoc}
      * @throws UnsupportedOperation - this operation is not supported
      */
+    
     public int drainTo(Collection<? super E> c) {
         return drainTo(c,Integer.MAX_VALUE);
     }

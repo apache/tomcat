@@ -68,7 +68,7 @@ public class PoolProperties implements PoolConfiguration {
     protected String initSQL;
     protected boolean testOnConnect =false;
     protected String jdbcInterceptors=null;
-    protected boolean fairQueue = false;
+    protected boolean fairQueue = true;
     protected boolean useEquals = false;
     protected int abandonWhenPercentageFull = 0;
     protected long maxAge = 0;
