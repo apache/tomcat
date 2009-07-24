@@ -31,11 +31,13 @@ public class TestConcurrency extends DefaultTestCase {
         ds.getPoolProperties().setTestWhileIdle(true);
         ds.getPoolProperties().setMinEvictableIdleTimeMillis(750);
         ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(25);
+        ds.setFairQueue(true);
     }
 
     @Override
     protected void tearDown() throws Exception {
         Driver.reset();
+        ds.close(true);
         super.tearDown();
     }
     
@@ -92,8 +94,8 @@ public class TestConcurrency extends DefaultTestCase {
     public void testBrutal() throws Exception {
         ds.getPoolProperties().setRemoveAbandoned(false);
         ds.getPoolProperties().setRemoveAbandonedTimeout(1);
-        ds.getPoolProperties().setMinEvictableIdleTimeMillis(10);
-        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.getPoolProperties().setMinEvictableIdleTimeMillis(100);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(10);
         ds.getConnection().close();
         final int iter = 100000 * 10;
         final AtomicInteger loopcount = new AtomicInteger(0);
@@ -119,7 +121,7 @@ public class TestConcurrency extends DefaultTestCase {
         }
         try {
             while (loopcount.get()<iter) {
-                //assertEquals("Size comparison:",10, ds.getPool().getSize());
+                assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
                 ds.getPool().testAllIdle();
                 ds.getPool().checkAbandoned();
                 ds.getPool().checkIdle();
@@ -137,8 +139,56 @@ public class TestConcurrency extends DefaultTestCase {
         assertEquals("Idle comparison:",10, ds.getPool().getIdle());
         assertEquals("Used comparison:",0, ds.getPool().getActive());
         assertEquals("Connect count",10,Driver.connectCount.get());
-            
     }
 
+    public void testBrutalNonFair() throws Exception {
+        ds.getPoolProperties().setRemoveAbandoned(false);
+        ds.getPoolProperties().setRemoveAbandonedTimeout(1);
+        ds.getPoolProperties().setMinEvictableIdleTimeMillis(100);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(10);
+        ds.getConnection().close();
+        final int iter = 100000 * 10;
+        final AtomicInteger loopcount = new AtomicInteger(0);
+        final Runnable run = new Runnable() {
+            public void run() {
+                try {
+                    while (loopcount.incrementAndGet() < iter) {
+                        Connection con = ds.getConnection();
+                        con.close();
+                    }
+                }catch (Exception x) {
+                    loopcount.set(iter); //stops the test
+                    x.printStackTrace();
+                }
+            }
+        };
+        Thread[] threads = new Thread[20];
+        for (int i=0; i<threads.length; i++) {
+            threads[i] = new Thread(run);
+        }
+        for (int i=0; i<threads.length; i++) {
+            threads[i].start();
+        }
+        try {
+            while (loopcount.get()<iter) {
+                assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
+                ds.getPool().testAllIdle();
+                ds.getPool().checkAbandoned();
+                ds.getPool().checkIdle();
+            }
+        }catch (Exception x) {
+            loopcount.set(iter); //stops the test
+            x.printStackTrace();
+        }
+        for (int i=0; i<threads.length; i++) {
+            threads[i].join();
+        }
+        System.out.println("Connect count:"+Driver.connectCount.get());
+        System.out.println("DisConnect count:"+Driver.disconnectCount.get());
+        assertEquals("Size comparison:",10, ds.getPool().getSize());
+        assertEquals("Idle comparison:",10, ds.getPool().getIdle());
+        assertEquals("Used comparison:",0, ds.getPool().getActive());
+        assertEquals("Connect count",10,Driver.connectCount.get());
+    }
     
 }
