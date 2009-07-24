@@ -45,7 +45,11 @@ compile.debug=true
 
 base-commons.loc=http://archive.apache.org/dist/commons
 base-tomcat.loc=http://archive.apache.org/dist/tomcat
-base-sf.loc=http://downloads.sourceforge.net
+#base-sf.loc=http://downloads.sourceforge.net
+# Temporarily use a mirror, while there is a problem
+# with downloads.sourceforge.net
+# https://sourceforge.net/apps/trac/sourceforge/ticket/2628
+base-sf.loc=http://sunet.dl.sourceforge.net
 
 # ----- Commons Logging, version 1.1 or later -----
 commons-logging-version=1.1.1
