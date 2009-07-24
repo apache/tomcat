@@ -78,12 +78,12 @@ commons-pool.home=${base.path}/commons-pool-1.5.2-src
 commons-pool-src.loc=${base-commons.loc}/pool/source/commons-pool-1.5.2-src.tar.gz
 
 # ----- NSIS, version 2.0 or later -----
-nsis.home=${base.path}/nsis-2.44
+nsis.home=${base.path}/nsis-2.45
 nsis.exe=${nsis.home}/makensis.exe
 nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
 nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
 nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
-nsis.loc=${base-sf.loc}/nsis/nsis-2.44.zip
+nsis.loc=${base-sf.loc}/nsis/nsis-2.45.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
 commons-daemon.home=${base.path}/commons-daemon-1.0.1
