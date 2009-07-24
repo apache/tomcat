@@ -250,6 +250,8 @@
         <include name="build.xml"/>
         <include name="build.properties.default"/>
         <include name="doc/*.xml"/>
+      	<include name="doc/*.xsl"/>
+      	<include name="resources/MANIFEST.MF"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
       </fileset>
@@ -261,6 +263,8 @@
         <include name="build.xml"/>
         <include name="build.properties.default"/>
         <include name="doc/*.xml"/>
+      	<include name="doc/*.xsl"/>
+      	<include name="resources/MANIFEST.MF"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
       </fileset>
