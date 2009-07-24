@@ -100,7 +100,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 c = waiters.poll();
                 //give the object to the thread instead of adding it to the pool
                 c.setItem(e);
-                if (isLinux && c!=null) c.countDown();
+                if (isLinux) c.countDown();
             } else {
                 //we always add first, so that the most recently used object will be given out
                 items.addFirst(e);
