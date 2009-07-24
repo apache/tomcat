@@ -148,6 +148,9 @@ public class ConnectionPool {
         if (idle instanceof FairBlockingQueue) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
             return new ConnectionFuture(pcf);
+        } else if (idle instanceof MultiLockFairBlockingQueue) {
+                Future<PooledConnection> pcf = ((MultiLockFairBlockingQueue<PooledConnection>)idle).pollAsync();
+                return new ConnectionFuture(pcf);
         } else {
             throw new SQLException("Connection pool is misconfigured, doesn't support async retrieval. Set the 'fair' property to 'true'");
         }
@@ -306,21 +309,6 @@ public class ConnectionPool {
     }
 
     /**
-     * If the connection pool gets garbage collected, lets make sure we clean up
-     * and close all the connections.
-     * {@inheritDoc}
-     */
-    @Override
-    protected void finalize() throws Throwable {
-//        Runnable closer = new Runnable() {
-//            public void run() {
-//                close(true);
-//            }
-//        };
-//        this.cancellator.execute(closer);
-    }
-
-    /**
      * Closes the pool and all disconnects all idle connections
      * Active connections will be closed upon the {@link java.sql.Connection#close close} method is called
      * on the underlying connection instead of being returned to the pool
@@ -381,6 +369,7 @@ public class ConnectionPool {
         //make space for 10 extra in case we flow over a bit
         if (properties.isFairQueue()) {
             idle = new FairBlockingQueue<PooledConnection>();
+            //idle = new MultiLockFairBlockingQueue<PooledConnection>();
         } else {
             idle = new ArrayBlockingQueue<PooledConnection>(properties.getMaxActive(),properties.isFairQueue());
         }
