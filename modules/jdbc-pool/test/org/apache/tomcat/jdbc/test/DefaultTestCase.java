@@ -52,6 +52,7 @@ public class DefaultTestCase extends TestCase {
     public org.apache.tomcat.jdbc.pool.DataSource createDefaultDataSource() {
         org.apache.tomcat.jdbc.pool.DataSource datasource = null;
         PoolConfiguration p = new DefaultProperties();
+        p.setFairQueue(false);
         p.setJmxEnabled(false);
         p.setTestWhileIdle(false);
         p.setTestOnBorrow(false);
@@ -77,9 +78,7 @@ public class DefaultTestCase extends TestCase {
 
     protected void transferProperties() {
         try {
-            BasicDataSourceFactory factory = new BasicDataSourceFactory();
             Properties p = new Properties();
-
             for (int i=0; i< ALL_PROPERTIES.length; i++) {
                 String name = "get" + Character.toUpperCase(ALL_PROPERTIES[i].charAt(0)) + ALL_PROPERTIES[i].substring(1);
                 String bname = "is" + name.substring(3);
