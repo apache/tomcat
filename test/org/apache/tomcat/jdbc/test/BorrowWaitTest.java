@@ -32,10 +32,10 @@ public class BorrowWaitTest extends DefaultTestCase {
         this.datasource.setMaxActive(1);
         this.datasource.setMaxWait(wait);
         Connection con = datasource.getConnection();
-        long start = System.currentTimeMillis();
         try {
             Connection con2 = datasource.getConnection();
             assertFalse("This should not happen, connection should be unavailable.",true);
+            con2.close();
         }catch (SQLException x) {
             long delta = System.currentTimeMillis();
             boolean inrange = Math.abs(wait-delta) < 1000;
