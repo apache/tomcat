@@ -38,7 +38,6 @@ public class AbandonPercentageTest extends DefaultTestCase {
         this.datasource.getPoolProperties().setRemoveAbandoned(true);
         this.datasource.getPoolProperties().setRemoveAbandonedTimeout(1);
         Connection con = datasource.getConnection();
-        long start = System.currentTimeMillis();
         assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
         Thread.sleep(2000);
         assertEquals("Number of connections active/busy should be 0",0,datasource.getPool().getActive());
@@ -56,7 +55,6 @@ public class AbandonPercentageTest extends DefaultTestCase {
         this.datasource.getPoolProperties().setRemoveAbandoned(true);
         this.datasource.getPoolProperties().setRemoveAbandonedTimeout(1);
         Connection con = datasource.getConnection();
-        long start = System.currentTimeMillis();
         assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
         Thread.sleep(2000);
         assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
@@ -75,7 +73,6 @@ public class AbandonPercentageTest extends DefaultTestCase {
         this.datasource.getPoolProperties().setRemoveAbandonedTimeout(1);
         this.datasource.getPoolProperties().setJdbcInterceptors(ResetAbandonedTimer.class.getName());
         Connection con = datasource.getConnection();
-        long start = System.currentTimeMillis();
         assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
         for (int i=0; i<20; i++) {
             Thread.sleep(200);
@@ -97,7 +94,6 @@ public class AbandonPercentageTest extends DefaultTestCase {
         this.datasource.getPoolProperties().setRemoveAbandonedTimeout(1);
         Connection[] con = new Connection[size];
         con[0] = datasource.getConnection();
-        long start = System.currentTimeMillis();
         assertEquals("Number of connections active/busy should be 1",1,datasource.getPool().getActive());
         for (int i=1; i<25; i++) {
             con[i] = datasource.getConnection();
