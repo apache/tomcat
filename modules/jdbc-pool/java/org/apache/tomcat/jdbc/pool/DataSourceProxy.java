@@ -155,17 +155,6 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-    protected void finalize() throws Throwable {
-//        //terminate the pool?
-//        ThreadPoolExecutor closer = new ThreadPoolExecutor(0,1,1000,TimeUnit.MILLISECONDS,new LinkedBlockingQueue<Runnable>());
-//        final Runnable r = new Runnable() {
-//            public void run(){ 
-//                close(true);                
-//            }
-//        };
-//        closer.execute(r);
-    }
-
     public int getPoolSize() throws SQLException{
         final ConnectionPool p = pool;
         if (p == null) return 0;

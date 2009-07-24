@@ -65,7 +65,7 @@ public interface PoolConfiguration {
      * Set to true if you wish that calls to getConnection 
      * should be treated fairly in a true FIFO fashion. 
      * This uses the {@link FairBlockingQueue} implementation for the list of the idle connections. 
-     * The default value is false. 
+     * The default value is true. 
      * This flag is required when you want to use asynchronous connection retrieval.
      * @param fairQueue
      */
