@@ -54,12 +54,12 @@ public class TestTomcat extends TestCase {
 
     public void setUp() throws Exception {
         t0 = System.currentTimeMillis();
-        tempDir = new File("output/tmp");
+        tempDir = new File(base + "output/tmp");
         tempDir.mkdir();
         
         tomcat = new Tomcat();
-        tomcat.getHost().setAppBase(tempDir.getAbsolutePath());
         tomcat.setBaseDir(tempDir.getAbsolutePath());
+        tomcat.getHost().setAppBase(tempDir.getAbsolutePath() + "/webapps");
           
         // If each test is running on same port - they
         // may interfere with each other (on unix at least)
@@ -71,6 +71,7 @@ public class TestTomcat extends TestCase {
         tomcat.stop();
         System.err.println("Test time: " + 
                 (System.currentTimeMillis() - t0));
+        ExpandWar.delete(tempDir);
     }
     
     /** 
