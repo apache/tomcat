@@ -15,8 +15,6 @@
  */
 package org.apache.tomcat.jdbc.pool.jmx;
 
-import java.util.Properties;
-
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 
 public interface ConnectionPoolMBean extends PoolConfiguration  {
