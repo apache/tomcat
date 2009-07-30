@@ -284,7 +284,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public int drainTo(Collection<? super E> c, int maxElements) {
         throw new UnsupportedOperationException("int drainTo(Collection<? super E> c, int maxElements)");
@@ -292,7 +292,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public int drainTo(Collection<? super E> c) {
         return drainTo(c,Integer.MAX_VALUE);
@@ -333,7 +333,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public void clear() {
         throw new UnsupportedOperationException("void clear()");
@@ -342,7 +342,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public boolean containsAll(Collection<?> c) {
         throw new UnsupportedOperationException("boolean containsAll(Collection<?> c)");
@@ -357,7 +357,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public boolean removeAll(Collection<?> c) {
         throw new UnsupportedOperationException("boolean removeAll(Collection<?> c)");
@@ -365,7 +365,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public boolean retainAll(Collection<?> c) {
         throw new UnsupportedOperationException("boolean retainAll(Collection<?> c)");
@@ -373,7 +373,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public Object[] toArray() {
         throw new UnsupportedOperationException("Object[] toArray()");
@@ -381,7 +381,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public <T> T[] toArray(T[] a) {
         throw new UnsupportedOperationException("<T> T[] toArray(T[] a)");
@@ -389,7 +389,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public E element() {
         throw new UnsupportedOperationException("E element()");
@@ -397,7 +397,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public E peek() {
         throw new UnsupportedOperationException("E peek()");
@@ -405,7 +405,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
 
     /**
      * {@inheritDoc}
-     * @throws UnsupportedOperation - this operation is not supported
+     * @throws UnsupportedOperationException - this operation is not supported
      */
     public E remove() {
         throw new UnsupportedOperationException("E remove()");
