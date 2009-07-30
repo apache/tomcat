@@ -36,8 +36,8 @@ public class TestConcurrency extends DefaultTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Driver.reset();
         ds.close(true);
+        Driver.reset();
         super.tearDown();
     }
     
@@ -68,7 +68,7 @@ public class TestConcurrency extends DefaultTestCase {
         }
         try {
             while (loopcount.get()<iter) {
-                assertEquals("Size comparison:",10, ds.getPool().getSize());
+                assertTrue("Size comparison(less than 11):",ds.getPool().getSize()<=10);
                 if (debug) {
                     System.out.println("Size: "+ds.getPool().getSize());
                     System.out.println("Used: "+ds.getPool().getActive());
