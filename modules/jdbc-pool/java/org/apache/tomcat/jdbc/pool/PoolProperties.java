@@ -733,7 +733,7 @@ public class PoolProperties implements PoolConfiguration {
     public static class InterceptorDefinition {
         protected String className;
         protected Map<String,InterceptorProperty> properties = new HashMap<String,InterceptorProperty>();
-        protected volatile Class clazz = null;
+        protected volatile Class<?> clazz = null;
         public InterceptorDefinition(String className) {
             this.className = className;
         }
