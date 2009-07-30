@@ -71,6 +71,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * Public constructor for instantation through reflection
      */
     public JdbcInterceptor() {
+        // NOOP
     }
 
     /**
@@ -184,6 +185,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * @param pool - the pool that is being closed.
      */
     public void poolClosed(ConnectionPool pool) {
+        // NOOP
     }
 
     /**
@@ -194,6 +196,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
      * @param pool - the pool that is being closed.
      */
     public void poolStarted(ConnectionPool pool) {
+        // NOOP
     }
 
 }

@@ -92,7 +92,7 @@ public class ConnectionState extends JdbcInterceptor  {
             try {
                 if (transactionIsolation==null || transactionIsolation.intValue()!=poolProperties.getDefaultTransactionIsolation()) {
                     con.getConnection().setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
-                    transactionIsolation = poolProperties.getDefaultTransactionIsolation();
+                    transactionIsolation = Integer.valueOf(poolProperties.getDefaultTransactionIsolation());
                 }
             }catch (SQLException x) {
                 transactionIsolation = null;
