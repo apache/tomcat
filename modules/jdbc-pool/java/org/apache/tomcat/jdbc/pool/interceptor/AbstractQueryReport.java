@@ -220,7 +220,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             //allow close to be called multiple times
             if (close && closed) return null; 
             //are we calling isClosed?
-            if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) return closed;
+            if (compare(JdbcInterceptor.ISCLOSED_VAL,name)) return Boolean.valueOf(closed);
             //if we are calling anything else, bail out
             if (closed) throw new SQLException("Statement closed.");
             boolean process = false;
