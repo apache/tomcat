@@ -168,7 +168,7 @@ public class DataSourceFactory implements ObjectFactory {
      * @exception Exception if an exception occurs creating the instance
      */
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable environment) throws Exception {
+                                    Hashtable<?,?> environment) throws Exception {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "javax.sql.DataSource"
