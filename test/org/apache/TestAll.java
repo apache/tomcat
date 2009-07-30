@@ -1,5 +1,6 @@
 package org.apache;
 
+import org.apache.catalina.connector.TestRequest;
 import org.apache.catalina.ha.session.TestSerializablePrincipal;
 import org.apache.catalina.startup.TestTomcat;
 import org.apache.catalina.tribes.test.TribesTestSuite;
@@ -15,18 +16,24 @@ public class TestAll {
 
     public static Test suite() {
         TestSuite suite = new TestSuite("Test for org.apache");
-        // o.a.catalina.ha.session
+        // o.a.catalina
+        // connector
+        suite.addTestSuite(TestRequest.class);
+        // ha.session
         suite.addTestSuite(TestSerializablePrincipal.class);
-        // o.a.catalina.startup
+        // startup
         suite.addTestSuite(TestTomcat.class);
-        // o.a.tomcat.util.http
-        suite.addTestSuite(TestCookies.class);
-        // Tribes
+        // tribes
         // suite.addTest(TribesTestSuite.suite());
+        
         // o.a.el
         suite.addTestSuite(TestELSupport.class);
         suite.addTestSuite(TestELEvaluation.class);
+        
         // o.a.tomcat.util
+        // http
+        suite.addTestSuite(TestCookies.class);
+        // res
         suite.addTestSuite(TestStringManager.class);
         
         return suite;
