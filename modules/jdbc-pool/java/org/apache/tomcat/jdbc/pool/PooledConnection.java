@@ -330,7 +330,7 @@ public class PooledConnection {
             if (log.isDebugEnabled())
                 log.debug("Unable to validate object:",ignore);
             if (stmt!=null)
-                try { stmt.close();} catch (Exception ignore2){}
+                try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
         }
         return false;
     } //validate
