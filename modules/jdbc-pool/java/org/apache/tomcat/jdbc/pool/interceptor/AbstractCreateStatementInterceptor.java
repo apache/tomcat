@@ -97,6 +97,6 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      */
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
-        
+        // NOOP
     }
 }

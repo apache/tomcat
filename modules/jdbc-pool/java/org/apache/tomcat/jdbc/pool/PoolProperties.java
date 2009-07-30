@@ -405,6 +405,7 @@ public class PoolProperties implements PoolConfiguration {
      */
     @Override
     public void setAccessToUnderlyingConnectionAllowed(boolean accessToUnderlyingConnectionAllowed) {
+        // NOOP
     }
 
     /** 

@@ -317,16 +317,16 @@ public class SlowQueryReport extends AbstractQueryReport  {
         public CompositeDataSupport getCompositeData(final CompositeType type) throws OpenDataException{
             Object[] values = new Object[] {
                     query,
-                    nrOfInvocations,
-                    maxInvocationTime,
-                    maxInvocationDate,
-                    minInvocationTime,
-                    minInvocationDate,
-                    totalInvocationTime,
-                    failures,
-                    prepareCount,
-                    prepareTime,
-                    lastInvocation
+                    Integer.valueOf(nrOfInvocations),
+                    Long.valueOf(maxInvocationTime),
+                    Long.valueOf(maxInvocationDate),
+                    Long.valueOf(minInvocationTime),
+                    Long.valueOf(minInvocationDate),
+                    Long.valueOf(totalInvocationTime),
+                    Long.valueOf(failures),
+                    Integer.valueOf(prepareCount),
+                    Long.valueOf(prepareTime),
+                    Long.valueOf(lastInvocation)
             };
             return new CompositeDataSupport(type,FIELD_NAMES,values);
         }

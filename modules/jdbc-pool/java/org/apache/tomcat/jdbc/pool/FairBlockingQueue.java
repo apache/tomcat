@@ -306,9 +306,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
      * {@inheritDoc}
      */
     public boolean addAll(Collection<? extends E> c) {
-        Iterator i = c.iterator();
+        Iterator<? extends E> i = c.iterator();
         while (i.hasNext()) {
-            E e = (E)i.next();
+            E e = i.next();
             offer(e);
         }
         return true;
