@@ -46,6 +46,9 @@ public class TestTomcat extends TestCase {
      * Simple servlet to test in-line registration 
      */
     public static class HelloWorld extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
             throws IOException {
           res.getWriter().write("Hello world");
