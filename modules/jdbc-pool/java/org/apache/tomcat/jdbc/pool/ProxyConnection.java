@@ -69,7 +69,7 @@ public class ProxyConnection extends JdbcInterceptor {
     }
 
 
-    public Object unwrap(Class iface) throws SQLException {
+    public Object unwrap(Class<?> iface) throws SQLException {
         if (isWrapperFor(iface)) {
             return connection.getConnection();
         } else {
@@ -79,7 +79,7 @@ public class ProxyConnection extends JdbcInterceptor {
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (compare(ISCLOSED_VAL,method)) {
-            return isClosed();
+            return Boolean.valueOf(isClosed());
         }
         if (compare(CLOSE_VAL,method)) {
             if (isClosed()) return null; //noop for already closed.

@@ -68,6 +68,7 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
      * {@inheritDoc}
      */
     public void postRegister(Boolean registrationDone) {
+        // NOOP
     }
 
 
@@ -76,6 +77,7 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
      * {@inheritDoc}
      */
     public void preDeregister() throws Exception {
+        // NOOP
     }
 
     /**
@@ -133,6 +135,7 @@ public class DataSource extends DataSourceProxy implements MBeanRegistration,jav
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             mbs.unregisterMBean(oname);
         } catch (InstanceNotFoundException ignore) {
+            // NOOP
         } catch (Exception e) {
             log.error("Unable to unregister JDBC pool with JMX",e);
         }
