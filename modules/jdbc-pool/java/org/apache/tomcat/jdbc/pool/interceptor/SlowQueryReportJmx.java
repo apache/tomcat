@@ -265,7 +265,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     }
 
 
-    public static ObjectName getObjectName(Class clazz, String poolName) throws MalformedObjectNameException {
+    public static ObjectName getObjectName(Class<?> clazz, String poolName) throws MalformedObjectNameException {
         ObjectName oname = new ObjectName(ConnectionPool.POOL_JMX_TYPE_PREFIX+clazz.getName()+",name=" + poolName);
         return oname;
     }
