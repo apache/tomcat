@@ -17,14 +17,8 @@
 package org.apache.tomcat.jdbc.pool;
 
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.sql.Connection;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Properties;
 
