@@ -98,7 +98,7 @@ public class ConnectionPool {
      * Since newProxyInstance performs the same operation, over and over
      * again, it is much more optimized if we simply store the constructor ourselves.
      */
-    private Constructor proxyClassConstructor;
+    private Constructor<?> proxyClassConstructor;
 
     /**
      * Executor service used to cancel Futures
@@ -295,10 +295,10 @@ public class ConnectionPool {
      * @return constructor used to instantiate the wrapper object
      * @throws NoSuchMethodException
      */
-    public Constructor getProxyConstructor() throws NoSuchMethodException {
+    public Constructor<?> getProxyConstructor() throws NoSuchMethodException {
         //cache the constructor
         if (proxyClassConstructor == null ) {
-            Class proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class});
+            Class<?> proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class});
             proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         }
         return proxyClassConstructor;
@@ -431,7 +431,7 @@ public class ConnectionPool {
             //return the members as idle to the pool
             for (int i = 0; i < initialPool.length; i++) {
                 if (initialPool[i] != null) {
-                    try {this.returnConnection(initialPool[i]);}catch(Exception x){}
+                    try {this.returnConnection(initialPool[i]);}catch(Exception x){/*NOOP*/}
                 } //end if
             } //for
         } //catch
@@ -927,7 +927,7 @@ public class ConnectionPool {
      * @param con
      */
     protected void finalize(PooledConnection con) {
-        
+        // NOOP
     }
     
     /**

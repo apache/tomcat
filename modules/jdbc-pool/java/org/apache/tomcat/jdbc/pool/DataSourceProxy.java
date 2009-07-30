@@ -424,7 +424,7 @@ public class DataSourceProxy implements PoolConfiguration {
         try {
             java.util.Properties prop = DataSourceFactory
                     .getProperties(properties);
-            Iterator i = prop.keySet().iterator();
+            Iterator<?> i = prop.keySet().iterator();
             while (i.hasNext()) {
                 String key = (String) i.next();
                 String value = prop.getProperty(key);
@@ -459,6 +459,7 @@ public class DataSourceProxy implements PoolConfiguration {
      * {@link javax.sql.DataSource#setLogWriter(PrintWriter)}
      */
     public void setLogWriter(PrintWriter out) throws SQLException {
+        // NOOP
     }
 
     /**
