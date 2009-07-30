@@ -17,17 +17,13 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.lang.management.ManagementFactory;
-import java.sql.SQLException;
 import java.util.Hashtable;
-import java.util.Properties;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-
-import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
 
 
 /**

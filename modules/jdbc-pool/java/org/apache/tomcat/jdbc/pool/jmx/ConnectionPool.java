@@ -17,7 +17,6 @@ package org.apache.tomcat.jdbc.pool.jmx;
 /**
  * @author Filip Hanik
  */
-import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
