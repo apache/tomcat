@@ -82,11 +82,12 @@
     <mkdir dir="${tomcat.extras}"/>
   </target>
 
-  <target name="clean">
+  <target name="clean" description="Delete the default output folders">
   	<delete dir="${tomcat.extras}"/>
   </target>
 
-  <target name="commons-logging">
+  <target name="commons-logging" depends="prepare"
+  	      description="Build JULI for log4j extras package">
     
     <antcall target="downloadfile">
       <param name="sourcefile" value="${commons-logging-src.loc}"/>
@@ -169,7 +170,8 @@
 
   </target>
 
-  <target name="webservices">
+  <target name="webservices" depends="prepare"
+  	      description="Build web services extras package">
 	
 	    <mkdir dir="${tomcat.extras}/webservices"/>
 	
@@ -219,7 +221,8 @@
 	
   </target>
 
-  <target name="jmx-remote" >
+  <target name="jmx-remote" depends="prepare"
+	      description="Build JMX remote extras package">
     <!-- Create the JAR file -->
     <jar jarfile="${catalina-jmx-remote.jar}">
 	    <fileset dir="${tomcat.classes}">
@@ -232,7 +235,8 @@
 	  
   </target>
   
-  <target name="extras" depends="prepare,commons-logging,webservices,jmx-remote">
+  <target name="extras" depends="prepare,commons-logging,webservices,jmx-remote"
+  	      description="Build all extras packages">
   </target>
 
   <!-- Download and dependency building -->
