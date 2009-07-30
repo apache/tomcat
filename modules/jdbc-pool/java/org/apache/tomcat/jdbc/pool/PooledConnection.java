@@ -17,7 +17,6 @@
 package org.apache.tomcat.jdbc.pool;
 
 
-import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
