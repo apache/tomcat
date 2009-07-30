@@ -161,7 +161,7 @@ public class ConnectionPool {
      */
     public Connection getConnection() throws SQLException {
         //check out a connection
-        PooledConnection con = (PooledConnection)borrowConnection(-1);
+        PooledConnection con = borrowConnection(-1);
         return setupConnection(con);
     }
 
@@ -770,9 +770,9 @@ public class ConnectionPool {
      */
     protected boolean shouldAbandon() {
         if (poolProperties.getAbandonWhenPercentageFull()==0) return true;
-        float used = (float)busy.size();
-        float max  = (float)poolProperties.getMaxActive();
-        float perc = (float)poolProperties.getAbandonWhenPercentageFull();
+        float used = busy.size();
+        float max  = poolProperties.getMaxActive();
+        float perc = poolProperties.getAbandonWhenPercentageFull();
         return (used/max*100f)>=perc;
     }
     
