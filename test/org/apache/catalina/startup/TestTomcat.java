@@ -29,19 +29,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import junit.framework.TestCase;
-
 import org.apache.catalina.core.StandardContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestTomcat extends TestCase {
-    Tomcat tomcat;
-    // if you run in eclipse - or tomcat src dir 
-    String base = "./"; 
-    File tempDir;
-    static int port = 8001;
-    long t0;
-    
+public class TestTomcat extends TestTomcatBase {
+
     /**
      * Simple servlet to test in-line registration 
      */
@@ -55,28 +47,6 @@ public class TestTomcat extends TestCase {
         }
     }
 
-    public void setUp() throws Exception {
-        t0 = System.currentTimeMillis();
-        tempDir = new File(base + "output/tmp");
-        tempDir.mkdir();
-        
-        tomcat = new Tomcat();
-        tomcat.setBaseDir(tempDir.getAbsolutePath());
-        tomcat.getHost().setAppBase(tempDir.getAbsolutePath() + "/webapps");
-          
-        // If each test is running on same port - they
-        // may interfere with each other (on unix at least)
-        port++;
-        tomcat.setPort(port);
-    }
-    
-    public void tearDown() throws Exception {
-        tomcat.stop();
-        System.err.println("Test time: " + 
-                (System.currentTimeMillis() - t0));
-        ExpandWar.delete(tempDir);
-    }
-    
     /** 
      * Start tomcat with a single context and one 
      * servlet - all programmatic, no server.xml or 
@@ -85,10 +55,11 @@ public class TestTomcat extends TestCase {
      * @throws Exception 
      */
     public void testProgrammatic() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
         
+        // Must have a real docBase - just use temp
         StandardContext ctx = 
-            tomcat.addContext("/", 
-                    tempDir.getAbsolutePath());
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
         // You can customize the context by calling 
         // its API
         
@@ -97,27 +68,34 @@ public class TestTomcat extends TestCase {
         
         tomcat.start();
         
-        ByteChunk res = getUrl("http://localhost:" + port + "/");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
         assertEquals(res.toString(), "Hello world");
     }
 
     public void testSingleWebapp() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
         // Currently in sandbox/tomcat-lite
         File appDir = 
-            new File(base + "output/build/webapps/examples");
+            new File("output/build/webapps/examples");
         // app dir is relative to server home
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + port + "/examples/servlets/servlet/HelloWorldExample");
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/examples/servlets/servlet/HelloWorldExample");
         assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
     }
     
     public void testLaunchTime() throws Exception {
-        tomcat.addContext(null, "/", base);
+        Tomcat tomcat = getTomcatInstance();
+        long t0 = System.currentTimeMillis();
+        tomcat.addContext(null, "/", ".");
         tomcat.start();
-    }
+        System.err.println("Test time: " + 
+                (System.currentTimeMillis() - t0));
+     }
     
     /**
      *  Wrapper for getting the response.

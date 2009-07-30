@@ -38,14 +38,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.TestTomcatBase;
 import org.apache.catalina.startup.Tomcat;
-
-import junit.framework.TestCase;
 
 /**
  * Test case for {@link Request}. 
  */
-public class TestRequest extends TestCase {
+public class TestRequest extends TestTomcatBase {
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
      * POST parameters are not returned from a call to 
@@ -54,6 +63,7 @@ public class TestRequest extends TestCase {
      */
     public void testBug37794() throws Exception {
         Bug37794Client client = new Bug37794Client();
+        client.setPort(getPort());
 
         // Edge cases around zero
         client.doRequest(-1, false); // Unlimited
@@ -97,6 +107,8 @@ public class TestRequest extends TestCase {
     
     private static class Bug37794Servlet extends HttpServlet {
         
+        private static final long serialVersionUID = 1L;
+
         /**
          * Only interested in the parameters and values for POST requests.
          */
@@ -120,15 +132,28 @@ public class TestRequest extends TestCase {
     /**
      * Bug 37794 test client.
      */
-    private static class Bug37794Client extends SimpleHttpClient {
+    private class Bug37794Client extends SimpleHttpClient {
+        
+        private boolean init;
+        
+        private synchronized void init() throws Exception {
+            if (init) return;
+            
+            Tomcat tomcat = getTomcatInstance();
+            StandardContext root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
+            root.addServletMapping("/test", "Bug37794");
+            tomcat.start();
+            
+            init = true;
+        }
+        
         private Exception doRequest(int postLimit, boolean ucChunkedHead) {
-            Tomcat tomcat = new Tomcat();
+            Tomcat tomcat = getTomcatInstance();
+            
             try {
-                StandardContext root = tomcat.addContext("", TEMP_DIR);
-                Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-                root.addServletMapping("/test", "Bug37794");
+                init();
                 tomcat.getConnector().setMaxPostSize(postLimit);
-                tomcat.start();
                 
                 // Open connection
                 connect();
@@ -167,12 +192,6 @@ public class TestRequest extends TestCase {
                 disconnect();
             } catch (Exception e) {
                 return e;
-            } finally {
-                try {
-                    tomcat.stop();
-                } catch (Exception e) {
-                    // Ignore
-                }
             }
             return null;
         }
@@ -209,6 +228,7 @@ public class TestRequest extends TestCase {
         private Socket socket;
         private Writer writer;
         private BufferedReader reader;
+        private int port = 8080;
         
         private String[] request;
         private int requestPause = 1000;
@@ -216,6 +236,10 @@ public class TestRequest extends TestCase {
         private String responseLine;
         private List<String> responseHeaders = new ArrayList<String>();
         private String responseBody;
+
+        public void setPort(int thePort) {
+            port = thePort;
+        }
 
         public void setRequest(String[] theRequest) {
             request = theRequest;
@@ -238,7 +262,7 @@ public class TestRequest extends TestCase {
         }
 
         public void connect() throws UnknownHostException, IOException {
-            socket = new Socket("localhost", 8080);
+            socket = new Socket("localhost", port);
             OutputStream os = socket.getOutputStream();
             writer = new OutputStreamWriter(os);
             InputStream is = socket.getInputStream();
