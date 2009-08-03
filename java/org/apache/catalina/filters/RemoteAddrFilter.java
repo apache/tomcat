@@ -31,7 +31,7 @@ import org.apache.juli.logging.LogFactory;
 
 
 /**
- * Concrete implementation of <code>RequestFilterFilter</code> that filters
+ * Concrete implementation of <code>RequestFilter</code> that filters
  * based on the string representation of the remote client's IP address.
  *
  * @author Craig R. McClanahan
