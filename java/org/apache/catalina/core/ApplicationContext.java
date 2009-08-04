@@ -897,7 +897,7 @@ public class ApplicationContext
         return null;
     }
     
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             String className) throws IllegalStateException {
         
         if (context.initialized) {
@@ -916,7 +916,7 @@ public class ApplicationContext
     }
 
 
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) throws IllegalStateException {
         
         if (context.initialized) {
@@ -935,7 +935,7 @@ public class ApplicationContext
     }
 
     
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass)
     throws IllegalStateException {
         
