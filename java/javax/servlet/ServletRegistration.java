@@ -35,7 +35,7 @@ public interface ServletRegistration extends Registration {
      */
     public Set<String> addMapping(String... urlPatterns); 
     
-    public static interface Dynmaic
+    public static interface Dynamic
     extends ServletRegistration, Registration.Dynamic {
         
     }
