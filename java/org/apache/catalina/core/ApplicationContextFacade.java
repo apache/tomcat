@@ -442,10 +442,10 @@ public final class ApplicationContextFacade
     }
     
     
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             String className) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (ServletRegistration.Dynmaic) doPrivileged(
+            return (ServletRegistration.Dynamic) doPrivileged(
                     "addServlet", new Object[]{servletName, className});
         } else {
             return context.addServlet(servletName, className);
@@ -453,10 +453,10 @@ public final class ApplicationContextFacade
     }
 
 
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (ServletRegistration.Dynmaic) doPrivileged(
+            return (ServletRegistration.Dynamic) doPrivileged(
                     "addServlet", new Object[]{servletName, servlet});
         } else {
             return context.addServlet(servletName, servlet);
@@ -464,10 +464,10 @@ public final class ApplicationContextFacade
     }
 
 
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Class <? extends Servlet> servletClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (ServletRegistration.Dynmaic) doPrivileged(
+            return (ServletRegistration.Dynamic) doPrivileged(
                     "addServlet", new Object[]{servletName, servletClass});
         } else {
             return context.addServlet(servletName, servletClass);
