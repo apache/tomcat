@@ -450,7 +450,7 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    public ServletRegistration.Dynmaic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             String className) {
         return null;
     }
@@ -488,13 +488,13 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    public javax.servlet.Registration.Dynamic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Servlet servlet) {
         return null;
     }
 
 
-    public javax.servlet.Registration.Dynamic addServlet(String servletName,
+    public ServletRegistration.Dynamic addServlet(String servletName,
             Class<? extends Servlet> servletClass) {
         return null;
     }
