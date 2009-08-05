@@ -651,6 +651,7 @@ public class PoolProperties implements PoolConfiguration {
         this.interceptors = null;
     }
 
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer("ConnectionPool[");
         try {
@@ -786,9 +787,11 @@ public class PoolProperties implements PoolConfiguration {
         public String getValue() {
             return value;
         }
+        @Override
         public int hashCode() {
             return name.hashCode();
         }
+        @Override
         public boolean equals(Object o) {
             if (o==this) return true;
             if (o instanceof InterceptorProperty) {

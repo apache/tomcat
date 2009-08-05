@@ -52,6 +52,7 @@ public class ConnectionState extends JdbcInterceptor  {
     protected String catalog = null;
     
     
+    @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         if (parent==null || con==null) return;
         PoolConfiguration poolProperties = parent.getPoolProperties();
