@@ -48,7 +48,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * the constructors that are used to create statement proxies 
      */
     protected static final Constructor<?>[] constructors =
-        new Constructor[AbstractCreateStatementInterceptor.statements.length];
+        new Constructor[AbstractCreateStatementInterceptor.STATEMENT_TYPE_COUNT];
 
     
     public AbstractQueryReport() {
@@ -82,7 +82,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         //extract the query string
         String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
         //if we do batch execution, then we name the query 'batch'
-        if (sql==null && compare(executes[3],name)) {
+        if (sql==null && compare(EXECUTE_BATCH,name)) {
             sql = "batch";
         }
         return sql;
@@ -101,7 +101,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         //extract the query string
         String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
         //if we do batch execution, then we name the query 'batch'
-        if (sql==null && compare(executes[3],name)) {
+        if (sql==null && compare(EXECUTE_BATCH,name)) {
             sql = "batch";
         }
         return sql;
@@ -120,7 +120,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
         //extract the query string
         String sql = (query==null && args!=null &&  args.length>0)?(String)args[0]:query;
         //if we do batch execution, then we name the query 'batch'
-        if (sql==null && compare(executes[3],name)) {
+        if (sql==null && compare(EXECUTE_BATCH,name)) {
             sql = "batch";
         }
         return sql;
@@ -169,20 +169,20 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             String name = method.getName();
             String sql = null;
             Constructor<?> constructor = null;
-            if (compare(statements[0],name)) {
+            if (compare(CREATE_STATEMENT,name)) {
                 //createStatement
-                constructor = getConstructor(0,Statement.class);
-            }else if (compare(statements[1],name)) {
+                constructor = getConstructor(CREATE_STATEMENT_IDX,Statement.class);
+            }else if (compare(PREPARE_STATEMENT,name)) {
                 //prepareStatement
                 sql = (String)args[0];
-                constructor = getConstructor(1,PreparedStatement.class);
+                constructor = getConstructor(PREPARE_STATEMENT_IDX,PreparedStatement.class);
                 if (sql!=null) {
                     prepareStatement(sql, time);
                 }
-            }else if (compare(statements[2],name)) {
+            }else if (compare(PREPARE_CALL,name)) {
                 //prepareCall
                 sql = (String)args[0];
-                constructor = getConstructor(2,CallableStatement.class);
+                constructor = getConstructor(PREPARE_IDX,CallableStatement.class);
                 prepareCall(sql,time);
             }else {
                 //do nothing, might be a future unsupported method
@@ -225,7 +225,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
             if (closed) throw new SQLException("Statement closed.");
             boolean process = false;
             //check to see if we are about to execute a query
-            process = process(executes, method, process);
+            process = isExecute( method, process);
             //if we are executing, get the current time
             long start = (process)?System.currentTimeMillis():0;
             Object result =  null;
