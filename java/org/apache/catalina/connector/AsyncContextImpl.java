@@ -56,7 +56,8 @@ public class AsyncContextImpl implements AsyncContext {
     private boolean hasOriginalRequestAndResponse = true;
     private volatile Runnable dispatch = null;
     private Context context = null;
-    private AtomicReference<AsyncState> state = new AtomicReference<AsyncState>();
+    private AtomicReference<AsyncState> state = new AtomicReference<AsyncState>(AsyncState.NOT_STARTED);
+    private long timeout = -1;
     
     private Request request;
     
@@ -67,12 +68,16 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void complete() {
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
+        if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING) ||
+            state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING)) {
             // TODO SERVLET3 - async
             AtomicBoolean dispatched = new AtomicBoolean(false);
             request.coyoteRequest.action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
             if (!dispatched.get()) doInternalComplete(false);
+        } else {
+            throw new IllegalStateException("Complete not allowed. Invalid state:"+state.get());
         }
+       
     }
 
     @Override
@@ -178,6 +183,7 @@ public class AsyncContextImpl implements AsyncContext {
         hasOriginalRequestAndResponse = true;
         state.set(AsyncState.NOT_STARTED);
         context = null;
+        timeout = -1;
     }
 
     public boolean isStarted() {
@@ -227,6 +233,7 @@ public class AsyncContextImpl implements AsyncContext {
     
     public void doInternalDispatch() throws ServletException, IOException {
         if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.DISPATCHED)) {
+            log.info("TIMING OUT!");
             boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
                 listener.fireOnTimeout();
@@ -260,7 +267,8 @@ public class AsyncContextImpl implements AsyncContext {
             //this is the same as
             //request.startAsync().complete();
             recycle();
-        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.NOT_STARTED)) {
+        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.NOT_STARTED) ||
+                   state.compareAndSet(AsyncState.COMPLETING, AsyncState.NOT_STARTED)) {
             for (AsyncListenerWrapper wrapper : listeners) {
                 try {
                     wrapper.fireOnComplete();
@@ -289,6 +297,15 @@ public class AsyncContextImpl implements AsyncContext {
     
     protected void setState(AsyncState st) {
         state.set(st);
+    }
+    
+    public long getAsyncTimeout() {
+        return timeout;
+    }
+    
+    public void setAsyncTimeout(long timeout) {
+        this.timeout = timeout;
+        request.coyoteRequest.action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
     }
 
 }
