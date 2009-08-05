@@ -43,7 +43,7 @@ import org.apache.juli.logging.LogFactory;
 public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
-        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING
+        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT
     }
     
     protected static Log log = LogFactory.getLog(AsyncContextImpl.class);
@@ -220,7 +220,11 @@ public class AsyncContextImpl implements AsyncContext {
     }
     
     public void doInternalDispatch() throws ServletException, IOException {
-        if (this.state.compareAndSet(AsyncState.DISPATCHING, AsyncState.DISPATCHED)) {
+        if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.DISPATCHED)) {
+            for (AsyncListenerWrapper listener : listeners) {
+                listener.fireOnTimeout();
+            }
+        } else if (this.state.compareAndSet(AsyncState.DISPATCHING, AsyncState.DISPATCHED)) {
             if (this.dispatch!=null) {
                 try {
                     dispatch.run();
@@ -265,6 +269,14 @@ public class AsyncContextImpl implements AsyncContext {
         } else { 
             throw new IllegalStateException("Complete illegal. Invalid state:"+state.get());
         }
+    }
+    
+    public AsyncState getState() {
+        return state.get();
+    }
+    
+    protected void setState(AsyncState st) {
+        state.set(st);
     }
 
 }
