@@ -404,6 +404,7 @@
  
     <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
+      <formatter type="brief" usefile="no"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
@@ -417,6 +418,7 @@
     <echo>Performance and fairness tests.</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
+      <formatter type="brief" usefile="no"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
@@ -433,12 +435,13 @@
     <echo>Functional tests.</echo>
     <junit printsummary="yes">
       <syspropertyset refid="testdb"/>
-      <formatter type="plain"/>
+      <formatter type="brief" usefile="no"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
         <fileset dir="${basedir}/test">
           <include name="org/apache/tomcat/jdbc/test/*Test*.java"/>
+          <exclude name="org/apache/tomcat/jdbc/test/*CheckOutThreadTest*.java"/>
           <exclude name="**/CreateTestTable*"/>
           <exclude name="**/DefaultTestCase*"/>
           <exclude name="**/CheckOutThread*"/>
@@ -457,7 +460,7 @@
     <echo>Testing:${test}</echo>
     <junit printsummary="withOutAndErr" showoutput="on">
       <syspropertyset refid="testdb"/>
-      <formatter type="plain"/>
+      <formatter type="brief" usefile="no"/>
       <classpath refid="tomcat.jdbc.classpath"/>
       <classpath refid="test.classpath"/>
       <batchtest fork="yes" todir="${tomcat.testclasses}">
