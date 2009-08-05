@@ -291,7 +291,8 @@ public class PooledConnection {
      *  
      * @return true if the connection was validated successfully. It returns true even if validation was not performed, such as when 
      * {@link PoolConfiguration#setValidationInterval(long)} has been called with a positive value. 
-     * @return false if the validation failed. The caller should close the connection if false is returned since a session could have been left in 
+     * <p>
+     * false if the validation failed. The caller should close the connection if false is returned since a session could have been left in 
      * an unknown state during initialization.
      */
     public boolean validate(int validateAction,String sql) {
@@ -322,7 +323,7 @@ public class PooledConnection {
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
-            boolean exec = stmt.execute(query);
+            stmt.execute(query);
             stmt.close();
             this.lastValidated = now;
             return true;
@@ -516,6 +517,7 @@ public class PooledConnection {
         this.handler = handler;
     }
     
+    @Override
     public String toString() {
         return "PooledConnection["+(connection!=null?connection.toString():"null")+"]";
     }
