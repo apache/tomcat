@@ -38,11 +38,11 @@ public class Async0 extends HttpServlet {
             log.info("Received dispatch, completing on the worker thread.");
             req.getAsyncContext().complete();
             log.info("After complete called started:"+req.isAsyncStarted());
-            resp.getWriter().write("Async dispatch worked\n");
+            resp.getWriter().write("Async dispatch worked:+"+System.currentTimeMillis()+"\n");
         } else {
             resp.setContentType("text/plain");
             final AsyncContext actx = req.startAsync();
-            actx.setAsyncTimeout(30*1000);
+            actx.setAsyncTimeout(Long.MAX_VALUE);
             Runnable run = new Runnable() {
                 public void run() {
                     try {
