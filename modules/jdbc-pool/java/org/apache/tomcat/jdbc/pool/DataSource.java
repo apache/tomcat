@@ -24,6 +24,7 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
+import javax.sql.XADataSource;
 
 
 /**
@@ -33,7 +34,7 @@ import javax.management.ObjectName;
  * @author Filip Hanik
  * @version 1.0
  */
-public class DataSource extends DataSourceProxy implements MBeanRegistration,javax.sql.DataSource, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean {
+public class DataSource extends DataSourceProxy implements MBeanRegistration,javax.sql.DataSource,XADataSource, org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean {
 
     /**
      * Constructor for reflection only. A default set of pool properties will be created.
