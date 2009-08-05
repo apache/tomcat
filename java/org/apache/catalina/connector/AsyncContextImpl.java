@@ -84,6 +84,8 @@ public class AsyncContextImpl implements AsyncContext {
     public void dispatch() {
         HttpServletRequest sr = (HttpServletRequest)getServletRequest();
         String path = sr.getRequestURI();
+        String cpath = sr.getContextPath();
+        if (cpath.length()>1) path = path.substring(cpath.length());
         dispatch(path);
     }
 
@@ -267,8 +269,7 @@ public class AsyncContextImpl implements AsyncContext {
             //this is the same as
             //request.startAsync().complete();
             recycle();
-        } else if (state.compareAndSet(AsyncState.DISPATCHED, AsyncState.NOT_STARTED) ||
-                   state.compareAndSet(AsyncState.COMPLETING, AsyncState.NOT_STARTED)) {
+        } else if (state.compareAndSet(AsyncState.COMPLETING, AsyncState.NOT_STARTED)) {
             for (AsyncListenerWrapper wrapper : listeners) {
                 try {
                     wrapper.fireOnComplete();

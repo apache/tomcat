@@ -7,4 +7,4 @@ System.out.println("Inside Async 1");
     request.getAsyncContext().complete();
   }
 %>
-Completed async request.
+Completed async request at <%=new java.sql.Date()%>
