@@ -27,7 +27,7 @@
 # ----- Vesion Control Flags -----
 version.major=1
 version.minor=0
-version.build=7
+version.build=8
 version.patch=
 version.suffix=
 

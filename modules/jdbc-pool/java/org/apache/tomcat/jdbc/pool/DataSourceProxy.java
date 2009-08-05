@@ -19,9 +19,12 @@ package org.apache.tomcat.jdbc.pool;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Future;
+
+import javax.sql.XAConnection;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -114,6 +117,33 @@ public class DataSourceProxy implements PoolConfiguration {
             return createPool().getConnectionAsync();
         return pool.getConnectionAsync();
     }
+    
+    /**
+     * {@link javax.sql.XADataSource#getXAConnection()} 
+     */
+    public XAConnection getXAConnection() throws SQLException {
+        Connection con = getConnection();
+        if (con instanceof XAConnection) {
+            return (XAConnection)con;
+        } else {
+            try {con.close();} catch (Exception ignore){}
+            throw new SQLException("Connection from pool does not implement javax.sql.XAConnection");
+        }
+    }
+    
+    /**
+     * {@link javax.sql.XADataSource#getXAConnection(String, String)} 
+     */
+    public XAConnection getXAConnection(String username, String password) throws SQLException {
+        Connection con = getConnection(username, password);
+        if (con instanceof XAConnection) {
+            return (XAConnection)con;
+        } else {
+            try {con.close();} catch (Exception ignore){}
+            throw new SQLException("Connection from pool does not implement javax.sql.XAConnection");
+        }
+    }
+
 
     /**
      * {@link javax.sql.DataSource#getConnection()}
