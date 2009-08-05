@@ -59,6 +59,7 @@ public class ProxyConnection extends JdbcInterceptor {
         setUseEquals(useEquals);
     }
 
+    @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         this.pool = parent;
         this.connection = con;
@@ -77,6 +78,7 @@ public class ProxyConnection extends JdbcInterceptor {
         }
     }
 
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (compare(ISCLOSED_VAL,method)) {
             return Boolean.valueOf(isClosed());
@@ -117,6 +119,7 @@ public class ProxyConnection extends JdbcInterceptor {
         return pool;
     }
     
+    @Override
     public String toString() {
         return "ProxyConnection["+(connection!=null?connection.toString():"null")+"]";
     }
