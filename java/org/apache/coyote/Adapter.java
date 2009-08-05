@@ -50,6 +50,6 @@ public interface Adapter {
     public boolean event(Request req, Response res, SocketStatus status)
     throws Exception;
     
-    public boolean asyncDispatch(Request req,Response res) throws Exception;
+    public boolean asyncDispatch(Request req,Response res, SocketStatus status) throws Exception;
 
 }

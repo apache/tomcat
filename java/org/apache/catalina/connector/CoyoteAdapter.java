@@ -251,7 +251,7 @@ public class CoyoteAdapter
         }
     }
     
-    public boolean asyncDispatch(org.apache.coyote.Request req,org.apache.coyote.Response res) throws Exception {
+    public boolean asyncDispatch(org.apache.coyote.Request req,org.apache.coyote.Response res, SocketStatus status) throws Exception {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
@@ -267,6 +267,12 @@ public class CoyoteAdapter
             request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
             // Calling the container
             try {
+                if (status==SocketStatus.TIMEOUT) {
+                   AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
+                   //TODO SERVLET3 - async
+                   //configure settings for timed out
+                   asyncConImpl.setState(AsyncContextImpl.AsyncState.TIMING_OUT);
+                }
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }catch (RuntimeException x) {
                 success = false;
