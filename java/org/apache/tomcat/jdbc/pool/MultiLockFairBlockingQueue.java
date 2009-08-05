@@ -196,11 +196,11 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
                 waiters[idx].addLast(c);
                 lock.unlock();
                 //return a future that will wait for the object
-                result = new ItemFuture(c);
+                result = new ItemFuture<E>(c);
             } else {
                 lock.unlock();
                 //return a future with the item
-                result = new ItemFuture(item);
+                result = new ItemFuture<E>(item);
             }
             error = false;
         } finally {
@@ -323,9 +323,9 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
      * {@inheritDoc}
      */
     public boolean addAll(Collection<? extends E> c) {
-        Iterator i = c.iterator();
+        Iterator<? extends E> i = c.iterator();
         while (i.hasNext()) {
-            E e = (E)i.next();
+            E e = i.next();
             offer(e);
         }
         return true;

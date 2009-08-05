@@ -143,10 +143,10 @@ public class ConnectionPool {
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
         //we can only retrieve a future if the underlying queue supports it.
-        if (idle instanceof FairBlockingQueue) {
+        if (idle instanceof FairBlockingQueue<?>) {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
             return new ConnectionFuture(pcf);
-        } else if (idle instanceof MultiLockFairBlockingQueue) {
+        } else if (idle instanceof MultiLockFairBlockingQueue<?>) {
                 Future<PooledConnection> pcf = ((MultiLockFairBlockingQueue<PooledConnection>)idle).pollAsync();
                 return new ConnectionFuture(pcf);
         } else {
@@ -1069,6 +1069,7 @@ public class ConnectionPool {
             }
         }
 
+        @Override
         public void run() {
             while (run) {
                 try {
