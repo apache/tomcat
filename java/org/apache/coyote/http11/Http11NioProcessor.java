@@ -22,6 +22,7 @@ import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -1314,10 +1315,13 @@ public class Http11NioProcessor implements ActionHook {
             async = true;
         } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
           //TODO SERVLET3 - async
+            AtomicBoolean dispatch = (AtomicBoolean)param;
             asyncClose = true;
             RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
-                socket.getPoller().cometInterest(socket);
+            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
+                dispatch.set(true);
+                endpoint.processSocket(this.socket, SocketStatus.STOP, true);
+            }
         } else if (actionCode == ActionCode.ACTION_ASYNC_SETTIMEOUT) {
           //TODO SERVLET3 - async
             if (param==null) return;
