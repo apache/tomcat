@@ -35,6 +35,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.sql.XAConnection;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -275,7 +277,7 @@ public class ConnectionPool {
         }
 
         try {
-            getProxyConstructor();
+            getProxyConstructor(con.getConnection() instanceof XAConnection);
             //create the proxy
             //TODO possible optimization, keep track if this connection was returned properly, and don't generate a new facade
             Connection connection = (Connection)proxyClassConstructor.newInstance(new Object[] { handler });
@@ -295,10 +297,12 @@ public class ConnectionPool {
      * @return constructor used to instantiate the wrapper object
      * @throws NoSuchMethodException
      */
-    public Constructor<?> getProxyConstructor() throws NoSuchMethodException {
+    public Constructor<?> getProxyConstructor(boolean xa) throws NoSuchMethodException {
         //cache the constructor
         if (proxyClassConstructor == null ) {
-            Class<?> proxyClass = Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class});
+            Class<?> proxyClass = xa ?
+                Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class, javax.sql.XAConnection.class}) :
+                Proxy.getProxyClass(ConnectionPool.class.getClassLoader(), new Class[] {java.sql.Connection.class,javax.sql.PooledConnection.class});
             proxyClassConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
         }
         return proxyClassConstructor;
