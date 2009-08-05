@@ -16,6 +16,8 @@
 */
 package javax.servlet;
 
+import org.apache.catalina.connector.AsyncContextImpl.AsyncState;
+
 /**
  * @since Servlet 3.0
  * $Id$
@@ -63,4 +65,8 @@ public interface AsyncContext {
     void complete();
     
     void start(Runnable run);
+    
+    public long getAsyncTimeout();
+    
+    public void setAsyncTimeout(long timeout);
 }
