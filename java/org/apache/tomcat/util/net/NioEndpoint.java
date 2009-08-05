@@ -1710,6 +1710,13 @@ public class NioEndpoint {
                             long nextTime = now+(timeout-delta);
                             nextExpiration = (nextTime < nextExpiration)?nextTime:nextExpiration;
                         }
+                    }else if (ka.isAsync()) {
+                        long delta = now - ka.getLastAccess();
+                        long timeout = (ka.getTimeout()==-1)?((long) socketProperties.getSoTimeout()):(ka.getTimeout());
+                        boolean isTimedout = delta > timeout;
+                        if (isTimedout) {
+                            processSocket(ka.getChannel(), SocketStatus.TIMEOUT, true);
+                        }
                     }//end if
                 }catch ( CancelledKeyException ckx ) {
                     cancelledKey(key, SocketStatus.ERROR,false);

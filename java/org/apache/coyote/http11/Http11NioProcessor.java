@@ -799,7 +799,7 @@ public class Http11NioProcessor implements ActionHook {
         final NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
         try {
             rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
-            error = !adapter.asyncDispatch(request, response);
+            error = !adapter.asyncDispatch(request, response, status);
             if ( !error ) {
                 if (attach != null) {
                     attach.setComet(comet);
@@ -861,6 +861,7 @@ public class Http11NioProcessor implements ActionHook {
         error = false;
         keepAlive = true;
         comet = false;
+        async = false;
         
         long soTimeout = endpoint.getSoTimeout();
         int keepAliveTimeout = endpoint.getKeepAliveTimeout();
@@ -870,7 +871,7 @@ public class Http11NioProcessor implements ActionHook {
         boolean recycle = true;
         final KeyAttachment ka = (KeyAttachment)socket.getAttachment(false);
         
-        while (!error && keepAlive && !comet) {
+        while (!error && keepAlive && !comet && !async) {
             //always default to our soTimeout
             ka.setTimeout(soTimeout);
             // Parsing the request header
@@ -1324,9 +1325,7 @@ public class Http11NioProcessor implements ActionHook {
             NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment)socket.getAttachment(false);
             long timeout = ((Long)param).longValue();
             //if we are not piggy backing on a worker thread, set the timeout
-            RequestInfo rp = request.getRequestProcessor();
-            if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) //async handling
-                attach.setTimeout(timeout);
+            attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
