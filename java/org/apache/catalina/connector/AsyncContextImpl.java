@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.AsyncContext;
@@ -35,6 +36,7 @@ import org.apache.catalina.Context;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.MutableInteger;
 /**
  * 
  * @author fhanik
@@ -65,8 +67,12 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void complete() {
-        // TODO SERVLET3 - async
-        doInternalComplete(false);
+        if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING)) {
+            // TODO SERVLET3 - async
+            AtomicBoolean dispatched = new AtomicBoolean(false);
+            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
+            if (!dispatched.get()) doInternalComplete(false);
+        }
     }
 
     @Override
@@ -221,9 +227,15 @@ public class AsyncContextImpl implements AsyncContext {
     
     public void doInternalDispatch() throws ServletException, IOException {
         if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.DISPATCHED)) {
+            boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
                 listener.fireOnTimeout();
+                listenerInvoked = true;
             }
+            if (!listenerInvoked) {
+                ((HttpServletResponse)servletResponse).setStatus(500);
+            }
+            doInternalComplete(true);
         } else if (this.state.compareAndSet(AsyncState.DISPATCHING, AsyncState.DISPATCHED)) {
             if (this.dispatch!=null) {
                 try {
@@ -264,8 +276,8 @@ public class AsyncContextImpl implements AsyncContext {
             }catch (Exception x) {
                 log.error("",x);
             }
-            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_COMPLETE,null);
             recycle();
+            
         } else { 
             throw new IllegalStateException("Complete illegal. Invalid state:"+state.get());
         }
