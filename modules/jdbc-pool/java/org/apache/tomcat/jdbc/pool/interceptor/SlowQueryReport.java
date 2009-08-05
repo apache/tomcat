@@ -287,6 +287,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return FIELD_TYPES;
         }
         
+        @Override
         public String toString() {
             StringBuffer buf = new StringBuffer("QueryStats[query:");
             buf.append(query);
@@ -390,10 +391,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
             return totalInvocationTime;
         }
 
+        @Override
         public int hashCode() {
             return query.hashCode();
         }
         
+        @Override
         public boolean equals(Object other) {
             if (other instanceof QueryStats) {
                 QueryStats qs = (QueryStats)other;

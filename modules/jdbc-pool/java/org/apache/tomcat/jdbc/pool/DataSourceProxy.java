@@ -188,6 +188,7 @@ public class DataSourceProxy implements PoolConfiguration {
         else return p.getSize();
     }
 
+    @Override
     public String toString() {
         return super.toString()+"{"+getPoolProperties()+"}";
     }
