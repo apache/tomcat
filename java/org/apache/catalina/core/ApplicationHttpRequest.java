@@ -196,7 +196,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Special attributes.
      */
     protected Object[] specialAttributes = new Object[specials.length];
-
+    
 
     // ------------------------------------------------- ServletRequest Methods
 
@@ -741,9 +741,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         this.queryParamString = queryString;
     }
 
-
     // ------------------------------------------------------ Protected Methods
-
 
     /**
      * Is this attribute name one of the special ones that is added only for

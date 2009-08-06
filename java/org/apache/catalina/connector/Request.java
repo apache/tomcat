@@ -386,11 +386,6 @@ public class Request
     protected String localName = null;
     
     /**
-     * asyncSupported
-     */
-    protected boolean asyncSupported = true;
-    
-    /**
      * AsyncContext 
      */
     protected AsyncContextImpl asyncContext = null;
@@ -400,6 +395,8 @@ public class Request
      */
     protected long asyncTimeout = 0;
     
+    protected Boolean asyncSupported = null;
+    
     
 
     // --------------------------------------------------------- Public Methods
@@ -407,7 +404,7 @@ public class Request
     
 
     public void setAsyncSupported(boolean asyncSupported) {
-        this.asyncSupported = asyncSupported;
+        asyncSupported = asyncSupported?Boolean.TRUE:Boolean.FALSE;
     }
 
     /**
@@ -483,7 +480,7 @@ public class Request
             }
         }
         
-        asyncSupported = true;
+        asyncSupported = null;
         if (asyncContext!=null) asyncContext.recycle();
 
     }
@@ -849,6 +846,10 @@ public class Request
             return (requestDispatcherPath == null) 
                 ? getRequestPathMB().toString()
                 : requestDispatcherPath.toString();
+        }
+        
+        if (name.equals(Globals.ASYNC_SUPPORTED_ATTR)) {
+            return isAsyncSupported();
         }
 
         Object attr=attributes.get(name);
@@ -1370,6 +1371,10 @@ public class Request
             requestDispatcherPath = value;
             return;
         }
+        
+        if (name.equals(Globals.ASYNC_SUPPORTED_ATTR)) {
+            this.asyncSupported = (Boolean)value;
+        }
 
         Object oldValue = null;
         boolean replaced = false;
@@ -1487,7 +1492,11 @@ public class Request
 
     public boolean isAsyncSupported() {
         // TODO SERVLET3 - async
-        return this.asyncSupported;
+        if (this.asyncSupported==null) { 
+            return true;
+        } else {
+            return asyncSupported.booleanValue();
+        }
     }
 
     public AsyncContext getAsyncContext() {

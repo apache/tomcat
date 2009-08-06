@@ -47,6 +47,8 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.InstanceSupport;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -66,6 +68,7 @@ import org.apache.tomcat.util.res.StringManager;
 final class ApplicationDispatcher
     implements RequestDispatcher {
 
+    protected static Log log = LogFactory.getLog(ApplicationDispatcher.class);
 
     protected class PrivilegedForward
             implements PrivilegedExceptionAction<Void> {
@@ -637,6 +640,16 @@ final class ApplicationDispatcher
         ApplicationFilterFactory factory = ApplicationFilterFactory.getInstance();
         ApplicationFilterChain filterChain = factory.createFilterChain(request,
                                                                 wrapper,servlet);
+        
+        Object asyncSupported = request.getAttribute(Globals.ASYNC_SUPPORTED_ATTR);
+        //we have a new filter chain, setup isAsyncSupported here
+        boolean filterAsyncSupported = filterChain.isAsyncSupported();
+        if (!filterAsyncSupported && request.isAsyncSupported()) {
+            //the request says we support it, but the filters don't
+            //TODO SERVLET3 - async
+            request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
+        }
+        
         // Call the service() method for the allocated servlet instance
         try {
             String jspFile = wrapper.getJspFile();
@@ -691,6 +704,8 @@ final class ApplicationDispatcher
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException",
                              wrapper.getName()), e);
             runtimeException = e;
+        } finally {
+            request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, asyncSupported);
         }
 
         // Release the filter chain (if any) for this request
@@ -777,8 +792,7 @@ final class ApplicationDispatcher
         }
 
     }
-
-
+    
     /**
      * Unwrap the response if we have wrapped it.
      */
