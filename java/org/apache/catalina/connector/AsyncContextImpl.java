@@ -257,6 +257,8 @@ public class AsyncContextImpl implements AsyncContext {
                     dispatch = null;
                 }
             }
+        } else if (this.state.get()==AsyncState.COMPLETING) {
+            doInternalComplete(false);
         } else {
             throw new IllegalStateException("Dispatch illegal. Invalid state: "+state.get());
         }
