@@ -18,6 +18,11 @@ Use cases:
  - background thread calls writes and calls complete()
    <a href="<%=response.encodeURL("/examples/async/async2")%>"> Async 2 </a>
 
+4. Simple dispatch
+ - servlet does a startAsync()
+ - servlet calls dispatch(/path/to/jsp)
+ - servlet calls complete()
+   <a href="<%=response.encodeURL("/examples/async/async3")%>"> Async 3 </a>
 
 3. Timeout s1
  - servlet does a startAsync()
