@@ -196,8 +196,11 @@ final class StandardWrapperValve
             ApplicationFilterFactory.getInstance();
         ApplicationFilterChain filterChain =
             factory.createFilterChain(request, wrapper, servlet);
+        
         // Reset comet flag value after creating the filter chain
         request.setComet(false);
+        //check filters to see if we support async or not.
+        request.setAsyncSupported(filterChain.isAsyncSupported());
 
         // Call the filter chain for this request
         // NOTE: This also calls the servlet's service() method

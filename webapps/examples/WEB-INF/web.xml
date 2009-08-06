@@ -320,4 +320,12 @@
       <servlet-name>async2</servlet-name>
       <url-pattern>/async/async2</url-pattern>
     </servlet-mapping>
+    <servlet>
+      <servlet-name>async3</servlet-name>
+      <servlet-class>async.Async3</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>async3</servlet-name>
+      <url-pattern>/async/async3</url-pattern>
+    </servlet-mapping>
 </web-app>
