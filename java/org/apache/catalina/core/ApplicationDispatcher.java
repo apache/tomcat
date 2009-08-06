@@ -641,7 +641,7 @@ final class ApplicationDispatcher
         ApplicationFilterChain filterChain = factory.createFilterChain(request,
                                                                 wrapper,servlet);
         
-        Object asyncSupported = request.getAttribute(Globals.ASYNC_SUPPORTED_ATTR);
+        Object origAsyncSupported = request.getAttribute(Globals.ASYNC_SUPPORTED_ATTR);
         //we have a new filter chain, setup isAsyncSupported here
         boolean filterAsyncSupported = filterChain.isAsyncSupported();
         if (!filterAsyncSupported && request.isAsyncSupported()) {
@@ -705,7 +705,7 @@ final class ApplicationDispatcher
                              wrapper.getName()), e);
             runtimeException = e;
         } finally {
-            request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, asyncSupported);
+            request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, origAsyncSupported);
         }
 
         // Release the filter chain (if any) for this request
