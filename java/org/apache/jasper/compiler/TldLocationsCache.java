@@ -95,6 +95,12 @@ public class TldLocationsCache {
     private static final String JAR_EXT = ".jar";
     private static final String TLD_EXT = ".tld";
 
+    // Configuration properties
+    private static final boolean SCAN_CLASSPATH = Boolean.valueOf(
+            System.getProperty(
+                "org.apache.jasper.compiler.TldLocationsCache.SCAN_CLASSPATH",
+                "true")).booleanValue();
+
     // Names of JARs that are known not to contain any TLDs
     private static HashSet<String> noTldJars;
 
@@ -245,7 +251,9 @@ public class TldLocationsCache {
             tldScanWebXml();
             tldScanResourcePaths(WEB_INF);
             tldScanWebInfLib();
-            tldScanClassloaders();
+            if (SCAN_CLASSPATH) {
+                tldScanClassloaders();
+            }
             initialized = true;
         } catch (Exception ex) {
             throw new JasperException(Localizer.getMessage(
@@ -467,13 +475,13 @@ public class TldLocationsCache {
     private void tldScanJar(URL url) throws IOException {
         URLConnection conn = url.openConnection();
         if (conn instanceof JarURLConnection) {
-            scanJar((JarURLConnection) conn);
+            tldScanJar((JarURLConnection) conn);
         } else {
             String urlStr = url.toString();
             if (urlStr.startsWith(FILE_PROTOCOL)
                     && urlStr.endsWith(JAR_EXT)) {
                 URL jarURL = new URL("jar:" + urlStr + "!/");
-                scanJar((JarURLConnection) jarURL.openConnection());
+                tldScanJar((JarURLConnection) jarURL.openConnection());
             }
         }
     }
@@ -487,7 +495,7 @@ public class TldLocationsCache {
      * 
      * Keep in sync with o.a.c.startup.TldConfig
      */
-    private void scanJar(JarURLConnection conn) throws IOException {
+    private void tldScanJar(JarURLConnection conn) throws IOException {
 
         JarFile jarFile = null;
         String resourcePath = conn.getJarFileURL().toString();
