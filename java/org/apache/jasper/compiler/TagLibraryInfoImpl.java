@@ -149,8 +149,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         }
 
         try {
-            if (!location[0].endsWith("jar")) {
-                // Location points to TLD file
+            if (location[1] == null) {
+                // Location points directly to TLD file
                 try {
                     in = getResourceAsStream(location[0]);
                     if (in == null) {
@@ -320,7 +320,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         String[] location = new String[2];
         location[0] = uri;
-        if (location[0].endsWith("jar")) {
+        if (location[0].endsWith(".jar")) {
             URL url = null;
             try {
                 url = ctxt.getResource(location[0]);
