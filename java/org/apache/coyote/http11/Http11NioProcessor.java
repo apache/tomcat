@@ -190,13 +190,6 @@ public class Http11NioProcessor implements ActionHook {
      * Async used
      */
     protected boolean async = false;
-    /**
-     * Closed flag, a Comet async thread can 
-     * signal for this Nio processor to be closed and recycled instead
-     * of waiting for a timeout.
-     * Closed by HttpServletRequest.getAsyncContext().complete()
-     */
-    protected boolean asyncClose;
 
     /**
      * Content delimitator for the request (if false, the connection will
@@ -1135,7 +1128,6 @@ public class Http11NioProcessor implements ActionHook {
             comet = false;
             cometClose = true;
             async = false;
-            asyncClose = false;
             SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
             if ( key != null ) {
                 NioEndpoint.KeyAttachment attach = (NioEndpoint.KeyAttachment) key.attachment();
@@ -1316,7 +1308,6 @@ public class Http11NioProcessor implements ActionHook {
         } else if (actionCode == ActionCode.ACTION_ASYNC_COMPLETE) {
           //TODO SERVLET3 - async
             AtomicBoolean dispatch = (AtomicBoolean)param;
-            asyncClose = true;
             RequestInfo rp = request.getRequestProcessor();
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) { //async handling
                 dispatch.set(true);
