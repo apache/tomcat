@@ -1323,10 +1323,11 @@ public class Http11NioProcessor implements ActionHook {
             attach.setTimeout(timeout);
         } else if (actionCode == ActionCode.ACTION_ASYNC_DISPATCH) {
             RequestInfo rp = request.getRequestProcessor();
+            AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
                 endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
             } else { 
-                throw new UnsupportedOperationException("Can't call dispatch on the worker thread.");
+                dispatch.set(true);
             }
         }
     }
