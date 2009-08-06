@@ -63,6 +63,12 @@ public final class TldConfig  implements LifecycleListener {
     private static final String WEB_INF = "/WEB-INF/";
     private static final String WEB_INF_LIB = "/WEB-INF/lib/";
     
+    // Configuration properties
+    private static final boolean SCAN_CLASSPATH = Boolean.valueOf(
+            System.getProperty(
+                "org.apache.jasper.compiler.TldLocationsCache.SCAN_CLASSPATH",
+                "true")).booleanValue();
+
     // Names of JARs that are known not to contain any TLDs
     private static HashSet<String> noTldJars;
 
@@ -334,7 +340,9 @@ public final class TldConfig  implements LifecycleListener {
         tldScanWebInfLib();
         
         // Stage 4 - Additional entries from the container
-        tldScanClassloaders();
+        if (SCAN_CLASSPATH) {
+            tldScanClassloaders();
+        }
 
         // Now add all the listeners we found to the listeners for this context
         String list[] = getTldListeners();
@@ -511,6 +519,10 @@ public final class TldConfig  implements LifecycleListener {
      */
     private void tldScanClassloaders() {
 
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("tldConfig.classloaderStart"));
+        }
+
         ClassLoader loader = 
             Thread.currentThread().getContextClassLoader();
         
@@ -543,6 +555,10 @@ public final class TldConfig  implements LifecycleListener {
      * Keep in sync with o.a.j.comiler.TldLocationsCache
      */
     private void tldScanJar(URL url) throws IOException {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("tldConfig.jarUrlStart", url));
+        }
+
         URLConnection conn = url.openConnection();
         if (conn instanceof JarURLConnection) {
             tldScanJar((JarURLConnection) conn);
