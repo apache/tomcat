@@ -94,6 +94,15 @@
       <code>true</code> will be used.</p>
     </property>
 
+    <property name="org.apache.jasper.compiler. TldLocationsCache.SCAN_CLASSPATH">
+      <p>When scanning the class path for TLDs, should Jasper scan all JAR files
+      in the classpath, including those provided by the web application's parent
+      clasloaders? This is intended for sharing tag libraries between multiple
+      web applications by making the JAR available via the common or shared
+      classloader. If not specified, the default value of <code>true</code> will
+      be used.</p>
+    </property>
+
     <property name="org.apache.jasper.runtime. BodyContentImpl.LIMIT_BUFFER">
       <p>If <code>true</code>, any tag buffer that expands beyond
       <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> will be
