@@ -13,6 +13,12 @@ Use cases:
  - background thread calls dispatch(/path/to/jsp)
    <a href="<%=response.encodeURL("/examples/async/async1")%>"> Async 1 </a>
  
+3. Simple dispatch
+ - servlet does startAsync()
+ - background thread calls writes and calls complete()
+   <a href="<%=response.encodeURL("/examples/async/async2")%>"> Async 2 </a>
+
+
 3. Timeout s1
  - servlet does a startAsync()
  - servlet does a setAsyncTimeout
