@@ -36,7 +36,6 @@ import org.apache.catalina.Context;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.MutableInteger;
 /**
  * 
  * @author fhanik
