@@ -160,9 +160,12 @@ public class AsyncContextImpl implements AsyncContext {
         if (state.compareAndSet(AsyncState.STARTED, AsyncState.DISPATCHING) ||
             state.compareAndSet(AsyncState.DISPATCHED, AsyncState.DISPATCHING)) {
             // TODO SERVLET3 - async
+            final ServletContext sctx = getServletRequest().getServletContext();
             Runnable r = new Runnable() {
                 public void run() {
+                    //TODO SERVLET3 - async - set context class loader when running the task.
                     try {
+                        
                         run.run();
                     }catch (Exception x) {
                         log.error("Unable to run async task.",x);
