@@ -849,7 +849,7 @@ public class Request
         }
         
         if (name.equals(Globals.ASYNC_SUPPORTED_ATTR)) {
-            return isAsyncSupported();
+            return asyncSupported;
         }
 
         Object attr=attributes.get(name);
