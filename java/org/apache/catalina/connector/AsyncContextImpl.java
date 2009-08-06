@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncListener;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -33,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -110,14 +112,18 @@ public class AsyncContextImpl implements AsyncContext {
             final HttpServletResponse servletResponse = (HttpServletResponse)getResponse();
             Runnable run = new Runnable() {
                 public void run() {
+                    DispatcherType type = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
                     try {
                         //piggy back on the request dispatcher to ensure that filters etc get called.
                         //TODO SERVLET3 - async should this be include/forward or a new dispatch type
                         //javadoc suggests include with the type of DispatcherType.ASYNC
+                        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
                         requestDispatcher.include(servletRequest, servletResponse);
                     }catch (Exception x) {
                         //log.error("Async.dispatch",x);
                         throw new RuntimeException(x);
+                    }finally {
+                        request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, type);
                     }
                 }
             };

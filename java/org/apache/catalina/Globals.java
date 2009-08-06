@@ -329,6 +329,11 @@ public final class Globals {
      */
     public static final boolean IS_SECURITY_ENABLED =
         (System.getSecurityManager() != null);
-
+    
+    /**
+     * 
+     */
+    public static final String ASYNC_SUPPORTED_ATTR = 
+        "org.apache.catalina.ASYNC_SUPPORTED";
 
 }
