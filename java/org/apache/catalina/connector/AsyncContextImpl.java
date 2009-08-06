@@ -122,7 +122,17 @@ public class AsyncContextImpl implements AsyncContext {
                 }
             };
             this.dispatch = run;
-            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, null );
+            AtomicBoolean dispatched = new AtomicBoolean(false);
+            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
+            if (!dispatched.get()) {
+                try {
+                    doInternalDispatch();
+                }catch (ServletException sx) {
+                    throw new RuntimeException(sx);
+                }catch (IOException ix) {
+                    throw new RuntimeException(ix);
+                }
+            }
 
         } else {
             throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
@@ -154,7 +164,17 @@ public class AsyncContextImpl implements AsyncContext {
                 }
             };
             this.dispatch = r;
-            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, null );
+            AtomicBoolean dispatched = new AtomicBoolean(false);
+            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
+            if (!dispatched.get()) {
+                try {
+                    doInternalDispatch();
+                }catch (ServletException sx) {
+                    throw new RuntimeException(sx);
+                }catch (IOException ix) {
+                    throw new RuntimeException(ix);
+                }
+            }
         } else {
             throw new IllegalStateException("Dispatch not allowed. Invalid state:"+state.get());
         }
