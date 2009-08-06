@@ -1326,8 +1326,9 @@ public class Http11NioProcessor implements ActionHook {
             AtomicBoolean dispatch = (AtomicBoolean)param;
             if ( rp.getStage() != org.apache.coyote.Constants.STAGE_SERVICE ) {//async handling
                 endpoint.processSocket(this.socket, SocketStatus.OPEN, true);
-            } else { 
                 dispatch.set(true);
+            } else { 
+                
             }
         }
     }

@@ -160,6 +160,8 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
      */                                                 
     private static Class<?>[] classTypeUsedInEvent = 
         new Class[] { CometEvent.class };
+    
+    
 
     // ---------------------------------------------------- FilterChain Methods
 
@@ -569,6 +571,16 @@ final class ApplicationFilterChain implements FilterChain, CometFilterChain {
 
         this.support = support;
 
+    }
+    
+    public boolean isAsyncSupported() {
+        boolean supported = true;
+        for (ApplicationFilterConfig config : filters) {
+            if (config!=null && config.getFilterDef()!=null) {
+                supported = supported & config.getFilterDef().isAsyncSupported();
+            }
+        }
+        return supported;
     }
 
 
