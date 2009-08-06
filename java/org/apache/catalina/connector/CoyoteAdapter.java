@@ -263,8 +263,6 @@ public class CoyoteAdapter
         boolean success = true;
         
         try {
-            DispatcherType prevDispatcherType = request.getDispatcherType();
-            request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
             // Calling the container
             try {
                 if (status==SocketStatus.TIMEOUT) {
@@ -283,7 +281,6 @@ public class CoyoteAdapter
             }catch (RuntimeException x) {
                 success = false;
             } finally {
-                request.setAttribute(Globals.DISPATCHER_TYPE_ATTR, prevDispatcherType);
             }
 
             if (request.isComet()) {
