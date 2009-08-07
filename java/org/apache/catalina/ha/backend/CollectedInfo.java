@@ -23,13 +23,10 @@ package org.apache.catalina.ha.backend;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.ObjectInstance;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.tomcat.util.modeler.Registry;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 
 /*
  * Listener to provider informations to mod_heartbeat.c
