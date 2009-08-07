@@ -92,6 +92,7 @@
 
   <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-core.jar"/>
   <property name="tomcat-embed-jasper.jar" value="${tomcat.embed}/tomcat-jasper.jar"/>
+  <property name="tomcat-embed-juli.jar" value="${tomcat.embed}/tomcat-juli.jar"/>
 
   <!-- Classpath -->
   <path id="tomcat.classpath">
@@ -267,7 +268,6 @@
     <patternset refid="files.servlet-api" />
     <patternset refid="files.el-api" />
     <patternset refid="files.bootstrap" />
-    <patternset refid="files.tomcat-juli" />
     <patternset refid="files.tomcat-api" />
     <patternset refid="files.catalina" />
     <patternset refid="files.tomcat-coyote" />
@@ -278,7 +278,10 @@
     <patternset refid="files.jasper" />
     <patternset refid="files.jasper-el" />
   </patternset>
-	
+  
+  <!-- Pattern sets used directly -->
+    <!--<patternset refid="files.tomcat-juli" />-->
+
   <!-- Pattern sets not included in embedded -->
     <!--<patternset refid="files.catalina-tribes" />-->
     <!--<patternset refid="files.catalina-ha" />-->
@@ -667,10 +670,12 @@
       failonerror="false"/>
     <copy file="${jasper-jdt.jar}" todir="${tomcat.embed}" />
 
-  	<jarIt jarfile="${tomcat-embed-core.jar}"
-  	  filesId="files.tomcat-embed-core"/>
+    <jarIt jarfile="${tomcat-embed-core.jar}"
+           filesId="files.tomcat-embed-core"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
-     filesId="files.tomcat-embed-jasper"/>
+           filesId="files.tomcat-embed-jasper"/>
+    <jarIt jarfile="${tomcat-embed-juli.jar}"
+           filesId="files.tomcat-juli"/>
 
   </target>
 
