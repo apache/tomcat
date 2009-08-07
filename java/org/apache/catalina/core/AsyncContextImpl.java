@@ -232,16 +232,8 @@ public class AsyncContextImpl implements AsyncContext {
         return servletRequest;
     }
 
-    public void setServletRequest(ServletRequest servletRequest) {
-        this.servletRequest = servletRequest;
-    }
-
     public ServletResponse getServletResponse() {
         return servletResponse;
-    }
-
-    public void setServletResponse(ServletResponse servletResponse) {
-        this.servletResponse = servletResponse;
     }
 
     @Override
@@ -343,8 +335,10 @@ public class AsyncContextImpl implements AsyncContext {
         state.set(AsyncState.TIMING_OUT);
     }
     
-    public void initEvent() {
-        event = new AsyncEvent(getRequest(),getResponse()); 
+    public void init(ServletRequest request, ServletResponse response) {
+        this.servletRequest = request;
+        this.servletResponse = response;
+        event = new AsyncEvent(request,response); 
     }
 
 }
