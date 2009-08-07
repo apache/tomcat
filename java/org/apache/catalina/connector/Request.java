@@ -36,6 +36,7 @@ import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
@@ -62,6 +63,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.ParameterMap;
@@ -1465,19 +1467,17 @@ public class Request
 
     public AsyncContext startAsync() {
         // TODO SERVLET3 - async
+        return startAsync(getRequest(),response.getResponse());
+    }
+
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
         if (!isAsyncSupported()) throw new IllegalStateException("Not supported.");
         if (asyncContext==null) asyncContext = new AsyncContextImpl(this);
         else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
         asyncContext.setStarted(getContext());
-        asyncContext.setServletRequest(getRequest());
-        asyncContext.setServletResponse(response.getResponse());
-        return asyncContext;
-    }
-
-    public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
-        startAsync();
         asyncContext.setServletRequest(request);
         asyncContext.setServletResponse(response);
+        asyncContext.initEvent();
         //TODO SERVLET3 - async - need to retrieve the ServletContext here
         //or just the webapp classloader associated with to do 
         //run with start(Runnable)
