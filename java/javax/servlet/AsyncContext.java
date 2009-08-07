@@ -16,8 +16,6 @@
 */
 package javax.servlet;
 
-import org.apache.catalina.core.AsyncContextImpl.AsyncState;
-
 /**
  * @since Servlet 3.0
  * $Id$
