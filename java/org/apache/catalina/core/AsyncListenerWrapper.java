@@ -14,10 +14,11 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-package org.apache.catalina.connector;
+package org.apache.catalina.core;
 
 import java.io.IOException;
 
+import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -29,34 +30,16 @@ import javax.servlet.ServletResponse;
 public class AsyncListenerWrapper {
 
     private AsyncListener listener = null;
-    private ServletRequest servletRequest = null;
-    private ServletResponse servletResponse = null;
     
-    public void fireOnComplete() throws IOException {
+    public void fireOnComplete(AsyncEvent event) throws IOException {
+        // TODO SERVLET 3 - async
+        listener.onComplete(event);
+    }
+
+
+    public void fireOnTimeout(AsyncEvent event) throws IOException {
         // TODO SERVLET 3 - async 
-
-    }
-
-
-    public void fireOnTimeout() throws IOException {
-        // TODO SERVLET 3 - async 
-
-    }
-
-    public ServletRequest getServletRequest() {
-        return servletRequest;
-    }
-
-    public void setServletRequest(ServletRequest servletRequest) {
-        this.servletRequest = servletRequest;
-    }
-
-    public ServletResponse getServletResponse() {
-        return servletResponse;
-    }
-
-    public void setServletResponse(ServletResponse servletResponse) {
-        this.servletResponse = servletResponse;
+        listener.onTimeout(event);
     }
 
     public AsyncListener getListener() {

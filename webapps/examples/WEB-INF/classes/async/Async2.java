@@ -41,7 +41,7 @@ public class Async2 extends HttpServlet {
                 try {
                     Thread.currentThread().setName("Async2-Thread");
                     log.info("Putting AsyncThread to sleep");
-                    Thread.sleep(10*1000);
+                    Thread.sleep(2*1000);
                     log.info("Writing data.");
                     actx.getResponse().getWriter().write("Output from background thread. Time:"+System.currentTimeMillis()+"\n");
                     actx.complete();
