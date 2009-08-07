@@ -42,7 +42,7 @@ public class Async1 extends HttpServlet {
                     String path = "/jsp/async/async1.jsp";
                     Thread.currentThread().setName("Async1-Thread");
                     log.info("Putting AsyncThread to sleep");
-                    Thread.sleep(10*1000);
+                    Thread.sleep(2*1000);
                     log.info("Dispatching to "+path);
                     actx.dispatch(path);
                 }catch (InterruptedException x) {

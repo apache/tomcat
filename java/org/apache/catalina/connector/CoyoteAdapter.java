@@ -29,6 +29,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
@@ -269,14 +270,8 @@ public class CoyoteAdapter
                    AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
                    //TODO SERVLET3 - async
                    //configure settings for timed out
-                   asyncConImpl.setState(AsyncContextImpl.AsyncState.TIMING_OUT);
+                   asyncConImpl.setTimeoutState();
                 }
-                if (status==SocketStatus.TIMEOUT) {
-                    AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
-                    //TODO SERVLET3 - async
-                    //configure settings for timed out
-                    asyncConImpl.setState(AsyncContextImpl.AsyncState.TIMING_OUT);
-                 }
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }catch (RuntimeException x) {
                 success = false;
