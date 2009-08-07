@@ -28,8 +28,15 @@ $Id: $
    - Done
 
 3. Implement all the new Servlet 3 features
+   - Sections 1 to 6    - not checked
+   - Section 7 - in progress
+     7.1, 7.2, 7.3, 7.4, 7.5, 7.6 - Compliant
+     7.7.1 - Compliant
+     7.7.2 - When is IAE thrown?
+     7.7.3 - Compliant
+   - Sections 8 onwards - not checked
 
-4. Do an alpha realease (from trunk)
+4. Do an alpha release (from trunk)
    - Create tc7.0.x\tags to hold release tags
    - Create Bugzilla project
    - Add to web site
