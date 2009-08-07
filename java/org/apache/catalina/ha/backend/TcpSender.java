@@ -28,8 +28,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.InetAddress;
-import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 
 /*
