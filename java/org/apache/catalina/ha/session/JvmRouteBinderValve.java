@@ -25,7 +25,6 @@ import javax.servlet.http.Cookie;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -39,6 +38,7 @@ import org.apache.catalina.ha.ClusterValve;
 import org.apache.catalina.ha.session.DeltaSession;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.PersistentManager;
 import org.apache.catalina.util.LifecycleSupport;
@@ -442,8 +442,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
     }
 
     /**
-     * Sets a new cookie for the given session id and response and see
-     * {@link org.apache.catalina.connector.Request#configureSessionCookie(javax.servlet.http.Cookie)}
+     * Sets a new cookie for the given session id and response
      * 
      * @param request current request
      * @param response Tomcat Response
@@ -456,27 +455,20 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
             if (context.getServletContext().getEffectiveSessionTrackingModes()
                     .contains(SessionTrackingMode.COOKIE)) {
                 // set a new session cookie
-                Cookie newCookie = new Cookie(Globals.SESSION_COOKIE_NAME,
-                        sessionId);
-                newCookie.setMaxAge(-1);
-                String contextPath = null;
-                if (!response.getConnector().getEmptySessionPath()
-                        && (context != null)) {
-                    contextPath = context.getEncodedPath();
-                }
-                if ((contextPath != null) && (contextPath.length() > 0)) {
-                    newCookie.setPath(contextPath);
-                } else {
-                    newCookie.setPath("/");
-                }
-                if (request.isSecure()) {
-                    newCookie.setSecure(true);
-                }
+                Cookie newCookie =
+                    ApplicationSessionCookieConfig.createSessionCookie(
+                            context.getServletContext().getSessionCookieConfig(),
+                            sessionId,
+                            request.isSecure(),
+                            context.getUseHttpOnly(),
+                            response.getConnector().getEmptySessionPath(),
+                            context.getEncodedPath()); 
+                    
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jvmRoute.newSessionCookie",
-                            sessionId, Globals.SESSION_COOKIE_NAME, newCookie
-                                    .getPath(), new Boolean(newCookie
-                                    .getSecure())));
+                            sessionId, newCookie.getName(), newCookie.getPath(),
+                            Boolean.valueOf(newCookie.getSecure()),
+                            Boolean.valueOf(newCookie.isHttpOnly())));
                 }
                 response.addCookie(newCookie);
             }
