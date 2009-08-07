@@ -20,16 +20,11 @@ package org.apache.catalina.ha.backend;
 
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-
-import org.apache.catalina.connector.Connector;
-
-import org.apache.tomcat.util.modeler.Registry;
 
 /*
  * Listener to provider informations to mod_heartbeat.c
@@ -83,7 +78,7 @@ public class HeartbeatListener
     }
 
     public void lifecycleEvent(LifecycleEvent event) {
-        Object source = event.getLifecycle();
+
         if (Lifecycle.PERIODIC_EVENT.equals(event.getType())) {
             if (sender == null) {
                 if (proxyList == null)
