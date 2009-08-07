@@ -48,7 +48,7 @@ public class Async0 extends HttpServlet {
                     try {
                         Thread.currentThread().setName("Async0-Thread");
                         log.info("Putting AsyncThread to sleep");
-                        Thread.sleep(10*1000);
+                        Thread.sleep(2*1000);
                         log.info("Dispatching");
                         actx.dispatch();
                     }catch (InterruptedException x) {
