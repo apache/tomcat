@@ -25,7 +25,7 @@ public class AsyncEvent {
     private ServletRequest request;
     private ServletResponse response;
     
-    AsyncEvent(ServletRequest request, ServletResponse response) {
+    public AsyncEvent(ServletRequest request, ServletResponse response) {
         this.request = request;
         this.response = response;
     }

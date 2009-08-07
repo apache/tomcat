@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.connector;
+package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
@@ -35,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
+import org.apache.catalina.connector.Request;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -59,6 +61,7 @@ public class AsyncContextImpl implements AsyncContext {
     private Context context = null;
     private AtomicReference<AsyncState> state = new AtomicReference<AsyncState>(AsyncState.NOT_STARTED);
     private long timeout = -1;
+    private AsyncEvent event = null;
     
     private Request request;
     
@@ -73,7 +76,7 @@ public class AsyncContextImpl implements AsyncContext {
             state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING)) {
             // TODO SERVLET3 - async
             AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
+            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_COMPLETE,dispatched);
             if (!dispatched.get()) doInternalComplete(false);
         } else {
             throw new IllegalStateException("Complete not allowed. Invalid state:"+state.get());
@@ -129,7 +132,7 @@ public class AsyncContextImpl implements AsyncContext {
             };
             this.dispatch = run;
             AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
+            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
             if (!dispatched.get()) {
                 try {
                     doInternalDispatch();
@@ -174,7 +177,7 @@ public class AsyncContextImpl implements AsyncContext {
             };
             this.dispatch = r;
             AtomicBoolean dispatched = new AtomicBoolean(false);
-            request.coyoteRequest.action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
+            request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_DISPATCH, dispatched );
             if (!dispatched.get()) {
                 try {
                     doInternalDispatch();
@@ -192,21 +195,17 @@ public class AsyncContextImpl implements AsyncContext {
     public void addAsyncListener(AsyncListener listener) {
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
-        wrapper.setServletRequest(getServletRequest());
-        wrapper.setServletResponse(getServletResponse());
         listeners.add(wrapper);
     }
 
     public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
-        wrapper.setServletRequest(servletRequest);
-        wrapper.setServletResponse(servletResponse);
         listeners.add(wrapper);
     }
     
     
-    protected void recycle() {
+    public void recycle() {
         servletRequest = null;
         servletResponse = null;
         listeners.clear();
@@ -214,6 +213,7 @@ public class AsyncContextImpl implements AsyncContext {
         state.set(AsyncState.NOT_STARTED);
         context = null;
         timeout = -1;
+        event = null;
     }
 
     public boolean isStarted() {
@@ -263,10 +263,10 @@ public class AsyncContextImpl implements AsyncContext {
     
     public void doInternalDispatch() throws ServletException, IOException {
         if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.DISPATCHED)) {
-            log.info("TIMING OUT!");
+            log.debug("TIMING OUT!");
             boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
-                listener.fireOnTimeout();
+                listener.fireOnTimeout(event);
                 listenerInvoked = true;
             }
             if (!listenerInvoked) {
@@ -302,7 +302,7 @@ public class AsyncContextImpl implements AsyncContext {
         } else if (state.compareAndSet(AsyncState.COMPLETING, AsyncState.NOT_STARTED)) {
             for (AsyncListenerWrapper wrapper : listeners) {
                 try {
-                    wrapper.fireOnComplete();
+                    wrapper.fireOnComplete(event);
                 }catch (IOException x) {
                     //how does this propagate, or should it?
                     //TODO SERVLET3 - async 
@@ -336,7 +336,15 @@ public class AsyncContextImpl implements AsyncContext {
     
     public void setAsyncTimeout(long timeout) {
         this.timeout = timeout;
-        request.coyoteRequest.action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
+        request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
+    }
+    
+    public void setTimeoutState() {
+        state.set(AsyncState.TIMING_OUT);
+    }
+    
+    public void initEvent() {
+        event = new AsyncEvent(getRequest(),getResponse()); 
     }
 
 }
