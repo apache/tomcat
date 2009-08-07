@@ -48,7 +48,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletRequestAttributeEvent;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletResponse;
-import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +62,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.util.Enumerator;
@@ -2384,9 +2384,15 @@ public class Request
                && getContext().getServletContext().
                        getEffectiveSessionTrackingModes().contains(
                                SessionTrackingMode.COOKIE)) {
-            Cookie cookie = new Cookie(Globals.SESSION_COOKIE_NAME,
-                                       session.getIdInternal());
-            configureSessionCookie(cookie);
+            Cookie cookie =
+                ApplicationSessionCookieConfig.createSessionCookie(
+                        context.getServletContext().getSessionCookieConfig(),
+                        session.getIdInternal(),
+                        isSecure(),
+                        context.getUseHttpOnly(),
+                        connector.getEmptySessionPath(),
+                        context.getEncodedPath());
+            
             response.addCookieInternal(cookie);
         }
 
@@ -2399,50 +2405,6 @@ public class Request
 
     }
 
-    /**
-     * Configures the given JSESSIONID cookie.
-     *
-     * @param cookie The JSESSIONID cookie to be configured
-     */
-    protected void configureSessionCookie(Cookie cookie) {
-        SessionCookieConfig scc =
-            context.getServletContext().getSessionCookieConfig();
-
-        cookie.setMaxAge(-1);
-
-        if (scc != null) {
-            cookie.setComment(scc.getComment());
-        }
-
-        if (scc != null) {
-            cookie.setDomain(scc.getDomain());
-        }
-
-        if ((scc != null && scc.isSecure()) || isSecure()) {
-            cookie.setSecure(true);
-        }
-
-        if ((scc != null && scc.isHttpOnly()) ||
-                context.getUseHttpOnly()) {
-            cookie.setHttpOnly(true);
-        }
-        
-        if (!connector.getEmptySessionPath() &&
-                scc != null && scc.getPath() != null) {
-            cookie.setPath(scc.getPath());
-        } else {
-            String contextPath = null;
-            if (!connector.getEmptySessionPath() && (getContext() != null)) {
-                contextPath = getContext().getEncodedPath();
-            }
-            if ((contextPath != null) && (contextPath.length() > 0)) {
-                cookie.setPath(contextPath);
-            } else {
-                cookie.setPath("/");
-            }
-        }
-    }
-    
     protected String unescape(String s) {
         if (s==null) return null;
         if (s.indexOf('\\') == -1) return s;
