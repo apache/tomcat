@@ -390,7 +390,7 @@ public class Request
     /**
      * AsyncContext 
      */
-    protected AsyncContextImpl asyncContext = null;
+    protected volatile AsyncContextImpl asyncContext = null;
     
     /**
      * async timeout
@@ -1475,9 +1475,7 @@ public class Request
         if (asyncContext==null) asyncContext = new AsyncContextImpl(this);
         else if (asyncContext.isStarted()) throw new IllegalStateException("Already started.");
         asyncContext.setStarted(getContext());
-        asyncContext.setServletRequest(request);
-        asyncContext.setServletResponse(response);
-        asyncContext.initEvent();
+        asyncContext.init(request,response);
         //TODO SERVLET3 - async - need to retrieve the ServletContext here
         //or just the webapp classloader associated with to do 
         //run with start(Runnable)
