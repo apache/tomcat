@@ -171,7 +171,8 @@ public class ApplicationContext
     /**
      * Session Cookie config
      */
-    private SessionCookieConfig sessionCookieConfig;
+    private SessionCookieConfig sessionCookieConfig =
+        new ApplicationSessionCookieConfig();
     
     /**
      * Session tracking modes
