@@ -54,8 +54,6 @@ import org.apache.coyote.ajp.AjpProtocol;
 import org.apache.coyote.http11.Http11AprProtocol;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.coyote.http11.Http11Protocol;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
@@ -70,10 +68,8 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 
 public class MBeanUtils {
-    private static Log log = LogFactory.getLog(MBeanUtils.class);
 
     // ------------------------------------------------------- Static Variables
-
 
     /**
      * The set of exceptions to the normal rules used by
@@ -633,7 +629,7 @@ public class MBeanUtils {
      * @exception MalformedObjectNameException if a name cannot be created
      */
     static ObjectName createObjectName(String domain,
-                                              Engine engine)
+            @SuppressWarnings("unused") Engine engine)
         throws MalformedObjectNameException {
 
         ObjectName name = null;
@@ -801,7 +797,7 @@ public class MBeanUtils {
      * @exception MalformedObjectNameException if a name cannot be created
      */
     static ObjectName createObjectName(String domain,
-                                              MBeanFactory factory)
+            @SuppressWarnings("unused") MBeanFactory factory)
         throws MalformedObjectNameException {
 
         ObjectName name = new ObjectName(domain + ":type=MBeanFactory");
@@ -879,7 +875,7 @@ public class MBeanUtils {
      * @exception MalformedObjectNameException if a name cannot be created
      */
     static ObjectName createObjectName(String domain,
-                                              Server server)
+            @SuppressWarnings("unused") Server server)
         throws MalformedObjectNameException {
 
         ObjectName name = null;
