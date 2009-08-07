@@ -21,7 +21,6 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.util.EnumSet;
 
-import javax.servlet.DispatcherType;
 import javax.servlet.SessionTrackingMode;
 
 import org.apache.catalina.CometEvent;
