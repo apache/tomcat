@@ -20,8 +20,7 @@ import java.io.IOException;
 
 import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+
 /**
  * TODO SERVLET 3 - async 
  * @author fhanik
