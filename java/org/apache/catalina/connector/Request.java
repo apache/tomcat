@@ -36,7 +36,6 @@ import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
 import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
@@ -406,7 +405,7 @@ public class Request
     
 
     public void setAsyncSupported(boolean asyncSupported) {
-        asyncSupported = asyncSupported?Boolean.TRUE:Boolean.FALSE;
+        asyncSupported = asyncSupported ? true : false;
     }
 
     /**
