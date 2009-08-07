@@ -109,7 +109,7 @@ public class JvmRouteSessionIDBinderListener extends ClusterListener {
      *            ClusterMessage - the message received from the cluster
      */
     public void messageReceived(ClusterMessage msg) {
-        if (msg instanceof SessionIDMessage && msg != null) {
+        if (msg instanceof SessionIDMessage) {
             SessionIDMessage sessionmsg = (SessionIDMessage) msg;
             if (log.isDebugEnabled())
                 log.debug(sm.getString(
