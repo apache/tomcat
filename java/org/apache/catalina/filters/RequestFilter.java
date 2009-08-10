@@ -30,6 +30,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.CometEvent;
+import org.apache.catalina.CometFilter;
+import org.apache.catalina.CometFilterChain;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -67,7 +70,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 
 public abstract class RequestFilter
-    extends FilterBase {
+    extends FilterBase implements CometFilter {
 
 
     // ----------------------------------------------------- Class Variables
@@ -253,43 +256,69 @@ public abstract class RequestFilter
             ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        // Check the deny patterns, if any
-        for (int i = 0; i < this.denies.length; i++) {
-            if (this.denies[i].matcher(property).matches()) {
-                if (isHttpServletResponse(response)) {
-                    ((HttpServletResponse) response)
-                            .sendError(HttpServletResponse.SC_FORBIDDEN);
-                    return;
-                } else {
-                    sendErrorWhenNotHttp(response);
-                    return;
-                }
+        if (isAllowed(property)) {
+            chain.doFilter(request, response);
+        } else {
+            if (isHttpServletResponse(response)) {
+                ((HttpServletResponse) response)
+                        .sendError(HttpServletResponse.SC_FORBIDDEN);
+            } else {
+                sendErrorWhenNotHttp(response);
             }
         }
+    }
 
+    /**
+     * Perform the filtering that has been configured for this Filter, matching
+     * against the specified request property.
+     * 
+     * @param property  The property to check against the allow/deny rules
+     * @param event     The comet event to be filtered
+     * @param chain     The comet filter chain
+     * @exception IOException if an input/output error occurs
+     * @exception ServletException if a servlet error occurs
+     */
+    protected void processCometEvent(String property, CometEvent event, CometFilterChain chain)
+            throws IOException, ServletException {
+        HttpServletResponse response = event.getHttpServletResponse();
+        
+        if (isAllowed(property)) {
+            chain.doFilterEvent(event);
+        } else {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            event.close();
+        }
+    }
+
+    /**
+     * Process the allow and deny rules for the provided property.
+     * 
+     * @param property  The property to test against the allow and deny lists
+     * @return          <code>true</code> if this request should be allowed,
+     *                  <code>false</code> otherwise
+     */
+    private boolean isAllowed(String property) {
+        for (int i = 0; i < this.denies.length; i++) {
+            if (this.denies[i].matcher(property).matches()) {
+                return false;
+            }
+        }
+     
         // Check the allow patterns, if any
         for (int i = 0; i < this.allows.length; i++) {
             if (this.allows[i].matcher(property).matches()) {
-                chain.doFilter(request, response);
-                return;
+                return true;
             }
         }
 
         // Allow if denies specified but not allows
         if ((this.denies.length > 0) && (this.allows.length == 0)) {
-            chain.doFilter(request, response);
-            return;
+            return true;
         }
 
         // Deny this request
-        if (isHttpServletResponse(response)) {
-            ((HttpServletResponse) response)
-                    .sendError(HttpServletResponse.SC_FORBIDDEN);
-        } else {
-            sendErrorWhenNotHttp(response);      
-        }
+        return false;
     }
-
 
     private void sendErrorWhenNotHttp(ServletResponse response)
             throws IOException {
