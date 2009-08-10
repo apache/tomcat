@@ -26,6 +26,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
+import org.apache.catalina.CometEvent;
+import org.apache.catalina.CometFilterChain;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -54,12 +56,13 @@ public final class RemoteAddrFilter
 
     /**
      * Extract the desired request property, and pass it (along with the
-     * specified request and response objects) to the protected
-     * <code>process()</code> method to perform the actual filtering.
-     * This method must be implemented by a concrete subclass.
+     * specified request and response objects and associated filter chain) to
+     * the protected <code>process()</code> method to perform the actual
+     * filtering.
      *
-     * @param request The servlet request to be processed
+     * @param request  The servlet request to be processed
      * @param response The servlet response to be created
+     * @param chain    The filter chain for this request
      *
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
@@ -71,7 +74,25 @@ public final class RemoteAddrFilter
         process(request.getRemoteAddr(), request, response, chain);
 
     }
-    
+
+    /**
+     * Extract the desired request property, and pass it (along with the comet
+     * event and filter chain) to the protected <code>process()</code> method
+     * to perform the actual filtering.
+     *
+     * @param event The comet event to be processed
+     * @param chain The filter chain for this event
+     *
+     * @exception IOException if an input/output error occurs
+     * @exception ServletException if a servlet error occurs
+     */
+    @Override
+    public void doFilterEvent(CometEvent event, CometFilterChain chain)
+            throws IOException, ServletException {
+        processCometEvent(event.getHttpServletRequest().getRemoteHost(),
+                event, chain);        
+    }
+
     protected Log getLogger() {
         return log;
     }
