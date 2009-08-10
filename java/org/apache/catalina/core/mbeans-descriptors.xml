@@ -17,6 +17,29 @@
 -->
 <mbeans-descriptors>
 
+  <mbean name="ApplicationFilterConfig"
+         description="Wrapper that represents an individual servlet-filter definition"
+         domain="Catalina"
+         group="Filter"
+         type="org.apache.catalina.core.ApplicationFilterConfig">
+                
+     <attribute name="filterName"
+                description="The name used to reference the filter in web.xml"
+                type="java.lang.String"
+                writeable="false"/>    
+
+     <attribute name="filterClass"
+                description="Fully qualified class name of the filter object"
+                type="java.lang.String"
+                writeable="false"/>                               
+
+     <attribute name="filterInitParameterMap"
+                description="Return the initiaization parameters associated with this filter"
+                type="java.util.Map"
+                writeable="false" />
+                    
+  </mbean> 
+
   <mbean name="NamingContextListener"
          description="Helper class used to initialize and populate the JNDI context associated with each context and server"
          domain="Catalina"
