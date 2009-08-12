@@ -64,45 +64,6 @@ public class ExpandWar {
      * @param host Host war is being installed for
      * @param war URL of the web application archive to be expanded
      *  (must start with "jar:")
-     *
-     * @exception IllegalArgumentException if this is not a "jar:" URL
-     * @exception IOException if an input/output error was encountered
-     *  during expansion
-     */
-    public static String expand(Host host, URL war)
-        throws IOException {
-
-        // Calculate the directory name of the expanded directory
-        if (host.getLogger().isDebugEnabled()) {
-            host.getLogger().debug("expand(" + war.toString() + ")");
-        }
-        String pathname = war.toString().replace('\\', '/');
-        if (pathname.endsWith("!/")) {
-            pathname = pathname.substring(0, pathname.length() - 2);
-        }
-        int period = pathname.lastIndexOf('.');
-        if (period >= pathname.length() - 4)
-            pathname = pathname.substring(0, period);
-        int slash = pathname.lastIndexOf('/');
-        if (slash >= 0) {
-            pathname = pathname.substring(slash + 1);
-        }
-        if (host.getLogger().isDebugEnabled()) {
-            host.getLogger().debug("  Proposed directory name: " + pathname);
-        }
-        return expand(host, war, pathname);
-
-    }
-
-
-    /**
-     * Expand the WAR file found at the specified URL into an unpacked
-     * directory structure, and return the absolute pathname to the expanded
-     * directory.
-     *
-     * @param host Host war is being installed for
-     * @param war URL of the web application archive to be expanded
-     *  (must start with "jar:")
      * @param pathname Context path name for web application
      *
      * @exception IllegalArgumentException if this is not a "jar:" URL
