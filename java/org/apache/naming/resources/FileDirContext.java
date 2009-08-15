@@ -773,15 +773,6 @@ public class FileDirContext extends BaseDirContext {
     protected File file(String name) {
 
         File file = new File(base, name);
-        return validate(file);
-
-    }
-
-
-    /*
-     * Check that the file is valid for this context
-     */
-    private File validate(File file) {
         if (file.exists() && file.canRead()) {
 
         	if (allowLinking)
@@ -854,9 +845,7 @@ public class FileDirContext extends BaseDirContext {
 
         for (int i = 0; i < names.length; i++) {
 
-            File currentFile = validate(new File(file, names[i]));
-            if (currentFile == null) continue;
-            
+            File currentFile = new File(file, names[i]);
             Object object = null;
             if (currentFile.isDirectory()) {
                 FileDirContext tempContext = new FileDirContext(env);
