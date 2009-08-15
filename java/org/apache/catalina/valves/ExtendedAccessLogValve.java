@@ -222,61 +222,55 @@ public class ExtendedAccessLogValve
     // ------------------------------------------------------ Lifecycle Methods
 
 
-    protected class DateElement implements AccessLogElement {
-        private Date currentDate = new Date(0);
+    protected static class DateElement implements AccessLogElement {
+        // Milli-seconds in 24 hours
+        private static final long INTERVAL = (1000 * 60 * 60 * 24);
         
-        private String currentDateString = null;
-        
-        /**
-         * A date formatter to format a Date into a date in the format
-         * "yyyy-MM-dd".
-         */
-        private SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        
-        public DateElement() {
-            dateFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-        
+        private static final ThreadLocal<ElementTimestampStruct> currentDate =
+                new ThreadLocal<ElementTimestampStruct>() {
+            protected ElementTimestampStruct initialValue() {
+                return new ElementTimestampStruct("yyyy-MM-dd");
+            }
+        };
+                
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            if (currentDate != date) {
-                synchronized (this) {
-                    if (currentDate != date) {
-                        currentDateString = dateFormatter.format(date);
-                        currentDate = date;
-                    }
-                }
+            ElementTimestampStruct eds = currentDate.get();
+            long millis = eds.currentTimestamp.getTime();
+            if (date.getTime() > (millis + INTERVAL -1) ||
+                    date.getTime() < millis) {
+                eds.currentTimestamp.setTime(
+                        date.getTime() - (date.getTime() % INTERVAL));
+                eds.currentTimestampString =
+                    eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
-            buf.append(currentDateString);            
+            buf.append(eds.currentTimestampString);            
         }
     }
     
-    protected class TimeElement implements AccessLogElement {
-        private Date currentDate = new Date(0);
+    protected static class TimeElement implements AccessLogElement {
+        // Milli-seconds in a second 
+        private static final long INTERVAL = 1000;
         
-        private String currentTimeString = null;
-        
-        /**
-         * A date formatter to format a Date into a time in the format
-         * "kk:mm:ss" (kk is a 24-hour representation of the hour).
-         */
-        private SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
-
-        public TimeElement() {
-            timeFormatter.setTimeZone(TimeZone.getTimeZone("GMT"));
-        }
-        
+        private static final ThreadLocal<ElementTimestampStruct> currentTime =
+                new ThreadLocal<ElementTimestampStruct>() {
+            protected ElementTimestampStruct initialValue() {
+                return new ElementTimestampStruct("HH:mm:ss");
+            }
+        };
+            
         public void addElement(StringBuffer buf, Date date, Request request,
                 Response response, long time) {
-            if (currentDate != date) {
-                synchronized (this) {
-                    if (currentDate != date) {
-                        currentTimeString = timeFormatter.format(date);
-                        currentDate = date;
-                    }
-                }
+            ElementTimestampStruct eds = currentTime.get();
+            long millis = eds.currentTimestamp.getTime();
+            if (date.getTime() > (millis + INTERVAL -1) ||
+                    date.getTime() < millis) {
+                eds.currentTimestamp.setTime(
+                        date.getTime() - (date.getTime() % INTERVAL));
+                eds.currentTimestampString =
+                    eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
-            buf.append(currentTimeString);            
+            buf.append(eds.currentTimestampString);            
         }
     }
     
@@ -845,5 +839,15 @@ public class ExtendedAccessLogValve
                 + parameter);
         return null;
     }
+
+    private static class ElementTimestampStruct {
+        private Date currentTimestamp = new Date(0);
+        private SimpleDateFormat currentTimestampFormat;
+        private String currentTimestampString;
         
+        ElementTimestampStruct(String format) {
+            currentTimestampFormat = new SimpleDateFormat(format);
+            currentTimestampFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        }
+    }
 }
