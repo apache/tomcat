@@ -1163,7 +1163,8 @@ public class WebappLoader
                         return false;
                 } else if (object instanceof DirContext) {
                     currentFile.mkdir();
-                    copyDir((DirContext) object, currentFile);
+                    if (!copyDir((DirContext) object, currentFile))
+                        return false;
                 }
             }
 
