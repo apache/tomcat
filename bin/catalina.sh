@@ -287,6 +287,11 @@ elif [ "$1" = "run" ]; then
 
 elif [ "$1" = "start" ] ; then
 
+  if [ ! -z "$CATALINA_PID" -a -e "$CATALINA_PID" ]; then
+    echo "PID file found. Is Tomcat still running? This start aborted"
+    exit 1
+  fi
+
   shift
   touch "$CATALINA_BASE"/logs/catalina.out
   if [ "$1" = "-security" ] ; then
@@ -302,9 +307,6 @@ elif [ "$1" = "start" ] ; then
       org.apache.catalina.startup.Bootstrap "$@" start \
       >> "$CATALINA_BASE"/logs/catalina.out 2>&1 &
 
-      if [ ! -z "$CATALINA_PID" ]; then
-        echo $! > $CATALINA_PID
-      fi
   else
     "$_RUNJAVA" "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
       -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
@@ -314,14 +316,22 @@ elif [ "$1" = "start" ] ; then
       org.apache.catalina.startup.Bootstrap "$@" start \
       >> "$CATALINA_BASE"/logs/catalina.out 2>&1 &
 
-      if [ ! -z "$CATALINA_PID" ]; then
-        echo $! > $CATALINA_PID
-      fi
+  fi
+
+  if [ ! -z "$CATALINA_PID" ]; then
+    echo $! > $CATALINA_PID
   fi
 
 elif [ "$1" = "stop" ] ; then
 
   shift
+
+  SLEEP=5
+  if [ ! -z "$1" -a $1 -eq $1 &>/dev/null ]; then
+    SLEEP=$1
+    shift
+  fi
+
   FORCE=0
   if [ "$1" = "-force" ]; then
     shift
@@ -335,12 +345,33 @@ elif [ "$1" = "stop" ] ; then
     -Djava.io.tmpdir="$CATALINA_TMPDIR" \
     org.apache.catalina.startup.Bootstrap "$@" stop
 
+  if [ ! -z "$CATALINA_PID" -a -e "$CATALINA_PID" ]; then
+    while [ $SLEEP -ge 0 ] 
+    do
+      if ! kill -0 `cat $CATALINA_PID` &>/dev/null; then
+        rm $CATALINA_PID
+        break
+      fi
+      if [ $SLEEP -gt 0 ]; then
+        sleep 1
+      fi
+      let SLEEP=SLEEP-1 
+    done
+  else
+    if [ $? -eq 0 ]; then
+      sleep $SLEEP
+    fi  
+  fi
+
   if [ $FORCE -eq 1 ]; then
-    if [ ! -z "$CATALINA_PID" ]; then
+    if [ ! -z "$CATALINA_PID" -a -e "$CATALINA_PID" ]; then
        echo "Killing: `cat $CATALINA_PID`"
        kill -9 `cat $CATALINA_PID`
+       rm $CATALINA_PID
     else
-       echo "Kill failed: \$CATALINA_PID not set"
+       if [ -z "$CATALINA_PID" ]; then
+         echo "Kill failed: \$CATALINA_PID not set"
+       fi
     fi
   fi
 
@@ -367,7 +398,9 @@ else
   echo "  start             Start Catalina in a separate window"
   echo "  start -security   Start in a separate window with security manager"
   echo "  stop              Stop Catalina"
+  echo "  stop n            Stop Catalina, waiting n seconds for the process to end"
   echo "  stop -force       Stop Catalina (followed by kill -KILL)"
+  echo "  stop n -force     Stop Catalina, wait n seconds and then use kill -KILL if still running"
   echo "  version           What version of tomcat are you running?"
   exit 1
 
