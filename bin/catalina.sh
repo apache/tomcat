@@ -357,10 +357,6 @@ elif [ "$1" = "stop" ] ; then
       fi
       let SLEEP=SLEEP-1 
     done
-  else
-    if [ $? -eq 0 ]; then
-      sleep $SLEEP
-    fi  
   fi
 
   if [ $FORCE -eq 1 ]; then
@@ -397,11 +393,12 @@ else
   echo "  run -security     Start in the current window with security manager"
   echo "  start             Start Catalina in a separate window"
   echo "  start -security   Start in a separate window with security manager"
-  echo "  stop              Stop Catalina"
-  echo "  stop n            Stop Catalina, waiting n seconds for the process to end"
-  echo "  stop -force       Stop Catalina (followed by kill -KILL)"
-  echo "  stop n -force     Stop Catalina, wait n seconds and then use kill -KILL if still running"
+  echo "  stop              Stop Catalina, waiting up to 5 seconds for the process to end"
+  echo "  stop n            Stop Catalina, waiting up to n seconds for the process to end"
+  echo "  stop -force       Stop Catalina, wait up to 5 seconds and then use kill -KILL if still running"
+  echo "  stop n -force     Stop Catalina, wait up to n seconds and then use kill -KILL if still running"
   echo "  version           What version of tomcat are you running?"
+  echo "Note: Waiting for the process to end and use of the -force option require that \$CATALINA_PID is defined"
   exit 1
 
 fi
