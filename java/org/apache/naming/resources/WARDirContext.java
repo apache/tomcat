@@ -797,7 +797,7 @@ public class WARDirContext extends BaseDirContext {
      * Entry tree lookup.
      */
     protected Entry treeLookup(Name name) {
-        if (name.isEmpty())
+        if (name.isEmpty() || entries == null)
             return entries;
         Entry currentEntry = entries;
         for (int i = 0; i < name.size(); i++) {
