@@ -900,9 +900,7 @@ public class WebappClassLoader
             }
             if ((clazz == null) && hasExternalRepositories) {
                 try {
-                    synchronized (this) {
-                        clazz = super.findClass(name);
-                    }
+                    clazz = super.findClass(name);
                 } catch(AccessControlException ace) {
                     throw new ClassNotFoundException(name, ace);
                 } catch (RuntimeException e) {
@@ -1259,7 +1257,7 @@ public class WebappClassLoader
      *
      * @exception ClassNotFoundException if the class was not found
      */
-    public Class<?> loadClass(String name, boolean resolve)
+    public synchronized Class<?> loadClass(String name, boolean resolve)
         throws ClassNotFoundException {
 
         if (log.isDebugEnabled())
