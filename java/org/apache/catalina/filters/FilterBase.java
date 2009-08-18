@@ -22,17 +22,14 @@ import java.util.Enumeration;
 import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for filters that provide some utility methods. 
+ * Base class for filters that provides generic initialisation and a simple
+ * no-op destruction. 
  * 
  * @author xxd
  *
@@ -42,6 +39,8 @@ public abstract class FilterBase implements Filter {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    protected abstract Log getLogger();
+    
     public void init(FilterConfig filterConfig) throws ServletException {
         Enumeration<String> paramNames = filterConfig.getInitParameterNames();
         while (paramNames.hasMoreElements()) {
@@ -54,38 +53,9 @@ public abstract class FilterBase implements Filter {
         }    
     }
 
-    /**
-     * Whether the request object is an HttpServletRequest or not.
-     * 
-     * @param request
-     * @return
-     */
-    protected boolean isHttpServletRequest(ServletRequest request) {
-        return request instanceof HttpServletRequest;
+    @Override
+    public void destroy() {
+        // NOOP
     }
 
-    /**
-     * Whether the response object is an HttpServletResponse or not.
-     * 
-     * @param response
-     * @return
-     */
-    protected boolean isHttpServletResponse(ServletResponse response) {
-        return response instanceof HttpServletResponse;
-    }
-
-    /**
-     * Whether the corresponding Servlet is an HttpServlet or not.
-     * 
-     * @param request
-     * @param response
-     * @return
-     */
-    protected boolean isHttpServlet(ServletRequest request,
-            ServletResponse response) {
-        return isHttpServletRequest(request) && isHttpServletResponse(response);
-    }
-
-    protected abstract Log getLogger();
-    
 }
