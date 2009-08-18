@@ -171,13 +171,6 @@ public abstract class RequestFilter
     // --------------------------------------------------------- Public Methods
 
 
-    /* (non-Javadoc)
-     * @see javax.servlet.Filter#destroy()
-     */
-    public void destroy() {
-        // NOOP
-    }   
-    
     /**
      * Extract the desired request property, and pass it (along with the
      * specified request and response objects) to the protected
@@ -259,7 +252,7 @@ public abstract class RequestFilter
         if (isAllowed(property)) {
             chain.doFilter(request, response);
         } else {
-            if (isHttpServletResponse(response)) {
+            if (response instanceof HttpServletResponse) {
                 ((HttpServletResponse) response)
                         .sendError(HttpServletResponse.SC_FORBIDDEN);
             } else {
