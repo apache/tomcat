@@ -39,7 +39,7 @@
 
     <filter>
         <filter-name>Request Dumper Filter</filter-name>
-        <filter-class>filters.RequestDumperFilter</filter-class>
+        <filter-class>org.apache.catalina.filters.RequestDumperFilter</filter-class>
     </filter>
 
     <!-- Example filter to set character encoding on each request -->
