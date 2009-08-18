@@ -194,6 +194,75 @@
 </section>
 
 
+<section name="Request Dumper Filter">
+
+  <subsection name="Introduction">
+
+    <p>The Request Dumper Filter logs information from the request and response
+    objects and is intended to be used for debugging purposes. When using this
+    Filter, it is recommended that the
+    <code>org.apache.catalina.filter.RequestDumperFilter</code> logger is
+    directed to a dedicated file and that the
+    <code>org.apache.juli.VerbatimFormmater</code> is used.</p>
+
+    <p><strong>WARNING: Using this filter has side-effects.</strong>  The
+    output from this filter includes any parameters included with the request.
+    The parameters will be decoded using the default platform encoding. Any
+    subsequent calls to <code>request.setCharacterEncoding()</code> within
+    the web application will have no effect.</p>
+    
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Request Dumper Filter is
+    <strong><code>org.apache.catalina.filters.RequestDumperFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The Request Dumper Filter does not support any initialization
+    parameters.</p>
+
+  </subsection>
+
+  <subsection name="Sample Configuration">
+  
+    <p>The following entries in a web application's web.xml would enable the
+    Request Dumper filter for all requests for that web application. If the
+    entries were added to <code>CATALINA_BASE/conf/web.xml</code>, the Request
+    Dumper Filter would be enabled for all web applications.</p>
+    <source>
+&lt;filter&gt;
+    &lt;filter-name&gt;requestdumper&lt;/filter-name&gt;
+    &lt;filter-class&gt;
+        org.apache.catalina.filters.RequestDumperFilter
+    &lt;/filter-class&gt;
+&lt;/filter&gt;
+&lt;filter-mapping&gt;
+    &lt;filter-name&gt;requestdumper&lt;/filter-name&gt;
+    &lt;url-pattern&gt;*&lt;/url-pattern&gt;
+&lt;/filter-mapping&gt;
+    </source>
+    
+    <p>The following entries in CATALINA_BASE/conf/logging.properties would
+    create a separate log file for the Request Dumper Filter output.</p>
+    <source>
+# To this configuration below, 1request-dumper.org.apache.juli.FileHandler
+# also needs to be added to the handlers property near the top of the file
+1request-dumper.org.apache.juli.FileHandler.level = INFO
+1request-dumper.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
+1request-dumper.org.apache.juli.FileHandler.prefix = request-dumper.
+1request-dumper.org.apache.juli.FileHandler.formatter = org.apache.juli.VerbatimFormatter
+org.apache.catalina.filters.RequestDumperFilter.level = INFO
+org.apache.catalina.filters.RequestDumperFilter.handlers = 1request-dumper.org.apache.juli.FileHandler
+    </source>
+  </subsection>
+</section>
+
+
 <section name="WebDAV Fix Filter">
 
   <subsection name="Introduction">

@@ -320,47 +320,6 @@
 </section>
 
 
-<section name="Request Dumper Valve">
-
-
-  <subsection name="Introduction">
-
-    <p>The <em>Request Dumper Valve</em> is a useful tool in debugging
-    interactions with a client application (or browser) that is sending
-    HTTP requests to your Tomcat-based server.  When configured, it causes
-    details about each request processed by its associated <code>Engine</code>, 
-    <code>Host</code>, or <code>Context</code> to be logged according to 
-    the logging configuration for that container.</p>
-
-    <p><strong>WARNING: Using this valve has side-effects.</strong>  The
-    output from this valve includes any parameters included with the request.
-    The parameters will be decoded using the default platform encoding. Any
-    subsequent calls to <code>request.setCharacterEncoding()</code> within
-    the web application will have no effect.</p>
-
-  </subsection>
-
-
-  <subsection name="Attributes">
-
-    <p>The <strong>Request Dumper Valve</strong> supports the following
-    configuration attributes:</p>
-
-    <attributes>
-
-      <attribute name="className" required="true">
-        <p>Java class name of the implementation to use.  This MUST be set to
-        <strong>org.apache.catalina.valves.RequestDumperValve</strong>.</p>
-      </attribute>
-
-    </attributes>
-
-  </subsection>
-
-
-</section>
-
-
 <section name="Single Sign On Valve">
 
   <subsection name="Introduction">
