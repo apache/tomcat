@@ -49,7 +49,6 @@ import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.catalina.valves.RemoteAddrValve;
 import org.apache.catalina.valves.RemoteHostValve;
-import org.apache.catalina.valves.RequestDumperValve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 
@@ -509,29 +508,6 @@ public class MBeanFactory extends BaseModelMBean {
         ObjectName oname = valve.getObjectName();
         return (oname.toString());
         
-    }
-
-
-    /**
-     * Create a new Request Dumper Valve.
-     *
-     * @param parent MBean Name of the associated parent component
-     *
-     * @exception Exception if an MBean cannot be created or registered
-     */
-    public String createRequestDumperValve(String parent)
-        throws Exception {
-
-        // Create a new RequestDumperValve instance
-        RequestDumperValve valve = new RequestDumperValve();
-
-        // Add the new instance to its parent component
-        ObjectName pname = new ObjectName(parent);
-        ContainerBase containerBase = getParentContainerFromParent(pname);
-        containerBase.addValve(valve);
-        ObjectName oname = valve.getObjectName();
-        return (oname.toString());
-
     }
 
 
