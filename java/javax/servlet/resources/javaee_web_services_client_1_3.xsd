@@ -60,6 +60,13 @@
 
   <xsd:annotation>
     <xsd:documentation>
+      The Apache Software Foundation elects to include this software under the
+      CDDL license.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:annotation>
+    <xsd:documentation>
 
       (C) Copyright International Business Machines Corporation 2002
       
