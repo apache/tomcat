@@ -59,6 +59,13 @@
 
   <xsd:annotation>
     <xsd:documentation>
+      The Apache Software Foundation elects to include this software under the
+      CDDL license.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:annotation>
+    <xsd:documentation>
 
       The following definitions that appear in the common
       shareable schema(s) of Java EE deployment descriptors should be
