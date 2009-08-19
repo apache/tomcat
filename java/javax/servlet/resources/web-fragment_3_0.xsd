@@ -58,6 +58,13 @@
 
   <xsd:annotation>
     <xsd:documentation>
+      The Apache Software Foundation elects to include this software under the
+      CDDL license.
+    </xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:annotation>
+    <xsd:documentation>
       <![CDATA[
 
 	This is the XML Schema for the Servlet 3.0 deployment descriptor.
