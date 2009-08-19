@@ -26,4 +26,10 @@ The original XML Schemas for Java EE Deployment Descriptors:
  - javaee_5.xsd
  - javaee_web_services_1_2.xsd
  - javaee_web_services_client_1_2.xsd
+ - javaee_6.xsd
+ - javaee_web_services_1_3.xsd
+ - javaee_web_services_client_1_3.xsd
+ - web-app_3_0.xsd
+ - web-common_3_0.xsd
+ - web-fragment_3_0.xsd
 may be obtained from http://java.sun.com/xml/ns/javaee/
