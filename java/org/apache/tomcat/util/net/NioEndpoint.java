@@ -92,24 +92,6 @@ public class NioEndpoint extends AbstractEndpoint {
     
     // ----------------------------------------------------------------- Fields
 
-
-    /**
-     * Running state of the endpoint.
-     */
-    protected volatile boolean running = false;
-
-
-    /**
-     * Will be set to true whenever the endpoint is paused.
-     */
-    protected volatile boolean paused = false;
-
-
-    /**
-     * Track the initialization state of the endpoint.
-     */
-    protected boolean initialized = false;
-    
     protected NioSelectorPool selectorPool = new NioSelectorPool();
     
     /**
@@ -299,58 +281,25 @@ public class NioEndpoint extends AbstractEndpoint {
 
 
     /**
-     * External Executor based thread pool.
+     * Generic properties, introspected
      */
-    protected Executor executor = null;
-    public void setExecutor(Executor executor) { 
-        this.executor = executor;
-        this.internalExecutor = (executor==null);
-    }
-    public Executor getExecutor() { return executor; }
-    /**
-     * Are we using an internal executor
-     */
-    protected volatile boolean internalExecutor = false;
-    
-    protected boolean useExecutor = true;
-    /**
-     * @deprecated Executor is always used
-     * @param useexec
-     */
-    public void setUseExecutor(boolean useexec) { log.info("Setting useExecutor is deprecated. Executors are always used.");}
-    public boolean getUseExecutor() { return useExecutor || (executor!=null);}
-
-    /**
-     * Maximum amount of worker threads.
-     */
-    protected int maxThreads = 200;
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
-        if (running && executor!=null && executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-            ((java.util.concurrent.ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
+    @Override
+    public boolean setProperty(String name, String value) {
+        final String selectorPoolName = "selectorPool.";
+        final String socketName = "socket.";
+        try {
+            if (name.startsWith(selectorPoolName)) {
+                return IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
+            } else { 
+                return super.setProperty(name, value);
+            }
+        }catch ( Exception x ) {
+            log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
+            return false;
         }
     }
-    public int getMaxThreads() { return maxThreads; }
-
-    /**
-     * Max keep alive requests 
-     */
-    protected int maxKeepAliveRequests=100; // as in Apache HTTPD server
-    public int getMaxKeepAliveRequests() {
-        return maxKeepAliveRequests;
-    }
-    public void setMaxKeepAliveRequests(int maxKeepAliveRequests) {
-        this.maxKeepAliveRequests = maxKeepAliveRequests;
-    }
 
 
-
-    /**
-     * Priority of the worker threads.
-     */
-    protected int threadPriority = Thread.NORM_PRIORITY;
-    public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
-    public int getThreadPriority() { return threadPriority; }
 
     /**
      * Priority of the acceptor threads.
@@ -366,20 +315,6 @@ public class NioEndpoint extends AbstractEndpoint {
     public void setPollerThreadPriority(int pollerThreadPriority) { this.pollerThreadPriority = pollerThreadPriority; }
     public int getPollerThreadPriority() { return pollerThreadPriority; }
 
-    /**
-     * Server socket port.
-     */
-    protected int port;
-    public int getPort() { return port; }
-    public void setPort(int port ) { this.port=port; }
-
-
-    /**
-     * Address for the server socket.
-     */
-    protected InetAddress address;
-    public InetAddress getAddress() { return address; }
-    public void setAddress(InetAddress address) { this.address = address; }
 
 
     /**
@@ -390,65 +325,8 @@ public class NioEndpoint extends AbstractEndpoint {
     public Handler getHandler() { return handler; }
 
 
-    /**
-     * Allows the server developer to specify the backlog that
-     * should be used for server sockets. By default, this value
-     * is 100.
-     */
-    protected int backlog = 100;
-    public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
-    public int getBacklog() { return backlog; }
-
-    /**
-     * Keepalive timeout, if lesser or equal to 0 then soTimeout will be used.
-     */
-    protected int keepAliveTimeout = 0;
-    public void setKeepAliveTimeout(int keepAliveTimeout) { this.keepAliveTimeout = keepAliveTimeout; }
-    public int getKeepAliveTimeout() { return keepAliveTimeout;}
 
     
-    protected SocketProperties socketProperties = new SocketProperties();
-
-    /**
-     * Socket TCP no delay.
-     */
-    public boolean getTcpNoDelay() { return socketProperties.getTcpNoDelay();}
-    public void setTcpNoDelay(boolean tcpNoDelay) { socketProperties.setTcpNoDelay(tcpNoDelay); }
-
-
-    /**
-     * Socket linger.
-     */
-    public int getSoLinger() { return socketProperties.getSoLingerTime(); }
-    public void setSoLinger(int soLinger) { 
-        socketProperties.setSoLingerTime(soLinger);
-        socketProperties.setSoLingerOn(soLinger>=0);
-    }
-
-
-    /**
-     * Socket timeout.
-     */
-    public int getSoTimeout() { return socketProperties.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
-
-    /**
-     * The default is true - the created threads will be
-     *  in daemon mode. If set to false, the control thread
-     *  will not be daemon - and will keep the process alive.
-     */
-    protected boolean daemon = true;
-    public void setDaemon(boolean b) { daemon = b; }
-    public boolean getDaemon() { return daemon; }
-
-
-    /**
-     * Name of the thread pool, which will be used for naming child threads.
-     */
-    protected String name = "TP";
-    public void setName(String name) { this.name = name; }
-    public String getName() { return name; }
-
 
 
     /**
@@ -492,39 +370,6 @@ public class NioEndpoint extends AbstractEndpoint {
         return pollers[idx];
     }
 
-    /**
-     * Dummy maxSpareThreads property.
-     */
-    public int getMaxSpareThreads() { return Math.min(getMaxThreads(),getMinSpareThreads()); }
-
-
-    public int minSpareThreads = 10;
-    public int getMinSpareThreads() {
-        return Math.min(minSpareThreads,getMaxThreads());
-    }
-    public void setMinSpareThreads(int minSpareThreads) {
-        this.minSpareThreads = minSpareThreads;
-    }
-    
-    /**
-     * Generic properties, introspected
-     */
-    public boolean setProperty(String name, String value) {
-        final String selectorPoolName = "selectorPool.";
-        final String socketName = "socket.";
-        try {
-            if (name.startsWith(selectorPoolName)) {
-                return IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
-            } else if (name.startsWith(socketName)) {
-                return IntrospectionUtils.setProperty(socketProperties, name.substring(socketName.length()), value);
-            } else {
-                return IntrospectionUtils.setProperty(this,name,value);
-            }
-        }catch ( Exception x ) {
-            log.error("Unable to set attribute \""+name+"\" to \""+value+"\"",x);
-            return false;
-        }
-    }
 
 
     public String adjustRelativePath(String path, String relativeTo) {
@@ -704,43 +549,6 @@ public class NioEndpoint extends AbstractEndpoint {
 
 
 
-    /**
-     * Return the amount of threads that are managed by the pool.
-     *
-     * @return the amount of threads that are managed by the pool
-     */
-    public int getCurrentThreadCount() {
-        if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getPoolSize();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getPoolSize();
-            } else {
-                return -1;
-            }
-        } else {
-            return -2;
-        }
-    }
-
-    /**
-     * Return the amount of threads that are in use 
-     *
-     * @return the amount of threads that are in use
-     */
-    public int getCurrentThreadsBusy() {
-        if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getActiveCount();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getActiveCount();
-            } else {
-                return -1;
-            }
-        } else {
-            return -2;
-        }
-    }
     
     /**
      * Return the state of the endpoint.
@@ -776,8 +584,8 @@ public class NioEndpoint extends AbstractEndpoint {
 
         serverSock = ServerSocketChannel.open();
         socketProperties.setProperties(serverSock.socket());
-        InetSocketAddress addr = (address!=null?new InetSocketAddress(address,port):new InetSocketAddress(port));
-        serverSock.socket().bind(addr,backlog); 
+        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+        serverSock.socket().bind(addr,getBacklog()); 
         serverSock.configureBlocking(true); //mimic APR behavior
         serverSock.socket().setSoTimeout(getSocketProperties().getSoTimeout());
 
@@ -860,12 +668,8 @@ public class NioEndpoint extends AbstractEndpoint {
             paused = false;
             
             // Create worker collection
-            if ( executor == null ) {
-                internalExecutor = true;
-                TaskQueue taskqueue = new TaskQueue();
-                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-                executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-                taskqueue.setParent( (ThreadPoolExecutor) executor);
+            if ( getExecutor() == null ) {
+                createExecutor();
             }
 
             // Start poller threads
@@ -882,7 +686,7 @@ public class NioEndpoint extends AbstractEndpoint {
             for (int i = 0; i < acceptorThreadCount; i++) {
                 Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
                 acceptorThread.setPriority(threadPriority);
-                acceptorThread.setDaemon(daemon);
+                acceptorThread.setDaemon(getDaemon());
                 acceptorThread.start();
             }
         }
@@ -929,16 +733,7 @@ public class NioEndpoint extends AbstractEndpoint {
         keyCache.clear();
         nioChannels.clear();
         processorCache.clear();
-        if ( executor!=null && internalExecutor ) {
-            if ( executor instanceof ThreadPoolExecutor ) {
-                //this is our internal one, so we need to shut it down
-                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
-                tpe.shutdownNow();
-                TaskQueue queue = (TaskQueue) tpe.getQueue();
-                queue.setParent(null);
-            }
-            executor = null;
-        }
+        shutdownExecutor();
         
     }
 
@@ -948,7 +743,7 @@ public class NioEndpoint extends AbstractEndpoint {
      */
     public void destroy() throws Exception {
         if (log.isDebugEnabled()) {
-            log.debug("Destroy initiated for "+new InetSocketAddress(address,port));
+            log.debug("Destroy initiated for "+new InetSocketAddress(getAddress(),getPort()));
         }
         if (running) {
             stop();
@@ -962,7 +757,7 @@ public class NioEndpoint extends AbstractEndpoint {
         releaseCaches();
         selectorPool.close();
         if (log.isDebugEnabled()) {
-            log.debug("Destroy completed for "+new InetSocketAddress(address,port));
+            log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
         }
     }
 
@@ -982,10 +777,6 @@ public class NioEndpoint extends AbstractEndpoint {
         return selectorPool;
     }
 
-    public SocketProperties getSocketProperties() {
-        return socketProperties;
-    }
-
     public boolean getUseSendfile() {
         return useSendfile;
     }
@@ -999,43 +790,7 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 
-    /**
-     * Unlock the server socket accept using a bogus connection.
-     */
-    protected void unlockAccept() {
-        java.net.Socket s = null;
-        InetSocketAddress saddr = null;
-        try {
-            // Need to create a connection to unlock the accept();
-            if (address == null) {
-                saddr = new InetSocketAddress("127.0.0.1", port);
-            } else {
-                saddr = new InetSocketAddress(address,port);
-            }
-            s = new java.net.Socket();
-            s.setSoTimeout(getSocketProperties().getSoTimeout());
-            s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-            if (log.isDebugEnabled()) {
-                log.debug("About to unlock socket for:"+saddr);
-            }
-            s.connect(saddr,getSocketProperties().getUnlockTimeout());
-            if (log.isDebugEnabled()) {
-                log.debug("Socket unlock completed for:"+saddr);
-            }
-        } catch(Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.debug.unlock", "" + port), e);
-            }
-        } finally {
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
-    }
+    
 
 
     /**
@@ -1110,10 +865,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * @return boolean
      */
     protected boolean isWorkerAvailable() {
-        if ( executor != null ) {
-            return true;
-        }
-        return false;
+        return true;
     }
 
     public boolean processSocket(NioChannel socket, SocketStatus status, boolean dispatch) {
@@ -1123,7 +875,7 @@ public class NioEndpoint extends AbstractEndpoint {
             SocketProcessor sc = processorCache.poll();
             if ( sc == null ) sc = new SocketProcessor(socket,status);
             else sc.reset(socket,status);
-            if ( dispatch && executor!=null ) executor.execute(sc);
+            if ( dispatch && getExecutor()!=null ) getExecutor().execute(sc);
             else sc.run();
         } catch (RejectedExecutionException rx) {
             log.warn("Socket processing request was rejected for:"+socket,rx);

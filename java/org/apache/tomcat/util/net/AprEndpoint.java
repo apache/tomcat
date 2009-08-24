@@ -68,68 +68,7 @@ public class AprEndpoint extends AbstractEndpoint {
     protected static Log log = LogFactory.getLog(AprEndpoint.class);
 
 
-
-    /**
-     * The Request attribute key for the cipher suite.
-     */
-    public static final String CIPHER_SUITE_KEY = "javax.servlet.request.cipher_suite";
-
-    /**
-     * The Request attribute key for the key size.
-     */
-    public static final String KEY_SIZE_KEY = "javax.servlet.request.key_size";
-
-    /**
-     * The Request attribute key for the client certificate chain.
-     */
-    public static final String CERTIFICATE_KEY = "javax.servlet.request.X509Certificate";
-
-    /**
-     * The Request attribute key for the session id.
-     * This one is a Tomcat extension to the Servlet spec.
-     */
-    public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
-
-
     // ----------------------------------------------------------------- Fields
-
-
-    /**
-     * Running state of the endpoint.
-     */
-    protected volatile boolean running = false;
-
-
-    /**
-     * Will be set to true whenever the endpoint is paused.
-     */
-    protected volatile boolean paused = false;
-
-
-    /**
-     * Track the initialization state of the endpoint.
-     */
-    protected boolean initialized = false;
-
-
-    /**
-     * Current worker threads busy count.
-     */
-    protected int curThreadsBusy = 0;
-
-
-    /**
-     * Current worker threads count.
-     */
-    protected int curThreads = 0;
-
-
-    /**
-     * Sequence number used to generate thread names.
-     */
-    protected int sequence = 0;
-
-
     /**
      * Root APR memory pool.
      */
@@ -154,10 +93,6 @@ public class AprEndpoint extends AbstractEndpoint {
     protected long sslContext = 0;
 
     
-    /**
-     * Are we using an internal executor
-     */
-    protected volatile boolean internalExecutor = false;
     // ------------------------------------------------------------- Properties
 
 
@@ -168,27 +103,6 @@ public class AprEndpoint extends AbstractEndpoint {
     public void setDeferAccept(boolean deferAccept) { this.deferAccept = deferAccept; }
     public boolean getDeferAccept() { return deferAccept; }
     
-
-    /**
-     * External Executor based thread pool.
-     */
-    protected Executor executor = null;
-    public void setExecutor(Executor executor) { this.executor = executor; }
-    public Executor getExecutor() { return executor; }
-
-
-    /**
-     * Maximum amount of worker threads.
-     */
-    protected int maxThreads = 200;
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
-        if (running && executor instanceof ResizableExecutor) {
-            ((ResizableExecutor)executor).resizePool(getMinSpareThreads(), getMaxThreads());
-        }
-    }
-    public int getMaxThreads() { return maxThreads; }
-
 
     /**
      * Priority of the acceptor and poller threads.
@@ -215,69 +129,11 @@ public class AprEndpoint extends AbstractEndpoint {
 
 
     /**
-     * Server socket port.
-     */
-    protected int port;
-    public int getPort() { return port; }
-    public void setPort(int port ) { this.port=port; }
-
-
-    /**
-     * Address for the server socket.
-     */
-    protected InetAddress address;
-    public InetAddress getAddress() { return address; }
-    public void setAddress(InetAddress address) { this.address = address; }
-
-
-    /**
      * Handling of accepted sockets.
      */
     protected Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
     public Handler getHandler() { return handler; }
-
-
-    /**
-     * Allows the server developer to specify the backlog that
-     * should be used for server sockets. By default, this value
-     * is 100.
-     */
-    protected int backlog = 100;
-    public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
-    public int getBacklog() { return backlog; }
-
-
-    /**
-     * Socket TCP no delay.
-     */
-    protected boolean tcpNoDelay = false;
-    public boolean getTcpNoDelay() { return tcpNoDelay; }
-    public void setTcpNoDelay(boolean tcpNoDelay) { this.tcpNoDelay = tcpNoDelay; }
-
-
-    /**
-     * Socket linger.
-     */
-    protected int soLinger = 100;
-    public int getSoLinger() { return soLinger; }
-    public void setSoLinger(int soLinger) { this.soLinger = soLinger; }
-
-
-    /**
-     * Socket timeout.
-     */
-    protected int soTimeout = -1;
-    public int getSoTimeout() { return soTimeout; }
-    public void setSoTimeout(int soTimeout) { this.soTimeout = soTimeout; }
-
-
-    /**
-     * Keep-Alive timeout.
-     */
-    protected int keepAliveTimeout = -1;
-    public int getKeepAliveTimeout() { return keepAliveTimeout; }
-    public void setKeepAliveTimeout(int keepAliveTimeout) { this.keepAliveTimeout = keepAliveTimeout; }
 
 
     /**
@@ -287,24 +143,6 @@ public class AprEndpoint extends AbstractEndpoint {
     protected int pollTime = 2000;
     public int getPollTime() { return pollTime; }
     public void setPollTime(int pollTime) { if (pollTime > 0) { this.pollTime = pollTime; } }
-
-
-    /**
-     * The default is true - the created threads will be
-     *  in daemon mode. If set to false, the control thread
-     *  will not be daemon - and will keep the process alive.
-     */
-    protected boolean daemon = true;
-    public void setDaemon(boolean b) { daemon = b; }
-    public boolean getDaemon() { return daemon; }
-
-
-    /**
-     * Name of the thread pool, which will be used for naming child threads.
-     */
-    protected String name = "TP";
-    public void setName(String name) { this.name = name; }
-    public String getName() { return name; }
 
 
     /**
@@ -378,26 +216,6 @@ public class AprEndpoint extends AbstractEndpoint {
         sendfileRoundRobin = (sendfileRoundRobin + 1) % sendfiles.length;
         return sendfiles[sendfileRoundRobin];
     }
-
-
-    /**
-     * Dummy maxSpareThreads property.
-     */
-    public int getMaxSpareThreads() { return 0; }
-
-
-    /**
-     * Dummy minSpareThreads property.
-     */
-    public int getMinSpareThreads() { return 0; }
-
-
-    /**
-     * SSL engine.
-     */
-    protected boolean SSLEnabled = false;
-    public boolean isSSLEnabled() { return SSLEnabled; }
-    public void setSSLEnabled(boolean SSLEnabled) { this.SSLEnabled = SSLEnabled; }
 
 
     /**
@@ -531,63 +349,6 @@ public class AprEndpoint extends AbstractEndpoint {
         }
     }
 
-    /**
-     * Return the amount of threads that are managed by the pool.
-     *
-     * @return the amount of threads that are managed by the pool
-     */
-    public int getCurrentThreadCount() {
-        if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getPoolSize();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getPoolSize();
-            } else {
-                return -1;
-            }
-        } else {
-            return -2;
-        }
-    }
-
-    /**
-     * Return the amount of threads that are in use 
-     *
-     * @return the amount of threads that are in use
-     */
-    public int getCurrentThreadsBusy() {
-        if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getActiveCount();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getActiveCount();
-            } else {
-                return -1;
-            }
-        } else {
-            return -2;
-        }
-    }
-    
-    /**
-     * Return the state of the endpoint.
-     *
-     * @return true if the endpoint is running, false otherwise
-     */
-    public boolean isRunning() {
-        return running;
-    }
-
-
-    /**
-     * Return the state of the endpoint.
-     *
-     * @return true if the endpoint is paused, false otherwise
-     */
-    public boolean isPaused() {
-        return paused;
-    }
-
 
     // ----------------------------------------------- Public Lifecycle Methods
 
@@ -607,8 +368,8 @@ public class AprEndpoint extends AbstractEndpoint {
         serverSockPool = Pool.create(rootPool);
         // Create the APR address that will be bound
         String addressStr = null;
-        if (address != null) {
-            addressStr = address.getHostAddress();
+        if (getAddress() != null) {
+            addressStr = getAddress().getHostAddress();
         }
         int family = Socket.APR_INET;
         if (Library.APR_HAVE_IPV6) {
@@ -621,7 +382,7 @@ public class AprEndpoint extends AbstractEndpoint {
          }
 
         long inetAddress = Address.info(addressStr, family,
-                port, 0, rootPool);
+                getPort(), 0, rootPool);
         // Create the APR server socket
         serverSock = Socket.create(Address.getInfo(inetAddress).family,
                 Socket.SOCK_STREAM,
@@ -637,7 +398,7 @@ public class AprEndpoint extends AbstractEndpoint {
             throw new Exception(sm.getString("endpoint.init.bind", "" + ret, Error.strerror(ret)));
         }
         // Start listening on the server socket
-        ret = Socket.listen(serverSock, backlog);
+        ret = Socket.listen(serverSock, getBacklog());
         if (ret != 0) {
             throw new Exception(sm.getString("endpoint.init.listen", "" + ret, Error.strerror(ret)));
         }
@@ -690,7 +451,7 @@ public class AprEndpoint extends AbstractEndpoint {
         }
 
         // Initialize SSL if needed
-        if (SSLEnabled) {
+        if (isSSLEnabled()) {
             
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_ALL;
@@ -748,12 +509,8 @@ public class AprEndpoint extends AbstractEndpoint {
             paused = false;
 
             // Create worker collection
-            if (executor == null) {
-                internalExecutor = true;
-                TaskQueue taskqueue = new TaskQueue();
-                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-                executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-                taskqueue.setParent( (ThreadPoolExecutor) executor);
+            if (getExecutor() == null) {
+                createExecutor();
             }
 
             // Start poller threads
@@ -795,7 +552,7 @@ public class AprEndpoint extends AbstractEndpoint {
             for (int i = 0; i < acceptorThreadCount; i++) {
                 Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
                 acceptorThread.setPriority(threadPriority);
-                acceptorThread.setDaemon(daemon);
+                acceptorThread.setDaemon(getDaemon());
                 acceptorThread.start();
             }
 
@@ -847,16 +604,7 @@ public class AprEndpoint extends AbstractEndpoint {
                 sendfiles = null;
             }
         }
-        if ( executor!=null && internalExecutor ) {
-            if ( executor instanceof ThreadPoolExecutor ) {
-                //this is our internal one, so we need to shut it down
-                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
-                tpe.shutdownNow();
-                TaskQueue queue = (TaskQueue) tpe.getQueue();
-                queue.setParent(null);
-            }
-            executor = null;
-        }
+        shutdownExecutor();
     }
 
 
@@ -883,44 +631,6 @@ public class AprEndpoint extends AbstractEndpoint {
     // ------------------------------------------------------ Protected Methods
 
 
-    /**
-     * Get a sequence number used for thread naming.
-     */
-    protected int getSequence() {
-        return sequence++;
-    }
-
-
-    /**
-     * Unlock the server socket accept using a bugus connection.
-     */
-    protected void unlockAccept() {
-        java.net.Socket s = null;
-        try {
-            // Need to create a connection to unlock the accept();
-            if (address == null) {
-                s = new java.net.Socket("127.0.0.1", port);
-            } else {
-                s = new java.net.Socket(address, port);
-                // setting soLinger to a small value will help shutdown the
-                // connection quicker
-                s.setSoLinger(true, 0);
-            }
-        } catch(Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.debug.unlock", "" + port), e);
-            }
-        } finally {
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
-    }
-
 
     /**
      * Process the specified connection.
@@ -931,12 +641,12 @@ public class AprEndpoint extends AbstractEndpoint {
         try {
 
             // 1: Set socket options: timeout, linger, etc
-            if (soLinger >= 0)
-                Socket.optSet(socket, Socket.APR_SO_LINGER, soLinger);
-            if (tcpNoDelay)
-                Socket.optSet(socket, Socket.APR_TCP_NODELAY, (tcpNoDelay ? 1 : 0));
-            if (soTimeout > 0)
-                Socket.timeoutSet(socket, soTimeout * 1000);
+            if (socketProperties.getSoLingerOn() && socketProperties.getSoLingerTime() >= 0)
+                Socket.optSet(socket, Socket.APR_SO_LINGER, socketProperties.getSoLingerTime());
+            if (socketProperties.getTcpNoDelay())
+                Socket.optSet(socket, Socket.APR_TCP_NODELAY, (socketProperties.getTcpNoDelay() ? 1 : 0));
+            if (socketProperties.getSoTimeout() > 0)
+                Socket.timeoutSet(socket, socketProperties.getSoTimeout() * 1000);
 
             // 2: SSL handshake
             step = 2;
@@ -989,7 +699,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocketWithOptions(long socket) {
         try {
-            executor.execute(new SocketWithOptionsProcessor(socket));
+            getExecutor().execute(new SocketWithOptionsProcessor(socket));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -1008,7 +718,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(long socket) {
         try {
-            executor.execute(new SocketProcessor(socket));
+            getExecutor().execute(new SocketProcessor(socket));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -1027,7 +737,7 @@ public class AprEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(long socket, SocketStatus status) {
         try {
-            executor.execute(new SocketEventProcessor(socket, status));
+            getExecutor().execute(new SocketEventProcessor(socket, status));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
@@ -1120,9 +830,9 @@ public class AprEndpoint extends AbstractEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = pollerSize / pollerThreadCount;
-            int timeout = keepAliveTimeout;
+            int timeout = getKeepAliveTimeout();
             if (timeout < 0) {
-                timeout = soTimeout;
+                timeout = socketProperties.getSoTimeout();
             }
             serverPollset = allocatePoller(size, pool, timeout);
             if (serverPollset == 0 && size > 1024) {
@@ -1292,7 +1002,7 @@ public class AprEndpoint extends AbstractEndpoint {
                             continue;
                         }
                     }
-                    if (soTimeout > 0 && maintainTime > 1000000L && running) {
+                    if (socketProperties.getSoTimeout() > 0 && maintainTime > 1000000L && running) {
                         rv = Poll.maintain(serverPollset, desc, true);
                         maintainTime = 0;
                         if (rv > 0) {
@@ -1375,14 +1085,14 @@ public class AprEndpoint extends AbstractEndpoint {
         protected void init() {
             pool = Pool.create(serverSockPool);
             int size = sendfileSize / sendfileThreadCount;
-            sendfilePollset = allocatePoller(size, pool, soTimeout);
+            sendfilePollset = allocatePoller(size, pool, socketProperties.getSoTimeout());
             if (sendfilePollset == 0 && size > 1024) {
                 size = 1024;
-                sendfilePollset = allocatePoller(size, pool, soTimeout);
+                sendfilePollset = allocatePoller(size, pool, socketProperties.getSoTimeout());
             }
             if (sendfilePollset == 0) {
                 size = 62;
-                sendfilePollset = allocatePoller(size, pool, soTimeout);
+                sendfilePollset = allocatePoller(size, pool, socketProperties.getSoTimeout());
             }
             desc = new long[size * 2];
             sendfileData = new HashMap<Long, SendfileData>(size);
@@ -1458,7 +1168,7 @@ public class AprEndpoint extends AbstractEndpoint {
                             // Entire file has been sent
                             Pool.destroy(data.fdpool);
                             // Set back socket to blocking mode
-                            Socket.timeoutSet(data.socket, soTimeout * 1000);
+                            Socket.timeoutSet(data.socket, socketProperties.getSoTimeout() * 1000);
                             return true;
                         }
                     }
@@ -1577,7 +1287,7 @@ public class AprEndpoint extends AbstractEndpoint {
                                 if (state.keepAlive) {
                                     // Destroy file descriptor pool, which should close the file
                                     Pool.destroy(state.fdpool);
-                                    Socket.timeoutSet(state.socket, soTimeout * 1000);
+                                    Socket.timeoutSet(state.socket, socketProperties.getSoTimeout() * 1000);
                                     // If all done put the socket back in the poller for
                                     // processing of further requests
                                     getPoller().add(state.socket);
@@ -1605,7 +1315,7 @@ public class AprEndpoint extends AbstractEndpoint {
                         }
                     }
                     // Call maintain for the sendfile poller
-                    if (soTimeout > 0 && maintainTime > 1000000L && running) {
+                    if (socketProperties.getSoTimeout() > 0 && maintainTime > 1000000L && running) {
                         rv = Poll.maintain(sendfilePollset, desc, true);
                         maintainTime = 0;
                         if (rv > 0) {
