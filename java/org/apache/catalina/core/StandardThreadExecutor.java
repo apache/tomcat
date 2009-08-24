@@ -24,11 +24,12 @@ import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.util.LifecycleSupport;
+import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-public class StandardThreadExecutor implements Executor {
+public class StandardThreadExecutor implements Executor, ResizableExecutor {
     
     // ---------------------------------------------- Properties
     /**
@@ -77,6 +78,8 @@ public class StandardThreadExecutor implements Executor {
     protected int maxQueueSize = Integer.MAX_VALUE;
     
     private LifecycleSupport lifecycle = new LifecycleSupport(this);
+    
+    private TaskQueue taskqueue = null;
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
         //empty constructor for the digester
@@ -87,7 +90,7 @@ public class StandardThreadExecutor implements Executor {
     // ---------------------------------------------- Public Methods
     public void start() throws LifecycleException {
         lifecycle.fireLifecycleEvent(BEFORE_START_EVENT, null);
-        TaskQueue taskqueue = new TaskQueue(maxQueueSize);
+        taskqueue = new TaskQueue(maxQueueSize);
         TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
         lifecycle.fireLifecycleEvent(START_EVENT, null);
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
@@ -100,6 +103,7 @@ public class StandardThreadExecutor implements Executor {
         lifecycle.fireLifecycleEvent(STOP_EVENT, null);
         if ( executor != null ) executor.shutdownNow();
         executor = null;
+        taskqueue = null;
         lifecycle.fireLifecycleEvent(AFTER_STOP_EVENT, null);
     }
     
@@ -249,4 +253,27 @@ public class StandardThreadExecutor implements Executor {
     public int getQueueSize() {
         return (executor != null) ? executor.getQueue().size() : -1;
     }
+
+
+
+    @Override
+    public boolean resizePool(int corePoolSize, int maximumPoolSize) {
+        if (executor == null) {
+            return false;
+        } else {
+            executor.setCorePoolSize(corePoolSize);
+            executor.setMaximumPoolSize(maximumPoolSize);
+            return true;
+        }
+    }
+
+
+
+    @Override
+    public boolean resizeQueue(int capacity) {
+        return false;
+    }
+    
+    
+    
 }
