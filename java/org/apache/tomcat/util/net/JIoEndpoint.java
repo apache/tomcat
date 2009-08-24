@@ -23,11 +23,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.ResizableExecutor;
+import org.apache.tomcat.util.threads.TaskQueue;
+import org.apache.tomcat.util.threads.TaskThreadFactory;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * Handle incoming TCP connections.
@@ -45,47 +51,14 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Yoav Shapira
  * @author Remy Maucherat
  */
-public class JIoEndpoint {
+public class JIoEndpoint extends AbstractEndpoint {
 
 
     // -------------------------------------------------------------- Constants
 
-
     protected static Log log = LogFactory.getLog(JIoEndpoint.class);
 
-    protected StringManager sm = 
-        StringManager.getManager("org.apache.tomcat.util.net.res");
-
-
-    /**
-     * The Request attribute key for the cipher suite.
-     */
-    public static final String CIPHER_SUITE_KEY = "javax.servlet.request.cipher_suite";
-
-    /**
-     * The Request attribute key for the key size.
-     */
-    public static final String KEY_SIZE_KEY = "javax.servlet.request.key_size";
-
-    /**
-     * The Request attribute key for the client certificate chain.
-     */
-    public static final String CERTIFICATE_KEY = "javax.servlet.request.X509Certificate";
-
-    /**
-     * The Request attribute key for the session id.
-     * This one is a Tomcat extension to the Servlet spec.
-     */
-    public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
-
-
     // ----------------------------------------------------------------- Fields
-
-
-    /**
-     * Available workers.
-     */
-    protected WorkerStack workers = null;
 
 
     /**
@@ -134,6 +107,10 @@ public class JIoEndpoint {
      */
     protected SocketProperties socketProperties = new SocketProperties();
 
+    /**
+     * Are we using an internal executor
+     */
+    protected volatile boolean internalExecutor = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -177,13 +154,19 @@ public class JIoEndpoint {
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
         if (running) {
-            synchronized(workers) {
-                workers.resize(maxThreads);
-            }
+            //TODO Dynamic resize
+            log.error("Resizing executor dynamically is not possible at this time.");
         }
     }
     public int getMaxThreads() { return maxThreads; }
 
+    public int minSpareThreads = 10;
+    public int getMinSpareThreads() {
+        return Math.min(minSpareThreads,getMaxThreads());
+    }
+    public void setMinSpareThreads(int minSpareThreads) {
+        this.minSpareThreads = minSpareThreads;
+    }
 
     /**
      * Priority of the acceptor and poller threads.
@@ -304,9 +287,15 @@ public class JIoEndpoint {
      */
     public int getCurrentThreadCount() {
         if (executor!=null) {
-            return -1;
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getPoolSize();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getPoolSize();
+            } else {
+                return -1;
+            }
         } else {
-            return curThreads;
+            return -2;
         }
     }
 
@@ -317,9 +306,15 @@ public class JIoEndpoint {
      */
     public int getCurrentThreadsBusy() {
         if (executor!=null) {
-            return -1;
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getActiveCount();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getActiveCount();
+            } else {
+                return -1;
+            }
         } else {
-            return workers!=null?curThreads - workers.size():0;
+            return -2;
         }
     }
     
@@ -426,113 +421,6 @@ public class JIoEndpoint {
     }
     
     
-    // ----------------------------------------------------- Worker Inner Class
-
-
-    protected class Worker implements Runnable {
-
-        protected Thread thread = null;
-        protected boolean available = false;
-        protected Socket socket = null;
-
-        
-        /**
-         * Process an incoming TCP/IP connection on the specified socket.  Any
-         * exception that occurs during processing must be logged and swallowed.
-         * <b>NOTE</b>:  This method is called from our Connector's thread.  We
-         * must assign it to our own thread so that multiple simultaneous
-         * requests can be handled.
-         *
-         * @param socket TCP socket to process
-         */
-        synchronized void assign(Socket socket) {
-
-            // Wait for the Processor to get the previous Socket
-            while (available) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            // Store the newly available Socket and notify our thread
-            this.socket = socket;
-            available = true;
-            notifyAll();
-
-        }
-
-        
-        /**
-         * Await a newly assigned Socket from our Connector, or <code>null</code>
-         * if we are supposed to shut down.
-         */
-        private synchronized Socket await() {
-
-            // Wait for the Connector to provide a new Socket
-            while (!available) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            // Notify the Connector that we have received this Socket
-            Socket socket = this.socket;
-            available = false;
-            notifyAll();
-
-            return (socket);
-
-        }
-
-
-
-        /**
-         * The background thread that listens for incoming TCP/IP connections and
-         * hands them off to an appropriate processor.
-         */
-        public void run() {
-
-            // Process requests until we receive a shutdown signal
-            while (running) {
-
-                // Wait for the next socket to be assigned
-                Socket socket = await();
-                if (socket == null)
-                    continue;
-
-                // Process the request from this socket
-                if (!setSocketOptions(socket) || !handler.process(socket)) {
-                    // Close socket
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                    }
-                }
-
-                // Finish up this request
-                socket = null;
-                recycleWorkerThread(this);
-
-            }
-
-        }
-
-
-        /**
-         * Start the background processing thread.
-         */
-        public void start() {
-            thread = new Thread(this);
-            thread.setName(getName() + "-" + (++curThreads));
-            thread.setDaemon(true);
-            thread.start();
-        }
-
-
-    }
-
 
     // -------------------- Public methods --------------------
 
@@ -583,7 +471,11 @@ public class JIoEndpoint {
 
             // Create worker collection
             if (executor == null) {
-                workers = new WorkerStack(maxThreads);
+                internalExecutor = true;
+                TaskQueue taskqueue = new TaskQueue();
+                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
+                executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
+                taskqueue.setParent( (ThreadPoolExecutor) executor);
             }
 
             // Start acceptor threads
@@ -613,6 +505,16 @@ public class JIoEndpoint {
         if (running) {
             running = false;
             unlockAccept();
+        }
+        if ( executor!=null && internalExecutor ) {
+            if ( executor instanceof ThreadPoolExecutor ) {
+                //this is our internal one, so we need to shut it down
+                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
+                tpe.shutdownNow();
+                TaskQueue queue = (TaskQueue) tpe.getQueue();
+                queue.setParent(null);
+            }
+            executor = null;
         }
     }
 
@@ -696,97 +598,16 @@ public class JIoEndpoint {
 
     
     /**
-     * Create (or allocate) and return an available processor for use in
-     * processing a specific HTTP request, if possible.  If the maximum
-     * allowed processors have already been created and are in use, return
-     * <code>null</code> instead.
-     */
-    protected Worker createWorkerThread() {
-
-        synchronized (workers) {
-            if (workers.size() > 0) {
-                curThreadsBusy++;
-                return workers.pop();
-            }
-            if ((maxThreads > 0) && (curThreads < maxThreads)) {
-                curThreadsBusy++;
-                if (curThreadsBusy == maxThreads) {
-                    log.info(sm.getString("endpoint.info.maxThreads",
-                            Integer.toString(maxThreads), address,
-                            Integer.toString(port)));
-                }
-                return (newWorkerThread());
-            } else {
-                if (maxThreads < 0) {
-                    curThreadsBusy++;
-                    return (newWorkerThread());
-                } else {
-                    return (null);
-                }
-            }
-        }
-
-    }
-
-
-    /**
-     * Create and return a new processor suitable for processing HTTP
-     * requests and returning the corresponding responses.
-     */
-    protected Worker newWorkerThread() {
-
-        Worker workerThread = new Worker();
-        workerThread.start();
-        return (workerThread);
-
-    }
-
-
-    /**
-     * Return a new worker thread, and block while to worker is available.
-     */
-    protected Worker getWorkerThread() {
-        // Allocate a new worker thread
-        Worker workerThread = createWorkerThread();
-        while (workerThread == null) {
-            try {
-                synchronized (workers) {
-                    workers.wait();
-                }
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-            workerThread = createWorkerThread();
-        }
-        return workerThread;
-    }
-
-
-    /**
-     * Recycle the specified Processor so that it can be used again.
-     *
-     * @param workerThread The processor to be recycled
-     */
-    protected void recycleWorkerThread(Worker workerThread) {
-        synchronized (workers) {
-            workers.push(workerThread);
-            curThreadsBusy--;
-            workers.notify();
-        }
-    }
-
-
-    /**
      * Process given socket.
      */
     protected boolean processSocket(Socket socket) {
         try {
-            if (executor == null) {
-                getWorkerThread().assign(socket);
-            } else {
-                executor.execute(new SocketProcessor(socket));
-            }
+            executor.execute(new SocketProcessor(socket));
+        } catch (RejectedExecutionException x) {
+            log.warn("Socket processing request was rejected for:"+socket,x);
+            return false;
         } catch (Throwable t) {
+            
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
@@ -795,82 +616,5 @@ public class JIoEndpoint {
         return true;
     }
     
-
-    // ------------------------------------------------- WorkerStack Inner Class
-
-
-    public class WorkerStack {
-        
-        protected Worker[] workers = null;
-        protected int end = 0;
-        
-        public WorkerStack(int size) {
-            workers = new Worker[size];
-        }
-        
-        /** 
-         * Put the object into the queue. If the queue is full (for example if
-         * the queue has been reduced in size) the object will be dropped.
-         * 
-         * @param   object  the object to be appended to the queue (first
-         *                  element).
-         */
-        public void push(Worker worker) {
-            if (end < workers.length) {
-                workers[end++] = worker;
-            } else {
-                curThreads--;
-            }
-        }
-        
-        /**
-         * Get the first object out of the queue. Return null if the queue
-         * is empty. 
-         */
-        public Worker pop() {
-            if (end > 0) {
-                return workers[--end];
-            }
-            return null;
-        }
-        
-        /**
-         * Get the first object out of the queue, Return null if the queue
-         * is empty.
-         */
-        public Worker peek() {
-            return workers[end];
-        }
-        
-        /**
-         * Is the queue empty?
-         */
-        public boolean isEmpty() {
-            return (end == 0);
-        }
-        
-        /**
-         * How many elements are there in this queue?
-         */
-        public int size() {
-            return (end);
-        }
-        
-        /**
-         * Resize the queue. If there are too many objects in the queue for the
-         * new size, drop the excess.
-         * 
-         * @param newSize
-         */
-        public void resize(int newSize) {
-            Worker[] newWorkers = new Worker[newSize];
-            int len = workers.length;
-            if (newSize < len) {
-                len = newSize;
-            }
-            System.arraycopy(workers, 0, newWorkers, 0, len);
-            workers = newWorkers;
-        }
-    }
 
 }

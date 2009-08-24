@@ -58,6 +58,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.ResizableExecutor;
 import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
@@ -77,7 +78,7 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * @author Remy Maucherat
  * @author Filip Hanik
  */
-public class NioEndpoint {
+public class NioEndpoint extends AbstractEndpoint {
 
 
     // -------------------------------------------------------------- Constants
@@ -85,30 +86,6 @@ public class NioEndpoint {
 
     protected static Log log = LogFactory.getLog(NioEndpoint.class);
 
-    protected static StringManager sm =
-        StringManager.getManager("org.apache.tomcat.util.net.res");
-
-
-    /**
-     * The Request attribute key for the cipher suite.
-     */
-    public static final String CIPHER_SUITE_KEY = "javax.servlet.request.cipher_suite";
-
-    /**
-     * The Request attribute key for the key size.
-     */
-    public static final String KEY_SIZE_KEY = "javax.servlet.request.key_size";
-
-    /**
-     * The Request attribute key for the client certificate chain.
-     */
-    public static final String CERTIFICATE_KEY = "javax.servlet.request.X509Certificate";
-
-    /**
-     * The Request attribute key for the session id.
-     * This one is a Tomcat extension to the Servlet spec.
-     */
-    public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
 
     public static final int OP_REGISTER = 0x100; //register interest op
     public static final int OP_CALLBACK = 0x200; //callback interest op
@@ -333,7 +310,7 @@ public class NioEndpoint {
     /**
      * Are we using an internal executor
      */
-    protected boolean internalExecutor = true;
+    protected volatile boolean internalExecutor = false;
     
     protected boolean useExecutor = true;
     /**
@@ -518,13 +495,16 @@ public class NioEndpoint {
     /**
      * Dummy maxSpareThreads property.
      */
-    public int getMaxSpareThreads() { return Math.min(getMaxThreads(),5); }
+    public int getMaxSpareThreads() { return Math.min(getMaxThreads(),getMinSpareThreads()); }
 
 
-    /**
-     * Dummy minSpareThreads property.
-     */
-    public int getMinSpareThreads() { return Math.min(getMaxThreads(),5); }
+    public int minSpareThreads = 10;
+    public int getMinSpareThreads() {
+        return Math.min(minSpareThreads,getMaxThreads());
+    }
+    public void setMinSpareThreads(int minSpareThreads) {
+        this.minSpareThreads = minSpareThreads;
+    }
     
     /**
      * Generic properties, introspected
@@ -733,6 +713,8 @@ public class NioEndpoint {
         if (executor!=null) {
             if (executor instanceof ThreadPoolExecutor) {
                 return ((ThreadPoolExecutor)executor).getPoolSize();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getPoolSize();
             } else {
                 return -1;
             }
@@ -750,6 +732,8 @@ public class NioEndpoint {
         if (executor!=null) {
             if (executor instanceof ThreadPoolExecutor) {
                 return ((ThreadPoolExecutor)executor).getActiveCount();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getActiveCount();
             } else {
                 return -1;
             }
@@ -1142,9 +1126,7 @@ public class NioEndpoint {
             if ( dispatch && executor!=null ) executor.execute(sc);
             else sc.run();
         } catch (RejectedExecutionException rx) {
-            if (log.isDebugEnabled()) {
-                log.debug("Unable to process socket, executor rejected the task.",rx);
-            }
+            log.warn("Socket processing request was rejected for:"+socket,rx);
             return false;
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that

@@ -21,6 +21,8 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -37,6 +39,10 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.ResizableExecutor;
+import org.apache.tomcat.util.threads.TaskQueue;
+import org.apache.tomcat.util.threads.TaskThreadFactory;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * APR tailored thread pool, providing the following services:
@@ -53,7 +59,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public class AprEndpoint {
+public class AprEndpoint extends AbstractEndpoint {
 
 
     // -------------------------------------------------------------- Constants
@@ -61,8 +67,6 @@ public class AprEndpoint {
 
     protected static Log log = LogFactory.getLog(AprEndpoint.class);
 
-    protected static StringManager sm =
-        StringManager.getManager("org.apache.tomcat.util.net.res");
 
 
     /**
@@ -86,21 +90,8 @@ public class AprEndpoint {
      */
     public static final String SESSION_ID_KEY = "javax.servlet.request.ssl_session";
 
-    /**
-     * The request attribute key for the session manager.
-     * This one is a Tomcat extension to the Servlet spec.
-     */
-    public static final String SESSION_MGR =
-        "javax.servlet.request.ssl_session_mgr";
-
 
     // ----------------------------------------------------------------- Fields
-
-
-    /**
-     * Available workers.
-     */
-    protected WorkerStack workers = null;
 
 
     /**
@@ -163,6 +154,10 @@ public class AprEndpoint {
     protected long sslContext = 0;
 
     
+    /**
+     * Are we using an internal executor
+     */
+    protected volatile boolean internalExecutor = false;
     // ------------------------------------------------------------- Properties
 
 
@@ -188,10 +183,8 @@ public class AprEndpoint {
     protected int maxThreads = 200;
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
-        if (running) {
-            synchronized(workers) {
-                workers.resize(maxThreads);
-            }
+        if (running && executor instanceof ResizableExecutor) {
+            ((ResizableExecutor)executor).resizePool(getMinSpareThreads(), getMaxThreads());
         }
     }
     public int getMaxThreads() { return maxThreads; }
@@ -545,9 +538,15 @@ public class AprEndpoint {
      */
     public int getCurrentThreadCount() {
         if (executor!=null) {
-            return -1;
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getPoolSize();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getPoolSize();
+            } else {
+                return -1;
+            }
         } else {
-            return curThreads;
+            return -2;
         }
     }
 
@@ -558,9 +557,15 @@ public class AprEndpoint {
      */
     public int getCurrentThreadsBusy() {
         if (executor!=null) {
-            return -1;
+            if (executor instanceof ThreadPoolExecutor) {
+                return ((ThreadPoolExecutor)executor).getActiveCount();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getActiveCount();
+            } else {
+                return -1;
+            }
         } else {
-            return workers!=null?curThreads - workers.size():0;
+            return -2;
         }
     }
     
@@ -744,7 +749,11 @@ public class AprEndpoint {
 
             // Create worker collection
             if (executor == null) {
-                workers = new WorkerStack(maxThreads);
+                internalExecutor = true;
+                TaskQueue taskqueue = new TaskQueue();
+                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
+                executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
+                taskqueue.setParent( (ThreadPoolExecutor) executor);
             }
 
             // Start poller threads
@@ -837,6 +846,16 @@ public class AprEndpoint {
                 }
                 sendfiles = null;
             }
+        }
+        if ( executor!=null && internalExecutor ) {
+            if ( executor instanceof ThreadPoolExecutor ) {
+                //this is our internal one, so we need to shut it down
+                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
+                tpe.shutdownNow();
+                TaskQueue queue = (TaskQueue) tpe.getQueue();
+                queue.setParent(null);
+            }
+            executor = null;
         }
     }
 
@@ -946,86 +965,6 @@ public class AprEndpoint {
     }
 
 
-    /**
-     * Create (or allocate) and return an available processor for use in
-     * processing a specific HTTP request, if possible.  If the maximum
-     * allowed processors have already been created and are in use, return
-     * <code>null</code> instead.
-     */
-    protected Worker createWorkerThread() {
-
-        synchronized (workers) {
-            if (workers.size() > 0) {
-                curThreadsBusy++;
-                return (workers.pop());
-            }
-            if ((maxThreads > 0) && (curThreads < maxThreads)) {
-                curThreadsBusy++;
-                if (curThreadsBusy == maxThreads) {
-                    log.info(sm.getString("endpoint.info.maxThreads",
-                            Integer.toString(maxThreads), address,
-                            Integer.toString(port)));
-                }
-                return (newWorkerThread());
-            } else {
-                if (maxThreads < 0) {
-                    curThreadsBusy++;
-                    return (newWorkerThread());
-                } else {
-                    return (null);
-                }
-            }
-        }
-
-    }
-
-
-    /**
-     * Create and return a new processor suitable for processing HTTP
-     * requests and returning the corresponding responses.
-     */
-    protected Worker newWorkerThread() {
-
-        Worker workerThread = new Worker();
-        workerThread.start();
-        return (workerThread);
-
-    }
-
-
-    /**
-     * Return a new worker thread, and block while to worker is available.
-     */
-    protected Worker getWorkerThread() {
-        // Allocate a new worker thread
-        Worker workerThread = createWorkerThread();
-        while (workerThread == null) {
-            try {
-                synchronized (workers) {
-                    workers.wait();
-                }
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-            workerThread = createWorkerThread();
-        }
-        return workerThread;
-    }
-
-
-    /**
-     * Recycle the specified Processor so that it can be used again.
-     *
-     * @param workerThread The processor to be recycled
-     */
-    protected void recycleWorkerThread(Worker workerThread) {
-        synchronized (workers) {
-            workers.push(workerThread);
-            curThreadsBusy--;
-            workers.notify();
-        }
-    }
-
     
     /**
      * Allocate a new poller of the specified size.
@@ -1050,11 +989,10 @@ public class AprEndpoint {
      */
     protected boolean processSocketWithOptions(long socket) {
         try {
-            if (executor == null) {
-                getWorkerThread().assignWithOptions(socket);
-            } else {
-                executor.execute(new SocketWithOptionsProcessor(socket));
-            }
+            executor.execute(new SocketWithOptionsProcessor(socket));
+        } catch (RejectedExecutionException x) {
+            log.warn("Socket processing request was rejected for:"+socket,x);
+            return false;
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
@@ -1070,11 +1008,10 @@ public class AprEndpoint {
      */
     protected boolean processSocket(long socket) {
         try {
-            if (executor == null) {
-                getWorkerThread().assign(socket);
-            } else {
-                executor.execute(new SocketProcessor(socket));
-            }
+            executor.execute(new SocketProcessor(socket));
+        } catch (RejectedExecutionException x) {
+            log.warn("Socket processing request was rejected for:"+socket,x);
+            return false;
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
@@ -1090,11 +1027,10 @@ public class AprEndpoint {
      */
     protected boolean processSocket(long socket, SocketStatus status) {
         try {
-            if (executor == null) {
-                getWorkerThread().assign(socket, status);
-            } else {
-                executor.execute(new SocketEventProcessor(socket, status));
-            }
+            executor.execute(new SocketEventProcessor(socket, status));
+        } catch (RejectedExecutionException x) {
+            log.warn("Socket processing request was rejected for:"+socket,x);
+            return false;
         } catch (Throwable t) {
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
@@ -1389,178 +1325,6 @@ public class AprEndpoint {
     // ----------------------------------------------------- Worker Inner Class
 
 
-    /**
-     * Server processor class.
-     */
-    protected class Worker implements Runnable {
-
-
-        protected Thread thread = null;
-        protected boolean available = false;
-        protected long socket = 0;
-        protected SocketStatus status = null;
-        protected boolean options = false;
-
-
-        /**
-         * Process an incoming TCP/IP connection on the specified socket.  Any
-         * exception that occurs during processing must be logged and swallowed.
-         * <b>NOTE</b>:  This method is called from our Connector's thread.  We
-         * must assign it to our own thread so that multiple simultaneous
-         * requests can be handled.
-         *
-         * @param socket TCP socket to process
-         */
-        protected synchronized void assignWithOptions(long socket) {
-
-            // Wait for the Processor to get the previous Socket
-            while (available) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            // Store the newly available Socket and notify our thread
-            this.socket = socket;
-            status = null;
-            options = true;
-            available = true;
-            notifyAll();
-
-        }
-
-
-        /**
-         * Process an incoming TCP/IP connection on the specified socket.  Any
-         * exception that occurs during processing must be logged and swallowed.
-         * <b>NOTE</b>:  This method is called from our Connector's thread.  We
-         * must assign it to our own thread so that multiple simultaneous
-         * requests can be handled.
-         *
-         * @param socket TCP socket to process
-         */
-        protected synchronized void assign(long socket) {
-
-            // Wait for the Processor to get the previous Socket
-            while (available) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            // Store the newly available Socket and notify our thread
-            this.socket = socket;
-            status = null;
-            options = false;
-            available = true;
-            notifyAll();
-
-        }
-
-
-        protected synchronized void assign(long socket, SocketStatus status) {
-
-            // Wait for the Processor to get the previous Socket
-            while (available) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            // Store the newly available Socket and notify our thread
-            this.socket = socket;
-            this.status = status;
-            options = false;
-            available = true;
-            notifyAll();
-
-        }
-
-
-        /**
-         * Await a newly assigned Socket from our Connector, or <code>null</code>
-         * if we are supposed to shut down.
-         */
-        protected synchronized long await() {
-
-            // Wait for the Connector to provide a new Socket
-            while (!available) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                }
-            }
-
-            // Notify the Connector that we have received this Socket
-            long socket = this.socket;
-            available = false;
-            notifyAll();
-
-            return (socket);
-
-        }
-
-
-        /**
-         * The background thread that listens for incoming TCP/IP connections and
-         * hands them off to an appropriate processor.
-         */
-        public void run() {
-
-            // Process requests until we receive a shutdown signal
-            while (running) {
-
-                // Wait for the next socket to be assigned
-                long socket = await();
-                if (socket == 0)
-                    continue;
-
-                if (!deferAccept && options) {
-                    if (setSocketOptions(socket)) {
-                        getPoller().add(socket);
-                    } else {
-                        // Close socket and pool
-                        Socket.destroy(socket);
-                        socket = 0;
-                    }
-                } else {
-
-                    // Process the request from this socket
-                    if ((status != null) && (handler.event(socket, status) == Handler.SocketState.CLOSED)) {
-                        // Close socket and pool
-                        Socket.destroy(socket);
-                        socket = 0;
-                    } else if ((status == null) && ((options && !setSocketOptions(socket)) 
-                            || handler.process(socket) == Handler.SocketState.CLOSED)) {
-                        // Close socket and pool
-                        Socket.destroy(socket);
-                        socket = 0;
-                    }
-                }
-
-                // Finish up this request
-                recycleWorkerThread(this);
-
-            }
-
-        }
-
-
-        /**
-         * Start the background processing thread.
-         */
-        public void start() {
-            thread = new Thread(this);
-            thread.setName(getName() + "-" + (++curThreads));
-            thread.setDaemon(true);
-            thread.start();
-        }
-
-
-    }
 
 
     // ----------------------------------------------- SendfileData Inner Class
@@ -1886,83 +1650,6 @@ public class AprEndpoint {
         public SocketState event(long socket, SocketStatus status);
     }
 
-
-    // ------------------------------------------------- WorkerStack Inner Class
-
-
-    public class WorkerStack {
-        
-        protected Worker[] workers = null;
-        protected int end = 0;
-        
-        public WorkerStack(int size) {
-            workers = new Worker[size];
-        }
-        
-        /** 
-         * Put the object into the queue. If the queue is full (for example if
-         * the queue has been reduced in size) the object will be dropped.
-         * 
-         * @param   object  the object to be appended to the queue (first
-         *                  element).
-         */
-        public void push(Worker worker) {
-            if (end < workers.length) {
-                workers[end++] = worker;
-            } else {
-                curThreads--;
-            }
-        }
-        
-        /**
-         * Get the first object out of the queue. Return null if the queue
-         * is empty. 
-         */
-        public Worker pop() {
-            if (end > 0) {
-                return workers[--end];
-            }
-            return null;
-        }
-        
-        /**
-         * Get the first object out of the queue, Return null if the queue
-         * is empty.
-         */
-        public Worker peek() {
-            return workers[end];
-        }
-        
-        /**
-         * Is the queue empty?
-         */
-        public boolean isEmpty() {
-            return (end == 0);
-        }
-        
-        /**
-         * How many elements are there in this queue?
-         */
-        public int size() {
-            return (end);
-        }
-        
-        /**
-         * Resize the queue. If there are too many objects in the queue for the
-         * new size, drop the excess.
-         * 
-         * @param newSize
-         */
-        public void resize(int newSize) {
-            Worker[] newWorkers = new Worker[newSize];
-            int len = workers.length;
-            if (newSize < len) {
-                len = newSize;
-            }
-            System.arraycopy(workers, 0, newWorkers, 0, len);
-            workers = newWorkers;
-        }
-    }
 
 
     // ---------------------------------------------- SocketProcessor Inner Class
