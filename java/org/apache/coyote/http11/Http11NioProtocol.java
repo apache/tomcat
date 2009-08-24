@@ -261,15 +261,6 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
         ep.setExecutor(executor);
     }
     
-    /**
-     * NOOP.
-     * @param useexec - Ignored
-     * @deprecated Executors are always used for NIO
-     */
-    public void setUseExecutor(boolean useexec) {
-        ep.setUseExecutor(useexec);
-    }
-
     public int getMaxThreads() {
         return ep.getMaxThreads();
     }

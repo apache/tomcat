@@ -60,57 +60,11 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     // ----------------------------------------------------------------- Fields
 
-
-    /**
-     * Running state of the endpoint.
-     */
-    protected volatile boolean running = false;
-
-
-    /**
-     * Will be set to true whenever the endpoint is paused.
-     */
-    protected volatile boolean paused = false;
-
-
-    /**
-     * Track the initialization state of the endpoint.
-     */
-    protected boolean initialized = false;
-
-
-    /**
-     * Current worker threads busy count.
-     */
-    protected int curThreadsBusy = 0;
-
-
-    /**
-     * Current worker threads count.
-     */
-    protected int curThreads = 0;
-
-
-    /**
-     * Sequence number used to generate thread names.
-     */
-    protected int sequence = 0;
-
-
     /**
      * Associated server socket.
      */
     protected ServerSocket serverSocket = null;
     
-    /**
-     * Holds all the socket properties
-     */
-    protected SocketProperties socketProperties = new SocketProperties();
-
-    /**
-     * Are we using an internal executor
-     */
-    protected volatile boolean internalExecutor = false;
 
     // ------------------------------------------------------------- Properties
 
@@ -138,36 +92,6 @@ public class JIoEndpoint extends AbstractEndpoint {
     public void setAcceptorThreadCount(int acceptorThreadCount) { this.acceptorThreadCount = acceptorThreadCount; }
     public int getAcceptorThreadCount() { return acceptorThreadCount; }
 
-
-    /**
-     * External Executor based thread pool.
-     */
-    protected Executor executor = null;
-    public void setExecutor(Executor executor) { this.executor = executor; }
-    public Executor getExecutor() { return executor; }
-
-
-    /**
-     * Maximum amount of worker threads.
-     */
-    protected int maxThreads = 200;
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
-        if (running) {
-            //TODO Dynamic resize
-            log.error("Resizing executor dynamically is not possible at this time.");
-        }
-    }
-    public int getMaxThreads() { return maxThreads; }
-
-    public int minSpareThreads = 10;
-    public int getMinSpareThreads() {
-        return Math.min(minSpareThreads,getMaxThreads());
-    }
-    public void setMinSpareThreads(int minSpareThreads) {
-        this.minSpareThreads = minSpareThreads;
-    }
-
     /**
      * Priority of the acceptor and poller threads.
      */
@@ -177,92 +101,11 @@ public class JIoEndpoint extends AbstractEndpoint {
 
     
     /**
-     * Server socket port.
-     */
-    protected int port;
-    public int getPort() { return port; }
-    public void setPort(int port ) { this.port=port; }
-
-
-    /**
-     * Address for the server socket.
-     */
-    protected InetAddress address;
-    public InetAddress getAddress() { return address; }
-    public void setAddress(InetAddress address) { this.address = address; }
-
-
-    /**
      * Handling of accepted sockets.
      */
     protected Handler handler = null;
     public void setHandler(Handler handler ) { this.handler = handler; }
     public Handler getHandler() { return handler; }
-
-
-    /**
-     * Allows the server developer to specify the backlog that
-     * should be used for server sockets. By default, this value
-     * is 100.
-     */
-    protected int backlog = 100;
-    public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
-    public int getBacklog() { return backlog; }
-
-
-    /**
-     * Socket TCP no delay.
-     */
-    public boolean getTcpNoDelay() { return socketProperties.getTcpNoDelay(); }
-    public void setTcpNoDelay(boolean tcpNoDelay) { socketProperties.setTcpNoDelay(tcpNoDelay); }
-
-
-    /**
-     * Socket linger.
-     */
-    public int getSoLinger() {return socketProperties.getSoLingerTime();}
-    public void setSoLinger(int soLinger) { 
-        if (soLinger>=0) {
-            socketProperties.setSoLingerOn(true);
-            socketProperties.setSoLingerTime(soLinger);
-        } else {
-            socketProperties.setSoLingerOn(false);
-            socketProperties.setSoLingerTime(-1);
-        }
-    }
-
-
-    /**
-     * Socket timeout.
-     */
-    public int getSoTimeout() { return socketProperties.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) {
-        // APR/native uses -1 for infinite - Java uses 0
-        if (soTimeout == -1) {
-            socketProperties.setSoTimeout(0);
-        } else {
-            socketProperties.setSoTimeout(soTimeout);
-        }
-    }
-
-
-    /**
-     * The default is true - the created threads will be
-     *  in daemon mode. If set to false, the control thread
-     *  will not be daemon - and will keep the process alive.
-     */
-    protected boolean daemon = true;
-    public void setDaemon(boolean b) { daemon = b; }
-    public boolean getDaemon() { return daemon; }
-
-
-    /**
-     * Name of the thread pool, which will be used for naming child threads.
-     */
-    protected String name = "TP";
-    public void setName(String name) { this.name = name; }
-    public String getName() { return name; }
-
 
     /**
      * Server socket factory.
@@ -272,53 +115,7 @@ public class JIoEndpoint extends AbstractEndpoint {
     public ServerSocketFactory getServerSocketFactory() { return serverSocketFactory; }
 
 
-    public boolean isRunning() {
-        return running;
-    }
     
-    public boolean isPaused() {
-        return paused;
-    }
-    
-    /**
-     * Return the amount of threads that are managed by the pool.
-     *
-     * @return the amount of threads that are managed by the pool
-     */
-    public int getCurrentThreadCount() {
-        if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getPoolSize();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getPoolSize();
-            } else {
-                return -1;
-            }
-        } else {
-            return -2;
-        }
-    }
-
-    /**
-     * Return the amount of threads that are in use 
-     *
-     * @return the amount of threads that are in use
-     */
-    public int getCurrentThreadsBusy() {
-        if (executor!=null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor)executor).getActiveCount();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getActiveCount();
-            } else {
-                return -1;
-            }
-        } else {
-            return -2;
-        }
-    }
-    
-
     // ------------------------------------------------ Handler Inner Interface
 
 
@@ -439,17 +236,17 @@ public class JIoEndpoint extends AbstractEndpoint {
         }
         if (serverSocket == null) {
             try {
-                if (address == null) {
-                    serverSocket = serverSocketFactory.createSocket(port, backlog);
+                if (getAddress() == null) {
+                    serverSocket = serverSocketFactory.createSocket(getPort(), getBacklog());
                 } else {
-                    serverSocket = serverSocketFactory.createSocket(port, backlog, address);
+                    serverSocket = serverSocketFactory.createSocket(getPort(), getBacklog(), getAddress());
                 }
             } catch (BindException be) {
-                if (address == null)
-                    throw new BindException(be.getMessage() + "<null>:" + port);
+                if (getAddress() == null)
+                    throw new BindException(be.getMessage() + "<null>:" + getPort());
                 else
                     throw new BindException(be.getMessage() + " " +
-                            address.toString() + ":" + port);
+                            getAddress().toString() + ":" + getPort());
             }
         }
         //if( serverTimeout >= 0 )
@@ -470,19 +267,15 @@ public class JIoEndpoint extends AbstractEndpoint {
             paused = false;
 
             // Create worker collection
-            if (executor == null) {
-                internalExecutor = true;
-                TaskQueue taskqueue = new TaskQueue();
-                TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
-                executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS,taskqueue, tf);
-                taskqueue.setParent( (ThreadPoolExecutor) executor);
+            if (getExecutor() == null) {
+                createExecutor();
             }
 
             // Start acceptor threads
             for (int i = 0; i < acceptorThreadCount; i++) {
                 Thread acceptorThread = new Thread(new Acceptor(), getName() + "-Acceptor-" + i);
                 acceptorThread.setPriority(threadPriority);
-                acceptorThread.setDaemon(daemon);
+                acceptorThread.setDaemon(getDaemon());
                 acceptorThread.start();
             }
         }
@@ -506,16 +299,7 @@ public class JIoEndpoint extends AbstractEndpoint {
             running = false;
             unlockAccept();
         }
-        if ( executor!=null && internalExecutor ) {
-            if ( executor instanceof ThreadPoolExecutor ) {
-                //this is our internal one, so we need to shut it down
-                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
-                tpe.shutdownNow();
-                TaskQueue queue = (TaskQueue) tpe.getQueue();
-                queue.setParent(null);
-            }
-            executor = null;
-        }
+        shutdownExecutor();
     }
 
     /**
@@ -537,36 +321,7 @@ public class JIoEndpoint extends AbstractEndpoint {
         initialized = false ;
     }
 
-    
-    /**
-     * Unlock the accept by using a local connection.
-     */
-    protected void unlockAccept() {
-        Socket s = null;
-        try {
-            // Need to create a connection to unlock the accept();
-            if (address == null) {
-                s = new Socket("127.0.0.1", port);
-            } else {
-                s = new Socket(address, port);
-                    // setting soLinger to a small value will help shutdown the
-                    // connection quicker
-                s.setSoLinger(true, 0);
-            }
-        } catch (Exception e) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("endpoint.debug.unlock", "" + port), e);
-            }
-        } finally {
-            if (s != null) {
-                try {
-                    s.close();
-                } catch (Exception e) {
-                    // Ignore
-                }
-            }
-        }
-    }
+  
 
 
     /**
@@ -602,7 +357,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(Socket socket) {
         try {
-            executor.execute(new SocketProcessor(socket));
+            getExecutor().execute(new SocketProcessor(socket));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
