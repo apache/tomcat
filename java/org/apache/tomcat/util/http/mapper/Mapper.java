@@ -804,6 +804,36 @@ public final class Mapper {
                                         
         }
 
+        /* welcome file processing - take 2
+         * Now that we have looked for welcome files with a physical
+         * backing, now look for an extension mapping listed
+         * but may not have a physical backing to it. This is for 
+         * the case of index.jsf, index.do, etc.
+         * A watered down version of rule 4
+         */
+        if (mappingData.wrapper == null) {
+            boolean checkWelcomeFiles = checkJspWelcomeFiles;
+            if (!checkWelcomeFiles) {
+                char[] buf = path.getBuffer();
+                checkWelcomeFiles = (buf[pathEnd - 1] == '/');
+            }
+            if (checkWelcomeFiles) {
+                for (int i = 0; (i < context.welcomeResources.length)
+                         && (mappingData.wrapper == null); i++) {
+                    path.setOffset(pathOffset);
+                    path.setEnd(pathEnd);
+                    path.append(context.welcomeResources[i], 0,
+                                context.welcomeResources[i].length());
+                    path.setOffset(servletPath);
+                    internalMapExtensionWrapper(extensionWrappers,
+                                                path, mappingData);
+                }
+
+                path.setOffset(servletPath);
+                path.setEnd(pathEnd);
+            }
+        }
+
 
         // Rule 7 -- Default servlet
         if (mappingData.wrapper == null && !checkJspWelcomeFiles) {
