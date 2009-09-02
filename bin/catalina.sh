@@ -287,9 +287,11 @@ elif [ "$1" = "run" ]; then
 
 elif [ "$1" = "start" ] ; then
 
-  if [ ! -z "$CATALINA_PID" -a -e "$CATALINA_PID" ]; then
-    echo "PID file found. Is Tomcat still running? This start aborted"
-    exit 1
+  if [ ! -z "$CATALINA_PID" ]; then
+    if [ -f "$CATALINA_PID" ]; then
+      echo "PID file ($CATALINA_PID) found. Is Tomcat still running? Start aborted."
+      exit 1
+    fi
   fi
 
   shift
@@ -327,9 +329,12 @@ elif [ "$1" = "stop" ] ; then
   shift
 
   SLEEP=5
-  if [ ! -z "$1" -a $1 -eq $1 &>/dev/null ]; then
-    SLEEP=$1
-    shift
+  if [ ! -z "$1" ]; then
+    echo $1 | grep "[^0-9]" > /dev/null 2>&1
+    if [ $? -eq 1 ]; then
+      SLEEP=$1
+      shift
+    fi
   fi
 
   FORCE=0
@@ -338,6 +343,19 @@ elif [ "$1" = "stop" ] ; then
     FORCE=1
   fi
 
+  if [ ! -z "$CATALINA_PID" ]; then
+    if [ -f "$CATALINA_PID" ]; then
+      kill -0 `cat $CATALINA_PID` >/dev/null 2>&1
+      if [ $? -eq 1 ]; then
+        echo "PID file ($CATALINA_PID) found but no matching process was found. Stop aborted."
+        exit 1
+      fi
+    else
+      echo "\$CATALINA_PID was set ($CATALINA_PID) but the specified file does not exist. Is Tomcat running? Stop aborted."
+      exit 1
+    fi
+  fi
+  
   "$_RUNJAVA" $JAVA_OPTS \
     -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
     -Dcatalina.base="$CATALINA_BASE" \
@@ -345,29 +363,36 @@ elif [ "$1" = "stop" ] ; then
     -Djava.io.tmpdir="$CATALINA_TMPDIR" \
     org.apache.catalina.startup.Bootstrap "$@" stop
 
-  if [ ! -z "$CATALINA_PID" -a -e "$CATALINA_PID" ]; then
-    while [ $SLEEP -ge 0 ] 
-    do
-      if ! kill -0 `cat $CATALINA_PID` &>/dev/null; then
-        rm $CATALINA_PID
-        break
-      fi
-      if [ $SLEEP -gt 0 ]; then
-        sleep 1
-      fi
-      let SLEEP=SLEEP-1 
-    done
+  if [ ! -z "$CATALINA_PID" ]; then
+    if [ -f "$CATALINA_PID" ]; then
+      while [ $SLEEP -ge 0 ]; do 
+        kill -0 `cat $CATALINA_PID` >/dev/null 2>&1
+        if [ $? -eq 1 ]; then
+          rm $CATALINA_PID
+          break
+        fi
+        if [ $SLEEP -gt 0 ]; then
+          sleep 1
+        fi
+        if [ $SLEEP -eq 0 ]; then
+          if [ $FORCE -eq 0 ]; then
+            echo "Tomcat did not stop in time. PID file was not removed."
+          fi
+        fi
+        SLEEP=`expr $SLEEP - 1 `
+      done
+    fi
   fi
 
   if [ $FORCE -eq 1 ]; then
-    if [ ! -z "$CATALINA_PID" -a -e "$CATALINA_PID" ]; then
-       echo "Killing: `cat $CATALINA_PID`"
-       kill -9 `cat $CATALINA_PID`
-       rm $CATALINA_PID
+    if [ -z "$CATALINA_PID" ]; then
+      echo "Kill failed: \$CATALINA_PID not set"
     else
-       if [ -z "$CATALINA_PID" ]; then
-         echo "Kill failed: \$CATALINA_PID not set"
-       fi
+      if [ -f "$CATALINA_PID" ]; then
+        echo "Killing: `cat $CATALINA_PID`"
+        kill -9 `cat $CATALINA_PID`
+        rm $CATALINA_PID
+      fi
     fi
   fi
 
