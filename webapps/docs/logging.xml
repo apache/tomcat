@@ -136,8 +136,10 @@
   <p>
     Example logging.properties file to be placed in $CATALINA_BASE/conf:
     <source>
-handlers = 1catalina.org.apache.juli.FileHandler, 2localhost.org.apache.juli.FileHandler, \
-           3manager.org.apache.juli.FileHandler, 4admin.org.apache.juli.FileHandler, \
+handlers = 1catalina.org.apache.juli.FileHandler, \
+           2localhost.org.apache.juli.FileHandler, \
+           3manager.org.apache.juli.FileHandler, \
+           4admin.org.apache.juli.FileHandler, \
            java.util.logging.ConsoleHandler
 
 .handlers = 1catalina.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
@@ -227,13 +229,13 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
         <li>Create a file called log4j.properties with the following content 
             and save it into $CATALINA_HOME/lib.
           <source>
-            log4j.rootLogger=INFO, R <br />
-            log4j.appender.R=org.apache.log4j.RollingFileAppender <br />
-            log4j.appender.R.File=${catalina.home}/logs/tomcat.log <br />
-            log4j.appender.R.MaxFileSize=10MB <br />
-            log4j.appender.R.MaxBackupIndex=10 <br />
-            log4j.appender.R.layout=org.apache.log4j.PatternLayout <br />
-            log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
+log4j.rootLogger=INFO, R <br />
+log4j.appender.R=org.apache.log4j.RollingFileAppender <br />
+log4j.appender.R.File=${catalina.base}/logs/tomcat.log <br />
+log4j.appender.R.MaxFileSize=10MB <br />
+log4j.appender.R.MaxBackupIndex=10 <br />
+log4j.appender.R.layout=org.apache.log4j.PatternLayout <br />
+log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
           </source>
         </li>
 
@@ -250,6 +252,8 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
         <li>Place <code>output/extras/tomcat-juli-adapters.jar</code> in 
             $CATALINA_HOME/lib.</li>
 
+        <li>Delete <code>$CATALINA_BASE/conf/logging.properties</code> to
+            prevent java.util.logging generating zero length log files.</li>
         <li>Start Tomcat</li>
       </ol>
     </p>
@@ -272,9 +276,9 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
       described until a future version of log4j allows this convention.
       
       <source>
-        log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG<br />
-        log4j.logger.org.apache.catalina.core=DEBUG<br />
-        log4j.logger.org.apache.catalina.session=DEBUG<br />
+log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=DEBUG<br />
+log4j.logger.org.apache.catalina.core=DEBUG<br />
+log4j.logger.org.apache.catalina.session=DEBUG<br />
       </source>
 
       Be warned a level of DEBUG will produce megabytes of logging and slow
