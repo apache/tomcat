@@ -32,7 +32,7 @@
 
   <section name="Introduction">
     <p>
-      Tomcat 7.0 uses 
+      Tomcat uses 
       <a href="http://commons.apache.org/logging">Commons Logging</a>
       throughout its internal code allowing the 
       developer to choose a logging configuration that suits their needs, e.g
@@ -80,10 +80,9 @@
     assigning them to loggers.
   </p>
   <p>
-    JULI is enabled by default in Tomcat 7.0, and supports per classloader
-    configuration, in addition to the regular global java.util.logging
-    configuration. This means that logging can be configured at the following
-    layers:
+    JULI is enabled by default, and supports per classloader configuration, in
+    addition to the regular global java.util.logging configuration. This means
+    that logging can be configured at the following layers:
     <ul>
       <li>In the JDK's logging.properties file. Check your JAVA_HOME environment
       setting to see which JDK Tomcat is using. The file will be in 
@@ -268,7 +267,7 @@ log4j.appender.R.layout.ConversionPattern=%p %t %c - %m%n
         
     <p>
       You can (and should) be more picky about which packages to include 
-      in the logging. Tomcat 7 defines loggers by Engine and Host names.
+      in the logging. Tomcat defines loggers by Engine and Host names.
       For example, for a more detailed Catalina localhost log, add this to the
       end of the log4j.properties above. Note that there are known issues with 
       using this naming convention (with square brackets) in log4j XML based
