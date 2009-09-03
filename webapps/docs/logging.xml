@@ -296,7 +296,15 @@ log4j.logger.org.apache.catalina.session=DEBUG<br />
       documentation</a> for more options. This page is intended only as a
       bootstrapping guide.
     </p>
-        
+
+    <p>
+      If you have multiple instances of Tomcat, each with a separate
+      <code>$CATALINA_HOME</code> but a shared <code>$CATALINA_BASE</code> then
+      you can configure log4j on a per instance basis by replacing references to
+      <code>$CATALINA_HOME</code> in the above instructions with
+      <code>$CATALINA_BASE</code>. Note that you may need to create a
+      <code>$CATALINA_BASE/lib</code> directory. 
+    </p>
   </section>
 
 </body>
