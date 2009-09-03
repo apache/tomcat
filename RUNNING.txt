@@ -116,6 +116,11 @@ of $CATALINA_HOME:
 
 * temp - Directory used by the JVM for temporary files (java.io.tmpdir)
 
+Note that by default Tomcat will first try to load classes and JARs from
+$CATALINA_BASE/lib and then $CATALINA_HOME/lib. You can place instance specific
+JARs and classes (eg JDBC drivers) in $CATALINA_BASE/lib whilst keeping the
+standard Tomcat JARs in $CATALINA_HOME/lib.  
+
 If you do not set $CATALINA_BASE, $CATALINA_BASE will default to the same value
 as $CATALINA_HOME, which means that the same directory is used for all relative
 path resolutions.
