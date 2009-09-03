@@ -104,7 +104,7 @@ When you use $CATALINA_BASE, Tomcat will calculate all relative references for
 files in the following directories based on the value of $CATALINA_BASE instead
 of $CATALINA_HOME:
 
-* bin  - Only setenv.sh (*nix) and setenv.bat (windows)
+* bin  - Only setenv.sh (*nix), setenv.bat (windows) and tomcat-juli.jar
 
 * conf - Server configuration files (including server.xml)
 
