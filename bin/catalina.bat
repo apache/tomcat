@@ -126,6 +126,15 @@ if not "%CATALINA_TMPDIR%" == "" goto gotTmpdir
 set CATALINA_TMPDIR=%CATALINA_BASE%\temp
 :gotTmpdir
 
+rem Add tomcat-juli.jar to classpath
+rem tomcat-juli.jar can be over-ridden per instance
+if not exist "%CATALINA_BASE%\bin\tomcat-juli.jar" goto juliClasspathHome
+set CLASSPATH=%CLASSPATH%;%CATALINA_BASE%\bin\tomcat-juli.jar
+goto juliClasspathDone
+:juliClasspathHome
+set CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\tomcat-juli.jar
+:juliClasspathDone
+
 if not "%LOGGING_CONFIG%" == "" goto noJuliConfig
 set LOGGING_CONFIG=-Dnop
 if not exist "%CATALINA_BASE%\conf\logging.properties" goto noJuliConfig

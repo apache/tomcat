@@ -168,6 +168,14 @@ if [ -z "$CATALINA_TMPDIR" ] ; then
   CATALINA_TMPDIR="$CATALINA_BASE"/temp
 fi
 
+# Add tomcat-juli.jar to classpath
+# tomcat-juli.jar can be over-ridden per instance
+if [ -r "$CATALINA_BASE/bin/tomcat-juli.jar" ] ; then
+  CLASSPATH=$CLASSPATH:$CATALINA_BASE/bin/tomcat-juli.jar
+else
+  CLASSPATH=$CLASSPATH:$CATALINA_HOME/bin/tomcat-juli.jar
+fi
+
 # Bugzilla 37848: When no TTY is available, don't output to console
 have_tty=0
 if [ "`tty`" != "not a tty" ]; then
