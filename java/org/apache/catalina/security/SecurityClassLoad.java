@@ -109,8 +109,6 @@ public final class SecurityClassLoad {
     private final static void loadUtilPackage(ClassLoader loader)
         throws Exception {
         String basePackage = "org.apache.catalina.";
-        loader.loadClass
-            (basePackage + "util.URL");
         loader.loadClass(basePackage + "util.Enumerator");
     }
     
