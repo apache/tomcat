@@ -352,74 +352,9 @@ database structure conforms to the following requirements:</p>
 
 <p>To configure JDBCRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>.  The following
-attributes are supported by this implementation:</p>
-
-<attributes>
-
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.JDBCRealm</code>" here.</p>
-  </attribute>
-
-  <attribute name="connectionName" required="true">
-    <p>The database username used to establish a JDBC connection.</p>
-  </attribute>
-
-  <attribute name="connectionPassword" required="true">
-    <p>The database password used to establish a JDBC connection.</p>
-  </attribute>
-
-  <attribute name="connectionURL" required="true">
-    <p>The database URL used to establish a JDBC connection.</p>
-  </attribute>
-
-  <attribute name="digest" required="false">
-    <p>The digest algorithm used to store passwords in non-plaintext formats.
-    Valid values are those accepted for the algorithm name by the
-    <code>java.security.MessageDigest</code> class.  See
-    <a href="#Digested Passwords">Digested Passwords</a> for more
-    information.  If not specified, passwords are stored in clear text.</p>
-  </attribute>
-
-  <attribute name="driverName" required="true">
-    <p>The fully qualified Java class name of the JDBC driver to be used.
-    Consult the documentation for your JDBC driver for the appropriate
-    value.</p>
-  </attribute>
-
-  <attribute name="roleNameCol" required="true">
-    <p>The name of the column, in the <em>user roles</em> table, that
-    contains the name of a role assigned to this user.</p>
-  </attribute>
-
-  <attribute name="userCredCol" required="true">
-    <p>The name of the column, in the <em>users</em> table, that contains
-    the password for this user (either in clear text, or digested if the
-    <code>digest</code> attribute is set).</p>
-  </attribute>
-
-  <attribute name="userNameCol" required="true">
-    <p>The name of the column, in the <em>users</em> and <em>user roles</em>
-    tables, that contains the username of this user.</p>
-  </attribute>
-
-  <attribute name="userRoleTable" required="true">
-    <p>The name of the table that contains one row for each <em>role</em>
-    assigned to a particular <em>username</em>.  This table must include at
-    least the columns named by the <code>userNameCol</code> and
-    <code>roleNameCol</code> attributes.</p>
-  </attribute>
-
-  <attribute name="userTable" required="true">
-    <p>The name of the table that contains one row for each <em>username</em>
-    to be recognized by Tomcat.  This table must include at least the columns
-    named by the <code>userNameCol</code> and <code>userCredCol</code>
-    attributes.</p>
-  </attribute>
-
-</attributes>
+as described <a href="#Configuring a Realm">above</a>. The attributes for the
+JDBCRealm are defined in the <a href="config/realm.html">Realm</a> configuration
+documentation.</p>
 
 <h3>Example</h3>
 
@@ -530,70 +465,9 @@ as your database structure conforms to the following requirements:</p>
 
 <p>To configure DataSourceRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>.  The following
-attributes are supported by this implementation:</p>
-
-<attributes>
-
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.DataSourceRealm</code>" here.</p>
-  </attribute>
-
-  <attribute name="dataSourceName" required="true">
-    <p>The JNDI named JDBC DataSource for your database. If the DataSource is
-    local to the context, the name is relative to <code>java:/comp/env</code>,
-    and otherwise the name should match the name used to define the global
-    DataSource.</p>
-  </attribute>
-
-  <attribute name="digest" required="false">
-    <p>The digest algorithm used to store passwords in non-plaintext formats.
-    Valid values are those accepted for the algorithm name by the
-    <code>java.security.MessageDigest</code> class.  See
-    <a href="#Digested Passwords">Digested Passwords</a> for more
-    information.  If not specified, passwords are stored in clear text.</p>
-  </attribute>
-    
-  <attribute name="localDataSource" required="false">
-    <p>When the realm is nested inside a Context element, this allows the 
-    realm to use a DataSource defined for the Context rather than a global
-    DataSource.  If not specified, the default is <code>false</code>: use a 
-    global DataSource.</p>
-  </attribute>
-    
-  <attribute name="roleNameCol" required="true">
-    <p>The name of the column, in the <em>user roles</em> table, that
-    contains the name of a role assigned to this user.</p>
-  </attribute>
-    
-  <attribute name="userCredCol" required="true">
-    <p>The name of the column, in the <em>users</em> table, that contains
-    the password for this user (either in clear text, or digested if the
-    <code>digest</code> attribute is set).</p>
-  </attribute>
-    
-  <attribute name="userNameCol" required="true">
-    <p>The name of the column, in the <em>users</em> and <em>user roles</em>
-    tables, that contains the username of this user.</p>
-  </attribute>
-
-  <attribute name="userRoleTable" required="true">
-    <p>The name of the table that contains one row for each <em>role</em>
-    assigned to a particular <em>username</em>.  This table must include at
-    least the columns named by the <code>userNameCol</code> and
-    <code>roleNameCol</code> attributes.</p>
-  </attribute>
-
-  <attribute name="userTable" required="true">
-    <p>The name of the table that contains one row for each <em>username</em>
-    to be recognized by Tomcat.  This table must include at least the columns
-    named by the <code>userNameCol</code> and <code>userCredCol</code>
-    attributes.</p>
-  </attribute>
-
-</attributes>
+as described <a href="#Configuring a Realm">above</a>. The attributes for the
+DataSourceRealm are defined in the <a href="config/realm.html">Realm</a>
+configuration documentation.</p>
 
 <h3>Example</h3>
 
@@ -839,199 +713,9 @@ the name of this attribute.</p>
 
 <p>To configure JNDIRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>.  The following
-attributes are supported by this implementation:</p>
-
-<attributes>
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.JNDIRealm</code>" here.</p>
-  </attribute>
-
-      <attribute name="adCompat" required="false">
-        <p>Microsoft Active Directory often returns referrals.
-        When iterating over NamingEnumerations these lead to
-        PartialResultExceptions. If you want us to ignore those exceptions,
-        set this attribute to "true". Unfortunately there's no stable way
-        to detect, if the Exceptions really come from an AD referral.
-        The default value is "false".</p>
-      </attribute>
-
-      <attribute name="alternateURL" required="false">
-        <p>If a socket connection can not be made to the provider at
-        the <code>connectionURL</code> an attempt will be made to use the
-        <code>alternateURL</code>.</p>
-      </attribute>
-
-      <attribute name="authentication" required="false">
-        <p>A string specifying the type of authentication to use.
-        "none", "simple", "strong" or a provider specific definition
-        can be used. If no value is given the providers default is used.</p>
-      </attribute>
-
-      <attribute name="commonRole" required="false">
-        <p>A role name assigned to each successfully authenticated user in
-        addition to the roles retrieved from LDAP. If not specified, only
-        the roles retrieved via LDAP are used.</p>
-      </attribute>
-
-      <attribute name="connectionName" required="false">
-        <p>The directory username to use when establishing a
-        connection to the directory for LDAP search operations. If not
-        specified an anonymous connection is made, which is often
-        sufficient unless you specify the <code>userPassword</code>
-        property.</p>
-      </attribute>
-
-      <attribute name="connectionPassword" required="false">
-        <p>The directory password to use when establishing a
-        connection to the directory for LDAP search operations. If not
-        specified an anonymous connection is made, which is often
-        sufficient unless you specify the <code>userPassword</code>
-        property.</p>
-      </attribute>
-
-      <attribute name="connectionURL" required="true">
-        <p>The connection URL to be passed to the JNDI driver when
-        establishing a connection to the directory.</p>
-      </attribute>
-
-      <attribute name="contextFactory" required="false">
-        <p>The fully qualified Java class name of the JNDI context
-        factory to be used for this connection.  By default, the standard
-        JNDI LDAP provider is used
-        (<code>com.sun.jndi.ldap.LdapCtxFactory</code>).</p>
-      </attribute>
-
-      <attribute name="digest" required="false">
-        <p>The digest algorithm to apply to the plaintext password offered
-        by the user before comparing it with the value retrieved from the
-        directory.  Valid values are those accepted for the algorithm name
-        by the <code>java.security.MessageDigest</code> class.  See <a
-        href="#Digested Passwords">Digested Passwords</a> for more
-        information. If not specified the plaintext password is assumed to
-        be retrieved. Not required unless <code>userPassword</code> is
-        specified</p>
-      </attribute>
-
-      <attribute name="referrals" required="false">
-        <p>How do we handle JNDI referrals? Allowed values are
-        "ignore", "follow", or "throw"  (see javax.naming.Context.REFERRAL
-        for more information).
-        Microsoft Active Directory often returns referrals.
-        If you need to follow them set referrals to "follow".
-        Caution: if your DNS is not part of AD, the LDAP client lib might try
-        to resolve your domain name in DNS to find another LDAP server.</p>
-      </attribute>
-
-      <attribute name="protocol" required="false">
-         <p>A string specifying the security protocol to use. If not given
-         the providers default is used.</p>
-      </attribute>
-
-      <attribute name="roleBase" required="false">
-        <p>The base directory entry for performing role searches. If
-        not specified, the top level element in the directory context
-        will be used.</p>
-      </attribute>
-
-      <attribute name="roleName" required="false">
-        <p>The name of the attribute that contains role names in the
-        directory entries found by a role search. In addition you can
-        use the <code>userRoleName</code> property to specify the name
-        of an attribute, in the user's entry, containing additional
-        role names.  If <code>roleName</code> is not specified a role
-        search does not take place, and roles are taken only from the
-        user's entry.</p>
-      </attribute>
-
-      <attribute name="roleSearch" required="false">
-        <p>The LDAP filter expression used for performing role
-        searches, following the syntax supported by the
-        <code>java.text.MessageFormat</code> class.  Use
-        <code>{0}</code> to substitute the distinguished name (DN) of
-        the user, and/or <code>{1}</code> to substitute the
-        username. If not specified a role search does not take place
-        and roles are taken only from the attribute in the user's
-        entry specified by the <code>userRoleName</code> property.</p>
-      </attribute>
-
-      <attribute name="roleSubtree" required="false">
-        <p>Set to <code>true</code> if you want to search the entire
-        subtree of the element specified by the <code>roleBase</code>
-        property for role entries associated with the user. The
-        default value of <code>false</code> causes only the top level
-        to be searched.</p>
-      </attribute>
-
-      <attribute name="userBase" required="false">
-        <p>The base element for user searches performed using the
-        <code>userSearch</code> expression.  If not specified, the top
-        level element in the directory context will be used. Not used
-        if you are using the <code>userPattern</code> expression.</p>
-      </attribute>
-
-      <attribute name="userPassword" required="false">
-        <p>Name of the attribute in the user's entry containing the
-        user's password.  If you specify this value, JNDIRealm will
-        bind to the directory using the values specified by
-        <code>connectionName</code> and
-        <code>connectionPassword</code> properties, and retrieve the
-        corresponding attribute for comparison to the value specified
-        by the user being authenticated.  If the <code>digest</code>
-        attribute is set, the specified digest algorithm is applied to
-        the password offered by the user before comparing it with the
-        value retrieved from the directory.  If you do
-        <strong>not</strong> specify this value, JNDIRealm will
-        attempt a simple bind to the directory using the DN of the
-        user's entry and password specified by the user, with a
-        successful bind being interpreted as an authenticated
-        user.</p>
-      </attribute>
-
-      <attribute name="userPattern" required="false">
-        <p>A pattern for the distinguished name (DN) of the user's
-        directory entry, following the syntax supported by the
-        <code>java.text.MessageFormat</code> class with
-        <code>{0}</code> marking where the actual username should be
-        inserted. You can use this property instead of
-        <code>userSearch</code>, <code>userSubtree</code> and
-        <code>userBase</code> when the distinguished name contains the
-        username and is otherwise the same for all users.</p>
-      </attribute>
-
-      <attribute name="userRoleName" required="false">
-        <p>The name of an attribute in the user's directory entry
-        containing zero or more values for the names of roles assigned
-        to this user.  In addition you can use the
-        <code>roleName</code> property to specify the name of an
-        attribute to be retrieved from individual role entries found
-        by searching the directory. If <code>userRoleName</code> is
-        not specified all the roles for a user derive from the role
-        search.</p>
-      </attribute>
-
-      <attribute name="userSearch" required="false">
-        <p>The LDAP filter expression to use when searching for a
-        user's directory entry, with <code>{0}</code> marking where
-        the actual username should be inserted.  Use this property
-        (along with the <code>userBase</code> and
-        <code>userSubtree</code> properties) instead of
-        <code>userPattern</code> to search the directory for the
-        user's entry.</p>
-      </attribute>
-
-      <attribute name="userSubtree" required="false">
-        <p>Set to <code>true</code> if you want to search the entire
-        subtree of the element specified by the <code>userBase</code>
-        property for the user's entry. The default value of
-        <code>false</code> causes only the top level to be searched.
-        Not used if you are using the <code>userPattern</code>
-        expression.</p>
-      </attribute>
-
-</attributes>
+as described <a href="#Configuring a Realm">above</a>. The attributes for the
+JNDIRealm are defined in the <a href="config/realm.html">Realm</a> configuration
+documentation.</p>
 
 <h3>Example</h3>
 
@@ -1236,33 +920,9 @@ in this file are not recognized until Tomcat is restarted.</p>
 
 <p>To configure MemoryRealm, you will create a <code>&lt;Realm&gt;</code>
 element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code> file,
-as described <a href="#Configuring a Realm">above</a>.  The following
-attributes are supported by this implementation:</p>
-
-<attributes>
-
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.MemoryRealm</code>" here.</p>
-  </attribute>
-
-  <attribute name="digest" required="false">
-    <p>The digest algorithm used to store passwords in non-plaintext formats.
-    Valid values are those accepted for the algorithm name by the
-    <code>java.security.MessageDigest</code> class.  See
-    <a href="#Digested Passwords">Digested Passwords</a> for more
-    information.  If not specified, passwords are stored in clear text.</p>
-  </attribute>
-
-  <attribute name="pathname" required="false">
-    <p>Absolute or relative (to $CATALINA_BASE) pathname of the XML document
-    containing our valid usernames, passwords, and roles.  See below for more
-    information on the format of this file.  If not specified, the value
-    <code>conf/tomcat-users.xml</code> is used.</p>
-  </attribute>
-
-</attributes>
+as described <a href="#Configuring a Realm">above</a>. The attributes for the
+MemoryRealm are defined in the <a href="config/realm.html">Realm</a>
+configuration documentation.</p>
 
 <h3>User File Format</h3>
 
@@ -1380,41 +1040,9 @@ the resources you want to protect</li>
         <p>To configure JAASRealm as for step 6 above, you create
 a <code>&lt;Realm&gt;</code> element and nest it in your 
 <code>$CATALINA_BASE/conf/server.xml</code>
-file within your <code>&lt;Engine&gt;</code> node. The following attributes 
-are supported by this implementation:</p>
-
-<attributes>
-
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.JAASRealm</code>" here.</p>
-  </attribute>
-
-  <attribute name="appName" required="true">
-    <p>The name of the application as configured in your login configuration file 
-    (<a href="http://java.sun.com/j2se/1.4.1/docs/guide/security/jaas/tutorials/LoginConfigFile.html">JAAS LoginConfig</a>).</p>
-  </attribute>
-
-  <attribute name="userClassNames" required="true">
-    <p>A comma-seperated list of the names of the classes that you have made 
-    for your user <code>Principals</code>.</p>
-  </attribute>
-
-  <attribute name="roleClassNames" required="false">
-    <p>A comma-seperated list of the names of the classes that you have made 
-    for your role <code>Principals</code>.</p>
-  </attribute>
-
-  <attribute name="useContextClassLoader" required="false">
-    <p>Instructs JAASRealm to use the context class loader for loading the user-specified
-    <code>LoginModule</code> class and associated <code>Principal</code> classes. The
-    default value is <code>true</code>, which is backwards-compatible with the way 
-    Tomcat 4 works. To load classes using the container's classloader, specify
-    <code>false</code>.</p>
-  </attribute>
-
-</attributes>
+file within your <code>&lt;Engine&gt;</code> node. The attributes for the
+JAASRealm are defined in the <a href="config/realm.html">Realm</a>
+configuration documentation.</p>
 
 <h3>Example</h3>
 
@@ -1491,19 +1119,8 @@ and restarting the server, without any code changes to your application.</li>
     element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code>
     file within your <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.
     You can also nest inside a <code>&lt;Context&gt;</code> node in a
-    <code>context.xml</code> file. The following attributes are supported by
-    this implementation:</p>
-
-<attributes>
-
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.CombinedRealm</code>" here.</p>
-  </attribute>
-
-</attributes>
-
+    <code>context.xml</code> file.</p>
+    
 <h3>Example</h3>
 
 <p>Here is an example of how your server.xml snippet should look to use a
@@ -1552,41 +1169,10 @@ UserDatabase Realm and a DataSource Realm.</p>
     element and nest it in your <code>$CATALINA_BASE/conf/server.xml</code>
     file within your <code>&lt;Engine&gt;</code> or <code>&lt;Host&gt;</code>.
     You can also nest inside a <code>&lt;Context&gt;</code> node in a
-    <code>context.xml</code> file. The following attributes are supported by
-    this implementation:</p>
-
-<attributes>
-
-  <attribute name="className" required="true">
-    <p>The fully qualified Java class name of this Realm implementation.
-    You <strong>MUST</strong> specify the value
-    "<code>org.apache.catalina.realm.LockOutRealm</code>" here.</p>
-  </attribute>
-
-  <attribute name="cacheRemovalWarningTime" required="false">
-    <p>If a failed user is removed from the cache because the cache is too
-    big before it has been in the cache for at least this period of time (in
-    seconds) a warning message will be logged. Defaults to 3600 (1 hour).</p>
-  </attribute>
-
-  <attribute name="cacheSize" required="false">
-    <p>Number of users that have failed authentication to keep in cache. Over
-    time the cache will grow to this size and may not shrink. Defaults to
-    1000.</p>
-  </attribute>
-
-  <attribute name="failureCount" required="false">
-    <p>The number of times in a row a user has to fail authentication to be
-    locked out. Defaults to 5.</p>
-  </attribute>
-
-  <attribute name="lockOutTime" required="false">
-    <p>The time (in seconds) a user is locked out for after too many
-    authentication failures. Defaults to 300 (5 minutes).</p>
-  </attribute>
-
-</attributes>
-
+    <code>context.xml</code> file. The attributes for the
+    LockOutRealm are defined in the <a href="config/realm.html">Realm</a>
+    configuration documentation.</p>
+    
 <h3>Example</h3>
 
 <p>Here is an example of how your server.xml snippet should look to add lock out
