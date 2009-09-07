@@ -1621,6 +1621,7 @@ public class WebappClassLoader
                 "org/apache/catalina/loader/JdbcLeakPrevention.class");
         // Cheat - we know roughly how big the class will be (~1K) but allow
         // plenty room to grow
+        // TODO Let buffer grow as required
         byte[] classBytes = new byte[4096];
         int offset = 0;
         try {
