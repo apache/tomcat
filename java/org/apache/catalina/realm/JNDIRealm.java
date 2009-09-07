@@ -1021,6 +1021,7 @@ public class JNDIRealm extends RealmBase {
                             List<String> roles = getRoles(context, user);
                             if (containerLog.isDebugEnabled()) {
                                 Iterator<String> it = roles.iterator();
+                                // TODO: Use a single log message
                                 while (it.hasNext()) {
                                     containerLog.debug("Found role: " + it.next());
                                 }
@@ -1054,6 +1055,7 @@ public class JNDIRealm extends RealmBase {
             List<String> roles = getRoles(context, user);
             if (containerLog.isDebugEnabled()) {
                 Iterator<String> it = roles.iterator();
+                // TODO: Use a single log message
                 while (it.hasNext()) {
                     containerLog.debug("Found role: " + it.next());
                 }
