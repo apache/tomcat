@@ -369,8 +369,8 @@ public class Tomcat {
     }
 
     /**
-     * Get the server object. You can add listeners and 
-     * few more customizations.  
+     * Get the server object. You can add listeners and few more
+     * customizations. JNDI is disabled by default.  
      */
     public StandardServer getServer() {
         
@@ -527,6 +527,31 @@ public class Tomcat {
         Logger.getLogger(base).setLevel(Level.WARNING);
     }
     
+    /**
+     * Enables JNDI naming which is disabled by default.
+     */
+    public void enableNaming() {
+        // Make sure getServer() has been called as that is where naming is
+        // disabled
+        getServer();
+        
+        System.setProperty("catalina.useNaming", "true");
+        String value = "org.apache.naming";
+        String oldValue =
+            System.getProperty(javax.naming.Context.URL_PKG_PREFIXES);
+        if (oldValue != null) {
+            value = value + ":" + oldValue;
+        }
+        System.setProperty(javax.naming.Context.URL_PKG_PREFIXES, value);
+        value = System.getProperty
+            (javax.naming.Context.INITIAL_CONTEXT_FACTORY);
+        if (value == null) {
+            System.setProperty
+                (javax.naming.Context.INITIAL_CONTEXT_FACTORY,
+                 "org.apache.naming.java.javaURLContextFactory");
+        }
+    }
+
     /**
      * Provide default configuration for a context. This is the programmatic
      * equivalent of the default web.xml. 
