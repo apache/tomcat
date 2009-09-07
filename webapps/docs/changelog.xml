@@ -86,7 +86,7 @@
         session attribute serialization. (mturk)
       </fix>
       <update>
-        Improve JNDI realm compatability with Active Directory. (rjung)
+        Improve JNDI realm compatibility with Active Directory. (rjung)
       </update>
       <fix>
         Give session thisAccessedTime and lastAccessedTime clear semantics.
