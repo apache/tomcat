@@ -25,11 +25,15 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestTomcat extends TestTomcatBase {
@@ -42,8 +46,34 @@ public class TestTomcat extends TestTomcatBase {
         private static final long serialVersionUID = 1L;
 
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
-            throws IOException {
-          res.getWriter().write("Hello world");
+                throws IOException {
+            res.getWriter().write("Hello world");
+        }
+    }
+
+    /**
+     * Simple servlet to test iJNDI 
+     */
+    public static class HelloWorldJndi extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private static final String JNDI_ENV_NAME = "test";
+        
+        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+                throws IOException {
+            
+            String name = null;
+            
+            try {
+                Context initCtx = new InitialContext();
+                Context envCtx = (Context) initCtx.lookup("java:comp/env");
+                name = (String) envCtx.lookup(JNDI_ENV_NAME);
+            } catch (NamingException e) {
+                throw new IOException(e);
+            }
+            
+            res.getWriter().write("Hello, " + name);
         }
     }
 
@@ -96,7 +126,39 @@ public class TestTomcat extends TestTomcatBase {
         System.err.println("Test time: " + 
                 (System.currentTimeMillis() - t0));
      }
+
     
+    /** 
+     * Test for enabling JNDI.
+     */
+    public void testEnableNaming() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        StandardContext ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+        
+        // You can customise the context by calling its API
+        
+        // Enable JNDI - it is disabled by default
+        tomcat.enableNaming();
+
+        ContextEnvironment environment = new ContextEnvironment();
+        environment.setType("java.lang.String");
+        environment.setName(HelloWorldJndi.JNDI_ENV_NAME);
+        environment.setValue("Tomcat User");
+        ctx.getNamingResources().addEnvironment(environment);
+        
+        Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
+        ctx.addServletMapping("/", "jndiServlet");
+        
+        tomcat.start();
+        
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
+        assertEquals(res.toString(), "Hello, Tomcat User");
+    }
+
+
     /**
      *  Wrapper for getting the response.
      */
