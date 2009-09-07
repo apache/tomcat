@@ -277,7 +277,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      */
     void release() {
 
-        unregsiterJMX();
+        unregisterJMX();
         
         if (this.filter != null)
         {
@@ -331,7 +331,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
             // Release any previously allocated filter instance
             if (this.filter != null){
-                if( Globals.IS_SECURITY_ENABLED) {
+                if (Globals.IS_SECURITY_ENABLED) {
                     try{
                         SecurityUtil.doAsPrivilege("destroy", filter);
                     } catch(java.lang.Exception ex){
@@ -405,23 +405,23 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
             Registry.getRegistry(null, null).registerComponent(this, oname,
                     null);
         } catch (Exception ex) {
-            log.info(sm.getString("applicationFilterConfig.jmxRegsiterFail",
+            log.info(sm.getString("applicationFilterConfig.jmxRegisterFail",
                     getFilterClass(), getFilterName()), ex);
         }
     }
     
-    private void unregsiterJMX() {
+    private void unregisterJMX() {
         // unregister this component
         if (oname != null) {
             try {
                 Registry.getRegistry(null, null).unregisterComponent(oname);
-                if(log.isDebugEnabled())
+                if (log.isDebugEnabled())
                     log.debug(sm.getString(
-                            "applicationFilterConfig.jmxUnregsiter",
+                            "applicationFilterConfig.jmxUnregister",
                             getFilterClass(), getFilterName()));
             } catch(Exception ex) {
                 log.error(sm.getString(
-                        "applicationFilterConfig.jmxUnregsiterFail",
+                        "applicationFilterConfig.jmxUnregisterFail",
                         getFilterClass(), getFilterName()), ex);
             }
         }
