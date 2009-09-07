@@ -199,7 +199,7 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
 
     <attributes>
 
-      <attribute name="rmiRegsitryPortPlatform" required="true">
+      <attribute name="rmiRegistryPortPlatform" required="true">
         <p>The port to be used by the JMX/RMI registry for the Platform MBeans.
         The replaces the use of the
         <code>com.sun.management.jmxremote.port</code> system property that
