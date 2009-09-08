@@ -23,41 +23,26 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Enumeration;
 
-import org.apache.tomcat.util.res.StringManager;
-
 /**
- * This class is loaded by the  {@link WebappClassLoader} to enable it to
+ * This class is loaded by the {@link WebappClassLoader} to enable it to
  * deregister JDBC drivers forgotten by the web application. There are some
  * classloading hacks involved - see {@link WebappClassLoader#clearReferences()}
  * for details - but the short version is do not just create a new instance of
  * this class with the new keyword.
+ * 
+ * Since this class is loaded by {@link WebappClassLoader}, it can not refer to
+ * any internal Tomcat classes as that will cause the security manager to
+ * complain.
  */
 public class JdbcLeakPrevention {
 
-    /**
-     * The logger for this class.
-     */
-    protected static org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( JdbcLeakPrevention.class );
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-    public void clearJdbcDriverRegistrations() {
+    public void clearJdbcDriverRegistrations() throws SQLException {
         // Unregister any JDBC drivers loaded by the class loader that loaded
         // this class - ie the webapp class loader
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             Driver driver = drivers.nextElement();
-            try {
-                DriverManager.deregisterDriver(driver);
-            } catch (SQLException sqle) {
-                log.warn(sm.getString("jdbcLeakPrevention.jdbcRemoveFailed",
-                        driver.toString()), sqle);
-            }
+            DriverManager.deregisterDriver(driver);
         }
         
     }

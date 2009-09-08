@@ -1619,16 +1619,21 @@ public class WebappClassLoader
          */
         InputStream is = getResourceAsStream(
                 "org/apache/catalina/loader/JdbcLeakPrevention.class");
-        // Cheat - we know roughly how big the class will be (~1K) but allow
-        // plenty room to grow
-        // TODO Let buffer grow as required
-        byte[] classBytes = new byte[4096];
+        // We know roughly how big the class will be (~ 1K) so allow 2k as a
+        // starting point
+        byte[] classBytes = new byte[2048];
         int offset = 0;
         try {
-            int read = is.read(classBytes, offset, 4096-offset);
+            int read = is.read(classBytes, offset, classBytes.length-offset);
             while (read > -1) {
                 offset += read;
-                read = is.read(classBytes, offset, 4096-offset);
+                if (offset == classBytes.length) {
+                    // Buffer full - double size
+                    byte[] tmp = new byte[classBytes.length * 2];
+                    System.arraycopy(classBytes, 0, tmp, 0, classBytes.length);
+                    classBytes = tmp;
+                }
+                read = is.read(classBytes, offset, classBytes.length-offset);
             }
             Class<?> lpClass =
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
