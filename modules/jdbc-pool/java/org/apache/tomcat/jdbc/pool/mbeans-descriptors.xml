@@ -54,6 +54,7 @@
     <attribute    name="poolSweeperEnabled"
            description="Returns true if the pool has a background thread running"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="url"
@@ -69,11 +70,13 @@
     <attribute    name="defaultAutoCommit"
            description="The JDBC auto commit setting for new connections"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="defaultReadOnly"
            description="The JDBC read only setting for new connections"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="defaultTransactionIsolation"
@@ -124,16 +127,19 @@
     <attribute    name="testOnBorrow"
            description="True if validation happens when a connection is requested"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="testOnReturn"
            description="True if validation happens when a connection is returned"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="testWhileIdle"
            description="True if validation happens when a connection is not in use (idle)"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="timeBetweenEvictionRunsMillis"
@@ -154,11 +160,13 @@
     <attribute    name="accessToUnderlyingConnectionAllowed"
            description="Returns true if one can retrieve the actual JDBC connection"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="removeAbandoned"
            description="Returns true if connection in use can be timed out"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="removeAbandonedTimeout"
@@ -169,6 +177,7 @@
     <attribute    name="logAbandoned"
            description="If true, stack trace will be recorded and printed out for timed out connection"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="loginTimeout"
@@ -202,9 +211,10 @@
                   type="java.lang.String"
              writeable="false"/>
 
-    <attribute    name="isTestOnConnect"
+    <attribute    name="testOnConnect"
            description="Validate connection after connection has been established"
                   type="java.lang.Boolean"
+                    is="true"
              writeable="false"/>
 
     <attribute    name="jdbcInterceptors"
