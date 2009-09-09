@@ -81,7 +81,7 @@ mkdir $CATALINA_HOME/stimpyapps
        <code>$CATALINA_HOME/renapps/foobar.war</code>. Note that the
        default or ROOT context for <code>ren</code> would be deployed as
        <code>$CATALINA_HOME/renapps/ROOT.war</code> (WAR) or
-       <code>$CATALINA_HOME/renapps/ROOR</code> (directory).
+       <code>$CATALINA_HOME/renapps/ROOT</code> (directory).
       </p>
       <p><strong>NOTE: The <code>docBase</code> for a context should never be
         the same as the <code>appBase</code> for a host.</strong>
