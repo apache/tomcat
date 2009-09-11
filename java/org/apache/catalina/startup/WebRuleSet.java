@@ -167,9 +167,9 @@ public class WebRuleSet extends RuleSetBase {
                                "setFilterClass", 0);
         digester.addCallMethod(prefix + "web-app/filter/filter-name",
                                "setFilterName", 0);
-        digester.addCallMethod(prefix + "web-app/filter/large-icon",
+        digester.addCallMethod(prefix + "web-app/filter/icon/large-icon",
                                "setLargeIcon", 0);
-        digester.addCallMethod(prefix + "web-app/filter/small-icon",
+        digester.addCallMethod(prefix + "web-app/filter/icon/small-icon",
                                "setSmallIcon", 0);
         
         //spec right now only has an annotation, not XML but we will add it
@@ -471,8 +471,10 @@ public class WebRuleSet extends RuleSetBase {
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/service-ref/display-name",
                                "setDisplayname", 0);
-        digester.addCallMethod(prefix + "web-app/service-ref/icon",
-                               "setIcon", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/icon/large-icon",
+                               "setLargeIcon", 0);
+        digester.addCallMethod(prefix + "web-app/service-ref/icon/small-icon",
+                               "setSmallIcon", 0);
         digester.addCallMethod(prefix + "web-app/service-ref/service-ref-name",
                                "setName", 0);
         digester.addCallMethod(prefix + "web-app/service-ref/service-interface",
