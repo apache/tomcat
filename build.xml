@@ -92,9 +92,9 @@
   <property name="tomcat-dbcp.jar" value="${tomcat-dbcp.home}/tomcat-dbcp.jar"/>
   <property name="jasper-jdt.jar" value="${jasper-jdt.home}/jasper-jdt.jar"/>
 
-  <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-core.jar"/>
-  <property name="tomcat-embed-jasper.jar" value="${tomcat.embed}/tomcat-jasper.jar"/>
-  <property name="tomcat-embed-juli.jar" value="${tomcat.embed}/tomcat-juli.jar"/>
+  <property name="tomcat-embed-core.jar" value="${tomcat.embed}/tomcat-embed-core.jar"/>
+  <property name="tomcat-embed-jasper.jar" value="${tomcat.embed}/tomcat-embed-jasper.jar"/>
+  <property name="tomcat-embed-juli.jar" value="${tomcat.embed}/tomcat-embed-logging-juli.jar"/>
 
   <!-- Classpath -->
   <path id="tomcat.classpath">
