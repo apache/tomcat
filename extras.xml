@@ -74,7 +74,9 @@
   <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
 
   <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
-	
+
+  <property name="tomcat-embed-log4j.jar" value="${tomcat.embed}/tomcat-embed-logging-log4j.jar"/>
+
   <!-- Classpath -->
   <path id="tomcat.classpath">
     <pathelement location="${tomcat.classes}"/>
@@ -82,6 +84,7 @@
 
   <target name="prepare">
     <mkdir dir="${tomcat.extras}"/>
+    <mkdir dir="${tomcat.embed}"/>
   </target>
 
   <target name="clean" description="Delete the default output folders">
@@ -255,6 +258,34 @@
   
   <target name="extras" depends="prepare,commons-logging,webservices,jmx-remote"
   	      description="Build all extras packages">
+  </target>
+
+  <target name="embed" depends="extras"
+  	      description="Embedded packaging for those extras that can use it">
+
+    <jar jarfile="${tomcat-embed-log4j.jar}"
+         manifest="${tomcat.tmp}/default.manifest" >
+      <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
+        <include name="org/apache/juli/logging/*.class" /> 
+        <include name="org/apache/juli/logging/impl/*.class" /> 
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+      <fileset dir="${tomcat.classes}">
+        <include name="org/apache/juli/*" />
+        <!-- Javadoc and i18n exclusions -->
+        <exclude name="**/package.html" />
+        <exclude name="**/LocalStrings_*" />
+      </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
+    </jar>
+    <checksum file="${tomcat-embed-log4j.jar}"
+              forceOverwrite="yes" fileext=".md5" />
+
   </target>
 
   <!-- Download and dependency building -->
