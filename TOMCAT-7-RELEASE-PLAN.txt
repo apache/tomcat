@@ -28,7 +28,14 @@ $Id: $
    - Done
 
 3. Implement all the new Servlet 3 features
-   - Sections 1 to 6 - not checked
+   - Section 1 - Compliant
+   - Section 2 - In progress
+     2.1, 2.2 - Compliant
+     2.3.1, 2.3.2 - Compliant
+     2.3.3.1, 2.3.3.2 - Compliant
+     2.3.3.3, 2.3.3.4 - In progress
+     2.3.4 - Compliant
+   - Sections 3 to 6 - not checked
    - Section 7 - in progress
      7.1, 7.2, 7.3, 7.4, 7.5, 7.6 - Compliant
      7.7.1 - Compliant
@@ -45,6 +52,7 @@ $Id: $
            - annotation scanning
      8.3 - not checked
    - Sections 9 onwards - not checked
+   - Java EE spec requirements - not checked
 
 4. Do an alpha release (from trunk)
    - Create tc7.0.x\tags to hold release tags
