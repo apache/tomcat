@@ -54,10 +54,12 @@
   <property name="final-src.name"        value="${project}-${version}-src" />
 
   <!-- Build Defaults -->
+  <property name="tomcat.home"       value="${basedir}"/>
   <property name="tomcat.build"      value="${basedir}/output/build"/>
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
   <property name="tomcat.dist"       value="${basedir}/output/dist"/>
   <property name="tomcat.embed"      value="${basedir}/output/embed"/>
+  <property name="tomcat.tmp"        value="${basedir}/output/tmp"/>
   <property name="test.classes"      value="${basedir}/output/testclasses"/>
 
   <property name="compile.source" value="1.6"/>
@@ -290,130 +292,154 @@
   <macrodef name="jarIt" description="utility macro for standard JAR packaging">
     <attribute name="jarfile" description="the name of the JAR file to create"/>
     <attribute name="filesId" description="the patternset id of the files to use"/>
+    <attribute name="manifest" description="the manifest file use"/>
+    <attribute name="notice" description="the LICENSE file to use"/>
+    <attribute name="license" description="the NOTICE file to use"/>
     <sequential>
-        <jar  jarfile="@{jarfile}">
-          <fileset dir="${tomcat.classes}">
-            <patternset refid="@{filesId}"/>
-            <!-- Javadoc and i18n exclusions -->
-            <exclude name="**/package.html" />
-            <exclude name="**/LocalStrings_*" />
-          </fileset>
-        </jar>
+      <jar  jarfile="@{jarfile}" manifest="@{manifest}">
+        <fileset dir="${tomcat.classes}">
+          <patternset refid="@{filesId}"/>
+          <!-- Javadoc and i18n exclusions -->
+          <exclude name="**/package.html" />
+          <exclude name="**/LocalStrings_*" />
+        </fileset>
+      	<zipfileset file="@{notice}" fullpath="META-INF/NOTICE" />
+        <zipfileset file="@{license}" fullpath="META-INF/LICENSE" />
+      </jar>
     </sequential>
   </macrodef>
   
-  <target name="package" >
-    <!-- Common filtering tokens for JAR manifests-->
+  <target name="build-manifests" >
+    <!-- Filtering tokens for JAR manifests-->
     <filter token="source.jdk" value="${compile.source}"/>
     <filter token="target.jdk" value="${compile.target}"/>
+    <filter token="servlet.revision" value="${servlet.revision}"/>
+    <filter token="jsp.revision" value="${jsp.revision}"/>
 
+    <mkdir dir="${tomcat.tmp}" />
+    <copy todir="${tomcat.tmp}" overwrite="yes" filtering="yes"
+      encoding="ISO-8859-1">
+      <filterset refid="version.filters"/>
+      <fileset dir="res/META-INF" includes="*.manifest" />
+    </copy>
+    
+  </target>
+
+  <target name="package" depends="build-manifests" >
     <!-- Common Annotations 1.0 JAR File -->
-    <jarIt jarfile="${annotations-api.jar}" filesId="files.annotations-api"/>
+    <jarIt jarfile="${annotations-api.jar}" filesId="files.annotations-api"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Servlet 3.0 Implementation JAR File -->
-    <filter token="implementation.revision"
-            value="${servlet.revision}"/>
-    <copy tofile="res/manifest.tmp"
-          file="res/servlet-api.jar.manifest"
-          overwrite="yes"
-          filtering="true"
-          encoding="ISO-8859-1" />
-    <jar jarfile="${servlet-api.jar}"
-         manifest="res/manifest.tmp">
-      <fileset dir="res">
-        <include name="META-INF/**" />
-      </fileset>
-      <fileset dir="${tomcat.classes}">
-        <patternset refid="files.servlet-api"/>
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${servlet-api.jar}" filesId="files.servlet-api"
+      manifest="${tomcat.tmp}/servlet-api.jar.manifest"
+      notice="res/META-INF/servlet-api.jar.notice"
+      license="res/META-INF/servlet-api.jar.license" />
 
     <!-- JSP 2.1 Implementation JAR File -->
-    <filter token="implementation.revision"
-            value="${jsp.revision}"/>
-    <copy tofile="res/manifest.tmp"
-          file="res/jsp-api.jar.manifest"
-          overwrite="yes"
-          filtering="true"
-          encoding="ISO-8859-1" />
-    <jar  jarfile="${jsp-api.jar}"
-          manifest="res/manifest.tmp">
-      <fileset dir="res">
-        <include name="META-INF/**" />
-      </fileset>
-      <fileset dir="${tomcat.classes}">
-        <patternset refid="files.jsp-api"/>
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${jsp-api.jar}" filesId="files.jsp-api"
+      manifest="${tomcat.tmp}/jsp-api.jar.manifest"
+      notice="res/META-INF/servlet-api.jar.notice"
+      license="res/META-INF/servlet-api.jar.license" />
 
     <!-- JSP 2.1 EL Implementation JAR File -->
-    <jarIt jarfile="${el-api.jar}" filesId="files.el-api"/>
+    <jarIt jarfile="${el-api.jar}" filesId="files.el-api"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Bootstrap JAR File -->
-    <copy tofile="res/manifest.tmp"
-          file="res/bootstrap.jar.manifest"
-          overwrite="yes"
-          encoding="ISO-8859-1">
-      <filterset refid="version.filters"/>
-    </copy>
-    <jar jarfile="${bootstrap.jar}"
-        manifest="res/manifest.tmp">
-      <fileset dir="${tomcat.classes}">
-        <patternset refid="files.bootstrap"/>
-        <!-- Javadoc and i18n exclusions -->
-        <exclude name="**/package.html" />
-        <exclude name="**/LocalStrings_*" />
-      </fileset>
-    </jar>
+    <jarIt jarfile="${bootstrap.jar}" filesId="files.bootstrap"
+      manifest="${tomcat.tmp}/bootstrap.jar.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Tomcat-juli JAR File -->
-    <jarIt jarfile="${tomcat-juli.jar}" filesId="files.tomcat-juli"/>
+    <jarIt jarfile="${tomcat-juli.jar}" filesId="files.tomcat-juli"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Catalina Main JAR File -->
-    <jarIt jarfile="${catalina.jar}" filesId="files.catalina"/>
+    <jarIt jarfile="${catalina.jar}" filesId="files.catalina"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Catalina GroupCom/Tribes JAR File -->
-    <jarIt jarfile="${catalina-tribes.jar}" filesId="files.catalina-tribes"/>
+    <jarIt jarfile="${catalina-tribes.jar}" filesId="files.catalina-tribes"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Catalina Cluster/HA JAR File -->
-    <jarIt jarfile="${catalina-ha.jar}" filesId="files.catalina-ha"/>
+    <jarIt jarfile="${catalina-ha.jar}" filesId="files.catalina-ha"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Catalina Ant Tasks JAR File -->
-    <jarIt jarfile="${catalina-ant.jar}" filesId="files.catalina-ant"/>
+    <jarIt jarfile="${catalina-ant.jar}" filesId="files.catalina-ant"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Tomcat API JAR File -->
-    <jarIt jarfile="${tomcat-api.jar}" filesId="files.tomcat-api"/>
+    <jarIt jarfile="${tomcat-api.jar}" filesId="files.tomcat-api"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Protocol handlers - Coyote -->
-    <jarIt jarfile="${tomcat-coyote.jar}" filesId="files.tomcat-coyote"/>
+    <jarIt jarfile="${tomcat-coyote.jar}" filesId="files.tomcat-coyote"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Jasper Implementation JAR File -->
-    <jarIt jarfile="${jasper.jar}" filesId="files.jasper"/>
+    <jarIt jarfile="${jasper.jar}" filesId="files.jasper"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- Jasper EL Implementation JAR File -->
-    <jarIt jarfile="${jasper-el.jar}" filesId="files.jasper-el"/>
+    <jarIt jarfile="${jasper-el.jar}" filesId="files.jasper-el"
+      manifest="${tomcat.tmp}/default.manifest"
+      notice="res/META-INF/default.notice"
+      license="res/META-INF/default.license" />
 
     <!-- i18n JARs -->
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar">
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
+      manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_es.properties" />
       </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+      	fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+      	fullpath="META-INF/LICENSE" />
     </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar">
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-fr.jar"
+      manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_fr.properties" />
       </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
     </jar>
-    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar">
+    <jar jarfile="${tomcat.build}/lib/tomcat-i18n-ja.jar"
+      manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.classes}">
         <include name="**/LocalStrings_ja.properties" />
       </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
     </jar>
 
   </target>
@@ -660,7 +686,7 @@
   </target>
 
   <target name="embed" description="Create experimental embedded jars"
-    depends="build-prepare,compile" >
+    depends="build-prepare,build-manifests,compile" >
 
     <mkdir dir="${tomcat.embed}" />
   	
@@ -671,7 +697,9 @@
     <copy file="${jasper-jdt.jar}" todir="${tomcat.embed}" />
 
     <jarIt jarfile="${tomcat-embed-core.jar}"
-           filesId="files.tomcat-embed-core"/>
+           filesId="files.tomcat-embed-core"
+           notice="res/META-INF/default.notice"
+           license="res/META-INF/default.license"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesId="files.tomcat-embed-jasper"/>
     <jarIt jarfile="${tomcat-embed-juli.jar}"
@@ -726,6 +754,7 @@
   	      description="Delete the default output folders">
     <delete dir="${tomcat.classes}" />
     <delete dir="${tomcat.build}" />
+    <delete dir="${tomcat.tmp}" />
   </target>
 
   <!-- Download and dependency building -->
@@ -773,7 +802,8 @@
   </target>
 
   <target name="download"
-          description="Download (and build as necessary) dependent components">
+          description="Download (and build as necessary) dependent components"
+  	      depends="build-manifests">
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${tomcat-native.loc}"/>
@@ -890,22 +920,32 @@
       <include name="**" />
     </javac>
     <jar jarfile="${tomcat-dbcp.jar}"
-         index="true">
+         index="true"
+    	 manifest="${tomcat.tmp}/default.manifest">
       <fileset dir="${tomcat-dbcp.home}/classes">
         <include name="**/*.class" />
         <include name="**/*.properties" />
       </fileset>
+      <zipfileset file="${tomcat.home}/res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.home}/res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
     </jar>
   </target>
 
   <target name="build-jasper-jdt">
     <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
-    <jar destfile="${jasper-jdt.jar}" index="true">
+    <jar destfile="${jasper-jdt.jar}" index="true"
+    	 manifest="${tomcat.tmp}/default.manifest">
       <fileset dir="${jasper-jdt.home}">
         <include name="org/eclipse/jdt/core/compiler/**"/>
         <include name="org/eclipse/jdt/internal/compiler/**"/>
         <include name="org/eclipse/jdt/internal/core/util/CommentRecorder*"/>
       </fileset>
+      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="${tomcat.home}/res/META-INF/jasper-jdt.jar.license"
+        fullpath="META-INF/LICENSE" />
     </jar>
   </target>
 
