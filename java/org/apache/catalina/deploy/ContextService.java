@@ -51,16 +51,29 @@ public class ContextService extends ResourceBase implements Serializable {
     }
 
     /**
-     * An icon for this WebService.
+     * A large icon for this WebService.
      */
-    private String icon = null;
+    private String largeIcon = null;
 
-    public String getIcon() {
-        return (this.icon);
+    public String getLargeIcon() {
+        return (this.largeIcon);
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setLargeIcon(String largeIcon) {
+        this.largeIcon = largeIcon;
+    }
+
+    /**
+     * A small icon for this WebService.
+     */
+    private String smallIcon = null;
+
+    public String getSmallIcon() {
+        return (this.smallIcon);
+    }
+
+    public void setSmallIcon(String smallIcon) {
+        this.smallIcon = smallIcon;
     }
 
     /**
@@ -200,9 +213,13 @@ public class ContextService extends ResourceBase implements Serializable {
             sb.append(", displayname=");
             sb.append(displayname);
         }
-        if (icon != null) {
-            sb.append(", icon=");
-            sb.append(icon);
+        if (largeIcon != null) {
+            sb.append(", largeIcon=");
+            sb.append(largeIcon);
+        }
+        if (smallIcon != null) {
+            sb.append(", smallIcon=");
+            sb.append(smallIcon);
         }
         if (wsdlfile != null) {
             sb.append(", wsdl-file=");
