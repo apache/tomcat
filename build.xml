@@ -320,7 +320,7 @@
     <copy todir="${tomcat.tmp}" overwrite="yes" filtering="yes"
       encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
-      <fileset dir="res/META-INF" includes="*.manifest" />
+      <fileset dir="${tomcat.home}/res/META-INF" includes="*.manifest" />
     </copy>
     
   </target>
@@ -802,8 +802,7 @@
   </target>
 
   <target name="download"
-          description="Download (and build as necessary) dependent components"
-  	      depends="build-manifests">
+          description="Download (and build as necessary) dependent components" >
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${tomcat-native.loc}"/>
@@ -880,7 +879,7 @@
 
   </target>
 
-  <target name="build-tomcat-dbcp">
+  <target name="build-tomcat-dbcp" depends="build-manifests" >
     <copy todir="${tomcat-dbcp.home}">
       <fileset dir="${commons-pool.home}">
         <include name="**/*.java" />
@@ -933,7 +932,7 @@
     </jar>
   </target>
 
-  <target name="build-jasper-jdt">
+  <target name="build-jasper-jdt" depends="build-manifests" >
     <unjar src="${jdt.jar}" dest="${jasper-jdt.home}" />
     <jar destfile="${jasper-jdt.jar}" index="true"
     	 manifest="${tomcat.tmp}/default.manifest">
