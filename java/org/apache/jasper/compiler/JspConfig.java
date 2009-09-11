@@ -448,7 +448,7 @@ public class JspConfig {
         return false;
     }
 
-    static class JspPropertyGroup {
+    public static class JspPropertyGroup {
         private String path;
         private String extension;
         private JspProperty jspProperty;
