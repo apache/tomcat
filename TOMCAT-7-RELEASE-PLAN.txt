@@ -28,13 +28,23 @@ $Id: $
    - Done
 
 3. Implement all the new Servlet 3 features
-   - Sections 1 to 6    - not checked
+   - Sections 1 to 6 - not checked
    - Section 7 - in progress
      7.1, 7.2, 7.3, 7.4, 7.5, 7.6 - Compliant
      7.7.1 - Compliant
      7.7.2 - When is IAE thrown?
      7.7.3 - Compliant
-   - Sections 8 onwards - not checked
+   - Section 8 - in progress
+     8.1 - not checked
+     8.2 - in progress, plan as follows
+           - modify digester to parse to new classes
+           - configure Context & Jasper from new classes
+           - fragment scanning / parsing
+           - fragment ordering
+           - web(-fragment).xml merging code
+           - annotation scanning
+     8.3 - not checked
+   - Sections 9 onwards - not checked
 
 4. Do an alpha release (from trunk)
    - Create tc7.0.x\tags to hold release tags
