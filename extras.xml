@@ -57,7 +57,9 @@
   <property name="tomcat.build"      value="${basedir}/output/build"/>
   <property name="tomcat.classes"    value="${basedir}/output/classes"/>
   <property name="tomcat.dist"       value="${basedir}/output/dist"/>
+  <property name="tomcat.embed"      value="${basedir}/output/embed"/>
   <property name="tomcat.extras"     value="${basedir}/output/extras"/>
+  <property name="tomcat.tmp"        value="${basedir}/output/tmp"/>
   <property name="tomcat.deployer"   value="${basedir}/output/deployer"/>
   <property name="tomcat.release"    value="${basedir}/output/release"/>
   <property name="test.failonerror"  value="true"/>
@@ -129,7 +131,8 @@
   	     dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src"
   	     target="compile" />
   
-    <jar jarfile="${tomcat-juli.jar}">
+    <jar jarfile="${tomcat-juli.jar}"
+         manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
         <include name="org/apache/juli/logging/*.class" /> 
         <include name="org/apache/juli/logging/impl/LogFactoryImpl*.class" /> 
@@ -137,8 +140,6 @@
         <include name="org/apache/juli/logging/impl/SimpleLog*.class" /> 
         <include name="org/apache/juli/logging/impl/NoOpLog*.class" /> 
         <include name="org/apache/juli/logging/impl/Jdk14Logger.class" /> 
-        <include name="META-INF/LICENSE.txt" /> 
-        <include name="META-INF/NOTICE.txt" /> 
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
@@ -149,21 +150,28 @@
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
       </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
     </jar>
     <checksum file="${tomcat-juli.jar}"
               forceOverwrite="yes" fileext=".md5" />
 
-    <jar jarfile="${tomcat-juli-adapters.jar}">
+    <jar jarfile="${tomcat-juli-adapters.jar}"
+    	 manifest="${tomcat.tmp}/default.manifest" >
       <fileset dir="${tomcat.extras}/logging/commons-logging-${commons-logging-version}-src/target/classes">
         <include name="org/apache/juli/logging/impl/**.class" /> 
         <exclude name="org/apache/juli/logging/impl/WeakHashtable*.class" /> 
         <exclude name="org/apache/juli/logging/impl/LogFactoryImpl.class" /> 
-        <include name="META-INF/LICENSE.txt" /> 
-        <include name="META-INF/NOTICE.txt" /> 
         <!-- Javadoc and i18n exclusions -->
         <exclude name="**/package.html" />
         <exclude name="**/LocalStrings_*" />
       </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
     </jar>
     <checksum file="${tomcat-juli-adapters.jar}"
               forceOverwrite="yes" fileext=".md5" />
@@ -208,13 +216,18 @@
 	    </javac>
 	
 	    <!-- Catalina Main JAR File -->
-	    <jar jarfile="${catalina-ws.jar}">
+	    <jar jarfile="${catalina-ws.jar}"
+	    	 manifest="${tomcat.tmp}/default.manifest">
 	      <fileset dir="${tomcat.classes}">
             <include name="org/apache/naming/factory/webservices/**" />
 	        <!-- Javadoc and i18n exclusions -->
 	        <exclude name="**/package.html" />
 	        <exclude name="**/LocalStrings_*" />
 	      </fileset>
+          <zipfileset file="res/META-INF/default.notice"
+            fullpath="META-INF/NOTICE" />
+	      <zipfileset file="res/META-INF/default.license"
+	        fullpath="META-INF/LICENSE" />
 	    </jar>
         <checksum file="${catalina-ws.jar}"
               forceOverwrite="yes" fileext=".md5" />
@@ -224,10 +237,15 @@
   <target name="jmx-remote" depends="prepare"
 	      description="Build JMX remote extras package">
     <!-- Create the JAR file -->
-    <jar jarfile="${catalina-jmx-remote.jar}">
-	    <fileset dir="${tomcat.classes}">
+    <jar jarfile="${catalina-jmx-remote.jar}"
+    	manifest="${tomcat.tmp}/default.manifest" >
+      <fileset dir="${tomcat.classes}">
         <include name="org/apache/catalina/mbeans/JmxRemote*" />
-     </fileset>
+      </fileset>
+      <zipfileset file="res/META-INF/default.notice"
+        fullpath="META-INF/NOTICE" />
+      <zipfileset file="res/META-INF/default.license"
+        fullpath="META-INF/LICENSE" />
    </jar>
 
    <checksum file="${catalina-jmx-remote.jar}"

@@ -5,7 +5,7 @@ Specification-Title: Java API for JavaServer Pages
 Specification-Version: 2.1
 Specification-Vendor: Sun Microsystems, Inc.
 Implementation-Title: javax.servlet.jsp
-Implementation-Version: 2.1.@implementation.revision@
+Implementation-Version: 2.1.@jsp.revision@
 Implementation-Vendor: Apache Software Foundation
 X-Compile-Source-JDK: @source.jdk@
 X-Compile-Target-JDK: @target.jdk@
