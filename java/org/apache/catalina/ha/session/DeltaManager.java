@@ -112,7 +112,7 @@ public class DeltaManager extends ClusterManagerBase{
     private boolean expireSessionsOnShutdown = false;
     private boolean notifyListenersOnReplication = true;
     private boolean notifySessionListenersOnReplication = true;
-    private boolean stateTransfered = false ;
+    private volatile boolean stateTransfered = false ;
     private int stateTransferTimeout = 60;
     private boolean sendAllSessions = true;
     private boolean sendClusterDomainOnly = true ;
