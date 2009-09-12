@@ -20,7 +20,6 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -38,7 +37,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -57,11 +55,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.net.SecureNioChannel.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.jsse.NioX509KeyManager;
-import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ResizableExecutor;
-import org.apache.tomcat.util.threads.TaskQueue;
-import org.apache.tomcat.util.threads.TaskThreadFactory;
-import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * NIO tailored thread pool, providing the following services:
@@ -286,7 +279,6 @@ public class NioEndpoint extends AbstractEndpoint {
     @Override
     public boolean setProperty(String name, String value) {
         final String selectorPoolName = "selectorPool.";
-        final String socketName = "socket.";
         try {
             if (name.startsWith(selectorPoolName)) {
                 return IntrospectionUtils.setProperty(selectorPool, name.substring(selectorPoolName.length()), value);
