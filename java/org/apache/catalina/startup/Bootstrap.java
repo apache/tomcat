@@ -142,7 +142,7 @@ public final class Bootstrap {
                 }
             }
             if (replace && log.isDebugEnabled())
-                log.debug("Expanded " + before + " to " + replace);
+                log.debug("Expanded " + before + " to " + repository);
 
             // Check for a JAR URL repository
             try {
