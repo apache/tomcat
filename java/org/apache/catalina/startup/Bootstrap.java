@@ -146,7 +146,7 @@ public final class Bootstrap {
 
             // Check for a JAR URL repository
             try {
-                URL url=new URL(repository);
+                new URL(repository);
                 repositoryLocations.add(repository);
                 repositoryTypes.add(ClassLoaderFactory.IS_URL);
                 continue;
