@@ -495,15 +495,21 @@ values, depending on how you configured your keystore earlier:</p>
   </tr>
   <tr>
    <td><code>truststoreType</code></td>
-    <td>Add this element if your are using a different format for the 
-        TrustStore then you are using for the KeyStore.</td>
+   <td>Add this element if your are using a different format for the 
+       TrustStore then you are using for the KeyStore.</td>
   </tr>
   <tr>
    <td><code>keyAlias</code></td>
-    <td>Add this element if your have more than one key in the KeyStore.
-        If the element is not present the first key read in the KeyStore
-        will be used.</td>
+   <td>Add this element if your have more than one key in the KeyStore.
+       If the element is not present the first key read in the KeyStore
+       will be used.</td>
   </tr>
+  <tr>
+    <td><code>crlFile</code></td>
+    <td>The certificate revocation list file to use to validate client
+        certificates.</td>
+  </tr>
+  
 </table>
 
 <p>After completing these configuration changes, you must restart Tomcat as
