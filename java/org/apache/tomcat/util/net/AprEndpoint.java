@@ -17,12 +17,9 @@
 
 package org.apache.tomcat.util.net;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -38,11 +35,6 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
-import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ResizableExecutor;
-import org.apache.tomcat.util.threads.TaskQueue;
-import org.apache.tomcat.util.threads.TaskThreadFactory;
-import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * APR tailored thread pool, providing the following services:
