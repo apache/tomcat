@@ -777,6 +777,11 @@
       timeout. Use 0 to specify an unlimited timeout. If not specified, a
       default of 86400 (24 hours) is used.</p>
     </attribute>
+
+    <attribute name="crlFile" required="false">
+      <p>The certificate revocation list file to use to validate client
+      certificates.</p>
+    </attribute>
     
   </attributes>
 
