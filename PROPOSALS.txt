@@ -24,7 +24,7 @@ $Revision$ $Date$
 
 PATCHES PROPOSED FOR INCLUSION in 6.1.x:
   [ The alpha/beta branch that will be the basis of the stable 6.2.x releases ]
-  [ No date has been set for the creatation of a 6.1.x branch at this point ]
+  [ No date has been set for the creation of a 6.1.x branch at this point ]
   [ New proposals should be added at the end of the list ]
 
 
