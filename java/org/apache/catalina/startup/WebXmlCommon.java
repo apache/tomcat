@@ -57,6 +57,9 @@ public abstract class WebXmlCommon {
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    private static org.apache.juli.logging.Log log=
+        org.apache.juli.logging.LogFactory.getLog(WebXmlCommon.class);
+    
     // Required attribute of web-app element
     private String version = null;
     public String getVersion() { return version; }
@@ -71,7 +74,14 @@ public abstract class WebXmlCommon {
     // Optional name element
     private String name = null;
     public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        if (ORDER_OTHERS.equalsIgnoreCase(name)) {
+            // This is unusual. This name will be ignored. Log the fact.
+            log.warn(sm.getString("webXmlCommon.reservedName", name));
+        } else {
+            this.name = name;
+        }
+    }
 
     // web-app elements
     // TODO: Ignored elements:
