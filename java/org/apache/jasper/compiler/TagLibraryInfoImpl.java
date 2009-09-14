@@ -17,6 +17,7 @@
 
 package org.apache.jasper.compiler;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -111,20 +112,24 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
     // the following is a workaround until these problems are resolved.
     private InputStream getResourceAsStream(String uri)
             throws FileNotFoundException {
-        try {
-            // see if file exists on the filesystem first
-            String real = ctxt.getRealPath(uri);
-            if (real == null) {
+        // Is uri absolute?
+        if (uri.startsWith("file:")) {
+            return new FileInputStream(new File(uri.substring(5)));
+        } else {
+            try {
+                // see if file exists on the filesystem
+                String real = ctxt.getRealPath(uri);
+                if (real == null) {
+                    return ctxt.getResourceAsStream(uri);
+                } else {
+                    return new FileInputStream(real);
+                }
+            } catch (FileNotFoundException ex) {
+                // if file not found on filesystem, get the resource through
+                // the context
                 return ctxt.getResourceAsStream(uri);
-            } else {
-                return new FileInputStream(real);
             }
-        } catch (FileNotFoundException ex) {
-            // if file not found on filesystem, get the resource through
-            // the context
-            return ctxt.getResourceAsStream(uri);
         }
-
     }
 
     /**
