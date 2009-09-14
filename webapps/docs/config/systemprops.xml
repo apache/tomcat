@@ -325,6 +325,37 @@
 
 </section>
 
+<section name="Logging">
+
+  <properties>
+
+    <property name="org.apache.juli.AsyncOverflowDropType">
+      <p>When the memory limit of records has been reached the system needs to determine what action to take.
+         Currently there are three actions that can be taken:
+         <ul>
+           <li><code>int OVERFLOW_DROP_LAST = 1</code> - the record that caused the overflow will be dropped and not logged</li>
+           <li><code>int OVERFLOW_DROP_FIRST = 2</code> - the record that is next in line to be logged will be dropped to make room for the latest record on the queue</li>
+           <li><code>int OVERFLOW_DROP_FLUSH = 3</code> - suspend the thread while the queue empties out and flushes the entries to the write buffer</li>
+         </ul>
+         Default value is <code>1</code> (OVERFLOW_DROP_LAST).
+      </p>
+    </property>
+
+    <property name="org.apache.juli.AsyncMaxRecordCount">
+      <p>The max number of log records that the async logger will keep in memory. When this limit is reached and a new record is being logged by the 
+         JULI framework the system will take an action based on the <code>org.apache.juli.AsyncOverflowDropType</code> setting.
+         The default value is <code>1000</code> records
+      </p>
+    </property>
+
+    <property name="org.apache.juli.AsyncRecordBatchCount">
+      <p>
+      </p>
+    </property>
+
+  </properties>
+
+</section>
 
 <section name="Other">
 
