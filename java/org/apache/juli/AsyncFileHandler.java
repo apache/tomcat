@@ -30,7 +30,10 @@ public class AsyncFileHandler extends FileHandler {
 
     public static final int OVERFLOW_DROP_LAST = 1;
     public static final int OVERFLOW_DROP_FIRST = 2;
-    public static final int DEFAULT_MAX_RECORDS = 1000;
+    public static final int OVERFLOW_DROP_FLUSH = 3;
+    
+    public static final int OVERFLOW_DROP_TYPE = Integer.parseInt(System.getProperty("org.apache.juli.AsyncOverflowDropType","1"));
+    public static final int DEFAULT_MAX_RECORDS = Integer.parseInt(System.getProperty("org.apache.juli.AsyncMaxRecordCount","1000"));
     public static final int RECORD_BATCH_COUNT = Integer.parseInt(System.getProperty("org.apache.juli.AsyncRecordBatchCount","100"));
     
     protected static ConcurrentLinkedQueue<FileHandler> handlers = new ConcurrentLinkedQueue<FileHandler>();
@@ -42,7 +45,7 @@ public class AsyncFileHandler extends FileHandler {
     }
     
     protected LogQueue<LogRecord> queue = new LogQueue<LogRecord>();
-    protected boolean closed = false;
+    protected volatile boolean closed = false;
     
     public AsyncFileHandler() {
         this(null,null,null);
@@ -55,14 +58,18 @@ public class AsyncFileHandler extends FileHandler {
 
     @Override
     public void close() {
+        if (closed) return;
         closed = true;
         // TODO Auto-generated method stub
         super.close();
         handlers.remove(this);
+        //empty the queue of log entries for this log
+        while (queue.poll()!=null) recordCounter.addAndGet(-1);
     }
     
     @Override
     protected void open() {
+        if(!closed) return;
         closed = false;
         // TODO Auto-generated method stub
         super.open();
@@ -108,14 +115,22 @@ public class AsyncFileHandler extends FileHandler {
     protected static class SignalAtomicLong {
         AtomicLong delegate = new AtomicLong(0);
         ReentrantLock lock = new ReentrantLock();
-        Condition cond = lock.newCondition();
+        Condition sleepUntilPositiveCond = lock.newCondition();
+        Condition sleepUntilEmpty = lock.newCondition();
         
         public long addAndGet(long i) {
             long prevValue = delegate.getAndAdd(i);
             if (prevValue<=0 && i>0) {
                 lock.lock();
                 try {
-                    cond.signalAll();
+                    sleepUntilPositiveCond.signalAll();
+                } finally {
+                    lock.unlock();
+                }
+            } else if (prevValue>0 && delegate.get()<=0) {
+                lock.lock();
+                try {
+                    sleepUntilEmpty.signalAll();
                 } finally {
                     lock.unlock();
                 }
@@ -128,10 +143,22 @@ public class AsyncFileHandler extends FileHandler {
             lock.lock();
             try {
                 if (delegate.get()>0) return;
-                cond.await();
+                sleepUntilPositiveCond.await();
             } finally {
                 lock.unlock();
             }
+        }
+        
+        public void sleepUntilEmpty() throws InterruptedException {
+            if (delegate.get()<=0) return;
+            lock.lock();
+            try {
+                if (delegate.get()<=0) return;
+                sleepUntilPositiveCond.await();
+            } finally {
+                lock.unlock();
+            }
+            
         }
         
         public long get() {
@@ -171,7 +198,7 @@ public class AsyncFileHandler extends FileHandler {
     
     protected static class LogQueue<E> {
         protected int max = DEFAULT_MAX_RECORDS;
-        protected int type = OVERFLOW_DROP_LAST;
+        protected int type = OVERFLOW_DROP_TYPE;
         protected ConcurrentLinkedQueue<E> delegate = new ConcurrentLinkedQueue<E>(); 
         
         public boolean offer(E e) {
@@ -181,6 +208,19 @@ public class AsyncFileHandler extends FileHandler {
                         return false;
                     case OVERFLOW_DROP_FIRST: {
                         this.poll();
+                        if (delegate.offer(e)) {
+                            recordCounter.addAndGet(1);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                    case OVERFLOW_DROP_FLUSH: {
+                        try {
+                            recordCounter.sleepUntilEmpty();
+                        }catch (InterruptedException x) {
+                            //no op - simply continue the operation
+                        }
                         if (delegate.offer(e)) {
                             recordCounter.addAndGet(1);
                             return true;
