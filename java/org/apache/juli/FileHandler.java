@@ -96,6 +96,11 @@ public class FileHandler
      * The PrintWriter to which we are currently logging, if any.
      */
     private PrintWriter writer = null;
+    
+    /**
+     * Log buffer size
+     */
+    private int bufferSize = 8192;
 
 
     // --------------------------------------------------------- Public Methods
@@ -212,7 +217,12 @@ public class FileHandler
             prefix = getProperty(className + ".prefix", "juli.");
         if (suffix == null)
             suffix = getProperty(className + ".suffix", ".log");
-
+        String sBufferSize = getProperty(className + ".bufferSize", "8192");
+        try {
+            bufferSize = Integer.parseInt(sBufferSize);
+        } catch (NumberFormatException ignore) {
+            //no op
+        }
         // Get encoding for the logging file
         String encoding = getProperty(className + ".encoding", null);
         if (encoding != null && encoding.length() > 0) {
@@ -284,7 +294,7 @@ public class FileHandler
                 prefix + date + suffix;
             String encoding = getEncoding();
             OutputStream os = new BufferedOutputStream(new FileOutputStream(
-                    pathname, true));
+                    pathname, true),bufferSize);
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding)
                             : new OutputStreamWriter(os), true);
