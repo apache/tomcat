@@ -124,7 +124,7 @@ public class AsyncFileHandler extends FileHandler {
             while (run) {
                 try {
                     LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
-                    entry.flush();
+                    if (entry!=null) entry.flush();
                 }catch (InterruptedException x) {
                     Thread.interrupted();
                 }catch (Exception x) {
