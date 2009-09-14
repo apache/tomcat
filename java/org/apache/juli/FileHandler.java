@@ -144,7 +144,6 @@ public class FileHandler
         try {
             if (writer!=null) {
                 writer.write(result);
-                writer.flush();
             } else {
                 reportError("FileHandler is closed or not yet initialized, unable to log ["+result+"]", null, ErrorManager.WRITE_FAILURE);
             }
