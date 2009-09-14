@@ -103,6 +103,23 @@
       be used.</p>
     </property>
 
+    <property name="org.apache.jasper.compiler. TldLocationsCache.SCAN_ALL_FILES">
+      <p>When scanning the class path for TLDs, should Jasper scan all files
+      as if they are JAR files even if they do not have a .jar file extension?
+      This is intended for use in embedded environments where custom
+      classloaders allow for archives on the classpath with non-standard file
+      extensions. If not specified, the default value of <code>false</code> will
+      be used.</p>
+    </property>
+
+    <property name="org.apache.jasper.compiler. TldLocationsCache.SCAN_ALL_DIRS">
+      <p>When scanning the class path for TLDs, should Jasper scan all
+      directories as if they are unpacked JAR files? This is intended for use in
+      embedded environments where custom classloaders allow for directories
+      representing unpacked WAR files on the classpath. If not specified, the
+      default value of <code>false</code> will be used.</p>
+    </property>
+
     <property name="org.apache.jasper.runtime. BodyContentImpl.LIMIT_BUFFER">
       <p>If <code>true</code>, any tag buffer that expands beyond
       <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> will be
