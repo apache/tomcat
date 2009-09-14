@@ -17,10 +17,13 @@
 
 package org.apache.jasper.compiler;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -100,6 +103,16 @@ public class TldLocationsCache {
             System.getProperty(
                 "org.apache.jasper.compiler.TldLocationsCache.SCAN_CLASSPATH",
                 "true")).booleanValue();
+
+    private static final boolean SCAN_ALL_FILES = Boolean.valueOf(
+            System.getProperty(
+                "org.apache.jasper.compiler.TldLocationsCache.SCAN_ALL_FILES",
+                "false")).booleanValue();
+
+    private static final boolean SCAN_ALL_DIRS = Boolean.valueOf(
+            System.getProperty(
+                "org.apache.jasper.compiler.TldLocationsCache.SCAN_ALL_DIRS",
+                "false")).booleanValue();
 
     // Names of JARs that are known not to contain any TLDs
     private static HashSet<String> noTldJars;
@@ -478,10 +491,67 @@ public class TldLocationsCache {
             tldScanJar((JarURLConnection) conn);
         } else {
             String urlStr = url.toString();
-            if (urlStr.startsWith(FILE_PROTOCOL)
-                    && urlStr.endsWith(JAR_EXT)) {
-                URL jarURL = new URL("jar:" + urlStr + "!/");
-                tldScanJar((JarURLConnection) jarURL.openConnection());
+            if (urlStr.startsWith("file:")) {
+                if (urlStr.endsWith(JAR_EXT)) {
+                    URL jarURL = new URL("jar:" + urlStr + "!/");
+                    tldScanJar((JarURLConnection) jarURL.openConnection());
+                } else {
+                    File f;
+                    try {
+                        f = new File(url.toURI());
+                        if (f.isFile() && SCAN_ALL_FILES) {
+                            // Treat this file as a JAR
+                            URL jarURL = new URL("jar:" + urlStr + "!/");
+                            tldScanJar((JarURLConnection) jarURL.openConnection());
+                            tldScanJar((JarURLConnection) jarURL.openConnection());
+                        } else if (f.isDirectory() && SCAN_ALL_DIRS) {
+                            File metainf = new File(f.getAbsoluteFile() +
+                                    File.separator + "META-INF");
+                            if (metainf.isDirectory()) {
+                                tldScanDir(metainf);
+                            }
+                        }
+                    } catch (URISyntaxException e) {
+                        // Wrap the exception and re-throw
+                        IOException ioe = new IOException();
+                        ioe.initCause(e);
+                        throw ioe;
+                    }
+                }
+            }
+        }
+    }
+
+    /*
+     * Scans the directory identified by startPath, along with its
+     * sub-directories, for TLDs.
+     *
+     * Keep in sync with o.a.c.startup.TldConfig
+     */
+    private void tldScanDir(File start) throws IOException {
+
+        File[] fileList = start.listFiles();
+        if (fileList != null) {
+            for (int i = 0; i < fileList.length; i++) {
+                // Scan recursively
+                if (fileList[i].isDirectory()) {
+                    tldScanDir(fileList[i]);
+                } else if (fileList[i].getAbsolutePath().endsWith(TLD_EXT)) {
+                    InputStream stream = null;
+                    try {
+                        stream = new FileInputStream(fileList[i]);
+                        tldScanStream(
+                                fileList[i].toURI().toString(), null, stream);
+                    } finally {
+                        if (stream != null) {
+                            try {
+                                stream.close();
+                            } catch (Throwable t) {
+                                // do nothing
+                            }
+                        }
+                    }
+                }
             }
         }
     }
