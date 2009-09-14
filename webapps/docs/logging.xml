@@ -128,6 +128,8 @@
       boolean value.</li>
       <li>The root logger can define its set of handlers using a
       <code>.handlers</code> property.</li>
+      <li>Logging is buffered using a default buffer size of 8192 bytes.
+      To change buffersize, use the <code>bufferSize</code> property.</li>
       <li>System property replacement for property values which start with
       ${systemPropertyName}.</li>
     </ul>
@@ -163,6 +165,7 @@ handlers = 1catalina.org.apache.juli.FileHandler, \
 4admin.org.apache.juli.FileHandler.level = FINE
 4admin.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
 4admin.org.apache.juli.FileHandler.prefix = admin.
+4admin.org.apache.juli.FileHandler.bufferSize = 16384
 
 java.util.logging.ConsoleHandler.level = FINE
 java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
