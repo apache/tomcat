@@ -25,6 +25,8 @@ public interface ResizableExecutor extends Executor {
      */
     public int getPoolSize();
     
+    public int getMaxThreads();
+
     /**
      * {@link java.util.concurrent.ThreadPoolExecutor#getActiveCount()}
      * @return {@link java.util.concurrent.ThreadPoolExecutor#getActiveCount()}
