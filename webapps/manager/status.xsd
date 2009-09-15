@@ -55,7 +55,6 @@
 	<xs:complexType name="threadInfo">
 		<xs:attribute name="maxThreads" type="xs:int" use="required"/>
 		<xs:attribute name="minSpareThreads" type="xs:int" use="required"/>
-		<xs:attribute name="maxSpareThreads" type="xs:int" use="required"/>
 		<xs:attribute name="currentThreadCount" type="xs:int" use="required"/>
 		<xs:attribute name="currentThreadsBusy" type="xs:int" use="required"/>
 	</xs:complexType>

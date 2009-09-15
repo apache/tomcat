@@ -316,7 +316,7 @@ file installed with Tomcat.  It will look something like this:</p>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
 &lt;Connector 
-           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           port="8443" minSpareThreads="5"
            enableLookups="true" disableUploadTimeout="true" 
            acceptCount="100"  maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
@@ -332,7 +332,7 @@ file installed with Tomcat.  It will look something like this:</p>
 &lt;-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
 &lt;Connector 
-           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           port="8443" minSpareThreads="5"
            enableLookups="true" disableUploadTimeout="true" 
            acceptCount="100"  maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
@@ -351,7 +351,7 @@ file installed with Tomcat.  It will look something like this:</p>
 &lt;-- Define a blocking Java SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
 &lt;Connector protocol="org.apache.coyote.http11.Http11Protocol"
-           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           port="8443" minSpareThreads="5"
            enableLookups="true" disableUploadTimeout="true" 
            acceptCount="100"  maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
@@ -361,7 +361,7 @@ file installed with Tomcat.  It will look something like this:</p>
 &lt;-- Define a non-blocking Java SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
 &lt;Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
-           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           port="8443" minSpareThreads="5"
            enableLookups="true" disableUploadTimeout="true" 
            acceptCount="100"  maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
@@ -374,7 +374,7 @@ and to specify an APR connector
 &lt;-- Define a APR SSL Coyote HTTP/1.1 Connector on port 8443 --&gt;
 &lt;!--
 &lt;Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
-           port="8443" minSpareThreads="5" maxSpareThreads="75"
+           port="8443" minSpareThreads="5"
            enableLookups="true" disableUploadTimeout="true" 
            acceptCount="100"  maxThreads="200"
            scheme="https" secure="true" SSLEnabled="true"
