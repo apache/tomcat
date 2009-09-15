@@ -203,6 +203,8 @@ static unsigned long ssl_thread_id(void)
     } *psaptr = 0;
 
     return psaptr->PSATOLD;
+#elif defined(WIN32)
+    return (unsigned long)GetCurrentThreadId();
 #else
     return (unsigned long)(apr_os_thread_current());
 #endif
