@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 6.0" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+<project name="Tomcat 7.0" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <!--
     Built for using Maven 2.0.4
