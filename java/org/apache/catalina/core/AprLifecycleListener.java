@@ -58,9 +58,9 @@ public class AprLifecycleListener
 
     protected static final int TCN_REQUIRED_MAJOR = 1;
     protected static final int TCN_REQUIRED_MINOR = 1;
-    protected static final int TCN_REQUIRED_PATCH = 8;
+    protected static final int TCN_REQUIRED_PATCH = 17;
     protected static final int TCN_RECOMMENDED_MIN = 1;
-    protected static final int TCN_RECOMMENDED_PV = 16;
+    protected static final int TCN_RECOMMENDED_PV = 17;
 
 
     // ---------------------------------------------- Properties
