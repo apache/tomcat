@@ -543,13 +543,20 @@ public class Tomcat {
     };
     
     /**
-     * Sets the log level to WARN for the loggers that log information on
-     * Tomcat start up. This prevents the usual startup information being
-     * logged to the console.
+     * Controls if the loggers will be silenced or not.
+     * @param silent    <code>true</code> sets the log level to WARN for the
+     *                  loggers that log information on Tomcat start up. This
+     *                  prevents the usual startup information being logged.
+     *                  <code>false</code> sets the log level to the default
+     *                  level of INFO.
      */
-    public void setSilent() {
+    public void setSilent(boolean silent) {
         for (String s : silences) {
-            Logger.getLogger(s).setLevel(Level.WARNING);
+            if (silent) {
+                Logger.getLogger(s).setLevel(Level.WARNING);
+            } else {
+                Logger.getLogger(s).setLevel(Level.INFO);
+            }
         }
     }
     
