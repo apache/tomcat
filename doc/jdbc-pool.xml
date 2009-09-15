@@ -220,7 +220,7 @@
     </attribute>
 
     <attribute name="maxWait" required="false">
-      <p>(long) The maximum number of milliseconds that the pool will wait (when there are no available connections) 
+      <p>(int) The maximum number of milliseconds that the pool will wait (when there are no available connections) 
          for a connection to be returned before throwing an exception. 
          Default value is <code>30000</code> (30 seconds)</p>
     </attribute>
@@ -260,7 +260,7 @@
     </attribute>
     
     <attribute name="timeBetweenEvictionRunsMillis" required="false">
-      <p>(long) The number of milliseconds to sleep between runs of the idle connection validation/cleaner thread. 
+      <p>(int) The number of milliseconds to sleep between runs of the idle connection validation/cleaner thread. 
          This value should not be set under 1 second. It dictates how often we check for idle, abandoned connections, and how often 
          we validate idle connections.
          The default value is <code>5000</code> (5 seconds).</p>
@@ -271,7 +271,7 @@
     </attribute>
 
     <attribute name="minEvictableIdleTimeMillis" required="false">
-      <p>(long) The minimum amount of time an object may sit idle in the pool before it is eligable for eviction. 
+      <p>(int) The minimum amount of time an object may sit idle in the pool before it is eligible for eviction. 
          The default value is <code>60000</code> (60 seconds).</p>
     </attribute>
 
@@ -290,7 +290,7 @@
     </attribute>
 
     <attribute name="removeAbandonedTimeout" required="false">
-      <p>(long) Timeout in seconds before an abandoned(in use) connection can be removed. 
+      <p>(int) Timeout in seconds before an abandoned(in use) connection can be removed. 
          The default value is <code>60</code> (60 seconds). The value should be set to the longest running query your applications 
          might have.</p>
     </attribute>
