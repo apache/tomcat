@@ -74,8 +74,7 @@ public class Connector
         this(null);
     }
 
-    public Connector(String protocol)
-        throws Exception {
+    public Connector(String protocol) {
         setProtocol(protocol);
         // Instantiate protocol handler
         try {
