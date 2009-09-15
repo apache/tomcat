@@ -562,11 +562,60 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
 {
     tcn_socket_t *s   = J2P(sock, tcn_socket_t *);
     tcn_ssl_conn_t *con;
+    int retVal;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
     con = (tcn_ssl_conn_t *)s->opaque;
-    return SSL_renegotiate(con->ssl);
+
+    /* Sequence to renegotiate is
+     *  SSL_renegotiate()
+     *  SSL_do_handshake()
+     *  ssl->state = SSL_ST_ACCEPT
+     *  SSL_do_handshake()
+     */
+    retVal = SSL_renegotiate(con->ssl);
+    if (retVal <= 0)
+        return APR_EGENERAL;
+    
+    retVal = SSL_do_handshake(con->ssl);
+    if (retVal <= 0)
+        return APR_EGENERAL;
+
+    con->ssl->state = SSL_ST_ACCEPT;
+
+    retVal = SSL_do_handshake(con->ssl);
+    if (retVal <= 0)
+        return APR_EGENERAL;
+
+    return APR_SUCCESS;
+}
+
+TCN_IMPLEMENT_CALL(void, SSLSocket, setVerify)(TCN_STDARGS,
+                                               jlong sock,
+                                               jint cverify,
+                                               jint depth)
+{
+    tcn_socket_t *s   = J2P(sock, tcn_socket_t *);
+    tcn_ssl_conn_t *con;
+    int verify = SSL_VERIFY_NONE;
+
+    UNREFERENCED_STDARGS;
+    TCN_ASSERT(sock != 0);
+    con = (tcn_ssl_conn_t *)s->opaque;
+
+    if (cverify == SSL_CVERIFY_UNSET)
+        cverify = SSL_CVERIFY_NONE;
+    if (depth > 0)
+        SSL_set_verify_depth(con->ssl, depth);
+
+    if (cverify == SSL_CVERIFY_REQUIRE)
+        verify |= SSL_VERIFY_PEER_STRICT;
+    if ((cverify == SSL_CVERIFY_OPTIONAL) ||
+        (cverify == SSL_CVERIFY_OPTIONAL_NO_CA))
+        verify |= SSL_VERIFY_PEER;
+
+    SSL_set_verify(con->ssl, verify, NULL);
 }
 
 #else
