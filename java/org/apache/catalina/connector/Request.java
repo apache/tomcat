@@ -405,7 +405,7 @@ public class Request
     
 
     public void setAsyncSupported(boolean asyncSupported) {
-        asyncSupported = asyncSupported ? true : false;
+        this.asyncSupported = Boolean.valueOf(asyncSupported);
     }
 
     /**
