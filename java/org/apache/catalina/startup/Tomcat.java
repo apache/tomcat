@@ -194,14 +194,6 @@ public class Tomcat {
         return addContext(getHost(), contextPath, baseDir);
     }
 
-    public StandardWrapper addServlet(String contextPath, 
-                                      String servletName, 
-                                      String servletClass) {
-        Container ctx = getHost().findChild(contextPath);
-        return addServlet((StandardContext) ctx, 
-                servletName, servletClass);
-    }
-    
     /**
      * Equivalent with 
      *  <servlet><servlet-name><servlet-class>.
@@ -214,6 +206,26 @@ public class Tomcat {
      * You can customize the returned servlet, ex:
      * 
      *    wrapper.addInitParameter("name", "value");
+     *    
+     * @param contextPath   Context to add Servlet to
+     * @param servletName   Servlet name (used in mappings)
+     * @param servletClass  The class to be used for the Servlet
+     * @return The wrapper for the servlet
+     */
+    public StandardWrapper addServlet(String contextPath, 
+            String servletName, 
+            String servletClass) {
+        Container ctx = getHost().findChild(contextPath);
+        return addServlet((StandardContext) ctx, 
+                servletName, servletClass);
+    }
+
+    /**
+     * Static version of {@link #addServlet(String, String, String)
+     * @param ctx           Context to add Servlet to
+     * @param servletName   Servlet name (used in mappings)
+     * @param servletClass  The class to be used for the Servlet
+     * @return The wrapper for the servlet
      */
     public static StandardWrapper addServlet(StandardContext ctx, 
                                       String servletName, 
@@ -227,8 +239,28 @@ public class Tomcat {
         return sw;
     }
 
-    /** Use an existing servlet, no class.forName or initialization will be 
-     *  performed
+    /**
+     * Add an existing Servlet to the context with no class.forName or
+     * initialisation.
+     * @param contextPath   Context to add Servlet to
+     * @param servletName   Servlet name (used in mappings)
+     * @param servlet       The Servlet to add
+     * @return The wrapper for the servlet
+     */
+    public StandardWrapper addServlet(String contextPath, 
+            String servletName, 
+            Servlet servlet) {
+        Container ctx = getHost().findChild(contextPath);
+        return addServlet((StandardContext) ctx, 
+                servletName, servlet);
+    }
+
+    /**
+     * Static version of {@link #addServlet(String, String, Servlet).
+     * @param ctx           Context to add Servlet to
+     * @param servletName   Servlet name (used in mappings)
+     * @param servlet       The Servlet to add
+     * @return The wrapper for the servlet
      */
     public static StandardWrapper addServlet(StandardContext ctx,
                                       String servletName, 
@@ -558,6 +590,17 @@ public class Tomcat {
      * 
      *  TODO: in normal tomcat, if default-web.xml is not found, use this 
      *  method
+     *  
+     * @param contextPath   The context to set the defaults for
+     */
+    public void initWebappDefaults(String contextPath) {
+        Container ctx = getHost().findChild(contextPath);
+        initWebappDefaults((StandardContext) ctx);
+    }
+    
+    /**
+     * Static version of {@link #initWebappDefaults(String)
+     * @param ctx   The context to set the defaults for
      */
     public static void initWebappDefaults(StandardContext ctx) {
         // Default servlet 
@@ -593,10 +636,11 @@ public class Tomcat {
     }
 
     
-    /** Fix startup sequence - required if you don't use web.xml.
+    /**
+     * Fix startup sequence - required if you don't use web.xml.
      * 
-     *  The start() method in context will set 'configured' to false - and
-     *  expects a listener to set it back to true.
+     * The start() method in context will set 'configured' to false - and
+     * expects a listener to set it back to true.
      */
     public static class FixContextListener implements LifecycleListener {
 
@@ -631,7 +675,8 @@ public class Tomcat {
     }
 
 
-    /** Helper class for wrapping existing servlets. This disables servlet 
+    /**
+     * Helper class for wrapping existing servlets. This disables servlet 
      * lifecycle and normal reloading, but also reduces overhead and provide
      * more direct control over the servlet.  
      */
