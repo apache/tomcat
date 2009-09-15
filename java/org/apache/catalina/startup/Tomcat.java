@@ -33,6 +33,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Connector;
@@ -276,8 +277,9 @@ public class Tomcat {
     
     /**
      * Initialize and start the server.
+     * @throws LifecycleException 
      */
-    public void start() throws Exception {
+    public void start() throws LifecycleException {
         getServer();
         getConnector();
         server.initialize();
@@ -286,8 +288,9 @@ public class Tomcat {
 
     /** 
      * Stop the server.
+     * @throws LifecycleException 
      */
-    public void stop() throws Exception {
+    public void stop() throws LifecycleException {
         getServer().stop();
     }
 
@@ -325,7 +328,7 @@ public class Tomcat {
      * 
      * @return A connector object that can be customized
      */
-    public Connector getConnector() throws Exception {
+    public Connector getConnector() {
         getServer();
         if (connector != null) {
             return connector;
