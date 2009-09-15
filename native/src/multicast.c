@@ -22,7 +22,7 @@
 
 #include "tcn.h"
 
-TCN_IMPLEMENT_CALL(jint, Mulicast, join)(TCN_STDARGS,
+TCN_IMPLEMENT_CALL(jint, Multicast, join)(TCN_STDARGS,
                                          jlong sock, jlong join,
                                          jlong iface, jlong source)
 {
@@ -34,7 +34,7 @@ TCN_IMPLEMENT_CALL(jint, Mulicast, join)(TCN_STDARGS,
     return (jint)apr_mcast_join(s->sock, ja, ia, sa);
 };
 
-TCN_IMPLEMENT_CALL(jint, Mulicast, leave)(TCN_STDARGS,
+TCN_IMPLEMENT_CALL(jint, Multicast, leave)(TCN_STDARGS,
                                           jlong sock, jlong addr,
                                           jlong iface, jlong source)
 {
@@ -46,7 +46,7 @@ TCN_IMPLEMENT_CALL(jint, Mulicast, leave)(TCN_STDARGS,
     return (jint)apr_mcast_leave(s->sock, aa, ia, sa);
 };
 
-TCN_IMPLEMENT_CALL(jint, Mulicast, hops)(TCN_STDARGS,
+TCN_IMPLEMENT_CALL(jint, Multicast, hops)(TCN_STDARGS,
                                          jlong sock, jint ttl)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
@@ -54,7 +54,7 @@ TCN_IMPLEMENT_CALL(jint, Mulicast, hops)(TCN_STDARGS,
     return (jint)apr_mcast_hops(s->sock, (apr_byte_t)ttl);
 };
 
-TCN_IMPLEMENT_CALL(jint, Mulicast, loopback)(TCN_STDARGS,
+TCN_IMPLEMENT_CALL(jint, Multicast, loopback)(TCN_STDARGS,
                                              jlong sock, jboolean opt)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
@@ -65,7 +65,7 @@ TCN_IMPLEMENT_CALL(jint, Mulicast, loopback)(TCN_STDARGS,
     return (jint)apr_mcast_loopback(s->sock, on);
 };
 
-TCN_IMPLEMENT_CALL(jint, Mulicast, ointerface)(TCN_STDARGS,
+TCN_IMPLEMENT_CALL(jint, Multicast, ointerface)(TCN_STDARGS,
                                                jlong sock, jlong iface)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);

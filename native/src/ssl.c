@@ -859,6 +859,12 @@ TCN_IMPLEMENT_CALL(jboolean, SSL, randMake)(TCN_STDARGS, jstring file,
     return JNI_FALSE;
 }
 
+TCN_IMPLEMENT_CALL(void, SSL, randSet)(TCN_STDARGS, jstring file)
+{
+    UNREFERENCED_STDARGS;
+    UNREFERENCED(file);
+}
+
 TCN_IMPLEMENT_CALL(jlong, SSL, newBIO)(TCN_STDARGS, jlong pool,
                                        jobject callback)
 {

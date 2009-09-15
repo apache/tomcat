@@ -92,7 +92,7 @@ cleanup:
 
 TCN_IMPLEMENT_CALL(jlong, File, mktemp)(TCN_STDARGS, jstring templ,
                                       jint flags,
-                                      jint pool)
+                                      jlong pool)
 {
     apr_pool_t *p = J2P(pool, apr_pool_t *);
     apr_file_t *f = NULL;

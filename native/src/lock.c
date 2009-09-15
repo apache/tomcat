@@ -84,7 +84,7 @@ TCN_IMPLEMENT_CALL(jint, Lock, unlock)(TCN_STDARGS, jlong mutex)
     return (jint)apr_proc_mutex_unlock(m);
 }
 
-TCN_IMPLEMENT_CALL(jint, Lock, destoy)(TCN_STDARGS, jlong mutex)
+TCN_IMPLEMENT_CALL(jint, Lock, destroy)(TCN_STDARGS, jlong mutex)
 {
     apr_proc_mutex_t *m = J2P(mutex, apr_proc_mutex_t *);
 
@@ -192,7 +192,7 @@ TCN_IMPLEMENT_CALL(jint, Global, unlock)(TCN_STDARGS, jlong mutex)
     return (jint)apr_global_mutex_unlock(m);
 }
 
-TCN_IMPLEMENT_CALL(jint, Global, destoy)(TCN_STDARGS, jlong mutex)
+TCN_IMPLEMENT_CALL(jint, Global, destroy)(TCN_STDARGS, jlong mutex)
 {
     apr_global_mutex_t *m = J2P(mutex, apr_global_mutex_t *);
 
