@@ -117,10 +117,6 @@
           description="Maximum size in bytes of a POST which will be handled by the servlet API provided features"
                  type="int"/>
 
-    <attribute   name="maxSpareThreads"
-          description="The maximum number of unused request processing threads"
-                 type="int"/>
-
     <attribute   name="maxThreads"
           description="The maximum number of request processing threads to be created"
                  type="int"/>
