@@ -209,7 +209,19 @@ public abstract class AbstractEndpoint {
             }
         }
     }
-    public int getMaxThreads() { return maxThreads; }
+    public int getMaxThreads() {
+        if (running && executor!=null) {
+            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                return ((java.util.concurrent.ThreadPoolExecutor)executor).getMaximumPoolSize();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor)executor).getMaxThreads();
+            } else {
+                return -1;
+            }
+        } else {
+            return maxThreads;
+        }
+    }
 
     /**
      * Max keep alive requests 
