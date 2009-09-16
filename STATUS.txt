@@ -30,3 +30,7 @@ PATCHES ACCEPTED TO BACKPORT:
 
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
+
+* Add detection of the macosx jvm.
+  Backport from trunk
+  http://svn.eu.apache.org/viewvc?view=rev&revision=803803
