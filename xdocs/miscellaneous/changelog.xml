@@ -39,6 +39,9 @@
 <section name="Changes between 1.1.16 and 1.1.17">
   <changelog>
     <fix>
+      <bug>47852</bug>: Fix some Javadoc errors. Patch provided by Sebb. (rjung)
+    </fix>
+    <fix>
       <bug>46950</bug>: Fix SSL renegotiation in combination with client
       certificates. The complete solution also needs a fix in Tomcat's Java code. (markt)
     </fix>

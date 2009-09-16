@@ -554,7 +554,7 @@ public class Socket {
      * Set internal send ByteBuffer.
      * This function will preset internal Java ByteBuffer for
      * consecutive sendbb calls.
-     * @param thesocket The socket to use
+     * @param sock The socket to use
      * @param buf The ByteBuffer
      */
     public static native void setsbb(long sock, ByteBuffer buf);
@@ -563,7 +563,7 @@ public class Socket {
      * Set internal receive ByteBuffer.
      * This function will preset internal Java ByteBuffer for
      * consecutive revcvbb/recvbbt calls.
-     * @param thesocket The socket to use
+     * @param sock The socket to use
      * @param buf The ByteBuffer
      */
     public static native void setrbb(long sock, ByteBuffer buf);
@@ -573,13 +573,11 @@ public class Socket {
      * @param sock The currently open socket.
      * @param data The user data to associate with the socket.
      * @param key The key to associate with the data.
-     * @param cleanup The cleanup to call when the socket is destroyed.
      */
       public static native int dataSet(long sock, String key, Object data);
 
     /**
      * Return the data associated with the current socket
-     * @param data The user data associated with the socket.
      * @param key The key to associate with the user data.
      * @param sock The currently open socket.
      * @return Data or null in case of error.
