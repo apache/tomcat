@@ -494,7 +494,7 @@ TCN_IMPLEMENT_CALL(void, SSLContext, setRandom)(TCN_STDARGS, jlong ctx,
                                                 jstring file)
 {
     tcn_ssl_ctxt_t *c = J2P(ctx, tcn_ssl_ctxt_t *);
-    TCN_ALLOC_CSTRING(file);    
+    TCN_ALLOC_CSTRING(file);
 
     TCN_ASSERT(ctx != 0);
     UNREFERENCED(o);
