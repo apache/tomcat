@@ -170,6 +170,16 @@ public class Socket {
      *          made the connection request.  This is the socket which should
      *          be used for all future communication.
      */
+    public static native long acceptx(long sock, long pool)
+        throws Exception;
+
+    /**
+     * Accept a new connection request
+     * @param sock The socket we are listening on.
+     * @return  A copy of the socket that is connected to the socket that
+     *          made the connection request.  This is the socket which should
+     *          be used for all future communication.
+     */
     public static native long accept(long sock)
         throws Exception;
 

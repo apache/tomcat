@@ -32,7 +32,7 @@ public class Buffer {
      * @param size The amount of memory to allocate
      * @return The ByteBuffer with allocated memory
      */
-    public static native ByteBuffer alloc(int size);
+    public static native ByteBuffer malloc(int size);
 
     /**
      * Allocate a new ByteBuffer from memory and set all of the memory to 0
@@ -86,6 +86,6 @@ public class Buffer {
      * Returns the allocated memory size of the ByteBuffer.
      * @param buf Previously allocated ByteBuffer.
      */
-    public static native int size(ByteBuffer buf);
+    public static native long size(ByteBuffer buf);
 
 }

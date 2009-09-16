@@ -693,11 +693,30 @@ public class File {
     public static native int stat(FileInfo finfo, String fname, int wanted, long pool);
 
     /**
+     * Get the specified file's stats.  The file is specified by filename,
+     * instead of using a pre-opened file.
+     * @param fname The name of the file to stat.
+     * @param wanted The desired apr_finfo_t fields, as a bit flag of APR_FINFO_ values
+     * @param pool the pool to use to allocate the new file.
+     * @return FileInfo object.
+     */
+    public static native FileInfo getStat(String fname, int wanted, long pool);
+
+    /**
      * Get the specified file's stats.
      * @param finfo Where to store the information about the file.
      * @param wanted The desired apr_finfo_t fields, as a bit flag of APR_FINFO_ values
      * @param thefile The file to get information about.
      */
     public static native int infoGet(FileInfo finfo, int wanted, long thefile);
+
+
+    /**
+     * Get the specified file's stats.
+     * @param wanted The desired apr_finfo_t fields, as a bit flag of APR_FINFO_ values
+     * @param thefile The file to get information about.
+     * @return FileInfo object.
+     */
+    public static native FileInfo getInfo(int wanted, long thefile);
 
 }
