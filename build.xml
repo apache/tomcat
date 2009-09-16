@@ -22,20 +22,35 @@
     -->
     <property file="${user.home}/.ant.properties" />
     <property file="${user.home}/build.properties" />
-    <property file="build.properties" />
     <property file=".ant.properties" />
+    <property file="build.properties" />
+    <property file="build.properties.default"/>
 
     <!-- Initialization properties -->
-    <property name="name" value="Tomcat Native"/>
-    <property name="title" value="Tomcat Native Library"/>
-    <property name="version" value="1.0.0"/>
-    <property name="version.number" value="100"/>
-    <property name="project" value="tomcat-native"/>
+    <property name="project"               value="tomcat-native" />
+    <property name="name"                  value="Tomcat Native" />
+    <property name="title"                 value="Tomcat Native Library"/>
+    <property name="year"                  value="2009" />
+    <property name="version.major"         value="1" />
+    <property name="version.minor"         value="1" />
+    <property name="version.build"         value="17" />
+    <property name="version.patch"         value="0" />
+    <property name="version.suffix"        value="-dev" />
+
+    <property name="junit.home"            value="/usr/local/junit3.8"/>
+    <property name="junit.jar"             value="${junit.home}/junit.jar"/>
+    <property name="test.runner"           value="junit.textui.TestRunner"/>
+
+    <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
+    <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
+    <property name="version.major.minor"   value="${version.major}.${version.minor}" />
+
+    <property name="final.name"            value="${project}-${version}" />
+
     <property name="build.dir" value="./dist"/>
     <property name="build.src" value="${build.dir}/src"/>
     <property name="build.dest" value="${build.dir}/classes"/>
     <property name="src.dir" value="."/>
-    <property name="final.name" value="${project}-${version}"/>
     <property name="dist.root" value="./dist"/>
     <property name="ant.home" value="."/>
 
@@ -46,15 +61,13 @@
     <property name="docs.src" value="./xdocs"/>
     <property name="docs.dest" value="${dist.root}/doc"/>
     <property name="docs.dest.print" value="${dist.root}/doc/printable"/>
-    <property name="test.runner" value="junit.textui.TestRunner"/>
     <property name="test.dir" value="${build.dest}/test"/>
     <property name="examples.dir" value="${build.dest}/examples"/>
-    <property name="junit.home" value="/usr/local/junit3.8"/>
-    <property name="junit.jar" value="${junit.home}/junit.jar"/>
+
     <property name="tc.library.path" value="${basedir}/native/.libs"/>
 
-      <!-- The base directory for component sources -->
-      <property name="source.home"             value="java"/>
+    <!-- The base directory for component sources -->
+    <property name="source.home"             value="java"/>
 
     <!-- Build classpath -->
     <path id="classpath">
@@ -145,7 +158,7 @@ limitations under the License.--&gt;">
         <filter token="VERSION" value="${version}"/>
         <filter token="VERSION_NUMBER" value="${version.number}"/>
         <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
-        <copy todir="${build.src}/java" filtering="yes">
+        <copy todir="${build.src}/java" filtering="yes" encoding="ISO-8859-1">
             <fileset dir="${src.dir}/java">
                 <include name="**/*.java"/>
                 <include name="**/*.xml"/>
@@ -157,10 +170,11 @@ limitations under the License.--&gt;">
             destdir="${build.dest}/java"
             debug="${debug}"
             deprecation="${deprecation}"
-            optimize="${optimize}">
+            optimize="${optimize}"
+            encoding="ISO-8859-1">
             <classpath refid="classpath"/>
         </javac>
-        <copy todir="${build.dest}/java" filtering="yes">
+        <copy todir="${build.dest}/java" filtering="yes" encoding="ISO-8859-1">
             <fileset dir="${build.src}/java">
                 <include name="**/*.xml"/>
                 <include name="**/*.properties"/>
@@ -175,10 +189,11 @@ limitations under the License.--&gt;">
                destdir="${build.home}/classes"
                  debug="${compile.debug}"
            deprecation="${compile.deprecation}"
-              optimize="${compile.optimize}">
+              optimize="${compile.optimize}"
+              encoding="ISO-8859-1">
           <classpath refid="classpath"/>
         </javac>
-        <copy    todir="${build.home}/classes" filtering="on">
+        <copy    todir="${build.home}/classes" filtering="on" encoding="ISO-8859-1">
           <fileset dir="${source.home}" excludes="**/*.java"/>
         </copy>
       </target>
@@ -199,7 +214,7 @@ limitations under the License.--&gt;">
         <filter token="VERSION" value="${version}"/>
         <filter token="VERSION_NUMBER" value="${version.number}"/>
         <filter token="VERSION_BUILT" value="${TODAY} ${TSTAMP}"/>
-        <copy todir="${build.src}/examples" filtering="yes">
+        <copy todir="${build.src}/examples" filtering="yes" encoding="ISO-8859-1">
             <fileset dir="${src.dir}/examples">
                 <include name="**/*.java"/>
                 <include name="**/*.xml"/>
@@ -211,10 +226,11 @@ limitations under the License.--&gt;">
             destdir="${build.dest}/examples"
             debug="${debug}"
             deprecation="${deprecation}"
-            optimize="${optimize}">
+            optimize="${optimize}"
+            encoding="ISO-8859-1">
             <classpath refid="examples.classpath"/>
         </javac>
-        <copy todir="${build.dest}/examples" filtering="yes">
+        <copy todir="${build.dest}/examples" filtering="yes" encoding="ISO-8859-1">
             <fileset dir="${build.src}/examples">
                 <include name="**/*.xml"/>
                 <include name="**/*.properties"/>
@@ -251,7 +267,7 @@ limitations under the License.--&gt;">
     <target name="compile-tests" depends="compile">
         <mkdir dir="${build.dest}/test"/>
         <mkdir dir="${build.src}/test"/>
-        <copy todir="${build.src}/test" filtering="yes">
+        <copy todir="${build.src}/test" filtering="yes" encoding="ISO-8859-1">
             <fileset dir="${src.dir}/test">
                 <include name="**/*.java"/>
                 <include name="**/*.xml"/>
@@ -262,8 +278,8 @@ limitations under the License.--&gt;">
             destdir="${build.dest}/test"
             debug="on"
             deprecation="${deprecation}"
-            optimize="${optimize}">
-
+            optimize="${optimize}"
+            encoding="ISO-8859-1">
             <classpath refid="test.classpath"/>
         </javac>
     </target>
@@ -295,7 +311,7 @@ limitations under the License.--&gt;">
     <target name="compile-examples" depends="compile">
         <mkdir dir="${build.dest}/examples"/>
         <mkdir dir="${build.src}/examples"/>
-        <copy todir="${build.src}/examples" filtering="yes">
+        <copy todir="${build.src}/examples" filtering="yes" encoding="ISO-8859-1">
             <fileset dir="${src.dir}/examples">
                 <include name="**/*.java"/>
                 <include name="**/*.xml"/>
@@ -306,8 +322,8 @@ limitations under the License.--&gt;">
             destdir="${build.dest}/examples"
             debug="${debug}"
             deprecation="${deprecation}"
-            optimize="${optimize}">
-
+            optimize="${optimize}"
+            encoding="ISO-8859-1">
             <classpath refid="examples.classpath"/>
         </javac>
     </target>
