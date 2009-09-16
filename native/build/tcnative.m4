@@ -164,7 +164,7 @@ dnl           AC_MSG_CHECKING([${GUESS}])
     fi
 
     AC_ARG_WITH(java-platform,
-     [  --with-java-platform[=2] Force the Java platorm
+     [  --with-java-platform[=2] Force the Java platform
                                  (value is 1 for 1.1.x or 2 for 1.2.x or greater)],
      [
         case "${withval}" in
