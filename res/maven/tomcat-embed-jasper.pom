@@ -17,38 +17,14 @@
 -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.tomcat</groupId>
-  <artifactId>catalina-ha</artifactId>
+  <groupId>org.apache.tomcat.embed</groupId>
+  <artifactId>tomcat-embed-jasper</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat High Availability Implementation</description>
+  <description>Core Tomcat implementation</description>
   <dependencies>
     <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>coyote</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>juli</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tribes</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>catalina</artifactId>
+      <groupId>org.apache.tomcat.embed</groupId>
+      <artifactId>tomcat-embed-core</artifactId>
       <version>@MAVEN.DEPLOY.VERSION@</version>
       <scope>compile</scope>
     </dependency>

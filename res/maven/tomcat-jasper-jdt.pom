@@ -17,24 +17,8 @@
 -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.tomcat.embed</groupId>
-  <artifactId>core</artifactId>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>tomcat-jasper-jdt</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Core Tomcat implementation</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>logging-juli</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>logging-log4j</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
-</project>
+  <description>Jasper javac compiler extension for Eclipse JDT</description>
+</project> 

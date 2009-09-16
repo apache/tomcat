@@ -17,14 +17,32 @@
 -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.tomcat.embed</groupId>
-  <artifactId>jasper</artifactId>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>tomcat-catalina</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Core Tomcat implementation</description>
+  <description>Tomcat Servlet Engine Core Classes and Standard implementations</description>
   <dependencies>
     <dependency>
-      <groupId>org.apache.tomcat.embed</groupId>
-      <artifactId>core</artifactId>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-servlet-api</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-annotations-api</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-api</artifactId>
       <version>@MAVEN.DEPLOY.VERSION@</version>
       <scope>compile</scope>
     </dependency>

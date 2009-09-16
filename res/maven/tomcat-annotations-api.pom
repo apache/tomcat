@@ -17,8 +17,8 @@
 -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.tomcat.embed</groupId>
-  <artifactId>logging-log4j</artifactId>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>tomcat-annotations-api</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>log4j logging implementation for embedded Tomcat</description>
+  <description>Annotations Package</description>
 </project>

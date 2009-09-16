@@ -18,39 +18,19 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>catalina</artifactId>
+  <artifactId>tomcat-jsp-api</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat Servlet Engine Core Classes and Standard implementations</description>
+  <description>JSP package</description>
   <dependencies>
-    <!--
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>coyote</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    -->
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>tomcat-el-api</artifactId>
       <version>@MAVEN.DEPLOY.VERSION@</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
-      <artifactId>juli</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>annotations-api</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>tomcat-api</artifactId>
+      <artifactId>tomcat-servlet-api</artifactId>
       <version>@MAVEN.DEPLOY.VERSION@</version>
       <scope>compile</scope>
     </dependency>
