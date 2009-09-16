@@ -105,7 +105,7 @@ JKJNIDIST=tomcat-native-${JKJNIVER}-src
 
 rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
-for i in native java xdocs examples test build.xml build.properties.sample
+for i in native java xdocs examples test build.xml build.properties.default
 do
     svn export $SVNBASE/${JKJNIEXT}/jni/${i} ${JKJNIDIST}/jni/${i}
     if [ $? -ne 0 ]; then
