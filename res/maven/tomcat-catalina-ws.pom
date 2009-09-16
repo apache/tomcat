@@ -18,7 +18,15 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>dbcp</artifactId>
+  <artifactId>tomcat-catalina-ws</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat Database Connection Pooling package</description>
+  <description>Tomcat Remote JMX listener</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-catalina</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 </project>
