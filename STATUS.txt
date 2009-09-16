@@ -31,11 +31,6 @@ PATCHES ACCEPTED TO BACKPORT:
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Fix typo. Second hunk of
-  http://svn.apache.org/viewvc/tomcat/connectors/trunk/jni/java/org/apache/tomcat/jni/SSLContext.java?r1=466585&r2=730523
-  +1: rjung
-  -1:
-
 * Fix typo Mulicast -> Multicast.
   http://svn.eu.apache.org/viewvc/tomcat/connectors/trunk/jni/native/src/multicast.c?r1=525493&r2=730523
   +1: rjung
