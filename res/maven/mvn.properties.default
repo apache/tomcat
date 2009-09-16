@@ -37,7 +37,7 @@ maven.bin=mvn.bat
 #Maven snapshot properties
 maven.snapshot.repo.url=scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository
 maven.snapshot.repo.repositoryId=apache.snapshots
-maven.snapshot.deploy.version=7.0.0
+maven.snapshot.deploy.version=7.0.0-SNAPSHOT
 
 #Maven release properties for Tomcat staging
 maven.release.repo.url=scp://people.apache.org/www/tomcat.apache.org/dev/dist/m2-repository
