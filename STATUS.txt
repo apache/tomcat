@@ -31,11 +31,6 @@ PATCHES ACCEPTED TO BACKPORT:
 PATCHES PROPOSED TO BACKPORT:
   [ New proposals should be added at the end of the list ]
 
-* Fix typo Mulicast -> Multicast.
-  http://svn.eu.apache.org/viewvc/tomcat/connectors/trunk/jni/native/src/multicast.c?r1=525493&r2=730523
-  +1: rjung
-  -1:
-
 * Backport remaining parts of
   http://svn.eu.apache.org/viewvc?view=rev&revision=730523
   I separated the non typo parts at

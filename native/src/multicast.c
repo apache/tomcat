@@ -23,8 +23,8 @@
 #include "tcn.h"
 
 TCN_IMPLEMENT_CALL(jint, Multicast, join)(TCN_STDARGS,
-                                         jlong sock, jlong join,
-                                         jlong iface, jlong source)
+                                          jlong sock, jlong join,
+                                          jlong iface, jlong source)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_sockaddr_t *ja = J2P(join, apr_sockaddr_t *);
@@ -35,8 +35,8 @@ TCN_IMPLEMENT_CALL(jint, Multicast, join)(TCN_STDARGS,
 };
 
 TCN_IMPLEMENT_CALL(jint, Multicast, leave)(TCN_STDARGS,
-                                          jlong sock, jlong addr,
-                                          jlong iface, jlong source)
+                                           jlong sock, jlong addr,
+                                           jlong iface, jlong source)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_sockaddr_t *aa = J2P(addr, apr_sockaddr_t *);
@@ -47,7 +47,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, leave)(TCN_STDARGS,
 };
 
 TCN_IMPLEMENT_CALL(jint, Multicast, hops)(TCN_STDARGS,
-                                         jlong sock, jint ttl)
+                                          jlong sock, jint ttl)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     UNREFERENCED_STDARGS;
@@ -55,7 +55,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, hops)(TCN_STDARGS,
 };
 
 TCN_IMPLEMENT_CALL(jint, Multicast, loopback)(TCN_STDARGS,
-                                             jlong sock, jboolean opt)
+                                              jlong sock, jboolean opt)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_byte_t on = 0;
@@ -66,7 +66,7 @@ TCN_IMPLEMENT_CALL(jint, Multicast, loopback)(TCN_STDARGS,
 };
 
 TCN_IMPLEMENT_CALL(jint, Multicast, ointerface)(TCN_STDARGS,
-                                               jlong sock, jlong iface)
+                                                jlong sock, jlong iface)
 {
     tcn_socket_t *s = J2P(sock, tcn_socket_t *);
     apr_sockaddr_t *ia = J2P(iface, apr_sockaddr_t *);
