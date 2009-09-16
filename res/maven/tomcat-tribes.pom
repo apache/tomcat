@@ -17,8 +17,16 @@
 -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.tomcat.embed</groupId>
-  <artifactId>logging-juli</artifactId>
+  <groupId>org.apache.tomcat</groupId>
+  <artifactId>tomcat-tribes</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>JULI logging implementation for embedded Tomcat</description>
-</project>
+  <description>Tomcat Group Communication Package</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-juli</artifactId>
+      <version>@MAVEN.DEPLOY.VERSION@</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+</project> 

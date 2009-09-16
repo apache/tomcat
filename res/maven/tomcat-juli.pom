@@ -18,15 +18,7 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.tomcat</groupId>
-  <artifactId>catalina-ws</artifactId>
+  <artifactId>tomcat-juli</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>Tomcat Remote JMX listener</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>catalina</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
+  <description>Tomcat Core Logging Package</description>
 </project>
