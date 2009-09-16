@@ -79,7 +79,6 @@ public class Poll {
      * descriptor is signalled in apr_pollset_poll().
      * @param pollset The pollset to which to add the descriptor
      * @param sock The sockets to add
-     * @param data Client data to add
      * @param reqevents requested events
      */
     public static native int add(long pollset, long sock,

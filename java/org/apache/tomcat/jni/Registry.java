@@ -56,7 +56,8 @@ public class Registry {
      * Create or open a Registry Key.
      * @param name Registry Subkey to open
      * @param root Root key, one of HKEY_*
-     * @param som Access mask that specifies the access rights for the key.
+     * @param sam Access mask that specifies the access rights for the key.
+     * @param pool Pool used for native memory allocation
      * @return Opened Registry key
      */
     public static native long create(int root, String name, int sam, long pool)
@@ -66,7 +67,8 @@ public class Registry {
      * Opens the specified Registry Key.
      * @param name Registry Subkey to open
      * @param root Root key, one of HKEY_*
-     * @param som Access mask that specifies the access rights for the key.
+     * @param sam Access mask that specifies the access rights for the key.
+     * @param pool Pool used for native memory allocation
      * @return Opened Registry key
      */
     public static native long open(int root, String name, int sam, long pool)
@@ -197,7 +199,6 @@ public class Registry {
     /**
      * Enumerate the Registry subkeys
      * @param key The Registry key descriptor to use.
-     * @param name The name of the value to query
      * @return Array of all subkey names
      */
     public static native String[] enumKeys(long key)
@@ -206,7 +207,6 @@ public class Registry {
     /**
      * Enumerate the Registry values
      * @param key The Registry key descriptor to use.
-     * @param name The name of the value to query
      * @return Array of all value names
      */
     public static native String[] enumValues(long key)
