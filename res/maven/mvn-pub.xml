@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 7.0" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+<project name="Tomcat 7.0 Maven Deployment" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
 
   <!--
     Built for using Maven 2.0.4
@@ -119,44 +119,76 @@
   
   <macrodef name="doMavenDeploy">
     <attribute name="artifactId"/>
-    <attribute name="jarFileName" default="@{artifactId}.jar" description="only need to be specified if not same as artifactId"/>
+    <attribute name="jarFileName" default="@{artifactId}.jar" />
+    <attribute name="groupId" default="org.apache.tomcat" />
+    <attribute name="file" default="${tomcat.lib.path}/@{jarFileName}" />
+    <attribute name="pom" default="@{artifactId}.pom" />
+  	<!-- How to handle sources ? -->
+    <attribute name="src" default="NONE" />
     <sequential>
       <antcall target="maven-deploy">
-        <param name="file" value="${tomcat.lib.path}/@{jarFileName}"/>
-        <param name="groupId" value="org.apache.tomcat"/>
+        <param name="file" value="@{file}"/>
+        <param name="groupId" value="@{groupId}"/>
         <param name="artifactId" value="@{artifactId}"/>
-        <param name="pom" value="${tomcat.pom.path}/@{artifactId}.pom"/>
+        <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
       </antcall>
     </sequential>
   </macrodef>
   
   <target name="generic-deploy" depends="init-maven">
-    <doMavenDeploy artifactId="annotations-api"/> <!--Deploy annotations-->
-    <doMavenDeploy artifactId="servlet-api"/> <!--Deploy Servlet api-->
-    <doMavenDeploy artifactId="el-api"/> <!--Deploy expression lanaguage api-->
-    <doMavenDeploy artifactId="jsp-api"/> <!--Deploy JSP api-->
-    <doMavenDeploy artifactId="tomcat-api" /> <!--Deploy Tomcat api-->
-    <doMavenDeploy artifactId="juli" jarFileName="tomcat-juli.jar"/> <!--Deploy JULI-->
-    <doMavenDeploy artifactId="tribes" jarFileName="catalina-tribes.jar"/> <!--Deploy Tribes-->
-    <doMavenDeploy artifactId="jasper-el"/> <!--Deploy Jasper EL-->
-    <doMavenDeploy artifactId="jasper-jdt"/> <!--Deploy Jasper JDT-->
-    <doMavenDeploy artifactId="coyote" jarFileName="tomcat-coyote.jar"/> <!--Deploy Coyote-->
-    <doMavenDeploy artifactId="catalina"/> <!--Deploy Catalina-->
-    <doMavenDeploy artifactId="catalina-ha"/> <!--Deploy Catalina-HA-->
-    <doMavenDeploy artifactId="jasper"/> <!--Deploy Jasper -->
-    <doMavenDeploy artifactId="dbcp" jarFileName="tomcat-dbcp.jar"/> <!--Deploy DBCP-->
-    <antcall target="maven-deploy"><!--Deploy Extras Juli-->
-      <param name="file" value="${tomcat.extras.path}/tomcat-juli.jar"/>
-      <param name="groupId" value="org.apache.tomcat.extras"/>
-      <param name="artifactId" value="juli"/>
-      <param name="pom" value="${tomcat.pom.path}/juli-extras.pom"/>
-    </antcall>
-    <antcall target="maven-deploy"><!--Deploy Extras Juli Adapters-->
-      <param name="file" value="${tomcat.extras.path}/tomcat-juli-adapters.jar"/>
-      <param name="groupId" value="org.apache.tomcat.extras"/>
-      <param name="artifactId" value="juli-adapters"/>
-      <param name="pom" value="${tomcat.pom.path}/juli-adapters.pom"/>
-    </antcall>
+  	<!-- Standard jars in bin directory -->
+  	<!-- Skip bootstrap.jar - it is just a subset of catalina.jar -->
+  	<doMavenDeploy artifactId="juli" file="${tomcat.bin.path}/tomcat-juli.jar"/>
+  	    
+  	<!-- Standard jars in lib directory -->
+  	<doMavenDeploy artifactId="annotations-api"/>
+  	<doMavenDeploy artifactId="catalina"/>
+    <doMavenDeploy artifactId="catalina-ant"/>
+    <doMavenDeploy artifactId="catalina-ha"/>
+    <doMavenDeploy artifactId="tribes" jarFileName="catalina-tribes.jar"/>
+    <doMavenDeploy artifactId="el-api"/>
+    <doMavenDeploy artifactId="jasper"/>
+    <doMavenDeploy artifactId="jasper-el"/>
+    <doMavenDeploy artifactId="jasper-jdt"/>
+    <doMavenDeploy artifactId="jsp-api"/>
+    <doMavenDeploy artifactId="servlet-api"/>
+    <doMavenDeploy artifactId="tomcat-api" />
+    <doMavenDeploy artifactId="coyote" jarFileName="tomcat-coyote.jar"/>
+    <doMavenDeploy artifactId="dbcp" jarFileName="tomcat-dbcp.jar"/>
+    <doMavenDeploy artifactId="tomcat-i18n-es" />
+    <doMavenDeploy artifactId="tomcat-i18n-fr" />
+    <doMavenDeploy artifactId="tomcat-i18n-ja" />
+
+    <!-- Extras jars -->
+    <doMavenDeploy artifactId="juli" groupId="org.apache.tomcat.extras"
+    	file="${tomcat.extras.path}/tomcat-juli.jar" pom="juli-extras.pom"/>
+    <doMavenDeploy artifactId="juli-adapters" groupId="org.apache.tomcat.extras"
+        file="${tomcat.extras.path}/tomcat-juli-adapters.jar" />
+    <doMavenDeploy artifactId="catalina-jmx-remote"
+    	groupId="org.apache.tomcat.extras"
+        file="${tomcat.extras.path}/catalina-jmx-remote.jar" />
+    <doMavenDeploy artifactId="catalina-ws" groupId="org.apache.tomcat.extras"
+        file="${tomcat.extras.path}/catalina-ws.jar" />
+  	
+  	<!-- Emedded jars -->
+  	<!-- Skip DBCP & Jasper-JDT - optional and can use standard ones above -->
+    <doMavenDeploy artifactId="core" groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-core.jar"
+    	pom="embed-core.pom"
+        src="${tomcat.embed.path}/tomcat-embed-core-src.jar"/>
+    <doMavenDeploy artifactId="jasper" groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-japser.jar"
+    	pom="embed-jasper.pom"
+        src="${tomcat.embed.path}/tomcat-embed-jasper-src.jar"/>
+    <doMavenDeploy artifactId="logging-juli" groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
+        pom="embed-logging-juli.pom"
+        src="${tomcat.embed.path}/tomcat-embed-logging-juli-src.jar"/>
+    <doMavenDeploy artifactId="logging-log4j" groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
+        pom="embed-logging-log4j.pom"
+        src="${tomcat.embed.path}/tomcat-embed-logging-log4j-src.jar"/>
+  	
   </target>
 
   <target name="deploy-snapshot">
