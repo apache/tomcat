@@ -56,7 +56,6 @@ public class Local {
     /**
      * Accept a new connection request
      * @param sock The socket we are listening on.
-     * @param pool The pool for the new socket.
      * @return  A copy of the socket that is connected to the socket that
      *          made the connection request.  This is the socket which should
      *          be used for all future communication.
