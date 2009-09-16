@@ -16,34 +16,27 @@
   limitations under the License.
 -->
 <project name="Tomcat 7.0 Maven Deployment" default="" basedir="." xmlns:artifact="urn:maven-artifact-ant">
-
   <!--
-    Built for using Maven 2.0.4
-    Two additional jar files required, please download from
-    http://people.apache.org/~fhanik/tomcat/maven/
-    
+    Built for using Maven Ant Tasks 2.0.10 - download to this directory
+    You'll also need to install jsch 0.1.42 and manually configure
+    wagon-ssh 1.0-beta-2 to use the updated jsch. This will also add a
+    requirement for jzlib 1.0.7
   -->
   <!--
   Properties required to be set:
-  maven.home - full path to Maven2 installation, mvn or mvn.bat is assumed to be in ${maven.home}/bin/
-  maven.bin  - the script to execute for maven, would be mvn or mvn.bat
   maven.repo.url - the URL of the repository, for example scp://people.apache.org/www/people.apache.org/repo/m2-snapshot-repository
   maven.repo.repositoryId - the id of the repository, for example apache.snapshots
   maven.deploy.version - the version that the components will be deployed as, for example @MAVEN.DEPLOY.VERSION@
   tomcat.lib.path - the path to tomcat JAR files
   tomcat.bin.path - the path to tomcat's bin directory (for other JAR files)
   tomcat.pom.path - the path to the POM files
+  
+  For passwordless upload you'll also need to set
+  maven.scp.username    - Your ASF ID
+  maven.scp.privateKey  - Path to your exported ssh key
+  
   All these can be defined by mvn.properties (and defaults are in mvn.properties.default)
   
-  To do password less upload, you can modify either
-  $MAVE_HOME/conf/settings.xml or ~/.m2/settings.xml and add this snippet
-    <server>
-      <id>apache.snapshots</id>
-      <username>yourusername</username>
-      <privateKey>/home/yourusername/.ssh/id_rsa</privateKey>
-      <passphrase></passphrase>
-    </server>
-    
   To get a private key to work on Windows, I followed these steps
   1. on a linux box execute 'ssh-keygen -t rsa'
   2. same linux box execute 'cat id_rsa.pub >> authorized_keys' and 'cat id_rsa.pub >> authorized_keys2'
@@ -61,8 +54,7 @@
   <target name="init-maven">
     <typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="urn:maven-artifact-ant">
       <classpath>
-        <pathelement location="${basedir}/maven-ant-tasks-attached-patch.jar" />
-        <pathelement location="${basedir}/maven-artifact-ant-2.0.4-dep.jar" />
+        <pathelement location="${basedir}/maven-ant-tasks-2.0.10.jar" />
       </classpath>
     </typedef>
     <artifact:install-provider artifactId="wagon-ssh" version="1.0-beta-2"/>
@@ -72,6 +64,7 @@
     <!--cleanup-->
     <delete file="${pom}.tmp"/>
     <delete file="${file}.asc"/>
+    <delete file="${src}.asc"/>
 
     <!--replace the version in the pom-->
     <copy file="${pom}" tofile="${pom}.tmp">
@@ -88,6 +81,13 @@
       <arg value="-b"/>
       <arg value="${file}"/>
     </exec>
+    <exec executable="${maven.gpg.exec}" failonerror="true" inputstring="${maven.gpg.passphrase}">
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="${src}"/>
+    </exec>
     
     <!--deploy it-->
     <artifact:deploy file="${file}">
@@ -96,41 +96,29 @@
           <authentication username="${maven.scp.username}" privateKey="${maven.scp.privateKey}" passphrase="${maven.scp.passphrase}"/>
         </remoteRepository>
         <attach file="${file}.asc" type="jar.asc"/>
+        <attach file="${src}" classifier="sources" type="jar"/>
+        <attach file="${src}.asc" type="jar.asc"/>
     </artifact:deploy>
 
-    <!--
-    <exec executable="${maven.home}/bin/${maven.bin}" failonerror="true">
-      <env key="MAVEN_HOME" value="${maven.home}"/>
-      <arg value="deploy:deploy-file"/>
-      <arg value="-Dfile=${file}"/>
-      <arg value="-DgroupId=${groupId}"/>
-      <arg value="-DartifactId=${artifactId}"/>
-      <arg value="-Dversion=${maven.deploy.version}"/>
-      <arg value="-Dpackaging=jar"/>
-      <arg value="-DgeneratePom=false"/>
-      <arg value="-DrepositoryId=${maven.repo.repositoryId}"/>
-      <arg value="-Durl=${maven.repo.url}"/>
-      <arg value="-DpomFile=${pom}.tmp"/>
-    </exec>
-    -->
     <delete file="${pom}.tmp"/>
     <delete file="${file}.asc"/>
+    <delete file="${src}.asc"/>
   </target>
-  
+
   <macrodef name="doMavenDeploy">
     <attribute name="artifactId"/>
     <attribute name="jarFileName" default="@{artifactId}.jar" />
     <attribute name="groupId" default="org.apache.tomcat" />
     <attribute name="file" default="${tomcat.lib.path}/@{jarFileName}" />
     <attribute name="pom" default="@{artifactId}.pom" />
-  	<!-- How to handle sources ? -->
-    <attribute name="src" default="NONE" />
+    <attribute name="src" default="${basedir}/TODO-currently-empty-src.jar" />
     <sequential>
       <antcall target="maven-deploy">
         <param name="file" value="@{file}"/>
         <param name="groupId" value="@{groupId}"/>
         <param name="artifactId" value="@{artifactId}"/>
         <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
+        <param name="src" value="@{src}"/>
       </antcall>
     </sequential>
   </macrodef>
@@ -138,56 +126,66 @@
   <target name="generic-deploy" depends="init-maven">
   	<!-- Standard jars in bin directory -->
   	<!-- Skip bootstrap.jar - it is just a subset of catalina.jar -->
-  	<doMavenDeploy artifactId="juli" file="${tomcat.bin.path}/tomcat-juli.jar"/>
-  	    
+  	<doMavenDeploy artifactId="tomcat-juli" file="${tomcat.bin.path}/tomcat-juli.jar"/>
+    <!-- TODO source JAR -->
+  	
   	<!-- Standard jars in lib directory -->
-  	<doMavenDeploy artifactId="annotations-api"/>
-  	<doMavenDeploy artifactId="catalina"/>
-    <doMavenDeploy artifactId="catalina-ant"/>
-    <doMavenDeploy artifactId="catalina-ha"/>
-    <doMavenDeploy artifactId="tribes" jarFileName="catalina-tribes.jar"/>
-    <doMavenDeploy artifactId="el-api"/>
-    <doMavenDeploy artifactId="jasper"/>
-    <doMavenDeploy artifactId="jasper-el"/>
-    <doMavenDeploy artifactId="jasper-jdt"/>
-    <doMavenDeploy artifactId="jsp-api"/>
-    <doMavenDeploy artifactId="servlet-api"/>
-    <doMavenDeploy artifactId="tomcat-api" />
-    <doMavenDeploy artifactId="coyote" jarFileName="tomcat-coyote.jar"/>
-    <doMavenDeploy artifactId="dbcp" jarFileName="tomcat-dbcp.jar"/>
-    <doMavenDeploy artifactId="tomcat-i18n-es" />
-    <doMavenDeploy artifactId="tomcat-i18n-fr" />
-    <doMavenDeploy artifactId="tomcat-i18n-ja" />
+  	<doMavenDeploy artifactId="tomcat-annotations-api" jarFileName="annotations-api.jar"/>
+  	<doMavenDeploy artifactId="tomcat-catalina" jarFileName="catalina.jar"/>
+    <doMavenDeploy artifactId="tomcat-catalina-ant" jarFileName="catalina-ant.jar"/>
+    <doMavenDeploy artifactId="tomcat-catalina-ha" jarFileName="catalina-ha.jar"/>
+    <doMavenDeploy artifactId="tomcat-tribes" jarFileName="catalina-tribes.jar"/>
+    <doMavenDeploy artifactId="tomcat-el-api" jarFileName="el-api.jar"/>
+    <doMavenDeploy artifactId="tomcat-jasper" jarFileName="jasper.jar"/>
+    <doMavenDeploy artifactId="tomcat-jasper-el" jarFileName="jasper-el.jar"/>
+    <doMavenDeploy artifactId="tomcat-jasper-jdt" jarFileName="jasper-jdt.jar"/>
+    <doMavenDeploy artifactId="tomcat-jsp-api" jarFileName="jsp-api.jar"/>
+    <doMavenDeploy artifactId="tomcat-servlet-api" jarFileName="servlet-api.jar"/>
+    <doMavenDeploy artifactId="tomcat-api"/>
+    <doMavenDeploy artifactId="tomcat-coyote"/>
+    <doMavenDeploy artifactId="tomcat-dbcp"/>
+    <doMavenDeploy artifactId="tomcat-i18n-es"/>
+    <doMavenDeploy artifactId="tomcat-i18n-fr"/>
+    <doMavenDeploy artifactId="tomcat-i18n-ja"/>
+    <!-- TODO source JARs -->
 
     <!-- Extras jars -->
-    <doMavenDeploy artifactId="juli" groupId="org.apache.tomcat.extras"
-    	file="${tomcat.extras.path}/tomcat-juli.jar" pom="juli-extras.pom"/>
-    <doMavenDeploy artifactId="juli-adapters" groupId="org.apache.tomcat.extras"
+    <doMavenDeploy artifactId="tomcat-extras-juli"
+        groupId="org.apache.tomcat.extras"
+    	file="${tomcat.extras.path}/tomcat-juli.jar" />
+    <doMavenDeploy artifactId="tomcat-extras-juli-adapters"
+    	groupId="org.apache.tomcat.extras"
         file="${tomcat.extras.path}/tomcat-juli-adapters.jar" />
-    <doMavenDeploy artifactId="catalina-jmx-remote"
+    <doMavenDeploy artifactId="tomcat-catalina-jmx-remote"
     	groupId="org.apache.tomcat.extras"
         file="${tomcat.extras.path}/catalina-jmx-remote.jar" />
-    <doMavenDeploy artifactId="catalina-ws" groupId="org.apache.tomcat.extras"
+    <doMavenDeploy artifactId="tomcat-catalina-ws"
+    	groupId="org.apache.tomcat.extras"
         file="${tomcat.extras.path}/catalina-ws.jar" />
-  	
+    <!-- TODO source JARs -->
+
   	<!-- Emedded jars -->
   	<!-- Skip DBCP & Jasper-JDT - optional and can use standard ones above -->
-    <doMavenDeploy artifactId="core" groupId="org.apache.tomcat.embed"
+    <doMavenDeploy artifactId="tomcat-embed-core"
+        groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-core.jar"
-    	pom="embed-core.pom"
+    	pom="tomcat-embed-core.pom"
         src="${tomcat.embed.path}/tomcat-embed-core-src.jar"/>
-    <doMavenDeploy artifactId="jasper" groupId="org.apache.tomcat.embed"
-        file="${tomcat.embed.path}/tomcat-embed-japser.jar"
-    	pom="embed-jasper.pom"
+    <doMavenDeploy artifactId="tomcat-embed-jasper"
+        groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
+    	pom="tomcat-embed-jasper.pom"
         src="${tomcat.embed.path}/tomcat-embed-jasper-src.jar"/>
-    <doMavenDeploy artifactId="logging-juli" groupId="org.apache.tomcat.embed"
+    <doMavenDeploy artifactId="tomcat-embed-logging-juli"
+        groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
-        pom="embed-logging-juli.pom"
+        pom="tomcat-embed-logging-juli.pom"
         src="${tomcat.embed.path}/tomcat-embed-logging-juli-src.jar"/>
-    <doMavenDeploy artifactId="logging-log4j" groupId="org.apache.tomcat.embed"
-        file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
-        pom="embed-logging-log4j.pom"
-        src="${tomcat.embed.path}/tomcat-embed-logging-log4j-src.jar"/>
+    <doMavenDeploy artifactId="tomcat-embed-logging-log4j"
+        groupId="org.apache.tomcat.embed"
+        file="${tomcat.embed.path}/tomcat-embed-logging-log4j.jar"
+        pom="tomcat-embed-logging-log4j.pom" />
+    <!-- TODO source JAR -->
   	
   </target>
 
