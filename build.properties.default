@@ -15,16 +15,38 @@
 #  limitations under the License.
 #
 
-# ----- Vesion Control Flags -----
+# ----- Version Control Flags -----
 version.major=1
 version.minor=1
 version.build=17
 version.patch=0
 version.suffix=-dev
 
-# The directory containing your binary distribution of JUnit,
-# version 3.8 or later
-junit.home = /usr/local/java/junit3.8.1
+# ----- Default Base Path for Dependent Packages -----
+# Please note this path must be absolute, not relative,
+# as it is referenced with different working directory
+# contexts by the various build scripts.
+base.path=/usr/share/java
+#base.path=C:/path/to/the/repository
+#base.path=/usr/local
 
+compile.source=1.4
+compile.target=1.4
+compile.debug=off
+compile.deprecation=on
+compile.optimize=on
+
+base-tomcat.loc=http://archive.apache.org/dist/tomcat
+base-sf.loc=http://downloads.sourceforge.net
+
+# ----- JUnit Unit Test Suite, version 3.8 or later -----
+# The JUnit version we will use
+junit.version=3.8.2
+# The directory containing your binary distribution of JUnit
+# It will be automatically downloaded if it doesn't exist
+junit.home=${base.path}/junit${junit.version}
+#junit.home = /usr/local/java/junit3.8.1
 # The pathname of the "junit.jar" JAR file
-junit.jar = ${junit.home}/junit.jar
+junit.jar=${junit.home}/junit.jar
+# The URL used to download JUnit if needed
+junit.loc=${base-sf.loc}/junit/junit${junit.version}.zip
