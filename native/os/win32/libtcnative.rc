@@ -20,7 +20,7 @@ LANGUAGE 0x9,0x1
                      "See the License for the specific language governing " \
                      "permissions and limitations under the License."
 
-#define TCN_VERISON "1.1.16"
+#define TCN_VERSION "1.1.16"
 1000 ICON "apache.ico"
 
 1001 DIALOGEX 0, 0, 252, 51
@@ -55,12 +55,12 @@ BEGIN
             VALUE "Comments",  TCN_LICENSE "\0"
             VALUE "CompanyName", "Apache Software Foundation\0"
             VALUE "FileDescription", "Tomcat Native Java Library\0"
-            VALUE "FileVersion", TCN_VERISON "\0"
+            VALUE "FileVersion", TCN_VERSION "\0"
             VALUE "InternalName", "libtcnative-1\0"
             VALUE "LegalCopyright", TCN_COPYRIGHT "\0"
             VALUE "OriginalFilename", "libtcnative-1.dll\0"
             VALUE "ProductName", "Tomcat Native Java Library\0"
-            VALUE "ProductVersion", TCN_VERISON "\0"
+            VALUE "ProductVersion", TCN_VERSION "\0"
         END
     END
     BLOCK "VarFileInfo"

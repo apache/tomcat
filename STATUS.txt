@@ -37,12 +37,6 @@ PATCHES PROPOSED TO BACKPORT:
   -1:
 
 * Fix typo.
-  http://svn.apache.org/viewvc/tomcat/connectors/trunk/jni/native/os/win32/libtcnative.rc?r1=714101&r2=714100
-  http://svn.apache.org/viewvc/tomcat/connectors/trunk/jni/jnirelease.sh?r1=714101&r2=714100
-  +1: rjung
-  -1:
-
-* Fix typo.
   http://svn.apache.org/viewvc/tomcat/connectors/trunk/jni/native/build/tcnative.m4?r1=714101&r2=714100
   +1: rjung
   -1:
