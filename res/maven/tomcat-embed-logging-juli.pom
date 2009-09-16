@@ -17,22 +17,8 @@
 -->
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.tomcat</groupId>
-  <artifactId>jsp-api</artifactId>
+  <groupId>org.apache.tomcat.embed</groupId>
+  <artifactId>tomcta-embed-logging-juli</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
-  <description>JSP package</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>el-api</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.tomcat</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>@MAVEN.DEPLOY.VERSION@</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
+  <description>JULI logging implementation for embedded Tomcat</description>
 </project>
