@@ -20,7 +20,7 @@
 apr_src_dir=`pwd`/srclib/apr
 JKJNIEXT=""
 JKJNIVER=""
-SVNBASE=https://svn.apache.org/repos/asf/tomcat/native/
+SVNBASE=https://svn.apache.org/repos/asf/tomcat/native
 
 for o
 do
@@ -92,19 +92,24 @@ if [ ! -x "$EXPTOOL" ]; then
 fi
 
 echo $JKJNIEXT | egrep -e 'x$' > /dev/null 2>&1
-NOT_A_BRANCH=$0
+if [ $? -eq 0 ]; then
+    USE_BRANCH=1
+else
+    USE_BRANCH=0
+fi
 
+JKJNISVN=$SVNBASE/${JKJNIEXT}
 if [ "x$JKJNIEXT" = "xtrunk" ]; then
-    JKJNIVER=`svn info $SVNBASE/${JKJNIEXT} | awk '$1 == "Revision:" {print $2}'`
-elif [ $NOT_A_BRANCH -eq 0 ]; then
-    JKJNIVER=$JKJNIEXT
-    JKJNIEXT=branches/${JKJNIEXT}
-    JKJNIVER=${JKJNIVER}-`svn info $SVNBASE/${JKJNIEXT} | awk '$1 == "Revision:" {print $2}'`
+    JKJNIVER=`svn info ${JKJNISVN} | awk '$1 == "Revision:" {print $2}'`
+elif [ $USE_BRANCH -eq 1 ]; then
+    JKJNIBRANCH=${JKJNIEXT}
+    JKJNISVN=$SVNBASE/branches/${JKJNIBRANCH}
+    JKJNIVER=${JKJNIBRANCH}-`svn info ${JKJNISVN} | awk '$1 == "Revision:" {print $2}'`
 else
     JKJNIVER=$JKJNIEXT
-    JKJNIEXT="tags/TOMCAT_NATIVE_`echo $JKJNIVER | sed 's/\./_/g'`"
+    JKJNISVN="${SVNBASE}/tags/TOMCAT_NATIVE_`echo $JKJNIVER | sed 's/\./_/g'`"
 fi
-echo "Using SVN repo       : \`$SVNBASE/${JKJNIEXT}'"
+echo "Using SVN repo       : \`${JKJNISVN}'"
 echo "Using version        : \`${JKJNIVER}'"
 
 
@@ -114,7 +119,7 @@ rm -rf ${JKJNIDIST}
 mkdir -p ${JKJNIDIST}/jni
 for i in native java xdocs examples test build.xml build.properties.default
 do
-    svn export $SVNBASE/${JKJNIEXT}/${i} ${JKJNIDIST}/jni/${i}
+    svn export ${JKJNISVN}/${i} ${JKJNIDIST}/jni/${i}
     if [ $? -ne 0 ]; then
         echo "svn export ${i} failed"
         exit 1
@@ -129,10 +134,10 @@ cd "$top"
 rm -rf ${JKJNIDIST}/jni/xdocs
 mv ${JKJNIDIST}/jni/build/docs ${JKJNIDIST}/jni/docs
 rm -rf ${JKJNIDIST}/jni/build
-svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKJNIDIST}/KEYS
-svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKJNIDIST}/LICENSE
-svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKJNIDIST}/NOTICE
-svn cat $SVNBASE/${JKJNIEXT}/README.txt > ${JKJNIDIST}/README.txt
+svn cat ${JKJNISVN}/KEYS > ${JKJNIDIST}/KEYS
+svn cat ${JKJNISVN}/LICENSE > ${JKJNIDIST}/LICENSE
+svn cat ${JKJNISVN}/NOTICE > ${JKJNIDIST}/NOTICE
+svn cat ${JKJNISVN}/README.txt > ${JKJNIDIST}/README.txt
 
 #
 # Prebuild
@@ -146,10 +151,10 @@ tar -cf - ${JKJNIDIST} | gzip -c9 > ${JKJNIDIST}.tar.gz
 JKWINDIST=tomcat-native-${JKJNIVER}-win32-src
 rm -rf ${JKWINDIST}
 mkdir -p ${JKWINDIST}/jni
-svn export --native-eol CRLF $SVNBASE/${JKJNIEXT}/native ${JKWINDIST}/jni/native
-svn cat $SVNBASE/${JKJNIEXT}/KEYS > ${JKWINDIST}/KEYS
-svn cat $SVNBASE/${JKJNIEXT}/LICENSE > ${JKWINDIST}/LICENSE
-svn cat $SVNBASE/${JKJNIEXT}/NOTICE > ${JKWINDIST}/NOTICE
-svn cat $SVNBASE/${JKJNIEXT}/README.txt > ${JKWINDIST}/README.txt
+svn export --native-eol CRLF ${JKJNISVN}/native ${JKWINDIST}/jni/native
+svn cat ${JKJNISVN}/KEYS > ${JKWINDIST}/KEYS
+svn cat ${JKJNISVN}/LICENSE > ${JKWINDIST}/LICENSE
+svn cat ${JKJNISVN}/NOTICE > ${JKWINDIST}/NOTICE
+svn cat ${JKJNISVN}/README.txt > ${JKWINDIST}/README.txt
 cp ${JKJNIDIST}/CHANGELOG.txt ${JKWINDIST}/
 zip -9rqyo ${JKWINDIST}.zip ${JKWINDIST}
