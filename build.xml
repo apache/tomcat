@@ -217,7 +217,6 @@
     <include name="org/apache/catalina/loader/Reloader.*" />
     <include name="org/apache/catalina/security/SecurityClassLoad.*" />
     <include name="org/apache/naming/JndiPermission.*" />
-    <include name="org/apache/tomcat/util/compat/*" />
   </patternset>
 
   <patternset id="files.tomcat-juli">
@@ -225,7 +224,7 @@
   </patternset>
 
   <patternset id="files.tomcat-api">
-    <include name="org/apache/tomcat/*" />
+    <include name="org/apache/tomcat/*.class" />
   </patternset>
   	
   <patternset id="files.catalina">
@@ -299,9 +298,12 @@
     <attribute name="jarfile" description="the name of the JAR file to create"/>
     <attribute name="filesDir" description="the directory to obtain the files from"/>
     <attribute name="filesId" description="the patternset id of the files to use"/>
-    <attribute name="manifest" description="the manifest file use"/>
-    <attribute name="notice" description="the LICENSE file to use"/>
-    <attribute name="license" description="the NOTICE file to use"/>
+    <attribute name="manifest" description="the manifest file use"
+               default="${tomcat.tmp}/servlet-api.jar.manifest" />
+    <attribute name="notice" description="the LICENSE file to use"
+               default="res/META-INF/default.notice" />
+    <attribute name="license" description="the NOTICE file to use"
+               default="res/META-INF/default.license" />
     <sequential>
       <jar  jarfile="@{jarfile}" manifest="@{manifest}">
         <fileset dir="@{filesDir}">
@@ -336,10 +338,7 @@
     <!-- Common Annotations 1.0 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.annotations-api"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.annotations-api" />
 
     <!-- Servlet 3.0 Implementation JAR File -->
     <jarIt jarfile="${servlet-api.jar}"
@@ -360,90 +359,58 @@
     <!-- JSP 2.1 EL Implementation JAR File -->
     <jarIt jarfile="${el-api.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.el-api"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.el-api" />
 
     <!-- Bootstrap JAR File -->
     <jarIt jarfile="${bootstrap.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.bootstrap"
-      manifest="${tomcat.tmp}/bootstrap.jar.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      manifest="${tomcat.tmp}/bootstrap.jar.manifest" />
 
     <!-- Tomcat-juli JAR File -->
     <jarIt jarfile="${tomcat-juli.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-juli"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.tomcat-juli" />
 
     <!-- Catalina Main JAR File -->
     <jarIt jarfile="${catalina.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.catalina"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.catalina" />
 
     <!-- Catalina GroupCom/Tribes JAR File -->
     <jarIt jarfile="${catalina-tribes.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.catalina-tribes"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.catalina-tribes" />
 
     <!-- Catalina Cluster/HA JAR File -->
     <jarIt jarfile="${catalina-ha.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.catalina-ha"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.catalina-ha" />
 
     <!-- Catalina Ant Tasks JAR File -->
     <jarIt jarfile="${catalina-ant.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.catalina-ant"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.catalina-ant" />
 
     <!-- Tomcat API JAR File -->
     <jarIt jarfile="${tomcat-api.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-api"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.tomcat-api" />
 
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.tomcat-coyote"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.tomcat-coyote" />
 
     <!-- Jasper Implementation JAR File -->
     <jarIt jarfile="${jasper.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.jasper"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.jasper" />
 
     <!-- Jasper EL Implementation JAR File -->
     <jarIt jarfile="${jasper-el.jar}"
       filesDir="${tomcat.classes}"
-      filesId="files.jasper-el"
-      manifest="${tomcat.tmp}/default.manifest"
-      notice="res/META-INF/default.notice"
-      license="res/META-INF/default.license" />
+      filesId="files.jasper-el" />
 
     <!-- i18n JARs -->
     <jar jarfile="${tomcat.build}/lib/tomcat-i18n-es.jar"
@@ -734,21 +701,14 @@
     <jarIt jarfile="${tomcat-embed-core.jar}"
            filesDir="${tomcat.classes}"
            filesId="files.tomcat-embed-core"
-    	   manifest="${tomcat.tmp}/default.manifest"
            notice="res/META-INF/servlet-api.jar.notice"
            license="res/META-INF/servlet-api.jar.license"/>
     <jarIt jarfile="${tomcat-embed-jasper.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-embed-jasper"
-           manifest="${tomcat.tmp}/default.manifest"
-           notice="res/META-INF/default.notice"
-           license="res/META-INF/default.license"/>
+           filesId="files.tomcat-embed-jasper"/>
     <jarIt jarfile="${tomcat-embed-juli.jar}"
            filesDir="${tomcat.classes}"
-           filesId="files.tomcat-juli"
-           manifest="${tomcat.tmp}/default.manifest"
-           notice="res/META-INF/default.notice"
-           license="res/META-INF/default.license"/>
+           filesId="files.tomcat-juli"/>
 
   </target>
 
@@ -761,22 +721,13 @@
   	
     <jarIt jarfile="${tomcat-embed-core-sources.jar}"
     	   filesDir="java"
-           filesId="files.tomcat-embed-core"
-           manifest="${tomcat.tmp}/default.manifest"
-           notice="res/META-INF/default.notice"
-           license="res/META-INF/default.license"/>
+           filesId="files.tomcat-embed-core"/>
     <jarIt jarfile="${tomcat-embed-jasper-sources.jar}"
            filesDir="java"
-           filesId="files.tomcat-embed-jasper"
-           manifest="${tomcat.tmp}/default.manifest"
-           notice="res/META-INF/default.notice"
-           license="res/META-INF/default.license"/>
+           filesId="files.tomcat-embed-jasper"/>
     <jarIt jarfile="${tomcat-embed-juli-sources.jar}"
            filesDir="java"
-           filesId="files.tomcat-juli"
-           manifest="${tomcat.tmp}/default.manifest"
-           notice="res/META-INF/default.notice"
-           license="res/META-INF/default.license"/>
+           filesId="files.tomcat-juli"/>
 
   </target>
 
