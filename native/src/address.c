@@ -104,7 +104,7 @@ cleanup:
 }
 
 TCN_IMPLEMENT_CALL(jboolean, Address, equal)(TCN_STDARGS,
-                                         jlong a, jlong b)
+                                             jlong a, jlong b)
 {
     apr_sockaddr_t *sa = J2P(a, apr_sockaddr_t *);
     apr_sockaddr_t *sb = J2P(b, apr_sockaddr_t *);
