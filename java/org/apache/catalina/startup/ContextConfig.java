@@ -115,12 +115,6 @@ public class ContextConfig
 
 
     /**
-     * Any parse error which occurred while parsing XML descriptors.
-     */
-    protected SAXParseException parseException = null;
-
-    
-    /**
      * Original docBase.
      */
     protected String originalDocBase = null;
@@ -351,7 +345,8 @@ public class ContextConfig
                         ((StandardContext) context).setReplaceWelcomeFiles(true);
                     }
                     webDigester.push(context);
-                    webDigester.setErrorHandler(new ContextErrorHandler());
+                    ContextErrorHandler errorHandler = new ContextErrorHandler();
+                    webDigester.setErrorHandler(errorHandler);
 
                     if(log.isDebugEnabled()) {
                         log.debug("Parsing application web.xml file at " + url.toExternalForm());
@@ -359,7 +354,7 @@ public class ContextConfig
 
                     webDigester.parse(is);
 
-                    if (parseException != null) {
+                    if (errorHandler.getParseException() != null) {
                         ok = false;
                     }
                 } else {
@@ -376,7 +371,6 @@ public class ContextConfig
                 ok = false;
             } finally {
                 webDigester.reset();
-                parseException = null;
                 try {
                     stream.close();
                 } catch (IOException e) {
@@ -688,9 +682,10 @@ public class ContextConfig
                 digester.setClassLoader(this.getClass().getClassLoader());
                 digester.setUseContextClassLoader(false);
                 digester.push(context);
-                digester.setErrorHandler(new ContextErrorHandler());
+                ContextErrorHandler errorHandler = new ContextErrorHandler();
+                digester.setErrorHandler(errorHandler);
                 digester.parse(source);
-                if (parseException != null) {
+                if (errorHandler.getParseException() != null) {
                     ok = false;
                 }
             } catch (SAXParseException e) {
@@ -704,7 +699,6 @@ public class ContextConfig
                 ok = false;
             } finally {
                 digester.reset();
-                parseException = null;
                 try {
                     if (stream != null) {
                         stream.close();
@@ -790,9 +784,10 @@ public class ContextConfig
                 contextDigester.setUseContextClassLoader(false);
                 contextDigester.push(context.getParent());
                 contextDigester.push(context);
-                contextDigester.setErrorHandler(new ContextErrorHandler());
+                ContextErrorHandler errorHandler = new ContextErrorHandler();
+                contextDigester.setErrorHandler(errorHandler);
                 contextDigester.parse(source);
-                if (parseException != null) {
+                if (errorHandler.parseException != null) {
                     ok = false;
                 }
                 if (log.isDebugEnabled())
@@ -811,7 +806,6 @@ public class ContextConfig
                 ok = false;
             } finally {
                 contextDigester.reset();
-                parseException = null;
                 try {
                     if (stream != null) {
                         stream.close();
@@ -1366,8 +1360,10 @@ public class ContextConfig
     }
 
 
-    protected class ContextErrorHandler
+    protected static class ContextErrorHandler
         implements ErrorHandler {
+
+        private SAXParseException parseException = null;
 
         public void error(SAXParseException exception) {
             parseException = exception;
@@ -1381,6 +1377,9 @@ public class ContextConfig
             parseException = exception;
         }
 
+        public SAXParseException getParseException() {
+            return parseException;
+        }
     }
 
 
