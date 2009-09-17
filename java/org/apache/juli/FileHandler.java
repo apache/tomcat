@@ -292,11 +292,11 @@ public class FileHandler
             String pathname = dir.getAbsolutePath() + File.separator +
                 prefix + date + suffix;
             String encoding = getEncoding();
-            OutputStream os = new BufferedOutputStream(new FileOutputStream(
-                    pathname, true),bufferSize);
+            FileOutputStream fos = new FileOutputStream(pathname, true);
+            OutputStream os = bufferSize>0?new BufferedOutputStream(fos,bufferSize):fos;
             writer = new PrintWriter(
                     (encoding != null) ? new OutputStreamWriter(os, encoding)
-                            : new OutputStreamWriter(os), true);
+                                       : new OutputStreamWriter(os), true);
             writer.write(getFormatter().getHead(this));
         } catch (Exception e) {
             reportError(null, e, ErrorManager.OPEN_FAILURE);
