@@ -563,6 +563,7 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
     tcn_socket_t *s   = J2P(sock, tcn_socket_t *);
     tcn_ssl_conn_t *con;
     int retVal;
+    int ecode = SSL_ERROR_WANT_READ;
 
     UNREFERENCED_STDARGS;
     TCN_ASSERT(sock != 0);
@@ -582,11 +583,30 @@ TCN_IMPLEMENT_CALL(jint, SSLSocket, renegotiate)(TCN_STDARGS,
     if (retVal <= 0)
         return APR_EGENERAL;
 
+    if (SSL_get_state(con->ssl) != SSL_ST_OK) {
+        return APR_EGENERAL;
+    }
     con->ssl->state = SSL_ST_ACCEPT;
 
-    retVal = SSL_do_handshake(con->ssl);
-    if (retVal <= 0)
+    ecode = SSL_ERROR_WANT_READ;
+    while (ecode == SSL_ERROR_WANT_READ) {
+        retVal = SSL_do_handshake(con->ssl);
+        if (retVal <= 0) {
+            ecode = SSL_get_error(con->ssl, retVal);
+            if (ecode == SSL_ERROR_WANT_READ) {
+                if (wait_for_io_or_timeout(con, ecode) != APR_SUCCESS)
+                    return APR_EGENERAL; /* Can't wait */
+                continue; /* It should be ok now */
+            }
+            else
+                return APR_EGENERAL;
+        } else
+            break;
+    }
+   
+    if (SSL_get_state(con->ssl) != SSL_ST_OK) {
         return APR_EGENERAL;
+    }
 
     return APR_SUCCESS;
 }
