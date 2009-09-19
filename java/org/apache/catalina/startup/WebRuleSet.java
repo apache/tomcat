@@ -22,11 +22,10 @@ package org.apache.catalina.startup;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ContextHandler;
 import org.apache.catalina.deploy.ContextService;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.catalina.deploy.ServletDef;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.CallMethodRule;
 import org.apache.tomcat.util.digester.CallParamRule;
@@ -128,7 +127,7 @@ public class WebRuleSet extends RuleSetBase {
                          new IgnoreAnnotationsRule());
 
         digester.addCallMethod(prefix + "web-app/context-param",
-                               "addParameter", 2);
+                               "addContextParam", 2);
         digester.addCallParam(prefix + "web-app/context-param/param-name", 0);
         digester.addCallParam(prefix + "web-app/context-param/param-value", 1);
 
@@ -156,7 +155,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addObjectCreate(prefix + "web-app/filter",
                                  "org.apache.catalina.deploy.FilterDef");
         digester.addSetNext(prefix + "web-app/filter",
-                            "addFilterDef",
+                            "addFilter",
                             "org.apache.catalina.deploy.FilterDef");
 
         digester.addCallMethod(prefix + "web-app/filter/description",
@@ -184,7 +183,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addObjectCreate(prefix + "web-app/filter-mapping",
                                  "org.apache.catalina.deploy.FilterMap");
         digester.addSetNext(prefix + "web-app/filter-mapping",
-                                 "addFilterMap",
+                                 "addFilterMapping",
                                  "org.apache.catalina.deploy.FilterMap");
 
         digester.addCallMethod(prefix + "web-app/filter-mapping/filter-name",
@@ -198,13 +197,34 @@ public class WebRuleSet extends RuleSetBase {
                                "setDispatcher", 0);
 
          digester.addCallMethod(prefix + "web-app/listener/listener-class",
-                                "addApplicationListener", 0);
+                                "addListener", 0);
          
         digester.addRule(prefix + "web-app/jsp-config",
                          jspConfig);
-        
+
+        digester.addObjectCreate(prefix + "web-app/jsp-config/jsp-property-group",
+                                 "org.apache.catalina.deploy.JspPropertyGroup");
+        digester.addSetNext(prefix + "web-app/jsp-config/jsp-property-group",
+                            "addJspPropertyGroup",
+                            "org.apache.catalina.deploy.JspPropertyGroup");
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/deferred-syntax-allowed-as-literal",
+                               "setDeferredSyntax", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/el-ignored",
+                               "setElIgnored", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/include-coda",
+                               "addIncludeCoda", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/include-prelude",
+                               "addIncludePrelude", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/is-xml",
+                               "setIsXml", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/page-encoding",
+                               "setPageEncoding", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/scripting-invalid",
+                               "setScriptingInvalid", 0);
+        digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/trim-directive-whitespaces",
+                               "setTrimWhitespace", 0);
         digester.addCallMethod(prefix + "web-app/jsp-config/jsp-property-group/url-pattern",
-                               "addJspMapping", 0);
+                               "setUrlPattern", 0);
 
         digester.addRule(prefix + "web-app/login-config",
                          loginConfig);
@@ -233,7 +253,7 @@ public class WebRuleSet extends RuleSetBase {
         digester.addObjectCreate(prefix + "web-app/security-constraint",
                                  "org.apache.catalina.deploy.SecurityConstraint");
         digester.addSetNext(prefix + "web-app/security-constraint",
-                            "addConstraint",
+                            "addSecurityConstraint",
                             "org.apache.catalina.deploy.SecurityConstraint");
 
         digester.addRule(prefix + "web-app/security-constraint/auth-constraint",
@@ -261,10 +281,10 @@ public class WebRuleSet extends RuleSetBase {
                                "addSecurityRole", 0);
 
         digester.addRule(prefix + "web-app/servlet",
-                         new WrapperCreateRule());
+                         new ServletDefCreateRule());
         digester.addSetNext(prefix + "web-app/servlet",
-                            "addChild",
-                            "org.apache.catalina.Container");
+                            "addServlet",
+                            "org.apache.catalina.deploy.ServletDef");
 
         digester.addCallMethod(prefix + "web-app/servlet/init-param",
                                "addInitParameter", 2);
@@ -276,19 +296,19 @@ public class WebRuleSet extends RuleSetBase {
         digester.addCallMethod(prefix + "web-app/servlet/jsp-file",
                                "setJspFile", 0);
         digester.addCallMethod(prefix + "web-app/servlet/load-on-startup",
-                               "setLoadOnStartupString", 0);
+                               "setLoadOnStartup", 0);
         digester.addCallMethod(prefix + "web-app/servlet/run-as/role-name",
                                "setRunAs", 0);
 
         digester.addCallMethod(prefix + "web-app/servlet/security-role-ref",
-                               "addSecurityReference", 2);
+                               "addSecurityRoleRef", 2);
         digester.addCallParam(prefix + "web-app/servlet/security-role-ref/role-link", 1);
         digester.addCallParam(prefix + "web-app/servlet/security-role-ref/role-name", 0);
 
         digester.addCallMethod(prefix + "web-app/servlet/servlet-class",
                               "setServletClass", 0);
         digester.addCallMethod(prefix + "web-app/servlet/servlet-name",
-                              "setName", 0);
+                              "setServletName", 0);
 
         digester.addRule(prefix + "web-app/servlet-mapping",
                                new CallMethodMultiRule("addServletMapping", 2, 0));
@@ -321,7 +341,7 @@ public class WebRuleSet extends RuleSetBase {
                                "addWelcomeFile", 0);
 
         digester.addCallMethod(prefix + "web-app/locale-encoding-mapping-list/locale-encoding-mapping",
-                              "addLocaleEncodingMappingParameter", 2);
+                              "addLocaleEncodingMapping", 2);
         digester.addCallParam(prefix + "web-app/locale-encoding-mapping-list/locale-encoding-mapping/locale", 0);
         digester.addCallParam(prefix + "web-app/locale-encoding-mapping-list/locale-encoding-mapping/encoding", 1);
 
@@ -331,10 +351,9 @@ public class WebRuleSet extends RuleSetBase {
         //ejb-local-ref
         digester.addObjectCreate(prefix + "web-app/ejb-local-ref",
                                  "org.apache.catalina.deploy.ContextLocalEjb");
-        digester.addRule(prefix + "web-app/ejb-local-ref",
-                new SetNextNamingRule("addLocalEjb",
-                            "org.apache.catalina.deploy.ContextLocalEjb"));
-
+        digester.addSetNext(prefix + "web-app/ejb-local-ref",
+                            "addEjbLocalRef",
+                            "org.apache.catalina.deploy.ContextLocalEjb");
         digester.addCallMethod(prefix + "web-app/ejb-local-ref/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/ejb-local-ref/ejb-link",
@@ -352,10 +371,9 @@ public class WebRuleSet extends RuleSetBase {
         //ejb-ref
         digester.addObjectCreate(prefix + "web-app/ejb-ref",
                                  "org.apache.catalina.deploy.ContextEjb");
-        digester.addRule(prefix + "web-app/ejb-ref",
-                new SetNextNamingRule("addEjb",
-                            "org.apache.catalina.deploy.ContextEjb"));
-
+        digester.addSetNext(prefix + "web-app/ejb-ref", 
+                            "addEjbRef",
+                            "org.apache.catalina.deploy.ContextEjb");
         digester.addCallMethod(prefix + "web-app/ejb-ref/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/ejb-ref/ejb-link",
@@ -373,10 +391,9 @@ public class WebRuleSet extends RuleSetBase {
         //env-entry
         digester.addObjectCreate(prefix + "web-app/env-entry",
                                  "org.apache.catalina.deploy.ContextEnvironment");
-        digester.addRule(prefix + "web-app/env-entry",
-                new SetNextNamingRule("addEnvironment",
-                            "org.apache.catalina.deploy.ContextEnvironment"));
-
+        digester.addSetNext(prefix + "web-app/env-entry",
+                            "addEnvEntry",
+                            "org.apache.catalina.deploy.ContextEnvironment");
         digester.addCallMethod(prefix + "web-app/env-entry/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/env-entry/env-entry-name",
@@ -390,10 +407,9 @@ public class WebRuleSet extends RuleSetBase {
         //resource-env-ref
         digester.addObjectCreate(prefix + "web-app/resource-env-ref",
             "org.apache.catalina.deploy.ContextResourceEnvRef");
-        digester.addRule(prefix + "web-app/resource-env-ref",
-                    new SetNextNamingRule("addResourceEnvRef",
-                        "org.apache.catalina.deploy.ContextResourceEnvRef"));
-
+        digester.addSetNext(prefix + "web-app/resource-env-ref",
+                            "addResourceEnvRef",
+                            "org.apache.catalina.deploy.ContextResourceEnvRef");
         digester.addCallMethod(prefix + "web-app/resource-env-ref/resource-env-ref-name",
                 "setName", 0);
         digester.addCallMethod(prefix + "web-app/resource-env-ref/resource-env-ref-type",
@@ -406,7 +422,6 @@ public class WebRuleSet extends RuleSetBase {
         digester.addSetNext(prefix + "web-app/message-destination",
                             "addMessageDestination",
                             "org.apache.catalina.deploy.MessageDestination");
-
         digester.addCallMethod(prefix + "web-app/message-destination/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/message-destination/display-name",
@@ -424,7 +439,6 @@ public class WebRuleSet extends RuleSetBase {
         digester.addSetNext(prefix + "web-app/message-destination-ref",
                             "addMessageDestinationRef",
                             "org.apache.catalina.deploy.MessageDestinationRef");
-
         digester.addCallMethod(prefix + "web-app/message-destination-ref/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/message-destination-ref/message-destination-link",
@@ -441,10 +455,9 @@ public class WebRuleSet extends RuleSetBase {
         //resource-ref
         digester.addObjectCreate(prefix + "web-app/resource-ref",
                                  "org.apache.catalina.deploy.ContextResource");
-        digester.addRule(prefix + "web-app/resource-ref",
-                new SetNextNamingRule("addResource",
-                            "org.apache.catalina.deploy.ContextResource"));
-
+        digester.addSetNext(prefix + "web-app/resource-ref",
+                            "addResourceRef",
+                            "org.apache.catalina.deploy.ContextResource");
         digester.addCallMethod(prefix + "web-app/resource-ref/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/resource-ref/res-auth",
@@ -460,10 +473,9 @@ public class WebRuleSet extends RuleSetBase {
         //service-ref
         digester.addObjectCreate(prefix + "web-app/service-ref",
                                  "org.apache.catalina.deploy.ContextService");
-        digester.addRule(prefix + "web-app/service-ref",
-                         new SetNextNamingRule("addService",
-                         "org.apache.catalina.deploy.ContextService"));
-
+        digester.addSetNext(prefix + "web-app/service-ref",
+                            "addServiceRef",
+                            "org.apache.catalina.deploy.ContextService");
         digester.addCallMethod(prefix + "web-app/service-ref/description",
                                "setDescription", 0);
         digester.addCallMethod(prefix + "web-app/service-ref/display-name",
@@ -638,11 +650,11 @@ final class SetDistributableRule extends Rule {
 
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
-        Context context = (Context) digester.peek();
-        context.setDistributable(true);
+        WebXml webXml = (WebXml) digester.peek();
+        webXml.setDistributable(true);
         if (digester.getLogger().isDebugEnabled()) {
             digester.getLogger().debug
-               (context.getClass().getName() + ".setDistributable( true)");
+               (webXml.getClass().getName() + ".setDistributable(true)");
         }
     }
 
@@ -695,26 +707,24 @@ final class SetPublicIdRule extends Rule {
  * create the object that is to be added to the stack.
  */
 
-final class WrapperCreateRule extends Rule {
+final class ServletDefCreateRule extends Rule {
 
-    public WrapperCreateRule() {
+    public ServletDefCreateRule() {
     }
 
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
-        Context context =
-            (Context) digester.peek(digester.getCount() - 1);
-        Wrapper wrapper = context.createWrapper();
-        digester.push(wrapper);
+        ServletDef servletDef = new ServletDef();
+        digester.push(servletDef);
         if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("new " + wrapper.getClass().getName());
+            digester.getLogger().debug("new " + servletDef.getClass().getName());
     }
 
     public void end(String namespace, String name)
         throws Exception {
-        Wrapper wrapper = (Wrapper) digester.pop();
+        ServletDef servletDef = (ServletDef) digester.pop();
         if (digester.getLogger().isDebugEnabled())
-            digester.getLogger().debug("pop " + wrapper.getClass().getName());
+            digester.getLogger().debug("pop " + servletDef.getClass().getName());
     }
 
 }
@@ -857,15 +867,15 @@ final class IgnoreAnnotationsRule extends Rule {
 
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
-        Context context = (Context) digester.peek(digester.getCount() - 1);
+        WebXml webxml = (WebXml) digester.peek(digester.getCount() - 1);
         String value = attributes.getValue("metadata-complete");
         if ("true".equals(value)) {
-            context.setIgnoreAnnotations(true);
+            webxml.setMetadataComplete(true);
         }
         if (digester.getLogger().isDebugEnabled()) {
             digester.getLogger().debug
-                (context.getClass().getName() + ".setIgnoreAnnotations( " +
-                    context.getIgnoreAnnotations() + ")");
+                (webxml.getClass().getName() + ".setMetadataComplete( " +
+                        webxml.isMetadataComplete() + ")");
         }
     }
 
@@ -955,9 +965,9 @@ final class TaglibLocationRule extends Rule {
     @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
-        Context context = (Context) digester.peek(digester.getCount() - 1);
+        WebXml webXml = (WebXml) digester.peek(digester.getCount() - 1);
         // If we have a public ID, this is not a 2.4 or later webapp
-        boolean havePublicId = (context.getPublicId() != null);
+        boolean havePublicId = (webXml.getPublicId() != null);
         // havePublicId and isServlet24OrLater should be mutually exclusive
         if (havePublicId == isServlet24OrLater) {
             throw new IllegalArgumentException(

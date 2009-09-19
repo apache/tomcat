@@ -24,7 +24,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -294,100 +296,6 @@ public class ContextConfig
 
 
     /**
-     * Process the application configuration file, if it exists.
-     */
-    protected void applicationWebConfig() {
-
-        String altDDName = null;
-
-        // Open the application web.xml file, if it exists
-        InputStream stream = null;
-        ServletContext servletContext = context.getServletContext();
-        if (servletContext != null) {
-            altDDName = (String)servletContext.getAttribute(
-                                                        Globals.ALT_DD_ATTR);
-            if (altDDName != null) {
-                try {
-                    stream = new FileInputStream(altDDName);
-                } catch (FileNotFoundException e) {
-                    log.error(sm.getString("contextConfig.altDDNotFound",
-                                           altDDName));
-                }
-            }
-            else {
-                stream = servletContext.getResourceAsStream
-                    (Constants.ApplicationWebXml);
-            }
-        }
-        if (stream == null) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("contextConfig.applicationMissing") + " " + context);
-            }
-            return;
-        }
-        
-        long t1=System.currentTimeMillis();
-
-        URL url=null;
-        // Process the application web.xml file
-        synchronized (webDigester) {
-            try {
-                if (altDDName != null) {
-                    url = new File(altDDName).toURI().toURL();
-                } else {
-                    url = servletContext.getResource(
-                                                Constants.ApplicationWebXml);
-                }
-                if( url!=null ) {
-                    InputSource is = new InputSource(url.toExternalForm());
-                    is.setByteStream(stream);
-                    if (context instanceof StandardContext) {
-                        ((StandardContext) context).setReplaceWelcomeFiles(true);
-                    }
-                    webDigester.push(context);
-                    ContextErrorHandler errorHandler = new ContextErrorHandler();
-                    webDigester.setErrorHandler(errorHandler);
-
-                    if(log.isDebugEnabled()) {
-                        log.debug("Parsing application web.xml file at " + url.toExternalForm());
-                    }
-
-                    webDigester.parse(is);
-
-                    if (errorHandler.getParseException() != null) {
-                        ok = false;
-                    }
-                } else {
-                    log.info("No web.xml, using defaults " + context );
-                }
-            } catch (SAXParseException e) {
-                log.error(sm.getString("contextConfig.applicationParse", url.toExternalForm()), e);
-                log.error(sm.getString("contextConfig.applicationPosition",
-                                 "" + e.getLineNumber(),
-                                 "" + e.getColumnNumber()));
-                ok = false;
-            } catch (Exception e) {
-                log.error(sm.getString("contextConfig.applicationParse", url.toExternalForm()), e);
-                ok = false;
-            } finally {
-                webDigester.reset();
-                try {
-                    stream.close();
-                } catch (IOException e) {
-                    log.error(sm.getString("contextConfig.applicationClose"), e);
-                }
-            }
-        }
-        webRuleSet.recycle();
-
-        long t2=System.currentTimeMillis();
-        if (context instanceof StandardContext) {
-            ((StandardContext) context).setStartupTime(t2-t1);
-        }
-    }
-
-
-    /**
      * Set up an Authenticator automatically if required, and one has not
      * already been configured.
      */
@@ -560,157 +468,7 @@ public class ContextConfig
         return System.getProperty("catalina.base");
     }
 
-    /**
-     * Process the default configuration file, if it exists.
-     * The default config must be read with the container loader - so
-     * container servlets can be loaded
-     */
-    protected void defaultWebConfig() {
-        long t1=System.currentTimeMillis();
-
-        // Open the default web.xml file, if it exists
-        if( defaultWebXml==null && context instanceof StandardContext ) {
-            defaultWebXml=((StandardContext)context).getDefaultWebXml();
-        }
-        // set the default if we don't have any overrides
-        if( defaultWebXml==null ) getDefaultWebXml();
-
-        File file = new File(this.defaultWebXml);
-        if (!file.isAbsolute()) {
-            file = new File(getBaseDir(),
-                            this.defaultWebXml);
-        }
-
-        InputStream stream = null;
-        InputSource source = null;
-
-        try {
-            if ( ! file.exists() ) {
-                // Use getResource and getResourceAsStream
-                stream = getClass().getClassLoader()
-                    .getResourceAsStream(defaultWebXml);
-                if( stream != null ) {
-                    source = new InputSource
-                            (getClass().getClassLoader()
-                            .getResource(defaultWebXml).toString());
-                } 
-                if( stream== null ) { 
-                    // maybe embedded
-                    stream = getClass().getClassLoader()
-                        .getResourceAsStream("web-embed.xml");
-                    if( stream != null ) {
-                        source = new InputSource
-                        (getClass().getClassLoader()
-                                .getResource("web-embed.xml").toString());
-                    }                                         
-                }
-                
-                if( stream== null ) {
-                    log.info("No default web.xml");
-                }
-            } else {
-                source =
-                    new InputSource("file://" + file.getAbsolutePath());
-                stream = new FileInputStream(file);
-                context.addWatchedResource(file.getAbsolutePath());
-            }
-        } catch (Exception e) {
-            log.error(sm.getString("contextConfig.defaultMissing") 
-                      + " " + defaultWebXml + " " + file , e);
-        }
-
-        if (stream != null) {
-            processDefaultWebConfig(webDigester, stream, source);
-            webRuleSet.recycle();
-        }
-
-        long t2=System.currentTimeMillis();
-        if( (t2-t1) > 200 )
-            log.debug("Processed default web.xml " + file + " "  + ( t2-t1));
-
-        stream = null;
-        source = null;
-
-        String resourceName = getHostConfigPath(Constants.HostWebXml);
-        file = new File(getConfigBase(), resourceName);
-        
-        try {
-            if ( ! file.exists() ) {
-                // Use getResource and getResourceAsStream
-                stream = getClass().getClassLoader()
-                    .getResourceAsStream(resourceName);
-                if( stream != null ) {
-                    source = new InputSource
-                            (getClass().getClassLoader()
-                            .getResource(resourceName).toString());
-                }
-            } else {
-                source =
-                    new InputSource("file://" + file.getAbsolutePath());
-                stream = new FileInputStream(file);
-            }
-        } catch (Exception e) {
-            log.error(sm.getString("contextConfig.defaultMissing") 
-                      + " " + resourceName + " " + file , e);
-        }
-
-        if (stream != null) {
-            processDefaultWebConfig(webDigester, stream, source);
-            webRuleSet.recycle();
-        }
-
-    }
-
-
-    /**
-     * Process a default web.xml.
-     */
-    protected void processDefaultWebConfig(Digester digester, InputStream stream, 
-            InputSource source) {
-
-        if (log.isDebugEnabled())
-            log.debug("Processing context [" + context.getName() 
-                    + "] web configuration resource " + source.getSystemId());
-
-        // Process the default web.xml file
-        synchronized (digester) {
-            try {
-                source.setByteStream(stream);
-                
-                if (context instanceof StandardContext)
-                    ((StandardContext) context).setReplaceWelcomeFiles(true);
-                digester.setClassLoader(this.getClass().getClassLoader());
-                digester.setUseContextClassLoader(false);
-                digester.push(context);
-                ContextErrorHandler errorHandler = new ContextErrorHandler();
-                digester.setErrorHandler(errorHandler);
-                digester.parse(source);
-                if (errorHandler.getParseException() != null) {
-                    ok = false;
-                }
-            } catch (SAXParseException e) {
-                log.error(sm.getString("contextConfig.defaultParse"), e);
-                log.error(sm.getString("contextConfig.defaultPosition",
-                                 "" + e.getLineNumber(),
-                                 "" + e.getColumnNumber()));
-                ok = false;
-            } catch (Exception e) {
-                log.error(sm.getString("contextConfig.defaultParse"), e);
-                ok = false;
-            } finally {
-                digester.reset();
-                try {
-                    if (stream != null) {
-                        stream.close();
-                    }
-                } catch (IOException e) {
-                    log.error(sm.getString("contextConfig.defaultClose"), e);
-                }
-            }
-        }
-    }
-
-
+    
     /**
      * Process the default configuration file, if it exists.
      */
@@ -1060,8 +818,8 @@ public class ContextConfig
         }
         webDigester = createWebXmlDigester(useXmlNamespaceAware, useXmlValidation);
         
-        defaultWebConfig();
-        applicationWebConfig();
+        webConfig();
+
         if (!context.getIgnoreAnnotations()) {
             applicationAnnotationsConfig();
         }
@@ -1357,6 +1115,272 @@ public class ContextConfig
         }
         result.append(resourceName);
         return result.toString();
+    }
+
+
+    /**
+     * Scan the web.xml files that apply to the web application and merge them
+     * using the rules defined in the spec. For the global web.xml files,
+     * where there is duplicate configuration, the most specific level wins. ie
+     * an application's web.xml takes precedence over the host level or global
+     * web.xml file.
+     */
+    protected void webConfig() {
+        WebXml webXml = new WebXml();
+        // Parse global web.xml if present
+        InputSource globalWebXml = getGlobalWebXmlSource();
+        if (globalWebXml == null) {
+            // This is unusual enough to log
+            log.info(sm.getString("contextConfig.defaultMissing"));
+        } else {
+            parseWebXml(globalWebXml, webXml);
+        }
+
+        // Parse host level web.xml if present
+        // Additive apart from welcome pages
+        webXml.setReplaceWelcomeFiles(true);
+        InputSource hostWebXml = getHostWebXmlSource();
+        parseWebXml(hostWebXml, webXml);
+        
+        // Parse context level web.xml
+        webXml.setReplaceWelcomeFiles(true);
+        InputSource contextWebXml = getContextWebXmlSource();
+        parseWebXml(contextWebXml, webXml);
+        
+        if (!webXml.isMetadataComplete()) {
+            // Have to process JARs for fragments
+            Map<String,WebXml> fragments = processJarsForWebFragments();
+            
+            // Merge the fragments into the main web.xml
+            mergeWebFragments(webXml, fragments);
+
+            // Apply merged web.xml to Context
+            webXml.configureContext(context);
+            
+            // Process JARs for annotations
+            processAnnotationsInJars(fragments);
+
+            // Process /WEB-INF/classes for annotations
+            // TODO SERVLET3
+        } else {
+            // Apply merged web.xml to Context
+            webXml.configureContext(context);
+        }
+    }
+
+    
+    /**
+     * Identify the default web.xml to be used and obtain an input source for
+     * it.
+     */
+    protected InputSource getGlobalWebXmlSource() {
+        // Is a default web.xml specified for the Context?
+        if (defaultWebXml == null && context instanceof StandardContext) {
+            defaultWebXml = ((StandardContext) context).getDefaultWebXml();
+        }
+        // Set the default if we don't have any overrides
+        if (defaultWebXml == null) getDefaultWebXml();
+
+        return getWebXmlSource(defaultWebXml, getBaseDir());
+    }
+    
+    /**
+     * Identify the host web.xml to be used and obtain an input source for
+     * it.
+     */
+    protected InputSource getHostWebXmlSource() {
+        String resourceName = getHostConfigPath(Constants.HostWebXml);
+        
+        String basePath = null;
+        try {
+            basePath = getConfigBase().getCanonicalPath();
+        } catch (IOException e) {
+            log.error(sm.getString("contectConfig.baseError"), e);
+            return null;
+        }
+
+        return getWebXmlSource(resourceName, basePath);
+    }
+    
+    /**
+     * Identify the application web.xml to be used and obtain an input source
+     * for it.
+     */
+    protected InputSource getContextWebXmlSource() {
+        InputStream stream = null;
+        InputSource source = null;
+        URL url = null;
+        
+        String altDDName = null;
+
+        // Open the application web.xml file, if it exists
+        ServletContext servletContext = context.getServletContext();
+        if (servletContext != null) {
+            altDDName = (String)servletContext.getAttribute(
+                                                        Globals.ALT_DD_ATTR);
+            if (altDDName != null) {
+                try {
+                    stream = new FileInputStream(altDDName);
+                    url = new File(altDDName).toURI().toURL();
+                } catch (FileNotFoundException e) {
+                    log.error(sm.getString("contextConfig.altDDNotFound",
+                                           altDDName));
+                } catch (MalformedURLException e) {
+                    log.error(sm.getString("contextConfig.applicationUrl"));
+                }
+            }
+            else {
+                stream = servletContext.getResourceAsStream
+                    (Constants.ApplicationWebXml);
+                try {
+                    url = servletContext.getResource(
+                            Constants.ApplicationWebXml);
+                } catch (MalformedURLException e) {
+                    log.error(sm.getString("contextConfig.applicationUrl"));
+                }
+            }
+        }
+        if (stream == null || url == null) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("contextConfig.applicationMissing") + " " + context);
+            }
+        } else {
+            source = new InputSource(url.toExternalForm());
+            source.setByteStream(stream);
+        }
+        
+        return source;
+    }
+    
+    /**
+     * 
+     * @param filename  Name of the file (possibly with one or more leading path
+     *                  segemnts) to read
+     * @param path      Location that filename is relative to 
+     * @return
+     */
+    protected InputSource getWebXmlSource(String filename, String path) {
+        File file = new File(filename);
+        if (!file.isAbsolute()) {
+            file = new File(path, filename);
+        }
+
+        InputStream stream = null;
+        InputSource source = null;
+
+        try {
+            if (!file.exists()) {
+                // Use getResource and getResourceAsStream
+                stream =
+                    getClass().getClassLoader().getResourceAsStream(filename);
+                if(stream != null) {
+                    source =
+                        new InputSource(getClass().getClassLoader().getResource(
+                                filename).toString());
+                } 
+            } else {
+                source = new InputSource("file://" + file.getAbsolutePath());
+                stream = new FileInputStream(file);
+                context.addWatchedResource(file.getAbsolutePath());
+            }
+
+            if (stream != null && source != null) {
+                source.setByteStream(stream);
+            }
+        } catch (Exception e) {
+            log.error(sm.getString(
+                    "contextConfig.defaultError", filename, file), e);
+        }
+
+        return source;
+    }
+
+
+    protected void parseWebXml(InputSource source, WebXml dest) {
+        
+        if (source == null) return;
+
+        ContextErrorHandler handler = new ContextErrorHandler();
+
+        // Web digesters and rulesets are shared between contexts but are not
+        // thread safe. Whilst there should only be one thread at a time
+        // processing a config, play safe and sync.
+        synchronized(webDigester) {
+            
+            webDigester.push(dest);
+            webDigester.setErrorHandler(handler);
+            
+            if(log.isDebugEnabled()) {
+                log.debug(sm.getString("contextConfig.applicationStart",
+                        source.getSystemId()));
+            }
+
+            try {
+                webDigester.parse(source);
+
+                if (handler.getParseException() != null) {
+                    ok = false;
+                }
+            } catch (SAXParseException e) {
+                log.error(sm.getString("contextConfig.applicationParse",
+                        source.getSystemId()), e);
+                log.error(sm.getString("contextConfig.applicationPosition",
+                                 "" + e.getLineNumber(),
+                                 "" + e.getColumnNumber()));
+                ok = false;
+            } catch (Exception e) {
+                log.error(sm.getString("contextConfig.applicationParse",
+                        source.getSystemId()), e);
+                ok = false;
+            } finally {
+                webDigester.reset();
+                webRuleSet.recycle();
+            }
+        }
+    }
+
+
+    /**
+     * Scan /META-INF/lib for JARs and for each one found add it and any
+     * /META-INF/web-fragment.xml to the resulting Map. web-fragment.xml files
+     * will be parsed before being added to the map. Every JAR will be added and
+     * <code>null</code> will be used if no web-fragment.xml was found. Any JARs
+     * known not contain fragments will be skipped.
+     * 
+     * @return A map of JAR name to processed web fragment (if any)
+     */
+    protected Map<String,WebXml> processJarsForWebFragments() {
+        // TODO SERVLET3
+        return new HashMap<String,WebXml>();
+    }
+
+
+    /**
+     * Merges the web-fragment.xml and web.xml files as per the rules in the
+     * Servlet spec.
+     * 
+     * @param application   The application web.xml file
+     * @param fragments     The map of JARs to web fragments
+     */
+    protected void mergeWebFragments(WebXml application,
+            Map<String,WebXml> fragments) {
+        // TODO SERVLET3
+        // Check order
+        
+        // Merge fragments in order - conflict == error
+        
+        // Merge fragment into application - conflict == application wins 
+    }
+
+    
+    protected void processAnnotationsInJars(Map<String,WebXml> fragments) {
+        for(String jar : fragments.keySet()) {
+            WebXml fragment = fragments.get(jar);
+            if (fragment == null || !fragment.isMetadataComplete()) {
+                // Scan jar for annotations
+                // TODO SERVLET3
+            }
+        }
     }
 
 
