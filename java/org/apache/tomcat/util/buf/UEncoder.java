@@ -44,7 +44,6 @@ public final class UEncoder {
     private ByteChunk bb=null;
 
     private String encoding="UTF8";
-    private static final int debug=0;
     
     public UEncoder() {
         initSafeChars();
@@ -75,10 +74,12 @@ public final class UEncoder {
         for (int i = 0; i < s.length(); i++) {
             int c = s.charAt(i);
             if( safeChars.get( c ) ) {
-                if( debug > 0 ) log("Safe: " + (char)c);
+                if(log.isDebugEnabled())
+                    log.debug("Encoder: Safe: " + (char)c);
                 buf.write((char)c);
             } else {
-                if( debug > 0 ) log("Unsafe:  " + (char)c);
+                if(log.isDebugEnabled())
+                    log.debug("Encoder: Unsafe:  " + (char)c);
                 c2b.convert( (char)c );
                 
                 // "surrogate" - UTF is _not_ 16 bit, but 21 !!!!
@@ -87,7 +88,8 @@ public final class UEncoder {
                     if ( (i+1) < s.length()) {
                         int d = s.charAt(i+1);
                         if (d >= 0xDC00 && d <= 0xDFFF) {
-                            if( debug > 0 ) log("Unsafe:  " + c);
+                            if(log.isDebugEnabled())
+                                log.debug("Encoder: Unsafe:  " + c);
                             c2b.convert( (char)d);
                             i++;
                         }
@@ -110,10 +112,12 @@ public final class UEncoder {
         for( int j=off; j< len; j++ ) {
             buf.write( '%' );
             char ch = Character.forDigit((bytes[j] >> 4) & 0xF, 16);
-            if( debug > 0 ) log("Encode:  " + ch);
+            if(log.isDebugEnabled())
+                log.debug("Encoder: Encode:  " + ch);
             buf.write(ch);
             ch = Character.forDigit(bytes[j] & 0xF, 16);
-            if( debug > 0 ) log("Encode:  " + ch);
+            if(log.isDebugEnabled())
+                log.debug("Encoder: Encode:  " + ch);
             buf.write(ch);
         }
     }
@@ -166,10 +170,5 @@ public final class UEncoder {
         safeChars.set('(');
         safeChars.set(')');
         safeChars.set(',');
-    }
-
-    private static void log( String s ) {
-        if (log.isDebugEnabled())
-            log.debug("Encoder: " + s );
     }
 }

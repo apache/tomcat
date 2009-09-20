@@ -190,13 +190,15 @@ public final class Cookies { // extends MultiMap {
 
             // Uncomment to test the new parsing code
             if( cookieValue.getType() == MessageBytes.T_BYTES ) {
-                if( dbg>0 ) log( "Parsing b[]: " + cookieValue.toString());
+                if(log.isDebugEnabled())
+                    log.debug("Cookies: Parsing b[]: " + cookieValue.toString());
                 ByteChunk bc=cookieValue.getByteChunk();
                 processCookieHeader( bc.getBytes(),
                                      bc.getOffset(),
                                      bc.getLength());
             } else {
-                if( dbg>0 ) log( "Parsing S: " + cookieValue.toString());
+                if(log.isDebugEnabled())
+                    log.debug("Cookies: Parsing S: " + cookieValue.toString());
                 processCookieHeader( cookieValue.toString() );
             }
             pos++;// search from the next position
@@ -224,7 +226,8 @@ public final class Cookies { // extends MultiMap {
     
     private void processCookieHeader(  String cookieString )
     {
-        if( dbg>0 ) log( "Parsing cookie header " + cookieString );
+        if(log.isDebugEnabled())
+            log.debug("Cookies: Parsing cookie header " + cookieString);
         // normal cookie, with a string value.
         // This is the original code, un-optimized - it shouldn't
         // happen in normal case
@@ -248,7 +251,8 @@ public final class Cookies { // extends MultiMap {
                 
                 cookie.getName().setString(name);
                 cookie.getValue().setString(value);
-                if( dbg > 0 ) log( "Add cookie " + name + "=" + value);
+                if(log.isDebugEnabled())
+                    log.debug("Cookies: Add cookie " + name + "=" + value);
             } else {
                 // we have a bad cookie.... just let it go
             }
@@ -277,15 +281,6 @@ public final class Cookies { // extends MultiMap {
         }
         return value;
     }  
-
-
-    // log
-    static final int dbg=0;
-    public void log(String s ) {
-        if (log.isDebugEnabled())
-            log.debug("Cookies: " + s);
-    }
-
 
    /**
      * Returns true if the byte is a separator character as
@@ -426,7 +421,8 @@ public final class Cookies { // extends MultiMap {
                         // INVALID COOKIE, advance to next delimiter
                         // The starting character of the cookie value was
                         // not valid.
-                        log("Invalid cookie. Value not a token or quoted value");
+                        log.info("Cookies: Invalid cookie." +
+                                "Value not a token or quoted value");
                         while (pos < end && bytes[pos] != ';' && 
                                bytes[pos] != ',') 
                             {pos++; }
@@ -525,7 +521,7 @@ public final class Cookies { // extends MultiMap {
                 } 
 
                 // Unknown cookie, complain
-                log("Unknown Special Cookie");
+                log.info("Cookies: Unknown Special Cookie");
 
             } else { // Normal Cookie
                 sc = addCookie();

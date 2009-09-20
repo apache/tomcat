@@ -77,9 +77,8 @@ public final class IntrospectionUtils {
                 log.debug("No setAttribute in " + proxy.getClass());
             return;
         }
-        if (false)
-            if (log.isDebugEnabled())
-                log.debug("Setting " + n + "=" + v + "  in " + proxy);
+        if (log.isDebugEnabled())
+            log.debug("Setting " + n + "=" + v + "  in " + proxy);
         executeM.invoke(proxy, new Object[] { n, v });
         return;
     }
@@ -259,8 +258,9 @@ public final class IntrospectionUtils {
      * you can have setDebug(1).
      */
     public static boolean setProperty(Object o, String name, String value) {
-        if (dbg > 1)
-            d("setProperty(" + o.getClass() + " " + name + "=" + value + ")");
+        if (log.isDebugEnabled())
+            log.debug("IntrospectionUtils: setProperty(" +
+                    o.getClass() + " " + name + "=" + value + ")");
 
         String setter = "set" + capitalize(name);
 
@@ -318,13 +318,16 @@ public final class IntrospectionUtils {
                         try {
                             params[0] = InetAddress.getByName(value);
                         } catch (UnknownHostException exc) {
-                            d("Unable to resolve host name:" + value);
+                            if (log.isDebugEnabled())
+                                log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
                             ok = false;
                         }
 
                         // Unknown type
                     } else {
-                        d("Unknown type " + paramType.getName());
+                        if (log.isDebugEnabled())
+                            log.debug("IntrospectionUtils: Unknown type " +
+                                    paramType.getName());
                     }
 
                     if (ok) {
@@ -371,23 +374,17 @@ public final class IntrospectionUtils {
         } catch (IllegalArgumentException ex2) {
             log.warn("IAE " + o + " " + name + " " + value, ex2);
         } catch (SecurityException ex1) {
-            if (dbg > 0)
-                d("SecurityException for " + o.getClass() + " " + name + "="
-                        + value + ")");
-            if (dbg > 1)
-                ex1.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: SecurityException for " +
+                        o.getClass() + " " + name + "=" + value + ")", ex1);
         } catch (IllegalAccessException iae) {
-            if (dbg > 0)
-                d("IllegalAccessException for " + o.getClass() + " " + name
-                        + "=" + value + ")");
-            if (dbg > 1)
-                iae.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: IllegalAccessException for " +
+                        o.getClass() + " " + name + "=" + value + ")", iae);
         } catch (InvocationTargetException ie) {
-            if (dbg > 0)
-                d("InvocationTargetException for " + o.getClass() + " " + name
-                        + "=" + value + ")");
-            if (dbg > 1)
-                ie.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: InvocationTargetException for " +
+                        o.getClass() + " " + name + "=" + value + ")", ie);
         }
         return false;
     }
@@ -425,22 +422,17 @@ public final class IntrospectionUtils {
         } catch (IllegalArgumentException ex2) {
             log.warn("IAE " + o + " " + name, ex2);
         } catch (SecurityException ex1) {
-            if (dbg > 0)
-                d("SecurityException for " + o.getClass() + " " + name + ")");
-            if (dbg > 1)
-                ex1.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: SecurityException for " +
+                        o.getClass() + " " + name + ")", ex1);
         } catch (IllegalAccessException iae) {
-            if (dbg > 0)
-                d("IllegalAccessException for " + o.getClass() + " " + name
-                        + ")");
-            if (dbg > 1)
-                iae.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: IllegalAccessException for " +
+                        o.getClass() + " " + name + ")", iae);
         } catch (InvocationTargetException ie) {
-            if (dbg > 0)
-                d("InvocationTargetException for " + o.getClass() + " " + name
-                        + ")");
-            if (dbg > 1)
-                ie.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: InvocationTargetException for " +
+                        o.getClass() + " " + name + ")");
         }
         return null;
     }
@@ -460,10 +452,9 @@ public final class IntrospectionUtils {
                 }
             }
         } catch (Exception ex1) {
-            if (dbg > 0)
-                d("Exception for " + o.getClass() + " " + name);
-            if (dbg > 1)
-                ex1.printStackTrace();
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: Exception for " +
+                        o.getClass() + " " + name, ex1);
         }
     }
 
@@ -787,11 +778,14 @@ public final class IntrospectionUtils {
     public static Object callMethod1(Object target, String methodN,
             Object param1, String typeParam1, ClassLoader cl) throws Exception {
         if (target == null || param1 == null) {
-            d("Assert: Illegal params " + target + " " + param1);
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: Assert: Illegal params " +
+                        target + " " + param1);
         }
-        if (dbg > 0)
-            d("callMethod1 " + target.getClass().getName() + " "
-                    + param1.getClass().getName() + " " + typeParam1);
+        if (log.isDebugEnabled())
+            log.debug("IntrospectionUtils: callMethod1 " +
+                    target.getClass().getName() + " " +
+                    param1.getClass().getName() + " " + typeParam1);
 
         Class<?> params[] = new Class[1];
         if (typeParam1 == null)
@@ -808,11 +802,14 @@ public final class IntrospectionUtils {
     public static Object callMethod0(Object target, String methodN)
             throws Exception {
         if (target == null) {
-            d("Assert: Illegal params " + target);
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: Assert: Illegal params " +
+                        target);
             return null;
         }
-        if (dbg > 0)
-            d("callMethod0 " + target.getClass().getName() + "." + methodN);
+        if (log.isDebugEnabled())
+            log.debug("IntrospectionUtils: callMethod0 " +
+                    target.getClass().getName() + "." + methodN);
 
         Class<?> params[] = new Class[0];
         Method m = findMethod(target.getClass(), methodN, params);
@@ -829,13 +826,14 @@ public final class IntrospectionUtils {
         Method m = null;
         m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
-            d("Can't find method " + methodN + " in " + target + " CLASS "
-                    + target.getClass());
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: Can't find method " + methodN +
+                        " in " + target + " CLASS " + target.getClass());
             return null;
         }
         Object o = m.invoke(target, params);
 
-        if (dbg > 0) {
+        if (log.isDebugEnabled()) {
             // debug
             StringBuffer sb = new StringBuffer();
             sb.append("" + target.getClass().getName() + "." + methodN + "( ");
@@ -845,7 +843,7 @@ public final class IntrospectionUtils {
                 sb.append(params[i]);
             }
             sb.append(")");
-            d(sb.toString());
+            log.debug("IntrospectionUtils:" + sb.toString());
         }
         return o;
     }
@@ -871,12 +869,16 @@ public final class IntrospectionUtils {
             try {
                 result = InetAddress.getByName(object);
             } catch (UnknownHostException exc) {
-                d("Unable to resolve host name:" + object);
+                if (log.isDebugEnabled())
+                    log.debug("IntrospectionUtils: Unable to resolve host name:" +
+                            object);
             }
 
             // Unknown type
         } else {
-            d("Unknown type " + paramType.getName());
+            if (log.isDebugEnabled())
+                log.debug("IntrospectionUtils: Unknown type " +
+                        paramType.getName());
         }
         if (result == null) {
             throw new IllegalArgumentException("Can't convert argument: " + object);
@@ -899,11 +901,4 @@ public final class IntrospectionUtils {
 
     }
 
-    // debug --------------------
-    static final int dbg = 0;
-
-    static void d(String s) {
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: " + s);
-    }
 }
