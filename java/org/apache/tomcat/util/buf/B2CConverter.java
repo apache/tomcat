@@ -80,18 +80,19 @@ public class B2CConverter {
                 int cnt=conv.read( result, 0, size );
                 if( cnt <= 0 ) {
                     // End of stream ! - we may be in a bad state
-                    if( debug>0)
-                        log( "EOF" );
+                    if(log.isDebugEnabled())
+                        log.debug("B2CConverter: EOF");
                     return;
                 }
-                if( debug > 1 )
-                    log("Converted: " + new String( result, 0, cnt ));
+                if(log.isDebugEnabled())
+                    log.debug("B2CConverter: Converted: " +
+                            new String(result, 0, cnt));
                 cb.append( result, 0, cnt );
                 limit = limit - (bbLengthBeforeRead - bb.getLength());
             }
         } catch( IOException ex) {
-            if( debug>0)
-                log( "Reseting the converter " + ex.toString() );
+            if(log.isDebugEnabled())
+                log.debug("B2CConverter: Reseting the converter " + ex.toString());
             reset();
             throw ex;
         }
@@ -104,12 +105,6 @@ public class B2CConverter {
         // destroy the reader/iis
         iis=new IntermediateInputStream();
         conv=new ReadConvertor( iis, encoding );
-    }
-
-    private final int debug=0;
-    void log( String s ) {
-        if (log.isDebugEnabled())
-            log.debug("B2CConverter: " + s );
     }
 
 }
