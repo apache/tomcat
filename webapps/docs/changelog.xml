@@ -182,12 +182,17 @@
       </update>
     </changelog>
   </subsection>
-  <subsection name="Documentation">
+  <subsection name="Web applications">
      <changelog>
       <update>
-        <rev>631321</rev> Update changelog to support the &lt;rev&gt; element.
-        (fhanik)
+        <rev>631321</rev> Update changelog to support the &lt;rev&gt; element
+        in the documentation. (fhanik)
       </update>
+      <add>
+        A number of additional roles were added to the Manager application to
+        separate out permissions for the HTML interface, the text interface and
+        the JMX proxy. (markt) 
+      </add>
     </changelog>
   </subsection>
   <subsection name="Extras">
