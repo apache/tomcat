@@ -184,19 +184,20 @@ public class TestTomcat extends TestTomcatBase {
     public void testGetResource() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         
-        // Must have a real docBase - just use temp
-        StandardContext ctx = 
-            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
-        // You can customize the context by calling 
-        // its API
+        String contextPath = "/examples";
         
-        Tomcat.addServlet(ctx, "myServlet", new GetResource());
-        ctx.addServletMapping("/", "myServlet");
+        File appDir = new File("output/build/webapps" + contextPath);
+        // app dir is relative to server home
+        StandardContext ctx =
+            tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        
+        Tomcat.addServlet(ctx, "testGetResource", new GetResource());
+        ctx.addServletMapping("/testGetResource", "testGetResource");
         
         tomcat.start();
         
-        int rc =getUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
-                null);
+        int rc =getUrl("http://localhost:" + getPort() + contextPath +
+                "/testGetResource", new ByteChunk(), null);
         assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
