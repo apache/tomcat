@@ -52,7 +52,7 @@ public class TestTomcat extends TestTomcatBase {
     }
 
     /**
-     * Simple servlet to test iJNDI 
+     * Simple servlet to test JNDI 
      */
     public static class HelloWorldJndi extends HttpServlet {
 
@@ -77,6 +77,26 @@ public class TestTomcat extends TestTomcatBase {
         }
     }
 
+    /**
+     * Servlet that tries to obtain a URL for WEB-INF/web.xml
+     */
+    public static class GetResource extends HttpServlet {
+        
+        private static final long serialVersionUID = 1L;
+        
+        public void doGet(HttpServletRequest req, HttpServletResponse res) 
+        throws IOException {
+            URL url = req.getServletContext().getResource("/WEB-INF/web.xml");
+         
+            res.getWriter().write("The URL obtained for /WEB-INF/web.xml was ");
+            if (url == null) {
+                res.getWriter().write("null");
+            } else {
+                res.getWriter().write(url.toString());
+            }
+        }
+    }
+    
     /** 
      * Start tomcat with a single context and one 
      * servlet - all programmatic, no server.xml or 
@@ -99,13 +119,12 @@ public class TestTomcat extends TestTomcatBase {
         tomcat.start();
         
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals(res.toString(), "Hello world");
+        assertEquals("Hello world", res.toString());
     }
 
     public void testSingleWebapp() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        // Currently in sandbox/tomcat-lite
         File appDir = 
             new File("output/build/webapps/examples");
         // app dir is relative to server home
@@ -155,9 +174,31 @@ public class TestTomcat extends TestTomcatBase {
         tomcat.start();
         
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals(res.toString(), "Hello, Tomcat User");
+        assertEquals("Hello, Tomcat User", res.toString());
     }
 
+
+    /**
+     * Test for https://issues.apache.org/bugzilla/show_bug.cgi?id=47866
+     */
+    public void testGetResource() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        
+        // Must have a real docBase - just use temp
+        StandardContext ctx = 
+            tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
+        // You can customize the context by calling 
+        // its API
+        
+        Tomcat.addServlet(ctx, "myServlet", new GetResource());
+        ctx.addServletMapping("/", "myServlet");
+        
+        tomcat.start();
+        
+        int rc =getUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
+                null);
+        assertEquals(HttpServletResponse.SC_OK, rc);
+    }
 
     /**
      *  Wrapper for getting the response.
