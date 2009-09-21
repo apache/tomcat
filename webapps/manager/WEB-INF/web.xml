@@ -27,12 +27,6 @@
     Manager lets you view, load/unload/etc particular web applications.
   </description>
 
-  <!-- Define the Manager Servlet
-       Change servlet-class to: org.apache.catalina.servlets.HTMLManagerServlet
-       to get a Servlet with a more intuitive HTML interface, don't change if you
-       have software that is expected to parse the output from ManagerServlet
-       since they're not compatible.
-   -->
   <servlet>
     <servlet-name>Manager</servlet-name>
     <servlet-class>org.apache.catalina.manager.ManagerServlet</servlet-class>
@@ -66,59 +60,7 @@
   <!-- Define the Manager Servlet Mapping -->
   <servlet-mapping>
     <servlet-name>Manager</servlet-name>
-      <url-pattern>/list</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/expire</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/sessions</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/start</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/stop</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/install</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/remove</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/deploy</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/undeploy</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/reload</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/save</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/serverinfo</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/roles</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>Manager</servlet-name>
-      <url-pattern>/resources</url-pattern>
+      <url-pattern>/text/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Status</servlet-name>
@@ -148,30 +90,44 @@
   </resource-env-ref>
 
   <!-- Define a Security Constraint on this Application -->
+  <!-- NOTE:  None of these roles are present in the default users file -->
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>HTMLManger and Manager command</web-resource-name>
-      <url-pattern>/jmxproxy/*</url-pattern>
+      <web-resource-name>HTML Manger interface (for humans)</web-resource-name>
       <url-pattern>/html/*</url-pattern>
-      <url-pattern>/list</url-pattern>
-      <url-pattern>/expire</url-pattern>
-      <url-pattern>/sessions</url-pattern>
-      <url-pattern>/start</url-pattern>
-      <url-pattern>/stop</url-pattern>
-      <url-pattern>/install</url-pattern>
-      <url-pattern>/remove</url-pattern>
-      <url-pattern>/deploy</url-pattern>
-      <url-pattern>/undeploy</url-pattern>
-      <url-pattern>/reload</url-pattern>
-      <url-pattern>/save</url-pattern>
-      <url-pattern>/serverinfo</url-pattern>
-      <url-pattern>/status/*</url-pattern>
-      <url-pattern>/roles</url-pattern>
-      <url-pattern>/resources</url-pattern>
     </web-resource-collection>
     <auth-constraint>
-       <!-- NOTE:  This role is not present in the default users file -->
        <role-name>manager</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Text Manger interface (for scripts)</web-resource-name>
+      <url-pattern>/text/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+       <role-name>manager-scripts</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>JMX Proxy interface</web-resource-name>
+      <url-pattern>/jmxproxy/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+       <role-name>manager-jmx</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Status interface</web-resource-name>
+      <url-pattern>/status/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+       <role-name>manager</role-name>
+       <role-name>manager-scripts</role-name>
+       <role-name>manager-jmx</role-name>
+       <role-name>manager-status</role-name>
     </auth-constraint>
   </security-constraint>
 
@@ -184,14 +140,36 @@
   <!-- Security roles referenced by this web application -->
   <security-role>
     <description>
-      The role that is required to log in to the Manager Application
+      The role that is required to access the HTML Manager pages
     </description>
     <role-name>manager</role-name>
+  </security-role>
+  <security-role>
+    <description>
+      The role that is required to access the text Manager pages
+    </description>
+    <role-name>manager-scripts</role-name>
+  </security-role>
+  <security-role>
+    <description>
+      The role that is required to access the HTML JMX Proxy
+    </description>
+    <role-name>manager-jmx</role-name>
+  </security-role>
+  <security-role>
+    <description>
+      The role that is required to access to the Manager Status pages 
+    </description>
+    <role-name>manager-status</role-name>
   </security-role>
 
   <error-page>
     <error-code>401</error-code>
     <location>/401.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.jsp</location>
   </error-page>
 
 </web-app>

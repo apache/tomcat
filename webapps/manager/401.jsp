@@ -35,15 +35,31 @@
     You are not authorized to view this page. If you have not changed
     any configuration files, please examine the file
     <tt>conf/tomcat-users.xml</tt> in your installation. That
-    file will contain the credentials to let you use this webapp.
+    file must contain the credentials to let you use this webapp.
    </p>
    <p>
-    You will need to add <tt>manager</tt> role to the config file listed above.
-    For example:
+    For example, to add the <tt>manager</tt> role to a user named
+    <tt>tomcat</tt> with a password of <tt>s3cret</tt>, add the following to the
+    config file listed above.
 <pre>
 &lt;role rolename="manager"/&gt;
 &lt;user username="tomcat" password="s3cret" roles="manager"/&gt;
 </pre>
+   </p>
+   <p>
+    Note that for Tomcat 7 onwards, the roles required to use the manager
+    application were changed from the single <tt>manager</tt> role to the
+    following four roles. You will need to assign the role(s) required for
+    the functionality you wish to access.
+    <ul>
+      <li><tt>manager</tt> - allows access to the HTML GUI and the status
+          pages</li>
+      <li><tt>manager-scripts</tt> - allows access to the text interface and the
+          status pages</li>
+      <li><tt>manager-jmx</tt> - allows access to the JMX proxy and the status
+          pages</li>
+      <li><tt>manager-status</tt> - allows access to the just status pages</li>
+    </ul>
    </p>
    <p>
     For more information - please see the
