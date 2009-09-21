@@ -211,7 +211,7 @@ an example of restricting access to the localhost by IP address:
 <p>All commands that the Manager application knows how to process are
 specified in a single request URI like this:</p>
 <source>
-http://{host}:{port}/manager/{command}?{parameters}
+http://{host}:{port}/manager/text/{command}?{parameters}
 </source>
 <p>where <code>{host}</code> and <code>{port}</code> represent the hostname
 and port number on which Tomcat is running, <code>{command}</code>
@@ -270,7 +270,7 @@ version of the messages.</p>
 <subsection name="Deploy A New Application Remotely">
 
 <source>
-http://localhost:8080/manager/deploy?path=/foo
+http://localhost:8080/manager/text/deploy?path=/foo
 </source>
 
 <p>Upload the web application archive (WAR) file that is specified as the
@@ -343,7 +343,7 @@ has been deployed using the <code>tag</code> attribute. Note that the work
 directory for the manager webapp will contain the previously deployed WARs;
 removing it would make the deployment fail.
 <source>
-http://localhost:8080/manager/deploy?path=/footoo&amp;tag=footag
+http://localhost:8080/manager/text/deploy?path=/footoo&amp;tag=footag
 </source>
 </p>
 
@@ -362,7 +362,7 @@ the entire WAR file.</p>
 <code>/path/to/foo</code> on the Tomcat server is deployed as the
 web application context named <code>/footoo</code>.
 <source>
-http://localhost:8080/manager/deploy?path=/footoo&amp;war=file:/path/to/foo
+http://localhost:8080/manager/text/deploy?path=/footoo&amp;war=file:/path/to/foo
 </source>
 </p>
 
@@ -372,7 +372,7 @@ Tomcat server is deployed as the web application context named
 so the context path defaults to the name of the web application archive
 file without the ".war" extension.
 <source>
-http://localhost:8080/manager/deploy?war=jar:file:/path/to/bar.war!/
+http://localhost:8080/manager/text/deploy?war=jar:file:/path/to/bar.war!/
 </source>
 </p>
 
@@ -387,7 +387,7 @@ extension is used as the path.</p>
 deployed as the web application context named <code>/foo</code>. Notice
 that the context path used is the name of the web application directory.
 <source>
-http://localhost:8080/manager/deploy?war=foo
+http://localhost:8080/manager/text/deploy?war=foo
 </source>
 </p>
 
@@ -395,7 +395,7 @@ http://localhost:8080/manager/deploy?war=foo
 Host appBase directory on the Tomcat server is deployed as the web
 application context named <code>/bar</code>.
 <source>
-http://localhost:8080/manager/deploy?war=bar.war
+http://localhost:8080/manager/text/deploy?war=bar.war
 </source>
 </p>
 
@@ -430,7 +430,7 @@ docBase configured in the context configuration ".xml" file.</p>
 <p>Here is an example of deploying an application using a Context
 configuration ".xml" file.
 <source>
-http://localhost:8080/manager/deploy?config=file:/path/context.xml
+http://localhost:8080/manager/text/deploy?config=file:/path/context.xml
 </source>
 </p>
 
@@ -438,7 +438,7 @@ http://localhost:8080/manager/deploy?config=file:/path/context.xml
 configuration ".xml" file and a web application ".war" file located
 on the server.
 <source>
-http://localhost:8080/manager/deploy?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/
+http://localhost:8080/manager/text/deploy?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/
 </source>
 </p>
 
@@ -529,7 +529,7 @@ error message.  Possible causes for problems include:</p>
 <subsection name="List Currently Deployed Applications">
 
 <source>
-http://localhost:8080/manager/list
+http://localhost:8080/manager/text/list
 </source>
 
 <p>List the context paths, current status (<code>running</code> or
@@ -549,7 +549,7 @@ OK - Listed applications for virtual host localhost
 <subsection name="Reload An Existing Application">
 
 <source>
-http://localhost:8080/manager/reload?path=/examples
+http://localhost:8080/manager/text/reload?path=/examples
 </source>
 
 <p>Signal an existing application to shut itself down and reload.  This can
@@ -608,7 +608,7 @@ error message.  Possible causes for problems include:</p>
 <subsection name="List OS and JVM Properties">
 
 <source>
-http://localhost:8080/manager/serverinfo
+http://localhost:8080/manager/text/serverinfo
 </source>
 
 <p>Lists information about the Tomcat version, OS, and JVM properties.</p>
@@ -628,7 +628,7 @@ include an error message.  Possible causes for problems include:</p>
 <subsection name="List Available Global JNDI Resources">
 
 <source>
-http://localhost:8080/manager/resources[?type=xxxxx]
+http://localhost:8080/manager/text/resources[?type=xxxxx]
 </source>
 
 <p>List the global JNDI resources that are available for use in resource
@@ -680,7 +680,7 @@ include an error message.  Possible causes for problems include:</p>
 <subsection name="List Available Security Roles">
 
 <source>
-http://localhost:8080/manager/roles
+http://localhost:8080/manager/text/roles
 </source>
 
 <p>List the security role names (and corresponding descriptions) that are
@@ -733,7 +733,7 @@ include an error message.  Possible causes for problems include:</p>
 <subsection name="Session Statistics">
 
 <source>
-http://localhost:8080/manager/sessions?path=/examples
+http://localhost:8080/manager/text/sessions?path=/examples
 </source>
 
 <p>Display the default session timeout for a web application, and the
@@ -753,7 +753,7 @@ Default maximum session inactive interval 30 minutes
 <subsection name="Start an Existing Application">
 
 <source>
-http://localhost:8080/manager/start?path=/examples
+http://localhost:8080/manager/text/start?path=/examples
 </source>
 
 <p>Signal a stopped application to restart, and make itself available again.
@@ -796,7 +796,7 @@ error message.  Possible causes for problems include:</p>
 <subsection name="Stop an Existing Application">
 
 <source>
-http://localhost:8080/manager/stop?path=/examples
+http://localhost:8080/manager/text/stop?path=/examples
 </source>
 
 <p>Signal an existing application to make itself unavailable, but leave it
@@ -839,7 +839,7 @@ error message.  Possible causes for problems include:</p>
 <subsection name="Undeploy an Existing Application">
 
 <source>
-http://localhost:8080/manager/undeploy?path=/examples
+http://localhost:8080/manager/text/undeploy?path=/examples
 </source>
 
 <p><strong><font color="red">WARNING</font> - This command will delete any web 
@@ -928,7 +928,7 @@ file might look something like this:</p>
   &lt;property name="path"     value="/myapp"/&gt;
 
   &lt;!-- Configure properties to access the Manager application --&gt;
-  &lt;property name="url"      value="http://localhost:8080/manager"/&gt;
+  &lt;property name="url"      value="http://localhost:8080/manager/text"/&gt;
   &lt;property name="username" value="myusername"/&gt;
   &lt;property name="password" value="mypassword"/&gt;
 
