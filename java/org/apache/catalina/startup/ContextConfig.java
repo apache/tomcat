@@ -1191,9 +1191,14 @@ public class ContextConfig
     protected InputSource getHostWebXmlSource() {
         String resourceName = getHostConfigPath(Constants.HostWebXml);
         
+        // In an embedded environment, configBase might not be set
+        File configBase = getConfigBase();
+        if (configBase == null)
+            return null;
+        
         String basePath = null;
         try {
-            basePath = getConfigBase().getCanonicalPath();
+            basePath = configBase.getCanonicalPath();
         } catch (IOException e) {
             log.error(sm.getString("contectConfig.baseError"), e);
             return null;
