@@ -494,7 +494,12 @@ public class WebXml {
             // Description is ignored
             // Display name is ignored
             // Icons are ignored
-            wrapper.setJspFile(servlet.getJspFile());
+            // Only set this if it is non-null else every servlet will get
+            // marked as the JSP servlet
+            String jspFile = servlet.getJspFile();
+            if (jspFile != null) {
+                wrapper.setJspFile(jspFile);
+            }
             if (servlet.getLoadOnStartup() != null) {
                 wrapper.setLoadOnStartup(servlet.getLoadOnStartup().intValue());
             }
