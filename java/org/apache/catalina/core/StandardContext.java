@@ -85,6 +85,7 @@ import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.loader.WebappLoader;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.startup.ContextConfig;
+import org.apache.catalina.startup.DefaultJarScanner;
 import org.apache.catalina.startup.TldConfig;
 import org.apache.catalina.util.CharsetMapper;
 import org.apache.catalina.util.ExtensionValidator;
@@ -99,6 +100,7 @@ import org.apache.naming.resources.FileDirContext;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.WARDirContext;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.modeler.Registry;
 
 /**
@@ -725,12 +727,30 @@ public class StandardContext
      */
     private boolean useHttpOnly = true;
 
+    /**
+     * The Jar scanner to use to search for Jars that might contain
+     * configuration information such as TLDs or web-fragment.xml files. 
+     */
+    private JarScanner jarScanner = null;
 
 
 
     // ----------------------------------------------------- Context Properties
 
 
+    public JarScanner getJarScanner() {
+        if (jarScanner == null) {
+            jarScanner = new DefaultJarScanner();
+        }
+        return jarScanner;
+    }
+
+
+    public void setJarScanner(JarScanner jarScanner) {
+        this.jarScanner = jarScanner;
+    }
+
+     
     public InstanceManager getInstanceManager() {
        return instanceManager;
     }
@@ -4458,6 +4478,11 @@ public class StandardContext
         try {
             
             // Create context attributes that will be required
+            if (ok) {
+                getServletContext().setAttribute(
+                        JarScanner.class.getName(), getJarScanner());
+            }
+
             if (ok) {
                 postWelcomeFiles();
             }

@@ -57,6 +57,7 @@
         <item name="Listeners"             href="listeners.html"/>
         <item name="Global Resources"      href="globalresources.html"/>
         <item name="Loader"                href="loader.html"/>
+        <item name="JarScanner"            href="jar-scanner.html"/>
         <item name="Manager"               href="manager.html"/> 
         <item name="Realm"                 href="realm.html"/>
         <item name="Resources"             href="resources.html"/>

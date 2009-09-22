@@ -21,6 +21,7 @@ package org.apache.catalina;
 
 import javax.servlet.ServletContext;
 
+import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.http.mapper.Mapper;
 
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -1080,6 +1081,20 @@ public interface Context extends Container {
      * @param path The path to the desired resource
      */
     public String getRealPath(String path);
+
+    /**
+     * Get the Jar Scanner to be used to scan for JAR resources for this
+     * context.
+     * @return  The Jar Scanner configured for this context.
+     */
+    public JarScanner getJarScanner();
+
+    /**
+     * Set the Jar Scanner to be used to scan for JAR resources for this
+     * context.
+     * @param jarScanner    The Jar Scanner to be used for this context.
+     */
+    public void setJarScanner(JarScanner jarScanner);
 
 }
 
