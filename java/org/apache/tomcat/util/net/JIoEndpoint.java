@@ -233,12 +233,16 @@ public class JIoEndpoint extends AbstractEndpoint {
                 } else {
                     serverSocket = serverSocketFactory.createSocket(getPort(), getBacklog(), getAddress());
                 }
-            } catch (BindException be) {
+            } catch (BindException orig) {
+                String msg;
                 if (getAddress() == null)
-                    throw new BindException(be.getMessage() + "<null>:" + getPort());
+                    msg = orig.getMessage() + " <null>:" + getPort();
                 else
-                    throw new BindException(be.getMessage() + " " +
-                            getAddress().toString() + ":" + getPort());
+                    msg = orig.getMessage() + " " +
+                            getAddress().toString() + ":" + getPort();
+                BindException be = new BindException(msg);
+                be.initCause(orig);
+                throw be;
             }
         }
         //if( serverTimeout >= 0 )
