@@ -24,11 +24,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import javax.servlet.ServletContext;
 
@@ -53,6 +57,8 @@ import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
+import org.apache.tomcat.JarScanner;
+import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
@@ -141,18 +147,31 @@ public class ContextConfig
      * deployment descriptor files.
      */
     protected Digester webDigester = null;
-    
-    
+
     /**
-     * The <code>Digester</code>s available to process web application
+     * The <code>Digester</code> we will use to process web fragment
      * deployment descriptor files.
      */
+    protected Digester webFragmentDigester = null;
+
+    
     protected static Digester[] webDigesters = new Digester[4];
+
+    /**
+     * The <code>Digester</code>s available to process web fragment
+     * deployment descriptor files.
+     */
+    protected static Digester[] webFragmentDigesters = new Digester[4];
     
     /**
-     * The <code>Rule</code> used to parse the web.xml
+     * The <code>Rule</code>s used to parse the web.xml
      */
-    protected static WebRuleSet webRuleSet = new WebRuleSet();
+    protected static WebRuleSet webRuleSet = new WebRuleSet(false);
+
+    /**
+     * The <code>Rule</code>s used to parse the web-fragment.xml
+     */
+    protected static WebRuleSet webFragmentRuleSet = new WebRuleSet(true);
 
     /**
      * Deployment count.
@@ -163,6 +182,61 @@ public class ContextConfig
     protected static final LoginConfig DUMMY_LOGIN_CONFIG =
                                 new LoginConfig("NONE", null, null, null);
 
+
+    // Names of JARs that are known not to contain web-fragment.xml
+    private static HashSet<String> noFragmentJars;
+    
+    /*
+     * Initializes the set of JARs that are known not to contain any TLDs
+     */
+    static {
+        noFragmentJars = new HashSet<String>();
+        // Bootstrap JARs
+        noFragmentJars.add("bootstrap.jar");
+        noFragmentJars.add("commons-daemon.jar");
+        noFragmentJars.add("tomcat-juli.jar");
+        // Main JARs
+        noFragmentJars.add("annotations-api.jar");
+        noFragmentJars.add("catalina.jar");
+        noFragmentJars.add("catalina-ant.jar");
+        noFragmentJars.add("catalina-ha.jar");
+        noFragmentJars.add("catalina-tribes.jar");
+        noFragmentJars.add("el-api.jar");
+        noFragmentJars.add("jasper.jar");
+        noFragmentJars.add("jasper-el.jar");
+        noFragmentJars.add("jasper-jdt.jar");
+        noFragmentJars.add("jsp-api.jar");
+        noFragmentJars.add("servlet-api.jar");
+        noFragmentJars.add("tomcat-api.jar");
+        noFragmentJars.add("tomcat-coyote.jar");
+        noFragmentJars.add("tomcat-dbcp.jar");
+        // i18n JARs
+        noFragmentJars.add("tomcat-i18n-en.jar");
+        noFragmentJars.add("tomcat-i18n-es.jar");
+        noFragmentJars.add("tomcat-i18n-fr.jar");
+        noFragmentJars.add("tomcat-i18n-ja.jar");
+        // Misc JARs not included with Tomcat
+        noFragmentJars.add("ant.jar");
+        noFragmentJars.add("commons-dbcp.jar");
+        noFragmentJars.add("commons-beanutils.jar");
+        noFragmentJars.add("commons-fileupload-1.0.jar");
+        noFragmentJars.add("commons-pool.jar");
+        noFragmentJars.add("commons-digester.jar");
+        noFragmentJars.add("commons-logging.jar");
+        noFragmentJars.add("commons-collections.jar");
+        noFragmentJars.add("jmx.jar");
+        noFragmentJars.add("jmx-tools.jar");
+        noFragmentJars.add("xercesImpl.jar");
+        noFragmentJars.add("xmlParserAPIs.jar");
+        noFragmentJars.add("xml-apis.jar");
+        // JARs from J2SE runtime
+        noFragmentJars.add("sunjce_provider.jar");
+        noFragmentJars.add("ldapsec.jar");
+        noFragmentJars.add("localedata.jar");
+        noFragmentJars.add("dnsns.jar");
+        noFragmentJars.add("tools.jar");
+        noFragmentJars.add("sunpkcs11.jar");
+    }
 
     // ------------------------------------------------------------- Properties
 
@@ -412,36 +486,47 @@ public class ContextConfig
      * Create (if necessary) and return a Digester configured to process the
      * web application deployment descriptor (web.xml).
      */
-    public static Digester createWebXmlDigester(boolean namespaceAware,
-                                                boolean validation) {
+    public void createWebXmlDigester(boolean namespaceAware,
+            boolean validation) {
         
-        Digester digester = null;
         if (!namespaceAware && !validation) {
             if (webDigesters[0] == null) {
                 webDigesters[0] = DigesterFactory.newDigester(validation,
                         namespaceAware, webRuleSet);
+                webFragmentDigesters[0] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
             }
-            digester = webDigesters[0];
+            webDigester = webDigesters[0];
+            webFragmentDigester = webFragmentDigesters[0];
+            
         } else if (!namespaceAware && validation) {
             if (webDigesters[1] == null) {
                 webDigesters[1] = DigesterFactory.newDigester(validation,
                         namespaceAware, webRuleSet);
+                webFragmentDigesters[1] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
             }
-            digester = webDigesters[1];
+            webDigester = webDigesters[1];
+            webFragmentDigester = webFragmentDigesters[1];
         } else if (namespaceAware && !validation) {
             if (webDigesters[2] == null) {
                 webDigesters[2] = DigesterFactory.newDigester(validation,
                         namespaceAware, webRuleSet);
+                webFragmentDigesters[2] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
             }
-            digester = webDigesters[2];
+            webDigester = webDigesters[2];
+            webFragmentDigester = webFragmentDigesters[2];
         } else {
             if (webDigesters[3] == null) {
                 webDigesters[3] = DigesterFactory.newDigester(validation,
+                        namespaceAware, webFragmentRuleSet);
+                webFragmentDigesters[3] = DigesterFactory.newDigester(validation,
                         namespaceAware, webRuleSet);
             }
-            digester = webDigesters[3];
+            webDigester = webDigesters[3];
+            webFragmentDigester = webFragmentDigesters[3];
         }
-        return digester;
     }
 
     
@@ -816,7 +901,8 @@ public class ContextConfig
                     context.getName(), Boolean.valueOf(useXmlValidation),
                     Boolean.valueOf(useXmlNamespaceAware)));
         }
-        webDigester = createWebXmlDigester(useXmlNamespaceAware, useXmlValidation);
+        
+        createWebXmlDigester(useXmlNamespaceAware, useXmlValidation);
         
         webConfig();
 
@@ -1133,23 +1219,23 @@ public class ContextConfig
             // This is unusual enough to log
             log.info(sm.getString("contextConfig.defaultMissing"));
         } else {
-            parseWebXml(globalWebXml, webXml);
+            parseWebXml(globalWebXml, webXml, false);
         }
 
         // Parse host level web.xml if present
         // Additive apart from welcome pages
         webXml.setReplaceWelcomeFiles(true);
         InputSource hostWebXml = getHostWebXmlSource();
-        parseWebXml(hostWebXml, webXml);
+        parseWebXml(hostWebXml, webXml, false);
         
         // Parse context level web.xml
         webXml.setReplaceWelcomeFiles(true);
         InputSource contextWebXml = getContextWebXmlSource();
-        parseWebXml(contextWebXml, webXml);
+        parseWebXml(contextWebXml, webXml, false);
         
         if (!webXml.isMetadataComplete()) {
             // Have to process JARs for fragments
-            Map<String,WebXml> fragments = processJarsForWebFragments();
+            Map<URL,WebXml> fragments = processJarsForWebFragments();
             
             // Merge the fragments into the main web.xml
             mergeWebFragments(webXml, fragments);
@@ -1301,7 +1387,8 @@ public class ContextConfig
     }
 
 
-    protected void parseWebXml(InputSource source, WebXml dest) {
+    protected void parseWebXml(InputSource source, WebXml dest,
+            boolean fragment) {
         
         if (source == null) return;
 
@@ -1310,10 +1397,17 @@ public class ContextConfig
         // Web digesters and rulesets are shared between contexts but are not
         // thread safe. Whilst there should only be one thread at a time
         // processing a config, play safe and sync.
-        synchronized(webDigester) {
+        Digester digester;
+        if (fragment) {
+            digester = webFragmentDigester;
+        } else {
+            digester = webDigester;
+        }
+        
+        synchronized(digester) {
             
-            webDigester.push(dest);
-            webDigester.setErrorHandler(handler);
+            digester.push(dest);
+            digester.setErrorHandler(handler);
             
             if(log.isDebugEnabled()) {
                 log.debug(sm.getString("contextConfig.applicationStart",
@@ -1321,7 +1415,7 @@ public class ContextConfig
             }
 
             try {
-                webDigester.parse(source);
+                digester.parse(source);
 
                 if (handler.getParseException() != null) {
                     ok = false;
@@ -1338,8 +1432,12 @@ public class ContextConfig
                         source.getSystemId()), e);
                 ok = false;
             } finally {
-                webDigester.reset();
-                webRuleSet.recycle();
+                digester.reset();
+                if (fragment) {
+                    webFragmentRuleSet.recycle();
+                } else {
+                    webRuleSet.recycle();
+                }
             }
         }
     }
@@ -1354,11 +1452,95 @@ public class ContextConfig
      * 
      * @return A map of JAR name to processed web fragment (if any)
      */
-    protected Map<String,WebXml> processJarsForWebFragments() {
-        // TODO SERVLET3
-        return new HashMap<String,WebXml>();
+    protected Map<URL,WebXml> processJarsForWebFragments() {
+        
+        JarScanner jarScanner = context.getJarScanner();
+        FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
+        
+        jarScanner.scan(context.getServletContext(),
+                context.getLoader().getClassLoader(), callback, noFragmentJars);
+        
+        return callback.getFragments();
     }
 
+    private class FragmentJarScannerCallback implements JarScannerCallback {
+
+        private static final String FRAGMENT_LOCATION =
+            "META-INF/web-fragment.xml";
+        private Map<URL,WebXml> fragments = new HashMap<URL,WebXml>();
+        
+        @Override
+        public void scan(JarURLConnection urlConn) throws IOException {
+            
+            JarFile jarFile = null;
+            InputStream stream = null;
+            WebXml fragment = null;
+
+            try {
+                urlConn.setUseCaches(false);
+                jarFile = urlConn.getJarFile();
+                JarEntry fragmentEntry =
+                    jarFile.getJarEntry(FRAGMENT_LOCATION);
+                if (fragmentEntry != null) {
+                    stream = jarFile.getInputStream(fragmentEntry);
+                    InputSource source = new InputSource(
+                            urlConn.getJarFileURL().toString() +
+                            File.separatorChar + FRAGMENT_LOCATION);
+                    source.setByteStream(stream);
+                    fragment = new WebXml();
+                    parseWebXml(source, fragment, true);
+                }
+            } finally {
+                if (jarFile != null) {
+                    try {
+                        jarFile.close();
+                    } catch (Throwable t) {
+                        // ignore
+                    }
+                }
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (Throwable t) {
+                        // ignore
+                    }
+                }
+                fragments.put(urlConn.getURL(), fragment);
+            }
+        }
+
+        @Override
+        public void scan(File file) throws IOException {
+
+            InputStream stream = null;
+            WebXml fragment = null;
+            
+            try {
+                File fragmentFile = new File(file, FRAGMENT_LOCATION);
+                if (fragmentFile.isFile()) {
+                    stream = new FileInputStream(fragmentFile);
+                    InputSource source =
+                        new InputSource(fragmentFile.toURI().toURL().toString());
+                    source.setByteStream(stream);
+                    fragment = new WebXml();
+                    parseWebXml(source, fragment, true);
+                }
+            } finally {
+                if (stream != null) {
+                    try {
+                        stream.close();
+                    } catch (Throwable t) {
+                        // ignore
+                    }
+                }
+                fragments.put(file.toURI().toURL(), fragment);
+            }
+        }
+        
+        public Map<URL,WebXml> getFragments() {
+            return fragments;
+        }
+    }
 
     /**
      * Merges the web-fragment.xml and web.xml files as per the rules in the
@@ -1368,7 +1550,7 @@ public class ContextConfig
      * @param fragments     The map of JARs to web fragments
      */
     protected void mergeWebFragments(WebXml application,
-            Map<String,WebXml> fragments) {
+            Map<URL,WebXml> fragments) {
         // TODO SERVLET3
         // Check order
         
@@ -1378,9 +1560,9 @@ public class ContextConfig
     }
 
     
-    protected void processAnnotationsInJars(Map<String,WebXml> fragments) {
-        for(String jar : fragments.keySet()) {
-            WebXml fragment = fragments.get(jar);
+    protected void processAnnotationsInJars(Map<URL,WebXml> fragments) {
+        for(URL url : fragments.keySet()) {
+            WebXml fragment = fragments.get(url);
             if (fragment == null || !fragment.isMetadataComplete()) {
                 // Scan jar for annotations
                 // TODO SERVLET3
