@@ -204,7 +204,7 @@ public class ContextRuleSet extends RuleSetBase {
                                "addWrapperListener", 0);
 
         digester.addObjectCreate(prefix + "Context/JarScanner",
-                                 "org.apache.catalina.deploy.DefaultJarScanner",
+                                 "org.apache.catalina.startup.DefaultJarScanner",
                                  "className");
         digester.addSetProperties(prefix + "Context/JarScanner");
         digester.addSetNext(prefix + "Context/JarScanner",
