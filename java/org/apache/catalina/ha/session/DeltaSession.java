@@ -38,7 +38,9 @@ import javax.servlet.http.HttpSessionContext;
 import org.apache.catalina.Manager;
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.ha.ClusterManager;
+import org.apache.catalina.ha.CatalinaCluster;
 import org.apache.catalina.ha.ClusterSession;
+import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.tribes.io.ReplicationStream;
@@ -373,7 +375,24 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     }
 
     public void expire(boolean notify, boolean notifyCluster) {
+        if (expiring)
+            return;
         String expiredId = getIdInternal();
+
+        if(expiredId != null && manager != null &&
+           manager instanceof DeltaManager) {
+            DeltaManager dmanager = (DeltaManager)manager;
+            CatalinaCluster cluster = dmanager.getCluster();
+            ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
+            if (msg != null) {
+                if(dmanager.doDomainReplication()) {
+                    cluster.sendClusterDomain(msg);
+                } else {
+                    cluster.send(msg);
+                }
+            }
+        }
+
         super.expire(notify);
 
         if (notifyCluster) {
