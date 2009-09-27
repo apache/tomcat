@@ -19,6 +19,7 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.EnumSet;
 
 import javax.servlet.SessionTrackingMode;
@@ -640,6 +641,12 @@ public class CoyoteAdapter
         int semicolon = uriBC.indexOf(match, 0, match.length(), 0);
 
         if (semicolon > 0) {
+            // What encoding to use? Some platforms, eg z/os, use a default
+            // encoding that doesn't give the expected result so be explicit 
+            String enc = connector.getURIEncoding();
+            if (enc == null) {
+                enc = "ISO-8859-1";
+            }
 
             // Parse session ID, and extract it from the decoded request URI
             int start = uriBC.getStart();
@@ -647,25 +654,32 @@ public class CoyoteAdapter
 
             int sessionIdStart = semicolon + match.length();
             int semicolon2 = uriBC.indexOf(';', sessionIdStart);
-            if (semicolon2 >= 0) {
-                request.setRequestedSessionId
-                    (new String(uriBC.getBuffer(), start + sessionIdStart, 
-                            semicolon2 - sessionIdStart));
-                // Extract session ID from request URI
-                byte[] buf = uriBC.getBuffer();
-                for (int i = 0; i < end - start - semicolon2; i++) {
-                    buf[start + semicolon + i] 
-                        = buf[start + i + semicolon2];
+            try {
+                if (semicolon2 >= 0) {
+                    request.setRequestedSessionId
+                        (new String(uriBC.getBuffer(), start + sessionIdStart,
+                                semicolon2 - sessionIdStart, enc));
+                    // Extract session ID from request URI
+                    byte[] buf = uriBC.getBuffer();
+                    for (int i = 0; i < end - start - semicolon2; i++) {
+                        buf[start + semicolon + i] 
+                            = buf[start + i + semicolon2];
+                    }
+                    uriBC.setBytes(buf, start,
+                            end - start - semicolon2 + semicolon);
+                } else {
+                    request.setRequestedSessionId
+                        (new String(uriBC.getBuffer(), start + sessionIdStart, 
+                                (end - start) - sessionIdStart, enc));
+                    uriBC.setEnd(start + semicolon);
                 }
-                uriBC.setBytes(buf, start, end - start - semicolon2 + semicolon);
-            } else {
-                request.setRequestedSessionId
-                    (new String(uriBC.getBuffer(), start + sessionIdStart, 
-                            (end - start) - sessionIdStart));
-                uriBC.setEnd(start + semicolon);
+                request.setRequestedSessionURL(true);
+            } catch (UnsupportedEncodingException uee) {
+                // Make sure no session ID is returned
+                request.setRequestedSessionId(null);
+                request.setRequestedSessionURL(false);
+                log.warn(sm.getString("coyoteAdapter.parseSession", enc), uee);
             }
-            request.setRequestedSessionURL(true);
-
         } else {
             request.setRequestedSessionId(null);
             request.setRequestedSessionURL(false);
