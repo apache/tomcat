@@ -26,7 +26,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <% String path = (String) request.getAttribute("path");
-   String submitUrl = ((HttpServletRequest)pageContext.getRequest()).getRequestURL().append("?path=").append(path).toString();
+   String submitUrl = ((HttpServletRequest)pageContext.getRequest()).getRequestURI() + "?path=" + path;
    Collection activeSessions = (Collection) request.getAttribute("activeSessions");
 %>
 <head>
@@ -36,7 +36,7 @@
 	<meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
 	<meta http-equiv="content-language" content="en"/>
 	<meta name="author" content="Cedrik LIME"/>
-	<meta name="copyright" content="copyright 2005-2007 the Apache Software Foundation"/>
+	<meta name="copyright" content="copyright 2005-2009 the Apache Software Foundation"/>
 	<meta name="robots" content="noindex,nofollow,noarchive"/>
 	<title>Sessions Administration for <%= path %></title>
 </head>
