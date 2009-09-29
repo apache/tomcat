@@ -203,7 +203,7 @@ public class SocketProperties {
         if (soLingerOn != null && soLingerTime != null)
             socket.setSoLinger(soLingerOn.booleanValue(),
                     soLingerTime.intValue());
-        if (soTimeout != null)
+        if (soTimeout != null && soTimeout.intValue() >= 0)
             socket.setSoTimeout(soTimeout.intValue());
         if (tcpNoDelay != null)
             socket.setTcpNoDelay(tcpNoDelay.booleanValue());
@@ -222,7 +222,7 @@ public class SocketProperties {
                     performanceBandwidth.intValue());
         if (soReuseAddress != null)
             socket.setReuseAddress(soReuseAddress.booleanValue());
-        if (soTimeout != null)
+        if (soTimeout != null && soTimeout.intValue() >= 0)
             socket.setSoTimeout(soTimeout.intValue());
     }
 
