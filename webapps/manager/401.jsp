@@ -17,10 +17,11 @@
 <%
   response.setHeader("WWW-Authenticate", "Basic realm=\"Tomcat Manager Application\"");
 %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
  <head>
   <title>401 Unauthorized</title>
-  <style>
+  <style type="text/css">
     <!--
     BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px;}
     H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;}
@@ -41,16 +42,17 @@
     For example, to add the <tt>manager</tt> role to a user named
     <tt>tomcat</tt> with a password of <tt>s3cret</tt>, add the following to the
     config file listed above.
+   </p>
 <pre>
 &lt;role rolename="manager"/&gt;
 &lt;user username="tomcat" password="s3cret" roles="manager"/&gt;
 </pre>
-   </p>
    <p>
     Note that for Tomcat 7 onwards, the roles required to use the manager
     application were changed from the single <tt>manager</tt> role to the
     following four roles. You will need to assign the role(s) required for
     the functionality you wish to access.
+   </p>
     <ul>
       <li><tt>manager</tt> - allows access to the HTML GUI and the status
           pages</li>
@@ -60,7 +62,6 @@
           pages</li>
       <li><tt>manager-status</tt> - allows access to the status pages only</li>
     </ul>
-   </p>
    <p>
     For more information - please see the
     <a href="/docs/manager-howto.html">Manager App HOW-TO</a>.
