@@ -93,7 +93,7 @@
   <!-- NOTE:  None of these roles are present in the default users file -->
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>HTML Manger interface (for humans)</web-resource-name>
+      <web-resource-name>HTML Manager interface (for humans)</web-resource-name>
       <url-pattern>/html/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
@@ -102,7 +102,7 @@
   </security-constraint>
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>Text Manger interface (for scripts)</web-resource-name>
+      <web-resource-name>Text Manager interface (for scripts)</web-resource-name>
       <url-pattern>/text/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
