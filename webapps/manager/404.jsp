@@ -15,10 +15,11 @@
   limitations under the License.
 --%>
 <%@ page import="org.apache.catalina.util.RequestUtil" %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
  <head>
   <title>404 Not found</title>
-  <style>
+  <style type="text/css">
     <!--
     BODY {font-family:Tahoma,Arial,sans-serif;color:black;background-color:white;font-size:12px;}
     H1 {font-family:Tahoma,Arial,sans-serif;color:white;background-color:#525D76;font-size:22px;}
@@ -39,12 +40,14 @@
     The Manager application has been re-structured for Tomcat 7 onwards and some
     of URLs have changed. All URLs used to access the Manager application should
     now start with one of the following options:
+   </p>
     <ul>
       <li><%=request.getContextPath()%>/html for the HTML GUI</li>
       <li><%=request.getContextPath()%>/text for the text interface</li>
       <li><%=request.getContextPath()%>/jmxproxy for the JMX proxy</li>
       <li><%=request.getContextPath()%>/status for the status pages</li>
     </ul>
+   <p>
     Note that the URL for the text interface has changed from
     &quot;<%=request.getContextPath()%>&quot; to
     &quot;<%=request.getContextPath()%>/text&quot;.
