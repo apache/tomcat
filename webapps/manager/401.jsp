@@ -58,7 +58,7 @@
           status pages</li>
       <li><tt>manager-jmx</tt> - allows access to the JMX proxy and the status
           pages</li>
-      <li><tt>manager-status</tt> - allows access to the just status pages</li>
+      <li><tt>manager-status</tt> - allows access to the status pages only</li>
     </ul>
    </p>
    <p>
