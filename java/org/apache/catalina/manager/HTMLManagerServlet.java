@@ -985,7 +985,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{6}\" rowspan=\"2\"><small>{2}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\"><small>{3}</small></td>\n" +
         " <td class=\"row-center\" bgcolor=\"{6}\" rowspan=\"2\">" +
-        "<small><a href=\"{4}\" target=\"_new\">{5}</a></small></td>\n";
+        "<small><a href=\"{4}\" target=\"_blank\">{5}</a></small></td>\n";
 
     private static final String MANAGER_APP_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
