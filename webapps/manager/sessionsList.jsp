@@ -99,7 +99,7 @@
 %>
 				<tr>
 					<td>
-<input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" /><a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>" target="_new"><%= JspHelper.escapeXml(currentSessionId) %></a>
+<input type="checkbox" name="sessionIds" value="<%= currentSessionId %>" /><a href="<%= submitUrl %>&amp;action=sessionDetail&amp;sessionId=<%= currentSessionId %>" target="_blank"><%= JspHelper.escapeXml(currentSessionId) %></a>
 					</td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayLocaleFromSession(currentSession) %></td>
 					<td style="text-align: center;"><%= JspHelper.guessDisplayUserFromSession(currentSession) %></td>
