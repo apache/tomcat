@@ -91,11 +91,7 @@ public class VirtualWebappLoader extends WebappLoader {
             if (!file.exists()) {
                 continue;
             }
-            if (file.isDirectory()) {
-                addRepository("file:/" + file.getAbsolutePath() + "/");
-            } else {
-                addRepository("file:/" + file.getAbsolutePath());
-            }
+            addRepository(file.toURI().toString());
         }
 
         super.start();
