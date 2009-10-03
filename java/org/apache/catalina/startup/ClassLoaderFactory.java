@@ -21,7 +21,8 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.apache.catalina.loader.StandardClassLoader;
 import org.apache.juli.logging.Log;
@@ -84,7 +85,7 @@ public final class ClassLoaderFactory {
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        ArrayList<URL> list = new ArrayList<URL>();
+        Set<URL> set = new LinkedHashSet<URL>();
 
         // Add unpacked directories
         if (unpacked != null) {
@@ -96,7 +97,7 @@ public final class ClassLoaderFactory {
                 URL url = file.toURI().toURL();
                 if (log.isDebugEnabled())
                     log.debug("  Including directory " + url);
-                list.add(url);
+                set.add(url);
             }
         }
 
@@ -116,13 +117,13 @@ public final class ClassLoaderFactory {
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + file.getAbsolutePath());
                     URL url = file.toURI().toURL();
-                    list.add(url);
+                    set.add(url);
                 }
             }
         }
 
         // Construct the class loader itself
-        URL[] array = list.toArray(new URL[list.size()]);
+        URL[] array = set.toArray(new URL[set.size()]);
         StandardClassLoader classLoader = null;
         if (parent == null)
             classLoader = new StandardClassLoader(array);
@@ -157,7 +158,7 @@ public final class ClassLoaderFactory {
             log.debug("Creating new class loader");
 
         // Construct the "class path" for this class loader
-        ArrayList<URL> list = new ArrayList<URL>();
+        Set<URL> set = new LinkedHashSet<URL>();
 
         if (locations != null && types != null && locations.length == types.length) {
             for (int i = 0; i < locations.length; i++)  {
@@ -166,7 +167,7 @@ public final class ClassLoaderFactory {
                     URL url = new URL(location);
                     if (log.isDebugEnabled())
                         log.debug("  Including URL " + url);
-                    list.add(url);
+                    set.add(url);
                 } else if ( types[i] == IS_DIR ) {
                     File directory = new File(location);
                     directory = new File(directory.getCanonicalPath());
@@ -176,7 +177,7 @@ public final class ClassLoaderFactory {
                     URL url = directory.toURI().toURL();
                     if (log.isDebugEnabled())
                         log.debug("  Including directory " + url);
-                    list.add(url);
+                    set.add(url);
                 } else if ( types[i] == IS_JAR ) {
                     File file=new File(location);
                     file = new File(file.getCanonicalPath());
@@ -185,7 +186,7 @@ public final class ClassLoaderFactory {
                     URL url = file.toURI().toURL();
                     if (log.isDebugEnabled())
                         log.debug("  Including jar file " + url);
-                    list.add(url);
+                    set.add(url);
                 } else if ( types[i] == IS_GLOB ) {
                     File directory=new File(location);
                     if (!directory.exists() || !directory.isDirectory() ||
@@ -207,14 +208,14 @@ public final class ClassLoaderFactory {
                             log.debug("    Including glob jar file "
                                 + file.getAbsolutePath());
                         URL url = file.toURI().toURL();
-                        list.add(url);
+                        set.add(url);
                     }
                 }
             }
         }
 
         // Construct the class loader itself
-        URL[] array = list.toArray(new URL[list.size()]);
+        URL[] array = set.toArray(new URL[set.size()]);
         if (log.isDebugEnabled())
             for (int i = 0; i < array.length; i++) {
                 log.debug("  location " + i + " is " + array[i]);
