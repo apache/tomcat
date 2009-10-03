@@ -305,10 +305,14 @@ log4j.logger.org.apache.catalina.session=DEBUG<br />
       <code>$CATALINA_BASE</code> but a shared <code>$CATALINA_HOME</code> then
       you can configure log4j on a per instance basis by replacing references to
       <code>$CATALINA_HOME</code> in the above instructions with
-      <code>$CATALINA_BASE</code>. Note that you may need to create a
-      <code>$CATALINA_BASE/lib</code> directory and if you are running with a
-      security manager you will need to adjust the codebase for JULI in 
-      <code>$CATALINA_BASE/conf/catalina.policy</code>.
+      <code>$CATALINA_BASE</code>. Note that if you do this then you may need to
+      make some, or all, of the following additional changes:
+      <ul>
+        <li>create a <code>$CATALINA_BASE/bin</code> directory</li>
+        <li>create a <code>$CATALINA_BASE/lib</code> directory</li>
+        <li>if running with a security manager, adjust the codebase for JULI in
+            <code>$CATALINA_BASE/conf/catalina.policy</code></li>
+      </ul>
     </p>
   </section>
 
