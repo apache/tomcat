@@ -338,7 +338,6 @@ public class JAASRealm
      * @param realmName     Realm name
      * @param md5a2         Second MD5 digest used to calculate the digest
      *                          MD5(Method + ":" + uri)
-     * @param authMethod    The authentication scheme in use
      */
     public Principal authenticate(String username, String clientDigest,
             String nonce, String nc, String cnonce, String qop,
