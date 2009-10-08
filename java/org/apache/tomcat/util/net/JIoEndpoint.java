@@ -117,7 +117,7 @@ public class JIoEndpoint extends AbstractEndpoint {
      * thread local fields.
      */
     public interface Handler {
-        public boolean process(Socket socket);
+        public boolean process(SocketWrapper<Socket> socket);
     }
 
 
@@ -185,26 +185,35 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     protected class SocketProcessor implements Runnable {
         
-        protected Socket socket = null;
+        protected SocketWrapper<Socket> socket = null;
         
-        public SocketProcessor(Socket socket) {
+        public SocketProcessor(SocketWrapper<Socket> socket) {
             this.socket = socket;
         }
 
         public void run() {
-
+        	boolean close = false;
             // Process the request from this socket
-            if (!setSocketOptions(socket) || !handler.process(socket)) {
-                // Close socket
+            if (!setSocketOptions(socket.getSocket())) { //this does a handshake and resets socket value
+            	close = true;
+            } else if (!handler.process(socket)) {
+                close = true;
+            }
+            if (close) {
+            	// Close socket
+            	if (log.isTraceEnabled()) {
+            		log.trace("Closing socket:"+socket);
+            	}
                 try {
-                    socket.close();
+                    socket.getSocket().close();
                 } catch (IOException e) {
                 }
+            } else {
+                //keepalive connection
+                getExecutor().execute(new SocketProcessor(socket));
             }
-
             // Finish up this request
             socket = null;
-
         }
         
     }
@@ -353,12 +362,13 @@ public class JIoEndpoint extends AbstractEndpoint {
      */
     protected boolean processSocket(Socket socket) {
         try {
-            getExecutor().execute(new SocketProcessor(socket));
+            SocketWrapper<Socket> wrapper = new SocketWrapper<Socket>(socket);
+            wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
+            getExecutor().execute(new SocketProcessor(wrapper));
         } catch (RejectedExecutionException x) {
             log.warn("Socket processing request was rejected for:"+socket,x);
             return false;
         } catch (Throwable t) {
-            
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
