@@ -1,16 +1,16 @@
 package org.apache;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import org.apache.catalina.connector.TestKeepAliveCount;
 import org.apache.catalina.connector.TestRequest;
 import org.apache.catalina.ha.session.TestSerializablePrincipal;
 import org.apache.catalina.startup.TestTomcat;
-import org.apache.catalina.tribes.test.TribesTestSuite;
-import org.apache.el.lang.TestELSupport;
 import org.apache.el.TestELEvaluation;
+import org.apache.el.lang.TestELSupport;
 import org.apache.tomcat.util.http.TestCookies;
 import org.apache.tomcat.util.res.TestStringManager;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class TestAll {
 
@@ -19,6 +19,7 @@ public class TestAll {
         // o.a.catalina
         // connector
         suite.addTestSuite(TestRequest.class);
+        suite.addTestSuite(TestKeepAliveCount.class);
         // ha.session
         suite.addTestSuite(TestSerializablePrincipal.class);
         // startup

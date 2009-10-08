@@ -49,6 +49,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.TrustManager;
@@ -157,7 +158,11 @@ public class JSSESocketFactory
     }
 
     public void handshake(Socket sock) throws IOException {
-        ((SSLSocket)sock).startHandshake();
+        //we do getSession instead of startHandshake() so we can call this multiple times
+    	SSLSession session = ((SSLSocket)sock).getSession();
+        if (session.getCipherSuite().equals("SSL_NULL_WITH_NULL_NULL"))
+        	throw new IOException("SSL handshake failed. Ciper suite in SSL Session is SSL_NULL_WITH_NULL_NULL");
+    	//((SSLSocket)sock).startHandshake();
     }
 
     /*
