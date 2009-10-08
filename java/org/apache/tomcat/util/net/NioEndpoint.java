@@ -1115,7 +1115,7 @@ public class NioEndpoint extends AbstractEndpoint {
         {
             socket.setPoller(this);
             KeyAttachment key = keyCache.poll();
-            final KeyAttachment ka = key!=null?key:new KeyAttachment();
+            final KeyAttachment ka = key!=null?key:new KeyAttachment(socket);
             ka.reset(this,socket,getSocketProperties().getSoTimeout());
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             PollerEvent r = eventCache.poll();
@@ -1145,7 +1145,7 @@ public class NioEndpoint extends AbstractEndpoint {
                 else handler.release((SocketChannel)key.channel());
                 if (key.isValid()) key.cancel();
                 if (key.channel().isOpen()) try {key.channel().close();}catch (Exception ignore){}
-                try {if (ka!=null) ka.channel.close(true);}catch (Exception ignore){}
+                try {if (ka!=null) ka.getSocket().close(true);}catch (Exception ignore){}
                 try {if (ka!=null && ka.getSendfileData()!=null && ka.getSendfileData().fchannel!=null && ka.getSendfileData().fchannel.isOpen()) ka.getSendfileData().fchannel.close();}catch (Exception ignore){}
                 if (ka!=null) ka.reset();
             } catch (Throwable e) {
@@ -1454,13 +1454,14 @@ public class NioEndpoint extends AbstractEndpoint {
     }
 
 // ----------------------------------------------------- Key Attachment Class   
-    public static class KeyAttachment {
+    public static class KeyAttachment extends SocketWrapper<NioChannel> {
         
-        public KeyAttachment() {
-            
+        public KeyAttachment(NioChannel channel) {
+            super(channel);
         }
+        
         public void reset(Poller poller, NioChannel channel, long soTimeout) {
-            this.channel = channel;
+            this.socket = channel;
             this.poller = poller;
             lastAccess = System.currentTimeMillis();
             currentAccess = false;
@@ -1484,27 +1485,16 @@ public class NioEndpoint extends AbstractEndpoint {
             reset(null,null,-1);
         }
         
-        public boolean isAsync() { return async; }
-        public void setAsync(boolean async) { this.async = async; }
         public Poller getPoller() { return poller;}
         public void setPoller(Poller poller){this.poller = poller;}
-        public long getLastAccess() { return lastAccess; }
-        public void access() { access(System.currentTimeMillis()); }
-        public void access(long access) { lastAccess = access; }
         public void setComet(boolean comet) { this.comet = comet; }
         public boolean getComet() { return comet; }
         public void setCometNotify(boolean notify) { this.cometNotify = notify; }
         public boolean getCometNotify() { return cometNotify; }
         public void setCometOps(int ops) { this.cometOps = ops; }
         public int getCometOps() { return cometOps; }
-        public boolean getCurrentAccess() { return currentAccess; }
-        public void setCurrentAccess(boolean access) { currentAccess = access; }
-        public void setTimeout(long timeout) {this.timeout = timeout;}
-        public long getTimeout() {return this.timeout;}
-        public boolean getError() { return error; }
-        public void setError(boolean error) { this.error = error; }
-        public NioChannel getChannel() { return channel;}
-        public void setChannel(NioChannel channel) { this.channel = channel;}
+        public NioChannel getChannel() { return getSocket();}
+        public void setChannel(NioChannel channel) { this.socket = channel;}
         protected Poller poller = null;
         protected int interestOps = 0;
         public int interestOps() { return interestOps;}
@@ -1526,9 +1516,6 @@ public class NioEndpoint extends AbstractEndpoint {
         }
         public void startReadLatch(int cnt) { readLatch = startLatch(readLatch,cnt);}
         public void startWriteLatch(int cnt) { writeLatch = startLatch(writeLatch,cnt);}
-        public int getKeepAliveLeft() { return this.keepAliveLeft; }
-        public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
-        public int decrementKeepAlive() { return (--keepAliveLeft);}
         
         protected void awaitLatch(CountDownLatch latch, long timeout, TimeUnit unit) throws InterruptedException {
             if ( latch == null ) throw new IllegalStateException("Latch cannot be null");
@@ -1543,20 +1530,13 @@ public class NioEndpoint extends AbstractEndpoint {
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf;}
         public SendfileData getSendfileData() { return this.sendfileData;}
         
-        protected long lastAccess = -1;
-        protected boolean currentAccess = false;
         protected boolean comet = false;
         protected int cometOps = SelectionKey.OP_READ;
         protected boolean cometNotify = false;
-        protected long timeout = -1;
-        protected boolean error = false;
-        protected NioChannel channel = null;
         protected CountDownLatch readLatch = null;
         protected CountDownLatch writeLatch = null;
-        protected long lastRegistered = 0;
         protected SendfileData sendfileData = null;
-        protected int keepAliveLeft = 100;
-        protected boolean async = false;
+        
     }
 
     // ------------------------------------------------ Application Buffer Handler

@@ -39,6 +39,7 @@ import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.RequestInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -358,7 +359,7 @@ public class AjpProtocol
             this.proto = proto;
         }
 
-        public boolean process(Socket socket) {
+        public boolean process(SocketWrapper<Socket> socket) {
             AjpProcessor processor = recycledProcessors.poll();
             try {
 
@@ -370,7 +371,7 @@ public class AjpProtocol
                     ((ActionHook) processor).action(ActionCode.ACTION_START, null);
                 }
 
-                processor.process(socket);
+                processor.process(socket.getSocket());
                 return false;
 
             } catch(java.net.SocketException e) {
