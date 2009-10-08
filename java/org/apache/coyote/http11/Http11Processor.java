@@ -205,7 +205,7 @@ public class Http11Processor extends AbstractHttp11Processor implements ActionHo
                         socket.setSoTimeout(soTimeout);
                     }
                 }
-                inputBuffer.parseRequestLine();
+                inputBuffer.parseRequestLine(false);
                 request.setStartTime(System.currentTimeMillis());
                 keptAlive = true;
                 if (disableUploadTimeout) {

@@ -26,11 +26,9 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.NioChannel;
-import org.apache.tomcat.util.net.NioSelectorPool;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioEndpoint;
+import org.apache.tomcat.util.net.NioSelectorPool;
 
 /**
  * Implementation of InputBuffer which provides HTTP request header parsing as
@@ -39,7 +37,7 @@ import org.apache.tomcat.util.net.NioEndpoint;
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @author Filip Hanik
  */
-public class InternalNioInputBuffer implements InputBuffer {
+public class InternalNioInputBuffer extends AbstractInputBuffer {
 
 
     // -------------------------------------------------------------- Constants
@@ -82,32 +80,6 @@ public class InternalNioInputBuffer implements InputBuffer {
 
     }
 
-
-    // -------------------------------------------------------------- Variables
-
-
-    /**
-     * The string manager for this package.
-     */
-    protected static StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    /**
-     * Associated Coyote request.
-     */
-    protected Request request;
-
-
-    /**
-     * Headers of the associated request.
-     */
-    protected MimeHeaders headers;
-
-
     /**
      * Parsing state - used for non blocking parsing so that
      * when more data arrives, we can pick up where we left off.
@@ -120,39 +92,6 @@ public class InternalNioInputBuffer implements InputBuffer {
     protected int parsingRequestLineQPos = -1;
     protected HeaderParsePosition headerParsePos;
 
-
-    /**
-     * Swallow input ? (in the case of an expectation)
-     */
-    protected boolean swallowInput;
-
-
-    /**
-     * Pointer to the current read buffer.
-     */
-    protected byte[] buf;
-
-
-    /**
-     * Last valid byte.
-     */
-    protected int lastValid;
-
-
-    /**
-     * Position in the buffer.
-     */
-    protected int pos;
-
-
-    /**
-     * Pos of the end of the header in the buffer, which is also the
-     * start of the body.
-     */
-    protected int end;
-
-
-
     /**
      * Underlying socket.
      */
@@ -163,30 +102,6 @@ public class InternalNioInputBuffer implements InputBuffer {
      */
     protected NioSelectorPool pool;
     
-
-    /**
-     * Underlying input buffer.
-     */
-    protected InputBuffer inputStreamInputBuffer;
-
-
-    /**
-     * Filter library.
-     * Note: Filter[0] is always the "chunked" filter.
-     */
-    protected InputFilter[] filterLibrary;
-
-
-    /**
-     * Active filters (in order).
-     */
-    protected InputFilter[] activeFilters;
-
-
-    /**
-     * Index of the last active filter.
-     */
-    protected int lastActiveFilter;
 
 
     // ------------------------------------------------------------- Properties
@@ -215,74 +130,6 @@ public class InternalNioInputBuffer implements InputBuffer {
     }
 
 
-    /**
-     * Add an input filter to the filter library.
-     */
-    public void addFilter(InputFilter filter) {
-
-        InputFilter[] newFilterLibrary = 
-            new InputFilter[filterLibrary.length + 1];
-        for (int i = 0; i < filterLibrary.length; i++) {
-            newFilterLibrary[i] = filterLibrary[i];
-        }
-        newFilterLibrary[filterLibrary.length] = filter;
-        filterLibrary = newFilterLibrary;
-
-        activeFilters = new InputFilter[filterLibrary.length];
-
-    }
-
-
-    /**
-     * Get filters.
-     */
-    public InputFilter[] getFilters() {
-
-        return filterLibrary;
-
-    }
-
-
-    /**
-     * Clear filters.
-     */
-    public void clearFilters() {
-
-        filterLibrary = new InputFilter[0];
-        lastActiveFilter = -1;
-
-    }
-
-
-    /**
-     * Add an input filter to the filter library.
-     */
-    public void addActiveFilter(InputFilter filter) {
-
-        if (lastActiveFilter == -1) {
-            filter.setBuffer(inputStreamInputBuffer);
-        } else {
-            for (int i = 0; i <= lastActiveFilter; i++) {
-                if (activeFilters[i] == filter)
-                    return;
-            }
-            filter.setBuffer(activeFilters[lastActiveFilter]);
-        }
-
-        activeFilters[++lastActiveFilter] = filter;
-
-        filter.setRequest(request);
-
-    }
-
-
-    /**
-     * Set the swallow input flag.
-     */
-    public void setSwallowInput(boolean swallowInput) {
-        this.swallowInput = swallowInput;
-    }
-
     // --------------------------------------------------------- Public Methods
     /**
      * Returns true if there are bytes available from the socket layer
@@ -307,19 +154,12 @@ public class InternalNioInputBuffer implements InputBuffer {
      * connection.
      */
     public void recycle() {
+        super.recycle();
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
             activeFilters[i].recycle();
         }
-
-        // Recycle Request object
-        request.recycle();
-
         socket = null;
-        lastValid = 0;
-        pos = 0;
-        lastActiveFilter = -1;
-        parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
         parsingRequestLinePhase = 0;
@@ -327,8 +167,6 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
         headerData.recycle();
-        swallowInput = true;
-
     }
 
 
@@ -339,31 +177,7 @@ public class InternalNioInputBuffer implements InputBuffer {
      * to parse the next HTTP request.
      */
     public void nextRequest() {
-
-        // Recycle Request object
-        request.recycle();
-
-        // Copy leftover bytes to the beginning of the buffer
-        if (lastValid - pos > 0) {
-            int npos = 0;
-            int opos = pos;
-            while (lastValid - opos > opos - npos) {
-                System.arraycopy(buf, opos, buf, npos, opos - npos);
-                npos += pos;
-                opos += pos;
-            }
-            System.arraycopy(buf, opos, buf, npos, lastValid - opos);
-        }
-
-        // Recycle filters
-        for (int i = 0; i <= lastActiveFilter; i++) {
-            activeFilters[i].recycle();
-        }
-
-        // Reset pointers
-        lastValid = lastValid - pos;
-        pos = 0;
-        lastActiveFilter = -1;
+        super.nextRequest();
         parsingHeader = true;
         headerParsePos = HeaderParsePosition.HEADER_START;
         parsingRequestLine = true;
@@ -372,26 +186,7 @@ public class InternalNioInputBuffer implements InputBuffer {
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
         headerData.recycle();
-        swallowInput = true;
-
     }
-
-
-    /**
-     * End request (consumes leftover bytes).
-     * 
-     * @throws IOException an undelying I/O error occured
-     */
-    public void endRequest()
-        throws IOException {
-
-        if (swallowInput && (lastActiveFilter != -1)) {
-            int extraBytes = (int) activeFilters[lastActiveFilter].end();
-            pos = pos - extraBytes;
-        }
-
-    }
-
 
     /**
      * Read the request line. This function is meant to be used during the 
@@ -404,7 +199,7 @@ public class InternalNioInputBuffer implements InputBuffer {
      * @return true if data is properly fed; false if no data is available 
      * immediately and thread should be freed
      */
-    public boolean parseRequestLine(boolean useAvailableData)
+    public boolean parseRequestLine(boolean useAvailableDataOnly)
         throws IOException {
 
         //check state
@@ -418,7 +213,7 @@ public class InternalNioInputBuffer implements InputBuffer {
                 
                 // Read new bytes if needed
                 if (pos >= lastValid) {
-                    if (useAvailableData) {
+                    if (useAvailableDataOnly) {
                         return false;
                     }
                     // Do a simple read with a short timeout
@@ -434,7 +229,7 @@ public class InternalNioInputBuffer implements InputBuffer {
             // Mark the current buffer position
             
             if (pos >= lastValid) {
-                if (useAvailableData) {
+                if (useAvailableDataOnly) {
                     return false;
                 }
                 // Do a simple read with a short timeout
@@ -593,6 +388,7 @@ public class InternalNioInputBuffer implements InputBuffer {
      * @throws IOException if a socket exception occurs
      * @throws EOFException if end of stream is reached
      */
+    
     private int readSocket(boolean timeout, boolean block) throws IOException {
         int nRead = 0;
         socket.getBufHandler().getReadBuffer().clear();
@@ -849,32 +645,21 @@ public class InternalNioInputBuffer implements InputBuffer {
     }
 
 
-    // ---------------------------------------------------- InputBuffer Methods
-
-
-    /**
-     * Read some bytes.
-     */
-    public int doRead(ByteChunk chunk, Request req) 
-        throws IOException {
-
-        if (lastActiveFilter == -1)
-            return inputStreamInputBuffer.doRead(chunk, req);
-        else
-            return activeFilters[lastActiveFilter].doRead(chunk,req);
-
-    }
 
 
     // ------------------------------------------------------ Protected Methods
 
     /**
-     * Fill the internal buffer using data from the undelying input stream.
+     * Fill the internal buffer using data from the underlying input stream.
      * 
      * @return false if at end of stream
      */
-    protected boolean fill(boolean timeout, boolean block)
-        throws IOException, EOFException {
+    protected boolean fill(boolean block) throws IOException, EOFException {
+        return fill(true,block);
+    }
+
+    protected boolean fill(boolean timeout, boolean block) throws IOException, EOFException {
+        
 
         boolean read = false;
 
