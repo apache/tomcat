@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.juli.logging.Log;
@@ -338,6 +339,13 @@ public class JIoEndpoint extends AbstractEndpoint {
         try {
             // 1: Set socket options: timeout, linger, etc
             socketProperties.setProperties(socket);
+        } catch (SocketException s) {
+            //error here is common if the client has reset the connection
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("endpoint.err.unexpected"), s);
+            }
+            // Close the socket
+            return false;
         } catch (Throwable t) {
             log.error(sm.getString("endpoint.err.unexpected"), t);
             // Close the socket
