@@ -40,6 +40,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.ServerSocketFactory;
+import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.net.JIoEndpoint.Handler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -306,7 +307,10 @@ public class Http11Protocol
      */
     protected int maxKeepAliveRequests = 100;
     public int getMaxKeepAliveRequests() { return maxKeepAliveRequests; }
-    public void setMaxKeepAliveRequests(int mkar) { maxKeepAliveRequests = mkar; }
+    public void setMaxKeepAliveRequests(int mkar) { 
+        maxKeepAliveRequests = mkar;
+        endpoint.setMaxKeepAliveRequests(mkar);
+    }
 
     // HTTP
     /**
@@ -564,7 +568,7 @@ public class Http11Protocol
             this.proto = proto;
         }
 
-        public boolean process(Socket socket) {
+        public boolean process(SocketWrapper<Socket> socket) {
             Http11Processor processor = recycledProcessors.poll();
             try {
 
@@ -576,13 +580,13 @@ public class Http11Protocol
 
                 if (proto.secure && (proto.sslImplementation != null)) {
                     processor.setSSLSupport
-                        (proto.sslImplementation.getSSLSupport(socket));
+                        (proto.sslImplementation.getSSLSupport(socket.getSocket()));
                 } else {
                     processor.setSSLSupport(null);
                 }
                 
-                processor.process(socket);
-                return false;
+                return processor.process(socket);
+                //return false;
 
             } catch(java.net.SocketException e) {
                 // SocketExceptions are normal

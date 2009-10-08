@@ -75,6 +75,9 @@ public abstract class SimpleHttpClient {
     }
     
     public void processRequest() throws IOException, InterruptedException {
+        processRequest(true);
+    }
+    public void processRequest(boolean readBody) throws IOException, InterruptedException {
         // Send the request
         boolean first = true;
         for (String requestPart : request) {
@@ -92,17 +95,19 @@ public abstract class SimpleHttpClient {
         
         // Put the headers into the map
         String line = readLine();
-        while (line.length() > 0) {
+        while (line!=null && line.length() > 0) {
             responseHeaders.add(line);
             line = readLine();
         }
         
         // Read the body, if any
         StringBuilder builder = new StringBuilder();
-        line = readLine();
-        while (line != null && line.length() > 0) {
-            builder.append(line);
+        if (readBody) {
             line = readLine();
+            while (line != null && line.length() > 0) {
+                builder.append(line);
+                line = readLine();
+            }
         }
         responseBody = builder.toString();
 
@@ -141,6 +146,10 @@ public abstract class SimpleHttpClient {
 
     public boolean isResponse500() {
         return getResponseLine().startsWith(FAIL_500);
+    }
+    
+    public Socket getSocket() {
+        return socket;
     }
 
     public abstract boolean isResponseBodyOK();
