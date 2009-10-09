@@ -47,6 +47,10 @@ public class SemaphoreValve
     extends ValveBase
     implements Lifecycle {
 
+    //------------------------------------------------------ Constructor
+    public SemaphoreValve() {
+        super(false); //TODO - is this async aware
+    }
 
     // ----------------------------------------------------- Instance Variables
 

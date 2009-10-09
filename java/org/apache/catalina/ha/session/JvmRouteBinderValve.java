@@ -108,6 +108,11 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
      */
     protected static final String info = "org.apache.catalina.ha.session.JvmRouteBinderValve/1.2";
 
+    //------------------------------------------------------ Constructor
+    public JvmRouteBinderValve() {
+        super(false);
+    }
+
     /*--Instance Variables--------------------------------------*/
 
     /**

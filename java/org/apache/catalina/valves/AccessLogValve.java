@@ -125,6 +125,11 @@ public class AccessLogValve
 
     private static Log log = LogFactory.getLog(AccessLogValve.class);
 
+    //------------------------------------------------------ Constructor
+    public AccessLogValve() {
+        super(false);
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 

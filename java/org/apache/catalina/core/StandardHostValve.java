@@ -59,6 +59,11 @@ final class StandardHostValve
 
     private static Log log = LogFactory.getLog(StandardHostValve.class);
 
+    //------------------------------------------------------ Constructor
+    public StandardHostValve() {
+        super(true);
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 

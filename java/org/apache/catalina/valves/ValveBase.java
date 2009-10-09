@@ -59,13 +59,21 @@ public abstract class ValveBase
     implements Contained, Valve, MBeanRegistration {
     private static Log log = LogFactory.getLog(ValveBase.class);
 
+    //------------------------------------------------------ Constructor
+    
+    public ValveBase() {
+        this(false);
+    }
+    
+    public ValveBase(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
+    }
+
     //------------------------------------------------------ Instance Variables
-
-
     /**
      * Does this valve support async reporting
      */
-    protected boolean asyncSupported = false;
+    protected boolean asyncSupported;
     
     /**
      * The Container whose pipeline this Valve is a component of.
