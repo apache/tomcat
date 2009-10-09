@@ -44,11 +44,15 @@ public class CollectedInfo {
     int ready;
     int busy;
 
+    int port = 0;
+    String host = null;
+
     public CollectedInfo(String host, int port) throws Exception {
         init(host, port);
     }
     public void init(String host, int port) throws Exception {
-        String sport = Integer.toString(port);
+        int iport = 0;
+        String shost = null;
         mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
         String onStr = "*:type=ThreadPool,*";
         ObjectName objectName = new ObjectName(onStr);
@@ -58,24 +62,29 @@ public class CollectedInfo {
             ObjectInstance oi = iterator.next();
             objName = oi.getObjectName();
             String name = objName.getKeyProperty("name");
+              
             /* Name are:
              * http-8080
              * jk-10.33.144.3-8009
              * jk-jfcpc%2F10.33.144.3-8009
              */
+            String [] elenames = name.split("-");
+            String sport = elenames[elenames.length-1];
+            iport = Integer.parseInt(sport);
+            String [] shosts = elenames[1].split("%2F");
+            shost = shosts[0];
+
             if (port==0 && host==null)
                   break; /* Take the first one */
-            String [] elenames = name.split("-");
-            if (elenames[elenames.length-1].compareTo(sport) != 0)
-                continue; /* port doesn't match */
-            if (host==null)
+            if (host==null && iport==port)
                 break; /* Only port done */
-            String [] shosts = elenames[1].split("%2F");
-            if (shosts[0].compareTo(host) == 0)
+            if (shost.compareTo(host) == 0)
                 break; /* Done port and host are the expected ones */
         }
         if (objName == null)
-            throw(new Exception("Can't find connector for " + host + ":" + sport));
+            throw(new Exception("Can't find connector for " + host + ":" + port));
+        this.port = iport;
+        this.host = shost;
         
     }
 

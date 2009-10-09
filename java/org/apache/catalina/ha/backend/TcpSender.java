@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.StringTokenizer;
 
@@ -90,7 +91,16 @@ public class TcpSender
         for (int i = 0; i < connections.length; i++) {
             if (connections[i] == null) {
                 try {
-                    connections[i] = new Socket(proxies[i].address, proxies[i].port);
+                    if (config.host != null) {
+                        connections[i] = new Socket();
+                        InetAddress addr =  InetAddress.getByName(config.host);
+                        InetSocketAddress addrs = new InetSocketAddress(addr, 0);
+                        connections[i].setReuseAddress(true);
+                        connections[i].bind(addrs);
+                        addrs = new InetSocketAddress(proxies[i].address, proxies[i].port);
+                        connections[i].connect(addrs);
+                    } else 
+                        connections[i] = new Socket(proxies[i].address, proxies[i].port);
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
                 } catch (Exception ex) {
