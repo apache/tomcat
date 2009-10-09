@@ -66,18 +66,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
 
 
     /**
-     * Logger.
-     */
-    protected static org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(Http11NioProcessor.class);
-
-    /**
-     * The string manager for this package.
-     */
-    protected static StringManager sm =
-        StringManager.getManager(Constants.Package);
-
-    /**
      * SSL information.
      */
     protected SSLSupport sslSupport;
