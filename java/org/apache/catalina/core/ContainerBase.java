@@ -1617,4 +1617,12 @@ public abstract class ContainerBase
     }
 
 
+    @Override
+    public boolean isAsyncSupported() {
+        return pipeline.isAsyncSupported();
+    }
+    
+    
+
+
 }

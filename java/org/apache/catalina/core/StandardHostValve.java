@@ -123,6 +123,10 @@ final class StandardHostValve
             Thread.currentThread().setContextClassLoader
                     (context.getLoader().getClassLoader());
         }
+        if (request.isAsyncSupported()) {
+            request.setAsyncSupported(context.getPipeline().isAsyncSupported());
+        }
+
 
         // Ask this Context to process this request
         context.getPipeline().getFirst().invoke(request, response);
