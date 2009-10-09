@@ -56,14 +56,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
  */
 public class Http11Processor extends AbstractHttp11Processor implements ActionHook {
 
-
-    /**
-     * Logger.
-     */
-    protected static org.apache.juli.logging.Log log
-        = org.apache.juli.logging.LogFactory.getLog(Http11Processor.class);
-
-    // ------------------------------------------------------------ Constructor
+   // ------------------------------------------------------------ Constructor
 
 
     public Http11Processor(int headerBufferSize, JIoEndpoint endpoint) {
