@@ -47,6 +47,14 @@ import org.apache.catalina.connector.Response;
 
 public class SSLValve
     extends ValveBase {
+    
+    
+    //------------------------------------------------------ Constructor
+    public SSLValve() {
+        super(true);
+    }
+
+
 
     public String mygetHeader(Request request, String header) {
         String strcert0 = request.getHeader(header);

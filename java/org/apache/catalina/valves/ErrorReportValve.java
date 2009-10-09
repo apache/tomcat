@@ -51,6 +51,10 @@ import org.apache.tomcat.util.res.StringManager;
 public class ErrorReportValve
     extends ValveBase {
 
+    //------------------------------------------------------ Constructor
+    public ErrorReportValve() {
+        super(false);
+    }
 
     // ----------------------------------------------------- Instance Variables
 
