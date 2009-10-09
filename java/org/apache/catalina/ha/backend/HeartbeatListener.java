@@ -85,26 +85,31 @@ public class HeartbeatListener
                     sender = new MultiCastSender();
                 else
                     sender = new TcpSender();
-
-                try {
-                    sender.init(this);
-                } catch (Exception ex) {
-                    log.error("Unable to initialize Sender: " + ex);
-                    sender = null;
-                    return;
-                }
             }
 
             /* Read busy and ready */
             if (coll == null) {
                 try {
                     coll = new CollectedInfo(host, port);
+                    this.port = coll.port;
+                    this.host = coll.host;
                 } catch (Exception ex) {
                     log.error("Unable to initialize info collection: " + ex);
                     coll = null;
                     return;
                 } 
             }
+
+            /* Start or restart sender */
+            try {
+                sender.init(this);
+            } catch (Exception ex) {
+                log.error("Unable to initialize Sender: " + ex);
+                sender = null;
+                return;
+            }
+
+            /* refresh the connector information and send it */
             try {
                 coll.refresh();
             } catch (Exception ex) {
