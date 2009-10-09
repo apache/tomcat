@@ -50,6 +50,10 @@ import org.apache.tomcat.util.res.StringManager;
 public class PersistentValve
     extends ValveBase {
 
+    //------------------------------------------------------ Constructor
+    public PersistentValve() {
+        super(false);
+    }
 
     // ----------------------------------------------------- Instance Variables
 

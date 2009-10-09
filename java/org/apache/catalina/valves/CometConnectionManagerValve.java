@@ -57,6 +57,11 @@ import org.apache.tomcat.util.res.StringManager;
 public class CometConnectionManagerValve
     extends ValveBase
     implements Lifecycle, HttpSessionListener, LifecycleListener {
+    
+    //------------------------------------------------------ Constructor
+    public CometConnectionManagerValve() {
+        super(false);
+    }
 
 
     // ----------------------------------------------------- Instance Variables

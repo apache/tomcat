@@ -66,6 +66,10 @@ public class SingleSignOn
     extends ValveBase
     implements Lifecycle, SessionListener {
 
+    //------------------------------------------------------ Constructor
+    public SingleSignOn() {
+        super(true);
+    }
 
     // ----------------------------------------------------- Instance Variables
 
