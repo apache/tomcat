@@ -80,6 +80,11 @@ public abstract class AuthenticatorBase
     private static Log log = LogFactory.getLog(AuthenticatorBase.class);
 
 
+    //------------------------------------------------------ Constructor
+    public AuthenticatorBase() {
+        super(true);
+    }
+
     // ----------------------------------------------------- Instance Variables
 
 

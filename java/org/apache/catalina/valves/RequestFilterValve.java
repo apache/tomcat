@@ -68,6 +68,10 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class RequestFilterValve
     extends ValveBase {
 
+    //------------------------------------------------------ Constructor
+    public RequestFilterValve() {
+        super(true);
+    }
 
     // ----------------------------------------------------- Class Variables
 

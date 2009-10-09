@@ -125,6 +125,7 @@ public class ReplicationValve
     // ------------------------------------------------------------- Properties
 
     public ReplicationValve() {
+        super(false);
     }
     
     /**
