@@ -144,5 +144,8 @@ public interface Valve {
     public void event(Request request, Response response, CometEvent event)
         throws IOException, ServletException;
 
+    
+    public boolean isAsyncSupported();
+    
 
 }

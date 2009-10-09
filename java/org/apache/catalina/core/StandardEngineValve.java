@@ -104,6 +104,9 @@ final class StandardEngineValve
                               request.getServerName()));
             return;
         }
+        if (request.isAsyncSupported()) {
+            request.setAsyncSupported(host.getPipeline().isAsyncSupported());
+        }
 
         // Ask this Host to process this request
         host.getPipeline().getFirst().invoke(request, response);

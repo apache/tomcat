@@ -187,7 +187,9 @@ final class StandardContextValve
                 }
             }
         }
-
+        if (request.isAsyncSupported()) {
+            request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());
+        }
         wrapper.getPipeline().getFirst().invoke(request, response);
 
         if ((instances !=null ) &&
