@@ -116,6 +116,12 @@ public interface Pipeline {
      * Valve for this Pipeline (if any).
      */
     public Valve getFirst();
+    
+    /**
+     * Returns true if all the valves in this pipeline support async, false otherwise
+     * @return true if all the valves in this pipeline support async, false otherwise
+     */
+    public boolean isAsyncSupported();
 
 
 }

@@ -128,8 +128,7 @@ public class StandardPipeline
      * The first valve associated with this Pipeline.
      */
     protected Valve first = null;
-
-
+    
     // --------------------------------------------------------- Public Methods
 
 
@@ -140,6 +139,16 @@ public class StandardPipeline
 
         return (this.info);
 
+    }
+    
+    public boolean isAsyncSupported() {
+        Valve valve = (first!=null)?first:basic;
+        boolean supported = true;
+        while (supported && valve!=null) {
+            supported = supported & valve.isAsyncSupported();
+            valve = valve.getNext();
+        }
+        return supported; 
     }
 
 
@@ -559,6 +568,4 @@ public class StandardPipeline
             return basic;
         }
     }
-
-
 }

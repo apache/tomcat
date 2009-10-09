@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<%@page session="false"%>
+%@page session="false"%>
 
 <pre>
 Use cases:
@@ -50,4 +50,16 @@ Use cases:
  - servlet does a setAsyncTimeout
  - servlet does a addAsyncListener
  - returns - waits for timeout to happen and listener invoked 
+ 
+5. Dispatch to asyncSupported=false servlet
+ - servlet1 does a startAsync()
+ - servlet1 dispatches to dispatch(/servlet2)
+ - the container calls complete() after servlet2 is complete
+ - TODO
+ 
+6. Chained dispatch
+ - servlet1 does a startAsync
+ - servlet1 does a dispatch to servlet2 (asyncsupported=true)
+ - servlet2 does a dispatch to servlet3 (asyncsupported=true)
+ - servlet3 does a dispatch to servlet4 (asyncsupported=false) 
 </pre>
