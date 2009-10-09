@@ -23,6 +23,7 @@ import org.apache.juli.logging.LogFactory;
 
 import java.net.MulticastSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.DatagramPacket;
 import java.io.UnsupportedEncodingException;
 
@@ -48,7 +49,13 @@ public class MultiCastSender
         if (s == null) {
             try {
                 group = InetAddress.getByName(config.getGroup());
-                s = new MulticastSocket(config.getMultiport());
+                if (config.host != null) {
+                    InetAddress addr =  InetAddress.getByName(config.host);
+                    InetSocketAddress addrs = new InetSocketAddress(addr, config.getMultiport());
+                    s = new MulticastSocket(addrs);
+                } else
+                    s = new MulticastSocket(config.getMultiport());
+          
                 s.setTimeToLive(config.getTtl());
                 s.joinGroup(group);
             } catch (Exception ex) {
