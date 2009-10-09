@@ -63,6 +63,11 @@ public abstract class ValveBase
 
 
     /**
+     * Does this valve support async reporting
+     */
+    protected boolean asyncSupported = false;
+    
+    /**
      * The Container whose pipeline this Valve is a component of.
      */
     protected Container container = null;
@@ -97,7 +102,7 @@ public abstract class ValveBase
 
     //-------------------------------------------------------------- Properties
 
-
+    
     /**
      * Return the Container with which this Valve is associated, if any.
      */
@@ -105,6 +110,16 @@ public abstract class ValveBase
 
         return (container);
 
+    }
+
+
+    public boolean isAsyncSupported() {
+        return asyncSupported;
+    }
+
+
+    public void setAsyncSupported(boolean asyncSupported) {
+        this.asyncSupported = asyncSupported;
     }
 
 
