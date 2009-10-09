@@ -373,6 +373,8 @@ public class CoyoteAdapter
             // request parameters
             req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
             if (postParseRequest(req, request, res, response)) {
+                //check valves if we support async
+                request.setAsyncSupported(connector.getContainer().getPipeline().isAsyncSupported());
                 // Calling the container
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
 

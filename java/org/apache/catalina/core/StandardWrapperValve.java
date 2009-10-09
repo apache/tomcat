@@ -199,7 +199,7 @@ final class StandardWrapperValve
         // Reset comet flag value after creating the filter chain
         request.setComet(false);
         //check filters to see if we support async or not.
-        if (filterChain != null) {
+        if (filterChain != null && request.isAsyncSupported()) {
             request.setAsyncSupported(filterChain.isAsyncSupported());
         }
 
