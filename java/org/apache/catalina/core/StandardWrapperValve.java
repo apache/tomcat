@@ -52,6 +52,11 @@ import org.apache.tomcat.util.log.SystemLogHandler;
 final class StandardWrapperValve
     extends ValveBase {
 
+    //------------------------------------------------------ Constructor
+    public StandardWrapperValve() {
+        super(true);
+    }
+    
     // ----------------------------------------------------- Instance Variables
 
 

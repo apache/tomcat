@@ -46,6 +46,11 @@ import org.apache.catalina.valves.ValveBase;
 final class StandardEngineValve
     extends ValveBase {
 
+    //------------------------------------------------------ Constructor
+    public StandardEngineValve() {
+        super(true);
+    }
+
 
     // ----------------------------------------------------- Instance Variables
 

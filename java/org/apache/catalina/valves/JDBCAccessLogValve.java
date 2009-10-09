@@ -143,7 +143,7 @@ public final class JDBCAccessLogValve
      * </pre>
      */
     public JDBCAccessLogValve() {
-        super();
+        super(false);
         driverName = null;
         connectionURL = null;
         tableName = "access";

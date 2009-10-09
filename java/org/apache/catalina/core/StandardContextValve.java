@@ -51,6 +51,10 @@ import org.apache.tomcat.util.buf.MessageBytes;
 final class StandardContextValve
     extends ValveBase {
 
+    //------------------------------------------------------ Constructor
+    public StandardContextValve() {
+        super(true);
+    }
 
     // ----------------------------------------------------- Instance Variables
 
