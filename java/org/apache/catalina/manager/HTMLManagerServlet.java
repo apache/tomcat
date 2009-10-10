@@ -178,6 +178,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
+        String message = upload(request);
+
+        list(request, response, message);
+    }
+
+    protected String upload(HttpServletRequest request) throws IOException {
         String message = "";
 
         // Create a new file upload handler
@@ -274,8 +280,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             }
             warUpload = null;
         }
-
-        list(request, response, message);
+        return message;
     }
 
     /**
