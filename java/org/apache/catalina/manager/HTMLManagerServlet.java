@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
@@ -81,14 +82,22 @@ public final class HTMLManagerServlet extends ManagerServlet {
     protected static final URLEncoder URL_ENCODER; 
     protected static final String APPLICATION_MESSAGE = "message";
     protected static final String APPLICATION_ERROR = "error";
-    protected String sessionsListJspPath  = "/sessionsList.jsp";
-    protected String sessionDetailJspPath = "/sessionDetail.jsp";
+    
+    protected static final String NONCE_SESSION =
+        "org.apache.catalina.manager.NONCE";
+    protected static final String NONCE_REQUEST = "nonce";
+        
+    protected static final String sessionsListJspPath  = "/sessionsList.jsp";
+    protected static final String sessionDetailJspPath = "/sessionDetail.jsp";
 
     static {
         URL_ENCODER = new URLEncoder();
         // '/' should not be encoded in context paths
         URL_ENCODER.addSafeCharacter('/');
     }
+    
+    private final Random randomSource = new Random();
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -165,12 +174,30 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String deployPath = request.getParameter("deployPath");
         String deployConfig = request.getParameter("deployConfig");
         String deployWar = request.getParameter("deployWar");
+        String requestNonce = request.getParameter(NONCE_REQUEST);
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
         String message = "";
 
+        // Check nonce
+        // There *must* be a nonce in the session before any POST is processed
+        HttpSession session = request.getSession();
+        String sessionNonce = (String) session.getAttribute(NONCE_SESSION);
+        if (sessionNonce == null) {
+            message = "FAIL: No nonce found in session. Command [" + command + "] was ignored.";
+            // Reset the command
+            command = null;
+        } else {
+            if (!sessionNonce.equals(requestNonce)) {
+                // Nonce mis-match.
+                message = "FAIL: Nonce mismatch. Command [" + command + "] was ignored.";
+                // Reset the command
+                command = null;
+            }
+        }
+        
         if (command == null || command.length() == 0) {
             // No command == list
             // List always displayed -> do nothing
@@ -195,6 +222,36 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         list(request, response, message);
+    }
+
+    /**
+     * Generate a once time token (nonce) for authenticating subsequent
+     * requests. This will also add the token to the session. The nonce
+     * generation is a simplified version of ManagerBase.generateSessionId().
+     * 
+     */
+    protected synchronized String generateNonce() {
+        byte random[] = new byte[16];
+
+        // Render the result as a String of hexadecimal digits
+        StringBuffer buffer = new StringBuffer();
+
+        randomSource.nextBytes(random);
+       
+        for (int j = 0; j < random.length; j++) {
+            byte b1 = (byte) ((random[j] & 0xf0) >> 4);
+            byte b2 = (byte) (random[j] & 0x0f);
+            if (b1 < 10)
+                buffer.append((char) ('0' + b1));
+            else
+                buffer.append((char) ('A' + (b1 - 10)));
+            if (b2 < 10)
+                buffer.append((char) ('0' + b2));
+            else
+                buffer.append((char) ('A' + (b2 - 10)));
+        }
+
+        return buffer.toString();
     }
 
     protected String upload(HttpServletRequest request) throws IOException {
@@ -332,6 +389,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
             log("list: Listing contexts for virtual host '" +
                 host.getName() + "'");
 
+        String newNonce = generateNonce();
+        request.getSession().setAttribute(NONCE_SESSION, newNonce);
+        
         PrintWriter writer = response.getWriter();
 
         // HTML Header Section
@@ -457,7 +517,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 writer.print
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[14];
+                args = new Object[15];
                 args[0] = response.encodeURL
                     (request.getContextPath() +
                      "/html/start?path=" + URL_ENCODER.encode(displayPath));
@@ -488,9 +548,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
                             context.getManager().getMaxInactiveInterval()/60);
                 }
                 args[12] = sm.getString("htmlManagerServlet.expire.unit");
-                
                 args[13] = highlightColor;
-
+                args[14] = newNonce;
+                
                 if (context.getPath().equals(this.context.getPath())) {
                     writer.print(MessageFormat.format(
                         MANAGER_APP_ROW_BUTTON_SECTION, args));
@@ -512,7 +572,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         // Deploy Section
-        args = new Object[7];
+        args = new Object[8];
         args[0] = sm.getString("htmlManagerServlet.deployTitle");
         args[1] = sm.getString("htmlManagerServlet.deployServer");
         args[2] = response.encodeURL(request.getContextPath() + "/html/deploy");
@@ -520,13 +580,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[4] = sm.getString("htmlManagerServlet.deployConfig");
         args[5] = sm.getString("htmlManagerServlet.deployWar");
         args[6] = sm.getString("htmlManagerServlet.deployButton");
+        args[7] = newNonce;
         writer.print(MessageFormat.format(DEPLOY_SECTION, args));
 
-        args = new Object[4];
+        args = new Object[5];
         args[0] = sm.getString("htmlManagerServlet.deployUpload");
         args[1] = response.encodeURL(request.getContextPath() + "/html/upload");
         args[2] = sm.getString("htmlManagerServlet.deployUploadFile");
         args[3] = sm.getString("htmlManagerServlet.deployButton");
+        args[4] = newNonce;
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
         // Server Header Section
@@ -1027,6 +1089,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
         "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
@@ -1036,14 +1099,24 @@ public final class HTMLManagerServlet extends ManagerServlet {
     private static final String STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{2}\"><small><input type=\"submit\" value=\"{3}\"></small></form>\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{4}\"><small><input type=\"submit\" value=\"{5}\"></small></form>\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{6}\"><small><input type=\"submit\" value=\"{7}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{3}\"></small>" +
+        "  </form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{5}\"></small>" +
+        "  </form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{7}\"></small>" +
+        "  </form>\n" +
         " </td>\n" +
         " </tr><tr>\n" +
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
         "  <form method=\"POST\" action=\"{8}\">\n" +
         "  <small>\n" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
         "  &nbsp;<input type=\"submit\" value=\"{9}\">&nbsp;{10}&nbsp;<input type=\"text\" name=\"idle\" size=\"5\" value=\"{11}\">&nbsp;{12}&nbsp;\n" +
         "  </small>\n" +
         "  </form>\n" +
@@ -1052,25 +1125,40 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{0}\"><small><input type=\"submit\" value=\"{1}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{1}\"></small>" +
+        "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{6}\"><small><input type=\"submit\" value=\"{7}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{6}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{7}\"></small>" +
+        "  </form>\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
 
     private static final String STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
         "  &nbsp;<small>{1}</small>&nbsp;\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{2}\"><small><input type=\"submit\" value=\"{3}\"></small></form>\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{4}\"><small><input type=\"submit\" value=\"{5}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{3}\"></small>" +
+        "  </form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{5}\"></small>" +
+        "  </form>\n" +
         "  &nbsp;<small>{7}</small>&nbsp;\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
 
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{0}\"><small><input type=\"submit\" value=\"{1}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
+        "  <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{14}\"" +
+        "  <small><input type=\"submit\" value=\"{1}\"></small>" +
+        "  </form>\n" +
         "  &nbsp;<small>{3}</small>&nbsp;\n" +
         "  &nbsp;<small>{5}</small>&nbsp;\n" +
         "  &nbsp;<small>{7}</small>&nbsp;\n" +
@@ -1089,7 +1177,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
-        "<form method=\"get\" action=\"{2}\">\n" +
+        "<form method=\"post\" action=\"{2}\">\n" +
+        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{7}\"" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
@@ -1134,7 +1223,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
-        "<form action=\"{1}\" method=\"post\" " +
+        "<form action=\"{1}?" + NONCE_REQUEST + "={4}\" method=\"post\" " +
         "enctype=\"multipart/form-data\">\n" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
