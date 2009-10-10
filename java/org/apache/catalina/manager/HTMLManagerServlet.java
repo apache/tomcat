@@ -230,7 +230,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
      * generation is a simplified version of ManagerBase.generateSessionId().
      * 
      */
-    protected synchronized String generateNonce() {
+    protected String generateNonce() {
         byte random[] = new byte[16];
 
         // Render the result as a String of hexadecimal digits
