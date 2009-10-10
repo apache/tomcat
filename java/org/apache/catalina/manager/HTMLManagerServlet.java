@@ -76,6 +76,8 @@ import org.apache.tomcat.util.http.fileupload.FileItem;
 
 public final class HTMLManagerServlet extends ManagerServlet {
 
+    private static final long serialVersionUID = 1L;
+
     protected static final URLEncoder URL_ENCODER; 
     protected static final String APPLICATION_MESSAGE = "message";
     protected static final String APPLICATION_ERROR = "error";
@@ -103,6 +105,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         throws IOException, ServletException {
 
         // Identify the request parameters that we need
+        // By obtaining the command from the pathInfo, per-command security can
+        // be configured in web.xml
         String command = request.getPathInfo();
 
         String path = request.getParameter("path");
@@ -116,9 +120,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String message = "";
         // Process the requested command
         if (command == null || command.equals("/")) {
+            // No command == list
         } else if (command.equals("/deploy")) {
             message = deployInternal(deployConfig, deployPath, deployWar);
         } else if (command.equals("/list")) {
+            // List always displayed - nothing to do here
         } else if (command.equals("/reload")) {
             message = reload(path);
         } else if (command.equals("/undeploy")) {
@@ -160,6 +166,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         throws IOException, ServletException {
 
         // Identify the request parameters that we need
+        // By obtaining the command from the pathInfo, per-command security can
+        // be configured in web.xml
         String command = request.getPathInfo();
 
         if (command == null || !command.equals("/upload")) {
@@ -710,13 +718,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
             throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
                                         RequestUtil.filter(path)));
         }
-        String displayPath = path;
+        String searchPath = path;
         if( path.equals("/") )
-            path = "";
-        Context context = (Context) host.findChild(path);
+            searchPath = "";
+        Context context = (Context) host.findChild(searchPath);
         if (null == context) {
             throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
-                                        RequestUtil.filter(displayPath)));
+                                        RequestUtil.filter(path)));
         }
         Session[] sessions = context.getManager().findSessions();
         return sessions;
@@ -726,13 +734,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
             throw new IllegalArgumentException(sm.getString("managerServlet.invalidPath",
                                         RequestUtil.filter(path)));
         }
-        String displayPath = path;
+        String searchPath = path;
         if( path.equals("/") )
-            path = "";
-        Context context = (Context) host.findChild(path);
+            searchPath = "";
+        Context context = (Context) host.findChild(searchPath);
         if (null == context) {
             throw new IllegalArgumentException(sm.getString("managerServlet.noContext",
-                                        RequestUtil.filter(displayPath)));
+                                        RequestUtil.filter(path)));
         }
         Session session = context.getManager().findSession(id);
         return session;
