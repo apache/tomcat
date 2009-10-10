@@ -27,7 +27,7 @@ public class Constants {
         "<html>\n" +
         "<head>\n" +
         "<style>\n" +
-        org.apache.catalina.util.TomcatCSS.TOMCAT_CSS +
+        org.apache.catalina.util.TomcatCSS.TOMCAT_CSS + "\n" +
         "  table {\n" +
         "    width: 100%;\n" +
         "  }\n" +
@@ -92,6 +92,12 @@ public class Constants {
         "    font-family:sans-serif,Tahoma,Arial;\n" +
         "    color: black;\n" +
         "  }\n" +
+        "  form {\n" +
+        "    margin: 1;\n" +
+        "  }\n" +
+        "  form.inline {\n" +
+        "    display: inline;\n" +
+        "  }\n" +
         "</style>\n";
 
     public static final String BODY_HEADER_SECTION =
@@ -100,7 +106,7 @@ public class Constants {
         "\n" +
         "<body bgcolor=\"#FFFFFF\">\n" +
         "\n" +
-        "<table cellspacing=\"4\" width=\"100%\" border=\"0\">\n" +
+        "<table cellspacing=\"4\" border=\"0\">\n" +
         " <tr>\n" +
         "  <td colspan=\"2\">\n" +
         "   <a href=\"http://www.apache.org/\">\n" +
@@ -115,7 +121,7 @@ public class Constants {
         " </tr>\n" +
         "</table>\n" +
         "<hr size=\"1\" noshade=\"noshade\">\n" +
-        "<table cellspacing=\"4\" width=\"100%\" border=\"0\">\n" +
+        "<table cellspacing=\"4\" border=\"0\">\n" +
         " <tr>\n" +
         "  <td class=\"page-title\" bordercolor=\"#000000\" " +
         "align=\"left\" nowrap>\n" +
