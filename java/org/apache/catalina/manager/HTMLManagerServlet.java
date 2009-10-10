@@ -110,9 +110,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String command = request.getPathInfo();
 
         String path = request.getParameter("path");
-        String deployPath = request.getParameter("deployPath");
-        String deployConfig = request.getParameter("deployConfig");
-        String deployWar = request.getParameter("deployWar");
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
@@ -121,16 +118,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // Process the requested command
         if (command == null || command.equals("/")) {
             // No command == list
-        } else if (command.equals("/deploy")) {
-            message = deployInternal(deployConfig, deployPath, deployWar);
         } else if (command.equals("/list")) {
             // List always displayed - nothing to do here
-        } else if (command.equals("/reload")) {
-            message = reload(path);
-        } else if (command.equals("/undeploy")) {
-            message = undeploy(path);
-        } else if (command.equals("/expire")) {
-            message = expireSessions(path, request);
         } else if (command.equals("/sessions")) {
             try {
                 doSessions(path, request, response);
@@ -140,10 +129,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 message = sm.getString("managerServlet.exception",
                         e.toString());
             }
-        } else if (command.equals("/start")) {
-            message = start(path);
-        } else if (command.equals("/stop")) {
-            message = stop(path);
+        } else if (command.equals("/upload") || command.equals("/deploy") ||
+                command.equals("/reload") || command.equals("/undeploy") ||
+                command.equals("/expire") || command.equals("/start") ||
+                command.equals("/stop")) {
+            message =
+                sm.getString("managerServlet.postCommand", command);
         } else {
             message =
                 sm.getString("managerServlet.unknownCommand", command);
@@ -170,15 +161,38 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // be configured in web.xml
         String command = request.getPathInfo();
 
-        if (command == null || !command.equals("/upload")) {
-            doGet(request,response);
-            return;
-        }
+        String path = request.getParameter("path");
+        String deployPath = request.getParameter("deployPath");
+        String deployConfig = request.getParameter("deployConfig");
+        String deployWar = request.getParameter("deployWar");
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
-        String message = upload(request);
+        String message = "";
+
+        if (command == null || command.length() == 0) {
+            // No command == list
+            // List always displayed -> do nothing
+        } else if (command.equals("/upload")) {
+            message = upload(request);
+        } else if (command.equals("/deploy")) {
+            message = deployInternal(deployConfig, deployPath, deployWar);
+        } else if (command.equals("/reload")) {
+            message = reload(path);
+        } else if (command.equals("/undeploy")) {
+            message = undeploy(path);
+        } else if (command.equals("/expire")) {
+            message = expireSessions(path, request);
+        } else if (command.equals("/start")) {
+            message = start(path);
+        } else if (command.equals("/stop")) {
+            message = stop(path);
+        } else {
+            // Try GET
+            doGet(request,response);
+            return;
+        }
 
         list(request, response, message);
     }
@@ -1021,12 +1035,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String STARTED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
-        "  <small>\n" +
-        "  &nbsp;{1}&nbsp;\n" +
-        "  &nbsp;<a href=\"{2}\" onclick=\"return(confirm('''Are you sure?'''))\">{3}</a>&nbsp;\n" +
-        "  &nbsp;<a href=\"{4}\" onclick=\"return(confirm('''Are you sure?'''))\">{5}</a>&nbsp;\n" +
-        "  &nbsp;<a href=\"{6}\" onclick=\"return(confirm('''Are you sure?'''))\">{7}</a>&nbsp;\n" +
-        "  </small>\n" +
+        "  &nbsp;<small>{1}</small>&nbsp;\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{2}\"><small><input type=\"submit\" value=\"{3}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{4}\"><small><input type=\"submit\" value=\"{5}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{6}\"><small><input type=\"submit\" value=\"{7}\"></small></form>\n" +
         " </td>\n" +
         " </tr><tr>\n" +
         " <td class=\"row-left\" bgcolor=\"{13}\">\n" +
@@ -1040,34 +1052,28 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final String STOPPED_DEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
-        "  <small>\n" +
-        "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm('''Are you sure?'''))\">{1}</a>&nbsp;\n" +
-        "  &nbsp;{3}&nbsp;\n" +
-        "  &nbsp;{5}&nbsp;\n" +
-        "  &nbsp;<a href=\"{6}\" onclick=\"return(confirm('''Are you sure?  This will delete the application.'''))\">{7}</a>&nbsp;\n" +
-        "  </small>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{0}\"><small><input type=\"submit\" value=\"{1}\"></small></form>\n" +
+        "  &nbsp;<small>{3}</small>&nbsp;\n" +
+        "  &nbsp;<small>{5}</small>&nbsp;\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{6}\"><small><input type=\"submit\" value=\"{7}\"></small></form>\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
 
     private static final String STARTED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
-        "  <small>\n" +
-        "  &nbsp;{1}&nbsp;\n" +
-        "  &nbsp;<a href=\"{2}\" onclick=\"return(confirm('''Are you sure?'''))\">{3}</a>&nbsp;\n" +
-        "  &nbsp;<a href=\"{4}\" onclick=\"return(confirm('''Are you sure?'''))\">{5}</a>&nbsp;\n" +
-        "  &nbsp;{7}&nbsp;\n" +
-        "  </small>\n" +
+        "  &nbsp;<small>{1}</small>&nbsp;\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{2}\"><small><input type=\"submit\" value=\"{3}\"></small></form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{4}\"><small><input type=\"submit\" value=\"{5}\"></small></form>\n" +
+        "  &nbsp;<small>{7}</small>&nbsp;\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
 
     private static final String STOPPED_NONDEPLOYED_APPS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" bgcolor=\"{13}\" rowspan=\"2\">\n" +
-        "  <small>\n" +
-        "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm('''Are you sure?'''))\">{1}</a>&nbsp;\n" +
-        "  &nbsp;{3}&nbsp;\n" +
-        "  &nbsp;{5}&nbsp;\n" +
-        "  &nbsp;{7}&nbsp;\n" +
-        "  </small>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{0}\"><small><input type=\"submit\" value=\"{1}\"></small></form>\n" +
+        "  &nbsp;<small>{3}</small>&nbsp;\n" +
+        "  &nbsp;<small>{5}</small>&nbsp;\n" +
+        "  &nbsp;<small>{7}</small>&nbsp;\n" +
         " </td>\n" +
         "</tr>\n<tr></tr>\n";
 
