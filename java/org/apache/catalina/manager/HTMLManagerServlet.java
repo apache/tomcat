@@ -234,7 +234,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         byte random[] = new byte[16];
 
         // Render the result as a String of hexadecimal digits
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         randomSource.nextBytes(random);
        
