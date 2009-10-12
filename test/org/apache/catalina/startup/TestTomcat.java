@@ -137,6 +137,21 @@ public class TestTomcat extends TestTomcatBase {
         assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
     }
     
+    public void testJsps() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = 
+            new File("output/build/webapps/examples");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() +
+                "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
+        assertTrue(res.toString().indexOf("<td>${(1==2) ? 3 : 4}</td>") > 0);
+    }
+    
     public void testLaunchTime() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         long t0 = System.currentTimeMillis();
