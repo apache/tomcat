@@ -28,7 +28,7 @@ import org.apache.tomcat.util.res.StringManager;
  *   <li>Testing all directories to see if they are exploded JARs
  *       (disabled by default)</li>
  * </ul>
- * All of the extenions may be controlled via configuration.
+ * All of the extensions may be controlled via configuration.
  */
 public class DefaultJarScanner implements JarScanner {
 
@@ -46,7 +46,7 @@ public class DefaultJarScanner implements JarScanner {
 
 
     /**
-     * Controls the classpath scanning extenion.
+     * Controls the classpath scanning extension.
      */
     private boolean scanClassPath = true;
     public boolean isScanClassPath() {
@@ -57,7 +57,7 @@ public class DefaultJarScanner implements JarScanner {
     }
 
     /**
-     * Controls the testing all files to see of they are JAR files extenion.
+     * Controls the testing all files to see of they are JAR files extension.
      */
     private boolean scanAllFiles = false;
     public boolean isScanAllFiles() {
@@ -69,7 +69,7 @@ public class DefaultJarScanner implements JarScanner {
 
     /**
      * Controls the testing all directories to see of they are exploded JAR
-     * files extenion.
+     * files extension.
      */
     private boolean scanAllDirectories = false;
     public boolean isScanAllDirectories() {
