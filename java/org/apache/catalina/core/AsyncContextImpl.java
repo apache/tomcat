@@ -48,7 +48,7 @@ import org.apache.juli.logging.LogFactory;
 public class AsyncContextImpl implements AsyncContext {
     
     public static enum AsyncState {
-        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT
+        NOT_STARTED, STARTED, DISPATCHING, DISPATCHED, COMPLETING, TIMING_OUT, ERROR_DISPATCHING
     }
     
     protected static Log log = LogFactory.getLog(AsyncContextImpl.class);
@@ -265,6 +265,18 @@ public class AsyncContextImpl implements AsyncContext {
                 ((HttpServletResponse)servletResponse).setStatus(500);
             }
             doInternalComplete(true);
+        } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.DISPATCHED)) {
+            log.debug("ON ERROR!");
+            boolean listenerInvoked = false;
+            for (AsyncListenerWrapper listener : listeners) {
+                listener.fireOnError(event);
+                listenerInvoked = true;
+            }
+            if (!listenerInvoked) {
+                ((HttpServletResponse)servletResponse).setStatus(500);
+            }
+            doInternalComplete(true);
+        
         } else if (this.state.compareAndSet(AsyncState.DISPATCHING, AsyncState.DISPATCHED)) {
             if (this.dispatch!=null) {
                 try {
@@ -303,7 +315,6 @@ public class AsyncContextImpl implements AsyncContext {
             }
             try {
                 if (!error) getResponse().flushBuffer();
-
             }catch (Exception x) {
                 log.error("",x);
             }
@@ -333,6 +344,10 @@ public class AsyncContextImpl implements AsyncContext {
     
     public void setTimeoutState() {
         state.set(AsyncState.TIMING_OUT);
+    }
+    
+    public void setErrorState() {
+        state.set(AsyncState.ERROR_DISPATCHING);
     }
     
     public void init(ServletRequest request, ServletResponse response) {
