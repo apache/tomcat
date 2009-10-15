@@ -53,7 +53,7 @@ public class ErrorReportValve
 
     //------------------------------------------------------ Constructor
     public ErrorReportValve() {
-        super(false);
+        super(true);
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -104,13 +104,17 @@ public class ErrorReportValve
 
         // Perform the request
         getNext().invoke(request, response);
-
-        Throwable throwable =
-            (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
-
+        
         if (response.isCommitted()) {
             return;
         }
+
+        if (request.isAsyncStarted()) {
+            return;
+        }
+        
+        Throwable throwable =
+            (Throwable) request.getAttribute(Globals.EXCEPTION_ATTR);
 
         if (throwable != null) {
 

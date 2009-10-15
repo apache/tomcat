@@ -67,7 +67,15 @@ public abstract class AbstractEndpoint {
      * This one is a Tomcat extension to the Servlet spec.
      */
     public static final String SESSION_MGR = "javax.servlet.request.ssl_session_mgr";
-    
+   
+    /**
+     * Different types of socket states to react upon
+     */
+    public static interface Handler {
+        public enum SocketState {
+            OPEN, CLOSED, LONG
+        }
+    }    
     // ----------------------------------------------------------------- Fields
 
 

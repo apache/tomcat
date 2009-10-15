@@ -1344,10 +1344,7 @@ public class AprEndpoint extends AbstractEndpoint {
      * stored in the ThreadWithAttributes extra folders, or alternately in
      * thread local fields.
      */
-    public interface Handler {
-        public enum SocketState {
-            OPEN, CLOSED, LONG
-        }
+    public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(long socket);
         public SocketState event(long socket, SocketStatus status);
     }
