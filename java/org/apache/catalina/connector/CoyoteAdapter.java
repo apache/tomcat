@@ -272,6 +272,12 @@ public class CoyoteAdapter
                    //configure settings for timed out
                    asyncConImpl.setTimeoutState();
                 }
+                if (status==SocketStatus.ERROR) {
+                    AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
+                    //TODO SERVLET3 - async
+                    //configure settings for timed out
+                    asyncConImpl.setErrorState();
+                }
                 connector.getContainer().getPipeline().getFirst().invoke(request, response);
             }catch (RuntimeException x) {
                 success = false;
