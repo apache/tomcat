@@ -40,6 +40,12 @@ public class AsyncListenerWrapper {
         // TODO SERVLET 3 - async 
         listener.onTimeout(event);
     }
+    
+    public void fireOnError(AsyncEvent event) throws IOException {
+        // TODO SERVLET 3 - async 
+        listener.onError(event);
+    }
+
 
     public AsyncListener getListener() {
         return listener;

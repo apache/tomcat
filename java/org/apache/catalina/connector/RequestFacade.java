@@ -969,7 +969,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     public boolean isAsyncSupported() {
-        return request.isAsyncStarted();
+        return request.isAsyncSupported();
     }
 
     
