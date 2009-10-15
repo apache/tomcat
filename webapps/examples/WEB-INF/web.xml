@@ -328,4 +328,13 @@
       <servlet-name>async3</servlet-name>
       <url-pattern>/async/async3</url-pattern>
     </servlet-mapping>
+    <servlet>
+      <servlet-name>stock</servlet-name>
+      <servlet-class>async.AsyncStockServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>stock</servlet-name>
+      <url-pattern>/async/stockticker</url-pattern>
+    </servlet-mapping>
+
 </web-app>

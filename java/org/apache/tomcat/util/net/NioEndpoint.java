@@ -1568,10 +1568,7 @@ public class NioEndpoint extends AbstractEndpoint {
      * stored in the ThreadWithAttributes extra folders, or alternately in
      * thread local fields.
      */
-    public interface Handler {
-        public enum SocketState {
-            OPEN, CLOSED, LONG
-        }
+    public interface Handler extends AbstractEndpoint.Handler {
         public SocketState process(NioChannel socket);
         public SocketState event(NioChannel socket, SocketStatus status);
         public void releaseCaches();
