@@ -72,7 +72,9 @@ public class AsyncContextImpl implements AsyncContext {
 
     @Override
     public void complete() {
-        if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING) ||
+        if (state.get()==AsyncState.COMPLETING) {
+            //do nothing
+        } else if (state.compareAndSet(AsyncState.STARTED, AsyncState.COMPLETING) ||
             state.compareAndSet(AsyncState.DISPATCHED, AsyncState.COMPLETING)) {
             // TODO SERVLET3 - async
             AtomicBoolean dispatched = new AtomicBoolean(false);
@@ -254,7 +256,7 @@ public class AsyncContextImpl implements AsyncContext {
     }
     
     public void doInternalDispatch() throws ServletException, IOException {
-        if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.DISPATCHED)) {
+        if (this.state.compareAndSet(AsyncState.TIMING_OUT, AsyncState.COMPLETING)) {
             log.debug("TIMING OUT!");
             boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
@@ -265,11 +267,17 @@ public class AsyncContextImpl implements AsyncContext {
                 ((HttpServletResponse)servletResponse).setStatus(500);
             }
             doInternalComplete(true);
-        } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.DISPATCHED)) {
+        } else if (this.state.compareAndSet(AsyncState.ERROR_DISPATCHING, AsyncState.COMPLETING)) {
             log.debug("ON ERROR!");
             boolean listenerInvoked = false;
             for (AsyncListenerWrapper listener : listeners) {
-                listener.fireOnError(event);
+                try {
+                    listener.fireOnError(event);
+                }catch (IllegalStateException x) {
+                    log.debug("Listener invoked invalid state.",x);
+                }catch (Exception x) {
+                    log.debug("Exception during onError.",x);
+                }
                 listenerInvoked = true;
             }
             if (!listenerInvoked) {
