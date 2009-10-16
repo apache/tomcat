@@ -54,19 +54,6 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        //get the client Id, it should be in the URL
-        String clientId = req.getParameter("clientId");
-        //get the method this client prefers
-        String method = req.getParameter("method");
-
-        //if the client doesn't have a method defined, then we will assume it is POLLING
-        if (method==null) method = POLL;
-        //if the client hasn't specified its own clientId, abort
-//        if (clientId==null) {
-//            resp.sendError(404,"Client not found.");
-//            return;
-//        }
-        
         if (req.isAsyncStarted()) {
             req.getAsyncContext().complete();
         } else if (req.isAsyncSupported()) {
@@ -131,10 +118,4 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
     public void onTimeout(AsyncEvent event) throws IOException {
         event.getRequest().getAsyncContext().complete();
     }
-    
-    
-    
-    
-    
-
 }
