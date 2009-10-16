@@ -272,7 +272,7 @@ public class CoyoteAdapter
                    //configure settings for timed out
                    asyncConImpl.setTimeoutState();
                 }
-                if (status==SocketStatus.ERROR) {
+                if (status==SocketStatus.ERROR || status==SocketStatus.STOP || status==SocketStatus.DISCONNECT) {
                     AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
                     //TODO SERVLET3 - async
                     //configure settings for timed out

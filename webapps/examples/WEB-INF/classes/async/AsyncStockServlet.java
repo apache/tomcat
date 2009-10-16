@@ -117,8 +117,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
 
     @Override
     public void onComplete(AsyncEvent event) throws IOException {
-        clients.remove(event.getRequest().getAsyncContext());
-        if (clientcount.decrementAndGet()==0) {
+        if (clients.remove(event.getRequest().getAsyncContext()) && clientcount.decrementAndGet()==0) {
             ticker.removeTickListener(this);
         }
     }
