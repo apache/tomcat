@@ -56,7 +56,7 @@
     <ul>
       <li><tt>manager</tt> - allows access to the HTML GUI and the status
           pages</li>
-      <li><tt>manager-scripts</tt> - allows access to the text interface and the
+      <li><tt>manager-script</tt> - allows access to the text interface and the
           status pages</li>
       <li><tt>manager-jmx</tt> - allows access to the JMX proxy and the status
           pages</li>
