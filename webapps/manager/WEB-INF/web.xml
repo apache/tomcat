@@ -106,7 +106,7 @@
       <url-pattern>/text/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
-       <role-name>manager-scripts</role-name>
+       <role-name>manager-script</role-name>
     </auth-constraint>
   </security-constraint>
   <security-constraint>
@@ -125,7 +125,7 @@
     </web-resource-collection>
     <auth-constraint>
        <role-name>manager</role-name>
-       <role-name>manager-scripts</role-name>
+       <role-name>manager-script</role-name>
        <role-name>manager-jmx</role-name>
        <role-name>manager-status</role-name>
     </auth-constraint>
@@ -148,7 +148,7 @@
     <description>
       The role that is required to access the text Manager pages
     </description>
-    <role-name>manager-scripts</role-name>
+    <role-name>manager-script</role-name>
   </security-role>
   <security-role>
     <description>
