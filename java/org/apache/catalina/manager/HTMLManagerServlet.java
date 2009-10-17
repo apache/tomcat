@@ -186,13 +186,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
         HttpSession session = request.getSession();
         String sessionNonce = (String) session.getAttribute(NONCE_SESSION);
         if (sessionNonce == null) {
-            message = "FAIL: No nonce found in session. Command [" + command + "] was ignored.";
+            message = sm.getString("htmlManagerServlet.noNonce", command);
             // Reset the command
             command = null;
         } else {
             if (!sessionNonce.equals(requestNonce)) {
                 // Nonce mis-match.
-                message = "FAIL: Nonce mismatch. Command [" + command + "] was ignored.";
+                message =
+                    sm.getString("htmlManagerServlet.nonceMismatch", command);
                 // Reset the command
                 command = null;
             }
