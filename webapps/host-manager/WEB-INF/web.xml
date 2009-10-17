@@ -53,23 +53,7 @@
   <!-- Define the Manager Servlet Mapping -->
   <servlet-mapping>
     <servlet-name>HostManager</servlet-name>
-    <url-pattern>/list</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>HostManager</servlet-name>
-    <url-pattern>/add</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>HostManager</servlet-name>
-    <url-pattern>/remove</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>HostManager</servlet-name>
-    <url-pattern>/start</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>HostManager</servlet-name>
-    <url-pattern>/stop</url-pattern>
+    <url-pattern>/text/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>HTMLHostManager</servlet-name>
@@ -79,13 +63,18 @@
   <!-- Define a Security Constraint on this Application -->
   <security-constraint>
     <web-resource-collection>
-      <web-resource-name>HTMLHostManager and HostManager commands</web-resource-name>
+      <web-resource-name>HostManager commands</web-resource-name>
+      <url-pattern>/text/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+       <!-- NOTE:  This role is not present in the default users file -->
+       <role-name>admin-script</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>HTMLHostManager commands</web-resource-name>
       <url-pattern>/html/*</url-pattern>
-      <url-pattern>/list</url-pattern>
-      <url-pattern>/add</url-pattern>
-      <url-pattern>/remove</url-pattern>
-      <url-pattern>/start</url-pattern>
-      <url-pattern>/stop</url-pattern>
     </web-resource-collection>
     <auth-constraint>
        <!-- NOTE:  This role is not present in the default users file -->
@@ -102,9 +91,26 @@
   <!-- Security roles referenced by this web application -->
   <security-role>
     <description>
-      The role that is required to log in to the Manager Application
+      The role that is required to log in to the Host Manager Application HTML
+      interface
     </description>
     <role-name>admin</role-name>
   </security-role>
+  <security-role>
+    <description>
+      The role that is required to log in to the Host Manager Application text
+      interface
+    </description>
+    <role-name>admin-script</role-name>
+  </security-role>
 
+  <error-page>
+    <error-code>401</error-code>
+    <location>/401.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.jsp</location>
+  </error-page>
+  
 </web-app>
