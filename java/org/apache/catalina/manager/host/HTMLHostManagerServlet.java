@@ -25,11 +25,13 @@ import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Host;
@@ -61,6 +63,14 @@ import org.apache.catalina.util.ServerInfo;
 
 public final class HTMLHostManagerServlet extends HostManagerServlet {
 
+    private static final long serialVersionUID = 1L;
+
+    protected static final String NONCE_SESSION =
+        "org.apache.catalina.manager.host.NONCE";
+    protected static final String NONCE_REQUEST = "nonce";
+
+    private final Random randomSource = new Random();
+    
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -79,23 +89,19 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Identify the request parameters that we need
         String command = request.getPathInfo();
 
-        String name = request.getParameter("name");
- 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
 
         String message = "";
         // Process the requested command
         if (command == null) {
-        } else if (command.equals("/add")) {
-            message = add(request, name);
-        } else if (command.equals("/remove")) {
-            message = remove(name);
+            // No command == list
         } else if (command.equals("/list")) {
-        } else if (command.equals("/start")) {
-            message = start(name);
-        } else if (command.equals("/stop")) {
-            message = stop(name);
+            // Nothing to do - always generate list
+        } else if (command.equals("/add") || command.equals("/remove") ||
+                command.equals("/start") || command.equals("/stop")) {
+            message =
+                sm.getString("hostManagerServlet.postCommand", command);
         } else {
             message =
                 sm.getString("hostManagerServlet.unknownCommand", command);
@@ -104,6 +110,99 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         list(request, response, message);
     }
 
+    
+    /**
+     * Process a POST request for the specified resource.
+     *
+     * @param request The servlet request we are processing
+     * @param response The servlet response we are creating
+     *
+     * @exception IOException if an input/output error occurs
+     * @exception ServletException if a servlet-specified error occurs
+     */
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        // Identify the request parameters that we need
+        String command = request.getPathInfo();
+
+        String name = request.getParameter("name");
+        String requestNonce = request.getParameter(NONCE_REQUEST);
+ 
+        // Prepare our output writer to generate the response message
+        response.setContentType("text/html; charset=" + Constants.CHARSET);
+
+        String message = "";
+        
+        // Check nonce
+        // There *must* be a nonce in the session before any POST is processed
+        HttpSession session = request.getSession();
+        String sessionNonce = (String) session.getAttribute(NONCE_SESSION);
+        if (sessionNonce == null) {
+            message = sm.getString("htmlHostManagerServlet.noNonce", command);
+            // Reset the command
+            command = null;
+        } else {
+            if (!sessionNonce.equals(requestNonce)) {
+                // Nonce mis-match.
+                message =
+                    sm.getString("htmlHostManagerServlet.nonceMismatch", command);
+                // Reset the command
+                command = null;
+            }
+        }
+ 
+        // Process the requested command
+        if (command == null) {
+            // No command == list
+        } else if (command.equals("/add")) {
+            message = add(request, name);
+        } else if (command.equals("/remove")) {
+            message = remove(name);
+        } else if (command.equals("/start")) {
+            message = start(name);
+        } else if (command.equals("/stop")) {
+            message = stop(name);
+        } else {
+            //Try GET
+            doGet(request, response);
+        }
+
+        list(request, response, message);
+    }
+
+
+    /**
+     * Generate a once time token (nonce) for authenticating subsequent
+     * requests. This will also add the token to the session. The nonce
+     * generation is a simplified version of ManagerBase.generateSessionId().
+     * 
+     */
+    protected String generateNonce() {
+        byte random[] = new byte[16];
+
+        // Render the result as a String of hexadecimal digits
+        StringBuilder buffer = new StringBuilder();
+
+        randomSource.nextBytes(random);
+       
+        for (int j = 0; j < random.length; j++) {
+            byte b1 = (byte) ((random[j] & 0xf0) >> 4);
+            byte b2 = (byte) (random[j] & 0x0f);
+            if (b1 < 10)
+                buffer.append((char) ('0' + b1));
+            else
+                buffer.append((char) ('A' + (b1 - 10)));
+            if (b2 < 10)
+                buffer.append((char) ('0' + b2));
+            else
+                buffer.append((char) ('A' + (b2 - 10)));
+        }
+
+        return buffer.toString();
+    }
+    
     
     /**
      * Add a host using the specified parameters.
@@ -182,6 +281,9 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                      HttpServletResponse response,
                      String message) throws IOException {
 
+        String newNonce = generateNonce();
+        request.getSession().setAttribute(NONCE_SESSION, newNonce);
+        
         PrintWriter writer = response.getWriter();
 
         // HTML Header Section
@@ -292,7 +394,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                      "/html/remove?name=" +
                      URLEncoder.encode(hostName, "UTF-8"));
                 args[5] = hostsRemove;
-                args[6] = RequestUtil.filter(hostName);
+                args[6] = newNonce;
                 if (host == this.host) {
                     writer.print(MessageFormat.format(
                         MANAGER_HOST_ROW_BUTTON_SECTION, args));
@@ -305,13 +407,14 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         }
 
         // Add Section
-        args = new Object[6];
+        args = new Object[7];
         args[0] = sm.getString("htmlHostManagerServlet.addTitle");
         args[1] = sm.getString("htmlHostManagerServlet.addHost");
         args[2] = response.encodeURL(request.getContextPath() + "/html/add");
         args[3] = sm.getString("htmlHostManagerServlet.addName");
         args[4] = sm.getString("htmlHostManagerServlet.addAliases");
         args[5] = sm.getString("htmlHostManagerServlet.addAppBase");
+        args[6] = newNonce;
         writer.print(MessageFormat.format(ADD_SECTION_START, args));
  
         args = new Object[3];
@@ -415,11 +518,18 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final String HOSTS_ROW_BUTTON_SECTION =
         " <td class=\"row-left\" NOWRAP>\n" +
-        "  <small>\n" +
-        "  &nbsp;<a href=\"{0}\" onclick=\"return(confirm(''{1} {6}\\n\\nAre you sure?''))\">{1}</a>&nbsp;\n" +
-        "  &nbsp;<a href=\"{2}\" onclick=\"return(confirm(''{3} {6}\\n\\nAre you sure?''))\">{3}</a>&nbsp;\n" +
-        "  &nbsp;<a href=\"{4}\" onclick=\"return(confirm(''{5} {6}\\n\\nAre you sure?''))\">{5}</a>&nbsp;\n" +
-        "  </small>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{0}\">" +
+        "   <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"" +
+        "   <small><input type=\"submit\" value=\"{1}\"></small>" +
+        "  </form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
+        "   <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"" +
+        "   <small><input type=\"submit\" value=\"{3}\"></small>" +
+        "  </form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
+        "   <input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"" +
+        "   <small><input type=\"submit\" value=\"{5}\"></small>" +
+        "  </form>\n" +
         " </td>\n" +
         "</tr>\n";
 
@@ -435,7 +545,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "</tr>\n" +
         "<tr>\n" +
         " <td colspan=\"2\">\n" +
-        "<form method=\"get\" action=\"{2}\">\n" +
+        "<form method=\"post\" action=\"{2}\">\n" +
+        "<input type=\"hidden\" name=\"" + NONCE_REQUEST + "\" value=\"{6}\"\n" +
         "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
