@@ -146,15 +146,16 @@ With Ant</a> for more information.</li>
 anyone on the Internet to execute the Manager application on your server.
 Therefore, the Manager application is shipped with the requirement that anyone
 who attempts to use it must authenticate themselves, using a username and
-password that have the role <strong>manager</strong> associated with them.
-Further, there is no username in the default users file
+password that have the role <strong>manager-script</strong> associated with
+them. Further, there is no username in the default users file
 (<conf>$CATALINA_BASE/conf/tomcat-users.xml</conf>) that is assigned this
 role.  Therefore, access to the Manager application is completely disabled
 by default.</p>
 
 <p>To enable access to the Manager web application, you must either create
 a new username/password combination and associate the role name
-<strong>manager</strong> with it, or add the <strong>manager</strong> role
+<strong>manager-script</strong> with it, or add the
+<strong>manager-script</strong> role
 to some existing username/password combination.  Exactly where this is done
 depends on which <code>Realm</code> implementation you are using:</p>
 <ul>
@@ -166,7 +167,7 @@ depends on which <code>Realm</code> implementation you are using:</p>
     <code>&lt;user&gt;</code> for each individual user, which might
     look something like this:
 <source>
-&lt;user name="craigmcc" password="secret" roles="standard,manager" /&gt;
+&lt;user name="craigmcc" password="secret" roles="standard,manager-script" /&gt;
 </source>
     which defines the username and password used by this individual to
     log on, and the role names he or she is associated with.  You can
@@ -174,15 +175,15 @@ depends on which <code>Realm</code> implementation you are using:</p>
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
 <li><em>JDBCRealm</em> - Your user and role information is stored in
-    a database accessed via JDBC.  Add the <strong>manager</strong> role
+    a database accessed via JDBC.  Add the <strong>manager-script</strong> role
     to one or more existing users, and/or create one or more new users
     with this role assigned, following the standard procedures for your
     environment.</li>
 <li><em>JNDIRealm</em> - Your user and role information is stored in
-    a directory server accessed via LDAP.  Add the <strong>manager</strong>
-    role to one or more existing users, and/or create one or more new users
-    with this role assigned, following the standard procedures for your
-    environment.</li>
+    a directory server accessed via LDAP.  Add the
+    <strong>manager-script</strong> role to one or more existing users,
+    and/or create one or more new users with this role assigned, following
+    the standard procedures for your environment.</li>
 </ul>
 
 <p>The first time you attempt to issue one of the Manager commands
