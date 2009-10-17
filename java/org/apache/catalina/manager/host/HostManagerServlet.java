@@ -94,6 +94,7 @@ import org.apache.catalina.core.ContainerBase;
 public class HostManagerServlet
     extends HttpServlet implements ContainerServlet {
 
+    private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
 
@@ -366,12 +367,14 @@ public class HostManagerServlet
 
         // Validate and create appBase
         File appBaseFile = null;
+        File file = null;
         if (appBase == null || appBase.length() == 0) {
-            appBase = name;
+            file = new File(name);
+        } else {
+            file = new File(appBase);
         }
-        File file = new File(appBase);
         if (!file.isAbsolute())
-            file = new File(System.getProperty("catalina.base"), appBase);
+            file = new File(System.getProperty("catalina.base"), file.getPath());
         try {
             appBaseFile = file.getCanonicalFile();
         } catch (IOException e) {
@@ -408,12 +411,14 @@ public class HostManagerServlet
                     try {
                         is.close();
                     } catch (IOException e) {
+                        // Ignore
                     }
                 }
                 if (os != null) {
                     try {
                         os.close();
                     } catch (IOException e) {
+                        // Ignore
                     }
                 }
             }
