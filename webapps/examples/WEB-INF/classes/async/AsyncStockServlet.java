@@ -58,7 +58,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
             req.getAsyncContext().complete();
         } else if (req.isAsyncSupported()) {
             AsyncContext actx = req.startAsync();
-            req.addAsyncListener(this);
+            actx.addListener(this);
             resp.setContentType("text/plain");
             clients.add(actx);
             if (this.clientcount.incrementAndGet()==1) {
@@ -104,18 +104,25 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
 
     @Override
     public void onComplete(AsyncEvent event) throws IOException {
-        if (clients.remove(event.getRequest().getAsyncContext()) && clientcount.decrementAndGet()==0) {
+        if (clients.remove(event.getAsyncContext()) && clientcount.decrementAndGet()==0) {
             ticker.removeTickListener(this);
         }
     }
 
     @Override
     public void onError(AsyncEvent event) throws IOException {
-        event.getRequest().getAsyncContext().complete();
+        event.getAsyncContext().complete();
     }
 
     @Override
     public void onTimeout(AsyncEvent event) throws IOException {
-        event.getRequest().getAsyncContext().complete();
+        event.getAsyncContext().complete();
+    }
+
+
+
+    @Override
+    public void onStartAsync(AsyncEvent event) throws IOException {
+        // NOOP
     }
 }
