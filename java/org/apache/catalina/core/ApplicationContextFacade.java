@@ -29,7 +29,9 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.Filter;
@@ -41,6 +43,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -432,12 +435,12 @@ public final class ApplicationContextFacade
     }
 
 
-    public FilterRegistration findFilterRegistration(String filterName) {
+    public FilterRegistration getFilterRegistration(String filterName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (FilterRegistration) doPrivileged(
                     "findFilterRegistration", new Object[]{filterName});
         } else {
-            return context.findFilterRegistration(filterName);
+            return context.getFilterRegistration(filterName);
         }
     }
     
@@ -486,12 +489,12 @@ public final class ApplicationContextFacade
     }
 
     
-    public ServletRegistration findServletRegistration(String servletName) {
+    public ServletRegistration getServletRegistration(String servletName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration) doPrivileged(
                     "findServletRegistration", new Object[]{servletName});
         } else {
-            return context.findServletRegistration(servletName);
+            return context.getServletRegistration(servletName);
         }
     }
     
@@ -545,8 +548,127 @@ public final class ApplicationContextFacade
             return context.setInitParameter(name, value);
         }
     }
-    
-    
+
+
+    @Override
+    public void addListener(Class<? extends EventListener> listenerClass) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addListener",
+                    new Object[]{listenerClass});
+        } else {
+            context.addListener(listenerClass);
+        }
+    }
+
+
+    @Override
+    public void addListener(String className) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addListener",
+                    new Object[]{className});
+        } else {
+            context.addListener(className);
+        }
+    }
+
+
+    @Override
+    public <T extends EventListener> void addListener(T t) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("addListener",
+                    new Object[]{t});
+        } else {
+            context.addListener(t);
+        }
+    }
+
+
+    @Override
+    public <T extends EventListener> T createListener(Class<T> c)
+            throws ServletException {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (T) doPrivileged("createListener", new Object[]{c});
+        } else {
+            return context.createListener(c);
+        }
+    }
+
+
+    @Override
+    public void declareRoles(String... roleNames) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("declareRoles",
+                    new Object[]{roleNames});
+        } else {
+            context.declareRoles(roleNames);
+        }
+    }
+
+
+    @Override
+    public ClassLoader getClassLoader() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (ClassLoader) doPrivileged("getClassLoader", null);
+        } else {
+            return context.getClassLoader();
+        }
+    }
+
+
+    @Override
+    public int getEffectiveMajorVersion() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getEffectiveMajorVersion",
+                    null)).intValue();
+        } else  {
+            return context.getEffectiveMajorVersion();
+        }
+    }
+
+
+    @Override
+    public int getEffectiveMinorVersion() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getEffectiveMinorVersion",
+                    null)).intValue();
+        } else  {
+            return context.getEffectiveMinorVersion();
+        }
+    }
+
+
+    @Override
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (Map<String, ? extends FilterRegistration>) doPrivileged(
+                    "getFilterRegistrations", null);
+        } else {
+            return context.getFilterRegistrations();
+        }
+    }
+
+
+    @Override
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (JspConfigDescriptor) doPrivileged("getJspConfigDescriptor",
+                    null);
+        } else {
+            return context.getJspConfigDescriptor();
+        }
+    }
+
+
+    @Override
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (Map<String, ? extends ServletRegistration>) doPrivileged(
+                    "getServletRegistrations", null);
+        } else {
+            return context.getServletRegistrations();
+        }
+    }
+
     /**
      * Use reflection to invoke the requested method. Cache the method object 
      * to speed up the process
@@ -669,4 +791,5 @@ public final class ApplicationContextFacade
         
         throw realException;
     }
+
 }

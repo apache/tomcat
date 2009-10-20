@@ -14,21 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.servlet.annotation;
+package javax.servlet.descriptor;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.annotation.Documented;
+import java.util.Collection;
 
 /**
  * @since Servlet 3.0
  * TODO SERVLET3 - Add comments
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface WebListener {
-    String value() default "";
+public interface JspPropertyGroupDescriptor {
+    public Collection<String> getUrlPatterns();
+    public String getElIgnored();
+    public String getPageEncoding();
+    public String getScriptingInvalid();
+    public String getIsXml();
+    public Collection<String> getIncludePreludes();
+    public Collection<String> getIncludeCodas();
+    public String getDeferredSyntaxAllowedAsLiteral();
+    public String getTrimDirectiveWhitespaces();
+    public String getDefaultContentType();
+    public String getBuffer();
+    public String getErrorOnUndeclaredNamespace();
 }

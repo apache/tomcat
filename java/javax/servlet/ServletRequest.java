@@ -651,44 +651,6 @@ public interface ServletRequest {
 
     /**
      * 
-     * @param listener
-     * @since Servlet 3.0
-     * TODO SERVLET3 - Add comments
-     */
-    public void addAsyncListener(AsyncListener listener);
-
-    /**
-     * 
-     * @param listener
-     * @param servletRequest
-     * @param servletResponse
-     * @since Servlet 3.0
-     * TODO SERVLET3 - Add comments
-     */
-    public void addAsyncListener(AsyncListener listener,
-            ServletRequest servletRequest, ServletResponse servletResponse);
-    
-    /**
-     * 
-     * @param timeout
-     * @throws java.lang.IllegalStateException
-     * @since Servlet 3.0
-     * TODO SERVLET3 - Add comments
-     */
-    public void setAsyncTimeout(long timeout);
-    
-    
-    /**
-     * 
-     * @return
-     * @since Servlet 3.0
-     * TODO SERVLET3 - Add comments
-     */
-    public long getAsyncTimeout();
-
-    
-    /**
-     * 
      * @return
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments

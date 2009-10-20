@@ -29,6 +29,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
@@ -876,7 +877,7 @@ public class Response
     /**
      * Return an Iterable of all the header names set for this response.
      */
-    public Iterable<String> getHeaderNames() {
+    public Collection<String> getHeaderNames() {
 
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         int n = headers.size();
@@ -895,7 +896,7 @@ public class Response
      *
      * @param name Header name to look up
      */
-    public Iterable<String> getHeaders(String name) {
+    public Collection<String> getHeaders(String name) {
 
         Enumeration<String> enumeration =
             coyoteResponse.getMimeHeaders().values(name);

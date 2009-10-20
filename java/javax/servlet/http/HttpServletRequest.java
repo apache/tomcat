@@ -21,6 +21,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 
 /**
@@ -681,7 +682,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public void login(java.lang.String username, String password)
+    public void login(String username, String password)
     throws ServletException;
     
     
@@ -700,7 +701,7 @@ public interface HttpServletRequest extends ServletRequest {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Iterable<Part> getParts();
+    public Collection<Part> getParts() throws IOException, ServletException;
     
     
     /**
@@ -711,5 +712,5 @@ public interface HttpServletRequest extends ServletRequest {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Part getPart(java.lang.String name);
+    public Part getPart(String name);
 }

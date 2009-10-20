@@ -25,13 +25,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -282,8 +282,6 @@ public class DummyRequest
     public String getLocalName() { return null; }
     public int getLocalPort() { return -1; }
     public int getRemotePort() { return -1; }
-    public void addAsyncListener(AsyncListener listener, ServletRequest req,
-            ServletResponse res) {}
     public ServletContext getServletContext() { return null; }
     public boolean isAsyncStarted() { return false; }
     public boolean isAsyncSupported() { return false; }
@@ -291,17 +289,14 @@ public class DummyRequest
         return null;
     }
     public Part getPart(String name) { return null; }
-    public Iterable<Part> getParts() { return null; }
+    public Collection<Part> getParts() { return null; }
     public boolean authenticate(HttpServletResponse response)
     throws IOException, ServletException { return false; }
     public void login(String username, String password)
     throws ServletException {}
     public void logout() throws ServletException {}
-    public void addAsyncListener(AsyncListener listener) {}
     public AsyncContext getAsyncContext() { return null; }
-    public long getAsyncTimeout() { return 0; }
     public DispatcherType getDispatcherType() { return null; }
-    public void setAsyncTimeout(long timeout) {}
     public AsyncContext startAsync(ServletRequest servletRequest,
             ServletResponse servletResponse) { return null; }
 }

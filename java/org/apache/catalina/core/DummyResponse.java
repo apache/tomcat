@@ -22,6 +22,7 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -101,7 +102,7 @@ public class DummyResponse
 
     public Cookie[] getCookies() { return null; }
     public String getHeader(String name) { return null; }
-    public Iterable<String> getHeaderNames() { return null; }
+    public Collection<String> getHeaderNames() { return null; }
     public String[] getHeaderValues(@SuppressWarnings("unused") String name) {
         return null;
     }
@@ -130,5 +131,5 @@ public class DummyResponse
     public void setStatus(int status) {}
     /** @deprecated */
     public void setStatus(int status, String message) {}
-    public Iterable<String> getHeaders(String name) { return null; }
+    public Collection<String> getHeaders(String name) { return null; }
 }

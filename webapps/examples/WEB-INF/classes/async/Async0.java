@@ -42,7 +42,7 @@ public class Async0 extends HttpServlet {
         } else {
             resp.setContentType("text/plain");
             final AsyncContext actx = req.startAsync();
-            actx.setAsyncTimeout(Long.MAX_VALUE);
+            actx.setTimeout(Long.MAX_VALUE);
             Runnable run = new Runnable() {
                 public void run() {
                     try {
