@@ -67,7 +67,7 @@
 
   <xsd:annotation>
     <xsd:documentation>
-<![CDATA[[
+      <![CDATA[[
       This is the XML Schema for the Servlet 3.0 deployment descriptor.
       The deployment descriptor must be named "WEB-INF/web.xml" in the
       web application's war file.  All Servlet deployment descriptors
@@ -92,7 +92,7 @@
       
       http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd
       
-]]>
+      ]]>
     </xsd:documentation>
   </xsd:annotation>
 
@@ -285,3 +285,4 @@
   </xsd:element>
 
 </xsd:schema>
+
