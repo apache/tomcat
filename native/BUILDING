@@ -38,7 +38,7 @@
   2 - In bin/setenv.sh add the following: 
     CATALINA_OPTS="$CATALINA_OPTS -Djava.library.path=tclib_location"
     In my machine I am using:
-    /home/jfclere/tomcat-connectors/jni/native/.libs for tclib_location
+    /home/jfclere/native/native/.libs for tclib_location
 
 NOTES:
   - configure --disable-openssl: Configure without ssl support.
