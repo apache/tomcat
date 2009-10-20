@@ -17,6 +17,7 @@
 package javax.servlet.http;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.servlet.ServletResponse;
 
@@ -348,7 +349,7 @@ public interface HttpServletResponse extends ServletResponse {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Iterable<String> getHeaders(String name);
+    public Collection<String> getHeaders(String name);
 
     
     /**
@@ -357,7 +358,7 @@ public interface HttpServletResponse extends ServletResponse {
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Iterable<String> getHeaderNames();
+    public Collection<String> getHeaderNames();
 
     
     /*

@@ -64,7 +64,15 @@ public interface AsyncContext {
     
     void start(Runnable run);
     
-    public long getAsyncTimeout();
+    void addListener(AsyncListener listener);
     
-    public void setAsyncTimeout(long timeout);
+    void addListener(AsyncListener listener, ServletRequest request,
+            ServletResponse response);
+    
+    <T extends AsyncListener> T createListener(Class<T> clazz)
+    throws ServletException;
+    
+    long getTimeout();
+    
+    void setTimeout(long timeout);
 }

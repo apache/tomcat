@@ -16,6 +16,7 @@
 */
 package javax.servlet;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -33,10 +34,17 @@ public interface ServletRegistration extends Registration {
      * @throws IllegalStateException if the associated ServletContext has
      *                                  already been initialised
      */
-    public Set<String> addMapping(String... urlPatterns); 
+    public Set<String> addMapping(String... urlPatterns);
+    
+    public Collection<String> getMappings();
+    
+    public String getRunAsRole();
     
     public static interface Dynamic
     extends ServletRegistration, Registration.Dynamic {
-        
+        public void setLoadOnStartup(int loadOnStartup);
+        public void setMultipartConfig(MultipartConfigElement multipartConfig);
+        public void setRunAsRole(String roleName);
+        public Set<String> setServletSecurity(ServletSecurityElement constraint);
     }
 }

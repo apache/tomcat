@@ -14,21 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package javax.servlet.annotation;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.annotation.Documented;
+package javax.servlet.descriptor;
 
 /**
  * @since Servlet 3.0
  * TODO SERVLET3 - Add comments
  */
-@Target({ElementType.TYPE})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface WebListener {
-    String value() default "";
+public interface TaglibDescriptor {
+    public String getTaglidURI();
+    public String getTaglibLocation();
 }

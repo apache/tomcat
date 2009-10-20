@@ -24,7 +24,6 @@ import java.lang.annotation.Target;
 
 /**
  * @since Servlet 3.0
- * $Id$
  * TODO SERVLET3 - Add comments
  */
 @Target({ElementType.TYPE})
@@ -32,7 +31,7 @@ import java.lang.annotation.Target;
 @Documented
 public @interface MultipartConfig {
     String location() default "";
-    long maxFileSize() default 0L;
-    long maxRequestSize() default 0L;
+    long maxFileSize() default -1L;
+    long maxRequestSize() default -1L;
     int fileSizeThreshold() default 0;
 }
