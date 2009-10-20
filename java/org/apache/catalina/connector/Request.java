@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,7 +37,6 @@ import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
@@ -390,11 +390,6 @@ public class Request
      * AsyncContext 
      */
     protected volatile AsyncContextImpl asyncContext = null;
-    
-    /**
-     * async timeout
-     */
-    protected long asyncTimeout = 0;
     
     protected Boolean asyncSupported = null;
     
@@ -1501,37 +1496,6 @@ public class Request
         return this.asyncContext;
     }
 
-    public void addAsyncListener(AsyncListener listener) {
-        // TODO SERVLET3 - async
-        if (isAsyncSupported() && isAsyncStarted()) {
-            this.asyncContext.addAsyncListener(listener);
-        } else {
-            throw new IllegalStateException("Async [Supported:"+isAsyncSupported()+"; Started:"+isAsyncStarted()+"]");
-        }
-    }
-
-    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
-        // TODO SERVLET3 - async
-        if (isAsyncSupported() && isAsyncStarted()) {
-            this.asyncContext.addAsyncListener(listener,servletRequest,servletResponse);
-        } else {
-            throw new IllegalStateException("Async [Supported:"+isAsyncSupported()+"; Started:"+isAsyncStarted()+"]");
-        }
-    }
-
-    public void setAsyncTimeout(long timeout) {
-        // TODO SERVLET3 - async
-        if (this.asyncTimeout!=timeout) {
-            this.asyncTimeout = timeout;
-            coyoteRequest.action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
-        }
-    }
-    
-    public long getAsyncTimeout() {
-        // TODO SERVLET3 - async
-        return asyncTimeout;
-    }
-    
     public DispatcherType getDispatcherType() {
         // TODO SERVLET3 - dispatcher
         if (internalDispatcherType==null) { 
@@ -2311,8 +2275,8 @@ public class Request
         // TODO Servlet 3 - authentication
     }
     
-    public Iterable<Part> getParts() {
-        // TODO Servlet 3 - authentication
+    public Collection<Part> getParts() {
+        // TODO Servlet 3 - file upload
         return null;
     }
     

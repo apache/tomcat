@@ -18,23 +18,51 @@ package javax.servlet;
 
 /**
  * @since Servlet 3.0
- * $Id$
  * TODO SERVLET3 - Add comments
  */
 public class AsyncEvent {
+    private AsyncContext context;
     private ServletRequest request;
     private ServletResponse response;
+    private Throwable throwable;
     
-    public AsyncEvent(ServletRequest request, ServletResponse response) {
+    public AsyncEvent(AsyncContext context) {
+        this.context = context;
+    }
+
+    public AsyncEvent(AsyncContext context, ServletRequest request,
+            ServletResponse response) {
+        this.context = context;
         this.request = request;
         this.response = response;
     }
     
-    public ServletRequest getRequest() {
+    public AsyncEvent(AsyncContext context, Throwable throwable) {
+        this.context = context;
+        this.throwable = throwable;
+    }
+
+    public AsyncEvent(AsyncContext context, ServletRequest request,
+            ServletResponse response, Throwable throwable) {
+        this.context = context;
+        this.request = request;
+        this.response = response;
+        this.throwable = throwable;
+    }
+    
+    public AsyncContext getAsyncContext() {
+        return context;
+    }
+
+    public ServletRequest getSuppliedRequest() {
         return request;
     }
     
-    public ServletResponse getResponse() {
+    public ServletResponse getSuppliedResponse() {
         return response;
+    }
+    
+    public Throwable getThrowable() {
+        return throwable;
     }
 }

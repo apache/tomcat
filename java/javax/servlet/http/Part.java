@@ -18,6 +18,7 @@ package javax.servlet.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 
 /**
  * @since Servlet 3.0
@@ -31,6 +32,6 @@ public interface Part {
     public void write(String fileName) throws IOException;
     public void delete() throws IOException;
     public String getHeader(String name);
-    public Iterable<String> getHeaders(String name);
-    public Iterable<String> getHeaderNames();
+    public Collection<String> getHeaders(String name);
+    public Collection<String> getHeaderNames();
 }
