@@ -38,6 +38,9 @@
 </section>
 <section name="Changes between 1.1.16 and 1.1.17">
   <changelog>
+    <update>
+      Arrange build after svn reorganisation (rjung)
+    </update>
     <fix>
       <bug>47852</bug>: Fix some Javadoc errors. Patch provided by Sebb. (rjung)
     </fix>
