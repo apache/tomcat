@@ -26,18 +26,40 @@ import java.util.Set;
  */
 public interface Registration {
     
-    public boolean setInitParameter(String name, String value)
-    throws IllegalArgumentException, IllegalStateException;
+    public String getName();
+    
+    public String getClassName();
 
-    public Set<String> setInitParameters(Map<String,String> initParameters)
-    throws IllegalArgumentException, IllegalStateException;
+    /**
+     * 
+     * @param name
+     * @param value
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
+     */
+    public boolean setInitParameter(String name, String value);
 
-    public interface Dynamic {
+    public String getInitParameter(String name);
+    
+    /**
+     * 
+     * @param initParameters
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
+     */
+    public Set<String> setInitParameters(Map<String,String> initParameters);
+
+    public Map<String, String> getInitParameters();
+
+    public interface Dynamic extends Registration {
         
-        public void setDescription(String description)
-        throws IllegalStateException;
-        
-        public void setAsyncSupported(boolean isAsyncSupported)
-        throws IllegalStateException;
+        /**
+         * 
+         * @param isAsyncSupported
+         * @throws IllegalStateException
+         */
+        public void setAsyncSupported(boolean isAsyncSupported);
     }
 }

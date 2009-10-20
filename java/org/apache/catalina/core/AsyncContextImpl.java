@@ -194,18 +194,36 @@ public class AsyncContextImpl implements AsyncContext {
         }
     }
     
-    public void addAsyncListener(AsyncListener listener) {
+    @Override
+    public void addListener(AsyncListener listener) {
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
         listeners.add(wrapper);
     }
 
-    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
+    @Override
+    public void addListener(AsyncListener listener, ServletRequest servletRequest,
+            ServletResponse servletResponse) {
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
         listeners.add(wrapper);
     }
-    
+
+    @Override
+    public <T extends AsyncListener> T createListener(Class<T> clazz)
+            throws ServletException {
+        T listener = null;
+        try {
+             listener = clazz.newInstance();
+        } catch (InstantiationException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        } catch (IllegalAccessException e) {
+            ServletException se = new ServletException(e);
+            throw se;
+        }
+        return listener;
+    }
     
     public void recycle() {
         servletRequest = null;
@@ -341,11 +359,11 @@ public class AsyncContextImpl implements AsyncContext {
         state.set(st);
     }
     
-    public long getAsyncTimeout() {
+    public long getTimeout() {
         return timeout;
     }
     
-    public void setAsyncTimeout(long timeout) {
+    public void setTimeout(long timeout) {
         this.timeout = timeout;
         request.getCoyoteRequest().action(ActionCode.ACTION_ASYNC_SETTIMEOUT,new Long(timeout));
     }
@@ -361,7 +379,7 @@ public class AsyncContextImpl implements AsyncContext {
     public void init(ServletRequest request, ServletResponse response) {
         this.servletRequest = request;
         this.servletResponse = response;
-        event = new AsyncEvent(request,response); 
+        event = new AsyncEvent(this, request, response); 
     }
 
 }

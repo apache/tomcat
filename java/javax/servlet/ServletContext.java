@@ -21,7 +21,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.EventListener;
+import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 /**
  * 
@@ -56,6 +60,12 @@ import java.util.Set;
 public interface ServletContext {
 
     public static final String TEMPDIR = "javax.servlet.context.tempdir";
+    
+    /**
+     * @since Servlet 3.0
+     */
+    public static final String ORDERED_LIBS =
+        "javax.servlet.context.orderedLibs";
 
     /**
      * Returns a <code>ServletContext</code> object that 
@@ -114,7 +124,23 @@ public interface ServletContext {
 
     public int getMinorVersion();
     
+    /**
+     * 
+     * @return
+     * @throws UnsupportedOperationException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public int getEffectiveMajorVersion();
     
+    /**
+     * 
+     * @return
+     * @throws UnsupportedOperationException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public int getEffectiveMinorVersion();
 
     /**
      * Returns the MIME type of the specified file, or <code>null</code> if 
@@ -532,6 +558,7 @@ public interface ServletContext {
      * @param value
      * @return
      * @throws IllegalStateException
+     * @throws UnsupportedOperationException
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
@@ -710,10 +737,21 @@ public interface ServletContext {
      * 
      * @param servletName
      * @return
+     * @throws UnsupportedOperationException
      * @since Servlet 3.0 
      * TODO SERVLET3 - Add comments
      */
-    public ServletRegistration findServletRegistration(String servletName);
+    public ServletRegistration getServletRegistration(String servletName);
+    
+    
+    /**
+     * 
+     * @return
+     * @throws UnsupportedOperationException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public Map<String, ? extends ServletRegistration> getServletRegistrations();
 
 
     /**
@@ -774,15 +812,25 @@ public interface ServletContext {
      * 
      * @param filterName
      * @return
+     * @throws UnsupportedOperationException
      * @since Servlet 3.0 
      * TODO SERVLET3 - Add comments
      */
-    public FilterRegistration findFilterRegistration(String filterName);
-
+    public FilterRegistration getFilterRegistration(String filterName);
 
     /**
      * 
      * @return
+     * @throws UnsupportedOperationException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations();
+
+    /**
+     * 
+     * @return
+     * @throws UnsupportedOperationException
      * @since Servlet 3.0 
      * TODO SERVLET3 - Add comments
      */
@@ -797,6 +845,7 @@ public interface ServletContext {
      *                                  {@link SessionTrackingMode}
      * @throws IllegalStateException    If the context has already been
      *                                  initialised
+     * @throws UnsupportedOperationException
      * @since Servlet 3.0 
      * TODO SERVLET3 - Add comments
      */
@@ -810,7 +859,7 @@ public interface ServletContext {
      * @since Servlet 3.0 
      * TODO SERVLET3 - Add comments
      */
-    public EnumSet<SessionTrackingMode> getDefaultSessionTrackingModes();
+    public Set<SessionTrackingMode> getDefaultSessionTrackingModes();
     
     /**
      * 
@@ -818,6 +867,72 @@ public interface ServletContext {
      * @since Servlet 3.0 
      * TODO SERVLET3 - Add comments
      */
-    public EnumSet<SessionTrackingMode> getEffectiveSessionTrackingModes();
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes();
     
+    /**
+     * 
+     * @param listenerClass
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public void addListener(Class <? extends EventListener> listenerClass);
+    
+    /**
+     * 
+     * @param className
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public void addListener(String className);
+
+    /**
+     * 
+     * @param <T>
+     * @param t
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public <T extends EventListener> void addListener(T t);
+    
+    /**
+     * 
+     * @param <T>
+     * @param c
+     * @return
+     * @throws ServletException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public <T extends EventListener> T createListener(Class<T> c)
+    throws ServletException;
+    
+    /**
+     * 
+     * @param roleNames
+     * @throws UnsupportedOperationException
+     * @throws IllegalArgumentException
+     * @throws IllegalStateException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public void declareRoles(String... roleNames);
+    
+    /**
+     * 
+     * @return
+     * @throws UnsupportedOperationException
+     * @throws SecurityException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public ClassLoader getClassLoader();
+    
+    /**
+     * 
+     * @return
+     * @throws UnsupportedOperationException
+     * @since Servlet 3.0 
+     * TODO SERVLET3 - Add comments
+     */
+    public JspConfigDescriptor getJspConfigDescriptor();
 }

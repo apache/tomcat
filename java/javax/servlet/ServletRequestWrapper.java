@@ -471,53 +471,6 @@ public class ServletRequestWrapper implements ServletRequest {
     }
 
     /**
-     * The default behavior of this method is to call
-     * addAsyncListener(AsyncListener) on the wrapped request object.
-     * 
-     * @param listener
-     * @since Servlet 3.0
-     */
-    public void addAsyncListener(AsyncListener listener) {
-        request.addAsyncListener(listener);
-    }
-    
-    /**
-     * The default behavior of this method is to call
-     * addAsyncListener(AsyncListener, ServletRequest, ServletResponse) on the
-     * wrapped request object.
-     * 
-     * @param listener
-     * @param servletRequest
-     * @param servletResponse
-     * @since Servlet 3.0
-     */
-    public void addAsyncListener(AsyncListener listener,
-            ServletRequest servletRequest, ServletResponse servletResponse) {
-        request.addAsyncListener(listener, servletRequest, servletResponse);
-    }
-    
-    /**
-     * The default behavior of this method is to call
-     * setAsyncTimeout(long) on the wrapped request object.
-     * 
-     * @param listener
-     * @since Servlet 3.0
-     */
-    public void setAsyncTimeout(long timeout) {
-        request.setAsyncTimeout(timeout);
-    }
-    
-    /**
-     * The default behavior of this method is to call
-     * getAsyncTimeout() on the wrapped request object.
-     * 
-     * @since Servlet 3.0
-     */
-    public long getAsyncTimeout() {
-        return request.getAsyncTimeout();
-    }
-    
-    /**
      * 
      * @param wrapped
      * @since Servlet 3.0

@@ -16,11 +16,11 @@
 */
 package javax.servlet;
 
+import java.util.Collection;
 import java.util.EnumSet;
 
 /**
  * @since Servlet 3.0
- * $Id$
  * TODO SERVLET3 - Add comments
  */
 public interface FilterRegistration extends Registration {
@@ -36,6 +36,11 @@ public interface FilterRegistration extends Registration {
     public void addMappingForServletNames(
             EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... servletNames);
+    /**
+     * 
+     * @return
+     */
+    public Collection<String> getServletNameMappings();
     
     /**
      * 
@@ -49,7 +54,14 @@ public interface FilterRegistration extends Registration {
             EnumSet<DispatcherType> dispatcherTypes,
             boolean isMatchAfter, String... urlPatterns);
 
+    /**
+     * 
+     * @return
+     */
+    public Collection<String> getUrlPatternMappings();
+    
     public static interface Dynamic
     extends FilterRegistration, Registration.Dynamic {
+        // No additional methods
     }
 }

@@ -24,7 +24,6 @@ import java.lang.annotation.Documented;
 
 /**
  * @since Servlet 3.0
- * $Id$
  * TODO SERVLET3 - Add comments
  */
 @Target({ElementType.TYPE})

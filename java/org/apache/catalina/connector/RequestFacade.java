@@ -22,12 +22,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.AsyncContext;
-import javax.servlet.AsyncListener;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -973,27 +973,10 @@ public class RequestFacade implements HttpServletRequest {
     }
 
     
-    public void addAsyncListener(AsyncListener listener) {
-        request.addAsyncListener(listener);
-    }
-
-    
-    public void addAsyncListener(AsyncListener listener, ServletRequest servletRequest, ServletResponse servletResponse) {
-        request.addAsyncListener(listener,servletRequest,servletResponse);
-    }
-
     public AsyncContext getAsyncContext() {
         return request.getAsyncContext();
     }
 
-    public long getAsyncTimeout() {
-        return request.getAsyncTimeout();
-    }
-    
-    public void setAsyncTimeout(long timeout) {
-        request.setAsyncTimeout(timeout);
-    }
-    
     public DispatcherType getDispatcherType() {
         return request.getDispatcherType();
     }
@@ -1011,7 +994,7 @@ public class RequestFacade implements HttpServletRequest {
         request.logout();
     }
     
-    public Iterable<Part> getParts() {
+    public Collection<Part> getParts() {
         return request.getParts();
     }
     
