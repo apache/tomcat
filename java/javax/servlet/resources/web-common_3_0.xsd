@@ -67,7 +67,7 @@
 
   <xsd:annotation>
     <xsd:documentation>
-<![CDATA[[
+      <![CDATA[[
       This is the common XML Schema for the Servlet 3.0 deployment descriptor.
       This file is in turn used by web.xml and web-fragment.xml
       web application's war file.  All Servlet deployment descriptors
@@ -92,7 +92,7 @@
       
       http://java.sun.com/xml/ns/javaee/web-common_3_0.xsd
       
-]]>
+      ]]>
     </xsd:documentation>
   </xsd:annotation>
 
@@ -211,10 +211,10 @@
   <xsd:complexType name="web-appType">
     <xsd:choice minOccurs="0"
                 maxOccurs="unbounded">
-      <xsd:group ref="javaee:web-commonType"/>
       <xsd:element name="module-name"
                    type="javaee:string"
                    minOccurs="0"/>
+      <xsd:group ref="javaee:web-commonType"/>
       <xsd:element name="absolute-ordering"
                    type="javaee:absoluteOrderingType"/>
     </xsd:choice>
@@ -433,7 +433,9 @@
       <xsd:element name="filter-name"
                    type="javaee:filter-nameType"/>
       <xsd:element name="filter-class"
-                   type="javaee:fully-qualified-classType">
+                   type="javaee:fully-qualified-classType"
+                   minOccurs="0"
+                   maxOccurs="1">
         <xsd:annotation>
           <xsd:documentation>
 
@@ -768,7 +770,8 @@
       <xsd:group ref="javaee:descriptionGroup"/>
       <xsd:element name="servlet-name"
                    type="javaee:servlet-nameType"/>
-      <xsd:choice>
+      <xsd:choice minOccurs="0"
+                  maxOccurs="1">
         <xsd:element name="servlet-class"
                      type="javaee:fully-qualified-classType">
           <xsd:annotation>
@@ -1526,12 +1529,8 @@
     <xsd:annotation>
       <xsd:documentation>
 
-        This element contains a sequence of "name" elements, each of which
-        refers to an application configuration resource by the "name"
-        declared on its web.xml fragment.  This element can also contain
-        a single "others" element which specifies that this document comes
-        before or after other documents within the application.
-        See section 8.2.2 of the specification for details.
+        This element specifies configuration information related to the
+        handling of multipart/form-data requests.
         
       </xsd:documentation>
     </xsd:annotation>
@@ -1539,20 +1538,54 @@
       <xsd:element name="location"
                    type="javaee:string"
                    minOccurs="0"
-                   maxOccurs="1"/>
+                   maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            The directory location where uploaded files will be stored
+            
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="max-file-size"
                    type="xsd:long"
                    minOccurs="0"
-                   maxOccurs="1"/>
+                   maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            The maximum size limit of uploaded files
+            
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="max-request-size"
                    type="xsd:long"
                    minOccurs="0"
-                   maxOccurs="1"/>
+                   maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            The maximum size limit of multipart/form-data requests
+            
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="file-size-threshold"
                    type="xsd:integer"
                    minOccurs="0"
-                   maxOccurs="1"/>
+                   maxOccurs="1">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            The size threshold after which an uploaded file will be
+            written to disk
+            
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
     </xsd:sequence>
   </xsd:complexType>
 
 </xsd:schema>
+
