@@ -16,12 +16,21 @@
 */
 package javax.servlet;
 
+import java.util.Set;
+
 /**
  * @since Servlet 3.0
  * $Id$
  * TODO SERVLET3 - Add comments
  */
 public interface ServletContainerInitializer {
-    public void onStartup(java.util.Set<java.lang.Class<?>> c,
-            ServletContext ctx);
+    
+    /**
+     * 
+     * @param c
+     * @param ctx
+     * @throws ServletException
+     */
+    public void onStartup(Set<java.lang.Class<?>> c, ServletContext ctx)
+    throws ServletException;
 }

@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequestWrapper;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 
 /**
@@ -292,7 +293,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements 
      * @since Servlet 3.0
      * TODO SERVLET3 - Add comments
      */
-    public Iterable<Part> getParts() {
+    public Collection<Part> getParts() throws IOException, ServletException {
         return this._getHttpServletRequest().getParts();
     }
 

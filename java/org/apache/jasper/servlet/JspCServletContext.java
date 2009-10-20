@@ -25,8 +25,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -40,6 +42,7 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.FilterRegistration.Dynamic;
+import javax.servlet.descriptor.JspConfigDescriptor;
 
 
 /**
@@ -512,18 +515,85 @@ public class JspCServletContext implements ServletContext {
     }
 
 
-    public FilterRegistration findFilterRegistration(String filterName) {
+    public FilterRegistration getFilterRegistration(String filterName) {
         return null;
     }
 
 
-    public ServletRegistration findServletRegistration(String servletName) {
+    public ServletRegistration getServletRegistration(String servletName) {
         return null;
     }
 
 
     public boolean setInitParameter(String name, String value) {
         return false;
+    }
+
+
+    @Override
+    public void addListener(Class<? extends EventListener> listenerClass) {
+        // NOOP
+    }
+
+
+    @Override
+    public void addListener(String className) {
+        // NOOP
+    }
+
+
+    @Override
+    public <T extends EventListener> void addListener(T t) {
+        // NOOP
+    }
+
+
+    @Override
+    public <T extends EventListener> T createListener(Class<T> c)
+            throws ServletException {
+        return null;
+    }
+
+
+    @Override
+    public void declareRoles(String... roleNames) {
+        // NOOP
+    }
+
+
+    @Override
+    public ClassLoader getClassLoader() {
+        return null;
+    }
+
+
+    @Override
+    public int getEffectiveMajorVersion() {
+        return 3;
+    }
+
+
+    @Override
+    public int getEffectiveMinorVersion() {
+        return 0;
+    }
+
+
+    @Override
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        return null;
+    }
+
+
+    @Override
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        return null;
+    }
+
+
+    @Override
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        return null;
     }
 
 }

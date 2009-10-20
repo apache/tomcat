@@ -43,8 +43,8 @@ import java.util.ResourceBundle;
 public abstract class ServletOutputStream extends OutputStream {
 
     private static final String LSTRING_FILE = "javax.servlet.LocalStrings";
-    private static ResourceBundle lStrings =
-	ResourceBundle.getBundle(LSTRING_FILE);
+    private static final ResourceBundle lStrings =
+        ResourceBundle.getBundle(LSTRING_FILE);
 
 
     

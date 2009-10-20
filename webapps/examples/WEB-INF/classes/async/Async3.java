@@ -35,7 +35,7 @@ public class Async3 extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final AsyncContext actx = req.startAsync();
-        actx.setAsyncTimeout(30*1000);
+        actx.setTimeout(30*1000);
         actx.dispatch("/jsp/async/async3.jsp");
         actx.complete();
     }
