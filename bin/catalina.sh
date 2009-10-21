@@ -248,7 +248,9 @@ if [ "$1" = "debug" ] ; then
   else
     shift
     if [ "$1" = "-security" ] ; then
-      echo "Using Security Manager"
+      if [ $have_tty -eq 1 ]; then
+        echo "Using Security Manager"
+      fi
       shift
       exec "$_RUNJDB" "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
         -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
@@ -274,7 +276,9 @@ elif [ "$1" = "run" ]; then
 
   shift
   if [ "$1" = "-security" ] ; then
-    echo "Using Security Manager"
+    if [ $have_tty -eq 1 ]; then
+      echo "Using Security Manager"
+    fi
     shift
     exec "$_RUNJAVA" "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
       -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
@@ -305,7 +309,9 @@ elif [ "$1" = "start" ] ; then
   shift
   touch "$CATALINA_BASE"/logs/catalina.out
   if [ "$1" = "-security" ] ; then
-    echo "Using Security Manager"
+    if [ $have_tty -eq 1 ]; then
+      echo "Using Security Manager"
+    fi
     shift
     "$_RUNJAVA" "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
       -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
