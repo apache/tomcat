@@ -41,8 +41,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
@@ -240,14 +238,7 @@ public class WebappClassLoader
      * The cache of ResourceEntry for classes and resources we have loaded,
      * keyed by resource name.
      */
-    protected HashMap<String, ResourceEntry> resourceEntries =
-            new LinkedHashMap<String, ResourceEntry>() {
-        private static final long serialVersionUID = 1L;
-        protected boolean removeEldestEntry(
-                Map.Entry<String, ResourceEntry> eldest) {
-            return size() > 1000;
-        }
-    };
+    protected HashMap<String, ResourceEntry> resourceEntries = new HashMap<String, ResourceEntry>();
 
 
     /**
