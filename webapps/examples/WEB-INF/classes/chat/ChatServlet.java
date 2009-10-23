@@ -106,7 +106,8 @@ public class ChatServlet
         }
     }
 
-    protected void begin(CometEvent event, HttpServletRequest request, HttpServletResponse response)
+    protected void begin(@SuppressWarnings("unused") CometEvent event,
+            HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         log("Begin for session: " + request.getSession(true).getId());
         
