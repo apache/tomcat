@@ -33,6 +33,7 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
 import org.apache.tomcat.util.digester.RuleSetBase;
 import org.apache.tomcat.util.digester.SetNextRule;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
 
@@ -46,6 +47,11 @@ import org.xml.sax.Attributes;
 
 public class WebRuleSet extends RuleSetBase {
 
+    /**
+     * The string resources for this package.
+     */
+    protected static final StringManager sm =
+        StringManager.getManager(Constants.Package);
 
     // ----------------------------------------------------- Instance Variables
 
@@ -60,6 +66,12 @@ public class WebRuleSet extends RuleSetBase {
      * component, to use for matching elements
      */
     protected String fullPrefix = null;
+
+    /**
+     * Flag that indicates if this ruleset is for a web-fragment.xml file or for
+     * a web.xml file.
+     */
+    protected boolean fragment = false;
 
     /**
      * The <code>SetSessionConfig</code> rule used to parse the web.xml
@@ -116,13 +128,13 @@ public class WebRuleSet extends RuleSetBase {
         super();
         this.namespaceURI = null;
         this.prefix = prefix;
+        this.fragment = fragment;
 
         if(fragment) {
             fullPrefix = prefix + "web-fragment";
         } else {
             fullPrefix = prefix + "web-app";
         }
-        
 
     }
 
@@ -147,6 +159,31 @@ public class WebRuleSet extends RuleSetBase {
                          new SetPublicIdRule("setPublicId"));
         digester.addRule(fullPrefix,
                          new IgnoreAnnotationsRule());
+
+        digester.addCallMethod(fullPrefix + "/name",
+                "setName", 0);
+        
+        if (fragment) {
+            // web-fragment.xml
+            digester.addRule(fullPrefix + "/absolute-ordering",
+                    new AbsoluteOrderingRule());
+            digester.addCallMethod(fullPrefix + "/ordering/after/name",
+                                   "addAfterOrdering", 0);
+            digester.addCallMethod(fullPrefix + "/ordering/after/others",
+                                   "addAfterOrderingOthers");
+            digester.addCallMethod(fullPrefix + "/ordering/before/name",
+                                   "addBeforeOrdering", 0);
+            digester.addCallMethod(fullPrefix + "/ordering/before/others",
+                                   "addBeforeOrderingOthers");
+        } else {
+            // web.xml
+            digester.addRule(fullPrefix + "/ordering",
+                    new RelativeOrderingRule());
+            digester.addCallMethod(fullPrefix + "/absolute-ordering/name",
+                                   "addAbsoluteOrdering", 0);
+            digester.addCallMethod(fullPrefix + "/absolute-ordering/name/others",
+                                   "addAbsoluteOrderingOthers");
+        }
 
         digester.addCallMethod(fullPrefix + "/context-param",
                                "addContextParam", 2);
@@ -901,6 +938,36 @@ final class IgnoreAnnotationsRule extends Rule {
         }
     }
 
+}
+
+/**
+ * A rule that logs a warning if absolute ordering is configured.
+ */
+final class AbsoluteOrderingRule extends Rule {
+    
+    public AbsoluteOrderingRule() {
+    }
+    
+    public void begin(String namespace, String name, Attributes attributes)
+            throws Exception {
+        digester.getLogger().warn(
+                WebRuleSet.sm.getString("webRuleSet.absoluteOrdering"));
+    } 
+}
+
+/**
+ * A rule that logs a warning if relative ordering is configured.
+ */
+final class RelativeOrderingRule extends Rule {
+    
+    public RelativeOrderingRule() {
+    }
+    
+    public void begin(String namespace, String name, Attributes attributes)
+            throws Exception {
+        digester.getLogger().warn(
+                WebRuleSet.sm.getString("webRuleSet.relativeOrdering"));
+    } 
 }
 
 /**
