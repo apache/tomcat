@@ -18,6 +18,7 @@
 
 package org.apache.catalina.startup;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -65,12 +66,21 @@ public class WebXml {
     
     // web.xml only elements
     // Absolute Ordering
-    private Set<String> absoluteOrdering = new LinkedHashSet<String>();
+    private Set<String> absoluteOrdering = null;
     public void addAbsoluteOrdering(String name) {
+        if (absoluteOrdering == null) {
+            absoluteOrdering = new LinkedHashSet<String>();
+        }
         absoluteOrdering.add(name);
     }
     public void addAbsoluteOrderingOthers() {
+        if (absoluteOrdering == null) {
+            absoluteOrdering = new LinkedHashSet<String>();
+        }
         absoluteOrdering.add(ORDER_OTHERS);
+    }
+    public Set<String> getAbsoluteOrdering() {
+        return absoluteOrdering;
     }
 
     // web-fragment.xml only elements
@@ -82,7 +92,7 @@ public class WebXml {
     public void addAfterOrderingOthers() {
         if (before.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString(
-                    "webXmlFragment.multipleOther"));
+                    "webXml.multipleOther"));
         }
         after.add(ORDER_OTHERS);
     }
@@ -93,7 +103,7 @@ public class WebXml {
     public void addBeforeOrderingOthers() {
         if (after.contains(ORDER_OTHERS)) {
             throw new IllegalArgumentException(sm.getString(
-                    "webXmlFragment.multipleOther"));
+                    "webXml.multipleOther"));
         }
         before.add(ORDER_OTHERS);
     }
@@ -122,7 +132,7 @@ public class WebXml {
     public void setName(String name) {
         if (ORDER_OTHERS.equalsIgnoreCase(name)) {
             // This is unusual. This name will be ignored. Log the fact.
-            log.warn(sm.getString("webXmlCommon.reservedName", name));
+            log.warn(sm.getString("webXml.reservedName", name));
         } else {
             this.name = name;
         }
@@ -165,7 +175,7 @@ public class WebXml {
         if (filters.containsKey(filter.getFilterName())) {
             // Filter names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXmlCommon.duplicateFilter"));
+                    sm.getString("webXml.duplicateFilter"));
         }
         filters.put(filter.getFilterName(), filter);
     }
@@ -299,7 +309,7 @@ public class WebXml {
         if (envEntries.containsKey(envEntry.getName())) {
             // env-entry names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXmlCommon.duplicateEnvEntry"));
+                    sm.getString("webXml.duplicateEnvEntry"));
         }
         envEntries.put(envEntry.getName(),envEntry);
     }
@@ -337,7 +347,7 @@ public class WebXml {
         if (resourceRefs.containsKey(resourceRef.getName())) {
             // resource-ref names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXmlCommon.duplicateResourceRef"));
+                    sm.getString("webXml.duplicateResourceRef"));
         }
         resourceRefs.put(resourceRef.getName(), resourceRef);
     }
@@ -353,7 +363,7 @@ public class WebXml {
         if (resourceEnvRefs.containsKey(resourceEnvRef.getName())) {
             // resource-env-ref names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXmlCommon.duplicateResourceEnvRef"));
+                    sm.getString("webXml.duplicateResourceEnvRef"));
         }
         resourceEnvRefs.put(resourceEnvRef.getName(), resourceEnvRef);
     }
@@ -372,7 +382,7 @@ public class WebXml {
             // message-destination-ref names must be unique within a
             // web(-fragment).xml
             throw new IllegalArgumentException(sm.getString(
-                    "webXmlCommon.duplicateMessageDestinationRef"));
+                    "webXml.duplicateMessageDestinationRef"));
         }
         messageDestinationRefs.put(messageDestinationRef.getName(),
                 messageDestinationRef);
@@ -394,7 +404,7 @@ public class WebXml {
             // message-destination names must be unique within a
             // web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXmlCommon.duplicateMessageDestination"));
+                    sm.getString("webXml.duplicateMessageDestination"));
         }
         messageDestinations.put(messageDestination.getName(),
                 messageDestination);
@@ -412,6 +422,14 @@ public class WebXml {
     public Map<String,String> getLocalEncodingMappings() {
         return localeEncodingMappings;
     }
+    
+
+    // Attributes not defined in web.xml or web-fragment.xml
+    
+    // URL of web-fragment
+    private URL uRL = null;
+    public void setURL(URL url) { this.uRL = url; }
+    public URL getURL() { return uRL; }
     
     /**
      * Configure a {@link Context} using the stored web.xml representation.
@@ -537,5 +555,34 @@ public class WebXml {
         for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
             context.addJspMapping(jspPropertyGroup.getUrlPattern());
         }
+    }
+    
+    /**
+     * Merge the supplied web fragment into this this one.
+     * 
+     * @param source            The fragment to merge in
+     * @boolean ignoreConflicts Flag that indicates that conflicts should be
+     *                          ignored and the existing value used
+     * @return <code>true</code> if merge is successful, else
+     *         <code>false</code>
+     */
+    public boolean merge(WebXml source, boolean ignoreConflicts) {
+        // TODO SERVLET3
+        
+        // Just do listeners for now since that is what my simple test case is
+        // using
+        for (String listener : source.getListeners()) {
+            if (listeners.contains(listener)) {
+                if (!ignoreConflicts) {
+                    log.error(sm.getString("webXml.mergeConflictListener",
+                            listener, source.getName(), source.getURL()));
+                    return false;
+                }
+            } else {
+                listeners.add(listener);
+            }
+        }
+
+        return true;
     }
 }

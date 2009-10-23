@@ -29,8 +29,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -1235,7 +1237,7 @@ public class ContextConfig
         
         if (!webXml.isMetadataComplete()) {
             // Have to process JARs for fragments
-            Map<URL,WebXml> fragments = processJarsForWebFragments();
+            Map<String,WebXml> fragments = processJarsForWebFragments();
             
             // Merge the fragments into the main web.xml
             mergeWebFragments(webXml, fragments);
@@ -1452,7 +1454,7 @@ public class ContextConfig
      * 
      * @return A map of JAR name to processed web fragment (if any)
      */
-    protected Map<URL,WebXml> processJarsForWebFragments() {
+    protected Map<String,WebXml> processJarsForWebFragments() {
         
         JarScanner jarScanner = context.getJarScanner();
         FragmentJarScannerCallback callback = new FragmentJarScannerCallback();
@@ -1467,7 +1469,7 @@ public class ContextConfig
 
         private static final String FRAGMENT_LOCATION =
             "META-INF/web-fragment.xml";
-        private Map<URL,WebXml> fragments = new HashMap<URL,WebXml>();
+        private Map<String,WebXml> fragments = new HashMap<String,WebXml>();
         
         @Override
         public void scan(JarURLConnection urlConn) throws IOException {
@@ -1505,7 +1507,15 @@ public class ContextConfig
                         // ignore
                     }
                 }
-                fragments.put(urlConn.getURL(), fragment);
+                if (fragment == null) {
+                    fragments.put(urlConn.getURL().toString(), fragment);
+                } else {
+                    fragment.setURL(urlConn.getURL());
+                    if (fragment.getName() == null) {
+                        fragment.setName(fragment.getURL().toString());
+                    }
+                    fragments.put(fragment.getName(), fragment);
+                }
             }
         }
 
@@ -1533,11 +1543,19 @@ public class ContextConfig
                         // ignore
                     }
                 }
-                fragments.put(file.toURI().toURL(), fragment);
+                if (fragment == null) {
+                    fragments.put(file.toURI().toURL().toString(), fragment);
+                } else {
+                    fragment.setURL(file.toURI().toURL());
+                    if (fragment.getName() == null) {
+                        fragment.setName(fragment.getURL().toString());
+                    }
+                    fragments.put(fragment.getName(), fragment);
+                }
             }
         }
         
-        public Map<URL,WebXml> getFragments() {
+        public Map<String,WebXml> getFragments() {
             return fragments;
         }
     }
@@ -1547,22 +1565,61 @@ public class ContextConfig
      * Servlet spec.
      * 
      * @param application   The application web.xml file
-     * @param fragments     The map of JARs to web fragments
+     * @param fragments     The map of fragment names to web fragments
      */
     protected void mergeWebFragments(WebXml application,
-            Map<URL,WebXml> fragments) {
-        // TODO SERVLET3
-        // Check order
+            Map<String,WebXml> fragments) {
+
+        Set<WebXml> orderedFragments = new LinkedHashSet<WebXml>();
+        
+        boolean absoluteOrdering =
+            (application.getAbsoluteOrdering() != null);
+        
+        if (absoluteOrdering) {
+            // Only those fragments listed should be processed
+            Set<String> requestedOrder = application.getAbsoluteOrdering();
+            
+            for (String requestedName : requestedOrder) {
+                if (WebXml.ORDER_OTHERS.equals(requestedName)) {
+                    // Add all fragments not named explicitly at this point
+                    for (String name : fragments.keySet()) {
+                        if (!requestedOrder.contains(name)) {
+                            WebXml fragment = fragments.get(name);
+                            if (fragment != null) {
+                                orderedFragments.add(fragment);
+                            }
+                        }
+                    }
+                } else {
+                    WebXml fragment = fragments.get(requestedName);
+                    if (fragment != null) {
+                        orderedFragments.add(fragment);
+                    }
+                }
+            }
+        } else {
+            // TODO SERVLET3 Relative ordering
+        }
         
         // Merge fragments in order - conflict == error
+        WebXml mergedFragments = new WebXml();
+        for (WebXml fragment : orderedFragments) {
+            ok = mergedFragments.merge(fragment, false);
+            if (ok == false) {
+                break;
+            }
+        }
         
-        // Merge fragment into application - conflict == application wins 
+        // Merge fragment into application - conflict == application wins
+        if (ok) {
+            ok = application.merge(mergedFragments, true);
+        }
     }
 
     
-    protected void processAnnotationsInJars(Map<URL,WebXml> fragments) {
-        for(URL url : fragments.keySet()) {
-            WebXml fragment = fragments.get(url);
+    protected void processAnnotationsInJars(Map<String,WebXml> fragments) {
+        for(String name : fragments.keySet()) {
+            WebXml fragment = fragments.get(name);
             if (fragment == null || !fragment.isMetadataComplete()) {
                 // Scan jar for annotations
                 // TODO SERVLET3
