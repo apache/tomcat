@@ -323,11 +323,14 @@ public class WebXml {
     
     // ejb-local-ref
     // TODO: Should support multiple description elements with language
-    private Set<ContextLocalEjb> ejbLocalRefs = new HashSet<ContextLocalEjb>();
+    private Map<String,ContextLocalEjb> ejbLocalRefs =
+        new HashMap<String,ContextLocalEjb>();
     public void addEjbLocalRef(ContextLocalEjb ejbLocalRef) {
-        ejbLocalRefs.add(ejbLocalRef);
+        ejbLocalRefs.put(ejbLocalRef.getName(),ejbLocalRef);
     }
-    public Set<ContextLocalEjb> getEjbLocalRefs() { return ejbLocalRefs; }
+    public Map<String,ContextLocalEjb> getEjbLocalRefs() {
+        return ejbLocalRefs;
+    }
     
     // service-ref
     // TODO: Should support multiple description elements with language
@@ -448,7 +451,7 @@ public class WebXml {
         }
         context.setDisplayName(displayName);
         context.setDistributable(distributable);
-        for (ContextLocalEjb ejbLocalRef : ejbLocalRefs) {
+        for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
             context.getNamingResources().addLocalEjb(ejbLocalRef);
         }
         for (ContextEjb ejbRef : ejbRefs) {
@@ -558,30 +561,131 @@ public class WebXml {
     }
     
     /**
-     * Merge the supplied web fragment into this this one.
+     * Merge the supplied web fragments into this main web.xml.
      * 
-     * @param source            The fragment to merge in
-     * @boolean ignoreConflicts Flag that indicates that conflicts should be
-     *                          ignored and the existing value used
+     * @param fragments     The fragments to merge in
      * @return <code>true</code> if merge is successful, else
      *         <code>false</code>
      */
-    public boolean merge(WebXml source, boolean ignoreConflicts) {
-        // TODO SERVLET3
+    public boolean merge(Set<WebXml> fragments) {
+        // As far as possible, process in alphabetical order so it is easy to
+        // check everything is present
         
-        // Just do listeners for now since that is what my simple test case is
-        // using
-        for (String listener : source.getListeners()) {
-            if (listeners.contains(listener)) {
-                if (!ignoreConflicts) {
-                    log.error(sm.getString("webXml.mergeConflictListener",
-                            listener, source.getName(), source.getURL()));
-                    return false;
+        // Merge rules vary from element to element. See SRV.8.2.3
+
+        WebXml temp = new WebXml();
+
+        for (WebXml fragment : fragments) {
+            for (String contextParam : fragment.getContextParams().keySet()) {
+                if (!contextParams.containsKey(contextParam)) {
+                    // Not defined in main web.xml
+                    String value =
+                        fragment.getContextParams().get(contextParam);
+                    if (temp.getContextParams().containsKey(contextParam)) {
+                        if (value != null && !value.equals(
+                                temp.getContextParams().get(contextParam))) {
+                            log.error(sm.getString(
+                                    "webXml.mergeConflictContextParam",
+                                    contextParam,
+                                    fragment.getName(),
+                                    fragment.getURL()));
+                            return false;
+                        }
+                    } else {
+                        temp.addContextParam(contextParam, value);
+                    }
                 }
-            } else {
-                listeners.add(listener);
             }
         }
+        contextParams.putAll(temp.getContextParams());
+
+        if (displayName == null) {
+            for (WebXml fragment : fragments) {
+                String value = fragment.getDisplayName(); 
+                if (value != null) {
+                    if (temp.getDisplayName() == null) {
+                        temp.setDisplayName(value);
+                    } else {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictDisplayName",
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    }
+                }
+            }
+        }
+        displayName = temp.getDisplayName();
+
+        if (distributable) {
+            for (WebXml fragment : fragments) {
+                if (!fragment.isDistributable()) {
+                    distributable = false;
+                    break;
+                }
+            }
+        }
+        
+        Map<String,Boolean> mergeInjectionFlags =
+            new HashMap<String, Boolean>();
+        for (WebXml fragment : fragments) {
+            for (ContextLocalEjb ejbLocalRef :
+                    fragment.getEjbLocalRefs().values()) {
+                String name = ejbLocalRef.getName();
+                boolean mergeInjectionFlag = false;
+                if (ejbLocalRefs.containsKey(name)) {
+                    if (mergeInjectionFlags.containsKey(name)) {
+                        mergeInjectionFlag =
+                            mergeInjectionFlags.get(name).booleanValue(); 
+                    } else {
+                        if (ejbLocalRefs.get(
+                                name).getInjectionTargets().size() == 0) {
+                            mergeInjectionFlag = true;
+                        }
+                        mergeInjectionFlags.put(name,
+                                Boolean.valueOf(mergeInjectionFlag));
+                    }
+                    if (mergeInjectionFlag) {
+                        ejbLocalRefs.get(name).getInjectionTargets().addAll(
+                                ejbLocalRef.getInjectionTargets());
+                    }
+                } else {
+                    // Not defined in main web.xml
+                    if (temp.getEjbLocalRefs().containsKey(name)) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictEjbLocalRef",
+                                name,
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    } else {
+                        temp.getEjbLocalRefs().put(name, ejbLocalRef);
+                    }
+                }
+            }
+        }
+        ejbLocalRefs.putAll(temp.getEjbLocalRefs());
+
+        // TODO SERVLET3 - Merge remaining elements
+
+        for (WebXml fragment : fragments) {
+            for (String listener : fragment.getListeners()) {
+                if (!listeners.contains(listener)) {
+                    // Not defined in main web.xml
+                    if (temp.getListeners().contains(listener)) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictListener",
+                                listener,
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    } else {
+                        temp.addListener(listener);
+                    }
+                }
+            }
+        }
+        listeners.addAll(temp.getListeners());
 
         return true;
     }
