@@ -61,7 +61,7 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
             actx.addListener(this);
             resp.setContentType("text/plain");
             clients.add(actx);
-            if (this.clientcount.incrementAndGet()==1) {
+            if (clientcount.incrementAndGet()==1) {
                 ticker.addTickListener(this);
             }
         } else {
