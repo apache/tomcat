@@ -42,17 +42,10 @@ public class DeferredFileOutputStream
 
 
     /**
-     * The output stream to which data will be written prior to the theshold
+     * The output stream to which data will be written prior to the threshold
      * being reached.
      */
     private ByteArrayOutputStream memoryOutputStream;
-
-
-    /**
-     * The output stream to which data will be written after the theshold is
-     * reached.
-     */
-    private FileOutputStream diskOutputStream;
 
 
     /**
@@ -126,7 +119,6 @@ public class DeferredFileOutputStream
         byte[] data = memoryOutputStream.toByteArray();
         FileOutputStream fos = new FileOutputStream(outputFile);
         fos.write(data);
-        diskOutputStream = fos;
         currentOutputStream = fos;
         memoryOutputStream = null;
     }
