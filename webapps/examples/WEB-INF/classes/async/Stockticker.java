@@ -40,7 +40,7 @@ public class Stockticker implements Runnable {
             try {
                 ticker.join();
             }catch (InterruptedException x) {
-                ticker.interrupted();
+                Thread.interrupted();
             }
             
             ticker = null;
