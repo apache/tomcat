@@ -32,7 +32,6 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.ActionHook;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.RequestGroupInfo;
@@ -367,9 +366,7 @@ public class AjpProtocol
                     processor = createProcessor();
                 }
 
-                if (processor instanceof ActionHook) {
-                    ((ActionHook) processor).action(ActionCode.ACTION_START, null);
-                }
+                processor.action(ActionCode.ACTION_START, null);
 
                 processor.process(socket.getSocket());
                 return false;
@@ -395,9 +392,7 @@ public class AjpProtocol
                 AjpProtocol.log.error
                     (sm.getString("ajpprotocol.proto.error"), e);
             } finally {
-                if (processor instanceof ActionHook) {
-                    ((ActionHook) processor).action(ActionCode.ACTION_STOP, null);
-                }
+                processor.action(ActionCode.ACTION_STOP, null);
                 recycledProcessors.offer(processor);
             }
             return false;
