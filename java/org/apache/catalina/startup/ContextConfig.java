@@ -1215,6 +1215,7 @@ public class ContextConfig
      */
     protected void webConfig() {
         WebXml webXml = new WebXml();
+
         // Parse global web.xml if present
         InputSource globalWebXml = getGlobalWebXmlSource();
         if (globalWebXml == null) {
@@ -1242,14 +1243,14 @@ public class ContextConfig
             // Merge the fragments into the main web.xml
             mergeWebFragments(webXml, fragments);
 
-            // Apply merged web.xml to Context
-            webXml.configureContext(context);
-            
             // Process JARs for annotations
             processAnnotationsInJars(fragments);
 
             // Process /WEB-INF/classes for annotations
             // TODO SERVLET3
+
+            // Apply merged web.xml to Context
+            webXml.configureContext(context);
         } else {
             // Apply merged web.xml to Context
             webXml.configureContext(context);
@@ -1601,18 +1602,9 @@ public class ContextConfig
             // TODO SERVLET3 Relative ordering
         }
         
-        // Merge fragments in order - conflict == error
-        WebXml mergedFragments = new WebXml();
-        for (WebXml fragment : orderedFragments) {
-            ok = mergedFragments.merge(fragment, false);
-            if (ok == false) {
-                break;
-            }
-        }
-        
-        // Merge fragment into application - conflict == application wins
+        // Merge fragment into application
         if (ok) {
-            ok = application.merge(mergedFragments, true);
+            ok = application.merge(orderedFragments);
         }
     }
 
