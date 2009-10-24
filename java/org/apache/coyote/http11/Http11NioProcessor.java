@@ -21,14 +21,10 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
 import java.nio.channels.SelectionKey;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ActionHook;
-import org.apache.coyote.Adapter;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.Response;
@@ -52,7 +48,6 @@ import org.apache.tomcat.util.net.NioEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketStatus;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.net.NioEndpoint.KeyAttachment;
 
 
@@ -182,67 +177,6 @@ public class Http11NioProcessor extends AbstractHttp11Processor implements Actio
         }
     }
 
-
-    /**
-     * General use method
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private String[] addStringArray(String sArray[], String value) {
-        String[] result = null;
-        if (sArray == null) {
-            result = new String[1];
-            result[0] = value;
-        }
-        else {
-            result = new String[sArray.length + 1];
-            for (int i = 0; i < sArray.length; i++)
-                result[i] = sArray[i];
-            result[sArray.length] = value;
-        }
-        return result;
-    }
-
-
-    /**
-     * General use method
-     *
-     * @param rArray the REArray
-     * @param value Obj
-     */
-    private Pattern[] addREArray(Pattern rArray[], Pattern value) {
-        Pattern[] result = null;
-        if (rArray == null) {
-            result = new Pattern[1];
-            result[0] = value;
-        }
-        else {
-            result = new Pattern[rArray.length + 1];
-            for (int i = 0; i < rArray.length; i++)
-                result[i] = rArray[i];
-            result[rArray.length] = value;
-        }
-        return result;
-    }
-
-
-    /**
-     * Checks if any entry in the string array starts with the specified value
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private boolean startsWithStringArray(String sArray[], String value) {
-        if (value == null)
-           return false;
-        for (int i = 0; i < sArray.length; i++) {
-            if (value.startsWith(sArray[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /**
      * Process pipelined HTTP requests using the specified input and output
