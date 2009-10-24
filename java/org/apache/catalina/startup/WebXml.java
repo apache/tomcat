@@ -249,11 +249,11 @@ public class WebXml {
     }
     
     // error-page
-    private Set<ErrorPage> errorPages = new HashSet<ErrorPage>();
+    private Map<String,ErrorPage> errorPages = new HashMap<String,ErrorPage>();
     public void addErrorPage(ErrorPage errorPage) {
-        errorPages.add(errorPage);
+        errorPages.put(errorPage.getName(), errorPage);
     }
-    public Set<ErrorPage> getErrorPages() { return errorPages; }
+    public Map<String,ErrorPage> getErrorPages() { return errorPages; }
     
     // Digester will check there is only one jsp-config
     // jsp-config/taglib or taglib (2.3 and earlier)
@@ -317,9 +317,11 @@ public class WebXml {
     
     // ejb-ref
     // TODO: Should support multiple description elements with language
-    private Set<ContextEjb> ejbRefs = new HashSet<ContextEjb>();
-    public void addEjbRef(ContextEjb ejbRef) { ejbRefs.add(ejbRef); }
-    public Set<ContextEjb> getEjbRefs() { return ejbRefs; }
+    private Map<String,ContextEjb> ejbRefs = new HashMap<String,ContextEjb>();
+    public void addEjbRef(ContextEjb ejbRef) {
+        ejbRefs.put(ejbRef.getName(),ejbRef);
+    }
+    public Map<String,ContextEjb> getEjbRefs() { return ejbRefs; }
     
     // ejb-local-ref
     // TODO: Should support multiple description elements with language
@@ -454,13 +456,13 @@ public class WebXml {
         for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
             context.getNamingResources().addLocalEjb(ejbLocalRef);
         }
-        for (ContextEjb ejbRef : ejbRefs) {
+        for (ContextEjb ejbRef : ejbRefs.values()) {
             context.getNamingResources().addEjb(ejbRef);
         }
         for (ContextEnvironment environment : envEntries.values()) {
             context.getNamingResources().addEnvironment(environment);
         }
-        for (ErrorPage errorPage : errorPages) {
+        for (ErrorPage errorPage : errorPages.values()) {
             context.addErrorPage(errorPage);
         }
         for (FilterDef filter : filters.values()) {
@@ -574,6 +576,8 @@ public class WebXml {
         // Merge rules vary from element to element. See SRV.8.2.3
 
         WebXml temp = new WebXml();
+        Map<String,Boolean> mergeInjectionFlags =
+            new HashMap<String, Boolean>();
 
         for (WebXml fragment : fragments) {
             for (String contextParam : fragment.getContextParams().keySet()) {
@@ -625,9 +629,7 @@ public class WebXml {
                 }
             }
         }
-        
-        Map<String,Boolean> mergeInjectionFlags =
-            new HashMap<String, Boolean>();
+
         for (WebXml fragment : fragments) {
             for (ContextLocalEjb ejbLocalRef :
                     fragment.getEjbLocalRefs().values()) {
@@ -665,6 +667,109 @@ public class WebXml {
             }
         }
         ejbLocalRefs.putAll(temp.getEjbLocalRefs());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            for (ContextEjb ejbRef : fragment.getEjbRefs().values()) {
+                String name = ejbRef.getName();
+                boolean mergeInjectionFlag = false;
+                if (ejbRefs.containsKey(name)) {
+                    if (mergeInjectionFlags.containsKey(name)) {
+                        mergeInjectionFlag =
+                            mergeInjectionFlags.get(name).booleanValue(); 
+                    } else {
+                        if (ejbRefs.get(
+                                name).getInjectionTargets().size() == 0) {
+                            mergeInjectionFlag = true;
+                        }
+                        mergeInjectionFlags.put(name,
+                                Boolean.valueOf(mergeInjectionFlag));
+                    }
+                    if (mergeInjectionFlag) {
+                        ejbRefs.get(name).getInjectionTargets().addAll(
+                                ejbRef.getInjectionTargets());
+                    }
+                } else {
+                    // Not defined in main web.xml
+                    if (temp.getEjbRefs().containsKey(name)) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictEjbRef",
+                                name,
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    } else {
+                        temp.getEjbRefs().put(name, ejbRef);
+                    }
+                }
+            }
+        }
+        ejbRefs.putAll(temp.getEjbRefs());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            for (ContextEnvironment envEntry :
+                    fragment.getEnvEntries().values()) {
+                String name = envEntry.getName();
+                boolean mergeInjectionFlag = false;
+                if (envEntries.containsKey(name)) {
+                    if (mergeInjectionFlags.containsKey(name)) {
+                        mergeInjectionFlag =
+                            mergeInjectionFlags.get(name).booleanValue(); 
+                    } else {
+                        if (envEntries.get(
+                                name).getInjectionTargets().size() == 0) {
+                            mergeInjectionFlag = true;
+                        }
+                        mergeInjectionFlags.put(name,
+                                Boolean.valueOf(mergeInjectionFlag));
+                    }
+                    if (mergeInjectionFlag) {
+                        envEntries.get(name).getInjectionTargets().addAll(
+                                envEntry.getInjectionTargets());
+                    }
+                } else {
+                    // Not defined in main web.xml
+                    if (temp.getEnvEntries().containsKey(name)) {
+                        log.error(sm.getString(
+                                "webXml.mergeConflictEnvEntry",
+                                name,
+                                fragment.getName(),
+                                fragment.getURL()));
+                        return false;
+                    } else {
+                        temp.getEnvEntries().put(name, envEntry);
+                    }
+                }
+            }
+        }
+        envEntries.putAll(temp.getEnvEntries());
+        mergeInjectionFlags.clear();
+
+        for (WebXml fragment : fragments) {
+            for (String errorPageKey : fragment.getErrorPages().keySet()) {
+                if (!errorPages.containsKey(errorPageKey)) {
+                    // Not defined in main web.xml
+                    ErrorPage errorPage =
+                        fragment.getErrorPages().get(errorPageKey);
+                    if (temp.getErrorPages().containsKey(errorPageKey)) {
+                        if (!errorPage.getLocation().equals(
+                                temp.getErrorPages().get(
+                                        errorPageKey).getLocation())) {
+                            log.error(sm.getString(
+                                    "webXml.mergeConflictErrorPage",
+                                    errorPageKey,
+                                    fragment.getName(),
+                                    fragment.getURL()));
+                            return false;
+                        }
+                    } else {
+                        temp.addErrorPage(errorPage);
+                    }
+                }
+            }
+        }
+        errorPages.putAll(temp.getErrorPages());
 
         // TODO SERVLET3 - Merge remaining elements
 
