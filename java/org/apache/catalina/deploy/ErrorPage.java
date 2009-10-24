@@ -167,5 +167,12 @@ public class ErrorPage implements Serializable {
 
     }
 
+    public String getName() {
+        if (exceptionType == null) {
+            return Integer.toString(errorCode);
+        } else {
+            return exceptionType;
+        }
+    }
 
 }
