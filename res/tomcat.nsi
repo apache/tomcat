@@ -25,7 +25,7 @@
   ;Product information
   VIAddVersionKey ProductName "Apache Tomcat"
   VIAddVersionKey CompanyName "Apache Software Foundation"
-  VIAddVersionKey LegalCopyright "Copyright (c) 1999-2006 The Apache Software Foundation"
+  VIAddVersionKey LegalCopyright "Copyright (c) 1999-2009 The Apache Software Foundation"
   VIAddVersionKey FileDescription "Apache Tomcat Installer"
   VIAddVersionKey FileVersion "2.0"
   VIAddVersionKey ProductVersion "@VERSION@"
@@ -99,7 +99,6 @@ ${StrRep}
     LangString DESC_SecMenu ${LANG_ENGLISH} "Create a Start Menu program group for Tomcat."
     LangString DESC_SecDocs ${LANG_ENGLISH} "Install the Tomcat documentation bundle. This include documentation on the servlet container and its configuration options, on the Jasper JSP page compiler, as well as on the native webserver connectors."
     LangString DESC_SecExamples ${LANG_ENGLISH} "Installs some examples web applications."
-    LangString DESC_SecAdmin ${LANG_ENGLISH} "Installs the administration web application.";
 
   ;Language
   !insertmacro MUI_LANGUAGE English
@@ -354,13 +353,9 @@ FunctionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SecTomcatCore} $(DESC_SecTomcatCore)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecTomcatService} $(DESC_SecTomcatService)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecTomcatNative} $(DESC_SecTomcatNative)
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SecTomcatSource} $(DESC_SecTomcatSource)
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SecCompat} $(DESC_SecCompat)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecMenu} $(DESC_SecMenu)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDocs} $(DESC_SecDocs)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecExamples} $(DESC_SecExamples)
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SecAdmin} $(DESC_SecAdmin)
-;  !insertmacro MUI_DESCRIPTION_TEXT ${SecWebapps} $(DESC_SecWebapps)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ; =====================
