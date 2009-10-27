@@ -218,6 +218,29 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
 
     </attributes>
 
+    <h3>JRE Memory Leak Prevention Listener
+        (org.apache.catalina.core.JreMemoryLeakPreventionListener)</h3>
+
+    <p>The <strong>JRE Memory Leak Prevention Listener</strong> provides
+    work-arounds for known places where the Java Runtime environment uses
+    the context class loader to load a singleton as this will cause a memory
+    leak if a web application class loader happens to be the context class
+    loader at the time. The work-around is to initialise these singletons when
+    this listener starts as Tomcat's common class loader is the context class
+    loader at that time.</p>
+    
+    <p>Currently the <strong>JRE Memory Leak Prevention Listener</strong>
+    provides work-arounds for the following:</p>
+    <ul>
+      <li><code>sun.awt.AppContext.getAppContext()</code></li>
+    </ul>
+
+    <p>This listener must only be nested within <a href="server.html">Server</a>
+    elements.</p>
+
+    <p>No additional attributes are support by the <strong>JRE Memory Leak
+    Prevention Listener</strong>.</p>
+
   </subsection>
 
 </section>
