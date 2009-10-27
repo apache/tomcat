@@ -793,6 +793,27 @@ public class Request
 
 
     /**
+     * Set the IP address of the remote client associated with this Request.
+     *
+     * @param remoteAddr The remote IP address
+     */
+    public void setRemoteAddr(String remoteAddr) {
+        this.remoteAddr = remoteAddr;
+    }
+
+
+    /**
+     * Set the fully qualified name of the remote client associated with this
+     * Request.
+     *
+     * @param remoteHost The remote host name
+     */
+    public void setRemoteHost(String remoteHost) {
+        this.remoteHost = remoteHost;
+    }
+
+
+    /**
      * Set the value to be returned by <code>isSecure()</code>
      * for this Request.
      *
