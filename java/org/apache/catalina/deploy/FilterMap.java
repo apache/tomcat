@@ -37,7 +37,8 @@ import javax.servlet.DispatcherType;
 
 public class FilterMap implements Serializable {
 
-
+    private static final long serialVersionUID = 1L;
+    
     // ------------------------------------------------------------- Properties
 
 
@@ -99,6 +100,15 @@ public class FilterMap implements Serializable {
         }
     }
 
+    public void addServletNames(String[] servletNames) {
+        if (servletNames != null) {
+            for (int i = 0; i < servletNames.length; i++) {
+                addServletName(servletNames[i]);
+            }
+        }
+    }
+
+
     
     /**
      * The flag that indicates this mapping will match all url-patterns
@@ -140,6 +150,14 @@ public class FilterMap implements Serializable {
         }
     }
     
+    public void addUrlPatterns(String[] urlPatterns) {
+        if (urlPatterns != null) {
+            for (int i = 0; i < urlPatterns.length; i++) {
+                addURLPattern(urlPatterns[i]);
+            }
+        }
+    }
+
     /**
      *
      * This method will be used to set the current state of the FilterMap
@@ -217,11 +235,15 @@ public class FilterMap implements Serializable {
     
     public int getDispatcherMapping() {
         // per the SRV.6.2.5 absence of any dispatcher elements is
-        // equivelant to a REQUEST value
+        // equivalent to a REQUEST value
         if (dispatcherMapping == NOT_SET) return REQUEST;
         else return dispatcherMapping; 
     }
 
+    public void addDispatcherMapping(int dispatcherMapping) {
+        // Merge the supplied mapping with the current mapping
+        this.dispatcherMapping =  getDispatcherMapping() | dispatcherMapping;
+    }
 
     // --------------------------------------------------------- Public Methods
 
