@@ -21,6 +21,7 @@ package org.apache.catalina.startup;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -170,7 +171,8 @@ public class WebXml {
     // TODO: Should support multiple display-name elements with language
     // TODO: Should support multiple icon elements
     // TODO: Description for init-param is ignored
-    private Map<String,FilterDef> filters = new HashMap<String,FilterDef>();
+    private Map<String,FilterDef> filters =
+        new LinkedHashMap<String,FilterDef>();
     public void addFilter(FilterDef filter) {
         if (filters.containsKey(filter.getFilterName())) {
             // Filter names must be unique within a web(-fragment).xml
@@ -182,11 +184,11 @@ public class WebXml {
     public Map<String,FilterDef> getFilters() { return filters; }
     
     // filter-mapping
-    private Set<FilterMap> filterMaps = new HashSet<FilterMap>();
+    private Map<String,FilterMap> filterMaps = new HashMap<String,FilterMap>();
     public void addFilterMapping(FilterMap filterMap) {
-        filterMaps.add(filterMap);
+        filterMaps.put(filterMap.getFilterName(),filterMap);
     }
-    public Set<FilterMap> getFilterMappings() { return filterMaps; }
+    public Map<String,FilterMap> getFilterMappings() { return filterMaps; }
     
     // listener
     // TODO: description (multiple with language) is ignored
@@ -468,7 +470,7 @@ public class WebXml {
         for (FilterDef filter : filters.values()) {
             context.addFilterDef(filter);
         }
-        for (FilterMap filterMap : filterMaps) {
+        for (FilterMap filterMap : filterMaps.values()) {
             context.addFilterMap(filterMap);
         }
         // jsp-property-group needs to be after servlet configuration
@@ -771,6 +773,25 @@ public class WebXml {
         }
         errorPages.putAll(temp.getErrorPages());
 
+        for (WebXml fragment : fragments) {
+            for (String filterName : fragment.getFilterMappings().keySet()) {
+                FilterMap filterMap =
+                    fragment.getFilterMappings().get(filterName);
+                // Always additive
+                if (filterMaps.containsKey(filterName)) {
+                    FilterMap appFilterMap = filterMaps.get(filterName);
+                    
+                    appFilterMap.addDispatcherMapping(
+                            filterMap.getDispatcherMapping());
+                    appFilterMap.addServletNames(filterMap.getServletNames());
+                    appFilterMap.addUrlPatterns(filterMap.getURLPatterns());
+                } else {
+                    addFilterMapping(filterMap);
+                }
+            }
+        }
+
+        
         // TODO SERVLET3 - Merge remaining elements
 
         for (WebXml fragment : fragments) {
