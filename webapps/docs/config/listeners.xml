@@ -78,7 +78,7 @@
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>The following additional attributes are support by the <strong>APR
+    <p>The following additional attributes are supported by the <strong>APR
     Lifecycle Listener</strong>:</p>
 
     <attributes>
@@ -111,7 +111,7 @@
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>No additional attributes are support by the <strong>Jasper Listener
+    <p>No additional attributes are supported by the <strong>Jasper Listener
     </strong>.</p>
 
     <h3>Server Lifecycle Listener
@@ -124,7 +124,7 @@
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>No additional attributes are support by the <strong>Server Lifecycle
+    <p>No additional attributes are supported by the <strong>Server Lifecycle
     Listener</strong>.</p>
 
     <h3>Global Resources Lifecycle Listener
@@ -138,7 +138,7 @@
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>No additional attributes are support by the <strong>Global Resources
+    <p>No additional attributes are supported by the <strong>Global Resources
     Lifecycle Listener</strong>.</p>
 
     <h3>JMX Remote Lifecycle Listener
@@ -194,7 +194,7 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
     <p>This listener must only be nested within a <a href="server.html">Server</a>
     element.</p>
 
-    <p>The following additional attributes are support by the <strong>JMX Remote
+    <p>The following additional attributes are supported by the <strong>JMX Remote
     Lifecycle Listener</strong>:</p>
 
     <attributes>
@@ -238,7 +238,7 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>No additional attributes are support by the <strong>JRE Memory Leak
+    <p>No additional attributes are supported by the <strong>JRE Memory Leak
     Prevention Listener</strong>.</p>
 
   </subsection>
