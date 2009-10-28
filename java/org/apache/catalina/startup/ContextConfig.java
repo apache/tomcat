@@ -1241,7 +1241,12 @@ public class ContextConfig
             Map<String,WebXml> fragments = processJarsForWebFragments();
             
             // Merge the fragments into the main web.xml
-            mergeWebFragments(webXml, fragments);
+            Set<WebXml> orderedFragments = orderWebFragments(webXml, fragments);
+
+            // Merge fragment into application
+            if (ok) {
+                ok = webXml.merge(orderedFragments);
+            }
 
             // Process JARs for annotations
             processAnnotationsInJars(fragments);
@@ -1562,13 +1567,15 @@ public class ContextConfig
     }
 
     /**
-     * Merges the web-fragment.xml and web.xml files as per the rules in the
+     * Generates the sub-set of the web-fragment.xml files to be processed in
+     * the order that the fragments must be processed as per the rules in the
      * Servlet spec.
      * 
      * @param application   The application web.xml file
      * @param fragments     The map of fragment names to web fragments
+     * @return Ordered list of web-fragment.xml files to process
      */
-    protected void mergeWebFragments(WebXml application,
+    protected static Set<WebXml> orderWebFragments(WebXml application,
             Map<String,WebXml> fragments) {
 
         Set<WebXml> orderedFragments = new LinkedHashSet<WebXml>();
@@ -1602,10 +1609,7 @@ public class ContextConfig
             // TODO SERVLET3 Relative ordering
         }
         
-        // Merge fragment into application
-        if (ok) {
-            ok = application.merge(orderedFragments);
-        }
+        return orderedFragments;
     }
 
     
