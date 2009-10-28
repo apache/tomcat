@@ -24,7 +24,6 @@ import org.apache.catalina.tribes.test.channel.TestRemoteProcessException;
 import org.apache.catalina.tribes.test.channel.TestUdpPackages;
 import org.apache.catalina.tribes.test.interceptors.TestNonBlockingCoordinator;
 import org.apache.catalina.tribes.test.interceptors.TestOrderInterceptor;
-import org.apache.catalina.tribes.test.interceptors.TestTwoPhaseCommit;
 import org.apache.catalina.tribes.test.io.TestSenderConnections;
 import org.apache.catalina.tribes.test.io.TestSerialization;
 import org.apache.catalina.tribes.test.membership.TestMemberSerialization;
@@ -55,7 +54,6 @@ public class TribesTestSuite
         // o.a.catalina.tribes.test.interceptors
         suite.addTestSuite(TestNonBlockingCoordinator.class);
         suite.addTestSuite(TestOrderInterceptor.class);
-        suite.addTestSuite(TestTwoPhaseCommit.class);
         // o.a.catalina.tribes.test.io
         suite.addTestSuite(TestSenderConnections.class);
         suite.addTestSuite(TestSerialization.class);
