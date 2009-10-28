@@ -31,7 +31,7 @@ import junit.framework.TestCase;
  * Base test case that provides a Tomcat instance for each test - mainly so we
  * don't have to keep writing the cleanup code.
  */
-public class TestTomcatBase extends TestCase {
+public abstract class TestTomcatBase extends TestCase {
     private Tomcat tomcat;
     private File tempDir;
     private static int port = 8001;
