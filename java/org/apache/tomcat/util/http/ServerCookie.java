@@ -68,22 +68,53 @@ public class ServerCookie implements Serializable {
     };
     private static final String ancientDate;
 
+    /**
+     * If set to true, we parse cookies strictly according to the servlet,
+     * cookie and HTTP specs by default.
+     */
+    public static final boolean STRICT_SERVLET_COMPLIANCE;
+
+    /**
+     * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
+     * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
+     * is false. Explicitly setting always takes priority.
+     */
+    public static final boolean ALWAYS_ADD_EXPIRES;
+
+    /**
+     * If set to true, the <code>/</code> character will be treated as a
+     * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
+     * then default is true. Explicitly setting always takes priority.
+     */
+    public static final boolean FWD_SLASH_IS_SEPARATOR;
+
 
     static {
         ancientDate = OLD_COOKIE_FORMAT.get().format(new Date(10000));
+        
+        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
+                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "false")).booleanValue();
+        
+
+        String alwaysAddExpires = System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
+        if (alwaysAddExpires == null) {
+            ALWAYS_ADD_EXPIRES = !STRICT_SERVLET_COMPLIANCE;
+        } else {
+            ALWAYS_ADD_EXPIRES =
+                Boolean.valueOf(alwaysAddExpires).booleanValue();
+        }
+        
+        String  fwdSlashIsSeparator = System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+        if (fwdSlashIsSeparator == null) {
+            FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            FWD_SLASH_IS_SEPARATOR =
+                Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
+        }
     }
-
-    /**
-     * If set to true, we parse cookies according to the servlet spec,
-     */
-    public static final boolean STRICT_SERVLET_COMPLIANCE =
-        Boolean.valueOf(System.getProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "false")).booleanValue();
-
-    /**
-     * If set to false, we don't use the IE6/7 Max-Age/Expires work around
-     */
-    public static final boolean ALWAYS_ADD_EXPIRES =
-        Boolean.valueOf(System.getProperty("org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES", "true")).booleanValue();
 
     // Note: Servlet Spec =< 2.5 only refers to Netscape and RFC2109,
     // not RFC2965
@@ -319,7 +350,13 @@ public class ServerCookie implements Serializable {
             if (version==0) {
                 maybeQuote2(version, buf, path);
             } else {
-                maybeQuote2(version, buf, path, ServerCookie.tspecials2NoSlash, false);
+                if (FWD_SLASH_IS_SEPARATOR) {
+                    maybeQuote2(version, buf, path, ServerCookie.tspecials,
+                            false);
+                } else {
+                    maybeQuote2(version, buf, path,
+                            ServerCookie.tspecials2NoSlash, false);
+                }
             }
         }
 
