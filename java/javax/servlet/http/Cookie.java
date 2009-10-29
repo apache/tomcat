@@ -17,6 +17,7 @@
 package javax.servlet.http;
 
 import java.text.MessageFormat;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 /**
@@ -486,8 +487,56 @@ public class Cookie implements Cloneable {
     // private static final String tspecials = "()<>@,;:\\\"/[]?={} \t";
 
     private static final String tspecials = ",; ";
+    private static final String tspecials2 = "()<>@,;:\\\"/[]?={} \t";
+    private static final String tspecials2NoSlash = "()<>@,;:\\\"/[]?={} \t";
     
-    
+    /**
+     * If set to true, we parse cookies strictly according to the servlet,
+     * cookie and HTTP specs by default.
+     */
+    private static final boolean STRICT_SERVLET_COMPLIANCE;
+
+    /**
+     * If set to true, the <code>/</code> character will be treated as a
+     * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
+     * then default is true. Explicitly setting always takes priority.
+     */
+    private static final boolean FWD_SLASH_IS_SEPARATOR;
+
+    /**
+     * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
+     * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
+     * is false. Explicitly setting always takes priority.
+     */
+    private static final boolean STRICT_NAMING;
+
+
+    static {
+        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
+                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "false")).booleanValue();
+
+        String  fwdSlashIsSeparator = System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+        if (fwdSlashIsSeparator == null) {
+            FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            FWD_SLASH_IS_SEPARATOR =
+                Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
+        }
+
+        String strictNaming = System.getProperty(
+                "javax.servlet.http.Cookie.STRICT_NAMING");
+        if (strictNaming == null) {
+            STRICT_NAMING = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            STRICT_NAMING =
+                Boolean.valueOf(strictNaming).booleanValue();
+        }
+
+    }
+
+
     
 
     /*
@@ -500,21 +549,24 @@ public class Cookie implements Cloneable {
      *				a reserved token; <code>false</code>
      *				if it is not			
      */
-
     private boolean isToken(String value) {
-	int len = value.length();
+        int len = value.length();
 
-	for (int i = 0; i < len; i++) {
-	    char c = value.charAt(i);
+        for (int i = 0; i < len; i++) {
+            char c = value.charAt(i);
 
-	    if (c < 0x20 || c >= 0x7f || tspecials.indexOf(c) != -1)
-		return false;
-	}
-	return true;
+            if (c < 0x20 ||
+                    c >= 0x7f ||
+                    (!STRICT_NAMING && tspecials.indexOf(c) != -1) ||
+                    (STRICT_NAMING && !FWD_SLASH_IS_SEPARATOR &&
+                            tspecials2NoSlash.indexOf(c) != -1) ||
+                    (STRICT_NAMING && FWD_SLASH_IS_SEPARATOR &&
+                            tspecials2.indexOf(c) != -1)) {
+                return false;
+            }
+        }
+        return true;
     }
-
-
-
 
 
 
