@@ -296,7 +296,7 @@
     </property>
 
     <property
-    name="javax.servlet.http.Cookie. STRICT_NAMING">
+    name="org.apache.tomcat.util.http. ServerCookie.STRICT_NAMING">
       <p> If this is true then the requirements of the Servlet specification
       that Cookie names must adhere to RFC2109 (no use of separators) will be
       enforced. If not specified, the default value will be used. If

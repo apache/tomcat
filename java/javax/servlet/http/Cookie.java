@@ -487,8 +487,9 @@ public class Cookie implements Cloneable {
     // private static final String tspecials = "()<>@,;:\\\"/[]?={} \t";
 
     private static final String tspecials = ",; ";
-    private static final String tspecials2 = "()<>@,;:\\\"/[]?={} \t";
-    private static final String tspecials2NoSlash = "()<>@,;:\\\"/[]?={} \t";
+    private static final String tspecials2NoSlash = "()<>@,;:\\\"[]?={} \t";
+    private static final String tspecials2WithSlash = tspecials2NoSlash + "/";
+    private static final String tspecials2;
     
     /**
      * If set to true, we parse cookies strictly according to the servlet,
@@ -504,9 +505,10 @@ public class Cookie implements Cloneable {
     private static final boolean FWD_SLASH_IS_SEPARATOR;
 
     /**
-     * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
-     * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
-     * is false. Explicitly setting always takes priority.
+     * If set to true, enforce the cookie naming rules in the spec that require
+     * no separators in the cookie name. Default is usually false. If
+     * STRICT_SERVLET_COMPLIANCE==true then default is true. Explicitly setting
+     * always takes priority.
      */
     private static final boolean STRICT_NAMING;
 
@@ -525,8 +527,14 @@ public class Cookie implements Cloneable {
                 Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
         }
 
+        if (FWD_SLASH_IS_SEPARATOR) {
+            tspecials2 = tspecials2WithSlash;
+        } else {
+            tspecials2 = tspecials2NoSlash;
+        }
+        
         String strictNaming = System.getProperty(
-                "javax.servlet.http.Cookie.STRICT_NAMING");
+                "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
         if (strictNaming == null) {
             STRICT_NAMING = STRICT_SERVLET_COMPLIANCE;
         } else {
@@ -555,13 +563,8 @@ public class Cookie implements Cloneable {
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
 
-            if (c < 0x20 ||
-                    c >= 0x7f ||
-                    (!STRICT_NAMING && tspecials.indexOf(c) != -1) ||
-                    (STRICT_NAMING && !FWD_SLASH_IS_SEPARATOR &&
-                            tspecials2NoSlash.indexOf(c) != -1) ||
-                    (STRICT_NAMING && FWD_SLASH_IS_SEPARATOR &&
-                            tspecials2.indexOf(c) != -1)) {
+            if (c < 0x20 || c >= 0x7f ||
+                    (STRICT_NAMING && tspecials2.indexOf(c) != -1)) {
                 return false;
             }
         }
