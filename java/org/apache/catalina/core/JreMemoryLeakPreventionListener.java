@@ -75,7 +75,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
             
             /*
              * Several components end up opening JarURLConnections without first
-             * disabling chaching. This effectively locks the file. Whilst more
+             * disabling caching. This effectively locks the file. Whilst more
              * noticeable and harder to ignore on Windows, it affects all
              * operating systems.
              * 
@@ -88,7 +88,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
             try {
                 // Doesn't matter that this JAR doesn't exist - just as long as
                 // the URL is well-formed
-                URL url = new URL("jar:file://dummy.jar!/dummy.txt");
+                URL url = new URL("jar:file://dummy.jar!/");
                 URLConnection uConn = url.openConnection();
                 uConn.setDefaultUseCaches(false);
             } catch (MalformedURLException e) {
