@@ -51,10 +51,10 @@ public final class Cookies { // extends MultiMap {
     Excluding the '/' char violates the RFC, but 
     it looks like a lot of people put '/'
     in unquoted values: '/': ; //47 
-    '\t':9 ' ':32 '\"':34 '\'':39 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
+    '\t':9 ' ':32 '\"':34 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
     '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
     */
-    public static final char SEPARATORS[] = { '\t', ' ', '\"', '\'', '(', ')', ',', 
+    public static final char SEPARATORS[] = { '\t', ' ', '\"', '(', ')', ',', 
         ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
 
     protected static final boolean separators[] = new boolean[128];
