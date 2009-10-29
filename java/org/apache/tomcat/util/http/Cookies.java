@@ -46,19 +46,54 @@ public final class Cookies { // extends MultiMap {
 
     MimeHeaders headers;
 
+    /**
+     * If set to true, we parse cookies strictly according to the servlet,
+     * cookie and HTTP specs by default.
+     */
+    public static final boolean STRICT_SERVLET_COMPLIANCE;
+
+    /**
+     * If set to true, the <code>/</code> character will be treated as a
+     * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
+     * then default is true. Explicitly setting always takes priority.
+     */
+    public static final boolean FWD_SLASH_IS_SEPARATOR;
+    
     /*
     List of Separator Characters (see isSeparator())
-    Excluding the '/' char violates the RFC, but 
-    it looks like a lot of people put '/'
-    in unquoted values: '/': ; //47 
-    '\t':9 ' ':32 '\"':34 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
-    '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
     */
-    public static final char SEPARATORS[] = { '\t', ' ', '\"', '(', ')', ',', 
-        ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
+    public static final char SEPARATORS[];
 
     protected static final boolean separators[] = new boolean[128];
     static {
+        STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
+                "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "false")).booleanValue();
+        
+        String  fwdSlashIsSeparator = System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+        if (fwdSlashIsSeparator == null) {
+            FWD_SLASH_IS_SEPARATOR = STRICT_SERVLET_COMPLIANCE;
+        } else {
+            FWD_SLASH_IS_SEPARATOR =
+                Boolean.valueOf(fwdSlashIsSeparator).booleanValue();
+        }
+
+        /*
+        Excluding the '/' char by default violates the RFC, but 
+        it looks like a lot of people put '/'
+        in unquoted values: '/': ; //47 
+        '\t':9 ' ':32 '\"':34 '(':40 ')':41 ',':44 ':':58 ';':59 '<':60 
+        '=':61 '>':62 '?':63 '@':64 '[':91 '\\':92 ']':93 '{':123 '}':125
+        */
+        if (FWD_SLASH_IS_SEPARATOR) {
+            SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',', '/', 
+                    ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
+        } else {
+            SEPARATORS = new char[] { '\t', ' ', '\"', '(', ')', ',', 
+                    ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '{', '}' };
+        }
+        
         for (int i = 0; i < 128; i++) {
             separators[i] = false;
         }
