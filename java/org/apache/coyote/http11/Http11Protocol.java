@@ -578,7 +578,7 @@ public class Http11Protocol
 
                 processor.action(ActionCode.ACTION_START, null);
 
-                if (proto.secure && (proto.sslImplementation != null)) {
+                if (proto.isSSLEnabled() && (proto.sslImplementation != null)) {
                     processor.setSSLSupport
                         (proto.sslImplementation.getSSLSupport(socket.getSocket()));
                 } else {
