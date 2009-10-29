@@ -244,8 +244,15 @@
         <code>ServletContext.getResource/getResourceAsStream</code> must start with "/"<br/>
         if set to false, code like <code>getResource("myfolder/myresource.txt")</code> will work
       </li>
+      <li>
+        The default value will be changed for
+        <code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.
+        <code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.
+      </li>
       </ul>
       </p>
+      <p>Note that where setting this to <code>true</code> changes a default,
+      that can always be overridden by setting a system property explicitly.</p>
     </property>
 
     <property
@@ -263,8 +270,23 @@
       <p>If this is <code>true</code> Tomcat will always add an expires
       parameter to a SetCookie header even for cookies with version greater than
       zero. This is to work around a known IE6 and IE7 bug that causes IE to
-      ignore the Max-Age parameter in a SetCookie header.If not specified, the
-      default value of <code>true</code> will be used.</p>
+      ignore the Max-Age parameter in a SetCookie header. If not specified, the
+      default value will be used. If
+      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>true</code>, the default of this setting will be <code>false</code>,
+      else the default value will be <code>true</code>.</p>
+    </property>
+
+    <property
+    name="org.apache.tomcat.util.http. ServerCookie.FWD_SLASH_IS_SEPARATOR">
+      <p> If this is true then the <code>/</code> (forward slash) character will
+      be treated as a separator. Note that this character is frequently used in
+      cookie path attributes and some browsers will fail to process a cookie if
+      the path attribute is quoted as is required by a strict adherence to the
+      specifications. If not specified, the default value will be used. If
+      <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
+      <code>true</code>, the default of this setting will be <code>true</code>,
+      else the default value will be <code>false</code>.</p>
     </property>
 
   </properties>
