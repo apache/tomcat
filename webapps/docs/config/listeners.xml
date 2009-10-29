@@ -227,19 +227,36 @@ service:jmx:rmi://&lt;hostname&gt;:10002/jndi/rmi://&lt;hostname&gt;:10001/jmxrm
     leak if a web application class loader happens to be the context class
     loader at the time. The work-around is to initialise these singletons when
     this listener starts as Tomcat's common class loader is the context class
-    loader at that time.</p>
+    loader at that time. It also provides work-arounds for known issues that
+    can result in locked JAR files.</p>
     
-    <p>Currently the <strong>JRE Memory Leak Prevention Listener</strong>
-    provides work-arounds for the following:</p>
-    <ul>
-      <li><code>sun.awt.AppContext.getAppContext()</code></li>
-    </ul>
-
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>
 
-    <p>No additional attributes are supported by the <strong>JRE Memory Leak
-    Prevention Listener</strong>.</p>
+    <p>The following additional attributes are supported by the <strong>JRE
+    Memory Leak Prevention Listener</strong>:</p>
+
+    <attributes>
+
+      <attribute name="appContextProtection" required="false">
+        <p>Enables protection so that calls to
+        <code>sun.awt.AppContext.getAppContext()</code> triggered by a web
+        application do not result in a memory leak. Note that a call to this
+        method will be triggered as part of the web application stop process so
+        it is strongly recommended that this protection is enabled. The default
+        is <code>true</code></p>
+      </attribute>
+
+      <attribute name="urlCacheProtection" required="false">
+        <p>Enables protection so that reading resources from JAR files using
+        <code>java.net.URLConnection</code>s does not result in the JAR file
+        being locked. Note that enabling this protection disables caching by
+        default for all resources obtained via
+        <code>java.net.URLConnection</code>s. Caching may be re-enabled on a
+        case by case basis is required. Defaults to <code>true</code>.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 
