@@ -51,7 +51,30 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         LogFactory.getLog(JreMemoryLeakPreventionListener.class);
     protected static final StringManager sm =
         StringManager.getManager(Constants.Package);
-    
+
+    /**
+     * Protect against the memory leak caused when the first call to
+     * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
+     * application. Defaults to <code>true</code>.
+     */
+    protected boolean appContextProtection = true;
+    public boolean isAppContextProtection() { return appContextProtection; }
+    public void setAppContextProtection(boolean appContextProtection) {
+        this.appContextProtection = appContextProtection;
+    }
+
+    /**
+     * Protect against resources being read for JAR files and, as a side-effect,
+     * the JAR file becoming locked. Note this disables caching for all
+     * {@link URLConnection}s, regardless of type. Defaults to
+     * <code>true</code>.
+     */
+    protected boolean urlCacheProtection = true;
+    public boolean isUrlCacheProtection() { return urlCacheProtection; }
+    public void setUrlCacheProtection(boolean urlCacheProtection) {
+        this.urlCacheProtection = urlCacheProtection;
+    }
+
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
@@ -71,7 +94,9 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
             // Trigger a call to sun.awt.AppContext.getAppContext(). This will
             // pin the common class loader in memory but that shouldn't be an
             // issue.
-            ImageIO.getCacheDirectory();
+            if (appContextProtection) {
+                ImageIO.getCacheDirectory();
+            }
             
             /*
              * Several components end up opening JarURLConnections without first
@@ -84,19 +109,21 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
              * - javax.xml.bind.JAXBContext.newInstance()
              */
             
-            // Set the default JAR URL caching policy to not to cache
-            try {
-                // Doesn't matter that this JAR doesn't exist - just as long as
-                // the URL is well-formed
-                URL url = new URL("jar:file://dummy.jar!/");
-                URLConnection uConn = url.openConnection();
-                uConn.setDefaultUseCaches(false);
-            } catch (MalformedURLException e) {
-                log.error(sm.getString(
-                        "jreLeakListener.jarUrlConnCacheFail"), e);
-            } catch (IOException e) {
-                log.error(sm.getString(
-                "jreLeakListener.jarUrlConnCacheFail"), e);
+            // Set the default URL caching policy to not to cache
+            if (urlCacheProtection) {
+                try {
+                    // Doesn't matter that this JAR doesn't exist - just as long as
+                    // the URL is well-formed
+                    URL url = new URL("jar:file://dummy.jar!/");
+                    URLConnection uConn = url.openConnection();
+                    uConn.setDefaultUseCaches(false);
+                } catch (MalformedURLException e) {
+                    log.error(sm.getString(
+                            "jreLeakListener.jarUrlConnCacheFail"), e);
+                } catch (IOException e) {
+                    log.error(sm.getString(
+                    "jreLeakListener.jarUrlConnCacheFail"), e);
+                }
             }
         }
     }
