@@ -74,19 +74,19 @@ public class TestCookies extends TestCase {
         test("$Version=1;foo=\"b\"ar\";$Domain=apache.org;$Port=8080;a=b",  "foo", "b", "a", "b"); // Incorrectly escaped.
         test("$Version=1;foo=\"b\\\"ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b\"ar", "a", "b"); // correctly escaped.
         test("$Version=1;foo=\"b'ar\";$Domain=apache.org;$Port=8080;a=b", "foo", "b'ar", "a", "b");
-        // JFC: sure it is "b" and not b'ar ?
-        test("$Version=1;foo=b'ar;$Domain=apache.org;$Port=8080;a=b", "foo", "b", "a", "b");
+        // ba'r is OK - ' is not a separator
+        test("$Version=1;foo=b'ar;$Domain=apache.org;$Port=8080;a=b", "foo", "b'ar", "a", "b");
 
         // Ends in quoted value
         test("foo=bar;a=\"b\"",  "foo", "bar", "a", "b");
         test("foo=bar;a=\"b\";",  "foo", "bar", "a", "b");
 
         // Last character is an escape character
-        test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\\"", "foo", "b");
-        test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\",  "foo", "b");
+        test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\\"", "foo", "b'ar");
+        test("$Version=1;foo=b'ar;$Domain=\"apache.org\";$Port=8080;a=\"b\\",  "foo", "b'ar");
         
-        // Bad... a token cannot be quoted with ' chars
-        test("$Version=\"1\"; foo='bar'; $Path=/path; $Domain=\"localhost\"");
+        // A token cannot be quoted with ' chars - they should be treated as part of the value
+        test("$Version=\"1\"; foo='bar'; $Path=/path; $Domain=\"localhost\"", "foo", "'bar'");
     
         // wrong, path should not have '/' JVK
         test("$Version=1;foo=\"bar\";$Path=/examples;a=b; ; ", "foo", "bar", "a", "b");
