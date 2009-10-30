@@ -675,8 +675,14 @@
   <subsection name="SSL Support">
 
   <p>You can enable SSL support for a particular instance of this
-  <strong>Connector</strong> by setting the <code>secure</code> attribute to
-  <code>true</code>.  In addition, you may need to configure the following
+  <strong>Connector</strong> by setting the <code>SSLEnabled</code> attribute to
+  <code>true</code>.</p>
+
+  <p>You will also need to set the <code>scheme</code> and <code>secure</code> attributes
+  to the values <code>https</code> and <code>true</code> respectively,
+  to pass correct information to the servlets.</p>
+
+  <p>In addition, you may need to configure the following
   attributes:</p>
 
   <attributes>
