@@ -563,7 +563,7 @@ public class Cookie implements Cloneable {
         for (int i = 0; i < len; i++) {
             char c = value.charAt(i);
 
-            if (c < 0x20 || c >= 0x7f ||
+            if (c < 0x20 || c >= 0x7f || tspecials.indexOf(c) != -1 ||
                     (STRICT_NAMING && tspecials2.indexOf(c) != -1)) {
                 return false;
             }
