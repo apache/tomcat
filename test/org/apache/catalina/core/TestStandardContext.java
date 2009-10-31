@@ -30,10 +30,10 @@ import javax.servlet.ServletResponse;
 import org.apache.catalina.deploy.FilterDef;
 import org.apache.catalina.deploy.FilterMap;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TestTomcatBase;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
 
-public class TestStandardContext extends TestTomcatBase {
+public class TestStandardContext extends TomcatBaseTest {
 
     private static final String REQUEST =
         "GET / HTTP/1.1\r\n" +

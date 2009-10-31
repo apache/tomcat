@@ -25,10 +25,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TestTomcatBase;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
 
-public class TestKeepAliveCount extends TestTomcatBase{
+public class TestKeepAliveCount extends TomcatBaseTest{
 
     public void testHttp10() throws Exception {
         TestKeepAliveClient client = new TestKeepAliveClient();
