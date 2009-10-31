@@ -28,13 +28,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.SimpleHttpClient;
-import org.apache.catalina.startup.TestTomcatBase;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.startup.Tomcat;
 
 /**
  * Test case for {@link Request}. 
  */
-public class TestRequest extends TestTomcatBase {
+public class TestRequest extends TomcatBaseTest {
 
     /**
      * Test case for https://issues.apache.org/bugzilla/show_bug.cgi?id=37794
