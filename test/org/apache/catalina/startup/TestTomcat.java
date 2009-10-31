@@ -16,14 +16,9 @@
  */
 package org.apache.catalina.startup;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -216,35 +211,4 @@ public class TestTomcat extends TestTomcatBase {
         assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
-    /**
-     *  Wrapper for getting the response.
-     */
-    public static ByteChunk getUrl(String path) throws IOException {
-        ByteChunk out = new ByteChunk();
-        getUrl(path, out, null);
-        return out;
-    }
-
-    public static int getUrl(String path, 
-                             ByteChunk out, 
-                             Map<String, List<String>> resHead) throws IOException {
-        URL url = new URL(path);
-        HttpURLConnection connection = 
-            (HttpURLConnection) url.openConnection();
-        connection.setReadTimeout(100000);
-        connection.connect();
-        int rc = connection.getResponseCode();
-        if (resHead != null) {
-            Map<String, List<String>> head = connection.getHeaderFields();
-            resHead.putAll(head);
-        }
-        InputStream is = connection.getInputStream();
-        BufferedInputStream bis = new BufferedInputStream(is);
-        byte[] buf = new byte[2048];
-        int rd = 0;
-        while((rd = bis.read(buf)) > 0) {
-            out.append(buf, 0, rd);
-        }
-        return rc;
-    }
 }
