@@ -39,20 +39,22 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
     /**
      * Servlet for cookie naming test.
      */
-    public static class CookieName extends HttpServlet {
+    public static class CookieServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         
         private final String cookieName;
-
-        public CookieName(String cookieName) {
+        private final String cookieValue;
+        
+        public CookieServlet(String cookieName, String cookieValue) {
             this.cookieName = cookieName;
+            this.cookieValue = cookieValue;
         }
         
         public void doGet(HttpServletRequest req, HttpServletResponse res) 
                 throws IOException {
             try {
-                Cookie cookie = new Cookie(cookieName,"Value");
+                Cookie cookie = new Cookie(cookieName, cookieValue);
                 res.addCookie(cookie);
                 res.getWriter().write("Cookie name ok");
             } catch (IllegalArgumentException iae) {
@@ -68,14 +70,18 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
         StandardContext ctx = 
             tomcat.addContext("/", System.getProperty("java.io.tmpdir"));
 
-        Tomcat.addServlet(ctx, "invalid", new CookieName("na;me"));
+        Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
         ctx.addServletMapping("/invalid", "invalid");
-        Tomcat.addServlet(ctx, "invalidFwd", new CookieName("na/me"));
+        Tomcat.addServlet(ctx, "invalidFwd",
+                new CookieServlet("na/me", "value"));
         ctx.addServletMapping("/invalidFwd", "invalidFwd");
-        Tomcat.addServlet(ctx, "invalidStrict", new CookieName("na?me"));
+        Tomcat.addServlet(ctx, "invalidStrict",
+                new CookieServlet("na?me", "value"));
         ctx.addServletMapping("/invalidStrict", "invalidStrict");
-        Tomcat.addServlet(ctx, "valid", new CookieName("name"));
+        Tomcat.addServlet(ctx, "valid", new CookieServlet("name", "value"));
         ctx.addServletMapping("/valid", "valid");
+        Tomcat.addServlet(ctx, "switch", new CookieServlet("name", "val?ue"));
+        ctx.addServletMapping("/switch", "switch");
 
     }
     
