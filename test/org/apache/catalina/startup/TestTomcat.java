@@ -31,7 +31,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.ContextEnvironment;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestTomcat extends TestTomcatBase {
+public class TestTomcat extends TomcatBaseTest {
 
     /**
      * Simple servlet to test in-line registration 
