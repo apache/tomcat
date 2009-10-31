@@ -17,6 +17,10 @@
 
 package org.apache.tomcat.util.http;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -45,6 +49,16 @@ public class TestCookiesDefaultSysProps extends CookiesBaseTest {
         assertEquals("Cookie name ok", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
         assertEquals("Cookie name ok", res.toString());
+
+        // Need to read response headers to test version switching
+        Map<String,List<String>> headers = new HashMap<String,List<String>>();
+        getUrl("http://localhost:" + getPort() + "/switch", res, headers);
+        List<String> cookieHeaders = headers.get("Set-Cookie");
+        for (String cookieHeader : cookieHeaders) {
+            if (cookieHeader.contains("name=")) {
+                assertTrue(cookieHeader.contains("name=\"val?ue\";"));
+            }
+        }
 
     }
         
