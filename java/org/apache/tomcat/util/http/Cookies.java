@@ -53,6 +53,12 @@ public final class Cookies { // extends MultiMap {
     public static final boolean STRICT_SERVLET_COMPLIANCE;
 
     /**
+     * If true, cookie values are allowed to contain an equals character without
+     * being quoted.
+     */
+    public static final boolean ALLOW_EQUALS_IN_VALUE;
+    
+    /**
      * If set to true, the <code>/</code> character will be treated as a
      * separator. Default is usually false. If STRICT_SERVLET_COMPLIANCE==true
      * then default is true. Explicitly setting always takes priority.
@@ -68,6 +74,10 @@ public final class Cookies { // extends MultiMap {
     static {
         STRICT_SERVLET_COMPLIANCE = Boolean.valueOf(System.getProperty(
                 "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "false")).booleanValue();
+        
+        ALLOW_EQUALS_IN_VALUE = Boolean.valueOf(System.getProperty(
+                "org.apache.tomcat.util.http.ServerCookie.ALLOW_EQUALS_IN_VALUE",
                 "false")).booleanValue();
         
         String  fwdSlashIsSeparator = System.getProperty(
@@ -588,7 +598,11 @@ public final class Cookies { // extends MultiMap {
      */
     public static final int getTokenEndPosition(byte bytes[], int off, int end){
         int pos = off;
-        while (pos < end && !isSeparator(bytes[pos])) {pos++; }
+        while (pos < end &&
+                (!isSeparator(bytes[pos]) ||
+                        bytes[pos]=='=' && ALLOW_EQUALS_IN_VALUE)) {
+            pos++;
+        }
         
         if (pos > end)
             return end;

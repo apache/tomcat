@@ -236,16 +236,12 @@
       the request explicitly accesses the session. (SRV.7.6)  
       </li>
       <li>
-        cookies will be parsed strictly, by default v0 cookies will not work with any invalid characters.
-        <br/>If set to false, any v0 cookie with invalid character will be switched to a v1 cookie and 
-        the value will be quoted.
-      </li>
-      <li>
         <code>ServletContext.getResource/getResourceAsStream</code> must start with "/"<br/>
         if set to false, code like <code>getResource("myfolder/myresource.txt")</code> will work
       </li>
       <li>
         The default value will be changed for
+        <code>org.apache.tomcat.util.http.ServerCookie.ALLOW_VERSION_SWITCH</code>.
         <code>org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES</code>.
         <code>org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR</code>.
         <code>org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING</code>.
@@ -269,6 +265,16 @@
       session. When determining if a session is valid, any session with at least
       one active request will always be considered valid. If not specified, the
       default value of <code>false</code> will be used.</p>
+    </property>
+
+    <property
+    name="org.apache.tomcat.util.http. ServerCookie.ALLOW_EQUALS_IN_VALUE">
+      <p>If this is <code>true</code> Tomcat will allow <code>=</code>
+      characters when parsing unquoted cookie values. If <code>false</code>,
+      cookie values containing <code>=</code> will be terminated when the
+      <code>=</code> is encountered and the remainder of the cookie value will
+      be dropped. If not specified, the default value specification compliant
+      value of <code>false</code> will be used.</p>
     </property>
 
     <property
