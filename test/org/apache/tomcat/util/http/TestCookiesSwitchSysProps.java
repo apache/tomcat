@@ -30,12 +30,15 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * executed in a new JVM instance. The tests have been place in separate classes
  * to facilitate this when running the unit tests via Ant.
  */
-public class TestCookiesStrictSysProps extends CookiesBaseTest {
+public class TestCookiesSwitchSysProps extends CookiesBaseTest {
 
     @Override
     public void testCookiesInstance() throws Exception {
 
         System.setProperty("org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
+                "true");
+        System.setProperty(
+                "org.apache.tomcat.util.http.ServerCookie.ALLOW_VERSION_SWITCH",
                 "true");
         
         Tomcat tomcat = getTomcatInstance();
@@ -52,14 +55,14 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
         assertEquals("Cookie name ok", res.toString());
-        
+
         // Need to read response headers to test version switching
         Map<String,List<String>> headers = new HashMap<String,List<String>>();
         getUrl("http://localhost:" + getPort() + "/switch", res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
         for (String cookieHeader : cookieHeaders) {
             if (cookieHeader.contains("name=")) {
-                assertTrue(cookieHeader.contains("name=val?ue"));
+                assertTrue(cookieHeader.contains("name=\"val?ue\""));
             }
         }
         
