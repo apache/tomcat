@@ -17,7 +17,6 @@
 package javax.servlet.http;
 
 import java.text.MessageFormat;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 /**
@@ -124,26 +123,30 @@ public class Cookie implements Cloneable {
      */
 
     public Cookie(String name, String value) {
-	if (!isToken(name)
-		|| name.equalsIgnoreCase("Comment")	// rfc2019
-		|| name.equalsIgnoreCase("Discard")	// 2019++
-		|| name.equalsIgnoreCase("Domain")
-		|| name.equalsIgnoreCase("Expires")	// (old cookies)
-		|| name.equalsIgnoreCase("Max-Age")	// rfc2019
-		|| name.equalsIgnoreCase("Path")
-		|| name.equalsIgnoreCase("Secure")
-		|| name.equalsIgnoreCase("Version")
-		|| name.startsWith("$")
-	    ) {
-	    String errMsg = lStrings.getString("err.cookie_name_is_token");
-	    Object[] errArgs = new Object[1];
-	    errArgs[0] = name;
-	    errMsg = MessageFormat.format(errMsg, errArgs);
-	    throw new IllegalArgumentException(errMsg);
-	}
+        if (name == null || name.length() == 0) {
+            throw new IllegalArgumentException(
+                    lStrings.getString("err.cookie_name_blank"));
+        }
+        if (!isToken(name)
+                || name.equalsIgnoreCase("Comment") // rfc2019
+                || name.equalsIgnoreCase("Discard") // 2019++
+                || name.equalsIgnoreCase("Domain")
+                || name.equalsIgnoreCase("Expires") // (old cookies)
+                || name.equalsIgnoreCase("Max-Age") // rfc2019
+                || name.equalsIgnoreCase("Path")
+                || name.equalsIgnoreCase("Secure")
+                || name.equalsIgnoreCase("Version")
+                || name.startsWith("$")
+            ) {
+            String errMsg = lStrings.getString("err.cookie_name_is_token");
+            Object[] errArgs = new Object[1];
+            errArgs[0] = name;
+            errMsg = MessageFormat.format(errMsg, errArgs);
+            throw new IllegalArgumentException(errMsg);
+        }
 
-	this.name = name;
-	this.value = value;
+        this.name = name;
+        this.value = value;
     }
 
 
