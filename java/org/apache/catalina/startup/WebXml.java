@@ -620,8 +620,8 @@ public class WebXml {
                     }
                 }
             }
+            displayName = temp.getDisplayName();
         }
-        displayName = temp.getDisplayName();
 
         if (distributable) {
             for (WebXml fragment : fragments) {
