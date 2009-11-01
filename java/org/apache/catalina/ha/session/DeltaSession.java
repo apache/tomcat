@@ -361,6 +361,16 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return (this.isValid);
     }
 
+    /**
+     * End the access and register to ReplicationValve (crossContext support)
+     */
+    public void endAccess() {
+    	super.endAccess() ;
+    	if(manager instanceof DeltaManager) {
+            ((DeltaManager)manager).registerSessionAtReplicationValve(this);   	
+    	}
+    }
+    
     // ------------------------------------------------- Session Public Methods
 
     /**
