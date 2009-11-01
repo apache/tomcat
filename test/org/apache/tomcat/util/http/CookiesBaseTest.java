@@ -72,6 +72,10 @@ public abstract class CookiesBaseTest extends TomcatBaseTest {
 
         Tomcat.addServlet(ctx, "invalid", new CookieServlet("na;me", "value"));
         ctx.addServletMapping("/invalid", "invalid");
+        Tomcat.addServlet(ctx, "null", new CookieServlet(null, "value"));
+        ctx.addServletMapping("/null", "null");
+        Tomcat.addServlet(ctx, "blank", new CookieServlet("", "value"));
+        ctx.addServletMapping("/blank", "blank");
         Tomcat.addServlet(ctx, "invalidFwd",
                 new CookieServlet("na/me", "value"));
         ctx.addServletMapping("/invalidFwd", "invalidFwd");
