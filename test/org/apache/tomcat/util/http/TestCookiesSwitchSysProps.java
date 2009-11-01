@@ -49,6 +49,10 @@ public class TestCookiesSwitchSysProps extends CookiesBaseTest {
         
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
         assertEquals("Cookie name fail", res.toString());
+        res = getUrl("http://localhost:" + getPort() + "/null");
+        assertEquals("Cookie name fail", res.toString());
+        res = getUrl("http://localhost:" + getPort() + "/blank");
+        assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidFwd");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidStrict");
