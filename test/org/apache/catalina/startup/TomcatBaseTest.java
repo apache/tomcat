@@ -58,6 +58,14 @@ public abstract class TomcatBaseTest extends TestCase {
         return port;
     }
     
+    /**
+     * Sub-classes may want to add connectors on a new port
+     */
+    public int getNextPort() {
+        port++;
+        return getPort();
+    }
+    
     public void setUp() throws Exception {
         tempDir = new File("output/tmp");
         tempDir.mkdir();
