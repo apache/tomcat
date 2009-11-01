@@ -75,14 +75,6 @@ public class ServerCookie implements Serializable {
     public static final boolean STRICT_SERVLET_COMPLIANCE;
 
     /**
-     * If set to false, we don't auto switch invalid v0 cookies to v1 and add
-     * quotes to make them valid.
-     * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
-     * is false. Explicitly setting always takes priority.
-     */
-    public static final boolean ALLOW_VERSION_SWITCH;
-
-    /**
      * If set to false, we don't use the IE6/7 Max-Age/Expires work around.
      * Default is usually true. If STRICT_SERVLET_COMPLIANCE==true then default
      * is false. Explicitly setting always takes priority.
@@ -104,15 +96,6 @@ public class ServerCookie implements Serializable {
                 "org.apache.catalina.STRICT_SERVLET_COMPLIANCE",
                 "false")).booleanValue();
         
-
-        String allowVersionSwitch = System.getProperty(
-                "org.apache.tomcat.util.http.ServerCookie.ALLOW_VERSION_SWITCH");
-        if (allowVersionSwitch == null) {
-            ALLOW_VERSION_SWITCH = !STRICT_SERVLET_COMPLIANCE;
-        } else {
-            ALLOW_VERSION_SWITCH =
-                Boolean.valueOf(allowVersionSwitch).booleanValue();
-        }
 
         String alwaysAddExpires = System.getProperty(
                 "org.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES");
@@ -319,6 +302,11 @@ public class ServerCookie implements Serializable {
         // Servlet implementation does not check anything else
         
         version = maybeQuote2(version, buf, value,true);
+        
+        // Spec team clarified setting comment on a v0 cookie switches it to v1
+        if (version == 0 && comment != null) {
+            version = 1;
+        }
 
         // Add version 1 specific information
         if (version == 1) {
@@ -417,7 +405,7 @@ public class ServerCookie implements Serializable {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,1,value.length()-1));
             buf.append('"');
-        } else if (allowVersionSwitch && ALLOW_VERSION_SWITCH && version==0 && !isToken2(value, literals)) {
+        } else if (allowVersionSwitch && version==0 && !isToken2(value, literals)) {
             buf.append('"');
             buf.append(escapeDoubleQuotes(value,0,value.length()));
             buf.append('"');
