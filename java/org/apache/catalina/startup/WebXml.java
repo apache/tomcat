@@ -184,11 +184,11 @@ public class WebXml {
     public Map<String,FilterDef> getFilters() { return filters; }
     
     // filter-mapping
-    private Map<String,FilterMap> filterMaps = new HashMap<String,FilterMap>();
+    private Set<FilterMap> filterMaps = new LinkedHashSet<FilterMap>();
     public void addFilterMapping(FilterMap filterMap) {
-        filterMaps.put(filterMap.getFilterName(),filterMap);
+        filterMaps.add(filterMap);
     }
-    public Map<String,FilterMap> getFilterMappings() { return filterMaps; }
+    public Set<FilterMap> getFilterMappings() { return filterMaps; }
     
     // listener
     // TODO: description (multiple with language) is ignored
@@ -470,7 +470,7 @@ public class WebXml {
         for (FilterDef filter : filters.values()) {
             context.addFilterDef(filter);
         }
-        for (FilterMap filterMap : filterMaps.values()) {
+        for (FilterMap filterMap : filterMaps) {
             context.addFilterMap(filterMap);
         }
         // jsp-property-group needs to be after servlet configuration
@@ -774,20 +774,9 @@ public class WebXml {
         errorPages.putAll(temp.getErrorPages());
 
         for (WebXml fragment : fragments) {
-            for (String filterName : fragment.getFilterMappings().keySet()) {
-                FilterMap filterMap =
-                    fragment.getFilterMappings().get(filterName);
+            for (FilterMap filterMap : fragment.getFilterMappings()) {
                 // Always additive
-                if (filterMaps.containsKey(filterName)) {
-                    FilterMap appFilterMap = filterMaps.get(filterName);
-                    
-                    appFilterMap.addDispatcherMapping(
-                            filterMap.getDispatcherMapping());
-                    appFilterMap.addServletNames(filterMap.getServletNames());
-                    appFilterMap.addUrlPatterns(filterMap.getURLPatterns());
-                } else {
-                    addFilterMapping(filterMap);
-                }
+                addFilterMapping(filterMap);
             }
         }
 
