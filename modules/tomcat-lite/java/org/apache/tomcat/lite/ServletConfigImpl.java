@@ -529,7 +529,7 @@ public class ServletConfigImpl implements ServletConfig, ServletRegistration {
      * Return a String representation of this component.
      */
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (ctx != null) {
             sb.append(ctx.toString());
             sb.append(".");

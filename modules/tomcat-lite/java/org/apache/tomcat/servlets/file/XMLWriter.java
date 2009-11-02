@@ -54,7 +54,7 @@ public class XMLWriter {
     /**
      * Buffer.
      */
-    protected StringBuffer buffer = new StringBuffer();
+    protected StringBuilder buffer = new StringBuilder();
 
 
     /**
@@ -235,7 +235,7 @@ public class XMLWriter {
         throws IOException {
         if (writer != null) {
             writer.write(buffer.toString());
-            buffer = new StringBuffer();
+            buffer = new StringBuilder();
         }
     }
 

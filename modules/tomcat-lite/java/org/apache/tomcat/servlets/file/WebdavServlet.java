@@ -231,7 +231,7 @@ public class WebdavServlet extends DefaultServlet {
             throws ServletException, IOException {
         resp.addHeader("DAV", "1"); // And not: ,2");
 
-        StringBuffer methodsAllowed = determineMethodsAllowed(basePath,
+        StringBuilder methodsAllowed = determineMethodsAllowed(basePath,
                                                               req);
         resp.addHeader("Allow", methodsAllowed.toString());
         resp.addHeader("MS-Author-Via", "DAV");
@@ -707,7 +707,7 @@ public class WebdavServlet extends DefaultServlet {
         // path
         if (object.exists()) {
             // Get allowed methods
-            StringBuffer methodsAllowed = determineMethodsAllowed(basePath,
+            StringBuilder methodsAllowed = determineMethodsAllowed(basePath,
                                                                   req);
 
             resp.addHeader("Allow", methodsAllowed.toString());
@@ -1477,7 +1477,7 @@ public class WebdavServlet extends DefaultServlet {
      * Get creation date in ISO format.
      */
     protected String getISOCreationDate(long creationDate) {
-        StringBuffer creationDateValue = new StringBuffer
+        StringBuilder creationDateValue = new StringBuilder
             (creationDateFormat.format
              (new Date(creationDate)));
         /*
@@ -1504,10 +1504,10 @@ public class WebdavServlet extends DefaultServlet {
      * Determines the methods normally allowed for the resource.
      *
      */
-    protected StringBuffer determineMethodsAllowed(File basePath,
+    protected StringBuilder determineMethodsAllowed(File basePath,
                                                    HttpServletRequest req) {
 
-        StringBuffer methodsAllowed = new StringBuffer();
+        StringBuilder methodsAllowed = new StringBuilder();
         String path = getRelativePath(req);
         File object = new File(basePath, path);
         if (!object.exists()) {

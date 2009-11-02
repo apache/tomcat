@@ -646,7 +646,7 @@ public class HttpSessionImpl  implements HttpSession, Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("StandardSession[");
         sb.append(id);
         sb.append("]");
