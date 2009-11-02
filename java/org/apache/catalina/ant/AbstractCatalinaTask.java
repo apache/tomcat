@@ -221,7 +221,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Process the response message
             reader = new InputStreamReader(hconn.getInputStream(), CHARSET);
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             String error = null;
             int msgPriority = Project.MSG_INFO;
             boolean first = true;
