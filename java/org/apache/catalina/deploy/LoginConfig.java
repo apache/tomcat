@@ -143,7 +143,7 @@ public class LoginConfig implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("LoginConfig[");
+        StringBuilder sb = new StringBuilder("LoginConfig[");
         sb.append("authMethod=");
         sb.append(authMethod);
         if (realmName != null) {

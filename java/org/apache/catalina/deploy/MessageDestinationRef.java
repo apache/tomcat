@@ -127,7 +127,7 @@ public class MessageDestinationRef implements Serializable, Injectable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("MessageDestination[");
+        StringBuilder sb = new StringBuilder("MessageDestination[");
         sb.append("name=");
         sb.append(name);
         if (link != null) {
