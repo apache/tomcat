@@ -432,7 +432,7 @@ public class WebappLoader
     /** Extra repositories for this loader
      */
     public String getRepositoriesString() {
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         for( int i=0; i<repositories.length ; i++ ) {
             sb.append( repositories[i]).append(":");
         }
@@ -448,7 +448,7 @@ public class WebappLoader
 
     public String getLoaderRepositoriesString() {
         String repositories[]=getLoaderRepositories();
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         for( int i=0; i<repositories.length ; i++ ) {
             sb.append( repositories[i]).append(":");
         }
@@ -505,7 +505,7 @@ public class WebappLoader
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("WebappLoader[");
+        StringBuilder sb = new StringBuilder("WebappLoader[");
         if (container != null)
             sb.append(container.getName());
         sb.append("]");
@@ -1066,7 +1066,7 @@ public class WebappLoader
             }
         }
 
-        StringBuffer classpath = new StringBuffer();
+        StringBuilder classpath = new StringBuilder();
 
         // Assemble the class path information from our class loader chain
         ClassLoader loader = getClassLoader();
