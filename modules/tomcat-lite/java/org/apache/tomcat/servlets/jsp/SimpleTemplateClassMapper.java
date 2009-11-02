@@ -109,8 +109,8 @@ public class SimpleTemplateClassMapper implements UserTemplateClassMapper {
     private static final String JSP_PACKAGE_NAME = "org.apache.jsp";
 
     private static final String makeJavaIdentifier(String identifier) {
-        StringBuffer modifiedIdentifier = 
-            new StringBuffer(identifier.length());
+        StringBuilder modifiedIdentifier = 
+            new StringBuilder(identifier.length());
         if (!Character.isJavaIdentifierStart(identifier.charAt(0))) {
             modifiedIdentifier.append('_');
         }
@@ -144,7 +144,7 @@ public class SimpleTemplateClassMapper implements UserTemplateClassMapper {
 
     private static final String makeJavaPackage(String path) {
         String classNameComponents[] = split(path,"/");
-        StringBuffer legalClassNames = new StringBuffer();
+        StringBuilder legalClassNames = new StringBuilder();
         for (int i = 0; i < classNameComponents.length; i++) {
             legalClassNames.append(makeJavaIdentifier(classNameComponents[i]));
             if (i < classNameComponents.length - 1) {
