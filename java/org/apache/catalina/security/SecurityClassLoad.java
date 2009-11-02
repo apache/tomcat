@@ -89,6 +89,8 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
              "loader.WebappClassLoader$PrivilegedFindResource");
+        loader.loadClass
+            (basePackage + "loader.ResourceEntry");
     }
     
     
