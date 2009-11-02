@@ -610,7 +610,7 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("MemoryUserDatabase[id=");
+        StringBuilder sb = new StringBuilder("MemoryUserDatabase[id=");
         sb.append(this.id);
         sb.append(",pathname=");
         sb.append(pathname);
