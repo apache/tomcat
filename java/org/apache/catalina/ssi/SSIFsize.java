@@ -74,7 +74,7 @@ public final class SSIFsize implements SSICommand {
         if (numChars < 0) {
             throw new IllegalArgumentException("Num chars can't be negative");
         }
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < numChars; i++) {
             buf.append(aChar);
         }
