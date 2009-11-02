@@ -184,7 +184,7 @@ public class ClusterSingleSignOn
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ClusterSingleSignOn[");
+        StringBuilder sb = new StringBuilder("ClusterSingleSignOn[");
         if (container == null )
             sb.append("Container is null");
         else
