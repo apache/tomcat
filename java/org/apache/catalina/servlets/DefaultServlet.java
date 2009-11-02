@@ -377,7 +377,7 @@ public class DefaultServlet
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
-        StringBuffer allow = new StringBuffer();
+        StringBuilder allow = new StringBuilder();
         // There is a doGet method
         allow.append("GET, HEAD");
         // There is a doPost
@@ -635,7 +635,7 @@ public class DefaultServlet
     /**
      * Display the size of a file.
      */
-    protected void displaySize(StringBuffer buf, int filesize) {
+    protected void displaySize(StringBuilder buf, int filesize) {
 
         int leftside = filesize / 1024;
         int rightside = (filesize % 1024) / 103;  // makes 1 digit
@@ -1149,7 +1149,7 @@ public class DefaultServlet
                                     InputStream xsltInputStream)
         throws IOException, ServletException {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("<?xml version=\"1.0\"?>");
         sb.append("<listing ");
@@ -1275,7 +1275,7 @@ public class DefaultServlet
         OutputStreamWriter osWriter = new OutputStreamWriter(stream, "UTF8");
         PrintWriter writer = new PrintWriter(osWriter);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         // rewriteUrl(contextPath) is expensive. cache result for later reuse
         String rewrittenContextPath =  rewriteUrl(contextPath);
