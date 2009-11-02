@@ -123,7 +123,7 @@ public final class HexDump {
      */
     public static String convert(byte bytes[]) {
 
-	StringBuffer sb = new StringBuffer(bytes.length * 2);
+	StringBuilder sb = new StringBuilder(bytes.length * 2);
 	for (int i = 0; i < bytes.length; i++) {
 	    sb.append(convertDigit((bytes[i] >> 4)));
 	    sb.append(convertDigit((bytes[i] & 0x0f)));
@@ -206,7 +206,7 @@ public final class HexDump {
      */
     public static String getHexDump(byte[] bytes, int pos, int len,
                                      boolean displayOffset) {
-        StringBuffer out = new StringBuffer( len * 2 );
+        StringBuilder out = new StringBuilder( len * 2 );
 
         for (int j = 0; j < len; j += 16) {
             hexLine(out, bytes, pos + j, pos + len, displayOffset);
@@ -215,7 +215,7 @@ public final class HexDump {
         return out.toString();
     }
     
-    private static void hexLine(StringBuffer out, 
+    private static void hexLine(StringBuilder out, 
                                 byte[] bytes, int start, int end,
                                 boolean displayOffset) {
 

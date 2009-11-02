@@ -92,7 +92,7 @@ public class GTest {
 
 
     // For Report generation
-    StringBuffer resultOut = new StringBuffer();
+    StringBuilder resultOut = new StringBuilder();
     
     boolean firstTask = false;
     boolean lastTask = false;
@@ -623,7 +623,7 @@ public class GTest {
             }
 
 	    if ( !found ) {
-		StringBuffer actualBuffer = new StringBuffer( 128 );
+		StringBuilder actualBuffer = new StringBuilder( 128 );
 		if ( resultOut != null ) {
 		    expectedString = "<expectedHeaderNotFound>" + currentHeaderField + ": " + currentHeaderValue + "</expectedHeader>\n";
 		}
@@ -779,7 +779,7 @@ public class GTest {
 
         if (req.indexOf('|') > -1) {
             StringTokenizer tok = new StringTokenizer( request, "|" );
-            StringBuffer sb = new StringBuffer( 50 );
+            StringBuilder sb = new StringBuilder( 50 );
         
             while ( tok.hasMoreElements() ) {
                 String token = tok.nextToken();
@@ -846,7 +846,7 @@ public class GTest {
          * false.
          */
 	if ( fromServer.length != fromGoldenFile.length ) {
-            StringBuffer sb = new StringBuffer( 50 );
+            StringBuilder sb = new StringBuilder( 50 );
             sb.append( " Response and golden files lengths do not match!\n" );
             sb.append( " Server response length: " );
             sb.append( fromServer.length );
@@ -918,7 +918,7 @@ public class GTest {
         }
 
         if ( !status ) {
-            StringBuffer sb = new StringBuffer( 255 );
+            StringBuilder sb = new StringBuilder( 255 );
             sb.append( "ERROR: Server's response and configured goldenfile do not match!\n" );
             sb.append( "Response received from server:\n" );
             sb.append( "---------------------------------------------------------\n" );
@@ -940,7 +940,7 @@ public class GTest {
      * @return a <code>byte[]</code> representation of the response
      */
     private byte[] readBody( InputStream input ) {
-        StringBuffer sb = new StringBuffer( 255 );
+        StringBuilder sb = new StringBuilder( 255 );
         while ( true ) {
             try {
                 int ch = input.read();
@@ -1045,7 +1045,7 @@ public class GTest {
      * @param goldenFile a <code>byte[]</code> value
      */
     private void dumpHex( byte[] serverResponse, byte[] goldenFile ) {
-        StringBuffer outBuf = new StringBuffer( ( serverResponse.length + goldenFile.length ) * 2 );
+        StringBuilder outBuf = new StringBuilder( ( serverResponse.length + goldenFile.length ) * 2 );
 
         String fromServerString = HexDump.getHexDump( serverResponse, 0, serverResponse.length, true );
         String fromGoldenFileString = HexDump.getHexDump( goldenFile, 0, goldenFile.length, true );
