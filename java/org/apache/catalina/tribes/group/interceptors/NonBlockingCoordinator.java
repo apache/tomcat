@@ -817,7 +817,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         }
         
         public String toString() {
-            StringBuffer buf = new StringBuffer("CoordinationEvent[type=");
+            StringBuilder buf = new StringBuilder("CoordinationEvent[type=");
             buf.append(type).append("\n\tLocal:");
             Member local = interceptor.getLocalMember(false);
             buf.append(local!=null?local.getName():"").append("\n\tCoord:");

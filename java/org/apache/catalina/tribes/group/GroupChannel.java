@@ -367,7 +367,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      * @throws ChannelException
      */
     protected void checkOptionFlags() throws ChannelException {
-        StringBuffer conflicts = new StringBuffer();
+        StringBuilder conflicts = new StringBuilder();
         ChannelInterceptor first = interceptors;
         while ( first != null ) {
             int flag = first.getOptionFlag();

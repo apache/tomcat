@@ -1197,7 +1197,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         }
         
         public String toString() {
-            StringBuffer buf = new StringBuffer("MapEntry[key:");
+            StringBuilder buf = new StringBuilder("MapEntry[key:");
             buf.append(getKey()).append("; ");
             buf.append("value:").append(getValue()).append("; ");
             buf.append("primary:").append(isPrimary()).append("; ");
@@ -1236,7 +1236,7 @@ public abstract class AbstractReplicatedMap extends ConcurrentHashMap implements
         private Member primary;
         
         public String toString() {
-            StringBuffer buf = new StringBuffer("MapMessage[context=");
+            StringBuilder buf = new StringBuilder("MapMessage[context=");
             buf.append(new String(mapId));
             buf.append("; type=");
             buf.append(getTypeDesc());

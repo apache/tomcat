@@ -339,7 +339,7 @@ public class ChannelData implements ChannelMessage {
     }
     
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("ClusterData[src=");
         buf.append(getAddress()).append("; id=");
         buf.append(bToS(getUniqueId())).append("; sent=");
@@ -348,7 +348,7 @@ public class ChannelData implements ChannelMessage {
     }
     
     public static String bToS(byte[] data) {
-        StringBuffer buf = new StringBuffer(4*16);
+        StringBuilder buf = new StringBuilder(4*16);
         buf.append("{");
         for (int i=0; data!=null && i<data.length; i++ ) buf.append(String.valueOf(data[i])).append(" ");
         buf.append("}");

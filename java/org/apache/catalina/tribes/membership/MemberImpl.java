@@ -508,7 +508,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
      * String representation of this object
      */
     public String toString()  {
-        StringBuffer buf = new StringBuffer("org.apache.catalina.tribes.membership.MemberImpl[");
+        StringBuilder buf = new StringBuilder("org.apache.catalina.tribes.membership.MemberImpl[");
         buf.append(getName()).append(",");
         buf.append(getHostname()).append(",");
         buf.append(port).append(", alive=");
@@ -526,7 +526,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         return bToS(data,data.length);
     }
     public static String bToS(byte[] data, int max) {
-        StringBuffer buf = new StringBuffer(4*16);
+        StringBuilder buf = new StringBuilder(4*16);
         buf.append("{");
         for (int i=0; data!=null && i<data.length; i++ ) {
             buf.append(String.valueOf(data[i])).append(" ");
