@@ -484,7 +484,7 @@ public class JDBCRealm
         throws SQLException {
 
         if (preparedCredentials == null) {
-            StringBuffer sb = new StringBuffer("SELECT ");
+            StringBuilder sb = new StringBuilder("SELECT ");
             sb.append(userCredCol);
             sb.append(" FROM ");
             sb.append(userTable);
@@ -736,7 +736,7 @@ public class JDBCRealm
         throws SQLException {
 
         if (preparedRoles == null) {
-            StringBuffer sb = new StringBuffer("SELECT ");
+            StringBuilder sb = new StringBuilder("SELECT ");
             sb.append(roleNameCol);
             sb.append(" FROM ");
             sb.append(userRoleTable);
