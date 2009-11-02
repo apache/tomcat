@@ -133,7 +133,7 @@ public class Txt2Html
         // Convert, line-by-line:
         String line;
         while( (line = in.readLine()) != null ) {
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             int len = line.length();
             for( int i = 0; i < len; i++ ) {
                 char c = line.charAt( i );

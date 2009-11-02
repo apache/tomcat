@@ -146,7 +146,7 @@ public class AttributeInfo extends FeatureInfo implements Serializable {
      */
     private String getMethodName(String name, boolean getter, boolean is) {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (getter) {
             if (is)
                 sb.append("is");
