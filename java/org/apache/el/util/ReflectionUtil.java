@@ -144,7 +144,7 @@ public class ReflectionUtil {
 
     protected static final String paramString(Class<?>[] types) {
         if (types != null) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < types.length; i++) {
                 sb.append(types[i].getName()).append(", ");
             }
