@@ -403,9 +403,9 @@ class JspReader {
      * @param quoted If <strong>true</strong> accept quoted strings.
      */
     String parseToken(boolean quoted) throws JasperException {
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder StringBuilder = new StringBuilder();
         skipSpaces();
-        stringBuffer.setLength(0);
+        StringBuilder.setLength(0);
         
         if (!hasMoreInput()) {
             return "";
@@ -423,7 +423,7 @@ class JspReader {
                          ch = nextChar()) {
                     if (ch == '\\') 
                         ch = nextChar();
-                    stringBuffer.append((char) ch);
+                    StringBuilder.append((char) ch);
                 }
                 // Check end of quote, skip closing quote:
                 if (ch == -1) {
@@ -443,12 +443,12 @@ class JspReader {
                                peekChar() == '>' || peekChar() == '%')
                             ch = nextChar();
                     }
-                    stringBuffer.append((char) ch);
+                    StringBuilder.append((char) ch);
                 } while (!isDelimiter());
             }
         }
 
-        return stringBuffer.toString();
+        return StringBuilder.toString();
     }
 
     void setSingleFile(boolean val) {

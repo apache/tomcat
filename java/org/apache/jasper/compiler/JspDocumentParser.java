@@ -68,7 +68,7 @@ class JspDocumentParser
     private JspCompilationContext ctxt;
     private PageInfo pageInfo;
     private String path;
-    private StringBuffer charBuffer;
+    private StringBuilder charBuffer;
 
     // Node representing the XML element currently being parsed
     private Node current;
@@ -454,7 +454,7 @@ class JspDocumentParser
     public void characters(char[] buf, int offset, int len) {
 
         if (charBuffer == null) {
-            charBuffer = new StringBuffer();
+            charBuffer = new StringBuilder();
         }
         charBuffer.append(buf, offset, len);
     }

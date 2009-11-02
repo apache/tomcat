@@ -150,7 +150,7 @@ public class Util {
      * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
      */
     public static String stripSession(String url) {
-        StringBuffer u = new StringBuffer(url);
+        StringBuilder u = new StringBuilder(url);
         int sessionStart;
         while ((sessionStart = u.toString().indexOf(";" + Constants.SESSION_PARAMETER_NAME + "=")) != -1) {
             int sessionEnd = u.toString().indexOf(";", sessionStart + 1);
@@ -182,16 +182,16 @@ public class Util {
         int start = 0;
         int length = buffer.length();
         char[] arrayBuffer = buffer.toCharArray();
-        StringBuffer escapedBuffer = null;
+        StringBuilder escapedBuffer = null;
         
         for (int i = 0; i < length; i++) {
             char c = arrayBuffer[i];
             if (c <= HIGHEST_SPECIAL) {
                 char[] escaped = specialCharactersRepresentation[c];
                 if (escaped != null) {
-                    // create StringBuffer to hold escaped xml string
+                    // create StringBuilder to hold escaped xml string
                     if (start == 0) {
-                        escapedBuffer = new StringBuffer(length + 5);
+                        escapedBuffer = new StringBuilder(length + 5);
                     }
                     // add unescaped portion
                     if (start < i) {

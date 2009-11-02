@@ -86,7 +86,7 @@ public class ELParser {
      */
     private ELNode.Nodes parseEL() {
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         ELexpr = new ELNode.Nodes();
         while (hasNext()) {
             curToken = nextToken();
@@ -176,7 +176,7 @@ public class ELParser {
      */
     private String skipUntilEL() {
         char prev = 0;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         while (hasNextChar()) {
             char ch = nextChar();
             if (prev == '\\') {
@@ -227,7 +227,7 @@ public class ELParser {
         if (hasNextChar()) {
             char ch = nextChar();
             if (Character.isJavaIdentifierStart(ch)) {
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 buf.append(ch);
                 while ((ch = peekChar()) != -1
                         && Character.isJavaIdentifierPart(ch)) {
@@ -252,7 +252,7 @@ public class ELParser {
      * '\\', and ('\"', or "\'")
      */
     private Token parseQuotedChars(char quote) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(quote);
         while (hasNextChar()) {
             char ch = nextChar();

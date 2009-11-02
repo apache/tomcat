@@ -93,7 +93,7 @@ public class SmapStratum {
         public String getString() {
             if (inputStartLine == -1 || outputStartLine == -1)
                 throw new IllegalStateException();
-            StringBuffer out = new StringBuffer();
+            StringBuilder out = new StringBuilder();
             out.append(inputStartLine);
             if (lineFileIDSet)
                 out.append("#" + lineFileID);
@@ -295,7 +295,7 @@ public class SmapStratum {
         if (fileNameList.size() == 0 || lineData.size() == 0)
             return null;
 
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
 
         // print StratumSection
         out.append("*S " + stratumName + "\n");

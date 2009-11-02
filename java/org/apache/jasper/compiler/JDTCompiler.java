@@ -106,7 +106,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     Reader reader = 
                         new BufferedReader(new InputStreamReader(is, ctxt.getOptions().getJavaEncoding()));
                     char[] chars = new char[8192];
-                    StringBuffer buf = new StringBuffer();
+                    StringBuilder buf = new StringBuilder();
                     int count;
                     while ((count = reader.read(chars, 0, 
                                                 chars.length)) > 0) {
@@ -374,7 +374,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                         new String(problems[i].getOriginatingFileName());
                                     try {
                                         problemList.add(ErrorDispatcher.createJavacError
-                                                (name, pageNodes, new StringBuffer(problem.getMessage()), 
+                                                (name, pageNodes, new StringBuilder(problem.getMessage()), 
                                                         problem.getSourceLineNumber(), ctxt));
                                     } catch (JasperException e) {
                                         log.error("Error visiting node", e);
