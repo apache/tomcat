@@ -23,7 +23,7 @@ package jsp2.examples.el;
  */
 public class Functions {
     public static String reverse( String text ) {
-        return new StringBuffer( text ).reverse().toString();
+        return new StringBuilder( text ).reverse().toString();
     }
 
     public static int numVowels( String text ) {
