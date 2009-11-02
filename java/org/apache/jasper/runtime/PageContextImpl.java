@@ -872,7 +872,7 @@ public class PageContextImpl extends PageContext {
 	private static String XmlEscape(String s) {
 		if (s == null)
 			return null;
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
 			if (c == '<') {
