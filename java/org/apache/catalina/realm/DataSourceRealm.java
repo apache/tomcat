@@ -613,7 +613,7 @@ public class DataSourceRealm
         super.start();
 
         // Create the roles PreparedStatement string
-        StringBuffer temp = new StringBuffer("SELECT ");
+        StringBuilder temp = new StringBuilder("SELECT ");
         temp.append(roleNameCol);
         temp.append(" FROM ");
         temp.append(userRoleTable);
@@ -623,7 +623,7 @@ public class DataSourceRealm
         preparedRoles = temp.toString();
 
         // Create the credentials PreparedStatement string
-        temp = new StringBuffer("SELECT ");
+        temp = new StringBuilder("SELECT ");
         temp.append(userCredCol);
         temp.append(" FROM ");
         temp.append(userTable);
