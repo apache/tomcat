@@ -191,7 +191,7 @@ public class GenericPrincipal implements Principal {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("GenericPrincipal[");
+        StringBuilder sb = new StringBuilder("GenericPrincipal[");
         sb.append(this.name);
         sb.append("(");
         for( int i=0;i<roles.length; i++ ) {

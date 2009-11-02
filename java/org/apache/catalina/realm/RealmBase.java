@@ -941,7 +941,7 @@ public abstract class RealmBase
         }
 
         // Redirect to the corresponding SSL port
-        StringBuffer file = new StringBuffer();
+        StringBuilder file = new StringBuilder();
         String protocol = "https";
         String host = request.getServerName();
         // Protocol
