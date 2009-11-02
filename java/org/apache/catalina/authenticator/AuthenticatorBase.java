@@ -584,7 +584,7 @@ public abstract class AuthenticatorBase
         bytes = getDigest().digest(bytes);
 
         // Render the result as a String of hexadecimal digits
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < bytes.length; i++) {
             byte b1 = (byte) ((bytes[i] & 0xf0) >> 4);
             byte b2 = (byte) (bytes[i] & 0x0f);
