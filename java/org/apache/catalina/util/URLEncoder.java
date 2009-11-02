@@ -59,7 +59,7 @@ public class URLEncoder {
 
     public String encode( String path ) {
         int maxBytesPerChar = 10;
-        StringBuffer rewrittenPath = new StringBuffer(path.length());
+        StringBuilder rewrittenPath = new StringBuilder(path.length());
         ByteArrayOutputStream buf = new ByteArrayOutputStream(maxBytesPerChar);
         OutputStreamWriter writer = null;
         try {
