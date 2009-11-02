@@ -819,7 +819,7 @@ public class WebappClassLoader
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("WebappClassLoader\r\n");
+        StringBuilder sb = new StringBuilder("WebappClassLoader\r\n");
         sb.append("  delegate: ");
         sb.append(delegate);
         sb.append("\r\n");
