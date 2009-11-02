@@ -64,7 +64,7 @@ public final class UniqueId implements Serializable{
     }
     
     public String toString() {
-        StringBuffer buf = new StringBuffer("UniqueId");
+        StringBuilder buf = new StringBuilder("UniqueId");
         buf.append(org.apache.catalina.tribes.util.Arrays.toString(id));
         return buf.toString();
     }
