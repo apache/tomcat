@@ -1041,7 +1041,7 @@ public class ManagerServlet
         if (debug >= 1)
             log("serverinfo");
         try {
-            StringBuffer props = new StringBuffer();
+            StringBuilder props = new StringBuilder();
             props.append("OK - Server info");
             props.append("\nTomcat Version: ");
             props.append(ServerInfo.getServerInfo());
