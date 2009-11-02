@@ -127,7 +127,7 @@ public final class LifecycleException extends Exception {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("LifecycleException:  ");
+        StringBuilder sb = new StringBuilder("LifecycleException:  ");
         if (message != null) {
             sb.append(message);
             if (throwable != null) {
