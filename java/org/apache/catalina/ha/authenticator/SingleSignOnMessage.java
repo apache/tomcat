@@ -103,7 +103,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
     public String getUniqueId() {
 	if (this.uniqueId != null)
 	    return this.uniqueId;
-	StringBuffer result = new StringBuffer(getSsoId());
+	StringBuilder result = new StringBuilder(getSsoId());
 	result.append("#-#");
 	result.append(System.currentTimeMillis());
 	return result.toString();
@@ -177,7 +177,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("SingleSignOnMessage[action=");
+        StringBuilder sb = new StringBuilder("SingleSignOnMessage[action=");
 	sb.append(getAction()).append(", ssoId=").append(getSsoId());
 	sb.append(", sessionId=").append(getSessionId()).append(", username=");
 	sb.append(getUsername()).append("]");

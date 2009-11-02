@@ -400,7 +400,7 @@ public class ReplicationValve
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ReplicationValve[");
+        StringBuilder sb = new StringBuilder("ReplicationValve[");
         if (container != null)
             sb.append(container.getName());
         sb.append("]");
