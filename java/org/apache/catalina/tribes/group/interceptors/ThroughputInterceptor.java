@@ -88,7 +88,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase {
     }
     
     public void report(double timeTx) {
-        StringBuffer buf = new StringBuffer("ThroughputInterceptor Report[\n\tTx Msg:");
+        StringBuilder buf = new StringBuilder("ThroughputInterceptor Report[\n\tTx Msg:");
         buf.append(msgTxCnt).append(" messages\n\tSent:");
         buf.append(df.format(mbTx));
         buf.append(" MB (total)\n\tSent:");
