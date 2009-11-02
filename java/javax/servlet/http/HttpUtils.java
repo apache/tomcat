@@ -88,7 +88,7 @@ public class HttpUtils {
             throw new IllegalArgumentException();
         }
         Hashtable<String,String[]> ht = new Hashtable<String,String[]>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         StringTokenizer st = new StringTokenizer(s, "&");
         while (st.hasMoreTokens()) {
             String pair = st.nextToken();
@@ -203,7 +203,7 @@ public class HttpUtils {
     /*
      * Parse a name in the query string.
      */
-    static private String parseName(String s, StringBuffer sb) {
+    static private String parseName(String s, StringBuilder sb) {
         sb.setLength(0);
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i); 
