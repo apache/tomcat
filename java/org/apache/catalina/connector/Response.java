@@ -1620,7 +1620,7 @@ public class Response
             anchor = path.substring(pound);
             path = path.substring(0, pound);
         }
-        StringBuffer sb = new StringBuffer(path);
+        StringBuilder sb = new StringBuilder(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
             sb.append(";");
             sb.append(Globals.SESSION_PARAMETER_NAME);
