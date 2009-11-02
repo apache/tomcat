@@ -146,7 +146,7 @@ public class RequestDumperFilter implements Filter {
         while (pnames.hasMoreElements()) {
             String pname = pnames.nextElement();
             String pvalues[] = request.getParameterValues(pname);
-            StringBuffer result = new StringBuffer(pname);
+            StringBuilder result = new StringBuilder(pname);
             result.append('=');
             for (int i = 0; i < pvalues.length; i++) {
                 if (i > 0)
