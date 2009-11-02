@@ -289,7 +289,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         
         @Override
         public String toString() {
-            StringBuffer buf = new StringBuffer("QueryStats[query:");
+            StringBuilder buf = new StringBuilder("QueryStats[query:");
             buf.append(query);
             buf.append(", nrOfInvocations:");
             buf.append(nrOfInvocations);

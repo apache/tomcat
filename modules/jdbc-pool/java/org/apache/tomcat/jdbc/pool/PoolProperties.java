@@ -653,7 +653,7 @@ public class PoolProperties implements PoolConfiguration {
 
     @Override
     public String toString() {
-        StringBuffer buf = new StringBuffer("ConnectionPool[");
+        StringBuilder buf = new StringBuilder("ConnectionPool[");
         try {
             String[] fields = DataSourceFactory.ALL_PROPERTIES;
             for (int i=0; i<fields.length; i++) {
