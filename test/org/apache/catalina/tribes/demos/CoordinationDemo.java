@@ -39,7 +39,7 @@ public class CoordinationDemo {
     static int CLEAR_SCREEN = 30;
     static boolean MULTI_THREAD = false;
     static boolean[] VIEW_EVENTS = new boolean[255];
-    StringBuffer statusLine = new StringBuffer();
+    StringBuilder statusLine = new StringBuilder();
     Status[] status = null;
     BufferedReader reader = null;
     /**
@@ -56,7 +56,7 @@ public class CoordinationDemo {
     
     
     public void clearScreen() {
-        StringBuffer buf = new StringBuffer(700);
+        StringBuilder buf = new StringBuilder(700);
         for (int i=0; i<CLEAR_SCREEN; i++ ) buf.append("\n");
         System.out.println(buf);
     }
@@ -90,7 +90,7 @@ public class CoordinationDemo {
         //view-id - 24
         //view count - 8
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(leftfill("Member",30," "));
         buf.append(leftfill("Running",10," "));
         buf.append(leftfill("Coord",30," "));
@@ -240,7 +240,7 @@ public class CoordinationDemo {
     }    
 
     public static String fill(String value, int length, String ch, boolean left) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if ( !left ) buf.append(value.trim());
         for (int i=value.trim().length(); i<length; i++ ) buf.append(ch);
         if ( left ) buf.append(value.trim());
@@ -266,7 +266,7 @@ public class CoordinationDemo {
             //coord - 30
             //view-id - 24
             //view count - 8
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             String local = "";
             String coord = "";
             String viewId = "";
