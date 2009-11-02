@@ -127,7 +127,7 @@ public final class ExampleFilter implements Filter {
 
 	if (filterConfig == null)
 	    return ("TimingFilter()");
-	StringBuffer sb = new StringBuffer("TimingFilter(");
+	StringBuilder sb = new StringBuilder("TimingFilter(");
 	sb.append(filterConfig);
 	sb.append(")");
 	return (sb.toString());
