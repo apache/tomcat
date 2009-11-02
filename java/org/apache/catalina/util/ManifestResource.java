@@ -129,7 +129,7 @@ public class ManifestResource {
     
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ManifestResource[");
+        StringBuilder sb = new StringBuilder("ManifestResource[");
         sb.append(resourceName);
 
         sb.append(", isFulfilled=");
