@@ -64,7 +64,7 @@ public class CoyotePrincipal
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("CoyotePrincipal[");
+        StringBuilder sb = new StringBuilder("CoyotePrincipal[");
         sb.append(this.name);
         sb.append("]");
         return (sb.toString());

@@ -125,7 +125,7 @@ public class CometEventImpl implements CometEvent {
     }
     
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
         buf.append("[EventType:");
         buf.append(eventType);
