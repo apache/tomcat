@@ -236,7 +236,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
         }
 
         // Build the connection string with fixed ports
-        StringBuffer url = new StringBuffer();
+        StringBuilder url = new StringBuilder();
         url.append("service:jmx:rmi://localhost:");
         url.append(theRmiServerPort);
         url.append("/jndi/rmi://localhost:");
