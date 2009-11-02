@@ -296,7 +296,7 @@ public class TreeNode {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         toString(sb, 0, this);
         return (sb.toString());
 
@@ -307,14 +307,14 @@ public class TreeNode {
 
 
     /**
-     * Append to the specified StringBuffer a character representation of
+     * Append to the specified StringBuilder a character representation of
      * this node, with the specified amount of indentation.
      *
-     * @param sb The StringBuffer to append to
+     * @param sb The StringBuilder to append to
      * @param indent Number of characters of indentation
      * @param node The TreeNode to be printed
      */
-    protected void toString(StringBuffer sb, int indent,
+    protected void toString(StringBuilder sb, int indent,
                             TreeNode node) {
 
         int indent2 = indent + 2;

@@ -685,7 +685,7 @@ public class JspCompilationContext {
 
     protected static final String canonicalURI(String s) {
        if (s == null) return null;
-       StringBuffer result = new StringBuffer();
+       StringBuilder result = new StringBuilder();
        final int len = s.length();
        int pos = 0;
        while (pos < len) {

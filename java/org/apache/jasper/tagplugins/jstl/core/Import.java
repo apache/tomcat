@@ -52,7 +52,7 @@ public class Import implements TagPlugin {
         String requestDispatcherName = ctxt.getTemporaryVariableName();
         String irwName = ctxt.getTemporaryVariableName();           //ImportResponseWrapper name
         String brName = ctxt.getTemporaryVariableName();            //BufferedReader name
-        String sbName = ctxt.getTemporaryVariableName();            //StringBuffer name
+        String sbName = ctxt.getTemporaryVariableName();            //StringBuilder name
         String tempStringName = ctxt.getTemporaryVariableName();
         
         //is absolute url
@@ -300,7 +300,7 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("    }");
             
             ctxt.generateJavaSource("    java.io.BufferedReader " + brName + " =  new java.io.BufferedReader(" + tempReaderName + ");");
-            ctxt.generateJavaSource("    StringBuffer " + sbName + " = new StringBuffer();");
+            ctxt.generateJavaSource("    StringBuilder " + sbName + " = new StringBuilder();");
             String index = ctxt.getTemporaryVariableName();
             ctxt.generateJavaSource("    int " + index + ";");
             ctxt.generateJavaSource("    while(("+index+" = "+brName+".read()) != -1) "+sbName+".append((char)"+index+");");

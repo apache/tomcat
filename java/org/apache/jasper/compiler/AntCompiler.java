@@ -85,7 +85,7 @@ public class AntCompiler extends Compiler {
     
     public class JasperAntLogger extends DefaultLogger {
         
-        protected StringBuffer reportBuf = new StringBuffer();
+        protected StringBuilder reportBuf = new StringBuilder();
         
         protected void printMessage(final String message,
                 final PrintStream stream,
@@ -124,9 +124,9 @@ public class AntCompiler extends Compiler {
         
         String sep = System.getProperty("path.separator");
         
-        StringBuffer errorReport = new StringBuffer();
+        StringBuilder errorReport = new StringBuilder();
         
-        StringBuffer info=new StringBuffer();
+        StringBuilder info=new StringBuilder();
         info.append("Compile: javaFileName=" + javaFileName + "\n" );
         info.append("    classpath=" + classpath + "\n" );
         
@@ -278,7 +278,7 @@ public class AntCompiler extends Compiler {
     }
 
     private String quotePathList(String list) {
-        StringBuffer result = new StringBuffer(list.length() + 10);
+        StringBuilder result = new StringBuilder(list.length() + 10);
         StringTokenizer st = new StringTokenizer(list, File.pathSeparator);
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
