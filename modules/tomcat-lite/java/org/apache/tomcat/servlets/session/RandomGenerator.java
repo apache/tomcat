@@ -117,7 +117,7 @@ public class RandomGenerator {
         String result = null;
 
         // Render the result as a String of hexadecimal digits
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         int resultLenBytes = 0;
 
         while (resultLenBytes < this.sessionIdLength) {

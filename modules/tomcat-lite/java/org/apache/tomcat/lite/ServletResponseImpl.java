@@ -670,7 +670,7 @@ public class ServletResponseImpl
         String contentLanguage = locale.getLanguage();
         if ((contentLanguage != null) && (contentLanguage.length() > 0)) {
             String country = locale.getCountry();
-            StringBuffer value = new StringBuffer(contentLanguage);
+            StringBuilder value = new StringBuilder(contentLanguage);
             if ((country != null) && (country.length() > 0)) {
                 value.append('-');
                 value.append(country);
@@ -809,7 +809,7 @@ public class ServletResponseImpl
 
         cookies.add(cookie);
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         ServerCookie.appendCookieValue
         (sb, cookie.getVersion(), cookie.getName(), cookie.getValue(),
                 cookie.getPath(), cookie.getDomain(), cookie.getComment(), 
@@ -1409,7 +1409,7 @@ public class ServletResponseImpl
             anchor = path.substring(pound);
             path = path.substring(0, pound);
         }
-        StringBuffer sb = new StringBuffer(path);
+        StringBuilder sb = new StringBuilder(path);
         if( sb.length() > 0 ) { // jsessionid can't be first.
             sb.append(";jsessionid=");
             sb.append(sessionId);

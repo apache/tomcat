@@ -122,7 +122,7 @@ public class ServletReaderImpl
         int pos = 0;
         int end = -1;
         int skip = -1;
-        StringBuffer aggregator = null;
+        StringBuilder aggregator = null;
         while (end < 0) {
             mark(MAX_LINE_LENGTH);
             while ((pos < MAX_LINE_LENGTH) && (end < 0)) {
@@ -158,7 +158,7 @@ public class ServletReaderImpl
             }
             if (end < 0) {
                 if (aggregator == null) {
-                    aggregator = new StringBuffer();
+                    aggregator = new StringBuilder();
                 }
                 aggregator.append(lineBuffer);
                 pos = 0;
