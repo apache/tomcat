@@ -2077,7 +2077,7 @@ public class JNDIRealm extends RealmBase {
      * @return String the escaped/encoded result
      */
     protected String doRFC2254Encoding(String inString) {
-        StringBuffer buf = new StringBuffer(inString.length());
+        StringBuilder buf = new StringBuilder(inString.length());
         for (int i = 0; i < inString.length(); i++) {
             char c = inString.charAt(i);
             switch (c) {
