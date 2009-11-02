@@ -251,7 +251,7 @@ public class RpcChannel implements ChannelListener{
     }
     
     protected static String bToS(byte[] data) {
-        StringBuffer buf = new StringBuffer(4*16);
+        StringBuilder buf = new StringBuilder(4*16);
         buf.append("{");
         for (int i=0; data!=null && i<data.length; i++ ) buf.append(String.valueOf(data[i])).append(" ");
         buf.append("}");

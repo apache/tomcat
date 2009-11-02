@@ -81,7 +81,7 @@ public class ChannelException extends Exception {
      * @see java.lang.Exception#getMessage()
      */
     public String getMessage() {
-        StringBuffer buf = new StringBuffer(super.getMessage());
+        StringBuilder buf = new StringBuilder(super.getMessage());
         if (faultyMembers==null || faultyMembers.size() == 0 ) {
             buf.append("; No faulty members identified.");
         } else {

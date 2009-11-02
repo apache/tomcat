@@ -60,7 +60,7 @@ public class Arrays {
     }
     
     public static String toString(byte[] data, int offset, int length, boolean asInt) {
-        StringBuffer buf = new StringBuffer("{");
+        StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
             if (asInt) buf.append((int)data[offset++]);
             else buf.append(data[offset++]);
@@ -77,7 +77,7 @@ public class Arrays {
     }
     
     public static String toString(Object[] data, int offset, int length) {
-        StringBuffer buf = new StringBuffer("{");
+        StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
             buf.append(data[offset++]);
             for (int i = offset; i < length; i++) {
@@ -93,7 +93,7 @@ public class Arrays {
     }
     
     public static String toNameString(Member[] data, int offset, int length) {
-        StringBuffer buf = new StringBuffer("{");
+        StringBuilder buf = new StringBuilder("{");
         if ( data != null && length > 0 ) {
             buf.append(data[offset++].getName());
             for (int i = offset; i < length; i++) {

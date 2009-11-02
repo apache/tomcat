@@ -150,7 +150,7 @@ public class BioSender extends AbstractSender implements DataSender {
      * Name of this SockerSender
      */
     public String toString() {
-        StringBuffer buf = new StringBuffer("DataSender[(");
+        StringBuilder buf = new StringBuilder("DataSender[(");
         buf.append(super.toString()).append(")");
         buf.append(getAddress()).append(":").append(getPort()).append("]");
         return buf.toString();
