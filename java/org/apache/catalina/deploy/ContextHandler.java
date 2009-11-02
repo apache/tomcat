@@ -122,7 +122,7 @@ public class ContextHandler extends ResourceBase implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ContextHandler[");
+        StringBuilder sb = new StringBuilder("ContextHandler[");
         sb.append("name=");
         sb.append(getName());
         if (handlerclass != null) {

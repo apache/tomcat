@@ -73,7 +73,7 @@ public class ContextResource extends ResourceBase implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ContextResource[");
+        StringBuilder sb = new StringBuilder("ContextResource[");
         sb.append("name=");
         sb.append(getName());
         if (getDescription() != null) {

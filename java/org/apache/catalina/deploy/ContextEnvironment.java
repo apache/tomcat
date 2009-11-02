@@ -127,7 +127,7 @@ public class ContextEnvironment implements Serializable, Injectable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ContextEnvironment[");
+        StringBuilder sb = new StringBuilder("ContextEnvironment[");
         sb.append("name=");
         sb.append(name);
         if (description != null) {
