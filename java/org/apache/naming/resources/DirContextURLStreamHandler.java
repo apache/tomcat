@@ -99,7 +99,7 @@ public class DirContextURLStreamHandler
      * Override as part of the fix for 36534, to ensure toString is correct.
      */
     protected String toExternalForm(URL u) {
-        // pre-compute length of StringBuffer
+        // pre-compute length of StringBuilder
         int len = u.getProtocol().length() + 1;
         if (u.getPath() != null) {
             len += u.getPath().length();
@@ -109,7 +109,7 @@ public class DirContextURLStreamHandler
         }
         if (u.getRef() != null) 
             len += 1 + u.getRef().length();
-        StringBuffer result = new StringBuffer(len);
+        StringBuilder result = new StringBuilder(len);
         result.append(u.getProtocol());
         result.append(":");
         if (u.getPath() != null) {

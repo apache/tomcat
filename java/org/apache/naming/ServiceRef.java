@@ -188,7 +188,7 @@ public class ServiceRef
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ServiceRef[");
+        StringBuilder sb = new StringBuilder("ServiceRef[");
         sb.append("className=");
         sb.append(getClassName());
         sb.append(",factoryClassLocation=");
