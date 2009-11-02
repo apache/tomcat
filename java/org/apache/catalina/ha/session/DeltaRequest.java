@@ -376,7 +376,7 @@ public class DeltaRequest implements Externalizable {
         }
         
         public String toString() {
-            StringBuffer buf = new StringBuffer("AttributeInfo[type=");
+            StringBuilder buf = new StringBuilder("AttributeInfo[type=");
             buf.append(getType()).append(", action=").append(getAction());
             buf.append(", name=").append(getName()).append(", value=").append(getValue());
             buf.append(", addr=").append(super.toString()).append("]");

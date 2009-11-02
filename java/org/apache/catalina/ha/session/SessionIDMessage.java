@@ -38,7 +38,7 @@ public class SessionIDMessage extends ClusterMessageBase implements ClusterMessa
 	private String contextPath;
 
 	public String getUniqueId() {
-		StringBuffer result = new StringBuffer(getOrignalSessionID());
+		StringBuilder result = new StringBuilder(getOrignalSessionID());
 		result.append("#-#");
 		result.append(getHost());
                 result.append("#-#");

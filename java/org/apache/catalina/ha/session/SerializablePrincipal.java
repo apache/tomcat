@@ -183,7 +183,7 @@ public class SerializablePrincipal  implements java.io.Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("SerializablePrincipal[");
+        StringBuilder sb = new StringBuilder("SerializablePrincipal[");
         sb.append(this.name);
         sb.append("]");
         return (sb.toString());
