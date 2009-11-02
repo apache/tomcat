@@ -168,7 +168,7 @@ public class FilterDef implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("FilterDef[");
+        StringBuilder sb = new StringBuilder("FilterDef[");
         sb.append("filterName=");
         sb.append(this.filterName);
         sb.append(", filterClass=");
