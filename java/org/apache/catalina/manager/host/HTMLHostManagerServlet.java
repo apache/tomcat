@@ -360,7 +360,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 args = new Object[2];
                 args[0] = RequestUtil.filter(hostName);
                 String[] aliases = host.findAliases();
-                StringBuffer buf = new StringBuffer();
+                StringBuilder buf = new StringBuilder();
                 if (aliases.length > 0) {
                     buf.append(aliases[0]);
                     for (int j = 1; j < aliases.length; j++) {

@@ -537,7 +537,7 @@ public class HostManagerServlet
             Host host = (Host) hosts[i];
             String name = host.getName();
             String[] aliases = host.findAliases();
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             if (aliases.length > 0) {
                 buf.append(aliases[0]);
                 for (int j = 1; j < aliases.length; j++) {
