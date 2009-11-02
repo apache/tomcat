@@ -125,7 +125,7 @@ public class NotificationInfo extends FeatureInfo implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("NotificationInfo[");
+        StringBuilder sb = new StringBuilder("NotificationInfo[");
         sb.append("name=");
         sb.append(name);
         sb.append(", description=");

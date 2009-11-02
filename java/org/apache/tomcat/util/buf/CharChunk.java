@@ -305,7 +305,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     /** Add data to the buffer
      */
-    public void append( StringBuffer sb )
+    public void append( StringBuilder sb )
 	throws IOException
     {
 	int len=sb.length();
