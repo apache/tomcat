@@ -194,6 +194,8 @@
 
   <patternset id="files.servlet-api">
     <include name="javax/servlet/*" />
+    <include name="javax/servlet/annotation/*" />
+    <include name="javax/servlet/descriptor/*" />
     <include name="javax/servlet/http/*" />
     <include name="javax/servlet/resources/*" />
   </patternset>
