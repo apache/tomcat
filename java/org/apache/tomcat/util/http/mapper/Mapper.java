@@ -500,7 +500,7 @@ public final class Mapper {
 
     public String getWrappersString( String host, String context ) {
         String names[]=getWrapperNames(host, context);
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         for( int i=0; i<names.length; i++ ) {
             sb.append(names[i]).append(":");
         }

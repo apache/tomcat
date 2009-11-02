@@ -759,7 +759,7 @@ public class MultipartStream
      */
     public String toString()
     {
-        StringBuffer sbTemp = new StringBuffer();
+        StringBuilder sbTemp = new StringBuilder();
         sbTemp.append("boundary='");
         sbTemp.append(String.valueOf(boundary));
         sbTemp.append("'\nbufSize=");

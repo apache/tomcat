@@ -362,7 +362,7 @@ public final class Parameters extends MultiMap {
     /** Debug purpose
      */
     public String paramsAsString() {
-        StringBuffer sb=new StringBuffer();
+        StringBuilder sb=new StringBuilder();
         Enumeration<String> en= paramHashStringArray.keys();
         while( en.hasMoreElements() ) {
             String k = en.nextElement();
