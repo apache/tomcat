@@ -104,7 +104,7 @@ public class CreateTestTable extends DefaultTestCase {
     
     public static Random random = new Random(System.currentTimeMillis());
     public static String getRandom() {
-        StringBuffer s = new StringBuffer(256);
+        StringBuilder s = new StringBuilder(256);
         for (int i=0;i<254; i++) {
             int b = Math.abs(random.nextInt() % 29);
             char c = (char)(b+65);
