@@ -569,7 +569,7 @@ public class AccessLogValve
             }
     
             Date date = getDate();
-            StringBuffer result = new StringBuffer(128);
+            StringBuilder result = new StringBuilder(128);
     
             for (int i = 0; i < logElements.length; i++) {
                 logElements[i].addElement(result, date, request, response, time);
@@ -772,7 +772,7 @@ public class AccessLogValve
     
     
     private String calculateTimeZoneOffset(long offset) {
-        StringBuffer tz = new StringBuffer();
+        StringBuilder tz = new StringBuilder();
         if ((offset < 0)) {
             tz.append("-");
             offset = -offset;
@@ -883,7 +883,7 @@ public class AccessLogValve
      * AccessLogElement writes the partial message into the buffer.
      */
     protected interface AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time);
 
     }
@@ -892,7 +892,7 @@ public class AccessLogValve
      * write thread name - %I
      */
     protected class ThreadNameElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             RequestInfo info = request.getCoyoteRequest().getRequestProcessor();
             if(info != null) {
@@ -920,7 +920,7 @@ public class AccessLogValve
             LOCAL_ADDR_VALUE = init;
         }
         
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(LOCAL_ADDR_VALUE);
         }
@@ -930,7 +930,7 @@ public class AccessLogValve
      * write remote IP address - %a
      */
     protected class RemoteAddrElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getRemoteAddr());
         }
@@ -940,7 +940,7 @@ public class AccessLogValve
      * write remote host name - %h
      */
     protected class HostElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getRemoteHost());
         }
@@ -950,7 +950,7 @@ public class AccessLogValve
      * write remote logical username from identd (always returns '-') - %l
      */
     protected class LogicalUserNameElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append('-');
         }
@@ -960,7 +960,7 @@ public class AccessLogValve
      * write request protocol - %H
      */
     protected class ProtocolElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getProtocol());
         }
@@ -970,7 +970,7 @@ public class AccessLogValve
      * write remote user that was authenticated (if any), else '-' - %u
      */
     protected class UserElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 String value = request.getRemoteUser();
@@ -993,11 +993,11 @@ public class AccessLogValve
         
 
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             AccessDateStruct struct = currentDateStruct.get();
             if (struct.currentDateString == null) {
-                StringBuffer current = new StringBuffer(32);
+                StringBuilder current = new StringBuilder(32);
                 current.append('[');
                 current.append(struct.dayFormatter.format(date));
                 current.append('/');
@@ -1019,7 +1019,7 @@ public class AccessLogValve
      * write first line of the request (method and request URI) - %r
      */
     protected class RequestElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 buf.append(request.getMethod());
@@ -1041,7 +1041,7 @@ public class AccessLogValve
      * write HTTP status code of the response - %s
      */
     protected class HttpStatusCodeElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (response != null) {
                 buf.append(response.getStatus());
@@ -1055,7 +1055,7 @@ public class AccessLogValve
      * write local port on which this request was received - %p
      */
     protected class LocalPortElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerPort());
         }
@@ -1074,7 +1074,7 @@ public class AccessLogValve
             this.conversion = conversion;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             long length = response.getContentCountLong() ;
             if (length <= 0 && conversion) {
@@ -1089,7 +1089,7 @@ public class AccessLogValve
      * write request method (GET, POST, etc.) - %m
      */
     protected class MethodElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 buf.append(request.getMethod());
@@ -1111,7 +1111,7 @@ public class AccessLogValve
             this.millis = millis;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (millis) {
                 buf.append(time);
@@ -1132,7 +1132,7 @@ public class AccessLogValve
      * write Query string (prepended with a '?' if it exists) - %q
      */
     protected class QueryElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             String query = null;
             if (request != null)
@@ -1148,7 +1148,7 @@ public class AccessLogValve
      * write user session ID - %S
      */
     protected class SessionIdElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 if (request.getSession(false) != null) {
@@ -1167,7 +1167,7 @@ public class AccessLogValve
      * write requested URL path - %U
      */
     protected class RequestURIElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             if (request != null) {
                 buf.append(request.getRequestURI());
@@ -1181,7 +1181,7 @@ public class AccessLogValve
      * write local server name - %v
      */
     protected class LocalServerNameElement implements AccessLogElement {
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(request.getServerName());
         }
@@ -1197,7 +1197,7 @@ public class AccessLogValve
             this.str = str;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             buf.append(str);
         }
@@ -1213,7 +1213,7 @@ public class AccessLogValve
             this.header = header;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             String value = request.getHeader(header);
             if (value == null) {
@@ -1234,7 +1234,7 @@ public class AccessLogValve
             this.header = header;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             String value = "-";
             Cookie[] c = request.getCookies();
@@ -1260,7 +1260,7 @@ public class AccessLogValve
             this.header = header;
         }
         
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
            if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
@@ -1287,7 +1287,7 @@ public class AccessLogValve
             this.header = header;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             Object value = null;
             if (request != null) {
@@ -1317,7 +1317,7 @@ public class AccessLogValve
             this.header = header;
         }
 
-        public void addElement(StringBuffer buf, Date date, Request request,
+        public void addElement(StringBuilder buf, Date date, Request request,
                 Response response, long time) {
             Object value = null;
             if (null != request) {
@@ -1348,7 +1348,7 @@ public class AccessLogValve
     protected AccessLogElement[] createLogElements() {
         List<AccessLogElement> list = new ArrayList<AccessLogElement>();
         boolean replace = false;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < pattern.length(); i++) {
             char ch = pattern.charAt(i);
             if (replace) {
@@ -1357,7 +1357,7 @@ public class AccessLogValve
                  * not enounter a closing } - then I ignore the {
                  */
                 if ('{' == ch) {
-                    StringBuffer name = new StringBuffer();
+                    StringBuilder name = new StringBuilder();
                     int j = i + 1;
                     for (; j < pattern.length() && '}' != pattern.charAt(j); j++) {
                         name.append(pattern.charAt(j));
@@ -1380,7 +1380,7 @@ public class AccessLogValve
             } else if (ch == '%') {
                 replace = true;
                 list.add(new StringElement(buf.toString()));
-                buf = new StringBuffer();
+                buf = new StringBuilder();
             } else {
                 buf.append(ch);
             }
