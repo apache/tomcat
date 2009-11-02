@@ -70,7 +70,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * Specialized web application class loader.
  * <p>
  * This class loader is a full reimplementation of the 
- * <code>URLClassLoader</code> from the JDK. It is desinged to be fully
+ * <code>URLClassLoader</code> from the JDK. It is designed to be fully
  * compatible with a normal <code>URLClassLoader</code>, although its internal
  * behavior may be completely different.
  * <p>
@@ -901,6 +901,8 @@ public class WebappClassLoader
                     throw cnfe;
                 }
             } catch(AccessControlException ace) {
+                log.warn("WebappClassLoader.findClassInternal(" + name
+                        + ") security exception: " + ace.getMessage(), ace);
                 throw new ClassNotFoundException(name, ace);
             } catch (RuntimeException e) {
                 if (log.isTraceEnabled())
@@ -911,6 +913,8 @@ public class WebappClassLoader
                 try {
                     clazz = super.findClass(name);
                 } catch(AccessControlException ace) {
+                    log.warn("WebappClassLoader.findClassInternal(" + name
+                            + ") security exception: " + ace.getMessage(), ace);
                     throw new ClassNotFoundException(name, ace);
                 } catch (RuntimeException e) {
                     if (log.isTraceEnabled())
