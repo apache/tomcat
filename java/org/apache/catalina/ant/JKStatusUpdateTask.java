@@ -272,7 +272,7 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
 
         super.execute();
         checkParameter();
-        StringBuffer sb = createLink();
+        StringBuilder sb = createLink();
         execute(sb.toString(), null, null, -1);
 
     }
@@ -289,9 +289,9 @@ public class JKStatusUpdateTask extends AbstractCatalinaTask {
      * 
      * @return create jkstatus link
      */
-    private StringBuffer createLink() {
+    private StringBuilder createLink() {
         // Building URL
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         try {
             sb.append("?cmd=update&mime=txt");
             sb.append("&w=");

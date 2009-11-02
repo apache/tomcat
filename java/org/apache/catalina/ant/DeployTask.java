@@ -176,7 +176,7 @@ public class DeployTask extends AbstractCatalinaTask {
         }
 
         // Building URL
-        StringBuffer sb = new StringBuffer("/deploy?path=");
+        StringBuilder sb = new StringBuilder("/deploy?path=");
         try {
             sb.append(URLEncoder.encode(this.path, getCharset()));
             if ((war == null) && (config != null)) {
