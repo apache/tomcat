@@ -310,7 +310,7 @@ public class Dir2Html  extends HttpServlet {
         }
         PrintWriter writer = new PrintWriter(osWriter);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         // rewriteUrl(contextPath) is expensive. cache result for later reuse
         String rewrittenContextPath =  rewriteUrl(contextPath);
@@ -457,7 +457,7 @@ public class Dir2Html  extends HttpServlet {
     /**
      * Display the size of a file.
      */
-    protected void displaySize(StringBuffer buf, long filesize) {
+    protected void displaySize(StringBuilder buf, long filesize) {
 
         long leftside = filesize / 1024;
         long rightside = (filesize % 1024) / 103;  // makes 1 digit

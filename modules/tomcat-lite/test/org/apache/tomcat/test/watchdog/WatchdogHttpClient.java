@@ -57,7 +57,7 @@ public class WatchdogHttpClient {
 
         OutputStream out = new BufferedOutputStream( 
                                socket.getOutputStream() );
-        StringBuffer reqbuf = new StringBuffer( 128 );
+        StringBuilder reqbuf = new StringBuilder( 128 );
 
         // set the Host header
         client.setHeaderDetails( "Host:" + host + ":" + port, requestHeaders, true );
@@ -92,7 +92,7 @@ public class WatchdogHttpClient {
             Iterator iter = requestHeaders.keySet().iterator();
                         
             while ( iter.hasNext() ) {
-                StringBuffer tmpBuf = new StringBuffer(32);
+                StringBuilder tmpBuf = new StringBuilder(32);
                 String headerKey = ( String ) iter.next();
                         ArrayList values = (ArrayList) requestHeaders.get( headerKey );
                         String[] value = (String[]) values.toArray( new String[ values.size() ] );
@@ -187,7 +187,7 @@ public class WatchdogHttpClient {
      * @return a <code>byte[]</code> representation of the response
      */
     private static byte[] readBody( InputStream input ) {
-        StringBuffer sb = new StringBuffer( 255 );
+        StringBuilder sb = new StringBuilder( 255 );
         while ( true ) {
             try {
                 int ch = input.read();
@@ -222,7 +222,7 @@ public class WatchdogHttpClient {
      */
     private static String read( InputStream input ) throws IOException {
         // Read the next line from the input stream
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         while ( true ) {
             try {
