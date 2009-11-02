@@ -1078,8 +1078,8 @@ public final class CGIServlet extends HttpServlet {
          * directory to enable CGI script to be executed.
          */
         protected void expandCGIScript() {
-            StringBuffer srcPath = new StringBuffer();
-            StringBuffer destPath = new StringBuffer();
+            StringBuilder srcPath = new StringBuilder();
+            StringBuilder destPath = new StringBuilder();
             InputStream is = null;
 
             // paths depend on mapping
@@ -1170,7 +1170,7 @@ public final class CGIServlet extends HttpServlet {
          */
         public String toString() {
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             sb.append("<TABLE border=2>");
 
@@ -1585,7 +1585,7 @@ public final class CGIServlet extends HttpServlet {
             int bufRead = -1;
 
             //create query arguments
-            StringBuffer cmdAndArgs = new StringBuffer();
+            StringBuilder cmdAndArgs = new StringBuilder();
             if (command.indexOf(" ") < 0) {
                 cmdAndArgs.append(command);
             } else {
@@ -1608,7 +1608,7 @@ public final class CGIServlet extends HttpServlet {
                 }
             }
 
-            StringBuffer command = new StringBuffer(cgiExecutable);
+            StringBuilder command = new StringBuilder(cgiExecutable);
             command.append(" ");
             command.append(cmdAndArgs.toString());
             cmdAndArgs = command;
