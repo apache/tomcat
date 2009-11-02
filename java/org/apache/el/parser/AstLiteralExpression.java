@@ -46,7 +46,7 @@ public final class AstLiteralExpression extends SimpleNode {
             return;
         }
         int size = image.length();
-        StringBuffer buf = new StringBuffer(size);
+        StringBuilder buf = new StringBuilder(size);
         for (int i = 0; i < size; i++) {
             char c = image.charAt(i);
             if (c == '\\' && i + 1 < size) {
