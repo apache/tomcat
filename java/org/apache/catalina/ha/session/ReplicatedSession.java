@@ -253,7 +253,7 @@ implements org.apache.catalina.ha.ClusterSession{
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer("ReplicatedSession id=");
+        StringBuilder buf = new StringBuilder("ReplicatedSession id=");
         buf.append(getIdInternal()).append(" ref=").append(super.toString()).append("\n");
         java.util.Enumeration<String> e = getAttributeNames();
         while ( e.hasMoreElements() ) {
