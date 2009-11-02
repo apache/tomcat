@@ -72,7 +72,7 @@ public class RpcMessage implements Externalizable {
     }
     
     public String toString() {
-        StringBuffer buf = new StringBuffer("RpcMessage[");
+        StringBuilder buf = new StringBuilder("RpcMessage[");
         buf.append(super.toString());
         buf.append("] rpcId=");
         buf.append(Arrays.toString(rpcId));
