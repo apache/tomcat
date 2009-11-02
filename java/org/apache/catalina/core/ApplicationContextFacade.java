@@ -680,7 +680,7 @@ public final class ApplicationContextFacade
         try{
             return invokeMethod(context, methodName, params);
         }catch(Throwable t){
-            throw new RuntimeException(t.getMessage());
+            throw new RuntimeException(t.getMessage(), t);
         }
     }
 
