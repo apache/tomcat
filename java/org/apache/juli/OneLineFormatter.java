@@ -54,7 +54,7 @@ public class OneLineFormatter extends Formatter {
 
     @Override
     public String format(LogRecord record) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         // Timestamp
         addTimestamp(sb, new Date(record.getMillis()));
@@ -89,11 +89,11 @@ public class OneLineFormatter extends Formatter {
         return sb.toString();
     }
 
-    public void addTimestamp(StringBuffer buf, Date date) {
+    public void addTimestamp(StringBuilder buf, Date date) {
         if (currentDate != date) {
             synchronized (this) {
                 if (currentDate != date) {
-                    StringBuffer current = new StringBuffer(32);
+                    StringBuilder current = new StringBuilder(32);
                     current.append(dayFormatter.format(date)); // Day
                     current.append('-');
                     current.append(lookup(monthFormatter.format(date))); // Month
