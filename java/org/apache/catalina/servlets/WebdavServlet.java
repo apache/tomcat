@@ -406,7 +406,7 @@ public class WebdavServlet
 
         resp.addHeader("DAV", "1,2");
 
-        StringBuffer methodsAllowed = determineMethodsAllowed(resources,
+        StringBuilder methodsAllowed = determineMethodsAllowed(resources,
                                                               req);
 
         resp.addHeader("Allow", methodsAllowed.toString());
@@ -423,7 +423,7 @@ public class WebdavServlet
 
         if (!listings) {
             // Get allowed methods
-            StringBuffer methodsAllowed = determineMethodsAllowed(resources,
+            StringBuilder methodsAllowed = determineMethodsAllowed(resources,
                                                                   req);
 
             resp.addHeader("Allow", methodsAllowed.toString());
@@ -728,7 +728,7 @@ public class WebdavServlet
         // path
         if (exists) {
             // Get allowed methods
-            StringBuffer methodsAllowed = determineMethodsAllowed(resources,
+            StringBuilder methodsAllowed = determineMethodsAllowed(resources,
                                                                   req);
 
             resp.addHeader("Allow", methodsAllowed.toString());
@@ -2600,7 +2600,7 @@ public class WebdavServlet
      * Get creation date in ISO format.
      */
     private String getISOCreationDate(long creationDate) {
-        StringBuffer creationDateValue = new StringBuffer
+        StringBuilder creationDateValue = new StringBuilder
             (creationDateFormat.format
              (new Date(creationDate)));
         /*
@@ -2627,10 +2627,10 @@ public class WebdavServlet
      * Determines the methods normally allowed for the resource.
      *
      */
-    private StringBuffer determineMethodsAllowed(DirContext resources,
+    private StringBuilder determineMethodsAllowed(DirContext resources,
                                                  HttpServletRequest req) {
 
-        StringBuffer methodsAllowed = new StringBuffer();
+        StringBuilder methodsAllowed = new StringBuilder();
         boolean exists = true;
         Object object = null;
         try {
