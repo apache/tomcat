@@ -171,7 +171,7 @@ public class TagAttributeInfo {
      * @return a String representation of this TagAttributeInfo
      */
     public String toString() {
-        StringBuffer b = new StringBuffer(64);
+        StringBuilder b = new StringBuilder(64);
         b.append("name = " + name + " ");
         b.append("type = " + type + " ");
         b.append("reqTime = " + reqTime + " ");
