@@ -183,7 +183,7 @@ public class MemoryGroup extends AbstractGroup {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("<group groupname=\"");
+        StringBuilder sb = new StringBuilder("<group groupname=\"");
         sb.append(groupname);
         sb.append("\"");
         if (description != null) {
