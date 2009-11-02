@@ -431,7 +431,7 @@ public class ErrorDispatcher {
 	        throws IOException, JasperException {
 
         ArrayList<JavacErrorDetail> errors = new ArrayList<JavacErrorDetail>();
-        StringBuffer errMsgBuf = null;
+        StringBuilder errMsgBuf = null;
         int lineNum = -1;
         JavacErrorDetail javacError = null;
         
@@ -465,7 +465,7 @@ public class ErrorDispatcher {
                     lineNum = -1;
                 }
                 
-                errMsgBuf = new StringBuffer();
+                errMsgBuf = new StringBuilder();
                 
                 javacError = createJavacError(fname, page, errMsgBuf, lineNum);
             }
@@ -503,7 +503,7 @@ public class ErrorDispatcher {
      * @throws JasperException
      */
     public static JavacErrorDetail createJavacError(String fname,
-            Node.Nodes page, StringBuffer errMsgBuf, int lineNum)
+            Node.Nodes page, StringBuilder errMsgBuf, int lineNum)
     throws JasperException {
         return createJavacError(fname, page, errMsgBuf, lineNum, null);
     }
@@ -519,7 +519,7 @@ public class ErrorDispatcher {
      * @throws JasperException
      */
     public static JavacErrorDetail createJavacError(String fname,
-            Node.Nodes page, StringBuffer errMsgBuf, int lineNum,
+            Node.Nodes page, StringBuilder errMsgBuf, int lineNum,
             JspCompilationContext ctxt) throws JasperException {
         JavacErrorDetail javacError;
         // Attempt to map javac error line number to line in JSP page

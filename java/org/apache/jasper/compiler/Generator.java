@@ -129,7 +129,7 @@ class Generator {
         if (s == null)
             return "";
 
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (c == '"')
@@ -151,7 +151,7 @@ class Generator {
      */
     static String quote(char c) {
 
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         b.append('\'');
         if (c == '\'')
             b.append('\\').append('\'');
@@ -169,7 +169,7 @@ class Generator {
 
     private String createJspId() {
         if (this.jspIdPrefix == null) {
-            StringBuffer sb = new StringBuffer(32);
+            StringBuilder sb = new StringBuilder(32);
             String name = ctxt.getServletJavaFileName();
             sb.append("jsp_").append(Math.abs(name.hashCode())).append('_');
             this.jspIdPrefix = sb.toString();
@@ -829,7 +829,7 @@ class Generator {
             if (tx==null) return null;
             Class<?> type = expectedType;
             int size = tx.length();
-            StringBuffer output = new StringBuffer(size);
+            StringBuilder output = new StringBuilder(size);
             boolean el = false;
             int i = 0;
             int mark = 0;
@@ -1996,7 +1996,7 @@ class Generator {
             n.setBeginJavaLine(out.getJavaLine());
 
             out.printin();
-            StringBuffer sb = new StringBuffer("out.write(\"");
+            StringBuilder sb = new StringBuilder("out.write(\"");
             int initLength = sb.length();
             int count = JspUtil.CHUNKSIZE;
             int srcLine = 0; // relative to starting srouce line
@@ -2822,7 +2822,7 @@ class Generator {
             } else if (attr.isELInterpreterInput()) {
 
                 // results buffer
-                StringBuffer sb = new StringBuffer(64);
+                StringBuilder sb = new StringBuilder(64);
 
                 TagAttributeInfo tai = attr.getTagAttributeInfo();
 

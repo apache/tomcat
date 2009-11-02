@@ -64,7 +64,7 @@ class DefaultErrorHandler implements ErrorHandler {
         }
         
         Object[] args = null;
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         
         for (int i=0; i < details.length; i++) {
             if (details[i].getJspBeginLineNumber() >= 0) {

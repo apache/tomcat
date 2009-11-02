@@ -29,7 +29,7 @@ class Dumper {
 	    if (attrs == null)
 		return "";
 
-	    StringBuffer buf = new StringBuffer();
+	    StringBuilder buf = new StringBuilder();
 	    for (int i=0; i < attrs.getLength(); i++) {
 		buf.append(" " + attrs.getQName(i) + "=\""
 			   + attrs.getValue(i) + "\"");

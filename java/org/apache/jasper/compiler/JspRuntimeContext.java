@@ -323,7 +323,7 @@ public final class JspRuntimeContext {
      */
     private void initClassPath() {
 
-        StringBuffer cpath = new StringBuffer();
+        StringBuilder cpath = new StringBuilder();
         String sep = System.getProperty("path.separator");
 
         if (parentClassLoader instanceof URLClassLoader) {
