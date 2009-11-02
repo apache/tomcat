@@ -248,7 +248,7 @@ public class MemoryUser extends AbstractUser {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("<user username=\"");
+        StringBuilder sb = new StringBuilder("<user username=\"");
         sb.append(RequestUtil.filter(username));
         sb.append("\" password=\"");
         sb.append(RequestUtil.filter(password));
