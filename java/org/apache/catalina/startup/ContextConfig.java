@@ -1184,7 +1184,7 @@ public class ContextConfig
 
     
     protected String getHostConfigPath(String resourceName) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Container container = context;
         Container host = null;
         Container engine = null;

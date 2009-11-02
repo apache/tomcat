@@ -139,7 +139,7 @@ public final class PasswdUserDatabase
             while (true) {
 
                 // Accumulate the next line
-                StringBuffer buffer = new StringBuffer();
+                StringBuilder buffer = new StringBuilder();
                 while (true) {
                     int ch = reader.read();
                     if ((ch < 0) || (ch == '\n'))
