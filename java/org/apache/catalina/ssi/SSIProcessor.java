@@ -98,7 +98,7 @@ public class SSIProcessor {
         stringWriter = null;
         int index = 0;
         boolean inside = false;
-        StringBuffer command = new StringBuffer();
+        StringBuilder command = new StringBuilder();
         try {
             while (index < fileContents.length()) {
                 char c = fileContents.charAt(index);
@@ -176,19 +176,19 @@ public class SSIProcessor {
 
 
     /**
-     * Parse a StringBuffer and take out the param type token. Called from
+     * Parse a StringBuilder and take out the param type token. Called from
      * <code>requestHandler</code>
      * 
      * @param cmd
-     *            a value of type 'StringBuffer'
+     *            a value of type 'StringBuilder'
      * @return a value of type 'String[]'
      */
-    protected String[] parseParamNames(StringBuffer cmd, int start) {
+    protected String[] parseParamNames(StringBuilder cmd, int start) {
         int bIdx = start;
         int i = 0;
         int quotes = 0;
         boolean inside = false;
-        StringBuffer retBuf = new StringBuffer();
+        StringBuilder retBuf = new StringBuilder();
         while (bIdx < cmd.length()) {
             if (!inside) {
                 while (bIdx < cmd.length() && isSpace(cmd.charAt(bIdx)))
@@ -226,18 +226,18 @@ public class SSIProcessor {
 
 
     /**
-     * Parse a StringBuffer and take out the param token. Called from
+     * Parse a StringBuilder and take out the param token. Called from
      * <code>requestHandler</code>
      * 
      * @param cmd
-     *            a value of type 'StringBuffer'
+     *            a value of type 'StringBuilder'
      * @return a value of type 'String[]'
      */
-    protected String[] parseParamValues(StringBuffer cmd, int start, int count) {
+    protected String[] parseParamValues(StringBuilder cmd, int start, int count) {
         int valIndex = 0;
         boolean inside = false;
         String[] vals = new String[count];
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         char endQuote = 0;
         for (int bIdx = start; bIdx < cmd.length(); bIdx++) {
             if (!inside) {
@@ -277,14 +277,14 @@ public class SSIProcessor {
 
 
     /**
-     * Parse a StringBuffer and take out the command token. Called from
+     * Parse a StringBuilder and take out the command token. Called from
      * <code>requestHandler</code>
      * 
      * @param cmd
-     *            a value of type 'StringBuffer'
+     *            a value of type 'StringBuilder'
      * @return a value of type 'String', or null if there is none
      */
-    private String parseCmd(StringBuffer cmd) {
+    private String parseCmd(StringBuilder cmd) {
         int firstLetter = -1;
         int lastLetter = -1;
         for (int i = 0; i < cmd.length(); i++) {

@@ -216,7 +216,7 @@ public class SSIMediator {
         val = val.replace("&quot;", "\"");
         val = val.replace("&amp;", "&");
 
-        StringBuffer sb = new StringBuffer(val);
+        StringBuilder sb = new StringBuilder(val);
         int charStart = sb.indexOf("&#");
         while (charStart > -1) {
             int charEnd = sb.indexOf(";", charStart);
