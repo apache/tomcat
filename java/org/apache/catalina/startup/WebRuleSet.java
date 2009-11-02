@@ -876,7 +876,7 @@ final class CallMethodMultiRule extends CallMethodRule {
         }
 
         if (target == null) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("[CallMethodRule]{");
             sb.append("");
             sb.append("} Call target is null (");
