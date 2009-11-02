@@ -206,12 +206,12 @@ public class Benchmarks extends TestCase {
         }
 
         public String printDate() {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             Date date = getDateSync();
             if (currentDate != date) {
                 synchronized (this) {
                     if (currentDate != date) {
-                        StringBuffer current = new StringBuffer(32);
+                        StringBuilder current = new StringBuilder(32);
                         current.append('[');
                         current.append(dayFormatter.format(date)); // Day
                         current.append('/');
@@ -285,7 +285,7 @@ public class Benchmarks extends TestCase {
         public String printDate() {
             getDateLocal();
             if (currentDateStringLocal.get() == null) {
-                StringBuffer current = new StringBuffer(32);
+                StringBuilder current = new StringBuilder(32);
                 current.append('[');
                 current.append(dayFormatterLocal.get().format(
                         currentDateLocal.get())); // Day
@@ -345,7 +345,7 @@ public class Benchmarks extends TestCase {
             getDateLocal();
             Struct struct = structLocal.get();
             if (struct.currentDateString == null) {
-                StringBuffer current = new StringBuffer(32);
+                StringBuilder current = new StringBuilder(32);
                 current.append('[');
                 current.append(struct.dayFormatter.format(struct.currentDate)); // Day
                 current.append('/');

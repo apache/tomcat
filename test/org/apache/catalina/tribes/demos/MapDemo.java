@@ -221,8 +221,8 @@ public class MapDemo implements ChannelListener, MembershipListener{
     
             public int getRowCount() {return map.sizeFull() +1; }
             
-            public StringBuffer getMemberNames(Member[] members){
-                StringBuffer buf = new StringBuffer();
+            public StringBuilder getMemberNames(Member[] members){
+                StringBuilder buf = new StringBuilder();
                 if ( members!=null ) {
                     for (int i=0;i<members.length; i++ ) {
                         buf.append(members[i].getName());
@@ -350,17 +350,17 @@ public class MapDemo implements ChannelListener, MembershipListener{
             System.out.println(e.getActionCommand());
             if ( "add".equals(e.getActionCommand()) ) {
                 System.out.println("Add key:"+txtAddKey.getText()+" value:"+txtAddValue.getText());
-                map.put(txtAddKey.getText(),new StringBuffer(txtAddValue.getText()));
+                map.put(txtAddKey.getText(),new StringBuilder(txtAddValue.getText()));
             }
             if ( "change".equals(e.getActionCommand()) ) {
                 System.out.println("Change key:"+txtChangeKey.getText()+" value:"+txtChangeValue.getText());
-                StringBuffer buf = (StringBuffer)map.get(txtChangeKey.getText());
+                StringBuilder buf = (StringBuilder)map.get(txtChangeKey.getText());
                 if ( buf!=null ) {
                     buf.delete(0,buf.length());
                     buf.append(txtChangeValue.getText());
                     map.replicate(txtChangeKey.getText(),true);
                 } else {
-                    buf = new StringBuffer();
+                    buf = new StringBuilder();
                     buf.append(txtChangeValue.getText());
                     map.put(txtChangeKey.getText(),buf);
                 }
@@ -378,7 +378,7 @@ public class MapDemo implements ChannelListener, MembershipListener{
                     public void run() {
                         for (int i = 0; i < 5; i++) {
                             String key = random(5,0,0,true,true,null);
-                            map.put(key, new StringBuffer(key));
+                            map.put(key, new StringBuilder(key));
                             dataModel.fireTableDataChanged();
                             table.paint(table.getGraphics());
                             try {

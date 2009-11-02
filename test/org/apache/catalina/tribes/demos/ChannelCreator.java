@@ -53,8 +53,8 @@ import org.apache.catalina.tribes.Member;
 public class ChannelCreator {
     
     
-    public static StringBuffer usage() {
-        StringBuffer buf = new StringBuffer();
+    public static StringBuilder usage() {
+        StringBuilder buf = new StringBuilder();
         buf.append("\n\t\t[-bind tcpbindaddress]")
            .append("\n\t\t[-tcpselto tcpselectortimeout]") 
            .append("\n\t\t[-tcpthreads tcpthreadcount]") 
