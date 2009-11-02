@@ -194,7 +194,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("ApplicationFilterConfig[");
+        StringBuilder sb = new StringBuilder("ApplicationFilterConfig[");
         sb.append("name=");
         sb.append(filterDef.getFilterName());
         sb.append(", filterClass=");

@@ -414,7 +414,7 @@ public final class StandardServer
             }
 
             // Read a set of characters from the socket
-            StringBuffer command = new StringBuffer();
+            StringBuilder command = new StringBuilder();
             int expected = 1024; // Cut off to avoid DoS attack
             while (expected < shutdown.length()) {
                 if (random == null)
@@ -578,7 +578,7 @@ public final class StandardServer
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("StandardServer[");
+        StringBuilder sb = new StringBuilder("StandardServer[");
         sb.append(getPort());
         sb.append("]");
         return (sb.toString());

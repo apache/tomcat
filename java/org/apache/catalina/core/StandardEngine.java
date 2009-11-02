@@ -461,7 +461,7 @@ public class StandardEngine
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("StandardEngine[");
+        StringBuilder sb = new StringBuilder("StandardEngine[");
         sb.append(getName());
         sb.append("]");
         return (sb.toString());
