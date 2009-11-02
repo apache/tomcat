@@ -401,11 +401,11 @@ public final class Bootstrap {
             }
 
             if (command.equals("startd")) {
-                args[0] = "start";
+                args[args.length - 1] = "start";
                 daemon.load(args);
                 daemon.start();
             } else if (command.equals("stopd")) {
-                args[0] = "stop";
+                args[args.length - 1] = "stop";
                 daemon.stop();
             } else if (command.equals("start")) {
                 daemon.setAwait(true);
