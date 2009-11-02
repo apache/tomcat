@@ -436,7 +436,7 @@ public class HostConfig
         if (host.getXmlBase()!=null) {
             configBase = returnCanonicalPath(host.getXmlBase());
         } else {
-            StringBuffer xmlDir = new StringBuffer("conf");
+            StringBuilder xmlDir = new StringBuilder("conf");
             Container parent = host.getParent();
             if (parent instanceof Engine) {
                 xmlDir.append('/');
