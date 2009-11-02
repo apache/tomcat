@@ -81,7 +81,7 @@ public class JspCompilationContext {
 
     protected JspRuntimeContext rctxt;
 
-    protected int removed = 0;
+    protected volatile int removed = 0;
 
     protected URLClassLoader jspLoader;
     protected URL baseUrl;
