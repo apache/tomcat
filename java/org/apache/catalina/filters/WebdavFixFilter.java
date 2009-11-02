@@ -125,8 +125,8 @@ public class WebdavFixFilter implements Filter {
 	}
 
     private String buildRedirect(HttpServletRequest request) {
-        StringBuffer location =
-            new StringBuffer(request.getRequestURL().length());
+        StringBuilder location =
+            new StringBuilder(request.getRequestURL().length());
         location.append(request.getScheme());
         location.append("://");
         location.append(request.getServerName());
