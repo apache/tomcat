@@ -374,7 +374,7 @@ public class StandardService
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("StandardService[");
+        StringBuilder sb = new StringBuilder("StandardService[");
         sb.append(getName());
         sb.append("]");
         return (sb.toString());
