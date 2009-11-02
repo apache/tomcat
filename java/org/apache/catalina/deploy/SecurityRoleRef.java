@@ -72,7 +72,7 @@ public class SecurityRoleRef {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("SecurityRoleRef[");
+        StringBuilder sb = new StringBuilder("SecurityRoleRef[");
         sb.append("name=");
         sb.append(name);
         if (link != null) {

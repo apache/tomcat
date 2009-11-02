@@ -383,7 +383,7 @@ public class SecurityConstraint implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("SecurityConstraint[");
+        StringBuilder sb = new StringBuilder("SecurityConstraint[");
         for (int i = 0; i < collections.length; i++) {
             if (i > 0)
                 sb.append(", ");

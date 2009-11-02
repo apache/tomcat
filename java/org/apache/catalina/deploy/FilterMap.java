@@ -233,7 +233,7 @@ public class FilterMap implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("FilterMap[");
+        StringBuilder sb = new StringBuilder("FilterMap[");
         sb.append("filterName=");
         sb.append(this.filterName);
         for (int i = 0; i < servletNames.length; i++) {

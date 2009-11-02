@@ -317,7 +317,7 @@ public class SecurityCollection implements Serializable {
      */
     public String toString() {
 
-        StringBuffer sb = new StringBuffer("SecurityCollection[");
+        StringBuilder sb = new StringBuilder("SecurityCollection[");
         sb.append(name);
         if (description != null) {
             sb.append(", ");
