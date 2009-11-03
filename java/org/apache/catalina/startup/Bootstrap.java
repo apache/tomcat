@@ -37,7 +37,7 @@ import org.apache.juli.logging.LogFactory;
 
 
 /**
- * Boostrap loader for Catalina.  This application constructs a class loader
+ * Bootstrap loader for Catalina.  This application constructs a class loader
  * for use in loading the Catalina internal classes (by accumulating all of the
  * JAR files found in the "server" directory under "catalina.home"), and
  * starts the regular execution of the container.  The purpose of this
@@ -303,7 +303,7 @@ public final class Bootstrap {
 
 
     /**
-     * Stop the standlone server.
+     * Stop the standalone server.
      */
     public void stopServer()
         throws Exception {
@@ -316,7 +316,7 @@ public final class Bootstrap {
 
 
    /**
-     * Stop the standlone server.
+     * Stop the standalone server.
      */
     public void stopServer(String[] arguments)
         throws Exception {
