@@ -78,7 +78,7 @@
     </operation>
 
     <operation name="addServiced"
-               description="Add a web application name to the serviced list"
+               description="Add a web application to the serviced list to show it gets serviced by another component"
                impact="ACTION"
                returnType="void">
       <parameter name="name"
@@ -87,7 +87,7 @@
     </operation>
 
     <operation name="isServiced"
-               description="Add a web application name to the serviced list"
+               description="Is a web application serviced by another component"
                impact="ACTION"
                returnType="boolean">
       <parameter name="name"
@@ -114,7 +114,7 @@
     </operation>
 
     <operation name="removeServiced"
-               description="Add a web application name to the serviced list"
+               description="Remove a web application from the serviced list to show it isn't serviced by another component"
                impact="ACTION"
                returnType="void">
       <parameter name="name"
