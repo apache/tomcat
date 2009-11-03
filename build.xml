@@ -104,7 +104,6 @@
 
   <!-- Classpath -->
   <path id="tomcat.classpath">
-    <pathelement location="${ant.jar}"/>
     <pathelement location="${jdt.jar}"/>
   </path>
 
@@ -157,7 +156,8 @@
            target="${compile.target}"
            optimize="${compile.optimize}"
            excludes="**/CVS/**,**/.svn/**"
-           encoding="ISO-8859-1">
+           encoding="ISO-8859-1"
+    	   includeAntRuntime="true" >
 <!-- Comment this in to show unchecked warnings:     
       <compilerarg value="-Xlint:unchecked"/>
  -->
