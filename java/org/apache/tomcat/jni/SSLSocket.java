@@ -57,7 +57,7 @@ public class SSLSocket {
     public static native int renegotiate(long thesocket);
 
     /**
-     * Retrun SSL Info parameter as byte array.
+     * Return SSL Info parameter as byte array.
      *
      * @param sock The socket to read the data from.
      * @param id Parameter id.
@@ -67,7 +67,7 @@ public class SSLSocket {
         throws Exception;
 
     /**
-     * Retrun SSL Info parameter as String.
+     * Return SSL Info parameter as String.
      *
      * @param sock The socket to read the data from.
      * @param id Parameter id.
@@ -77,7 +77,7 @@ public class SSLSocket {
         throws Exception;
 
     /**
-     * Retrun SSL Info parameter as integer.
+     * Return SSL Info parameter as integer.
      *
      * @param sock The socket to read the data from.
      * @param id Parameter id.
