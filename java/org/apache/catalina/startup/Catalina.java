@@ -48,8 +48,10 @@ import org.xml.sax.InputSource;
  *     to be processed.  If a relative path is specified, it will be
  *     interpreted as relative to the directory pathname specified by the
  *     "catalina.base" system property.   [conf/server.xml]
- * <li><b>-help</b> - Display usage information.
- * <li><b>-stop</b> - Stop the currently running instance of Catalina.
+ * <li><b>-help</b>      - Display usage information.
+ * <li><b>-nonaming</b>  - Disable naming support.
+ * <li><b>-start</b>     - Start an instance of Catalina.
+ * <li><b>-stop</b>      - Stop the currently running instance of Catalina.
  * </u>
  *
  * Should do the same thing as Embedded, but using a server.xml file.
@@ -660,7 +662,8 @@ public class Catalina extends Embedded {
         System.out.println
             ("usage: java org.apache.catalina.startup.Catalina"
              + " [ -config {pathname} ]"
-             + " [ -nonaming ] { start | stop }");
+             + " [ -nonaming ] "
+             + " { -help | start | stop }");
 
     }
 
