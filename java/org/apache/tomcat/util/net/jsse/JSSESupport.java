@@ -212,7 +212,7 @@ class JSSESupport implements SSLSupport, SSLSessionManager {
         byte [] ssl_session = session.getId();
         if ( ssl_session == null) 
             return null;
-        StringBuilder buf=new StringBuilder("");
+        StringBuilder buf=new StringBuilder();
         for(int x=0; x<ssl_session.length; x++) {
             String digit=Integer.toHexString(ssl_session[x]);
             if (digit.length()<2) buf.append('0');
