@@ -2182,6 +2182,10 @@ public class WebappClassLoader
                     } catch (IOException e) {}
                 }
                 if (fileNeedConvert) {
+                    // Workaround for certain files on platforms that use
+                    // EBCDIC encoding, when they are read through FileInputStream.
+                    // See commit message of rev.303915 for details
+                    // http://svn.apache.org/viewvc?view=revision&revision=303915
                     String str = new String(binaryContent,0,pos);
                     try {
                         binaryContent = str.getBytes("UTF-8");
