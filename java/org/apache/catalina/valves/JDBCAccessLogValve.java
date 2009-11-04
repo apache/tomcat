@@ -462,17 +462,13 @@ public final class JDBCAccessLogValve
         
         getNext().invoke(request, response);
 
-        String remoteHost = EMPTY;
+        String remoteHost;
         if(resolveHosts)
             remoteHost = request.getRemoteHost();
         else
             remoteHost = request.getRemoteAddr();
-        String user = EMPTY;
-        if(request != null)
-            user = request.getRemoteUser();
-        String query="";
-        if(request != null)
-            query = request.getRequestURI();
+        String user = request.getRemoteUser();
+        String query=request.getRequestURI();
         
         long bytes = response.getContentCountLong() ;
         if(bytes < 0)
@@ -482,7 +478,7 @@ public final class JDBCAccessLogValve
         String method = EMPTY;
         String referer = EMPTY;
         String userAgent = EMPTY;
-        if (pattern.equals("combined") && request != null) {
+        if (pattern.equals("combined")) {
             virtualHost = request.getServerName();
             method = request.getMethod();
             referer = request.getHeader("referer");
