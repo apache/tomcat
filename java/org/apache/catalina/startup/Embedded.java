@@ -227,7 +227,7 @@ public class Embedded  extends StandardService {
 
 
     /**
-     * Return true if redirction of standard streams is enabled.
+     * Return true if redirection of standard streams is enabled.
      */
     public boolean isRedirectStreams() {
 
@@ -872,7 +872,7 @@ public class Embedded  extends StandardService {
 
 
     /** Initialize naming - this should only enable java:env and root naming.
-     * If tomcat is embeded in an application that already defines those -
+     * If tomcat is embedded in an application that already defines those -
      * it shouldn't do it.
      *
      * XXX The 2 should be separated, you may want to enable java: but not
