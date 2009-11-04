@@ -30,7 +30,7 @@ import org.apache.catalina.tribes.transport.AbstractRxTask;
 /**
  *
  * @author Filip Hanik
- * @version $Revision:$ $Date:$
+ * @version $Revision$ $Date$
  */
 public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiver, ListenCallback {
 
