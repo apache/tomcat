@@ -350,7 +350,7 @@ public class NioBlockingSelector {
                                 countDown(attachment.getWriteLatch());
                             }
                         }catch (CancelledKeyException ckx) {
-                            if (sk!=null) sk.cancel();
+                            sk.cancel();
                             countDown(attachment.getReadLatch());
                             countDown(attachment.getWriteLatch());
                         }
