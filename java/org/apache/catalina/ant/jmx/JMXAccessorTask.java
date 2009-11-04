@@ -430,10 +430,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             try {
                 jmxServerConnection = (MBeanServerConnection) pref;
             } catch (ClassCastException cce) {
-                if (project != null) {
-                    project.log("wrong object reference " + refId + " - "
+                project.log("wrong object reference " + refId + " - "
                             + pref.getClass());
-                }
                 return null;
             }
         }
