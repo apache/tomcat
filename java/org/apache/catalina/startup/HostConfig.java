@@ -143,7 +143,7 @@ public class HostConfig
 
 
     /**
-     * Attribute value used to turn on/off XML namespace awarenes.
+     * Attribute value used to turn on/off XML namespace awareness.
      */
     protected boolean xmlNamespaceAware = false;
 
@@ -265,7 +265,7 @@ public class HostConfig
 
     /**
      * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
+     * @return true if namespace awareness is enabled.
      *
      */
     public boolean getXmlNamespaceAware(){
@@ -274,7 +274,7 @@ public class HostConfig
 
 
     /**
-     * Set the namespace aware feature of the XML parser used when
+     * Set the namespace-aware feature of the XML parser used when
      * parsing xml instances.
      * @param xmlNamespaceAware true to enable namespace awareness
      */
@@ -363,7 +363,7 @@ public class HostConfig
      * Has the specified application been deployed? Note applications defined
      * in server.xml will not have been deployed.
      * @return <code>true</code> if the application has been deployed and
-     * <code>false</code> if the applciation has not been deployed or does not
+     * <code>false</code> if the application has not been deployed or does not
      * exist
      */
     public boolean isDeployed(String name) {
@@ -1325,7 +1325,7 @@ public class HostConfig
 
     /**
      * Add a new Context to be managed by us.
-     * Entry point for the admin webapp, and other JMX Context controlers.
+     * Entry point for the admin webapp, and other JMX Context controllers.
      */
     public void manageApp(Context context)  {    
 
@@ -1379,7 +1379,7 @@ public class HostConfig
 
     /**
      * Remove a webapp from our control.
-     * Entry point for the admin webapp, and other JMX Context controlers.
+     * Entry point for the admin webapp, and other JMX Context controllers.
      */
     public void unmanageApp(String contextPath) {
         if(isServiced(contextPath)) {
