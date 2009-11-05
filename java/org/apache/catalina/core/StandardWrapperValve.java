@@ -60,7 +60,7 @@ final class StandardWrapperValve
     // ----------------------------------------------------- Instance Variables
 
 
-    // Some JMX statistics. This vavle is associated with a StandardWrapper.
+    // Some JMX statistics. This valve is associated with a StandardWrapper.
     // We expose the StandardWrapper as JMX ( j2eeType=Servlet ). The fields
     // are here for performance.
     private volatile long processingTime;

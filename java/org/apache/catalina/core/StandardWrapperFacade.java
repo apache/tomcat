@@ -40,7 +40,7 @@ public final class StandardWrapperFacade
 
 
     /**
-     * Create a new facede around a StandardWrapper.
+     * Create a new facade around a StandardWrapper.
      */
     public StandardWrapperFacade(StandardWrapper config) {
 
