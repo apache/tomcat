@@ -139,6 +139,7 @@ public class SmapGenerator {
 	return out.toString();
     }
 
+    @Override
     public String toString() { return getString(); }
 
     //*********************************************************************

@@ -54,6 +54,7 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
         perThreadDataVector = new Vector<PerThreadData>();
     }
 
+    @Override
     protected void init(ServletConfig config) {
         maxSize = Constants.MAX_POOL_SIZE;
         String maxSizeS = getOption(config, OPTION_MAXSIZE, null);
@@ -65,6 +66,7 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
         }
 
         perThread = new ThreadLocal<PerThreadData>() {
+            @Override
             protected PerThreadData initialValue() {
                 PerThreadData ptd = new PerThreadData();
                 ptd.handlers = new Tag[maxSize];
@@ -85,6 +87,7 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
      *
      * @throws JspException if a tag handler cannot be instantiated
      */
+    @Override
     public Tag get(Class<? extends Tag> handlerClass) throws JspException {
         PerThreadData ptd = perThread.get();
         if(ptd.current >=0 ) {
@@ -105,6 +108,7 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
      *
      * @param handler Tag handler to add to this tag handler pool
      */
+    @Override
     public void reuse(Tag handler) {
         PerThreadData ptd = perThread.get();
 	if (ptd.current < (ptd.handlers.length - 1)) {
@@ -117,6 +121,7 @@ public class PerThreadTagHandlerPool extends TagHandlerPool {
     /**
      * Calls the release() method of all tag handlers in this tag handler pool.
      */
+    @Override
     public void release() {        
         Enumeration<PerThreadData> enumeration = perThreadDataVector.elements();
         while (enumeration.hasMoreElements()) {

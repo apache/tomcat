@@ -55,10 +55,12 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
     /**
      * Returns a wrapper around the JspWriter of the including page.
      */
+    @Override
     public PrintWriter getWriter() throws IOException {
 	return printWriter;
     }
 
+    @Override
     public ServletOutputStream getOutputStream() throws IOException {
 	throw new IllegalStateException();
     }
@@ -67,6 +69,7 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
      * Clears the output buffer of the JspWriter associated with the including
      * page.
      */
+    @Override
     public void resetBuffer() {
 	try {
 	    jspWriter.clearBuffer();

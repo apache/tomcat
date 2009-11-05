@@ -180,6 +180,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
      * @return The TagFileInfo corresponding to the given tag name, or null if
      * the given tag name is not implemented as a tag file
      */
+    @Override
     public TagFileInfo getTagFile(String shortName) {
 
         TagFileInfo tagFile = super.getTagFile(shortName);
@@ -210,6 +211,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
         return tagFile;
     }
 
+    @Override
     public TagLibraryInfo[] getTagLibraryInfos() {
         Collection<TagLibraryInfo> coll = pi.getTaglibs();
         return coll.toArray(new TagLibraryInfo[0]);

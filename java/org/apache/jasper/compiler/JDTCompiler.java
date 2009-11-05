@@ -64,6 +64,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
     /** 
      * Compile the servlet from .java file to .class file
      */
+    @Override
     protected void generateClass(String[] smap)
         throws FileNotFoundException, JasperException, Exception {
 

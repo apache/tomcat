@@ -57,6 +57,7 @@ public class TagPluginManager {
 	this.pageInfo = pageInfo;
 
         page.visit(new Node.Visitor() {
+            @Override
             public void visit(Node.CustomTag n)
                     throws JasperException {
                 invokePlugin(n);

@@ -106,6 +106,7 @@ public class SmapStratum {
             return out.toString();
         }
 
+        @Override
         public String toString() {
             return getString();
         }
@@ -329,6 +330,7 @@ public class SmapStratum {
         return out.toString();
     }
 
+    @Override
     public String toString() {
         return getString();
     }
