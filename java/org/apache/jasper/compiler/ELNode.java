@@ -52,6 +52,7 @@ abstract class ELNode {
         this.type = type;
         }
 
+        @Override
         public void accept(Visitor v) throws JasperException {
             v.visit(this);
         }
@@ -76,6 +77,7 @@ abstract class ELNode {
             this.text = text;
         }
 
+        @Override
         public void accept(Visitor v) throws JasperException {
             v.visit(this);
         }
@@ -97,6 +99,7 @@ abstract class ELNode {
             this.text = text;
         }
 
+        @Override
         public void accept(Visitor v) throws JasperException {
             v.visit(this);
         }
@@ -125,6 +128,7 @@ abstract class ELNode {
             this.name = name;
         }
 
+        @Override
         public void accept(Visitor v) throws JasperException {
             v.visit(this);
         }

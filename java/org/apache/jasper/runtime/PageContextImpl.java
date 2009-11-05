@@ -116,7 +116,8 @@ public class PageContextImpl extends PageContext {
 		this.depth = -1;
 	}
 
-	public void initialize(Servlet servlet, ServletRequest request,
+	@Override
+    public void initialize(Servlet servlet, ServletRequest request,
 			ServletResponse response, String errorPageURL,
 			boolean needsSession, int bufferSize, boolean autoFlush)
 			throws IOException {
@@ -173,7 +174,8 @@ public class PageContextImpl extends PageContext {
 		isIncluded = request.getAttribute("javax.servlet.include.servlet_path") != null;
 	}
 
-	public void release() {
+	@Override
+    public void release() {
 		out = baseOut;
 		try {
 			if (isIncluded) {
@@ -206,7 +208,8 @@ public class PageContextImpl extends PageContext {
         }
 	}
 
-	public Object getAttribute(final String name) {
+	@Override
+    public Object getAttribute(final String name) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -230,7 +233,8 @@ public class PageContextImpl extends PageContext {
 		return attributes.get(name);
 	}
 
-	public Object getAttribute(final String name, final int scope) {
+	@Override
+    public Object getAttribute(final String name, final int scope) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -273,7 +277,8 @@ public class PageContextImpl extends PageContext {
 		}
 	}
 
-	public void setAttribute(final String name, final Object attribute) {
+	@Override
+    public void setAttribute(final String name, final Object attribute) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -300,7 +305,8 @@ public class PageContextImpl extends PageContext {
 		}
 	}
 
-	public void setAttribute(final String name, final Object o, final int scope) {
+	@Override
+    public void setAttribute(final String name, final Object o, final int scope) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -351,7 +357,8 @@ public class PageContextImpl extends PageContext {
 		}
 	}
 
-	public void removeAttribute(final String name, final int scope) {
+	@Override
+    public void removeAttribute(final String name, final int scope) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -396,7 +403,8 @@ public class PageContextImpl extends PageContext {
 		}
 	}
 
-	public int getAttributesScope(final String name) {
+	@Override
+    public int getAttributesScope(final String name) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -438,7 +446,8 @@ public class PageContextImpl extends PageContext {
 		return 0;
 	}
 
-	public Object findAttribute(final String name) {
+	@Override
+    public Object findAttribute(final String name) {
 		if (SecurityUtil.isPackageProtectionEnabled()) {
 			return AccessController.doPrivileged(
 			        new PrivilegedAction<Object>() {
@@ -485,7 +494,8 @@ public class PageContextImpl extends PageContext {
 		return context.getAttribute(name);
 	}
 
-	public Enumeration<String> getAttributeNamesInScope(final int scope) {
+	@Override
+    public Enumeration<String> getAttributeNamesInScope(final int scope) {
 		if (SecurityUtil.isPackageProtectionEnabled()) {
 			return AccessController.doPrivileged(
 			        new PrivilegedAction<Enumeration<String>>() {
@@ -521,7 +531,8 @@ public class PageContextImpl extends PageContext {
 		}
 	}
 
-	public void removeAttribute(final String name) {
+	@Override
+    public void removeAttribute(final String name) {
 
 		if (name == null) {
 			throw new NullPointerException(Localizer
@@ -554,11 +565,13 @@ public class PageContextImpl extends PageContext {
 	    removeAttribute(name, APPLICATION_SCOPE);
 	}
 
-	public JspWriter getOut() {
+	@Override
+    public JspWriter getOut() {
 		return out;
 	}
 
-	public HttpSession getSession() {
+	@Override
+    public HttpSession getSession() {
 		return session;
 	}
 
@@ -566,19 +579,23 @@ public class PageContextImpl extends PageContext {
 		return servlet;
 	}
 
-	public ServletConfig getServletConfig() {
+	@Override
+    public ServletConfig getServletConfig() {
 		return config;
 	}
 
-	public ServletContext getServletContext() {
+	@Override
+    public ServletContext getServletContext() {
 		return config.getServletContext();
 	}
 
-	public ServletRequest getRequest() {
+	@Override
+    public ServletRequest getRequest() {
 		return request;
 	}
 
-	public ServletResponse getResponse() {
+	@Override
+    public ServletResponse getResponse() {
 		return response;
 	}
 
@@ -589,7 +606,8 @@ public class PageContextImpl extends PageContext {
 	 * 
 	 * @return The Exception associated with this page context, if any.
 	 */
-	public Exception getException() {
+	@Override
+    public Exception getException() {
 		Throwable t = JspRuntimeLibrary.getThrowable(request);
 
 		// Only wrap if needed
@@ -600,7 +618,8 @@ public class PageContextImpl extends PageContext {
 		return (Exception) t;
 	}
 
-	public Object getPage() {
+	@Override
+    public Object getPage() {
 		return servlet;
 	}
 
@@ -619,13 +638,15 @@ public class PageContextImpl extends PageContext {
 		return path;
 	}
 
-	public void include(String relativeUrlPath) throws ServletException,
+	@Override
+    public void include(String relativeUrlPath) throws ServletException,
 			IOException {
 		JspRuntimeLibrary
 				.include(request, response, relativeUrlPath, out, true);
 	}
 
-	public void include(final String relativeUrlPath, final boolean flush)
+	@Override
+    public void include(final String relativeUrlPath, final boolean flush)
 			throws ServletException, IOException {
 		if (SecurityUtil.isPackageProtectionEnabled()) {
 			try {
@@ -655,11 +676,13 @@ public class PageContextImpl extends PageContext {
 				flush);
 	}
 
-	public VariableResolver getVariableResolver() {
+	@Override
+    public VariableResolver getVariableResolver() {
 		return new VariableResolverImpl(this.getELContext());
 	}
 
-	public void forward(final String relativeUrlPath) throws ServletException,
+	@Override
+    public void forward(final String relativeUrlPath) throws ServletException,
 			IOException {
 		if (SecurityUtil.isPackageProtectionEnabled()) {
 			try {
@@ -715,11 +738,13 @@ public class PageContextImpl extends PageContext {
 		}
 	}
 
-	public BodyContent pushBody() {
+	@Override
+    public BodyContent pushBody() {
 		return (BodyContent) pushBody(null);
 	}
 
-	public JspWriter pushBody(Writer writer) {
+	@Override
+    public JspWriter pushBody(Writer writer) {
 		depth++;
 		if (depth >= outs.length) {
 			BodyContentImpl[] newOuts = new BodyContentImpl[depth + 1];
@@ -740,7 +765,8 @@ public class PageContextImpl extends PageContext {
 		return outs[depth];
 	}
 
-	public JspWriter popBody() {
+	@Override
+    public JspWriter popBody() {
 		depth--;
 		if (depth >= 0) {
 			out = outs[depth];
@@ -760,18 +786,21 @@ public class PageContextImpl extends PageContext {
 	 * Container must return a valid instance of an ExpressionEvaluator that can
 	 * parse EL expressions.
 	 */
-	public ExpressionEvaluator getExpressionEvaluator() {
+	@Override
+    public ExpressionEvaluator getExpressionEvaluator() {
 		return new ExpressionEvaluatorImpl(this.applicationContext.getExpressionFactory());
 	}
 
-	public void handlePageException(Exception ex) throws IOException,
+	@Override
+    public void handlePageException(Exception ex) throws IOException,
 			ServletException {
 		// Should never be called since handleException() called with a
 		// Throwable in the generated servlet.
 		handlePageException((Throwable) ex);
 	}
 
-	public void handlePageException(final Throwable t) throws IOException,
+	@Override
+    public void handlePageException(final Throwable t) throws IOException,
 			ServletException {
 		if (t == null)
 			throw new NullPointerException("null Throwable");
@@ -947,7 +976,8 @@ public class PageContextImpl extends PageContext {
 		return retValue;
 	}
 
-	public ELContext getELContext() {
+	@Override
+    public ELContext getELContext() {
 		if (this.elContext == null) {
 			this.elContext = this.applicationContext.createELContext(this);
 		}

@@ -257,6 +257,7 @@ class JspDocumentParser
      * corresponding TagLibraryInfo object is added to the set of custom
      * tag libraries.
      */
+    @Override
     public void startElement(
         String uri,
         String localName,
@@ -451,6 +452,7 @@ class JspDocumentParser
      *
      * @throws SAXException
      */
+    @Override
     public void characters(char[] buf, int offset, int len) {
 
         if (charBuffer == null) {
@@ -607,6 +609,7 @@ class JspDocumentParser
     /*
      * Receives notification of the end of an element.
      */
+    @Override
     public void endElement(String uri, String localName, String qName)
         throws SAXException {
 
@@ -671,6 +674,7 @@ class JspDocumentParser
      *
      * @param locator the document locator
      */
+    @Override
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
     }
@@ -747,6 +751,7 @@ class JspDocumentParser
     /*
      * Receives notification of a non-recoverable error.
      */
+    @Override
     public void fatalError(SAXParseException e) throws SAXException {
         throw e;
     }
@@ -754,6 +759,7 @@ class JspDocumentParser
     /*
      * Receives notification of a recoverable error.
      */
+    @Override
     public void error(SAXParseException e) throws SAXException {
         throw e;
     }
@@ -761,6 +767,7 @@ class JspDocumentParser
     /*
      * Receives notification of the start of a Namespace mapping. 
      */
+    @Override
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException {
         TagLibraryInfo taglibInfo;
@@ -791,6 +798,7 @@ class JspDocumentParser
     /*
      * Receives notification of the end of a Namespace mapping. 
      */
+    @Override
     public void endPrefixMapping(String prefix) throws SAXException {
 
         if (directivesOnly) {

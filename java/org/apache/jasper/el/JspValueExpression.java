@@ -48,10 +48,12 @@ public final class JspValueExpression extends ValueExpression implements
         this.mark = mark;
     }
 
+    @Override
     public Class<?> getExpectedType() {
         return this.target.getExpectedType();
     }
 
+    @Override
     public Class<?> getType(ELContext context) throws NullPointerException,
             PropertyNotFoundException, ELException {
         try {
@@ -65,6 +67,7 @@ public final class JspValueExpression extends ValueExpression implements
         }
     }
 
+    @Override
     public boolean isReadOnly(ELContext context) throws NullPointerException,
             PropertyNotFoundException, ELException {
         try {
@@ -78,6 +81,7 @@ public final class JspValueExpression extends ValueExpression implements
         }
     }
 
+    @Override
     public void setValue(ELContext context, Object value)
             throws NullPointerException, PropertyNotFoundException,
             PropertyNotWritableException, ELException {
@@ -95,6 +99,7 @@ public final class JspValueExpression extends ValueExpression implements
         }
     }
 
+    @Override
     public Object getValue(ELContext context) throws NullPointerException,
             PropertyNotFoundException, ELException {
         try {
@@ -108,18 +113,22 @@ public final class JspValueExpression extends ValueExpression implements
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         return this.target.equals(obj);
     }
 
+    @Override
     public int hashCode() {
         return this.target.hashCode();
     }
 
+    @Override
     public String getExpressionString() {
         return this.target.getExpressionString();
     }
 
+    @Override
     public boolean isLiteralText() {
         return this.target.isLiteralText();
     }

@@ -50,6 +50,7 @@ public class JspFactoryImpl extends JspFactory {
 
     private ThreadLocal<PageContextPool> localPool = new ThreadLocal<PageContextPool>();
 
+    @Override
     public PageContext getPageContext(Servlet servlet, ServletRequest request,
             ServletResponse response, String errorPageURL, boolean needsSession,
             int bufferSize, boolean autoflush) {
@@ -66,6 +67,7 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
 
+    @Override
     public void releasePageContext(PageContext pc) {
         if( pc == null )
             return;
@@ -78,8 +80,10 @@ public class JspFactoryImpl extends JspFactory {
         }
     }
 
+    @Override
     public JspEngineInfo getEngineInfo() {
         return new JspEngineInfo() {
+            @Override
             public String getSpecificationVersion() {
                 return SPEC_VERSION;
             }
@@ -198,6 +202,7 @@ public class JspFactoryImpl extends JspFactory {
 
     }
 
+    @Override
     public JspApplicationContext getJspApplicationContext(
             final ServletContext context) {
         if (Constants.IS_SECURITY_ENABLED) {
