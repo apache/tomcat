@@ -19,8 +19,6 @@ package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
 
-import org.apache.tomcat.jdbc.pool.DataSourceProxy;
-
 public class TwoDataSources extends DefaultTestCase {
 
     public TwoDataSources(String name) {
