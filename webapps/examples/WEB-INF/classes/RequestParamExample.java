@@ -36,6 +36,7 @@ public class RequestParamExample extends HttpServlet {
 
     ResourceBundle rb = ResourceBundle.getBundle("LocalStrings");
     
+    @Override
     public void doGet(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException
@@ -96,6 +97,7 @@ public class RequestParamExample extends HttpServlet {
         out.println("</html>");
     }
 
+    @Override
     public void doPost(HttpServletRequest request,
                       HttpServletResponse response)
         throws IOException, ServletException

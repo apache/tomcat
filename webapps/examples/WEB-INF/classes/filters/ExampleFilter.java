@@ -123,6 +123,7 @@ public final class ExampleFilter implements Filter {
     /**
      * Return a String representation of this object.
      */
+    @Override
     public String toString() {
 
 	if (filterConfig == null)

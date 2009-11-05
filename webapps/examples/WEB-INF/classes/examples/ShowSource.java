@@ -34,6 +34,7 @@ public class ShowSource
         this.jspFile = jspFile;
     }
 
+    @Override
     public int doEndTag() throws JspException {
 	if ((jspFile.indexOf( ".." ) >= 0) ||
             (jspFile.toUpperCase().indexOf("/WEB-INF/") != 0) ||

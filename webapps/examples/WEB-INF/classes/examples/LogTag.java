@@ -38,10 +38,12 @@ public class LogTag
             toBrowser = false;
     }
 
+    @Override
     public int doStartTag() throws JspException {
         return EVAL_BODY_BUFFERED;
     }
     
+    @Override
     public int doAfterBody() throws JspException {
         try {
             String s = bodyOut.getString();
