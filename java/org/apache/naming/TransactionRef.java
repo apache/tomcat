@@ -74,6 +74,7 @@ public class TransactionRef
      * Retrieves the class name of the factory of the object to which this 
      * reference refers.
      */
+    @Override
     public String getFactoryClassName() {
         String factory = super.getFactoryClassName();
         if (factory != null) {

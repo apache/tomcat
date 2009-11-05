@@ -82,6 +82,7 @@ public class LogConfigurationException extends RuntimeException {
     /**
      * Return the underlying cause of this exception (if any).
      */
+    @Override
     public Throwable getCause() {
 
         return (this.cause);
