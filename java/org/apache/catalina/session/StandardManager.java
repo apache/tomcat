@@ -219,7 +219,7 @@ public class StandardManager
 
 
     /**
-     * Set the maximum number of actives Sessions allowed, or -1 for
+     * Set the maximum number of active Sessions allowed, or -1 for
      * no limit.
      *
      * @param max The new maximum number of sessions

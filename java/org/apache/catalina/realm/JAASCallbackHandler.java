@@ -86,7 +86,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @param nonce         Server generated nonce
      * @param nc            Nonce count
      * @param cnonce        Client generated nonce
-     * @param qop           Quality of protection aplied to the message
+     * @param qop           Quality of protection applied to the message
      * @param realmName     Realm name
      * @param md5a2         Second MD5 digest used to calculate the digest
      *                      MD5(Method + ":" + uri)
@@ -146,7 +146,7 @@ public class JAASCallbackHandler implements CallbackHandler {
     protected String cnonce = null;
 
     /**
-     * Quality of protection aplied to the message.
+     * Quality of protection applied to the message.
      */
     protected String qop;
 
@@ -172,7 +172,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * Retrieve the information requested in the provided <code>Callbacks</code>.
      * This implementation only recognizes {@link NameCallback},
      * {@link PasswordCallback} and {@link TextInputCallback}.
-     * {@link TextInputCallback} is ued to pass the various additional
+     * {@link TextInputCallback} is used to pass the various additional
      * parameters required for DIGEST authentication. 
      *
      * @param callbacks The set of <code>Callback</code>s to be processed

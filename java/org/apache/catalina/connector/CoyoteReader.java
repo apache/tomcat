@@ -23,7 +23,7 @@ import java.io.IOException;
 
 
 /**
- * Coyote implementation of the buffred reader.
+ * Coyote implementation of the buffered reader.
  * 
  * @author Remy Maucherat
  */

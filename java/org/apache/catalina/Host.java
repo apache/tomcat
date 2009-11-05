@@ -102,7 +102,7 @@ public interface Host extends Container {
 
     /**
      * Return the value of the auto deploy flag.  If true, it indicates that 
-     * this host's child webapps should be discovred and automatically 
+     * this host's child webapps should be discovered and automatically 
      * deployed dynamically.
      */
     public boolean getAutoDeploy();
@@ -134,7 +134,7 @@ public interface Host extends Container {
         
     /**
      * Return the value of the deploy on startup flag.  If true, it indicates 
-     * that this host's child webapps should be discovred and automatically 
+     * that this host's child webapps should be discovered and automatically 
      * deployed.
      */
     public boolean getDeployOnStartup();
@@ -168,7 +168,7 @@ public interface Host extends Container {
 
     /**
      * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
+     * @return true if namespace awareness is enabled.
      *
      */
     public boolean getXmlNamespaceAware();

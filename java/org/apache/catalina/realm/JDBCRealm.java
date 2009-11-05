@@ -34,7 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
 *
-* Implmentation of <b>Realm</b> that works with any JDBC supported database.
+* Implementation of <b>Realm</b> that works with any JDBC supported database.
 * See the JDBCRealm.howto for more details on how to set up the database and
 * for configuration options.
 *
@@ -133,7 +133,7 @@ public class JDBCRealm
 
 
     /**
-     * The column in the user table that holds the user's credintials
+     * The column in the user table that holds the user's credentials
      */
     protected String userCredCol = null;
 
@@ -332,9 +332,9 @@ public class JDBCRealm
     @Override
     public synchronized Principal authenticate(String username, String credentials) {
 
-        // Number of tries is the numebr of attempts to connect to the database
+        // Number of tries is the number of attempts to connect to the database
         // during this login attempt (if we need to open the database)
-        // This needs rewritten wuth better pooling support, the existing code
+        // This needs rewritten with better pooling support, the existing code
         // needs signature changes since the Prepared statements needs cached
         // with the connections.
         // The code below will try twice if there is a SQLException so the
@@ -533,9 +533,9 @@ public class JDBCRealm
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        // Number of tries is the numebr of attempts to connect to the database
+        // Number of tries is the number of attempts to connect to the database
         // during this login attempt (if we need to open the database)
-        // This needs rewritten wuth better pooling support, the existing code
+        // This needs rewritten with better pooling support, the existing code
         // needs signature changes since the Prepared statements needs cached
         // with the connections.
         // The code below will try twice if there is a SQLException so the
@@ -614,7 +614,7 @@ public class JDBCRealm
         PreparedStatement stmt = null;
         ResultSet rs = null;
 
-        // Number of tries is the numebr of attempts to connect to the database
+        // Number of tries is the number of attempts to connect to the database
         // during this login attempt (if we need to open the database)
         // This needs rewritten wuth better pooling support, the existing code
         // needs signature changes since the Prepared statements needs cached

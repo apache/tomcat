@@ -61,7 +61,7 @@ import org.apache.tomcat.util.digester.Digester;
  * <li><strong>debug</strong> - Set to "true" to get debugging messages
  *     generated to System.out.  The default value is <code>false</code>.</li>
  * <li><strong>pathname</strong> - Relative (to the pathname specified by the
- *     "catalina.base" system property) or absolute pahtname to the
+ *     "catalina.base" system property) or absolute pathname to the
  *     XML file containing our user information, in the format supported by
  *     {@link MemoryRealm}.  The default value matches the MemoryRealm
  *     default.</li>
@@ -110,7 +110,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
     /**
      * The <code>Principal</code> identified by our validation, or
-     * <code>null</code> if validation falied.
+     * <code>null</code> if validation failed.
      */
     protected Principal principal = null;
 
@@ -374,7 +374,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     /**
      * Log out this user.
      *
-     * @return <code>true</code> in all cases because thie
+     * @return <code>true</code> in all cases because the
      *  <code>LoginModule</code> should not be ignored
      *
      * @exception LoginException if logging out failed

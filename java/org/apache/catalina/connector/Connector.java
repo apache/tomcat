@@ -156,7 +156,7 @@ public class Connector
 
 
     /**
-     * The server port to which we should pretent requests to this Connector
+     * The server port to which we should pretend requests to this Connector
      * were directed.  This is useful when operating Tomcat behind a proxy
      * server, so that redirects get constructed accurately.  If not specified,
      * the port number specified by the <code>port</code> property is used.

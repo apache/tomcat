@@ -92,7 +92,7 @@ public class FileMessageFactory {
     protected long totalNrOfMessages = 0;
     
     /**
-     * The number of the last message procssed. Message IDs are 1 based.
+     * The number of the last message processed. Message IDs are 1 based.
      */
     protected AtomicLong lastMessageProcessed = new AtomicLong(0);
     

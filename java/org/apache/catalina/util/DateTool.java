@@ -35,7 +35,7 @@ import java.util.TimeZone;
 public class DateTool {
 
     /**
-     * US locale - all HTTP dates are in english
+     * US locale - all HTTP dates are in English
      */
     public final static Locale LOCALE_US = Locale.US;
 

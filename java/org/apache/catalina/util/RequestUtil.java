@@ -324,7 +324,7 @@ public final class RequestUtil {
 
 
     /**
-     * Convert a byte character value to hexidecimal digit value.
+     * Convert a byte character value to hexadecimal digit value.
      *
      * @param b the character value byte
      */

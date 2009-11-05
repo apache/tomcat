@@ -25,7 +25,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 
 /**
  * A fast queue that remover thread lock the adder thread. <br/>Limit the queue
- * length when you have strange producer thread problemes.
+ * length when you have strange producer thread problems.
  * 
  * FIXME add i18n support to log messages
  * @author Rainer Jung
@@ -69,7 +69,7 @@ public class FastQueue {
     private boolean inMutex = false;
 
     /**
-     * limit the queue legnth ( default is unlimited)
+     * limit the queue length ( default is unlimited)
      */
     private int maxQueueLength = 0;
 

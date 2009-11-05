@@ -41,7 +41,7 @@ public class IOTools {
      *
      * @param reader the reader to read from.
      * @param writer the writer to write to.
-     * @param buf the char array to use as a bufferx
+     * @param buf the char array to use as a buffer
      */
     public static void flow( Reader reader, Writer writer, char[] buf ) 
         throws IOException {
