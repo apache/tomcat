@@ -112,6 +112,7 @@ public class Tomcat {
     private Map<String, Principal> userPrincipals = new HashMap<String, Principal>();
     
     public Tomcat() {
+        // NOOP
     }
     
     /**
@@ -152,7 +153,7 @@ public class Tomcat {
      * 
      * @param contextPath
      * @param baseDir
-     * @return
+     * @return new StandardContext
      * @throws ServletException 
      */
     public StandardContext addWebapp(String contextPath, 
@@ -185,9 +186,8 @@ public class Tomcat {
      *  
      * TODO: add the rest
      *
-     *  @param host NULL for the 'default' host
      *  @param contextPath "/" for root context.
-     *  @param dir base dir for the context, for static files. Must exist, 
+     *  @param baseDir base dir for the context, for static files. Must exist, 
      *  relative to the server home
      */
     public StandardContext addContext(String contextPath, 
@@ -222,7 +222,7 @@ public class Tomcat {
     }
 
     /**
-     * Static version of {@link #addServlet(String, String, String)
+     * Static version of {@link #addServlet(String, String, String)}
      * @param ctx           Context to add Servlet to
      * @param servletName   Servlet name (used in mappings)
      * @param servletClass  The class to be used for the Servlet
@@ -257,7 +257,7 @@ public class Tomcat {
     }
 
     /**
-     * Static version of {@link #addServlet(String, String, Servlet).
+     * Static version of {@link #addServlet(String, String, Servlet)}.
      * @param ctx           Context to add Servlet to
      * @param servletName   Servlet name (used in mappings)
      * @param servlet       The Servlet to add
@@ -305,7 +305,7 @@ public class Tomcat {
     }
     
     /**
-     * @see addUser 
+     * @see #addUser(String, String) 
      */
     public void addRole(String user, String role) {
         List<String> roles = userRoles.get(user);
@@ -436,15 +436,15 @@ public class Tomcat {
         ctx.addLifecycleListener(new FixContextListener());
         
         if (host == null) {
-            host = getHost();
+            getHost().addChild(ctx);
+        } else {
+            host.addChild(ctx);
         }
-        host.addChild(ctx);
         return ctx;
     }
     
     public StandardContext addWebapp(StandardHost host, 
-                                     String url, String path) 
-           throws ServletException {
+                                     String url, String path) {
         silence(url);
 
         StandardContext ctx = new StandardContext();
@@ -462,9 +462,10 @@ public class Tomcat {
         ctxCfg.setDefaultWebXml("org/apache/catalin/startup/NO_DEFAULT_XML");
         
         if (host == null) {
-            host = getHost();
+            getHost().addChild(ctx);
+        } else {
+            host.addChild(ctx);
         }
-        host.addChild(ctx);
 
         return ctx;
     }
@@ -609,7 +610,7 @@ public class Tomcat {
     }
     
     /**
-     * Static version of {@link #initWebappDefaults(String)
+     * Static version of {@link #initWebappDefaults(String)}
      * @param ctx   The context to set the defaults for
      */
     public static void initWebappDefaults(StandardContext ctx) {
