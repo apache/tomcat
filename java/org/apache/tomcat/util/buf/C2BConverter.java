@@ -177,6 +177,7 @@ public final class C2BConverter {
     
     /** Overriden - will do nothing but reset internal state.
      */
+    @Override
     public  final void close() throws IOException {
 	// NOTHING
 	// Calling super.close() would reset out and cb.
@@ -185,12 +186,14 @@ public final class C2BConverter {
     /**
      *  Flush the characters only
      */ 
+    @Override
     public  final void flush() throws IOException {
 	// Will flushBuffer and out()
 	// flushBuffer put any remaining chars in the byte[] 
 	super.flush();
     }
     
+    @Override
     public  final void write(char cbuf[], int off, int len) throws IOException {
 	// will do the conversion and call write on the output stream
 	super.write( cbuf, off, len );
@@ -226,16 +229,19 @@ final class IntermediateOutputStream extends OutputStream {
 	    this.tbuff=tbuff;
     }
     
+    @Override
     public  final void close() throws IOException {
 	// shouldn't be called - we filter it out in writer
 	throw new IOException("close() called - shouldn't happen ");
     }
     
+    @Override
     public  final void flush() throws IOException {
 	// nothing - write will go directly to the buffer,
 	// we don't keep any state
     }
     
+    @Override
     public  final  void write(byte cbuf[], int off, int len) throws IOException {
 	// will do the conversion and call write on the output stream
 	if( enabled ) {
@@ -243,6 +249,7 @@ final class IntermediateOutputStream extends OutputStream {
 	}
     }
     
+    @Override
     public  final void write( int i ) throws IOException {
 	throw new IOException("write( int ) called - shouldn't happen ");
     }

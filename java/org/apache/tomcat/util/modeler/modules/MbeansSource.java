@@ -103,6 +103,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
         return mbeans;
     }
 
+    @Override
     public List<ObjectName> loadDescriptors(Registry registry, String location,
             String type, Object source) throws Exception {
         setRegistry(registry);
@@ -267,6 +268,7 @@ public class MbeansSource extends ModelerSource implements MbeansSourceMBean
         }
     }
     
+    @Override
     public void updateField( ObjectName oname, String name, 
                              Object value )
     {

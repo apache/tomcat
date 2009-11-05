@@ -483,6 +483,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     
     // -------------------- Conversion and getters --------------------
 
+    @Override
     public String toString() {
         if (null == buff) {
             return null;

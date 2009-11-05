@@ -444,6 +444,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 //        }
     }
 
+    @Override
     public String toString() {
         if( resource==null ) 
             return "BaseModelMbean[" + resourceType + "]";
@@ -1149,7 +1150,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 	    this.signature = signature;
 	}
 
-	public boolean equals(Object other) {
+	@Override
+    public boolean equals(Object other) {
 	    if(!(other instanceof MethodKey)) {
 		return false;
 	    }
@@ -1168,7 +1170,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 	    return true;
 	}
 
-	public int hashCode() {
+	@Override
+    public int hashCode() {
 	    return name.hashCode();
 	}
     }

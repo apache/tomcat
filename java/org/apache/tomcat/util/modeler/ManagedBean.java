@@ -460,6 +460,7 @@ public class ManagedBean implements java.io.Serializable
     /**
      * Return a string representation of this managed bean.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("ManagedBean[");

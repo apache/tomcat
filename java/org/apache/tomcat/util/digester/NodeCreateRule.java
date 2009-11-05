@@ -163,6 +163,7 @@ public class NodeCreateRule extends Rule {
          * @param length the number of characters to read from the array
          * @throws SAXException if the DOM implementation throws an exception
          */
+        @Override
         public void characters(char[] ch, int start, int length)
             throws SAXException {
 
@@ -186,6 +187,7 @@ public class NodeCreateRule extends Rule {
          * @param qName the qualified (prefixed) name
          * @throws SAXException if the DOM implementation throws an exception
          */
+        @Override
         public void endElement(String namespaceURI, String localName,
                                String qName)
             throws SAXException {
@@ -217,6 +219,7 @@ public class NodeCreateRule extends Rule {
          *   supplied
          * @throws SAXException if the DOM implementation throws an exception
          */
+        @Override
         public void processingInstruction(String target, String data)
             throws SAXException {
             
@@ -239,6 +242,7 @@ public class NodeCreateRule extends Rule {
          * @param atts the list of attributes
          * @throws SAXException if the DOM implementation throws an exception
          */
+        @Override
         public void startElement(String namespaceURI, String localName,
                                  String qName, Attributes atts)
             throws SAXException {
@@ -384,6 +388,7 @@ public class NodeCreateRule extends Rule {
      * @param attributes The attribute list of this element
      * @throws Exception indicates a JAXP configuration problem
      */
+    @Override
     public void begin(String namespaceURI, String name, Attributes attributes)
         throws Exception {
 
@@ -425,6 +430,7 @@ public class NodeCreateRule extends Rule {
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
      */
+    @Override
     public void end(String namespace, String name) throws Exception {
 
         digester.pop();
