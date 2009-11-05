@@ -302,6 +302,7 @@ public final class URL implements Serializable {
      *
      * @param obj The URL to compare against
      */
+    @Override
     public boolean equals(Object obj) {
 
         if (obj == null)
@@ -561,6 +562,7 @@ public final class URL implements Serializable {
     /**
      * Return a string representation of this object.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("URL[");
