@@ -174,6 +174,7 @@ public class JDBCStore extends StoreBase {
     /**
      * Return the info for this Store.
      */
+    @Override
     public String getInfo() {
         return (info);
     }
@@ -210,6 +211,7 @@ public class JDBCStore extends StoreBase {
     /**
      * Return the name for this Store, used for logging.
      */
+    @Override
     public String getStoreName() {
         return (storeName);
     }
@@ -959,6 +961,7 @@ public class JDBCStore extends StoreBase {
     /**
      * Called once when this Store is first started.
      */
+    @Override
     public void start() throws LifecycleException {
         super.start();
 
@@ -971,6 +974,7 @@ public class JDBCStore extends StoreBase {
      * Called once when this Store is stopping.
      *
      */
+    @Override
     public void stop() throws LifecycleException {
         super.stop();
 

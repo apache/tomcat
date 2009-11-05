@@ -179,6 +179,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
     /**
      * Override persistence since they don't go hand in hand with replication for now.
      */
+    @Override
     public void unload() throws IOException {
         if ( !getDistributable() ) {
             super.unload();
@@ -238,6 +239,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
      * @exception IllegalStateException if a new session cannot be
      *  instantiated for any reason
      */
+    @Override
     public Session createSession(String sessionId)
     {
         //create a session and notify the other nodes in the cluster
@@ -459,6 +461,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         return null;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }
@@ -473,6 +476,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
         mManagerRunning = true;
         super.start();
@@ -535,6 +539,7 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException
     {
         mManagerRunning = false;
@@ -551,10 +556,12 @@ public class SimpleTcpReplicationManager extends StandardManager implements Clus
         }
     }
 
+    @Override
     public void setDistributable(boolean dist) {
         this.distributable = dist;
     }
 
+    @Override
     public boolean getDistributable() {
         return distributable;
     }

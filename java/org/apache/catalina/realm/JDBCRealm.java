@@ -329,6 +329,7 @@ public class JDBCRealm
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public synchronized Principal authenticate(String username, String credentials) {
 
         // Number of tries is the numebr of attempts to connect to the database
@@ -513,6 +514,7 @@ public class JDBCRealm
     /**
      * Return a short name for this Realm implementation.
      */
+    @Override
     protected String getName() {
 
         return (name);
@@ -523,6 +525,7 @@ public class JDBCRealm
     /**
      * Return the password associated with the given principal's user name.
      */
+    @Override
     protected synchronized String getPassword(String username) {
 
         // Look up the user's credentials
@@ -593,6 +596,7 @@ public class JDBCRealm
     /**
      * Return the Principal associated with the given user name.
      */
+    @Override
     protected synchronized Principal getPrincipal(String username) {
 
         return (new GenericPrincipal(username,
@@ -763,6 +767,7 @@ public class JDBCRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents it from being started
      */
+    @Override
     public void start() throws LifecycleException {
 
         // Perform normal superclass initialization
@@ -785,6 +790,7 @@ public class JDBCRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException {
 
         // Perform normal superclass finalization

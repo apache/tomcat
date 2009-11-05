@@ -62,6 +62,7 @@ public class CoyoteReader
     /**
      * Prevent cloning the facade.
      */
+    @Override
     protected Object clone()
         throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
@@ -82,59 +83,69 @@ public class CoyoteReader
     // --------------------------------------------------------- Reader Methods
 
 
+    @Override
     public void close()
         throws IOException {
         ib.close();
     }
 
 
+    @Override
     public int read()
         throws IOException {
         return ib.read();
     }
 
 
+    @Override
     public int read(char[] cbuf)
         throws IOException {
         return ib.read(cbuf, 0, cbuf.length);
     }
 
 
+    @Override
     public int read(char[] cbuf, int off, int len)
         throws IOException {
         return ib.read(cbuf, off, len);
     }
 
 
+    @Override
     public long skip(long n)
         throws IOException {
         return ib.skip(n);
     }
 
 
+    @Override
     public boolean ready()
         throws IOException {
         return ib.ready();
     }
 
 
+    @Override
     public boolean markSupported() {
         return true;
     }
 
 
+    @Override
     public void mark(int readAheadLimit)
         throws IOException {
         ib.mark(readAheadLimit);
     }
 
 
+    @Override
     public void reset()
         throws IOException {
         ib.reset();
     }
 
 
+    @Override
     public String readLine()
         throws IOException {
 

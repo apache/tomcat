@@ -71,6 +71,7 @@ public class MemoryRole extends AbstractRole {
     /**
      * Return the {@link UserDatabase} within which this role is defined.
      */
+    @Override
     public UserDatabase getUserDatabase() {
 
         return (this.database);
@@ -84,6 +85,7 @@ public class MemoryRole extends AbstractRole {
     /**
      * <p>Return a String representation of this role in XML format.</p>
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("<role rolename=\"");

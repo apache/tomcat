@@ -233,6 +233,7 @@ public class CometConnectionManagerValve
     /**
      * Return descriptive information about this Valve implementation.
      */
+    @Override
     public String getInfo() {
         return (info);
     }
@@ -247,6 +248,7 @@ public class CometConnectionManagerValve
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public void invoke(Request request, Response response)
         throws IOException, ServletException {
         // Perform the request
@@ -293,6 +295,7 @@ public class CometConnectionManagerValve
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs
      */
+    @Override
     public void event(Request request, Response response, CometEvent event)
         throws IOException, ServletException {
         

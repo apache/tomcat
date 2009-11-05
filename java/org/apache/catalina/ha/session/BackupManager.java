@@ -121,6 +121,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
     /**
      * Override persistence since they don't go hand in hand with replication for now.
      */
+    @Override
     public void unload() throws IOException {
     }
     
@@ -145,6 +146,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
         }
     }
 
+    @Override
     public Session createEmptySession() {
         return new DeltaSession(this);
     }
@@ -173,6 +175,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
 
 
 
+    @Override
     public String getName() {
         return this.name;
     }
@@ -187,6 +190,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents this component from being used
      */
+    @Override
     public void start() throws LifecycleException {
         if ( this.started ) return;
         
@@ -224,6 +228,7 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException
     {
         
@@ -243,10 +248,12 @@ public class BackupManager extends StandardManager implements ClusterManager, Ma
 
     }
 
+    @Override
     public void setDistributable(boolean dist) {
         this.distributable = dist;
     }
 
+    @Override
     public boolean getDistributable() {
         return distributable;
     }

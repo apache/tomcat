@@ -69,6 +69,7 @@ public final class ReplicationStream extends ObjectInputStream {
      * @exception ClassNotFoundException if this class cannot be found
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public Class<?> resolveClass(ObjectStreamClass classDesc)
         throws ClassNotFoundException, IOException {
         String name = classDesc.getName();
@@ -155,6 +156,7 @@ public final class ReplicationStream extends ObjectInputStream {
         else throw new ClassNotFoundException(name);
     }
     
+    @Override
     public void close() throws IOException  {
         this.classLoaders = null;
         super.close();

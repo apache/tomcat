@@ -175,6 +175,7 @@ public class SingleSignOnMessage implements ClusterMessage, Serializable {
     /**
      * Return a String rendering of this object.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("SingleSignOnMessage[action=");

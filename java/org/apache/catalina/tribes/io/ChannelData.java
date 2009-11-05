@@ -271,6 +271,7 @@ public class ChannelData implements ChannelMessage {
         return data;
     }
     
+    @Override
     public int hashCode() {
         return XByteBuffer.toInt(getUniqueId(),0);
     }
@@ -280,6 +281,7 @@ public class ChannelData implements ChannelMessage {
      * @param o Object
      * @return boolean
      */
+    @Override
     public boolean equals(Object o) {
         if ( o instanceof ChannelData ) {
             return Arrays.equals(getUniqueId(),((ChannelData)o).getUniqueId());
@@ -290,6 +292,7 @@ public class ChannelData implements ChannelMessage {
      * Create a shallow clone, only the data gets recreated
      * @return ClusterData
      */
+    @Override
     public Object clone() {
 //        byte[] d = this.getDataPackage();
 //        return ClusterData.getDataFromPackage(d);
@@ -338,6 +341,7 @@ public class ChannelData implements ChannelMessage {
             ( (Channel.SEND_OPTIONS_SYNCHRONIZED_ACK & options) != Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
     }
     
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("ClusterData[src=");

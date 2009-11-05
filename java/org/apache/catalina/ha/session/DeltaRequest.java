@@ -328,6 +328,7 @@ public class DeltaRequest implements Externalizable {
         public Object getValue() {
             return value;
         }
+        @Override
         public int hashCode() {
             return name.hashCode();
         }
@@ -343,6 +344,7 @@ public class DeltaRequest implements Externalizable {
             action=-1;
         }
 
+        @Override
         public boolean equals(Object o) {
             if ( ! (o instanceof AttributeInfo ) ) return false;
             AttributeInfo other =  (AttributeInfo)o;
@@ -375,6 +377,7 @@ public class DeltaRequest implements Externalizable {
             if (getValue()!=null) out.writeObject(getValue());
         }
         
+        @Override
         public String toString() {
             StringBuilder buf = new StringBuilder("AttributeInfo[type=");
             buf.append(getType()).append(", action=").append(getAction());

@@ -57,6 +57,7 @@ public class ByteArrayServletOutputStream extends ServletOutputStream {
      *
      * @param b The parameter to write
      */
+    @Override
     public void write(int b) {
         buf.write(b);
     }

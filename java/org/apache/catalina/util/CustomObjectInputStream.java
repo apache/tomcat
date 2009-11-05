@@ -69,6 +69,7 @@ public final class CustomObjectInputStream
      * @exception ClassNotFoundException if this class cannot be found
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public Class<?> resolveClass(ObjectStreamClass classDesc)
         throws ClassNotFoundException, IOException {
         try {
@@ -85,6 +86,7 @@ public final class CustomObjectInputStream
      * class descriptor. Do this using the class loader assigned to this
      * Context.
      */
+    @Override
     protected Class<?> resolveProxyClass(String[] interfaces)
         throws IOException, ClassNotFoundException {
 

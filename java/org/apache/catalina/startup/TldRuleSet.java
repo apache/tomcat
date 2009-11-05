@@ -86,6 +86,7 @@ public class TldRuleSet extends RuleSetBase {
      * @param digester Digester instance to which the new Rule instances
      *  should be added.
      */
+    @Override
     public void addRuleInstances(Digester digester) {
 
         // Note the sharing of state between rules
@@ -113,6 +114,7 @@ final class TaglibRule extends Rule {
         this.taglibUriRule = taglibUriRule;
     }
     
+    @Override
     public void body(String namespace, String name, String text)
     throws Exception {
         taglibUriRule.setDuplicateUri(false);

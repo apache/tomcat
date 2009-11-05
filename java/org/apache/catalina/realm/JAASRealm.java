@@ -220,6 +220,7 @@ public class JAASRealm
         return useContextClassLoader;
     } 
 
+    @Override
     public void setContainer(Container container) {
         super.setContainer(container);
 
@@ -320,6 +321,7 @@ public class JAASRealm
      * @param credentials Password or other credentials to use in
      *  authenticating this username
      */
+    @Override
     public Principal authenticate(String username, String credentials) {
         return authenticate(username,
                 new JAASCallbackHandler(this, username, credentials));
@@ -340,6 +342,7 @@ public class JAASRealm
      * @param md5a2         Second MD5 digest used to calculate the digest
      *                          MD5(Method + ":" + uri)
      */
+    @Override
     public Principal authenticate(String username, String clientDigest,
             String nonce, String nc, String cnonce, String qop,
             String realmName, String md5a2) {
@@ -446,6 +449,7 @@ public class JAASRealm
     /**
      * Return a short name for this <code>Realm</code> implementation.
      */
+    @Override
     protected String getName() {
 
         return (name);
@@ -458,6 +462,7 @@ public class JAASRealm
      * always returns null as the JAASRealm has no way of obtaining this
      * information.
      */
+    @Override
     protected String getPassword(String username) {
 
         return (null);
@@ -468,6 +473,7 @@ public class JAASRealm
     /**
      * Return the <code>Principal</code> associated with the given user name.
      */
+    @Override
     protected Principal getPrincipal(String username) {
 
         return authenticate(username,
@@ -580,6 +586,7 @@ public class JAASRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that prevents it from being started
      */
+    @Override
     public void start() throws LifecycleException {
 
         // Perform normal superclass initialization
@@ -598,6 +605,7 @@ public class JAASRealm
      * @exception LifecycleException if this component detects a fatal error
      *  that needs to be reported
      */
+    @Override
     public void stop() throws LifecycleException {
 
         // Perform normal superclass finalization
