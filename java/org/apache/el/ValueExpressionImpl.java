@@ -123,6 +123,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
         return (obj instanceof ValueExpressionImpl && obj.hashCode() == this
                 .hashCode());
@@ -133,6 +134,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#getExpectedType()
      */
+    @Override
     public Class<?> getExpectedType() {
         return this.expectedType;
     }
@@ -147,6 +149,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.Expression#getExpressionString()
      */
+    @Override
     public String getExpressionString() {
         return this.expr;
     }
@@ -167,6 +170,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#getType(javax.el.ELContext)
      */
+    @Override
     public Class<?> getType(ELContext context) throws PropertyNotFoundException,
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
@@ -179,6 +183,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#getValue(javax.el.ELContext)
      */
+    @Override
     public Object getValue(ELContext context) throws PropertyNotFoundException,
             ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
@@ -195,6 +200,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return this.expr.hashCode();
     }
@@ -204,6 +210,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#isLiteralText()
      */
+    @Override
     public boolean isLiteralText() {
         try {
             return this.getNode() instanceof AstLiteralExpression;
@@ -217,6 +224,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * 
      * @see javax.el.ValueExpression#isReadOnly(javax.el.ELContext)
      */
+    @Override
     public boolean isReadOnly(ELContext context)
             throws PropertyNotFoundException, ELException {
         EvaluationContext ctx = new EvaluationContext(context, this.fnMapper,
@@ -241,6 +249,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
      * @see javax.el.ValueExpression#setValue(javax.el.ELContext,
      *      java.lang.Object)
      */
+    @Override
     public void setValue(ELContext context, Object value)
             throws PropertyNotFoundException, PropertyNotWritableException,
             ELException {
@@ -257,6 +266,7 @@ public final class ValueExpressionImpl extends ValueExpression implements
         out.writeObject(this.varMapper);
     }
 
+    @Override
     public String toString() {
         return "ValueExpression["+this.expr+"]";
     }

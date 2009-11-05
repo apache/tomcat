@@ -84,6 +84,7 @@ public abstract class SimpleNode extends ELSupport implements Node {
      * otherwise overriding toString() is probably all you need to do.
      */
 
+    @Override
     public String toString() {
         if (this.image != null) {
             return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image

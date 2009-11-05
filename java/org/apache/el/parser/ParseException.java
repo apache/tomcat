@@ -96,6 +96,7 @@ public class ParseException extends Exception {
    * of the final stack trace, and hence the correct error message
    * gets displayed.
    */
+  @Override
   public String getMessage() {
     if (!specialConstructor) {
       return super.getMessage();

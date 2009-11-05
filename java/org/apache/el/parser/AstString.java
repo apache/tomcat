@@ -41,16 +41,19 @@ public final class AstString extends SimpleNode {
         return this.string;
     }
 
+    @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return String.class;
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         return this.getString();
     }
 
+    @Override
     public void setImage(String image) {
         if (image.indexOf('\\') == -1) {
             this.image = image;

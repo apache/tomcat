@@ -35,11 +35,13 @@ public final class AstEmpty extends SimpleNode {
         super(id);
     }
 
+    @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return Boolean.class;
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         Object obj = this.children[0].getValue(ctx);
