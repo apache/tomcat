@@ -445,6 +445,7 @@ public class Catalina extends Embedded {
      * working directory if it has not been set.
      * @deprecated Use initDirs()
      */
+    @Deprecated
     public void setCatalinaBase() {
         initDirs();
     }
@@ -454,6 +455,7 @@ public class Catalina extends Embedded {
      * working directory if it has not been set.
      * @deprecated Use initDirs()
      */
+    @Deprecated
     public void setCatalinaHome() {
         initDirs();
     }

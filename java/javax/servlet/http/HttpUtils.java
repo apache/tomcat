@@ -32,6 +32,7 @@ import java.io.IOException;
 */
 
 
+@Deprecated
 public class HttpUtils {
 
     private static final String LSTRING_FILE =

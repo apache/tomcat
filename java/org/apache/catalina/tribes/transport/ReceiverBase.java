@@ -132,6 +132,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use getMinThreads()/getMaxThreads()
      * @return int
      */
+    @Deprecated
     public int getTcpThreadCount() {
         return getMaxThreads();
     }
@@ -150,6 +151,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use setPort
      * @param tcpListenPort int
      */
+    @Deprecated
     public void setTcpListenPort(int tcpListenPort) {
         setPort(tcpListenPort);
     }
@@ -158,6 +160,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use setAddress
      * @param tcpListenHost String
      */
+    @Deprecated
     public void setTcpListenAddress(String tcpListenHost) {
         setAddress(tcpListenHost);
     }
@@ -174,6 +177,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use setMaxThreads/setMinThreads
      * @param tcpThreadCount int
      */
+    @Deprecated
     public void setTcpThreadCount(int tcpThreadCount) {
         setMaxThreads(tcpThreadCount);
         setMinThreads(tcpThreadCount);
@@ -285,6 +289,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use getPort
      * @return int
      */
+    @Deprecated
     public int getTcpListenPort() {
         return getPort();
     }
@@ -317,6 +322,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use getSelectorTimeout
      * @return long
      */
+    @Deprecated
     public long getTcpSelectorTimeout() {
         return getSelectorTimeout();
     }
@@ -337,6 +343,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use getAddress
      * @return String
      */
+    @Deprecated
     public String getTcpListenAddress() {
         return getAddress();
     }
@@ -414,6 +421,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * @deprecated use setSelectorTimeout
      * @param selTimeout long
      */
+    @Deprecated
     public void setTcpSelectorTimeout(long selTimeout) {
         setSelectorTimeout(selTimeout);
     }

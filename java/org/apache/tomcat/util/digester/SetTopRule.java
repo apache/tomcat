@@ -50,6 +50,7 @@ public class SetTopRule extends Rule {
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
      * Use {@link #SetTopRule(String methodName)} instead.
      */
+    @Deprecated
     public SetTopRule(Digester digester, String methodName) {
 
         this(methodName);
@@ -70,6 +71,7 @@ public class SetTopRule extends Rule {
      * @deprecated The digester instance is now set in the {@link Digester#addRule} method. 
      * Use {@link #SetTopRule(String methodName, String paramType)} instead.
      */
+    @Deprecated
     public SetTopRule(Digester digester, String methodName,
                       String paramType) {
 

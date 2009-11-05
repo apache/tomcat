@@ -1156,6 +1156,7 @@ public class Request
      * @deprecated As of version 2.1 of the Java Servlet API, use
      *  <code>ServletContext.getRealPath()</code>.
      */
+    @Deprecated
     public String getRealPath(String path) {
 
         if (context == null)
@@ -2143,6 +2144,7 @@ public class Request
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>isRequestedSessionIdFromURL()</code> instead.
      */
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         return (isRequestedSessionIdFromURL());
     }

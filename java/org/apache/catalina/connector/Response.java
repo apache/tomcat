@@ -1130,6 +1130,7 @@ public class Response
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeRedirectURL()</code> instead.
      */
+    @Deprecated
     public String encodeRedirectUrl(String url) {
         return (encodeRedirectURL(url));
     }
@@ -1166,6 +1167,7 @@ public class Response
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeURL()</code> instead.
      */
+    @Deprecated
     public String encodeUrl(String url) {
         return (encodeURL(url));
     }
@@ -1384,6 +1386,7 @@ public class Response
      *  has been deprecated due to the ambiguous meaning of the message
      *  parameter.
      */
+    @Deprecated
     public void setStatus(int status, String message) {
 
         if (isCommitted())
