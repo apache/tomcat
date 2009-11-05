@@ -30,7 +30,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.deploy.FilterMap;
 
 /**
- * Factory for the creation and caching of Filters and creationg 
+ * Factory for the creation and caching of Filters and creation 
  * of Filter Chains.
  *
  * @author Greg Murray
@@ -56,7 +56,7 @@ public final class ApplicationFilterFactory {
 
 
     /*
-     * Prevent instanciation outside of the getInstanceMethod().
+     * Prevent instantiation outside of the getInstanceMethod().
      */
     private ApplicationFilterFactory() {
     }
@@ -66,7 +66,7 @@ public final class ApplicationFilterFactory {
 
 
     /**
-     * Return the fqctory instance.
+     * Return the factory instance.
      */
     public static ApplicationFilterFactory getInstance() {
         if (factory == null) {
@@ -328,7 +328,7 @@ public final class ApplicationFilterFactory {
 
 
     /**
-     * Convienience method which returns true if  the dispatcher type
+     * Convenience method which returns true if  the dispatcher type
      * matches the dispatcher types specified in the FilterMap
      */
     private boolean matchDispatcher(FilterMap filterMap, DispatcherType type) {

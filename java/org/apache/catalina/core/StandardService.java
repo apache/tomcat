@@ -584,7 +584,7 @@ public class StandardService
                 }
             }
         }
-        // FIXME pero -- Why container stop first? KeepAlive connetions can send request! 
+        // FIXME pero -- Why container stop first? KeepAlive connections can send request! 
         // Stop our defined Connectors first
         synchronized (connectors) {
             for (int i = 0; i < connectors.length; i++) {
@@ -601,7 +601,7 @@ public class StandardService
         if( oname==controller ) {
             // we registered ourself on init().
             // That should be the typical case - this object is just for
-            // backward compat, nobody should bother to load it explicitely
+            // backward compat, nobody should bother to load it explicitly
             Registry.getRegistry(null, null).unregisterComponent(oname);
             Executor[] executors = findExecutors();
             for (int i = 0; i < executors.length; i++) {
@@ -629,7 +629,7 @@ public class StandardService
     public void initialize()
             throws LifecycleException
     {
-        // Service shouldn't be used with embeded, so it doesn't matter
+        // Service shouldn't be used with embedded, so it doesn't matter
         if (initialized) {
             if(log.isInfoEnabled())
                 log.info(sm.getString("standardService.initialize.initialized"));

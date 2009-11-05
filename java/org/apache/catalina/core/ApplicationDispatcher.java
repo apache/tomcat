@@ -285,7 +285,7 @@ final class ApplicationDispatcher
     /**
      * Forward this request and response to another resource for processing.
      * Any runtime exception, IOException, or ServletException thrown by the
-     * called servlet will be propogated to the caller.
+     * called servlet will be propagated to the caller.
      *
      * @param request The servlet request to be forwarded
      * @param response The servlet response to be forwarded
@@ -389,7 +389,7 @@ final class ApplicationDispatcher
         if  (response instanceof ResponseFacade) {
             ((ResponseFacade) response).finish();
         } else {
-            // Servlet SRV.6.2.2. The Resquest/Response may have been wrapped
+            // Servlet SRV.6.2.2. The Request/Response may have been wrapped
             // and may no longer be instance of RequestFacade 
             if (wrapper.getLogger().isDebugEnabled()){
                 wrapper.getLogger().debug( " The Response is vehiculed using a wrapper: " 
@@ -469,7 +469,7 @@ final class ApplicationDispatcher
     /**
      * Include the response from another resource in the current response.
      * Any runtime exception, IOException, or ServletException thrown by the
-     * called servlet will be propogated to the caller.
+     * called servlet will be propagated to the caller.
      *
      * @param request The servlet request that is including this one
      * @param response The servlet response to be appended to
