@@ -41,6 +41,7 @@ public class SocketReceive {
         socket.setReceiveBufferSize(43800);
         InputStream in = socket.getInputStream();
         Thread t = new Thread() {
+            @Override
             public void run() {
                 while ( true ) {
                     try {

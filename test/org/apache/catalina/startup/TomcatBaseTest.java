@@ -66,6 +66,7 @@ public abstract class TomcatBaseTest extends TestCase {
         return getPort();
     }
     
+    @Override
     public void setUp() throws Exception {
         tempDir = new File("output/tmp");
         tempDir.mkdir();
@@ -80,6 +81,7 @@ public abstract class TomcatBaseTest extends TestCase {
         tomcat.setPort(port);
     }
     
+    @Override
     public void tearDown() throws Exception {
         tomcat.stop();
         ExpandWar.delete(tempDir);

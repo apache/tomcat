@@ -374,6 +374,7 @@ public class CheckOutThreadTest extends DefaultTestCase {
     public class TestThread extends Thread {
         protected DataSource d;
         protected String query = null;
+        @Override
         public void run() {
             long max = -1, totalmax=0, totalcmax=0, cmax = -1, nroffetch = 0, totalruntime = 0;
             try {

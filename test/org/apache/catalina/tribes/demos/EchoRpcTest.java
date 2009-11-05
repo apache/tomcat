@@ -185,6 +185,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
                 this.channel = channel;
             }
     
+            @Override
             public void run() {
                 System.out.println("Shutting down...");
                 SystemExit exit = new SystemExit(5000);
@@ -204,6 +205,7 @@ public class EchoRpcTest implements RpcCallback, Runnable {
             public SystemExit(long delay) {
                 this.delay = delay;
             }
+            @Override
             public void run () {
                 try {
                     Thread.sleep(delay);
