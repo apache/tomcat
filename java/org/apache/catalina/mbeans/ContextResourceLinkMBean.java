@@ -97,7 +97,7 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
              throw new MBeanException(e);
         }
         
-        // cannot use side-efects.  It's removed and added back each time 
+        // cannot use side-effects.  It's removed and added back each time 
         // there is a modification in a resource.
         NamingResources nr = crl.getNamingResources();
         nr.removeResourceLink(crl.getName());

@@ -128,7 +128,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
     
     /**
      * clear text event type name (for logging purpose only) 
-     * @return the event type in a string representating, useful for debugging
+     * @return the event type in a string representation, useful for debugging
      */
     public String getEventTypeString()
     {

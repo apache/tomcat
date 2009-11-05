@@ -820,7 +820,7 @@ public class MBeanFactory extends BaseModelMBean {
     /**
      * Remove an existing Context.
      *
-     * @param contextName MBean Name of the comonent to remove
+     * @param contextName MBean Name of the component to remove
      *
      * @exception Exception if a component cannot be removed
      */
@@ -871,7 +871,7 @@ public class MBeanFactory extends BaseModelMBean {
     /**
      * Remove an existing Host.
      *
-     * @param name MBean Name of the comonent to remove
+     * @param name MBean Name of the component to remove
      *
      * @exception Exception if a component cannot be removed
      */
@@ -898,7 +898,7 @@ public class MBeanFactory extends BaseModelMBean {
     /**
      * Remove an existing Loader.
      *
-     * @param name MBean Name of the comonent to remove
+     * @param name MBean Name of the component to remove
      *
      * @exception Exception if a component cannot be removed
      */
@@ -915,7 +915,7 @@ public class MBeanFactory extends BaseModelMBean {
     /**
      * Remove an existing Manager.
      *
-     * @param name MBean Name of the comonent to remove
+     * @param name MBean Name of the component to remove
      *
      * @exception Exception if a component cannot be removed
      */
@@ -932,7 +932,7 @@ public class MBeanFactory extends BaseModelMBean {
     /**
      * Remove an existing Realm.
      *
-     * @param name MBean Name of the comonent to remove
+     * @param name MBean Name of the component to remove
      *
      * @exception Exception if a component cannot be removed
      */
@@ -948,7 +948,7 @@ public class MBeanFactory extends BaseModelMBean {
     /**
      * Remove an existing Valve.
      *
-     * @param name MBean Name of the comonent to remove
+     * @param name MBean Name of the component to remove
      *
      * @exception Exception if a component cannot be removed
      */

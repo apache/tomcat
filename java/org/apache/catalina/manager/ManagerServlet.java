@@ -1074,7 +1074,7 @@ public class ManagerServlet
      *
      * @param writer Writer to render to
      * @param path Context path of the application to list session information for
-     * @param idle Expire all sessions with idle time &ge; idle for this context
+     * @param idle Expire all sessions with idle time &gt; idle for this context
      */
     protected void sessions(PrintWriter writer, String path, int idle) {
 

@@ -210,7 +210,7 @@ public class McastServiceImpl
                 socket = new MulticastSocket(new InetSocketAddress(address,port));
             } catch (BindException e) {
                 /*
-                 * On some plattforms (e.g. Linux) it is not possible to bind
+                 * On some platforms (e.g. Linux) it is not possible to bind
                  * to the multicast address. In this case only bind to the
                  * port.
                  */

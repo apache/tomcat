@@ -53,7 +53,7 @@ public interface Member {
 
     /**
      * Returns the listen port for the ChannelReceiver implementation
-     * @return the listen port for this member, -1 if its not listening on an unsecure port
+     * @return the listen port for this member, -1 if its not listening on an insecure port
      * @see ChannelReceiver
      */
     public int getPort();

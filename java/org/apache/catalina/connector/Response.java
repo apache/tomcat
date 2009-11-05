@@ -792,7 +792,7 @@ public class Response
      * of the request. This method must be called prior to reading
      * request parameters or reading input using getReader().
      *
-     * @param charset String containing the name of the chararacter encoding.
+     * @param charset String containing the name of the character encoding.
      */
     public void setCharacterEncoding(String charset) {
 
@@ -971,7 +971,7 @@ public class Response
 
         final StringBuffer sb = new StringBuffer();
         //web application code can receive a IllegalArgumentException 
-        //from the appendCookieValue invokation
+        //from the appendCookieValue invocation
         if (SecurityUtil.isPackageProtectionEnabled()) {
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
                 public Void run(){

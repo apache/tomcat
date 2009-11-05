@@ -70,7 +70,7 @@ public class WarWatcher {
     /*--Logic---------------------------------------------------*/
 
     /**
-     * check for modification and send notifcation to listener
+     * check for modification and send notification to listener
      */
     public void check() {
         if (log.isInfoEnabled())

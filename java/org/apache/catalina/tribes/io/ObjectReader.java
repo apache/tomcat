@@ -91,7 +91,7 @@ public class ObjectReader {
      * @param data new transfer buffer
      * @param off offset
      * @param len length in buffer
-     * @return number of messages that sended to callback
+     * @return number of messages that was sent to callback
      * @throws java.io.IOException
      */
     public int append(ByteBuffer data, int len, boolean count) throws java.io.IOException {

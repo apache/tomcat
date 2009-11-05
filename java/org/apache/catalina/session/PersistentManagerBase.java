@@ -39,7 +39,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Extends the <b>ManagerBase</b> class to implement most of the
  * functionality required by a Manager which supports any kind of
- * persistence, even if onlyfor  restarts.
+ * persistence, even if only for  restarts.
  * <p>
  * <b>IMPLEMENTATION NOTE</b>:  Correct behavior of session storing and
  * reloading depends upon external calls to the <code>start()</code> and
@@ -386,7 +386,7 @@ public abstract class PersistentManagerBase
 
 
     /**
-     * Set the maximum number of actives Sessions allowed, or -1 for
+     * Set the maximum number of active Sessions allowed, or -1 for
      * no limit.
      *
      * @param max The new maximum number of sessions

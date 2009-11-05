@@ -79,7 +79,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     protected ChannelCoordinator coordinator = new ChannelCoordinator();
 
     /**
-     * The first interceptor in the inteceptor stack.
+     * The first interceptor in the interceptor stack.
      * The interceptors are chained in a linked list, so we only need a reference to the
      * first one
      */
@@ -587,7 +587,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
 
     /**
      * Returns the sleep time in milliseconds that the internal heartbeat will
-     * sleep in between invokations of <code>Channel.heartbeat()</code>
+     * sleep in between invocations of <code>Channel.heartbeat()</code>
      * @return long
      */
     public long getHeartbeatSleeptime() {

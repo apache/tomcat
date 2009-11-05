@@ -86,7 +86,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
     private transient DeltaRequest deltaRequest = null;
 
     /**
-     * Last time the session was replicatd, used for distributed expiring of
+     * Last time the session was replicated, used for distributed expiring of
      * session
      */
     private transient long lastTimeReplicated = System.currentTimeMillis();

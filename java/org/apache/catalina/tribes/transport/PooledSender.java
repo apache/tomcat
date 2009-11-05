@@ -88,7 +88,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     }
 
     public void add(Member member) {
-        // no op, senders created upon demans
+        // no op, senders created upon demands
     }
 
     public void remove(Member member) {

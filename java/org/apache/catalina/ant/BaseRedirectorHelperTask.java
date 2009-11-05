@@ -93,7 +93,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
     /** 
      * Flag which indicates that, if redirected, output should also be 
-     * always sent to the log. Default is that otput is sent only to
+     * always sent to the log. Default is that output is sent only to
      * redirected streams.
      */
     protected boolean alwaysLog = false;
@@ -271,7 +271,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
         }
         /*
          * Due to depends chain, Ant could call the Task more than once,
-         * this is to prevent that we attempt to reuse the previuosly 
+         * this is to prevent that we attempt to reuse the previously 
          * closed Streams.
          */
         redirectOutStream = null;
@@ -346,7 +346,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
   
     /**
      * Handles output with ERR priority to error stream and all other
-     * pritorities to output stream.
+     * priorities to output stream.
      *
      * @param output The output to log. Should not be <code>null</code>.
      */
@@ -360,7 +360,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
   
     /**
      * Handles output with ERR priority to error stream and all other
-     * pritorities to output stream, then flushes the stream.
+     * priorities to output stream, then flushes the stream.
      *
      * @param output The output to log. Should not be <code>null</code>.
      */

@@ -155,7 +155,7 @@ public class JMXProxyServlet extends HttpServlet  {
 
             try {
                 MBeanInfo minfo=mBeanServer.getMBeanInfo(oname);
-                // can't be null - I thinl
+                // can't be null - I think
                 String code=minfo.getClassName();
                 if ("org.apache.commons.modeler.BaseModelMBean".equals(code)) {
                     code=(String)mBeanServer.getAttribute(oname, "modelerType");
