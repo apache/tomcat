@@ -37,6 +37,7 @@ public final class AstIdentifier extends SimpleNode {
         super(id);
     }
 
+    @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
         if (varMapper != null) {
@@ -49,6 +50,7 @@ public final class AstIdentifier extends SimpleNode {
         return ctx.getELResolver().getType(ctx, null, this.image);
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
         if (varMapper != null) {
@@ -61,6 +63,7 @@ public final class AstIdentifier extends SimpleNode {
         return ctx.getELResolver().getValue(ctx, null, this.image);
     }
 
+    @Override
     public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
         if (varMapper != null) {
@@ -73,6 +76,7 @@ public final class AstIdentifier extends SimpleNode {
         return ctx.getELResolver().isReadOnly(ctx, null, this.image);
     }
 
+    @Override
     public void setValue(EvaluationContext ctx, Object value)
             throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
@@ -87,12 +91,14 @@ public final class AstIdentifier extends SimpleNode {
         ctx.getELResolver().setValue(ctx, null, this.image, value);
     }
 
+    @Override
     public Object invoke(EvaluationContext ctx, Class[] paramTypes,
             Object[] paramValues) throws ELException {
         return this.getMethodExpression(ctx).invoke(ctx.getELContext(), paramValues);
     }
     
 
+    @Override
     public MethodInfo getMethodInfo(EvaluationContext ctx, Class[] paramTypes)
             throws ELException {
         return this.getMethodExpression(ctx).getMethodInfo(ctx.getELContext());

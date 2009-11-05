@@ -32,14 +32,17 @@ public final class AstLiteralExpression extends SimpleNode {
         super(id);
     }
 
+    @Override
     public Class<?> getType(EvaluationContext ctx) throws ELException {
         return String.class;
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         return this.image;
     }
 
+    @Override
     public void setImage(String image) {
         if (image.indexOf('\\') == -1) {
             this.image = image;

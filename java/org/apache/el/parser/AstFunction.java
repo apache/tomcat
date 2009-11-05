@@ -58,6 +58,7 @@ public final class AstFunction extends SimpleNode {
         return prefix;
     }
 
+    @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         
@@ -75,6 +76,7 @@ public final class AstFunction extends SimpleNode {
         return m.getReturnType();
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         
@@ -127,6 +129,7 @@ public final class AstFunction extends SimpleNode {
     }
     
     
+    @Override
     public String toString()
     {
         return ELParserTreeConstants.jjtNodeName[id] + "[" + this.getOutputName() + "]";
