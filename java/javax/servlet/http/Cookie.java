@@ -584,6 +584,7 @@ public class Cookie implements Cloneable {
      *
      */
 
+    @Override
     public Object clone() {
 	try {
 	    return super.clone();

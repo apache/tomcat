@@ -47,7 +47,8 @@ public class BeanELResolver extends ELResolver {
 		this.readOnly = readOnly;
 	}
 
-	public Object getValue(ELContext context, Object base, Object property)
+	@Override
+    public Object getValue(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -71,7 +72,8 @@ public class BeanELResolver extends ELResolver {
 		}
 	}
 
-	public Class<?> getType(ELContext context, Object base, Object property)
+	@Override
+    public Class<?> getType(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -84,7 +86,8 @@ public class BeanELResolver extends ELResolver {
 		return this.property(context, base, property).getPropertyType();
 	}
 
-	public void setValue(ELContext context, Object base, Object property,
+	@Override
+    public void setValue(ELContext context, Object base, Object property,
 			Object value) throws NullPointerException,
 			PropertyNotFoundException, PropertyNotWritableException,
 			ELException {
@@ -117,7 +120,8 @@ public class BeanELResolver extends ELResolver {
 		}
 	}
 
-	public boolean isReadOnly(ELContext context, Object base, Object property)
+	@Override
+    public boolean isReadOnly(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -131,7 +135,8 @@ public class BeanELResolver extends ELResolver {
 				|| this.property(context, base, property).isReadOnly();
 	}
 
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+	@Override
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		if (context == null) {
 			throw new NullPointerException();
 		}
@@ -155,7 +160,8 @@ public class BeanELResolver extends ELResolver {
 		return null;
 	}
 
-	public Class<?> getCommonPropertyType(ELContext context, Object base) {
+	@Override
+    public Class<?> getCommonPropertyType(ELContext context, Object base) {
 		if (context == null) {
 			throw new NullPointerException();
 		}

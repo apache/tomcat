@@ -77,6 +77,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         super();
     }
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
@@ -119,6 +120,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
@@ -134,6 +136,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) throws NullPointerException,
             PropertyNotFoundException, PropertyNotWritableException,
@@ -151,6 +154,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         }
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property)
             throws NullPointerException, PropertyNotFoundException, ELException {
         if (context == null) {
@@ -167,6 +171,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return false;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
         List<FeatureDescriptor> feats = new ArrayList<FeatureDescriptor>(
                 SCOPE_NAMES.length);
@@ -185,6 +190,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         return feats.iterator();
     }
 
+    @Override
     public Class<String> getCommonPropertyType(ELContext context, Object base) {
         if (base == null) {
             return String.class;
@@ -233,18 +239,22 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,Object> getApplicationScope() {
             if (this.applicationScope == null) {
                 this.applicationScope = new ScopeMap<Object>() {
+                    @Override
                     protected void setAttribute(String name, Object value) {
                         page.getServletContext().setAttribute(name, value);
                     }
 
+                    @Override
                     protected void removeAttribute(String name) {
                         page.getServletContext().removeAttribute(name);
                     }
 
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return page.getServletContext().getAttributeNames();
                     }
 
+                    @Override
                     protected Object getAttribute(String name) {
                         return page.getServletContext().getAttribute(name);
                     }
@@ -256,6 +266,7 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,Cookie> getCookie() {
             if (this.cookie == null) {
                 this.cookie = new ScopeMap<Cookie>() {
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         Cookie[] c = ((HttpServletRequest) page.getRequest())
                                 .getCookies();
@@ -269,6 +280,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                         return null;
                     }
 
+                    @Override
                     protected Cookie getAttribute(String name) {
                         Cookie[] c = ((HttpServletRequest) page.getRequest())
                                 .getCookies();
@@ -290,11 +302,13 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,String> getHeader() {
             if (this.header == null) {
                 this.header = new ScopeMap<String>() {
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return ((HttpServletRequest) page.getRequest())
                                 .getHeaderNames();
                     }
 
+                    @Override
                     protected String getAttribute(String name) {
                         return ((HttpServletRequest) page.getRequest())
                                 .getHeader(name);
@@ -307,11 +321,13 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,String[]> getHeaderValues() {
             if (this.headerValues == null) {
                 this.headerValues = new ScopeMap<String[]>() {
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return ((HttpServletRequest) page.getRequest())
                                 .getHeaderNames();
                     }
 
+                    @Override
                     protected String[] getAttribute(String name) {
                         Enumeration<String> e =
                             ((HttpServletRequest) page.getRequest())
@@ -334,10 +350,12 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,String> getInitParam() {
             if (this.initParam == null) {
                 this.initParam = new ScopeMap<String>() {
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return page.getServletContext().getInitParameterNames();
                     }
 
+                    @Override
                     protected String getAttribute(String name) {
                         return page.getServletContext().getInitParameter(name);
                     }
@@ -353,19 +371,23 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,Object> getPageScope() {
             if (this.pageScope == null) {
                 this.pageScope = new ScopeMap<Object>() {
+                    @Override
                     protected void setAttribute(String name, Object value) {
                         page.setAttribute(name, value);
                     }
 
+                    @Override
                     protected void removeAttribute(String name) {
                         page.removeAttribute(name);
                     }
 
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return page.getAttributeNamesInScope(
                                 PageContext.PAGE_SCOPE);
                     }
 
+                    @Override
                     protected Object getAttribute(String name) {
                         return page.getAttribute(name);
                     }
@@ -377,10 +399,12 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,String> getParam() {
             if (this.param == null) {
                 this.param = new ScopeMap<String>() {
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return page.getRequest().getParameterNames();
                     }
 
+                    @Override
                     protected String getAttribute(String name) {
                         return page.getRequest().getParameter(name);
                     }
@@ -392,10 +416,12 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,String[]> getParamValues() {
             if (this.paramValues == null) {
                 this.paramValues = new ScopeMap<String[]>() {
+                    @Override
                     protected String[] getAttribute(String name) {
                         return page.getRequest().getParameterValues(name);
                     }
 
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return page.getRequest().getParameterNames();
                     }
@@ -407,18 +433,22 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,Object> getRequestScope() {
             if (this.requestScope == null) {
                 this.requestScope = new ScopeMap<Object>() {
+                    @Override
                     protected void setAttribute(String name, Object value) {
                         page.getRequest().setAttribute(name, value);
                     }
 
+                    @Override
                     protected void removeAttribute(String name) {
                         page.getRequest().removeAttribute(name);
                     }
 
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         return page.getRequest().getAttributeNames();
                     }
 
+                    @Override
                     protected Object getAttribute(String name) {
                         return page.getRequest().getAttribute(name);
                     }
@@ -430,11 +460,13 @@ public class ImplicitObjectELResolver extends ELResolver {
         public Map<String,Object> getSessionScope() {
             if (this.sessionScope == null) {
                 this.sessionScope = new ScopeMap<Object>() {
+                    @Override
                     protected void setAttribute(String name, Object value) {
                         ((HttpServletRequest) page.getRequest()).getSession()
                                 .setAttribute(name, value);
                     }
 
+                    @Override
                     protected void removeAttribute(String name) {
                         HttpSession session = page.getSession();
                         if (session != null) {
@@ -442,6 +474,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                         }
                     }
 
+                    @Override
                     protected Enumeration<String> getAttributeNames() {
                         HttpSession session = page.getSession();
                         if (session != null) {
@@ -450,6 +483,7 @@ public class ImplicitObjectELResolver extends ELResolver {
                         return null;
                     }
 
+                    @Override
                     protected Object getAttribute(String name) {
                         HttpSession session = page.getSession();
                         if (session != null) {
@@ -477,6 +511,7 @@ public class ImplicitObjectELResolver extends ELResolver {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public final Set<Map.Entry<String,V>> entrySet() {
             Enumeration<String> e = getAttributeNames();
             Set<Map.Entry<String, V>> set = new HashSet<Map.Entry<String, V>>();
@@ -513,10 +548,12 @@ public class ImplicitObjectELResolver extends ELResolver {
                 return null;
             }
 
+            @Override
             public boolean equals(Object obj) {
                 return (obj != null && this.hashCode() == obj.hashCode());
             }
 
+            @Override
             public int hashCode() {
                 return this.key.hashCode();
             }
@@ -530,6 +567,7 @@ public class ImplicitObjectELResolver extends ELResolver {
             return null;
         }
 
+        @Override
         public final V put(String key, V value) {
             if (key == null) {
                 throw new NullPointerException();
