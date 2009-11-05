@@ -191,7 +191,7 @@ public final class TldConfig  implements LifecycleListener {
 
 
     /**
-     * Attribute value used to turn on/off TLD  namespace awarenes.
+     * Attribute value used to turn on/off TLD  namespace awareness.
      */
     private boolean tldNamespaceAware = false;
 
@@ -258,7 +258,7 @@ public final class TldConfig  implements LifecycleListener {
 
     /**
      * Get the server.xml &lt;host&gt; attribute's xmlNamespaceAware.
-     * @return true if namespace awarenes is enabled.
+     * @return true if namespace awareness is enabled.
      *
      */
     public boolean getTldNamespaceAware(){
