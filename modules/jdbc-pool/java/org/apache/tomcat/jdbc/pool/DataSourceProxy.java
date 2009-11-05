@@ -19,7 +19,6 @@ package org.apache.tomcat.jdbc.pool;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Future;
