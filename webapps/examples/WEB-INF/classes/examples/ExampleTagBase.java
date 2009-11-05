@@ -21,40 +21,49 @@ import javax.servlet.jsp.tagext.*;
 
 public abstract class ExampleTagBase extends BodyTagSupport {
 
+    @Override
     public void setParent(Tag parent) {
         this.parent = parent;
     }
 
+    @Override
     public void setBodyContent(BodyContent bodyOut) {
         this.bodyOut = bodyOut;
     }
 
+    @Override
     public void setPageContext(PageContext pageContext) {
         this.pageContext = pageContext;
     }
 
+    @Override
     public Tag getParent() {
         return this.parent;
     }
     
+    @Override
     public int doStartTag() throws JspException {
         return SKIP_BODY;
     }
 
+    @Override
     public int doEndTag() throws JspException {
         return EVAL_PAGE;
     }
     
 
+    @Override
     public void doInitBody() throws JspException {
         // Default implementations for BodyTag methods as well
         // just in case a tag decides to implement BodyTag.
     }
 
+    @Override
     public int doAfterBody() throws JspException {
         return SKIP_BODY;
     }
 
+    @Override
     public void release() {
         bodyOut = null;
         pageContext = null;

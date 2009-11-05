@@ -43,6 +43,7 @@ public class ChatServlet
         new ArrayList<HttpServletResponse>();
     protected MessageSender messageSender = null;
     
+    @Override
     public void init() throws ServletException {
         messageSender = new MessageSender();
         Thread messageSenderThread = 
@@ -51,6 +52,7 @@ public class ChatServlet
         messageSenderThread.start();
     }
 
+    @Override
     public void destroy() {
         connections.clear();
         messageSender.stop();
@@ -162,6 +164,7 @@ public class ChatServlet
         }
     }
 
+    @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws IOException, ServletException {
         // Compatibility method: equivalent method using the regular connection model
