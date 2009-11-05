@@ -151,10 +151,12 @@ public class Stockticker implements Runnable {
             return df.format(lastchange);
         }
 
+        @Override
         public int hashCode() {
             return symbol.hashCode();
         }
 
+        @Override
         public boolean equals(Object other) {
             if (other instanceof Stock) {
                 return this.symbol.equals(((Stock) other).symbol);
@@ -163,6 +165,7 @@ public class Stockticker implements Runnable {
             }
         }
 
+        @Override
         public String toString() {
             StringBuilder buf = new StringBuilder("STOCK#");
             buf.append(getSymbol());
@@ -176,6 +179,7 @@ public class Stockticker implements Runnable {
 
         }
 
+        @Override
         public Object clone() {
             Stock s = new Stock(this.getSymbol(), this.getValue());
             s.setLastChange(this.getLastChange());

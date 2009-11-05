@@ -53,16 +53,19 @@ public class FooTag
      *
      * @return EVAL_BODY_INCLUDE
      */
+    @Override
     public int doStartTag() throws JspException {
         i = 0;
 	return EVAL_BODY_BUFFERED;
     }
 
+    @Override
     public void doInitBody() throws JspException {
         pageContext.setAttribute("member", atts[i]);
         i++;
     }
     
+    @Override
     public int doAfterBody() throws JspException {
         try {
             if (i == 3) {

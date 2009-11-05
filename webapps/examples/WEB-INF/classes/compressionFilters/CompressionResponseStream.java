@@ -130,6 +130,7 @@ public class CompressionResponseStream
      * Close this output stream, causing any buffered data to be flushed and
      * any further output data to throw an IOException.
      */
+    @Override
     public void close() throws IOException {
 
         if (debug > 1) {
@@ -164,6 +165,7 @@ public class CompressionResponseStream
      * Flush any buffered data for this output stream, which also causes the
      * response to be committed.
      */
+    @Override
     public void flush() throws IOException {
 
         if (debug > 1) {
@@ -201,6 +203,7 @@ public class CompressionResponseStream
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void write(int b) throws IOException {
 
         if (debug > 1) {
@@ -226,6 +229,7 @@ public class CompressionResponseStream
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void write(byte b[]) throws IOException {
 
         write(b, 0, b.length);
@@ -243,6 +247,7 @@ public class CompressionResponseStream
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public void write(byte b[], int off, int len) throws IOException {
 
         if (debug > 1) {
