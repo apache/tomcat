@@ -38,39 +38,48 @@ public final class ELContextWrapper extends ELContext {
         this.fnMapper = fnMapper;
     }
 
+    @Override
     public ELResolver getELResolver() {
         return this.target.getELResolver();
     }
 
+    @Override
     public FunctionMapper getFunctionMapper() {
         if (this.fnMapper != null) return this.fnMapper;
         return this.target.getFunctionMapper();
     }
 
+    @Override
     public VariableMapper getVariableMapper() {
         return this.target.getVariableMapper();
     }
 
+    @Override
     public Object getContext(Class key) {
         return this.target.getContext(key);
     }
 
+    @Override
     public Locale getLocale() {
         return this.target.getLocale();
     }
 
+    @Override
     public boolean isPropertyResolved() {
         return this.target.isPropertyResolved();
     }
 
+    @Override
     public void putContext(Class key, Object contextObject) throws NullPointerException {
         this.target.putContext(key, contextObject);
     }
 
+    @Override
     public void setLocale(Locale locale) {
         this.target.setLocale(locale);
     }
 
+    @Override
     public void setPropertyResolved(boolean resolved) {
         this.target.setPropertyResolved(resolved);
     }

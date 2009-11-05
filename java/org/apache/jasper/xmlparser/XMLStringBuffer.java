@@ -105,6 +105,7 @@ public class XMLStringBuffer
     //
 
     /** Clears the string buffer. */
+    @Override
     public void clear() {
         offset = 0;
         length = 0;

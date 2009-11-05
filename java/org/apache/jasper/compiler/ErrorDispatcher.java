@@ -594,7 +594,8 @@ public class ErrorDispatcher {
 	    this.lineNum = lineNum;
 	}
 
-	public void doVisit(Node n) throws JasperException {
+	@Override
+    public void doVisit(Node n) throws JasperException {
 	    if ((lineNum >= n.getBeginJavaLine())
 		    && (lineNum < n.getEndJavaLine())) {
 		found = n;

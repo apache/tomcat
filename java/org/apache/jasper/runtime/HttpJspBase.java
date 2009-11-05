@@ -43,6 +43,7 @@ public abstract class HttpJspBase
     protected HttpJspBase() {
     }
 
+    @Override
     public final void init(ServletConfig config) 
 	throws ServletException 
     {
@@ -51,10 +52,12 @@ public abstract class HttpJspBase
         _jspInit();
     }
     
+    @Override
     public String getServletInfo() {
 	return Localizer.getMessage("jsp.engine.info");
     }
 
+    @Override
     public final void destroy() {
 	jspDestroy();
 	_jspDestroy();
@@ -63,6 +66,7 @@ public abstract class HttpJspBase
     /**
      * Entry point into service.
      */
+    @Override
     public final void service(HttpServletRequest request, HttpServletResponse response) 
 	throws ServletException, IOException 
     {

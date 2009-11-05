@@ -28,7 +28,8 @@ public final class FunctionMapperImpl extends javax.el.FunctionMapper {
 		this.fnMapper = fnMapper;
 	}
 
-	public Method resolveFunction(String prefix, String localName) {
+	@Override
+    public Method resolveFunction(String prefix, String localName) {
 		return this.fnMapper.resolveFunction(prefix, localName);
 	}
 

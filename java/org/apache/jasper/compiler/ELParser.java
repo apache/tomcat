@@ -320,6 +320,7 @@ public class ELParser {
             return 0;
         }
 
+        @Override
         public String toString() {
             return "";
         }
@@ -335,6 +336,7 @@ public class ELParser {
             this.id = id;
         }
 
+        @Override
         public String toString() {
             return id;
         }
@@ -351,10 +353,12 @@ public class ELParser {
             this.ch = ch;
         }
 
+        @Override
         char toChar() {
             return ch;
         }
 
+        @Override
         public String toString() {
             return (new Character(ch)).toString();
         }
@@ -371,6 +375,7 @@ public class ELParser {
             this.value = v;
         }
 
+        @Override
         public String toString() {
             return value;
         }

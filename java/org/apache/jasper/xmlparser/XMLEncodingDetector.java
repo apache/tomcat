@@ -1092,6 +1092,7 @@ public class XMLEncodingDetector {
             fOffset = fStartOffset;
         }
 
+        @Override
         public int read() throws IOException {
             int b = 0;
             if (fOffset < fLength) {
@@ -1115,6 +1116,7 @@ public class XMLEncodingDetector {
             return b & 0xff;
         }
 
+        @Override
         public int read(byte[] b, int off, int len) throws IOException {
             int bytesLeft = fLength - fOffset;
             if (bytesLeft == 0) {
@@ -1148,6 +1150,7 @@ public class XMLEncodingDetector {
             return len;
         }
 
+        @Override
         public long skip(long n)
             throws IOException
         {
@@ -1182,6 +1185,7 @@ public class XMLEncodingDetector {
             return fInputStream.skip(n) + bytesLeft;
         }
 
+        @Override
         public int available() throws IOException {
             int bytesLeft = fLength - fOffset;
             if (bytesLeft == 0) {
@@ -1194,18 +1198,22 @@ public class XMLEncodingDetector {
             return bytesLeft;
         }
 
+        @Override
         public void mark(int howMuch) {
             fMark = fOffset;
         }
 
+        @Override
         public void reset() {
             fOffset = fMark;
         }
 
+        @Override
         public boolean markSupported() {
             return true;
         }
 
+        @Override
         public void close() throws IOException {
             if (fInputStream != null) {
                 fInputStream.close();

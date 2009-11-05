@@ -503,6 +503,7 @@ public class SmapUtil {
             this.innerClassMap = map;
         }
 
+        @Override
         public void visitBody(Node n) throws JasperException {
             SmapStratum smapSave = smap;
             String innerClass = n.getInnerClassName();
@@ -513,91 +514,110 @@ public class SmapUtil {
             smap = smapSave;
         }
 
+        @Override
         public void visit(Node.Declaration n) throws JasperException {
             doSmapText(n);
         }
 
+        @Override
         public void visit(Node.Expression n) throws JasperException {
             doSmapText(n);
         }
 
+        @Override
         public void visit(Node.Scriptlet n) throws JasperException {
             doSmapText(n);
         }
 
+        @Override
         public void visit(Node.IncludeAction n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.ForwardAction n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.GetProperty n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.SetProperty n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.UseBean n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.PlugIn n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.CustomTag n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.UninterpretedTag n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.JspElement n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.JspText n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.NamedAttribute n) throws JasperException {
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.JspBody n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.InvokeAction n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.DoBodyAction n) throws JasperException {
             doSmap(n);
             visitBody(n);
         }
 
+        @Override
         public void visit(Node.ELExpression n) throws JasperException {
             doSmap(n);
         }
 
+        @Override
         public void visit(Node.TemplateText n) throws JasperException {
             Mark mark = n.getStart();
             if (mark == null) {
@@ -702,6 +722,7 @@ public class SmapUtil {
 
         HashMap<String, SmapStratum> map = new HashMap<String, SmapStratum>();
 
+        @Override
         public void doVisit(Node n) {
             String inner = n.getInnerClassName();
             if (inner != null && !map.containsKey(inner)) {

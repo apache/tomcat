@@ -200,6 +200,7 @@ final class Mark {
         return null;
     }
 
+    @Override
     public String toString() {
 	return getFile()+"("+line+","+col+")";
     }
@@ -219,6 +220,7 @@ final class Mark {
         return ctxt.getResource(getFile());
     }
 
+    @Override
     public boolean equals(Object other) {
 	if (other instanceof Mark) {
 	    Mark m = (Mark) other;
