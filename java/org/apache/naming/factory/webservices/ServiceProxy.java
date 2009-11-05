@@ -57,7 +57,7 @@ public class ServiceProxy
     /**
      * PortComponentRef list
      */
-    private Hashtable portComponentRef = null;
+    private Hashtable<String,QName> portComponentRef = null;
 
     /**
      * Constructs a new ServiceProxy wrapping given Service instance.
@@ -103,10 +103,10 @@ public class ServiceProxy
     throws ServiceException {
         QName name = (QName) args[0];
         String nameString = name.getLocalPart();
-        Class serviceendpointClass = (Class) args[1];
+        Class<?> serviceendpointClass = (Class<?>) args[1];
 
-        for (Iterator ports = service.getPorts(); ports.hasNext();) {
-            QName portName = (QName) ports.next();
+        for (Iterator<QName> ports = service.getPorts(); ports.hasNext();) {
+            QName portName = ports.next();
             String portnameString = portName.getLocalPart();
             if (portnameString.equals(nameString)) {
                 return service.getPort(name, serviceendpointClass);
@@ -120,7 +120,7 @@ public class ServiceProxy
     /**
      * @param portComponentRef List
      */
-    public void setPortComponentRef(Hashtable portComponentRef) {
+    public void setPortComponentRef(Hashtable<String,QName> portComponentRef) {
         this.portComponentRef = portComponentRef;
     }
 
@@ -131,12 +131,12 @@ public class ServiceProxy
      */
     private Remote getProxyPortClass(Object[] args) 
     throws ServiceException {
-        Class serviceendpointClass = (Class) args[0];
+        Class<?> serviceendpointClass = (Class<?>) args[0];
 
         if (this.portComponentRef == null)
             return service.getPort(serviceendpointClass);
 
-        QName portname = (QName) this.portComponentRef.get(serviceendpointClass.getName());
+        QName portname = this.portComponentRef.get(serviceendpointClass.getName());
         if (portname != null) {
             return service.getPort(portname, serviceendpointClass);
         } else {
