@@ -46,6 +46,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      * @throws IOException
      * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
+    @Override
     public void start() throws IOException {
         super.start();
         try {
@@ -83,6 +84,7 @@ public class BioReceiver extends ReceiverBase implements Runnable, ChannelReceiv
      *
      * @todo Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
+    @Override
     public void stop() {
         setListen(false);
         try {

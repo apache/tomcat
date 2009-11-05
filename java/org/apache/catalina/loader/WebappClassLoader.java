@@ -249,6 +249,7 @@ public class WebappClassLoader
     protected HashMap<String, String> notFoundResources =
         new LinkedHashMap<String, String>() {
         private static final long serialVersionUID = 1L;
+        @Override
         protected boolean removeEldestEntry(
                 Map.Entry<String, String> eldest) {
             return size() > 1000;
@@ -817,6 +818,7 @@ public class WebappClassLoader
     /**
      * Render a String representation of this object.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("WebappClassLoader\r\n");
@@ -847,6 +849,7 @@ public class WebappClassLoader
      /**
       * Add the specified URL to the classloader.
       */
+    @Override
      protected void addURL(URL url) {
          super.addURL(url);
          hasExternalRepositories = true;
@@ -862,6 +865,7 @@ public class WebappClassLoader
      *
      * @exception ClassNotFoundException if the class was not found
      */
+    @Override
     public Class<?> findClass(String name) throws ClassNotFoundException {
 
         if (log.isDebugEnabled())
@@ -959,6 +963,7 @@ public class WebappClassLoader
      *
      * @param name Name of the resource to be found
      */
+    @Override
     public URL findResource(final String name) {
 
         if (log.isDebugEnabled())
@@ -997,6 +1002,7 @@ public class WebappClassLoader
      *
      * @exception IOException if an input/output error occurs
      */
+    @Override
     public Enumeration<URL> findResources(String name) throws IOException {
 
         if (log.isDebugEnabled())
@@ -1081,6 +1087,7 @@ public class WebappClassLoader
      *
      * @param name Name of the resource to return a URL for
      */
+    @Override
     public URL getResource(String name) {
 
         if (log.isDebugEnabled())
@@ -1156,6 +1163,7 @@ public class WebappClassLoader
      *
      * @param name Name of the resource to return an input stream for
      */
+    @Override
     public InputStream getResourceAsStream(String name) {
 
         if (log.isDebugEnabled())
@@ -1238,6 +1246,7 @@ public class WebappClassLoader
      *
      * @exception ClassNotFoundException if the class was not found
      */
+    @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
 
         return (loadClass(name, false));
@@ -1270,6 +1279,7 @@ public class WebappClassLoader
      *
      * @exception ClassNotFoundException if the class was not found
      */
+    @Override
     public synchronized Class<?> loadClass(String name, boolean resolve)
         throws ClassNotFoundException {
 
@@ -1408,6 +1418,7 @@ public class WebappClassLoader
      * @param codeSource where the code was loaded from
      * @return PermissionCollection for CodeSource
      */
+    @Override
     protected PermissionCollection getPermissions(CodeSource codeSource) {
 
         String codeUrl = codeSource.getLocation().toString();
@@ -1434,6 +1445,7 @@ public class WebappClassLoader
      * along with any URLs subsequently appended by the addURL() method.
      * @return the search path of URLs for loading classes and resources.
      */
+    @Override
     public URL[] getURLs() {
 
         if (repositoryURLs != null) {
