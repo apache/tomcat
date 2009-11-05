@@ -478,6 +478,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
         protected ConcurrentLinkedQueue<Http11AprProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<Http11AprProcessor>() {
             protected AtomicInteger size = new AtomicInteger(0);
+            @Override
             public boolean offer(Http11AprProcessor processor) {
                 boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
                 //avoid over growing our cache or add after we have stopped
@@ -492,6 +493,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
                 return result;
             }
             
+            @Override
             public Http11AprProcessor poll() {
                 Http11AprProcessor result = super.poll();
                 if ( result != null ) {
@@ -500,6 +502,7 @@ public class Http11AprProtocol implements ProtocolHandler, MBeanRegistration {
                 return result;
             }
             
+            @Override
             public void clear() {
                 Http11AprProcessor next = poll();
                 while ( next != null ) {

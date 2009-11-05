@@ -434,6 +434,7 @@ public final class Request {
 
     // -------------------- debug --------------------
 
+    @Override
     public String toString() {
         return "R( " + requestURI().toString() + ")";
     }
