@@ -120,6 +120,7 @@ public class AsyncFileHandler extends FileHandler {
             this.setName("AsyncFileHandlerWriter-"+System.identityHashCode(this));
         }
         
+        @Override
         public void run() {
             while (run) {
                 try {

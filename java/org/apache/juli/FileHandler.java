@@ -111,6 +111,7 @@ public class FileHandler
      *
      * @param  record  description of the log event
      */
+    @Override
     public void publish(LogRecord record) {
 
         if (!isLoggable(record)) {
@@ -161,6 +162,7 @@ public class FileHandler
     /**
      * Close the currently open log file (if any).
      */
+    @Override
     public void close() {
         closeWriter();
     }
@@ -185,6 +187,7 @@ public class FileHandler
     /**
      * Flush the writer.
      */
+    @Override
     public void flush() {
 
         try {
