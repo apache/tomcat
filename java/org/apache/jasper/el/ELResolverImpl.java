@@ -51,7 +51,8 @@ public final class ELResolverImpl extends ELResolver {
 		this.variableResolver = variableResolver;
 	}
 
-	public Object getValue(ELContext context, Object base, Object property)
+	@Override
+    public Object getValue(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -75,7 +76,8 @@ public final class ELResolverImpl extends ELResolver {
 		return null;
 	}
 
-	public Class<?> getType(ELContext context, Object base, Object property)
+	@Override
+    public Class<?> getType(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -100,7 +102,8 @@ public final class ELResolverImpl extends ELResolver {
 		return null;
 	}
 
-	public void setValue(ELContext context, Object base, Object property,
+	@Override
+    public void setValue(ELContext context, Object base, Object property,
 			Object value) throws NullPointerException,
 			PropertyNotFoundException, PropertyNotWritableException,
 			ELException {
@@ -119,7 +122,8 @@ public final class ELResolverImpl extends ELResolver {
 		}
 	}
 
-	public boolean isReadOnly(ELContext context, Object base, Object property)
+	@Override
+    public boolean isReadOnly(ELContext context, Object base, Object property)
 			throws NullPointerException, PropertyNotFoundException, ELException {
 		if (context == null) {
 			throw new NullPointerException();
@@ -133,11 +137,13 @@ public final class ELResolverImpl extends ELResolver {
 		return getDefaultResolver().isReadOnly(context, base, property);
 	}
 
-	public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
+	@Override
+    public Iterator<java.beans.FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
 		return getDefaultResolver().getFeatureDescriptors(context, base);
 	}
 
-	public Class<?> getCommonPropertyType(ELContext context, Object base) {
+	@Override
+    public Class<?> getCommonPropertyType(ELContext context, Object base) {
 		if (base == null) {
 			return String.class;
 		}

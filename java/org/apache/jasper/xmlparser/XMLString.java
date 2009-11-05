@@ -190,6 +190,7 @@ public class XMLString {
     //
 
     /** Returns a string representation of this object. */
+    @Override
     public String toString() {
         return length > 0 ? new String(ch, offset, length) : "";
     } // toString():String

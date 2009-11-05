@@ -41,7 +41,8 @@ class ScriptingVariabler {
 	private int count;
 	private Node.CustomTag parent;
 
-	public void visit(Node.CustomTag n) throws JasperException {
+	@Override
+    public void visit(Node.CustomTag n) throws JasperException {
 	    n.setCustomTagParent(parent);
 	    Node.CustomTag tmpParent = parent;
 	    parent = n;
@@ -65,7 +66,8 @@ class ScriptingVariabler {
 	    scriptVars = new Hashtable<String,Integer>();
 	}
 
-	public void visit(Node.CustomTag n) throws JasperException {
+	@Override
+    public void visit(Node.CustomTag n) throws JasperException {
 	    setScriptingVars(n, VariableInfo.AT_BEGIN);
 	    setScriptingVars(n, VariableInfo.NESTED);
 	    new ScriptingVariableVisitor(err).visitBody(n);

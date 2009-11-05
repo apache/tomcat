@@ -36,6 +36,7 @@ import org.apache.jasper.Constants;
 public final class ELContextImpl extends ELContext {
 
     private final static FunctionMapper NullFunctionMapper = new FunctionMapper() {
+        @Override
         public Method resolveFunction(String prefix, String localName) {
             return null;
         }
@@ -45,6 +46,7 @@ public final class ELContextImpl extends ELContext {
 
         private Map<String, ValueExpression> vars;
 
+        @Override
         public ValueExpression resolveVariable(String variable) {
             if (vars == null) {
                 return null;
@@ -52,6 +54,7 @@ public final class ELContextImpl extends ELContext {
             return vars.get(variable);
         }
 
+        @Override
         public ValueExpression setVariable(String variable,
                 ValueExpression expression) {
             if (vars == null)
@@ -71,6 +74,7 @@ public final class ELContextImpl extends ELContext {
         this(ELResolverImpl.getDefaultResolver());
         if (Constants.IS_SECURITY_ENABLED) {
             functionMapper = new FunctionMapper() {
+                @Override
                 public Method resolveFunction(String prefix, String localName) {
                     return null;
                 }
@@ -84,14 +88,17 @@ public final class ELContextImpl extends ELContext {
         this.resolver = resolver;
     }
 
+    @Override
     public ELResolver getELResolver() {
         return this.resolver;
     }
 
+    @Override
     public FunctionMapper getFunctionMapper() {
         return this.functionMapper;
     }
 
+    @Override
     public VariableMapper getVariableMapper() {
         if (this.variableMapper == null) {
             this.variableMapper = new VariableMapperImpl();

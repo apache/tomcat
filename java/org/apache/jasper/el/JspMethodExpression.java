@@ -44,6 +44,7 @@ public final class JspMethodExpression extends MethodExpression implements
         this.mark = mark;
     }
 
+    @Override
     public MethodInfo getMethodInfo(ELContext context)
             throws NullPointerException, PropertyNotFoundException,
             MethodNotFoundException, ELException {
@@ -61,6 +62,7 @@ public final class JspMethodExpression extends MethodExpression implements
         }
     }
 
+    @Override
     public Object invoke(ELContext context, Object[] params)
             throws NullPointerException, PropertyNotFoundException,
             MethodNotFoundException, ELException {
@@ -78,18 +80,22 @@ public final class JspMethodExpression extends MethodExpression implements
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         return this.target.equals(obj);
     }
 
+    @Override
     public int hashCode() {
         return this.target.hashCode();
     }
 
+    @Override
     public String getExpressionString() {
         return this.target.getExpressionString();
     }
 
+    @Override
     public boolean isLiteralText() {
         return this.target.isLiteralText();
     }
