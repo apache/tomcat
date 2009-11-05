@@ -1056,7 +1056,7 @@ public class ContextConfig
         }
         */
 
-        // Removing sercurity role
+        // Removing security role
         String[] securityRoles = context.findSecurityRoles();
         for (i = 0; i < securityRoles.length; i++) {
             context.removeSecurityRole(securityRoles[i]);
@@ -1354,7 +1354,7 @@ public class ContextConfig
     /**
      * 
      * @param filename  Name of the file (possibly with one or more leading path
-     *                  segemnts) to read
+     *                  segments) to read
      * @param path      Location that filename is relative to 
      * @return
      */
