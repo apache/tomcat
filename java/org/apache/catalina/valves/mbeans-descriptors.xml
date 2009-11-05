@@ -355,4 +355,41 @@
 
   </mbean>
 
+  <mbean name="RemoteIpValve"
+         description="Valve that sets client information (eg IP address) based on data from a trusted proxy"
+         domain="Catalina"
+         group="Valve"
+         type="org.apache.catalina.valves.RemoteIpValve">
+    
+    <attribute name="internalProxies"
+               description="Comma delimited list of internal proxies"
+               type="java.lang.String"
+               writeable="false" />
+               
+    <attribute name="protocolHeader"
+               description="The protocol header (e.g. &quot;X-Forwarded-Proto&quot;)"
+               type="java.lang.String"
+               writeable="false" />
+               
+    <attribute name="protocolHeaderHttpsValue"
+               description="The value of the protocol header for incoming https request (e.g. &quot;https&quot;)"
+               type="java.lang.String"
+               writeable="false" />
+               
+    <attribute name="proxiesHeader"
+               description="The proxies header name (e.g. &quot;X-Forwarded-By&quot;)"
+               type="java.lang.String"
+               writeable="false" />
+               
+    <attribute name="remoteIpHedaer"
+               description="The remote IP header name (e.g. &quot;X-Forwarded-For&quot;)"
+               type="java.lang.String"
+               writeable="false" />
+               
+    <attribute name="trustedProxies"
+               description="Comma delimited list of trusted proxies"
+               type="java.lang.String"
+               writeable="false" />
+               
+  </mbean>
 </mbeans-descriptors>
