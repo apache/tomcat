@@ -119,6 +119,7 @@ public class ObjectCreateRule extends Rule {
      *   the element name otherwise
      * @param attributes The attribute list for this element
      */
+    @Override
     public void begin(String namespace, String name, Attributes attributes)
             throws Exception {
 
@@ -152,6 +153,7 @@ public class ObjectCreateRule extends Rule {
      * @param name the local name if the parser is namespace aware, or just 
      *   the element name otherwise
      */
+    @Override
     public void end(String namespace, String name) throws Exception {
 
         Object top = digester.pop();
@@ -166,6 +168,7 @@ public class ObjectCreateRule extends Rule {
     /**
      * Render a printable version of this Rule.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("ObjectCreateRule[");
