@@ -455,7 +455,8 @@ public final class JDBCAccessLogValve
      * @exception IOException Should not be thrown.
      * @exception ServletException Database SQLException is wrapped 
      * in a ServletException.
-     */    
+     */
+    @Override
     public void invoke(Request request, Response response) 
         throws IOException, ServletException {
         final String EMPTY = "" ;
