@@ -83,6 +83,7 @@ public class DirContextURLStreamHandler
      * Opens a connection to the object referenced by the <code>URL</code> 
      * argument.
      */
+    @Override
     protected URLConnection openConnection(URL u) 
         throws IOException {
         DirContext currentContext = this.context;
@@ -98,6 +99,7 @@ public class DirContextURLStreamHandler
     /**
      * Override as part of the fix for 36534, to ensure toString is correct.
      */
+    @Override
     protected String toExternalForm(URL u) {
         // pre-compute length of StringBuilder
         int len = u.getProtocol().length() + 1;

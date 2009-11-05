@@ -64,6 +64,7 @@ public class NamingEntry {
     // --------------------------------------------------------- Object Methods
 
 
+    @Override
     public boolean equals(Object obj) {
         if ((obj != null) && (obj instanceof NamingEntry)) {
             return name.equals(((NamingEntry) obj).name);
@@ -73,6 +74,7 @@ public class NamingEntry {
     }
 
 
+    @Override
     public int hashCode() {
         return name.hashCode();
     }

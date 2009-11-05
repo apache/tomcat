@@ -74,6 +74,7 @@ public class ClassLoaderLogManager extends LogManager {
      * 
      * @param logger The logger to be added
      */
+    @Override
     public synchronized boolean addLogger(final Logger logger) {
 
         final String loggerName = logger.getName();
@@ -170,6 +171,7 @@ public class ClassLoaderLogManager extends LogManager {
      * 
      * @param name The name of the logger to retrieve
      */
+    @Override
     public synchronized Logger getLogger(final String name) {
         ClassLoader classLoader = Thread.currentThread()
                 .getContextClassLoader();
@@ -181,6 +183,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Get an enumeration of the logger names currently defined in the 
      * classloader local configuration.
      */
+    @Override
     public synchronized Enumeration<String> getLoggerNames() {
         ClassLoader classLoader = Thread.currentThread()
                 .getContextClassLoader();
@@ -194,6 +197,7 @@ public class ClassLoaderLogManager extends LogManager {
      * 
      * @param name The property name
      */    
+    @Override
     public String getProperty(String name) {
         ClassLoader classLoader = Thread.currentThread()
             .getContextClassLoader();
@@ -230,6 +234,7 @@ public class ClassLoaderLogManager extends LogManager {
     }
     
     
+    @Override
     public void readConfiguration()
         throws IOException, SecurityException {
         
@@ -239,6 +244,7 @@ public class ClassLoaderLogManager extends LogManager {
         
     }
         
+    @Override
     public void readConfiguration(InputStream is)
         throws IOException, SecurityException {
         

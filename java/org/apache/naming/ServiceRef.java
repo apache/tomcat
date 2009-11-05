@@ -165,6 +165,7 @@ public class ServiceRef
      * Retrieves the class name of the factory of the object to which this 
      * reference refers.
      */
+    @Override
     public String getFactoryClassName() {
         String factory = super.getFactoryClassName();
         if (factory != null) {
@@ -186,6 +187,7 @@ public class ServiceRef
     /**
      * Return a String rendering of this object.
      */
+    @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder("ServiceRef[");
