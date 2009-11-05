@@ -138,7 +138,7 @@ public class BioReplicationTask extends AbstractRxTask {
 
 
     /**
-     * send a reply-acknowledgement (6,2,3)
+     * send a reply-acknowledgment (6,2,3)
      * @param key
      * @param channel
      */

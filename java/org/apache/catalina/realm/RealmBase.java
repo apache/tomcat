@@ -864,7 +864,7 @@ public abstract class RealmBase
      */
     public boolean hasRole(Principal principal, String role) {
 
-        // Should be overriten in JAASRealm - to avoid pretty inefficient conversions
+        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
         if ((principal == null) || (role == null) ||
             !(principal instanceof GenericPrincipal))
             return (false);

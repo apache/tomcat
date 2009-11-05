@@ -2308,7 +2308,7 @@ public class WebdavServlet
 
 
     /**
-     * Propfind helper method. Dispays the properties of a lock-null resource.
+     * Propfind helper method. Displays the properties of a lock-null resource.
      *
      * @param resources Resources object associated with this context
      * @param generatedXML XML response to the Propfind request
@@ -3019,8 +3019,8 @@ class WebdavStatus {
      * providing status for multiple independent operations.
      */
     public static final int SC_MULTI_STATUS = 207;
-    // This one colides with HTTP 1.1
-    // "207 Parital Update OK"
+    // This one collides with HTTP 1.1
+    // "207 Partial Update OK"
 
 
     /**
@@ -3028,7 +3028,7 @@ class WebdavStatus {
      * the PATCH method was not understood by the resource.
      */
     public static final int SC_UNPROCESSABLE_ENTITY = 418;
-    // This one colides with HTTP 1.1
+    // This one collides with HTTP 1.1
     // "418 Reauthentication Required"
 
 
@@ -3038,7 +3038,7 @@ class WebdavStatus {
      * execution of this method.
      */
     public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
-    // This one colides with HTTP 1.1
+    // This one collides with HTTP 1.1
     // "419 Proxy Reauthentication Required"
 
 
@@ -3064,7 +3064,7 @@ class WebdavStatus {
 
 
     static {
-        // HTTP 1.0 tatus Code
+        // HTTP 1.0 status Code
         addStatusCodeMap(SC_OK, "OK");
         addStatusCodeMap(SC_CREATED, "Created");
         addStatusCodeMap(SC_ACCEPTED, "Accepted");

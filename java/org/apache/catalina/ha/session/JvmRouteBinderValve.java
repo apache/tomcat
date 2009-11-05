@@ -54,7 +54,7 @@ import org.apache.catalina.valves.ValveBase;
  * backup cluster node, that answered the request. After the response is
  * delivered to the client, all subsequent client requests will go directly to
  * the backup node. The change of sessionid is also sent to all other cluster
- * nodes. After all that, the session stickyness will work directly to the
+ * nodes. After all that, the session stickiness will work directly to the
  * backup node and the traffic will not go back to the failed node after it is
  * restarted!
  * 
@@ -169,7 +169,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
     }
 
     /**
-     * get name of failed reqeust session attribute
+     * get name of failed request session attribute
      * 
      * @param sessionIdAttribute
      *            The sessionIdAttribute to set.
@@ -306,9 +306,9 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
     }
     
     /**
-     * Handle jvmRoute stickyness after tomcat instance failed. After this
+     * Handle jvmRoute stickiness after tomcat instance failed. After this
      * correction a new Cookie send to client with new jvmRoute and the
-     * SessionID change propage to the other cluster nodes.
+     * SessionID change propagate to the other cluster nodes.
      * 
      * @param request current request
      * @param response
@@ -379,7 +379,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
             Response response, String sessionId, String newSessionID, Session catalinaSession) {
         lifecycle.fireLifecycleEvent("Before session migration",
                 catalinaSession);
-        // FIXME: setId trigger session Listener, but only chance to registiert manager with correct id!
+        // FIXME: setId trigger session Listener, but only chance to register manager with correct id!
         catalinaSession.setId(newSessionID);
         // FIXME: Why we remove change data from other running request?
         // setId also trigger resetDeltaRequest!!
@@ -388,7 +388,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
         changeRequestSessionID(request, response, sessionId, newSessionID);
 
         if (getCluster() != null) {
-            // now sending the change to all other clusternode!
+            // now sending the change to all other clusternodes!
             ClusterManager manager = (ClusterManager)catalinaSession.getManager();
             sendSessionIDClusterBackup(manager,request,sessionId, newSessionID);
         }
@@ -413,7 +413,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve, Life
         request.setRequestedSessionId(newSessionID);
         if(request.isRequestedSessionIdFromCookie())
             setNewSessionCookie(request, response,newSessionID);
-        // set orginal sessionid at request, to allow application detect the
+        // set original sessionid at request, to allow application detect the
         // change
         if (sessionIdAttribute != null && !"".equals(sessionIdAttribute)) {
             if (log.isDebugEnabled()) {

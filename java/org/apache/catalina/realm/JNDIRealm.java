@@ -1815,7 +1815,7 @@ public class JNDIRealm extends RealmBase {
             // Ensure that we have a directory context available
             context = open();
 
-            // Occassionally the directory context will timeout.  Try one more
+            // Occasionally the directory context will timeout.  Try one more
             // time before giving up.
             try {
 

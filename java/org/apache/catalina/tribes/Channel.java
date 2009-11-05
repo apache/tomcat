@@ -28,7 +28,7 @@ import java.io.Serializable;
  * 2. receive message (by registering a <code>ChannelListener</code><br>
  * 3. get all members of the group <code>getMembers()</code><br>
  * 4. receive notifications of members added and members disappeared by
- *    registerering a <code>MembershipListener</code><br>
+ *    registering a <code>MembershipListener</code><br>
  * <br>
  * The channel has 5 major components:<br>
  * 1. Data receiver, with a built in thread pool to receive messages from other peers<br>
@@ -125,7 +125,7 @@ public interface Channel {
      * to trigger certain behavior. Most flags are used to trigger channel interceptors
      * as the message passes through the channel stack. <br>
      * However, there are five default flags that every channel implementation must implement<br>
-     * SEND_OPTIONS_BYTE_MESSAGE - The message is a pure byte message and no marshalling or unmarshalling will
+     * SEND_OPTIONS_BYTE_MESSAGE - The message is a pure byte message and no marshaling or unmarshaling will
      * be performed.<br>
      *
      * @see #send(Member[], Serializable , int)

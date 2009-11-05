@@ -197,7 +197,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
 
     /**
-     * Get MBean Attriute from Mbean Server
+     * Get MBean Attribute from Mbean Server
      * @param jmxServerConnection
      * @param name
      * @param attribute

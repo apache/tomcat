@@ -394,7 +394,7 @@ public class RequestFacade implements HttpServletRequest {
 
         /*
          * Clone the returned array only if there is a security manager
-         * in place, so that performance won't suffer in the nonsecure case
+         * in place, so that performance won't suffer in the non-secure case
          */
         if (SecurityUtil.isPackageProtectionEnabled()){
             ret = AccessController.doPrivileged(
@@ -616,7 +616,7 @@ public class RequestFacade implements HttpServletRequest {
 
         /*
          * Clone the returned array only if there is a security manager
-         * in place, so that performance won't suffer in the nonsecure case
+         * in place, so that performance won't suffer in the non-secure case
          */
         if (SecurityUtil.isPackageProtectionEnabled()){
             ret = AccessController.doPrivileged(

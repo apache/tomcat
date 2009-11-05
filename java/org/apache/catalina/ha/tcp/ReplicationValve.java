@@ -385,7 +385,7 @@ public class ReplicationValve
 
     
     /**
-     * reset the active statitics 
+     * reset the active statistics 
      */
     public void resetStatistics() {
         totalRequestTime = 0 ;
@@ -469,7 +469,7 @@ public class ReplicationValve
   
     /**
      * Fix memory leak for long sessions with many changes, when no backup member exists!
-     * @param request current request after responce is generated
+     * @param request current request after response is generated
      * @param isCrossContext check crosscontext threadlocal
      */
     protected void resetReplicationRequest(Request request, boolean isCrossContext) {

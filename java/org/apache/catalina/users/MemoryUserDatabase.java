@@ -111,7 +111,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * The relative or absolute pathname ot the file in which we write
+     * The relative or absolute pathname of the file in which we write
      * our new information prior to renaming.
      */
     protected String pathnameNew = pathname + ".new";

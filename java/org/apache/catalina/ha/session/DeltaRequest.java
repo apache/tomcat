@@ -20,7 +20,7 @@ package org.apache.catalina.ha.session;
 
 /**
  * This class is used to track the series of actions that happens when
- * a request is executed. These actions will then translate into invokations of methods 
+ * a request is executed. These actions will then translate into invocations of methods 
  * on the actual session.
  * This class is NOT thread safe. One DeltaRequest per session
  * @author <a href="mailto:fhanik@apache.org">Filip Hanik</a>

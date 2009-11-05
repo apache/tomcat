@@ -100,7 +100,7 @@ public class ManifestResource {
     }
     
     /**
-     * Convienience method to check if this <code>ManifestResource</code>
+     * Convenience method to check if this <code>ManifestResource</code>
      * has an requires extensions.
      *
      * @return true if required extensions are present
