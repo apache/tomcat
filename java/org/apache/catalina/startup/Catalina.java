@@ -516,6 +516,9 @@ public class Catalina extends Embedded {
 
         if ((inputStream == null) && (file != null)) {
             log.warn("Can't load server.xml from " + file.getAbsolutePath());
+            if (file.exists() && !file.canRead()) {
+                log.warn("Permissions incorrect, read permission is not allowed on the file.");
+            }
             return;
         }
 
