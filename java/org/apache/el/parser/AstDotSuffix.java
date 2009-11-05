@@ -32,6 +32,7 @@ public final class AstDotSuffix extends SimpleNode {
         super(id);
     }
 
+    @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
         return this.image;

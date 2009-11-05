@@ -32,6 +32,7 @@ public class BooleanNode extends SimpleNode {
     public BooleanNode(int i) {
         super(i);
     }
+    @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
         return Boolean.class;
