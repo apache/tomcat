@@ -600,6 +600,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
             new ConcurrentHashMap<NioChannel, Http11NioProcessor>();
         protected ConcurrentLinkedQueue<Http11NioProcessor> recycledProcessors = new ConcurrentLinkedQueue<Http11NioProcessor>() {
             protected AtomicInteger size = new AtomicInteger(0);
+            @Override
             public boolean offer(Http11NioProcessor processor) {
                 boolean offer = proto.processorCache==-1?true:size.get() < proto.processorCache;
                 //avoid over growing our cache or add after we have stopped
@@ -614,6 +615,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                 return result;
             }
             
+            @Override
             public Http11NioProcessor poll() {
                 Http11NioProcessor result = super.poll();
                 if ( result != null ) {
@@ -622,6 +624,7 @@ public class Http11NioProtocol implements ProtocolHandler, MBeanRegistration
                 return result;
             }
             
+            @Override
             public void clear() {
                 Http11NioProcessor next = poll();
                 while ( next != null ) {

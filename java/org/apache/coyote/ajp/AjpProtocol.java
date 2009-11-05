@@ -321,6 +321,7 @@ public class AjpProtocol
         protected ConcurrentLinkedQueue<AjpProcessor> recycledProcessors = 
             new ConcurrentLinkedQueue<AjpProcessor>() {
             protected AtomicInteger size = new AtomicInteger(0);
+            @Override
             public boolean offer(AjpProcessor processor) {
                 boolean offer = (proto.processorCache == -1) ? true : (size.get() < proto.processorCache);
                 //avoid over growing our cache or add after we have stopped
@@ -335,6 +336,7 @@ public class AjpProtocol
                 return result;
             }
             
+            @Override
             public AjpProcessor poll() {
                 AjpProcessor result = super.poll();
                 if ( result != null ) {
@@ -343,6 +345,7 @@ public class AjpProtocol
                 return result;
             }
             
+            @Override
             public void clear() {
                 AjpProcessor next = poll();
                 while ( next != null ) {
